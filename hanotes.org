@@ -57,6 +57,7 @@ Haroon Anwar 10:31 AM
 “but my sense is that topology is important for reason mentioned above” - cant agree more…
 samn 10:31 AM
 you should try both ways
+**** 1 Possible solution: "The role of competitive inhibition and top-down feedback in binding during object recognition"
 *****In this regard, use Bhezhenov strategy.
 ****Another issue in the way the model is setup for learning is: hardly a couple of successful events occur (i.e. the player hits the ball with the racket). I wonder what will be a better strategy to overcome this problem.
 10:07 AM
@@ -218,4 +219,11 @@ can you send me that
 samn 10:06 AM
 yeah, i agree we should keep inhibitory and excitatory neurons separate
 
- 
+ *** Do we need inhibition to be cell based (inhibition implements contrast enhancement or define receptive fields) or region based (with some temporal difference different hierarchical regions inhibit other regions)?
+ ***for connectivity could have broad inputs to interneurons, with some spatial dependence on prbability too
+ ***factors for connectivity: how strongly the E cells are activated will determine how strongly the I cells have to get activated
+spatial dependence of E -> E wiring will influence spatial dependence of E -> I and I -> I and I -> E wiring
+for now i would make it parameterized so you can play with it and see what works
+***O-Reilly model uses k-winner-take-all competitive inhibition:
+****Input; V1 - 3600 neurons; V2/V4 (overlapping field of views) - 2800 neurons that receive from 320 neighboring V1 neurons; IT - 200 neurons - receive inputs from 2800 neurons; Feedforward - 80-90%; Feedback between adjacent - 10-20%; k-winner take all inhibitory competition rule — k most active units remain active over time. each layer has different k, but is generally in the range of 10-20% of neurons in the layer.
+***for network balacing use sam's homeostatic synaptic scaling
