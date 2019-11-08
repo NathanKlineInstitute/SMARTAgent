@@ -3,9 +3,219 @@
 **I tested a couple of initial weights to see how the synaptic weights evolve
 ***The results are very similar (by eye balling) when initial weight is 0.001 vs 0.0012
 ****I feel that the topological mapping from layer R to layer V1 would not be a useful strategy at this time because i think that having biological realism in model will require completeness too to make the model useful. And with just a couple of layers to encode image sequences, having topological mapping limits the capacity of the network to encode the changes in virtual game environment and later associate actions to the sequence of images.
+samn 10:23 AM
+why does topology limit capacity of network to encode changes and associate actions?
+10:24 AM
+can objects be represented without topology?
+Haroon Anwar 10:24 AM
+because a couple of layers would not allow merging localized information into spatial sequences
+10:24 AM
+“can objects be represented without topology?” - no
+samn 10:25 AM
+how many layers are needed to merge local info into spatial sequence?
+Haroon Anwar 10:26 AM
+not sure…. would guess 3-4 or so
+samn 10:26 AM
+can try that then
+10:26 AM
+and have a variable control whether to use topological mapping
+Haroon Anwar 10:27 AM
+i am not against topological mapping….just trying to think the potential issues as we build up network
+samn 10:27 AM
+it would be interesting if the system worked without topological mapping, but also surprising
+10:27 AM
+since you would think it needs some representation of space including positioning of objects
+Haroon Anwar 10:28 AM
+i like to make things as biological as possible but then it also require completeness and we dont know how much detail would be enough to capture something at biological level
+samn 10:28 AM
+if pixels from two rackets are activated with same neurons, how is the neuronal representation separated?
+10:28 AM
+i'm not sure if we need completeness for what we are doing. besides that, we will never have completeness
+Haroon Anwar 10:28 AM
+thats an interesting point
+10:28 AM
+completeness for a task
+samn 10:28 AM
+ic
+Haroon Anwar 10:29 AM
+like we talked about layers
+samn 10:29 AM
+right, we don't know how much detail needed
+10:29 AM
+can only guess/hypothesize until we have a way to test the system
+Haroon Anwar 10:30 AM
+when things are merged into a single or two layers and everything is connected to everything, the network can be trained to do a task without making sense
+10:30 AM
+just increase the number of neurons and connections in the middle layer and it does the magic
+samn 10:30 AM
+that would be fine too
+10:30 AM
+even that with more realistic neurons is a step towards more realism
+10:30 AM
+but my sense is that topology is important for reason mentioned above
+Haroon Anwar 10:31 AM
+“but my sense is that topology is important for reason mentioned above” - cant agree more…
+samn 10:31 AM
+you should try both ways
 *****In this regard, use Bhezhenov strategy.
 ****Another issue in the way the model is setup for learning is: hardly a couple of successful events occur (i.e. the player hits the ball with the racket). I wonder what will be a better strategy to overcome this problem.
+10:07 AM
+not immediate problem but it will be a problem
+samn 10:07 AM
+can you clarify the problem?
+Haroon Anwar 10:07 AM
+and we need to find a solution for this
+10:07 AM
+ok
+10:07 AM
+in game there are 2 players
+10:08 AM
+game allows access to 1 player
+10:08 AM
+its actions and reward
+10:08 AM
+within each episode, if the player plays randomly, it hardly plays a correct move and gets rewarded
+10:14 AM
+the player using random strategy gets rewarded, but less than a player with a good strategy
+Haroon Anwar 10:14 AM
+yes
+samn 10:14 AM
+and the random strategy also produces punishment too
+Haroon Anwar 10:15 AM
+i am not sure about that….
+10:15 AM
+i just noticed reward to be 0 or 1
+samn 10:16 AM
+well, we will have to build in some punishment too
+10:16 AM
+for all games they only use 0 or 1 ?
+Haroon Anwar 10:16 AM
+not sure
+10:16 AM
+need to check that
+samn 10:16 AM
+we could make rules such as if no reward for a while, produce a punishment
+Haroon Anwar 10:16 AM
+i see
+samn 10:17 AM
+but hopefully they have explicit punishments already. yeah, good to think about different approaches for those issues
+Haroon Anwar 10:17 AM
+OK
+10:17 AM
+but i was thinking, how we learn is not only by getting results of our actions
+10:18 AM
+but also looking at others, how they play
+samn 10:18 AM
+true
+Haroon Anwar 10:18 AM
+and try to learn some rules
+samn 10:18 AM
+there's something called teacher-based learning
+10:18 AM
+imitation, etc.
+Haroon Anwar 10:18 AM
+ok
+samn 10:19 AM
+can try some of that as well...e.g. produce a population of models, transfer some weights from strong models to weaker models
+10:19 AM
+in that case it's similar to evolution
+Haroon Anwar 10:19 AM
+yes. so all of these are possible strategies. that can be pursued in parallel
+samn 10:19 AM
+for more complicated teacher learning have to develop an algorithm that can observe and copy
+Haroon Anwar 10:20 AM
+agree… but will also need access to rewards and association to actions of other player
+samn 10:20 AM
+yeah
 ****Can agent learn about good actions from the computer (i.e. the other player)? A couple of problems in that regard are lack of access to the information regarding the other player's actions and reward.
 **To Do List: 1. Include inhibition in the model. 2. Implement a strategy for STDP where the strength of synapses slowly decay over time unless it hits a threshold, in which case, it stays strengthened.
 *19nov8
+**To Do List (side tracked): 1. Include inhibition in the model. 2. Before implementing homeostatic STDP, implement Bhezhenov model. This model should exist in parallel. 3. Implement simplified motor cortex and use reward based STDP to train it. 4. Implement homeostatic STDP
+***PROBLEM UNDERSTANDING BAZHENOV ARCHITECTURE- disuccion with same
+****Haroon Anwar 9:53 AM
+it says every neuron send an excitatory and inhibitory synapse to 9 neurons
+samn 9:53 AM
+that's strange
+samn 9:53 AM
+we of course don't have to follow his paper exactly
+Haroon Anwar 9:53 AM
+read figure 1 legend
+samn 9:53 AM
+it's just a general framework, which we've developed similarly previously too
+Haroon Anwar 9:54 AM
+i understand that. but just trying to understand what they did
+samn 9:54 AM
+they tried to balance the output by having feedforward inhibition?
+Haroon Anwar 9:54 AM
+i thought may be i dont understand English
+samn 9:54 AM
+ic
+9:54 AM
+you probably understand, but their rule does seem unusual
+Haroon Anwar 9:55 AM
+so same neuron excites postsynaptic neuron and inhibits too
+9:55 AM
+but then there has to be some rule to have a balanced excitation
+9:55 AM
+so its not real inhibition as in biological network
+samn 9:56 AM
+they might have different delays and time constants, as well as how far it spreads spatially
+Haroon Anwar 9:56 AM
+its balancing inhibition
+samn 9:56 AM
+let me read more of the details
+Haroon Anwar 9:56 AM
+please
+samn 10:00 AM
+"Output balancing.
+Our previous study revealed the importance of balancing the strength of the output synapses [30]. In this new study, implementation of the output part of synaptic balancing was to reduce the rate of synaptic growth in the neurons that already had high total synaptic output. This effectively prevented a very small number of neurons from controlling the entire network. Thus, for each middle-layer cell, increments of the strength of outgoing synapses resulting from rewarded STDP events were divided by the ratio of the current sum of synaptic outputs to the initial sum of synaptic outputs of the same cells (see Methods). The result was that synapses originating from the neurons with many strong outputs were not able to increase their synaptic strength as quickly as synapses from the neurons with a weak output. This gave a competitive advantage to the later neurons. It helped to control synaptic output, thus preventing over-representation by the cells whose activities were most often correlated with the rewards (see S1 Fig). The performance of the full model simulated without this rule is shown by the red line in Fig 3."
+10:00 AM
+so they increment the input synapse of cells that already have high weights by a smaller increment?
+10:00 AM
+sorry, the output
+10:00 AM
+synapses
+Haroon Anwar 10:01 AM
+but how does inhibition play role in that
+samn 10:01 AM
+yeah, it doesn't mention inhibition there
+10:01 AM
+where was the inhibition mentioned?
+Haroon Anwar 10:01 AM
+in the architecture
+samn 10:02 AM
+ic, Feedforward synaptic inhibition was implemented in the model (see Methods) and was necessary for optimal behavior of the network. Thus each layer projecting excitatory connections to the following layer was also projecting inhibition and the total strength of inhibition was equal to the total strength of excitation.
+Haroon Anwar 10:02 AM
+yes that too
+10:02 AM
+dont understand the role of this inhibition
+samn 10:03 AM
+some way to maintain sparse firing and prevent incorrect output
+Haroon Anwar 10:03 AM
+i see
+samn 10:04 AM
+they don't seem to explain too much at finer level of detail
+Haroon Anwar 10:04 AM
+no
+samn 10:04 AM
+we could test that later on. see how individual synapses being turned on or off impact very specific behaviors
+Haroon Anwar 10:04 AM
+ok
+samn 10:04 AM
+or groups of synapses
+10:05 AM
+did you see the mod file i had to maintaining a target firing rate? it's just one way to have homeostatic weights
+10:05 AM
+i mean homeostatic synaptic scaling
+10:05 AM
+/u/samn/syscale
+Haroon Anwar 10:05 AM
+so for now, previously i was thinking about having inhibition driven by inhibitory neurons
+10:05 AM
+no
+10:05 AM
+can you send me that
+samn 10:06 AM
+yeah, i agree we should keep inhibitory and excitatory neurons separate
+
  
