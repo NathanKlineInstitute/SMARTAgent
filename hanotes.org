@@ -1,0 +1,11 @@
+*19nov7
+**I ran a simulation with overlapped field of view i.e. every neuron in layer V1 received input from 25 neurons in a topological manner.
+**I tested a couple of initial weights to see how the synaptic weights evolve
+***The results are very similar (by eye balling) when initial weight is 0.001 vs 0.0012
+****I feel that the topological mapping from layer R to layer V1 would not be a useful strategy at this time because i think that having biological realism in model will require completeness too to make the model useful. And with just a couple of layers to encode image sequences, having topological mapping limits the capacity of the network to encode the changes in virtual game environment and later associate actions to the sequence of images.
+*****In this regard, use Bhezhenov strategy.
+****Another issue in the way the model is setup for learning is: hardly a couple of successful events occur (i.e. the player hits the ball with the racket). I wonder what will be a better strategy to overcome this problem.
+****Can agent learn about good actions from the computer (i.e. the other player)? A couple of problems in that regard are lack of access to the information regarding the other player's actions and reward.
+**To Do List: 1. Include inhibition in the model. 2. Implement a strategy for STDP where the strength of synapses slowly decay over time unless it hits a threshold, in which case, it stays strengthened.
+*19nov8
+ 

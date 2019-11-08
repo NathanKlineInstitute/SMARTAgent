@@ -36,17 +36,17 @@ netParams.stimTargetParams['stimMod->all'] = {'source': 'stimMod',
 
 ######################################################################################
 def connectRtoV1withOverlap():
-    NBpreN = 6400
-    NBpostN = 6400
+    NBpreN = 6400 	#number of presynaptic neurons
+    NBpostN = 6400	#number of postsynaptic neurons
     convergence_factor = NBpreN/NBpostN
-    overlap_xdir = 5
-    overlap_ydir = 5
-    postNIndices = numpy.zeros((80,80))
+    overlap_xdir = 5	#number of rows in a window for overlapping connectivity
+    overlap_ydir = 5	#number of columns in a window for overlapping connectivity
+    postNIndices = numpy.zeros((80,80))		#list created for indices from linear (1-6400) to square indexing (1-80,81-160,....) 
     blist = []
     for i in range(80):
         for j in range(80):
             postNIndices[i,j]=j+(80*i)
-    for i in range(80):
+    for i in range(80):				#boundary conditions are implemented here
         for j in range(80):
             postN = int(postNIndices[i,j])
             x0 = i - int(overlap_xdir/2)
@@ -70,7 +70,7 @@ def connectRtoV1withOverlap():
             for xi in range(len(xinds)):
                 for yi in range(len(yinds)):
                     preN = int(postNIndices[xinds[xi],yinds[yi]])
-                    blist.append([preN,postN]) 
+                    blist.append([preN,postN]) 			#list of [presynaptic_neuron, postsynaptic_neuron] 
     return blist
     
 def connectRtoV1withoutOverlap():
@@ -108,7 +108,7 @@ def saveWeights(sim):
     with open(sim.weightsfilename,'w') as fid:
         for weightdata in sim.allWeights:
             count = count+1
-            if count==100:
+            if count==1000:
                 #fid.write('%0.0f' % weightdata[0]) # Time
                 for i in range(1,len(weightdata)): fid.write('\t%0.8f' % weightdata[i])
                 fid.write('\n')
@@ -140,7 +140,7 @@ netParams.connParams['R->V1'] = {
         'postConds': {'pop': 'V1'},
         'connList': blist,
         #'convergence': 10,
-        'weight': 0.001,
+        'weight': 0.002,
         'delay': 20,
         'synMech': 'exc',
         'plast': {'mech': 'STDP', 'params': STDPparams}}
@@ -148,7 +148,7 @@ netParams.connParams['R->V1'] = {
 #Simulation options
 simConfig = specs.SimConfig()           # object of class SimConfig to store simulation configuration
 
-simConfig.duration = 1e4                      # Duration of the simulation, in ms
+simConfig.duration = 1e5                      # Duration of the simulation, in ms
 simConfig.dt = 0.2                            # Internal integration timestep to use
 simConfig.verbose = False                       # Show detailed messages
 simConfig.recordTraces = {'V_soma':{'sec':'soma','loc':0.5,'var':'v'}}  # Dict with traces to record
