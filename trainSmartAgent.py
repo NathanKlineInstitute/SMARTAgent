@@ -5,7 +5,7 @@ import numpy
 
 sim.allWeights = [] # list to store weights
 sim.weightsfilename = 'weights.txt'  # file to store weights
-sim.plotWeights = 1  # plot weights
+sim.plotWeights = 0  # plot weights
 
 # Network parameters
 netParams = specs.NetParams() #object of class NetParams to store the network parameters
@@ -13,9 +13,11 @@ netParams = specs.NetParams() #object of class NetParams to store the network pa
 #Population parameters
 netParams.popParams['R'] = {'cellType': 'E', 'numCells': 6400, 'cellModel': 'HH'}
 netParams.popParams['V1'] = {'cellType': 'EV1', 'numCells': 6400, 'cellModel': 'HH'}
+netParams.popParams['V4'] = {'cellType': 'EV4', 'numCells': 1600, 'cellModel': 'HH'}
+netParams.popParams['IT'] = {'cellType': 'EIT', 'numCells': 400, 'cellModel': 'HH'}
 
 netParams.cellParams['ERule'] = {               # cell rule label
-        'conds': {'cellType': ['E','EV1']},              #properties will be applied to cells that match these conditions
+        'conds': {'cellType': ['E','EV1','EV4','EIT']},              #properties will be applied to cells that match these conditions
         'secs': {'soma':                        #sections
                 {'geom': {'diam':10, 'L':10, 'Ra':120},         #geometry
                 'mechs': {'hh': {'gnabar': 0.12, 'gkbar': 0.036, 'gl': 0.003, 'el': -70}}}}}    #mechanism
@@ -35,32 +37,48 @@ netParams.stimTargetParams['stimMod->all'] = {'source': 'stimMod',
         'synMech': 'exc'}
 
 ######################################################################################
-def connectRtoV1withOverlap():
-    NBpreN = 6400 	#number of presynaptic neurons
-    NBpostN = 6400	#number of postsynaptic neurons
+def connectRtoV1withOverlap(NBpreN, NBpostN, overlap_xdir):
+    #NBpreN = 6400 	#number of presynaptic neurons
+    NBpreN_x = int(numpy.sqrt(NBpreN))
+    NBpreN_y = int(numpy.sqrt(NBpreN))
+    #NBpostN = 6400	#number of postsynaptic neurons
+    NBpostN_x = int(numpy.sqrt(NBpostN))
+    NBpostN_y = int(numpy.sqrt(NBpostN))
     convergence_factor = NBpreN/NBpostN
-    overlap_xdir = 5	#number of rows in a window for overlapping connectivity
-    overlap_ydir = 5	#number of columns in a window for overlapping connectivity
-    postNIndices = numpy.zeros((80,80))		#list created for indices from linear (1-6400) to square indexing (1-80,81-160,....) 
+    convergence_factor_x = numpy.sqrt(convergence_factor)
+    convergence_factor_y = numpy.sqrt(convergence_factor)
+    #overlap_xdir = 5	#number of rows in a window for overlapping connectivity
+    #overlap_ydir = 5	#number of columns in a window for overlapping connectivity
+    overlap_ydir = overlap_xdir
+    preNIndices = numpy.zeros((NBpreN_x,NBpreN_y))
+    postNIndices = numpy.zeros((NBpostN_x,NBpostN_y))		#list created for indices from linear (1-6400) to square indexing (1-80,81-160,....) 
     blist = []
-    for i in range(80):
-        for j in range(80):
-            postNIndices[i,j]=j+(80*i)
-    for i in range(80):				#boundary conditions are implemented here
-        for j in range(80):
+    for i in range(NBpreN_x):
+        for j in range(NBpreN_y):
+            preNIndices[i,j]=j+(NBpreN_y*i)
+    for i in range(NBpostN_x):
+        for j in range(NBpostN_y):
+            postNIndices[i,j]=j+(NBpostN_y*i)
+    for i in range(NBpostN_x):				#boundary conditions are implemented here
+        for j in range(NBpostN_y):
             postN = int(postNIndices[i,j])
-            x0 = i - int(overlap_xdir/2)
+            if convergence_factor_x>1:
+                preN = int(convergence_factor_x*convergence_factor_y*NBpostN_y*i) + int(convergence_factor_y*j)
+            else:
+                preN = int(postN)
+            preN_ind = numpy.where(preNIndices==preN)
+            x0 = preN_ind[0][0] - int(overlap_xdir/2)
             if x0<0:
                 x0 = 0
-            y0 = j - int(overlap_ydir/2)
+            y0 = preN_ind[1][0] - int(overlap_ydir/2)
             if y0<0:
                 y0 = 0
-            xlast = i + int(overlap_xdir/2)
-            if xlast>79:
-                xlast = 79
-            ylast = j + int(overlap_ydir/2)
-            if ylast>79:
-                ylast = 79
+            xlast = preN_ind[0][0] + int(overlap_xdir/2)
+            if xlast>NBpreN_x-1:
+                xlast = NBpreN_x-1
+            ylast = preN_ind[1][0] + int(overlap_ydir/2)
+            if ylast>NBpreN_y-1:
+                ylast = NBpreN_y-1
             xinds = [x0]
             for _ in range(xlast-x0):
                 xinds.append(xinds[-1]+1)
@@ -69,10 +87,10 @@ def connectRtoV1withOverlap():
                 yinds.append(yinds[-1]+1)
             for xi in range(len(xinds)):
                 for yi in range(len(yinds)):
-                    preN = int(postNIndices[xinds[xi],yinds[yi]])
+                    preN = int(preNIndices[xinds[xi],yinds[yi]])
                     blist.append([preN,postN]) 			#list of [presynaptic_neuron, postsynaptic_neuron] 
     return blist
-    
+      
 def connectRtoV1withoutOverlap():
     NBpreN = 6400
     NBpostN = 400
@@ -133,7 +151,9 @@ def plotWeights():
     show()
 
 ######################################################################################
-blist = connectRtoV1withOverlap()
+blist = connectRtoV1withOverlap(NBpreN = 6400, NBpostN = 6400, overlap_xdir = 5)
+blistV1toV4 = connectRtoV1withOverlap(NBpreN = 6400, NBpostN = 1600, overlap_xdir = 5)
+#blist = connectRtoV1withOverlap()
 #blist = connectRtoV1withoutOverlap()
 netParams.connParams['R->V1'] = {
         'preConds': {'pop': 'R'},
@@ -144,7 +164,15 @@ netParams.connParams['R->V1'] = {
         'delay': 20,
         'synMech': 'exc',
         'plast': {'mech': 'STDP', 'params': STDPparams}}
-
+netParams.connParams['V1->V4'] = {
+        'preConds': {'pop': 'V1'},
+        'postConds': {'pop': 'V4'},
+        'connList': blistV1toV4,
+        #'convergence': 10,
+        'weight': 0.01,
+        'delay': 20,
+        'synMech': 'exc',
+        'plast': {'mech': 'STDP', 'params': STDPparams}}
 #Simulation options
 simConfig = specs.SimConfig()           # object of class SimConfig to store simulation configuration
 
@@ -157,7 +185,7 @@ simConfig.filename = 'model_output'  # Set file output name
 simConfig.savePickle = False            # Save params, network and sim output to pickle file
 
 simConfig.analysis['plotRaster'] = True                         # Plot a raster
-simConfig.analysis['plotTraces'] = {'include': [7000, 8000, 9000, 10000]}
+simConfig.analysis['plotTraces'] = {'include': [13000, 13500, 14000]}
 ###################################################################################################################################
 
 #SMARTAgent.initGame('self')

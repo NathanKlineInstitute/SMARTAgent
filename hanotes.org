@@ -227,3 +227,11 @@ for now i would make it parameterized so you can play with it and see what works
 ***O-Reilly model uses k-winner-take-all competitive inhibition:
 ****Input; V1 - 3600 neurons; V2/V4 (overlapping field of views) - 2800 neurons that receive from 320 neighboring V1 neurons; IT - 200 neurons - receive inputs from 2800 neurons; Feedforward - 80-90%; Feedback between adjacent - 10-20%; k-winner take all inhibitory competition rule — k most active units remain active over time. each layer has different k, but is generally in the range of 10-20% of neurons in the layer.
 ***for network balacing use sam's homeostatic synaptic scaling
+
+*19nov12
+**Things to do today: 
+***1. to implement inhibition, use gabaa syn model. 
+***2. drive inhibitory neurons using hh model but with higher firing rate then excitatory neurons.
+***3. Extend Bazhenov architecture to O'Reilly architecture (Front. Psych. 2012 paper):
+****Input; V1 - 3600 neurons; V2/V4 (overlapping field of views) - 2800 neurons that receive from 320 neighboring V1 neurons; IT - 200 neurons - receive inputs from 2800 neurons; Feedforward - 80-90%; Feedback between adjacent - 10-20%; k-winner take all inhibitory competition rule — k most active units remain active over time. each layer has different k, but is generally in the range of 10-20% of neurons in the layer.
+****Base on O'Reilly's architecture: try using R: 3600, V1: 3600, each neuron in V1 receive input from overlapping 25 neurons in R. 400 neurons in IT with each neuron receiving inputs from all neurons in V1. 
