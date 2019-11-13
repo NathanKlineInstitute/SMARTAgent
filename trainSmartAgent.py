@@ -153,6 +153,7 @@ def plotWeights():
 ######################################################################################
 blist = connectRtoV1withOverlap(NBpreN = 6400, NBpostN = 6400, overlap_xdir = 5)
 blistV1toV4 = connectRtoV1withOverlap(NBpreN = 6400, NBpostN = 1600, overlap_xdir = 5)
+blistV4toIT = connectRtoV1withOverlap(NBpreN = 1600, NBpostN = 1600, overlap_xdir = 15)
 #blist = connectRtoV1withOverlap()
 #blist = connectRtoV1withoutOverlap()
 netParams.connParams['R->V1'] = {
@@ -169,7 +170,16 @@ netParams.connParams['V1->V4'] = {
         'postConds': {'pop': 'V4'},
         'connList': blistV1toV4,
         #'convergence': 10,
-        'weight': 0.01,
+        'weight': 0.002,
+        'delay': 20,
+        'synMech': 'exc',
+        'plast': {'mech': 'STDP', 'params': STDPparams}}
+netParams.connParams['V4->IT'] = {
+        'preConds': {'pop': 'V4'},
+        'postConds': {'pop': 'IT'},
+        'connList': blistV4toIT,
+        #'convergence': 10,
+        'weight': 0.002,
         'delay': 20,
         'synMech': 'exc',
         'plast': {'mech': 'STDP', 'params': STDPparams}}
