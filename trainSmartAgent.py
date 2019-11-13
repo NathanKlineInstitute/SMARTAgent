@@ -16,14 +16,26 @@ netParams.popParams['V1'] = {'cellType': 'EV1', 'numCells': 6400, 'cellModel': '
 netParams.popParams['V4'] = {'cellType': 'EV4', 'numCells': 1600, 'cellModel': 'HH'}
 netParams.popParams['IT'] = {'cellType': 'EIT', 'numCells': 400, 'cellModel': 'HH'}
 
+netParams.popParams['IV1'] = {'cellType': 'InV1', 'numCells': 1600, 'cellModel': 'HH'}
+netParams.popParams['IV4'] = {'cellType': 'InV4', 'numCells': 400, 'cellModel': 'HH'}
+netParams.popParams['IIT'] = {'cellType': 'InIT', 'numCells': 100, 'cellModel': 'HH'}
+
+
 netParams.cellParams['ERule'] = {               # cell rule label
         'conds': {'cellType': ['E','EV1','EV4','EIT']},              #properties will be applied to cells that match these conditions
         'secs': {'soma':                        #sections
                 {'geom': {'diam':10, 'L':10, 'Ra':120},         #geometry
                 'mechs': {'hh': {'gnabar': 0.12, 'gkbar': 0.036, 'gl': 0.003, 'el': -70}}}}}    #mechanism
 
+netParams.cellParams['IRule'] = {               # cell rule label
+        'conds': {'cellType': ['InV1','InV4','InIT']},              #properties will be applied to cells that match these conditions
+        'secs': {'soma':                        #sections
+                {'geom': {'diam':10, 'L':10, 'Ra':120},         #geometry
+                'mechs': {'hh': {'gnabar': 0.12, 'gkbar': 0.036, 'gl': 0.003, 'el': -70}}}}}    #mechanism
+
 ## Synaptic mechanism parameters
 netParams.synMechParams['exc'] = {'mod': 'Exp2Syn', 'tau1': 0.1, 'tau2': 5.0, 'e': 0}  # excitatory synaptic mechanism
+netParams.synMechParams['inh'] = {'mod': 'GABAa', 'Alpha': 1, 'Beta': 0.5, 'e': -70}  # inhibitory synaptic mechanism
 
 STDPparams = {'hebbwt': 0.0001, 'antiwt':-0.00001, 'wmax': 50, 'RLon': 0 , 'RLhebbwt': 0.001, 'RLantiwt': -0.000,
         'tauhebb': 10, 'RLwindhebb': 50, 'useRLexp': 0, 'softthresh': 0, 'verbose':0}
@@ -151,9 +163,16 @@ def plotWeights():
     show()
 
 ######################################################################################
+#E to E - Feedforward connections
 blist = connectRtoV1withOverlap(NBpreN = 6400, NBpostN = 6400, overlap_xdir = 5)
 blistV1toV4 = connectRtoV1withOverlap(NBpreN = 6400, NBpostN = 1600, overlap_xdir = 5)
 blistV4toIT = connectRtoV1withOverlap(NBpreN = 1600, NBpostN = 400, overlap_xdir = 15)
+
+#E to I - Feedforward connections
+blistEtoInV1 = connectRtoV1withOverlap(NBpreN = 6400, NBpostN = 1600, overlap_xdir = 15)
+blistV1toInV4 = connectRtoV1withOverlap(NBpreN = 6400, NBpostN = 400, overlap_xdir = 25)
+blistV4toInIT = connectRtoV1withOverlap(NBpreN = 1600, NBpostN = 100, overlap_xdir = 25)
+
 #blist = connectRtoV1withOverlap()
 #blist = connectRtoV1withoutOverlap()
 netParams.connParams['R->V1'] = {
@@ -183,6 +202,41 @@ netParams.connParams['V4->IT'] = {
         'delay': 20,
         'synMech': 'exc',
         'plast': {'mech': 'STDP', 'params': STDPparams}}
+
+
+
+#E to I connections
+
+
+netParams.connParams['R->IV1'] = {
+        'preConds': {'pop': 'R'},
+        'postConds': {'pop': 'IV1'},
+        'connList': blistEtoInV1,
+        #'convergence': 10,
+        'weight': 0.002,
+        'delay': 10,
+        'synMech': 'exc',
+        'plast': {'mech': 'STDP', 'params': STDPparams}}
+netParams.connParams['V1->IV4'] = {
+        'preConds': {'pop': 'V1'},
+        'postConds': {'pop': 'IV4'},
+        'connList': blistV1toInV4,
+        #'convergence': 10,
+        'weight': 0.002,
+        'delay': 10,
+        'synMech': 'exc',
+        'plast': {'mech': 'STDP', 'params': STDPparams}}
+netParams.connParams['V4->IIT'] = {
+        'preConds': {'pop': 'V4'},
+        'postConds': {'pop': 'IIT'},
+        'connList': blistV4toInIT,
+        #'convergence': 10,
+        'weight': 0.002,
+        'delay': 10,
+        'synMech': 'exc',
+        'plast': {'mech': 'STDP', 'params': STDPparams}}
+
+
 #Simulation options
 simConfig = specs.SimConfig()           # object of class SimConfig to store simulation configuration
 

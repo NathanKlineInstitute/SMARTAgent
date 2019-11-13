@@ -235,3 +235,12 @@ for now i would make it parameterized so you can play with it and see what works
 ***3. Extend Bazhenov architecture to O'Reilly architecture (Front. Psych. 2012 paper):
 ****Input; V1 - 3600 neurons; V2/V4 (overlapping field of views) - 2800 neurons that receive from 320 neighboring V1 neurons; IT - 200 neurons - receive inputs from 2800 neurons; Feedforward - 80-90%; Feedback between adjacent - 10-20%; k-winner take all inhibitory competition rule — k most active units remain active over time. each layer has different k, but is generally in the range of 10-20% of neurons in the layer.
 ****Base on O'Reilly's architecture: try using R: 6400, V1: 6400, each neuron in V1 receive input from overlapping 25 neurons in R. 1600 neurons in V2/V4. each neuron in V2/V4 receives 25 neurons from V1. 400 neurons in IT with each neuron receiving inputs from 25 neurons in V2/V4. 
+
+*19nov13
+*** Based on the paper "Recruitment of inhibition and excitation across mouse visual cortex depends on the hierarchy of interconnecting areas by Rinaldo David D’Souza1*, Andrew Max Meier1, Pawan Bista1, Quanxin Wang2, Andreas Burkhalter1"
+****In L2/3 FF (V1->PM) pathway, EPSC recorded from PV cells were larger than those from Pyr cells.
+****FF excitation of inhibitory PV neurons relative to neighboring Pyr neuron is stronger than FB excitation of PV neurons. In both cases PV excitation is stronger than Pyr excitation.
+****Larger EPSC in PV cells could be a result of either higher density of excitatory input (higher weight of synaptic connections) or due to larger area over which individual PV cells are contacted by inter areal projections, or both.
+****The difference in relative excitation of PV and Pyr was bigger in FF(V1->PM) than in FF(LM->PM: the pathway is V1->LM->PM). 
+****in contrast, the difference was smaller in FB (PM->V1) than FB(LM->V1).
+****Rules are different in L5.
