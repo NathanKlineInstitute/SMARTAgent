@@ -305,7 +305,7 @@ netParams.connParams['IV1->R'] = {
         #'convergence': 10,
         'weight': 0.002,
         'delay': 10,
-        'synMech': 'exc',
+        'synMech': 'inh',
         'plast': {'mech': 'STDP', 'params': STDPparams}}
 netParams.connParams['IV4->V1'] = {
         'preConds': {'pop': 'IV4'},
@@ -314,7 +314,7 @@ netParams.connParams['IV4->V1'] = {
         #'convergence': 10,
         'weight': 0.002,
         'delay': 10,
-        'synMech': 'exc',
+        'synMech': 'inh',
         'plast': {'mech': 'STDP', 'params': STDPparams}}
 netParams.connParams['IIT->V4'] = {
         'preConds': {'pop': 'IIT'},
@@ -323,7 +323,7 @@ netParams.connParams['IIT->V4'] = {
         #'convergence': 10,
         'weight': 0.002,
         'delay': 10,
-        'synMech': 'exc',
+        'synMech': 'inh',
         'plast': {'mech': 'STDP', 'params': STDPparams}}
 
 
