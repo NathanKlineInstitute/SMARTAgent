@@ -244,3 +244,10 @@ for now i would make it parameterized so you can play with it and see what works
 ****The difference in relative excitation of PV and Pyr was bigger in FF(V1->PM) than in FF(LM->PM: the pathway is V1->LM->PM). 
 ****in contrast, the difference was smaller in FB (PM->V1) than FB(LM->V1).
 ****Rules are different in L5.
+
+*19nov14
+**Implemented divergent connectivity function
+**Included inhibitory neurons: 1600 InV1, 400 InV4 and 100 InIT. These neurons are driven by excitation from R, V1 and V4 respectively.
+***for all pre(E) to post(I), the overlap is different: 15x15 for R to InV1, 25x25 for V1 to InV4 and 25x25 for V4 to InIT.
+**Feedback inhibition implemented: InV1 inhibit neurons in R, InV4 inhibit neurons in V1 and InIT inhibit neurons in V4.
+***for all pre(I) to post(E), the overlap is 5x5 neurons i.e. every post synaptic neuron receives inhibition from 25 neighboring neurons. 
