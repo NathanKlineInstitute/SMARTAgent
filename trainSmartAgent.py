@@ -35,7 +35,8 @@ netParams.cellParams['IRule'] = {               # cell rule label
 
 ## Synaptic mechanism parameters
 netParams.synMechParams['exc'] = {'mod': 'Exp2Syn', 'tau1': 0.1, 'tau2': 5.0, 'e': 0}  # excitatory synaptic mechanism
-netParams.synMechParams['inh'] = {'mod': 'GABAa', 'Alpha': 1, 'Beta': 0.5, 'e': -70}  # inhibitory synaptic mechanism
+netParams.synMechParams['inh'] = {'mod': 'GABAa_S', 'Alpha': 1, 'Beta': 0.5, 'Erev': -70}  # inhibitory synaptic mechanism
+#netParams.synMechParams['inh'] = {'mod': 'GABAa_S'}  # inhibitory synaptic mechanism
 
 STDPparams = {'hebbwt': 0.0001, 'antiwt':-0.00001, 'wmax': 50, 'RLon': 0 , 'RLhebbwt': 0.001, 'RLantiwt': -0.000,
         'tauhebb': 10, 'RLwindhebb': 50, 'useRLexp': 0, 'softthresh': 0, 'verbose':0}
@@ -304,7 +305,7 @@ netParams.connParams['IV1->R'] = {
         #'convergence': 10,
         'weight': 0.002,
         'delay': 10,
-        'synMech': 'inh',
+        'synMech': 'exc',
         'plast': {'mech': 'STDP', 'params': STDPparams}}
 netParams.connParams['IV4->V1'] = {
         'preConds': {'pop': 'IV4'},
@@ -313,7 +314,7 @@ netParams.connParams['IV4->V1'] = {
         #'convergence': 10,
         'weight': 0.002,
         'delay': 10,
-        'synMech': 'inh',
+        'synMech': 'exc',
         'plast': {'mech': 'STDP', 'params': STDPparams}}
 netParams.connParams['IIT->V4'] = {
         'preConds': {'pop': 'IIT'},
@@ -322,14 +323,14 @@ netParams.connParams['IIT->V4'] = {
         #'convergence': 10,
         'weight': 0.002,
         'delay': 10,
-        'synMech': 'inh',
+        'synMech': 'exc',
         'plast': {'mech': 'STDP', 'params': STDPparams}}
 
 
 #Simulation options
 simConfig = specs.SimConfig()           # object of class SimConfig to store simulation configuration
 
-simConfig.duration = 1e4                      # Duration of the simulation, in ms
+simConfig.duration = 1e3                      # Duration of the simulation, in ms
 simConfig.dt = 0.2                            # Internal integration timestep to use
 simConfig.verbose = False                       # Show detailed messages
 simConfig.recordTraces = {'V_soma':{'sec':'soma','loc':0.5,'var':'v'}}  # Dict with traces to record
