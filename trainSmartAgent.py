@@ -50,7 +50,7 @@ netParams.stimTargetParams['stimMod->all'] = {'source': 'stimMod',
         'convergence': 1,
         'weight': 0.01,
         'delay': 1,
-        'synMech': 'exc'}
+        'synMech': 'AMPA'}
 
 ######################################################################################
 def connectLayerswithOverlap(NBpreN, NBpostN, overlap_xdir):
