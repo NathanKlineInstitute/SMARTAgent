@@ -225,6 +225,11 @@ blistEtoInV1 = connectLayerswithOverlap(NBpreN = 6400, NBpostN = 1600, overlap_x
 blistV1toInV4 = connectLayerswithOverlap(NBpreN = 6400, NBpostN = 400, overlap_xdir = 25)
 blistV4toInIT = connectLayerswithOverlap(NBpreN = 1600, NBpostN = 100, overlap_xdir = 25)
 
+#I to E - Feedbackward connections
+blistInV1toE = connectLayerswithOverlapDiv(NBpreN = 1600, NBpostN = 6400, overlap_xdir = 5)
+blistInV4toV1 = connectLayerswithOverlapDiv(NBpreN = 400, NBpostN = 6400, overlap_xdir = 5)
+blistInITtoV4 = connectLayerswithOverlapDiv(NBpreN = 100, NBpostN = 1600, overlap_xdir = 5)
+
 #blist = connectRtoV1withOverlap()
 #blist = connectRtoV1withoutOverlap()
 netParams.connParams['R->V1'] = {
@@ -286,6 +291,38 @@ netParams.connParams['V4->IIT'] = {
         'weight': 0.002,
         'delay': 10,
         'synMech': 'exc',
+        'plast': {'mech': 'STDP', 'params': STDPparams}}
+
+
+#I to E connections
+
+
+netParams.connParams['IV1->R'] = {
+        'preConds': {'pop': 'IV1'},
+        'postConds': {'pop': 'R'},
+        'connList': blistInV1toE,
+        #'convergence': 10,
+        'weight': 0.002,
+        'delay': 10,
+        'synMech': 'GABAa',
+        'plast': {'mech': 'STDP', 'params': STDPparams}}
+netParams.connParams['IV4->V1'] = {
+        'preConds': {'pop': 'IV4'},
+        'postConds': {'pop': 'V1'},
+        'connList': blistInV4toV1,
+        #'convergence': 10,
+        'weight': 0.002,
+        'delay': 10,
+        'synMech': 'GABAa',
+        'plast': {'mech': 'STDP', 'params': STDPparams}}
+netParams.connParams['IIT->V4'] = {
+        'preConds': {'pop': 'IIT'},
+        'postConds': {'pop': 'V4'},
+        'connList': blistInITtoV4,
+        #'convergence': 10,
+        'weight': 0.002,
+        'delay': 10,
+        'synMech': 'GABAa',
         'plast': {'mech': 'STDP', 'params': STDPparams}}
 
 

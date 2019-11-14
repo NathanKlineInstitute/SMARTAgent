@@ -251,3 +251,4 @@ for now i would make it parameterized so you can play with it and see what works
 ***for all pre(E) to post(I), the overlap is different: 15x15 for R to InV1, 25x25 for V1 to InV4 and 25x25 for V4 to InIT.
 **Feedback inhibition implemented: InV1 inhibit neurons in R, InV4 inhibit neurons in V1 and InIT inhibit neurons in V4.
 ***for all pre(I) to post(E), the overlap is 5x5 neurons i.e. every post synaptic neuron receives inhibition from 25 neighboring neurons. 
+**To DO: add poisson noise to inhibitory neurons so that the neurons are close to threshold. this is to increase firing rate of inhibitory neurons.
