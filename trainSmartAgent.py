@@ -52,6 +52,11 @@ netParams.stimTargetParams['stimMod->all'] = {'source': 'stimMod',
         'delay': 1,
         'synMech': 'AMPA'}
 
+#background input to inhibitory neurons to increase their firing rate
+
+# Stimulation parameters
+netParams.stimSourceParams['bkg'] = {'type': 'NetStim', 'rate': 20, 'noise': 0.3}
+netParams.stimTargetParams['bkg->all'] = {'source': 'bkg', 'conds': {'cellType': ['InV1','InV4','InIT']}, 'weight': 0.01, 'delay': 'max(1, normal(5,2))', 'synMech': 'AMPA'}
 ######################################################################################
 def connectLayerswithOverlap(NBpreN, NBpostN, overlap_xdir):
     #NBpreN = 6400 	#number of presynaptic neurons
@@ -275,7 +280,7 @@ netParams.connParams['R->IV1'] = {
         'connList': blistEtoInV1,
         #'convergence': 10,
         'weight': 0.002,
-        'delay': 10,
+        'delay': 20,
         'synMech': 'AMPA',
         'plast': {'mech': 'STDP', 'params': STDPparams}}
 netParams.connParams['V1->IV4'] = {
@@ -284,7 +289,7 @@ netParams.connParams['V1->IV4'] = {
         'connList': blistV1toInV4,
         #'convergence': 10,
         'weight': 0.002,
-        'delay': 10,
+        'delay': 20,
         'synMech': 'AMPA',
         'plast': {'mech': 'STDP', 'params': STDPparams}}
 netParams.connParams['V4->IIT'] = {
@@ -293,7 +298,7 @@ netParams.connParams['V4->IIT'] = {
         'connList': blistV4toInIT,
         #'convergence': 10,
         'weight': 0.002,
-        'delay': 10,
+        'delay': 20,
         'synMech': 'AMPA',
         'plast': {'mech': 'STDP', 'params': STDPparams}}
 
@@ -307,7 +312,7 @@ netParams.connParams['IV1->R'] = {
         'connList': blistInV1toE,
         #'convergence': 10,
         'weight': 0.002,
-        'delay': 10,
+        'delay': 20,
         'synMech': 'GABA',
         'plast': {'mech': 'STDP', 'params': STDPparams}}
 netParams.connParams['IV4->V1'] = {
@@ -316,7 +321,7 @@ netParams.connParams['IV4->V1'] = {
         'connList': blistInV4toV1,
         #'convergence': 10,
         'weight': 0.002,
-        'delay': 10,
+        'delay': 20,
         'synMech': 'GABA',
         'plast': {'mech': 'STDP', 'params': STDPparams}}
 netParams.connParams['IIT->V4'] = {
@@ -325,7 +330,7 @@ netParams.connParams['IIT->V4'] = {
         'connList': blistInITtoV4,
         #'convergence': 10,
         'weight': 0.002,
-        'delay': 10,
+        'delay': 20,
         'synMech': 'GABA',
         'plast': {'mech': 'STDP', 'params': STDPparams}}
 
@@ -333,7 +338,7 @@ netParams.connParams['IIT->V4'] = {
 #Simulation options
 simConfig = specs.SimConfig()           # object of class SimConfig to store simulation configuration
 
-simConfig.duration = 1e3                      # Duration of the simulation, in ms
+simConfig.duration = 1e4                      # Duration of the simulation, in ms
 simConfig.dt = 0.2                            # Internal integration timestep to use
 simConfig.verbose = False                       # Show detailed messages
 simConfig.recordTraces = {'V_soma':{'sec':'soma','loc':0.5,'var':'v'}}  # Dict with traces to record
