@@ -224,27 +224,48 @@ def plotWeights():
     show()
 
 ######################################################################################
+
+
+#Feedforward excitation
 #E to E - Feedforward connections
-blist = connectLayerswithOverlap(NBpreN = 6400, NBpostN = 6400, overlap_xdir = 5)
+blistEtoV1 = connectLayerswithOverlap(NBpreN = 6400, NBpostN = 6400, overlap_xdir = 5)
 blistV1toV4 = connectLayerswithOverlap(NBpreN = 6400, NBpostN = 1600, overlap_xdir = 5)
 blistV4toIT = connectLayerswithOverlap(NBpreN = 1600, NBpostN = 400, overlap_xdir = 15)
 
 #E to I - Feedforward connections
-blistEtoInV1 = connectLayerswithOverlap(NBpreN = 6400, NBpostN = 1600, overlap_xdir = 15)
-blistV1toInV4 = connectLayerswithOverlap(NBpreN = 6400, NBpostN = 400, overlap_xdir = 25)
-blistV4toInIT = connectLayerswithOverlap(NBpreN = 1600, NBpostN = 100, overlap_xdir = 25)
+blistEtoInV1 = connectLayerswithOverlap(NBpreN = 6400, NBpostN = 1600, overlap_xdir = 5)
+blistV1toInV4 = connectLayerswithOverlap(NBpreN = 6400, NBpostN = 400, overlap_xdir = 15)
+blistV4toInIT = connectLayerswithOverlap(NBpreN = 1600, NBpostN = 100, overlap_xdir = 15)
 
-#I to E - Feedbackward connections
+#Feedbackward excitation
+#E to E  
+blistV1toE = connectLayerswithOverlapDiv(NBpreN = 6400, NBpostN = 6400, overlap_xdir = 3)
+blistV4toV1 = connectLayerswithOverlapDiv(NBpreN = 1600, NBpostN = 6400, overlap_xdir = 3)
+blistITtoV4 = connectLayerswithOverlapDiv(NBpreN = 400, NBpostN = 1600, overlap_xdir = 3)
+
+
+#Feedforward inhibition
+#I to I
+blistInV1toInV4 = connectLayerswithOverlap(NBpreN = 1600, NBpostN = 400, overlap_xdir = 5)
+blistInV4toInIT = connectLayerswithOverlap(NBpreN = 400, NBpostN = 100, overlap_xdir = 5)
+
+
+#Feedbackward inhibition
+#I to E 
 blistInV1toE = connectLayerswithOverlapDiv(NBpreN = 1600, NBpostN = 6400, overlap_xdir = 5)
 blistInV4toV1 = connectLayerswithOverlapDiv(NBpreN = 400, NBpostN = 6400, overlap_xdir = 5)
 blistInITtoV4 = connectLayerswithOverlapDiv(NBpreN = 100, NBpostN = 1600, overlap_xdir = 5)
 
+
 #blist = connectRtoV1withOverlap()
 #blist = connectRtoV1withoutOverlap()
+
+
+#E to E feedforward connections
 netParams.connParams['R->V1'] = {
         'preConds': {'pop': 'R'},
         'postConds': {'pop': 'V1'},
-        'connList': blist,
+        'connList': blistEtoV1,
         #'convergence': 10,
         'weight': 0.002,
         'delay': 20,
@@ -269,11 +290,7 @@ netParams.connParams['V4->IT'] = {
         'synMech': 'AMPA',
         'plast': {'mech': 'STDP', 'params': STDPparams}}
 
-
-
-#E to I connections
-
-
+#E to I feedforward connections
 netParams.connParams['R->IV1'] = {
         'preConds': {'pop': 'R'},
         'postConds': {'pop': 'IV1'},
@@ -303,8 +320,37 @@ netParams.connParams['V4->IIT'] = {
         'plast': {'mech': 'STDP', 'params': STDPparams}}
 
 
-#I to E connections
+#E to E feedbackward connections
+netParams.connParams['V1->R'] = {
+        'preConds': {'pop': 'V1'},
+        'postConds': {'pop': 'R'},
+        'connList': blistV1toE,
+        #'convergence': 10,
+        'weight': 0.002,
+        'delay': 20,
+        'synMech': 'AMPA',
+        'plast': {'mech': 'STDP', 'params': STDPparams}}
+netParams.connParams['V4->V1'] = {
+        'preConds': {'pop': 'V4'},
+        'postConds': {'pop': 'V1'},
+        'connList': blistInV4toV1,
+        #'convergence': 10,
+        'weight': 0.002,
+        'delay': 20,
+        'synMech': 'AMPA',
+        'plast': {'mech': 'STDP', 'params': STDPparams}}
+netParams.connParams['IT->V4'] = {
+        'preConds': {'pop': 'IT'},
+        'postConds': {'pop': 'V4'},
+        'connList': blistITtoV4,
+        #'convergence': 10,
+        'weight': 0.002,
+        'delay': 20,
+        'synMech': 'AMPA',
+        'plast': {'mech': 'STDP', 'params': STDPparams}}
 
+
+#I to E connections
 
 netParams.connParams['IV1->R'] = {
         'preConds': {'pop': 'IV1'},
@@ -333,7 +379,25 @@ netParams.connParams['IIT->V4'] = {
         'delay': 20,
         'synMech': 'GABA',
         'plast': {'mech': 'STDP', 'params': STDPparams}}
-
+#I to I
+netParams.connParams['IV1->IV4'] = {
+        'preConds': {'pop': 'IV1'},
+        'postConds': {'pop': 'IV4'},
+        'connList': blistInV1toInV4,
+        #'convergence': 10,
+        'weight': 0.002,
+        'delay': 20,
+        'synMech': 'GABA',
+        'plast': {'mech': 'STDP', 'params': STDPparams}}
+netParams.connParams['IV4->IIT'] = {
+        'preConds': {'pop': 'IV4'},
+        'postConds': {'pop': 'IIT'},
+        'connList': blistInV4toInIT,
+        #'convergence': 10,
+        'weight': 0.002,
+        'delay': 20,
+        'synMech': 'GABA',
+        'plast': {'mech': 'STDP', 'params': STDPparams}}
 
 #Simulation options
 simConfig = specs.SimConfig()           # object of class SimConfig to store simulation configuration

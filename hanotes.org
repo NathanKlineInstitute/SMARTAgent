@@ -255,4 +255,8 @@ for now i would make it parameterized so you can play with it and see what works
 
 *19nov15
 **Run the simulation for 10s with same firing rate for both excitatory and inhibitory neurons. Only save the raster.
-**Add noise stim to inhibitory neurons to increase their firing rates.
+**Add noise stim to inhibitory neurons to increase their firing rates and run the simulation.
+**I had only feedback inhibition and feedforward excitation. Now i have included feedforward inhibition as well as feedbackward excitation.
+***QUESTION: Is there any evidence of feedforward inhibition and feedbackward excitation in cortex? any biological numbers for such connectivity?
+**To do: implement local inhibition- previously we had only feedforward and feedbackward inhibition.
+***What are the rules for local inhibition in terms of receptive fields.
