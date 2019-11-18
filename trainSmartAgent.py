@@ -326,7 +326,7 @@ netParams.connParams['V1->R'] = {
         'postConds': {'pop': 'R'},
         'connList': blistV1toE,
         #'convergence': 10,
-        'weight': 0.002,
+        'weight': 0.0001,
         'delay': 20,
         'synMech': 'AMPA',
         'plast': {'mech': 'STDP', 'params': STDPparams}}
@@ -335,7 +335,7 @@ netParams.connParams['V4->V1'] = {
         'postConds': {'pop': 'V1'},
         'connList': blistInV4toV1,
         #'convergence': 10,
-        'weight': 0.002,
+        'weight': 0.0001,
         'delay': 20,
         'synMech': 'AMPA',
         'plast': {'mech': 'STDP', 'params': STDPparams}}
@@ -344,7 +344,7 @@ netParams.connParams['IT->V4'] = {
         'postConds': {'pop': 'V4'},
         'connList': blistITtoV4,
         #'convergence': 10,
-        'weight': 0.002,
+        'weight': 0.0001,
         'delay': 20,
         'synMech': 'AMPA',
         'plast': {'mech': 'STDP', 'params': STDPparams}}
@@ -402,16 +402,18 @@ netParams.connParams['IV4->IIT'] = {
 #Simulation options
 simConfig = specs.SimConfig()           # object of class SimConfig to store simulation configuration
 
-simConfig.duration = 1e4                      # Duration of the simulation, in ms
+simConfig.duration = 2e4                      # Duration of the simulation, in ms
 simConfig.dt = 0.2                            # Internal integration timestep to use
 simConfig.verbose = False                       # Show detailed messages
 simConfig.recordTraces = {'V_soma':{'sec':'soma','loc':0.5,'var':'v'}}  # Dict with traces to record
-simConfig.recordStep = 0.2                      # Step size in ms to save data (e.g. V traces, LFP, etc)
+simConfig.recordStep = 2                      # Step size in ms to save data (e.g. V traces, LFP, etc)
 simConfig.filename = 'model_output'  # Set file output name
 simConfig.savePickle = False            # Save params, network and sim output to pickle file
 
-simConfig.analysis['plotRaster'] = True                         # Plot a raster
-simConfig.analysis['plotTraces'] = {'include': [13000, 13500, 14000]}
+#simConfig.analysis['plotRaster'] = True                         # Plot a raster
+#simConfig.analysis['plotTraces'] = {'include': [13000, 13500, 14000]}
+simConfig.analysis['plotRaster'] = {'popRates':'overlay','showFig':True}
+simConfig.analysis['plot2Dnet'] = True 
 ###################################################################################################################################
 
 #SMARTAgent.initGame('self')

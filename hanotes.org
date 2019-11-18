@@ -260,3 +260,9 @@ for now i would make it parameterized so you can play with it and see what works
 ***QUESTION: Is there any evidence of feedforward inhibition and feedbackward excitation in cortex? any biological numbers for such connectivity?
 **To do: implement local inhibition- previously we had only feedforward and feedbackward inhibition.
 ***What are the rules for local inhibition in terms of receptive fields.
+
+*19nov18
+**Ran simulation for 10 sec with strong feedback excitation (weight of 0.02)-- observed high firing rates for excitatory and inhibtory neurons (just obseration)
+**Ran simulation for 10 sec without feedback excitation-- observed firing rates (R = 0.686, V1 = 1.96, V4 = 3.75, IT = 11.7, IV1 = 21.2, IV4 = 11, IIT = 15.2 Hz)
+**Ran simulation for 10 sec with weaker feedback excitation (weight of 0.002)-- observed firing rates (R = 0.7, V1 = 2.5, V4 = 4.85, IT = 11.9, IV1 = 21.2, IV4 = 11.2, IIT = 14.2 Hz)
+**Running simulation for 20 sec with weaker feedback excitation (weight of 0.002) and saving at 2 ms instead of 0.2 ms--
