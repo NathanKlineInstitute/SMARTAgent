@@ -261,6 +261,117 @@ blistInITtoV4 = connectLayerswithOverlapDiv(NBpreN = 100, NBpostN = 1600, overla
 #blist = connectRtoV1withoutOverlap()
 
 
+#Local excitation
+#E to E
+netParams.connParams['R->V1'] = {
+        'preConds': {'pop': 'R'},
+        'postConds': {'pop': 'R'},
+        'probability': 0.2,
+        'weight': 0.0001,
+        'delay': 20,
+        'synMech': 'AMPA',
+        'plast': {'mech': 'STDP', 'params': STDPparams}}
+netParams.connParams['V1->V1'] = {
+        'preConds': {'pop': 'V1'},
+        'postConds': {'pop': 'V1'},
+        'probability': 0.2,
+        'weight': 0.0001,
+        'delay': 20,
+        'synMech': 'AMPA',
+        'plast': {'mech': 'STDP', 'params': STDPparams}}
+netParams.connParams['V4->V4'] = {
+        'preConds': {'pop': 'V4'},
+        'postConds': {'pop': 'V4'},
+        'probability': 0.2,
+        'weight': 0.0001,
+        'delay': 20,
+        'synMech': 'AMPA',
+        'plast': {'mech': 'STDP', 'params': STDPparams}}
+netParams.connParams['IT->IT'] = {
+        'preConds': {'pop': 'IT'},
+        'postConds': {'pop': 'IT'},
+        'probability': 0.2,
+        'weight': 0.0001,
+        'delay': 20,
+        'synMech': 'AMPA',
+        'plast': {'mech': 'STDP', 'params': STDPparams}}
+#E to I
+netParams.connParams['V1->IV1'] = {
+        'preConds': {'pop': 'V1'},
+        'postConds': {'pop': 'IV1'},
+        'probability': 0.2,
+        'weight': 0.0001,
+        'delay': 20,
+        'synMech': 'AMPA',
+        'plast': {'mech': 'STDP', 'params': STDPparams}}
+netParams.connParams['V4->IV4'] = {
+        'preConds': {'pop': 'V4'},
+        'postConds': {'pop': 'IV4'},
+        'probability': 0.2,
+        'weight': 0.0001,
+        'delay': 20,
+        'synMech': 'AMPA',
+        'plast': {'mech': 'STDP', 'params': STDPparams}}
+netParams.connParams['IT->IIT'] = {
+        'preConds': {'pop': 'IT'},
+        'postConds': {'pop': 'IIT'},
+        'probability': 0.2,
+        'weight': 0.0001,
+        'delay': 20,
+        'synMech': 'AMPA',
+        'plast': {'mech': 'STDP', 'params': STDPparams}}
+#Local inhibition
+#I to E
+netParams.connParams['IV1->V1'] = {
+        'preConds': {'pop': 'IV1'},
+        'postConds': {'pop': 'V1'},
+        'probability': 0.2,
+        'weight': 0.0001,
+        'delay': 20,
+        'synMech': 'GABA',
+        'plast': {'mech': 'STDP', 'params': STDPparams}}
+netParams.connParams['IV4->V4'] = {
+        'preConds': {'pop': 'IV4'},
+        'postConds': {'pop': 'V4'},
+        'probability': 0.2,
+        'weight': 0.0001,
+        'delay': 20,
+        'synMech': 'GABA',
+        'plast': {'mech': 'STDP', 'params': STDPparams}}
+netParams.connParams['IIT->IT'] = {
+        'preConds': {'pop': 'IIT'},
+        'postConds': {'pop': 'IT'},
+        'probability': 0.2,
+        'weight': 0.0001,
+        'delay': 20,
+        'synMech': 'GABA',
+        'plast': {'mech': 'STDP', 'params': STDPparams}}
+#I to I
+netParams.connParams['IV1->IV1'] = {
+        'preConds': {'pop': 'IV1'},
+        'postConds': {'pop': 'IV1'},
+        'probability': 0.2,
+        'weight': 0.0001,
+        'delay': 20,
+        'synMech': 'GABA',
+        'plast': {'mech': 'STDP', 'params': STDPparams}}
+netParams.connParams['IV4->IV4'] = {
+        'preConds': {'pop': 'IV4'},
+        'postConds': {'pop': 'IV4'},
+        'probability': 0.2,
+        'weight': 0.0001,
+        'delay': 20,
+        'synMech': 'GABA',
+        'plast': {'mech': 'STDP', 'params': STDPparams}}
+netParams.connParams['IIT->IIT'] = {
+        'preConds': {'pop': 'IIT'},
+        'postConds': {'pop': 'IIT'},
+        'probability': 0.2,
+        'weight': 0.0001,
+        'delay': 20,
+        'synMech': 'GABA',
+        'plast': {'mech': 'STDP', 'params': STDPparams}}
+
 #E to E feedforward connections
 netParams.connParams['R->V1'] = {
         'preConds': {'pop': 'R'},
@@ -402,18 +513,19 @@ netParams.connParams['IV4->IIT'] = {
 #Simulation options
 simConfig = specs.SimConfig()           # object of class SimConfig to store simulation configuration
 
-simConfig.duration = 2e4                      # Duration of the simulation, in ms
+simConfig.duration = 1e4                      # Duration of the simulation, in ms
 simConfig.dt = 0.2                            # Internal integration timestep to use
 simConfig.verbose = False                       # Show detailed messages
 simConfig.recordTraces = {'V_soma':{'sec':'soma','loc':0.5,'var':'v'}}  # Dict with traces to record
-simConfig.recordStep = 2                      # Step size in ms to save data (e.g. V traces, LFP, etc)
+simConfig.recordStep = 0.2                      # Step size in ms to save data (e.g. V traces, LFP, etc)
 simConfig.filename = 'model_output'  # Set file output name
 simConfig.savePickle = False            # Save params, network and sim output to pickle file
 
 #simConfig.analysis['plotRaster'] = True                         # Plot a raster
 #simConfig.analysis['plotTraces'] = {'include': [13000, 13500, 14000]}
 simConfig.analysis['plotRaster'] = {'popRates':'overlay','showFig':True}
-simConfig.analysis['plot2Dnet'] = True 
+#simConfig.analysis['plot2Dnet'] = True 
+simConfig.analysis['plotConn'] = True           # plot connectivity matrix
 ###################################################################################################################################
 
 #SMARTAgent.initGame('self')
