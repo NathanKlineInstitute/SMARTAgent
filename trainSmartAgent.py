@@ -266,7 +266,7 @@ blistInITtoV4 = connectLayerswithOverlapDiv(NBpreN = 100, NBpostN = 1600, overla
 netParams.connParams['R->V1'] = {
         'preConds': {'pop': 'R'},
         'postConds': {'pop': 'R'},
-        'probability': 0.2,
+        'probability': 0.02,
         'weight': 0.0001,
         'delay': 20,
         'synMech': 'AMPA',
@@ -274,7 +274,7 @@ netParams.connParams['R->V1'] = {
 netParams.connParams['V1->V1'] = {
         'preConds': {'pop': 'V1'},
         'postConds': {'pop': 'V1'},
-        'probability': 0.2,
+        'probability': 0.02,
         'weight': 0.0001,
         'delay': 20,
         'synMech': 'AMPA',
@@ -282,7 +282,7 @@ netParams.connParams['V1->V1'] = {
 netParams.connParams['V4->V4'] = {
         'preConds': {'pop': 'V4'},
         'postConds': {'pop': 'V4'},
-        'probability': 0.2,
+        'probability': 0.02,
         'weight': 0.0001,
         'delay': 20,
         'synMech': 'AMPA',
@@ -290,7 +290,7 @@ netParams.connParams['V4->V4'] = {
 netParams.connParams['IT->IT'] = {
         'preConds': {'pop': 'IT'},
         'postConds': {'pop': 'IT'},
-        'probability': 0.2,
+        'probability': 0.02,
         'weight': 0.0001,
         'delay': 20,
         'synMech': 'AMPA',
@@ -299,7 +299,7 @@ netParams.connParams['IT->IT'] = {
 netParams.connParams['V1->IV1'] = {
         'preConds': {'pop': 'V1'},
         'postConds': {'pop': 'IV1'},
-        'probability': 0.2,
+        'probability': 0.02,
         'weight': 0.0001,
         'delay': 20,
         'synMech': 'AMPA',
@@ -307,7 +307,7 @@ netParams.connParams['V1->IV1'] = {
 netParams.connParams['V4->IV4'] = {
         'preConds': {'pop': 'V4'},
         'postConds': {'pop': 'IV4'},
-        'probability': 0.2,
+        'probability': 0.02,
         'weight': 0.0001,
         'delay': 20,
         'synMech': 'AMPA',
@@ -315,7 +315,7 @@ netParams.connParams['V4->IV4'] = {
 netParams.connParams['IT->IIT'] = {
         'preConds': {'pop': 'IT'},
         'postConds': {'pop': 'IIT'},
-        'probability': 0.2,
+        'probability': 0.02,
         'weight': 0.0001,
         'delay': 20,
         'synMech': 'AMPA',
@@ -325,7 +325,7 @@ netParams.connParams['IT->IIT'] = {
 netParams.connParams['IV1->V1'] = {
         'preConds': {'pop': 'IV1'},
         'postConds': {'pop': 'V1'},
-        'probability': 0.2,
+        'probability': 0.02,
         'weight': 0.0001,
         'delay': 20,
         'synMech': 'GABA',
@@ -333,7 +333,7 @@ netParams.connParams['IV1->V1'] = {
 netParams.connParams['IV4->V4'] = {
         'preConds': {'pop': 'IV4'},
         'postConds': {'pop': 'V4'},
-        'probability': 0.2,
+        'probability': 0.02,
         'weight': 0.0001,
         'delay': 20,
         'synMech': 'GABA',
@@ -341,7 +341,7 @@ netParams.connParams['IV4->V4'] = {
 netParams.connParams['IIT->IT'] = {
         'preConds': {'pop': 'IIT'},
         'postConds': {'pop': 'IT'},
-        'probability': 0.2,
+        'probability': 0.02,
         'weight': 0.0001,
         'delay': 20,
         'synMech': 'GABA',
@@ -350,7 +350,7 @@ netParams.connParams['IIT->IT'] = {
 netParams.connParams['IV1->IV1'] = {
         'preConds': {'pop': 'IV1'},
         'postConds': {'pop': 'IV1'},
-        'probability': 0.2,
+        'probability': 0.02,
         'weight': 0.0001,
         'delay': 20,
         'synMech': 'GABA',
@@ -358,7 +358,7 @@ netParams.connParams['IV1->IV1'] = {
 netParams.connParams['IV4->IV4'] = {
         'preConds': {'pop': 'IV4'},
         'postConds': {'pop': 'IV4'},
-        'probability': 0.2,
+        'probability': 0.02,
         'weight': 0.0001,
         'delay': 20,
         'synMech': 'GABA',
@@ -366,7 +366,7 @@ netParams.connParams['IV4->IV4'] = {
 netParams.connParams['IIT->IIT'] = {
         'preConds': {'pop': 'IIT'},
         'postConds': {'pop': 'IIT'},
-        'probability': 0.2,
+        'probability': 0.02,
         'weight': 0.0001,
         'delay': 20,
         'synMech': 'GABA',
