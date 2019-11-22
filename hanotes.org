@@ -270,3 +270,46 @@ for now i would make it parameterized so you can play with it and see what works
 
 *19nov19
 **Include local inhibition and excitation (using some general statistics).
+
+**19nov20
+**Tried installing atari environment for gym open ai on neurosim, but due to dependencies could not succeeded. 
+**Tried installing atari environment for gym open ai on KONG, which worked but netpyne didn't work becaue NEURON is not installed with python3.
+***pip install gym --user
+***pip install atari-py --user
+***Contacted ARCS for help in installing NEURON with python3
+** Tried again installing atari environment for gym open ai on neurosim: tried on no.neurosim.downstate.edu
+***pip3 install gym --user (it worked)
+***pip3 install atari-py --user (it worked)
+**Running trainSmartAgent.py on neurosim. (it could not run render therefore i commented out render command)
+**Compare neurosim vs personal magic
+
+
+***NEUROSIM
+Creating network of 7 cell populations on 1 hosts...
+  Number of cells on node 0: 16900 
+  Done; cell creation time = 2.68 s.
+Making connections...
+  Number of connections on node 0: 2318471 
+  Done; cell connection time = 430.00 s.
+Adding stims...
+  Number of stims on node 0: 8500 
+  Done; cell stims creation time = 1.27 s.
+
+
+***Personal Mac
+Creating network of 7 cell populations on 1 hosts...
+  Number of cells on node 0: 16900 
+  Done; cell creation time = 1.61 s.
+Making connections...
+  Number of connections on node 0: 2318471 
+  Done; cell connection time = 325.40 s.
+Adding stims...
+  Number of stims on node 0: 8500 
+  Done; cell stims creation time = 0.82 s.
+
+**19nov21
+***To run simulation on neurosim- always use py3env to use python3.
+***To run simulation in parallel using 8 cores on neurosim - use mpirun -n 8 python trainSmartAgent.py
+***run time on neurosim using 8 cores - Done; run time = 5936.18 s; real-time ratio: 0.00.
+***One problem remains: Plotting raster plot.
+***Additional analyses to include: evolving spike rates and .....
