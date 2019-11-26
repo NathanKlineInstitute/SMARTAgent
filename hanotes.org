@@ -307,9 +307,14 @@ Adding stims...
   Number of stims on node 0: 8500 
   Done; cell stims creation time = 0.82 s.
 
-**19nov21
+*19nov21
 ***To run simulation on neurosim- always use py3env to use python3.
 ***To run simulation in parallel using 8 cores on neurosim - use mpirun -n 8 python trainSmartAgent.py
 ***run time on neurosim using 8 cores - Done; run time = 5936.18 s; real-time ratio: 0.00.
 ***One problem remains: Plotting raster plot.
 ***Additional analyses to include: evolving spike rates and .....
+
+*19nov26
+**Yesterday, I made changes in the script to save the firing times of all cells.
+**Salva told me that we can only use .pkl or .json to save data from plotRaster
+***e.g. simConfig.analysis['plotRaster'] = {'popRates':'overlay','saveData':'RasterData.pkl','showFig':True}
