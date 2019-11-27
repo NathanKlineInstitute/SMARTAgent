@@ -2,3 +2,27 @@
 *19nov27
 ** trying on laptop
 
+do not have netpyne on laptop
+
+python3
+import netpyne
+
+pip3 install netpyne
+
+Traceback (most recent call last):
+  File "/usr/bin/pip3", line 9, in <module>
+    from pip import main
+ImportError: cannot import name 'main'
+
+what's wrong with pip3?
+
+https://stackoverflow.com/questions/49836676/error-after-upgrading-pip-cannot-import-name-main
+
+sudo python3 -m pip uninstall pip && sudo apt install python3-pip --reinstall
+
+pip3 install netpyne
+
+hmm, needs newer version of python (>= 3.6 ), only have python 3.5 on laptop ...
+
+will try on neurosim ... 
+
