@@ -534,15 +534,24 @@ simConfig.analysis['plotRaster'] = {'popRates':'overlay','saveData':'RasterData.
 
 sim.SMARTAgent = SMARTAgent()
 
-def trainAgent(t):
-    sim.SMARTAgent.playGame()
-    sim.SMARTAgent.run(t,sim)
-    sim.allWeights.append([]) # Save this time
-    for cell in sim.net.cells:
-        for conn in cell.conns:
-            if 'hSTDP' in conn:
-                sim.allWeights[-1].append(float(conn['hObj'].weight[0])) # save weight only for STDP conns
+recordWeightDT = 500 # interval for recording synaptic weights (change later)
 
+def recordWeights ():
+  """ record the STDP weights during the simulation - called in trainAgent
+  """
+  sim.allWeights.append([]) # Save this time
+  for cell in sim.net.cells:
+    for conn in cell.conns:
+      if 'hSTDP' in conn:
+        sim.allWeights[-1].append(float(conn['hObj'].weight[0])) # save weight only for STDP conns
+
+def trainAgent(t):
+  """ training interface between simulation and game environment
+  """
+  sim.SMARTAgent.playGame()
+  sim.SMARTAgent.run(t,sim)
+  print('trainAgent time is : ', t)
+  if t%saveWeightDT==0: recordWeights()
 
 #Alterate to create network and run simulation
 sim.initialize(                       # create network object and set cfg and net params

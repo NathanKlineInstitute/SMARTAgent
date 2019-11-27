@@ -26,3 +26,19 @@ hmm, needs newer version of python (>= 3.6 ), only have python 3.5 on laptop ...
 
 will try on neurosim ... 
 
+python3
+import netpyne
+netpyne.__version__ # '0.9.3.1'
+
+pip3 install gym --user
+pip3 install atari-py --user
+
+compile:
+nrnivmodl
+
+for running on 1 node:
+py3env
+python3 trainSmartAgent.py
+
+mpirun -n 16 python trainSmartAgent.py
+
