@@ -42,3 +42,6 @@ python3 trainSmartAgent.py
 
 mpirun -n 16 python trainSmartAgent.py
 
+was able to run with 1 core, took 2.5 GB with 500 ms interval for saving weights and 1000 ms simulation
+will need to record from only a small fraction of the cells
+
