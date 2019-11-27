@@ -551,7 +551,7 @@ def trainAgent(t):
   sim.SMARTAgent.playGame()
   sim.SMARTAgent.run(t,sim)
   print('trainAgent time is : ', t)
-  if t%saveWeightDT==0: recordWeights()
+  if t%recordWeightDT==0: recordWeights()
 
 #Alterate to create network and run simulation
 sim.initialize(                       # create network object and set cfg and net params
