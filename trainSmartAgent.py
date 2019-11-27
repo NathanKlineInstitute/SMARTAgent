@@ -517,15 +517,15 @@ simConfig.duration = 1e3                      # Duration of the simulation, in m
 simConfig.dt = 0.2                            # Internal integration timestep to use
 simConfig.verbose = False                       # Show detailed messages
 #simConfig.recordTraces = {'V_soma':{'sec':'soma','loc':0.5,'var':'v'}}  # Dict with traces to record
-simConfig.recordCellsSpikes = True
+simConfig.recordCellsSpikes = [-1]
 simConfig.recordStep = 0.2                      # Step size in ms to save data (e.g. V traces, LFP, etc)
 simConfig.filename = 'model_output'  # Set file output name
-simConfig.savePickle = False            # Save params, network and sim output to pickle file
-simConfig.saveMat = True
+simConfig.savePickle = True            # Save params, network and sim output to pickle file
+#simConfig.saveMat = True
 
 #simConfig.analysis['plotRaster'] = True                         # Plot a raster
 #simConfig.analysis['plotTraces'] = {'include': [13000, 13500, 14000]}
-simConfig.analysis['plotRaster'] = {'popRates':'overlay','saveData':'RasterData.txt','showFig':True}
+simConfig.analysis['plotRaster'] = {'popRates':'overlay','saveData':'RasterData.pkl','showFig':True}
 #simConfig.analysis['plot2Dnet'] = True 
 #simConfig.analysis['plotConn'] = True           # plot connectivity matrix
 ###################################################################################################################################
