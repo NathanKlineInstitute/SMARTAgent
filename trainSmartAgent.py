@@ -525,7 +525,7 @@ simConfig.savePickle = True            # Save params, network and sim output to 
 
 #simConfig.analysis['plotRaster'] = True                         # Plot a raster
 #simConfig.analysis['plotTraces'] = {'include': [13000, 13500, 14000]}
-simConfig.analysis['plotRaster'] = {'popRates':'overlay','saveData':'RasterData.pkl','showFig':True}
+simConfig.analysis['plotRaster'] = {'timeRange': [500,1000],'popRates':'overlay','saveData':'RasterData.pkl','showFig':True}
 #simConfig.analysis['plot2Dnet'] = True 
 #simConfig.analysis['plotConn'] = True           # plot connectivity matrix
 ###################################################################################################################################
