@@ -318,3 +318,16 @@ Adding stims...
 **Yesterday, I made changes in the script to save the firing times of all cells.
 **Salva told me that we can only use .pkl or .json to save data from plotRaster
 ***e.g. simConfig.analysis['plotRaster'] = {'popRates':'overlay','saveData':'RasterData.pkl','showFig':True}
+
+*19dec4
+**Yesterday, I ran analyzeSpikeRate.py on neurosim to analyze population average firing rates. I ntoiced extremely high values for frequencies, which was due to a bug in the code.
+**Today, i fixed the code and reran on neurosim. Firing rate of all populations rose initially and then decayed to a stable firing rate. This analysis was done on 100 s of simulation.
+**Nest step is to implement motor cortex. First, i will keep the motor cortex in my model simple.
+**Two layers: 
+**Input layer with 100 excitatory neurons and 25 inhibitory neurons.
+**Output layer with 4 excitatory neurons only.
+**Feedforward [IT to MI]: 25 E to 1 E, 225 E to 1 I, 25 I to 1 I, 
+**Feedbackward [MI to IT]: 1 E to 9 E, 1 I to 25 E, No I to I
+**Feedforward [MI to MO]: 400 E to 1 E (all to all by using probability of connection 1)
+**Feedbackward [MO to MI]: 1 E to 121 E 
+

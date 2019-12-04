@@ -20,15 +20,19 @@ netParams.popParams['IV1'] = {'cellType': 'InV1', 'numCells': 1600, 'cellModel':
 netParams.popParams['IV4'] = {'cellType': 'InV4', 'numCells': 400, 'cellModel': 'HH'}
 netParams.popParams['IIT'] = {'cellType': 'InIT', 'numCells': 100, 'cellModel': 'HH'}
 
+netParams.popParams['MI'] = {'cellType': 'EMI', 'numCells': 400, 'cellModel': 'HH'}
+netParams.popParams['MO'] = {'cellType': 'EMO', 'numCells': 4, 'cellModel': 'HH'}
+
+netParams.popParams['IMI'] = {'cellType': 'InMI', 'numCells': 100, 'cellModel': 'HH'}
 
 netParams.cellParams['ERule'] = {               # cell rule label
-        'conds': {'cellType': ['E','EV1','EV4','EIT']},              #properties will be applied to cells that match these conditions
+        'conds': {'cellType': ['E','EV1','EV4','EIT', 'EMI', 'EMO']},              #properties will be applied to cells that match these conditions
         'secs': {'soma':                        #sections
                 {'geom': {'diam':10, 'L':10, 'Ra':120},         #geometry
                 'mechs': {'hh': {'gnabar': 0.12, 'gkbar': 0.036, 'gl': 0.003, 'el': -70}}}}}    #mechanism
 
 netParams.cellParams['IRule'] = {               # cell rule label
-        'conds': {'cellType': ['InV1','InV4','InIT']},              #properties will be applied to cells that match these conditions
+        'conds': {'cellType': ['InV1','InV4','InIT', 'InMI']},              #properties will be applied to cells that match these conditions
         'secs': {'soma':                        #sections
                 {'geom': {'diam':10, 'L':10, 'Ra':120},         #geometry
                 'mechs': {'hh': {'gnabar': 0.12, 'gkbar': 0.036, 'gl': 0.003, 'el': -70}}}}}    #mechanism
@@ -56,7 +60,7 @@ netParams.stimTargetParams['stimMod->all'] = {'source': 'stimMod',
 
 # Stimulation parameters
 netParams.stimSourceParams['bkg'] = {'type': 'NetStim', 'rate': 20, 'noise': 0.3}
-netParams.stimTargetParams['bkg->all'] = {'source': 'bkg', 'conds': {'cellType': ['InV1','InV4','InIT']}, 'weight': 0.01, 'delay': 'max(1, normal(5,2))', 'synMech': 'AMPA'}
+netParams.stimTargetParams['bkg->all'] = {'source': 'bkg', 'conds': {'cellType': ['InV1','InV4','InIT', 'InMI']}, 'weight': 0.01, 'delay': 'max(1, normal(5,2))', 'synMech': 'AMPA'}
 ######################################################################################
 def connectLayerswithOverlap(NBpreN, NBpostN, overlap_xdir):
     #NBpreN = 6400 	#number of presynaptic neurons
@@ -231,31 +235,35 @@ def plotWeights():
 blistEtoV1 = connectLayerswithOverlap(NBpreN = 6400, NBpostN = 6400, overlap_xdir = 5)
 blistV1toV4 = connectLayerswithOverlap(NBpreN = 6400, NBpostN = 1600, overlap_xdir = 5)
 blistV4toIT = connectLayerswithOverlap(NBpreN = 1600, NBpostN = 400, overlap_xdir = 15)
+blistITtoMI = connectLayerswithOverlap(NBpreN = 400, NBpostN = 400, overlap_xdir = 5) #Not sure if this is a good strategy instead of all to all
+#blistMItoMO: Feedforward for MI to MO is all to all and can be specified in the connection statement iteself
 
 #E to I - Feedforward connections
 blistEtoInV1 = connectLayerswithOverlap(NBpreN = 6400, NBpostN = 1600, overlap_xdir = 5)
 blistV1toInV4 = connectLayerswithOverlap(NBpreN = 6400, NBpostN = 400, overlap_xdir = 15)
 blistV4toInIT = connectLayerswithOverlap(NBpreN = 1600, NBpostN = 100, overlap_xdir = 15)
+blistITtoInMI = connectLayerswithOverlap(NBpreN = 400, NBpostN = 100, overlap_xdir = 15)
 
 #Feedbackward excitation
 #E to E  
 blistV1toE = connectLayerswithOverlapDiv(NBpreN = 6400, NBpostN = 6400, overlap_xdir = 3)
 blistV4toV1 = connectLayerswithOverlapDiv(NBpreN = 1600, NBpostN = 6400, overlap_xdir = 3)
 blistITtoV4 = connectLayerswithOverlapDiv(NBpreN = 400, NBpostN = 1600, overlap_xdir = 3)
-
+blistMItoIT = connectLayerswithOverlapDiv(NBpreN = 400, NBpostN = 400, overlap_xdir = 3)
+blistMOtoMI = connectLayerswithOverlapDiv(NBpreN = 4, NBpostN = 400, overlap_xdir = 11)
 
 #Feedforward inhibition
 #I to I
 blistInV1toInV4 = connectLayerswithOverlap(NBpreN = 1600, NBpostN = 400, overlap_xdir = 5)
 blistInV4toInIT = connectLayerswithOverlap(NBpreN = 400, NBpostN = 100, overlap_xdir = 5)
-
+blistInITtoInMI = connectLayerswithOverlap(NBpreN = 100, NBpostN = 100, overlap_xdir = 5)
 
 #Feedbackward inhibition
 #I to E 
 blistInV1toE = connectLayerswithOverlapDiv(NBpreN = 1600, NBpostN = 6400, overlap_xdir = 5)
 blistInV4toV1 = connectLayerswithOverlapDiv(NBpreN = 400, NBpostN = 6400, overlap_xdir = 5)
 blistInITtoV4 = connectLayerswithOverlapDiv(NBpreN = 100, NBpostN = 1600, overlap_xdir = 5)
-
+blistInMItoIT = connectLayerswithOverlapDiv(NBpreN = 100, NBpostN = 400, overlap_xdir = 5)
 
 #blist = connectRtoV1withOverlap()
 #blist = connectRtoV1withoutOverlap()
@@ -263,7 +271,7 @@ blistInITtoV4 = connectLayerswithOverlapDiv(NBpreN = 100, NBpostN = 1600, overla
 
 #Local excitation
 #E to E
-netParams.connParams['R->V1'] = {
+netParams.connParams['R->R'] = {
         'preConds': {'pop': 'R'},
         'postConds': {'pop': 'R'},
         'probability': 0.02,
@@ -295,6 +303,14 @@ netParams.connParams['IT->IT'] = {
         'delay': 20,
         'synMech': 'AMPA',
         'plast': {'mech': 'STDP', 'params': STDPparams}}
+netParams.connParams['MI->MI'] = {
+        'preConds': {'pop': 'MI'},
+        'postConds': {'pop': 'MI'},
+        'probability': 0.02,
+        'weight': 0.0001,
+        'delay': 20,
+        'synMech': 'AMPA',
+        'plast': {'mech': 'STDP', 'params': STDPparams}}
 #E to I
 netParams.connParams['V1->IV1'] = {
         'preConds': {'pop': 'V1'},
@@ -315,6 +331,14 @@ netParams.connParams['V4->IV4'] = {
 netParams.connParams['IT->IIT'] = {
         'preConds': {'pop': 'IT'},
         'postConds': {'pop': 'IIT'},
+        'probability': 0.02,
+        'weight': 0.0001,
+        'delay': 20,
+        'synMech': 'AMPA',
+        'plast': {'mech': 'STDP', 'params': STDPparams}}
+netParams.connParams['MI->IMI'] = {
+        'preConds': {'pop': 'MI'},
+        'postConds': {'pop': 'IMI'},
         'probability': 0.02,
         'weight': 0.0001,
         'delay': 20,
@@ -346,6 +370,14 @@ netParams.connParams['IIT->IT'] = {
         'delay': 20,
         'synMech': 'GABA',
         'plast': {'mech': 'STDP', 'params': STDPparams}}
+netParams.connParams['IMI->MI'] = {
+        'preConds': {'pop': 'IMI'},
+        'postConds': {'pop': 'MI'},
+        'probability': 0.02,
+        'weight': 0.0001,
+        'delay': 20,
+        'synMech': 'GABA',
+        'plast': {'mech': 'STDP', 'params': STDPparams}}
 #I to I
 netParams.connParams['IV1->IV1'] = {
         'preConds': {'pop': 'IV1'},
@@ -371,7 +403,14 @@ netParams.connParams['IIT->IIT'] = {
         'delay': 20,
         'synMech': 'GABA',
         'plast': {'mech': 'STDP', 'params': STDPparams}}
-
+netParams.connParams['IMI->IMI'] = {
+        'preConds': {'pop': 'IMI'},
+        'postConds': {'pop': 'IMI'},
+        'probability': 0.02,
+        'weight': 0.0001,
+        'delay': 20,
+        'synMech': 'GABA',
+        'plast': {'mech': 'STDP', 'params': STDPparams}}
 #E to E feedforward connections
 netParams.connParams['R->V1'] = {
         'preConds': {'pop': 'R'},
@@ -400,7 +439,25 @@ netParams.connParams['V4->IT'] = {
         'delay': 20,
         'synMech': 'AMPA',
         'plast': {'mech': 'STDP', 'params': STDPparams}}
-
+netParams.connParams['IT->MI'] = {
+        'preConds': {'pop': 'IT'},
+        'postConds': {'pop': 'MI'},
+        'connList': blistITtoMI,
+        #'convergence': 10,
+        'weight': 0.002,
+        'delay': 20,
+        'synMech': 'AMPA',
+        'plast': {'mech': 'STDP', 'params': STDPparams}}
+netParams.connParams['MI->MO'] = {
+        'preConds': {'pop': 'MI'},
+        'postConds': {'pop': 'MO'},
+        'probability': 1.0,
+        #'connList': blistITtoMI,
+        #'convergence': 10,
+        'weight': 0.002,
+        'delay': 20,
+        'synMech': 'AMPA',
+        'plast': {'mech': 'STDP', 'params': STDPparams}}
 #E to I feedforward connections
 netParams.connParams['R->IV1'] = {
         'preConds': {'pop': 'R'},
@@ -429,7 +486,15 @@ netParams.connParams['V4->IIT'] = {
         'delay': 20,
         'synMech': 'AMPA',
         'plast': {'mech': 'STDP', 'params': STDPparams}}
-
+netParams.connParams['IT->IMI'] = {
+        'preConds': {'pop': 'IT'},
+        'postConds': {'pop': 'IMI'},
+        'connList': blistITtoInMI,
+        #'convergence': 10,
+        'weight': 0.002,
+        'delay': 20,
+        'synMech': 'AMPA',
+        'plast': {'mech': 'STDP', 'params': STDPparams}}
 
 #E to E feedbackward connections
 netParams.connParams['V1->R'] = {
@@ -459,7 +524,24 @@ netParams.connParams['IT->V4'] = {
         'delay': 20,
         'synMech': 'AMPA',
         'plast': {'mech': 'STDP', 'params': STDPparams}}
-
+netParams.connParams['MI->IT'] = {
+        'preConds': {'pop': 'MI'},
+        'postConds': {'pop': 'IT'},
+        'connList': blistMItoIT,
+        #'convergence': 10,
+        'weight': 0.0001,
+        'delay': 20,
+        'synMech': 'AMPA',
+        'plast': {'mech': 'STDP', 'params': STDPparams}}
+netParams.connParams['MO->MI'] = {
+        'preConds': {'pop': 'MO'},
+        'postConds': {'pop': 'MI'},
+        'connList': blistMOtoMI,
+        #'convergence': 10,
+        'weight': 0.0001,
+        'delay': 20,
+        'synMech': 'AMPA',
+        'plast': {'mech': 'STDP', 'params': STDPparams}}
 
 #I to E connections
 
@@ -490,6 +572,15 @@ netParams.connParams['IIT->V4'] = {
         'delay': 20,
         'synMech': 'GABA',
         'plast': {'mech': 'STDP', 'params': STDPparams}}
+netParams.connParams['IMI->IT'] = {
+        'preConds': {'pop': 'IMI'},
+        'postConds': {'pop': 'IT'},
+        'connList': blistInMItoIT,
+        #'convergence': 10,
+        'weight': 0.002,
+        'delay': 20,
+        'synMech': 'GABA',
+        'plast': {'mech': 'STDP', 'params': STDPparams}}
 #I to I
 netParams.connParams['IV1->IV4'] = {
         'preConds': {'pop': 'IV1'},
@@ -509,7 +600,15 @@ netParams.connParams['IV4->IIT'] = {
         'delay': 20,
         'synMech': 'GABA',
         'plast': {'mech': 'STDP', 'params': STDPparams}}
-
+netParams.connParams['IIT->IMI'] = {
+        'preConds': {'pop': 'IIT'},
+        'postConds': {'pop': 'IMI'},
+        'connList': blistInV4toInIT,
+        #'convergence': 10,
+        'weight': 0.002,
+        'delay': 20,
+        'synMech': 'GABA',
+        'plast': {'mech': 'STDP', 'params': STDPparams}}
 #Simulation options
 simConfig = specs.SimConfig()           # object of class SimConfig to store simulation configuration
 
