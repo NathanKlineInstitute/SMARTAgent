@@ -11,7 +11,7 @@ cellIDs = data1["cellGids"]
 skColors = data1["spkColors"] 
 
 totalDur = 1000
-tBin = 1000
+tBin = 100
 
 
 #NB of excitatory neurons
@@ -45,17 +45,20 @@ ITiCells_spkTimes = AllCells_spkTimes[(AllCells>16799) &(AllCells<16900)]
 
 
 def computeMeanFiringRate(totalDur, tBin, Cells, Cells_spkTimes,NBCells):
+    uniqueCells = np.unique(Cells)
     nbBins = int(totalDur/tBin)
-    spkCount = np.zeros((nbBins,len(Cells)))
+    spkCount = np.zeros((nbBins,len(uniqueCells)))
     Cells_spkCount = []
+    totalSpikes = []
     count = 0
-    for cell in Cells:
+    for cell in uniqueCells:
         cCell_spkTimes = Cells_spkTimes[Cells==cell]
         Cells_spkCount.append(count)
+        totalSpikes.append(len(cCell_spkTimes))
         for n in range(nbBins):
             t0 = n*tBin
             t1 = ((n+1)*tBin) - 1
-            spk_times = cCell_spkTimes[(cCell_spkTimes>t0) & (cCell_spkTimes<t1)]
+            spk_times = cCell_spkTimes[(cCell_spkTimes>t0-0.001) & (cCell_spkTimes<t1+0.01)]
             spkCount[n][count]=len(spk_times)
         count = count+1
     mfactor = 1000/(tBin*NBCells) 
