@@ -451,9 +451,7 @@ netParams.connParams['IT->MI'] = {
 netParams.connParams['MI->MO'] = {
         'preConds': {'pop': 'MI'},
         'postConds': {'pop': 'MO'},
-        'probability': 1.0,
-        #'connList': blistITtoMI,
-        #'convergence': 10,
+        'convergence': 400,
         'weight': 0.002,
         'delay': 20,
         'synMech': 'AMPA',
@@ -603,7 +601,7 @@ netParams.connParams['IV4->IIT'] = {
 netParams.connParams['IIT->IMI'] = {
         'preConds': {'pop': 'IIT'},
         'postConds': {'pop': 'IMI'},
-        'connList': blistInV4toInIT,
+        'connList': blistInITtoInMI,
         #'convergence': 10,
         'weight': 0.002,
         'delay': 20,

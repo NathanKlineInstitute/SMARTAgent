@@ -330,4 +330,4 @@ Adding stims...
 **Feedbackward [MI to IT]: 1 E to 9 E, 1 I to 25 E, No I to I
 **Feedforward [MI to MO]: 400 E to 1 E (all to all by using probability of connection 1)
 **Feedbackward [MO to MI]: 1 E to 121 E 
-
+**There was a bug in connParams. Fixed now.
