@@ -351,5 +351,18 @@ Total time = 3753.03 s
 *19dec6
 **Sam suggested: May be should increase number of neurons in motor output layer (MO).
 **Change MO from 2x2(4) to 10x10(100)
-**Increase number of MO neurons from 4 to 100. Also changed the connectivity from MO to MI and MI to MO. 
+**Increase number of MO neurons from 4 to 100. Also changed the connectivity from MO to MI and MI to MO.
+**Ran the simulation after changing MO as described above. Below are some runtime stats.
+Analyzing...
+  Cells: 17500
+  Connections: 3212180 (183.55 per cell)
+  Spikes: 762715 (4.36 Hz)
+  Simulated time: 10.0 s; 1 workers
+  Run time: 1810.90 s
+  Done; saving time = 0.22 s.
+Plotting raster...
+Saving figure data as RasterData.pkl ... 
+  Done; plotting time = 92.46 s
+**Replace connections between Visual Cortex and Motor Cortex from STDP to Reward-based STDP.
+**Keeping connections within every layer of Motor Cortex standard STDP.
 

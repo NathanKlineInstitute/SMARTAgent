@@ -48,6 +48,9 @@ netParams.synMechParams['GABA'] = {'mod': 'Exp2Syn', 'tau1': 0.07, 'tau2': 9.1, 
 STDPparams = {'hebbwt': 0.0001, 'antiwt':-0.00001, 'wmax': 50, 'RLon': 0 , 'RLhebbwt': 0.001, 'RLantiwt': -0.000,
         'tauhebb': 10, 'RLwindhebb': 50, 'useRLexp': 0, 'softthresh': 0, 'verbose':0}
 
+STDPparamsRL = {'hebbwt': 0.00001, 'antiwt':-0.00001, 'wmax': 50, 'RLon': 1 , 'RLhebbwt': 0.001, 'RLantiwt': -0.000,
+        'tauhebb': 10, 'RLwindhebb': 50, 'useRLexp': 0, 'softthresh': 0, 'verbose':0}
+
 netParams.stimSourceParams['stimMod'] = {'type': 'NetStim', 'rate': 'variable', 'noise': 0}
 netParams.stimTargetParams['stimMod->all'] = {'source': 'stimMod',
         'conds': {'pop': 'R'},
@@ -448,7 +451,7 @@ netParams.connParams['IT->MI'] = {
         'weight': 0.002,
         'delay': 20,
         'synMech': 'AMPA',
-        'plast': {'mech': 'STDP', 'params': STDPparams}}
+        'plast': {'mech': 'STDP', 'params': STDPparamsRL}}
 netParams.connParams['MI->MO'] = {
         'preConds': {'pop': 'MI'},
         'postConds': {'pop': 'MO'},
@@ -457,7 +460,7 @@ netParams.connParams['MI->MO'] = {
         'weight': 0.002,
         'delay': 20,
         'synMech': 'AMPA',
-        'plast': {'mech': 'STDP', 'params': STDPparams}}
+        'plast': {'mech': 'STDP', 'params': STDPparamsRL}}
 #E to I feedforward connections
 netParams.connParams['R->IV1'] = {
         'preConds': {'pop': 'R'},
@@ -494,7 +497,7 @@ netParams.connParams['IT->IMI'] = {
         'weight': 0.002,
         'delay': 20,
         'synMech': 'AMPA',
-        'plast': {'mech': 'STDP', 'params': STDPparams}}
+        'plast': {'mech': 'STDP', 'params': STDPparamsRL}}
 
 #E to E feedbackward connections
 netParams.connParams['V1->R'] = {
@@ -532,7 +535,7 @@ netParams.connParams['MI->IT'] = {
         'weight': 0.0001,
         'delay': 20,
         'synMech': 'AMPA',
-        'plast': {'mech': 'STDP', 'params': STDPparams}}
+        'plast': {'mech': 'STDP', 'params': STDPparamsRL}}
 netParams.connParams['MO->MI'] = {
         'preConds': {'pop': 'MO'},
         'postConds': {'pop': 'MI'},
@@ -541,7 +544,7 @@ netParams.connParams['MO->MI'] = {
         'weight': 0.0001,
         'delay': 20,
         'synMech': 'AMPA',
-        'plast': {'mech': 'STDP', 'params': STDPparams}}
+        'plast': {'mech': 'STDP', 'params': STDPparamsRL}}
 
 #I to E connections
 
@@ -580,7 +583,7 @@ netParams.connParams['IMI->IT'] = {
         'weight': 0.002,
         'delay': 20,
         'synMech': 'GABA',
-        'plast': {'mech': 'STDP', 'params': STDPparams}}
+        'plast': {'mech': 'STDP', 'params': STDPparamsRL}}
 #I to I
 netParams.connParams['IV1->IV4'] = {
         'preConds': {'pop': 'IV1'},
@@ -608,7 +611,7 @@ netParams.connParams['IIT->IMI'] = {
         'weight': 0.002,
         'delay': 20,
         'synMech': 'GABA',
-        'plast': {'mech': 'STDP', 'params': STDPparams}}
+        'plast': {'mech': 'STDP', 'params': STDPparamsRL}}
 #Simulation options
 simConfig = specs.SimConfig()           # object of class SimConfig to store simulation configuration
 
