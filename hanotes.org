@@ -331,3 +331,25 @@ Adding stims...
 **Feedforward [MI to MO]: 400 E to 1 E (all to all by using probability of connection 1)
 **Feedbackward [MO to MI]: 1 E to 121 E 
 **There was a bug in connParams. Fixed now.
+
+*19dec5
+Analyzing...
+  Cells: 17404
+  Connections: 3189957 (183.29 per cell)
+  Spikes: 770534 (4.43 Hz)
+  Simulated time: 10.0 s; 1 workers
+  Run time: 1838.15 s
+Saving output as model_output.pkl ... 
+Finished saving!
+  Done; saving time = 995.82 s.
+Plotting raster...
+Saving figure data as RasterData.pkl ... 
+  Done; plotting time = 98.44 s
+
+Total time = 3753.03 s
+
+*19dec6
+**Sam suggested: May be should increase number of neurons in motor output layer (MO).
+**Change MO from 2x2(4) to 10x10(100)
+**Increase number of MO neurons from 4 to 100. Also changed the connectivity from MO to MI and MI to MO. 
+

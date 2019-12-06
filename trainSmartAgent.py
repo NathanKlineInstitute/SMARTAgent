@@ -21,7 +21,7 @@ netParams.popParams['IV4'] = {'cellType': 'InV4', 'numCells': 400, 'cellModel': 
 netParams.popParams['IIT'] = {'cellType': 'InIT', 'numCells': 100, 'cellModel': 'HH'}
 
 netParams.popParams['MI'] = {'cellType': 'EMI', 'numCells': 400, 'cellModel': 'HH'}
-netParams.popParams['MO'] = {'cellType': 'EMO', 'numCells': 4, 'cellModel': 'HH'}
+netParams.popParams['MO'] = {'cellType': 'EMO', 'numCells': 100, 'cellModel': 'HH'}
 
 netParams.popParams['IMI'] = {'cellType': 'InMI', 'numCells': 100, 'cellModel': 'HH'}
 
@@ -236,6 +236,7 @@ blistEtoV1 = connectLayerswithOverlap(NBpreN = 6400, NBpostN = 6400, overlap_xdi
 blistV1toV4 = connectLayerswithOverlap(NBpreN = 6400, NBpostN = 1600, overlap_xdir = 5)
 blistV4toIT = connectLayerswithOverlap(NBpreN = 1600, NBpostN = 400, overlap_xdir = 15)
 blistITtoMI = connectLayerswithOverlap(NBpreN = 400, NBpostN = 400, overlap_xdir = 5) #Not sure if this is a good strategy instead of all to all
+blistMItoMO = connectLayerswithOverlap(NBpreN = 400, NBpostN = 100, overlap_xdir = 19)
 #blistMItoMO: Feedforward for MI to MO is all to all and can be specified in the connection statement iteself
 
 #E to I - Feedforward connections
@@ -250,7 +251,7 @@ blistV1toE = connectLayerswithOverlapDiv(NBpreN = 6400, NBpostN = 6400, overlap_
 blistV4toV1 = connectLayerswithOverlapDiv(NBpreN = 1600, NBpostN = 6400, overlap_xdir = 3)
 blistITtoV4 = connectLayerswithOverlapDiv(NBpreN = 400, NBpostN = 1600, overlap_xdir = 3)
 blistMItoIT = connectLayerswithOverlapDiv(NBpreN = 400, NBpostN = 400, overlap_xdir = 3)
-blistMOtoMI = connectLayerswithOverlapDiv(NBpreN = 4, NBpostN = 400, overlap_xdir = 11)
+blistMOtoMI = connectLayerswithOverlapDiv(NBpreN = 100, NBpostN = 400, overlap_xdir = 3)
 
 #Feedforward inhibition
 #I to I
@@ -451,9 +452,10 @@ netParams.connParams['IT->MI'] = {
 netParams.connParams['MI->MO'] = {
         'preConds': {'pop': 'MI'},
         'postConds': {'pop': 'MO'},
-        'convergence': 100,
+        'connList': blistMItoMO,
+        #'convergence': 100,
         'weight': 0.002,
-        'delay': 10,
+        'delay': 20,
         'synMech': 'AMPA',
         'plast': {'mech': 'STDP', 'params': STDPparams}}
 #E to I feedforward connections
@@ -617,7 +619,7 @@ simConfig.verbose = False                       # Show detailed messages
 simConfig.recordCellsSpikes = [-1]
 simConfig.recordStep = 0.2                      # Step size in ms to save data (e.g. V traces, LFP, etc)
 simConfig.filename = 'model_output'  # Set file output name
-simConfig.savePickle = True            # Save params, network and sim output to pickle file
+simConfig.savePickle = False            # Save params, network and sim output to pickle file
 #simConfig.saveMat = True
 
 #simConfig.analysis['plotRaster'] = True                         # Plot a raster
