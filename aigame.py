@@ -29,11 +29,14 @@ class SMARTAgent:
     ################################
     ### PLAY GAME
     ###############################
-    def playGame(self):
+    def playGame(self, actions): #actions need to be generated from motor cortex
+        rewards = numpy.zeros(shape=(1,5))
         dsum_Images = numpy.zeros(shape=(80,80))
-        for _ in range(5):
-            action = random.randint(3,4)
-            observation, reward, done, info = self.env.step(action)
+        for a in range(5):
+            #action = random.randint(3,4)
+            caction = actions[a]
+            observation, reward, done, info = self.env.step(caction)
+            rewards[a] = reward
             Image = observation[34:194,:,:]
             gray_Image = numpy.zeros(shape=(160,160))
             for i in range(160):
@@ -73,6 +76,7 @@ class SMARTAgent:
         if self.countAll==1000:
             self.env.reset()
             self.countAll = 0
+        return rewards
         #return firing_rates
 
     ################################          

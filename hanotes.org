@@ -366,3 +366,6 @@ Saving figure data as RasterData.pkl ...
 **Replace connections between Visual Cortex and Motor Cortex from STDP to Reward-based STDP.
 **Keeping connections within every layer of Motor Cortex standard STDP.
 
+*19dec10
+**function playGame is modified to take a list of actions (5 actions) and returns rewards (5 rewards) associated with those actions.
+**generate actions based on activity of MO.
