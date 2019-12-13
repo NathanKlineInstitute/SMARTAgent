@@ -2,6 +2,7 @@ from netpyne import specs, sim
 from aigame import SMARTAgent
 from neuron import h
 import numpy
+import random
 
 sim.allWeights = [] # list to store weights
 sim.weightsfilename = 'weights.txt'  # file to store weights
@@ -648,10 +649,66 @@ def recordWeights ():
       if 'hSTDP' in conn:
         sim.allWeights[-1].append(float(conn['hObj'].weight[0])) # save weight only for STDP conns
 
+def getFiringRatesWithInterval(trange = None, neuronal_pop = None):
+  #sim.gatherData()
+  spkts = sim.simData['spkt']
+  spkids = sim.simData['spkid']
+  pop_spikes = 0
+  if len(spkts)>0:
+    for i in range(len(spkids)):
+      if trange[0] <= spkts[i] <= trange[1] and spkids[i] in neuronal_pop:
+        pop_spikes = pop_spikes+1
+    tsecs = float((trange[1]-trange[0]))/1000.0
+    numCells = float(len(neuronal_pop))
+    avgRates = pop_spikes/numCells/tsecs
+  else:
+    avgRates = 0.0
+  print('Firing rate : %.3f Hz'%(avgRates))
+  return avgRates
+
+
 def trainAgent(t):
   """ training interface between simulation and game environment
   """
-  sim.SMARTAgent.playGame()
+  if t<21.0: # for the first time interval use randomly selected actions
+    actions =[]
+    for _ in range(5):
+      action = random.randint(3,4)
+      actions.append(action)
+  else: #the actions should be based on the activity of motor cortex (MO)
+    F_R1 = getFiringRatesWithInterval([t-20,t], range(17301,17310))
+    F_R2 = getFiringRatesWithInterval([t-20,t], range(17311,17320))
+    F_R3 = getFiringRatesWithInterval([t-20,t], range(17321,17330))
+    F_R4 = getFiringRatesWithInterval([t-20,t], range(17331,17340))
+    F_R5 = getFiringRatesWithInterval([t-20,t], range(17341,17350))
+    F_L1 = getFiringRatesWithInterval([t-20,t], range(17351,17360))
+    F_L2 = getFiringRatesWithInterval([t-20,t], range(17361,17370))
+    F_L3 = getFiringRatesWithInterval([t-20,t], range(17371,17380))
+    F_L4 = getFiringRatesWithInterval([t-20,t], range(17381,17390))
+    F_L5 = getFiringRatesWithInterval([t-20,t], range(17391,17400))
+    actions = []
+    if F_R1>F_L1:
+      actions.append(4)
+    else:
+      actions.append(3)
+    if F_R2>F_L2:
+      actions.append(4)
+    else:
+      actions.append(3)
+    if F_R3>F_L3:
+      actions.append(4)
+    else:
+      actions.append(3)
+    if F_R4>F_L4:
+      actions.append(4)
+    else:
+      actions.append(3)
+    if F_R5>F_L5:
+      actions.append(4)
+    else:
+      actions.append(3)
+  print(actions)
+  rewards = sim.SMARTAgent.playGame(actions)
   sim.SMARTAgent.run(t,sim)
   print('trainAgent time is : ', t)
   if t%recordWeightDT==0: recordWeights()

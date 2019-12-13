@@ -30,13 +30,15 @@ class SMARTAgent:
     ### PLAY GAME
     ###############################
     def playGame(self, actions): #actions need to be generated from motor cortex
-        rewards = numpy.zeros(shape=(1,5))
+        #rewards = numpy.zeros(shape=(1,5))
+        rewards = []
         dsum_Images = numpy.zeros(shape=(80,80))
+        print(actions)
         for a in range(5):
             #action = random.randint(3,4)
             caction = actions[a]
             observation, reward, done, info = self.env.step(caction)
-            rewards[a] = reward
+            rewards.append(reward)
             Image = observation[34:194,:,:]
             gray_Image = numpy.zeros(shape=(160,160))
             for i in range(160):

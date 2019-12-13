@@ -369,3 +369,15 @@ Saving figure data as RasterData.pkl ...
 *19dec10
 **function playGame is modified to take a list of actions (5 actions) and returns rewards (5 rewards) associated with those actions.
 **generate actions based on activity of MO.
+
+*19dec11
+**record firing rate of populations of neurons for 20 ms and use that rate to generate actions.
+***100 MO neurons are divided into 50 neurons for Right-move(up) and 50 neurons for left-move(down) action.
+***Those 50 neurons are further divided into groups of 10 neurons with each group respoisnble for 1 actions out of a sequence of 5 actions.
+
+*19dec12
+**Error detected in code in function playGame.
+
+*19dec13
+**Fixed the error and reran the simulation.
+**action is generated based on activitiy of MO.
