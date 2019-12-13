@@ -381,3 +381,5 @@ Saving figure data as RasterData.pkl ...
 *19dec13
 **Fixed the error and reran the simulation.
 **action is generated based on activitiy of MO.
+**RL code included---mainly modified from Salva's RL model. I don't understand rank and pc.broadcast related script.
+**Still need to test the code.
