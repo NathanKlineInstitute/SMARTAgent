@@ -383,3 +383,15 @@ Saving figure data as RasterData.pkl ...
 **action is generated based on activitiy of MO.
 **RL code included---mainly modified from Salva's RL model. I don't understand rank and pc.broadcast related script.
 **Still need to test the code.
+**When i tested the code, i noticed that the firing rate of neuronal population generating actions was 0 most of the times.
+**The reason might be that the connection weights reduced to 0 but have not checked that yet.
+**So after discussing with Sam, I have made a list of things to test with the model as Below:
+1. turn off the -1 and only use 0 or 1, what happens?
+2. compare the results of full model simulation with the simulation after completing tuning off reward, punishment.
+3. compare the results of full model simulation with the simulation after completely turning off STDP.
+4. compare the results of full model simulation with the simulation after using RL-STDP for all synapses.
+5. Can do 2 phase learning: phase 1 for STDP between visual layers. training is terminated when the firing rates become stable. Then use those weights for visual connections and train RL-STDP connections.
+6. For different configurations, play with starting weights by increasing.
+7. could try saving weights from visual learning, then restore them into the network, and continue from there with RL
+
+Also for later he suggested: for the longer term should think about how to avoid "catastrophic forgetting" <- which is what that guy hananel mentioned - when certain neural networks have to learn > 1 thing, the new info/memory/task sometimes interferes with the previously learned. i think the bazhenov model/paper mentions that problem with a solution too (might involve homeostatic plasticity)
