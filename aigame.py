@@ -33,7 +33,7 @@ class SMARTAgent:
         #rewards = numpy.zeros(shape=(1,5))
         rewards = []
         dsum_Images = numpy.zeros(shape=(80,80))
-        print(actions)
+        #print(actions)
         for a in range(5):
             #action = random.randint(3,4)
             caction = actions[a]

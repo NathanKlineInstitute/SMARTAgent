@@ -709,6 +709,23 @@ def trainAgent(t):
       actions.append(3)
   print(actions)
   rewards = sim.SMARTAgent.playGame(actions)
+  #I don't understand the code below. Copied from Salva's RL model
+  vec = h.Vector()
+  if sim.rank == 0:
+    rewards = sim.SMARTAgent.playGame(actions)
+    critic = sum(rewards) # get critic signal (-1, 0 or 1)
+    sim.pc.broadcast(vec.from_python([critic]), 0) # convert python list to hoc vector for broadcast data received from arm
+  else: # other workers
+    sim.pc.broadcast(vec, 0)
+    critic = vec.to_python()[0] #till here I dont understand
+  if critic != 0: # if critic signal indicates punishment (-1) or reward (+1)
+    print('t=',t,'- adjusting weights based on RL critic value:', critic)
+    for cell in sim.net.cells:
+      for conn in cell.conns:
+        STDPmech = conn.get('hSTDP')  # check if has STDP mechanism
+        if STDPmech:   # run stdp.mod method to update syn weights based on RLprint cell.gid
+          STDPmech.reward_punish(float(critic))
+  print(rewards)
   sim.SMARTAgent.run(t,sim)
   print('trainAgent time is : ', t)
   if t%recordWeightDT==0: recordWeights()
