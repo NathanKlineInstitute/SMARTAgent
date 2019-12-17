@@ -408,3 +408,4 @@ Also for later he suggested: for the longer term should think about how to avoid
 *19dec17
 **Start debugging the code to save weights.
 ***I noticed that i was not passing argument sim to the function saveWeights(sim). I made this correction and now rerunning the simulation.
+***Another problem detected: precision of t such that it never gives DT%1000==0

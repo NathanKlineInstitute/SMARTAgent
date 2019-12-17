@@ -10,7 +10,8 @@ sim.RLweightsfilename = 'RLweights.txt'  # file to store weights
 sim.NonRLweightsfilename = 'NonRLweights.txt'  # file to store weights
 sim.plotWeights = 0  # plot weights
 sim.saveWeights = 1  # save weights
-recordWeightDT = 1000 # interval for recording synaptic weights (change later)
+recordWeightStepSize = 2
+#recordWeightDT = 1000 # interval for recording synaptic weights (change later)
 recordWeightDCells = 10 # to record weights for sub samples of neurons
 
 
@@ -589,7 +590,7 @@ netParams.connParams['IIT->IMI'] = {
 #Simulation options
 simConfig = specs.SimConfig()           # object of class SimConfig to store simulation configuration
 
-simConfig.duration = 1e4                      # Duration of the simulation, in ms
+simConfig.duration = 1e5                      # Duration of the simulation, in ms
 simConfig.dt = 0.2                            # Internal integration timestep to use
 simConfig.verbose = False                       # Show detailed messages
 #simConfig.recordTraces = {'V_soma':{'sec':'soma','loc':0.5,'var':'v'}}  # Dict with traces to record
@@ -677,10 +678,12 @@ def getFiringRatesWithInterval(trange = None, neuronal_pop = None):
     print('Firing rate : %.3f Hz'%(avgRates))
     return avgRates
 
+NBsteps = 0
 
 def trainAgent(t):
     """ training interface between simulation and game environment
     """
+    global NBsteps
     if t<21.0: # for the first time interval use randomly selected actions
         actions =[]
         for _ in range(5):
@@ -749,7 +752,12 @@ def trainAgent(t):
     print('rewards are : ', rewards)
     sim.SMARTAgent.run(t,sim)
     print('trainAgent time is : ', t)
-    if t%recordWeightDT==0: recordWeights(sim)
+    NBsteps = NBsteps+1
+    if NBsteps==recordWeightStepSize:
+        #if t%recordWeightDT==0:
+        print('Weights Recording Time:', t) 
+        recordWeights(sim)
+        NBsteps = 0
 
 #Alterate to create network and run simulation
 sim.initialize(                       # create network object and set cfg and net params
