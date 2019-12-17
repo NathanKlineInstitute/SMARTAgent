@@ -4,9 +4,15 @@ from neuron import h
 import numpy
 import random
 
-sim.allWeights = [] # list to store weights
-sim.weightsfilename = 'weights.txt'  # file to store weights
+sim.allRLWeights = [] # list to store weights
+sim.allNonRLWeights = [] # list to store weights
+sim.RLweightsfilename = 'RLweights.txt'  # file to store weights
+sim.NonRLweightsfilename = 'NonRLweights.txt'  # file to store weights
 sim.plotWeights = 0  # plot weights
+sim.saveWeights = 1  # save weights
+recordWeightDT = 1000 # interval for recording synaptic weights (change later)
+recordWeightDCells = 10 # to record weights for sub samples of neurons
+
 
 # Network parameters
 netParams = specs.NetParams() #object of class NetParams to store the network parameters
@@ -201,39 +207,6 @@ def connectRtoV1withoutOverlap():
     return blist
 
 #####################################################################################
-def saveWeights(sim):
-    ''' Save the weights for each plastic synapse '''
-    count = 0
-    with open(sim.weightsfilename,'w') as fid:
-        for weightdata in sim.allWeights:
-            count = count+1
-            if count==1000:
-                #fid.write('%0.0f' % weightdata[0]) # Time
-                for i in range(1,len(weightdata)): fid.write('\t%0.8f' % weightdata[i])
-                fid.write('\n')
-                count = 0
-    print(('Saved weights as %s' % sim.weightsfilename))    
-
-
-def plotWeights():
-    from pylab import figure, loadtxt, xlabel, ylabel, xlim, ylim, show, pcolor, array, colorbar
-
-    figure()
-    weightdata = loadtxt(sim.weightsfilename)
-    weightdataT=list(map(list, list(zip(*weightdata))))
-    vmax = max([max(row) for row in weightdata])
-    vmin = min([min(row) for row in weightdata])
-    pcolor(array(weightdataT), cmap='hot_r', vmin=vmin, vmax=vmax)
-    xlim((0,len(weightdata)))
-    ylim((0,len(weightdata[0])))
-    xlabel('Time (weight updates)')
-    ylabel('Synaptic connection id')
-    colorbar()
-    show()
-
-######################################################################################
-
-
 #Feedforward excitation
 #E to E - Feedforward connections
 blistEtoV1 = connectLayerswithOverlap(NBpreN = 6400, NBpostN = 6400, overlap_xdir = 5)
@@ -638,107 +611,145 @@ simConfig.analysis['plotRaster'] = {'popRates':'overlay','saveData':'RasterData.
 
 sim.SMARTAgent = SMARTAgent()
 
-recordWeightDT = 500 # interval for recording synaptic weights (change later)
 
-def recordWeights ():
-  """ record the STDP weights during the simulation - called in trainAgent
-  """
-  sim.allWeights.append([]) # Save this time
-  for cell in sim.net.cells:
-    for conn in cell.conns:
-      if 'hSTDP' in conn:
-        sim.allWeights[-1].append(float(conn['hObj'].weight[0])) # save weight only for STDP conns
+def recordWeights (sim):
+    """ record the STDP weights during the simulation - called in trainAgent
+    """
+    sim.allRLWeights.append([]) # Save this time
+    sim.allNonRLWeights.append([])
+    for cell in sim.net.cells:
+        for conn in cell.conns:
+            if 'hSTDP' in conn:
+                if conn.plast.params.RLon ==1:
+                    sim.allRLWeights[-1].append(float(conn['hObj'].weight[0])) # save weight only for Rl-STDP conns
+                else:
+                    sim.allNonRLWeights[-1].append(float(conn['hObj'].weight[0])) # save weight only for nonRL-STDP conns
+
+def saveWeights(sim, downSampleCells):
+    ''' Save the weights for each plastic synapse '''
+    with open(sim.RLweightsfilename,'w') as fid1:
+        for weightdata in sim.allRLWeights:
+            #fid.write('%0.0f' % weightdata[0]) # Time
+            #print(len(weightdata))
+            for i in range(1,len(weightdata), downSampleCells): fid1.write('\t%0.8f' % weightdata[i])
+            fid1.write('\n')
+    print(('Saved RL weights as %s' % sim.RLweightsfilename))
+    with open(sim.NonRLweightsfilename,'w') as fid2:
+        for weightdata in sim.allNonRLWeights:
+            #fid.write('%0.0f' % weightdata[0]) # Time
+            #print(len(weightdata))
+            for i in range(1,len(weightdata), downSampleCells): fid2.write('\t%0.8f' % weightdata[i])
+            fid2.write('\n')
+    print(('Saved Non-RL weights as %s' % sim.NonRLweightsfilename))    
+    
+def plotWeights():
+    from pylab import figure, loadtxt, xlabel, ylabel, xlim, ylim, show, pcolor, array, colorbar
+
+    figure()
+    weightdata = loadtxt(sim.weightsfilename)
+    weightdataT=list(map(list, list(zip(*weightdata))))
+    vmax = max([max(row) for row in weightdata])
+    vmin = min([min(row) for row in weightdata])
+    pcolor(array(weightdataT), cmap='hot_r', vmin=vmin, vmax=vmax)
+    xlim((0,len(weightdata)))
+    ylim((0,len(weightdata[0])))
+    xlabel('Time (weight updates)')
+    ylabel('Synaptic connection id')
+    colorbar()
+    show()
+
+######################################################################################
 
 def getFiringRatesWithInterval(trange = None, neuronal_pop = None):
-  #sim.gatherData()
-  spkts = sim.simData['spkt']
-  spkids = sim.simData['spkid']
-  pop_spikes = 0
-  if len(spkts)>0:
-    for i in range(len(spkids)):
-      if trange[0] <= spkts[i] <= trange[1] and spkids[i] in neuronal_pop:
-        pop_spikes = pop_spikes+1
-    tsecs = float((trange[1]-trange[0]))/1000.0
-    numCells = float(len(neuronal_pop))
-    avgRates = pop_spikes/numCells/tsecs
-  else:
-    avgRates = 0.0
-  print('Firing rate : %.3f Hz'%(avgRates))
-  return avgRates
+    #sim.gatherData()
+    spkts = sim.simData['spkt']
+    spkids = sim.simData['spkid']
+    pop_spikes = 0
+    if len(spkts)>0:
+        for i in range(len(spkids)):
+            if trange[0] <= spkts[i] <= trange[1] and spkids[i] in neuronal_pop:
+                pop_spikes = pop_spikes+1
+        tsecs = float((trange[1]-trange[0]))/1000.0
+        numCells = float(len(neuronal_pop))
+        avgRates = pop_spikes/numCells/tsecs
+    else:
+        avgRates = 0.0
+    print('Firing rate : %.3f Hz'%(avgRates))
+    return avgRates
 
 
 def trainAgent(t):
-  """ training interface between simulation and game environment
-  """
-  if t<21.0: # for the first time interval use randomly selected actions
-    actions =[]
-    for _ in range(5):
-      action = random.randint(3,4)
-      actions.append(action)
-  else: #the actions should be based on the activity of motor cortex (MO)
-    F_R1 = getFiringRatesWithInterval([t-20,t], range(17301,17310))
-    F_R2 = getFiringRatesWithInterval([t-20,t], range(17311,17320))
-    F_R3 = getFiringRatesWithInterval([t-20,t], range(17321,17330))
-    F_R4 = getFiringRatesWithInterval([t-20,t], range(17331,17340))
-    F_R5 = getFiringRatesWithInterval([t-20,t], range(17341,17350))
-    F_L1 = getFiringRatesWithInterval([t-20,t], range(17351,17360))
-    F_L2 = getFiringRatesWithInterval([t-20,t], range(17361,17370))
-    F_L3 = getFiringRatesWithInterval([t-20,t], range(17371,17380))
-    F_L4 = getFiringRatesWithInterval([t-20,t], range(17381,17390))
-    F_L5 = getFiringRatesWithInterval([t-20,t], range(17391,17400))
-    actions = []
-    if F_R1>F_L1:
-      actions.append(4)
-    elif F_R1<F_L1:
-      actions.append(3)
-    else:
-      actions.append(random.randint(3,4))  
-    if F_R2>F_L2:
-      actions.append(4)
-    elif F_R2<F_L2:
-      actions.append(3)
-    else:
-      actions.append(random.randint(3,4))
-    if F_R3>F_L3:
-      actions.append(4)
-    elif F_R3<F_L3:
-      actions.append(3)
-    else:
-      actions.append(random.randint(3,4))
-    if F_R4>F_L4:
-      actions.append(4)
-    elif F_R4<F_L4:
-      actions.append(3)
-    else:
-      actions.append(random.randint(3,4))
-    if F_R5>F_L5:
-      actions.append(4)
-    elif F_R5<F_L5:
-      actions.append(3)
-    else:
-      actions.append(random.randint(3,4))
-  print('actions generated by model are: ', actions)
-  rewards = sim.SMARTAgent.playGame(actions)
-  #I don't understand the code below. Copied from Salva's RL model
-  vec = h.Vector()
-  if sim.rank == 0:
+    """ training interface between simulation and game environment
+    """
+    if t<21.0: # for the first time interval use randomly selected actions
+        actions =[]
+        for _ in range(5):
+            action = random.randint(3,4)
+            actions.append(action)
+    else: #the actions should be based on the activity of motor cortex (MO)
+        F_R1 = getFiringRatesWithInterval([t-20,t], range(17301,17310))
+        F_R2 = getFiringRatesWithInterval([t-20,t], range(17311,17320))
+        F_R3 = getFiringRatesWithInterval([t-20,t], range(17321,17330))
+        F_R4 = getFiringRatesWithInterval([t-20,t], range(17331,17340))
+        F_R5 = getFiringRatesWithInterval([t-20,t], range(17341,17350))
+        F_L1 = getFiringRatesWithInterval([t-20,t], range(17351,17360))
+        F_L2 = getFiringRatesWithInterval([t-20,t], range(17361,17370))
+        F_L3 = getFiringRatesWithInterval([t-20,t], range(17371,17380))
+        F_L4 = getFiringRatesWithInterval([t-20,t], range(17381,17390))
+        F_L5 = getFiringRatesWithInterval([t-20,t], range(17391,17400))
+        actions = []
+        if F_R1>F_L1:
+            actions.append(4) #UP
+        elif F_R1<F_L1:
+            actions.append(3) # Down
+        else:
+            actions.append(1) # No move 
+        if F_R2>F_L2:
+            actions.append(4) #UP
+        elif F_R2<F_L2:
+            actions.append(3) #Down
+        else:
+            actions.append(1) #No move
+        if F_R3>F_L3:
+            actions.append(4) #UP
+        elif F_R3<F_L3:
+            actions.append(3) #Down
+        else:
+            actions.append(1) #No move
+        if F_R4>F_L4:
+            actions.append(4) #UP
+        elif F_R4<F_L4:
+            actions.append(3) #Down
+        else:
+            actions.append(1) #No move
+        if F_R5>F_L5:
+            actions.append(4) #UP
+        elif F_R5<F_L5:
+            actions.append(3) #Down
+        else:
+            actions.append(1) #No move
+    print('actions generated by model are: ', actions)
     rewards = sim.SMARTAgent.playGame(actions)
-    critic = sum(rewards) # get critic signal (-1, 0 or 1)
-    sim.pc.broadcast(vec.from_python([critic]), 0) # convert python list to hoc vector for broadcast data received from arm
-  else: # other workers
-    sim.pc.broadcast(vec, 0)
-    critic = vec.to_python()[0] #till here I dont understand
-  if critic != 0: # if critic signal indicates punishment (-1) or reward (+1)
-    print('t=',t,'- adjusting weights based on RL critic value:', critic)
-    for cell in sim.net.cells:
-      for conn in cell.conns:
-        STDPmech = conn.get('hSTDP')  # check if has STDP mechanism
-        if STDPmech:   # run stdp.mod method to update syn weights based on RLprint cell.gid
-          STDPmech.reward_punish(float(critic))
-  print('rewards are : ', rewards)
-  sim.SMARTAgent.run(t,sim)
-  print('trainAgent time is : ', t)
-  if t%recordWeightDT==0: recordWeights()
+    #I don't understand the code below. Copied from Salva's RL model
+    vec = h.Vector()
+    if sim.rank == 0:
+        rewards = sim.SMARTAgent.playGame(actions)
+        critic = sum(rewards) # get critic signal (-1, 0 or 1)
+        sim.pc.broadcast(vec.from_python([critic]), 0) # convert python list to hoc vector for broadcast data received from arm
+    else: # other workers
+        sim.pc.broadcast(vec, 0)
+        critic = vec.to_python()[0] #till here I dont understand
+    if critic != 0: # if critic signal indicates punishment (-1) or reward (+1)
+        print('t=',t,'- adjusting weights based on RL critic value:', critic)
+        for cell in sim.net.cells:
+            for conn in cell.conns:
+                STDPmech = conn.get('hSTDP')  # check if has STDP mechanism
+                if STDPmech:   # run stdp.mod method to update syn weights based on RLprint cell.gid
+                    STDPmech.reward_punish(float(critic))
+    print('rewards are : ', rewards)
+    sim.SMARTAgent.run(t,sim)
+    print('trainAgent time is : ', t)
+    if t%recordWeightDT==0: recordWeights(sim)
 
 #Alterate to create network and run simulation
 sim.initialize(                       # create network object and set cfg and net params
@@ -755,6 +766,8 @@ sim.gatherData()
 sim.saveData()
 sim.analysis.plotData()
 
-if sim.plotWeights:
-    saveWeights(sim) 
+if sim.plotWeights: 
     plotWeights() 
+if sim.saveWeights:
+    saveWeights(sim, recordWeightDCells)
+

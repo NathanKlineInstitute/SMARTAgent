@@ -395,3 +395,16 @@ Saving figure data as RasterData.pkl ...
 7. could try saving weights from visual learning, then restore them into the network, and continue from there with RL
 
 Also for later he suggested: for the longer term should think about how to avoid "catastrophic forgetting" <- which is what that guy hananel mentioned - when certain neural networks have to learn > 1 thing, the new info/memory/task sometimes interferes with the previously learned. i think the bazhenov model/paper mentions that problem with a solution too (might involve homeostatic plasticity)
+
+*19dec16
+**implemented a function to record RL and NonRL weights separately and save at different cellular resolution.
+**For every simulation, run for 100 sec, record weights for every 10th neuron.
+***A few observations:
+1. A lot of time steps, the firing rate of output neurons is 0HZ.
+2. When the firing rate is 0 Hz, the action is "Don't move". So most of the times the racket is not moving.
+***Find out why the firing rate of output layer is 0?
+**While running the simulation, i could not save weights..... need debugging.
+
+*19dec17
+**Start debugging the code to save weights.
+***I noticed that i was not passing argument sim to the function saveWeights(sim). I made this correction and now rerunning the simulation.
