@@ -409,3 +409,40 @@ Also for later he suggested: for the longer term should think about how to avoid
 **Start debugging the code to save weights.
 ***I noticed that i was not passing argument sim to the function saveWeights(sim). I made this correction and now rerunning the simulation.
 ***Another problem detected: precision of t such that it never gives DT%1000==0
+
+
+*19dec19
+**On neurosim: Save the rasterdata and weights for bothRLandNonRL case.
+**On neurosim: Run the simulation with only RL. i.e. turn RLon = 1 in STDPparams.
+**Reduced model has 1102 neurons and 50260 connections (45.61 per cell)
+***1. Reduced model with both RL and nonRL. Also no movement if firing rate of R neuron is equal to firing rate of L neuron.
+***2. Reduced model with only RL for all neurons. Also no movement if firing rate of R neuron is equal to firing rate of L neuron.
+***3. Reduced model with only RL for all neurons. Also no movement if firing rate of R neuron is equal to firing rate of L neuron.
+***1.2. Reduced model with both RL and nonRL. Move randomly if firing rate of R neuron is equal to firing rate of L neuron.
+***1.3. RECORD actions and rewards.
+
+*19dec23
+**Ran 100 sec simulation of reduced model with recording actions and rewards.
+**actions were chosen based on the firing rate of MO neurons except when the firing rate was not decisive.
+
+*19dec24
+**run 100 sec simulation of reduced model with recording actions and rewards.
+**assign reward = 1 if its 0. and 0 if its 1.
+
+*19dec26
+**run 100 sec simulation of reduced model with no actions but randomly generated rewards for RL.
+***I want to see how does the network behave if the environment does not change after 1st episode (_NoAction.py). 
+****e.g. how NonRL weights evolve: this will give some hint on whether change in NonRL is random or because of the image sequences.
+****e.g. how RL weights evolve: this will be random or not.
+
+*19dec30
+**Problems:
+***I told Sam about my frustration with the reward system in the game i.e. Model gets +1 only if the computer/other player makes a mistake. He argued that Model can get +1 also when It plays a good move. But I said that at this point model is not at that cognitive level to acieve that kind of smartness. Though I am not convinced that model will ever do that, can still hope for that.
+***Sam was concerned about sudden drop of weights. I told him that is because of so many -1s. He suggested that I might mask -1 in the beginning and also slow down the change in weight due to -1.
+***I will use a threshold for weights to activate punishment in RL.
+***I will also decrease the change in weight due to punishment in RL.
+***The other problem I observed was that the weights keep increasing even in the absense of new scenes. I think this will make difficult for model to learn much about the game environment as most of the activity is intrinsic (not evoked by the image).
+***Sam wants me to save movies and also plot activity of output motor neurons.
+**Before I do anything I discussed with Sam, I will implement my idea: GUIDE MODEL TO PLAY THE GAME BASED ON VECTOR ALGEBRA. (local dir: SMARTAgent_Reduced_12302019)
+***GUIDE MODEL TO PLAY THE GAME BASED ON VECTOR ALGEBRA ---> Done. Running now.
+***Change fixed number of trials to complete episodes i.e. number of trials until one of the players score 20. use 'done' and also record total episodes. 
