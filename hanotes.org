@@ -445,4 +445,18 @@ Also for later he suggested: for the longer term should think about how to avoid
 ***Sam wants me to save movies and also plot activity of output motor neurons.
 **Before I do anything I discussed with Sam, I will implement my idea: GUIDE MODEL TO PLAY THE GAME BASED ON VECTOR ALGEBRA. (local dir: SMARTAgent_Reduced_12302019)
 ***GUIDE MODEL TO PLAY THE GAME BASED ON VECTOR ALGEBRA ---> Done. Running now.
-***Change fixed number of trials to complete episodes i.e. number of trials until one of the players score 20. use 'done' and also record total episodes. 
+***Change fixed number of trials to complete episodes i.e. number of trials until one of the players score 20. use 'done' and also record total episodes.
+
+*19dec31
+**The simulation I ran with VECTOR ALGEBRA using 2 different values of RLhebbwt (0.001 and 0.0001) were done. But I realized i made a mistake in RL signal i.e. i used 0 as +1.
+**I will re run these simulations and also record activity of the motor neurons.
+
+    #I don't understand the code below. Copied from Salva's RL model
+    vec = h.Vector()
+    if sim.rank == 0:
+        rewards, epCount = sim.SMARTAgent.playGame(actions, epCount)
+        critic = sum(rewards) # get critic signal (-1, 0 or 1)
+        sim.pc.broadcast(vec.from_python([critic]), 0) # convert python list to hoc vector for broadcast data received from arm
+    else: # other workers
+        sim.pc.broadcast(vec, 0)
+        critic = vec.to_python()[0] #till here I dont understand
