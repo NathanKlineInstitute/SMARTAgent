@@ -460,3 +460,6 @@ Also for later he suggested: for the longer term should think about how to avoid
     else: # other workers
         sim.pc.broadcast(vec, 0)
         critic = vec.to_python()[0] #till here I dont understand
+
+
+**running reduced model with VECTOR ALEBRA and recording RLWeights, NonRLWeights, ActionsAndRewards, FiringRate of MotorNeurons in MO, binned 20 ms, ActionsPerEpisode
