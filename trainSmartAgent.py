@@ -4,6 +4,13 @@ from neuron import h
 import numpy
 import random
 
+sim.allTimes = []
+sim.allRewards = [] # list to store all rewards
+sim.allActions = [] # list to store all actions
+sim.allMotorOutputs = [] # list to store firing rate of output motor neurons.
+sim.ActionsRewardsfilename = 'ActionsRewards.txt'
+sim.MotorOutputsfilename = 'MotorOutputs.txt'
+sim.WeightsRecordingTimes = [] 
 sim.allRLWeights = [] # list to store weights
 sim.allNonRLWeights = [] # list to store weights
 sim.RLweightsfilename = 'RLweights.txt'  # file to store weights
@@ -14,24 +21,41 @@ recordWeightStepSize = 2
 #recordWeightDT = 1000 # interval for recording synaptic weights (change later)
 recordWeightDCells = 10 # to record weights for sub samples of neurons
 
+global fid4
+
+fid4 = open(sim.MotorOutputsfilename,'w')
+
+NB_Rneurons = 400
+NB_V1neurons = 400
+NB_V4neurons = 100
+NB_ITneurons = 25
+
+NB_IV1neurons = 100
+NB_IV4neurons = 25
+NB_IITneurons = 9
+
+NB_MIneurons = 25
+NB_MOneurons = 9
+
+NB_IMIneurons = 9
 
 # Network parameters
 netParams = specs.NetParams() #object of class NetParams to store the network parameters
 
 #Population parameters
-netParams.popParams['R'] = {'cellType': 'E', 'numCells': 6400, 'cellModel': 'HH'}
-netParams.popParams['V1'] = {'cellType': 'EV1', 'numCells': 6400, 'cellModel': 'HH'}
-netParams.popParams['V4'] = {'cellType': 'EV4', 'numCells': 1600, 'cellModel': 'HH'}
-netParams.popParams['IT'] = {'cellType': 'EIT', 'numCells': 400, 'cellModel': 'HH'}
+netParams.popParams['R'] = {'cellType': 'E', 'numCells': NB_Rneurons, 'cellModel': 'HH'}  #6400 neurons to represent 6400 pixels, now we have 400 pixels
+netParams.popParams['V1'] = {'cellType': 'EV1', 'numCells': NB_V1neurons, 'cellModel': 'HH'} #6400 neurons
+netParams.popParams['V4'] = {'cellType': 'EV4', 'numCells': NB_V4neurons, 'cellModel': 'HH'} #1600 neurons
+netParams.popParams['IT'] = {'cellType': 'EIT', 'numCells': NB_ITneurons, 'cellModel': 'HH'} #400 neurons
 
-netParams.popParams['IV1'] = {'cellType': 'InV1', 'numCells': 1600, 'cellModel': 'HH'}
-netParams.popParams['IV4'] = {'cellType': 'InV4', 'numCells': 400, 'cellModel': 'HH'}
-netParams.popParams['IIT'] = {'cellType': 'InIT', 'numCells': 100, 'cellModel': 'HH'}
+netParams.popParams['IV1'] = {'cellType': 'InV1', 'numCells': NB_IV1neurons, 'cellModel': 'HH'} #1600
+netParams.popParams['IV4'] = {'cellType': 'InV4', 'numCells': NB_IV4neurons, 'cellModel': 'HH'} #400
+netParams.popParams['IIT'] = {'cellType': 'InIT', 'numCells': NB_IITneurons, 'cellModel': 'HH'} #100
 
-netParams.popParams['MI'] = {'cellType': 'EMI', 'numCells': 400, 'cellModel': 'HH'}
-netParams.popParams['MO'] = {'cellType': 'EMO', 'numCells': 100, 'cellModel': 'HH'}
+netParams.popParams['MI'] = {'cellType': 'EMI', 'numCells': NB_MIneurons, 'cellModel': 'HH'} #400
+netParams.popParams['MO'] = {'cellType': 'EMO', 'numCells': NB_MOneurons, 'cellModel': 'HH'} #100
 
-netParams.popParams['IMI'] = {'cellType': 'InMI', 'numCells': 100, 'cellModel': 'HH'}
+netParams.popParams['IMI'] = {'cellType': 'InMI', 'numCells': NB_IMIneurons, 'cellModel': 'HH'} #100
 
 netParams.cellParams['ERule'] = {               # cell rule label
         'conds': {'cellType': ['E','EV1','EV4','EIT', 'EMI', 'EMO']},              #properties will be applied to cells that match these conditions
@@ -179,70 +203,42 @@ def connectLayerswithOverlapDiv(NBpreN, NBpostN, overlap_xdir):
                         blist.append([preN,cpostN]) 			#list of [presynaptic_neuron, postsynaptic_neuron] 
     return blist
 
-def connectRtoV1withoutOverlap():
-    NBpreN = 6400
-    NBpostN = 400
-    convergence_factor = NBpreN/NBpostN
-    xdir = int(numpy.sqrt(convergence_factor))
-    ydir = int(numpy.sqrt(convergence_factor))
-    blist = []
-    for ix in range(xdir):
-        blist.append([ix,0])
-    nlist = blist
-    for iy in range(ydir-1):
-        nlist = numpy.ndarray.tolist(numpy.add(nlist,[int(numpy.sqrt(NBpreN)),0]))
-        blist = blist + nlist
-    #blist = [[0,0],[1,0],[2,0],[3,0],[80,0],[81,0],[82,0],[83,0],[160,0],[161,0],[162,0],[163,0],[240,0],[241,0],[242,0],[243,0]]
-    acol = numpy.ndarray.tolist(numpy.add(blist,[xdir*int(numpy.sqrt(NBpreN)),int(numpy.sqrt(NBpostN))]))
-    arow = numpy.ndarray.tolist(numpy.add(blist,[xdir,1]))
-    #b.append(a)
-    for rowNB in range(int(numpy.sqrt(NBpostN))):
-        for colNB in range(int(numpy.sqrt(NBpostN))-1):
-            blist = blist + arow
-            arow = numpy.ndarray.tolist(numpy.add(arow,[xdir,1]))
-        if rowNB<19:
-            blist = blist + acol
-            arow = acol
-            arow = numpy.ndarray.tolist(numpy.add(arow,[xdir,1]))
-            acol = numpy.ndarray.tolist(numpy.add(acol,[xdir*int(numpy.sqrt(NBpreN)),int(numpy.sqrt(NBpostN))]))
-    return blist
-
 #####################################################################################
 #Feedforward excitation
 #E to E - Feedforward connections
-blistEtoV1 = connectLayerswithOverlap(NBpreN = 6400, NBpostN = 6400, overlap_xdir = 5)
-blistV1toV4 = connectLayerswithOverlap(NBpreN = 6400, NBpostN = 1600, overlap_xdir = 5)
-blistV4toIT = connectLayerswithOverlap(NBpreN = 1600, NBpostN = 400, overlap_xdir = 15)
-blistITtoMI = connectLayerswithOverlap(NBpreN = 400, NBpostN = 400, overlap_xdir = 5) #Not sure if this is a good strategy instead of all to all
-blistMItoMO = connectLayerswithOverlap(NBpreN = 400, NBpostN = 100, overlap_xdir = 19)
+blistEtoV1 = connectLayerswithOverlap(NBpreN = NB_Rneurons, NBpostN = NB_V1neurons, overlap_xdir = 5)
+blistV1toV4 = connectLayerswithOverlap(NBpreN = NB_V1neurons, NBpostN = NB_V4neurons, overlap_xdir = 5)
+blistV4toIT = connectLayerswithOverlap(NBpreN = NB_V4neurons, NBpostN = NB_ITneurons, overlap_xdir = 7) #was 15
+blistITtoMI = connectLayerswithOverlap(NBpreN = NB_ITneurons, NBpostN = NB_MIneurons, overlap_xdir = 5) #Not sure if this is a good strategy instead of all to all
+blistMItoMO = connectLayerswithOverlap(NBpreN = NB_MIneurons, NBpostN = NB_MOneurons, overlap_xdir = 9) #was 19
 #blistMItoMO: Feedforward for MI to MO is all to all and can be specified in the connection statement iteself
 
 #E to I - Feedforward connections
-blistEtoInV1 = connectLayerswithOverlap(NBpreN = 6400, NBpostN = 1600, overlap_xdir = 5)
-blistV1toInV4 = connectLayerswithOverlap(NBpreN = 6400, NBpostN = 400, overlap_xdir = 15)
-blistV4toInIT = connectLayerswithOverlap(NBpreN = 1600, NBpostN = 100, overlap_xdir = 15)
-blistITtoInMI = connectLayerswithOverlap(NBpreN = 400, NBpostN = 100, overlap_xdir = 15)
+blistEtoInV1 = connectLayerswithOverlap(NBpreN = NB_Rneurons, NBpostN = NB_IV1neurons, overlap_xdir = 5)
+blistV1toInV4 = connectLayerswithOverlap(NBpreN = NB_V1neurons, NBpostN = NB_IV4neurons, overlap_xdir = 7) #was 15
+blistV4toInIT = connectLayerswithOverlap(NBpreN = NB_V4neurons, NBpostN = NB_IITneurons, overlap_xdir = 7) #was 15
+blistITtoInMI = connectLayerswithOverlap(NBpreN = NB_ITneurons, NBpostN = NB_IMIneurons, overlap_xdir = 7) #was 15
 
 #Feedbackward excitation
 #E to E  
-blistV1toE = connectLayerswithOverlapDiv(NBpreN = 6400, NBpostN = 6400, overlap_xdir = 3)
-blistV4toV1 = connectLayerswithOverlapDiv(NBpreN = 1600, NBpostN = 6400, overlap_xdir = 3)
-blistITtoV4 = connectLayerswithOverlapDiv(NBpreN = 400, NBpostN = 1600, overlap_xdir = 3)
-blistMItoIT = connectLayerswithOverlapDiv(NBpreN = 400, NBpostN = 400, overlap_xdir = 3)
-blistMOtoMI = connectLayerswithOverlapDiv(NBpreN = 100, NBpostN = 400, overlap_xdir = 3)
+blistV1toE = connectLayerswithOverlapDiv(NBpreN = NB_V1neurons, NBpostN = NB_Rneurons, overlap_xdir = 3)
+blistV4toV1 = connectLayerswithOverlapDiv(NBpreN = NB_V4neurons, NBpostN = NB_V1neurons, overlap_xdir = 3)
+blistITtoV4 = connectLayerswithOverlapDiv(NBpreN = NB_ITneurons, NBpostN = NB_V4neurons, overlap_xdir = 3)
+blistMItoIT = connectLayerswithOverlapDiv(NBpreN = NB_MIneurons, NBpostN = NB_ITneurons, overlap_xdir = 3)
+blistMOtoMI = connectLayerswithOverlapDiv(NBpreN = NB_MOneurons, NBpostN = NB_MIneurons, overlap_xdir = 3)
 
 #Feedforward inhibition
 #I to I
-blistInV1toInV4 = connectLayerswithOverlap(NBpreN = 1600, NBpostN = 400, overlap_xdir = 5)
-blistInV4toInIT = connectLayerswithOverlap(NBpreN = 400, NBpostN = 100, overlap_xdir = 5)
-blistInITtoInMI = connectLayerswithOverlap(NBpreN = 100, NBpostN = 100, overlap_xdir = 5)
+blistInV1toInV4 = connectLayerswithOverlap(NBpreN = NB_IV1neurons, NBpostN = NB_IV4neurons, overlap_xdir = 5)
+blistInV4toInIT = connectLayerswithOverlap(NBpreN = NB_IV4neurons, NBpostN = NB_IITneurons, overlap_xdir = 5)
+blistInITtoInMI = connectLayerswithOverlap(NBpreN = NB_IITneurons, NBpostN = NB_IMIneurons, overlap_xdir = 5)
 
 #Feedbackward inhibition
 #I to E 
-blistInV1toE = connectLayerswithOverlapDiv(NBpreN = 1600, NBpostN = 6400, overlap_xdir = 5)
-blistInV4toV1 = connectLayerswithOverlapDiv(NBpreN = 400, NBpostN = 6400, overlap_xdir = 5)
-blistInITtoV4 = connectLayerswithOverlapDiv(NBpreN = 100, NBpostN = 1600, overlap_xdir = 5)
-blistInMItoIT = connectLayerswithOverlapDiv(NBpreN = 100, NBpostN = 400, overlap_xdir = 5)
+blistInV1toE = connectLayerswithOverlapDiv(NBpreN = NB_IV1neurons, NBpostN = NB_Rneurons, overlap_xdir = 5)
+blistInV4toV1 = connectLayerswithOverlapDiv(NBpreN = NB_IV4neurons, NBpostN = NB_V1neurons, overlap_xdir = 5)
+blistInITtoV4 = connectLayerswithOverlapDiv(NBpreN = NB_IITneurons, NBpostN = NB_V4neurons, overlap_xdir = 5)
+blistInMItoIT = connectLayerswithOverlapDiv(NBpreN = NB_IMIneurons, NBpostN = NB_ITneurons, overlap_xdir = 5)
 
 #blist = connectRtoV1withOverlap()
 #blist = connectRtoV1withoutOverlap()
@@ -593,7 +589,7 @@ simConfig = specs.SimConfig()           # object of class SimConfig to store sim
 simConfig.duration = 1e5                      # Duration of the simulation, in ms
 simConfig.dt = 0.2                            # Internal integration timestep to use
 simConfig.verbose = False                       # Show detailed messages
-#simConfig.recordTraces = {'V_soma':{'sec':'soma','loc':0.5,'var':'v'}}  # Dict with traces to record
+simConfig.recordTraces = {'V_soma':{'sec':'soma','loc':0.5,'var':'v'}}  # Dict with traces to record
 simConfig.recordCellsSpikes = [-1]
 simConfig.recordStep = 0.2                      # Step size in ms to save data (e.g. V traces, LFP, etc)
 simConfig.filename = 'model_output'  # Set file output name
@@ -601,7 +597,7 @@ simConfig.savePickle = False            # Save params, network and sim output to
 #simConfig.saveMat = True
 
 #simConfig.analysis['plotRaster'] = True                         # Plot a raster
-#simConfig.analysis['plotTraces'] = {'include': [13000, 13500, 14000]}
+simConfig.analysis['plotTraces'] = {'include': [1084, 1085, 1086, 1087, 1088, 1089, 1090, 1091, 1092]}
 #simConfig.analysis['plotRaster'] = {'timeRange': [500,1000],'popRates':'overlay','saveData':'RasterData.pkl','showFig':True}
 simConfig.analysis['plotRaster'] = {'popRates':'overlay','saveData':'RasterData.pkl','showFig':True}
 #simConfig.analysis['plot2Dnet'] = True 
@@ -613,9 +609,10 @@ simConfig.analysis['plotRaster'] = {'popRates':'overlay','saveData':'RasterData.
 sim.SMARTAgent = SMARTAgent()
 
 
-def recordWeights (sim):
+def recordWeights (sim, t):
     """ record the STDP weights during the simulation - called in trainAgent
     """
+    sim.WeightsRecordingTimes.append(t)
     sim.allRLWeights.append([]) # Save this time
     sim.allNonRLWeights.append([])
     for cell in sim.net.cells:
@@ -629,16 +626,22 @@ def recordWeights (sim):
 def saveWeights(sim, downSampleCells):
     ''' Save the weights for each plastic synapse '''
     with open(sim.RLweightsfilename,'w') as fid1:
+        count1 = 0
         for weightdata in sim.allRLWeights:
             #fid.write('%0.0f' % weightdata[0]) # Time
             #print(len(weightdata))
+            fid1.write('%0.1f' %sim.WeightsRecordingTimes[count1])
+            count1 = count1+1
             for i in range(1,len(weightdata), downSampleCells): fid1.write('\t%0.8f' % weightdata[i])
             fid1.write('\n')
     print(('Saved RL weights as %s' % sim.RLweightsfilename))
     with open(sim.NonRLweightsfilename,'w') as fid2:
+        count2 = 0
         for weightdata in sim.allNonRLWeights:
             #fid.write('%0.0f' % weightdata[0]) # Time
             #print(len(weightdata))
+            fid2.write('%0.1f' %sim.WeightsRecordingTimes[count2])
+            count2 = count2+1
             for i in range(1,len(weightdata), downSampleCells): fid2.write('\t%0.8f' % weightdata[i])
             fid2.write('\n')
     print(('Saved Non-RL weights as %s' % sim.NonRLweightsfilename))    
@@ -658,6 +661,14 @@ def plotWeights():
     ylabel('Synaptic connection id')
     colorbar()
     show()
+
+def saveGameBehavior(sim):
+    with open(sim.ActionsRewardsfilename,'w') as fid3:
+        for i in range(len(sim.allActions)):
+            fid3.write('%0.1f' % sim.allTimes[i])
+            fid3.write('\t%0.1f' % sim.allActions[i])
+            fid3.write('\t%0.1f' % sim.allRewards[i])
+            fid3.write('\n')
 
 ######################################################################################
 
@@ -679,6 +690,71 @@ def getFiringRatesWithInterval(trange = None, neuronal_pop = None):
     return avgRates
 
 NBsteps = 0
+epCount = []
+def trainAgentFake(t):
+    """ training interface between simulation and game environment
+    """
+    global NBsteps, last_obs, epCount
+    if t<21.0: # for the first time interval use first action randomly and other four actions based on relative position of ball and agent.
+        last_obs = []
+        rewards, actions, last_obs, epCount = sim.SMARTAgent.playGameFake(last_obs, epCount)
+    else: #the actions are generated based on relative positions of ball and Agent.
+        rewards, actions, last_obs, epCount = sim.SMARTAgent.playGameFake(last_obs, epCount)
+    print('actions generated by model are: ', actions)
+    F_R1 = getFiringRatesWithInterval([t-20,t], [1085])
+    F_R2 = getFiringRatesWithInterval([t-20,t], [1086])
+    F_R3 = getFiringRatesWithInterval([t-20,t], [1087])
+    F_R4 = getFiringRatesWithInterval([t-20,t], [1088])
+    F_R5 = getFiringRatesWithInterval([t-20,t], [1088,1089])
+    F_L1 = getFiringRatesWithInterval([t-20,t], [1089,1090])
+    F_L2 = getFiringRatesWithInterval([t-20,t], [1090])
+    F_L3 = getFiringRatesWithInterval([t-20,t], [1091])
+    F_L4 = getFiringRatesWithInterval([t-20,t], [1092])
+    F_L5 = getFiringRatesWithInterval([t-20,t], [1093])
+    fid4.write('%0.1f' % t)
+    fid4.write('\t%0.1f' % F_R1)
+    fid4.write('\t%0.1f' % F_R2)
+    fid4.write('\t%0.1f' % F_R3)
+    fid4.write('\t%0.1f' % F_R4)
+    fid4.write('\t%0.1f' % F_R5)
+    fid4.write('\t%0.1f' % F_L1)
+    fid4.write('\t%0.1f' % F_L2)
+    fid4.write('\t%0.1f' % F_L3)
+    fid4.write('\t%0.1f' % F_L4)
+    fid4.write('\t%0.1f' % F_L5)
+    fid4.write('\n')
+
+    critic = sum(rewards) # get critic signal (-1, 0 or 1)
+    if critic>1:
+        critic = 1
+    elif critic<0:
+        critic = -1
+    else:
+        critic = 0
+    if critic != 0: # if critic signal indicates punishment (-1) or reward (+1)
+        print('t=',t,'- adjusting weights based on RL critic value:', critic)
+        for cell in sim.net.cells:
+            for conn in cell.conns:
+                STDPmech = conn.get('hSTDP')  # check if has STDP mechanism
+                if STDPmech:   # run stdp.mod method to update syn weights based on RLprint cell.gid
+                    STDPmech.reward_punish(float(critic))
+    print('rewards are : ', rewards)
+    for action in actions:
+        sim.allActions.append(action)
+    for reward in rewards:
+        sim.allRewards.append(reward)
+    ltpnt = t-20
+    for _ in range(5):
+        ltpnt = ltpnt+4
+        sim.allTimes.append(ltpnt)
+    sim.SMARTAgent.run(t,sim)
+    print('trainAgent time is : ', t)
+    NBsteps = NBsteps+1
+    if NBsteps==recordWeightStepSize:
+        #if t%recordWeightDT==0:
+        print('Weights Recording Time:', t) 
+        recordWeights(sim, t)
+        NBsteps = 0
 
 def trainAgent(t):
     """ training interface between simulation and game environment
@@ -689,54 +765,71 @@ def trainAgent(t):
         for _ in range(5):
             action = random.randint(3,4)
             actions.append(action)
-    else: #the actions should be based on the activity of motor cortex (MO)
-        F_R1 = getFiringRatesWithInterval([t-20,t], range(17301,17310))
-        F_R2 = getFiringRatesWithInterval([t-20,t], range(17311,17320))
-        F_R3 = getFiringRatesWithInterval([t-20,t], range(17321,17330))
-        F_R4 = getFiringRatesWithInterval([t-20,t], range(17331,17340))
-        F_R5 = getFiringRatesWithInterval([t-20,t], range(17341,17350))
-        F_L1 = getFiringRatesWithInterval([t-20,t], range(17351,17360))
-        F_L2 = getFiringRatesWithInterval([t-20,t], range(17361,17370))
-        F_L3 = getFiringRatesWithInterval([t-20,t], range(17371,17380))
-        F_L4 = getFiringRatesWithInterval([t-20,t], range(17381,17390))
-        F_L5 = getFiringRatesWithInterval([t-20,t], range(17391,17400))
+    else: #the actions should be based on the activity of motor cortex (MO) 1085-1093
+        F_R1 = getFiringRatesWithInterval([t-20,t], [1085])
+        F_R2 = getFiringRatesWithInterval([t-20,t], [1086])
+        F_R3 = getFiringRatesWithInterval([t-20,t], [1087])
+        F_R4 = getFiringRatesWithInterval([t-20,t], [1088])
+        F_R5 = getFiringRatesWithInterval([t-20,t], [1088,1089])
+        F_L1 = getFiringRatesWithInterval([t-20,t], [1089,1090])
+        F_L2 = getFiringRatesWithInterval([t-20,t], [1090])
+        F_L3 = getFiringRatesWithInterval([t-20,t], [1091])
+        F_L4 = getFiringRatesWithInterval([t-20,t], [1092])
+        F_L5 = getFiringRatesWithInterval([t-20,t], [1093])
+        fid4.write('%0.1f' % t)
+        fid4.write('\t%0.1f' % F_R1)
+        fid4.write('\t%0.1f' % F_R2)
+        fid4.write('\t%0.1f' % F_R3)
+        fid4.write('\t%0.1f' % F_R4)
+        fid4.write('\t%0.1f' % F_R5)
+        fid4.write('\t%0.1f' % F_L1)
+        fid4.write('\t%0.1f' % F_L2)
+        fid4.write('\t%0.1f' % F_L3)
+        fid4.write('\t%0.1f' % F_L4)
+        fid4.write('\t%0.1f' % F_L5)
+        fid4.write('\n')
         actions = []
         if F_R1>F_L1:
             actions.append(4) #UP
         elif F_R1<F_L1:
             actions.append(3) # Down
         else:
-            actions.append(1) # No move 
+            actions.append(random.randint(3,4))
+            #actions.append(1) # No move 
         if F_R2>F_L2:
             actions.append(4) #UP
         elif F_R2<F_L2:
             actions.append(3) #Down
         else:
-            actions.append(1) #No move
+            actions.append(random.randint(3,4))
+            #actions.append(1) #No move
         if F_R3>F_L3:
             actions.append(4) #UP
         elif F_R3<F_L3:
             actions.append(3) #Down
         else:
-            actions.append(1) #No move
+            actions.append(random.randint(3,4))
+            #actions.append(1) #No move
         if F_R4>F_L4:
             actions.append(4) #UP
         elif F_R4<F_L4:
             actions.append(3) #Down
         else:
-            actions.append(1) #No move
+            actions.append(random.randint(3,4))
+            #actions.append(1) #No move
         if F_R5>F_L5:
             actions.append(4) #UP
         elif F_R5<F_L5:
             actions.append(3) #Down
         else:
-            actions.append(1) #No move
+            actions.append(random.randint(3,4))
+            #actions.append(1) #No move
     print('actions generated by model are: ', actions)
     rewards = sim.SMARTAgent.playGame(actions)
     #I don't understand the code below. Copied from Salva's RL model
     vec = h.Vector()
     if sim.rank == 0:
-        rewards = sim.SMARTAgent.playGame(actions)
+        rewards, epCount = sim.SMARTAgent.playGame(actions, epCount)
         critic = sum(rewards) # get critic signal (-1, 0 or 1)
         sim.pc.broadcast(vec.from_python([critic]), 0) # convert python list to hoc vector for broadcast data received from arm
     else: # other workers
@@ -750,13 +843,21 @@ def trainAgent(t):
                 if STDPmech:   # run stdp.mod method to update syn weights based on RLprint cell.gid
                     STDPmech.reward_punish(float(critic))
     print('rewards are : ', rewards)
+    for action in actions:
+        sim.allActions.append(action)
+    for reward in rewards:
+        sim.allRewards.append(reward)
+    ltpnt = t-20
+    for _ in range(5):
+        ltpnt = ltpnt+4
+        sim.allTimes.append(ltpnt)
     sim.SMARTAgent.run(t,sim)
     print('trainAgent time is : ', t)
     NBsteps = NBsteps+1
     if NBsteps==recordWeightStepSize:
         #if t%recordWeightDT==0:
         print('Weights Recording Time:', t) 
-        recordWeights(sim)
+        recordWeights(sim, t)
         NBsteps = 0
 
 #Alterate to create network and run simulation
@@ -769,7 +870,7 @@ sim.net.connectCells()                    # create connections between cells bas
 sim.net.addStims()                      #instantiate netStim
 sim.setupRecording()                  # setup variables to record for each cell (spikes, V traces, etc)
 #sim.runSim()
-sim.runSimWithIntervalFunc(20.0,trainAgent)
+sim.runSimWithIntervalFunc(20.0,trainAgentFake)
 sim.gatherData()
 sim.saveData()
 sim.analysis.plotData()
@@ -778,4 +879,9 @@ if sim.plotWeights:
     plotWeights() 
 if sim.saveWeights:
     saveWeights(sim, recordWeightDCells)
+    saveGameBehavior(sim)
+    fid5 = open('ActionsPerEpisode.txt','w')
+    for i in range(len(epCount)):
+        fid5.write('\t%0.1f' % epCount[i])
+        fid5.write('\n')
 
