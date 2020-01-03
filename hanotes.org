@@ -468,9 +468,13 @@ Also for later he suggested: for the longer term should think about how to avoid
 **I created a folder 'SMARTAgent_Reduced_12302019/Dec31' and saved the output files and analysis of the simulation ran on Dec31. The simulation was run using RLparams as
 STDPparamsRL = {'hebbwt': 0.00001, 'antiwt':-0.00001, 'wmax': 50, 'RLon': 1 , 'RLhebbwt': 0.0001, 'RLantiwt': -0.000,
         'tauhebb': 10, 'RLwindhebb': 50, 'useRLexp': 0, 'softthresh': 0, 'verbose':0} ---> check RLdescription.txt
-**Running simulation with STDPparamsRL = {'hebbwt': 0.00001, 'antiwt':-0.00001, 'wmax': 50, 'RLon': 1 , 'RLhebbwt': 0.001, 'RLantiwt': -0.000,
+**create a new dir 'SMARTAgent_Reduced_12302019/Jan2_0' and run simulation with STDPparamsRL = {'hebbwt': 0.00001, 'antiwt':-0.00001, 'wmax': 50, 'RLon': 1 , 'RLhebbwt': 0.001, 'RLantiwt': -0.000,
         'tauhebb': 10, 'RLwindhebb': 50, 'useRLexp': 0, 'softthresh': 0, 'verbose':0} in folder 'SMARTAgent_Reduced_12302019'
 **create a new dir 'SMARTAgent_Reduced_12302019/Jan2' and run another simulation with STDPparamsRL = {'hebbwt': 0.00001, 'antiwt':-0.00001, 'wmax': 50, 'RLon': 1 , 'RLhebbwt': 0.001, 'RLantiwt': -0.0001,
         'tauhebb': 10, 'RLwindhebb': 50, 'useRLexp': 0, 'softthresh': 0, 'verbose':0}
 **create a new dir 'SMARTAgent_Reduced_12302019/Jan2_1' and run another simulation with STDPparamsRL = {'hebbwt': 0.00001, 'antiwt':-0.00001, 'wmax': 50, 'RLon': 1 , 'RLhebbwt': 0.01, 'RLantiwt': -0.0001,
+        'tauhebb': 10, 'RLwindhebb': 50, 'useRLexp': 0, 'softthresh': 0, 'verbose':0}
+
+*20jan3
+**create a new dir 'SMARTAgent_Reduced_12302019/Jan3' and run another simulation with STDPparamsRL = {'hebbwt': 0.00001, 'antiwt':-0.00001, 'wmax': 50, 'RLon': 1 , 'RLhebbwt': 0.001, 'RLantiwt': -0.00001,
         'tauhebb': 10, 'RLwindhebb': 50, 'useRLexp': 0, 'softthresh': 0, 'verbose':0}
