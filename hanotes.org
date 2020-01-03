@@ -479,4 +479,7 @@ STDPparamsRL = {'hebbwt': 0.00001, 'antiwt':-0.00001, 'wmax': 50, 'RLon': 1 , 'R
 **create a new dir 'SMARTAgent_Reduced_12302019/Jan3' and run another simulation with STDPparamsRL = {'hebbwt': 0.00001, 'antiwt':-0.00001, 'wmax': 50, 'RLon': 1 , 'RLhebbwt': 0.001, 'RLantiwt': -0.00001,
         'tauhebb': 10, 'RLwindhebb': 50, 'useRLexp': 0, 'softthresh': 0, 'verbose':0}
 **create a new dir 'SMARTAgent_Reduced_12302019/Jan3_1' and run another simulation with STDPparamsRL = {'hebbwt': 0.0001, 'antiwt':-0.00001, 'wmax': 50, 'RLon': 1 , 'RLhebbwt': 0.001, 'RLantiwt': -0.00001,
-        'tauhebb': 10, 'RLwindhebb': 50, 'useRLexp': 0, 'softthresh': 0, 'verbose':0}        
+        'tauhebb': 10, 'RLwindhebb': 50, 'useRLexp': 0, 'softthresh': 0, 'verbose':0}
+**Some ideas to test: 
+***1. decrease inhibition (i think right now the activity is too sparse to have eligibitly established).
+***2. To have better chances of learning, increase the window so that the chances for eligibility increases.
