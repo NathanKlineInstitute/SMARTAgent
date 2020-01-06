@@ -484,3 +484,7 @@ STDPparamsRL = {'hebbwt': 0.00001, 'antiwt':-0.00001, 'wmax': 50, 'RLon': 1 , 'R
 ***1. decrease inhibition (i think right now the activity is too sparse to have eligibitly established).
 ***2. To have better chances of learning, increase the window so that the chances for eligibility increases.
 **create a new dir 'SMARTAgent_Reduced_12302019/Jan3_2' and run another simulation with same parameters as the simulation in Jan3_1. Additionally, only use +1 (line 734). Run for 10sec (line 589)
+***Though there were only two +1 rewards, the weight kept increasing. So rerun the simulation with +1 and 0.
+
+*20jan6
+**creating 2 cell model 'SMARTAgent_2Cell_01062020' to understand and debug RL-model.

@@ -632,7 +632,7 @@ def saveWeights(sim, downSampleCells):
             #print(len(weightdata))
             fid1.write('%0.1f' %sim.WeightsRecordingTimes[count1])
             count1 = count1+1
-            for i in range(1,len(weightdata), downSampleCells): fid1.write('\t%0.8f' % weightdata[i])
+            for i in range(0,len(weightdata), downSampleCells): fid1.write('\t%0.8f' % weightdata[i])
             fid1.write('\n')
     print(('Saved RL weights as %s' % sim.RLweightsfilename))
     with open(sim.NonRLweightsfilename,'w') as fid2:
@@ -642,7 +642,7 @@ def saveWeights(sim, downSampleCells):
             #print(len(weightdata))
             fid2.write('%0.1f' %sim.WeightsRecordingTimes[count2])
             count2 = count2+1
-            for i in range(1,len(weightdata), downSampleCells): fid2.write('\t%0.8f' % weightdata[i])
+            for i in range(0,len(weightdata), downSampleCells): fid2.write('\t%0.8f' % weightdata[i])
             fid2.write('\n')
     print(('Saved Non-RL weights as %s' % sim.NonRLweightsfilename))    
     
