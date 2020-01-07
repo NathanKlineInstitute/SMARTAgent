@@ -493,4 +493,6 @@ STDPparamsRL = {'hebbwt': 0.00001, 'antiwt':-0.00001, 'wmax': 50, 'RLon': 1 , 'R
 **running 2 cell model showed that:
 1)RL weight change must be smaller or equal to the hebb weight change otherwise too many punishments reduce the weight to 0.
 2)with RL = 1 and hebbwt assigned, the model implements hebb stdp and RL, both.
-**running reduced model simulation with RL weight change adjusted to hebbwt. 
+**running reduced model simulation with RL weight change adjusted to hebbwt in 'SMARTAgent_Reduced_12302019/Jan7' using 
+STDPparamsRL = {'hebbwt': 0.00001, 'antiwt':-0.0000, 'wmax': 50, 'RLon': 1 , 'RLhebbwt': 0.00001, 'RLantiwt': -0.000,
+        'tauhebb': 10, 'RLwindhebb': 50, 'useRLexp': 0, 'softthresh': 0, 'verbose':0} 
