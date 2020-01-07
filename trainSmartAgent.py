@@ -17,9 +17,9 @@ sim.RLweightsfilename = 'RLweights.txt'  # file to store weights
 sim.NonRLweightsfilename = 'NonRLweights.txt'  # file to store weights
 sim.plotWeights = 0  # plot weights
 sim.saveWeights = 1  # save weights
-recordWeightStepSize = 2
+recordWeightStepSize = 1
 #recordWeightDT = 1000 # interval for recording synaptic weights (change later)
-recordWeightDCells = 10 # to record weights for sub samples of neurons
+recordWeightDCells = 1 # to record weights for sub samples of neurons
 
 global fid4
 
@@ -80,7 +80,7 @@ netParams.synMechParams['GABA'] = {'mod': 'Exp2Syn', 'tau1': 0.07, 'tau2': 9.1, 
 STDPparams = {'hebbwt': 0.0001, 'antiwt':-0.00001, 'wmax': 50, 'RLon': 0 , 'RLhebbwt': 0.001, 'RLantiwt': -0.000,
         'tauhebb': 10, 'RLwindhebb': 50, 'useRLexp': 0, 'softthresh': 0, 'verbose':0}
 
-STDPparamsRL = {'hebbwt': 0.00001, 'antiwt':-0.00001, 'wmax': 50, 'RLon': 1 , 'RLhebbwt': 0.001, 'RLantiwt': -0.000,
+STDPparamsRL = {'hebbwt': 0.00001, 'antiwt':-0.0000, 'wmax': 50, 'RLon': 1 , 'RLhebbwt': 0.00001, 'RLantiwt': -0.000,
         'tauhebb': 10, 'RLwindhebb': 50, 'useRLexp': 0, 'softthresh': 0, 'verbose':0}
 
 netParams.stimSourceParams['stimMod'] = {'type': 'NetStim', 'rate': 'variable', 'noise': 0}
@@ -594,7 +594,7 @@ simConfig.recordCellsSpikes = [-1]
 simConfig.recordStep = 0.2                      # Step size in ms to save data (e.g. V traces, LFP, etc)
 simConfig.filename = 'model_output'  # Set file output name
 simConfig.savePickle = False            # Save params, network and sim output to pickle file
-#simConfig.saveMat = True
+simConfig.saveMat = True
 
 #simConfig.analysis['plotRaster'] = True                         # Plot a raster
 simConfig.analysis['plotTraces'] = {'include': [1084, 1085, 1086, 1087, 1088, 1089, 1090, 1091, 1092]}
@@ -725,7 +725,7 @@ def trainAgentFake(t):
     fid4.write('\n')
 
     critic = sum(rewards) # get critic signal (-1, 0 or 1)
-    if critic>1:
+    if critic>0:
         critic = 1
     elif critic<0:
         critic = -1
