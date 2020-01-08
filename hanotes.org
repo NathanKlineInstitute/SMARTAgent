@@ -496,3 +496,9 @@ STDPparamsRL = {'hebbwt': 0.00001, 'antiwt':-0.00001, 'wmax': 50, 'RLon': 1 , 'R
 **running reduced model simulation with RL weight change adjusted to hebbwt in 'SMARTAgent_Reduced_12302019/Jan7' using 
 STDPparamsRL = {'hebbwt': 0.00001, 'antiwt':-0.0000, 'wmax': 50, 'RLon': 1 , 'RLhebbwt': 0.00001, 'RLantiwt': -0.000,
         'tauhebb': 10, 'RLwindhebb': 50, 'useRLexp': 0, 'softthresh': 0, 'verbose':0} 
+**running reduced model simulation with RL weight change adjusted to hebbwt in 'SMARTAgent_Reduced_12302019/Jan7_1' using 
+STDPparamsRL = {'hebbwt': 0.00001, 'antiwt':-0.0000, 'wmax': 50, 'RLon': 1 , 'RLhebbwt': 0.00005, 'RLantiwt': -0.000,
+        'tauhebb': 10, 'RLwindhebb': 50, 'useRLexp': 0, 'softthresh': 0, 'verbose':0}
+**running reduced model simulation with RL weight change adjusted to hebbwt in 'SMARTAgent_Reduced_12302019/Jan7_2' using
+STDPparamsRL = {'hebbwt': 0.00001, 'antiwt':-0.0000, 'wmax': 50, 'RLon': 1 , 'RLhebbwt': 0.0001, 'RLantiwt': -0.000,
+        'tauhebb': 10, 'RLwindhebb': 50, 'useRLexp': 0, 'softthresh': 0, 'verbose':0}
