@@ -252,40 +252,35 @@ netParams.connParams['R->R'] = {
         'probability': 0.02,
         'weight': 0.0001,
         'delay': 20,
-        'synMech': 'AMPA',
-        'plast': {'mech': 'STDP', 'params': STDPparams}}
+        'synMech': 'AMPA'}
 netParams.connParams['V1->V1'] = {
         'preConds': {'pop': 'V1'},
         'postConds': {'pop': 'V1'},
         'probability': 0.02,
         'weight': 0.0001,
         'delay': 20,
-        'synMech': 'AMPA',
-        'plast': {'mech': 'STDP', 'params': STDPparams}}
+        'synMech': 'AMPA'}
 netParams.connParams['V4->V4'] = {
         'preConds': {'pop': 'V4'},
         'postConds': {'pop': 'V4'},
         'probability': 0.02,
         'weight': 0.0001,
         'delay': 20,
-        'synMech': 'AMPA',
-        'plast': {'mech': 'STDP', 'params': STDPparams}}
+        'synMech': 'AMPA'}
 netParams.connParams['IT->IT'] = {
         'preConds': {'pop': 'IT'},
         'postConds': {'pop': 'IT'},
         'probability': 0.02,
         'weight': 0.0001,
         'delay': 20,
-        'synMech': 'AMPA',
-        'plast': {'mech': 'STDP', 'params': STDPparams}}
+        'synMech': 'AMPA'}
 netParams.connParams['MI->MI'] = {
         'preConds': {'pop': 'MI'},
         'postConds': {'pop': 'MI'},
         'probability': 0.02,
         'weight': 0.0001,
         'delay': 20,
-        'synMech': 'AMPA',
-        'plast': {'mech': 'STDP', 'params': STDPparams}}
+        'synMech': 'AMPA'}
 #E to I
 netParams.connParams['V1->IV1'] = {
         'preConds': {'pop': 'V1'},
@@ -293,32 +288,28 @@ netParams.connParams['V1->IV1'] = {
         'probability': 0.02,
         'weight': 0.0001,
         'delay': 20,
-        'synMech': 'AMPA',
-        'plast': {'mech': 'STDP', 'params': STDPparams}}
+        'synMech': 'AMPA'}
 netParams.connParams['V4->IV4'] = {
         'preConds': {'pop': 'V4'},
         'postConds': {'pop': 'IV4'},
         'probability': 0.02,
         'weight': 0.0001,
         'delay': 20,
-        'synMech': 'AMPA',
-        'plast': {'mech': 'STDP', 'params': STDPparams}}
+        'synMech': 'AMPA'}
 netParams.connParams['IT->IIT'] = {
         'preConds': {'pop': 'IT'},
         'postConds': {'pop': 'IIT'},
         'probability': 0.02,
         'weight': 0.0001,
         'delay': 20,
-        'synMech': 'AMPA',
-        'plast': {'mech': 'STDP', 'params': STDPparams}}
+        'synMech': 'AMPA'}
 netParams.connParams['MI->IMI'] = {
         'preConds': {'pop': 'MI'},
         'postConds': {'pop': 'IMI'},
         'probability': 0.02,
         'weight': 0.0001,
         'delay': 20,
-        'synMech': 'AMPA',
-        'plast': {'mech': 'STDP', 'params': STDPparams}}
+        'synMech': 'AMPA'}
 #Local inhibition
 #I to E
 netParams.connParams['IV1->V1'] = {
@@ -327,32 +318,28 @@ netParams.connParams['IV1->V1'] = {
         'probability': 0.02,
         'weight': 0.0001,
         'delay': 20,
-        'synMech': 'GABA',
-        'plast': {'mech': 'STDP', 'params': STDPparams}}
+        'synMech': 'GABA'}
 netParams.connParams['IV4->V4'] = {
         'preConds': {'pop': 'IV4'},
         'postConds': {'pop': 'V4'},
         'probability': 0.02,
         'weight': 0.0001,
         'delay': 20,
-        'synMech': 'GABA',
-        'plast': {'mech': 'STDP', 'params': STDPparams}}
+        'synMech': 'GABA'}
 netParams.connParams['IIT->IT'] = {
         'preConds': {'pop': 'IIT'},
         'postConds': {'pop': 'IT'},
         'probability': 0.02,
         'weight': 0.0001,
         'delay': 20,
-        'synMech': 'GABA',
-        'plast': {'mech': 'STDP', 'params': STDPparams}}
+        'synMech': 'GABA'}
 netParams.connParams['IMI->MI'] = {
         'preConds': {'pop': 'IMI'},
         'postConds': {'pop': 'MI'},
         'probability': 0.02,
         'weight': 0.0001,
         'delay': 20,
-        'synMech': 'GABA',
-        'plast': {'mech': 'STDP', 'params': STDPparams}}
+        'synMech': 'GABA'}
 #I to I
 netParams.connParams['IV1->IV1'] = {
         'preConds': {'pop': 'IV1'},
@@ -360,32 +347,28 @@ netParams.connParams['IV1->IV1'] = {
         'probability': 0.02,
         'weight': 0.0001,
         'delay': 20,
-        'synMech': 'GABA',
-        'plast': {'mech': 'STDP', 'params': STDPparams}}
+        'synMech': 'GABA'}
 netParams.connParams['IV4->IV4'] = {
         'preConds': {'pop': 'IV4'},
         'postConds': {'pop': 'IV4'},
         'probability': 0.02,
         'weight': 0.0001,
         'delay': 20,
-        'synMech': 'GABA',
-        'plast': {'mech': 'STDP', 'params': STDPparams}}
+        'synMech': 'GABA'}
 netParams.connParams['IIT->IIT'] = {
         'preConds': {'pop': 'IIT'},
         'postConds': {'pop': 'IIT'},
         'probability': 0.02,
         'weight': 0.0001,
         'delay': 20,
-        'synMech': 'GABA',
-        'plast': {'mech': 'STDP', 'params': STDPparams}}
+        'synMech': 'GABA'}
 netParams.connParams['IMI->IMI'] = {
         'preConds': {'pop': 'IMI'},
         'postConds': {'pop': 'IMI'},
         'probability': 0.02,
         'weight': 0.0001,
         'delay': 20,
-        'synMech': 'GABA',
-        'plast': {'mech': 'STDP', 'params': STDPparams}}
+        'synMech': 'GABA'}
 #E to E feedforward connections
 netParams.connParams['R->V1'] = {
         'preConds': {'pop': 'R'},
@@ -394,8 +377,7 @@ netParams.connParams['R->V1'] = {
         #'convergence': 10,
         'weight': 0.002,
         'delay': 20,
-        'synMech': 'AMPA',
-        'plast': {'mech': 'STDP', 'params': STDPparams}}
+        'synMech': 'AMPA'}
 netParams.connParams['V1->V4'] = {
         'preConds': {'pop': 'V1'},
         'postConds': {'pop': 'V4'},
@@ -403,8 +385,7 @@ netParams.connParams['V1->V4'] = {
         #'convergence': 10,
         'weight': 0.002,
         'delay': 20,
-        'synMech': 'AMPA',
-        'plast': {'mech': 'STDP', 'params': STDPparams}}
+        'synMech': 'AMPA'}
 netParams.connParams['V4->IT'] = {
         'preConds': {'pop': 'V4'},
         'postConds': {'pop': 'IT'},
@@ -412,8 +393,7 @@ netParams.connParams['V4->IT'] = {
         #'convergence': 10,
         'weight': 0.002,
         'delay': 20,
-        'synMech': 'AMPA',
-        'plast': {'mech': 'STDP', 'params': STDPparams}}
+        'synMech': 'AMPA'}
 netParams.connParams['IT->MI'] = {
         'preConds': {'pop': 'IT'},
         'postConds': {'pop': 'MI'},
@@ -440,8 +420,7 @@ netParams.connParams['R->IV1'] = {
         #'convergence': 10,
         'weight': 0.002,
         'delay': 20,
-        'synMech': 'AMPA',
-        'plast': {'mech': 'STDP', 'params': STDPparams}}
+        'synMech': 'AMPA'}
 netParams.connParams['V1->IV4'] = {
         'preConds': {'pop': 'V1'},
         'postConds': {'pop': 'IV4'},
@@ -449,8 +428,7 @@ netParams.connParams['V1->IV4'] = {
         #'convergence': 10,
         'weight': 0.002,
         'delay': 20,
-        'synMech': 'AMPA',
-        'plast': {'mech': 'STDP', 'params': STDPparams}}
+        'synMech': 'AMPA'}
 netParams.connParams['V4->IIT'] = {
         'preConds': {'pop': 'V4'},
         'postConds': {'pop': 'IIT'},
@@ -458,8 +436,7 @@ netParams.connParams['V4->IIT'] = {
         #'convergence': 10,
         'weight': 0.002,
         'delay': 20,
-        'synMech': 'AMPA',
-        'plast': {'mech': 'STDP', 'params': STDPparams}}
+        'synMech': 'AMPA'}
 netParams.connParams['IT->IMI'] = {
         'preConds': {'pop': 'IT'},
         'postConds': {'pop': 'IMI'},
@@ -478,8 +455,7 @@ netParams.connParams['V1->R'] = {
         #'convergence': 10,
         'weight': 0.0001,
         'delay': 20,
-        'synMech': 'AMPA',
-        'plast': {'mech': 'STDP', 'params': STDPparams}}
+        'synMech': 'AMPA'}
 netParams.connParams['V4->V1'] = {
         'preConds': {'pop': 'V4'},
         'postConds': {'pop': 'V1'},
@@ -487,8 +463,7 @@ netParams.connParams['V4->V1'] = {
         #'convergence': 10,
         'weight': 0.0001,
         'delay': 20,
-        'synMech': 'AMPA',
-        'plast': {'mech': 'STDP', 'params': STDPparams}}
+        'synMech': 'AMPA'}
 netParams.connParams['IT->V4'] = {
         'preConds': {'pop': 'IT'},
         'postConds': {'pop': 'V4'},
@@ -496,8 +471,7 @@ netParams.connParams['IT->V4'] = {
         #'convergence': 10,
         'weight': 0.0001,
         'delay': 20,
-        'synMech': 'AMPA',
-        'plast': {'mech': 'STDP', 'params': STDPparams}}
+        'synMech': 'AMPA'}
 netParams.connParams['MI->IT'] = {
         'preConds': {'pop': 'MI'},
         'postConds': {'pop': 'IT'},
@@ -526,8 +500,7 @@ netParams.connParams['IV1->R'] = {
         #'convergence': 10,
         'weight': 0.002,
         'delay': 20,
-        'synMech': 'GABA',
-        'plast': {'mech': 'STDP', 'params': STDPparams}}
+        'synMech': 'GABA'}
 netParams.connParams['IV4->V1'] = {
         'preConds': {'pop': 'IV4'},
         'postConds': {'pop': 'V1'},
@@ -535,8 +508,7 @@ netParams.connParams['IV4->V1'] = {
         #'convergence': 10,
         'weight': 0.002,
         'delay': 20,
-        'synMech': 'GABA',
-        'plast': {'mech': 'STDP', 'params': STDPparams}}
+        'synMech': 'GABA'}
 netParams.connParams['IIT->V4'] = {
         'preConds': {'pop': 'IIT'},
         'postConds': {'pop': 'V4'},
@@ -544,8 +516,7 @@ netParams.connParams['IIT->V4'] = {
         #'convergence': 10,
         'weight': 0.002,
         'delay': 20,
-        'synMech': 'GABA',
-        'plast': {'mech': 'STDP', 'params': STDPparams}}
+        'synMech': 'GABA'}
 netParams.connParams['IMI->IT'] = {
         'preConds': {'pop': 'IMI'},
         'postConds': {'pop': 'IT'},
@@ -553,8 +524,7 @@ netParams.connParams['IMI->IT'] = {
         #'convergence': 10,
         'weight': 0.002,
         'delay': 20,
-        'synMech': 'GABA',
-        'plast': {'mech': 'STDP', 'params': STDPparamsRL}}
+        'synMech': 'GABA'}
 #I to I
 netParams.connParams['IV1->IV4'] = {
         'preConds': {'pop': 'IV1'},
@@ -563,8 +533,7 @@ netParams.connParams['IV1->IV4'] = {
         #'convergence': 10,
         'weight': 0.002,
         'delay': 20,
-        'synMech': 'GABA',
-        'plast': {'mech': 'STDP', 'params': STDPparams}}
+        'synMech': 'GABA'}
 netParams.connParams['IV4->IIT'] = {
         'preConds': {'pop': 'IV4'},
         'postConds': {'pop': 'IIT'},
@@ -572,8 +541,7 @@ netParams.connParams['IV4->IIT'] = {
         #'convergence': 10,
         'weight': 0.002,
         'delay': 20,
-        'synMech': 'GABA',
-        'plast': {'mech': 'STDP', 'params': STDPparams}}
+        'synMech': 'GABA'}
 netParams.connParams['IIT->IMI'] = {
         'preConds': {'pop': 'IIT'},
         'postConds': {'pop': 'IMI'},

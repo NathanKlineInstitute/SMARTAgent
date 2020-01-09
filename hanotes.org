@@ -489,7 +489,7 @@ STDPparamsRL = {'hebbwt': 0.00001, 'antiwt':-0.00001, 'wmax': 50, 'RLon': 1 , 'R
 *20jan6
 **creating 2 cell model 'SMARTAgent_2Cell_01062020' to understand and debug RL-model.
 
-*20dec7
+*20jan7
 **running 2 cell model showed that:
 1)RL weight change must be smaller or equal to the hebb weight change otherwise too many punishments reduce the weight to 0.
 2)with RL = 1 and hebbwt assigned, the model implements hebb stdp and RL, both.
@@ -502,3 +502,7 @@ STDPparamsRL = {'hebbwt': 0.00001, 'antiwt':-0.0000, 'wmax': 50, 'RLon': 1 , 'RL
 **running reduced model simulation with RL weight change adjusted to hebbwt in 'SMARTAgent_Reduced_12302019/Jan7_2' using
 STDPparamsRL = {'hebbwt': 0.00001, 'antiwt':-0.0000, 'wmax': 50, 'RLon': 1 , 'RLhebbwt': 0.0001, 'RLantiwt': -0.000,
         'tauhebb': 10, 'RLwindhebb': 50, 'useRLexp': 0, 'softthresh': 0, 'verbose':0}
+
+*20jan9
+**Do we need STDP between neurons in visual cortex? May be not. As there is an existing topological map, activation of neurons in V1 will encode spatial information about the visual space. and neurons in V4 and IT will encode associations between objects in visual scenes.
+**run reduced model without nonRL-STDP. 
