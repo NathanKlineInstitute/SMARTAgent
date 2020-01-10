@@ -505,4 +505,114 @@ STDPparamsRL = {'hebbwt': 0.00001, 'antiwt':-0.0000, 'wmax': 50, 'RLon': 1 , 'RL
 
 *20jan9
 **Do we need STDP between neurons in visual cortex? May be not. As there is an existing topological map, activation of neurons in V1 will encode spatial information about the visual space. and neurons in V4 and IT will encode associations between objects in visual scenes.
-**run reduced model without nonRL-STDP. 
+**run reduced model without nonRL-STDP.
+**running reduced model simulation without nonRL-STDP in 'SMARTAgent_Reduced_12302019/Jan9'.
+**D1R-expressing medium spiny neurons reinforce, while D2R-expressing MSNs encode punsihment. High concentrations of DA preferentially activate D1R-expressing direct pathway neurons, while low level of DA preferentially activates D2R expressing indirect pathway neurons.
+**Kravitz and Kreitzer suggest LTP of the direct pathway and LTD of the indirect pathway mediates reinforcement, whereas LTP of the indirect pathway and LTD of direct pathway mediates punishment in substentia niagra compacta (SNc) neurons. 
+**STDP works good.
+**Reward based weight adjustment looks weird:
+example 1:
+t=500.600000 (BEFORE) tlaspre=499.200000, tlastpost=400.000000, flag=0.000000, w=-1.000000, deltaw=0.000000 
+t=500.600000 (AFTER) tlaspre=499.200000, tlastpost=500.600000, flag=0.000000, w=-1.000000, deltaw=0.000000 
+
+t= 520.0000000000497 - adjusting weights based on RL critic value: -1
+t=520.000000, RL-hebb =0.001000, deltaw=-0.001000 
+t=520.000000, RL-antihebb =0.000000, deltaw=-0.001000 
+RL event: t = 520.000000 ms; reinf = -1.000000; RLhebbwt = 0.001000; RLlenhebb = 100.000000; tlasthebbelig = 500.600000; deltaw = -0.001000
+
+example 2:
+t=780.200000 (BEFORE) tlaspre=758.000000, tlastpost=779.000000, flag=0.000000, w=1.000000, deltaw=0.000000 
+t=780.200000 (AFTER) tlaspre=780.200000, tlastpost=779.000000, flag=0.000000, w=1.000000, deltaw=0.000000
+
+t=798.800000 (BEFORE) tlaspre=780.200000, tlastpost=779.000000, flag=0.000000, w=1.000000, deltaw=0.000000 
+t=798.800000 (AFTER) tlaspre=798.800000, tlastpost=779.000000, flag=0.000000, w=1.000000, deltaw=0.000000 
+eligibility established -- see above and now reward/punishment delivered at time 800ms -- see below
+
+t= 800.0000000001133 - adjusting weights based on RL critic value: -1
+t=800.000000, RL-hebb =0.001000, deltaw=-0.001000 
+t=800.000000, RL-antihebb =-0.000200, deltaw=-0.000800 
+RL event: t = 800.000000 ms; reinf = -1.000000; RLhebbwt = 0.001000; RLlenhebb = 100.000000; tlasthebbelig = 779.000000; deltaw = -0.000800
+
+example 3:
+t=801.200000 (BEFORE) tlaspre=798.800000, tlastpost=779.000000, flag=0.000000, w=-1.000000, deltaw=0.000000 
+t=801.200000 (AFTER) tlaspre=798.800000, tlastpost=801.200000, flag=0.000000, w=-1.000000, deltaw=0.000000 
+
+t=818.000000 (BEFORE) tlaspre=798.800000, tlastpost=801.200000, flag=0.000000, w=1.000000, deltaw=0.000000 
+t=818.000000 (AFTER) tlaspre=818.000000, tlastpost=801.200000, flag=0.000000, w=1.000000, deltaw=0.000000
+
+t= 820.0000000001179 - adjusting weights based on RL critic value: -1
+t=820.000000, RL-hebb =0.001000, deltaw=-0.001000 
+t=820.000000, RL-antihebb =-0.000200, deltaw=-0.000800 
+RL event: t = 820.000000 ms; reinf = -1.000000; RLhebbwt = 0.001000; RLlenhebb = 100.000000; tlasthebbelig = 801.200000; deltaw = -0.000800
+
+example 4:
+t=940.800000 (BEFORE) tlaspre=923.800000, tlastpost=881.000000, flag=0.000000, w=1.000000, deltaw=0.000000 
+t=940.800000 (AFTER) tlaspre=940.800000, tlastpost=881.000000, flag=0.000000, w=1.000000, deltaw=0.000000
+
+t=944.800000 (BEFORE) tlaspre=940.800000, tlastpost=881.000000, flag=0.000000, w=-1.000000, deltaw=0.000000 
+t=944.800000 (AFTER) tlaspre=940.800000, tlastpost=944.800000, flag=0.000000, w=-1.000000, deltaw=0.000000
+
+t=959.400000 (BEFORE) tlaspre=940.800000, tlastpost=944.800000, flag=0.000000, w=1.000000, deltaw=0.000000 
+t=959.400000 (AFTER) tlaspre=959.400000, tlastpost=944.800000, flag=0.000000, w=1.000000, deltaw=0.000000
+
+t= 960.0000000001497 - adjusting weights based on RL critic value: -1
+t=960.000000, RL-hebb =0.001000, deltaw=-0.001000 
+t=960.000000, RL-antihebb =0.000000, deltaw=-0.001000 
+RL event: t = 960.000000 ms; reinf = -1.000000; RLhebbwt = 0.001000; RLlenhebb = 100.000000; tlasthebbelig = 944.800000; deltaw = -0.001000
+
+example 5:
+
+t=1059.400000 (BEFORE) tlaspre=1038.400000, tlastpost=1032.400000, flag=0.000000, w=-1.000000, deltaw=0.000000 
+t=1059.400000 (AFTER) tlaspre=1038.400000, tlastpost=1059.400000, flag=0.000000, w=-1.000000, deltaw=0.000000 
+
+t= 1080.0000000001132 - adjusting weights based on RL critic value: 1
+t=1080.000000, RL-hebb =0.001000, deltaw=0.001000 
+t=1080.000000, RL-antihebb =-0.000200, deltaw=0.000800 
+RL event: t = 1080.000000 ms; reinf = 1.000000; RLhebbwt = 0.001000; RLlenhebb = 100.000000; tlasthebbelig = 1059.400000; deltaw = 0.000800
+
+
+another example with more information: (both tlasthebbelig and tlastantielig)
+
+t= 860.000000000127 - adjusting weights based on RL critic value: 1
+t=860.000000, RL-hebb =0.001000, deltaw=0.001000 
+t=860.000000, RL-antihebb =-0.000200, deltaw=0.000800 
+RL event: t = 860.000000 ms; reinf = 1.000000; RLhebbwt = 0.001000; RLlenhebb = 100.000000; tlasthebbelig = 839.000000; tlastantielig = 840.400000; deltaw = 0.000800
+
+
+**Still unsure how tlasthebbelig and tlastantielig set.
+***eligibility is establised by comparing times of pre- and post-synaptic spikes.
+*** the function receives w. if w>=0, its a presynaptic spike. if w<0 its postsynaptic spike.
+*** if presynaptic spike at time t, it will look at the time of last postsynaptic spike. and therefore look for antihebbian eligibility.
+*** if postsynaptic spike at time t, it will look at the time of last presynaptic spike and therefore look for hebbian eligibility.
+
+**In the example below 2 spike events were printed
+
+***spike event 1:
+t=1253.600000 (BEFORE) tlaspre=1232.600000, tlastpost=1219.600000, tlasthebbelig=1219.600000, tlastantielig=-1.000000, flag=0.000000, w=-1.000000, deltaw=0.000000 
+t=1253.600000 (AFTER) tlaspre=1232.600000, tlastpost=1253.600000, tlasthebbelig=1253.600000, tlastantielig=-1.000000, flag=0.000000, w=-1.000000, deltaw=0.000000 
+
+--at time 1253.6 ms, a postsynaptic spike occurs (because w = -1), therefore the mechanism compares time of last presynaptic spike which is 1232.6 ms
+--the time difference between current postsynaptic spike and last presynaptic spike is 20 ms. 
+--tpost-tpre (20 ms) is less than 100 ms therefore the eligibilty trace is activated at 1253.6 ms for hebbian plasticity.
+
+***spike event 2:
+t=1259.000000 (BEFORE) tlaspre=1232.600000, tlastpost=1253.600000, tlasthebbelig=1253.600000, tlastantielig=-1.000000, flag=0.000000, w=1.000000, deltaw=0.000000 
+t=1259.000000 (AFTER) tlaspre=1259.000000, tlastpost=1253.600000, tlasthebbelig=1253.600000, tlastantielig=1259.000000, flag=0.000000, w=1.000000, deltaw=0.000000
+
+--at time 1259 ms, a presynaptic spike accurs (because w = 1), therefore the mechanism compares time of last postsynaptic spike which is 1253.6 ms.
+-- the time difference between current presynaptic spike and last postsynaptic spike is 5.4 ms.
+--tpre-tpost (5.4 ms) is less than 10 ms therefore the eligibility trace is activated at 1259.0 ms for antihebbian plasticity.
+
+*** a reward/punishment arrives at 1260 ms
+
+t= 1259.9999999999495 - adjusting weights based on RL critic value: 1
+t=1260.000000, RL-hebb =0.001000, deltaw=0.001000 
+t=1260.000000, RL-antihebb =-0.000200, deltaw=0.000800 
+RL event: t = 1260.000000 ms; reinf = 1.000000; RLhebbwt = 0.001000; RLlenhebb = 100.000000; tlasthebbelig = 1253.600000; tlastantielig = 1259.000000; deltaw = 0.000800
+
+-- at time 1260 ms, eligibility for both hebbian and antihebbian were active (hebbian was active till 1353.6 ms and antihebb was active till 1359 ms).
+-- since its a reward... it will implement positive reinforcement.
+-- if it was a negative, both hebbian and antihebbian plasticities will be reversed.
+
+** right now the window for hebbian plasticity is 100 ms where as antihebbian plasticity is 10 ms.
+** the eligibility for both hebbian and anithebbian stays active for 100 ms.

@@ -659,6 +659,7 @@ def getFiringRatesWithInterval(trange = None, neuronal_pop = None):
 
 NBsteps = 0
 epCount = []
+last_obs = [] #make sure this does not introduce a bug
 def trainAgentFake(t):
     """ training interface between simulation and game environment
     """
