@@ -579,7 +579,7 @@ t=860.000000, RL-antihebb =-0.000200, deltaw=0.000800
 RL event: t = 860.000000 ms; reinf = 1.000000; RLhebbwt = 0.001000; RLlenhebb = 100.000000; tlasthebbelig = 839.000000; tlastantielig = 840.400000; deltaw = 0.000800
 
 
-**Still unsure how tlasthebbelig and tlastantielig set.
+**Still unsure how tlasthebbelig and tlastantielig set. Now I understand. It's explained below, with RLon = 1 and STDPon = 0
 ***eligibility is establised by comparing times of pre- and post-synaptic spikes.
 *** the function receives w. if w>=0, its a presynaptic spike. if w<0 its postsynaptic spike.
 *** if presynaptic spike at time t, it will look at the time of last postsynaptic spike. and therefore look for antihebbian eligibility.
@@ -616,3 +616,44 @@ RL event: t = 1260.000000 ms; reinf = 1.000000; RLhebbwt = 0.001000; RLlenhebb =
 
 ** right now the window for hebbian plasticity is 100 ms where as antihebbian plasticity is 10 ms.
 ** the eligibility for both hebbian and anithebbian stays active for 100 ms.
+
+**What happens when both RLon and STDPon are 1. See the example below.
+
+t=47.200000 (AFTER) tlaspre=25.800000, tlastpost=47.200000, tlasthebbelig=47.200000, tlastantielig=-1.000000, flag=0.000000, w=-1.000000, deltaw=0.000000 
+t=48.200000 (BEFORE) tlaspre=25.800000, tlastpost=47.200000, tlasthebbelig=47.200000, tlastantielig=-1.000000, flag=-1.000000, w=-1.000000, deltaw=0.000000 
+Hebbian STDP event: t = 48.200000 ms; tlastpre = 25.800000; w = -1.000000; deltaw = 0.000118
+
+t= 60.00000000000058 - adjusting weights based on RL critic value: -1
+t=60.000000, RL-hebb =0.001000, deltaw=-0.001000 
+t=60.000000, RL-antihebb =0.000000, deltaw=-0.001000 
+RL event: t = 60.000000 ms; reinf = -1.000000; RLhebbwt = 0.001000; RLlenhebb = 100.000000; tlasthebbelig = 47.200000; tlastantielig = -1.000000; deltaw = -0.001000
+
+**Sent 2 messages (Slack) to Sam on Jan10,2020 for discussion
+Message 1:
+While building SmartAgent model, i incorporated stdp.mod from RL_arm model 
+(https://github.com/Neurosim-lab/netpyne/blob/development/examples/RL_arm/params.py)
+and used the parameters: 
+STDPparams = {'hebbwt': 0.00001, 'antiwt':-0.00001, 'wmax': 50, 'RLon': 1 , 'RLhebbwt': 0.001, 'RLantiwt': -0.000, \
+    'tauhebb': 10, 'RLwindhebb': 50, 'useRLexp': 0, 'softthresh': 0, 'verbose':0}.
+As earlier, i didn't carefully looked at all these parameters and didn't try to understand the meaning of each of these
+parameters, while running a reduced verson of SmartAgent, I noticed a drop in the activity of postsynaptic neurons which 
+were connected with presynaptic neurons using STDPparams as declared above. on dissecting these mechanisms, i found out:
+1. It was using STDP-based and RL-based weight adjustments. It was because, by default STDPon is set to 1 and I didn't set STDPon to 0.
+1.1. Before I further dive into the working of the mechanisms, i wonder why this choice was made? I am not against using this strategy 
+but want to understand biological rationale behind this choice
+2. The second set of parameters, i wondered about were 'RLhebbwt': 0.001, 'RLantiwt': -0.000.
+2.1. RLhebbwt defines the change in weight, when RLon is 1 and hebbeligibilty is active. 
+2.1.1 hebbeligibility is active for 100 ms if postsynaptic neuron fires within 50 ms ('RLwindhebb': 50) of presynaptic neuron. by default RLwindhebb is 10 ms.  
+2.1.2 when there is a reward (+1), and hebbelegibility is active for less than 100 ms, the weight increases.
+2.1.3 when there is a punishment (-1), and hebbelegibility is active for less than 100 ms, the weight decreases.
+2.2. RLantiwt defines the change in weight, when RLon is 1 and antieligibility is active.
+2.2.1. antieligibility is active for 100 ms if presynaptic neuron fires after postsynaptic neuron within 10 ms. (default: 'RLwindanti': 10) 
+2.2.2. when there is a reward (+1), and antieligibility is active for less than 100 ms, the weight decreases.
+2.2.3. when there is a punishment (-1), and antieligibility is active for less than 100 ms, the weight increases.
+2.2.4. However, this mechanism is inactive because RLantiwt': -0.000.
+2.2.5. So the question is why was it set to be inactive? Should I use it? What is the biological relevance of this mechanism?
+3. The biggest issue in my model is that because the postsynaptic neurons are driven by presynaptic neurons, 
+if the connection weight drops to 0, the postsynaptic neurons become inactive. Probably, need to have some baseline activity in the model for all neurons.
+
+Message 2: 
+Also just for discussion, if there is a topologically mapped neurons across multiple layers, i have been wondering why would we need STDP to encode spatial information. Same question from other side: how would STDP help encode visual information, all i can think (also see in the model) of is that it increase firing rate globally. I understand the basic concept but cant wrap my head around how this can be useful. Of course, i am trying both ways i.e. with STDP (adjustable weights) and without STDP (fixed weights) in Visual cortex.
