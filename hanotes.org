@@ -657,3 +657,12 @@ if the connection weight drops to 0, the postsynaptic neurons become inactive. P
 
 Message 2: 
 Also just for discussion, if there is a topologically mapped neurons across multiple layers, i have been wondering why would we need STDP to encode spatial information. Same question from other side: how would STDP help encode visual information, all i can think (also see in the model) of is that it increase firing rate globally. I understand the basic concept but cant wrap my head around how this can be useful. Of course, i am trying both ways i.e. with STDP (adjustable weights) and without STDP (fixed weights) in Visual cortex.
+
+*20jan13
+**Things to do:
+***Develop analytical tools/scripts to dissect the circuit to see how the activity is encoded hierarchically. V1 vs V4 vs IT etc
+***Add noise to the Motor neurons so that these neurons can fire in the absence of synaptic input. This will give a chance to recover if the connection weights are depressed to 0.
+***Remove STDP in Visual areas.
+***what is the firing rate of neurons and their population in the absence of plasticity?
+***How to have a better control over the racket movements in the aigame?
+  
