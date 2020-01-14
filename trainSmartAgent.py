@@ -94,6 +94,11 @@ netParams.stimTargetParams['stimMod->all'] = {'source': 'stimMod',
 #background input to inhibitory neurons to increase their firing rate
 
 # Stimulation parameters
+
+netParams.stimSourceParams['ebkg'] = {'type': 'NetStim', 'rate': 5, 'noise': 0.3}
+netParams.stimTargetParams['ebkg->all'] = {'source': 'ebkg', 'conds': {'cellType': ['EV1','EV4','EIT', 'EMI', 'EMO']}, 'weight': 0.01, 'delay': 'max(1, normal(5,2))', 'synMech': 'AMPA'}
+
+
 netParams.stimSourceParams['bkg'] = {'type': 'NetStim', 'rate': 20, 'noise': 0.3}
 netParams.stimTargetParams['bkg->all'] = {'source': 'bkg', 'conds': {'cellType': ['InV1','InV4','InIT', 'InMI']}, 'weight': 0.01, 'delay': 'max(1, normal(5,2))', 'synMech': 'AMPA'}
 ######################################################################################

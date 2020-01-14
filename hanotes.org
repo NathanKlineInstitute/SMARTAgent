@@ -665,4 +665,9 @@ Also just for discussion, if there is a topologically mapped neurons across mult
 ***Remove STDP in Visual areas.
 ***what is the firing rate of neurons and their population in the absence of plasticity?
 ***How to have a better control over the racket movements in the aigame?
-  
+
+*20jan14
+**add background noise firing rate with noise to excitatory cells.
+netParams.stimSourceParams['ebkg'] = {'type': 'NetStim', 'rate': 5, 'noise': 0.3}
+netParams.stimTargetParams['ebkg->all'] = {'source': 'ebkg', 'conds': {'cellType': ['EV1','EV4','EIT', 'EMI', 'EMO']}, 'weight': 0.01, 'delay': 'max(1, normal(5,2))', 'synMech': 'AMPA'}  
+**
