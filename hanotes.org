@@ -670,4 +670,6 @@ Also just for discussion, if there is a topologically mapped neurons across mult
 **add background noise firing rate with noise to excitatory cells.
 netParams.stimSourceParams['ebkg'] = {'type': 'NetStim', 'rate': 5, 'noise': 0.3}
 netParams.stimTargetParams['ebkg->all'] = {'source': 'ebkg', 'conds': {'cellType': ['EV1','EV4','EIT', 'EMI', 'EMO']}, 'weight': 0.01, 'delay': 'max(1, normal(5,2))', 'synMech': 'AMPA'}  
-**
+**In folder 'SMARTAgent_Reduced_01142020/AllConns0' set weights of all connections to 0 to see the background activity of the network i.e. R will fire based on the input and E cells will fire based on ebkg and i cells will fire based on bkg.
+**In folder 'SMARTAgent_Reduced_01142020/AllConns0ExceptReccurent' set wights of all connections to 0 except recurrent connections and background activity as in the above case.
+**In folder 'SMARTAgent_Reduced_01142020/AllConns0ExceptFeedForwardExcit' set weights of all connections to 0 except feedforward excitatory connections and background activity.
