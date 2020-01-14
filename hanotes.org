@@ -673,3 +673,4 @@ netParams.stimTargetParams['ebkg->all'] = {'source': 'ebkg', 'conds': {'cellType
 **In folder 'SMARTAgent_Reduced_01142020/AllConns0' set weights of all connections to 0 to see the background activity of the network i.e. R will fire based on the input and E cells will fire based on ebkg and i cells will fire based on bkg.
 **In folder 'SMARTAgent_Reduced_01142020/AllConns0ExceptReccurent' set wights of all connections to 0 except recurrent connections and background activity as in the above case.
 **In folder 'SMARTAgent_Reduced_01142020/AllConns0ExceptFeedForwardExcit' set weights of all connections to 0 except feedforward excitatory connections and background activity.
+**When compared AllConns0 with AllConns0ExceptRecurrent, found no difference. Rerunning ALlConns0ExceptRecurrent with higher connection strength (0.0001 --> 0.001) 
