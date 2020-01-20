@@ -693,4 +693,8 @@ netParams.stimTargetParams['ebkg->all'] = {'source': 'ebkg', 'conds': {'cellType
 2.1) For propagation, he suggested may be we should increase the strength of the connections.
 2.2) I think the limitation is time step for playing game i.e. 20 ms. it allows only to detect 50Hz stimulation, any input driving lower frequency will not bre represented.
 2.2.1) Solution could be shifting either the activiation curve to increase firing rates or increase the time step for playing game. If we increase step to 100 ms. this will allow to encode atleast 10Hz input.
-3) Also for comparison, Sam suggested that we should also plot the actual input image. 
+3) Also for comparison, Sam suggested that we should also plot the actual input image.
+
+*20jan20
+**Implemented saving input frames to the model.
+**Now can show the input images together with model's spatial activity of neuron in each layer. 

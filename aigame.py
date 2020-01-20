@@ -33,7 +33,7 @@ class SMARTAgent:
     ################################
     ### PLAY GAME
     ###############################
-    def playGame(self, actions, epCount): #actions need to be generated from motor cortex
+    def playGame(self, actions, epCount, InputImages): #actions need to be generated from motor cortex
         #rewards = numpy.zeros(shape=(1,5))
         rewards = []
         dsum_Images = numpy.zeros(shape=(20,20)) #previously we merged 2x2 pixels into 1 value. Now we merge 8x8 pixels into 1 value. so the original 160x160 pixels will result into 20x20 values instead of previously used 80x80.
@@ -74,6 +74,7 @@ class SMARTAgent:
         dsum_Images = numpy.maximum(dsum_Images,i2)
         dsum_Images = numpy.maximum(dsum_Images,i3)
         dsum_Images = numpy.maximum(dsum_Images,i4)
+        InputImages.append(dsum_Images)
         #fr_Images = numpy.where(dsum_Images>1.0,100,dsum_Images) #Using this to check what number would work for firing rate
         #fr_Images = numpy.where(dsum_Images<10.0,0,dsum_Images)
         fr_Images = 40/(1+numpy.exp((numpy.multiply(-1,dsum_Images)+123)/25))
@@ -85,10 +86,10 @@ class SMARTAgent:
             epCount.append(self.countAll)
             self.env.reset()
             self.countAll = 0
-        return rewards, epCount
+        return rewards, epCount, InputImages
         #return firing_rates
 
-    def playGameFake(self, last_obs, epCount): #actions are generated based on Vector Algebra
+    def playGameFake(self, last_obs, epCount, InputImages): #actions are generated based on Vector Algebra
         #rewards = numpy.zeros(shape=(1,5))
         actions = []
         rewards = []
@@ -146,6 +147,7 @@ class SMARTAgent:
         dsum_Images = numpy.maximum(dsum_Images,i2)
         dsum_Images = numpy.maximum(dsum_Images,i3)
         dsum_Images = numpy.maximum(dsum_Images,i4)
+        InputImages.append(dsum_Images)
         #fr_Images = numpy.where(dsum_Images>1.0,100,dsum_Images) #Using this to check what number would work for firing rate
         #fr_Images = numpy.where(dsum_Images<10.0,0,dsum_Images)
         fr_Images = 40/(1+numpy.exp((numpy.multiply(-1,dsum_Images)+123)/25))
@@ -157,7 +159,7 @@ class SMARTAgent:
             epCount.append(self.countAll)
             self.env.reset()
             self.countAll = 0
-        return rewards, actions, last_obs, epCount
+        return rewards, actions, last_obs, epCount, InputImages
 
     ################################          
     ### RUN     
