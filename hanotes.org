@@ -674,3 +674,23 @@ netParams.stimTargetParams['ebkg->all'] = {'source': 'ebkg', 'conds': {'cellType
 **In folder 'SMARTAgent_Reduced_01142020/AllConns0ExceptReccurent' set wights of all connections to 0 except recurrent connections and background activity as in the above case.
 **In folder 'SMARTAgent_Reduced_01142020/AllConns0ExceptFeedForwardExcit' set weights of all connections to 0 except feedforward excitatory connections and background activity.
 **When compared AllConns0 with AllConns0ExceptRecurrent, found no difference. Rerunning ALlConns0ExceptRecurrent with higher connection strength (0.0001 --> 0.001) 
+
+*20jan15
+**For 'SMARTAgent_Reduced_01142020/AllConns0ExceptFeedForwardExcit', we had used weight of 0.002 and had run simulation for 100 sec.
+*** Comparing the firing rate to the baseline, it seemed that 0.002 was high. 
+***So for comparison at different values for weights, i reran the simulation for 10 sec with 0.002.
+***Running simulation for 10 sec with weight of 0.001 and 0.0005
+
+*20jan16
+**worked on plotting neural activity to show spatial patterns of neurons activated in diffent layers.
+**finished in matlab and started implementing in python.
+
+*20jan17
+**finished plotting neural activity to show spatial patterns of neurons activated in different layers.
+**found that: 
+1) The activity didnt propagate across the layers faithfully. Rather only noise was seen across layers.
+2) Sam thinks that noise is good however, the activity should be propagated across layers faithfully.
+2.1) For propagation, he suggested may be we should increase the strength of the connections.
+2.2) I think the limitation is time step for playing game i.e. 20 ms. it allows only to detect 50Hz stimulation, any input driving lower frequency will not bre represented.
+2.2.1) Solution could be shifting either the activiation curve to increase firing rates or increase the time step for playing game. If we increase step to 100 ms. this will allow to encode atleast 10Hz input.
+3) Also for comparison, Sam suggested that we should also plot the actual input image. 
