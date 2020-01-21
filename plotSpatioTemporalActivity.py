@@ -20,8 +20,8 @@ spkInds = data1["spkInds"]
 cellIDs = data1["cellGids"]
 skColors = data1["spkColors"] 
 
-totalDur = 1000
-tBin_Size = 20
+totalDur = 10000
+tBin_Size = 100
 
 neuronIDs = np.unique(spkInds)
 
@@ -123,7 +123,6 @@ mIV4 = np.max(IV4act)
 mIIT = np.max(IITact)
 
 max_spks = np.max([mR, mV1, mV4, mIT, mIV1, mIV4, mIIT])
-
 ############################
 
 #plt.axis('off')
@@ -134,8 +133,8 @@ ax = axs.ravel()
 cbaxes = fig.add_axes([0.95, 0.4, 0.01, 0.2]) 
 #cb = plt.colorbar(ax1, cax = cbaxes)  
 
-for t in range(len(t1)):
-    fig.suptitle('20 ms binned activity' + str(t*tBin_Size) + ' ms')
+for t in range(1,len(t1)):
+    fig.suptitle('100 ms binned activity' + str(t*tBin_Size) + ' ms')
     ax[0].imshow(Ract[:,:,t],cmap='gray', vmin=0, vmax=max_spks)
     ax[0].set_title('Excit R')
     ax[0].set_xlim(-0.5,19.5)
@@ -152,8 +151,8 @@ for t in range(len(t1)):
     ax[3].set_xlim(-0.5,4.5)
     ax[3].set_ylim(-0.5,4.5)
     ax[3].set_title('Excit IT')
-    ax[4].axis('off')
-    ax[4].imshow(New_InputImages[t,:,:],cmap='gray', vmin=0, vmax = 255)
+    #ax[4].axis('off')
+    ax[4].imshow(New_InputImages[t-1,:,:],cmap='gray', vmin=0, vmax = 255)
     ax[4].set_xlim(-0.5,19.5)
     ax[4].set_ylim(-0.5,19.5)
     ax[4].set_title('Input Images')
