@@ -861,6 +861,9 @@ if sim.saveWeights:
         fid5.write('\t%0.1f' % epCount[i])
         fid5.write('\n')
 
+InputImages = numpy.array(InputImages)
+print(InputImages.shape)
+
 if sim.saveInputImages:
     with open('InputImages.txt', 'w') as outfile:
         outfile.write('# Array shape: {0}\n'.format(InputImages.shape))
