@@ -702,4 +702,5 @@ netParams.stimTargetParams['ebkg->all'] = {'source': 'ebkg', 'conds': {'cellType
 *20jan23
 **In folder 'SMARTAgent_Reduced_01232020/AllConns0' --- set all conn weights 0 and see the effect of noise in each area.
 ***Saw all populations firing at baseline rate except MO. Found that MIi was plotted instead of MO. Fixed now.
-**In folder 'SMARTAgent_Reduced_01232020/AllConns0ExceptFeedForwardExcit/0_05'
+**In folder 'SMARTAgent_Reduced_01232020/AllConns0ExceptFeedForwardExcit'
+***The inhibition rate was similar to the simulation when there were no connections. Increased e.g. V1-->InV1 0.0001 to 0.001
