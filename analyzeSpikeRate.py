@@ -94,7 +94,7 @@ plt.plot(mFR_V1e,'b-')
 plt.plot(mFR_V4e,'r-')
 plt.plot(mFR_ITe,'k-')
 plt.plot(mFR_MIe,'m-')
-plt.plot(mFR_MIi,color = '0.75')
+plt.plot(mFR_MOe,color = '0.75')
 plt.legend(('R','V1','V4','IT','MI','MO'),loc='upper left')
 plt.title('Excitatory populations')
 
