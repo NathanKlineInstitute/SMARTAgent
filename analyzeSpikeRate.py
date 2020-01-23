@@ -15,45 +15,45 @@ tBin = 100
 
 
 #NB of excitatory neurons
-R = 6400
-V1 = 6400
-V4 = 1600
-IT = 400
+R = 400
+V1 = 400
+V4 = 100
+IT = 25
 #NB of inhibitory neurons
-InV1 = 1600
-InV4 = 400
-InIT = 100
+InV1 = 100
+InV4 = 25
+InIT = 9
 #NB of neurons in Motor cortex
-MI = 400
-MO = 100
-InMI = 100
+MI = 25
+MO = 9
+InMI = 9
 
 AllCells = np.array(spkInds)
 AllCells_spkTimes = np.array(spkTimes)
 
-ReCells = AllCells[AllCells<6400]
-V1eCells =AllCells[(AllCells>6399) & (AllCells<12800)]
-V4eCells =AllCells[(AllCells>12799) &(AllCells<14400)]
-ITeCells =AllCells[(AllCells>14399) &(AllCells<14800)]
-V1iCells =AllCells[(AllCells>14799) &(AllCells<16400)]
-V4iCells =AllCells[(AllCells>16399) &(AllCells<16800)]
-ITiCells =AllCells[(AllCells>16799) &(AllCells<16900)]
+ReCells = AllCells[AllCells<R]
+V1eCells =AllCells[(AllCells>R-1) & (AllCells<R+V1)]
+V4eCells =AllCells[(AllCells>R+V1-1) &(AllCells<R+V1+V4)]
+ITeCells =AllCells[(AllCells>R+V1+V4-1) &(AllCells<R+V1+V4+IT)]
+V1iCells =AllCells[(AllCells>R+V1+V4+IT-1) &(AllCells<R+V1+V4+IT+InV1)]
+V4iCells =AllCells[(AllCells>R+V1+V4+IT+InV1-1) &(AllCells<R+V1+V4+IT+InV1+InV4)]
+ITiCells =AllCells[(AllCells>R+V1+V4+IT+InV1+InV4-1) &(AllCells<R+V1+V4+IT+InV1+InV4+InIT)]
 
-MIeCells =AllCells[(AllCells>16899) &(AllCells<17300)]
-MOeCells =AllCells[(AllCells>17299) &(AllCells<17400)]
-MIiCells =AllCells[(AllCells>17399) &(AllCells<17500)]
+MIeCells =AllCells[(AllCells>R+V1+V4+IT+InV1+InV4+InIT-1) &(AllCells<R+V1+V4+IT+InV1+InV4+InIT+MI)]
+MOeCells =AllCells[(AllCells>R+V1+V4+IT+InV1+InV4+InIT+MI-1) &(AllCells<R+V1+V4+IT+InV1+InV4+InIT+MI+MO)]
+MIiCells =AllCells[(AllCells>R+V1+V4+IT+InV1+InV4+InIT+MI+MO-1) &(AllCells<R+V1+V4+IT+InV1+InV4+InIT+MI+MO+InMI)]
 
-ReCells_spkTimes = AllCells_spkTimes[AllCells<6400]
-V1eCells_spkTimes = AllCells_spkTimes[(AllCells>6399) & (AllCells<12800)]
-V4eCells_spkTimes = AllCells_spkTimes[(AllCells>12799) &(AllCells<14400)]
-ITeCells_spkTimes = AllCells_spkTimes[(AllCells>14399) &(AllCells<14800)]
-V1iCells_spkTimes = AllCells_spkTimes[(AllCells>14799) &(AllCells<16400)]
-V4iCells_spkTimes = AllCells_spkTimes[(AllCells>16399) &(AllCells<16800)]
-ITiCells_spkTimes = AllCells_spkTimes[(AllCells>16799) &(AllCells<16900)]
+ReCells_spkTimes = AllCells_spkTimes[AllCells<R]
+V1eCells_spkTimes = AllCells_spkTimes[(AllCells>R-1) & (AllCells<R+V1)]
+V4eCells_spkTimes = AllCells_spkTimes[(AllCells>R+V1-1) &(AllCells<R+V1+V4)]
+ITeCells_spkTimes = AllCells_spkTimes[(AllCells>R+V1+V4-1) &(AllCells<R+V1+V4+IT)]
+V1iCells_spkTimes = AllCells_spkTimes[(AllCells>R+V1+V4+IT-1) &(AllCells<R+V1+V4+IT+InV1)]
+V4iCells_spkTimes = AllCells_spkTimes[(AllCells>R+V1+V4+IT+InV1-1) &(AllCells<R+V1+V4+IT+InV1+InV4)]
+ITiCells_spkTimes = AllCells_spkTimes[(AllCells>R+V1+V4+IT+InV1+InV4-1) &(AllCells<R+V1+V4+IT+InV1+InV4+InIT)]
 
-MIeCells_spkTimes =AllCells_spkTimes[(AllCells>16899) &(AllCells<17300)]
-MOeCells_spkTimes =AllCells_spkTimes[(AllCells>17299) &(AllCells<17400)]
-MIiCells_spkTimes =AllCells_spkTimes[(AllCells>17399) &(AllCells<17500)]
+MIeCells_spkTimes =AllCells_spkTimes[(AllCells>R+V1+V4+IT+InV1+InV4+InIT-1) &(AllCells<R+V1+V4+IT+InV1+InV4+InIT+MI)]
+MOeCells_spkTimes =AllCells_spkTimes[(AllCells>R+V1+V4+IT+InV1+InV4+InIT+MI-1) &(AllCells<R+V1+V4+IT+InV1+InV4+InIT+MI+MO)]
+MIiCells_spkTimes =AllCells_spkTimes[(AllCells>R+V1+V4+IT+InV1+InV4+InIT+MI+MO-1) &(AllCells<R+V1+V4+IT+InV1+InV4+InIT+MI+MO+InMI)]
 
 def computeMeanFiringRate(totalDur, tBin, Cells, Cells_spkTimes,NBCells):
     uniqueCells = np.unique(Cells)

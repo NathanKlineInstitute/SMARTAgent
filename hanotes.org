@@ -697,4 +697,8 @@ netParams.stimTargetParams['ebkg->all'] = {'source': 'ebkg', 'conds': {'cellType
 
 *20jan20
 **Implemented saving input frames to the model.
-**Now can show the input images together with model's spatial activity of neuron in each layer. 
+**Now can show the input images together with model's spatial activity of neuron in each layer.
+
+*20jan23
+**In folder 'SMARTAgent_Reduced_01232020/AllConns0' --- set all conn weights 0 and see the effect of noise in each area.
+**In folder 'SMARTAgent_Reduced_01232020/AllConns0ExceptFeedForwardExcit/0_05'
