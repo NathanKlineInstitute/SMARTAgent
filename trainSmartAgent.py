@@ -325,29 +325,33 @@ netParams.connParams['MI->IMI'] = {
 netParams.connParams['IV1->V1'] = {
         'preConds': {'pop': 'IV1'},
         'postConds': {'pop': 'V1'},
-        'probability': 0.02,
-        'weight': 0.0001,
+        #'probability': 0.02,
+        'divergence': 9,
+        'weight': 0.001,
         'delay': 20,
         'synMech': 'GABA'}
 netParams.connParams['IV4->V4'] = {
         'preConds': {'pop': 'IV4'},
         'postConds': {'pop': 'V4'},
-        'probability': 0.02,
-        'weight': 0.0001,
+        #'probability': 0.02,
+        'divergence': 9,
+        'weight': 0.001,
         'delay': 20,
         'synMech': 'GABA'}
 netParams.connParams['IIT->IT'] = {
         'preConds': {'pop': 'IIT'},
         'postConds': {'pop': 'IT'},
-        'probability': 0.02,
-        'weight': 0.0001,
+        #'probability': 0.02,
+        'divergence': 9,
+        'weight': 0.001,
         'delay': 20,
         'synMech': 'GABA'}
 netParams.connParams['IMI->MI'] = {
         'preConds': {'pop': 'IMI'},
         'postConds': {'pop': 'MI'},
-        'probability': 0.02,
-        'weight': 0.0001,
+        #'probability': 0.02,
+        'divergence': 9,
+        'weight': 0.001,
         'delay': 20,
         'synMech': 'GABA'}
 #I to I
