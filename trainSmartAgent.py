@@ -291,29 +291,29 @@ netParams.connParams['MI->MI'] = {
 netParams.connParams['V1->IV1'] = {
         'preConds': {'pop': 'V1'},
         'postConds': {'pop': 'IV1'},
-        'probability': 0.02,
-        'weight': 0.001,
+        'probability': 0.2,
+        'weight': 0.002,
         'delay': 20,
         'synMech': 'AMPA'}
 netParams.connParams['V4->IV4'] = {
         'preConds': {'pop': 'V4'},
         'postConds': {'pop': 'IV4'},
-        'probability': 0.02,
-        'weight': 0.001,
+        'probability': 0.2,
+        'weight': 0.002,
         'delay': 20,
         'synMech': 'AMPA'}
 netParams.connParams['IT->IIT'] = {
         'preConds': {'pop': 'IT'},
         'postConds': {'pop': 'IIT'},
-        'probability': 0.02,
-        'weight': 0.001,
+        'probability': 0.2,
+        'weight': 0.002,
         'delay': 20,
         'synMech': 'AMPA'}
 netParams.connParams['MI->IMI'] = {
         'preConds': {'pop': 'MI'},
         'postConds': {'pop': 'IMI'},
-        'probability': 0.02,
-        'weight': 0.001,
+        'probability': 0.2,
+        'weight': 0.002,
         'delay': 20,
         'synMech': 'AMPA'}
 #Local inhibition

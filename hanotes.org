@@ -704,3 +704,9 @@ netParams.stimTargetParams['ebkg->all'] = {'source': 'ebkg', 'conds': {'cellType
 ***Saw all populations firing at baseline rate except MO. Found that MIi was plotted instead of MO. Fixed now.
 **In folder 'SMARTAgent_Reduced_01232020/AllConns0ExceptFeedForwardExcit'
 ***The inhibition rate was similar to the simulation when there were no connections. Increased e.g. V1-->InV1 0.0001 to 0.001
+****0.001 seems insufficient as only InV1 firing rate increases.
+***Try increasing to 0.002 and then to 0.004 and so on.
+***Seems like the problem is not with the weight of connections but the connection probability.
+
+*20jan24
+***Increase connection probability for within area Exct-->Inhib from 0.02 to 0.2 and keep strength 0.002
