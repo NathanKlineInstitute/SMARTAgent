@@ -293,7 +293,7 @@ netParams.connParams['V1->IV1'] = {
         'postConds': {'pop': 'IV1'},
         #'probability': 0.23,
         'convergence': 9,
-        'weight': 0.001,
+        'weight': 0.002,
         'delay': 20,
         'synMech': 'AMPA'}
 netParams.connParams['V4->IV4'] = {
@@ -301,7 +301,7 @@ netParams.connParams['V4->IV4'] = {
         'postConds': {'pop': 'IV4'},
         #'probability': 0.23,
         'convergence': 9,
-        'weight': 0.001,
+        'weight': 0.002,
         'delay': 20,
         'synMech': 'AMPA'}
 netParams.connParams['IT->IIT'] = {
@@ -309,7 +309,7 @@ netParams.connParams['IT->IIT'] = {
         'postConds': {'pop': 'IIT'},
         #'probability': 0.23,
         'convergence': 9,
-        'weight': 0.001,
+        'weight': 0.002,
         'delay': 20,
         'synMech': 'AMPA'}
 netParams.connParams['MI->IMI'] = {
@@ -317,7 +317,7 @@ netParams.connParams['MI->IMI'] = {
         'postConds': {'pop': 'IMI'},
         #'probability': 0.23,
         'convergence': 9,
-        'weight': 0.001,
+        'weight': 0.002,
         'delay': 20,
         'synMech': 'AMPA'}
 #Local inhibition
