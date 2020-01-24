@@ -712,3 +712,5 @@ netParams.stimTargetParams['ebkg->all'] = {'source': 'ebkg', 'conds': {'cellType
 ***Increase connection probability for within area Exct-->Inhib from 0.02 to 0.2 and keep strength 0.002
 ****Strength of 0.002 was too high for IV1 and IV4. Rerunning with strength of 0.001 and prob Conn 0.23
 ***The lowest number of neuron in any area is 9. So i decided to choose 0.23 as connection probability so that atleast I get 2 connections
+****Both increasing weight and prob connections do not work for all the areas. If presynaptic area has too many neurons then using same prob for that area will connect a lots of presynaptic neuron with each postsynaptic neuron.
+****A quick fix to this problem might be to have a fixed convergence on to postsynaptic area. I choose 9.
