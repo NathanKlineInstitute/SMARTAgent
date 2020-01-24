@@ -710,3 +710,4 @@ netParams.stimTargetParams['ebkg->all'] = {'source': 'ebkg', 'conds': {'cellType
 
 *20jan24
 ***Increase connection probability for within area Exct-->Inhib from 0.02 to 0.2 and keep strength 0.002
+***The lowest number of neuron in any area is 9. So i decided to choose 0.23 as connection probability so that atleast I get 2 connections
