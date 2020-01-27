@@ -180,7 +180,7 @@ def connectLayerswithOverlapDiv(NBpreN, NBpostN, overlap_xdir):
         for j in range(NBpreN_y):
             preN = int(preNIndices[i,j])
             if divergence_factor_x>1:
-                postN = postNIndices[int(i*convergence_factor_y),int(j*convergence_factor_x)]
+                postN = postNIndices[int(i*divergence_factor_y),int(j*divergence_factor_x)]
             else:
                 postN = int(preN)
             postN_ind = numpy.where(postNIndices==postN)
