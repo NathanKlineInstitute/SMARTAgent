@@ -723,3 +723,19 @@ netParams.stimTargetParams['ebkg->all'] = {'source': 'ebkg', 'conds': {'cellType
 **I was using convergence and divergence factor of 9 for connectivity from E to I and I to E within layers that we decided to change.
 **I changed E to I and I to E connectivity using spatial overlap of 9 (3x3 in square window) for E to I within layers and 25 (5x5 in square window) for I to E within layers.
 **Now I will test the connections and strength.
+***To see if the connections list are generated as expected or not, I printed the lists as below
+List MI to InMI
+[[0, 0], [1, 0], [5, 0], [6, 0], [0, 1], [1, 1], [2, 1], [5, 1], [6, 1], [7, 1], 
+[2, 2], [3, 2], [4, 2], [7, 2], [8, 2], [9, 2], [2, 3], [3, 3], [4, 3], [7, 3], [8, 3], [9, 3], [12, 3], [13, 3], [14, 3], 
+[3, 4], [4, 4], [8, 4], [9, 4], [13, 4], [14, 4], [5, 5], [6, 5], [7, 5], [10, 5], [11, 5], [12, 5], [15, 5], [16, 5], [17, 5], 
+[10, 6], [11, 6], [12, 6], [15, 6], [16, 6], [17, 6], [20, 6], [21, 6], [22, 6], [11, 7], [12, 7], [13, 7], [16, 7], [17, 7], [18, 7], [21, 7], [22, 7], [23, 7], 
+[13, 8], [14, 8], [18, 8], [19, 8], [23, 8], [24, 8]]
+List InMI to MI
+[[0, 0], [1, 0], [2, 0], [3, 0], [4, 0], [5, 0], [6, 0], [7, 0], [8, 0], [0, 1], [1, 1], [2, 1], [3, 1], [4, 1], [5, 1], [6, 1], [7, 1], [8, 1], 
+[0, 2], [1, 2], [2, 2], [3, 2], [4, 2], [5, 2], [6, 2], [7, 2], [8, 2], [0, 3], [1, 3], [2, 3], [3, 3], [4, 3], [5, 3], [6, 3], [7, 3], [8, 3], 
+[0, 4], [1, 4], [2, 4], [3, 4], [4, 4], [5, 4], [6, 4], [7, 4], [8, 4], [0, 5], [1, 5], [2, 5], [3, 5], [4, 5], [5, 5], [6, 5], [7, 5], [8, 5], 
+[0, 6], [1, 6], [2, 6], [3, 6], [4, 6], [5, 6], [6, 6], [7, 6], [8, 6], [0, 7], [1, 7], [2, 7], [3, 7], [4, 7], [5, 7], [6, 7], [7, 7], [8, 7], 
+[0, 8], [1, 8], [2, 8], [3, 8], [4, 8], [5, 8], [6, 8], [7, 8], [8, 8]]
+
+**Found wrong connections in List MI to InMI.
+**Fixed the bug. Hopefully it is fixed. Atleast for this case:

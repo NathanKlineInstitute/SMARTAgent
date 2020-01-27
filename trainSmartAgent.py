@@ -111,8 +111,8 @@ def connectLayerswithOverlap(NBpreN, NBpostN, overlap_xdir):
     NBpostN_x = int(numpy.sqrt(NBpostN))
     NBpostN_y = int(numpy.sqrt(NBpostN))
     convergence_factor = NBpreN/NBpostN
-    convergence_factor_x = numpy.sqrt(convergence_factor)
-    convergence_factor_y = numpy.sqrt(convergence_factor)
+    convergence_factor_x = numpy.ceil(numpy.sqrt(convergence_factor))
+    convergence_factor_y = numpy.ceil(numpy.sqrt(convergence_factor))
     #overlap_xdir = 5	#number of rows in a window for overlapping connectivity
     #overlap_ydir = 5	#number of columns in a window for overlapping connectivity
     overlap_ydir = overlap_xdir
@@ -129,7 +129,8 @@ def connectLayerswithOverlap(NBpreN, NBpostN, overlap_xdir):
         for j in range(NBpostN_y):
             postN = int(postNIndices[i,j])
             if convergence_factor_x>1:
-                preN = int(convergence_factor_x*convergence_factor_y*NBpostN_y*i) + int(convergence_factor_y*j)
+                preN = preNIndices[int(i*convergence_factor_y),int(j*convergence_factor_x)]
+                #preN = int(convergence_factor_x*convergence_factor_y*NBpostN_y*i) + int(convergence_factor_y*j)
             else:
                 preN = int(postN)
             preN_ind = numpy.where(preNIndices==preN)
