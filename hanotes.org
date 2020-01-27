@@ -718,3 +718,8 @@ netParams.stimTargetParams['ebkg->all'] = {'source': 'ebkg', 'conds': {'cellType
 **Now fix inhibition within area. (SMARTAgent_Reduced_01232020/FFExcitAndWithinAreaInhibition)
 ***change 'probability': 0.02 to 'divergence': 9
 ***change 'weight': 0.0001 to 'weight': 0.001 in subfolder 0_001; to 'weight': 0.002 in subfolder 0_002 and 0_005.
+
+*20jan27
+**I was using convergence and divergence factor of 9 for connectivity from E to I and I to E within layers that we decided to change.
+**I changed E to I and I to E connectivity using spatial overlap of 9 (3x3 in square window) for E to I within layers and 25 (5x5 in square window) for I to E within layers.
+**Now I will test the connections and strength.
