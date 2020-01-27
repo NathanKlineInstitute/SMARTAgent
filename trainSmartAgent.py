@@ -218,6 +218,22 @@ blistITtoMI = connectLayerswithOverlap(NBpreN = NB_ITneurons, NBpostN = NB_MIneu
 blistMItoMO = connectLayerswithOverlap(NBpreN = NB_MIneurons, NBpostN = NB_MOneurons, overlap_xdir = 9) #was 19
 #blistMItoMO: Feedforward for MI to MO is all to all and can be specified in the connection statement iteself
 
+print('E to V1')
+print(blistEtoV1)
+
+print('V1 to V4')
+print(blistV1toV4)
+
+print('V4 to IT')
+print(blistV4toIT)
+
+print('IT to MI')
+print(blistITtoMI)
+
+print('MI to MO')
+print(blistMItoMO)
+
+
 #E to I - Feedforward connections
 blistEtoInV1 = connectLayerswithOverlap(NBpreN = NB_Rneurons, NBpostN = NB_IV1neurons, overlap_xdir = 5)
 blistV1toInV4 = connectLayerswithOverlap(NBpreN = NB_V1neurons, NBpostN = NB_IV4neurons, overlap_xdir = 7) #was 15
@@ -230,11 +246,37 @@ blistV4toInV4 = connectLayerswithOverlap(NBpreN = NB_V4neurons, NBpostN = NB_IV4
 blistITtoInIT = connectLayerswithOverlap(NBpreN = NB_ITneurons, NBpostN = NB_IITneurons, overlap_xdir = 3)
 blistMItoInMI = connectLayerswithOverlap(NBpreN = NB_MIneurons, NBpostN = NB_IMIneurons, overlap_xdir = 3)
 
+print('V1 to InV1')
+print(blistV1toInV1)
+
+print('V4 to InV4')
+print(blistV4toInV4)
+
+print('IT to InIT')
+print(blistITtoInIT)
+
+print('MI to InMI')
+print(blistMItoInMI)
+
+
 #I to E - WithinLayer Inhibition
 blistInV1toV1 = connectLayerswithOverlapDiv(NBpreN = NB_IV1neurons, NBpostN = NB_V1neurons, overlap_xdir = 5)
 blistInV4toV4 = connectLayerswithOverlapDiv(NBpreN = NB_IV4neurons, NBpostN = NB_V4neurons, overlap_xdir = 5)
 blistInITtoIT = connectLayerswithOverlapDiv(NBpreN = NB_IITneurons, NBpostN = NB_ITneurons, overlap_xdir = 5)
 blistInMItoMI = connectLayerswithOverlapDiv(NBpreN = NB_IMIneurons, NBpostN = NB_MIneurons, overlap_xdir = 5)
+
+print('InV1 to V1')
+print(blistInV1toV1)
+
+print('InV4 to V4')
+print(blistInV4toV4)
+
+print('InIT to IT')
+print(blistInITtoIT)
+
+print('InMI to MI')
+print(blistInMItoMI)
+
 
 #Feedbackward excitation
 #E to E  
