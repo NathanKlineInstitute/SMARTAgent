@@ -717,4 +717,4 @@ netParams.stimTargetParams['ebkg->all'] = {'source': 'ebkg', 'conds': {'cellType
 ***Using convergence of 9 instead of conn prob of 0.02 or 0.23 seems to work better. Now increasing weight from 0.001 to 0.002
 **Now fix inhibition within area. (SMARTAgent_Reduced_01232020/FFExcitAndWithinAreaInhibition)
 ***change 'probability': 0.02 to 'divergence': 9
-***change 'weight': 0.0001 to 'weight': 0.001 in subfolder 0_001; to 'weight': 0.002 in subfolder 0_002
+***change 'weight': 0.0001 to 'weight': 0.001 in subfolder 0_001; to 'weight': 0.002 in subfolder 0_002 and 0_005.

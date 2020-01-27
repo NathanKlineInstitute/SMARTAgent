@@ -225,6 +225,18 @@ blistV1toInV4 = connectLayerswithOverlap(NBpreN = NB_V1neurons, NBpostN = NB_IV4
 blistV4toInIT = connectLayerswithOverlap(NBpreN = NB_V4neurons, NBpostN = NB_IITneurons, overlap_xdir = 7) #was 15
 blistITtoInMI = connectLayerswithOverlap(NBpreN = NB_ITneurons, NBpostN = NB_IMIneurons, overlap_xdir = 7) #was 15
 
+#E to I - WithinLayer connections
+blistV1toInV1 = connectLayerswithOverlap(NBpreN = NB_V1neurons, NBpostN = NB_IV1neurons, overlap_xdir = 3)
+blistV4toInV4 = connectLayerswithOverlap(NBpreN = NB_V4neurons, NBpostN = NB_IV4neurons, overlap_xdir = 3)
+blistITtoInIT = connectLayerswithOverlap(NBpreN = NB_ITneurons, NBpostN = NB_IITneurons, overlap_xdir = 3)
+blistMItoInMI = connectLayerswithOverlap(NBpreN = NB_MIneurons, NBpostN = NB_IMIneurons, overlap_xdir = 3)
+
+#I to E - WithinLayer Inhibition
+blistInV1toV1 = connectLayerswithOverlapDiv(NBpreN = NB_IV1neurons, NBpostN = NB_V1neurons, overlap_xdir = 5)
+blistInV4toV4 = connectLayerswithOverlapDiv(NBpreN = NB_IV4neurons, NBpostN = NB_V4neurons, overlap_xdir = 5)
+blistInITtoIT = connectLayerswithOverlapDiv(NBpreN = NB_IITneurons, NBpostN = NB_ITneurons, overlap_xdir = 5)
+blistInMItoMI = connectLayerswithOverlapDiv(NBpreN = NB_IMIneurons, NBpostN = NB_MIneurons, overlap_xdir = 5)
+
 #Feedbackward excitation
 #E to E  
 blistV1toE = connectLayerswithOverlapDiv(NBpreN = NB_V1neurons, NBpostN = NB_Rneurons, overlap_xdir = 3)
@@ -291,32 +303,36 @@ netParams.connParams['MI->MI'] = {
 netParams.connParams['V1->IV1'] = {
         'preConds': {'pop': 'V1'},
         'postConds': {'pop': 'IV1'},
+        'connList': blistV1toInV1,
         #'probability': 0.23,
-        'convergence': 9,
+        #'convergence': 9,
         'weight': 0.002,
         'delay': 20,
         'synMech': 'AMPA'}
 netParams.connParams['V4->IV4'] = {
         'preConds': {'pop': 'V4'},
         'postConds': {'pop': 'IV4'},
+        'connList': blistV4toInV4,
         #'probability': 0.23,
-        'convergence': 9,
+        #'convergence': 9,
         'weight': 0.002,
         'delay': 20,
         'synMech': 'AMPA'}
 netParams.connParams['IT->IIT'] = {
         'preConds': {'pop': 'IT'},
         'postConds': {'pop': 'IIT'},
+        'connList': blistITtoInIT,
         #'probability': 0.23,
-        'convergence': 9,
+        #'convergence': 9,
         'weight': 0.002,
         'delay': 20,
         'synMech': 'AMPA'}
 netParams.connParams['MI->IMI'] = {
         'preConds': {'pop': 'MI'},
         'postConds': {'pop': 'IMI'},
+        'connList': blistMItoInMI,
         #'probability': 0.23,
-        'convergence': 9,
+        #'convergence': 9,
         'weight': 0.002,
         'delay': 20,
         'synMech': 'AMPA'}
@@ -325,32 +341,36 @@ netParams.connParams['MI->IMI'] = {
 netParams.connParams['IV1->V1'] = {
         'preConds': {'pop': 'IV1'},
         'postConds': {'pop': 'V1'},
+        'connList': blistInV1toV1,
         #'probability': 0.02,
-        'divergence': 9,
+        #'divergence': 9,
         'weight': 0.001,
         'delay': 20,
         'synMech': 'GABA'}
 netParams.connParams['IV4->V4'] = {
         'preConds': {'pop': 'IV4'},
         'postConds': {'pop': 'V4'},
+        'connList': blistInV4toV4,
         #'probability': 0.02,
-        'divergence': 9,
+        #'divergence': 9,
         'weight': 0.001,
         'delay': 20,
         'synMech': 'GABA'}
 netParams.connParams['IIT->IT'] = {
         'preConds': {'pop': 'IIT'},
         'postConds': {'pop': 'IT'},
+        'connList': blistInITtoIT,
         #'probability': 0.02,
-        'divergence': 9,
+        #'divergence': 9,
         'weight': 0.001,
         'delay': 20,
         'synMech': 'GABA'}
 netParams.connParams['IMI->MI'] = {
         'preConds': {'pop': 'IMI'},
         'postConds': {'pop': 'MI'},
+        'connList': blistInMItoMI,
         #'probability': 0.02,
-        'divergence': 9,
+        #'divergence': 9,
         'weight': 0.001,
         'delay': 20,
         'synMech': 'GABA'}
