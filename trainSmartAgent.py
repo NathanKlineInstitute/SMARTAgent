@@ -164,8 +164,8 @@ def connectLayerswithOverlapDiv(NBpreN, NBpostN, overlap_xdir):
     NBpostN_x = int(numpy.sqrt(NBpostN))
     NBpostN_y = int(numpy.sqrt(NBpostN))
     divergence_factor = NBpostN/NBpreN
-    divergence_factor_x = int(numpy.sqrt(divergence_factor))
-    divergence_factor_y = int(numpy.sqrt(divergence_factor))
+    divergence_factor_x = numpy.ceil(numpy.sqrt(divergence_factor))
+    divergence_factor_y = numpy.ceil(numpy.sqrt(divergence_factor))
     overlap_ydir = overlap_xdir
     preNIndices = numpy.zeros((NBpreN_x,NBpreN_y))
     postNIndices = numpy.zeros((NBpostN_x,NBpostN_y))		#list created for indices from linear (1-6400) to square indexing (1-80,81-160,....) 
@@ -178,36 +178,34 @@ def connectLayerswithOverlapDiv(NBpreN, NBpostN, overlap_xdir):
             postNIndices[i,j]=j+(NBpostN_y*i)
     for i in range(NBpreN_x):				#boundary conditions are implemented here
         for j in range(NBpreN_y):
-            fpostN = int(divergence_factor_x*divergence_factor_y*NBpreN_y*i) + int(divergence_factor_y*j)
-            postN = []
-            for indx in range(divergence_factor_x):
-                for indy in range(divergence_factor_y):
-                    postN.append(int(fpostN+(NBpostN_y*indx)+indy))
             preN = int(preNIndices[i,j])
-            preN_ind = numpy.where(preNIndices==preN)
-            x0 = preN_ind[0][0] - int(overlap_xdir/2)
+            if divergence_factor_x>1:
+                postN = postNIndices[int(i*convergence_factor_y),int(j*convergence_factor_x)]
+            else:
+                postN = int(preN)
+            postN_ind = numpy.where(postNIndices==postN)
+            x0 = postN_ind[0][0] - int(overlap_xdir/2)
             if x0<0:
                 x0 = 0
-            y0 = preN_ind[1][0] - int(overlap_ydir/2)
+            y0 = postN_ind[1][0] - int(overlap_ydir/2)
             if y0<0:
                 y0 = 0
-            xlast = preN_ind[0][0] + int(overlap_xdir/2)
-            if xlast>NBpreN_x-1:
-                xlast = NBpreN_x-1
-            ylast = preN_ind[1][0] + int(overlap_ydir/2)
-            if ylast>NBpreN_y-1:
-                ylast = NBpreN_y-1
+            xlast = postN_ind[0][0] + int(overlap_xdir/2)
+            if xlast>NBpostN_x-1:
+                xlast = NBpostN_x-1
+            ylast = postN_ind[1][0] + int(overlap_ydir/2)
+            if ylast>NBpostN_y-1:
+                ylast = NBpostN_y-1
             xinds = [x0]
             for _ in range(xlast-x0):
                 xinds.append(xinds[-1]+1)
             yinds = [y0]
             for _ in range(ylast-y0):
                 yinds.append(yinds[-1]+1)
-            for cpostN in postN:
-                for xi in range(len(xinds)):
-                    for yi in range(len(yinds)):
-                        preN = int(preNIndices[xinds[xi],yinds[yi]])
-                        blist.append([preN,cpostN]) 			#list of [presynaptic_neuron, postsynaptic_neuron] 
+            for xi in range(len(xinds)):
+                for yi in range(len(yinds)):
+                    postN = int(postNIndices[xinds[xi],yinds[yi]])
+                    blist.append([preN,postN]) 			#list of [presynaptic_neuron, postsynaptic_neuron] 
     return blist
 
 #####################################################################################

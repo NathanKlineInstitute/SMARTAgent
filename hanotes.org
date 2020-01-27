@@ -739,3 +739,12 @@ List InMI to MI
 
 **Found wrong connections in List MI to InMI.
 **Fixed the bug. Hopefully it is fixed. Atleast for this case:
+List MI to InMI
+[[0, 0], [1, 0], [5, 0], [6, 0], [1, 1], [2, 1], [3, 1], [6, 1], [7, 1], [8, 1], 
+[3, 2], [4, 2], [8, 2], [9, 2], [5, 3], [6, 3], [10, 3], [11, 3], [15, 3], [16, 3], 
+[6, 4], [7, 4], [8, 4], [11, 4], [12, 4], [13, 4], [16, 4], [17, 4], [18, 4], 
+[8, 5], [9, 5], [13, 5], [14, 5], [18, 5], [19, 5], [15, 6], [16, 6], [20, 6], [21, 6], 
+[16, 7], [17, 7], [18, 7], [21, 7], [22, 7], [23, 7], [18, 8], [19, 8], [23, 8], [24, 8]]
+
+**Found wrong connections in List InMI to MI.
+**Fixed the bug. Hopefully it is fixed.
