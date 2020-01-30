@@ -31,6 +31,7 @@ NB_V1neurons = 400
 NB_V4neurons = 100
 NB_ITneurons = 25
 
+NBIRneurons = 100
 NB_IV1neurons = 100
 NB_IV4neurons = 25
 NB_IITneurons = 9
@@ -49,6 +50,7 @@ netParams.popParams['V1'] = {'cellType': 'EV1', 'numCells': NB_V1neurons, 'cellM
 netParams.popParams['V4'] = {'cellType': 'EV4', 'numCells': NB_V4neurons, 'cellModel': 'HH'} #1600 neurons
 netParams.popParams['IT'] = {'cellType': 'EIT', 'numCells': NB_ITneurons, 'cellModel': 'HH'} #400 neurons
 
+netParams.popParams['IR'] = {'cellType': 'InR', 'numCells': NB_IRneurons, 'cellModel': 'HH'}
 netParams.popParams['IV1'] = {'cellType': 'InV1', 'numCells': NB_IV1neurons, 'cellModel': 'HH'} #1600
 netParams.popParams['IV4'] = {'cellType': 'InV4', 'numCells': NB_IV4neurons, 'cellModel': 'HH'} #400
 netParams.popParams['IIT'] = {'cellType': 'InIT', 'numCells': NB_IITneurons, 'cellModel': 'HH'} #100
@@ -65,7 +67,7 @@ netParams.cellParams['ERule'] = {               # cell rule label
                 'mechs': {'hh': {'gnabar': 0.12, 'gkbar': 0.036, 'gl': 0.003, 'el': -70}}}}}    #mechanism
 
 netParams.cellParams['IRule'] = {               # cell rule label
-        'conds': {'cellType': ['InV1','InV4','InIT', 'InMI']},              #properties will be applied to cells that match these conditions
+        'conds': {'cellType': ['InR','InV1','InV4','InIT', 'InMI']},              #properties will be applied to cells that match these conditions
         'secs': {'soma':                        #sections
                 {'geom': {'diam':10, 'L':10, 'Ra':120},         #geometry
                 'mechs': {'hh': {'gnabar': 0.12, 'gkbar': 0.036, 'gl': 0.003, 'el': -70}}}}}    #mechanism
@@ -101,7 +103,7 @@ netParams.stimTargetParams['ebkg->all'] = {'source': 'ebkg', 'conds': {'cellType
 
 
 netParams.stimSourceParams['bkg'] = {'type': 'NetStim', 'rate': 20, 'noise': 0.3}
-netParams.stimTargetParams['bkg->all'] = {'source': 'bkg', 'conds': {'cellType': ['InV1','InV4','InIT', 'InMI']}, 'weight': 0.01, 'delay': 'max(1, normal(5,2))', 'synMech': 'AMPA'}
+netParams.stimTargetParams['bkg->all'] = {'source': 'bkg', 'conds': {'cellType': ['InR','InV1','InV4','InIT', 'InMI']}, 'weight': 0.01, 'delay': 'max(1, normal(5,2))', 'synMech': 'AMPA'}
 ######################################################################################
 def connectLayerswithOverlap(NBpreN, NBpostN, overlap_xdir):
     #NBpreN = 6400 	#number of presynaptic neurons
@@ -241,6 +243,7 @@ blistV4toInIT = connectLayerswithOverlap(NBpreN = NB_V4neurons, NBpostN = NB_IIT
 blistITtoInMI = connectLayerswithOverlap(NBpreN = NB_ITneurons, NBpostN = NB_IMIneurons, overlap_xdir = 3) #was 15
 
 #E to I - WithinLayer connections
+blistRtoInR = connectLayerswithOverlap(NBpreN = NB_Rneurons, NBpostN = NB_IRneurons, overlap_xdir = 3)
 blistV1toInV1 = connectLayerswithOverlap(NBpreN = NB_V1neurons, NBpostN = NB_IV1neurons, overlap_xdir = 3)
 blistV4toInV4 = connectLayerswithOverlap(NBpreN = NB_V4neurons, NBpostN = NB_IV4neurons, overlap_xdir = 3)
 blistITtoInIT = connectLayerswithOverlap(NBpreN = NB_ITneurons, NBpostN = NB_IITneurons, overlap_xdir = 3)
@@ -260,6 +263,7 @@ print(blistMItoInMI)
 
 
 #I to E - WithinLayer Inhibition
+blistInRtoR = connectLayerswithOverlapDiv(NBpreN = NB_IRneurons, NBpostN = NB_Rneurons, overlap_xdir = 5)
 blistInV1toV1 = connectLayerswithOverlapDiv(NBpreN = NB_IV1neurons, NBpostN = NB_V1neurons, overlap_xdir = 5)
 blistInV4toV4 = connectLayerswithOverlapDiv(NBpreN = NB_IV4neurons, NBpostN = NB_V4neurons, overlap_xdir = 5)
 blistInITtoIT = connectLayerswithOverlapDiv(NBpreN = NB_IITneurons, NBpostN = NB_ITneurons, overlap_xdir = 5)
@@ -341,6 +345,15 @@ netParams.connParams['MI->MI'] = {
         'delay': 2,
         'synMech': 'AMPA'}
 #E to I
+netParams.connParams['R->IR'] = {
+        'preConds': {'pop': 'R'},
+        'postConds': {'pop': 'IR'},
+        'connList': blistRtoInR,
+        #'probability': 0.23,
+        #'convergence': 9,
+        'weight': 0.002,
+        'delay': 2,
+        'synMech': 'AMPA'}
 netParams.connParams['V1->IV1'] = {
         'preConds': {'pop': 'V1'},
         'postConds': {'pop': 'IV1'},
@@ -379,6 +392,15 @@ netParams.connParams['MI->IMI'] = {
         'synMech': 'AMPA'}
 #Local inhibition
 #I to E
+netParams.connParams['IR->R'] = {
+        'preConds': {'pop': 'IR'},
+        'postConds': {'pop': 'R'},
+        'connList': blistInRtoR,
+        #'probability': 0.02,
+        #'divergence': 9,
+        'weight': 0.001,
+        'delay': 2,
+        'synMech': 'GABA'}
 netParams.connParams['IV1->V1'] = {
         'preConds': {'pop': 'IV1'},
         'postConds': {'pop': 'V1'},

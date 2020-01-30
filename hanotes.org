@@ -832,3 +832,7 @@ InMI to MI - CHECKED - STATUS = 'GOOD'
 **so i confirmed that the connectivity is correct. At least for the current configuration where I have reduced network with 20x20 neurons in R and V1 followed by 10x10 neurons in V4 and 5x5 neurons in IT and so on.
 **Until now i have been using delay of 20 ms, which is too long. Biologically, it should be 1 or 2 ms (see for references).
 **Changed delays for all synaptic connections to 2 ms.
+**Create a new folder 'SMARTAgent_Reduced_01302020' and test output firing rates for different inhibition strengths in FFEtoE_WILEtoI_WILItoE (0.001,0.002,0.004). (WIL - withinlayer and FF is feedforward). WIL E->I (0.002) WIL I->E(0.001,0.002,0.004) and FF E->E (0.002)
+**Why there is a lot of noise in R neurons? Can i reduce it?
+***May be by adding inhibition in R helps it. so add IR neurons (10x10) and connections R->IR (3) IR->R (5).
+**test new model with IR and R->IR->R loop in a folder 'FFEtoE_WILEtoI_WILItoE_withIR' 
