@@ -20,6 +20,7 @@ V1 = 400
 V4 = 100
 IT = 25
 #NB of inhibitory neurons
+InR = 100
 InV1 = 100
 InV4 = 25
 InIT = 9
@@ -35,25 +36,27 @@ ReCells = AllCells[AllCells<R]
 V1eCells =AllCells[(AllCells>R-1) & (AllCells<R+V1)]
 V4eCells =AllCells[(AllCells>R+V1-1) &(AllCells<R+V1+V4)]
 ITeCells =AllCells[(AllCells>R+V1+V4-1) &(AllCells<R+V1+V4+IT)]
-V1iCells =AllCells[(AllCells>R+V1+V4+IT-1) &(AllCells<R+V1+V4+IT+InV1)]
-V4iCells =AllCells[(AllCells>R+V1+V4+IT+InV1-1) &(AllCells<R+V1+V4+IT+InV1+InV4)]
-ITiCells =AllCells[(AllCells>R+V1+V4+IT+InV1+InV4-1) &(AllCells<R+V1+V4+IT+InV1+InV4+InIT)]
+RiCells =AllCells[(AllCells>R+V1+V4+IT-1) &(AllCells<R+V1+V4+IT+InR)]
+V1iCells =AllCells[(AllCells>R+V1+V4+IT+InR-1) &(AllCells<R+V1+V4+IT+InR+InV1)]
+V4iCells =AllCells[(AllCells>R+V1+V4+IT+InR+InV1-1) &(AllCells<R+V1+V4+IT+InR+InV1+InV4)]
+ITiCells =AllCells[(AllCells>R+V1+V4+IT+InR+InV1+InV4-1) &(AllCells<R+V1+V4+IT+InR+InV1+InV4+InIT)]
 
-MIeCells =AllCells[(AllCells>R+V1+V4+IT+InV1+InV4+InIT-1) &(AllCells<R+V1+V4+IT+InV1+InV4+InIT+MI)]
-MOeCells =AllCells[(AllCells>R+V1+V4+IT+InV1+InV4+InIT+MI-1) &(AllCells<R+V1+V4+IT+InV1+InV4+InIT+MI+MO)]
-MIiCells =AllCells[(AllCells>R+V1+V4+IT+InV1+InV4+InIT+MI+MO-1) &(AllCells<R+V1+V4+IT+InV1+InV4+InIT+MI+MO+InMI)]
+MIeCells =AllCells[(AllCells>R+V1+V4+IT+InR+InV1+InV4+InIT-1) &(AllCells<R+V1+V4+IT+InR+InV1+InV4+InIT+MI)]
+MOeCells =AllCells[(AllCells>R+V1+V4+IT+InR+InV1+InV4+InIT+MI-1) &(AllCells<R+V1+V4+IT+InR+InV1+InV4+InIT+MI+MO)]
+MIiCells =AllCells[(AllCells>R+V1+V4+IT+InR+InV1+InV4+InIT+MI+MO-1) &(AllCells<R+V1+V4+IT+InR+InV1+InV4+InIT+MI+MO+InMI)]
 
 ReCells_spkTimes = AllCells_spkTimes[AllCells<R]
 V1eCells_spkTimes = AllCells_spkTimes[(AllCells>R-1) & (AllCells<R+V1)]
 V4eCells_spkTimes = AllCells_spkTimes[(AllCells>R+V1-1) &(AllCells<R+V1+V4)]
 ITeCells_spkTimes = AllCells_spkTimes[(AllCells>R+V1+V4-1) &(AllCells<R+V1+V4+IT)]
-V1iCells_spkTimes = AllCells_spkTimes[(AllCells>R+V1+V4+IT-1) &(AllCells<R+V1+V4+IT+InV1)]
-V4iCells_spkTimes = AllCells_spkTimes[(AllCells>R+V1+V4+IT+InV1-1) &(AllCells<R+V1+V4+IT+InV1+InV4)]
-ITiCells_spkTimes = AllCells_spkTimes[(AllCells>R+V1+V4+IT+InV1+InV4-1) &(AllCells<R+V1+V4+IT+InV1+InV4+InIT)]
+RiCells_spkTimes = AllCells_spkTimes[(AllCells>R+V1+V4+IT-1) &(AllCells<R+V1+V4+IT+InR)]
+V1iCells_spkTimes = AllCells_spkTimes[(AllCells>R+V1+V4+IT+InR-1) &(AllCells<R+V1+V4+IT+InR+InV1)]
+V4iCells_spkTimes = AllCells_spkTimes[(AllCells>R+V1+V4+IT+InR+InV1-1) &(AllCells<R+V1+V4+IT+InR+InV1+InV4)]
+ITiCells_spkTimes = AllCells_spkTimes[(AllCells>R+V1+V4+IT+InR+InV1+InV4-1) &(AllCells<R+V1+V4+IT+InR+InV1+InV4+InIT)]
 
-MIeCells_spkTimes =AllCells_spkTimes[(AllCells>R+V1+V4+IT+InV1+InV4+InIT-1) &(AllCells<R+V1+V4+IT+InV1+InV4+InIT+MI)]
-MOeCells_spkTimes =AllCells_spkTimes[(AllCells>R+V1+V4+IT+InV1+InV4+InIT+MI-1) &(AllCells<R+V1+V4+IT+InV1+InV4+InIT+MI+MO)]
-MIiCells_spkTimes =AllCells_spkTimes[(AllCells>R+V1+V4+IT+InV1+InV4+InIT+MI+MO-1) &(AllCells<R+V1+V4+IT+InV1+InV4+InIT+MI+MO+InMI)]
+MIeCells_spkTimes =AllCells_spkTimes[(AllCells>R+V1+V4+IT+InR+InV1+InV4+InIT-1) &(AllCells<R+V1+V4+IT+InR+InV1+InV4+InIT+MI)]
+MOeCells_spkTimes =AllCells_spkTimes[(AllCells>R+V1+V4+IT+InR+InV1+InV4+InIT+MI-1) &(AllCells<R+V1+V4+IT+InR+InV1+InV4+InIT+MI+MO)]
+MIiCells_spkTimes =AllCells_spkTimes[(AllCells>R+V1+V4+IT+InR+InV1+InV4+InIT+MI+MO-1) &(AllCells<R+V1+V4+IT+InR+InV1+InV4+InIT+MI+MO+InMI)]
 
 def computeMeanFiringRate(totalDur, tBin, Cells, Cells_spkTimes,NBCells):
     uniqueCells = np.unique(Cells)
@@ -83,6 +86,7 @@ mFR_ITe = computeMeanFiringRate(totalDur, tBin, ITeCells, ITeCells_spkTimes,IT)
 mFR_MIe = computeMeanFiringRate(totalDur, tBin, MIeCells, MIeCells_spkTimes,MI)
 mFR_MOe = computeMeanFiringRate(totalDur, tBin, MOeCells, MOeCells_spkTimes,MO)
 
+mFR_Ri = computeMeanFiringRate(totalDur, tBin, RiCells, RiCells_spkTimes,InR)
 mFR_V1i = computeMeanFiringRate(totalDur, tBin, V1iCells, V1iCells_spkTimes,InV1)
 mFR_V4i = computeMeanFiringRate(totalDur, tBin, V4iCells, V4iCells_spkTimes,InV4)
 mFR_ITi = computeMeanFiringRate(totalDur, tBin, ITiCells, ITiCells_spkTimes,InIT)
@@ -99,6 +103,7 @@ plt.legend(('R','V1','V4','IT','MI','MO'),loc='upper left')
 plt.title('Excitatory populations')
 
 plt.subplot(1,2,2)
+plt.plot(mFR_Ri,'g-')
 plt.plot(mFR_V1i,'b-')
 plt.plot(mFR_V4i,'r-')
 plt.plot(mFR_ITi,'k-')

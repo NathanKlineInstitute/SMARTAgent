@@ -31,6 +31,7 @@ V1 = 400
 V4 = 100
 IT = 25
 #NB of inhibitory neurons
+InR = 100
 InV1 = 100
 InV4 = 25
 InIT = 9
@@ -46,18 +47,20 @@ lastR = R
 lastV1 = R+V1
 lastV4 = R+V1+V4
 lastIT = R+V1+V4+IT
-lastInV1 = R+V1+V4+IT+InV1
-lastInV4 = R+V1+V4+IT+InV1+InV4
-lastInIT = R+V1+V4+IT+InV1+InV4+InIT
-lastMI = R+V1+V4+IT+InV1+InV4+InIT+MI
-lastMO = R+V1+V4+IT+InV1+InV4+InIT+MI+MO
-lastInMI = R+V1+V4+IT+InV1+InV4+InIT+MI+MO+InMI 
+lastInR = R+V1+V4+IT+InR
+lastInV1 = R+V1+V4+IT+InR+InV1
+lastInV4 = R+V1+V4+IT+InR+InV1+InV4
+lastInIT = R+V1+V4+IT+InR+InV1+InV4+InIT
+lastMI = R+V1+V4+IT+InR+InV1+InV4+InIT+MI
+lastMO = R+V1+V4+IT+InR+InV1+InV4+InIT+MI+MO
+lastInMI = R+V1+V4+IT+InR+InV1+InV4+InIT+MI+MO+InMI 
 
 ReCells = AllCells[AllCells<lastR]
 V1eCells =AllCells[(AllCells>lastR-1) & (AllCells<lastV1)]
 V4eCells =AllCells[(AllCells>lastV1-1) &(AllCells<lastV4)]
 ITeCells =AllCells[(AllCells>lastV4-1) &(AllCells<lastIT)]
-V1iCells =AllCells[(AllCells>lastIT-1) &(AllCells<lastInV1)]
+RiCells =AllCells[(AllCells>lastIT-1) &(AllCells<lastInR)]
+V1iCells =AllCells[(AllCells>lastInR-1) &(AllCells<lastInV1)]
 V4iCells =AllCells[(AllCells>lastInV1-1) &(AllCells<lastInV4)]
 ITiCells =AllCells[(AllCells>lastInV4-1) &(AllCells<lastInIT)]
 
@@ -70,6 +73,7 @@ RCells = np.subtract(ReCells,np.min(ReCells))
 V1Cells = np.subtract(V1eCells,np.min(V1eCells))
 V4Cells = np.subtract(V4eCells,np.min(V4eCells))
 ITCells = np.subtract(ITeCells,np.min(ITeCells))
+InRCells = np.subtract(RiCells,np.min(RiCells))
 InV1Cells = np.subtract(V1iCells,np.min(V1iCells))
 InV4Cells = np.subtract(V4iCells,np.min(V4iCells))
 InITCells = np.subtract(ITiCells,np.min(ITiCells))
@@ -81,7 +85,8 @@ ReCells_spkTimes = AllCells_spkTimes[AllCells<lastR]
 V1eCells_spkTimes = AllCells_spkTimes[(AllCells>lastR-1) & (AllCells<lastV1)]
 V4eCells_spkTimes = AllCells_spkTimes[(AllCells>lastV1-1) &(AllCells<lastV4)]
 ITeCells_spkTimes = AllCells_spkTimes[(AllCells>lastV4-1) &(AllCells<lastIT)]
-V1iCells_spkTimes = AllCells_spkTimes[(AllCells>lastIT-1) &(AllCells<lastInV1)]
+RiCells_spkTimes = AllCells_spkTimes[(AllCells>lastIT-1) &(AllCells<lastInR)]
+V1iCells_spkTimes = AllCells_spkTimes[(AllCells>lastInR-1) &(AllCells<lastInV1)]
 V4iCells_spkTimes = AllCells_spkTimes[(AllCells>lastInV1-1) &(AllCells<lastInV4)]
 ITiCells_spkTimes = AllCells_spkTimes[(AllCells>lastInV4-1) &(AllCells<lastInIT)]
 
@@ -109,6 +114,7 @@ V1act = generateActivityMap(t1, t2, V1Cells, V1eCells_spkTimes)
 V4act = generateActivityMap(t1, t2, V4Cells, V4eCells_spkTimes)
 ITact = generateActivityMap(t1, t2, ITCells, ITeCells_spkTimes)
 
+IRact = generateActivityMap(t1, t2, InRCells, RiCells_spkTimes)
 IV1act = generateActivityMap(t1, t2, InV1Cells, V1iCells_spkTimes)
 IV4act = generateActivityMap(t1, t2, InV4Cells, V4iCells_spkTimes)
 IITact = generateActivityMap(t1, t2, InITCells, ITiCells_spkTimes)
@@ -118,16 +124,17 @@ mV1 = np.max(V1act)
 mV4 = np.max(V4act)
 mIT = np.max(ITact)
 
+mIR = np.max(IRact)
 mIV1 = np.max(IV1act)
 mIV4 = np.max(IV4act)
 mIIT = np.max(IITact)
 
-max_spks = np.max([mR, mV1, mV4, mIT, mIV1, mIV4, mIIT])
+max_spks = np.max([mR, mV1, mV4, mIT, mIR, mIV1, mIV4, mIIT])
 ############################
 
 #plt.axis('off')
 
-fig, axs = plt.subplots(2, 4)
+fig, axs = plt.subplots(3, 4)
 ax = axs.ravel()
 
 cbaxes = fig.add_axes([0.95, 0.4, 0.01, 0.2]) 
@@ -151,11 +158,15 @@ for t in range(1,len(t1)):
     ax[3].set_xlim(-0.5,4.5)
     ax[3].set_ylim(-0.5,4.5)
     ax[3].set_title('Excit IT')
-    #ax[4].axis('off')
-    ax[4].imshow(New_InputImages[t-1,:,:],cmap='gray', vmin=0, vmax = 255)
+    ax[4].imshow(IRact[:,:,t],cmap='gray', vmin=0, vmax=max_spks)
     ax[4].set_xlim(-0.5,19.5)
     ax[4].set_ylim(-0.5,19.5)
-    ax[4].set_title('Input Images')
+    ax[4].set_title('Inhib R')
+    #ax[4].axis('off')
+    ax[8].imshow(New_InputImages[t-1,:,:],cmap='gray', vmin=0, vmax = 255)
+    ax[8].set_xlim(-0.5,19.5)
+    ax[8].set_ylim(-0.5,19.5)
+    ax[8].set_title('Input Images')
     ax[5].imshow(IV1act[:,:,t],cmap='gray', vmin=0, vmax=max_spks)
     ax[5].set_xlim(-0.5,9.5)
     ax[5].set_ylim(-0.5,9.5)
