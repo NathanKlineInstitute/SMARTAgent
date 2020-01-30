@@ -31,7 +31,7 @@ NB_V1neurons = 400
 NB_V4neurons = 100
 NB_ITneurons = 25
 
-NBIRneurons = 100
+NB_IRneurons = 100
 NB_IV1neurons = 100
 NB_IV4neurons = 25
 NB_IITneurons = 9
