@@ -826,3 +826,9 @@ InMI to MI - CHECKED - STATUS = 'GOOD'
 [6, 10], [6, 11], [6, 12], [6, 15], [6, 16], [6, 17], [6, 20], [6, 21], [6, 22], 
 [7, 10], [7, 11], [7, 12], [7, 13], [7, 14], [7, 15], [7, 16], [7, 17], [7, 18], [7, 19], [7, 20], [7, 21], [7, 22], [7, 23], [7, 24], 
 [8, 12], [8, 13], [8, 14], [8, 17], [8, 18], [8, 19], [8, 22], [8, 23], [8, 24]]
+
+
+*20jan30
+**so i confirmed that the connectivity is correct. At least for the current configuration where I have reduced network with 20x20 neurons in R and V1 followed by 10x10 neurons in V4 and 5x5 neurons in IT and so on.
+**Until now i have been using delay of 20 ms, which is too long. Biologically, it should be 1 or 2 ms (see for references).
+**Changed delays for all synaptic connections to 2 ms.
