@@ -836,3 +836,19 @@ InMI to MI - CHECKED - STATUS = 'GOOD'
 **Why there is a lot of noise in R neurons? Can i reduce it?
 ***May be by adding inhibition in R helps it. so add IR neurons (10x10) and connections R->IR (3) IR->R (5).
 **test new model with IR and R->IR->R loop in a folder 'FFEtoE_WILEtoI_WILItoE_withIR' 
+
+*20jan31
+**When i tested new model with IR and R->IR->R loop and compared it with R->IR. using IR->R of 0.004 gave me very similar results to IR->R of 0. When i increased IR->R to 0.04, the firing rate of R and IR both went down. But i want to see the oscillations.
+**May be i need to reduce the model to 2 layers to understand the interplay between excitation and inhibition.
+
+*20feb3
+**running 2 layers model with 5x5 neurons in R and 1 neuron in IR, where 3x3 neurons in R make connections with 1 IR neuron. The input is only corner pixels 5x5.
+***I noticed that the strength of poisson neurons (processes converting pixel intensities to firing rate) to R is too much which leads to a burst of activity in which some of the spikes are very small.
+** weight reduced to 0.002 as shown below:
+netParams.stimTargetParams['stimMod->all'] = {'source': 'stimMod',
+        'conds': {'pop': 'R'},
+        'convergence': 1,
+        'weight': 0.002,
+        'delay': 1,
+        'synMech': 'AMPA'}
+**I found another issue..... firing rate for baseline (black background) was ~7 Hz in addition to the 5Hz provided to all the excitatory neurons. So probably get rid of the baseline activity of ~7Hz i.e. in aigame.py

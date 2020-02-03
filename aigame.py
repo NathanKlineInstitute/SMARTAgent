@@ -78,6 +78,7 @@ class SMARTAgent:
         #fr_Images = numpy.where(dsum_Images>1.0,100,dsum_Images) #Using this to check what number would work for firing rate
         #fr_Images = numpy.where(dsum_Images<10.0,0,dsum_Images)
         fr_Images = 40/(1+numpy.exp((numpy.multiply(-1,dsum_Images)+123)/25))
+        fr_Images = numpy.subtract(fr_Images,7.722) #baseline firing rate subtraction. Instead all excitatory neurons are firing at 5Hz.
         #print(numpy.amax(fr_Images))
         self.firing_rates = numpy.reshape(fr_Images,400) #6400 for 80*80 Image, now its 400 for 20*20
         self.env.render()
@@ -151,6 +152,7 @@ class SMARTAgent:
         #fr_Images = numpy.where(dsum_Images>1.0,100,dsum_Images) #Using this to check what number would work for firing rate
         #fr_Images = numpy.where(dsum_Images<10.0,0,dsum_Images)
         fr_Images = 40/(1+numpy.exp((numpy.multiply(-1,dsum_Images)+123)/25))
+        fr_Images = numpy.subtract(fr_Images,7.722) #baseline firing rate subtraction. Instead all excitatory neurons are firing at 5Hz.
         #print(numpy.amax(fr_Images))
         self.firing_rates = numpy.reshape(fr_Images,400) #6400 for 80*80 Image, now its 400 for 20*20
         self.env.render()
@@ -170,11 +172,7 @@ class SMARTAgent:
         for cell in [c for c in f.net.cells]:   # shoulder
             for stim in cell.stims:
                 if stim['source'] == 'stimMod':
-                    if self.firing_rates[cind]>1000.0:
-                        print(self.firing_rates[cind])
                     stim['hObj'].interval = 1000.0/self.firing_rates[cind] # interval in ms as a function of rate
-                    if self.firing_rates[cind]>40.0:
-                        print(self.firing_rates[cind])
             cind = cind+1
                       
 
