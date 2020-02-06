@@ -313,35 +313,35 @@ netParams.connParams['R->R'] = {
         'preConds': {'pop': 'R'},
         'postConds': {'pop': 'R'},
         'probability': 0.02,
-        'weight': 0.0001,
+        'weight': 0.000, #0.0001
         'delay': 2,
         'synMech': 'AMPA'}
 netParams.connParams['V1->V1'] = {
         'preConds': {'pop': 'V1'},
         'postConds': {'pop': 'V1'},
         'probability': 0.02,
-        'weight': 0.0001,
+        'weight': 0.000, #0.0001
         'delay': 2,
         'synMech': 'AMPA'}
 netParams.connParams['V4->V4'] = {
         'preConds': {'pop': 'V4'},
         'postConds': {'pop': 'V4'},
         'probability': 0.02,
-        'weight': 0.0001,
+        'weight': 0.000, #0.0001
         'delay': 2,
         'synMech': 'AMPA'}
 netParams.connParams['IT->IT'] = {
         'preConds': {'pop': 'IT'},
         'postConds': {'pop': 'IT'},
         'probability': 0.02,
-        'weight': 0.0001,
+        'weight': 0.000, #0.0001
         'delay': 2,
         'synMech': 'AMPA'}
 netParams.connParams['MI->MI'] = {
         'preConds': {'pop': 'MI'},
         'postConds': {'pop': 'MI'},
         'probability': 0.02,
-        'weight': 0.0001,
+        'weight': 0.000, #0.0001
         'delay': 2,
         'synMech': 'AMPA'}
 #E to I
@@ -398,7 +398,7 @@ netParams.connParams['IR->R'] = {
         'connList': blistInRtoR,
         #'probability': 0.02,
         #'divergence': 9,
-        'weight': 0.001,
+        'weight': 0.002,
         'delay': 2,
         'synMech': 'GABA'}
 netParams.connParams['IV1->V1'] = {
@@ -407,7 +407,7 @@ netParams.connParams['IV1->V1'] = {
         'connList': blistInV1toV1,
         #'probability': 0.02,
         #'divergence': 9,
-        'weight': 0.001,
+        'weight': 0.002,
         'delay': 2,
         'synMech': 'GABA'}
 netParams.connParams['IV4->V4'] = {
@@ -416,7 +416,7 @@ netParams.connParams['IV4->V4'] = {
         'connList': blistInV4toV4,
         #'probability': 0.02,
         #'divergence': 9,
-        'weight': 0.001,
+        'weight': 0.002,
         'delay': 2,
         'synMech': 'GABA'}
 netParams.connParams['IIT->IT'] = {
@@ -425,7 +425,7 @@ netParams.connParams['IIT->IT'] = {
         'connList': blistInITtoIT,
         #'probability': 0.02,
         #'divergence': 9,
-        'weight': 0.001,
+        'weight': 0.002,
         'delay': 2,
         'synMech': 'GABA'}
 netParams.connParams['IMI->MI'] = {
@@ -434,7 +434,7 @@ netParams.connParams['IMI->MI'] = {
         'connList': blistInMItoMI,
         #'probability': 0.02,
         #'divergence': 9,
-        'weight': 0.001,
+        'weight': 0.002,
         'delay': 2,
         'synMech': 'GABA'}
 #I to I
@@ -442,28 +442,28 @@ netParams.connParams['IV1->IV1'] = {
         'preConds': {'pop': 'IV1'},
         'postConds': {'pop': 'IV1'},
         'probability': 0.02,
-        'weight': 0.0001,
+        'weight': 0.000, #0.0001
         'delay': 2,
         'synMech': 'GABA'}
 netParams.connParams['IV4->IV4'] = {
         'preConds': {'pop': 'IV4'},
         'postConds': {'pop': 'IV4'},
         'probability': 0.02,
-        'weight': 0.0001,
+        'weight': 0.000, #0.0001
         'delay': 2,
         'synMech': 'GABA'}
 netParams.connParams['IIT->IIT'] = {
         'preConds': {'pop': 'IIT'},
         'postConds': {'pop': 'IIT'},
         'probability': 0.02,
-        'weight': 0.0001,
+        'weight': 0.000, #0.0001
         'delay': 2,
         'synMech': 'GABA'}
 netParams.connParams['IMI->IMI'] = {
         'preConds': {'pop': 'IMI'},
         'postConds': {'pop': 'IMI'},
         'probability': 0.02,
-        'weight': 0.0001,
+        'weight': 0.000, #0.0001
         'delay': 2,
         'synMech': 'GABA'}
 #E to E feedforward connections
@@ -515,7 +515,7 @@ netParams.connParams['R->IV1'] = {
         'postConds': {'pop': 'IV1'},
         'connList': blistEtoInV1,
         #'convergence': 10,
-        'weight': 0.002,
+        'weight': 0.00, #0.002
         'delay': 2,
         'synMech': 'AMPA'}
 netParams.connParams['V1->IV4'] = {
@@ -523,7 +523,7 @@ netParams.connParams['V1->IV4'] = {
         'postConds': {'pop': 'IV4'},
         'connList': blistV1toInV4,
         #'convergence': 10,
-        'weight': 0.002,
+        'weight': 0.00, #0.002
         'delay': 2,
         'synMech': 'AMPA'}
 netParams.connParams['V4->IIT'] = {
@@ -531,7 +531,7 @@ netParams.connParams['V4->IIT'] = {
         'postConds': {'pop': 'IIT'},
         'connList': blistV4toInIT,
         #'convergence': 10,
-        'weight': 0.002,
+        'weight': 0.00, #0.002
         'delay': 2,
         'synMech': 'AMPA'}
 netParams.connParams['IT->IMI'] = {
@@ -539,10 +539,10 @@ netParams.connParams['IT->IMI'] = {
         'postConds': {'pop': 'IMI'},
         'connList': blistITtoInMI,
         #'convergence': 10,
-        'weight': 0.002,
+        'weight': 0.00, #0.002
         'delay': 2,
-        'synMech': 'AMPA',
-        'plast': {'mech': 'STDP', 'params': STDPparamsRL}}
+        'synMech': 'AMPA'}#,
+        #'plast': {'mech': 'STDP', 'params': STDPparamsRL}}
 
 #E to E feedbackward connections
 netParams.connParams['V1->R'] = {
@@ -550,7 +550,7 @@ netParams.connParams['V1->R'] = {
         'postConds': {'pop': 'R'},
         'connList': blistV1toE,
         #'convergence': 10,
-        'weight': 0.0001,
+        'weight': 0.000, #0.0001
         'delay': 2,
         'synMech': 'AMPA'}
 netParams.connParams['V4->V1'] = {
@@ -558,7 +558,7 @@ netParams.connParams['V4->V1'] = {
         'postConds': {'pop': 'V1'},
         'connList': blistInV4toV1,
         #'convergence': 10,
-        'weight': 0.0001,
+        'weight': 0.000, #0.0001
         'delay': 2,
         'synMech': 'AMPA'}
 netParams.connParams['IT->V4'] = {
@@ -566,7 +566,7 @@ netParams.connParams['IT->V4'] = {
         'postConds': {'pop': 'V4'},
         'connList': blistITtoV4,
         #'convergence': 10,
-        'weight': 0.0001,
+        'weight': 0.000, #0.0001
         'delay': 2,
         'synMech': 'AMPA'}
 netParams.connParams['MI->IT'] = {
@@ -574,19 +574,19 @@ netParams.connParams['MI->IT'] = {
         'postConds': {'pop': 'IT'},
         'connList': blistMItoIT,
         #'convergence': 10,
-        'weight': 0.0001,
+        'weight': 0.000, #0.0001
         'delay': 2,
-        'synMech': 'AMPA',
-        'plast': {'mech': 'STDP', 'params': STDPparamsRL}}
+        'synMech': 'AMPA'}#,
+        #'plast': {'mech': 'STDP', 'params': STDPparamsRL}}
 netParams.connParams['MO->MI'] = {
         'preConds': {'pop': 'MO'},
         'postConds': {'pop': 'MI'},
         'connList': blistMOtoMI,
         #'convergence': 10,
-        'weight': 0.0001,
+        'weight': 0.000, #0.0001
         'delay': 2,
-        'synMech': 'AMPA',
-        'plast': {'mech': 'STDP', 'params': STDPparamsRL}}
+        'synMech': 'AMPA'}#,
+        #'plast': {'mech': 'STDP', 'params': STDPparamsRL}}
 
 #I to E connections
 
@@ -595,7 +595,7 @@ netParams.connParams['IV1->R'] = {
         'postConds': {'pop': 'R'},
         'connList': blistInV1toE,
         #'convergence': 10,
-        'weight': 0.002,
+        'weight': 0.00, #0.002
         'delay': 2,
         'synMech': 'GABA'}
 netParams.connParams['IV4->V1'] = {
@@ -603,7 +603,7 @@ netParams.connParams['IV4->V1'] = {
         'postConds': {'pop': 'V1'},
         'connList': blistInV4toV1,
         #'convergence': 10,
-        'weight': 0.002,
+        'weight': 0.00, #0.002
         'delay': 2,
         'synMech': 'GABA'}
 netParams.connParams['IIT->V4'] = {
@@ -611,7 +611,7 @@ netParams.connParams['IIT->V4'] = {
         'postConds': {'pop': 'V4'},
         'connList': blistInITtoV4,
         #'convergence': 10,
-        'weight': 0.002,
+        'weight': 0.00, #0.002
         'delay': 2,
         'synMech': 'GABA'}
 netParams.connParams['IMI->IT'] = {
@@ -619,7 +619,7 @@ netParams.connParams['IMI->IT'] = {
         'postConds': {'pop': 'IT'},
         'connList': blistInMItoIT,
         #'convergence': 10,
-        'weight': 0.002,
+        'weight': 0.00, #0.002
         'delay': 2,
         'synMech': 'GABA'}
 #I to I
@@ -628,7 +628,7 @@ netParams.connParams['IV1->IV4'] = {
         'postConds': {'pop': 'IV4'},
         'connList': blistInV1toInV4,
         #'convergence': 10,
-        'weight': 0.002,
+        'weight': 0.00, #0.002
         'delay': 2,
         'synMech': 'GABA'}
 netParams.connParams['IV4->IIT'] = {
@@ -636,7 +636,7 @@ netParams.connParams['IV4->IIT'] = {
         'postConds': {'pop': 'IIT'},
         'connList': blistInV4toInIT,
         #'convergence': 10,
-        'weight': 0.002,
+        'weight': 0.00, #0.002
         'delay': 2,
         'synMech': 'GABA'}
 netParams.connParams['IIT->IMI'] = {
@@ -644,14 +644,14 @@ netParams.connParams['IIT->IMI'] = {
         'postConds': {'pop': 'IMI'},
         'connList': blistInITtoInMI,
         #'convergence': 10,
-        'weight': 0.002,
+        'weight': 0.00, #0.002
         'delay': 2,
-        'synMech': 'GABA',
-        'plast': {'mech': 'STDP', 'params': STDPparamsRL}}
+        'synMech': 'GABA'}#,
+        #'plast': {'mech': 'STDP', 'params': STDPparamsRL}}
 #Simulation options
 simConfig = specs.SimConfig()           # object of class SimConfig to store simulation configuration
 
-simConfig.duration = 1e4                      # Duration of the simulation, in ms
+simConfig.duration = 2e5                      # Duration of the simulation, in ms
 simConfig.dt = 0.2                            # Internal integration timestep to use
 simConfig.verbose = False                       # Show detailed messages
 simConfig.recordTraces = {'V_soma':{'sec':'soma','loc':0.5,'var':'v'}}  # Dict with traces to record
@@ -659,7 +659,7 @@ simConfig.recordCellsSpikes = [-1]
 simConfig.recordStep = 0.2                      # Step size in ms to save data (e.g. V traces, LFP, etc)
 simConfig.filename = 'model_output'  # Set file output name
 simConfig.savePickle = False            # Save params, network and sim output to pickle file
-simConfig.saveMat = True
+simConfig.saveMat = False
 
 #simConfig.analysis['plotRaster'] = True                         # Plot a raster
 simConfig.analysis['plotTraces'] = {'include': [1084, 1085, 1086, 1087, 1088, 1089, 1090, 1091, 1092]}

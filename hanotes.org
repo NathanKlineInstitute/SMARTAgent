@@ -861,3 +861,24 @@ netParams.stimTargetParams['ebkg->all'] = {'source': 'ebkg', 'conds': {'cellType
 
 netParams.stimSourceParams['bkg'] = {'type': 'NetStim', 'rate': 20, 'noise': 0.0} #noise was 0.3 and weight was 0.01
 netParams.stimTargetParams['bkg->all'] = {'source': 'bkg', 'conds': {'cellType': ['InR','InV1','InV4','InIT', 'InMI']}, 'weight': 0, 'delay': 'max(1, normal(5,2))', 'synMech': 'AMPA'}
+
+**All long range inputs to M1 originates in thalamus or other cortical areas and is exculsively glutamatergic.
+**In rodents, these thalamic inputs include motor thalamic nuclei such as Va-VL, posterior sensory nuclei including PO and ventromedial (VM) thalamus. The axons differentially target distinct layers of M1.
+
+*20feb5
+**ran the following simulations:
+1. No background firing rate:
+1a. 100s_withRL -- firing rates of most of the neurons looked stable except motor areas which were increasing
+1b. 500s_withRL -- firing rates of IT, MI and MO neurons increased first and then decreases sharply. These effects are probably due to RL between IT, MI and MO.
+1c. 200s_noRL--all firing rates stable.
+1d. 200s_noRL_noInhib--al firing rate stable but the now the neurons are firing at higher rate.
+2. With 5Hz and 20 Hz background firing rates for excitatory and inhibitory neurons.
+2a. 100s_withRL -- firing rates of most of the neurons looked stable except motor areas which were increasing
+2b. 500s_withRL -- firing rates of IT, MI and MO neurons increased first and then decreases sharply. These effects are probably due to RL between IT, MI and MO.
+2c. 200s_noRL--all firing rates stable.
+2d. 200s_noRL_noInhib--al firing rate stable but the now the neurons are firing at higher rate.
+
+**start adding RL
+1. add between IT and MI. ---> constant increase in weights observed. ALso in the presence of background firing, the firing rates of MI and MO increased. But in the absence of background firing, the firing rates of MI and MO didn't increase.
+
+*20feb6
