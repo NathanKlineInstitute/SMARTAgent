@@ -10,7 +10,7 @@ spkInds = data1["spkInds"]
 cellIDs = data1["cellGids"]
 skColors = data1["spkColors"] 
 
-totalDur = 10000
+totalDur = 50000
 tBin = 100
 
 

@@ -83,7 +83,7 @@ netParams.synMechParams['GABA'] = {'mod': 'Exp2Syn', 'tau1': 0.07, 'tau2': 9.1, 
 STDPparams = {'hebbwt': 0.0001, 'antiwt':-0.00001, 'wmax': 50, 'RLon': 0 , 'RLhebbwt': 0.001, 'RLantiwt': -0.000,
         'tauhebb': 10, 'RLwindhebb': 50, 'useRLexp': 0, 'softthresh': 0, 'verbose':0}
 
-STDPparamsRL = {'hebbwt': 0.00001, 'antiwt':-0.00001, 'wmax': 50, 'RLon': 1 , 'RLhebbwt': 0.00001, 'RLantiwt': -0.000,
+STDPparamsRL = {'hebbwt': 0.0000, 'antiwt':-0.0000, 'wmax': 50, 'RLon': 1 , 'RLhebbwt': 0.00001, 'RLantiwt': -0.000,
         'tauhebb': 10, 'RLwindhebb': 50, 'useRLexp': 0, 'softthresh': 0, 'verbose':0}
 
 netParams.stimSourceParams['stimMod'] = {'type': 'NetStim', 'rate': 'variable', 'noise': 0}
@@ -651,7 +651,7 @@ netParams.connParams['IIT->IMI'] = {
 #Simulation options
 simConfig = specs.SimConfig()           # object of class SimConfig to store simulation configuration
 
-simConfig.duration = 2e5                      # Duration of the simulation, in ms
+simConfig.duration = 0.5e5                      # Duration of the simulation, in ms
 simConfig.dt = 0.2                            # Internal integration timestep to use
 simConfig.verbose = False                       # Show detailed messages
 simConfig.recordTraces = {'V_soma':{'sec':'soma','loc':0.5,'var':'v'}}  # Dict with traces to record
