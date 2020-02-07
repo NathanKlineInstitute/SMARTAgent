@@ -882,3 +882,4 @@ netParams.stimTargetParams['bkg->all'] = {'source': 'bkg', 'conds': {'cellType':
 1. add between IT and MI. ---> constant increase in weights observed. ALso in the presence of background firing, the firing rates of MI and MO increased. But in the absence of background firing, the firing rates of MI and MO didn't increase.
 
 *20feb6
+**firing rate of MO pop increased rapidly and then start dropping. Trying to find why is that? May be connections getting too strong. Look at the MO neurons voltage traces.

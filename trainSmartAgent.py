@@ -662,7 +662,7 @@ simConfig.savePickle = False            # Save params, network and sim output to
 simConfig.saveMat = False
 
 #simConfig.analysis['plotRaster'] = True                         # Plot a raster
-simConfig.analysis['plotTraces'] = {'include': [1084, 1085, 1086, 1087, 1088, 1089, 1090, 1091, 1092]}
+simConfig.analysis['plotTraces'] = {'include': [1184, 1185, 1186, 1187, 1188, 1189, 1190, 1191, 1192]}
 #simConfig.analysis['plotRaster'] = {'timeRange': [500,1000],'popRates':'overlay','saveData':'RasterData.pkl','showFig':True}
 simConfig.analysis['plotRaster'] = {'popRates':'overlay','saveData':'RasterData.pkl','showFig':True}
 #simConfig.analysis['plot2Dnet'] = True 
