@@ -883,3 +883,8 @@ netParams.stimTargetParams['bkg->all'] = {'source': 'bkg', 'conds': {'cellType':
 
 *20feb6
 **firing rate of MO pop increased rapidly and then start dropping. Trying to find why is that? May be connections getting too strong. Look at the MO neurons voltage traces.
+**baseline voltage shifts and the firing is going on. Don't see any issue with blocking.
+
+*20feb7
+**seems the problem is with background firing rate. background firing rate should be same across areas. right now this is not the case.
+**For now get rid of the background firing rate and run with RL between IT and MI and between MI and MO. set 'weight': 0.01 to 'weight': 0.0 for both ['ebkg->all'] and ['bkg->all']
