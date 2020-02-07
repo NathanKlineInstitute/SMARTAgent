@@ -894,5 +894,6 @@ from: STDPparamsRL = {'hebbwt': 0.00001, 'antiwt':-0.0000, 'wmax': 50, 'RLon': 1
 To: STDPparamsRL = {'hebbwt': 0.00001, 'antiwt':-0.00001, 'wmax': 50, 'RLon': 1 , 'RLhebbwt': 0.00001, 'RLantiwt': -0.000,
         'tauhebb': 10, 'RLwindhebb': 50, 'useRLexp': 0, 'softthresh': 0, 'verbose':0}
 ***Not much different than when antiwt was 0.
-**Check what happens if hebbwt is also turned to 0
+**Check what happens if hebbwt is also turned to 0 i.e. both hebbwt and antiwt are 0. ---> overall weight decreased
+**Try decreasing weights between (V1->V4),(V4->IT). 0.002 to 0.001
 

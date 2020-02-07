@@ -480,7 +480,7 @@ netParams.connParams['V1->V4'] = {
         'postConds': {'pop': 'V4'},
         'connList': blistV1toV4,
         #'convergence': 10,
-        'weight': 0.002,
+        'weight': 0.001,
         'delay': 2,
         'synMech': 'AMPA'}
 netParams.connParams['V4->IT'] = {
@@ -488,7 +488,7 @@ netParams.connParams['V4->IT'] = {
         'postConds': {'pop': 'IT'},
         'connList': blistV4toIT,
         #'convergence': 10,
-        'weight': 0.002,
+        'weight': 0.001,
         'delay': 2,
         'synMech': 'AMPA'}
 netParams.connParams['IT->MI'] = {
