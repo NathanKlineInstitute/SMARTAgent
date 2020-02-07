@@ -887,4 +887,8 @@ netParams.stimTargetParams['bkg->all'] = {'source': 'bkg', 'conds': {'cellType':
 
 *20feb7
 **seems the problem is with background firing rate. background firing rate should be same across areas. right now this is not the case.
-**For now get rid of the background firing rate and run with RL between IT and MI and between MI and MO. set 'weight': 0.01 to 'weight': 0.0 for both ['ebkg->all'] and ['bkg->all']
+**For now get rid of the background firing rate and run with RL between IT and MI and between MI and MO. set 'weight': 0.01 to 'weight': 0.0 for both ['ebkg->all'] and ['bkg->all']---->Still the weights kept strengthening probably because both RL and STDP hebbian learning are working.
+**Try activating antihebbian on RL synapses.
+from: STDPparamsRL = {'hebbwt': 0.00001, 'antiwt':-0.0000, 'wmax': 50, 'RLon': 1 , 'RLhebbwt': 0.00001, 'RLantiwt': -0.000,
+        'tauhebb': 10, 'RLwindhebb': 50, 'useRLexp': 0, 'softthresh': 0, 'verbose':0}
+To:
