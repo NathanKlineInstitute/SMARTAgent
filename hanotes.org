@@ -900,5 +900,6 @@ To: STDPparamsRL = {'hebbwt': 0.00001, 'antiwt':-0.00001, 'wmax': 50, 'RLon': 1 
 
 *20feb10
 **Reducing weights between (IT->MI) and (MI->MO) from 0.002 to 0.001 was too much as the firing rate decreased to around 2-3Hz.
-**Change weights between IT->MI and MI->MO to 0.0015
+**Change weights between IT->MI and MI->MO to 0.0015 ----> Still low firing rate.
+**Chnage weights between IT->MI and MI->MO to 0.002
 
