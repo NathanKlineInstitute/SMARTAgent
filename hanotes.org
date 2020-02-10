@@ -902,5 +902,7 @@ To: STDPparamsRL = {'hebbwt': 0.00001, 'antiwt':-0.00001, 'wmax': 50, 'RLon': 1 
 **Reducing weights between (IT->MI) and (MI->MO) from 0.002 to 0.001 was too much as the firing rate decreased to around 2-3Hz.
 **Change weights between IT->MI and MI->MO to 0.0015 ----> Still low firing rate.
 **Chnage weights between IT->MI and MI->MO to 0.002----> So i just realized that i was looking at wrong data to draw conclusions. even for 0.0015, the firing rate increases. 
-**Change weights between IT->MI and MI->MO to 0.0012
+**Change weights between IT->MI and MI->MO to 0.0012 ----> In the beginning the firing rate is still high but then it decreases because of RL i.e. the weight decreases most of the times. ----> run simulation for longer duration (200 s). ---> population firing rates look reasonable. Not same but not too different.
+**rerun the simulation (50sec) using shorter game-interaction interval of 10 ms. 
+
 
