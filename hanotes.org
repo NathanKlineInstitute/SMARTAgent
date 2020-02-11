@@ -907,5 +907,6 @@ To: STDPparamsRL = {'hebbwt': 0.00001, 'antiwt':-0.00001, 'wmax': 50, 'RLon': 1 
 
 *20feb11
 **Need to change the RL based STDP mechanism. For now, put a limit such that if the connection has not learned anything it can not forget. which means that whatever weight is assigned in the beginning sould be the absolute minimum i.e. without learning. therefore the weights can not go below that initially assigned weights. 'wmin' is assigned 0.0012.
+**wmin is giving error so using wbase.
 
 

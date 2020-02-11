@@ -43,7 +43,7 @@ NEURON {
     RANGE useRLexp : Use exponentially decaying eligibility traces?  If 0, then the eligibility traces are binary, turning on at the beginning and completely off after time has passed corresponding to RLlen.
     RANGE RLlenhebb, RLlenanti : Length of the eligibility Hebbian and anti-Hebbian eligibility traces, or the decay time constants if the traces are decaying exponentials.
     RANGE RLhebbwt, RLantiwt : Maximum gains to be applied to the reward or punishing signal by Hebbian and anti-Hebbian eligibility traces.  
-    RANGE wmin, wmax : The maximum weight for the synapse. min weight for the synapse.
+    RANGE wbase, wmax : The maximum weight for the synapse. min weight for the synapse.
     RANGE softthresh : Flag turning on "soft thresholding" for the maximal adjustment parameters.
     RANGE STDPon : Flag for turning STDP adjustment on / off.
     RANGE RLon : Flag for turning RL adjustment on / off.
@@ -89,7 +89,7 @@ PARAMETER {
     RLlenanti = 100 (ms)
     RLhebbwt = 1.0
     RLantiwt = -1.0
-    wmin = 0
+    wbase = 0
     wmax  = 15.0
     softthresh = 0
     STDPon = 1
@@ -190,5 +190,5 @@ FUNCTION softthreshold(rawwc) {
 PROCEDURE adjustweight(wc) {
    synweight = synweight + wc : apply the synaptic modification, and then clip the weight if necessary to make sure it's between 0 and wmax.
    if (synweight > wmax) { synweight = wmax }
-   if (synweight < wmin) { synweight = wmin }
+   if (synweight < wbase) { synweight = wbase }
 }
