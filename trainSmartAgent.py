@@ -827,7 +827,7 @@ def trainAgentFake(t):
 def trainAgent(t):
     """ training interface between simulation and game environment
     """
-    global NBsteps, InputImages
+    global NBsteps, epCount, InputImages
     if t<21.0: # for the first time interval use randomly selected actions
         actions =[]
         for _ in range(5):
