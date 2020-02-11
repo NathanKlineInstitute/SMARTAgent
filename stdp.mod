@@ -89,6 +89,7 @@ PARAMETER {
     RLlenanti = 100 (ms)
     RLhebbwt = 1.0
     RLantiwt = -1.0
+    wmin = 0
     wmax  = 15.0
     softthresh = 0
     STDPon = 1
