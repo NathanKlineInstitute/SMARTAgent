@@ -938,7 +938,7 @@ sim.net.connectCells()                    # create connections between cells bas
 sim.net.addStims()                      #instantiate netStim
 sim.setupRecording()                  # setup variables to record for each cell (spikes, V traces, etc)
 #sim.runSim()
-sim.runSimWithIntervalFunc(10.0,trainAgentFake)
+sim.runSimWithIntervalFunc(100.0,trainAgentFake)
 sim.gatherData()
 sim.saveData()
 sim.analysis.plotData()
