@@ -36,10 +36,8 @@ NB_IV1neurons = 100
 NB_IV4neurons = 25
 NB_IITneurons = 9
 
-NB_MIneurons = 25
-NB_MOneurons = 9
-
-NB_IMIneurons = 9
+NB_MLneurons = 25
+NB_MRneurons = 25
 
 # Network parameters
 netParams = specs.NetParams() #object of class NetParams to store the network parameters
@@ -55,19 +53,17 @@ netParams.popParams['IV1'] = {'cellType': 'InV1', 'numCells': NB_IV1neurons, 'ce
 netParams.popParams['IV4'] = {'cellType': 'InV4', 'numCells': NB_IV4neurons, 'cellModel': 'HH'} #400
 netParams.popParams['IIT'] = {'cellType': 'InIT', 'numCells': NB_IITneurons, 'cellModel': 'HH'} #100
 
-netParams.popParams['MI'] = {'cellType': 'EMI', 'numCells': NB_MIneurons, 'cellModel': 'HH'} #400
-netParams.popParams['MO'] = {'cellType': 'EMO', 'numCells': NB_MOneurons, 'cellModel': 'HH'} #100
-
-netParams.popParams['IMI'] = {'cellType': 'InMI', 'numCells': NB_IMIneurons, 'cellModel': 'HH'} #100
+netParams.popParams['ML'] = {'cellType': 'EML', 'numCells': NB_MIneurons, 'cellModel': 'HH'} #400
+netParams.popParams['MR'] = {'cellType': 'EMR', 'numCells': NB_MOneurons, 'cellModel': 'HH'} #100
 
 netParams.cellParams['ERule'] = {               # cell rule label
-        'conds': {'cellType': ['E','EV1','EV4','EIT', 'EMI', 'EMO']},              #properties will be applied to cells that match these conditions
+        'conds': {'cellType': ['E','EV1','EV4','EIT', 'EML', 'EMR']},              #properties will be applied to cells that match these conditions
         'secs': {'soma':                        #sections
                 {'geom': {'diam':10, 'L':10, 'Ra':120},         #geometry
                 'mechs': {'hh': {'gnabar': 0.12, 'gkbar': 0.036, 'gl': 0.003, 'el': -70}}}}}    #mechanism
 
 netParams.cellParams['IRule'] = {               # cell rule label
-        'conds': {'cellType': ['InR','InV1','InV4','InIT', 'InMI']},              #properties will be applied to cells that match these conditions
+        'conds': {'cellType': ['InR','InV1','InV4','InIT']},              #properties will be applied to cells that match these conditions
         'secs': {'soma':                        #sections
                 {'geom': {'diam':10, 'L':10, 'Ra':120},         #geometry
                 'mechs': {'hh': {'gnabar': 0.12, 'gkbar': 0.036, 'gl': 0.003, 'el': -70}}}}}    #mechanism
@@ -100,11 +96,11 @@ netParams.stimTargetParams['stimMod->all'] = {'source': 'stimMod',
 # Stimulation parameters
 
 netParams.stimSourceParams['ebkg'] = {'type': 'NetStim', 'rate': 5, 'noise': 0.3}
-netParams.stimTargetParams['ebkg->all'] = {'source': 'ebkg', 'conds': {'cellType': ['EV1','EV4','EIT', 'EMI', 'EMO']}, 'weight': 0.0, 'delay': 'max(1, normal(5,2))', 'synMech': 'AMPA'}
+netParams.stimTargetParams['ebkg->all'] = {'source': 'ebkg', 'conds': {'cellType': ['EV1','EV4','EIT', 'EML', 'EMR']}, 'weight': 0.0, 'delay': 'max(1, normal(5,2))', 'synMech': 'AMPA'}
 
 
 netParams.stimSourceParams['bkg'] = {'type': 'NetStim', 'rate': 20, 'noise': 0.3}
-netParams.stimTargetParams['bkg->all'] = {'source': 'bkg', 'conds': {'cellType': ['InR','InV1','InV4','InIT', 'InMI']}, 'weight': 0.0, 'delay': 'max(1, normal(5,2))', 'synMech': 'AMPA'}
+netParams.stimTargetParams['bkg->all'] = {'source': 'bkg', 'conds': {'cellType': ['InR','InV1','InV4','InIT']}, 'weight': 0.0, 'delay': 'max(1, normal(5,2))', 'synMech': 'AMPA'}
 ######################################################################################
 def connectLayerswithOverlap(NBpreN, NBpostN, overlap_xdir):
     #NBpreN = 6400 	#number of presynaptic neurons
@@ -217,95 +213,43 @@ def connectLayerswithOverlapDiv(NBpreN, NBpostN, overlap_xdir):
 blistEtoV1 = connectLayerswithOverlap(NBpreN = NB_Rneurons, NBpostN = NB_V1neurons, overlap_xdir = 3)
 blistV1toV4 = connectLayerswithOverlap(NBpreN = NB_V1neurons, NBpostN = NB_V4neurons, overlap_xdir = 3)
 blistV4toIT = connectLayerswithOverlap(NBpreN = NB_V4neurons, NBpostN = NB_ITneurons, overlap_xdir = 3) #was 15
-blistITtoMI = connectLayerswithOverlap(NBpreN = NB_ITneurons, NBpostN = NB_MIneurons, overlap_xdir = 3) #Not sure if this is a good strategy instead of all to all
-blistMItoMO = connectLayerswithOverlap(NBpreN = NB_MIneurons, NBpostN = NB_MOneurons, overlap_xdir = 3) #was 19
+#blistITtoMI = connectLayerswithOverlap(NBpreN = NB_ITneurons, NBpostN = NB_MIneurons, overlap_xdir = 3) #Not sure if this is a good strategy instead of all to all
+#blistMItoMO = connectLayerswithOverlap(NBpreN = NB_MIneurons, NBpostN = NB_MOneurons, overlap_xdir = 3) #was 19
 #blistMItoMO: Feedforward for MI to MO is all to all and can be specified in the connection statement iteself
-
-print('E to V1')
-print(blistEtoV1)
-
-print('V1 to V4')
-print(blistV1toV4)
-
-print('V4 to IT')
-print(blistV4toIT)
-
-print('IT to MI')
-print(blistITtoMI)
-
-print('MI to MO')
-print(blistMItoMO)
-
 
 #E to I - Feedforward connections
 blistEtoInV1 = connectLayerswithOverlap(NBpreN = NB_Rneurons, NBpostN = NB_IV1neurons, overlap_xdir = 3)
 blistV1toInV4 = connectLayerswithOverlap(NBpreN = NB_V1neurons, NBpostN = NB_IV4neurons, overlap_xdir = 3) #was 15
 blistV4toInIT = connectLayerswithOverlap(NBpreN = NB_V4neurons, NBpostN = NB_IITneurons, overlap_xdir = 3) #was 15
-blistITtoInMI = connectLayerswithOverlap(NBpreN = NB_ITneurons, NBpostN = NB_IMIneurons, overlap_xdir = 3) #was 15
 
 #E to I - WithinLayer connections
 blistRtoInR = connectLayerswithOverlap(NBpreN = NB_Rneurons, NBpostN = NB_IRneurons, overlap_xdir = 3)
 blistV1toInV1 = connectLayerswithOverlap(NBpreN = NB_V1neurons, NBpostN = NB_IV1neurons, overlap_xdir = 3)
 blistV4toInV4 = connectLayerswithOverlap(NBpreN = NB_V4neurons, NBpostN = NB_IV4neurons, overlap_xdir = 3)
 blistITtoInIT = connectLayerswithOverlap(NBpreN = NB_ITneurons, NBpostN = NB_IITneurons, overlap_xdir = 3)
-blistMItoInMI = connectLayerswithOverlap(NBpreN = NB_MIneurons, NBpostN = NB_IMIneurons, overlap_xdir = 3)
-
-print('V1 to InV1')
-print(blistV1toInV1)
-
-print('V4 to InV4')
-print(blistV4toInV4)
-
-print('IT to InIT')
-print(blistITtoInIT)
-
-print('MI to InMI')
-print(blistMItoInMI)
-
 
 #I to E - WithinLayer Inhibition
 blistInRtoR = connectLayerswithOverlapDiv(NBpreN = NB_IRneurons, NBpostN = NB_Rneurons, overlap_xdir = 5)
 blistInV1toV1 = connectLayerswithOverlapDiv(NBpreN = NB_IV1neurons, NBpostN = NB_V1neurons, overlap_xdir = 5)
 blistInV4toV4 = connectLayerswithOverlapDiv(NBpreN = NB_IV4neurons, NBpostN = NB_V4neurons, overlap_xdir = 5)
 blistInITtoIT = connectLayerswithOverlapDiv(NBpreN = NB_IITneurons, NBpostN = NB_ITneurons, overlap_xdir = 5)
-blistInMItoMI = connectLayerswithOverlapDiv(NBpreN = NB_IMIneurons, NBpostN = NB_MIneurons, overlap_xdir = 5)
-
-print('InV1 to V1')
-print(blistInV1toV1)
-
-print('InV4 to V4')
-print(blistInV4toV4)
-
-print('InIT to IT')
-print(blistInITtoIT)
-
-print('InMI to MI')
-print(blistInMItoMI)
-
 
 #Feedbackward excitation
 #E to E  
 blistV1toE = connectLayerswithOverlapDiv(NBpreN = NB_V1neurons, NBpostN = NB_Rneurons, overlap_xdir = 3)
 blistV4toV1 = connectLayerswithOverlapDiv(NBpreN = NB_V4neurons, NBpostN = NB_V1neurons, overlap_xdir = 3)
 blistITtoV4 = connectLayerswithOverlapDiv(NBpreN = NB_ITneurons, NBpostN = NB_V4neurons, overlap_xdir = 3)
-blistMItoIT = connectLayerswithOverlapDiv(NBpreN = NB_MIneurons, NBpostN = NB_ITneurons, overlap_xdir = 3)
-blistMOtoMI = connectLayerswithOverlapDiv(NBpreN = NB_MOneurons, NBpostN = NB_MIneurons, overlap_xdir = 3)
 
 #Feedforward inhibition
 #I to I
 blistInV1toInV4 = connectLayerswithOverlap(NBpreN = NB_IV1neurons, NBpostN = NB_IV4neurons, overlap_xdir = 5)
 blistInV4toInIT = connectLayerswithOverlap(NBpreN = NB_IV4neurons, NBpostN = NB_IITneurons, overlap_xdir = 5)
-blistInITtoInMI = connectLayerswithOverlap(NBpreN = NB_IITneurons, NBpostN = NB_IMIneurons, overlap_xdir = 5)
 
 #Feedbackward inhibition
 #I to E 
 blistInV1toE = connectLayerswithOverlapDiv(NBpreN = NB_IV1neurons, NBpostN = NB_Rneurons, overlap_xdir = 5)
 blistInV4toV1 = connectLayerswithOverlapDiv(NBpreN = NB_IV4neurons, NBpostN = NB_V1neurons, overlap_xdir = 5)
 blistInITtoV4 = connectLayerswithOverlapDiv(NBpreN = NB_IITneurons, NBpostN = NB_V4neurons, overlap_xdir = 5)
-blistInMItoIT = connectLayerswithOverlapDiv(NBpreN = NB_IMIneurons, NBpostN = NB_ITneurons, overlap_xdir = 5)
-
-#blist = connectRtoV1withOverlap()
-#blist = connectRtoV1withoutOverlap()
 
 
 #Local excitation
@@ -338,13 +282,20 @@ netParams.connParams['IT->IT'] = {
         'weight': 0.000, #0.0001
         'delay': 2,
         'synMech': 'AMPA'}
-netParams.connParams['MI->MI'] = {
-        'preConds': {'pop': 'MI'},
-        'postConds': {'pop': 'MI'},
+netParams.connParams['ML->ML'] = {
+        'preConds': {'pop': 'ML'},
+        'postConds': {'pop': 'ML'},
         'probability': 0.02,
         'weight': 0.000, #0.0001
         'delay': 2,
         'synMech': 'AMPA'}
+netParams.connParams['MR->MR'] = {
+        'preConds': {'pop': 'MR'},
+        'postConds': {'pop': 'MR'},
+        'probability': 0.02,
+        'weight': 0.000, #0.0001
+        'delay': 2,
+        'synMech': 'AMPA'}        
 #E to I
 netParams.connParams['R->IR'] = {
         'preConds': {'pop': 'R'},
@@ -377,15 +328,6 @@ netParams.connParams['IT->IIT'] = {
         'preConds': {'pop': 'IT'},
         'postConds': {'pop': 'IIT'},
         'connList': blistITtoInIT,
-        #'probability': 0.23,
-        #'convergence': 9,
-        'weight': 0.002,
-        'delay': 2,
-        'synMech': 'AMPA'}
-netParams.connParams['MI->IMI'] = {
-        'preConds': {'pop': 'MI'},
-        'postConds': {'pop': 'IMI'},
-        'connList': blistMItoInMI,
         #'probability': 0.23,
         #'convergence': 9,
         'weight': 0.002,
@@ -429,15 +371,6 @@ netParams.connParams['IIT->IT'] = {
         'weight': 0.002,
         'delay': 2,
         'synMech': 'GABA'}
-netParams.connParams['IMI->MI'] = {
-        'preConds': {'pop': 'IMI'},
-        'postConds': {'pop': 'MI'},
-        'connList': blistInMItoMI,
-        #'probability': 0.02,
-        #'divergence': 9,
-        'weight': 0.002,
-        'delay': 2,
-        'synMech': 'GABA'}
 #I to I
 netParams.connParams['IV1->IV1'] = {
         'preConds': {'pop': 'IV1'},
@@ -456,13 +389,6 @@ netParams.connParams['IV4->IV4'] = {
 netParams.connParams['IIT->IIT'] = {
         'preConds': {'pop': 'IIT'},
         'postConds': {'pop': 'IIT'},
-        'probability': 0.02,
-        'weight': 0.000, #0.0001
-        'delay': 2,
-        'synMech': 'GABA'}
-netParams.connParams['IMI->IMI'] = {
-        'preConds': {'pop': 'IMI'},
-        'postConds': {'pop': 'IMI'},
         'probability': 0.02,
         'weight': 0.000, #0.0001
         'delay': 2,
@@ -492,20 +418,20 @@ netParams.connParams['V4->IT'] = {
         'weight': 0.001,
         'delay': 2,
         'synMech': 'AMPA'}
-netParams.connParams['IT->MI'] = {
+netParams.connParams['IT->ML'] = {
         'preConds': {'pop': 'IT'},
-        'postConds': {'pop': 'MI'},
-        'connList': blistITtoMI,
-        #'convergence': 10,
+        'postConds': {'pop': 'ML'},
+        #'connList': blistITtoMI,
+        'convergence': 25,
         'weight': 0.0012,
         'delay': 2,
         'synMech': 'AMPA',
         'plast': {'mech': 'STDP', 'params': STDPparamsRL}}
-netParams.connParams['MI->MO'] = {
-        'preConds': {'pop': 'MI'},
-        'postConds': {'pop': 'MO'},
-        'connList': blistMItoMO,
-        #'convergence': 100,
+netParams.connParams['IT->MR'] = {
+        'preConds': {'pop': 'IT'},
+        'postConds': {'pop': 'MR'},
+        #'connList': blistMItoMO,
+        'convergence': 25,
         'weight': 0.0012,
         'delay': 2,
         'synMech': 'AMPA',
@@ -535,16 +461,6 @@ netParams.connParams['V4->IIT'] = {
         'weight': 0.00, #0.002
         'delay': 2,
         'synMech': 'AMPA'}
-netParams.connParams['IT->IMI'] = {
-        'preConds': {'pop': 'IT'},
-        'postConds': {'pop': 'IMI'},
-        'connList': blistITtoInMI,
-        #'convergence': 10,
-        'weight': 0.00, #0.002
-        'delay': 2,
-        'synMech': 'AMPA'}#,
-        #'plast': {'mech': 'STDP', 'params': STDPparamsRL}}
-
 #E to E feedbackward connections
 netParams.connParams['V1->R'] = {
         'preConds': {'pop': 'V1'},
@@ -570,27 +486,7 @@ netParams.connParams['IT->V4'] = {
         'weight': 0.000, #0.0001
         'delay': 2,
         'synMech': 'AMPA'}
-netParams.connParams['MI->IT'] = {
-        'preConds': {'pop': 'MI'},
-        'postConds': {'pop': 'IT'},
-        'connList': blistMItoIT,
-        #'convergence': 10,
-        'weight': 0.000, #0.0001
-        'delay': 2,
-        'synMech': 'AMPA'}#,
-        #'plast': {'mech': 'STDP', 'params': STDPparamsRL}}
-netParams.connParams['MO->MI'] = {
-        'preConds': {'pop': 'MO'},
-        'postConds': {'pop': 'MI'},
-        'connList': blistMOtoMI,
-        #'convergence': 10,
-        'weight': 0.000, #0.0001
-        'delay': 2,
-        'synMech': 'AMPA'}#,
-        #'plast': {'mech': 'STDP', 'params': STDPparamsRL}}
-
 #I to E connections
-
 netParams.connParams['IV1->R'] = {
         'preConds': {'pop': 'IV1'},
         'postConds': {'pop': 'R'},
@@ -615,14 +511,6 @@ netParams.connParams['IIT->V4'] = {
         'weight': 0.00, #0.002
         'delay': 2,
         'synMech': 'GABA'}
-netParams.connParams['IMI->IT'] = {
-        'preConds': {'pop': 'IMI'},
-        'postConds': {'pop': 'IT'},
-        'connList': blistInMItoIT,
-        #'convergence': 10,
-        'weight': 0.00, #0.002
-        'delay': 2,
-        'synMech': 'GABA'}
 #I to I
 netParams.connParams['IV1->IV4'] = {
         'preConds': {'pop': 'IV1'},
@@ -640,19 +528,10 @@ netParams.connParams['IV4->IIT'] = {
         'weight': 0.00, #0.002
         'delay': 2,
         'synMech': 'GABA'}
-netParams.connParams['IIT->IMI'] = {
-        'preConds': {'pop': 'IIT'},
-        'postConds': {'pop': 'IMI'},
-        'connList': blistInITtoInMI,
-        #'convergence': 10,
-        'weight': 0.00, #0.002
-        'delay': 2,
-        'synMech': 'GABA'}#,
-        #'plast': {'mech': 'STDP', 'params': STDPparamsRL}}
 #Simulation options
 simConfig = specs.SimConfig()           # object of class SimConfig to store simulation configuration
 
-simConfig.duration = 0.5e5                      # Duration of the simulation, in ms
+simConfig.duration = 0.1e5                      # Duration of the simulation, in ms
 simConfig.dt = 0.2                            # Internal integration timestep to use
 simConfig.verbose = False                       # Show detailed messages
 simConfig.recordTraces = {'V_soma':{'sec':'soma','loc':0.5,'var':'v'}}  # Dict with traces to record
@@ -663,7 +542,7 @@ simConfig.savePickle = False            # Save params, network and sim output to
 simConfig.saveMat = False
 
 #simConfig.analysis['plotRaster'] = True                         # Plot a raster
-simConfig.analysis['plotTraces'] = {'include': [1184, 1185, 1186, 1187, 1188, 1189, 1190, 1191, 1192]}
+simConfig.analysis['plotTraces'] = {'include': [1159, 1169, 1179, 1189, 1199]}
 #simConfig.analysis['plotRaster'] = {'timeRange': [500,1000],'popRates':'overlay','saveData':'RasterData.pkl','showFig':True}
 simConfig.analysis['plotRaster'] = {'popRates':'overlay','saveData':'RasterData.pkl','showFig':True}
 #simConfig.analysis['plot2Dnet'] = True 
@@ -759,9 +638,15 @@ InputImages = []
 NBsteps = 0
 epCount = []
 last_obs = [] #make sure this does not introduce a bug
+
+Mlist = []
+for mid in range(25):
+    Mlist.append(mid)
+
 def trainAgentFake(t):
     """ training interface between simulation and game environment
     """
+    global Mlist
     global NBsteps, last_obs, epCount, InputImages
     if t<21.0: # for the first time interval use first action randomly and other four actions based on relative position of ball and agent.
         last_obs = []
@@ -769,16 +654,16 @@ def trainAgentFake(t):
     else: #the actions are generated based on relative positions of ball and Agent.
         rewards, actions, last_obs, epCount, InputImages = sim.SMARTAgent.playGameFake(last_obs, epCount, InputImages)
     print('actions generated by model are: ', actions)
-    F_R1 = getFiringRatesWithInterval([t-20,t], [1184])
-    F_R2 = getFiringRatesWithInterval([t-20,t], [1185])
-    F_R3 = getFiringRatesWithInterval([t-20,t], [1186])
-    F_R4 = getFiringRatesWithInterval([t-20,t], [1187])
-    F_R5 = getFiringRatesWithInterval([t-20,t], [1187,1188])
-    F_L1 = getFiringRatesWithInterval([t-20,t], [1188,1189])
-    F_L2 = getFiringRatesWithInterval([t-20,t], [1189])
-    F_L3 = getFiringRatesWithInterval([t-20,t], [1190])
-    F_L4 = getFiringRatesWithInterval([t-20,t], [1191])
-    F_L5 = getFiringRatesWithInterval([t-20,t], [1192])
+    F_R1 = getFiringRatesWithInterval([t-100,t-80], numpy.add(Mlist,1184))
+    F_R2 = getFiringRatesWithInterval([t-80,t-60], numpy.add(Mlist,1184))
+    F_R3 = getFiringRatesWithInterval([t-60,t-40], numpy.add(Mlist,1184))
+    F_R4 = getFiringRatesWithInterval([t-40,t-20], numpy.add(Mlist,1184))
+    F_R5 = getFiringRatesWithInterval([t-20,t], numpy.add(Mlist,1184))
+    F_L1 = getFiringRatesWithInterval([t-100,t-80], numpy.add(Mlist,1159))
+    F_L2 = getFiringRatesWithInterval([t-80,t-60], numpy.add(Mlist,1159))
+    F_L3 = getFiringRatesWithInterval([t-60,t-40], numpy.add(Mlist,1159))
+    F_L4 = getFiringRatesWithInterval([t-40,t-20], numpy.add(Mlist,1159))
+    F_L5 = getFiringRatesWithInterval([t-20,t], numpy.add(Mlist,1159))
     fid4.write('%0.1f' % t)
     fid4.write('\t%0.1f' % F_R1)
     fid4.write('\t%0.1f' % F_R2)
@@ -827,23 +712,24 @@ def trainAgentFake(t):
 def trainAgent(t):
     """ training interface between simulation and game environment
     """
+    global Mlist
     global NBsteps, epCount, InputImages
-    if t<21.0: # for the first time interval use randomly selected actions
+    if t<100.0: # for the first time interval use randomly selected actions
         actions =[]
         for _ in range(5):
             action = random.randint(3,4)
             actions.append(action)
     else: #the actions should be based on the activity of motor cortex (MO) 1085-1093
-        F_R1 = getFiringRatesWithInterval([t-20,t], [1184])
-        F_R2 = getFiringRatesWithInterval([t-20,t], [1185])
-        F_R3 = getFiringRatesWithInterval([t-20,t], [1186])
-        F_R4 = getFiringRatesWithInterval([t-20,t], [1187])
-        F_R5 = getFiringRatesWithInterval([t-20,t], [1187,1188])
-        F_L1 = getFiringRatesWithInterval([t-20,t], [1188,1189])
-        F_L2 = getFiringRatesWithInterval([t-20,t], [1189])
-        F_L3 = getFiringRatesWithInterval([t-20,t], [1190])
-        F_L4 = getFiringRatesWithInterval([t-20,t], [1191])
-        F_L5 = getFiringRatesWithInterval([t-20,t], [1192])
+        F_R1 = getFiringRatesWithInterval([t-100,t-80], numpy.add(Mlist,1184))
+        F_R2 = getFiringRatesWithInterval([t-80,t-60], numpy.add(Mlist,1184))
+        F_R3 = getFiringRatesWithInterval([t-60,t-40], numpy.add(Mlist,1184))
+        F_R4 = getFiringRatesWithInterval([t-40,t-20], numpy.add(Mlist,1184))
+        F_R5 = getFiringRatesWithInterval([t-20,t], numpy.add(Mlist,1184))
+        F_L1 = getFiringRatesWithInterval([t-100,t-80], numpy.add(Mlist,1159))
+        F_L2 = getFiringRatesWithInterval([t-80,t-60], numpy.add(Mlist,1159))
+        F_L3 = getFiringRatesWithInterval([t-60,t-40], numpy.add(Mlist,1159))
+        F_L4 = getFiringRatesWithInterval([t-40,t-20], numpy.add(Mlist,1159))
+        F_L5 = getFiringRatesWithInterval([t-20,t], numpy.add(Mlist,1159))
         fid4.write('%0.1f' % t)
         fid4.write('\t%0.1f' % F_R1)
         fid4.write('\t%0.1f' % F_R2)
@@ -862,35 +748,35 @@ def trainAgent(t):
         elif F_R1<F_L1:
             actions.append(3) # Down
         else:
-            actions.append(random.randint(3,4))
+            actions.append(1)
             #actions.append(1) # No move 
         if F_R2>F_L2:
             actions.append(4) #UP
         elif F_R2<F_L2:
             actions.append(3) #Down
         else:
-            actions.append(random.randint(3,4))
+            actions.append(1)
             #actions.append(1) #No move
         if F_R3>F_L3:
             actions.append(4) #UP
         elif F_R3<F_L3:
             actions.append(3) #Down
         else:
-            actions.append(random.randint(3,4))
+            actions.append(1)
             #actions.append(1) #No move
         if F_R4>F_L4:
             actions.append(4) #UP
         elif F_R4<F_L4:
             actions.append(3) #Down
         else:
-            actions.append(random.randint(3,4))
+            actions.append(1)
             #actions.append(1) #No move
         if F_R5>F_L5:
             actions.append(4) #UP
         elif F_R5<F_L5:
             actions.append(3) #Down
         else:
-            actions.append(random.randint(3,4))
+            actions.append(1)
             #actions.append(1) #No move
     print('actions generated by model are: ', actions)
     #rewards, epCount, InputImages = sim.SMARTAgent.playGame(actions, epCount, InputImages)

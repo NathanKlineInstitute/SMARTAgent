@@ -909,5 +909,10 @@ To: STDPparamsRL = {'hebbwt': 0.00001, 'antiwt':-0.00001, 'wmax': 50, 'RLon': 1 
 **Need to change the RL based STDP mechanism. For now, put a limit such that if the connection has not learned anything it can not forget. which means that whatever weight is assigned in the beginning sould be the absolute minimum i.e. without learning. therefore the weights can not go below that initially assigned weights. 'wmin' is assigned 0.0012.
 **wmin is giving error so using wbase. ---> Seems to be stable. atleast not going down.
 **Run simulation with real game.
+**Motor cortex structure modified.
+***Before the model had 2 layers MI and MO with 25 and 10 neurons respectively. IT->MI and MI->MO.
+***Now the model has 2 layers ML and MR, each with 25 neurons. IT->ML and IT->MR. All to All connections.
+***Decision is made by comparing firing rate of 25 neurons in ML and MR in intervals of 20 ms. such that the model can decide about 5 actions to be taken place in next 100 ms. 
+
 
 
