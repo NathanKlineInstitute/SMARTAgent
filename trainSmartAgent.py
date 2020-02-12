@@ -53,8 +53,8 @@ netParams.popParams['IV1'] = {'cellType': 'InV1', 'numCells': NB_IV1neurons, 'ce
 netParams.popParams['IV4'] = {'cellType': 'InV4', 'numCells': NB_IV4neurons, 'cellModel': 'HH'} #400
 netParams.popParams['IIT'] = {'cellType': 'InIT', 'numCells': NB_IITneurons, 'cellModel': 'HH'} #100
 
-netParams.popParams['ML'] = {'cellType': 'EML', 'numCells': NB_MIneurons, 'cellModel': 'HH'} #400
-netParams.popParams['MR'] = {'cellType': 'EMR', 'numCells': NB_MOneurons, 'cellModel': 'HH'} #100
+netParams.popParams['ML'] = {'cellType': 'EML', 'numCells': NB_MLneurons, 'cellModel': 'HH'} #400
+netParams.popParams['MR'] = {'cellType': 'EMR', 'numCells': NB_MRneurons, 'cellModel': 'HH'} #100
 
 netParams.cellParams['ERule'] = {               # cell rule label
         'conds': {'cellType': ['E','EV1','EV4','EIT', 'EML', 'EMR']},              #properties will be applied to cells that match these conditions
