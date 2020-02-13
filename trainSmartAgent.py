@@ -531,7 +531,7 @@ netParams.connParams['IV4->IIT'] = {
 #Simulation options
 simConfig = specs.SimConfig()           # object of class SimConfig to store simulation configuration
 
-simConfig.duration = 0.1e5                      # Duration of the simulation, in ms
+simConfig.duration = 1000 # 0.1e5                      # Duration of the simulation, in ms
 simConfig.dt = 0.2                            # Internal integration timestep to use
 simConfig.verbose = False                       # Show detailed messages
 simConfig.recordTraces = {'V_soma':{'sec':'soma','loc':0.5,'var':'v'}}  # Dict with traces to record
@@ -799,7 +799,7 @@ def trainAgent(t):
     print('rewards are : ', rewards)
     for action in actions:
         sim.allActions.append(action)
-    for reward in rewards:
+    for reward in rewards: # this generates an error - since rewards only declared for sim.rank==0; bug?
         sim.allRewards.append(reward)
     ltpnt = t-20
     for _ in range(5):
