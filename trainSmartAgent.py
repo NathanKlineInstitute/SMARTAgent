@@ -643,6 +643,8 @@ Mlist = []
 for mid in range(25):
     Mlist.append(mid)
 
+lSTDPmech = [] # global list of STDP mechanisms; so do not have to lookup at each interval function call 
+    
 def trainAgentFake(t):
     """ training interface between simulation and game environment
     """
@@ -686,11 +688,7 @@ def trainAgentFake(t):
         critic = 0
     if critic != 0: # if critic signal indicates punishment (-1) or reward (+1)
         print('t=',t,'- adjusting weights based on RL critic value:', critic)
-        for cell in sim.net.cells:
-            for conn in cell.conns:
-                STDPmech = conn.get('hSTDP')  # check if has STDP mechanism
-                if STDPmech:   # run stdp.mod method to update syn weights based on RLprint cell.gid
-                    STDPmech.reward_punish(float(critic))
+        for STDPmech in lSTDPmech: STDPmech.reward_punish(float(critic))
     print('rewards are : ', rewards)
     for action in actions:
         sim.allActions.append(action)
@@ -720,12 +718,12 @@ def trainAgent(t):
             action = random.randint(3,4)
             actions.append(action)
     else: #the actions should be based on the activity of motor cortex (MO) 1085-1093
-        F_R1 = getFiringRatesWithInterval([t-100,t-80], numpy.add(Mlist,1184))
+        F_R1 = getFiringRatesWithInterval([t-100,t-80], numpy.add(Mlist,1184)) # what is 1184?
         F_R2 = getFiringRatesWithInterval([t-80,t-60], numpy.add(Mlist,1184))
         F_R3 = getFiringRatesWithInterval([t-60,t-40], numpy.add(Mlist,1184))
         F_R4 = getFiringRatesWithInterval([t-40,t-20], numpy.add(Mlist,1184))
         F_R5 = getFiringRatesWithInterval([t-20,t], numpy.add(Mlist,1184))
-        F_L1 = getFiringRatesWithInterval([t-100,t-80], numpy.add(Mlist,1159))
+        F_L1 = getFiringRatesWithInterval([t-100,t-80], numpy.add(Mlist,1159)) # what is 1159?
         F_L2 = getFiringRatesWithInterval([t-80,t-60], numpy.add(Mlist,1159))
         F_L3 = getFiringRatesWithInterval([t-60,t-40], numpy.add(Mlist,1159))
         F_L4 = getFiringRatesWithInterval([t-40,t-20], numpy.add(Mlist,1159))
@@ -791,11 +789,7 @@ def trainAgent(t):
         critic = vec.to_python()[0] #till here I dont understand
     if critic != 0: # if critic signal indicates punishment (-1) or reward (+1)
         print('t=',t,'- adjusting weights based on RL critic value:', critic)
-        for cell in sim.net.cells:
-            for conn in cell.conns:
-                STDPmech = conn.get('hSTDP')  # check if has STDP mechanism
-                if STDPmech:   # run stdp.mod method to update syn weights based on RLprint cell.gid
-                    STDPmech.reward_punish(float(critic))
+        for STDPmech in lSTDPmech: STDPmech.reward_punish(float(critic))        
     print('rewards are : ', rewards)
     for action in actions:
         sim.allActions.append(action)
@@ -814,6 +808,16 @@ def trainAgent(t):
         recordWeights(sim, t)
         NBsteps = 0
 
+def getAllSTDPObjects (sim):
+  # get all the STDP objects from the simulation's cells
+  lSTDPmech = []
+  for cell in sim.net.cells:
+      for conn in cell.conns:
+          STDPmech = conn.get('hSTDP')  # check if has STDP mechanism
+          if STDPmech:   # make sure it is not None
+            lSTDPmech.append(STDPmech)
+  return lSTDPmech
+        
 #Alterate to create network and run simulation
 sim.initialize(                       # create network object and set cfg and net params
     simConfig = simConfig,   # pass simulation config and network params as arguments
@@ -824,7 +828,10 @@ sim.net.connectCells()                    # create connections between cells bas
 sim.net.addStims()                      #instantiate netStim
 sim.setupRecording()                  # setup variables to record for each cell (spikes, V traces, etc)
 #sim.runSim()
-sim.runSimWithIntervalFunc(100.0,trainAgent)
+
+lSTDPmech = getAllSTDPObjects(sim) # get all the STDP objects up-front
+
+sim.runSimWithIntervalFunc(100.0,trainAgent) # has periodic callback to adjust STDP weights based on RL signal
 sim.gatherData()
 sim.saveData()
 sim.analysis.plotData()
