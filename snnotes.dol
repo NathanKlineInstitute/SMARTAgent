@@ -45,3 +45,37 @@ mpirun -n 16 python trainSmartAgent.py
 was able to run with 1 core, took 2.5 GB with 500 ms interval for saving weights and 1000 ms simulation
 will need to record from only a small fraction of the cells
 
+*20feb13
+** make new branch to avoid conflict with haroon's work
+
+git branch samn
+git checkout samn
+git add snnotes.dol
+git commit -m 'new branch for samn test'
+git push origin samn
+
+make an alias for that: gpushsamn
+
+** try compile and then run 
+
+nrnivmodl
+
+mpirun -n 16 python trainSmartAgent.py
+
+myrun
+
+mpirun -n 16 python trainSmartAgent.py
+
+even after calling py3env to set the environment to use anaconda ... 
+it's showing many different pong windows ... should only be 1 window  (this was run on zn)
+
+aigame.py loads the gym environment with the pong game
+where is aigame.py called from?
+
+trainSmartAgent.py is the main sim setup
+it imports SMARTAgent from aigame
+
+hmm, not running it properly ...
+
+mpiexec -n 16 python -mpi trainSmartAgent.py
+

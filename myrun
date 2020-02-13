@@ -1,0 +1,1 @@
+mpiexec -n $1 nrniv -python -mpi trainSmartAgent.py

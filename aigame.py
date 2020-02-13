@@ -169,7 +169,7 @@ class SMARTAgent:
     def run(self, t, f):
         #SMARTAgent.playGame(self)
         cind = 0
-        for cell in [c for c in f.net.cells]:   # shoulder
+        for cell in [c for c in f.net.cells]:   
             for stim in cell.stims:
                 if stim['source'] == 'stimMod':
                     stim['hObj'].interval = 1000.0/self.firing_rates[cind] # interval in ms as a function of rate
