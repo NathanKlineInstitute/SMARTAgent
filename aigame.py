@@ -179,9 +179,6 @@ class SMARTAgent:
             self.firing_rates = self.fvec.to_python()
             print('Receiving firing rates from master:')
             print(self.firing_rates)
-        else:
-            f.pc.broadcast(self.fvec,0)
-            firing_rates = self.fvec.to_python()
         cind = 0
         for cell in [c for c in f.net.cells]:   
             for stim in cell.stims:
