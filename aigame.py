@@ -173,12 +173,12 @@ class SMARTAgent:
         if f.rank==0:
             f.pc.broadcast(self.fvec.from_python(self.firing_rates),0)
             print('Broadcasting firing rates from master:')
-            print(self.firing_rates)
+            print(numpy.max(self.firing_rates))
         else:
             f.pc.broadcast(self.fvec,0)
             self.firing_rates = self.fvec.to_python()
             print('Receiving firing rates from master:')
-            print(self.firing_rates)
+            print(numpy.max(self.firing_rates))
         cind = 0
         for cell in [c for c in f.net.cells]:   
             for stim in cell.stims:
