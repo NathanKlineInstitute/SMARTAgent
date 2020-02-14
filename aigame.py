@@ -168,6 +168,12 @@ class SMARTAgent:
     ################################
     def run(self, t, f):
         #SMARTAgent.playGame(self)
+        fvec = h.Vector()
+        if f.rank==0:
+            f.pc.broadcast(fvec.from_python(self.firing_rates),0)
+        else:
+            f.pc.broadcast(fvec,0)
+            firing_rates = fvec.to_python()
         cind = 0
         for cell in [c for c in f.net.cells]:   
             for stim in cell.stims:
