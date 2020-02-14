@@ -31,7 +31,7 @@ class SMARTAgent:
         self.count = 0 
         self.countAll = 0
         self.fvec = h.Vector()
-        self.firing_rates = numpy.zeros(400)
+        self.firing_rates = numpy.zeros(shape=(1,400))
     ################################
     ### PLAY GAME
     ###############################
@@ -179,15 +179,12 @@ class SMARTAgent:
             self.firing_rates = self.fvec.to_python()
             print('Receiving firing rates from master:')
             print(self.firing_rates)
+        else:
+            f.pc.broadcast(self.fvec,0)
+            firing_rates = self.fvec.to_python()
         cind = 0
         for cell in [c for c in f.net.cells]:   
             for stim in cell.stims:
                 if stim['source'] == 'stimMod':
                     stim['hObj'].interval = 1000.0/self.firing_rates[cind] # interval in ms as a function of rate
             cind = cind+1
-                      
-
-
-
-
-
