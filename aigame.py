@@ -31,7 +31,7 @@ class SMARTAgent:
         self.count = 0 
         self.countAll = 0
         self.fvec = h.Vector()
-        self.firing_rates = numpy.zeros(shape=(1,400))
+        self.firing_rates = numpy.zeros(400)
     ################################
     ### PLAY GAME
     ###############################
