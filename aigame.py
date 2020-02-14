@@ -30,6 +30,8 @@ class SMARTAgent:
         self.env = env
         self.count = 0 
         self.countAll = 0
+        self.fvec = h.Vector()
+        self.firing_rates = numpy.zeros(400)
     ################################
     ### PLAY GAME
     ###############################
@@ -168,12 +170,15 @@ class SMARTAgent:
     ################################
     def run(self, t, f):
         #SMARTAgent.playGame(self)
-        fvec = h.Vector()
         if f.rank==0:
-            f.pc.broadcast(fvec.from_python(self.firing_rates),0)
+            f.pc.broadcast(self.fvec.from_python(self.firing_rates),0)
+            print('Broadcasting firing rates from master:')
+            print(self.firing_rates)
         else:
-            f.pc.broadcast(fvec,0)
-            firing_rates = fvec.to_python()
+            f.pc.broadcast(self.fvec,0)
+            self.firing_rates = self.fvec.to_python()
+            print('Receiving firing rates from master:')
+            print(self.firing_rates)
         cind = 0
         for cell in [c for c in f.net.cells]:   
             for stim in cell.stims:
