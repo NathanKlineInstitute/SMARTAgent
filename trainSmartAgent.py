@@ -790,8 +790,9 @@ def trainAgent(t):
         print('t=',t,'- adjusting weights based on RL critic value:', critic)
         for STDPmech in lSTDPmech: STDPmech.reward_punish(float(critic))        
     if sim.rank==0: print('rewards are : ', rewards) # only rank 0 has access to rewards
-    for action in actions:
-        sim.allActions.append(action)
+    if sim.rank==0:
+        for action in actions:
+            sim.allActions.append(action)
     if sim.rank == 0: # only rank 0 has access to rewards
       for reward in rewards: # this generates an error - since rewards only declared for sim.rank==0; bug?
         sim.allRewards.append(reward)
