@@ -912,7 +912,13 @@ To: STDPparamsRL = {'hebbwt': 0.00001, 'antiwt':-0.00001, 'wmax': 50, 'RLon': 1 
 **Motor cortex structure modified.
 ***Before the model had 2 layers MI and MO with 25 and 10 neurons respectively. IT->MI and MI->MO.
 ***Now the model has 2 layers ML and MR, each with 25 neurons. IT->ML and IT->MR. All to All connections.
-***Decision is made by comparing firing rate of 25 neurons in ML and MR in intervals of 20 ms. such that the model can decide about 5 actions to be taken place in next 100 ms. 
+***Decision is made by comparing firing rate of 25 neurons in ML and MR in intervals of 20 ms. such that the model can decide about 5 actions to be taken place in next 100 ms.
+
+*20feb20
+**firing rates information while playing the game was not boradcasted to all nodes, so the nodes other than master node didnt know what to do with that--->fixed that on feb14.
+**tried running the simulation using mpi after the change in code and everything worked except saving some output parameters into text files----> I observed that firing rate was low, but there is no one-to-one correspondence between parallel simulation and simulation on a single node.
+**when i ran simulation on 2 nodes, i observed firing rate calculated twice every time.
+
 
 
 
