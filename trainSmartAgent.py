@@ -713,7 +713,7 @@ def trainAgentFake(t):
         recordWeights(sim, t)
         NBsteps = 0
 
-def trainAgent(t,f):
+def trainAgent(t):
     """ training interface between simulation and game environment
     """
     global Mlist
