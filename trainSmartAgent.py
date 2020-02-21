@@ -96,7 +96,13 @@ netParams.stimTargetParams['stimMod->all'] = {'source': 'stimMod',
 # Stimulation parameters
 
 netParams.stimSourceParams['ebkg'] = {'type': 'NetStim', 'rate': 5, 'noise': 0.3}
-netParams.stimTargetParams['ebkg->all'] = {'source': 'ebkg', 'conds': {'cellType': ['EV1','EV4','EIT', 'EML', 'EMR']}, 'weight': 0.0, 'delay': 'max(1, normal(5,2))', 'synMech': 'AMPA'}
+netParams.stimTargetParams['ebkg->all'] = {'source': 'ebkg', 'conds': {'cellType': ['EV1','EV4','EIT']}, 'weight': 0.0, 'delay': 'max(1, normal(5,2))', 'synMech': 'AMPA'}
+
+netParams.stimSourceParams['MLbkg'] = {'type': 'NetStim', 'rate': 5, 'noise': 0.5}
+netParams.stimTargetParams['MLbkg->all'] = {'source': 'MLbkg', 'conds': {'cellType': ['EML']}, 'weight': 0.01, 'delay': 'max(1, normal(5,2))', 'synMech': 'AMPA'}
+
+netParams.stimSourceParams['MRbkg'] = {'type': 'NetStim', 'rate': 5, 'noise': 0.5}
+netParams.stimTargetParams['MRbkg->all'] = {'source': 'MRbkg', 'conds': {'cellType': ['EMR']}, 'weight': 0.01, 'delay': 'max(1, normal(5,2))', 'synMech': 'AMPA'}
 
 
 netParams.stimSourceParams['bkg'] = {'type': 'NetStim', 'rate': 20, 'noise': 0.3}
@@ -719,12 +725,12 @@ def trainAgent(t):
             actions.append(action)
     else: #the actions should be based on the activity of motor cortex (MO) 1085-1093
         if sim.rank==0:
-            F_R1 = getFiringRatesWithInterval([t-100,t-80], numpy.add(Mlist,1184)) # what is 1184?
+            F_R1 = getFiringRatesWithInterval([t-100,t-80], numpy.add(Mlist,1184)) # what is 1184? 1184 is an offset to neuron indices for MR
             F_R2 = getFiringRatesWithInterval([t-80,t-60], numpy.add(Mlist,1184))
             F_R3 = getFiringRatesWithInterval([t-60,t-40], numpy.add(Mlist,1184))
             F_R4 = getFiringRatesWithInterval([t-40,t-20], numpy.add(Mlist,1184))
             F_R5 = getFiringRatesWithInterval([t-20,t], numpy.add(Mlist,1184))
-            F_L1 = getFiringRatesWithInterval([t-100,t-80], numpy.add(Mlist,1159)) # what is 1159?
+            F_L1 = getFiringRatesWithInterval([t-100,t-80], numpy.add(Mlist,1159)) # what is 1159? 1159 is an offset to neuron indices for ML
             F_L2 = getFiringRatesWithInterval([t-80,t-60], numpy.add(Mlist,1159))
             F_L3 = getFiringRatesWithInterval([t-60,t-40], numpy.add(Mlist,1159))
             F_L4 = getFiringRatesWithInterval([t-40,t-20], numpy.add(Mlist,1159))

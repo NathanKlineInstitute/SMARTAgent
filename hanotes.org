@@ -917,7 +917,12 @@ To: STDPparamsRL = {'hebbwt': 0.00001, 'antiwt':-0.00001, 'wmax': 50, 'RLon': 1 
 *20feb20
 **firing rates information while playing the game was not boradcasted to all nodes, so the nodes other than master node didnt know what to do with that--->fixed that on feb14.
 **tried running the simulation using mpi after the change in code and everything worked except saving some output parameters into text files----> I observed that firing rate was low, but there is no one-to-one correspondence between parallel simulation and simulation on a single node.
-**when i ran simulation on 2 nodes, i observed firing rate calculated twice every time.
+**when i ran simulation on 2 nodes, i observed firing rate calculated twice every time --->problem fixed.
+
+*20feb21
+**the racket seems to get stuck on one side. 
+**Right now there is no noise, may be add different noise to neurons in ML and MR---->5 Hz noise added to ML and MR neurons.
+
 
 
 
