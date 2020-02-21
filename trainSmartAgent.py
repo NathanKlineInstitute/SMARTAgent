@@ -637,7 +637,7 @@ def getFiringRatesWithInterval(trange = None, neuronal_pop = None):
         avgRates = pop_spikes/numCells/tsecs
     else:
         avgRates = 0.0
-    print('Firing rate : %.3f Hz'%(avgRates))
+    #print('Firing rate : %.3f Hz'%(avgRates))
     return avgRates
 
 InputImages = []
@@ -756,6 +756,16 @@ def trainAgent(t):
         sim.pc.allreduce(vec.from_python([F_L5]), 1) # sum
         F_L5 = vec.to_python()[0] 
         if sim.rank==0:
+            print('Firing rate : %.3f Hz' % F_R1)
+            print('Firing rate : %.3f Hz' % F_R2)
+            print('Firing rate : %.3f Hz' % F_R3)
+            print('Firing rate : %.3f Hz' % F_R4)
+            print('Firing rate : %.3f Hz' % F_R5)
+            print('Firing rate : %.3f Hz' % F_L1)
+            print('Firing rate : %.3f Hz' % F_L2)
+            print('Firing rate : %.3f Hz' % F_L3)
+            print('Firing rate : %.3f Hz' % F_L4)
+            print('Firing rate : %.3f Hz' % F_L5)
             fid4.write('%0.1f' % t)
             fid4.write('\t%0.1f' % F_R1)
             fid4.write('\t%0.1f' % F_R2)
