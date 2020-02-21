@@ -927,7 +927,8 @@ To: STDPparamsRL = {'hebbwt': 0.00001, 'antiwt':-0.00001, 'wmax': 50, 'RLon': 1 
 **May be something wrong with playgame as the actions seems to be not executed. Try producing random actions.
 **based on suggestion by Salva. Changed the scripts. Now calculating firing rate on each node and then summing up using command sim.pc.allreduce(vec.from_python([F_R1]), 1) # sum
 F_R1 = vec.to_python()[0] 
-        
+**seems like problem fixed. Now getting same level of firing rates as using single node.
+**Reduce background firing rate/noise for driving ML and MR neurons to 5Hz.         
 
 
 
