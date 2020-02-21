@@ -928,7 +928,14 @@ To: STDPparamsRL = {'hebbwt': 0.00001, 'antiwt':-0.00001, 'wmax': 50, 'RLon': 1 
 **based on suggestion by Salva. Changed the scripts. Now calculating firing rate on each node and then summing up using command sim.pc.allreduce(vec.from_python([F_R1]), 1) # sum
 F_R1 = vec.to_python()[0] 
 **seems like problem fixed. Now getting same level of firing rates as using single node.
-**Reduce background firing rate/noise for driving ML and MR neurons to 5Hz.         
+**Reduce background firing rate/noise for driving ML and MR neurons to 5Hz.
+**IDEAS: we could randomly explore weights by choosing a set of weights for an episode and evaluating the performance of the SmartAgent during that episode with the given weights.
+**The other issue is right now, we are only using +1 or -1 for the reward. There are several kinds of performances:
+1. Tha SmartAgent hit the ball and didn't let the opponent (computer) score +1 and itself loose a score -1. The SmartAgent gets a 0, but we need to encode this information in the circuit as this move has a positive effect on the outcome of the game.
+2. The SmartAgent hit the ball in such a way that the computer could not pick up the ball and therefore SmartAgent made a score +1. This is a reward signal which is used in the model for RL weight adjustment.
+3. The SmartAgent misses the ball and the computer made a score, so the SmartAgent gets -1 which act as a punishment in the RL framework.
+4. Based on the scores, either SmartAgent wins or the computer. This should also has an impact on the performance or the model. Not urgent but this could be used as a reward signal too.  
+
 
 
 
