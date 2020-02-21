@@ -429,7 +429,7 @@ netParams.connParams['IT->ML'] = {
         'postConds': {'pop': 'ML'},
         #'connList': blistITtoMI,
         'convergence': 25,
-        'weight': 0.006,
+        'weight': 0.0025,
         'delay': 2,
         'synMech': 'AMPA',
         'plast': {'mech': 'STDP', 'params': STDPparamsRL}}
@@ -438,7 +438,7 @@ netParams.connParams['IT->MR'] = {
         'postConds': {'pop': 'MR'},
         #'connList': blistMItoMO,
         'convergence': 25,
-        'weight': 0.006,
+        'weight': 0.0025,
         'delay': 2,
         'synMech': 'AMPA',
         'plast': {'mech': 'STDP', 'params': STDPparamsRL}}
