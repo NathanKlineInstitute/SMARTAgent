@@ -99,10 +99,10 @@ netParams.stimSourceParams['ebkg'] = {'type': 'NetStim', 'rate': 5, 'noise': 0.3
 netParams.stimTargetParams['ebkg->all'] = {'source': 'ebkg', 'conds': {'cellType': ['EV1','EV4','EIT']}, 'weight': 0.0, 'delay': 'max(1, normal(5,2))', 'synMech': 'AMPA'}
 
 netParams.stimSourceParams['MLbkg'] = {'type': 'NetStim', 'rate': 40, 'noise': 0.5}
-netParams.stimTargetParams['MLbkg->all'] = {'source': 'MLbkg', 'conds': {'cellType': ['EML']}, 'weight': 0.01, 'delay': 'max(1, normal(5,2))', 'synMech': 'AMPA'}
+netParams.stimTargetParams['MLbkg->all'] = {'source': 'MLbkg', 'conds': {'cellType': ['EML']}, 'weight': 0.01, 'delay': 1, 'synMech': 'AMPA'}
 
 netParams.stimSourceParams['MRbkg'] = {'type': 'NetStim', 'rate': 40, 'noise': 0.5}
-netParams.stimTargetParams['MRbkg->all'] = {'source': 'MRbkg', 'conds': {'cellType': ['EMR']}, 'weight': 0.01, 'delay': 'max(1, normal(5,2))', 'synMech': 'AMPA'}
+netParams.stimTargetParams['MRbkg->all'] = {'source': 'MRbkg', 'conds': {'cellType': ['EMR']}, 'weight': 0.01, 'delay': 1, 'synMech': 'AMPA'}
 
 
 netParams.stimSourceParams['bkg'] = {'type': 'NetStim', 'rate': 20, 'noise': 0.3}
