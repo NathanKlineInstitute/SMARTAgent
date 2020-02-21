@@ -924,6 +924,7 @@ To: STDPparamsRL = {'hebbwt': 0.00001, 'antiwt':-0.00001, 'wmax': 50, 'RLon': 1 
 **Right now there is no noise, may be add different noise to neurons in ML and MR---->5 Hz noise added to ML and MR neurons.
 **With 5Hz, it is still stuck on one corner. Increase noise to 20 Hz and try again.
 **With 20 Hz, it is still stuck on one corner. Increase noise to 40 Hz and try again.
+**May be something wrong with playgame as the actions seems to be not executed. Try producing random actions.
 
 
 
