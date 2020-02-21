@@ -934,7 +934,8 @@ F_R1 = vec.to_python()[0]
 1. Tha SmartAgent hit the ball and didn't let the opponent (computer) score +1 and itself loose a score -1. The SmartAgent gets a 0, but we need to encode this information in the circuit as this move has a positive effect on the outcome of the game.
 2. The SmartAgent hit the ball in such a way that the computer could not pick up the ball and therefore SmartAgent made a score +1. This is a reward signal which is used in the model for RL weight adjustment.
 3. The SmartAgent misses the ball and the computer made a score, so the SmartAgent gets -1 which act as a punishment in the RL framework.
-4. Based on the scores, either SmartAgent wins or the computer. This should also has an impact on the performance or the model. Not urgent but this could be used as a reward signal too.  
+4. Based on the scores, either SmartAgent wins or the computer. This should also has an impact on the performance or the model. Not urgent but this could be used as a reward signal too.
+**remove ML and MR noise from the model and run 1 hr simulation.
 
 
 

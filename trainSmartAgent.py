@@ -99,10 +99,10 @@ netParams.stimSourceParams['ebkg'] = {'type': 'NetStim', 'rate': 5, 'noise': 0.3
 netParams.stimTargetParams['ebkg->all'] = {'source': 'ebkg', 'conds': {'cellType': ['EV1','EV4','EIT']}, 'weight': 0.0, 'delay': 'max(1, normal(5,2))', 'synMech': 'AMPA'}
 
 netParams.stimSourceParams['MLbkg'] = {'type': 'NetStim', 'rate': 5, 'noise': 0.5}
-netParams.stimTargetParams['MLbkg->all'] = {'source': 'MLbkg', 'conds': {'cellType': ['EML']}, 'weight': 0.01, 'delay': 1, 'synMech': 'AMPA'}
+netParams.stimTargetParams['MLbkg->all'] = {'source': 'MLbkg', 'conds': {'cellType': ['EML']}, 'weight': 0.0, 'delay': 1, 'synMech': 'AMPA'}
 
 netParams.stimSourceParams['MRbkg'] = {'type': 'NetStim', 'rate': 5, 'noise': 0.5}
-netParams.stimTargetParams['MRbkg->all'] = {'source': 'MRbkg', 'conds': {'cellType': ['EMR']}, 'weight': 0.01, 'delay': 1, 'synMech': 'AMPA'}
+netParams.stimTargetParams['MRbkg->all'] = {'source': 'MRbkg', 'conds': {'cellType': ['EMR']}, 'weight': 0.0, 'delay': 1, 'synMech': 'AMPA'}
 
 
 netParams.stimSourceParams['bkg'] = {'type': 'NetStim', 'rate': 20, 'noise': 0.3}
@@ -537,7 +537,7 @@ netParams.connParams['IV4->IIT'] = {
 #Simulation options
 simConfig = specs.SimConfig()           # object of class SimConfig to store simulation configuration
 
-simConfig.duration = 200000 # 0.1e5                      # Duration of the simulation, in ms
+simConfig.duration = 3600e3 # 0.1e5                      # Duration of the simulation, in ms
 simConfig.dt = 0.2                            # Internal integration timestep to use
 simConfig.verbose = False                       # Show detailed messages
 simConfig.recordTraces = {'V_soma':{'sec':'soma','loc':0.5,'var':'v'}}  # Dict with traces to record
