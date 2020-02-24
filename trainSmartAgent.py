@@ -870,7 +870,7 @@ sim.setupRecording()                  # setup variables to record for each cell 
 
 lSTDPmech = getAllSTDPObjects(sim) # get all the STDP objects up-front
 
-sim.runSimWithIntervalFunc(100.0,trainAgentFake) # has periodic callback to adjust STDP weights based on RL signal
+sim.runSimWithIntervalFunc(100.0,trainAgent) # has periodic callback to adjust STDP weights based on RL signal
 sim.gatherData()
 sim.saveData()
 sim.analysis.plotData()
