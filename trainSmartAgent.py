@@ -537,7 +537,7 @@ netParams.connParams['IV4->IIT'] = {
 #Simulation options
 simConfig = specs.SimConfig()           # object of class SimConfig to store simulation configuration
 
-simConfig.duration = 3600e3 # 0.1e5                      # Duration of the simulation, in ms
+simConfig.duration = 100e3 # 0.1e5                      # Duration of the simulation, in ms
 simConfig.dt = 0.2                            # Internal integration timestep to use
 simConfig.verbose = False                       # Show detailed messages
 simConfig.recordTraces = {'V_soma':{'sec':'soma','loc':0.5,'var':'v'}}  # Dict with traces to record
@@ -870,7 +870,7 @@ sim.setupRecording()                  # setup variables to record for each cell 
 
 lSTDPmech = getAllSTDPObjects(sim) # get all the STDP objects up-front
 
-sim.runSimWithIntervalFunc(100.0,trainAgent) # has periodic callback to adjust STDP weights based on RL signal
+sim.runSimWithIntervalFunc(100.0,trainAgentFake) # has periodic callback to adjust STDP weights based on RL signal
 sim.gatherData()
 sim.saveData()
 sim.analysis.plotData()
