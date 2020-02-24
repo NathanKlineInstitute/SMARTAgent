@@ -19,22 +19,18 @@ from skimage.transform import downscale_local_mean
 import json
 import gym
 
-def makeENV (fn='sim.json'):
-  # make the environment
-  try:
-    with open(fn,'r') as fp:
-      d = json.load(fp)
-      print(d)
-      env = gym.make(d['env']['name'],frameskip=d['env']['frameskip'])
-      env.reset()
-      return env
-  except:
-    print('Exception in makeENV')
-    env = gym.make('Pong-v0',frameskip=3)
+# make the environment
+try:
+  fn = 'sim.json'
+  with open(fn,'r') as fp:
+    d = json.load(fp)
+    print(d)
+    env = gym.make(d['env']['name'],frameskip=d['env']['frameskip'])
     env.reset()
-    return env
-
-env = makeENV('sim.json')  
+except:
+  print('Exception in makeENV')
+  env = gym.make('Pong-v0',frameskip=3)
+  env.reset()
 
 class SMARTAgent:
     def __init__ (self,fcfg='sim.json'): # initialize variables
