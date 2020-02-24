@@ -937,6 +937,13 @@ F_R1 = vec.to_python()[0]
 4. Based on the scores, either SmartAgent wins or the computer. This should also has an impact on the performance or the model. Not urgent but this could be used as a reward signal too.
 **remove ML and MR noise from the model and run 1 hr simulation.
 
+*20feb24
+**THINGS TO DO:
+1) Make connections from earlier visual layers to motor cortex for RL.
+2) Check the duration of eligibility trace to make sure that the association between the reward/punishment, action and visual scene can be established.
+3) Include reward for the case when the player hits the ball as it prevents from losing the score.
+4) Make eligibility trace exponentially dropping instead of square-like. 
+
 
 
 
