@@ -79,3 +79,8 @@ hmm, not running it properly ...
 
 mpiexec -n 16 python -mpi trainSmartAgent.py
 
+*20feb24
+** HA fixed the MPI issues
+** set env.frameskip to a constant value on environment init to avoid random frameskip in a range
+** setup code for some more flexibility
+
