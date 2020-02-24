@@ -24,7 +24,7 @@ from skimage.transform import downscale_local_mean
 import gym
 env = gym.make("Pong-v0")
 env.reset()
-  
+env.frameskip = 2  
 class SMARTAgent:
     def __init__(self): # initialize variables
         self.env = env
@@ -88,6 +88,7 @@ class SMARTAgent:
         if done:
             epCount.append(self.countAll)
             self.env.reset()
+            self.env.frameskip = 2
             self.countAll = 0
         return rewards, epCount, InputImages
         #return firing_rates
@@ -162,6 +163,7 @@ class SMARTAgent:
         if done:
             epCount.append(self.countAll)
             self.env.reset()
+            self.env.frameskip = 2
             self.countAll = 0
         return rewards, actions, last_obs, epCount, InputImages
 
