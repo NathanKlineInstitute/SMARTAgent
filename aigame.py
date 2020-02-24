@@ -22,9 +22,8 @@ from skimage.transform import downscale_local_mean
 
 
 import gym
-env = gym.make("Pong-v0")
+env = gym.make("Pong-v0",frameskip=3)
 env.reset()
-env.frameskip = 2  
 class SMARTAgent:
     def __init__(self): # initialize variables
         self.env = env
