@@ -4,6 +4,7 @@ Code to connect a open ai gym game to the SMARTAgent model (V1-M1-RL)
 Adapted from arm.py
 Original Version: 2015jan28 by salvadordura@gmail.com
 Modified Version: 2019oct1 by haroon.anwar@gmail.com
+Modified 2019-2020 samn
 """
 
 from neuron import h
@@ -11,26 +12,37 @@ from numpy import exp
 from pylab import concatenate, figure, show, ion, ioff, pause,xlabel, ylabel, plot, Circle, sqrt, arctan, arctan2, close
 from copy import copy
 from random import uniform, seed, sample, randint
-
 from matplotlib import pyplot as plt
 import random
 import numpy
-
 from skimage.transform import downscale_local_mean
-
-#comment 
-
-
+import json
 import gym
-env = gym.make("Pong-v0",frameskip=3)
-env.reset()
+
+def makeENV (fn='sim.json'):
+  # make the environment
+  try:
+    with open(fn,'r') as fp:
+      d = json.load(fp)
+      print(d)
+      env = gym.make(d['env']['name'],frameskip=d['env']['frameskip'])
+      env.reset()
+      return env
+  except:
+    print('Exception in makeENV')
+    env = gym.make('Pong-v0',frameskip=3)
+    env.reset()
+    return env
+
+env = makeENV('sim.json')  
+
 class SMARTAgent:
-    def __init__(self): # initialize variables
+    def __init__ (self,fcfg='sim.json'): # initialize variables
         self.env = env
         self.count = 0 
         self.countAll = 0
         self.fvec = h.Vector()
-        self.firing_rates = numpy.zeros(400)
+        self.firing_rates = numpy.zeros(400)        
     ################################
     ### PLAY GAME
     ###############################
@@ -186,3 +198,4 @@ class SMARTAgent:
                 if stim['source'] == 'stimMod':
                     stim['hObj'].interval = 1000.0/self.firing_rates[cind] # interval in ms as a function of rate
             cind = cind+1
+            

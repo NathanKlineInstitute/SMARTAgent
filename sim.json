@@ -1,0 +1,8 @@
+
+{
+    "env":
+    {
+	"name": "Pong-v0",
+	"frameskip": 3
+    }
+}
