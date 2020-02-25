@@ -2,8 +2,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pickle
 import time
+from conf import dconf
 
-Input_Images = np.loadtxt('InputImages.txt')
+Input_Images = np.loadtxt('data/InputImages.txt')
 New_InputImages = []
 NB_Images = int(Input_Images.shape[0]/Input_Images.shape[1])
 for x in range(NB_Images):
@@ -13,14 +14,14 @@ for x in range(NB_Images):
 New_InputImages = np.array(New_InputImages)
 
 ##Change the rasterdata file below
-phl_file = open('RasterData.pkl','rb')
+phl_file = open('data/RasterData.pkl','rb')
 data1 = pickle.load(phl_file)
 spkTimes = data1["spkTimes"]
 spkInds = data1["spkInds"]
 cellIDs = data1["cellGids"]
 skColors = data1["spkColors"] 
 
-totalDur = 10000
+totalDur = dconf['sim']['duration']
 tBin_Size = 100
 
 neuronIDs = np.unique(spkInds)

@@ -96,3 +96,16 @@ and M still receives the lower resolution visual information from V2, IT as well
 
 does it produce expected behavior?
 
+myrun 16
+
+python
+import numpy as np
+from pylab import *
+ion()
+d = np.loadtxt('ActionsRewards.txt')
+len(np.where(d[:,1]==3)[0]) # 232
+len(np.where(d[:,1]==4)[0]) # 246
+len(np.where(d[:,1]==1)[0]) # 272
+
+plot(d[:,0],d[:,1],'ko')
+hist(d[:,1])
