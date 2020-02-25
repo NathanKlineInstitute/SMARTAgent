@@ -843,16 +843,13 @@ def trainAgent(t):
         firing_rates = fvec.to_python()
         print(sim.rank,'received firing rates:',numpy.where(firing_rates==numpy.amax(firing_rates)),numpy.amax(firing_rates))                
 
-    #cind = 0
-    lcell = [c for c in sim.net.cells] # is this a subset of all the cells in the network ?? yes, each node has a subset of the cells
-    # this means the cind index is incorrect when there is > 1 node
-    print(sim.rank,'updating len(lcell)=',len(lcell),'source firing rates. len(firing_rates)=',len(firing_rates))
-    for cell in lcell:  
+    # update input firing rates for stimuli to R cells
+    lRcell = [c for c in sim.net.cells if c.gid in sim.net.pops['R'].cellGids] # this is the set of R cells
+    print(sim.rank,'updating len(lRcell)=',len(lRcell),'source firing rates. len(firing_rates)=',len(firing_rates))
+    for cell in lRcell:  
         for stim in cell.stims:
             if stim['source'] == 'stimMod':
-                #stim['hObj'].interval = 1000.0/firing_rates[cind] # interval in ms as a function of rate
                 stim['hObj'].interval = 1000.0/firing_rates[int(cell.gid)] # interval in ms as a function of rate; is cell.gid correct index???
-        #cind = cind+1
         
     NBsteps = NBsteps+1
     if NBsteps==recordWeightStepSize:
