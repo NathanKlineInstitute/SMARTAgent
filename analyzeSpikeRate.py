@@ -10,8 +10,8 @@ spkInds = data1["spkInds"]
 cellIDs = data1["cellGids"]
 skColors = data1["spkColors"] 
 
-totalDur = 50000
-tBin = 100
+totalDur = 100000
+tBin = 1000
 
 
 #NB of excitatory neurons

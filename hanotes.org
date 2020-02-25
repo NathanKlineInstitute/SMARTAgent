@@ -944,6 +944,13 @@ F_R1 = vec.to_python()[0]
 3) Include reward for the case when the player hits the ball as it prevents from losing the score.
 4) Make eligibility trace exponentially dropping instead of square-like. 
 
+**change RL parameters to use RLexp and increase RLlenhebb from 100 ms to 800 ms.
+STDPparamsRL = {'hebbwt': 0.0000, 'antiwt':-0.0000, 'wbase': 0.0012, 'wmax': 50, 'RLon': 1 , 'RLhebbwt': 0.00001, 'RLantiwt': -0.000, 'tauhebb': 10, 'RLwindhebb': 50, 'useRLexp': 0, 'softthresh': 0, 'verbose':0}
+to
+STDPparamsRL = {'hebbwt': 0.0000, 'antiwt':-0.0000, 'wbase': 0.0012, 'wmax': 50, 'RLon': 1 , 'RLhebbwt': 0.00001, 'RLantiwt': -0.000,'tauhebb': 10, 'RLlenhebb': 800 ,'RLwindhebb': 50, 'useRLexp': 1, 'softthresh': 0, 'verbose':0}
+
+**too many no move actions because the firing rate of ML is same as MR. Try picking up random action if ML is equal to MR firing rates.
+
 
 
 
