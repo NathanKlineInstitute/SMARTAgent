@@ -38,7 +38,7 @@ class SMARTAgent:
         self.count = 0 
         self.countAll = 0
         self.fvec = h.Vector()
-        self.firing_rates = numpy.zeros(400)        
+        self.firing_rates = numpy.zeros(400)  # image-based input firing rates; 20x20 = 400 pixels
     ################################
     ### PLAY GAME
     ###############################
@@ -47,13 +47,13 @@ class SMARTAgent:
         rewards = []
         dsum_Images = numpy.zeros(shape=(20,20)) #previously we merged 2x2 pixels into 1 value. Now we merge 8x8 pixels into 1 value. so the original 160x160 pixels will result into 20x20 values instead of previously used 80x80.
         #print(actions)
+        gray_Image = numpy.zeros(shape=(160,160))        
         for a in range(5):
             #action = random.randint(3,4)
             caction = actions[a]
             observation, reward, done, info = self.env.step(caction)
             rewards.append(reward)
             Image = observation[34:194,:,:]
-            gray_Image = numpy.zeros(shape=(160,160))
             for i in range(160):
                 for j in range(160):
                     gray_Image[i][j]= 0.2989*Image[i][j][0] + 0.5870*Image[i][j][1] + 0.1140*Image[i][j][2]
@@ -63,7 +63,7 @@ class SMARTAgent:
             gray_ds = numpy.where(gray_ds>numpy.min(gray_ds)+1,255,gray_ds) #Different thresholding
             #gray_ds = numpy.where(gray_ds<127,0,gray_ds)
             #gray_ds = numpy.where(gray_ds>=127,255,gray_ds)
-            if self.count==0:
+            if self.count==0: # 
                 i0 = 0.6*gray_ds
                 self.count = self.count+1
             elif self.count==1:
@@ -92,11 +92,11 @@ class SMARTAgent:
         self.firing_rates = numpy.reshape(fr_Images,400) #6400 for 80*80 Image, now its 400 for 20*20
         self.env.render()
         print(self.countAll)
-        if done:
+        if done: # what is done?
             epCount.append(self.countAll)
             self.env.reset()
-            self.env.frameskip = 2
-            self.countAll = 0
+            self.env.frameskip = 2 # why is frameskip set to 2 here?
+            self.countAll = 0 # should self.count also get set to 0?
         return rewards, epCount, InputImages
         #return firing_rates
 
@@ -177,19 +177,19 @@ class SMARTAgent:
     ################################          
     ### RUN     
     ################################
-    def run(self, t, f):
+    def run (self, f):
         #SMARTAgent.playGame(self)
         if f.rank==0:
             f.pc.broadcast(self.fvec.from_python(self.firing_rates),0)
-            print('Broadcasting firing rates from master:')
-            print(numpy.where(self.firing_rates==numpy.amax(self.firing_rates)),numpy.amax(self.firing_rates))
+            #print('Broadcasting firing rates from master:')
+            #print(numpy.where(self.firing_rates==numpy.amax(self.firing_rates)),numpy.amax(self.firing_rates))
         else:
             f.pc.broadcast(self.fvec,0)
             self.firing_rates = self.fvec.to_python()
-            print('Receiving firing rates from master:')
-            print(numpy.where(self.firing_rates==numpy.amax(self.firing_rates)),numpy.amax(self.firing_rates))
+            #print('Receiving firing rates from master:')
+            #print(numpy.where(self.firing_rates==numpy.amax(self.firing_rates)),numpy.amax(self.firing_rates))
         cind = 0
-        for cell in [c for c in f.net.cells]:   
+        for cell in [c for c in f.net.cells]:  # is this a subset of all the cells in the network ??
             for stim in cell.stims:
                 if stim['source'] == 'stimMod':
                     stim['hObj'].interval = 1000.0/self.firing_rates[cind] # interval in ms as a function of rate
