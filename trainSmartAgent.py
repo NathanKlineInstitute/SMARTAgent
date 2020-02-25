@@ -3,6 +3,8 @@ from neuron import h
 import numpy
 import random
 
+random.seed(1234) # this will not work properly across runs with different number of nodes
+
 sim.allTimes = []
 sim.allRewards = [] # list to store all rewards
 sim.allActions = [] # list to store all actions
@@ -707,7 +709,7 @@ def trainAgentFake(t):
         recordWeights(sim, t)
         NBsteps = 0
 
-def trainAgent(t):
+def trainAgent (t):
     """ training interface between simulation and game environment
     """
     global Mlist
