@@ -648,6 +648,8 @@ def saveAdjustableWeights(sim):
         fid1.write('\n')
         for i in range(3,len(sim.WeightsRecordingTimes)):
             fid1.write('%0.0f' % sim.WeightsRecordingTimes[i]) # Time
+            print('test weight saving')
+            print(len(sim.AdjustableWeights[i-3]))
             for j in range(0,len(sim.AdjustableWeights[i-3])): fid1.write('\t%0.8f' % sim.AdjustableWeights[i-3][j])
             fid1.write('\n')
     print(('Saved Adjustable Weights as %s' % sim.AdjustableWeightsfilename))
