@@ -82,11 +82,11 @@ PARAMETER {
     tauanti  = 10  (ms)    
     hebbwt = 1.0
     antiwt = -1.0
-    RLwindhebb = 10 (ms)
-    RLwindanti = 10 (ms)
+    RLwindhebb = 25 (ms) : 10 (ms)
+    RLwindanti = 25 (ms) : 10 (ms)
     useRLexp = 1   : default to using binary eligibility traces
-    RLlenhebb = 100 (ms)
-    RLlenanti = 100 (ms)
+    RLlenhebb = 1000 (ms) : 100 (ms)
+    RLlenanti = 1000 (ms) : 100 (ms)
     RLhebbwt = 1.0
     RLantiwt = -1.0
     wbase = 0

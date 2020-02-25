@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pickle
 import time
+from conf import dconf
 
 Input_Images = np.loadtxt('InputImages.txt')
 New_InputImages = []
@@ -20,7 +21,7 @@ spkInds = data1["spkInds"]
 cellIDs = data1["cellGids"]
 skColors = data1["spkColors"] 
 
-totalDur = 10000
+totalDur = dconf['sim']['duration']
 tBin_Size = 100
 
 neuronIDs = np.unique(spkInds)
