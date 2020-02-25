@@ -10,8 +10,8 @@ sim.allTimes = []
 sim.allRewards = [] # list to store all rewards
 sim.allActions = [] # list to store all actions
 sim.allMotorOutputs = [] # list to store firing rate of output motor neurons.
-sim.ActionsRewardsfilename = 'ActionsRewards.txt'
-sim.MotorOutputsfilename = 'MotorOutputs.txt'
+sim.ActionsRewardsfilename = 'data/ActionsRewards.txt'
+sim.MotorOutputsfilename = 'data/MotorOutputs.txt'
 sim.WeightsRecordingTimes = [-1,-1,-1] #because first row would be PreID, second-postID and third-type of STDP
 sim.WeightsPreID = [-1] #save gid for presynaptic neuron; using -1 because 1st column would be time
 sim.WeightsPostID = [-1] #save gid for postsynaptic neuron-- the actual neuron linked to the conn
@@ -19,8 +19,8 @@ sim.WeightsSTDPtype = [-1] #0 for STDP, 1 for RL based
 sim.allAdjustableWeights = []
 sim.allRLWeights = [] # list to store weights --- should remove that
 sim.allNonRLWeights = [] # list to store weights --- should remove that
-sim.AdjustableWeightsfilename = 'AdjustableWeights.txt'  # file to store weights
-#sim.NonRLweightsfilename = 'NonRLweights.txt'  # file to store weights
+sim.AdjustableWeightsfilename = 'data/AdjustableWeights.txt'  # file to store weights
+#sim.NonRLweightsfilename = 'data/NonRLweights.txt'  # file to store weights
 sim.plotWeights = 0  # plot weights
 sim.saveWeights = 1  # save weights
 sim.saveInputImages = 1 #save Input Images (5 game frames)
@@ -594,8 +594,8 @@ simConfig.saveMat = False
 
 #simConfig.analysis['plotRaster'] = True                         # Plot a raster
 simConfig.analysis['plotTraces'] = {'include': [1159, 1169, 1179, 1189, 1199]}
-#simConfig.analysis['plotRaster'] = {'timeRange': [500,1000],'popRates':'overlay','saveData':'RasterData.pkl','showFig':True}
-simConfig.analysis['plotRaster'] = {'popRates':'overlay','saveData':'RasterData.pkl','showFig':True}
+#simConfig.analysis['plotRaster'] = {'timeRange': [500,1000],'popRates':'overlay','saveData':'data/RasterData.pkl','showFig':True}
+simConfig.analysis['plotRaster'] = {'popRates':'overlay','saveData':'data/RasterData.pkl','showFig':True}
 #simConfig.analysis['plot2Dnet'] = True 
 #simConfig.analysis['plotConn'] = True           # plot connectivity matrix
 ###################################################################################################################################
@@ -1010,7 +1010,7 @@ if sim.saveWeights:
     saveAdjustableWeights(sim)
     #saveWeights(sim, recordWeightDCells)
     saveGameBehavior(sim)
-    fid5 = open('ActionsPerEpisode.txt','w')
+    fid5 = open('data/ActionsPerEpisode.txt','w')
     for i in range(len(epCount)):
         fid5.write('\t%0.1f' % epCount[i])
         fid5.write('\n')
@@ -1019,7 +1019,7 @@ InputImages = numpy.array(InputImages)
 print(InputImages.shape)
 
 if sim.saveInputImages:
-    with open('InputImages.txt', 'w') as outfile:
+    with open('data/InputImages.txt', 'w') as outfile:
         outfile.write('# Array shape: {0}\n'.format(InputImages.shape))
         for Input_Image in InputImages:
             numpy.savetxt(outfile, Input_Image, fmt='%-7.2f')
