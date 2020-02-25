@@ -21,7 +21,7 @@ spkInds = data1["spkInds"]
 cellIDs = data1["cellGids"]
 skColors = data1["spkColors"] 
 
-totalDur = dconf['sim']['duration']
+totalDur = int(dconf['sim']['duration'])
 tBin_Size = 100
 
 neuronIDs = np.unique(spkInds)
