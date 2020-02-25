@@ -84,3 +84,5 @@ mpiexec -n 16 python -mpi trainSmartAgent.py
 ** set env.frameskip to a constant value on environment init to avoid random frameskip in a range
 ** setup code for some more flexibility
 
+can use json for config file
+
