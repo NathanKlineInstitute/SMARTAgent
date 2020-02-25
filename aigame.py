@@ -92,10 +92,10 @@ class SMARTAgent:
         self.firing_rates = numpy.reshape(fr_Images,400) #6400 for 80*80 Image, now its 400 for 20*20
         self.env.render()
         print(self.countAll)
-        if done: # what is done?
+        if done: # what is done? --- when done == 1, it means that 1 episode of the game ends, so it needs to be reset. 
             epCount.append(self.countAll)
             self.env.reset()
-            self.env.frameskip = 2 # why is frameskip set to 2 here?
+            self.env.frameskip = 3 # why is frameskip set to 2 here? -- fixed to 3
             self.countAll = 0 # should self.count also get set to 0?
         return rewards, epCount, InputImages
         #return firing_rates
