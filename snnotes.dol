@@ -84,3 +84,15 @@ mpiexec -n 16 python -mpi trainSmartAgent.py
 ** set env.frameskip to a constant value on environment init to avoid random frameskip in a range
 ** setup code for some more flexibility
 
+can use json for config file
+
+*20feb25
+** adjust architecture add direct V1 -> M popoulations
+
+that way M has higher resolution visual information
+and M still receives the lower resolution visual information from V2, IT as well ...
+
+** simple test - reward for moving up, punish for moving down
+
+does it produce expected behavior?
+

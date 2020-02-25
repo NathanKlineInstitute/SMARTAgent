@@ -2,6 +2,7 @@ from netpyne import specs, sim
 from neuron import h
 import numpy
 import random
+from conf import dconf # configuration dictionary
 
 random.seed(1234) # this will not work properly across runs with different number of nodes
 
@@ -580,7 +581,8 @@ netParams.connParams['V4->ML'] = {
 #Simulation options
 simConfig = specs.SimConfig()           # object of class SimConfig to store simulation configuration
 
-simConfig.duration = 5000 # 100e3 # 0.1e5                      # Duration of the simulation, in ms
+
+simConfig.duration = 5e3 # 100e3 # 0.1e5                      # Duration of the simulation, in ms
 simConfig.dt = 0.2                            # Internal integration timestep to use
 simConfig.verbose = False                       # Show detailed messages
 simConfig.recordTraces = {'V_soma':{'sec':'soma','loc':0.5,'var':'v'}}  # Dict with traces to record
@@ -726,7 +728,7 @@ epCount = []
 last_obs = [] #make sure this does not introduce a bug
 
 Mlist = []
-for mid in range(25):
+for mid in range(25): # what is this? list of motor neuron IDs??
     Mlist.append(mid)
 
 lSTDPmech = [] # global list of STDP mechanisms; so do not have to lookup at each interval function call 
@@ -795,6 +797,27 @@ def trainAgentFake(t):
         recordWeights(sim, t)
         NBsteps = 0
 
+def updateInputRates ():
+    # update the source firing rates for the R neuron population, based on image contents
+    if sim.rank == 0:
+        if dconf['verbose']:
+          print(sim.rank,'broadcasting firing rates:',numpy.where(sim.SMARTAgent.firing_rates==numpy.amax(sim.SMARTAgent.firing_rates)),numpy.amax(sim.SMARTAgent.firing_rates))        
+        sim.pc.broadcast(sim.SMARTAgent.fvec.from_python(sim.SMARTAgent.firing_rates),0)
+        firing_rates = sim.SMARTAgent.firing_rates
+    else:
+        fvec = h.Vector()
+        sim.pc.broadcast(fvec,0)
+        firing_rates = fvec.to_python()
+        if dconf['verbose']:
+          print(sim.rank,'received firing rates:',numpy.where(firing_rates==numpy.amax(firing_rates)),numpy.amax(firing_rates))                
+    # update input firing rates for stimuli to R cells
+    lRcell = [c for c in sim.net.cells if c.gid in sim.net.pops['R'].cellGids] # this is the set of R cells
+    print(sim.rank,'updating len(lRcell)=',len(lRcell),'source firing rates. len(firing_rates)=',len(firing_rates))
+    for cell in lRcell:  
+        for stim in cell.stims:
+            if stim['source'] == 'stimMod':
+                stim['hObj'].interval = 1000.0/firing_rates[int(cell.gid)] # interval in ms as a function of rate; is cell.gid correct index???
+          
 def trainAgent (t):
     """ training interface between simulation and game environment
     """
@@ -804,7 +827,7 @@ def trainAgent (t):
     if t<100.0: # for the first time interval use randomly selected actions
         actions =[]
         for _ in range(5):
-            action = random.randint(3,4)
+            action = dconf['movecodes'][random.randint(0,len(dconf['movecodes'])-1)]
             actions.append(action)
     else: #the actions should be based on the activity of motor cortex (MO) 1085-1093
         F_R1 = getFiringRatesWithInterval([t-100,t-80], numpy.add(Mlist,1184)) # what is 1184? 1184 is an offset to neuron indices for MR
@@ -862,41 +885,37 @@ def trainAgent (t):
             fid4.write('\n')
             actions = []
             if F_R1>F_L1:
-                actions.append(4) #UP
+                actions.append(dconf['moves']['UP']) #UP
             elif F_R1<F_L1:
-                actions.append(3) # Down
+                actions.append(dconf['moves']['DOWN']) # Down
             else:
-                actions.append(random.randint(3,4))
-                #actions.append(1) # No move 
+                actions.append(dconf['moves']['NOMOVE']) # No move 
             if F_R2>F_L2:
-                actions.append(4) #UP
+                actions.append(dconf['moves']['UP']) #UP
             elif F_R2<F_L2:
-                actions.append(3) #Down
+                actions.append(dconf['moves']['DOWN']) #Down
             else:
-                actions.append(random.randint(3,4))
-                #actions.append(1) #No move
+                actions.append(dconf['moves']['NOMOVE']) #No move
             if F_R3>F_L3:
-                actions.append(4) #UP
+                actions.append(dconf['moves']['UP']) #UP
             elif F_R3<F_L3:
-                actions.append(3) #Down
+                actions.append(dconf['moves']['DOWN']) #Down
             else:
-                actions.append(random.randint(3,4))
-                #actions.append(1) #No move
+                actions.append(dconf['moves']['NOMOVE']) #No move
             if F_R4>F_L4:
-                actions.append(4) #UP
+                actions.append(dconf['moves']['UP']) #UP
             elif F_R4<F_L4:
-                actions.append(3) #Down
+                actions.append(dconf['moves']['DOWN']) #Down
             else:
-                actions.append(random.randint(3,4))
-                #actions.append(1) #No move
+                actions.append(dconf['moves']['NOMOVE']) #No move
             if F_R5>F_L5:
-                actions.append(4) #UP
+                actions.append(dconf['moves']['UP']) #UP
             elif F_R5<F_L5:
-                actions.append(3) #Down
+                actions.append(dconf['moves']['DOWN']) #Down
             else:
-                actions.append(random.randint(3,4))
-                #actions.append(1) #No move
-            #print('actions generated by model are: ', actions)    
+                actions.append(dconf['moves']['NOMOVE']) #No move
+            #print('actions generated by model are: ', actions)
+            
     if sim.rank == 0:
         print('actions generated by model are: ', actions)
         rewards, epCount, InputImages = sim.SMARTAgent.playGame(actions, epCount, InputImages)
@@ -914,31 +933,14 @@ def trainAgent (t):
             sim.allActions.append(action)
         for reward in rewards: # this generates an error - since rewards only declared for sim.rank==0; bug?
             sim.allRewards.append(reward)
+            
     ltpnt = t-20
     for _ in range(5):
         ltpnt = ltpnt+4
         sim.allTimes.append(ltpnt)
-        
-    if sim.rank == 0:
-        #sim.SMARTAgent.run(sim)
-        print(sim.rank,'broadcasting firing rates:',numpy.where(sim.SMARTAgent.firing_rates==numpy.amax(sim.SMARTAgent.firing_rates)),numpy.amax(sim.SMARTAgent.firing_rates))        
-        sim.pc.broadcast(sim.SMARTAgent.fvec.from_python(sim.SMARTAgent.firing_rates),0)
-        print('trainAgent time is : ', t)
-        firing_rates = sim.SMARTAgent.firing_rates
-    else:
-        fvec = h.Vector()
-        sim.pc.broadcast(fvec,0)
-        firing_rates = fvec.to_python()
-        print(sim.rank,'received firing rates:',numpy.where(firing_rates==numpy.amax(firing_rates)),numpy.amax(firing_rates))                
 
-    # update input firing rates for stimuli to R cells
-    lRcell = [c for c in sim.net.cells if c.gid in sim.net.pops['R'].cellGids] # this is the set of R cells
-    print(sim.rank,'updating len(lRcell)=',len(lRcell),'source firing rates. len(firing_rates)=',len(firing_rates))
-    for cell in lRcell:  
-        for stim in cell.stims:
-            if stim['source'] == 'stimMod':
-                stim['hObj'].interval = 1000.0/firing_rates[int(cell.gid)] # interval in ms as a function of rate; is cell.gid correct index???
-        
+    updateInputRates() # update firing rate of inputs to R population (based on image content)
+                
     NBsteps = NBsteps+1
     if NBsteps==recordWeightStepSize:
         #if t%recordWeightDT==0:
@@ -966,7 +968,6 @@ sim.net.createCells()                     # instantiate network cells based on d
 sim.net.connectCells()                    # create connections between cells based on params
 sim.net.addStims()                      #instantiate netStim
 sim.setupRecording()                  # setup variables to record for each cell (spikes, V traces, etc)
-#sim.runSim()
 
 lSTDPmech = getAllSTDPObjects(sim) # get all the STDP objects up-front
 
@@ -975,8 +976,8 @@ if sim.rank == 0: # only create SMARTAgent on node 0
     sim.SMARTAgent = SMARTAgent()
 
 sim.runSimWithIntervalFunc(100.0,trainAgent) # has periodic callback to adjust STDP weights based on RL signal
-sim.gatherData()
-sim.saveData()
+sim.gatherData() # gather data from different nodes
+sim.saveData() # save data to disk
 sim.analysis.plotData()
 
 if sim.plotWeights: 
