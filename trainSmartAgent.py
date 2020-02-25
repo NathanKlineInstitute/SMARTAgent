@@ -531,6 +531,48 @@ netParams.connParams['IV4->IIT'] = {
         'weight': 0.00, #0.002
         'delay': 2,
         'synMech': 'GABA'}
+
+#Add direct connections from higher layers to motor cortex
+#Still no idea, how these connections should look like...just trying some numbers: 400 to 25 means convergence factor of 16
+netParams.connParams['V1->MR'] = {
+        'preConds': {'pop': 'V1'},
+        'postConds': {'pop': 'MR'},
+        #'connList': blistMItoMO,
+        'convergence': 16,
+        'weight': 0.001,
+        'delay': 2,
+        'synMech': 'AMPA',
+        'plast': {'mech': 'STDP', 'params': STDPparamsRL}}
+netParams.connParams['V1->ML'] = {
+        'preConds': {'pop': 'V1'},
+        'postConds': {'pop': 'ML'},
+        #'connList': blistMItoMO,
+        'convergence': 16,
+        'weight': 0.001,
+        'delay': 2,
+        'synMech': 'AMPA',
+        'plast': {'mech': 'STDP', 'params': STDPparamsRL}}
+
+netParams.connParams['V4->MR'] = {
+        'preConds': {'pop': 'V4'},
+        'postConds': {'pop': 'MR'},
+        #'connList': blistMItoMO,
+        'convergence': 4,
+        'weight': 0.001,
+        'delay': 2,
+        'synMech': 'AMPA',
+        'plast': {'mech': 'STDP', 'params': STDPparamsRL}}
+netParams.connParams['V4->ML'] = {
+        'preConds': {'pop': 'V4'},
+        'postConds': {'pop': 'ML'},
+        #'connList': blistMItoMO,
+        'convergence': 4,
+        'weight': 0.001,
+        'delay': 2,
+        'synMech': 'AMPA',
+        'plast': {'mech': 'STDP', 'params': STDPparamsRL}}
+
+
 #Simulation options
 simConfig = specs.SimConfig()           # object of class SimConfig to store simulation configuration
 
