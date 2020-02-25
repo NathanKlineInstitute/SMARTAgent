@@ -11,11 +11,15 @@ sim.allActions = [] # list to store all actions
 sim.allMotorOutputs = [] # list to store firing rate of output motor neurons.
 sim.ActionsRewardsfilename = 'ActionsRewards.txt'
 sim.MotorOutputsfilename = 'MotorOutputs.txt'
-sim.WeightsRecordingTimes = [] 
-sim.allRLWeights = [] # list to store weights
-sim.allNonRLWeights = [] # list to store weights
-sim.RLweightsfilename = 'RLweights.txt'  # file to store weights
-sim.NonRLweightsfilename = 'NonRLweights.txt'  # file to store weights
+sim.WeightsRecordingTimes = [-1,-1,-1] #because first row would be PreID, second-postID and third-type of STDP
+sim.WeightsPreID = [-1] #save gid for presynaptic neuron; using -1 because 1st column would be time
+sim.WeightsPostID = [-1] #save gid for postsynaptic neuron-- the actual neuron linked to the conn
+sim.WeightsSTDPtype = [-1] #0 for STDP, 1 for RL based 
+sim.allAdjustableWeights = []
+sim.allRLWeights = [] # list to store weights --- should remove that
+sim.allNonRLWeights = [] # list to store weights --- should remove that
+sim.AdjustableWeightsfilename = 'AdjustableWeights.txt'  # file to store weights
+#sim.NonRLweightsfilename = 'NonRLweights.txt'  # file to store weights
 sim.plotWeights = 0  # plot weights
 sim.saveWeights = 1  # save weights
 sim.saveInputImages = 1 #save Input Images (5 game frames)
@@ -596,9 +600,29 @@ simConfig.analysis['plotRaster'] = {'popRates':'overlay','saveData':'RasterData.
 
 sim.SMARTAgent = None
 
+def recordAdjustableWeights (sim, t):
+    """ record the STDP weights during the simulation - called in trainAgent
+    """
+    #lRcell = [c for c in sim.net.cells if c.gid in sim.net.pops['R'].cellGids]
+    sim.WeightsRecordingTimes.append(t)
+    sim.allAdjustableWeights.append([]) # Save this time
+    for cell in sim.net.cells:
+        for conn in cell.conns:
+            if 'hSTDP' in conn:
+                sim.allAdjustableWeights[-1].append(float(conn['hObj'].weight[0])) # save weight for both Rl-STDP and nonRL-STDP conns
+                if len(sim.WeightsRecordingTimes)==4: #used 4 because, i used [-1,-1,-1] for file saving
+                    sim.WeightsPostID.append(cell.gid) #record ID of postsynaptic neuron
+                    sim.WeightsPreID.append(conn.preGid)
+                    if conn.plast.params.RLon ==1:
+                        sim.WeightsSTDPtype.append(1) #for RL
+                    else:
+                        sim.WeightsSTDPtype.append(0) #for nonRL
+
+
 def recordWeights (sim, t):
     """ record the STDP weights during the simulation - called in trainAgent
     """
+    #lRcell = [c for c in sim.net.cells if c.gid in sim.net.pops['R'].cellGids]
     sim.WeightsRecordingTimes.append(t)
     sim.allRLWeights.append([]) # Save this time
     sim.allNonRLWeights.append([])
@@ -610,6 +634,24 @@ def recordWeights (sim, t):
                 else:
                     sim.allNonRLWeights[-1].append(float(conn['hObj'].weight[0])) # save weight only for nonRL-STDP conns
 
+def saveAdjustableWeights(sim):
+    ''' Save the weights for each plastic synapse '''
+    with open(sim.AdjustableWeightsfilename,'w') as fid1:
+        fid1.write('%0.0f' % sim.WeightsRecordingTimes[0])
+        for j in range(1,len(sim.WeightsPreID)): fid1.write('\t%0.0f' % sim.WeightsPreID[j])
+        fid1.write('\n')
+        fid1.write('%0.0f' % sim.WeightsRecordingTimes[1])
+        for j in range(1,len(sim.WeightsPostID)): fid1.write('\t%0.0f' % sim.WeightsPostID[j])
+        fid1.write('\n')
+        fid1.write('\n%0.0f' % sim.WeightsRecordingTimes[2])
+        for j in range(1,len(sim.WeightsSTDPtype)): fid1.write('\t%0.0f' % sim.WeightsSTDPtype[j])
+        fid1.write('\n')
+        for i in range(3,len(sim.WeightsRecordingTimes)):
+            fid1.write('%0.0f' % sim.WeightsRecordingTimes[i]) # Time
+            for j in range(0,len(sim.AdjustableWeights[i-3])): fid1.write('\t%0.8f' % sim.AdjustableWeights[i-3][j])
+            fid1.write('\n')
+    print(('Saved Adjustable Weights as %s' % sim.AdjustableWeightsfilename))
+    
 def saveWeights(sim, downSampleCells):
     ''' Save the weights for each plastic synapse '''
     with open(sim.RLweightsfilename,'w') as fid1:
@@ -898,8 +940,9 @@ def trainAgent (t):
     NBsteps = NBsteps+1
     if NBsteps==recordWeightStepSize:
         #if t%recordWeightDT==0:
-        print('Weights Recording Time:', t) 
-        recordWeights(sim, t)
+        print('Weights Recording Time:', t)
+        recordAdjustableWeights(sim, t) 
+        #recordWeights(sim, t)
         NBsteps = 0
 
 def getAllSTDPObjects (sim):
@@ -937,7 +980,8 @@ sim.analysis.plotData()
 if sim.plotWeights: 
     plotWeights() 
 if sim.saveWeights:
-    saveWeights(sim, recordWeightDCells)
+    saveAdjustableWeights(sim)
+    #saveWeights(sim, recordWeightDCells)
     saveGameBehavior(sim)
     fid5 = open('ActionsPerEpisode.txt','w')
     for i in range(len(epCount)):
