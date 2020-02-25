@@ -1,6 +1,7 @@
 
 {
     "env":  {"name": "Pong-v0", "frameskip": 3},
-    "moves": {"UP": 4,"DOWN":3, "NOMOVE":1 },
-    "movecodes": [1,3,4]    
+    "moves": {"UP": 4,"DOWN":3, "NOMOVE":1},
+    "movecodes": [1,3,4],
+    "verbose": 1
 }
