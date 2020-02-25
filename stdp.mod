@@ -84,7 +84,7 @@ PARAMETER {
     antiwt = -1.0
     RLwindhebb = 10 (ms)
     RLwindanti = 10 (ms)
-    useRLexp = 0   : default to using binary eligibility traces
+    useRLexp = 1   : default to using binary eligibility traces
     RLlenhebb = 100 (ms)
     RLlenanti = 100 (ms)
     RLhebbwt = 1.0
