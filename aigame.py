@@ -18,15 +18,13 @@ import numpy
 from skimage.transform import downscale_local_mean
 import json
 import gym
+import sys
 
 # make the environment
 try:
-  fn = 'sim.json'
-  with open(fn,'r') as fp:
-    d = json.load(fp)
-    print(d)
-    env = gym.make(d['env']['name'],frameskip=d['env']['frameskip'])
-    env.reset()
+  from conf import dconf
+  env = gym.make(dconf['env']['name'],frameskip=dconf['env']['frameskip'])
+  env.reset()
 except:
   print('Exception in makeENV')
   env = gym.make('Pong-v0',frameskip=3)
