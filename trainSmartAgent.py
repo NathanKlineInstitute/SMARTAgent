@@ -683,7 +683,7 @@ epCount = []
 last_obs = [] #make sure this does not introduce a bug
 
 Mlist = []
-for mid in range(25):
+for mid in range(25): # what is this? list of motor neuron IDs??
     Mlist.append(mid)
 
 lSTDPmech = [] # global list of STDP mechanisms; so do not have to lookup at each interval function call 
@@ -922,7 +922,6 @@ sim.net.createCells()                     # instantiate network cells based on d
 sim.net.connectCells()                    # create connections between cells based on params
 sim.net.addStims()                      #instantiate netStim
 sim.setupRecording()                  # setup variables to record for each cell (spikes, V traces, etc)
-#sim.runSim()
 
 lSTDPmech = getAllSTDPObjects(sim) # get all the STDP objects up-front
 
@@ -931,8 +930,8 @@ if sim.rank == 0: # only create SMARTAgent on node 0
     sim.SMARTAgent = SMARTAgent()
 
 sim.runSimWithIntervalFunc(100.0,trainAgent) # has periodic callback to adjust STDP weights based on RL signal
-sim.gatherData()
-sim.saveData()
+sim.gatherData() # gather data from different nodes
+sim.saveData() # save data to disk
 sim.analysis.plotData()
 
 if sim.plotWeights: 
