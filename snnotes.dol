@@ -109,3 +109,7 @@ len(np.where(d[:,1]==1)[0]) # 272
 
 plot(d[:,0],d[:,1],'ko')
 hist(d[:,1])
+
+to test if it's working just check the RL weights onto ML vs MR; weights onto ML neurons should
+increase, while weights onto MR should decrease ...  if that's not happening, something is wrong ...
+

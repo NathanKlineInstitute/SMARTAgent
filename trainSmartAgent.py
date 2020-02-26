@@ -83,7 +83,7 @@ STDPparams = {'hebbwt': 0.0001, 'antiwt':-0.00001, 'wbase': 0.0012, 'wmax': 50, 
         'tauhebb': 10, 'RLwindhebb': 50, 'useRLexp': 0, 'softthresh': 0, 'verbose':0}
 
 STDPparamsRL = {'hebbwt': 0.0000, 'antiwt':-0.0000, 'wbase': 0.0012, 'wmax': 50, 'RLon': 1 , 'RLhebbwt': 0.00001, 'RLantiwt': -0.000,
-        'tauhebb': 10, 'RLlenhebb': 800 ,'RLwindhebb': 50, 'useRLexp': 1, 'softthresh': 0, 'verbose':0}
+                'tauhebb': 10, 'RLlenhebb': 800 ,'RLlenanti': 100, 'RLwindhebb': 50, 'useRLexp': 1, 'softthresh': 0, 'verbose':0}
 
 netParams.stimSourceParams['stimMod'] = {'type': 'NetStim', 'rate': 'variable', 'noise': 0}
 netParams.stimTargetParams['stimMod->all'] = {'source': 'stimMod',
@@ -800,7 +800,7 @@ def trainAgentFake(t):
 def updateInputRates ():
     # update the source firing rates for the R neuron population, based on image contents
     if sim.rank == 0:
-        if dconf['verbose']:
+        if dconf['verbose'] > 1:
           print(sim.rank,'broadcasting firing rates:',numpy.where(sim.SMARTAgent.firing_rates==numpy.amax(sim.SMARTAgent.firing_rates)),numpy.amax(sim.SMARTAgent.firing_rates))        
         sim.pc.broadcast(sim.SMARTAgent.fvec.from_python(sim.SMARTAgent.firing_rates),0)
         firing_rates = sim.SMARTAgent.firing_rates
@@ -808,7 +808,7 @@ def updateInputRates ():
         fvec = h.Vector()
         sim.pc.broadcast(fvec,0)
         firing_rates = fvec.to_python()
-        if dconf['verbose']:
+        if dconf['verbose'] > 1:
           print(sim.rank,'received firing rates:',numpy.where(firing_rates==numpy.amax(firing_rates)),numpy.amax(firing_rates))                
     # update input firing rates for stimuli to R cells
     lRcell = [c for c in sim.net.cells if c.gid in sim.net.pops['R'].cellGids] # this is the set of R cells
@@ -922,28 +922,20 @@ def trainAgent (t):
         rewards, epCount, InputImages = sim.SMARTAgent.playGame(actions, epCount, InputImages)
 
         if dconf['sim']['RLFakeUpRule']: # fake rule for testing reinforcing of up moves
-          if actions.count(dconf['moves']['UP']) > actions.count(dconf['moves']['DOWN']):
-            critic = 1
-            print('REWARD')
-          elif actions.count(dconf['moves']['DOWN']) > actions.count(dconf['moves']['UP']):
-            critic = -1
-            print('PUNISH')
-          else:
-            critic = 0
-            print('NO REWARD/PUNISH')
+          critic = numpy.sign(actions.count(dconf['moves']['UP']) - actions.count(dconf['moves']['DOWN']))
         elif dconf['sim']['RLFakeDownRule']: # fake rule for testing reinforcing of down moves
-          if actions.count(dconf['moves']['UP']) < actions.count(dconf['moves']['DOWN']):
-            critic = 1
-            print('REWARD')
-          elif actions.count(dconf['moves']['DOWN']) < actions.count(dconf['moves']['UP']):
-            critic = -1
-            print('PUNISH')
-          else:
-            critic = 0
-            print('NO REWARD/PUNISH')
+          critic = numpy.sign(actions.count(dconf['moves']['DOWN']) - actions.count(dconf['moves']['UP']))
         else: # normal game play scoring rules
           critic = sum(rewards) # get critic signal (-1, 0 or 1)
-                  
+
+        if dconf['verbose']:
+          if critic > 0:
+            print('REWARD')
+          elif critic < 0:
+            print('PUNISH')
+          else:
+            print('NO REWARD/PUNISH')          
+          
         sim.pc.broadcast(vec.from_python([critic]), 0) # convert python list to hoc vector to broadcast critic value to other nodes
     else: # other workers
         sim.pc.broadcast(vec, 0) # receive critic value from master node
