@@ -919,7 +919,7 @@ def trainAgent (t):
           critic = numpy.sign(actions.count(dconf['moves']['DOWN']) - actions.count(dconf['moves']['UP']))
         else: # normal game play scoring rules
           critic = sum(rewards) # get critic signal (-1, 0 or 1)
-
+        if critic<0: critic = 0 #just to make sure there is no punishment
         if dconf['verbose']:
           if critic > 0:
             print('REWARD')
