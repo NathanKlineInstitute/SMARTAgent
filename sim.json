@@ -4,5 +4,5 @@
     "moves": {"UP": 4,"DOWN":3, "NOMOVE":1},
     "movecodes": [1,3,4],
     "verbose": 1,        
-    "sim": {"duration": 15e3, "dt": 0.2, "verbose": 0, "recordStep":0.2,"RLFakeUpRule": 1,"RLFakeDownRule": 0}
+    "sim": {"duration": 200e3, "dt": 0.2, "verbose": 0, "recordStep":0.2,"RLFakeUpRule": 1,"RLFakeDownRule": 0}
 }
