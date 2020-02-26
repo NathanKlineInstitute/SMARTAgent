@@ -644,7 +644,7 @@ def saveAdjustableWeights(sim):
             fid1.write('\t%0.0f' % sim.WeightsPreID[j])
             fid1.write('\t%0.0f' % sim.WeightsPostID[j])
             fid1.write('\t%0.0f' % sim.WeightsSTDPtype[j])
-            fid1.write('\t%0.8f' % sim.allAdjustableWeights[j][j])
+            fid1.write('\t%0.8f' % sim.allAdjustableWeights[j])
             fid1.write('\n')
     print(('Saved Adjustable Weights as %s' % sim.AdjustableWeightsfilename))
     
