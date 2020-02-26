@@ -619,7 +619,17 @@ def recordAdjustableWeights (sim, t):
                     sim.WeightsSTDPtype.append(1) #for RL
                 else:
                     sim.WeightsSTDPtype.append(0) #for nonRL
-
+    for cell in MLcell:
+        for conn in cell.conns:
+            if 'hSTDP' in conn:
+                sim.WeightsRecordingTimes.append(t)
+                sim.allAdjustableWeights.append(float(conn['hObj'].weight[0])) # save weight for both Rl-STDP and nonRL-STDP conns
+                sim.WeightsPostID.append(cell.gid) #record ID of postsynaptic neuron
+                sim.WeightsPreID.append(conn.preGid)
+                if conn.plast.params.RLon ==1:
+                    sim.WeightsSTDPtype.append(1) #for RL
+                else:
+                    sim.WeightsSTDPtype.append(0) #for nonRL    
 
 def recordWeights (sim, t):
     """ record the STDP weights during the simulation - called in trainAgent
