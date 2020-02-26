@@ -12,10 +12,10 @@ sim.allActions = [] # list to store all actions
 sim.allMotorOutputs = [] # list to store firing rate of output motor neurons.
 sim.ActionsRewardsfilename = 'data/ActionsRewards.txt'
 sim.MotorOutputsfilename = 'data/MotorOutputs.txt'
-sim.WeightsRecordingTimes = [-1,-1,-1] #because first row would be PreID, second-postID and third-type of STDP
-sim.WeightsPreID = [-1] #save gid for presynaptic neuron; using -1 because 1st column would be time
-sim.WeightsPostID = [-1] #save gid for postsynaptic neuron-- the actual neuron linked to the conn
-sim.WeightsSTDPtype = [-1] #0 for STDP, 1 for RL based 
+sim.WeightsRecordingTimes = [] #because first row would be PreID, second-postID and third-type of STDP
+sim.WeightsPreID = [] #save gid for presynaptic neuron; using -1 because 1st column would be time
+sim.WeightsPostID = [] #save gid for postsynaptic neuron-- the actual neuron linked to the conn
+sim.WeightsSTDPtype = [] #0 for STDP, 1 for RL based 
 sim.allAdjustableWeights = []
 sim.allRLWeights = [] # list to store weights --- should remove that
 sim.allNonRLWeights = [] # list to store weights --- should remove that
@@ -605,20 +605,20 @@ sim.SMARTAgent = None
 def recordAdjustableWeights (sim, t):
     """ record the STDP weights during the simulation - called in trainAgent
     """
-    #lRcell = [c for c in sim.net.cells if c.gid in sim.net.pops['R'].cellGids]
-    sim.WeightsRecordingTimes.append(t)
-    sim.allAdjustableWeights.append([]) # Save this time
-    for cell in sim.net.cells:
+    MRcell = [c for c in sim.net.cells if c.gid in sim.net.pops['MR'].cellGids] # this is the set of MR cells
+    MLcell = [c for c in sim.net.cells if c.gid in sim.net.pops['ML'].cellGids] # this is the set of ML cells
+    print(sim.rank,'updating len(MRcell)=',len(MRcell),' and len(MLcell)=',len(MLcell))
+    for cell in MRcell:
         for conn in cell.conns:
             if 'hSTDP' in conn:
-                sim.allAdjustableWeights[-1].append(float(conn['hObj'].weight[0])) # save weight for both Rl-STDP and nonRL-STDP conns
-                if len(sim.WeightsRecordingTimes)==4: #used 4 because, i used [-1,-1,-1] for file saving
-                    sim.WeightsPostID.append(cell.gid) #record ID of postsynaptic neuron
-                    sim.WeightsPreID.append(conn.preGid)
-                    if conn.plast.params.RLon ==1:
-                        sim.WeightsSTDPtype.append(1) #for RL
-                    else:
-                        sim.WeightsSTDPtype.append(0) #for nonRL
+                sim.WeightsRecordingTimes.append(t)
+                sim.allAdjustableWeights.append(float(conn['hObj'].weight[0])) # save weight for both Rl-STDP and nonRL-STDP conns
+                sim.WeightsPostID.append(cell.gid) #record ID of postsynaptic neuron
+                sim.WeightsPreID.append(conn.preGid)
+                if conn.plast.params.RLon ==1:
+                    sim.WeightsSTDPtype.append(1) #for RL
+                else:
+                    sim.WeightsSTDPtype.append(0) #for nonRL
 
 
 def recordWeights (sim, t):
@@ -639,20 +639,12 @@ def recordWeights (sim, t):
 def saveAdjustableWeights(sim):
     ''' Save the weights for each plastic synapse '''
     with open(sim.AdjustableWeightsfilename,'w') as fid1:
-        fid1.write('%0.0f' % sim.WeightsRecordingTimes[0])
-        for j in range(1,len(sim.WeightsPreID)): fid1.write('\t%0.0f' % sim.WeightsPreID[j])
-        fid1.write('\n')
-        fid1.write('%0.0f' % sim.WeightsRecordingTimes[1])
-        for j in range(1,len(sim.WeightsPostID)): fid1.write('\t%0.0f' % sim.WeightsPostID[j])
-        fid1.write('\n')
-        fid1.write('\n%0.0f' % sim.WeightsRecordingTimes[2])
-        for j in range(1,len(sim.WeightsSTDPtype)): fid1.write('\t%0.0f' % sim.WeightsSTDPtype[j])
-        fid1.write('\n')
-        for i in range(3,len(sim.WeightsRecordingTimes)):
-            fid1.write('%0.0f' % sim.WeightsRecordingTimes[i]) # Time
-            print('test weight saving')
-            print(len(sim.allAdjustableWeights[i-3]))
-            for j in range(0,len(sim.allAdjustableWeights[i-3])): fid1.write('\t%0.8f' % sim.allAdjustableWeights[i-3][j])
+        for j in range(1,len(sim.WeightsPreID)):
+            fid1.write('%0.0f' % sim.WeightsRecordingTimes[j])
+            fid1.write('\t%0.0f' % sim.WeightsPreID[j])
+            fid1.write('\t%0.0f' % sim.WeightsPostID[j])
+            fid1.write('\t%0.0f' % sim.WeightsSTDPtype[j])
+            fid1.write('\t%0.8f' % sim.allAdjustableWeights[j][j])
             fid1.write('\n')
     print(('Saved Adjustable Weights as %s' % sim.AdjustableWeightsfilename))
     
