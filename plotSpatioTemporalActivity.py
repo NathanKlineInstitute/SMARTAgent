@@ -142,7 +142,7 @@ cbaxes = fig.add_axes([0.95, 0.4, 0.01, 0.2])
 #cb = plt.colorbar(ax1, cax = cbaxes)  
 
 for t in range(1,len(t1)):
-    fig.suptitle('100 ms binned activity' + str(t*tBin_Size) + ' ms')
+    fig.suptitle('100 ms binned activity ' + str(t*tBin_Size) + ' ms')
     ax[0].imshow(New_InputImages[t-1,:,:],cmap='gray', vmin=0, vmax = 255)
     ax[0].set_xlim(-0.5,19.5)
     ax[0].set_ylim(-0.5,19.5)

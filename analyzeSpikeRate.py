@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import pickle
 
 ##Change the rasterdata file below
-phl_file = open('RasterData.pkl','rb')
+phl_file = open('data/RasterData.pkl','rb')
 data1 = pickle.load(phl_file)
 spkTimes = data1["spkTimes"]
 spkInds = data1["spkInds"]
