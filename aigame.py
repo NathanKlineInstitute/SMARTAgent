@@ -168,7 +168,7 @@ class SMARTAgent:
         if done:
             epCount.append(self.countAll)
             self.env.reset()
-            self.env.frameskip = 2
+            self.env.frameskip = 3
             self.countAll = 0
         return rewards, actions, last_obs, epCount, InputImages
 
