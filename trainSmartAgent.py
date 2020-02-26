@@ -602,13 +602,10 @@ simConfig.analysis['plotRaster'] = {'popRates':'overlay','saveData':'data/Raster
 
 sim.SMARTAgent = None
 
-def recordAdjustableWeights (sim, t):
-    """ record the STDP weights during the simulation - called in trainAgent
-    """
-    MRcell = [c for c in sim.net.cells if c.gid in sim.net.pops['MR'].cellGids] # this is the set of MR cells
-    MLcell = [c for c in sim.net.cells if c.gid in sim.net.pops['ML'].cellGids] # this is the set of ML cells
-    print(sim.rank,'updating len(MRcell)=',len(MRcell),' and len(MLcell)=',len(MLcell))
-    for cell in MRcell:
+def recordAdjustableWeightsPop (sim, t, popname):
+    # record the plastic weights for specified popname
+    lcell = [c for c in sim.net.cells if c.gid in sim.net.pops[popname].cellGids] # this is the set of MR cells
+    for cell in lcell:
         for conn in cell.conns:
             if 'hSTDP' in conn:
                 sim.WeightsRecordingTimes.append(t)
@@ -619,17 +616,13 @@ def recordAdjustableWeights (sim, t):
                     sim.WeightsSTDPtype.append(1) #for RL
                 else:
                     sim.WeightsSTDPtype.append(0) #for nonRL
-    for cell in MLcell:
-        for conn in cell.conns:
-            if 'hSTDP' in conn:
-                sim.WeightsRecordingTimes.append(t)
-                sim.allAdjustableWeights.append(float(conn['hObj'].weight[0])) # save weight for both Rl-STDP and nonRL-STDP conns
-                sim.WeightsPostID.append(cell.gid) #record ID of postsynaptic neuron
-                sim.WeightsPreID.append(conn.preGid)
-                if conn.plast.params.RLon ==1:
-                    sim.WeightsSTDPtype.append(1) #for RL
-                else:
-                    sim.WeightsSTDPtype.append(0) #for nonRL    
+    return len(lcell)
+                    
+def recordAdjustableWeights (sim, t):
+    """ record the STDP weights during the simulation - called in trainAgent
+    """
+    for pop in ['MR', 'ML']:
+      print(sim.rank,'updating len(',pop,') =', recordAdjustableWeightsPop(sim, t, 'MR'))
 
 def recordWeights (sim, t):
     """ record the STDP weights during the simulation - called in trainAgent
@@ -680,10 +673,10 @@ def saveWeights(sim, downSampleCells):
             for i in range(0,len(weightdata), downSampleCells): fid2.write('\t%0.8f' % weightdata[i])
             fid2.write('\n')
     print(('Saved Non-RL weights as %s' % sim.NonRLweightsfilename))    
-    
+
+#    
 def plotWeights():
     from pylab import figure, loadtxt, xlabel, ylabel, xlim, ylim, show, pcolor, array, colorbar
-
     figure()
     weightdata = loadtxt(sim.weightsfilename)
     weightdataT=list(map(list, list(zip(*weightdata))))
@@ -998,8 +991,8 @@ sim.gatherData() # gather data from different nodes
 sim.saveData() # save data to disk
 sim.analysis.plotData()
 
-if sim.plotWeights: 
-    plotWeights() 
+if sim.plotWeights: plotWeights() 
+
 if sim.saveWeights:
     saveAdjustableWeights(sim)
     #saveWeights(sim, recordWeightDCells)
