@@ -13,14 +13,9 @@ sim.allActions = [] # list to store all actions
 sim.allMotorOutputs = [] # list to store firing rate of output motor neurons.
 sim.ActionsRewardsfilename = 'data/ActionsRewards.txt'
 sim.MotorOutputsfilename = 'data/MotorOutputs.txt'
-sim.WeightsRecordingTimes = [] #because first row would be PreID, second-postID and third-type of STDP
-sim.WeightsPreID = [] #save gid for presynaptic neuron; using -1 because 1st column would be time
-sim.WeightsPostID = [] #save gid for postsynaptic neuron-- the actual neuron linked to the conn
-sim.WeightsSTDPtype = [] #0 for STDP, 1 for RL based 
-sim.allAdjustableWeights = []
+sim.WeightsRecordingTimes = []
 sim.allRLWeights = [] # list to store weights --- should remove that
 sim.allNonRLWeights = [] # list to store weights --- should remove that
-sim.AdjustableWeightsfilename = 'data/AdjustableWeights.txt'  # file to store weights
 #sim.NonRLweightsfilename = 'data/NonRLweights.txt'  # file to store weights
 sim.plotWeights = 0  # plot weights
 sim.saveWeights = 1  # save weights
@@ -582,7 +577,6 @@ netParams.connParams['V4->ML'] = {
 #Simulation options
 simConfig = specs.SimConfig()           # object of class SimConfig to store simulation configuration
 
-
 simConfig.duration = dconf['sim']['duration'] # 100e3 # 0.1e5                      # Duration of the simulation, in ms
 simConfig.dt = dconf['sim']['dt']                            # Internal integration timestep to use
 simConfig.verbose = dconf['sim']['verbose']                       # Show detailed messages
@@ -611,15 +605,7 @@ def recordAdjustableWeightsPop (sim, t, popname):
     for cell in lcell:
         for conn in cell.conns:
             if 'hSTDP' in conn:
-                sim.simData['synweights'][sim.rank].append([t,float(conn['hObj'].weight[0]),cell.gid,conn.preGid,conn.plast.params.RLon]) 
-                sim.WeightsRecordingTimes.append(t)
-                sim.allAdjustableWeights.append(float(conn['hObj'].weight[0])) # save weight for both Rl-STDP and nonRL-STDP conns
-                sim.WeightsPostID.append(cell.gid) #record ID of postsynaptic neuron
-                sim.WeightsPreID.append(conn.preGid)
-                if conn.plast.params.RLon ==1:
-                    sim.WeightsSTDPtype.append(1) #for RL
-                else:
-                    sim.WeightsSTDPtype.append(0) #for nonRL
+                sim.simData['synweights'][sim.rank].append([t,float(conn['hObj'].weight[0]),cell.gid,conn.preGid,conn.plast.params.RLon])                     
     return len(lcell)
                     
 def recordAdjustableWeights (sim, t):
@@ -642,18 +628,6 @@ def recordWeights (sim, t):
                     sim.allRLWeights[-1].append(float(conn['hObj'].weight[0])) # save weight only for Rl-STDP conns
                 else:
                     sim.allNonRLWeights[-1].append(float(conn['hObj'].weight[0])) # save weight only for nonRL-STDP conns
-
-def saveAdjustableWeights(sim):
-    ''' Save the weights for each plastic synapse '''
-    with open(sim.AdjustableWeightsfilename,'w+') as fid1:
-        for j in range(len(sim.WeightsPreID)):
-            fid1.write('%0.0f' % sim.WeightsRecordingTimes[j])
-            fid1.write('\t%0.0f' % sim.WeightsPreID[j])
-            fid1.write('\t%0.0f' % sim.WeightsPostID[j])
-            fid1.write('\t%0.0f' % sim.WeightsSTDPtype[j])
-            fid1.write('\t%0.8f' % sim.allAdjustableWeights[j])
-            fid1.write('\n')
-    print(('Saved Adjustable Weights as %s' % sim.AdjustableWeightsfilename))
     
 def saveWeights(sim, downSampleCells):
     ''' Save the weights for each plastic synapse '''
