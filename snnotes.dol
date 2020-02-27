@@ -252,3 +252,55 @@ savefig('gif/20feb27_wghts_a2.png')
 
 so both ML and MR weights are increasing - that's incorrect
 
+checking if recording the synaptic weights into sim.simData['synweights'] will work
+with netpyne gathering the info across nodes automatically ...
+
+python3
+import numpy as np
+from pylab import *
+import pickle
+
+simConfig = pickle.load(open('data/simConfig.pkl','rb'))
+simConfig.keys() # dict_keys(['netpyne_version', 'netpyne_changeset', 'net', 'simConfig', 'simData'])
+simConfig['simData'].keys() # dict_keys(['spkt', 'spkid', 'V_soma', 't', 'synweights', 'avgRate'])
+len(simConfig['simData']['synweights']) # 22000
+simConfig['simData']['synweights'][0] # [99.9999999999986, 0.0025, 1184, 900, 1]
+
+and that was when running with 1 node ... try again with > 1 to see if same
+
+myrun 16
+
+Traceback (most recent call last):
+  File "sim.py", line 988, in <module>
+    sim.gatherData() # gather data from different nodes
+  File "/usr/site/python/netpyne/netpyne/sim/gather.py", line 165, in gatherData
+    sim.allSimData[key].update(val)           # update simData dicts which are not Vectors
+ValueError: dictionary update sequence element #0 has length 5; 2 is required
+
+change sim.simData['synweights'] to a dict (with key 0 pointing to a list of lists)
+
+type(sim.simData['synweights']) # <class 'dict'>
+sim.simData['synweights'][0][0] # [99.9999999999986, 0.0025, 1184, 912, 1]
+len(sim.simData['synweights'][0]) # 1320
+len(sim.allSimData['synweights'][0]) # 1320
+sim.allSimData['synweights'].keys() # dict_keys([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15])
+len(sim.allSimData['synweights'][15]) # 1320
+sum([len(sim.allSimData['synweights'][i]) for i in range(16)]) # 22000
+
+import pickle
+simConfig = pickle.load(open('data/simConfig.pkl','rb'))
+len(simConfig['simData']['synweights'][0]) # 1320
+simConfig['simData']['synweights'].keys() # dict_keys([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15])
+simConfig['simData']['synweights'][0][0] # [99.9999999999986, 0.0025, 1184, 912, 1]
+
+ion()
+awt = np.loadtxt('data/AdjustableWeights.txt')
+
+import pandas as pd
+pdf = pd.DataFrame(awt,columns=['time','preid','postid','stdptype','weight'])
+
+
+ok, good ...
+
+dstartidx = {p:simConfig['net']['pops'][p]['cellGids'][0] for p in simConfig['net']['pops'].keys()}
+dendidx = {p:simConfig['net']['pops'][p]['cellGids'][-1] for p in simConfig['net']['pops'].keys()}

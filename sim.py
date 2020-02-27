@@ -16,8 +16,6 @@ sim.MotorOutputsfilename = 'data/MotorOutputs.txt'
 sim.WeightsRecordingTimes = [] #because first row would be PreID, second-postID and third-type of STDP
 sim.WeightsPreID = [] #save gid for presynaptic neuron; using -1 because 1st column would be time
 sim.WeightsPostID = [] #save gid for postsynaptic neuron-- the actual neuron linked to the conn
-sim.WeightsPreType = [] #save type for presynaptic neuron
-sim.WeightsPostType = [] #save type for postsynaptic neuron
 sim.WeightsSTDPtype = [] #0 for STDP, 1 for RL based 
 sim.allAdjustableWeights = []
 sim.allRLWeights = [] # list to store weights --- should remove that
@@ -607,17 +605,17 @@ simConfig.analysis['plotRaster'] = {'popRates':'overlay','saveData':'data/Raster
 sim.SMARTAgent = None
 
 def recordAdjustableWeightsPop (sim, t, popname):
+    if 'synweights' not in sim.simData: sim.simData['synweights'] = {sim.rank:[]}
     # record the plastic weights for specified popname
     lcell = [c for c in sim.net.cells if c.gid in sim.net.pops[popname].cellGids] # this is the set of MR cells
     for cell in lcell:
         for conn in cell.conns:
             if 'hSTDP' in conn:
+                sim.simData['synweights'][sim.rank].append([t,float(conn['hObj'].weight[0]),cell.gid,conn.preGid,conn.plast.params.RLon]) 
                 sim.WeightsRecordingTimes.append(t)
                 sim.allAdjustableWeights.append(float(conn['hObj'].weight[0])) # save weight for both Rl-STDP and nonRL-STDP conns
                 sim.WeightsPostID.append(cell.gid) #record ID of postsynaptic neuron
                 sim.WeightsPreID.append(conn.preGid)
-                sim.WeightsPreType.append(cell.tags['pop'])
-                #sim.WeightsPostType.append(cell.tags['pop'])     
                 if conn.plast.params.RLon ==1:
                     sim.WeightsSTDPtype.append(1) #for RL
                 else:
