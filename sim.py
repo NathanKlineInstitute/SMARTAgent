@@ -879,10 +879,20 @@ def trainAgent (t):
         rewards, epCount, InputImages = sim.AIGame.playGame(actions, epCount, InputImages)
 
         if dconf['sim']['RLFakeUpRule']: # fake rule for testing reinforcing of up moves
-          critic = np.sign(actions.count(dconf['moves']['UP']) - actions.count(dconf['moves']['DOWN']))
+          if actions.count(dconf['moves']['UP']) > 0 and actions.count(dconf['moves']['DOWN']) < 1:
+            critic = 1
+          elif actions.count(dconf['moves']['DOWN']) > actions.count(dconf['moves']['UP']):
+            critic = -1
+          else:
+            critic = 0
           rewards = [critic for i in range(len(rewards))]
         elif dconf['sim']['RLFakeDownRule']: # fake rule for testing reinforcing of down moves
-          critic = np.sign(actions.count(dconf['moves']['DOWN']) - actions.count(dconf['moves']['UP']))
+          if actions.count(dconf['moves']['DOWN']) > 0 and actions.count(dconf['moves']['UP']) < 1:
+            critic = 1
+          elif actions.count(dconf['moves']['UP']) > actions.count(dconf['moves']['DOWN']):
+            critic = -1
+          else:
+            critic = 0
           rewards = [critic for i in range(len(rewards))]          
         else: # normal game play scoring rules
           critic = sum(rewards) # get critic signal (-1, 0 or 1)
