@@ -553,8 +553,7 @@ netParams.connParams['V1->ML'] = {
         'postConds': {'pop': 'ML'},
         #'connList': blistMItoMO,
         'convergence': 16,
-        'weight': 0.0,
-        #'weight': 0.001,
+        'weight': 0.001,
         'delay': 2,
         'synMech': 'AMPA',
         'plast': {'mech': 'STDP', 'params': STDPparamsRL}}
