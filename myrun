@@ -1,1 +1,2 @@
+rm data/AdjustableWeights.txt
 mpiexec -n $1 nrniv -python -mpi trainSmartAgent.py

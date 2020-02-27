@@ -16,6 +16,8 @@ sim.MotorOutputsfilename = 'data/MotorOutputs.txt'
 sim.WeightsRecordingTimes = [] #because first row would be PreID, second-postID and third-type of STDP
 sim.WeightsPreID = [] #save gid for presynaptic neuron; using -1 because 1st column would be time
 sim.WeightsPostID = [] #save gid for postsynaptic neuron-- the actual neuron linked to the conn
+sim.WeightsPreType = [] #save type for presynaptic neuron
+sim.WeightsPostType = [] #save type for postsynaptic neuron
 sim.WeightsSTDPtype = [] #0 for STDP, 1 for RL based 
 sim.allAdjustableWeights = []
 sim.allRLWeights = [] # list to store weights --- should remove that
@@ -613,6 +615,8 @@ def recordAdjustableWeightsPop (sim, t, popname):
                 sim.allAdjustableWeights.append(float(conn['hObj'].weight[0])) # save weight for both Rl-STDP and nonRL-STDP conns
                 sim.WeightsPostID.append(cell.gid) #record ID of postsynaptic neuron
                 sim.WeightsPreID.append(conn.preGid)
+                sim.WeightsPreType.append(cell.tags['pop'])
+                #sim.WeightsPostType.append(cell.tags['pop'])     
                 if conn.plast.params.RLon ==1:
                     sim.WeightsSTDPtype.append(1) #for RL
                 else:
@@ -623,7 +627,7 @@ def recordAdjustableWeights (sim, t):
     """ record the STDP weights during the simulation - called in trainAgent
     """
     for pop in ['MR', 'ML']:
-      print(sim.rank,'updating len(',pop,') =', recordAdjustableWeightsPop(sim, t, 'MR'))
+      print(sim.rank,'updating len(',pop,') =', recordAdjustableWeightsPop(sim, t, pop))
 
 def recordWeights (sim, t):
     """ record the STDP weights during the simulation - called in trainAgent
@@ -642,8 +646,8 @@ def recordWeights (sim, t):
 
 def saveAdjustableWeights(sim):
     ''' Save the weights for each plastic synapse '''
-    with open(sim.AdjustableWeightsfilename,'w') as fid1:
-        for j in range(1,len(sim.WeightsPreID)):
+    with open(sim.AdjustableWeightsfilename,'w+') as fid1:
+        for j in range(len(sim.WeightsPreID)):
             fid1.write('%0.0f' % sim.WeightsRecordingTimes[j])
             fid1.write('\t%0.0f' % sim.WeightsPreID[j])
             fid1.write('\t%0.0f' % sim.WeightsPostID[j])

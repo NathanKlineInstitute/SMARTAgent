@@ -113,3 +113,84 @@ hist(d[:,1])
 to test if it's working just check the RL weights onto ML vs MR; weights onto ML neurons should
 increase, while weights onto MR should decrease ...  if that's not happening, something is wrong ...
 
+*20feb26
+** looking at the output weights for the fake training task
+
+myrun 1
+quit()
+
+python3
+import numpy as np
+from pylab import *
+ion()
+awt = np.loadtxt('data/AdjustableWeights.txt')
+awt.shape # (21999, 5) # columns are time, preid, postid, stdptype, weight
+
+plot(awt[:,0],awt[:,4],'ko')
+savefig('gif/20feb26_a0.png')
+
+need to know cell types ...
+
+import pandas as pd
+pdf = pd.DataFrame(awt,columns=['time','preid','postid','stdptype','weight'])
+len(pdf) # 21999
+
+pdfs = pdf[(pdf.postid==1184) & (pdf.stdptype==1)]
+len(pdfs) # 879
+plot(pdfs.time,pdfs.weight,'r')
+savefig('gif/20feb26_a1.png') # looks incorrect ?? does it go up and down or are those two different synapses?
+
+min(pdfs.preid),max(pdfs.preid) # (403.0, 924.0)
+yeah, two preids ... and they're differnet because different source populations ...
+
+pdfs = pdf[(pdf.postid==1184) & (pdf.stdptype==1) & (pdf.preid==403)]
+len(pdfs) # 20
+plot(pdfs.time,pdfs.weight,'b')
+savefig('gif/20feb26_a2.png')
+ok, that weight is increasing gradually ... but is that the ML or MR output population?
+
+ID 1159 through 1183 (inclusive) are the ML neurons? (/u/samn/SMARTAgent/trainSmartAgent.py:754)
+
+pdfs = pdf[(pdf.postid==1159) & (pdf.stdptype==1)]
+len(pdfs) # 0
+
+pdfs = pdf[(pdf.postid==1160) & (pdf.stdptype==1)]
+len(pdfs) # 0
+
+pdfs = pdf[(pdf.postid>=1159) & (pdf.postid<=1183) & (pdf.stdptype==1)]
+len(pdfs) # 0
+
+hmm, are any of the ML weights getting saved??
+
+note that this was run with a single core ...
+
+ah, a bug in new code ...
+
+fix, rerun ...
+
+myrun 1
+
+python3
+import numpy as np
+from pylab import *
+ion()
+awt = np.loadtxt('data/AdjustableWeights.txt')
+awt.shape # (22000, 5) # columns are time, preid, postid, stdptype, weight
+
+plot(awt[:,0],awt[:,4],'ko')
+
+import pandas as pd
+pdf = pd.DataFrame(awt,columns=['time','preid','postid','stdptype','weight'])
+pdfs = pdf[(pdf.postid>=1159) & (pdf.postid<=1183) & (pdf.stdptype==1)]
+len(pdfs) # 11000
+
+should save types in the file ... 
+
+plot(pdfs.time,pdfs.weight,'b')
+
+myrun 1
+sim.net.cells[0].tags['pop'] # 'R'
+
+sim.net.cells[1184].tags['pop'] # 'MR'
+sim.net.cells[1159].tags['pop'] # 'ML'
+
