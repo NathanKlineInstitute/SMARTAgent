@@ -19,7 +19,7 @@ import json
 import gym
 import sys
 
-# make the environment
+# make the environment - env is global so that it only gets created on a single node (important when using MPI with > 1 node)
 try:
   from conf import dconf
   env = gym.make(dconf['env']['name'],frameskip=dconf['env']['frameskip'])
@@ -29,37 +29,35 @@ except:
   env = gym.make('Pong-v0',frameskip=3)
   env.reset()
 
-class SMARTAgent:
+class AIGame:
+    """ Interface to OpenAI gym game 
+    """
     def __init__ (self,fcfg='sim.json'): # initialize variables
         self.env = env
         self.count = 0 
         self.countAll = 0
         self.fvec = h.Vector()
         self.firing_rates = np.zeros(400)  # image-based input firing rates; 20x20 = 400 pixels
+        self.intaction = 5 # integrate this many actions together before returning reward information to model
     ################################
     ### PLAY GAME
     ###############################
-    def playGame(self, actions, epCount, InputImages): #actions need to be generated from motor cortex
+    def playGame (self, actions, epCount, InputImages): #actions need to be generated from motor cortex
         #rewards = np.zeros(shape=(1,5))
         rewards = []
         dsum_Images = np.zeros(shape=(20,20)) #previously we merged 2x2 pixels into 1 value. Now we merge 8x8 pixels into 1 value. so the original 160x160 pixels will result into 20x20 values instead of previously used 80x80.
         #print(actions)
         gray_Image = np.zeros(shape=(160,160))        
-        for a in range(5):
-            #action = random.randint(3,4)
+        for a in range(self.intaction):
             caction = actions[a]
             observation, reward, done, info = self.env.step(caction)
             rewards.append(reward)
-            Image = observation[34:194,:,:]
+            Image = observation[34:194,:,:] # why does it only use rows 34 through 194?
             for i in range(160):
                 for j in range(160):
                     gray_Image[i][j]= 0.2989*Image[i][j][0] + 0.5870*Image[i][j][1] + 0.1140*Image[i][j][2]
-            #gray_ds = gray_Image[:,range(0,gray_Image.shape[1],2)]
-            #gray_ds = gray_ds[range(0,gray_ds.shape[0],2),:]
             gray_ds = downscale_local_mean(gray_Image,(8,8))
             gray_ds = np.where(gray_ds>np.min(gray_ds)+1,255,gray_ds) #Different thresholding
-            #gray_ds = np.where(gray_ds<127,0,gray_ds)
-            #gray_ds = np.where(gray_ds>=127,255,gray_ds)
             if self.count==0: # 
                 i0 = 0.6*gray_ds
                 self.count = self.count+1
@@ -86,16 +84,15 @@ class SMARTAgent:
         fr_Images = 40/(1+np.exp((np.multiply(-1,dsum_Images)+123)/25))
         fr_Images = np.subtract(fr_Images,7.722) #baseline firing rate subtraction. Instead all excitatory neurons are firing at 5Hz.
         #print(np.amax(fr_Images))
-        self.firing_rates = np.reshape(fr_Images,400) #6400 for 80*80 Image, now its 400 for 20*20
+        self.firing_rates = np.reshape(fr_Images,400) #400 for 20*20
         self.env.render()
-        print(self.countAll)
+        #print(self.countAll)
         if done: # what is done? --- when done == 1, it means that 1 episode of the game ends, so it needs to be reset. 
             epCount.append(self.countAll)
             self.env.reset()
-            self.env.frameskip = 3 # why is frameskip set to 2 here? -- fixed to 3
+            self.env.frameskip = 3 
             self.countAll = 0 # should self.count also get set to 0?
         return rewards, epCount, InputImages
-        #return firing_rates
 
     def playGameFake(self, last_obs, epCount, InputImages): #actions are generated based on Vector Algebra
         #rewards = np.zeros(shape=(1,5))
@@ -163,32 +160,11 @@ class SMARTAgent:
         #print(np.amax(fr_Images))
         self.firing_rates = np.reshape(fr_Images,400) #6400 for 80*80 Image, now its 400 for 20*20
         self.env.render()
-        print(self.countAll)
+        #print(self.countAll)
         if done:
             epCount.append(self.countAll)
             self.env.reset()
             self.env.frameskip = 3
             self.countAll = 0
         return rewards, actions, last_obs, epCount, InputImages
-
-    ################################          
-    ### RUN     
-    ################################
-    def run (self, f):
-        #SMARTAgent.playGame(self)
-        if f.rank==0:
-            f.pc.broadcast(self.fvec.from_python(self.firing_rates),0)
-            #print('Broadcasting firing rates from master:')
-            #print(np.where(self.firing_rates==np.amax(self.firing_rates)),np.amax(self.firing_rates))
-        else:
-            f.pc.broadcast(self.fvec,0)
-            self.firing_rates = self.fvec.to_python()
-            #print('Receiving firing rates from master:')
-            #print(np.where(self.firing_rates==np.amax(self.firing_rates)),np.amax(self.firing_rates))
-        cind = 0
-        for cell in [c for c in f.net.cells]:  # is this a subset of all the cells in the network ??
-            for stim in cell.stims:
-                if stim['source'] == 'stimMod':
-                    stim['hObj'].interval = 1000.0/self.firing_rates[cind] # interval in ms as a function of rate
-            cind = cind+1
             

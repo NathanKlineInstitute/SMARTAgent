@@ -13,16 +13,9 @@ sim.allActions = [] # list to store all actions
 sim.allMotorOutputs = [] # list to store firing rate of output motor neurons.
 sim.ActionsRewardsfilename = 'data/ActionsRewards.txt'
 sim.MotorOutputsfilename = 'data/MotorOutputs.txt'
-sim.WeightsRecordingTimes = [] #because first row would be PreID, second-postID and third-type of STDP
-sim.WeightsPreID = [] #save gid for presynaptic neuron; using -1 because 1st column would be time
-sim.WeightsPostID = [] #save gid for postsynaptic neuron-- the actual neuron linked to the conn
-sim.WeightsPreType = [] #save type for presynaptic neuron
-sim.WeightsPostType = [] #save type for postsynaptic neuron
-sim.WeightsSTDPtype = [] #0 for STDP, 1 for RL based 
-sim.allAdjustableWeights = []
+sim.WeightsRecordingTimes = []
 sim.allRLWeights = [] # list to store weights --- should remove that
 sim.allNonRLWeights = [] # list to store weights --- should remove that
-sim.AdjustableWeightsfilename = 'data/AdjustableWeights.txt'  # file to store weights
 #sim.NonRLweightsfilename = 'data/NonRLweights.txt'  # file to store weights
 sim.plotWeights = 0  # plot weights
 sim.saveWeights = 1  # save weights
@@ -85,8 +78,8 @@ netParams.synMechParams['GABA'] = {'mod': 'Exp2Syn', 'tau1': 0.07, 'tau2': 9.1, 
 STDPparams = {'hebbwt': 0.0001, 'antiwt':-0.00001, 'wbase': 0.0012, 'wmax': 50, 'RLon': 0 , 'RLhebbwt': 0.001, 'RLantiwt': -0.000,
         'tauhebb': 10, 'RLwindhebb': 50, 'useRLexp': 0, 'softthresh': 0, 'verbose':0}
 
-STDPparamsRL = {'hebbwt': 0.0000, 'antiwt':-0.0000, 'wbase': 0.0012, 'wmax': 50, 'RLon': 1 , 'RLhebbwt': 0.00001, 'RLantiwt': -0.000,
-                'tauhebb': 10, 'RLlenhebb': 800 ,'RLlenanti': 100, 'RLwindhebb': 50, 'useRLexp': 1, 'softthresh': 0, 'verbose':0}
+STDPparamsRL = {'hebbwt': 0.0000, 'antiwt':-0.0000, 'wbase': 0.0, 'wmax': 50, 'RLon': 1 , 'RLhebbwt': 0.00001, 'RLantiwt': -0.000,
+                'tauhebb': 10, 'RLlenhebb': 800 ,'RLlenanti': 100, 'RLwindhebb': 50, 'useRLexp': 0, 'softthresh': 0, 'verbose':0}
 
 netParams.stimSourceParams['stimMod'] = {'type': 'NetStim', 'rate': 'variable', 'noise': 0}
 netParams.stimTargetParams['stimMod->all'] = {'source': 'stimMod',
@@ -413,6 +406,8 @@ netParams.connParams['R->V1'] = {
         'weight': 0.002,
         'delay': 2,
         'synMech': 'AMPA'}
+
+"""
 netParams.connParams['V1->V4'] = {
         'preConds': {'pop': 'V1'},
         'postConds': {'pop': 'V4'},
@@ -447,6 +442,8 @@ netParams.connParams['IT->MR'] = {
         'delay': 2,
         'synMech': 'AMPA',
         'plast': {'mech': 'STDP', 'params': STDPparamsRL}}
+"""
+
 #E to I feedforward connections
 netParams.connParams['R->IV1'] = {
         'preConds': {'pop': 'R'},
@@ -540,7 +537,7 @@ netParams.connParams['IV4->IIT'] = {
         'delay': 2,
         'synMech': 'GABA'}
 
-#Add direct connections from higher layers to motor cortex
+#Add direct connections from lower and higher visual areas to motor cortex
 #Still no idea, how these connections should look like...just trying some numbers: 400 to 25 means convergence factor of 16
 netParams.connParams['V1->MR'] = {
         'preConds': {'pop': 'V1'},
@@ -556,11 +553,13 @@ netParams.connParams['V1->ML'] = {
         'postConds': {'pop': 'ML'},
         #'connList': blistMItoMO,
         'convergence': 16,
-        'weight': 0.001,
+        'weight': 0.0,
+        #'weight': 0.001,
         'delay': 2,
         'synMech': 'AMPA',
         'plast': {'mech': 'STDP', 'params': STDPparamsRL}}
 
+"""
 netParams.connParams['V4->MR'] = {
         'preConds': {'pop': 'V4'},
         'postConds': {'pop': 'MR'},
@@ -579,11 +578,10 @@ netParams.connParams['V4->ML'] = {
         'delay': 2,
         'synMech': 'AMPA',
         'plast': {'mech': 'STDP', 'params': STDPparamsRL}}
-
+"""
 
 #Simulation options
 simConfig = specs.SimConfig()           # object of class SimConfig to store simulation configuration
-
 
 simConfig.duration = dconf['sim']['duration'] # 100e3 # 0.1e5                      # Duration of the simulation, in ms
 simConfig.dt = dconf['sim']['dt']                            # Internal integration timestep to use
@@ -591,9 +589,10 @@ simConfig.verbose = dconf['sim']['verbose']                       # Show detaile
 simConfig.recordTraces = {'V_soma':{'sec':'soma','loc':0.5,'var':'v'}}  # Dict with traces to record
 simConfig.recordCellsSpikes = [-1]
 simConfig.recordStep = dconf['sim']['recordStep'] # Step size in ms to save data (e.g. V traces, LFP, etc)
-simConfig.filename = 'model_output'  # Set file output name
-simConfig.savePickle = False            # Save params, network and sim output to pickle file
+simConfig.filename = 'data/simConfig'  # Set file output name
+simConfig.savePickle = True            # Save params, network and sim output to pickle file
 simConfig.saveMat = False
+simConfig.saveFolder = 'data'
 
 #simConfig.analysis['plotRaster'] = True                         # Plot a raster
 simConfig.analysis['plotTraces'] = {'include': [1159, 1169, 1179, 1189, 1199]}
@@ -603,31 +602,22 @@ simConfig.analysis['plotRaster'] = {'popRates':'overlay','saveData':'data/Raster
 #simConfig.analysis['plotConn'] = True           # plot connectivity matrix
 ###################################################################################################################################
 
-sim.SMARTAgent = None
+sim.AIGame = None
 
 def recordAdjustableWeightsPop (sim, t, popname):
+    if 'synweights' not in sim.simData: sim.simData['synweights'] = {sim.rank:[]}
     # record the plastic weights for specified popname
     lcell = [c for c in sim.net.cells if c.gid in sim.net.pops[popname].cellGids] # this is the set of MR cells
     for cell in lcell:
         for conn in cell.conns:
             if 'hSTDP' in conn:
-                sim.WeightsRecordingTimes.append(t)
-                sim.allAdjustableWeights.append(float(conn['hObj'].weight[0])) # save weight for both Rl-STDP and nonRL-STDP conns
-                sim.WeightsPostID.append(cell.gid) #record ID of postsynaptic neuron
-                sim.WeightsPreID.append(conn.preGid)
-                sim.WeightsPreType.append(cell.tags['pop'])
-                #sim.WeightsPostType.append(cell.tags['pop'])     
-                if conn.plast.params.RLon ==1:
-                    sim.WeightsSTDPtype.append(1) #for RL
-                else:
-                    sim.WeightsSTDPtype.append(0) #for nonRL
+                sim.simData['synweights'][sim.rank].append([t,conn.plast.params.RLon,conn.preGid,cell.gid,float(conn['hObj'].weight[0])])
     return len(lcell)
                     
-def recordAdjustableWeights (sim, t):
+def recordAdjustableWeights (sim, t, lpop = ['MR', 'ML']):
     """ record the STDP weights during the simulation - called in trainAgent
     """
-    for pop in ['MR', 'ML']:
-      print(sim.rank,'updating len(',pop,') =', recordAdjustableWeightsPop(sim, t, pop))
+    for pop in lpop: recordAdjustableWeightsPop(sim, t, pop)
 
 def recordWeights (sim, t):
     """ record the STDP weights during the simulation - called in trainAgent
@@ -643,18 +633,6 @@ def recordWeights (sim, t):
                     sim.allRLWeights[-1].append(float(conn['hObj'].weight[0])) # save weight only for Rl-STDP conns
                 else:
                     sim.allNonRLWeights[-1].append(float(conn['hObj'].weight[0])) # save weight only for nonRL-STDP conns
-
-def saveAdjustableWeights(sim):
-    ''' Save the weights for each plastic synapse '''
-    with open(sim.AdjustableWeightsfilename,'w+') as fid1:
-        for j in range(len(sim.WeightsPreID)):
-            fid1.write('%0.0f' % sim.WeightsRecordingTimes[j])
-            fid1.write('\t%0.0f' % sim.WeightsPreID[j])
-            fid1.write('\t%0.0f' % sim.WeightsPostID[j])
-            fid1.write('\t%0.0f' % sim.WeightsSTDPtype[j])
-            fid1.write('\t%0.8f' % sim.allAdjustableWeights[j])
-            fid1.write('\n')
-    print(('Saved Adjustable Weights as %s' % sim.AdjustableWeightsfilename))
     
 def saveWeights(sim, downSampleCells):
     ''' Save the weights for each plastic synapse '''
@@ -727,35 +705,30 @@ NBsteps = 0
 epCount = []
 last_obs = [] #make sure this does not introduce a bug
 
-Mlist = []
-for mid in range(25): # what is this? list of motor neuron IDs??
-    Mlist.append(mid)
-
 lSTDPmech = [] # global list of STDP mechanisms; so do not have to lookup at each interval function call 
     
 def trainAgentFake(t):
     """ training interface between simulation and game environment
     """
-    global Mlist
     global NBsteps, last_obs, epCount, InputImages
     if t<21.0: # for the first time interval use first action randomly and other four actions based on relative position of ball and agent.
         last_obs = []
         if sim.rank == 0:
-            rewards, actions, last_obs, epCount, InputImages = sim.SMARTAgent.playGameFake(last_obs, epCount, InputImages)
+            rewards, actions, last_obs, epCount, InputImages = sim.AIGame.playGameFake(last_obs, epCount, InputImages)
     else: #the actions are generated based on relative positions of ball and Agent.
         if sim.rank == 0:
-            rewards, actions, last_obs, epCount, InputImages = sim.SMARTAgent.playGameFake(last_obs, epCount, InputImages)
+            rewards, actions, last_obs, epCount, InputImages = sim.AIGame.playGameFake(last_obs, epCount, InputImages)
     #print('actions generated by model are: ', actions)
-    F_R1 = getFiringRatesWithInterval([t-100,t-80], np.add(Mlist,1184))
-    F_R2 = getFiringRatesWithInterval([t-80,t-60], np.add(Mlist,1184))
-    F_R3 = getFiringRatesWithInterval([t-60,t-40], np.add(Mlist,1184))
-    F_R4 = getFiringRatesWithInterval([t-40,t-20], np.add(Mlist,1184))
-    F_R5 = getFiringRatesWithInterval([t-20,t], np.add(Mlist,1184))
-    F_L1 = getFiringRatesWithInterval([t-100,t-80], np.add(Mlist,1159))
-    F_L2 = getFiringRatesWithInterval([t-80,t-60], np.add(Mlist,1159))
-    F_L3 = getFiringRatesWithInterval([t-60,t-40], np.add(Mlist,1159))
-    F_L4 = getFiringRatesWithInterval([t-40,t-20], np.add(Mlist,1159))
-    F_L5 = getFiringRatesWithInterval([t-20,t], np.add(Mlist,1159))
+    F_R1 = getFiringRatesWithInterval([t-100,t-80], sim.net.pops['MR'].cellGids)
+    F_R2 = getFiringRatesWithInterval([t-80,t-60], sim.net.pops['MR'].cellGids)
+    F_R3 = getFiringRatesWithInterval([t-60,t-40], sim.net.pops['MR'].cellGids)
+    F_R4 = getFiringRatesWithInterval([t-40,t-20], sim.net.pops['MR'].cellGids)
+    F_R5 = getFiringRatesWithInterval([t-20,t], sim.net.pops['MR'].cellGids)
+    F_L1 = getFiringRatesWithInterval([t-100,t-80], sim.net.pops['ML'].cellGids)
+    F_L2 = getFiringRatesWithInterval([t-80,t-60], sim.net.pops['ML'].cellGids)
+    F_L3 = getFiringRatesWithInterval([t-60,t-40], sim.net.pops['ML'].cellGids)
+    F_L4 = getFiringRatesWithInterval([t-40,t-20], sim.net.pops['ML'].cellGids)
+    F_L5 = getFiringRatesWithInterval([t-20,t], sim.net.pops['ML'].cellGids)
     fid4.write('%0.1f' % t)
     fid4.write('\t%0.1f' % F_R1)
     fid4.write('\t%0.1f' % F_R2)
@@ -776,7 +749,7 @@ def trainAgentFake(t):
     else:
         critic = 0
     if critic != 0: # if critic signal indicates punishment (-1) or reward (+1)
-        print('t=',t,'- adjusting weights based on RL critic value:', critic)
+        if sim.rank==0: print('t=',t,'- adjusting weights based on RL critic value:', critic)
         for STDPmech in lSTDPmech: STDPmech.reward_punish(float(critic))
     print('rewards are : ', rewards)
     for action in actions:
@@ -788,7 +761,7 @@ def trainAgentFake(t):
         ltpnt = ltpnt+4
         sim.allTimes.append(ltpnt)
     if sim.rank == 0:
-        sim.SMARTAgent.run(t,sim)
+        sim.AIGame.run(t,sim)
     print('trainAgent time is : ', t)
     NBsteps = NBsteps+1
     if NBsteps==recordWeightStepSize:
@@ -801,9 +774,9 @@ def updateInputRates ():
     # update the source firing rates for the R neuron population, based on image contents
     if sim.rank == 0:
         if dconf['verbose'] > 1:
-          print(sim.rank,'broadcasting firing rates:',np.where(sim.SMARTAgent.firing_rates==np.amax(sim.SMARTAgent.firing_rates)),np.amax(sim.SMARTAgent.firing_rates))        
-        sim.pc.broadcast(sim.SMARTAgent.fvec.from_python(sim.SMARTAgent.firing_rates),0)
-        firing_rates = sim.SMARTAgent.firing_rates
+          print(sim.rank,'broadcasting firing rates:',np.where(sim.AIGame.firing_rates==np.amax(sim.AIGame.firing_rates)),np.amax(sim.AIGame.firing_rates))        
+        sim.pc.broadcast(sim.AIGame.fvec.from_python(sim.AIGame.firing_rates),0)
+        firing_rates = sim.AIGame.firing_rates
     else:
         fvec = h.Vector()
         sim.pc.broadcast(fvec,0)
@@ -812,7 +785,7 @@ def updateInputRates ():
           print(sim.rank,'received firing rates:',np.where(firing_rates==np.amax(firing_rates)),np.amax(firing_rates))                
     # update input firing rates for stimuli to R cells
     lRcell = [c for c in sim.net.cells if c.gid in sim.net.pops['R'].cellGids] # this is the set of R cells
-    print(sim.rank,'updating len(lRcell)=',len(lRcell),'source firing rates. len(firing_rates)=',len(firing_rates))
+    if dconf['verbose'] > 1: print(sim.rank,'updating len(lRcell)=',len(lRcell),'source firing rates. len(firing_rates)=',len(firing_rates))
     for cell in lRcell:  
         for stim in cell.stims:
             if stim['source'] == 'stimMod':
@@ -821,7 +794,6 @@ def updateInputRates ():
 def trainAgent (t):
     """ training interface between simulation and game environment
     """
-    global Mlist
     global NBsteps, epCount, InputImages
     vec = h.Vector()
     if t<100.0: # for the first time interval use randomly selected actions
@@ -830,47 +802,38 @@ def trainAgent (t):
             action = dconf['movecodes'][random.randint(0,len(dconf['movecodes'])-1)]
             actions.append(action)
     else: #the actions should be based on the activity of motor cortex (MO) 1085-1093
-        F_R1 = getFiringRatesWithInterval([t-100,t-80], np.add(Mlist,1184)) # what is 1184? 1184 is an offset to neuron indices for MR
+        F_R1 = getFiringRatesWithInterval([t-100,t-80], sim.net.pops['MR'].cellGids) 
         sim.pc.allreduce(vec.from_python([F_R1]), 1) # sum
         F_R1 = vec.to_python()[0] 
-        F_R2 = getFiringRatesWithInterval([t-80,t-60], np.add(Mlist,1184))
+        F_R2 = getFiringRatesWithInterval([t-80,t-60], sim.net.pops['MR'].cellGids)
         sim.pc.allreduce(vec.from_python([F_R2]), 1) # sum
         F_R2 = vec.to_python()[0] 
-        F_R3 = getFiringRatesWithInterval([t-60,t-40], np.add(Mlist,1184))
+        F_R3 = getFiringRatesWithInterval([t-60,t-40], sim.net.pops['MR'].cellGids)
         sim.pc.allreduce(vec.from_python([F_R3]), 1) # sum
         F_R3 = vec.to_python()[0] 
-        F_R4 = getFiringRatesWithInterval([t-40,t-20], np.add(Mlist,1184))
+        F_R4 = getFiringRatesWithInterval([t-40,t-20], sim.net.pops['MR'].cellGids)
         sim.pc.allreduce(vec.from_python([F_R4]), 1) # sum
         F_R4 = vec.to_python()[0] 
-        F_R5 = getFiringRatesWithInterval([t-20,t], np.add(Mlist,1184))
+        F_R5 = getFiringRatesWithInterval([t-20,t], sim.net.pops['MR'].cellGids)
         sim.pc.allreduce(vec.from_python([F_R5]), 1) # sum
         F_R5 = vec.to_python()[0] 
-        F_L1 = getFiringRatesWithInterval([t-100,t-80], np.add(Mlist,1159)) # what is 1159? 1159 is an offset to neuron indices for ML
+        F_L1 = getFiringRatesWithInterval([t-100,t-80], sim.net.pops['ML'].cellGids) 
         sim.pc.allreduce(vec.from_python([F_L1]), 1) # sum
         F_L1 = vec.to_python()[0] 
-        F_L2 = getFiringRatesWithInterval([t-80,t-60], np.add(Mlist,1159))
+        F_L2 = getFiringRatesWithInterval([t-80,t-60], sim.net.pops['ML'].cellGids)
         sim.pc.allreduce(vec.from_python([F_L2]), 1) # sum
         F_L2 = vec.to_python()[0] 
-        F_L3 = getFiringRatesWithInterval([t-60,t-40], np.add(Mlist,1159))
+        F_L3 = getFiringRatesWithInterval([t-60,t-40], sim.net.pops['ML'].cellGids)
         sim.pc.allreduce(vec.from_python([F_L3]), 1) # sum
         F_L3 = vec.to_python()[0] 
-        F_L4 = getFiringRatesWithInterval([t-40,t-20], np.add(Mlist,1159))
+        F_L4 = getFiringRatesWithInterval([t-40,t-20], sim.net.pops['ML'].cellGids)
         sim.pc.allreduce(vec.from_python([F_L4]), 1) # sum
         F_L4 = vec.to_python()[0] 
-        F_L5 = getFiringRatesWithInterval([t-20,t], np.add(Mlist,1159))
+        F_L5 = getFiringRatesWithInterval([t-20,t], sim.net.pops['ML'].cellGids)
         sim.pc.allreduce(vec.from_python([F_L5]), 1) # sum
         F_L5 = vec.to_python()[0] 
         if sim.rank==0:
-            print('Firing rate : %.3f Hz' % F_R1)
-            print('Firing rate : %.3f Hz' % F_R2)
-            print('Firing rate : %.3f Hz' % F_R3)
-            print('Firing rate : %.3f Hz' % F_R4)
-            print('Firing rate : %.3f Hz' % F_R5)
-            print('Firing rate : %.3f Hz' % F_L1)
-            print('Firing rate : %.3f Hz' % F_L2)
-            print('Firing rate : %.3f Hz' % F_L3)
-            print('Firing rate : %.3f Hz' % F_L4)
-            print('Firing rate : %.3f Hz' % F_L5)
+            print('Firing rates: ', F_R1, F_R2, F_R3, F_R4, F_R5, F_L1, F_L2, F_L3, F_L4, F_L5)
             fid4.write('%0.1f' % t)
             fid4.write('\t%0.1f' % F_R1)
             fid4.write('\t%0.1f' % F_R2)
@@ -918,16 +881,17 @@ def trainAgent (t):
             # actions = [dconf['moves']['UP'] for i in range(5)] # force move UP for testing
             
     if sim.rank == 0:
-        print('actions generated by model are: ', actions)
-        rewards, epCount, InputImages = sim.SMARTAgent.playGame(actions, epCount, InputImages)
+        print('Model actions:', actions)
+        rewards, epCount, InputImages = sim.AIGame.playGame(actions, epCount, InputImages)
 
         if dconf['sim']['RLFakeUpRule']: # fake rule for testing reinforcing of up moves
-          critic = np.sign(actions.count(dconf['moves']['UP']) - actions.count(dconf['moves']['DOWN']))
+          critic = np.sign(actions.count(dconf['moves']['UP']) - actions.count(dconf['moves']['DOWN']))          
+          rewards = [critic for i in range(len(rewards))]
         elif dconf['sim']['RLFakeDownRule']: # fake rule for testing reinforcing of down moves
           critic = np.sign(actions.count(dconf['moves']['DOWN']) - actions.count(dconf['moves']['UP']))
+          rewards = [critic for i in range(len(rewards))]          
         else: # normal game play scoring rules
           critic = sum(rewards) # get critic signal (-1, 0 or 1)
-        if critic<0: critic = 0 #just to make sure there is no punishment
         if dconf['verbose']:
           if critic > 0:
             print('REWARD')
@@ -941,26 +905,23 @@ def trainAgent (t):
         sim.pc.broadcast(vec, 0) # receive critic value from master node
         critic = vec.to_python()[0] # critic is first element of the array
     if critic != 0: # if critic signal indicates punishment (-1) or reward (+1)
-        print('t=',t,'- adjusting weights based on RL critic value:', critic)
+        if sim.rank==0: print('t=',t,'- adjusting weights based on RL critic value:', critic)
         for STDPmech in lSTDPmech: STDPmech.reward_punish(float(critic))        
     if sim.rank==0:
-        print('rewards are : ', rewards) # only rank 0 has access to rewards      
+        print('Game rewards:', rewards) # only rank 0 has access to rewards      
         for action in actions:
             sim.allActions.append(action)
         for reward in rewards: # this generates an error - since rewards only declared for sim.rank==0; bug?
             sim.allRewards.append(reward)
-            
-    ltpnt = t-20
-    for _ in range(5):
-        ltpnt = ltpnt+4
-        sim.allTimes.append(ltpnt)
+
+        for ltpnt in [t-80, t-60, t-40, t-20, t-0]: sim.allTimes.append(ltpnt)
 
     updateInputRates() # update firing rate of inputs to R population (based on image content)
                 
     NBsteps = NBsteps+1
     if NBsteps==recordWeightStepSize:
         #if t%recordWeightDT==0:
-        print('Weights Recording Time:', t)
+        if dconf['verbose'] > 1: print('Weights Recording Time:', t)
         recordAdjustableWeights(sim, t) 
         #recordWeights(sim, t)
         NBsteps = 0
@@ -987,9 +948,9 @@ sim.setupRecording()                  # setup variables to record for each cell 
 
 lSTDPmech = getAllSTDPObjects(sim) # get all the STDP objects up-front
 
-if sim.rank == 0: # only create SMARTAgent on node 0
-    from aigame import SMARTAgent
-    sim.SMARTAgent = SMARTAgent()
+if sim.rank == 0: # only create AIGame on node 0
+    from aigame import AIGame
+    sim.AIGame = AIGame()
 
 sim.runSimWithIntervalFunc(100.0,trainAgent) # has periodic callback to adjust STDP weights based on RL signal
 sim.gatherData() # gather data from different nodes
@@ -999,7 +960,6 @@ sim.analysis.plotData()
 if sim.plotWeights: plotWeights() 
 
 if sim.saveWeights:
-    saveAdjustableWeights(sim)
     #saveWeights(sim, recordWeightDCells)
     saveGameBehavior(sim)
     fid5 = open('data/ActionsPerEpisode.txt','w')

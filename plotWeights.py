@@ -1,42 +1,50 @@
-import numpy
-import matplotlib.pyplot as plt
+import numpy as np
+from pylab import *
+import pickle
+import pandas as pd
 
-A = numpy.loadtxt('data/AdjustableWeights.txt')
-postN = A[:,2]
-postN_MR = numpy.where(postN>1183)
-postN_ML = numpy.where(postN<1184)#first one is bad
-Mneurons_R = numpy.unique(postN[postN_MR])
-Mneurons_L = numpy.unique(postN[postN_ML])
+ion()
 
-times = A[:,0]
-utimes = numpy.unique(times)
+simConfig = pickle.load(open('data/simConfig.pkl','rb'))
 
-#numpy.zeros(shape=(20,20))
-All_ML_weights = []
-All_MR_weights = []
-for t in utimes:
-    ctime_inds = numpy.where(times==t)
-    ctime_postNs = A[ctime_inds,2]
-    ctime_preNs = A[ctime_inds,1]
-    ctime_weights = A[ctime_inds,4]
-    ML_weights = []
-    MR_weights = []
-    for n in ctime_postNs[0]:
-        cn_preNs = ctime_preNs[0][numpy.where(ctime_postNs[0]==n)]
-        if len(cn_preNs)>len(numpy.unique(cn_preNs)):
-            print(len(cn_preNs)-len(numpy.unique(cn_preNs)))
-        cn_weights = ctime_weights[0][numpy.where(ctime_postNs[0]==n)]       
-        if n in Mneurons_R:
-            MR_weights.append(numpy.sum(cn_weights))
-        elif n in Mneurons_L:
-            ML_weights.append(numpy.sum(cn_weights))
-    All_ML_weights.append(numpy.sum(ML_weights))
-    All_MR_weights.append(numpy.sum(MR_weights))
+dstartidx = {p:simConfig['net']['pops'][p]['cellGids'][0] for p in simConfig['net']['pops'].keys()} # starting indices for each population
+dendidx = {p:simConfig['net']['pops'][p]['cellGids'][-1] for p in simConfig['net']['pops'].keys()} # ending indices for each population
 
-#plt.subplot(1,2,1)
-plt.plot(utimes,All_ML_weights,'r-')
-plt.plot(utimes,All_MR_weights,'b-')
-plt.xlabel('time [msec]')
-plt.legend(('ML','MR'),loc='upper left')
-plt.title('Weights')
-plt.show()
+#
+def readinweights (d):
+  A = []
+  ddsyn = d['simData']['synweights']
+  for rank in ddsyn.keys():
+    dsyn = ddsyn[rank]
+    for lsyn in dsyn:
+      A.append(lsyn)
+  return pd.DataFrame(A,columns=['time','stdptype','preid','postid','weight'])
+
+pdf = readinweights(simConfig)
+
+actreward = np.loadtxt('data/ActionsRewards.txt') 
+
+#
+def plotavgweights (pdf):
+  utimes = np.unique(pdf.time)
+  All_ML_weights = []
+  All_MR_weights = []
+  for t in utimes:
+      for pop, arr in zip(['ML','MR'],[All_ML_weights,All_MR_weights]):
+        pdfs = pdf[(pdf.time==t) & (pdf.postid>=dstartidx[pop]) & (pdf.postid<=dendidx[pop]) & (pdf.preid>=dstartidx['V1']) & (pdf.preid<=dendidx['V1'])]
+        arr.append(np.mean(pdfs.weight))
+  subplot(2,1,1)
+  plot(actreward[:,0],actreward[:,2],'k',linewidth=4)
+  plot(actreward[:,0],actreward[:,2],'ko',markersize=10)  
+  xlim((0,simConfig['simConfig']['duration']))
+  ylim((-1.1,1.1))
+  subplot(2,1,2)
+  plot(utimes,All_ML_weights,'r-',linewidth=3);
+  plot(utimes,All_MR_weights,'b-',linewidth=3); 
+  legend(('V->ML','V->MR'),loc='upper left')
+  plot(utimes,All_ML_weights,'ro',markersize=10);  plot(utimes,All_MR_weights,'bo',markersize=10)
+  xlabel('Time (ms)'); ylabel('RL weights')
+  xlim((0,simConfig['simConfig']['duration']))
+  return All_ML_weights, All_MR_weights
+
+All_ML_weights,All_MR_Weights = plotavgweights(pdf)

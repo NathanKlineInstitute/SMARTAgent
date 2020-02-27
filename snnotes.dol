@@ -194,3 +194,152 @@ sim.net.cells[0].tags['pop'] # 'R'
 sim.net.cells[1184].tags['pop'] # 'MR'
 sim.net.cells[1159].tags['pop'] # 'ML'
 
+*20feb27
+** continue debugging
+
+to get the network/cell info use this:
+simConfig.savePickle = True            # Save params, network and sim output to pickle file
+
+myrun 1
+
+from pylab import *
+savefig('gif/20feb27_rast_a0.png')
+
+simConfig.filename = 'data/simConfig'
+sim.saveFolder = 'data'
+
+python3
+import numpy as np
+from pylab import *
+ion()
+awt = np.loadtxt('data/AdjustableWeights.txt')
+
+import pandas as pd
+pdf = pd.DataFrame(awt,columns=['time','preid','postid','stdptype','weight'])
+pdfs = pdf[(pdf.postid>=1159) & (pdf.postid<=1183) & (pdf.stdptype==1)]
+
+import pickle
+simConfig = pickle.load(open('data/simConfig.pkl','rb'))
+simConfig.keys() # dict_keys(['netpyne_version', 'netpyne_changeset', 'net', 'simConfig', 'simData'])
+
+simConfig['net'].keys() # dict_keys(['params', 'cells', 'pops'])
+simConfig['net']['pops'].keys() # odict_keys(['R', 'V1', 'V4', 'IT', 'IR', 'IV1', 'IV4', 'IIT', 'ML', 'MR'])
+simConfig['net']['pops']['MR'].keys() # dict_keys(['tags', 'cellGids'])
+simConfig['net']['pops']['MR']['cellGids'] # [1184, 1185, 1186, 1187, 1188, 1189, 1190, 1191, 1192, 1193, 1194, 1195, 1196, 1197, 1198, 1199, 1200, 1201, 1202, 1203, 1204, 1205, 1206, 1207, 1208]
+simConfig['net']['pops']['ML']['cellGids'] # [1159, 1160, 1161, 1162, 1163, 1164, 1165, 1166, 1167, 1168, 1169, 1170, 1171, 1172, 1173, 1174, 1175, 1176, 1177, 1178, 1179, 1180, 1181, 1182, 1183]
+
+ok, good ...
+
+dstartidx = {p:simConfig['net']['pops'][p]['cellGids'][0] for p in simConfig['net']['pops'].keys()}
+dendidx = {p:simConfig['net']['pops'][p]['cellGids'][-1] for p in simConfig['net']['pops'].keys()}
+
+dstartidx # {'R': 0, 'V1': 400, 'V4': 800, 'IT': 900, 'IR': 925, 'IV1': 1025, 'IV4': 1125, 'IIT': 1150, 'ML': 1159, 'MR': 1184}
+dendidx # {'R': 399, 'V1': 799, 'V4': 899, 'IT': 924, 'IR': 1024, 'IV1': 1124, 'IV4': 1149, 'IIT': 1158, 'ML': 1183, 'MR': 1208}
+
+pdfs = pdf[(pdf.postid>=dstartidx['ML']) & (pdf.postid<=dendidx['ML']) & (pdf.preid>=dstartidx['V1']) & (pdf.preid<=dendidx['V1']) & (pdf.stdptype==1)]
+len(pdfs) # 4000
+
+plot(pdfs.time,pdfs.weight,'bo')
+
+savefig('gif/20feb27_wghts_a1.png')
+
+pdfs = pdf[(pdf.postid>=dstartidx['MR']) & (pdf.postid<=dendidx['MR']) & (pdf.preid>=dstartidx['V1']) & (pdf.preid<=dendidx['V1']) & (pdf.stdptype==1)]
+len(pdfs) # 4000
+
+plot(pdfs.time,pdfs.weight,'ro')
+
+savefig('gif/20feb27_wghts_a2.png')
+
+so both ML and MR weights are increasing - that's incorrect
+
+checking if recording the synaptic weights into sim.simData['synweights'] will work
+with netpyne gathering the info across nodes automatically ...
+
+python3
+import numpy as np
+from pylab import *
+import pickle
+
+simConfig = pickle.load(open('data/simConfig.pkl','rb'))
+simConfig.keys() # dict_keys(['netpyne_version', 'netpyne_changeset', 'net', 'simConfig', 'simData'])
+simConfig['simData'].keys() # dict_keys(['spkt', 'spkid', 'V_soma', 't', 'synweights', 'avgRate'])
+len(simConfig['simData']['synweights']) # 22000
+simConfig['simData']['synweights'][0] # [99.9999999999986, 0.0025, 1184, 900, 1]
+
+and that was when running with 1 node ... try again with > 1 to see if same
+
+myrun 16
+
+Traceback (most recent call last):
+  File "sim.py", line 988, in <module>
+    sim.gatherData() # gather data from different nodes
+  File "/usr/site/python/netpyne/netpyne/sim/gather.py", line 165, in gatherData
+    sim.allSimData[key].update(val)           # update simData dicts which are not Vectors
+ValueError: dictionary update sequence element #0 has length 5; 2 is required
+
+change sim.simData['synweights'] to a dict (with key 0 pointing to a list of lists)
+
+type(sim.simData['synweights']) # <class 'dict'>
+sim.simData['synweights'][0][0] # [99.9999999999986, 0.0025, 1184, 912, 1]
+len(sim.simData['synweights'][0]) # 1320
+len(sim.allSimData['synweights'][0]) # 1320
+sim.allSimData['synweights'].keys() # dict_keys([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15])
+len(sim.allSimData['synweights'][15]) # 1320
+sum([len(sim.allSimData['synweights'][i]) for i in range(16)]) # 22000
+
+import pickle
+simConfig = pickle.load(open('data/simConfig.pkl','rb'))
+len(simConfig['simData']['synweights'][0]) # 1320
+simConfig['simData']['synweights'].keys() # dict_keys([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15])
+simConfig['simData']['synweights'][0][0] # [99.9999999999986, 0.0025, 1184, 912, 1]
+
+ion()
+awt = np.loadtxt('data/AdjustableWeights.txt')
+
+import pandas as pd
+pdf = pd.DataFrame(awt,columns=['time','preid','postid','stdptype','weight'])
+
+
+ok, good ...
+
+dstartidx = {p:simConfig['net']['pops'][p]['cellGids'][0] for p in simConfig['net']['pops'].keys()}
+dendidx = {p:simConfig['net']['pops'][p]['cellGids'][-1] for p in simConfig['net']['pops'].keys()}
+
+testing basic mechanism again , with RL exp off and fake up rule ... 
+
+myrun 16
+
+plw
+
+savefig('gif/20feb27_rewards_wghts_a3.png')
+
+seems to generally work, once separated out the population specific projections (V1->ML and V1->MR) ...
+but not clear why V1->MR is getting reinforced when MR produces down moves ...
+
+could be that MR getting reinforced since V1 projects to both MR and ML and V1->MR synapses are tagged
+within the interval when V1->ML synapses are tagged for reward ...
+
+try cutting off some of the higher connections connections and see what happens ... e.g. no V1 -> MR
+and no V4, IT -> ML or -> MR; and may need to set wbase to 0 as well ...
+
+myrun 16
+
+now for some reason ML never firing ... ??? no, ML firing but MR not firing (that was the test)
+but mostly only producing move 3 (down), instead of 4 (up) ... why?
+
+savefig('gif/20feb27_rewards_wghts_a4.png')
+savefig('gif/20feb27_rewards_wghts_a5.png')
+
+hmm, had the rule backwards:
+            if F_R1>F_L1:
+                actions.append(dconf['moves']['UP']) #UP
+            elif F_R1<F_L1:
+                actions.append(dconf['moves']['DOWN']) # Down
+            else:
+            actions.append(dconf['moves']['NOMOVE']) # No move
+
+R produces up, L produces down ...
+
+ok, fixing that, now V->MR weights go up as they should (but now have turned off inputs to ML)
+savefig('gif/20feb27_rewards_wghts_a6.png')
+
