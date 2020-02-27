@@ -31,18 +31,20 @@ def plotavgweights (pdf):
   All_MR_weights = []
   for t in utimes:
       for pop, arr in zip(['ML','MR'],[All_ML_weights,All_MR_weights]):
-        pdfs = pdf[(pdf.time==t) & (pdf.postid>=dstartidx[pop]) & (pdf.postid<=dendidx[pop])]
+        pdfs = pdf[(pdf.time==t) & (pdf.postid>=dstartidx[pop]) & (pdf.postid<=dendidx[pop]) & (pdf.preid>=dstartidx['V1']) & (pdf.preid<=dendidx['V1'])]
         arr.append(np.mean(pdfs.weight))
   subplot(2,1,1)
-  plot(actreward[:,0],actreward[:,2])
+  plot(actreward[:,0],actreward[:,2],'k',linewidth=4)
+  plot(actreward[:,0],actreward[:,2],'ko',markersize=10)  
   xlim((0,simConfig['simConfig']['duration']))
   ylim((-1.1,1.1))
   subplot(2,1,2)
-  plot(utimes,All_ML_weights,'r-')
-  plot(utimes,All_MR_weights,'b-')
-  xlabel('Time (ms)')
-  legend(('ML','MR'),loc='upper left')
-  ylabel('RL weights')
+  plot(utimes,All_ML_weights,'r-',linewidth=3);
+  plot(utimes,All_MR_weights,'b-',linewidth=3); 
+  legend(('V->ML','V->MR'),loc='upper left')
+  plot(utimes,All_ML_weights,'ro',markersize=10);  plot(utimes,All_MR_weights,'bo',markersize=10)
+  xlabel('Time (ms)'); ylabel('RL weights')
   xlim((0,simConfig['simConfig']['duration']))
+  return All_ML_weights, All_MR_weights
 
-plotavgweights(pdf)
+All_ML_weights,All_MR_Weights = plotavgweights(pdf)
