@@ -78,7 +78,7 @@ netParams.synMechParams['GABA'] = {'mod': 'Exp2Syn', 'tau1': 0.07, 'tau2': 9.1, 
 STDPparams = {'hebbwt': 0.0001, 'antiwt':-0.00001, 'wbase': 0.0012, 'wmax': 50, 'RLon': 0 , 'RLhebbwt': 0.001, 'RLantiwt': -0.000,
         'tauhebb': 10, 'RLwindhebb': 50, 'useRLexp': 0, 'softthresh': 0, 'verbose':0}
 
-STDPparamsRL = {'hebbwt': 0.0000, 'antiwt':-0.0000, 'wbase': 0.0012, 'wmax': 50, 'RLon': 1 , 'RLhebbwt': 0.00001, 'RLantiwt': -0.000,
+STDPparamsRL = {'hebbwt': 0.0000, 'antiwt':-0.0000, 'wbase': 0.0, 'wmax': 50, 'RLon': 1 , 'RLhebbwt': 0.00001, 'RLantiwt': -0.000,
                 'tauhebb': 10, 'RLlenhebb': 800 ,'RLlenanti': 100, 'RLwindhebb': 50, 'useRLexp': 0, 'softthresh': 0, 'verbose':0}
 
 netParams.stimSourceParams['stimMod'] = {'type': 'NetStim', 'rate': 'variable', 'noise': 0}
@@ -406,6 +406,8 @@ netParams.connParams['R->V1'] = {
         'weight': 0.002,
         'delay': 2,
         'synMech': 'AMPA'}
+
+"""
 netParams.connParams['V1->V4'] = {
         'preConds': {'pop': 'V1'},
         'postConds': {'pop': 'V4'},
@@ -440,6 +442,8 @@ netParams.connParams['IT->MR'] = {
         'delay': 2,
         'synMech': 'AMPA',
         'plast': {'mech': 'STDP', 'params': STDPparamsRL}}
+"""
+
 #E to I feedforward connections
 netParams.connParams['R->IV1'] = {
         'preConds': {'pop': 'R'},
@@ -533,7 +537,7 @@ netParams.connParams['IV4->IIT'] = {
         'delay': 2,
         'synMech': 'GABA'}
 
-#Add direct connections from higher layers to motor cortex
+#Add direct connections from lower and higher visual areas to motor cortex
 #Still no idea, how these connections should look like...just trying some numbers: 400 to 25 means convergence factor of 16
 netParams.connParams['V1->MR'] = {
         'preConds': {'pop': 'V1'},
@@ -549,11 +553,13 @@ netParams.connParams['V1->ML'] = {
         'postConds': {'pop': 'ML'},
         #'connList': blistMItoMO,
         'convergence': 16,
-        'weight': 0.001,
+        'weight': 0.0,
+        #'weight': 0.001,
         'delay': 2,
         'synMech': 'AMPA',
         'plast': {'mech': 'STDP', 'params': STDPparamsRL}}
 
+"""
 netParams.connParams['V4->MR'] = {
         'preConds': {'pop': 'V4'},
         'postConds': {'pop': 'MR'},
@@ -572,7 +578,7 @@ netParams.connParams['V4->ML'] = {
         'delay': 2,
         'synMech': 'AMPA',
         'plast': {'mech': 'STDP', 'params': STDPparamsRL}}
-
+"""
 
 #Simulation options
 simConfig = specs.SimConfig()           # object of class SimConfig to store simulation configuration

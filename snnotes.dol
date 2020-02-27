@@ -304,3 +304,42 @@ ok, good ...
 
 dstartidx = {p:simConfig['net']['pops'][p]['cellGids'][0] for p in simConfig['net']['pops'].keys()}
 dendidx = {p:simConfig['net']['pops'][p]['cellGids'][-1] for p in simConfig['net']['pops'].keys()}
+
+testing basic mechanism again , with RL exp off and fake up rule ... 
+
+myrun 16
+
+plw
+
+savefig('gif/20feb27_rewards_wghts_a3.png')
+
+seems to generally work, once separated out the population specific projections (V1->ML and V1->MR) ...
+but not clear why V1->MR is getting reinforced when MR produces down moves ...
+
+could be that MR getting reinforced since V1 projects to both MR and ML and V1->MR synapses are tagged
+within the interval when V1->ML synapses are tagged for reward ...
+
+try cutting off some of the higher connections connections and see what happens ... e.g. no V1 -> MR
+and no V4, IT -> ML or -> MR; and may need to set wbase to 0 as well ...
+
+myrun 16
+
+now for some reason ML never firing ... ??? no, ML firing but MR not firing (that was the test)
+but mostly only producing move 3 (down), instead of 4 (up) ... why?
+
+savefig('gif/20feb27_rewards_wghts_a4.png')
+savefig('gif/20feb27_rewards_wghts_a5.png')
+
+hmm, had the rule backwards:
+            if F_R1>F_L1:
+                actions.append(dconf['moves']['UP']) #UP
+            elif F_R1<F_L1:
+                actions.append(dconf['moves']['DOWN']) # Down
+            else:
+            actions.append(dconf['moves']['NOMOVE']) # No move
+
+R produces up, L produces down ...
+
+ok, fixing that, now V->MR weights go up as they should (but now have turned off inputs to ML)
+savefig('gif/20feb27_rewards_wghts_a6.png')
+
