@@ -88,7 +88,7 @@ class SMARTAgent:
         #print(np.amax(fr_Images))
         self.firing_rates = np.reshape(fr_Images,400) #6400 for 80*80 Image, now its 400 for 20*20
         self.env.render()
-        print(self.countAll)
+        #print(self.countAll)
         if done: # what is done? --- when done == 1, it means that 1 episode of the game ends, so it needs to be reset. 
             epCount.append(self.countAll)
             self.env.reset()
@@ -163,7 +163,7 @@ class SMARTAgent:
         #print(np.amax(fr_Images))
         self.firing_rates = np.reshape(fr_Images,400) #6400 for 80*80 Image, now its 400 for 20*20
         self.env.render()
-        print(self.countAll)
+        #print(self.countAll)
         if done:
             epCount.append(self.countAll)
             self.env.reset()
