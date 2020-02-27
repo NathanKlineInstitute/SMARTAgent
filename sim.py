@@ -79,7 +79,7 @@ STDPparams = {'hebbwt': 0.0001, 'antiwt':-0.00001, 'wbase': 0.0012, 'wmax': 50, 
         'tauhebb': 10, 'RLwindhebb': 50, 'useRLexp': 0, 'softthresh': 0, 'verbose':0}
 
 STDPparamsRL = {'hebbwt': 0.0000, 'antiwt':-0.0000, 'wbase': 0.0012, 'wmax': 50, 'RLon': 1 , 'RLhebbwt': 0.00001, 'RLantiwt': -0.000,
-                'tauhebb': 10, 'RLlenhebb': 800 ,'RLlenanti': 100, 'RLwindhebb': 50, 'useRLexp': 1, 'softthresh': 0, 'verbose':0}
+                'tauhebb': 10, 'RLlenhebb': 800 ,'RLlenanti': 100, 'RLwindhebb': 50, 'useRLexp': 0, 'softthresh': 0, 'verbose':0}
 
 netParams.stimSourceParams['stimMod'] = {'type': 'NetStim', 'rate': 'variable', 'noise': 0}
 netParams.stimTargetParams['stimMod->all'] = {'source': 'stimMod',
@@ -879,20 +879,10 @@ def trainAgent (t):
         rewards, epCount, InputImages = sim.AIGame.playGame(actions, epCount, InputImages)
 
         if dconf['sim']['RLFakeUpRule']: # fake rule for testing reinforcing of up moves
-          if actions.count(dconf['moves']['UP']) > 0 and actions.count(dconf['moves']['DOWN']) < 1:
-            critic = 1
-          elif actions.count(dconf['moves']['DOWN']) > actions.count(dconf['moves']['UP']):
-            critic = -1
-          else:
-            critic = 0
+          critic = np.sign(actions.count(dconf['moves']['UP']) - actions.count(dconf['moves']['DOWN']))          
           rewards = [critic for i in range(len(rewards))]
         elif dconf['sim']['RLFakeDownRule']: # fake rule for testing reinforcing of down moves
-          if actions.count(dconf['moves']['DOWN']) > 0 and actions.count(dconf['moves']['UP']) < 1:
-            critic = 1
-          elif actions.count(dconf['moves']['UP']) > actions.count(dconf['moves']['DOWN']):
-            critic = -1
-          else:
-            critic = 0
+          critic = np.sign(actions.count(dconf['moves']['DOWN']) - actions.count(dconf['moves']['UP']))
           rewards = [critic for i in range(len(rewards))]          
         else: # normal game play scoring rules
           critic = sum(rewards) # get critic signal (-1, 0 or 1)
