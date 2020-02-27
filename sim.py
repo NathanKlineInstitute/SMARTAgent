@@ -728,16 +728,11 @@ NBsteps = 0
 epCount = []
 last_obs = [] #make sure this does not introduce a bug
 
-Mlist = []
-for mid in range(25): # what is this? list of motor neuron IDs??
-    Mlist.append(mid)
-
 lSTDPmech = [] # global list of STDP mechanisms; so do not have to lookup at each interval function call 
     
 def trainAgentFake(t):
     """ training interface between simulation and game environment
     """
-    global Mlist
     global NBsteps, last_obs, epCount, InputImages
     if t<21.0: # for the first time interval use first action randomly and other four actions based on relative position of ball and agent.
         last_obs = []
@@ -822,7 +817,6 @@ def updateInputRates ():
 def trainAgent (t):
     """ training interface between simulation and game environment
     """
-    global Mlist
     global NBsteps, epCount, InputImages
     vec = h.Vector()
     if t<100.0: # for the first time interval use randomly selected actions
