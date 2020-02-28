@@ -433,9 +433,9 @@ netParams.connParams['IT->ML'] = {
         'preConds': {'pop': 'IT'},
         'postConds': {'pop': 'ML'},
         #'connList': blistITtoMI,
-        'convergence': 25,
+        'convergence': 16,
         #'weight': 0.0025,
-        'weight': 0.001,
+        'weight': 0.0005,
         'delay': 2,
         'synMech': 'AMPA',
         'plast': {'mech': 'STDP', 'params': STDPparamsRL}}
@@ -443,9 +443,9 @@ netParams.connParams['IT->MR'] = {
         'preConds': {'pop': 'IT'},
         'postConds': {'pop': 'MR'},
         #'connList': blistMItoMO,
-        'convergence': 25,
+        'convergence': 16,
         #'weight': 0.0025,
-        'weight': 0.001,
+        'weight': 0.0005,
         'delay': 2,
         'synMech': 'AMPA',
         'plast': {'mech': 'STDP', 'params': STDPparamsRL}}
@@ -553,7 +553,7 @@ netParams.connParams['V1->MR'] = {
         'postConds': {'pop': 'MR'},
         #'connList': blistMItoMO,
         'convergence': 16,
-        'weight': 0.001,
+        'weight': 0.0005,
         'delay': 2,
         'synMech': 'AMPA',
         'plast': {'mech': 'STDP', 'params': STDPparamsRL}}
@@ -562,7 +562,7 @@ netParams.connParams['V1->ML'] = {
         'postConds': {'pop': 'ML'},
         #'connList': blistMItoMO,
         'convergence': 16,
-        'weight': 0.001,
+        'weight': 0.0005,
         'delay': 2,
         'synMech': 'AMPA',
         'plast': {'mech': 'STDP', 'params': STDPparamsRL}}
@@ -571,7 +571,7 @@ netParams.connParams['V4->MR'] = {
         'postConds': {'pop': 'MR'},
         #'connList': blistMItoMO,
         'convergence': 16,
-        'weight': 0.001,
+        'weight': 0.0005,
         'delay': 2,
         'synMech': 'AMPA',
         'plast': {'mech': 'STDP', 'params': STDPparamsRL}}
@@ -580,7 +580,7 @@ netParams.connParams['V4->ML'] = {
         'postConds': {'pop': 'ML'},
         #'connList': blistMItoMO,
         'convergence': 16,
-        'weight': 0.001,
+        'weight': 0.0005,
         'delay': 2,
         'synMech': 'AMPA',
         'plast': {'mech': 'STDP', 'params': STDPparamsRL}}
