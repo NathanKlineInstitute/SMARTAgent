@@ -28,44 +28,45 @@ global fid4
 
 fid4 = open(sim.MotorOutputsfilename,'w')
 
-NB_Rneurons = 400
-NB_V1neurons = 400
-NB_V4neurons = 100
-NB_ITneurons = 25
+scale = dconf['net']['scale']
 
-NB_IRneurons = 100
-NB_IV1neurons = 100
-NB_IV4neurons = 25
-NB_IITneurons = 9
+ETypes = ['E','EV1','EV4','EIT', 'EML', 'EMR']
+ITypes = ['InR','InV1','InV4','InIT']
 
-NB_MLneurons = 25
-NB_MRneurons = 25
+NB_Rneurons = dconf['net']['E'] * scale
+NB_V1neurons = dconf['net']['EV1'] * scale
+NB_IRneurons = dconf['net']['InR'] * scale
+NB_IV1neurons = dconf['net']['InV1'] * scale
+NB_V4neurons = dconf['net']['EV4'] * scale
+NB_ITneurons = dconf['net']['EIT'] * scale
+NB_IV4neurons = dconf['net']['InV4'] * scale
+NB_IITneurons = dconf['net']['InIT'] * scale
+NB_MLneurons = dconf['net']['ML'] * scale
+NB_MRneurons = dconf['net']['MR'] * scale
 
 # Network parameters
 netParams = specs.NetParams() #object of class NetParams to store the network parameters
 
 #Population parameters
 netParams.popParams['R'] = {'cellType': 'E', 'numCells': NB_Rneurons, 'cellModel': 'HH'}  #6400 neurons to represent 6400 pixels, now we have 400 pixels
-netParams.popParams['V1'] = {'cellType': 'EV1', 'numCells': NB_V1neurons, 'cellModel': 'HH'} #6400 neurons
-netParams.popParams['V4'] = {'cellType': 'EV4', 'numCells': NB_V4neurons, 'cellModel': 'HH'} #1600 neurons
-netParams.popParams['IT'] = {'cellType': 'EIT', 'numCells': NB_ITneurons, 'cellModel': 'HH'} #400 neurons
-
 netParams.popParams['IR'] = {'cellType': 'InR', 'numCells': NB_IRneurons, 'cellModel': 'HH'}
+netParams.popParams['V1'] = {'cellType': 'EV1', 'numCells': NB_V1neurons, 'cellModel': 'HH'} #6400 neurons
 netParams.popParams['IV1'] = {'cellType': 'InV1', 'numCells': NB_IV1neurons, 'cellModel': 'HH'} #1600
+netParams.popParams['V4'] = {'cellType': 'EV4', 'numCells': NB_V4neurons, 'cellModel': 'HH'} #1600 neurons
 netParams.popParams['IV4'] = {'cellType': 'InV4', 'numCells': NB_IV4neurons, 'cellModel': 'HH'} #400
+netParams.popParams['IT'] = {'cellType': 'EIT', 'numCells': NB_ITneurons, 'cellModel': 'HH'} #400 neurons
 netParams.popParams['IIT'] = {'cellType': 'InIT', 'numCells': NB_IITneurons, 'cellModel': 'HH'} #100
-
 netParams.popParams['ML'] = {'cellType': 'EML', 'numCells': NB_MLneurons, 'cellModel': 'HH'} #400
 netParams.popParams['MR'] = {'cellType': 'EMR', 'numCells': NB_MRneurons, 'cellModel': 'HH'} #100
 
 netParams.cellParams['ERule'] = {               # cell rule label
-        'conds': {'cellType': ['E','EV1','EV4','EIT', 'EML', 'EMR']},              #properties will be applied to cells that match these conditions
+        'conds': {'cellType': ETypes},              #properties will be applied to cells that match these conditions
         'secs': {'soma':                        #sections
                 {'geom': {'diam':10, 'L':10, 'Ra':120},         #geometry
                 'mechs': {'hh': {'gnabar': 0.12, 'gkbar': 0.036, 'gl': 0.003, 'el': -70}}}}}    #mechanism
 
 netParams.cellParams['IRule'] = {               # cell rule label
-        'conds': {'cellType': ['InR','InV1','InV4','InIT']},              #properties will be applied to cells that match these conditions
+        'conds': {'cellType': ITypes},              #properties will be applied to cells that match these conditions
         'secs': {'soma':                        #sections
                 {'geom': {'diam':10, 'L':10, 'Ra':120},         #geometry
                 'mechs': {'hh': {'gnabar': 0.12, 'gkbar': 0.036, 'gl': 0.003, 'el': -70}}}}}    #mechanism
@@ -81,6 +82,7 @@ STDPparams = {'hebbwt': 0.0001, 'antiwt':-0.00001, 'wbase': 0.0012, 'wmax': 50, 
 STDPparamsRL = {'hebbwt': 0.0000, 'antiwt':-0.0000, 'wbase': 0.0, 'wmax': 50, 'RLon': 1 , 'RLhebbwt': 0.00001, 'RLantiwt': -0.000,
                 'tauhebb': 10, 'RLlenhebb': 800 ,'RLlenanti': 100, 'RLwindhebb': 50, 'useRLexp': 0, 'softthresh': 0, 'verbose':0}
 
+# these are the image-based inputs provided to the R (retinal) cells
 netParams.stimSourceParams['stimMod'] = {'type': 'NetStim', 'rate': 'variable', 'noise': 0}
 netParams.stimTargetParams['stimMod->all'] = {'source': 'stimMod',
         'conds': {'pop': 'R'},
@@ -93,18 +95,19 @@ netParams.stimTargetParams['stimMod->all'] = {'source': 'stimMod',
 
 # Stimulation parameters
 
-netParams.stimSourceParams['ebkg'] = {'type': 'NetStim', 'rate': 5, 'noise': 0.3}
+netParams.stimSourceParams['ebkg'] = {'type': 'NetStim', 'rate': 5, 'noise': 1.0}
 netParams.stimTargetParams['ebkg->all'] = {'source': 'ebkg', 'conds': {'cellType': ['EV1','EV4','EIT']}, 'weight': 0.0, 'delay': 'max(1, normal(5,2))', 'synMech': 'AMPA'}
 
-netParams.stimSourceParams['MLbkg'] = {'type': 'NetStim', 'rate': 5, 'noise': 0.5}
+netParams.stimSourceParams['MLbkg'] = {'type': 'NetStim', 'rate': 5, 'noise': 1.0}
 netParams.stimTargetParams['MLbkg->all'] = {'source': 'MLbkg', 'conds': {'cellType': ['EML']}, 'weight': 0.0, 'delay': 1, 'synMech': 'AMPA'}
 
-netParams.stimSourceParams['MRbkg'] = {'type': 'NetStim', 'rate': 5, 'noise': 0.5}
+netParams.stimSourceParams['MRbkg'] = {'type': 'NetStim', 'rate': 5, 'noise': 1.0}
 netParams.stimTargetParams['MRbkg->all'] = {'source': 'MRbkg', 'conds': {'cellType': ['EMR']}, 'weight': 0.0, 'delay': 1, 'synMech': 'AMPA'}
 
 
-netParams.stimSourceParams['bkg'] = {'type': 'NetStim', 'rate': 20, 'noise': 0.3}
+netParams.stimSourceParams['bkg'] = {'type': 'NetStim', 'rate': 20, 'noise': 1.0}
 netParams.stimTargetParams['bkg->all'] = {'source': 'bkg', 'conds': {'cellType': ['InR','InV1','InV4','InIT']}, 'weight': 0.0, 'delay': 'max(1, normal(5,2))', 'synMech': 'AMPA'}
+
 ######################################################################################
 def connectLayerswithOverlap(NBpreN, NBpostN, overlap_xdir):
     #NBpreN = 6400 	#number of presynaptic neurons
@@ -255,7 +258,6 @@ blistInV1toE = connectLayerswithOverlapDiv(NBpreN = NB_IV1neurons, NBpostN = NB_
 blistInV4toV1 = connectLayerswithOverlapDiv(NBpreN = NB_IV4neurons, NBpostN = NB_V1neurons, overlap_xdir = 5)
 blistInITtoV4 = connectLayerswithOverlapDiv(NBpreN = NB_IITneurons, NBpostN = NB_V4neurons, overlap_xdir = 5)
 
-
 #Local excitation
 #E to E
 netParams.connParams['R->R'] = {
@@ -337,6 +339,7 @@ netParams.connParams['IT->IIT'] = {
         'weight': 0.002,
         'delay': 2,
         'synMech': 'AMPA'}
+
 #Local inhibition
 #I to E
 netParams.connParams['IR->R'] = {
@@ -375,6 +378,7 @@ netParams.connParams['IIT->IT'] = {
         'weight': 0.002,
         'delay': 2,
         'synMech': 'GABA'}
+
 #I to I
 netParams.connParams['IV1->IV1'] = {
         'preConds': {'pop': 'IV1'},
@@ -383,6 +387,7 @@ netParams.connParams['IV1->IV1'] = {
         'weight': 0.000, #0.0001
         'delay': 2,
         'synMech': 'GABA'}
+
 netParams.connParams['IV4->IV4'] = {
         'preConds': {'pop': 'IV4'},
         'postConds': {'pop': 'IV4'},
@@ -397,6 +402,7 @@ netParams.connParams['IIT->IIT'] = {
         'weight': 0.000, #0.0001
         'delay': 2,
         'synMech': 'GABA'}
+
 #E to E feedforward connections
 netParams.connParams['R->V1'] = {
         'preConds': {'pop': 'R'},
@@ -407,7 +413,6 @@ netParams.connParams['R->V1'] = {
         'delay': 2,
         'synMech': 'AMPA'}
 
-"""
 netParams.connParams['V1->V4'] = {
         'preConds': {'pop': 'V1'},
         'postConds': {'pop': 'V4'},
@@ -428,8 +433,9 @@ netParams.connParams['IT->ML'] = {
         'preConds': {'pop': 'IT'},
         'postConds': {'pop': 'ML'},
         #'connList': blistITtoMI,
-        'convergence': 25,
-        'weight': 0.0025,
+        'convergence': 16,
+        #'weight': 0.0025,
+        'weight': 0.0005,
         'delay': 2,
         'synMech': 'AMPA',
         'plast': {'mech': 'STDP', 'params': STDPparamsRL}}
@@ -437,12 +443,12 @@ netParams.connParams['IT->MR'] = {
         'preConds': {'pop': 'IT'},
         'postConds': {'pop': 'MR'},
         #'connList': blistMItoMO,
-        'convergence': 25,
-        'weight': 0.0025,
+        'convergence': 16,
+        #'weight': 0.0025,
+        'weight': 0.0005,
         'delay': 2,
         'synMech': 'AMPA',
         'plast': {'mech': 'STDP', 'params': STDPparamsRL}}
-"""
 
 #E to I feedforward connections
 netParams.connParams['R->IV1'] = {
@@ -469,6 +475,7 @@ netParams.connParams['V4->IIT'] = {
         'weight': 0.00, #0.002
         'delay': 2,
         'synMech': 'AMPA'}
+
 #E to E feedbackward connections
 netParams.connParams['V1->R'] = {
         'preConds': {'pop': 'V1'},
@@ -494,7 +501,8 @@ netParams.connParams['IT->V4'] = {
         'weight': 0.000, #0.0001
         'delay': 2,
         'synMech': 'AMPA'}
-#I to E connections
+
+#I to E feedbackward connections
 netParams.connParams['IV1->R'] = {
         'preConds': {'pop': 'IV1'},
         'postConds': {'pop': 'R'},
@@ -519,6 +527,7 @@ netParams.connParams['IIT->V4'] = {
         'weight': 0.00, #0.002
         'delay': 2,
         'synMech': 'GABA'}
+
 #I to I
 netParams.connParams['IV1->IV4'] = {
         'preConds': {'pop': 'IV1'},
@@ -544,7 +553,7 @@ netParams.connParams['V1->MR'] = {
         'postConds': {'pop': 'MR'},
         #'connList': blistMItoMO,
         'convergence': 16,
-        'weight': 0.001,
+        'weight': 0.0005,
         'delay': 2,
         'synMech': 'AMPA',
         'plast': {'mech': 'STDP', 'params': STDPparamsRL}}
@@ -553,18 +562,16 @@ netParams.connParams['V1->ML'] = {
         'postConds': {'pop': 'ML'},
         #'connList': blistMItoMO,
         'convergence': 16,
-        'weight': 0.001,
+        'weight': 0.0005,
         'delay': 2,
         'synMech': 'AMPA',
         'plast': {'mech': 'STDP', 'params': STDPparamsRL}}
-
-"""
 netParams.connParams['V4->MR'] = {
         'preConds': {'pop': 'V4'},
         'postConds': {'pop': 'MR'},
         #'connList': blistMItoMO,
-        'convergence': 4,
-        'weight': 0.001,
+        'convergence': 16,
+        'weight': 0.0005,
         'delay': 2,
         'synMech': 'AMPA',
         'plast': {'mech': 'STDP', 'params': STDPparamsRL}}
@@ -572,12 +579,11 @@ netParams.connParams['V4->ML'] = {
         'preConds': {'pop': 'V4'},
         'postConds': {'pop': 'ML'},
         #'connList': blistMItoMO,
-        'convergence': 4,
-        'weight': 0.001,
+        'convergence': 16,
+        'weight': 0.0005,
         'delay': 2,
         'synMech': 'AMPA',
         'plast': {'mech': 'STDP', 'params': STDPparamsRL}}
-"""
 
 #Simulation options
 simConfig = specs.SimConfig()           # object of class SimConfig to store simulation configuration
@@ -592,6 +598,7 @@ simConfig.filename = 'data/'+dconf['sim']['name']+'simConfig'  # Set file output
 simConfig.savePickle = True            # Save params, network and sim output to pickle file
 simConfig.saveMat = False
 simConfig.saveFolder = 'data'
+# simConfig.backupCfg = ['sim.json', 'backupcfg/'+dconf['sim']['name']+'sim.json']
 
 #simConfig.analysis['plotRaster'] = True                         # Plot a raster
 simConfig.analysis['plotTraces'] = {'include': [1159, 1169, 1179, 1189, 1199]}
@@ -601,7 +608,7 @@ simConfig.analysis['plotRaster'] = {'popRates':'overlay','saveData':'data/'+dcon
 #simConfig.analysis['plotConn'] = True           # plot connectivity matrix
 ###################################################################################################################################
 
-sim.AIGame = None
+sim.AIGame = None # placeholder
 
 def recordAdjustableWeightsPop (sim, t, popname):
     if 'synweights' not in sim.simData: sim.simData['synweights'] = {sim.rank:[]}
@@ -939,9 +946,8 @@ def getAllSTDPObjects (sim):
   return lSTDPmech
         
 #Alterate to create network and run simulation
-sim.initialize(                       # create network object and set cfg and net params
-    simConfig = simConfig,   # pass simulation config and network params as arguments
-    netParams = netParams)
+# create network object and set cfg and net params; pass simulation config and network params as arguments
+sim.initialize(simConfig = simConfig, netParams = netParams)
 sim.net.createPops()                      # instantiate network populations
 sim.net.createCells()                     # instantiate network cells based on defined populations
 sim.net.connectCells()                    # create connections between cells based on params
@@ -950,10 +956,14 @@ sim.setupRecording()                  # setup variables to record for each cell 
 
 lSTDPmech = getAllSTDPObjects(sim) # get all the STDP objects up-front
 
-if sim.rank == 0: # only create AIGame on node 0
+if sim.rank == 0: 
     from aigame import AIGame
-    sim.AIGame = AIGame()
-
+    sim.AIGame = AIGame() # only create AIGame on node 0
+    # node 0 saves the json config file
+    # this is just a precaution since simConfig pkl file has MOST of the info; ideally should adjust simConfig to contain ALL of the required info
+    from utils import backupcfg
+    backupcfg(dconf['sim']['name']) 
+    
 sim.runSimWithIntervalFunc(100.0,trainAgent) # has periodic callback to adjust STDP weights based on RL signal
 sim.gatherData() # gather data from different nodes
 sim.saveData() # save data to disk

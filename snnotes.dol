@@ -439,3 +439,64 @@ note that any move up or down (in the 5 action block) is a penalty and any stay 
 
 myrun 16
 
+  Cells: 1209
+  Connections: 27879 (23.06 per cell)
+  Spikes: 173771 (1.44 Hz)
+  Simulated time: 100.0 s; 16 workers
+  Run time: 2286.23 s
+Saving output as data/20feb27_FakeStayRule_C0_simConfig.pkl ... 
+Finished saving!
+Done; saving time = 11.18 s.
+
+savefig('gif/20feb27_FakeStayRule_C0_raster.png')
+lower firing rates for MR, ML ... next, look at behavior and weights...
+
+plw
+
+savefig('gif/20feb27_FakeStayRule_C0_rewards_weights_c0.png')
+
+both sets of weights stay close to baseline ... 
+would have expected both sets to decrease towards 0
+
+savefig('gif/20feb27_FakeStayRule_C0_action_freq_c0.png')
+
+well, at least neither action dominates here ...
+
+*20feb28
+** continue 
+
+should make it easier to load the output data ... maybe consolidate plotting funcs too ...
+
+question about architecture - how much of the higher level areas do we need/want? and should
+allow easier scaling of the simulation in case need larger-sized populations  ... 
+
+homeostatic plasticity will likely be needed - the weights were increasing, and could push
+the net to epilepsy ...
+
+try full architecture with the fake rules ... possible that higher order connections are not a problem ...
+
+myrun 24
+
+looks like M population might be too small ... ML and MR neurons should receive largely overlapping inputs from V1
+because of the much higher number of V1 (400) compared to ML (25) and MR (25) neurons , with the high convergence (16)
+this might be reason see highly synchronous firing in ML, MR neurons and correlation between the weight changes for the
+fake tasks... whether or not topography is needed for ML,MR is unclear - random inputs may allow more complex encodings.
+but can at least try increasing populaion size of ML, MR.
+
+try that out ...
+
+also, looks like noise inputs are off ... may want to reintroduce them ...
+other source of artificial synchronization is the image inputs, which arrive to the network at a fixed interval (~30 ms?)
+
+adjusted some of the convergence/weights onto ML,MR to have same convergence from each V1,V4,IT source
+and lower weights 1/2 of original to prevent too high firing ...
+
+savefig('gif/20feb28_rast_a0.png')
+savefig('gif/20feb28_reward_weights_a1.png')
+some separation between them in all projections ...
+savefig('gif/20feb28_action_freq_a2.png')
+
+try same, but longer ...
+
+125 s ...
+
