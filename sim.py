@@ -888,7 +888,10 @@ def trainAgent (t):
           rewards = [critic for i in range(len(rewards))]
         elif dconf['sim']['RLFakeDownRule']: # fake rule for testing reinforcing of down moves
           critic = np.sign(actions.count(dconf['moves']['DOWN']) - actions.count(dconf['moves']['UP']))
-          rewards = [critic for i in range(len(rewards))]          
+          rewards = [critic for i in range(len(rewards))]
+        elif dconf['sim']['RLFakeStayRule']: # fake rule for testing reinforcing of stay still
+          critic = np.sign(actions.count(dconf['moves']['NOMOVE']) - actions.count(dconf['moves']['DOWN']) - actions.count(dconf['moves']['UP']))
+          rewards = [critic for i in range(len(rewards))]                    
         else: # normal game play scoring rules
           critic = sum(rewards) # get critic signal (-1, 0 or 1)
         if dconf['verbose']:

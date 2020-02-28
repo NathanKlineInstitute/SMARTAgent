@@ -432,3 +432,10 @@ or some runaway effect ...
 
 could run another test to see if teach net to hold paddle still ... leading to suppression of ML and MR ...
 
+ok, will try that ... with this sim name: 20feb27_FakeStayRule_C0_
+and RLFakeStayRule == 1
+
+note that any move up or down (in the 5 action block) is a penalty and any stay command is opposite (for the critic signal)... 
+
+myrun 16
+
