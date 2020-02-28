@@ -386,3 +386,49 @@ ok, using sim.json sim:name to specify simulation name so can save output files 
 also may as well adjust plotWeights to draw actions in top panel ...? suppose only useful when using fake rule ... 
 otherwise up/down rates not so important ...  
 
+sim name is 20feb27_FakeDownRule_B0_
+
+myrun 16
+
+  Cells: 1209
+  Connections: 27879 (23.06 per cell)
+  Spikes: 173390 (1.43 Hz)
+  Simulated time: 100.0 s; 16 workers
+  Run time: 2309.54 s
+
+savefig('gif/20feb27_raster_b0.png')
+
+more spikes at bottom, where they should be ... ML has higher firing rate (ML produces down move), much more than in previous example where MR had
+slightly higher firing rate than ML  ... maybe a bug somewhere? why the difference?
+
+and now check the weights and action freqs ... 
+
+plw
+
+savefig('gif/20feb27_rewards_weights_b1.png')
+
+#
+ldown,lup = [],[]
+ltt = linspace(0,99,100)
+for tt in ltt:
+  actrewards = actreward[(actreward.action==3) & (actreward.time>=tt*1e3) & (actreward.time<=(tt+1)*1e3)]
+  ldown.append(len(actrewards))
+  actrewards = actreward[(actreward.action==4) & (actreward.time>=tt*1e3) & (actreward.time<=(tt+1)*1e3)]
+  lup.append(len(actrewards))
+
+figure(); plot(ltt,ldown,'r',linewidth=4); plot(ltt,lup,'b',linewidth=4); xlabel('Time (s)'); ylabel('Move frequency (Hz)');
+import matplotlib.patches as mpatches
+lpatch = [mpatches.Patch(color=c,label=s) for c,s in zip(['b','r'],['Up','Down'])]
+ax=gca()
+ax.legend(handles=lpatch,handlelength=1)
+
+savefig('gif/20feb27_action_freq_b2.png')
+
+so, there are more down actions generally ..., particularly as the sim progresses ... maybe less consistent
+than in previous FAKE MOVEUP test ...
+
+not clear why would get diff results for the two fake rule tests ... one up and one down ... maybe some bug,
+or some runaway effect ... 
+
+could run another test to see if teach net to hold paddle still ... leading to suppression of ML and MR ...
+
