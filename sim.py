@@ -29,26 +29,18 @@ global fid4
 fid4 = open(sim.MotorOutputsfilename,'w')
 
 scale = dconf['net']['scale']
-higherorder = dconf['net']['higherorder'] # whether to include higher-order areas
 
-ETypes = ['E','EV1']
-ITypes = ['InR','InV1']
+ETypes = ['E','EV1','EV4','EIT', 'EML', 'EMR']
+ITypes = ['InR','InV1','InV4','InIT']
 
 NB_Rneurons = dconf['net']['E'] * scale
 NB_V1neurons = dconf['net']['EV1'] * scale
 NB_IRneurons = dconf['net']['InR'] * scale
 NB_IV1neurons = dconf['net']['InV1'] * scale
-
-if higherorder:
-  NB_V4neurons = dconf['net']['EV4'] * scale
-  NB_ITneurons = dconf['net']['EIT'] * scale
-  NB_IV4neurons = dconf['net']['InV4'] * scale
-  NB_IITneurons = dconf['net']['InIT'] * scale
-  for ty in ['EV4','EIT', 'EML', 'EMR']: ETypes.append(ty)
-  for ty in ['InV4','InIT']: ITypes.append(ty)
-else:
-  NB_V4neurons = NB_ITneurons = NB_IV4neurons = NB_IITneurons = 0
-    
+NB_V4neurons = dconf['net']['EV4'] * scale
+NB_ITneurons = dconf['net']['EIT'] * scale
+NB_IV4neurons = dconf['net']['InV4'] * scale
+NB_IITneurons = dconf['net']['InIT'] * scale
 NB_MLneurons = dconf['net']['ML'] * scale
 NB_MRneurons = dconf['net']['MR'] * scale
 
@@ -62,12 +54,10 @@ netParams.popParams['IR'] = {'cellType': 'InR', 'numCells': NB_IRneurons, 'cellM
 netParams.popParams['IV1'] = {'cellType': 'InV1', 'numCells': NB_IV1neurons, 'cellModel': 'HH'} #1600
 netParams.popParams['ML'] = {'cellType': 'EML', 'numCells': NB_MLneurons, 'cellModel': 'HH'} #400
 netParams.popParams['MR'] = {'cellType': 'EMR', 'numCells': NB_MRneurons, 'cellModel': 'HH'} #100
-
-if higherorder:
-  netParams.popParams['V4'] = {'cellType': 'EV4', 'numCells': NB_V4neurons, 'cellModel': 'HH'} #1600 neurons
-  netParams.popParams['IT'] = {'cellType': 'EIT', 'numCells': NB_ITneurons, 'cellModel': 'HH'} #400 neurons
-  netParams.popParams['IV4'] = {'cellType': 'InV4', 'numCells': NB_IV4neurons, 'cellModel': 'HH'} #400
-  netParams.popParams['IIT'] = {'cellType': 'InIT', 'numCells': NB_IITneurons, 'cellModel': 'HH'} #100
+netParams.popParams['V4'] = {'cellType': 'EV4', 'numCells': NB_V4neurons, 'cellModel': 'HH'} #1600 neurons
+netParams.popParams['IT'] = {'cellType': 'EIT', 'numCells': NB_ITneurons, 'cellModel': 'HH'} #400 neurons
+netParams.popParams['IV4'] = {'cellType': 'InV4', 'numCells': NB_IV4neurons, 'cellModel': 'HH'} #400
+netParams.popParams['IIT'] = {'cellType': 'InIT', 'numCells': NB_IITneurons, 'cellModel': 'HH'} #100
 
 netParams.cellParams['ERule'] = {               # cell rule label
         'conds': {'cellType': ETypes},              #properties will be applied to cells that match these conditions
@@ -227,53 +217,45 @@ def connectLayerswithOverlapDiv(NBpreN, NBpostN, overlap_xdir):
 #Feedforward excitation
 #E to E - Feedforward connections
 blistEtoV1 = connectLayerswithOverlap(NBpreN = NB_Rneurons, NBpostN = NB_V1neurons, overlap_xdir = 3)
-if higherorder:
-  blistV1toV4 = connectLayerswithOverlap(NBpreN = NB_V1neurons, NBpostN = NB_V4neurons, overlap_xdir = 3)
-  blistV4toIT = connectLayerswithOverlap(NBpreN = NB_V4neurons, NBpostN = NB_ITneurons, overlap_xdir = 3) #was 15
-  #blistITtoMI = connectLayerswithOverlap(NBpreN = NB_ITneurons, NBpostN = NB_MIneurons, overlap_xdir = 3) #Not sure if this is a good strategy instead of all to all
-  #blistMItoMO = connectLayerswithOverlap(NBpreN = NB_MIneurons, NBpostN = NB_MOneurons, overlap_xdir = 3) #was 19
-  #blistMItoMO: Feedforward for MI to MO is all to all and can be specified in the connection statement iteself
+blistV1toV4 = connectLayerswithOverlap(NBpreN = NB_V1neurons, NBpostN = NB_V4neurons, overlap_xdir = 3)
+blistV4toIT = connectLayerswithOverlap(NBpreN = NB_V4neurons, NBpostN = NB_ITneurons, overlap_xdir = 3) #was 15
+#blistITtoMI = connectLayerswithOverlap(NBpreN = NB_ITneurons, NBpostN = NB_MIneurons, overlap_xdir = 3) #Not sure if this is a good strategy instead of all to all
+#blistMItoMO = connectLayerswithOverlap(NBpreN = NB_MIneurons, NBpostN = NB_MOneurons, overlap_xdir = 3) #was 19
+#blistMItoMO: Feedforward for MI to MO is all to all and can be specified in the connection statement iteself
 
 #E to I - Feedforward connections
 blistEtoInV1 = connectLayerswithOverlap(NBpreN = NB_Rneurons, NBpostN = NB_IV1neurons, overlap_xdir = 3)
-if higherorder:
-  blistV1toInV4 = connectLayerswithOverlap(NBpreN = NB_V1neurons, NBpostN = NB_IV4neurons, overlap_xdir = 3) #was 15
-  blistV4toInIT = connectLayerswithOverlap(NBpreN = NB_V4neurons, NBpostN = NB_IITneurons, overlap_xdir = 3) #was 15
+blistV1toInV4 = connectLayerswithOverlap(NBpreN = NB_V1neurons, NBpostN = NB_IV4neurons, overlap_xdir = 3) #was 15
+blistV4toInIT = connectLayerswithOverlap(NBpreN = NB_V4neurons, NBpostN = NB_IITneurons, overlap_xdir = 3) #was 15
 
 #E to I - WithinLayer connections
 blistRtoInR = connectLayerswithOverlap(NBpreN = NB_Rneurons, NBpostN = NB_IRneurons, overlap_xdir = 3)
 blistV1toInV1 = connectLayerswithOverlap(NBpreN = NB_V1neurons, NBpostN = NB_IV1neurons, overlap_xdir = 3)
-if higherorder:
-  blistV4toInV4 = connectLayerswithOverlap(NBpreN = NB_V4neurons, NBpostN = NB_IV4neurons, overlap_xdir = 3)
-  blistITtoInIT = connectLayerswithOverlap(NBpreN = NB_ITneurons, NBpostN = NB_IITneurons, overlap_xdir = 3)
+blistV4toInV4 = connectLayerswithOverlap(NBpreN = NB_V4neurons, NBpostN = NB_IV4neurons, overlap_xdir = 3)
+blistITtoInIT = connectLayerswithOverlap(NBpreN = NB_ITneurons, NBpostN = NB_IITneurons, overlap_xdir = 3)
 
 #I to E - WithinLayer Inhibition
 blistInRtoR = connectLayerswithOverlapDiv(NBpreN = NB_IRneurons, NBpostN = NB_Rneurons, overlap_xdir = 5)
 blistInV1toV1 = connectLayerswithOverlapDiv(NBpreN = NB_IV1neurons, NBpostN = NB_V1neurons, overlap_xdir = 5)
-if higherorder:
-  blistInV4toV4 = connectLayerswithOverlapDiv(NBpreN = NB_IV4neurons, NBpostN = NB_V4neurons, overlap_xdir = 5)
-  blistInITtoIT = connectLayerswithOverlapDiv(NBpreN = NB_IITneurons, NBpostN = NB_ITneurons, overlap_xdir = 5)
+blistInV4toV4 = connectLayerswithOverlapDiv(NBpreN = NB_IV4neurons, NBpostN = NB_V4neurons, overlap_xdir = 5)
+blistInITtoIT = connectLayerswithOverlapDiv(NBpreN = NB_IITneurons, NBpostN = NB_ITneurons, overlap_xdir = 5)
 
 #Feedbackward excitation
 #E to E  
 blistV1toE = connectLayerswithOverlapDiv(NBpreN = NB_V1neurons, NBpostN = NB_Rneurons, overlap_xdir = 3)
-if higherorder:
-  blistV4toV1 = connectLayerswithOverlapDiv(NBpreN = NB_V4neurons, NBpostN = NB_V1neurons, overlap_xdir = 3)
-  blistITtoV4 = connectLayerswithOverlapDiv(NBpreN = NB_ITneurons, NBpostN = NB_V4neurons, overlap_xdir = 3)
+blistV4toV1 = connectLayerswithOverlapDiv(NBpreN = NB_V4neurons, NBpostN = NB_V1neurons, overlap_xdir = 3)
+blistITtoV4 = connectLayerswithOverlapDiv(NBpreN = NB_ITneurons, NBpostN = NB_V4neurons, overlap_xdir = 3)
 
 #Feedforward inhibition
 #I to I
-if higherorder:
-  blistInV1toInV4 = connectLayerswithOverlap(NBpreN = NB_IV1neurons, NBpostN = NB_IV4neurons, overlap_xdir = 5)
-  blistInV4toInIT = connectLayerswithOverlap(NBpreN = NB_IV4neurons, NBpostN = NB_IITneurons, overlap_xdir = 5)
+blistInV1toInV4 = connectLayerswithOverlap(NBpreN = NB_IV1neurons, NBpostN = NB_IV4neurons, overlap_xdir = 5)
+blistInV4toInIT = connectLayerswithOverlap(NBpreN = NB_IV4neurons, NBpostN = NB_IITneurons, overlap_xdir = 5)
 
 #Feedbackward inhibition
 #I to E 
 blistInV1toE = connectLayerswithOverlapDiv(NBpreN = NB_IV1neurons, NBpostN = NB_Rneurons, overlap_xdir = 5)
-if higherorder:
-  blistInV4toV1 = connectLayerswithOverlapDiv(NBpreN = NB_IV4neurons, NBpostN = NB_V1neurons, overlap_xdir = 5)
-  blistInITtoV4 = connectLayerswithOverlapDiv(NBpreN = NB_IITneurons, NBpostN = NB_V4neurons, overlap_xdir = 5)
-
+blistInV4toV1 = connectLayerswithOverlapDiv(NBpreN = NB_IV4neurons, NBpostN = NB_V1neurons, overlap_xdir = 5)
+blistInITtoV4 = connectLayerswithOverlapDiv(NBpreN = NB_IITneurons, NBpostN = NB_V4neurons, overlap_xdir = 5)
 
 #Local excitation
 #E to E
@@ -404,21 +386,21 @@ netParams.connParams['IV1->IV1'] = {
         'weight': 0.000, #0.0001
         'delay': 2,
         'synMech': 'GABA'}
-if higherorder:
-  netParams.connParams['IV4->IV4'] = {
-          'preConds': {'pop': 'IV4'},
-          'postConds': {'pop': 'IV4'},
-          'probability': 0.02,
-          'weight': 0.000, #0.0001
-          'delay': 2,
-          'synMech': 'GABA'}
-  netParams.connParams['IIT->IIT'] = {
-          'preConds': {'pop': 'IIT'},
-          'postConds': {'pop': 'IIT'},
-          'probability': 0.02,
-          'weight': 0.000, #0.0001
-          'delay': 2,
-          'synMech': 'GABA'}
+
+netParams.connParams['IV4->IV4'] = {
+        'preConds': {'pop': 'IV4'},
+        'postConds': {'pop': 'IV4'},
+        'probability': 0.02,
+        'weight': 0.000, #0.0001
+        'delay': 2,
+        'synMech': 'GABA'}
+netParams.connParams['IIT->IIT'] = {
+        'preConds': {'pop': 'IIT'},
+        'postConds': {'pop': 'IIT'},
+        'probability': 0.02,
+        'weight': 0.000, #0.0001
+        'delay': 2,
+        'synMech': 'GABA'}
 #E to E feedforward connections
 netParams.connParams['R->V1'] = {
         'preConds': {'pop': 'R'},
@@ -429,41 +411,40 @@ netParams.connParams['R->V1'] = {
         'delay': 2,
         'synMech': 'AMPA'}
 
-if higherorder:
-  netParams.connParams['V1->V4'] = {
-          'preConds': {'pop': 'V1'},
-          'postConds': {'pop': 'V4'},
-          'connList': blistV1toV4,
-          #'convergence': 10,
-          'weight': 0.001,
-          'delay': 2,
-          'synMech': 'AMPA'}
-  netParams.connParams['V4->IT'] = {
-          'preConds': {'pop': 'V4'},
-          'postConds': {'pop': 'IT'},
-          'connList': blistV4toIT,
-          #'convergence': 10,
-          'weight': 0.001,
-          'delay': 2,
-          'synMech': 'AMPA'}
-  netParams.connParams['IT->ML'] = {
-          'preConds': {'pop': 'IT'},
-          'postConds': {'pop': 'ML'},
-          #'connList': blistITtoMI,
-          'convergence': 25,
-          'weight': 0.0025,
-          'delay': 2,
-          'synMech': 'AMPA',
-          'plast': {'mech': 'STDP', 'params': STDPparamsRL}}
-  netParams.connParams['IT->MR'] = {
-          'preConds': {'pop': 'IT'},
-          'postConds': {'pop': 'MR'},
-          #'connList': blistMItoMO,
-          'convergence': 25,
-          'weight': 0.0025,
-          'delay': 2,
-          'synMech': 'AMPA',
-          'plast': {'mech': 'STDP', 'params': STDPparamsRL}}
+netParams.connParams['V1->V4'] = {
+        'preConds': {'pop': 'V1'},
+        'postConds': {'pop': 'V4'},
+        'connList': blistV1toV4,
+        #'convergence': 10,
+        'weight': 0.001,
+        'delay': 2,
+        'synMech': 'AMPA'}
+netParams.connParams['V4->IT'] = {
+        'preConds': {'pop': 'V4'},
+        'postConds': {'pop': 'IT'},
+        'connList': blistV4toIT,
+        #'convergence': 10,
+        'weight': 0.001,
+        'delay': 2,
+        'synMech': 'AMPA'}
+netParams.connParams['IT->ML'] = {
+        'preConds': {'pop': 'IT'},
+        'postConds': {'pop': 'ML'},
+        #'connList': blistITtoMI,
+        'convergence': 25,
+        'weight': 0.0025,
+        'delay': 2,
+        'synMech': 'AMPA',
+        'plast': {'mech': 'STDP', 'params': STDPparamsRL}}
+netParams.connParams['IT->MR'] = {
+        'preConds': {'pop': 'IT'},
+        'postConds': {'pop': 'MR'},
+        #'connList': blistMItoMO,
+        'convergence': 25,
+        'weight': 0.0025,
+        'delay': 2,
+        'synMech': 'AMPA',
+        'plast': {'mech': 'STDP', 'params': STDPparamsRL}}
 
 #E to I feedforward connections
 netParams.connParams['R->IV1'] = {
@@ -474,23 +455,22 @@ netParams.connParams['R->IV1'] = {
         'weight': 0.00, #0.002
         'delay': 2,
         'synMech': 'AMPA'}
-if higherorder:
-  netParams.connParams['V1->IV4'] = {
-          'preConds': {'pop': 'V1'},
-          'postConds': {'pop': 'IV4'},
-          'connList': blistV1toInV4,
-          #'convergence': 10,
-          'weight': 0.00, #0.002
-          'delay': 2,
-          'synMech': 'AMPA'}
-  netParams.connParams['V4->IIT'] = {
-          'preConds': {'pop': 'V4'},
-          'postConds': {'pop': 'IIT'},
-          'connList': blistV4toInIT,
-          #'convergence': 10,
-          'weight': 0.00, #0.002
-          'delay': 2,
-          'synMech': 'AMPA'}
+netParams.connParams['V1->IV4'] = {
+        'preConds': {'pop': 'V1'},
+        'postConds': {'pop': 'IV4'},
+        'connList': blistV1toInV4,
+        #'convergence': 10,
+        'weight': 0.00, #0.002
+        'delay': 2,
+        'synMech': 'AMPA'}
+netParams.connParams['V4->IIT'] = {
+        'preConds': {'pop': 'V4'},
+        'postConds': {'pop': 'IIT'},
+        'connList': blistV4toInIT,
+        #'convergence': 10,
+        'weight': 0.00, #0.002
+        'delay': 2,
+        'synMech': 'AMPA'}
 
 #E to E feedbackward connections
 netParams.connParams['V1->R'] = {
@@ -501,23 +481,22 @@ netParams.connParams['V1->R'] = {
         'weight': 0.000, #0.0001
         'delay': 2,
         'synMech': 'AMPA'}
-if higherorder:
-  netParams.connParams['V4->V1'] = {
-          'preConds': {'pop': 'V4'},
-          'postConds': {'pop': 'V1'},
-          'connList': blistInV4toV1,
-          #'convergence': 10,
-          'weight': 0.000, #0.0001
-          'delay': 2,
-          'synMech': 'AMPA'}
-  netParams.connParams['IT->V4'] = {
-          'preConds': {'pop': 'IT'},
-          'postConds': {'pop': 'V4'},
-          'connList': blistITtoV4,
-          #'convergence': 10,
-          'weight': 0.000, #0.0001
-          'delay': 2,
-          'synMech': 'AMPA'}
+netParams.connParams['V4->V1'] = {
+        'preConds': {'pop': 'V4'},
+        'postConds': {'pop': 'V1'},
+        'connList': blistInV4toV1,
+        #'convergence': 10,
+        'weight': 0.000, #0.0001
+        'delay': 2,
+        'synMech': 'AMPA'}
+netParams.connParams['IT->V4'] = {
+        'preConds': {'pop': 'IT'},
+        'postConds': {'pop': 'V4'},
+        'connList': blistITtoV4,
+        #'convergence': 10,
+        'weight': 0.000, #0.0001
+        'delay': 2,
+        'synMech': 'AMPA'}
 
 #I to E connections
 netParams.connParams['IV1->R'] = {
@@ -528,42 +507,40 @@ netParams.connParams['IV1->R'] = {
         'weight': 0.00, #0.002
         'delay': 2,
         'synMech': 'GABA'}
-if higherorder:
-  netParams.connParams['IV4->V1'] = {
-          'preConds': {'pop': 'IV4'},
-          'postConds': {'pop': 'V1'},
-          'connList': blistInV4toV1,
-          #'convergence': 10,
-          'weight': 0.00, #0.002
-          'delay': 2,
-          'synMech': 'GABA'}
-  netParams.connParams['IIT->V4'] = {
-          'preConds': {'pop': 'IIT'},
-          'postConds': {'pop': 'V4'},
-          'connList': blistInITtoV4,
-          #'convergence': 10,
-          'weight': 0.00, #0.002
-          'delay': 2,
-          'synMech': 'GABA'}
+netParams.connParams['IV4->V1'] = {
+        'preConds': {'pop': 'IV4'},
+        'postConds': {'pop': 'V1'},
+        'connList': blistInV4toV1,
+        #'convergence': 10,
+        'weight': 0.00, #0.002
+        'delay': 2,
+        'synMech': 'GABA'}
+netParams.connParams['IIT->V4'] = {
+        'preConds': {'pop': 'IIT'},
+        'postConds': {'pop': 'V4'},
+        'connList': blistInITtoV4,
+        #'convergence': 10,
+        'weight': 0.00, #0.002
+        'delay': 2,
+        'synMech': 'GABA'}
 
 #I to I
-if higherorder:
-  netParams.connParams['IV1->IV4'] = {
-          'preConds': {'pop': 'IV1'},
-          'postConds': {'pop': 'IV4'},
-          'connList': blistInV1toInV4,
-          #'convergence': 10,
-          'weight': 0.00, #0.002
-          'delay': 2,
-          'synMech': 'GABA'}
-  netParams.connParams['IV4->IIT'] = {
-          'preConds': {'pop': 'IV4'},
-          'postConds': {'pop': 'IIT'},
-          'connList': blistInV4toInIT,
-          #'convergence': 10,
-          'weight': 0.00, #0.002
-          'delay': 2,
-          'synMech': 'GABA'}
+netParams.connParams['IV1->IV4'] = {
+        'preConds': {'pop': 'IV1'},
+        'postConds': {'pop': 'IV4'},
+        'connList': blistInV1toInV4,
+        #'convergence': 10,
+        'weight': 0.00, #0.002
+        'delay': 2,
+        'synMech': 'GABA'}
+netParams.connParams['IV4->IIT'] = {
+        'preConds': {'pop': 'IV4'},
+        'postConds': {'pop': 'IIT'},
+        'connList': blistInV4toInIT,
+        #'convergence': 10,
+        'weight': 0.00, #0.002
+        'delay': 2,
+        'synMech': 'GABA'}
 
 #Add direct connections from lower and higher visual areas to motor cortex
 #Still no idea, how these connections should look like...just trying some numbers: 400 to 25 means convergence factor of 16
@@ -586,25 +563,24 @@ netParams.connParams['V1->ML'] = {
         'synMech': 'AMPA',
         'plast': {'mech': 'STDP', 'params': STDPparamsRL}}
 
-if higherorder:
-  netParams.connParams['V4->MR'] = {
-          'preConds': {'pop': 'V4'},
-          'postConds': {'pop': 'MR'},
-          #'connList': blistMItoMO,
-          'convergence': 4,
-          'weight': 0.001,
-          'delay': 2,
-          'synMech': 'AMPA',
-          'plast': {'mech': 'STDP', 'params': STDPparamsRL}}
-  netParams.connParams['V4->ML'] = {
-          'preConds': {'pop': 'V4'},
-          'postConds': {'pop': 'ML'},
-          #'connList': blistMItoMO,
-          'convergence': 4,
-          'weight': 0.001,
-          'delay': 2,
-          'synMech': 'AMPA',
-          'plast': {'mech': 'STDP', 'params': STDPparamsRL}}
+netParams.connParams['V4->MR'] = {
+        'preConds': {'pop': 'V4'},
+        'postConds': {'pop': 'MR'},
+        #'connList': blistMItoMO,
+        'convergence': 4,
+        'weight': 0.001,
+        'delay': 2,
+        'synMech': 'AMPA',
+        'plast': {'mech': 'STDP', 'params': STDPparamsRL}}
+netParams.connParams['V4->ML'] = {
+        'preConds': {'pop': 'V4'},
+        'postConds': {'pop': 'ML'},
+        #'connList': blistMItoMO,
+        'convergence': 4,
+        'weight': 0.001,
+        'delay': 2,
+        'synMech': 'AMPA',
+        'plast': {'mech': 'STDP', 'params': STDPparamsRL}}
 
 #Simulation options
 simConfig = specs.SimConfig()           # object of class SimConfig to store simulation configuration
