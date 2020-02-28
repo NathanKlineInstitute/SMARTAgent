@@ -32,25 +32,30 @@ def loadsimdat (name=None):
 #
 def plotavgweights (pdf):
   utimes = np.unique(pdf.time)
-  All_ML_weights = []
-  All_MR_weights = []
-  for t in utimes:
-      for pop, arr in zip(['ML','MR'],[All_ML_weights,All_MR_weights]):
-        pdfs = pdf[(pdf.time==t) & (pdf.postid>=dstartidx[pop]) & (pdf.postid<=dendidx[pop]) & (pdf.preid>=dstartidx['V1']) & (pdf.preid<=dendidx['V1'])]
-        arr.append(np.mean(pdfs.weight))
-  subplot(2,1,1)
+  davgw = {}
+  subplot(4,1,1)
   plot(actreward.time,actreward.reward,'k',linewidth=4)
   plot(actreward.time,actreward.reward,'ko',markersize=10)  
   xlim((0,simConfig['simConfig']['duration']))
   ylim((-1.1,1.1))
-  subplot(2,1,2)
-  plot(utimes,All_ML_weights,'r-',linewidth=3);
-  plot(utimes,All_MR_weights,'b-',linewidth=3); 
-  legend(('V->ML','V->MR'),loc='upper left')
-  plot(utimes,All_ML_weights,'ro',markersize=10);  plot(utimes,All_MR_weights,'bo',markersize=10)
-  xlabel('Time (ms)'); ylabel('RL weights')
-  xlim((0,simConfig['simConfig']['duration']))
-  return All_ML_weights, All_MR_weights
+  gdx = 2
+  for src in ['V1', 'V4', 'IT']:
+      for trg in ['ML', 'MR']:
+          davgw[src+'->'+trg] = arr = []        
+          for t in utimes:
+              pdfs = pdf[(pdf.time==t) & (pdf.postid>=dstartidx[trg]) & (pdf.postid<=dendidx[trg]) & (pdf.preid>=dstartidx[src]) & (pdf.preid<=dendidx[trg])]
+              arr.append(np.mean(pdfs.weight))
+      subplot(4,1,gdx)
+      plot(utimes,davgw[src+'->ML'],'r-',linewidth=3);
+      plot(utimes,davgw[src+'->MR'],'b-',linewidth=3); 
+      legend((src+'->ML',src+'->MR'),loc='upper left')
+      plot(utimes,davgw[src+'->ML'],'ro',markersize=10);
+      plot(utimes,davgw[src+'->MR'],'bo',markersize=10);       
+      xlim((0,simConfig['simConfig']['duration']))
+      ylabel('RL weights') 
+      gdx += 1
+  xlabel('Time (ms)'); 
+  return davgw
 
 if __name__ == '__main__':
   simConfig, pdf, actreward, dstartidx, dendidx = loadsimdat()
