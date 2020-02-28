@@ -439,3 +439,26 @@ note that any move up or down (in the 5 action block) is a penalty and any stay 
 
 myrun 16
 
+  Cells: 1209
+  Connections: 27879 (23.06 per cell)
+  Spikes: 173771 (1.44 Hz)
+  Simulated time: 100.0 s; 16 workers
+  Run time: 2286.23 s
+Saving output as data/20feb27_FakeStayRule_C0_simConfig.pkl ... 
+Finished saving!
+Done; saving time = 11.18 s.
+
+savefig('gif/20feb27_FakeStayRule_C0_raster.png')
+lower firing rates for MR, ML ... next, look at behavior and weights...
+
+plw
+
+savefig('gif/20feb27_FakeStayRule_C0_rewards_weights_c0.png')
+
+both sets of weights stay close to baseline ... 
+would have expected both sets to decrease towards 0
+
+savefig('gif/20feb27_FakeStayRule_C0_action_freq_c0.png')
+
+well, at least neither action dominates here ...
+
