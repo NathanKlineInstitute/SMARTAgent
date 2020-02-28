@@ -4,7 +4,7 @@ import pickle
 import time
 from conf import dconf
 
-Input_Images = np.loadtxt('data/InputImages.txt')
+Input_Images = np.loadtxt('data/'+dconf['sim']['name']+'InputImages.txt')
 New_InputImages = []
 NB_Images = int(Input_Images.shape[0]/Input_Images.shape[1])
 for x in range(NB_Images):
@@ -14,7 +14,7 @@ for x in range(NB_Images):
 New_InputImages = np.array(New_InputImages)
 
 ##Change the rasterdata file below
-phl_file = open('data/RasterData.pkl','rb')
+phl_file = open('data/'+dconf['sim']['name']+'RasterData.pkl','rb')
 data1 = pickle.load(phl_file)
 spkTimes = data1["spkTimes"]
 spkInds = data1["spkInds"]

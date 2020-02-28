@@ -2,10 +2,11 @@ import numpy as np
 from pylab import *
 import pickle
 import pandas as pd
+from conf import dconf
 
 ion()
 
-simConfig = pickle.load(open('data/simConfig.pkl','rb'))
+simConfig = pickle.load(open('data/'+dconf['sim']['name']+'simConfig.pkl','rb'))
 
 dstartidx = {p:simConfig['net']['pops'][p]['cellGids'][0] for p in simConfig['net']['pops'].keys()} # starting indices for each population
 dendidx = {p:simConfig['net']['pops'][p]['cellGids'][-1] for p in simConfig['net']['pops'].keys()} # ending indices for each population
@@ -22,7 +23,7 @@ def readinweights (d):
 
 pdf = readinweights(simConfig)
 
-actreward = np.loadtxt('data/ActionsRewards.txt') 
+actreward = pd.DataFrame(np.loadtxt('data/'+dconf['sim']['name']+'ActionsRewards.txt'),columns=['time','action','reward']) 
 
 #
 def plotavgweights (pdf):
@@ -34,8 +35,8 @@ def plotavgweights (pdf):
         pdfs = pdf[(pdf.time==t) & (pdf.postid>=dstartidx[pop]) & (pdf.postid<=dendidx[pop]) & (pdf.preid>=dstartidx['V1']) & (pdf.preid<=dendidx['V1'])]
         arr.append(np.mean(pdfs.weight))
   subplot(2,1,1)
-  plot(actreward[:,0],actreward[:,2],'k',linewidth=4)
-  plot(actreward[:,0],actreward[:,2],'ko',markersize=10)  
+  plot(actreward.time,actreward.reward,'k',linewidth=4)
+  plot(actreward.time,actreward.reward,'ko',markersize=10)  
   xlim((0,simConfig['simConfig']['duration']))
   ylim((-1.1,1.1))
   subplot(2,1,2)
