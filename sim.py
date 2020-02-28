@@ -320,25 +320,25 @@ netParams.connParams['V1->IV1'] = {
         'weight': 0.002,
         'delay': 2,
         'synMech': 'AMPA'}
-if higherorder:
-  netParams.connParams['V4->IV4'] = {
-          'preConds': {'pop': 'V4'},
-          'postConds': {'pop': 'IV4'},
-          'connList': blistV4toInV4,
-          #'probability': 0.23,
-          #'convergence': 9,
-          'weight': 0.002,
-          'delay': 2,
-          'synMech': 'AMPA'}
-  netParams.connParams['IT->IIT'] = {
-          'preConds': {'pop': 'IT'},
-          'postConds': {'pop': 'IIT'},
-          'connList': blistITtoInIT,
-          #'probability': 0.23,
-          #'convergence': 9,
-          'weight': 0.002,
-          'delay': 2,
-          'synMech': 'AMPA'}
+netParams.connParams['V4->IV4'] = {
+        'preConds': {'pop': 'V4'},
+        'postConds': {'pop': 'IV4'},
+        'connList': blistV4toInV4,
+        #'probability': 0.23,
+        #'convergence': 9,
+        'weight': 0.002,
+        'delay': 2,
+        'synMech': 'AMPA'}
+netParams.connParams['IT->IIT'] = {
+        'preConds': {'pop': 'IT'},
+        'postConds': {'pop': 'IIT'},
+        'connList': blistITtoInIT,
+        #'probability': 0.23,
+        #'convergence': 9,
+        'weight': 0.002,
+        'delay': 2,
+        'synMech': 'AMPA'}
+
 #Local inhibition
 #I to E
 netParams.connParams['IR->R'] = {
@@ -359,25 +359,25 @@ netParams.connParams['IV1->V1'] = {
         'weight': 0.002,
         'delay': 2,
         'synMech': 'GABA'}
-if higherorder:
-  netParams.connParams['IV4->V4'] = {
-          'preConds': {'pop': 'IV4'},
-          'postConds': {'pop': 'V4'},
-          'connList': blistInV4toV4,
-          #'probability': 0.02,
-          #'divergence': 9,
-          'weight': 0.002,
-          'delay': 2,
-          'synMech': 'GABA'}
-  netParams.connParams['IIT->IT'] = {
-          'preConds': {'pop': 'IIT'},
-          'postConds': {'pop': 'IT'},
-          'connList': blistInITtoIT,
-          #'probability': 0.02,
-          #'divergence': 9,
-          'weight': 0.002,
-          'delay': 2,
-          'synMech': 'GABA'}
+netParams.connParams['IV4->V4'] = {
+        'preConds': {'pop': 'IV4'},
+        'postConds': {'pop': 'V4'},
+        'connList': blistInV4toV4,
+        #'probability': 0.02,
+        #'divergence': 9,
+        'weight': 0.002,
+        'delay': 2,
+        'synMech': 'GABA'}
+netParams.connParams['IIT->IT'] = {
+        'preConds': {'pop': 'IIT'},
+        'postConds': {'pop': 'IT'},
+        'connList': blistInITtoIT,
+        #'probability': 0.02,
+        #'divergence': 9,
+        'weight': 0.002,
+        'delay': 2,
+        'synMech': 'GABA'}
+
 #I to I
 netParams.connParams['IV1->IV1'] = {
         'preConds': {'pop': 'IV1'},
