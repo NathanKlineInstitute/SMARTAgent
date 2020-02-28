@@ -49,15 +49,15 @@ netParams = specs.NetParams() #object of class NetParams to store the network pa
 
 #Population parameters
 netParams.popParams['R'] = {'cellType': 'E', 'numCells': NB_Rneurons, 'cellModel': 'HH'}  #6400 neurons to represent 6400 pixels, now we have 400 pixels
-netParams.popParams['V1'] = {'cellType': 'EV1', 'numCells': NB_V1neurons, 'cellModel': 'HH'} #6400 neurons
 netParams.popParams['IR'] = {'cellType': 'InR', 'numCells': NB_IRneurons, 'cellModel': 'HH'}
+netParams.popParams['V1'] = {'cellType': 'EV1', 'numCells': NB_V1neurons, 'cellModel': 'HH'} #6400 neurons
 netParams.popParams['IV1'] = {'cellType': 'InV1', 'numCells': NB_IV1neurons, 'cellModel': 'HH'} #1600
+netParams.popParams['V4'] = {'cellType': 'EV4', 'numCells': NB_V4neurons, 'cellModel': 'HH'} #1600 neurons
+netParams.popParams['IV4'] = {'cellType': 'InV4', 'numCells': NB_IV4neurons, 'cellModel': 'HH'} #400
+netParams.popParams['IT'] = {'cellType': 'EIT', 'numCells': NB_ITneurons, 'cellModel': 'HH'} #400 neurons
+netParams.popParams['IIT'] = {'cellType': 'InIT', 'numCells': NB_IITneurons, 'cellModel': 'HH'} #100
 netParams.popParams['ML'] = {'cellType': 'EML', 'numCells': NB_MLneurons, 'cellModel': 'HH'} #400
 netParams.popParams['MR'] = {'cellType': 'EMR', 'numCells': NB_MRneurons, 'cellModel': 'HH'} #100
-netParams.popParams['V4'] = {'cellType': 'EV4', 'numCells': NB_V4neurons, 'cellModel': 'HH'} #1600 neurons
-netParams.popParams['IT'] = {'cellType': 'EIT', 'numCells': NB_ITneurons, 'cellModel': 'HH'} #400 neurons
-netParams.popParams['IV4'] = {'cellType': 'InV4', 'numCells': NB_IV4neurons, 'cellModel': 'HH'} #400
-netParams.popParams['IIT'] = {'cellType': 'InIT', 'numCells': NB_IITneurons, 'cellModel': 'HH'} #100
 
 netParams.cellParams['ERule'] = {               # cell rule label
         'conds': {'cellType': ETypes},              #properties will be applied to cells that match these conditions
@@ -401,6 +401,7 @@ netParams.connParams['IIT->IIT'] = {
         'weight': 0.000, #0.0001
         'delay': 2,
         'synMech': 'GABA'}
+
 #E to E feedforward connections
 netParams.connParams['R->V1'] = {
         'preConds': {'pop': 'R'},
@@ -432,7 +433,8 @@ netParams.connParams['IT->ML'] = {
         'postConds': {'pop': 'ML'},
         #'connList': blistITtoMI,
         'convergence': 25,
-        'weight': 0.0025,
+        #'weight': 0.0025,
+        'weight': 0.001,
         'delay': 2,
         'synMech': 'AMPA',
         'plast': {'mech': 'STDP', 'params': STDPparamsRL}}
@@ -441,7 +443,8 @@ netParams.connParams['IT->MR'] = {
         'postConds': {'pop': 'MR'},
         #'connList': blistMItoMO,
         'convergence': 25,
-        'weight': 0.0025,
+        #'weight': 0.0025,
+        'weight': 0.001,
         'delay': 2,
         'synMech': 'AMPA',
         'plast': {'mech': 'STDP', 'params': STDPparamsRL}}
@@ -498,7 +501,7 @@ netParams.connParams['IT->V4'] = {
         'delay': 2,
         'synMech': 'AMPA'}
 
-#I to E connections
+#I to E feedbackward connections
 netParams.connParams['IV1->R'] = {
         'preConds': {'pop': 'IV1'},
         'postConds': {'pop': 'R'},
@@ -562,7 +565,6 @@ netParams.connParams['V1->ML'] = {
         'delay': 2,
         'synMech': 'AMPA',
         'plast': {'mech': 'STDP', 'params': STDPparamsRL}}
-
 netParams.connParams['V4->MR'] = {
         'preConds': {'pop': 'V4'},
         'postConds': {'pop': 'MR'},
