@@ -4,6 +4,6 @@
     "moves": {"UP": 4,"DOWN":3, "NOMOVE":1},
     "movecodes": [1,3,4],
     "verbose": 1,        
-    "sim": {"duration": 1e3, "dt": 0.2, "verbose": 0, "recordStep":0.2,"RLFakeUpRule": 0,"RLFakeDownRule": 0,"RLFakeStayRule": 0,"name":"20feb28_A0_"},
-    "net":{"scale":1,"E":400,"EV1":400,"InR":100,"InV1":100,"EV4":100,"EIT":25,"InV4":25,"InIT":9,"ML":25,"MR":25}
+    "sim": {"duration": 1e3, "dt": 0.2, "verbose": 0, "recordStep":0.2,"RLFakeUpRule": 1,"RLFakeDownRule": 0,"RLFakeStayRule": 0,"name":"20feb28_A0_"},
+    "net":{"scale":1,"E":400,"EV1":400,"InR":100,"InV1":100,"EV4":100,"EIT":25,"InV4":25,"InIT":9,"ML":100,"MR":100}
 }

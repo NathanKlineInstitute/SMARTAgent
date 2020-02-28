@@ -59,4 +59,4 @@ def plotavgweights (pdf):
 
 if __name__ == '__main__':
   simConfig, pdf, actreward, dstartidx, dendidx = loadsimdat()
-  All_ML_weights,All_MR_Weights = plotavgweights(pdf)
+  davgw = plotavgweights(pdf)
