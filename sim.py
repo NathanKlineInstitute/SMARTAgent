@@ -11,12 +11,12 @@ sim.allTimes = []
 sim.allRewards = [] # list to store all rewards
 sim.allActions = [] # list to store all actions
 sim.allMotorOutputs = [] # list to store firing rate of output motor neurons.
-sim.ActionsRewardsfilename = 'data/ActionsRewards.txt'
-sim.MotorOutputsfilename = 'data/MotorOutputs.txt'
+sim.ActionsRewardsfilename = 'data/'+dconf['sim']['name']+'ActionsRewards.txt'
+sim.MotorOutputsfilename = 'data/'+dconf['sim']['name']+'MotorOutputs.txt'
 sim.WeightsRecordingTimes = []
 sim.allRLWeights = [] # list to store weights --- should remove that
 sim.allNonRLWeights = [] # list to store weights --- should remove that
-#sim.NonRLweightsfilename = 'data/NonRLweights.txt'  # file to store weights
+#sim.NonRLweightsfilename = 'data/'+dconf['sim']['name']+'NonRLweights.txt'  # file to store weights
 sim.plotWeights = 0  # plot weights
 sim.saveWeights = 1  # save weights
 sim.saveInputImages = 1 #save Input Images (5 game frames)
@@ -596,7 +596,7 @@ simConfig.saveFolder = 'data'
 #simConfig.analysis['plotRaster'] = True                         # Plot a raster
 simConfig.analysis['plotTraces'] = {'include': [1159, 1169, 1179, 1189, 1199]}
 #simConfig.analysis['plotRaster'] = {'timeRange': [500,1000],'popRates':'overlay','saveData':'data/RasterData.pkl','showFig':True}
-simConfig.analysis['plotRaster'] = {'popRates':'overlay','saveData':'data/RasterData.pkl','showFig':True}
+simConfig.analysis['plotRaster'] = {'popRates':'overlay','saveData':'data/'+dconf['sim']['name']+'RasterData.pkl','showFig':True}
 #simConfig.analysis['plot2Dnet'] = True 
 #simConfig.analysis['plotConn'] = True           # plot connectivity matrix
 ###################################################################################################################################
@@ -961,7 +961,7 @@ if sim.plotWeights: plotWeights()
 if sim.saveWeights:
     #saveWeights(sim, recordWeightDCells)
     saveGameBehavior(sim)
-    fid5 = open('data/ActionsPerEpisode.txt','w')
+    fid5 = open('data/'+dconf['sim']['name']+'ActionsPerEpisode.txt','w')
     for i in range(len(epCount)):
         fid5.write('\t%0.1f' % epCount[i])
         fid5.write('\n')
@@ -970,7 +970,7 @@ InputImages = np.array(InputImages)
 print(InputImages.shape)
 
 if sim.saveInputImages:
-    with open('data/InputImages.txt', 'w') as outfile:
+    with open('data/'+dconf['sim']['name']+'InputImages.txt', 'w') as outfile:
         outfile.write('# Array shape: {0}\n'.format(InputImages.shape))
         for Input_Image in InputImages:
             np.savetxt(outfile, Input_Image, fmt='%-7.2f')

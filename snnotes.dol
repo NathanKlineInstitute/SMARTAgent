@@ -343,3 +343,46 @@ R produces up, L produces down ...
 ok, fixing that, now V->MR weights go up as they should (but now have turned off inputs to ML)
 savefig('gif/20feb27_rewards_wghts_a6.png')
 
+so, turned back on the inputs to ML to see if -> MR weights still go up with time ...
+
+savefig('gif/20feb27_raster_a7.png')
+
+savefig('gif/20feb27_rewards_weights_a8.png')
+
+it does look like the V -> MR weights increase more than the V -> ML weights, which
+is correct, but the V -> ML weights still seem to correlate with the V -> MR weights, and go up in parallel
+perhaps, as long as overall more of the correct moves are made, it doesn't matter if the V -> ML weights
+are increased too ... ?
+
+what is the move command as a function of time? more correct moves later on compared to earlier?
+
+pad = pd.DataFrame(actreward,columns=['time','action','reward'])
+
+figure(); pads = pad[pad.action==3]; plot(pads.time,pads.action,'bo'); pads = pad[pad.action==4]; plot(pads.time,pads.action,'ro')
+
+#
+ldown,lup = [],[]
+ltt = linspace(0,99,100)
+for tt in ltt:
+  pads = pad[(pad.action==3) & (pad.time>=tt*1e3) & (pad.time<=(tt+1)*1e3)]
+  ldown.append(len(pads))
+  pads = pad[(pad.action==4) & (pad.time>=tt*1e3) & (pad.time<=(tt+1)*1e3)]
+  lup.append(len(pads))
+
+clf(); plot(ltt,ldown,'r',linewidth=4); plot(ltt,lup,'b',linewidth=4); xlabel('Time (s)'); ylabel('Move frequency (Hz)');
+import matplotlib.patches as mpatches
+lpatch = [mpatches.Patch(color=c,label=s) for c,s in zip(['b','r'],['Up','Down'])]
+ax=gca()
+ax.legend(handles=lpatch,handlelength=1)
+
+savefig('gif/20feb27_action_freq_a9.png')
+
+most of the time, up moves have higher rate than down moves ...
+
+see if it's reversed when using the down fake rule ...
+
+ok, using sim.json sim:name to specify simulation name so can save output files for different sim in data ...
+
+also may as well adjust plotWeights to draw actions in top panel ...? suppose only useful when using fake rule ... 
+otherwise up/down rates not so important ...  
+
