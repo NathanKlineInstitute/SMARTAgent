@@ -1,1 +1,2 @@
-python3 -i plotWeights.py
+python3 -i simdat.py
+

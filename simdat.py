@@ -3,16 +3,14 @@ from pylab import *
 import pickle
 import pandas as pd
 from conf import dconf
+import os
+import sys
 
 ion()
 
-simConfig = pickle.load(open('data/'+dconf['sim']['name']+'simConfig.pkl','rb'))
-
-dstartidx = {p:simConfig['net']['pops'][p]['cellGids'][0] for p in simConfig['net']['pops'].keys()} # starting indices for each population
-dendidx = {p:simConfig['net']['pops'][p]['cellGids'][-1] for p in simConfig['net']['pops'].keys()} # ending indices for each population
-
 #
 def readinweights (d):
+  # read the synaptic plasticity weights into a pandas dataframe
   A = []
   ddsyn = d['simData']['synweights']
   for rank in ddsyn.keys():
@@ -21,9 +19,15 @@ def readinweights (d):
       A.append(lsyn)
   return pd.DataFrame(A,columns=['time','stdptype','preid','postid','weight'])
 
-pdf = readinweights(simConfig)
-
-actreward = pd.DataFrame(np.loadtxt('data/'+dconf['sim']['name']+'ActionsRewards.txt'),columns=['time','action','reward']) 
+def loadsimdat (name=None):
+  # load simulation data
+  if name is None: name = dconf['sim']['name']
+  simConfig = pickle.load(open('data/'+name+'simConfig.pkl','rb'))
+  dstartidx = {p:simConfig['net']['pops'][p]['cellGids'][0] for p in simConfig['net']['pops'].keys()} # starting indices for each population
+  dendidx = {p:simConfig['net']['pops'][p]['cellGids'][-1] for p in simConfig['net']['pops'].keys()} # ending indices for each population
+  pdf = readinweights(simConfig)
+  actreward = pd.DataFrame(np.loadtxt('data/'+name+'ActionsRewards.txt'),columns=['time','action','reward'])   
+  return simConfig, pdf, actreward, dstartidx, dendidx
 
 #
 def plotavgweights (pdf):
@@ -48,4 +52,6 @@ def plotavgweights (pdf):
   xlim((0,simConfig['simConfig']['duration']))
   return All_ML_weights, All_MR_weights
 
-All_ML_weights,All_MR_Weights = plotavgweights(pdf)
+if __name__ == '__main__':
+  simConfig, pdf, actreward, dstartidx, dendidx = loadsimdat()
+  All_ML_weights,All_MR_Weights = plotavgweights(pdf)

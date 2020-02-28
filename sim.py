@@ -592,6 +592,7 @@ simConfig.filename = 'data/'+dconf['sim']['name']+'simConfig'  # Set file output
 simConfig.savePickle = True            # Save params, network and sim output to pickle file
 simConfig.saveMat = False
 simConfig.saveFolder = 'data'
+# simConfig.backupCfg = ['sim.json', 'backupcfg/'+dconf['sim']['name']+'sim.json']
 
 #simConfig.analysis['plotRaster'] = True                         # Plot a raster
 simConfig.analysis['plotTraces'] = {'include': [1159, 1169, 1179, 1189, 1199]}
@@ -601,7 +602,7 @@ simConfig.analysis['plotRaster'] = {'popRates':'overlay','saveData':'data/'+dcon
 #simConfig.analysis['plotConn'] = True           # plot connectivity matrix
 ###################################################################################################################################
 
-sim.AIGame = None
+sim.AIGame = None # placeholder
 
 def recordAdjustableWeightsPop (sim, t, popname):
     if 'synweights' not in sim.simData: sim.simData['synweights'] = {sim.rank:[]}
@@ -939,9 +940,8 @@ def getAllSTDPObjects (sim):
   return lSTDPmech
         
 #Alterate to create network and run simulation
-sim.initialize(                       # create network object and set cfg and net params
-    simConfig = simConfig,   # pass simulation config and network params as arguments
-    netParams = netParams)
+# create network object and set cfg and net params; pass simulation config and network params as arguments
+sim.initialize(simConfig = simConfig, netParams = netParams)
 sim.net.createPops()                      # instantiate network populations
 sim.net.createCells()                     # instantiate network cells based on defined populations
 sim.net.connectCells()                    # create connections between cells based on params
@@ -950,10 +950,14 @@ sim.setupRecording()                  # setup variables to record for each cell 
 
 lSTDPmech = getAllSTDPObjects(sim) # get all the STDP objects up-front
 
-if sim.rank == 0: # only create AIGame on node 0
+if sim.rank == 0: 
     from aigame import AIGame
-    sim.AIGame = AIGame()
-
+    sim.AIGame = AIGame() # only create AIGame on node 0
+    # node 0 saves the json config file
+    # this is just a precaution since simConfig pkl file has MOST of the info; ideally should adjust simConfig to contain ALL of the required info
+    from utils import backupcfg
+    backupcfg(dconf['sim']['name']) 
+    
 sim.runSimWithIntervalFunc(100.0,trainAgent) # has periodic callback to adjust STDP weights based on RL signal
 sim.gatherData() # gather data from different nodes
 sim.saveData() # save data to disk

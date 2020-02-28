@@ -462,3 +462,14 @@ savefig('gif/20feb27_FakeStayRule_C0_action_freq_c0.png')
 
 well, at least neither action dominates here ...
 
+*20feb28
+** continue 
+
+should make it easier to load the output data ... maybe consolidate plotting funcs too ...
+
+question about architecture - how much of the higher level areas do we need/want? and should
+allow easier scaling of the simulation in case need larger-sized populations  ... 
+
+homeostatic plasticity will likely be needed - the weights were increasing, and could push
+the net to epilepsy ...
+
