@@ -1,6 +1,5 @@
 """
-SMARTAgent
-Code to connect a open ai gym game to the SMARTAgent model (V1-M1-RL)
+AIGame: connects OpenAI gym game to the model (V1-M1-RL)
 Adapted from arm.py
 Original Version: 2015jan28 by salvadordura@gmail.com
 Modified Version: 2019oct1 by haroon.anwar@gmail.com
@@ -18,15 +17,19 @@ from skimage.transform import downscale_local_mean
 import json
 import gym
 import sys
+from gym import wrappers
+from time import time
 
 # make the environment - env is global so that it only gets created on a single node (important when using MPI with > 1 node)
 try:
   from conf import dconf
   env = gym.make(dconf['env']['name'],frameskip=dconf['env']['frameskip'])
+  if dconf['env']['savemp4']: env = wrappers.Monitor(env, './videos/' + dconf['sim']['name'] + '/')
   env.reset()
 except:
   print('Exception in makeENV')
   env = gym.make('Pong-v0',frameskip=3)
+  env = wrappers.Monitor(env, './videos/' + str(time()) + '/')
   env.reset()
 
 class AIGame:
@@ -47,10 +50,14 @@ class AIGame:
         rewards = []
         dsum_Images = np.zeros(shape=(20,20)) #previously we merged 2x2 pixels into 1 value. Now we merge 8x8 pixels into 1 value. so the original 160x160 pixels will result into 20x20 values instead of previously used 80x80.
         #print(actions)
-        gray_Image = np.zeros(shape=(160,160))        
+        gray_Image = np.zeros(shape=(160,160))
+        done = False
         for a in range(self.intaction):
             caction = actions[a]
             observation, reward, done, info = self.env.step(caction)
+            if done:
+                self.env.reset()
+                done = False
             rewards.append(reward)
             Image = observation[34:194,:,:] # why does it only use rows 34 through 194?
             for i in range(160):
