@@ -500,3 +500,56 @@ try same, but longer ...
 
 125 s ...
 
+  Cells: 1359
+  Connections: 38281 (28.17 per cell)
+  Spikes: 484922 (2.85 Hz)
+  Simulated time: 125.0 s; 16 workers
+  Run time: 2823.09 s
+Saving output as data/20feb28_A0_simConfig.pkl ... 
+Finished saving!
+Done; saving time = 97.79 s.
+
+savefig('gif/20feb28_rast_b0.png')
+rates go up too much ... another indication that need some form of homeostasis
+
+savefig('gif/20feb28_reward_weight_b1.png')
+
+#
+ldown,lup = [],[]
+ltt = linspace(0,124,125)
+for tt in ltt:
+  actrewards = actreward[(actreward.action==3) & (actreward.time>=tt*1e3) & (actreward.time<=(tt+1)*1e3)]
+  ldown.append(len(actrewards))
+  actrewards = actreward[(actreward.action==4) & (actreward.time>=tt*1e3) & (actreward.time<=(tt+1)*1e3)]
+  lup.append(len(actrewards))
+
+figure(); plot(ltt,ldown,'r',linewidth=4); plot(ltt,lup,'b',linewidth=4); xlabel('Time (s)'); ylabel('Move frequency (Hz)');
+import matplotlib.patches as mpatches
+lpatch = [mpatches.Patch(color=c,label=s) for c,s in zip(['b','r'],['Up','Down'])]
+ax=gca()
+ax.legend(handles=lpatch,handlelength=1)
+xlim((0,125))
+
+savefig('gif/20feb28_move_rate_b2.png')
+ok, clearly moving up more than down after training ... (as it should)
+
+can try training in DOWN direction as precaution or run actual game test ...
+
+will try game test ...
+
+ok running this with no fake rule, and duration of 250e3 ... 
+"20feb28_G0_"
+
+if there was a weaker opponent, might be easier to train as starting point?
+or play against self ...
+does openai allow controlling difficulty level of opponent?
+
+well, did see the model score a point...but pretty rare so far ...
+intermediate rewards after ball contacts racket might be sensible, though less generic...
+can also have multidimensional error for reward/punishment, consisting of distance
+between racket/ball (0.25), contact with racket (0.5), actual points (+1/-1)
+or sign(current distance to ball - last distance to ball) -- but once using those
+types of rules, no longer need the visual input at all ... 
+
+separately, also need to be able to save/restore learned weights ...
+

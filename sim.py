@@ -707,7 +707,7 @@ def getFiringRatesWithInterval(trange = None, neuronal_pop = None):
     return avgRates
 
 InputImages = []
-NBsteps = 0
+NBsteps = 0 # this is a counter for recording the plastic weights
 epCount = []
 last_obs = [] #make sure this does not introduce a bug
 
