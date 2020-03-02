@@ -903,11 +903,12 @@ def trainAgent (t):
           critic = sum(rewards) # get critic signal (-1, 0 or 1)
         if dconf['verbose']:
           if critic > 0:
-            print('REWARD')
+            print('REWARD, critic=',critic)
           elif critic < 0:
-            print('PUNISH')
+            critic = -0.01 # reduce magnitude of critic so rewards dominate
+            print('PUNISH, critic=',critic)
           else:
-            print('NO REWARD/PUNISH')          
+            print('CRITIC=0')          
           
         sim.pc.broadcast(vec.from_python([critic]), 0) # convert python list to hoc vector to broadcast critic value to other nodes
     else: # other workers
