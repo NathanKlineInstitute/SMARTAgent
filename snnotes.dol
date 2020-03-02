@@ -635,9 +635,36 @@ mpiexec noticed that process rank 0 with PID 0 on node zn exited on signal 6 (Ab
 so will probably have to run simulation for shorter duration ...
 
 *20mar1
-** run 500 s again - adjust critic for punishments
+** run 750 s again - adjust critic for punishments
 
 can try critic with -0.1 or -0.01 so it's less pronounced compared to reward
 
 750 s, with critic at -0.01 ...
+
+myrun 24
+
+*20mar2
+** continue - look at output from last sim
+
+  Cells: 1359
+  Connections: 38281 (28.17 per cell)
+  Spikes: 3478200 (3.41 Hz)
+  Simulated time: 750.0 s; 24 workers
+  Run time: 18652.00 s
+Saving output as data/20mar1_G2_simConfig.pkl ... 
+Finished saving!
+  Done; saving time = 83.59 s.
+Plotting recorded cell traces ... cell
+QStandardPaths: XDG_RUNTIME_DIR not set, defaulting to '/tmp/runtime-samn'
+Plotting raster...
+Saving figure data as data/20mar1_G2_RasterData.pkl ... 
+  Done; plotting time = 1282.06 s
+
+savefig('gif/20mar2_G2_Raster.png')
+  
+savefig('gif/20mar2_G2_reward_weights.png')
+
+ok, weights do not have as much time to decay now ...
+
+but still need a way to save/restore the weights, and produce videos capturing whole simulation ...
 
