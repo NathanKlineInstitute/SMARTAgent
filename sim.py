@@ -960,6 +960,7 @@ lSTDPmech = getAllSTDPObjects(sim) # get all the STDP objects up-front
 
 def updateSTDPWeights (sim, W):
     # get all the STDP objects from the simulation's cells
+    print(W)
     for cell in sim.net.cells:
         cpreID = cell.gid#find postID
         for conn in cell.conns:
