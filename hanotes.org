@@ -951,6 +951,23 @@ STDPparamsRL = {'hebbwt': 0.0000, 'antiwt':-0.0000, 'wbase': 0.0012, 'wmax': 50,
 
 **too many no move actions because the firing rate of ML is same as MR. Try picking up random action if ML is equal to MR firing rates.
 
+*20mar4
+**THINGS TO DO:
+1. Fix videos (follow this: https://hub.packtpub.com/openai-gym-environments-wrappers-and-monitors-tutorial/)
+2. Allow saving and loading weights so that we can run loneger simulations.
+3. other thing while those types of sims run is to think about whether to have those "fake" rules you suggested - such as reward the model when it moves racket toward ball and when it contacts the ball. can do that via different values of critic signal.
+
+**needed to istall ffmpeg using homebrew - installed
+
+
+*20mar5
+**added "simtype": {"NewSim":0,"ResumeSim":1,"ResumeSimFromFile":"data/20mar1_G2_simConfig.pkl"} in sim.json
+***Choose here if need NewSim or ResumeSim. For resume sim, should also include ResumeSimFromFile
+**update STDP weights
+
+
+
+
 
 
 

@@ -4,6 +4,7 @@ import numpy as np
 import random
 from conf import dconf # configuration dictionary
 import pandas as pd
+import pickle
 
 random.seed(1234) # this will not work properly across runs with different number of nodes
 
@@ -956,6 +957,39 @@ sim.net.addStims()                      #instantiate netStim
 sim.setupRecording()                  # setup variables to record for each cell (spikes, V traces, etc)
 
 lSTDPmech = getAllSTDPObjects(sim) # get all the STDP objects up-front
+
+def updateSTDPWeights (sim, W):
+    # get all the STDP objects from the simulation's cells
+    for cell in sim.net.cells:
+        cpreID = cell.gid#find postID
+        for conn in cell.conns:
+            cpostID = conn.preGid  #find preID
+            cConnW = W[(W.postid==cpostID) & (W.preid==cpreID)]
+            #find weight for the STDP connection between preID and postID
+            countConns = 0
+            for idx in cConnW.index:
+                countConns = countConns+1
+                if countConns>1:
+                    print('Something Wrong: Each Connection should have 1 weight')
+                else: 
+                    cW = cConnW.at[idx,'weight']
+                    cstdp = cConnW.at[idx,'weight'] 
+                    STDPmech = conn.get('hSTDP')  # check if has STDP mechanism
+                    if STDPmech and cstdp:   # make sure it is not None
+                        conn['hObj'].weight[0] = cW
+
+if dconf['simtype']['ResumeSim']:
+    data = pickle.load(open('data/'+dconf['simtype']['ResumeSimFromFile'],'rb'))
+    A = []
+    ddsyn = data['simData']['synweights']
+    for rank in ddsyn.keys():
+        dsyn = ddsyn[rank]
+        for lsyn in dsyn:
+            A.append(lsyn)
+    B = pd.DataFrame(A,columns=['time','stdptype','preid','postid','weight'])
+    ltpntW = B[B.time == max(B.time)]
+    updateSTDPWeights (sim, ltpntW)
+
 
 if sim.rank == 0: 
     from aigame import AIGame
