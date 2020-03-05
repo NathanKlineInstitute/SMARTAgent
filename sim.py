@@ -965,6 +965,7 @@ def updateSTDPWeights (sim, W):
         for conn in cell.conns:
             cpostID = conn.preGid  #find preID
             cConnW = W[(W.postid==cpostID) & (W.preid==cpreID)]
+            print(cConnW)
             #find weight for the STDP connection between preID and postID
             countConns = 0
             for idx in cConnW.index:
@@ -975,7 +976,7 @@ def updateSTDPWeights (sim, W):
                     cW = cConnW.at[idx,'weight']
                     cstdp = cConnW.at[idx,'stdptype'] 
                     STDPmech = conn.get('hSTDP')  # check if has STDP mechanism
-                    print('weight updated:', cW, cstdp, STDPmech)
+                    #print('weight updated:', cW, cstdp, STDPmech)
                     if STDPmech and cstdp:   # make sure it is not None
                         conn['hObj'].weight[0] = cW
                         
