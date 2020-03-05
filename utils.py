@@ -19,4 +19,4 @@ def backupcfg (name):
   if os.path.exists(fout):
     print('removing prior cfg file' , fout)
     os.system('rm ' + fout)  
-  os.system('cp ' + fcfg + ' ' + fout) # fcfg created in geom.py via conf.py
+  os.system('cp sim.json ' + fout) # fcfg created in geom.py via conf.py
