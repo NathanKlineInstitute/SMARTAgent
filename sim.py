@@ -973,11 +973,11 @@ def updateSTDPWeights (sim, W):
                     print('Something Wrong: Each Connection should have 1 weight')
                 else: 
                     cW = cConnW.at[idx,'weight']
-                    cstdp = cConnW.at[idx,'weight'] 
+                    cstdp = cConnW.at[idx,'stdptype'] 
                     STDPmech = conn.get('hSTDP')  # check if has STDP mechanism
                     if STDPmech and cstdp:   # make sure it is not None
                         conn['hObj'].weight[0] = cW
-    print('sim updated:')
+    print('sim updated:', countConns)
     return sim
 
 if dconf['simtype']['ResumeSim']:
