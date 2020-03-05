@@ -968,18 +968,13 @@ def updateSTDPWeights (sim, W):
             cConnW = W[(W.postid==cpostID) & (W.preid==cpreID)]
             #print(cConnW)
             #find weight for the STDP connection between preID and postID
-            countConns = 0
             for idx in cConnW.index:
-                countConns = countConns+1
-                if countConns>1:
-                    print('Something Wrong: Each Connection should have 1 weight')
-                else: 
-                    cW = cConnW.at[idx,'weight']
-                    cstdp = cConnW.at[idx,'stdptype'] 
-                    #STDPmech = conn.get('hSTDP')  # check if has STDP mechanism
-                    print('weight updated:', cW, cstdp)
-                    if cstdp:   # make sure it is not None
-                        conn['hObj'].weight[0] = cW
+                cW = cConnW.at[idx,'weight']
+                cstdp = cConnW.at[idx,'stdptype'] 
+                #STDPmech = conn.get('hSTDP')  # check if has STDP mechanism
+                print('weight updated:', cW, cstdp)
+                if cstdp:   # make sure it is not None
+                    conn['hObj'].weight[0] = cW
                         
     return sim
 
