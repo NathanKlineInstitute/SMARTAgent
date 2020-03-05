@@ -966,6 +966,7 @@ STDPparamsRL = {'hebbwt': 0.0000, 'antiwt':-0.0000, 'wbase': 0.0012, 'wmax': 50,
 **update STDP weights
 
 **testing weight loading - G0: run sim for 100 sec with initial weights.
+**testing weight loading - G1: run sim for 100 sec with weights from G0
 
 
 
