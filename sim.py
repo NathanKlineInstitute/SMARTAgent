@@ -977,12 +977,11 @@ def updateSTDPWeights (sim, W):
                     STDPmech = conn.get('hSTDP')  # check if has STDP mechanism
                     if STDPmech and cstdp:   # make sure it is not None
                         conn['hObj'].weight[0] = cW
-    print('sim updated:', countConns)
+                        print('weight updated:', cW)
     return sim
 
 if dconf['simtype']['ResumeSim']:
     data = pickle.load(open('data/'+dconf['simtype']['ResumeSimFromFile'],'rb'))
-    print('data loaded:')
     A = []
     ddsyn = data['simData']['synweights']
     for rank in ddsyn.keys():
