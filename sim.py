@@ -962,9 +962,9 @@ def updateSTDPWeights (sim, W):
     # get all the STDP objects from the simulation's cells
     for cell in sim.net.cells:
         cpreID = cell.gid#find postID
-        print(cpreID)
         for conn in cell.conns:
             cpostID = conn.preGid  #find preID
+            print(cpreID, cpostID)
             cConnW = W[(W.postid==cpostID) & (W.preid==cpreID)]
             #print(cConnW)
             #find weight for the STDP connection between preID and postID
