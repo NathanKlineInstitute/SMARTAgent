@@ -965,6 +965,8 @@ STDPparamsRL = {'hebbwt': 0.0000, 'antiwt':-0.0000, 'wbase': 0.0012, 'wmax': 50,
 ***Choose here if need NewSim or ResumeSim. For resume sim, should also include ResumeSimFromFile
 **update STDP weights
 
+**testing weight loading - G0: run sim for 100 sec with initial weights.
+
 
 
 
