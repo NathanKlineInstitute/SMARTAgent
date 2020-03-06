@@ -748,3 +748,11 @@ myrun 12
 also have this in pythonpath:
  setenv PYTHONPATH {$PYTHONPATH}:$ND/share/python/lib/python:/usr/site/nrniv/local/python
 
+*20mar6 - long run with restarts?
+** testing
+
+since haroon implemented weight save/restore, could let it run a few times with restarts ...
+
+may not need to save video for now ... could instead run video once run a few rounds of training
+...
+
