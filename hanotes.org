@@ -968,6 +968,14 @@ STDPparamsRL = {'hebbwt': 0.0000, 'antiwt':-0.0000, 'wbase': 0.0012, 'wmax': 50,
 **testing weight loading - G0: run sim for 100 sec with initial weights.
 **testing weight loading - G1: run sim for 100 sec with weights from G0
 
+**WEIGHT RELOADING WORKS- can run long simulations by resuming from last run without problem
+
+*20mar6
+**in aigame.py, find the position of ball and racket, then propose action based on the their relative positions. The strategy here is to move towards the ball.
+**all proposed actions are returned from playGame to sim.py and appended in sim.allProposedActions and saved in the end of simulation.
+**Next step would be to use the proposed actions and compare it with the performed action, if the performed action was similar to the proposed action, give some reward.
+
+
 
 
 

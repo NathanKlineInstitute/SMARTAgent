@@ -11,6 +11,7 @@ random.seed(1234) # this will not work properly across runs with different numbe
 sim.allTimes = []
 sim.allRewards = [] # list to store all rewards
 sim.allActions = [] # list to store all actions
+sim.allProposedActions = [] # list to store all proposed actions
 sim.allMotorOutputs = [] # list to store firing rate of output motor neurons.
 sim.ActionsRewardsfilename = 'data/'+dconf['sim']['name']+'ActionsRewards.txt'
 sim.MotorOutputsfilename = 'data/'+dconf['sim']['name']+'MotorOutputs.txt'
@@ -686,6 +687,7 @@ def saveGameBehavior(sim):
             fid3.write('%0.1f' % sim.allTimes[i])
             fid3.write('\t%0.1f' % sim.allActions[i])
             fid3.write('\t%0.1f' % sim.allRewards[i])
+            fid3.write('\t%0.1f' % sim.allProposedActions[i]) #the number of proposed action should be equal to the number of actions
             fid3.write('\n')
 
 ######################################################################################
@@ -801,7 +803,7 @@ def updateInputRates ():
 def trainAgent (t):
     """ training interface between simulation and game environment
     """
-    global NBsteps, epCount, InputImages
+    global NBsteps, epCount, InputImages, last_obs
     vec = h.Vector()
     if t<100.0: # for the first time interval use randomly selected actions
         actions =[]
@@ -889,8 +891,7 @@ def trainAgent (t):
             
     if sim.rank == 0:
         print('Model actions:', actions)
-        rewards, epCount, InputImages = sim.AIGame.playGame(actions, epCount, InputImages)
-
+        rewards, epCount, InputImages, last_obs, proposed_actions = sim.AIGame.playGame(actions, epCount, InputImages, last_obs)
         if dconf['sim']['RLFakeUpRule']: # fake rule for testing reinforcing of up moves
           critic = np.sign(actions.count(dconf['moves']['UP']) - actions.count(dconf['moves']['DOWN']))          
           rewards = [critic for i in range(len(rewards))]
@@ -922,6 +923,8 @@ def trainAgent (t):
         print('Game rewards:', rewards) # only rank 0 has access to rewards      
         for action in actions:
             sim.allActions.append(action)
+        for pactions in proposed_actions: #also record proposed actions
+            sim.allProposedActions.append(pactions)
         for reward in rewards: # this generates an error - since rewards only declared for sim.rank==0; bug?
             sim.allRewards.append(reward)
 
