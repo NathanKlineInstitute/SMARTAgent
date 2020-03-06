@@ -96,6 +96,7 @@ class AIGame:
             else:
                 proposed_action = -1 #if there is no last_obs
             observation, reward, done, info = self.env.step(caction)
+            self.env.render()
             last_obs = observation #current observation will be used as last_obs for the next action
             if done:
                 self.env.reset()
@@ -136,7 +137,7 @@ class AIGame:
         fr_Images = np.subtract(fr_Images,7.722) #baseline firing rate subtraction. Instead all excitatory neurons are firing at 5Hz.
         #print(np.amax(fr_Images))
         self.firing_rates = np.reshape(fr_Images,400) #400 for 20*20
-        self.env.render()
+        #self.env.render()
         #print(self.countAll)
         if done: # what is done? --- when done == 1, it means that 1 episode of the game ends, so it needs to be reset. 
             epCount.append(self.countAll)
