@@ -983,9 +983,13 @@ def updateSTDPWeights (sim, W):
 if dconf['simtype']['ResumeSim']:
     try:
         from simdat import readinweights
-        print('reading in weights from', 'data/'+dconf['simtype']['ResumeSimFromFile'])
-        A = readinweights(pickle.load(open('data/'+dconf['simtype']['ResumeSimFromFile'],'rb')))
-        print('read in weights from', 'data/'+dconf['simtype']['ResumeSimFromFile'])        
+        fn = dconf['simtype']['ResumeSimFromFile']        
+        print('reading in weights from', fn)
+        print('fn is ', fn)
+        d = pickle.load(open(fn,'rb'))
+        print(d.keys())
+        A = readinweights(d)
+        print('read in weights from', fn)
         updateSTDPWeights(sim, A[A.time == max(A.time)]) # take the latest weights saved
     except:
         print('Could not restore STDP weights from file.')
