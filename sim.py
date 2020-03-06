@@ -962,8 +962,9 @@ sim.setupRecording()                  # setup variables to record for each cell 
 
 lSTDPmech = getAllSTDPObjects(sim) # get all the STDP objects up-front
 
-def updateSTDPWeights (sim, W): #this function assign weights stored in 'ResumeSimFromFile' to all connections by matching pre and post neuron ids  
-    # get all the simulation's cells
+def updateSTDPWeights (sim, W):
+    #this function assign weights stored in 'ResumeSimFromFile' to all connections by matching pre and post neuron ids  
+    # get all the simulation's cells (on a given node)
     for cell in sim.net.cells:
         cpostID = cell.gid#find postID
         for conn in cell.conns:
@@ -982,18 +983,14 @@ def updateSTDPWeights (sim, W): #this function assign weights stored in 'ResumeS
                         
     return sim
 
-if dconf['simtype']['ResumeSim']: #if specified 'ResumeSim' = 1, load the connection data from 'ResumeSimFromFile' and assign weights to STDP synapses
-    data = pickle.load(open('data/'+dconf['simtype']['ResumeSimFromFile'],'rb'))
-    A = []
-    ddsyn = data['simData']['synweights']
-    for rank in ddsyn.keys():
-        dsyn = ddsyn[rank]
-        for lsyn in dsyn:
-            A.append(lsyn)
-    B = pd.DataFrame(A,columns=['time','stdptype','preid','postid','weight'])
-    ltpntW = B[B.time == max(B.time)]
-    sim = updateSTDPWeights (sim, ltpntW)
-
+#if specified 'ResumeSim' = 1, load the connection data from 'ResumeSimFromFile' and assign weights to STDP synapses  
+if dconf['simtype']['ResumeSim']:
+    try:
+        from simdat import readinweights        
+        A = readinweights(pickle.load(open('data/'+dconf['simtype']['ResumeSimFromFile'],'rb')))
+        sim = updateSTDPWeights (sim, A[A.time == max(A.time)]) # take the latest weights saved
+    except:
+        print('Could not restore STDP weights from file.')
 
 if sim.rank == 0: 
     from aigame import AIGame
