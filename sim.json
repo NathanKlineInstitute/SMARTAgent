@@ -4,7 +4,7 @@
     "moves": {"UP": 4,"DOWN":3, "NOMOVE":1},
     "movecodes": [1,3,4],
     "verbose": 1,
-    "simtype": {"ResumeSim":1,"ResumeSimFromFile":"20mar5_G0_simConfig.pkl"},        
-    "sim": {"duration": 10e3, "dt": 0.2, "verbose": 0, "recordStep":0.2,"recordWeightStepSize":10,"RLFakeUpRule": 0,"RLFakeDownRule": 0,"RLFakeStayRule": 0,"name":"20mar5_G1_"},
+    "simtype": {"ResumeSim":0,"ResumeSimFromFile":"20mar5_G0_simConfig.pkl"},        
+    "sim": {"duration": 10e3, "dt": 0.2, "verbose": 0, "recordStep":0.2,"recordWeightStepSize":10,"RLFakeUpRule": 0,"RLFakeDownRule": 0,"RLFakeStayRule": 0,"name":"20mar6_G0_"},
     "net":{"scale":1,"E":400,"EV1":400,"InR":100,"InV1":100,"EV4":100,"EIT":25,"InV4":25,"InIT":9,"ML":100,"MR":100}
 }

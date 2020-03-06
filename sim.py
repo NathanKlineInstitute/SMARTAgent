@@ -892,6 +892,7 @@ def trainAgent (t):
     if sim.rank == 0:
         print('Model actions:', actions)
         rewards, epCount, InputImages, last_obs, proposed_actions = sim.AIGame.playGame(actions, epCount, InputImages, last_obs)
+        print('Proposed actions:', proposed_actions)
         if dconf['sim']['RLFakeUpRule']: # fake rule for testing reinforcing of up moves
           critic = np.sign(actions.count(dconf['moves']['UP']) - actions.count(dconf['moves']['DOWN']))          
           rewards = [critic for i in range(len(rewards))]
