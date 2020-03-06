@@ -958,17 +958,17 @@ sim.setupRecording()                  # setup variables to record for each cell 
 
 lSTDPmech = getAllSTDPObjects(sim) # get all the STDP objects up-front
 
-def updateSTDPWeights (sim, W):
-    # get all the STDP objects from the simulation's cells
+def updateSTDPWeights (sim, W): #this function assign weights stored in 'ResumeSimFromFile' to all connections by matching pre and post neuron ids  
+    # get all the simulation's cells
     for cell in sim.net.cells:
         cpostID = cell.gid#find postID
         for conn in cell.conns:
             cpreID = conn.preGid  #find preID
             #print(cpreID, cpostID)
-            cConnW = W[(W.postid==cpostID) & (W.preid==cpreID)]
+            cConnW = W[(W.postid==cpostID) & (W.preid==cpreID)] #find the record for a connection with pre and post neuron ID
             #print(cConnW)
             #find weight for the STDP connection between preID and postID
-            for idx in cConnW.index:
+            for idx in cConnW.index: 
                 cW = cConnW.at[idx,'weight']
                 cstdp = cConnW.at[idx,'stdptype'] 
                 #STDPmech = conn.get('hSTDP')  # check if has STDP mechanism
@@ -978,7 +978,7 @@ def updateSTDPWeights (sim, W):
                         
     return sim
 
-if dconf['simtype']['ResumeSim']:
+if dconf['simtype']['ResumeSim']: #if specified 'ResumeSim' = 1, load the connection data from 'ResumeSimFromFile' and assign weights to STDP synapses
     data = pickle.load(open('data/'+dconf['simtype']['ResumeSimFromFile'],'rb'))
     A = []
     ddsyn = data['simData']['synweights']
