@@ -21,3 +21,5 @@ if __name__ == '__main__':
     fpout.writelines('myrun ' + str(ncore) + ' ' + fnjson + '\n')
     json.dump(d, open(fnjson,'w'))
   fpout.close()
+  os.chmod(outf,0o775)
+  
