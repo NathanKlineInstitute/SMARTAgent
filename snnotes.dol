@@ -668,3 +668,83 @@ ok, weights do not have as much time to decay now ...
 
 but still need a way to save/restore the weights, and produce videos capturing whole simulation ...
 
+*20mar5 - testing on laptop after conda/neurosim setup 
+** conda/packages
+
+had installed anaconda with python36 and then recompiled neuron, etc.
+
+for ffmpeg if you're on ubuntu & have root can use sudo apt-get install ffmpeg
+
+py3env <<-- that now sets conda to use py36
+conda install numpy
+conda install scipy
+conda install pandas
+conda install matplotlib
+used new version of netpyne from github (development branch) with pip after activating the conda
+env above; note that netpyne does not support latest matplotlib or latest pandas (sal mentioned
+bug in those latest versions)
+
+this is the alias in .tcshrc for setting the py env with conda:
+alias py3env 'alias py3env setenv NSUF 'py3';source /usr/site/config/nrnenv.csh; setenv PYTHONPATH {$PYTHONPATH}:/usr/site/nrniv/local/python; conda activate py36'
+
+once that env is activated can just use pip (it points to the right pip3 for that py env) and
+don't have to explicitly indicate pip3
+
+myrun 16
+
+here's first error:
+
+ImportError: /usr/lib/x86_64-linux-gnu/libstdc++.so.6: version `GLIBCXX_3.4.22' not found
+(required by
+/usr/site/nrniv/local/python/anaconda3/envs/py36/lib/python3.6/site-packages/scipy/fft/_pocketfft/pypocketfft.cpython-36m-x86_64-linux-gnu.so)
+
+according to : https://github.com/facebookresearch/detectron2/issues/609
+should do:
+conda update libgcc
+
+PackageNotInstalledError: Package is not installed in prefix.
+  prefix: /usr/site/nrniv/local/python/anaconda3/envs/py36
+  package name: libgcc
+
+conda install libgcc
+
+ok, that fixed that problem ...
+
+next error:
+python
+import sim
+ModuleNotFoundError: No module named 'skimage'
+
+conda install skimage
+
+not found ...
+
+it's scikit-image
+
+conda install scikit-image
+
+and also need openai gym
+can install with conda as:
+conda install -c akode gym
+
+hmm, did not find it ...
+
+ok, just use pip ...
+
+pip install gym
+
+pip install 'gym[atari]'
+
+sudo add-apt-repository ppa:ubuntu-toolchain-r/test
+sudo apt-get update
+sudo apt-get install gcc-4.9
+sudo apt-get install --only-upgrade libstdc++6
+
+ok, that fixed error ... based on this:
+ https://github.com/lhelontra/tensorflow-on-arm/issues/13#issuecomment-489296444
+
+myrun 12
+
+also have this in pythonpath:
+ setenv PYTHONPATH {$PYTHONPATH}:$ND/share/python/lib/python:/usr/site/nrniv/local/python
+
