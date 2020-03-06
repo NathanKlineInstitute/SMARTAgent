@@ -969,9 +969,7 @@ def updateSTDPWeights (sim, W):
         cpostID = cell.gid#find postID
         for conn in cell.conns:
             cpreID = conn.preGid  #find preID
-            #print(cpreID, cpostID)
             cConnW = W[(W.postid==cpostID) & (W.preid==cpreID)] #find the record for a connection with pre and post neuron ID
-            #print(cConnW)
             #find weight for the STDP connection between preID and postID
             for idx in cConnW.index: 
                 cW = cConnW.at[idx,'weight']
@@ -980,15 +978,15 @@ def updateSTDPWeights (sim, W):
                 print('weight updated:', cW, cstdp)
                 if cstdp:   # make sure it is not None
                     conn['hObj'].weight[0] = cW
-                        
-    return sim
 
 #if specified 'ResumeSim' = 1, load the connection data from 'ResumeSimFromFile' and assign weights to STDP synapses  
 if dconf['simtype']['ResumeSim']:
     try:
-        from simdat import readinweights        
+        from simdat import readinweights
+        print('reading in weights from', 'data/'+dconf['simtype']['ResumeSimFromFile'])
         A = readinweights(pickle.load(open('data/'+dconf['simtype']['ResumeSimFromFile'],'rb')))
-        sim = updateSTDPWeights (sim, A[A.time == max(A.time)]) # take the latest weights saved
+        print('read in weights from', 'data/'+dconf['simtype']['ResumeSimFromFile'])        
+        updateSTDPWeights(sim, A[A.time == max(A.time)]) # take the latest weights saved
     except:
         print('Could not restore STDP weights from file.')
 
@@ -1024,3 +1022,5 @@ if sim.saveInputImages:
         for Input_Image in InputImages:
             np.savetxt(outfile, Input_Image, fmt='%-7.2f')
             outfile.write('# New slice\n')
+
+if dconf['sim']['doquit']: quit()
