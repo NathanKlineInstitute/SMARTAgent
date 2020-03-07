@@ -50,7 +50,7 @@ NB_EMRneurons = dconf['net']['EMR'] * scale
 
 # Network parameters
 netParams = specs.NetParams() #object of class NetParams to store the network parameters
-netParams.defaultThreshold = -20.0 # spike threshold, 10 mV is NetCon default, lower it for all cells
+netParams.defaultThreshold = -10.0 # spike threshold, 10 mV is NetCon default, lower it for all cells
 
 #Population parameters
 netParams.popParams['ER'] = {'cellType': 'ER', 'numCells': NB_ERneurons, 'cellModel': 'HH'}  #6400 neurons to represent 6400 pixels, now we have 400 pixels
@@ -289,7 +289,7 @@ simConfig.analysis['plotRaster'] = {'popRates':'overlay','saveData':'data/'+dcon
 
 # synaptic weight gain (based on E, I types)
 cfg = simConfig
-cfg.EEGain = 5.0  # E to E scaling factor
+cfg.EEGain = 10.0  # E to E scaling factor
 cfg.EIGain = 10.0 # E to I scaling factor
 cfg.IEGain = 10.0 # I to E scaling factor
 cfg.IIGain = 10.0  # I to I scaling factor
