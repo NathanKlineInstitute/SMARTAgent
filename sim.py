@@ -92,7 +92,7 @@ netParams.stimSourceParams['stimMod'] = {'type': 'NetStim', 'rate': 'variable', 
 netParams.stimTargetParams['stimMod->all'] = {'source': 'stimMod',
         'conds': {'pop': 'ER'},
         'convergence': 1,
-        'weight': 0.1,
+        'weight': 1,
         'delay': 1,
         'synMech': 'AMPA'}
 
@@ -222,7 +222,7 @@ def connectLayerswithOverlapDiv(NBpreN, NBpostN, overlap_xdir):
 #####################################################################################
 #Feedforward excitation
 #E to E - Feedforward connections
-blistERtoV1 = connectLayerswithOverlap(NBpreN = NB_ERneurons, NBpostN = NB_EV1neurons, overlap_xdir = 3)
+blistERtoEV1 = connectLayerswithOverlap(NBpreN = NB_ERneurons, NBpostN = NB_EV1neurons, overlap_xdir = 3)
 blistEV1toEV4 = connectLayerswithOverlap(NBpreN = NB_EV1neurons, NBpostN = NB_EV4neurons, overlap_xdir = 3)
 blistEV4toEIT = connectLayerswithOverlap(NBpreN = NB_EV4neurons, NBpostN = NB_EITneurons, overlap_xdir = 3) #was 15
 #blistITtoMI = connectLayerswithOverlap(NBpreN = NB_ITneurons, NBpostN = NB_MIneurons, overlap_xdir = 3) #Not sure if this is a good strategy instead of all to all
@@ -263,335 +263,6 @@ blistIV1toER = connectLayerswithOverlapDiv(NBpreN = NB_IV1neurons, NBpostN = NB_
 blistIV4toEV1 = connectLayerswithOverlapDiv(NBpreN = NB_IV4neurons, NBpostN = NB_EV1neurons, overlap_xdir = 5)
 blistIITtoEV4 = connectLayerswithOverlapDiv(NBpreN = NB_IITneurons, NBpostN = NB_EV4neurons, overlap_xdir = 5)
 
-#Local excitation
-#E to E
-netParams.connParams['ER->ER'] = {
-        'preConds': {'pop': 'ER'},
-        'postConds': {'pop': 'ER'},
-        'probability': 0.02,
-        'weight': 0.000, #0.0001
-        'delay': 2,
-        'synMech': 'AMPA'}
-netParams.connParams['EV1->EV1'] = {
-        'preConds': {'pop': 'EV1'},
-        'postConds': {'pop': 'EV1'},
-        'probability': 0.02,
-        'weight': 0.000, #0.0001
-        'delay': 2,
-        'synMech': 'AMPA'}
-netParams.connParams['EV4->EV4'] = {
-        'preConds': {'pop': 'EV4'},
-        'postConds': {'pop': 'EV4'},
-        'probability': 0.02,
-        'weight': 0.000, #0.0001
-        'delay': 2,
-        'synMech': 'AMPA'}
-netParams.connParams['EIT->EIT'] = {
-        'preConds': {'pop': 'EIT'},
-        'postConds': {'pop': 'EIT'},
-        'probability': 0.02,
-        'weight': 0.000, #0.0001
-        'delay': 2,
-        'synMech': 'AMPA'}
-netParams.connParams['EML->EML'] = {
-        'preConds': {'pop': 'EML'},
-        'postConds': {'pop': 'EML'},
-        'probability': 0.02,
-        'weight': 0.000, #0.0001
-        'delay': 2,
-        'synMech': 'AMPA'}
-netParams.connParams['EMR->EMR'] = {
-        'preConds': {'pop': 'EMR'},
-        'postConds': {'pop': 'EMR'},
-        'probability': 0.02,
-        'weight': 0.000, #0.0001
-        'delay': 2,
-        'synMech': 'AMPA'}        
-#E to I
-netParams.connParams['ER->IR'] = {
-        'preConds': {'pop': 'ER'},
-        'postConds': {'pop': 'IR'},
-        'connList': blistERtoIR,
-        #'probability': 0.23,
-        #'convergence': 9,
-        'weight': 0.02,
-        'delay': 2,
-        'synMech': 'AMPA'}
-netParams.connParams['EV1->IV1'] = {
-        'preConds': {'pop': 'EV1'},
-        'postConds': {'pop': 'IV1'},
-        'connList': blistEV1toIV1,
-        #'probability': 0.23,
-        #'convergence': 9,
-        'weight': 0.02,
-        'delay': 2,
-        'synMech': 'AMPA'}
-netParams.connParams['EV4->IV4'] = {
-        'preConds': {'pop': 'EV4'},
-        'postConds': {'pop': 'IV4'},
-        'connList': blistEV4toIV4,
-        #'probability': 0.23,
-        #'convergence': 9,
-        'weight': 0.02,
-        'delay': 2,
-        'synMech': 'AMPA'}
-netParams.connParams['EIT->IIT'] = {
-        'preConds': {'pop': 'EIT'},
-        'postConds': {'pop': 'IIT'},
-        'connList': blistEITtoIIT,
-        #'probability': 0.23,
-        #'convergence': 9,
-        'weight': 0.02,
-        'delay': 2,
-        'synMech': 'AMPA'}
-
-#Local inhibition
-#I to E
-netParams.connParams['IR->ER'] = {
-        'preConds': {'pop': 'IR'},
-        'postConds': {'pop': 'ER'},
-        'connList': blistIRtoER,
-        #'probability': 0.02,
-        #'divergence': 9,
-        'weight': 0.02,
-        'delay': 2,
-        'synMech': 'GABA'}
-netParams.connParams['IV1->EV1'] = {
-        'preConds': {'pop': 'IV1'},
-        'postConds': {'pop': 'EV1'},
-        'connList': blistIV1toEV1,
-        #'probability': 0.02,
-        #'divergence': 9,
-        'weight': 0.02,
-        'delay': 2,
-        'synMech': 'GABA'}
-netParams.connParams['IV4->EV4'] = {
-        'preConds': {'pop': 'IV4'},
-        'postConds': {'pop': 'EV4'},
-        'connList': blistIV4toEV4,
-        #'probability': 0.02,
-        #'divergence': 9,
-        'weight': 0.02,
-        'delay': 2,
-        'synMech': 'GABA'}
-netParams.connParams['IIT->EIT'] = {
-        'preConds': {'pop': 'IIT'},
-        'postConds': {'pop': 'EIT'},
-        'connList': blistIITtoEIT,
-        #'probability': 0.02,
-        #'divergence': 9,
-        'weight': 0.02,
-        'delay': 2,
-        'synMech': 'GABA'}
-
-#I to I
-netParams.connParams['IV1->IV1'] = {
-        'preConds': {'pop': 'IV1'},
-        'postConds': {'pop': 'IV1'},
-        'probability': 0.02,
-        'weight': 0.000, #0.0001
-        'delay': 2,
-        'synMech': 'GABA'}
-
-netParams.connParams['IV4->IV4'] = {
-        'preConds': {'pop': 'IV4'},
-        'postConds': {'pop': 'IV4'},
-        'probability': 0.02,
-        'weight': 0.000, #0.0001
-        'delay': 2,
-        'synMech': 'GABA'}
-netParams.connParams['IIT->IIT'] = {
-        'preConds': {'pop': 'IIT'},
-        'postConds': {'pop': 'IIT'},
-        'probability': 0.02,
-        'weight': 0.000, #0.0001
-        'delay': 2,
-        'synMech': 'GABA'}
-
-#E to E feedforward connections
-netParams.connParams['ER->EV1'] = {
-        'preConds': {'pop': 'ER'},
-        'postConds': {'pop': 'EV1'},
-        'connList': blistERtoV1,
-        #'convergence': 10,
-        'weight': 0.02,
-        'delay': 2,
-        'synMech': 'AMPA'}
-
-netParams.connParams['EV1->EV4'] = {
-        'preConds': {'pop': 'EV1'},
-        'postConds': {'pop': 'EV4'},
-        'connList': blistEV1toEV4,
-        #'convergence': 10,
-        'weight': 0.01,
-        'delay': 2,
-        'synMech': 'AMPA'}
-netParams.connParams['EV4->EIT'] = {
-        'preConds': {'pop': 'EV4'},
-        'postConds': {'pop': 'EIT'},
-        'connList': blistEV4toEIT,
-        #'convergence': 10,
-        'weight': 0.01,
-        'delay': 2,
-        'synMech': 'AMPA'}
-netParams.connParams['EIT->EML'] = {
-        'preConds': {'pop': 'EIT'},
-        'postConds': {'pop': 'EML'},
-        #'connList': blistITtoMI,
-        'convergence': 16,
-        #'weight': 0.0025,
-        'weight': 0.005,
-        'delay': 2,
-        'synMech': 'AMPA',
-        'plast': {'mech': 'STDP', 'params': STDPparamsRL}}
-netParams.connParams['EIT->EMR'] = {
-        'preConds': {'pop': 'EIT'},
-        'postConds': {'pop': 'EMR'},
-        #'connList': blistMItoMO,
-        'convergence': 16,
-        #'weight': 0.0025,
-        'weight': 0.005,
-        'delay': 2,
-        'synMech': 'AMPA',
-        'plast': {'mech': 'STDP', 'params': STDPparamsRL}}
-
-#E to I feedforward connections
-netParams.connParams['ER->IV1'] = {
-        'preConds': {'pop': 'ER'},
-        'postConds': {'pop': 'IV1'},
-        'connList': blistERtoIV1,
-        #'convergence': 10,
-        'weight': 0.00, #0.002
-        'delay': 2,
-        'synMech': 'AMPA'}
-netParams.connParams['EV1->IV4'] = {
-        'preConds': {'pop': 'EV1'},
-        'postConds': {'pop': 'IV4'},
-        'connList': blistEV1toIV4,
-        #'convergence': 10,
-        'weight': 0.00, #0.002
-        'delay': 2,
-        'synMech': 'AMPA'}
-netParams.connParams['EV4->IIT'] = {
-        'preConds': {'pop': 'EV4'},
-        'postConds': {'pop': 'IIT'},
-        'connList': blistEV4toIIT,
-        #'convergence': 10,
-        'weight': 0.00, #0.002
-        'delay': 2,
-        'synMech': 'AMPA'}
-
-#E to E feedbackward connections
-netParams.connParams['EV1->ER'] = {
-        'preConds': {'pop': 'EV1'},
-        'postConds': {'pop': 'ER'},
-        'connList': blistEV1toER,
-        #'convergence': 10,
-        'weight': 0.000, #0.0001
-        'delay': 2,
-        'synMech': 'AMPA'}
-"""
-netParams.connParams['EV4->EV1'] = {    # <<-- that's E -> I ?? or E -> E ?? weight is 0 but something wrong here
-        'preConds': {'pop': 'EV4'},
-        'postConds': {'pop': 'EV1'},
-        'connList': blistInV4toV1,
-        #'convergence': 10,
-        'weight': 0.000, #0.0001
-        'delay': 2,
-        'synMech': 'AMPA'}
-"""
-netParams.connParams['EIT->EV4'] = {
-        'preConds': {'pop': 'EIT'},
-        'postConds': {'pop': 'EV4'},
-        'connList': blistEITtoEV4,
-        #'convergence': 10,
-        'weight': 0.000, #0.0001
-        'delay': 2,
-        'synMech': 'AMPA'}
-
-#I to E feedbackward connections
-netParams.connParams['IV1->ER'] = {
-        'preConds': {'pop': 'IV1'},
-        'postConds': {'pop': 'ER'},
-        'connList': blistIV1toER,
-        #'convergence': 10,
-        'weight': 0.00, #0.002
-        'delay': 2,
-        'synMech': 'GABA'}
-netParams.connParams['IV4->EV1'] = {
-        'preConds': {'pop': 'IV4'},
-        'postConds': {'pop': 'EV1'},
-        'connList': blistIV4toEV1,
-        #'convergence': 10,
-        'weight': 0.00, #0.002
-        'delay': 2,
-        'synMech': 'GABA'}
-netParams.connParams['IIT->EV4'] = {
-        'preConds': {'pop': 'IIT'},
-        'postConds': {'pop': 'EV4'},
-        'connList': blistIITtoEV4,
-        #'convergence': 10,
-        'weight': 0.00, #0.002
-        'delay': 2,
-        'synMech': 'GABA'}
-
-#I to I
-netParams.connParams['IV1->IV4'] = {
-        'preConds': {'pop': 'IV1'},
-        'postConds': {'pop': 'IV4'},
-        'connList': blistIV1toIV4,
-        #'convergence': 10,
-        'weight': 0.00, #0.002
-        'delay': 2,
-        'synMech': 'GABA'}
-netParams.connParams['IV4->IIT'] = {
-        'preConds': {'pop': 'IV4'},
-        'postConds': {'pop': 'IIT'},
-        'connList': blistIV4toIIT,
-        #'convergence': 10,
-        'weight': 0.00, #0.002
-        'delay': 2,
-        'synMech': 'GABA'}
-
-#Add direct connections from lower and higher visual areas to motor cortex
-#Still no idea, how these connections should look like...just trying some numbers: 400 to 25 means convergence factor of 16
-netParams.connParams['EV1->EMR'] = {
-        'preConds': {'pop': 'EV1'},
-        'postConds': {'pop': 'EMR'},
-        #'connList': blistMItoMO,
-        'convergence': 16,
-        'weight': 0.005,
-        'delay': 2,
-        'synMech': 'AMPA',
-        'plast': {'mech': 'STDP', 'params': STDPparamsRL}}
-netParams.connParams['EV1->EML'] = {
-        'preConds': {'pop': 'EV1'},
-        'postConds': {'pop': 'EML'},
-        #'connList': blistMItoMO,
-        'convergence': 16,
-        'weight': 0.005,
-        'delay': 2,
-        'synMech': 'AMPA',
-        'plast': {'mech': 'STDP', 'params': STDPparamsRL}}
-netParams.connParams['EV4->EMR'] = {
-        'preConds': {'pop': 'EV4'},
-        'postConds': {'pop': 'EMR'},
-        #'connList': blistMItoMO,
-        'convergence': 16,
-        'weight': 0.005,
-        'delay': 2,
-        'synMech': 'AMPA',
-        'plast': {'mech': 'STDP', 'params': STDPparamsRL}}
-netParams.connParams['EV4->EML'] = {
-        'preConds': {'pop': 'EV4'},
-        'postConds': {'pop': 'EML'},
-        #'connList': blistMItoMO,
-        'convergence': 16,
-        'weight': 0.005,
-        'delay': 2,
-        'synMech': 'AMPA',
-        'plast': {'mech': 'STDP', 'params': STDPparamsRL}}
-
 #Simulation options
 simConfig = specs.SimConfig()           # object of class SimConfig to store simulation configuration
 
@@ -615,6 +286,344 @@ simConfig.analysis['plotTraces'] = {'include': [(pop, 0) for pop in allpops]}
 simConfig.analysis['plotRaster'] = {'popRates':'overlay','saveData':'data/'+dconf['sim']['name']+'RasterData.pkl','showFig':True}
 #simConfig.analysis['plot2Dnet'] = True 
 #simConfig.analysis['plotConn'] = True           # plot connectivity matrix
+
+# synaptic weight gain (based on E, I types)
+cfg = simConfig
+cfg.EEGain = 5.0  # E to E scaling factor
+cfg.EIGain = 10.0 # E to I scaling factor
+cfg.IEGain = 10.0 # I to E scaling factor
+cfg.IIGain = 10.0  # I to I scaling factor
+
+
+#Local excitation
+#E to E
+netParams.connParams['ER->ER'] = {
+        'preConds': {'pop': 'ER'},
+        'postConds': {'pop': 'ER'},
+        'probability': 0.02,
+        'weight': 0.000 * cfg.EEGain, #0.0001
+        'delay': 2,
+        'synMech': 'AMPA'}
+netParams.connParams['EV1->EV1'] = {
+        'preConds': {'pop': 'EV1'},
+        'postConds': {'pop': 'EV1'},
+        'probability': 0.02,
+        'weight': 0.000 * cfg.EEGain, #0.0001
+        'delay': 2,
+        'synMech': 'AMPA'}
+netParams.connParams['EV4->EV4'] = {
+        'preConds': {'pop': 'EV4'},
+        'postConds': {'pop': 'EV4'},
+        'probability': 0.02,
+        'weight': 0.000 * cfg.EEGain, #0.0001
+        'delay': 2,
+        'synMech': 'AMPA'}
+netParams.connParams['EIT->EIT'] = {
+        'preConds': {'pop': 'EIT'},
+        'postConds': {'pop': 'EIT'},
+        'probability': 0.02,
+        'weight': 0.000 * cfg.EEGain, #0.0001
+        'delay': 2,
+        'synMech': 'AMPA'}
+netParams.connParams['EML->EML'] = {
+        'preConds': {'pop': 'EML'},
+        'postConds': {'pop': 'EML'},
+        'probability': 0.02,
+        'weight': 0.000 * cfg.EEGain, #0.0001
+        'delay': 2,
+        'synMech': 'AMPA'}
+netParams.connParams['EMR->EMR'] = {
+        'preConds': {'pop': 'EMR'},
+        'postConds': {'pop': 'EMR'},
+        'probability': 0.02,
+        'weight': 0.000 * cfg.EEGain, #0.0001
+        'delay': 2,
+        'synMech': 'AMPA'}        
+#E to I
+netParams.connParams['ER->IR'] = {
+        'preConds': {'pop': 'ER'},
+        'postConds': {'pop': 'IR'},
+        'connList': blistERtoIR,
+        #'probability': 0.23,
+        #'convergence': 9,
+        'weight': 0.02 * cfg.EIGain,
+        'delay': 2,
+        'synMech': 'AMPA'}
+netParams.connParams['EV1->IV1'] = {
+        'preConds': {'pop': 'EV1'},
+        'postConds': {'pop': 'IV1'},
+        'connList': blistEV1toIV1,
+        #'probability': 0.23,
+        #'convergence': 9,
+        'weight': 0.02 * cfg.EIGain,
+        'delay': 2,
+        'synMech': 'AMPA'}
+netParams.connParams['EV4->IV4'] = {
+        'preConds': {'pop': 'EV4'},
+        'postConds': {'pop': 'IV4'},
+        'connList': blistEV4toIV4,
+        #'probability': 0.23,
+        #'convergence': 9,
+        'weight': 0.02 * cfg.EIGain,
+        'delay': 2,
+        'synMech': 'AMPA'}
+netParams.connParams['EIT->IIT'] = {
+        'preConds': {'pop': 'EIT'},
+        'postConds': {'pop': 'IIT'},
+        'connList': blistEITtoIIT,
+        #'probability': 0.23,
+        #'convergence': 9,
+        'weight': 0.02 * cfg.EIGain,
+        'delay': 2,
+        'synMech': 'AMPA'}
+
+#Local inhibition
+#I to E
+netParams.connParams['IR->ER'] = {
+        'preConds': {'pop': 'IR'},
+        'postConds': {'pop': 'ER'},
+        'connList': blistIRtoER,
+        #'probability': 0.02,
+        #'divergence': 9,
+        'weight': 0.02 * cfg.IEGain,
+        'delay': 2,
+        'synMech': 'GABA'}
+netParams.connParams['IV1->EV1'] = {
+        'preConds': {'pop': 'IV1'},
+        'postConds': {'pop': 'EV1'},
+        'connList': blistIV1toEV1,
+        #'probability': 0.02,
+        #'divergence': 9,
+        'weight': 0.02 * cfg.IEGain,
+        'delay': 2,
+        'synMech': 'GABA'}
+netParams.connParams['IV4->EV4'] = {
+        'preConds': {'pop': 'IV4'},
+        'postConds': {'pop': 'EV4'},
+        'connList': blistIV4toEV4,
+        #'probability': 0.02,
+        #'divergence': 9,
+        'weight': 0.02 * cfg.IEGain,
+        'delay': 2,
+        'synMech': 'GABA'}
+netParams.connParams['IIT->EIT'] = {
+        'preConds': {'pop': 'IIT'},
+        'postConds': {'pop': 'EIT'},
+        'connList': blistIITtoEIT,
+        #'probability': 0.02,
+        #'divergence': 9,
+        'weight': 0.02 * cfg.IEGain,
+        'delay': 2,
+        'synMech': 'GABA'}
+
+#I to I
+netParams.connParams['IV1->IV1'] = {
+        'preConds': {'pop': 'IV1'},
+        'postConds': {'pop': 'IV1'},
+        'probability': 0.02,
+        'weight': 0.000 * cfg.IIGain, #0.0001
+        'delay': 2,
+        'synMech': 'GABA'}
+
+netParams.connParams['IV4->IV4'] = {
+        'preConds': {'pop': 'IV4'},
+        'postConds': {'pop': 'IV4'},
+        'probability': 0.02,
+        'weight': 0.000 * cfg.IIGain, #0.0001
+        'delay': 2,
+        'synMech': 'GABA'}
+netParams.connParams['IIT->IIT'] = {
+        'preConds': {'pop': 'IIT'},
+        'postConds': {'pop': 'IIT'},
+        'probability': 0.02,
+        'weight': 0.000 * cfg.IIGain, #0.0001
+        'delay': 2,
+        'synMech': 'GABA'}
+
+#E to E feedforward connections
+netParams.connParams['ER->EV1'] = {
+        'preConds': {'pop': 'ER'},
+        'postConds': {'pop': 'EV1'},
+        'connList': blistERtoEV1,
+        #'convergence': 10,
+        'weight': 0.02 * cfg.EEGain,
+        'delay': 2,
+        'synMech': 'AMPA'}
+
+netParams.connParams['EV1->EV4'] = {
+        'preConds': {'pop': 'EV1'},
+        'postConds': {'pop': 'EV4'},
+        'connList': blistEV1toEV4,
+        #'convergence': 10,
+        'weight': 0.01 * cfg.EEGain,
+        'delay': 2,
+        'synMech': 'AMPA'}
+netParams.connParams['EV4->EIT'] = {
+        'preConds': {'pop': 'EV4'},
+        'postConds': {'pop': 'EIT'},
+        'connList': blistEV4toEIT,
+        #'convergence': 10,
+        'weight': 0.01 * cfg.EEGain,
+        'delay': 2,
+        'synMech': 'AMPA'}
+netParams.connParams['EIT->EML'] = {
+        'preConds': {'pop': 'EIT'},
+        'postConds': {'pop': 'EML'},
+        #'connList': blistITtoMI,
+        'convergence': 16,
+        #'weight': 0.0025,
+        'weight': 0.005 * cfg.EEGain,
+        'delay': 2,
+        'synMech': 'AMPA',
+        'plast': {'mech': 'STDP', 'params': STDPparamsRL}}
+netParams.connParams['EIT->EMR'] = {
+        'preConds': {'pop': 'EIT'},
+        'postConds': {'pop': 'EMR'},
+        #'connList': blistMItoMO,
+        'convergence': 16,
+        #'weight': 0.0025,
+        'weight': 0.005 * cfg.EEGain,
+        'delay': 2,
+        'synMech': 'AMPA',
+        'plast': {'mech': 'STDP', 'params': STDPparamsRL}}
+
+#E to I feedforward connections
+netParams.connParams['ER->IV1'] = {
+        'preConds': {'pop': 'ER'},
+        'postConds': {'pop': 'IV1'},
+        'connList': blistERtoIV1,
+        #'convergence': 10,
+        'weight': 0.00 * cfg.EIGain, #0.002
+        'delay': 2,
+        'synMech': 'AMPA'}
+netParams.connParams['EV1->IV4'] = {
+        'preConds': {'pop': 'EV1'},
+        'postConds': {'pop': 'IV4'},
+        'connList': blistEV1toIV4,
+        #'convergence': 10,
+        'weight': 0.00 * cfg.EIGain, #0.002
+        'delay': 2,
+        'synMech': 'AMPA'}
+netParams.connParams['EV4->IIT'] = {
+        'preConds': {'pop': 'EV4'},
+        'postConds': {'pop': 'IIT'},
+        'connList': blistEV4toIIT,
+        #'convergence': 10,
+        'weight': 0.00 * cfg.EIGain, #0.002
+        'delay': 2,
+        'synMech': 'AMPA'}
+
+#E to E feedbackward connections
+netParams.connParams['EV1->ER'] = {
+        'preConds': {'pop': 'EV1'},
+        'postConds': {'pop': 'ER'},
+        'connList': blistEV1toER,
+        #'convergence': 10,
+        'weight': 0.000 * cfg.EEGain, #0.0001
+        'delay': 2,
+        'synMech': 'AMPA'}
+"""
+netParams.connParams['EV4->EV1'] = {    # <<-- that's E -> I ?? or E -> E ?? weight is 0 but something wrong here
+        'preConds': {'pop': 'EV4'},
+        'postConds': {'pop': 'EV1'},
+        'connList': blistInV4toV1,
+        #'convergence': 10,
+        'weight': 0.000 * cfg.EEGain, #0.0001
+        'delay': 2,
+        'synMech': 'AMPA'}
+"""
+netParams.connParams['EIT->EV4'] = {
+        'preConds': {'pop': 'EIT'},
+        'postConds': {'pop': 'EV4'},
+        'connList': blistEITtoEV4,
+        #'convergence': 10,
+        'weight': 0.000 * cfg.EEGain, #0.0001
+        'delay': 2,
+        'synMech': 'AMPA'}
+
+#I to E feedbackward connections
+netParams.connParams['IV1->ER'] = {
+        'preConds': {'pop': 'IV1'},
+        'postConds': {'pop': 'ER'},
+        'connList': blistIV1toER,
+        #'convergence': 10,
+        'weight': 0.00 * cfg.IEGain, #0.002
+        'delay': 2,
+        'synMech': 'GABA'}
+netParams.connParams['IV4->EV1'] = {
+        'preConds': {'pop': 'IV4'},
+        'postConds': {'pop': 'EV1'},
+        'connList': blistIV4toEV1,
+        #'convergence': 10,
+        'weight': 0.00 * cfg.IEGain, #0.002
+        'delay': 2,
+        'synMech': 'GABA'}
+netParams.connParams['IIT->EV4'] = {
+        'preConds': {'pop': 'IIT'},
+        'postConds': {'pop': 'EV4'},
+        'connList': blistIITtoEV4,
+        #'convergence': 10,
+        'weight': 0.00 * cfg.IEGain, #0.002
+        'delay': 2,
+        'synMech': 'GABA'}
+
+#I to I
+netParams.connParams['IV1->IV4'] = {
+        'preConds': {'pop': 'IV1'},
+        'postConds': {'pop': 'IV4'},
+        'connList': blistIV1toIV4,
+        #'convergence': 10,
+        'weight': 0.00 * cfg.IIGain, #0.002
+        'delay': 2,
+        'synMech': 'GABA'}
+netParams.connParams['IV4->IIT'] = {
+        'preConds': {'pop': 'IV4'},
+        'postConds': {'pop': 'IIT'},
+        'connList': blistIV4toIIT,
+        #'convergence': 10,
+        'weight': 0.00 * cfg.IIGain, #0.002
+        'delay': 2,
+        'synMech': 'GABA'}
+
+#Add direct connections from lower and higher visual areas to motor cortex
+#Still no idea, how these connections should look like...just trying some numbers: 400 to 25 means convergence factor of 16
+netParams.connParams['EV1->EMR'] = {
+        'preConds': {'pop': 'EV1'},
+        'postConds': {'pop': 'EMR'},
+        #'connList': blistMItoMO,
+        'convergence': 16,
+        'weight': 0.005 * cfg.EEGain,
+        'delay': 2,
+        'synMech': 'AMPA',
+        'plast': {'mech': 'STDP', 'params': STDPparamsRL}}
+netParams.connParams['EV1->EML'] = {
+        'preConds': {'pop': 'EV1'},
+        'postConds': {'pop': 'EML'},
+        #'connList': blistMItoMO,
+        'convergence': 16,
+        'weight': 0.005 * cfg.EEGain,
+        'delay': 2,
+        'synMech': 'AMPA',
+        'plast': {'mech': 'STDP', 'params': STDPparamsRL}}
+netParams.connParams['EV4->EMR'] = {
+        'preConds': {'pop': 'EV4'},
+        'postConds': {'pop': 'EMR'},
+        #'connList': blistMItoMO,
+        'convergence': 16,
+        'weight': 0.005 * cfg.EEGain,
+        'delay': 2,
+        'synMech': 'AMPA',
+        'plast': {'mech': 'STDP', 'params': STDPparamsRL}}
+netParams.connParams['EV4->EML'] = {
+        'preConds': {'pop': 'EV4'},
+        'postConds': {'pop': 'EML'},
+        #'connList': blistMItoMO,
+        'convergence': 16,
+        'weight': 0.005 * cfg.EEGain,
+        'delay': 2,
+        'synMech': 'AMPA',
+        'plast': {'mech': 'STDP', 'params': STDPparamsRL}}
+
 ###################################################################################################################################
 
 sim.AIGame = None # placeholder
