@@ -15,6 +15,7 @@ if __name__ == '__main__':
     simstr = d['sim']['name']
     d['sim']['name'] += '_step_' + str(i) + '_'
     d['sim']['doquit'] = 1
+    d['sim']['doplot'] = 0
     if i > 0:
       d['simtype']['ResumeSim'] = 1
       d['simtype']['ResumeSimFromFile'] = 'data/' + simstr + '_step_' + str(i-1) + '_simConfig.pkl'

@@ -283,7 +283,7 @@ simConfig.saveFolder = 'data'
 simConfig.analysis['plotTraces'] = {'include': [(pop, 0) for pop in allpops]}
 
 #simConfig.analysis['plotRaster'] = {'timeRange': [500,1000],'popRates':'overlay','saveData':'data/RasterData.pkl','showFig':True}
-simConfig.analysis['plotRaster'] = {'popRates':'overlay','saveData':'data/'+dconf['sim']['name']+'RasterData.pkl','showFig':True}
+simConfig.analysis['plotRaster'] = {'popRates':'overlay','saveData':'data/'+dconf['sim']['name']+'RasterData.pkl','showFig':dconf['sim']['doplot']}
 #simConfig.analysis['plot2Dnet'] = True 
 #simConfig.analysis['plotConn'] = True           # plot connectivity matrix
 
@@ -1011,8 +1011,9 @@ sim.gatherData() # gather data from different nodes
 sim.saveData() # save data to disk
 
 if sim.rank == 0: # only rank 0 should save. otherwise all the other nodes could over-write the output or quit first; rank 0 plots
-    sim.analysis.plotData()    
-    if sim.plotWeights: plotWeights() 
+    if dconf['sim']['doplot']:
+        sim.analysis.plotData()    
+        sim.plotWeights: plotWeights() 
     if sim.saveWeights:
         #saveWeights(sim, recordWeightDCells)
         saveGameBehavior(sim)
