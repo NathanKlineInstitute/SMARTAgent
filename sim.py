@@ -789,11 +789,10 @@ def trainAgentFake(t):
         sim.AIGame.run(t,sim)
     print('trainAgent time is : ', t)
     NBsteps = NBsteps+1
-    if NBsteps==recordWeightStepSize:
+    if NBsteps % recordWeightStepSize == 0:
         #if t%recordWeightDT==0:
         print('Weights Recording Time:', t) 
         recordWeights(sim, t)
-        NBsteps = 0
 
 def updateInputRates ():
     # update the source firing rates for the R neuron population, based on image contents
@@ -945,13 +944,12 @@ def trainAgent (t):
         for ltpnt in [t-80, t-60, t-40, t-20, t-0]: sim.allTimes.append(ltpnt)
     updateInputRates() # update firing rate of inputs to R population (based on image content)                
     NBsteps = NBsteps+1
-    if NBsteps==recordWeightStepSize:
+    if NBsteps % recordWeightStepSize == 0:
         #if t%recordWeightDT==0:
         if dconf['verbose'] > 0 and sim.rank==0:
             print('Weights Recording Time:', t, 'NBsteps:',NBsteps,'recordWeightStepSize:',recordWeightStepSize)
         recordAdjustableWeights(sim, t) 
         #recordWeights(sim, t)
-        NBsteps = 0
 
 def getAllSTDPObjects (sim):
   # get all the STDP objects from the simulation's cells
@@ -1011,26 +1009,23 @@ if sim.rank == 0:
 sim.runSimWithIntervalFunc(100.0,trainAgent) # has periodic callback to adjust STDP weights based on RL signal
 sim.gatherData() # gather data from different nodes
 sim.saveData() # save data to disk
-sim.analysis.plotData()
 
-if sim.plotWeights: plotWeights() 
-
-if sim.saveWeights:
-    #saveWeights(sim, recordWeightDCells)
-    saveGameBehavior(sim)
-    fid5 = open('data/'+dconf['sim']['name']+'ActionsPerEpisode.txt','w')
-    for i in range(len(epCount)):
-        fid5.write('\t%0.1f' % epCount[i])
-        fid5.write('\n')
-
-InputImages = np.array(InputImages)
-print(InputImages.shape)
-
-if sim.saveInputImages:
-    with open('data/'+dconf['sim']['name']+'InputImages.txt', 'w') as outfile:
-        outfile.write('# Array shape: {0}\n'.format(InputImages.shape))
-        for Input_Image in InputImages:
-            np.savetxt(outfile, Input_Image, fmt='%-7.2f')
-            outfile.write('# New slice\n')
-
-if dconf['sim']['doquit']: quit()
+if sim.rank == 0: # only rank 0 should save. otherwise all the other nodes could over-write the output or quit first; rank 0 plots
+    sim.analysis.plotData()    
+    if sim.plotWeights: plotWeights() 
+    if sim.saveWeights:
+        #saveWeights(sim, recordWeightDCells)
+        saveGameBehavior(sim)
+        fid5 = open('data/'+dconf['sim']['name']+'ActionsPerEpisode.txt','w')
+        for i in range(len(epCount)):
+            fid5.write('\t%0.1f' % epCount[i])
+            fid5.write('\n')
+    if sim.saveInputImages:
+        InputImages = np.array(InputImages)
+        print(InputImages.shape)  
+        with open('data/'+dconf['sim']['name']+'InputImages.txt', 'w') as outfile:
+            outfile.write('# Array shape: {0}\n'.format(InputImages.shape))
+            for Input_Image in InputImages:
+                np.savetxt(outfile, Input_Image, fmt='%-7.2f')
+                outfile.write('# New slice\n')
+    if dconf['sim']['doquit']: quit()
