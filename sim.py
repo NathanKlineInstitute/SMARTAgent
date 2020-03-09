@@ -995,6 +995,7 @@ if dconf['simtype']['ResumeSim']:
         from simdat import readinweights
         A = readinweights(pickle.load(open(dconf['simtype']['ResumeSimFromFile'],'rb')))
         updateSTDPWeights(sim, A[A.time == max(A.time)]) # take the latest weights saved
+        if sim.rank==0: print('Updated STDP weights')
     except:
         print('Could not restore STDP weights from file.')
 

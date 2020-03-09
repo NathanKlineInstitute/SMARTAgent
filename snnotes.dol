@@ -775,3 +775,22 @@ more costly than simpler standalone HH
 some populations seemd to have inconsistent names
 now always using E as prefix for excitatory population and I as prefix for inhibitory population
 
+** ran fake up rule test with new setup
+
+produced higher weights for expected population
+
+*20mar8 - fix for multistepsim, run test
+** multistep test - still not working properly? fixed ... 
+
+python multistepSim.py sim.json 16 2 multirun
+
+individual sims do not stop after plot ... ?
+
+ok, fixed problems ... conf.py was not reading correct json, was not passing it to sim.py either, etc.
+
+** replace cell types?
+
+voltage traces don't look great now after temp adjustment ...
+
+** try a multistepsim test run with game
+
