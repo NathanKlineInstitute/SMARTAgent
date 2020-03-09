@@ -975,6 +975,9 @@ STDPparamsRL = {'hebbwt': 0.0000, 'antiwt':-0.0000, 'wbase': 0.0012, 'wmax': 50,
 **all proposed actions are returned from playGame to sim.py and appended in sim.allProposedActions and saved in the end of simulation.
 **Next step would be to use the proposed actions and compare it with the performed action, if the performed action was similar to the proposed action, give some reward.
 
+*20mar9
+**When Sam adjusted temperature to 37 degrees, all of a sudden the spiking behavior of HH neurons got weird.
+**Sam suggested that we should try PYR2 (2 compartment pyramidal neuron from Mainen) for E type cells and FS_Basket (only with fast sodium and fast K based on this published work by Sam. Sam et al. 2016 : https://senselab.med.yale.edu/ModelDB/ShowModel?model=185858#tabs-1) for I type cells.
 
 
 

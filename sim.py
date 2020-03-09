@@ -54,29 +54,29 @@ netParams.defaultThreshold = -10.0 # spike threshold, 10 mV is NetCon default, l
 
 #Population parameters
 netParams.popParams['ER'] = {'cellType': 'ER', 'numCells': NB_ERneurons, 'cellModel': 'Mainen'}  #6400 neurons to represent 6400 pixels, now we have 400 pixels
-netParams.popParams['IR'] = {'cellType': 'IR', 'numCells': NB_IRneurons, 'cellModel': 'HH'}
+netParams.popParams['IR'] = {'cellType': 'IR', 'numCells': NB_IRneurons, 'cellModel': 'FS_BasketCell'}
 netParams.popParams['EV1'] = {'cellType': 'EV1', 'numCells': NB_EV1neurons, 'cellModel': 'Mainen'} #6400 neurons
-netParams.popParams['IV1'] = {'cellType': 'IV1', 'numCells': NB_IV1neurons, 'cellModel': 'HH'} #1600
+netParams.popParams['IV1'] = {'cellType': 'IV1', 'numCells': NB_IV1neurons, 'cellModel': 'FS_BasketCell'} #1600
 netParams.popParams['EV4'] = {'cellType': 'EV4', 'numCells': NB_EV4neurons, 'cellModel': 'Mainen'} #1600 neurons
-netParams.popParams['IV4'] = {'cellType': 'IV4', 'numCells': NB_IV4neurons, 'cellModel': 'HH'} #400
+netParams.popParams['IV4'] = {'cellType': 'IV4', 'numCells': NB_IV4neurons, 'cellModel': 'FS_BasketCell'} #400
 netParams.popParams['EIT'] = {'cellType': 'EIT', 'numCells': NB_EITneurons, 'cellModel': 'Mainen'} #400 neurons
-netParams.popParams['IIT'] = {'cellType': 'IIT', 'numCells': NB_IITneurons, 'cellModel': 'HH'} #100
+netParams.popParams['IIT'] = {'cellType': 'IIT', 'numCells': NB_IITneurons, 'cellModel': 'FS_BasketCell'} #100
 netParams.popParams['EML'] = {'cellType': 'EML', 'numCells': NB_EMLneurons, 'cellModel': 'Mainen'} #400
 netParams.popParams['EMR'] = {'cellType': 'EMR', 'numCells': NB_EMRneurons, 'cellModel': 'Mainen'} #100
 
 netParams.importCellParams(label='PYR_Mainen_rule', conds={'cellType': ETypes}, fileName='mainen.py', cellName='PYR2')
-
+netParams.importCellParams(label='FS_BasketCell_rule', conds={'cellType': ITypes}, fileName='FS_BasketCell.py', cellName='Bas')
 #netParams.cellParams['ERule'] = {               # cell rule label
 #        'conds': {'cellType': ETypes},              #properties will be applied to cells that match these conditions
 #        'secs': {'soma':                        #sections
 #                {'geom': {'diam':10, 'L':10, 'Ra':120},         #geometry
 #                'mechs': {'hh': {'gnabar': 0.12, 'gkbar': 0.036, 'gl': 0.003, 'el': -70}}}}}    #mechanism
 
-netParams.cellParams['IRule'] = {               # cell rule label
-        'conds': {'cellType': ITypes},              #properties will be applied to cells that match these conditions
-        'secs': {'soma':                        #sections
-                {'geom': {'diam':10, 'L':10, 'Ra':120},         #geometry
-                'mechs': {'hh': {'gnabar': 0.12, 'gkbar': 0.036, 'gl': 0.003, 'el': -70}}}}}    #mechanism
+#netParams.cellParams['IRule'] = {               # cell rule label
+#        'conds': {'cellType': ITypes},              #properties will be applied to cells that match these conditions
+#        'secs': {'soma':                        #sections
+#                {'geom': {'diam':10, 'L':10, 'Ra':120},         #geometry
+#                'mechs': {'hh': {'gnabar': 0.12, 'gkbar': 0.036, 'gl': 0.003, 'el': -70}}}}}    #mechanism
 
 ## Synaptic mechanism parameters
 netParams.synMechParams['AMPA'] = {'mod': 'Exp2Syn', 'tau1': 0.05, 'tau2': 5.3, 'e': 0}  # excitatory synaptic mechanism
