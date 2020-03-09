@@ -15,8 +15,9 @@ def safemkdir (dn):
 # backup the config file
 def backupcfg (name):
   safemkdir('backupcfg')
+  from conf import fnjson  
   fout = 'backupcfg/' + name + 'sim.json'
   if os.path.exists(fout):
     print('removing prior cfg file' , fout)
-    os.system('rm ' + fout)  
-  os.system('cp sim.json ' + fout) # fcfg created in geom.py via conf.py
+    os.system('rm ' + fout)
+  os.system('cp ' + fnjson + '  ' + fout) # fcfg created in geom.py via conf.py
