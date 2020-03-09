@@ -53,22 +53,24 @@ netParams = specs.NetParams() #object of class NetParams to store the network pa
 netParams.defaultThreshold = -10.0 # spike threshold, 10 mV is NetCon default, lower it for all cells
 
 #Population parameters
-netParams.popParams['ER'] = {'cellType': 'ER', 'numCells': NB_ERneurons, 'cellModel': 'HH'}  #6400 neurons to represent 6400 pixels, now we have 400 pixels
+netParams.popParams['ER'] = {'cellType': 'ER', 'numCells': NB_ERneurons, 'cellModel': 'Mainen'}  #6400 neurons to represent 6400 pixels, now we have 400 pixels
 netParams.popParams['IR'] = {'cellType': 'IR', 'numCells': NB_IRneurons, 'cellModel': 'HH'}
-netParams.popParams['EV1'] = {'cellType': 'EV1', 'numCells': NB_EV1neurons, 'cellModel': 'HH'} #6400 neurons
+netParams.popParams['EV1'] = {'cellType': 'EV1', 'numCells': NB_EV1neurons, 'cellModel': 'Mainen'} #6400 neurons
 netParams.popParams['IV1'] = {'cellType': 'IV1', 'numCells': NB_IV1neurons, 'cellModel': 'HH'} #1600
-netParams.popParams['EV4'] = {'cellType': 'EV4', 'numCells': NB_EV4neurons, 'cellModel': 'HH'} #1600 neurons
+netParams.popParams['EV4'] = {'cellType': 'EV4', 'numCells': NB_EV4neurons, 'cellModel': 'Mainen'} #1600 neurons
 netParams.popParams['IV4'] = {'cellType': 'IV4', 'numCells': NB_IV4neurons, 'cellModel': 'HH'} #400
-netParams.popParams['EIT'] = {'cellType': 'EIT', 'numCells': NB_EITneurons, 'cellModel': 'HH'} #400 neurons
+netParams.popParams['EIT'] = {'cellType': 'EIT', 'numCells': NB_EITneurons, 'cellModel': 'Mainen'} #400 neurons
 netParams.popParams['IIT'] = {'cellType': 'IIT', 'numCells': NB_IITneurons, 'cellModel': 'HH'} #100
-netParams.popParams['EML'] = {'cellType': 'EML', 'numCells': NB_EMLneurons, 'cellModel': 'HH'} #400
-netParams.popParams['EMR'] = {'cellType': 'EMR', 'numCells': NB_EMRneurons, 'cellModel': 'HH'} #100
+netParams.popParams['EML'] = {'cellType': 'EML', 'numCells': NB_EMLneurons, 'cellModel': 'Mainen'} #400
+netParams.popParams['EMR'] = {'cellType': 'EMR', 'numCells': NB_EMRneurons, 'cellModel': 'Mainen'} #100
 
-netParams.cellParams['ERule'] = {               # cell rule label
-        'conds': {'cellType': ETypes},              #properties will be applied to cells that match these conditions
-        'secs': {'soma':                        #sections
-                {'geom': {'diam':10, 'L':10, 'Ra':120},         #geometry
-                'mechs': {'hh': {'gnabar': 0.12, 'gkbar': 0.036, 'gl': 0.003, 'el': -70}}}}}    #mechanism
+netParams.importCellParams(label='PYR_Mainen_rule', conds={'cellType': ETypes}, fileName='mainen.py', cellName='PYR2')
+
+#netParams.cellParams['ERule'] = {               # cell rule label
+#        'conds': {'cellType': ETypes},              #properties will be applied to cells that match these conditions
+#        'secs': {'soma':                        #sections
+#                {'geom': {'diam':10, 'L':10, 'Ra':120},         #geometry
+#                'mechs': {'hh': {'gnabar': 0.12, 'gkbar': 0.036, 'gl': 0.003, 'el': -70}}}}}    #mechanism
 
 netParams.cellParams['IRule'] = {               # cell rule label
         'conds': {'cellType': ITypes},              #properties will be applied to cells that match these conditions
