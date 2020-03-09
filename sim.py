@@ -985,7 +985,8 @@ def updateSTDPWeights (sim, W):
                 cW = cConnW.at[idx,'weight']
                 cstdp = cConnW.at[idx,'stdptype'] 
                 #STDPmech = conn.get('hSTDP')  # check if has STDP mechanism
-                print('weight updated:', cW, cstdp)
+                if dconf['verbose'] > 1:
+                    print('weight updated:', cW, cstdp)
                 if cstdp:   # make sure it is not None
                     conn['hObj'].weight[0] = cW
 

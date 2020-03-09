@@ -792,5 +792,9 @@ ok, fixed problems ... conf.py was not reading correct json, was not passing it 
 
 voltage traces don't look great now after temp adjustment ...
 
-** try a multistepsim test run with game
+** try a multistepsim test run with game (300 s run with 12 steps = 1 hr.)
+
+not using fake rules ...
+
+python multistepSim.py sim.json 16 12 multirun
 
