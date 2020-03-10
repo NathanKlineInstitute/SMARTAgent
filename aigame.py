@@ -45,10 +45,11 @@ class AIGame:
     ################################
     ### PLAY GAME
     ###############################
-    def playGame (self, actions, epCount, InputImages, last_obs): #actions need to be generated from motor cortex
+    def playGame (self, actions, epCount, InputImages, last_obs, last_ball_dir): #actions need to be generated from motor cortex
         #rewards = np.zeros(shape=(1,5))
         rewards = []
         proposed_actions =[]
+        total_hits = []
         dsum_Images = np.zeros(shape=(20,20)) #previously we merged 2x2 pixels into 1 value. Now we merge 8x8 pixels into 1 value. so the original 160x160 pixels will result into 20x20 values instead of previously used 80x80.
         #print(actions)
         gray_Image = np.zeros(shape=(160,160))
@@ -95,7 +96,47 @@ class AIGame:
                     proposed_action = -1 #no valid action guessed
             else:
                 proposed_action = -1 #if there is no last_obs
+                ypos_Ball = -1 #if there is no last_obs, no position of ball
+                xpos_Ball = -1 #if there is no last_obs, no position of ball
             observation, reward, done, info = self.env.step(caction)
+            #find position of ball after action
+            ##FROM HERE ON----> Not tested
+            ImageCourt2 = observation[34:194,20:140,:]
+            sIC2 = np.sum(ImageCourt2,2) #since the color of object is uniform, add values or r,g,b to get a single value
+            newpixelVal_Ball = np.amax(sIC2) #find the pixel value representing Ball..court is blackish
+            sIC2[sIC2<newpixelVal_Ball]=0 #make binary image of court
+            Ball2_inds = []
+            for i in range(sIC2.shape[0]):
+                for j in range(sIC2.shape[1]):
+                    if sIC2[i,j]>0:
+                        Ball2_inds.append([i,j])
+            if sIC2.shape[0]*sIC2.shape[1]==np.shape(Ball2_inds)[0]: #if there is no ball in the court
+                ypos_Ball2 = -1
+                xpos_Ball2 = -1
+            else:
+                ypos_Ball2 = np.median(Ball2_inds,0)[0] #y position of the center of mass of the ball
+                xpos_Ball2 = np.median(Ball2_inds,0)[1] #x position of the center of mass of the ball
+            if xpos_Ball>0 and xpos_Ball2>0:
+                if xpos_Ball2-xpos_Ball>0:
+                    ball_moves_towards_racket = 1 #use proposed action for reward only when the ball moves towards the racket
+                    current_ball_dir = 1 
+                elif xpos_Ball2-xpos_Ball<0:
+                    ball_moves_towards_racket = 0
+                    current_ball_dir = -1
+                else:
+                    ball_moves_towards_racket = 0
+                    current_ball_dir = 0 #direction can't be determinted  prob. because the ball didn't move in x dir.
+            else:
+                ball_moves_towards_racket = 0
+                current_ball_dir = 0 #direction can't be determined because either current or last position of the ball is outside the court
+            if last_ball_dir==0 or current_ball_dir==0: # no way to find out if the ball hit the racket
+                ball_hits_racket = 0 #therefore assumed that ball didn't hit the racket--weak/bad assumption
+            else:
+                if last_ball_dir==1 and current_ball_dir==-1 and reward==0: #if the ball was moving towards the racket and now its moving away from racket and didnt lose
+                    ball_hits_Racket = 1
+            last_ball_dir = current_ball_dir
+            total_hits.append(ball_hits_Racket) # i dont think this can be more than a single hit in 5 moves. so check if sum is greater than 1, print error
+            #TILL HERE ---- not tested
             self.env.render()
             last_obs = observation #current observation will be used as last_obs for the next action
             if done:
@@ -144,7 +185,9 @@ class AIGame:
             self.env.reset()
             self.env.frameskip = 3 
             self.countAll = 0 # should self.count also get set to 0?
-        return rewards, epCount, InputImages, last_obs, proposed_actions
+        if np.sum(total_hits)>1:
+            print('ERROR COMPUTING NUMBER OF HITS')
+        return rewards, epCount, InputImages, last_obs, proposed_actions, last_ball_dir, total_hits
 
     def playGameFake(self, last_obs, epCount, InputImages): #actions are generated based on Vector Algebra
         #rewards = np.zeros(shape=(1,5))
