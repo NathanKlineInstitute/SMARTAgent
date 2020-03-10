@@ -50,7 +50,7 @@ NB_EMRneurons = dconf['net']['EMR'] * scale
 
 # Network parameters
 netParams = specs.NetParams() #object of class NetParams to store the network parameters
-netParams.defaultThreshold = -10.0 # spike threshold, 10 mV is NetCon default, lower it for all cells
+netParams.defaultThreshold = 0.0 # spike threshold, 10 mV is NetCon default, lower it for all cells
 
 #Population parameters
 netParams.popParams['ER'] = {'cellType': 'ER', 'numCells': NB_ERneurons, 'cellModel': 'Mainen'}  #6400 neurons to represent 6400 pixels, now we have 400 pixels
