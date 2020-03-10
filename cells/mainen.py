@@ -3,10 +3,7 @@ from neuron import h
 from math import pi
 
 class PYR2:
-  def __init__ (self,ID=0,ty=0,col=0,rho=165.0,kappa=10.0,soma_pas=False):
-    self.ID=ID
-    self.ty=ty
-    self.col=col
+  def __init__ (self,rho=165.0,kappa=10.0,soma_pas=False):
     self.soma_pas = soma_pas
     self.soma = soma = h.Section(name='soma',cell=self)
     self.dend = dend = h.Section(name='dend',cell=self)
