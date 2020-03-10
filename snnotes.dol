@@ -798,3 +798,21 @@ not using fake rules ...
 
 python multistepSim.py sim.json 16 12 multirun
 
+*20mar9 - adjustments to cell types/architecture
+** code reorg - moved mod files to mod subdir; moved cell types to cells subdir; compile script (nrnivmodl mod)
+** HA added Mainen PYR2 and FS basket cells to model
+this then required adjusting weights and...
+** adjusted rules to have AMPA synapses of PYR on dend; AMPA of I cells on soma; GABAA for E,I on soma
+** ...then had to adjust architecture slightly (new interneuron population)
+to include IM interneuron population in motor area; this reduces likelihood of depolarization blockade
+of the EMR and EML populations (seems to work after some adjustment to the weights)
+a 10 s run shows one population of EM neurons firing faster than the other leading to paddle
+staying at top of screen for much of the sim - not sure where this assymetry comes from
+
+right now there's one interneuron population in M area providing feedback inhibition onto both EM and ER
+populations; in future may want multiple interneuron populations that receive excitation from one population
+and suppress the other (easy to implement in netpyne, but thought that might lead to further positive feedback
+and one EMR vs EML population dominating the dynamics)
+
+still, where does the assymetry come from?
+
