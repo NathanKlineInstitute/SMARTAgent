@@ -217,7 +217,7 @@ blistEV4toEIT = connectLayerswithOverlap(NBpreN = dnumc['EV4'], NBpostN = dnumc[
 #blistMItoMO: Feedforward for MI to MO is all to all and can be specified in the connection statement iteself
 
 #E to I - Feedforward connections
-blistERtoIV1 = connectLayerswithOverlap(NBpreN = dnumc['E4'], NBpostN = dnumc['IV1'], overlap_xdir = 3)
+blistERtoIV1 = connectLayerswithOverlap(NBpreN = dnumc['ER'], NBpostN = dnumc['IV1'], overlap_xdir = 3)
 blistEV1toIV4 = connectLayerswithOverlap(NBpreN = dnumc['EV1'], NBpostN = dnumc['IV4'], overlap_xdir = 3) #was 15
 blistEV4toIIT = connectLayerswithOverlap(NBpreN = dnumc['EV4'], NBpostN = dnumc['IIT'], overlap_xdir = 3) #was 15
 
