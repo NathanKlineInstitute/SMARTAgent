@@ -36,7 +36,7 @@ scale = dconf['net']['scale']
 ETypes = ['ER','EV1','EV4','EIT', 'EML', 'EMR']
 ITypes = ['IR','IV1','IV4','IIT','IM']
 allpops = ['ER','IR','EV1','IV1','EV4','IV4','EIT','IIT','EML','EMR','IM']
-dnumc = OrderedDict({ty:dconf['net']['ty']*scale for ty in allpops}) # number of neurons of a given type
+dnumc = OrderedDict({ty:dconf['net'][ty]*scale for ty in allpops}) # number of neurons of a given type
 
 # Network parameters
 netParams = specs.NetParams() #object of class NetParams to store the network parameters
