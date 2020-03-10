@@ -291,9 +291,9 @@ simConfig.analysis['plotRaster'] = {'popRates':'overlay','saveData':'data/'+dcon
 
 # synaptic weight gain (based on E, I types)
 cfg = simConfig
-cfg.EEGain = 10.0  # E to E scaling factor
-cfg.EIGain = 10.0 # E to I scaling factor
-cfg.IEGain = 10.0 # I to E scaling factor
+cfg.EEGain = 5.0  # E to E scaling factor
+cfg.EIGain = 20.0 # E to I scaling factor
+cfg.IEGain = 20.0 # I to E scaling factor
 cfg.IIGain = 10.0  # I to I scaling factor
 
 
@@ -473,8 +473,7 @@ netParams.connParams['EIT->EML'] = {
         'postConds': {'pop': 'EML'},
         #'connList': blistITtoMI,
         'convergence': 16,
-        #'weight': 0.0025,
-        'weight': 0.005 * cfg.EEGain,
+        'weight': 0.0025 * cfg.EEGain,
         'delay': 2,
         'synMech': 'AMPA',
         'plast': {'mech': 'STDP', 'params': STDPparamsRL},'sec':'dend', 'loc':0.5}
@@ -483,8 +482,7 @@ netParams.connParams['EIT->EMR'] = {
         'postConds': {'pop': 'EMR'},
         #'connList': blistMItoMO,
         'convergence': 16,
-        #'weight': 0.0025,
-        'weight': 0.005 * cfg.EEGain,
+        'weight': 0.0025 * cfg.EEGain,
         'delay': 2,
         'synMech': 'AMPA',
         'plast': {'mech': 'STDP', 'params': STDPparamsRL},'sec':'dend', 'loc':0.5}
@@ -594,7 +592,7 @@ netParams.connParams['EV1->EMR'] = {
         'postConds': {'pop': 'EMR'},
         #'connList': blistMItoMO,
         'convergence': 16,
-        'weight': 0.005 * cfg.EEGain,
+        'weight': 0.0025 * cfg.EEGain,
         'delay': 2,
         'synMech': 'AMPA',
         'plast': {'mech': 'STDP', 'params': STDPparamsRL},'sec':'dend', 'loc':0.5}
@@ -603,7 +601,7 @@ netParams.connParams['EV1->EML'] = {
         'postConds': {'pop': 'EML'},
         #'connList': blistMItoMO,
         'convergence': 16,
-        'weight': 0.005 * cfg.EEGain,
+        'weight': 0.0025 * cfg.EEGain,
         'delay': 2,
         'synMech': 'AMPA',
         'plast': {'mech': 'STDP', 'params': STDPparamsRL},'sec':'dend', 'loc':0.5}
@@ -612,7 +610,7 @@ netParams.connParams['EV4->EMR'] = {
         'postConds': {'pop': 'EMR'},
         #'connList': blistMItoMO,
         'convergence': 16,
-        'weight': 0.005 * cfg.EEGain,
+        'weight': 0.0025 * cfg.EEGain,
         'delay': 2,
         'synMech': 'AMPA',
         'plast': {'mech': 'STDP', 'params': STDPparamsRL},'sec':'dend', 'loc':0.5}
@@ -621,7 +619,7 @@ netParams.connParams['EV4->EML'] = {
         'postConds': {'pop': 'EML'},
         #'connList': blistMItoMO,
         'convergence': 16,
-        'weight': 0.005 * cfg.EEGain,
+        'weight': 0.0025 * cfg.EEGain,
         'delay': 2,
         'synMech': 'AMPA',
         'plast': {'mech': 'STDP', 'params': STDPparamsRL},'sec':'dend', 'loc':0.5}
