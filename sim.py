@@ -305,42 +305,42 @@ netParams.connParams['ER->ER'] = {
         'probability': 0.02,
         'weight': 0.000 * cfg.EEGain, #0.0001
         'delay': 2,
-        'synMech': 'AMPA'}
+        'synMech': 'AMPA', 'sec':'dend', 'loc':0.5}
 netParams.connParams['EV1->EV1'] = {
         'preConds': {'pop': 'EV1'},
         'postConds': {'pop': 'EV1'},
         'probability': 0.02,
         'weight': 0.000 * cfg.EEGain, #0.0001
         'delay': 2,
-        'synMech': 'AMPA'}
+        'synMech': 'AMPA', 'sec':'dend', 'loc':0.5}
 netParams.connParams['EV4->EV4'] = {
         'preConds': {'pop': 'EV4'},
         'postConds': {'pop': 'EV4'},
         'probability': 0.02,
         'weight': 0.000 * cfg.EEGain, #0.0001
         'delay': 2,
-        'synMech': 'AMPA'}
+        'synMech': 'AMPA', 'sec':'dend', 'loc':0.5}
 netParams.connParams['EIT->EIT'] = {
         'preConds': {'pop': 'EIT'},
         'postConds': {'pop': 'EIT'},
         'probability': 0.02,
         'weight': 0.000 * cfg.EEGain, #0.0001
         'delay': 2,
-        'synMech': 'AMPA'}
+        'synMech': 'AMPA', 'sec':'dend', 'loc':0.5}
 netParams.connParams['EML->EML'] = {
         'preConds': {'pop': 'EML'},
         'postConds': {'pop': 'EML'},
         'probability': 0.02,
         'weight': 0.000 * cfg.EEGain, #0.0001
         'delay': 2,
-        'synMech': 'AMPA'}
+        'synMech': 'AMPA', 'sec':'dend', 'loc':0.5}
 netParams.connParams['EMR->EMR'] = {
         'preConds': {'pop': 'EMR'},
         'postConds': {'pop': 'EMR'},
         'probability': 0.02,
         'weight': 0.000 * cfg.EEGain, #0.0001
         'delay': 2,
-        'synMech': 'AMPA'}        
+        'synMech': 'AMPA', 'sec':'dend', 'loc':0.5}
 #E to I
 netParams.connParams['ER->IR'] = {
         'preConds': {'pop': 'ER'},
@@ -350,7 +350,7 @@ netParams.connParams['ER->IR'] = {
         #'convergence': 9,
         'weight': 0.02 * cfg.EIGain,
         'delay': 2,
-        'synMech': 'AMPA'}
+        'synMech': 'AMPA', 'sec':'soma', 'loc':0.5}
 netParams.connParams['EV1->IV1'] = {
         'preConds': {'pop': 'EV1'},
         'postConds': {'pop': 'IV1'},
@@ -359,7 +359,7 @@ netParams.connParams['EV1->IV1'] = {
         #'convergence': 9,
         'weight': 0.02 * cfg.EIGain,
         'delay': 2,
-        'synMech': 'AMPA'}
+        'synMech': 'AMPA', 'sec':'soma', 'loc':0.5}
 netParams.connParams['EV4->IV4'] = {
         'preConds': {'pop': 'EV4'},
         'postConds': {'pop': 'IV4'},
@@ -368,7 +368,7 @@ netParams.connParams['EV4->IV4'] = {
         #'convergence': 9,
         'weight': 0.02 * cfg.EIGain,
         'delay': 2,
-        'synMech': 'AMPA'}
+        'synMech': 'AMPA', 'sec':'soma', 'loc':0.5}
 netParams.connParams['EIT->IIT'] = {
         'preConds': {'pop': 'EIT'},
         'postConds': {'pop': 'IIT'},
@@ -377,7 +377,7 @@ netParams.connParams['EIT->IIT'] = {
         #'convergence': 9,
         'weight': 0.02 * cfg.EIGain,
         'delay': 2,
-        'synMech': 'AMPA'}
+        'synMech': 'AMPA', 'sec':'soma', 'loc':0.5}
 
 #Local inhibition
 #I to E
@@ -389,7 +389,7 @@ netParams.connParams['IR->ER'] = {
         #'divergence': 9,
         'weight': 0.02 * cfg.IEGain,
         'delay': 2,
-        'synMech': 'GABA'}
+        'synMech': 'GABA', 'sec':'soma', 'loc':0.5}
 netParams.connParams['IV1->EV1'] = {
         'preConds': {'pop': 'IV1'},
         'postConds': {'pop': 'EV1'},
@@ -398,7 +398,7 @@ netParams.connParams['IV1->EV1'] = {
         #'divergence': 9,
         'weight': 0.02 * cfg.IEGain,
         'delay': 2,
-        'synMech': 'GABA'}
+        'synMech': 'GABA', 'sec':'soma', 'loc':0.5}
 netParams.connParams['IV4->EV4'] = {
         'preConds': {'pop': 'IV4'},
         'postConds': {'pop': 'EV4'},
@@ -407,7 +407,7 @@ netParams.connParams['IV4->EV4'] = {
         #'divergence': 9,
         'weight': 0.02 * cfg.IEGain,
         'delay': 2,
-        'synMech': 'GABA'}
+        'synMech': 'GABA', 'sec':'soma', 'loc':0.5}
 netParams.connParams['IIT->EIT'] = {
         'preConds': {'pop': 'IIT'},
         'postConds': {'pop': 'EIT'},
@@ -416,31 +416,31 @@ netParams.connParams['IIT->EIT'] = {
         #'divergence': 9,
         'weight': 0.02 * cfg.IEGain,
         'delay': 2,
-        'synMech': 'GABA'}
+        'synMech': 'GABA', 'sec':'soma', 'loc':0.5}
 
 #I to I
 netParams.connParams['IV1->IV1'] = {
         'preConds': {'pop': 'IV1'},
         'postConds': {'pop': 'IV1'},
         'probability': 0.02,
-        'weight': 0.000 * cfg.IIGain, #0.0001
+        'weight': 0.0001 * cfg.IIGain, # 0.000
         'delay': 2,
-        'synMech': 'GABA'}
+        'synMech': 'GABA', 'sec':'soma', 'loc':0.5}
 
 netParams.connParams['IV4->IV4'] = {
         'preConds': {'pop': 'IV4'},
         'postConds': {'pop': 'IV4'},
         'probability': 0.02,
-        'weight': 0.000 * cfg.IIGain, #0.0001
+        'weight': 0.0001 * cfg.IIGain, #0.000
         'delay': 2,
-        'synMech': 'GABA'}
+        'synMech': 'GABA', 'sec':'soma', 'loc':0.5}
 netParams.connParams['IIT->IIT'] = {
         'preConds': {'pop': 'IIT'},
         'postConds': {'pop': 'IIT'},
         'probability': 0.02,
-        'weight': 0.000 * cfg.IIGain, #0.0001
+        'weight': 0.0001 * cfg.IIGain, #0.000
         'delay': 2,
-        'synMech': 'GABA'}
+        'synMech': 'GABA' ,'sec':'soma', 'loc':0.5}
 
 #E to E feedforward connections
 netParams.connParams['ER->EV1'] = {
@@ -450,7 +450,7 @@ netParams.connParams['ER->EV1'] = {
         #'convergence': 10,
         'weight': 0.02 * cfg.EEGain,
         'delay': 2,
-        'synMech': 'AMPA'}
+        'synMech': 'AMPA','sec':'dend', 'loc':0.5}
 
 netParams.connParams['EV1->EV4'] = {
         'preConds': {'pop': 'EV1'},
@@ -459,7 +459,7 @@ netParams.connParams['EV1->EV4'] = {
         #'convergence': 10,
         'weight': 0.01 * cfg.EEGain,
         'delay': 2,
-        'synMech': 'AMPA'}
+        'synMech': 'AMPA','sec':'dend', 'loc':0.5}
 netParams.connParams['EV4->EIT'] = {
         'preConds': {'pop': 'EV4'},
         'postConds': {'pop': 'EIT'},
@@ -467,7 +467,7 @@ netParams.connParams['EV4->EIT'] = {
         #'convergence': 10,
         'weight': 0.01 * cfg.EEGain,
         'delay': 2,
-        'synMech': 'AMPA'}
+        'synMech': 'AMPA','sec':'dend', 'loc':0.5}
 netParams.connParams['EIT->EML'] = {
         'preConds': {'pop': 'EIT'},
         'postConds': {'pop': 'EML'},
@@ -477,7 +477,7 @@ netParams.connParams['EIT->EML'] = {
         'weight': 0.005 * cfg.EEGain,
         'delay': 2,
         'synMech': 'AMPA',
-        'plast': {'mech': 'STDP', 'params': STDPparamsRL}}
+        'plast': {'mech': 'STDP', 'params': STDPparamsRL},'sec':'dend', 'loc':0.5}
 netParams.connParams['EIT->EMR'] = {
         'preConds': {'pop': 'EIT'},
         'postConds': {'pop': 'EMR'},
@@ -487,7 +487,7 @@ netParams.connParams['EIT->EMR'] = {
         'weight': 0.005 * cfg.EEGain,
         'delay': 2,
         'synMech': 'AMPA',
-        'plast': {'mech': 'STDP', 'params': STDPparamsRL}}
+        'plast': {'mech': 'STDP', 'params': STDPparamsRL},'sec':'dend', 'loc':0.5}
 
 #E to I feedforward connections
 netParams.connParams['ER->IV1'] = {
@@ -497,7 +497,7 @@ netParams.connParams['ER->IV1'] = {
         #'convergence': 10,
         'weight': 0.00 * cfg.EIGain, #0.002
         'delay': 2,
-        'synMech': 'AMPA'}
+        'synMech': 'AMPA','sec':'soma', 'loc':0.5}
 netParams.connParams['EV1->IV4'] = {
         'preConds': {'pop': 'EV1'},
         'postConds': {'pop': 'IV4'},
@@ -505,7 +505,7 @@ netParams.connParams['EV1->IV4'] = {
         #'convergence': 10,
         'weight': 0.00 * cfg.EIGain, #0.002
         'delay': 2,
-        'synMech': 'AMPA'}
+        'synMech': 'AMPA','sec':'soma', 'loc':0.5}
 netParams.connParams['EV4->IIT'] = {
         'preConds': {'pop': 'EV4'},
         'postConds': {'pop': 'IIT'},
@@ -513,7 +513,7 @@ netParams.connParams['EV4->IIT'] = {
         #'convergence': 10,
         'weight': 0.00 * cfg.EIGain, #0.002
         'delay': 2,
-        'synMech': 'AMPA'}
+        'synMech': 'AMPA','sec':'soma', 'loc':0.5}
 
 #E to E feedbackward connections
 netParams.connParams['EV1->ER'] = {
@@ -523,7 +523,7 @@ netParams.connParams['EV1->ER'] = {
         #'convergence': 10,
         'weight': 0.000 * cfg.EEGain, #0.0001
         'delay': 2,
-        'synMech': 'AMPA'}
+        'synMech': 'AMPA','sec':'dend', 'loc':0.5}
 """
 netParams.connParams['EV4->EV1'] = {    # <<-- that's E -> I ?? or E -> E ?? weight is 0 but something wrong here
         'preConds': {'pop': 'EV4'},
@@ -532,7 +532,7 @@ netParams.connParams['EV4->EV1'] = {    # <<-- that's E -> I ?? or E -> E ?? wei
         #'convergence': 10,
         'weight': 0.000 * cfg.EEGain, #0.0001
         'delay': 2,
-        'synMech': 'AMPA'}
+        'synMech': 'AMPA','sec':'dend', 'loc':0.5}
 """
 netParams.connParams['EIT->EV4'] = {
         'preConds': {'pop': 'EIT'},
@@ -541,7 +541,7 @@ netParams.connParams['EIT->EV4'] = {
         #'convergence': 10,
         'weight': 0.000 * cfg.EEGain, #0.0001
         'delay': 2,
-        'synMech': 'AMPA'}
+        'synMech': 'AMPA','sec':'dend', 'loc':0.5}
 
 #I to E feedbackward connections
 netParams.connParams['IV1->ER'] = {
@@ -551,7 +551,7 @@ netParams.connParams['IV1->ER'] = {
         #'convergence': 10,
         'weight': 0.00 * cfg.IEGain, #0.002
         'delay': 2,
-        'synMech': 'GABA'}
+        'synMech': 'GABA','sec':'soma', 'loc':0.5}
 netParams.connParams['IV4->EV1'] = {
         'preConds': {'pop': 'IV4'},
         'postConds': {'pop': 'EV1'},
@@ -559,7 +559,7 @@ netParams.connParams['IV4->EV1'] = {
         #'convergence': 10,
         'weight': 0.00 * cfg.IEGain, #0.002
         'delay': 2,
-        'synMech': 'GABA'}
+        'synMech': 'GABA','sec':'soma', 'loc':0.5}
 netParams.connParams['IIT->EV4'] = {
         'preConds': {'pop': 'IIT'},
         'postConds': {'pop': 'EV4'},
@@ -567,7 +567,7 @@ netParams.connParams['IIT->EV4'] = {
         #'convergence': 10,
         'weight': 0.00 * cfg.IEGain, #0.002
         'delay': 2,
-        'synMech': 'GABA'}
+        'synMech': 'GABA','sec':'soma', 'loc':0.5}
 
 #I to I
 netParams.connParams['IV1->IV4'] = {
@@ -575,17 +575,17 @@ netParams.connParams['IV1->IV4'] = {
         'postConds': {'pop': 'IV4'},
         'connList': blistIV1toIV4,
         #'convergence': 10,
-        'weight': 0.00 * cfg.IIGain, #0.002
+        'weight': 0.002 * cfg.IIGain, #0.00
         'delay': 2,
-        'synMech': 'GABA'}
+        'synMech': 'GABA','sec':'soma', 'loc':0.5}
 netParams.connParams['IV4->IIT'] = {
         'preConds': {'pop': 'IV4'},
         'postConds': {'pop': 'IIT'},
         'connList': blistIV4toIIT,
         #'convergence': 10,
-        'weight': 0.00 * cfg.IIGain, #0.002
+        'weight': 0.002 * cfg.IIGain, #0.00
         'delay': 2,
-        'synMech': 'GABA'}
+        'synMech': 'GABA','sec':'soma', 'loc':0.5}
 
 #Add direct connections from lower and higher visual areas to motor cortex
 #Still no idea, how these connections should look like...just trying some numbers: 400 to 25 means convergence factor of 16
@@ -597,7 +597,7 @@ netParams.connParams['EV1->EMR'] = {
         'weight': 0.005 * cfg.EEGain,
         'delay': 2,
         'synMech': 'AMPA',
-        'plast': {'mech': 'STDP', 'params': STDPparamsRL}}
+        'plast': {'mech': 'STDP', 'params': STDPparamsRL},'sec':'dend', 'loc':0.5}
 netParams.connParams['EV1->EML'] = {
         'preConds': {'pop': 'EV1'},
         'postConds': {'pop': 'EML'},
@@ -606,7 +606,7 @@ netParams.connParams['EV1->EML'] = {
         'weight': 0.005 * cfg.EEGain,
         'delay': 2,
         'synMech': 'AMPA',
-        'plast': {'mech': 'STDP', 'params': STDPparamsRL}}
+        'plast': {'mech': 'STDP', 'params': STDPparamsRL},'sec':'dend', 'loc':0.5}
 netParams.connParams['EV4->EMR'] = {
         'preConds': {'pop': 'EV4'},
         'postConds': {'pop': 'EMR'},
@@ -615,7 +615,7 @@ netParams.connParams['EV4->EMR'] = {
         'weight': 0.005 * cfg.EEGain,
         'delay': 2,
         'synMech': 'AMPA',
-        'plast': {'mech': 'STDP', 'params': STDPparamsRL}}
+        'plast': {'mech': 'STDP', 'params': STDPparamsRL},'sec':'dend', 'loc':0.5}
 netParams.connParams['EV4->EML'] = {
         'preConds': {'pop': 'EV4'},
         'postConds': {'pop': 'EML'},
@@ -624,7 +624,7 @@ netParams.connParams['EV4->EML'] = {
         'weight': 0.005 * cfg.EEGain,
         'delay': 2,
         'synMech': 'AMPA',
-        'plast': {'mech': 'STDP', 'params': STDPparamsRL}}
+        'plast': {'mech': 'STDP', 'params': STDPparamsRL},'sec':'dend', 'loc':0.5}
 
 ###################################################################################################################################
 
