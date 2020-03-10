@@ -32,21 +32,21 @@ fid4 = open(sim.MotorOutputsfilename,'w')
 
 scale = dconf['net']['scale']
 
-ETypes = ['ER','EV1','EV4','EIT', 'EML', 'EMR']
-ITypes = ['IR','IV1','IV4','IIT']
-allpops = [x for x in ETypes]
+allpops = ETypes = ['ER','EV1','EV4','EIT', 'EML', 'EMR']
+ITypes = ['IR','IV1','IV4','IIT','IM']
 for x in ITypes: allpops.append(x)
 
 NB_ERneurons = dconf['net']['ER'] * scale
-NB_EV1neurons = dconf['net']['EV1'] * scale
+NB_EV1neurons = dconf['net']['EV1'] * scale # E cell in V1
 NB_IRneurons = dconf['net']['IR'] * scale
-NB_IV1neurons = dconf['net']['IV1'] * scale
-NB_EV4neurons = dconf['net']['EV4'] * scale
-NB_EITneurons = dconf['net']['EIT'] * scale
-NB_IV4neurons = dconf['net']['IV4'] * scale
-NB_IITneurons = dconf['net']['IIT'] * scale
-NB_EMLneurons = dconf['net']['EML'] * scale
-NB_EMRneurons = dconf['net']['EMR'] * scale
+NB_IV1neurons = dconf['net']['IV1'] * scale # I cell in V1
+NB_EV4neurons = dconf['net']['EV4'] * scale # E cell in V4
+NB_EITneurons = dconf['net']['EIT'] * scale # E cell in IT
+NB_IV4neurons = dconf['net']['IV4'] * scale # I cell in V4
+NB_IITneurons = dconf['net']['IIT'] * scale # I cell in IT
+NB_EMLneurons = dconf['net']['EML'] * scale # E cell in Motor Left pop (only for Pong -- really up or down!)
+NB_EMRneurons = dconf['net']['EMR'] * scale # E cell in Motor Right pop (only for Pong -- really up or down!)
+NB_IMneurons = dconf['net']['IM'] * scale # motor area interneuron
 
 # Network parameters
 netParams = specs.NetParams() #object of class NetParams to store the network parameters
@@ -61,8 +61,9 @@ netParams.popParams['EV4'] = {'cellType': 'EV4', 'numCells': NB_EV4neurons, 'cel
 netParams.popParams['IV4'] = {'cellType': 'IV4', 'numCells': NB_IV4neurons, 'cellModel': 'FS_BasketCell'} #400
 netParams.popParams['EIT'] = {'cellType': 'EIT', 'numCells': NB_EITneurons, 'cellModel': 'Mainen'} #400 neurons
 netParams.popParams['IIT'] = {'cellType': 'IIT', 'numCells': NB_IITneurons, 'cellModel': 'FS_BasketCell'} #100
-netParams.popParams['EML'] = {'cellType': 'EML', 'numCells': NB_EMLneurons, 'cellModel': 'Mainen'} #400
+netParams.popParams['EML'] = {'cellType': 'EML', 'numCells': NB_EMLneurons, 'cellModel': 'Mainen'} # 100
 netParams.popParams['EMR'] = {'cellType': 'EMR', 'numCells': NB_EMRneurons, 'cellModel': 'Mainen'} #100
+netParams.popParams['IM'] = {'cellType': 'IM', 'numCells': NB_IMneurons, 'cellModel': 'FS_BasketCell'} #50
 
 netParams.importCellParams(label='PYR_Mainen_rule', conds={'cellType': ETypes}, fileName='cells/mainen.py', cellName='PYR2')
 netParams.importCellParams(label='FS_BasketCell_rule', conds={'cellType': ITypes}, fileName='cells/FS_BasketCell.py', cellName='Bas')
@@ -378,6 +379,22 @@ netParams.connParams['EIT->IIT'] = {
         'weight': 0.02 * cfg.EIGain,
         'delay': 2,
         'synMech': 'AMPA', 'sec':'soma', 'loc':0.5}
+netParams.connParams['EML->IM'] = {
+        'preConds': {'pop': 'EML'},
+        'postConds': {'pop': 'IM'},
+        'probability': 0.25,
+        #'convergence': 9,
+        'weight': 0.02 * cfg.EIGain,
+        'delay': 2,
+        'synMech': 'AMPA', 'sec':'soma', 'loc':0.5}
+netParams.connParams['EMR->IM'] = {
+        'preConds': {'pop': 'EMR'},
+        'postConds': {'pop': 'IM'},
+        'probability': 0.25,
+        #'convergence': 9,
+        'weight': 0.02 * cfg.EIGain,
+        'delay': 2,
+        'synMech': 'AMPA', 'sec':'soma', 'loc':0.5}
 
 #Local inhibition
 #I to E
@@ -417,12 +434,29 @@ netParams.connParams['IIT->EIT'] = {
         'weight': 0.02 * cfg.IEGain,
         'delay': 2,
         'synMech': 'GABA', 'sec':'soma', 'loc':0.5}
+netParams.connParams['IM->EML'] = {
+        'preConds': {'pop': 'IM'},
+        'postConds': {'pop': 'EML'},
+        'probability': 0.25,
+        #'divergence': 9,
+        'weight': 0.02 * cfg.IEGain,
+        'delay': 2,
+        'synMech': 'GABA', 'sec':'soma', 'loc':0.5}
+netParams.connParams['IM->EMR'] = {
+        'preConds': {'pop': 'IM'},
+        'postConds': {'pop': 'EMR'},
+        'probability': 0.25,
+        #'divergence': 9,
+        'weight': 0.02 * cfg.IEGain,
+        'delay': 2,
+        'synMech': 'GABA', 'sec':'soma', 'loc':0.5}
+
 
 #I to I
 netParams.connParams['IV1->IV1'] = {
         'preConds': {'pop': 'IV1'},
         'postConds': {'pop': 'IV1'},
-        'probability': 0.02,
+        'probability': 0.25,
         'weight': 0.0001 * cfg.IIGain, # 0.000
         'delay': 2,
         'synMech': 'GABA', 'sec':'soma', 'loc':0.5}
@@ -430,17 +464,25 @@ netParams.connParams['IV1->IV1'] = {
 netParams.connParams['IV4->IV4'] = {
         'preConds': {'pop': 'IV4'},
         'postConds': {'pop': 'IV4'},
-        'probability': 0.02,
-        'weight': 0.0001 * cfg.IIGain, #0.000
+        'probability': 0.25,
+        'weight': 0.005 * cfg.IIGain, #0.000
         'delay': 2,
         'synMech': 'GABA', 'sec':'soma', 'loc':0.5}
 netParams.connParams['IIT->IIT'] = {
         'preConds': {'pop': 'IIT'},
         'postConds': {'pop': 'IIT'},
-        'probability': 0.02,
-        'weight': 0.0001 * cfg.IIGain, #0.000
+        'probability': 0.25,
+        'weight': 0.005 * cfg.IIGain, #0.000
         'delay': 2,
         'synMech': 'GABA' ,'sec':'soma', 'loc':0.5}
+netParams.connParams['IM->IM'] = {
+        'preConds': {'pop': 'IM'},
+        'postConds': {'pop': 'IM'},
+        'probability': 0.25,
+        'weight': 0.005 * cfg.IIGain, #0.000
+        'delay': 2,
+        'synMech': 'GABA' ,'sec':'soma', 'loc':0.5}
+
 
 #E to E feedforward connections
 netParams.connParams['ER->EV1'] = {
