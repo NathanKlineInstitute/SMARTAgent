@@ -6,10 +6,7 @@ import numpy as np
 ###############################################################################
 class Bas:
   "Basket cell"	
-  def __init__ (self,ID=0,ty=0,col=0):
-    self.ID=ID #what is this? ask sam
-    self.ty=ty #what is this? ask sam
-    self.col=col #what is this? ask sam
+  def __init__ (self):
     self.soma = soma = h.Section(name='soma',cell=self)
     self.soma.insert('k_ion')
     self.soma.insert('na_ion')
