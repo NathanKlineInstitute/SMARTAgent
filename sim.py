@@ -1017,7 +1017,7 @@ sim.saveData() # save data to disk
 if sim.rank == 0: # only rank 0 should save. otherwise all the other nodes could over-write the output or quit first; rank 0 plots
     if dconf['sim']['doplot']:
         sim.analysis.plotData()    
-        sim.plotWeights: plotWeights() 
+        if sim.plotWeights: plotWeights() 
     if sim.saveWeights:
         #saveWeights(sim, recordWeightDCells)
         saveGameBehavior(sim)
