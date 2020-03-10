@@ -51,17 +51,6 @@ for ty in allpops:
     
 netParams.importCellParams(label='PYR_Mainen_rule', conds={'cellType': ETypes}, fileName='cells/mainen.py', cellName='PYR2')
 netParams.importCellParams(label='FS_BasketCell_rule', conds={'cellType': ITypes}, fileName='cells/FS_BasketCell.py', cellName='Bas')
-#netParams.cellParams['ERule'] = {               # cell rule label
-#        'conds': {'cellType': ETypes},              #properties will be applied to cells that match these conditions
-#        'secs': {'soma':                        #sections
-#                {'geom': {'diam':10, 'L':10, 'Ra':120},         #geometry
-#                'mechs': {'hh': {'gnabar': 0.12, 'gkbar': 0.036, 'gl': 0.003, 'el': -70}}}}}    #mechanism
-
-#netParams.cellParams['IRule'] = {               # cell rule label
-#        'conds': {'cellType': ITypes},              #properties will be applied to cells that match these conditions
-#        'secs': {'soma':                        #sections
-#                {'geom': {'diam':10, 'L':10, 'Ra':120},         #geometry
-#                'mechs': {'hh': {'gnabar': 0.12, 'gkbar': 0.036, 'gl': 0.003, 'el': -70}}}}}    #mechanism
 
 ## Synaptic mechanism parameters
 netParams.synMechParams['AMPA'] = {'mod': 'Exp2Syn', 'tau1': 0.05, 'tau2': 5.3, 'e': 0}  # excitatory synaptic mechanism
@@ -95,7 +84,6 @@ netParams.stimTargetParams['MLbkg->all'] = {'source': 'MLbkg', 'conds': {'cellTy
 
 netParams.stimSourceParams['MRbkg'] = {'type': 'NetStim', 'rate': 5, 'noise': 1.0}
 netParams.stimTargetParams['MRbkg->all'] = {'source': 'MRbkg', 'conds': {'cellType': ['EMR']}, 'weight': 0.0, 'delay': 1, 'synMech': 'AMPA'}
-
 
 netParams.stimSourceParams['bkg'] = {'type': 'NetStim', 'rate': 20, 'noise': 1.0}
 netParams.stimTargetParams['bkg->all'] = {'source': 'bkg', 'conds': {'cellType': ['IR','IV1','IV4','IIT']}, 'weight': 0.0, 'delay': 'max(1, normal(5,2))', 'synMech': 'AMPA'}

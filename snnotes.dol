@@ -816,3 +816,17 @@ and one EMR vs EML population dominating the dynamics)
 
 still, where does the assymetry come from?
 
+*20mar10 -
+** lack of symmetry fix? use convergence instead of probability
+
+probably due to higher/lower number of inputs from IM to EMR vs EML
+can fix that via using convergence rather than random connectivity
+
+conv = pmat[from][to] * numc[from]
+
+ok, try that with fake up rule ... 
+
+myrun 16
+
+hmm, something messed up ...
+
