@@ -64,8 +64,8 @@ netParams.popParams['IIT'] = {'cellType': 'IIT', 'numCells': NB_IITneurons, 'cel
 netParams.popParams['EML'] = {'cellType': 'EML', 'numCells': NB_EMLneurons, 'cellModel': 'Mainen'} #400
 netParams.popParams['EMR'] = {'cellType': 'EMR', 'numCells': NB_EMRneurons, 'cellModel': 'Mainen'} #100
 
-netParams.importCellParams(label='PYR_Mainen_rule', conds={'cellType': ETypes}, fileName='mainen.py', cellName='PYR2')
-netParams.importCellParams(label='FS_BasketCell_rule', conds={'cellType': ITypes}, fileName='FS_BasketCell.py', cellName='Bas')
+netParams.importCellParams(label='PYR_Mainen_rule', conds={'cellType': ETypes}, fileName='cells/mainen.py', cellName='PYR2')
+netParams.importCellParams(label='FS_BasketCell_rule', conds={'cellType': ITypes}, fileName='cells/FS_BasketCell.py', cellName='Bas')
 #netParams.cellParams['ERule'] = {               # cell rule label
 #        'conds': {'cellType': ETypes},              #properties will be applied to cells that match these conditions
 #        'secs': {'soma':                        #sections
