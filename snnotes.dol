@@ -880,5 +880,15 @@ that did not seem to work ... paddle ends up becoming stationary after a while .
 probably too much punishment suppressing EMR,EML
 
 *20mar11
-** 
+** add noise?
+** check haroon's updated intermediate reward rules
 
+has these in sim.json:
+"rewardcodes": {"scorePoint": 1, "losePoint": -0.01, "followBall": 0.001, "avoidBall": -0.001, "hitBall": 0.05},
+
+will reward following ball and hitting ball more ... take a look to see if works, etc.
+
+can try:
+"rewardcodes": {"scorePoint": 1, "losePoint": -1, "followBall": 0.5, "avoidBall": -0.001, "hitBall": 0.75},
+
+myrun 16
