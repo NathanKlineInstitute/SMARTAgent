@@ -919,11 +919,11 @@ def trainAgent (t):
           rewards = [critic for i in range(len(rewards))]                    
         else: # normal game play scoring rules
           critic = sum(rewards) # get critic signal (-1, 0 or 1)
+        if critic < 0: critic = -0.01 # reduce magnitude of critic so rewards dominate
         if dconf['verbose']:
           if critic > 0:
             print('REWARD, critic=',critic)
           elif critic < 0:
-            critic = -0.01 # reduce magnitude of critic so rewards dominate
             print('PUNISH, critic=',critic)
           else:
             print('CRITIC=0')                    

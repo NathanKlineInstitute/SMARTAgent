@@ -875,3 +875,10 @@ EMR, EML population names
 ** meanwhile, try multistep test again
 
 python multistepSim.py sim.json 16 12 multirun
+
+that did not seem to work ... paddle ends up becoming stationary after a while ...
+probably too much punishment suppressing EMR,EML
+
+*20mar11
+** 
+
