@@ -925,11 +925,12 @@ def trainAgent (t):
           if critic>0:
             critic  = dconf['rewardcodes']['scorePoint'] 
           elif critic<0:
-            critic = dconf['rewardcodes']['losePoint']  #-0.01, reduce magnitude of critic so rewards dominate
+            critic = dconf['rewardcodes']['losePoint']  #-0.01, e.g. to reduce magnitude of punishment so rewards dominate
           else:
             critic = 0
           #starting from here not tested
           #rewards for hitting the ball
+          critic_for_avoidingloss = 0
           if sum(total_hits)>0:
             critic_for_avoidingloss = dconf['rewardcodes']['hitBall'] #should be able to change this number from config file
           #rewards for following or avoiding the ball
@@ -937,10 +938,10 @@ def trainAgent (t):
           for ai in range(len(actions)):
               caction = actions[ai]
               cproposed_action = proposed_actions[ai]
-              if caction-cproposed_action==0:
-                critic_for_following_ball = critic_for_following_ball + dconf['rewardcodes']['followBall'] #follow the ball
+              if caction - cproposed_action == 0:
+                critic_for_following_ball += dconf['rewardcodes']['followBall'] #follow the ball
               else:
-                critic_for_following_ball = critic_for_following_ball + dconf['rewardcodes']['avoidBall'] # didn't follow the ball
+                critic_for_following_ball += dconf['rewardcodes']['avoidBall'] # didn't follow the ball
           #total rewards
           critic = critic + critic_for_avoidingloss + critic_for_following_ball
         #till here not tested
