@@ -816,3 +816,32 @@ and one EMR vs EML population dominating the dynamics)
 
 still, where does the assymetry come from?
 
+*20mar10 - adjustments to connectivity, thresholds, E/I balance
+** using dnumc as dictionary for number of cells
+** set different thresholds for E and I cells (lower for I cells) via cellRule
+
+netParams.cellParams['PYR_Mainen_rule']['secs']['soma']['threshold'] = 0.0
+netParams.cellParams['FS_BasketCell_rule']['secs']['soma']['threshold'] = -10.0
+
+** lack of symmetry fix? use convergence instead of probability
+
+probably due to higher/lower number of inputs from IM to EMR vs EML
+can fix that via using convergence rather than random connectivity
+
+conv = pmat[from][to] * numc[from]
+
+ok, try that with fake up rule ... 
+
+myrun 16
+
+hmm, something messed up ... was getting too much dep blockade ... 
+
+ok, after adjusting the thresholds, other connection weights and gains ...
+
+(note that IV4 was acting differently since receives extra inhibition from the large IV1 population; reduced
+the weights from IV1 -> IV4 to reduce that effect)
+
+get more reasonable raster, with higher I than E rates ... 
+
+savefig('gif/20mar10_rast_a0.png')
+

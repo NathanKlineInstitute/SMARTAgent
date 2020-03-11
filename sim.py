@@ -5,6 +5,7 @@ import random
 from conf import dconf # configuration dictionary
 import pandas as pd
 import pickle
+from collections import OrderedDict
 
 random.seed(1234) # this will not work properly across runs with different number of nodes
 
@@ -32,52 +33,27 @@ fid4 = open(sim.MotorOutputsfilename,'w')
 
 scale = dconf['net']['scale']
 
-allpops = ETypes = ['ER','EV1','EV4','EIT', 'EML', 'EMR']
+ETypes = ['ER','EV1','EV4','EIT', 'EML', 'EMR']
 ITypes = ['IR','IV1','IV4','IIT','IM']
-for x in ITypes: allpops.append(x)
-
-NB_ERneurons = dconf['net']['ER'] * scale
-NB_EV1neurons = dconf['net']['EV1'] * scale # E cell in V1
-NB_IRneurons = dconf['net']['IR'] * scale
-NB_IV1neurons = dconf['net']['IV1'] * scale # I cell in V1
-NB_EV4neurons = dconf['net']['EV4'] * scale # E cell in V4
-NB_EITneurons = dconf['net']['EIT'] * scale # E cell in IT
-NB_IV4neurons = dconf['net']['IV4'] * scale # I cell in V4
-NB_IITneurons = dconf['net']['IIT'] * scale # I cell in IT
-NB_EMLneurons = dconf['net']['EML'] * scale # E cell in Motor Left pop (only for Pong -- really up or down!)
-NB_EMRneurons = dconf['net']['EMR'] * scale # E cell in Motor Right pop (only for Pong -- really up or down!)
-NB_IMneurons = dconf['net']['IM'] * scale # motor area interneuron
+allpops = ['ER','IR','EV1','IV1','EV4','IV4','EIT','IIT','EML','EMR','IM']
+dnumc = OrderedDict({ty:dconf['net'][ty]*scale for ty in allpops}) # number of neurons of a given type
 
 # Network parameters
 netParams = specs.NetParams() #object of class NetParams to store the network parameters
 netParams.defaultThreshold = 0.0 # spike threshold, 10 mV is NetCon default, lower it for all cells
 
 #Population parameters
-netParams.popParams['ER'] = {'cellType': 'ER', 'numCells': NB_ERneurons, 'cellModel': 'Mainen'}  #6400 neurons to represent 6400 pixels, now we have 400 pixels
-netParams.popParams['IR'] = {'cellType': 'IR', 'numCells': NB_IRneurons, 'cellModel': 'FS_BasketCell'}
-netParams.popParams['EV1'] = {'cellType': 'EV1', 'numCells': NB_EV1neurons, 'cellModel': 'Mainen'} #6400 neurons
-netParams.popParams['IV1'] = {'cellType': 'IV1', 'numCells': NB_IV1neurons, 'cellModel': 'FS_BasketCell'} #1600
-netParams.popParams['EV4'] = {'cellType': 'EV4', 'numCells': NB_EV4neurons, 'cellModel': 'Mainen'} #1600 neurons
-netParams.popParams['IV4'] = {'cellType': 'IV4', 'numCells': NB_IV4neurons, 'cellModel': 'FS_BasketCell'} #400
-netParams.popParams['EIT'] = {'cellType': 'EIT', 'numCells': NB_EITneurons, 'cellModel': 'Mainen'} #400 neurons
-netParams.popParams['IIT'] = {'cellType': 'IIT', 'numCells': NB_IITneurons, 'cellModel': 'FS_BasketCell'} #100
-netParams.popParams['EML'] = {'cellType': 'EML', 'numCells': NB_EMLneurons, 'cellModel': 'Mainen'} # 100
-netParams.popParams['EMR'] = {'cellType': 'EMR', 'numCells': NB_EMRneurons, 'cellModel': 'Mainen'} #100
-netParams.popParams['IM'] = {'cellType': 'IM', 'numCells': NB_IMneurons, 'cellModel': 'FS_BasketCell'} #50
-
+for ty in allpops:
+    if ty in ETypes:
+        netParams.popParams[ty] = {'cellType':ty, 'numCells': dnumc[ty], 'cellModel': 'Mainen'}
+    else:
+        netParams.popParams[ty] = {'cellType':ty, 'numCells': dnumc[ty], 'cellModel': 'FS_BasketCell'}
+    
 netParams.importCellParams(label='PYR_Mainen_rule', conds={'cellType': ETypes}, fileName='cells/mainen.py', cellName='PYR2')
 netParams.importCellParams(label='FS_BasketCell_rule', conds={'cellType': ITypes}, fileName='cells/FS_BasketCell.py', cellName='Bas')
-#netParams.cellParams['ERule'] = {               # cell rule label
-#        'conds': {'cellType': ETypes},              #properties will be applied to cells that match these conditions
-#        'secs': {'soma':                        #sections
-#                {'geom': {'diam':10, 'L':10, 'Ra':120},         #geometry
-#                'mechs': {'hh': {'gnabar': 0.12, 'gkbar': 0.036, 'gl': 0.003, 'el': -70}}}}}    #mechanism
 
-#netParams.cellParams['IRule'] = {               # cell rule label
-#        'conds': {'cellType': ITypes},              #properties will be applied to cells that match these conditions
-#        'secs': {'soma':                        #sections
-#                {'geom': {'diam':10, 'L':10, 'Ra':120},         #geometry
-#                'mechs': {'hh': {'gnabar': 0.12, 'gkbar': 0.036, 'gl': 0.003, 'el': -70}}}}}    #mechanism
+netParams.cellParams['PYR_Mainen_rule']['secs']['soma']['threshold'] = 0.0
+netParams.cellParams['FS_BasketCell_rule']['secs']['soma']['threshold'] = -10.0
 
 ## Synaptic mechanism parameters
 netParams.synMechParams['AMPA'] = {'mod': 'Exp2Syn', 'tau1': 0.05, 'tau2': 5.3, 'e': 0}  # excitatory synaptic mechanism
@@ -111,7 +87,6 @@ netParams.stimTargetParams['MLbkg->all'] = {'source': 'MLbkg', 'conds': {'cellTy
 
 netParams.stimSourceParams['MRbkg'] = {'type': 'NetStim', 'rate': 5, 'noise': 1.0}
 netParams.stimTargetParams['MRbkg->all'] = {'source': 'MRbkg', 'conds': {'cellType': ['EMR']}, 'weight': 0.0, 'delay': 1, 'synMech': 'AMPA'}
-
 
 netParams.stimSourceParams['bkg'] = {'type': 'NetStim', 'rate': 20, 'noise': 1.0}
 netParams.stimTargetParams['bkg->all'] = {'source': 'bkg', 'conds': {'cellType': ['IR','IV1','IV4','IIT']}, 'weight': 0.0, 'delay': 'max(1, normal(5,2))', 'synMech': 'AMPA'}
@@ -225,46 +200,46 @@ def connectLayerswithOverlapDiv(NBpreN, NBpostN, overlap_xdir):
 #####################################################################################
 #Feedforward excitation
 #E to E - Feedforward connections
-blistERtoEV1 = connectLayerswithOverlap(NBpreN = NB_ERneurons, NBpostN = NB_EV1neurons, overlap_xdir = 3)
-blistEV1toEV4 = connectLayerswithOverlap(NBpreN = NB_EV1neurons, NBpostN = NB_EV4neurons, overlap_xdir = 3)
-blistEV4toEIT = connectLayerswithOverlap(NBpreN = NB_EV4neurons, NBpostN = NB_EITneurons, overlap_xdir = 3) #was 15
+blistERtoEV1 = connectLayerswithOverlap(NBpreN = dnumc['ER'], NBpostN = dnumc['EV1'], overlap_xdir = 3)
+blistEV1toEV4 = connectLayerswithOverlap(NBpreN = dnumc['EV1'], NBpostN = dnumc['EV4'], overlap_xdir = 3)
+blistEV4toEIT = connectLayerswithOverlap(NBpreN = dnumc['EV4'], NBpostN = dnumc['EIT'], overlap_xdir = 3) #was 15
 #blistITtoMI = connectLayerswithOverlap(NBpreN = NB_ITneurons, NBpostN = NB_MIneurons, overlap_xdir = 3) #Not sure if this is a good strategy instead of all to all
 #blistMItoMO = connectLayerswithOverlap(NBpreN = NB_MIneurons, NBpostN = NB_MOneurons, overlap_xdir = 3) #was 19
 #blistMItoMO: Feedforward for MI to MO is all to all and can be specified in the connection statement iteself
 
 #E to I - Feedforward connections
-blistERtoIV1 = connectLayerswithOverlap(NBpreN = NB_ERneurons, NBpostN = NB_IV1neurons, overlap_xdir = 3)
-blistEV1toIV4 = connectLayerswithOverlap(NBpreN = NB_EV1neurons, NBpostN = NB_IV4neurons, overlap_xdir = 3) #was 15
-blistEV4toIIT = connectLayerswithOverlap(NBpreN = NB_EV4neurons, NBpostN = NB_IITneurons, overlap_xdir = 3) #was 15
+blistERtoIV1 = connectLayerswithOverlap(NBpreN = dnumc['ER'], NBpostN = dnumc['IV1'], overlap_xdir = 3)
+blistEV1toIV4 = connectLayerswithOverlap(NBpreN = dnumc['EV1'], NBpostN = dnumc['IV4'], overlap_xdir = 3) 
+blistEV4toIIT = connectLayerswithOverlap(NBpreN = dnumc['EV4'], NBpostN = dnumc['IIT'], overlap_xdir = 3) 
 
 #E to I - WithinLayer connections
-blistERtoIR = connectLayerswithOverlap(NBpreN = NB_ERneurons, NBpostN = NB_IRneurons, overlap_xdir = 3)
-blistEV1toIV1 = connectLayerswithOverlap(NBpreN = NB_EV1neurons, NBpostN = NB_IV1neurons, overlap_xdir = 3)
-blistEV4toIV4 = connectLayerswithOverlap(NBpreN = NB_EV4neurons, NBpostN = NB_IV4neurons, overlap_xdir = 3)
-blistEITtoIIT = connectLayerswithOverlap(NBpreN = NB_EITneurons, NBpostN = NB_IITneurons, overlap_xdir = 3)
+blistERtoIR = connectLayerswithOverlap(NBpreN = dnumc['ER'], NBpostN = dnumc['IR'], overlap_xdir = 3)
+blistEV1toIV1 = connectLayerswithOverlap(NBpreN = dnumc['EV1'], NBpostN = dnumc['IV1'], overlap_xdir = 3)
+blistEV4toIV4 = connectLayerswithOverlap(NBpreN = dnumc['EV4'], NBpostN = dnumc['IV4'], overlap_xdir = 3)
+blistEITtoIIT = connectLayerswithOverlap(NBpreN = dnumc['EIT'], NBpostN = dnumc['IIT'], overlap_xdir = 3)
 
 #I to E - WithinLayer Inhibition
-blistIRtoER = connectLayerswithOverlapDiv(NBpreN = NB_IRneurons, NBpostN = NB_ERneurons, overlap_xdir = 5)
-blistIV1toEV1 = connectLayerswithOverlapDiv(NBpreN = NB_IV1neurons, NBpostN = NB_EV1neurons, overlap_xdir = 5)
-blistIV4toEV4 = connectLayerswithOverlapDiv(NBpreN = NB_IV4neurons, NBpostN = NB_EV4neurons, overlap_xdir = 5)
-blistIITtoEIT = connectLayerswithOverlapDiv(NBpreN = NB_IITneurons, NBpostN = NB_EITneurons, overlap_xdir = 5)
+blistIRtoER = connectLayerswithOverlapDiv(NBpreN = dnumc['IR'], NBpostN = dnumc['ER'], overlap_xdir = 5)
+blistIV1toEV1 = connectLayerswithOverlapDiv(NBpreN = dnumc['IV1'], NBpostN = dnumc['EV1'], overlap_xdir = 5)
+blistIV4toEV4 = connectLayerswithOverlapDiv(NBpreN = dnumc['IV4'], NBpostN = dnumc['EV4'], overlap_xdir = 5)
+blistIITtoEIT = connectLayerswithOverlapDiv(NBpreN = dnumc['IIT'], NBpostN = dnumc['EIT'], overlap_xdir = 5)
 
 #Feedbackward excitation
 #E to E  
-blistEV1toER = connectLayerswithOverlapDiv(NBpreN = NB_EV1neurons, NBpostN = NB_ERneurons, overlap_xdir = 3)
-blistEV4toEV1 = connectLayerswithOverlapDiv(NBpreN = NB_EV4neurons, NBpostN = NB_EV1neurons, overlap_xdir = 3)
-blistEITtoEV4 = connectLayerswithOverlapDiv(NBpreN = NB_EITneurons, NBpostN = NB_EV4neurons, overlap_xdir = 3)
+blistEV1toER = connectLayerswithOverlapDiv(NBpreN = dnumc['EV1'], NBpostN = dnumc['ER'], overlap_xdir = 3)
+blistEV4toEV1 = connectLayerswithOverlapDiv(NBpreN = dnumc['EV4'], NBpostN = dnumc['EV1'], overlap_xdir = 3)
+blistEITtoEV4 = connectLayerswithOverlapDiv(NBpreN = dnumc['EIT'], NBpostN = dnumc['EV4'], overlap_xdir = 3)
 
 #Feedforward inhibition
 #I to I
-blistIV1toIV4 = connectLayerswithOverlap(NBpreN = NB_IV1neurons, NBpostN = NB_IV4neurons, overlap_xdir = 5)
-blistIV4toIIT = connectLayerswithOverlap(NBpreN = NB_IV4neurons, NBpostN = NB_IITneurons, overlap_xdir = 5)
+blistIV1toIV4 = connectLayerswithOverlap(NBpreN = dnumc['IV1'], NBpostN = dnumc['IV4'], overlap_xdir = 5)
+blistIV4toIIT = connectLayerswithOverlap(NBpreN = dnumc['IV4'], NBpostN = dnumc['IIT'], overlap_xdir = 5)
 
 #Feedbackward inhibition
 #I to E 
-blistIV1toER = connectLayerswithOverlapDiv(NBpreN = NB_IV1neurons, NBpostN = NB_ERneurons, overlap_xdir = 5)
-blistIV4toEV1 = connectLayerswithOverlapDiv(NBpreN = NB_IV4neurons, NBpostN = NB_EV1neurons, overlap_xdir = 5)
-blistIITtoEV4 = connectLayerswithOverlapDiv(NBpreN = NB_IITneurons, NBpostN = NB_EV4neurons, overlap_xdir = 5)
+blistIV1toER = connectLayerswithOverlapDiv(NBpreN = dnumc['IV1'], NBpostN = dnumc['ER'], overlap_xdir = 5)
+blistIV4toEV1 = connectLayerswithOverlapDiv(NBpreN = dnumc['IV4'], NBpostN = dnumc['EV1'], overlap_xdir = 5)
+blistIITtoEV4 = connectLayerswithOverlapDiv(NBpreN = dnumc['IIT'], NBpostN = dnumc['EV4'], overlap_xdir = 5)
 
 #Simulation options
 simConfig = specs.SimConfig()           # object of class SimConfig to store simulation configuration
@@ -292,9 +267,9 @@ simConfig.analysis['plotRaster'] = {'popRates':'overlay','saveData':'data/'+dcon
 
 # synaptic weight gain (based on E, I types)
 cfg = simConfig
-cfg.EEGain = 5.0  # E to E scaling factor
-cfg.EIGain = 20.0 # E to I scaling factor
-cfg.IEGain = 20.0 # I to E scaling factor
+cfg.EEGain = 0.5  # E to E scaling factor
+cfg.EIGain = 1.0 # E to I scaling factor
+cfg.IEGain = 10.0 # I to E scaling factor
 cfg.IIGain = 10.0  # I to I scaling factor
 
 
@@ -347,8 +322,6 @@ netParams.connParams['ER->IR'] = {
         'preConds': {'pop': 'ER'},
         'postConds': {'pop': 'IR'},
         'connList': blistERtoIR,
-        #'probability': 0.23,
-        #'convergence': 9,
         'weight': 0.02 * cfg.EIGain,
         'delay': 2,
         'synMech': 'AMPA', 'sec':'soma', 'loc':0.5}
@@ -356,8 +329,6 @@ netParams.connParams['EV1->IV1'] = {
         'preConds': {'pop': 'EV1'},
         'postConds': {'pop': 'IV1'},
         'connList': blistEV1toIV1,
-        #'probability': 0.23,
-        #'convergence': 9,
         'weight': 0.02 * cfg.EIGain,
         'delay': 2,
         'synMech': 'AMPA', 'sec':'soma', 'loc':0.5}
@@ -365,8 +336,6 @@ netParams.connParams['EV4->IV4'] = {
         'preConds': {'pop': 'EV4'},
         'postConds': {'pop': 'IV4'},
         'connList': blistEV4toIV4,
-        #'probability': 0.23,
-        #'convergence': 9,
         'weight': 0.02 * cfg.EIGain,
         'delay': 2,
         'synMech': 'AMPA', 'sec':'soma', 'loc':0.5}
@@ -374,24 +343,22 @@ netParams.connParams['EIT->IIT'] = {
         'preConds': {'pop': 'EIT'},
         'postConds': {'pop': 'IIT'},
         'connList': blistEITtoIIT,
-        #'probability': 0.23,
-        #'convergence': 9,
         'weight': 0.02 * cfg.EIGain,
         'delay': 2,
         'synMech': 'AMPA', 'sec':'soma', 'loc':0.5}
 netParams.connParams['EML->IM'] = {
         'preConds': {'pop': 'EML'},
         'postConds': {'pop': 'IM'},
-        'probability': 0.25,
-        #'convergence': 9,
+        #'probability': 0.25,
+        'convergence': 25,
         'weight': 0.02 * cfg.EIGain,
         'delay': 2,
         'synMech': 'AMPA', 'sec':'soma', 'loc':0.5}
 netParams.connParams['EMR->IM'] = {
         'preConds': {'pop': 'EMR'},
         'postConds': {'pop': 'IM'},
-        'probability': 0.25,
-        #'convergence': 9,
+        #'probability': 0.25,
+        'convergence': 25,
         'weight': 0.02 * cfg.EIGain,
         'delay': 2,
         'synMech': 'AMPA', 'sec':'soma', 'loc':0.5}
@@ -402,8 +369,6 @@ netParams.connParams['IR->ER'] = {
         'preConds': {'pop': 'IR'},
         'postConds': {'pop': 'ER'},
         'connList': blistIRtoER,
-        #'probability': 0.02,
-        #'divergence': 9,
         'weight': 0.02 * cfg.IEGain,
         'delay': 2,
         'synMech': 'GABA', 'sec':'soma', 'loc':0.5}
@@ -411,8 +376,6 @@ netParams.connParams['IV1->EV1'] = {
         'preConds': {'pop': 'IV1'},
         'postConds': {'pop': 'EV1'},
         'connList': blistIV1toEV1,
-        #'probability': 0.02,
-        #'divergence': 9,
         'weight': 0.02 * cfg.IEGain,
         'delay': 2,
         'synMech': 'GABA', 'sec':'soma', 'loc':0.5}
@@ -420,8 +383,6 @@ netParams.connParams['IV4->EV4'] = {
         'preConds': {'pop': 'IV4'},
         'postConds': {'pop': 'EV4'},
         'connList': blistIV4toEV4,
-        #'probability': 0.02,
-        #'divergence': 9,
         'weight': 0.02 * cfg.IEGain,
         'delay': 2,
         'synMech': 'GABA', 'sec':'soma', 'loc':0.5}
@@ -429,24 +390,24 @@ netParams.connParams['IIT->EIT'] = {
         'preConds': {'pop': 'IIT'},
         'postConds': {'pop': 'EIT'},
         'connList': blistIITtoEIT,
-        #'probability': 0.02,
-        #'divergence': 9,
         'weight': 0.02 * cfg.IEGain,
         'delay': 2,
         'synMech': 'GABA', 'sec':'soma', 'loc':0.5}
 netParams.connParams['IM->EML'] = {
         'preConds': {'pop': 'IM'},
         'postConds': {'pop': 'EML'},
-        'probability': 0.25,
+        #'probability': 0.25,
         #'divergence': 9,
+        'convergence': 13,
         'weight': 0.02 * cfg.IEGain,
         'delay': 2,
         'synMech': 'GABA', 'sec':'soma', 'loc':0.5}
 netParams.connParams['IM->EMR'] = {
         'preConds': {'pop': 'IM'},
         'postConds': {'pop': 'EMR'},
-        'probability': 0.25,
+        #'probability': 0.25,
         #'divergence': 9,
+        'convergence': 13,
         'weight': 0.02 * cfg.IEGain,
         'delay': 2,
         'synMech': 'GABA', 'sec':'soma', 'loc':0.5}
@@ -457,7 +418,7 @@ netParams.connParams['IV1->IV1'] = {
         'preConds': {'pop': 'IV1'},
         'postConds': {'pop': 'IV1'},
         'probability': 0.25,
-        'weight': 0.0001 * cfg.IIGain, # 0.000
+        'weight': 0.005 * cfg.IIGain, # 0.000
         'delay': 2,
         'synMech': 'GABA', 'sec':'soma', 'loc':0.5}
 
@@ -489,7 +450,6 @@ netParams.connParams['ER->EV1'] = {
         'preConds': {'pop': 'ER'},
         'postConds': {'pop': 'EV1'},
         'connList': blistERtoEV1,
-        #'convergence': 10,
         'weight': 0.02 * cfg.EEGain,
         'delay': 2,
         'synMech': 'AMPA','sec':'dend', 'loc':0.5}
@@ -498,7 +458,6 @@ netParams.connParams['EV1->EV4'] = {
         'preConds': {'pop': 'EV1'},
         'postConds': {'pop': 'EV4'},
         'connList': blistEV1toEV4,
-        #'convergence': 10,
         'weight': 0.01 * cfg.EEGain,
         'delay': 2,
         'synMech': 'AMPA','sec':'dend', 'loc':0.5}
@@ -615,7 +574,7 @@ netParams.connParams['IV1->IV4'] = {
         'postConds': {'pop': 'IV4'},
         'connList': blistIV1toIV4,
         #'convergence': 10,
-        'weight': 0.002 * cfg.IIGain, #0.00
+        'weight': 0.00075 * cfg.IIGain, #0.00
         'delay': 2,
         'synMech': 'GABA','sec':'soma', 'loc':0.5}
 netParams.connParams['IV4->IIT'] = {
@@ -623,7 +582,7 @@ netParams.connParams['IV4->IIT'] = {
         'postConds': {'pop': 'IIT'},
         'connList': blistIV4toIIT,
         #'convergence': 10,
-        'weight': 0.002 * cfg.IIGain, #0.00
+        'weight': 0.00075 * cfg.IIGain, #0.00
         'delay': 2,
         'synMech': 'GABA','sec':'soma', 'loc':0.5}
 
