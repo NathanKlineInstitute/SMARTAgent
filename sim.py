@@ -267,7 +267,7 @@ simConfig.analysis['plotRaster'] = {'popRates':'overlay','saveData':'data/'+dcon
 
 # synaptic weight gain (based on E, I types)
 cfg = simConfig
-cfg.EEGain = 0.5  # E to E scaling factor
+cfg.EEGain = 0.75  # E to E scaling factor
 cfg.EIGain = 1.0 # E to I scaling factor
 cfg.IEGain = 10.0 # I to E scaling factor
 cfg.IIGain = 10.0  # I to I scaling factor
@@ -944,6 +944,7 @@ def trainAgent (t):
                 critic_for_following_ball += dconf['rewardcodes']['avoidBall'] # didn't follow the ball
           #total rewards
           critic = critic + critic_for_avoidingloss + critic_for_following_ball
+          rewards = [critic for i in range(len(rewards))]  # reset rewards to modified critic signal - should use more granular recording
         #till here not tested
         if dconf['verbose']:
           if critic > 0:
