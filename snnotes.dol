@@ -845,3 +845,31 @@ get more reasonable raster, with higher I than E rates ...
 
 savefig('gif/20mar10_rast_a0.png')
 
+testing fake up rule for 10 s ... still stable at end ...
+
+raster looks ok:
+savefig('gif/20mar10_rast_a1.png')
+cells look ok:
+savefig('gif/20mar10_IM_a1.png')
+savefig('gif/20mar10_EMR_a1.png')
+savefig('gif/20mar10_EML_a1.png')
+savefig('gif/20mar10_IIT_a1.png')
+savefig('gif/20mar10_EIT_a1.png')
+savefig('gif/20mar10_IV4_a1.png')
+savefig('gif/20mar10_EV4_a1.png')
+savefig('gif/20mar10_IV1_a1.png')
+savefig('gif/20mar10_EV1_a1.png')
+savefig('gif/20mar10_IR_a1.png')
+savefig('gif/20mar10_ER_a1.png')
+
+and the weights ?
+simdat
+savefig('gif/20mar10_reward_weights_a1.png')
+weights look biased towards correct population
+(note that only recording weights every 1 s here, while reward signal recorded every 0.1 s so
+cannot always see correspondence closely in figure above)
+
+** Note: should change R and L to up and down (as appropriate)!
+EMR, EML population names
+
+** meanwhile, try multistep test again
