@@ -730,7 +730,9 @@ InputImages = []
 NBsteps = 0 # this is a counter for recording the plastic weights
 epCount = []
 last_obs = [] #make sure this does not introduce a bug
-
+proposed_actions = [] 
+last_ball_dir = 0 
+total_hits = [] #number of times a ball is hit by racket as the ball changes its direction and player doesn't lose a score.
 lSTDPmech = [] # global list of STDP mechanisms; so do not have to lookup at each interval function call 
     
 def trainAgentFake(t):
@@ -819,7 +821,7 @@ def updateInputRates ():
 def trainAgent (t):
     """ training interface between simulation and game environment
     """
-    global NBsteps, epCount, InputImages, last_obs
+    global NBsteps, epCount, InputImages, last_obs, proposed_actions, last_ball_dir, total_hits
     vec = h.Vector()
     if t<100.0: # for the first time interval use randomly selected actions
         actions =[]
@@ -906,7 +908,7 @@ def trainAgent (t):
             # actions = [dconf['moves']['UP'] for i in range(5)] # force move UP for testing            
     if sim.rank == 0:
         print('Model actions:', actions)
-        rewards, epCount, InputImages, last_obs, proposed_actions = sim.AIGame.playGame(actions, epCount, InputImages, last_obs)
+        rewards, epCount, InputImages, last_obs, proposed_actions, last_ball_dir, total_hits = sim.AIGame.playGame(actions, epCount, InputImages, last_obs, last_ball_dir)
         print('Proposed actions:', proposed_actions)
         if dconf['sim']['RLFakeUpRule']: # fake rule for testing reinforcing of up moves
           critic = np.sign(actions.count(dconf['moves']['UP']) - actions.count(dconf['moves']['DOWN']))          
@@ -918,8 +920,30 @@ def trainAgent (t):
           critic = np.sign(actions.count(dconf['moves']['NOMOVE']) - actions.count(dconf['moves']['DOWN']) - actions.count(dconf['moves']['UP']))
           rewards = [critic for i in range(len(rewards))]                    
         else: # normal game play scoring rules
+          #normal game based rewards
           critic = sum(rewards) # get critic signal (-1, 0 or 1)
-        if critic < 0: critic = -0.01 # reduce magnitude of critic so rewards dominate
+          if critic>0:
+            critic  = dconf['rewardcodes']['scorePoint'] 
+          elif critic<0:
+            critic = dconf['rewardcodes']['losePoint']  #-0.01, reduce magnitude of critic so rewards dominate
+          else:
+            critic = 0
+          #starting from here not tested
+          #rewards for hitting the ball
+          if sum(total_hits)>0:
+            critic_for_avoidingloss = dconf['rewardcodes']['hitBall'] #should be able to change this number from config file
+          #rewards for following or avoiding the ball
+          critic_for_following_ball = 0
+          for ai in range(len(actions)):
+              caction = actions[ai]
+              cproposed_action = proposed_actions[ai]
+              if caction-cproposed_action==0:
+                critic_for_following_ball = critic_for_following_ball + dconf['rewardcodes']['followBall'] #follow the ball
+              else:
+                critic_for_following_ball = critic_for_following_ball + dconf['rewardcodes']['avoidBall'] # didn't follow the ball
+          #total rewards
+          critic = critic + critic_for_avoidingloss + critic_for_following_ball
+        #till here not tested
         if dconf['verbose']:
           if critic > 0:
             print('REWARD, critic=',critic)
