@@ -52,6 +52,9 @@ for ty in allpops:
 netParams.importCellParams(label='PYR_Mainen_rule', conds={'cellType': ETypes}, fileName='cells/mainen.py', cellName='PYR2')
 netParams.importCellParams(label='FS_BasketCell_rule', conds={'cellType': ITypes}, fileName='cells/FS_BasketCell.py', cellName='Bas')
 
+netParams.cellParams['PYR_Mainen_rule']['secs']['soma']['threshold'] = 0.0
+netParams.cellParams['FS_BasketCell_rule']['secs']['soma']['threshold'] = -10.0
+
 ## Synaptic mechanism parameters
 netParams.synMechParams['AMPA'] = {'mod': 'Exp2Syn', 'tau1': 0.05, 'tau2': 5.3, 'e': 0}  # excitatory synaptic mechanism
 netParams.synMechParams['GABA'] = {'mod': 'Exp2Syn', 'tau1': 0.07, 'tau2': 9.1, 'e': -80}  # inhibitory synaptic mechanism
@@ -206,8 +209,8 @@ blistEV4toEIT = connectLayerswithOverlap(NBpreN = dnumc['EV4'], NBpostN = dnumc[
 
 #E to I - Feedforward connections
 blistERtoIV1 = connectLayerswithOverlap(NBpreN = dnumc['ER'], NBpostN = dnumc['IV1'], overlap_xdir = 3)
-blistEV1toIV4 = connectLayerswithOverlap(NBpreN = dnumc['EV1'], NBpostN = dnumc['IV4'], overlap_xdir = 3) #was 15
-blistEV4toIIT = connectLayerswithOverlap(NBpreN = dnumc['EV4'], NBpostN = dnumc['IIT'], overlap_xdir = 3) #was 15
+blistEV1toIV4 = connectLayerswithOverlap(NBpreN = dnumc['EV1'], NBpostN = dnumc['IV4'], overlap_xdir = 3) 
+blistEV4toIIT = connectLayerswithOverlap(NBpreN = dnumc['EV4'], NBpostN = dnumc['IIT'], overlap_xdir = 3) 
 
 #E to I - WithinLayer connections
 blistERtoIR = connectLayerswithOverlap(NBpreN = dnumc['ER'], NBpostN = dnumc['IR'], overlap_xdir = 3)
@@ -264,9 +267,9 @@ simConfig.analysis['plotRaster'] = {'popRates':'overlay','saveData':'data/'+dcon
 
 # synaptic weight gain (based on E, I types)
 cfg = simConfig
-cfg.EEGain = 5.0  # E to E scaling factor
-cfg.EIGain = 20.0 # E to I scaling factor
-cfg.IEGain = 20.0 # I to E scaling factor
+cfg.EEGain = 0.5  # E to E scaling factor
+cfg.EIGain = 1.0 # E to I scaling factor
+cfg.IEGain = 10.0 # I to E scaling factor
 cfg.IIGain = 10.0  # I to I scaling factor
 
 
@@ -319,8 +322,6 @@ netParams.connParams['ER->IR'] = {
         'preConds': {'pop': 'ER'},
         'postConds': {'pop': 'IR'},
         'connList': blistERtoIR,
-        #'probability': 0.23,
-        #'convergence': 9,
         'weight': 0.02 * cfg.EIGain,
         'delay': 2,
         'synMech': 'AMPA', 'sec':'soma', 'loc':0.5}
@@ -328,8 +329,6 @@ netParams.connParams['EV1->IV1'] = {
         'preConds': {'pop': 'EV1'},
         'postConds': {'pop': 'IV1'},
         'connList': blistEV1toIV1,
-        #'probability': 0.23,
-        #'convergence': 9,
         'weight': 0.02 * cfg.EIGain,
         'delay': 2,
         'synMech': 'AMPA', 'sec':'soma', 'loc':0.5}
@@ -337,8 +336,6 @@ netParams.connParams['EV4->IV4'] = {
         'preConds': {'pop': 'EV4'},
         'postConds': {'pop': 'IV4'},
         'connList': blistEV4toIV4,
-        #'probability': 0.23,
-        #'convergence': 9,
         'weight': 0.02 * cfg.EIGain,
         'delay': 2,
         'synMech': 'AMPA', 'sec':'soma', 'loc':0.5}
@@ -346,24 +343,22 @@ netParams.connParams['EIT->IIT'] = {
         'preConds': {'pop': 'EIT'},
         'postConds': {'pop': 'IIT'},
         'connList': blistEITtoIIT,
-        #'probability': 0.23,
-        #'convergence': 9,
         'weight': 0.02 * cfg.EIGain,
         'delay': 2,
         'synMech': 'AMPA', 'sec':'soma', 'loc':0.5}
 netParams.connParams['EML->IM'] = {
         'preConds': {'pop': 'EML'},
         'postConds': {'pop': 'IM'},
-        'probability': 0.25,
-        #'convergence': 9,
+        #'probability': 0.25,
+        'convergence': 25,
         'weight': 0.02 * cfg.EIGain,
         'delay': 2,
         'synMech': 'AMPA', 'sec':'soma', 'loc':0.5}
 netParams.connParams['EMR->IM'] = {
         'preConds': {'pop': 'EMR'},
         'postConds': {'pop': 'IM'},
-        'probability': 0.25,
-        #'convergence': 9,
+        #'probability': 0.25,
+        'convergence': 25,
         'weight': 0.02 * cfg.EIGain,
         'delay': 2,
         'synMech': 'AMPA', 'sec':'soma', 'loc':0.5}
@@ -374,8 +369,6 @@ netParams.connParams['IR->ER'] = {
         'preConds': {'pop': 'IR'},
         'postConds': {'pop': 'ER'},
         'connList': blistIRtoER,
-        #'probability': 0.02,
-        #'divergence': 9,
         'weight': 0.02 * cfg.IEGain,
         'delay': 2,
         'synMech': 'GABA', 'sec':'soma', 'loc':0.5}
@@ -383,8 +376,6 @@ netParams.connParams['IV1->EV1'] = {
         'preConds': {'pop': 'IV1'},
         'postConds': {'pop': 'EV1'},
         'connList': blistIV1toEV1,
-        #'probability': 0.02,
-        #'divergence': 9,
         'weight': 0.02 * cfg.IEGain,
         'delay': 2,
         'synMech': 'GABA', 'sec':'soma', 'loc':0.5}
@@ -392,8 +383,6 @@ netParams.connParams['IV4->EV4'] = {
         'preConds': {'pop': 'IV4'},
         'postConds': {'pop': 'EV4'},
         'connList': blistIV4toEV4,
-        #'probability': 0.02,
-        #'divergence': 9,
         'weight': 0.02 * cfg.IEGain,
         'delay': 2,
         'synMech': 'GABA', 'sec':'soma', 'loc':0.5}
@@ -401,8 +390,6 @@ netParams.connParams['IIT->EIT'] = {
         'preConds': {'pop': 'IIT'},
         'postConds': {'pop': 'EIT'},
         'connList': blistIITtoEIT,
-        #'probability': 0.02,
-        #'divergence': 9,
         'weight': 0.02 * cfg.IEGain,
         'delay': 2,
         'synMech': 'GABA', 'sec':'soma', 'loc':0.5}
@@ -431,7 +418,7 @@ netParams.connParams['IV1->IV1'] = {
         'preConds': {'pop': 'IV1'},
         'postConds': {'pop': 'IV1'},
         'probability': 0.25,
-        'weight': 0.0001 * cfg.IIGain, # 0.000
+        'weight': 0.005 * cfg.IIGain, # 0.000
         'delay': 2,
         'synMech': 'GABA', 'sec':'soma', 'loc':0.5}
 
@@ -463,7 +450,6 @@ netParams.connParams['ER->EV1'] = {
         'preConds': {'pop': 'ER'},
         'postConds': {'pop': 'EV1'},
         'connList': blistERtoEV1,
-        #'convergence': 10,
         'weight': 0.02 * cfg.EEGain,
         'delay': 2,
         'synMech': 'AMPA','sec':'dend', 'loc':0.5}
@@ -472,7 +458,6 @@ netParams.connParams['EV1->EV4'] = {
         'preConds': {'pop': 'EV1'},
         'postConds': {'pop': 'EV4'},
         'connList': blistEV1toEV4,
-        #'convergence': 10,
         'weight': 0.01 * cfg.EEGain,
         'delay': 2,
         'synMech': 'AMPA','sec':'dend', 'loc':0.5}
@@ -589,7 +574,7 @@ netParams.connParams['IV1->IV4'] = {
         'postConds': {'pop': 'IV4'},
         'connList': blistIV1toIV4,
         #'convergence': 10,
-        'weight': 0.002 * cfg.IIGain, #0.00
+        'weight': 0.00075 * cfg.IIGain, #0.00
         'delay': 2,
         'synMech': 'GABA','sec':'soma', 'loc':0.5}
 netParams.connParams['IV4->IIT'] = {
@@ -597,7 +582,7 @@ netParams.connParams['IV4->IIT'] = {
         'postConds': {'pop': 'IIT'},
         'connList': blistIV4toIIT,
         #'convergence': 10,
-        'weight': 0.002 * cfg.IIGain, #0.00
+        'weight': 0.00075 * cfg.IIGain, #0.00
         'delay': 2,
         'synMech': 'GABA','sec':'soma', 'loc':0.5}
 
