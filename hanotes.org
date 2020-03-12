@@ -991,6 +991,8 @@ STDPparamsRL = {'hebbwt': 0.0000, 'antiwt':-0.0000, 'wbase': 0.0012, 'wmax': 50,
 *20mar12
 **Sam told me that there is too much reward. so testing all reward for "rewardcodes": {"scorePoint": 1, "losePoint": -1, "followBall": 0.5, "avoidBall": -0.001, "hitBall": 0.75}, in 20mar12_TG0_
 **load step file in simdat.py
+**reduce reward for followBall from 0.5 to 0.001 and Run "rewardcodes": {"scorePoint": 1, "losePoint": -1, "followBall": 0.001, "avoidBall": -0.001, "hitBall": 0.75} in 20mar12_TG1_
+
 
 
 
