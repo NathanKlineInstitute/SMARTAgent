@@ -23,7 +23,8 @@ def readinweights (d):
 
 def loadsimdat (name=None):
   # load simulation data
-  stepNB = int(sys.argv[0]) #which file(stepNB) want to plot
+  stepNB = sys.argv[0] #which file(stepNB) want to plot
+  print(stepNB)
   if stepNB is None: stepNB = -1
   if name is None and stepNB is None: name = dconf['sim']['name']
   elif name is None and stepNB > -1: name = dconf['sim']['name'] + '_step_' + str(stepNB)
