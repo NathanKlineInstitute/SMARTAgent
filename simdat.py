@@ -62,7 +62,7 @@ def plotavgweights (pdf):
   return davgw
 
 if __name__ == '__main__':
-  stepNB = int(sys.argv[0]) #which file(stepNB) want to plot
+  stepNB = int(sys.argv[1]) #which file(stepNB) want to plot
   if stepNB is None: stepNB = -1
   print(stepNB)
   simConfig, pdf, actreward, dstartidx, dendidx = loadsimdat()
