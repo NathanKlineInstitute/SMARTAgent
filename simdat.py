@@ -8,6 +8,8 @@ import sys
 
 ion()
 
+
+
 #
 def readinweights (d):
   # read the synaptic plasticity weights into a pandas dataframe
@@ -21,7 +23,10 @@ def readinweights (d):
 
 def loadsimdat (name=None):
   # load simulation data
-  if name is None: name = dconf['sim']['name']
+  stepNB = int(sys.argv[0]) #which file(stepNB) want to plot
+  if stepNB is None: stepNB = -1
+  if name is None and stepNB is None: name = dconf['sim']['name']
+  elif name is None and stepNB > -1: name = dconf['sim']['name'] + '_step_' + str(stepNB)
   simConfig = pickle.load(open('data/'+name+'simConfig.pkl','rb'))
   dstartidx = {p:simConfig['net']['pops'][p]['cellGids'][0] for p in simConfig['net']['pops'].keys()} # starting indices for each population
   dendidx = {p:simConfig['net']['pops'][p]['cellGids'][-1] for p in simConfig['net']['pops'].keys()} # ending indices for each population
