@@ -993,6 +993,8 @@ STDPparamsRL = {'hebbwt': 0.0000, 'antiwt':-0.0000, 'wbase': 0.0012, 'wmax': 50,
 **load step file in simdat.py
 **reduce reward for followBall from 0.5 to 0.001 and Run "rewardcodes": {"scorePoint": 1, "losePoint": -1, "followBall": 0.001, "avoidBall": -0.001, "hitBall": 0.75} in 20mar12_TG1_
 **don't use scorePoint and losePoint. Only use followBall, avoidBall and hitBall as rewards: "rewardcodes": {"scorePoint": 0, "losePoint": -0, "followBall": 0.001, "avoidBall": -0.001, "hitBall": 0.1}, in 20mar12_TG2_
+**again the problem is too many times, the actions generate avoidBall signal. make followBall = 0.005 and rerun the sim. "rewardcodes": {"scorePoint": 0, "losePoint": -0, "followBall": 0.005, "avoidBall": -0.001, "hitBall": 0.1} in 20mar12_TG3_
+
 
 
 
