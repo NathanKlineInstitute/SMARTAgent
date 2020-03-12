@@ -9,7 +9,8 @@ import sys
 ion()
 
 
-
+global stepNB
+stepNB = -1
 #
 def readinweights (d):
   # read the synaptic plasticity weights into a pandas dataframe
@@ -23,9 +24,6 @@ def readinweights (d):
 
 def loadsimdat (name=None):
   # load simulation data
-  stepNB = sys.argv[0] #which file(stepNB) want to plot
-  print(stepNB)
-  if stepNB is None: stepNB = -1
   if name is None and stepNB is None: name = dconf['sim']['name']
   elif name is None and stepNB > -1: name = dconf['sim']['name'] + '_step_' + str(stepNB)
   simConfig = pickle.load(open('data/'+name+'simConfig.pkl','rb'))
@@ -64,5 +62,8 @@ def plotavgweights (pdf):
   return davgw
 
 if __name__ == '__main__':
+  stepNB = int(sys.argv[0]) #which file(stepNB) want to plot
+  if stepNB is None: stepNB = -1
+  print(stepNB)
   simConfig, pdf, actreward, dstartidx, dendidx = loadsimdat()
   davgw = plotavgweights(pdf)
