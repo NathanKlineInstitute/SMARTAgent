@@ -703,7 +703,7 @@ def saveGameBehavior(sim):
         for i in range(len(sim.allActions)):
             fid3.write('%0.1f' % sim.allTimes[i])
             fid3.write('\t%0.1f' % sim.allActions[i])
-            fid3.write('\t%0.1f' % sim.allRewards[i])
+            fid3.write('\t%0.5f' % sim.allRewards[i])
             fid3.write('\t%0.1f' % sim.allProposedActions[i]) #the number of proposed action should be equal to the number of actions
             fid3.write('\n')
 
