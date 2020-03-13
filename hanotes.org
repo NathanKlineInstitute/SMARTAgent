@@ -996,6 +996,15 @@ STDPparamsRL = {'hebbwt': 0.0000, 'antiwt':-0.0000, 'wbase': 0.0012, 'wmax': 50,
 **again the problem is too many times, the actions generate avoidBall signal. make followBall = 0.005 and rerun the sim. "rewardcodes": {"scorePoint": 0, "losePoint": -0, "followBall": 0.005, "avoidBall": -0.001, "hitBall": 0.1} in 20mar12_TG3_
 **make followBall = 0.002 and rerun the sim. "rewardcodes": {"scorePoint": 0, "losePoint": -0, "followBall": 0.002, "avoidBall": -0.001, "hitBall": 0.1} in 20mar12_TG4_
 
+*20mar13
+**Should look at individual synapses
+**should try to look at the capcity of network to store input---though not sure how to do that exactly. 
+--Input space: nput space is ~number_frames * (Height x Width)^levels, where levels is number of grayscale values
+--network space is proportional to number of plastic synapses, but each synapse has continuous range.... to the network capacity? something like synapses ^ NB of synaptic states...NB of synaptic states = number of synaptic values...each one has a range from wbase to wmax, and they're 64 bit numbers, but not using the full 64 bits
+**IDEAS to enahnce network storage capacity:
+1) use mulitple synapses between each pair of cells with different delays. Could use AMPA and NMDA or AMPA with different delays.
+2)recurrent connecitivity with different delays.
+3)Using detailed morphologies with multiple synapses at different loactions to allow different integration time constants and thus increasing the capacity of network storage.
 
 
 
