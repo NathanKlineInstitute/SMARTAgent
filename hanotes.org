@@ -1006,6 +1006,8 @@ STDPparamsRL = {'hebbwt': 0.0000, 'antiwt':-0.0000, 'wbase': 0.0012, 'wmax': 50,
 2)recurrent connecitivity with different delays.
 3)Using detailed morphologies with multiple synapses at different loactions to allow different integration time constants and thus increasing the capacity of network storage.
 
+**run shorter sim (2000 ms) with followBall reward of 0.004 in "20mar13_TG0_" and "sim": {"duration": 2000, "dt": 0.2, "verbose": 0, "recordStep":0.2,"recordWeightStepSize":1,"RLFakeUpRule": 0,"RLFakeDownRule": 0,"RLFakeStayRule": 0,"name":"20mar13_TG0_","doquit":0,"doplot":1}
+
 
 
 
