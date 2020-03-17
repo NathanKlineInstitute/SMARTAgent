@@ -61,9 +61,43 @@ def plotavgweights (pdf):
   xlabel('Time (ms)'); 
   return davgw
 
+def plotavgweightsPerPostSynNeuron (pdf):
+  utimes = np.unique(pdf.time)
+  #for every postsynaptic neuron, find total weight of synaptic inputs per area (i.e. synaptic inputs from EV1, EV4 and EIT and treated separately for each cell——if there are 200 unique cells, will get 600 weights as 200 from each originating layer)
+  wperPostID = {}
+  subplot(4,1,1)
+  plot(actreward.time,actreward.reward,'k',linewidth=4)
+  plot(actreward.time,actreward.reward,'ko',markersize=10)  
+  xlim((0,simConfig['simConfig']['duration']))
+  ylim((-1.1,1.1))
+  gdx = 2   
+  for src in ['EV1', 'EV4', 'EIT']:
+      for trg in ['EML', 'EMR']:
+          wperPostID[src+'->'+trg] = arr = []
+          tstep = 0
+          for t in utimes:
+              arr.append([])
+              pdfs = pdf[(pdf.time==t) & (pdf.postid>=dstartidx[trg]) & (pdf.postid<=dendidx[trg]) & (pdf.preid>=dstartidx[src]) & (pdf.preid<=dendidx[trg])]
+              uniqueCells = np.unique(pdfs.postid)
+              for cell in uniqueCells:
+                  pdfs1 = pdfs[(pdfs.postid==cell)]
+                  arr[tstep].append(np.mean(pdfs1.weight))
+              tstep += 1
+      subplot(4,1,gdx)
+      plot(utimes,np.array(wperPostID[src+'->EML']),'r-o',linewidth=3,markersize=5)
+      plot(utimes,np.array(wperPostID[src+'->EMR']),'b-o',linewidth=3,markersize=5) 
+      legend((src+'->EML',src+'->EMR'),loc='upper left')       
+      xlim((0,simConfig['simConfig']['duration']))
+      ylabel('RL weights') 
+      gdx += 1
+  xlabel('Time (ms)')
+  title('sum of weights on to post-synaptic neurons') 
+  return wperPostID
+
 if __name__ == '__main__':
   stepNB = int(sys.argv[1]) #which file(stepNB) want to plot
   if stepNB is None: stepNB = -1
   print(stepNB)
   simConfig, pdf, actreward, dstartidx, dendidx = loadsimdat()
   davgw = plotavgweights(pdf)
+  wperPostID = plotavgweightsPerPostSynNeuron(pdf)

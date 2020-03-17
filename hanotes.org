@@ -1010,6 +1010,10 @@ STDPparamsRL = {'hebbwt': 0.0000, 'antiwt':-0.0000, 'wbase': 0.0012, 'wmax': 50,
 
 **save rewards with more precision.
 
+*20mar17
+**plot synaptic weights per post neuron IDs.
+**testing new plots.
+
 
 
 
