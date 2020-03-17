@@ -113,6 +113,7 @@ def plotavgweightsPerPostSynNeuron2(pdf):
       xlim((0,simConfig['simConfig']['duration']))
       ylim((-1.1,1.1))
       ylabel('critic')
+      colorbar
       title('sum of weights on to post-synaptic neurons')
       for trg in ['EML', 'EMR']:
           wperPostID[src+'->'+trg] = arr = []
@@ -128,8 +129,8 @@ def plotavgweightsPerPostSynNeuron2(pdf):
       subplot(3,1,2)
       imshow(np.transpose(np.array(wperPostID[src+'->EML'])),aspect = 'auto', interpolation='None')
       b1 = gca().get_xticks()
-      b1 = b1+100
       b1 = 100*b1
+      b1 = b1+100
       b1 = b1.astype(int)
       gca().set_xticklabels(b1)
       colorbar()
@@ -139,8 +140,8 @@ def plotavgweightsPerPostSynNeuron2(pdf):
       subplot(3,1,3)
       imshow(np.transpose(np.array(wperPostID[src+'->EMR'])),aspect = 'auto', interpolation='None') 
       b2 = gca().get_xticks()
-      b2 = b2+100
       b2 = 100*b2
+      b2 = b2+100
       b2 = b2.astype(int)
       gca().set_xticklabels(b2)
       colorbar()
