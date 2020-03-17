@@ -73,6 +73,7 @@ def plotavgweightsPerPostSynNeuron1(pdf):
       plot(actreward.time,actreward.reward,'ko',markersize=10)  
       xlim((0,simConfig['simConfig']['duration']))
       ylim((-1.1,1.1))
+      title('sum of weights on to post-synaptic neurons')
       for trg in ['EML', 'EMR']:
           wperPostID[src+'->'+trg] = arr = []
           tstep = 0
@@ -95,8 +96,7 @@ def plotavgweightsPerPostSynNeuron1(pdf):
       xlim((0,simConfig['simConfig']['duration']))
       ylabel(src+'->EMR weights') 
       gdx += 1
-      xlabel('Time (ms)')
-      title('sum of weights on to post-synaptic neurons') 
+      xlabel('Time (ms)')  
   return wperPostID
 
 def plotavgweightsPerPostSynNeuron2(pdf):
@@ -111,6 +111,7 @@ def plotavgweightsPerPostSynNeuron2(pdf):
       plot(actreward.time,actreward.reward,'ko',markersize=10)  
       xlim((0,simConfig['simConfig']['duration']))
       ylim((-1.1,1.1))
+      title('sum of weights on to post-synaptic neurons')
       for trg in ['EML', 'EMR']:
           wperPostID[src+'->'+trg] = arr = []
           tstep = 0
@@ -126,8 +127,7 @@ def plotavgweightsPerPostSynNeuron2(pdf):
       imshow(np.transpose(np.array(wperPostID[src+'->EML'])),aspect = 'auto', extent = (0.1,0.8,0.1,0.8), interpolation='None')
       b1 = gca().get_xticks()
       b1 = 1000*b1
-      b1.astype(int)
-      b1
+      b1 = b1.astype(int)
       gca().set_xticklabels(b1)
       #legend((src+'->EML'),loc='upper left')
       #xlim((0,simConfig['simConfig']['duration']))
@@ -136,14 +136,12 @@ def plotavgweightsPerPostSynNeuron2(pdf):
       imshow(np.transpose(np.array(wperPostID[src+'->EMR'])),aspect = 'auto', extent = (0.1,0.8,0.1,0.8), interpolation='None') 
       b2 = gca().get_xticks()
       b2 = 1000*b2
-      b2.astype(int)
-      b2
+      b2 = b2.astype(int)
       gca().set_xticklabels(b2)
       #legend((src+'->EMR'),loc='upper left')       
       #xlim((0,simConfig['simConfig']['duration']))
       ylabel(src+'->EMR weights') 
       xlabel('Time (ms)')
-      title('sum of weights on to post-synaptic neurons') 
   
 if __name__ == '__main__':
   stepNB = int(sys.argv[1]) #which file(stepNB) want to plot
