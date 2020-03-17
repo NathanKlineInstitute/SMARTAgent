@@ -73,6 +73,7 @@ def plotavgweightsPerPostSynNeuron1(pdf):
       plot(actreward.time,actreward.reward,'ko',markersize=10)  
       xlim((0,simConfig['simConfig']['duration']))
       ylim((-1.1,1.1))
+      ylabel('critic')
       title('sum of weights on to post-synaptic neurons')
       for trg in ['EML', 'EMR']:
           wperPostID[src+'->'+trg] = arr = []
@@ -111,6 +112,7 @@ def plotavgweightsPerPostSynNeuron2(pdf):
       plot(actreward.time,actreward.reward,'ko',markersize=10)  
       xlim((0,simConfig['simConfig']['duration']))
       ylim((-1.1,1.1))
+      ylabel('critic')
       title('sum of weights on to post-synaptic neurons')
       for trg in ['EML', 'EMR']:
           wperPostID[src+'->'+trg] = arr = []
@@ -149,5 +151,5 @@ if __name__ == '__main__':
   print(stepNB)
   simConfig, pdf, actreward, dstartidx, dendidx = loadsimdat()
   davgw = plotavgweights(pdf)
-  #wperPostID = plotavgweightsPerPostSynNeuron1(pdf)
+  wperPostID = plotavgweightsPerPostSynNeuron1(pdf)
   plotavgweightsPerPostSynNeuron2(pdf)
