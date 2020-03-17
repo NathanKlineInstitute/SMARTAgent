@@ -128,18 +128,22 @@ def plotavgweightsPerPostSynNeuron2(pdf):
       subplot(3,1,2)
       imshow(np.transpose(np.array(wperPostID[src+'->EML'])),aspect = 'auto', interpolation='None')
       b1 = gca().get_xticks()
-      b1 = 1000*b1
+      b1 = b1+100
+      b1 = 100*b1
       b1 = b1.astype(int)
       gca().set_xticklabels(b1)
+      colorbar()
       #legend((src+'->EML'),loc='upper left')
       #xlim((0,simConfig['simConfig']['duration']))
       ylabel(src+'->EML weights')
       subplot(3,1,3)
       imshow(np.transpose(np.array(wperPostID[src+'->EMR'])),aspect = 'auto', interpolation='None') 
       b2 = gca().get_xticks()
-      b2 = 1000*b2
+      b2 = b2+100
+      b2 = 100*b2
       b2 = b2.astype(int)
       gca().set_xticklabels(b2)
+      colorbar()
       #legend((src+'->EMR'),loc='upper left')       
       #xlim((0,simConfig['simConfig']['duration']))
       ylabel(src+'->EMR weights') 
