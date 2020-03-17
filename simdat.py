@@ -138,7 +138,7 @@ def plotavgweightsPerPostSynNeuron2(pdf):
       gca().set_xticklabels(b1)
       colorbar(orientation='horizontal')
       #legend((src+'->EML'),loc='upper left')
-      #xlim((0,simConfig['simConfig']['duration']))
+      xlim((0,b1[-1]))
       ylabel(src+'->EML weights')
       subplot(3,1,3)
       imshow(np.transpose(np.array(wperPostID[src+'->EMR'])),aspect = 'auto', interpolation='None') 
@@ -152,7 +152,7 @@ def plotavgweightsPerPostSynNeuron2(pdf):
       gca().set_xticklabels(b2)
       #colorbar()
       #legend((src+'->EMR'),loc='upper left')       
-      #xlim((0,simConfig['simConfig']['duration']))
+      xlim((0,b2[-1]))
       ylabel(src+'->EMR weights') 
       xlabel('Time (ms)')
   
