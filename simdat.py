@@ -127,6 +127,7 @@ def plotavgweightsPerPostSynNeuron2(pdf):
       b1 = gca().get_xticks()
       b1 = 1000*b1
       b1.astype(int)
+      b1
       gca().set_xticklabels(b1)
       #legend((src+'->EML'),loc='upper left')
       #xlim((0,simConfig['simConfig']['duration']))
@@ -136,6 +137,7 @@ def plotavgweightsPerPostSynNeuron2(pdf):
       b2 = gca().get_xticks()
       b2 = 1000*b2
       b2.astype(int)
+      b2
       gca().set_xticklabels(b2)
       #legend((src+'->EMR'),loc='upper left')       
       #xlim((0,simConfig['simConfig']['duration']))
