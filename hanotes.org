@@ -1013,6 +1013,7 @@ STDPparamsRL = {'hebbwt': 0.0000, 'antiwt':-0.0000, 'wbase': 0.0012, 'wmax': 50,
 *20mar17
 **plot synaptic weights per post neuron IDs.
 **testing new plots.
+**create separate figures for each pair of areas e.g. V1 to ML and MR, V4 to ML and MR and IT to ML and MR.
 
 
 
