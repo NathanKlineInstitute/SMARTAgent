@@ -170,7 +170,9 @@ def plotIndividualSynWeights(pdf):
               uniqueCells = np.unique(pdfs.postid)
               for cell in uniqueCells:
                   pdfs1 = pdfs[(pdfs.postid==cell)]
-                  arr[tstep].append(pdfs1.weight)
+                  p1 = np.array(pdfs1.weight)
+                  for w in p1:
+                      arr[tstep].append(w)
               tstep += 1
       subplot(3,1,2)
       imshow(np.transpose(np.array(allweights[src+'->EML'])),aspect = 'auto',cmap='hot', interpolation='None')
