@@ -188,7 +188,9 @@ def plotIndividualSynWeights(pdf):
       figure()
       subplot(position=[0.05,0.1,0.01,0.8])
       c1 = get_cmap('viridis',256)
-      imshow(np.transpose(np.array(preNeuronIDs[src+'->EML'])),aspect = 'auto',cmap=c1, interpolation='None')
+      newcolors = c1(np.linspace(0, 1, 256))
+      #newcmp = ListedColormap(newcolors)
+      imshow(np.transpose(np.array(preNeuronIDs[src+'->EML'])),aspect = 'auto',cmap=newcolors, interpolation='None')
       subplot(position=[0.15,0.1,0.8,0.8])
       imshow(np.transpose(np.array(allweights[src+'->EML'])),aspect = 'auto',cmap='hot', interpolation='None')
       b1 = gca().get_xticks()
@@ -200,11 +202,11 @@ def plotIndividualSynWeights(pdf):
       ylabel(src+'->EML weights')
       xlabel('Time (ms)')
       subplot(position=[0.98,0.1,0.01,0.8])
-      imshow(np.transpose(np.array(postNeuronIDs[src+'->EML'])),aspect = 'auto',cmap=c1, interpolation='None')
+      imshow(np.transpose(np.array(postNeuronIDs[src+'->EML'])),aspect = 'auto',cmap=newcolors, interpolation='None')
       #subplot(2,1,2)
       figure()
       subplot(position=[0.05,0.1,0.01,0.8])
-      imshow(np.transpose(np.array(preNeuronIDs[src+'->EMR'])),aspect = 'auto',cmap=c1, interpolation='None')
+      imshow(np.transpose(np.array(preNeuronIDs[src+'->EMR'])),aspect = 'auto',cmap=newcolors, interpolation='None')
       subplot(position=[0.15,0.1,0.8,0.8])
       imshow(np.transpose(np.array(allweights[src+'->EMR'])),aspect = 'auto',cmap='hot', interpolation='None') 
       b2 = gca().get_xticks()
@@ -216,7 +218,7 @@ def plotIndividualSynWeights(pdf):
       ylabel(src+'->EMR weights') 
       xlabel('Time (ms)')
       subplot(position=[0.98,0.1,0.01,0.8])
-      imshow(np.transpose(np.array(postNeuronIDs[src+'->EMR'])),aspect = 'auto',cmap=c1, interpolation='None')
+      imshow(np.transpose(np.array(postNeuronIDs[src+'->EMR'])),aspect = 'auto',cmap=newcolors, interpolation='None')
 
 if __name__ == '__main__':
   stepNB = int(sys.argv[1]) #which file(stepNB) want to plot
