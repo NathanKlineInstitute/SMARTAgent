@@ -153,14 +153,14 @@ def plotIndividualSynWeights(pdf):
   #gdx = 2   
   for src in ['EV1', 'EV4', 'EIT']:
       figure()
-      subplot(3,1,1)
-      plot(actreward.time,actreward.reward,'k',linewidth=4)
-      plot(actreward.time,actreward.reward,'ko',markersize=10)  
-      xlim((0,simConfig['simConfig']['duration']))
-      ylim((-1.1,1.1))
-      ylabel('critic')
-      colorbar
-      title('sum of weights on to post-synaptic neurons')
+      #subplot(9,1,1)
+      #plot(actreward.time,actreward.reward,'k',linewidth=4)
+      #plot(actreward.time,actreward.reward,'ko',markersize=10)  
+      #xlim((0,simConfig['simConfig']['duration']))
+      #ylim((-1.1,1.1))
+      #ylabel('critic')
+      #colorbar
+      #title('sum of weights on to post-synaptic neurons')
       for trg in ['EML', 'EMR']:
           allweights[src+'->'+trg] = arr = []
           tstep = 0
@@ -174,21 +174,21 @@ def plotIndividualSynWeights(pdf):
                   for w in p1:
                       arr[tstep].append(w)
               tstep += 1
-      subplot(3,1,2)
+      subplot(2,1,1)
       imshow(np.transpose(np.array(allweights[src+'->EML'])),aspect = 'auto',cmap='hot', interpolation='None')
       b1 = gca().get_xticks()
       gca().set_xticks(b1-1)
       gca().set_xticklabels((100*b1).astype(int))
-      colorbar(orientation='horizontal',fraction=0.05)
+      colorbar(orientation='vertical',fraction=0.05)
       #legend((src+'->EML'),loc='upper left')
       xlim((-1,b1[-1]-1))
       ylabel(src+'->EML weights')
-      subplot(3,1,3)
+      subplot(2,1,2)
       imshow(np.transpose(np.array(allweights[src+'->EMR'])),aspect = 'auto',cmap='hot', interpolation='None') 
       b2 = gca().get_xticks()
       gca().set_xticks(b2-1)
       gca().set_xticklabels((100*b2).astype(int))
-      colorbar(orientation='horizontal',fraction=0.05)
+      colorbar(orientation='vertical',fraction=0.05)
       #legend((src+'->EMR'),loc='upper left')       
       xlim((-1,b2[-1]-1))
       ylabel(src+'->EMR weights') 
