@@ -150,9 +150,11 @@ def plotIndividualSynWeights(pdf):
   utimes = np.unique(pdf.time)
   #for every postsynaptic neuron, find total weight of synaptic inputs per area (i.e. synaptic inputs from EV1, EV4 and EIT and treated separately for each cell——if there are 200 unique cells, will get 600 weights as 200 from each originating layer)
   allweights = {}
+  preNeuronIDs = {}
+  postNeuronIDs = {}
   #gdx = 2   
   for src in ['EV1', 'EV4', 'EIT']:
-      figure()
+      #figure()
       #subplot(9,1,1)
       #plot(actreward.time,actreward.reward,'k',linewidth=4)
       #plot(actreward.time,actreward.reward,'ko',markersize=10)  
@@ -163,36 +165,57 @@ def plotIndividualSynWeights(pdf):
       #title('sum of weights on to post-synaptic neurons')
       for trg in ['EML', 'EMR']:
           allweights[src+'->'+trg] = arr = []
+          preNeuronIDs[src+'->'+trg] = arr2 = []
+          postNeuronIDs[src+'->'+trg] = arr3 = []
           tstep = 0
           for t in utimes:
               arr.append([])
+              arr2.append([])
+              arr3.append([])
               pdfs = pdf[(pdf.time==t) & (pdf.postid>=dstartidx[trg]) & (pdf.postid<=dendidx[trg]) & (pdf.preid>=dstartidx[src]) & (pdf.preid<=dendidx[trg])]
               uniqueCells = np.unique(pdfs.postid)
               for cell in uniqueCells:
                   pdfs1 = pdfs[(pdfs.postid==cell)]
                   p1 = np.array(pdfs1.weight)
+                  preIDs1 = np.array(pdfs1.preid) #ID of pre synaptic neuron
                   for w in p1:
                       arr[tstep].append(w)
+                  for preID in preIDs1:
+                      arr2[tstep].append(preID)
+                      arr3[tstep].append(cell)
               tstep += 1
-      subplot(2,1,1)
+      #subplot(2,1,1)
+      figure()
+      subplot(1,10,1)
+      imshow(np.transpose(np.array(preNeuronIDs[src+'->EML'])),aspect = 'auto',cmap='dark2', interpolation='None')
+      subplot(1,10,[2,3,4,5,6,7,8,9])
       imshow(np.transpose(np.array(allweights[src+'->EML'])),aspect = 'auto',cmap='hot', interpolation='None')
       b1 = gca().get_xticks()
       gca().set_xticks(b1-1)
       gca().set_xticklabels((100*b1).astype(int))
-      colorbar(orientation='vertical',fraction=0.05)
+      colorbar(orientation='vertical',fraction=0.01)
       #legend((src+'->EML'),loc='upper left')
       xlim((-1,b1[-1]-1))
       ylabel(src+'->EML weights')
-      subplot(2,1,2)
+      xlabel('Time (ms)')
+      subplot(1,10,10)
+      imshow(np.transpose(np.array(postNeuronIDs[src+'->EML'])),aspect = 'auto',cmap='dark2', interpolation='None')
+      #subplot(2,1,2)
+      figure()
+      subplot(1,10,1)
+      imshow(np.transpose(np.array(preNeuronIDs[src+'->EMR'])),aspect = 'auto',cmap='dark2', interpolation='None')
+      subplot(1,10,[2,3,4,5,6,7,8,9])
       imshow(np.transpose(np.array(allweights[src+'->EMR'])),aspect = 'auto',cmap='hot', interpolation='None') 
       b2 = gca().get_xticks()
       gca().set_xticks(b2-1)
       gca().set_xticklabels((100*b2).astype(int))
-      colorbar(orientation='vertical',fraction=0.05)
+      colorbar(orientation='vertical',fraction=0.01)
       #legend((src+'->EMR'),loc='upper left')       
       xlim((-1,b2[-1]-1))
       ylabel(src+'->EMR weights') 
       xlabel('Time (ms)')
+      subplot(1,10,10)
+      imshow(np.transpose(np.array(postNeuronIDs[src+'->EMR'])),aspect = 'auto',cmap='dark2', interpolation='None')
 
 if __name__ == '__main__':
   stepNB = int(sys.argv[1]) #which file(stepNB) want to plot
