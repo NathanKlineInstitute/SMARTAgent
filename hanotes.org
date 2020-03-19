@@ -1016,6 +1016,27 @@ STDPparamsRL = {'hebbwt': 0.0000, 'antiwt':-0.0000, 'wbase': 0.0012, 'wmax': 50,
 **create separate figures for each pair of areas e.g. V1 to ML and MR, V4 to ML and MR and IT to ML and MR.
 **plot as images
 
+*20mar18
+**still not happy with plotting synaptic weights.... difficult to analyze and learn about the learning and dynamics of synapses.
+**will leave it for now and start including more synaptic time constants in the model i.e. via including different types of synapses between every pair of neurons connected.
+
+*20mar19
+**Using a bit different time constants for NMDA netParams.synMechParams['NMDA'] = {'mod': 'Exp2Syn', 'tau1': 0.15, 'tau2': 166.0, 'e': 0} # NMDA.... arm model had .. netParams.synMechParams['NMDA'] = {'mod': 'Exp2Syn', 'tau1': 0.15, 'tau2': 1.5, 'e': 0} # NMDA
+
+**Based on this paper : Functional Properties of AMPA and NMDA Receptors Expressed in Identified Types of Basal Ganglia Neurons
+Thomas Götz, Udo Kraushaar, Jörg Geiger, Joachim Lübke, Thomas Berger and Peter Jonas
+Journal of Neuroscience 1 January 1997, 17 (1) 204-215; DOI: https://doi.org/10.1523/JNEUROSCI.17-01-00204.1997
+***AMPARs in striatal principal neurons exhibited sloest gating (desnsitization time constant of 11.5 msec, 1 mM glutamate, 22C), whereas those in striatal cholinergic interneurons showed the fastest gating (desensitization time constant of 3.6 msec).
+***The lowest permeability of AMPARs was observed in nigral dopaminergic neurons (PCa/PNa = 0.1), where as the highest Ca2+ permeability was found in subthalamic nucleus neurons (PCa/PNa = 1.17).
+***NMDARs of different types of basal ganglia neurons were less variable in their functional properties; those expressed in nigral dopaminergic neurons exhibited the slowest gating (deactivation time constant of predominant fast component was 150 msec, 100uM glutamate) and those of globus pallidus neurons showed fastest gating (deactivation of 67 msec).
+**deactivation time constant of AMPARs is in range of 1-3 ms.
+**desensitization(inactivation) time constant of AMPARs is in range of 3-12 ms.
+***deactivation of NMDARs has multiple time constants. The fastes time constant is ~166 ms (64% of recordings) and the second fastest time constant is ~1158 msec (36%).
+
+**another paper  "Cell Type-Specific Development of NMDA Receptors in the Interneurons of Rat Prefrontal Cortex" -- might be useful from developmental perspective.
+
+**Added NMDA synapses to long range connections between Visual areas and motor areas.
+
 
 
 

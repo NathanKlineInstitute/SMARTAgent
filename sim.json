@@ -6,7 +6,7 @@
     "rewardcodes": {"scorePoint": 0, "losePoint": -0, "followBall": 0.004, "avoidBall": -0.001, "hitBall": 0.1},
     "verbose": 0,
     "simtype": {"ResumeSim":0,"ResumeSimFromFile":"20mar5_G0_simConfig.pkl"},        
-    "sim": {"duration": 2000, "dt": 0.2, "verbose": 0, "recordStep":0.2,"recordWeightStepSize":1,"RLFakeUpRule": 0,"RLFakeDownRule": 0,"RLFakeStayRule": 0,"name":"20mar13_TG0_","doquit":0,"doplot":1},
+    "sim": {"duration": 2000, "dt": 0.2, "verbose": 0, "recordStep":0.2,"recordWeightStepSize":1,"RLFakeUpRule": 0,"RLFakeDownRule": 0,"RLFakeStayRule": 0,"name":"20mar19_TG0_","doquit":0,"doplot":1},
     "net":{"scale":1,"ER":400,"IR":100,"EV1":400,"IV1":100,"EV4":100,"IV4":25,"EIT":25,"IIT":9,"EML":100,"EMR":100,"IM":50}
 }
 

@@ -57,6 +57,7 @@ netParams.cellParams['FS_BasketCell_rule']['secs']['soma']['threshold'] = -10.0
 
 ## Synaptic mechanism parameters
 netParams.synMechParams['AMPA'] = {'mod': 'Exp2Syn', 'tau1': 0.05, 'tau2': 5.3, 'e': 0}  # excitatory synaptic mechanism
+netParams.synMechParams['NMDA'] = {'mod': 'Exp2Syn', 'tau1': 0.15, 'tau2': 166.0, 'e': 0} # NMDA
 netParams.synMechParams['GABA'] = {'mod': 'Exp2Syn', 'tau1': 0.07, 'tau2': 9.1, 'e': -80}  # inhibitory synaptic mechanism
 
 #wmin should be set to the initial/baseline weight of the connection.
@@ -317,7 +318,7 @@ netParams.connParams['EMR->EMR'] = {
         'weight': 0.000 * cfg.EEGain, #0.0001
         'delay': 2,
         'synMech': 'AMPA', 'sec':'dend', 'loc':0.5}
-#E to I
+#E to I within area
 netParams.connParams['ER->IR'] = {
         'preConds': {'pop': 'ER'},
         'postConds': {'pop': 'IR'},
@@ -364,7 +365,7 @@ netParams.connParams['EMR->IM'] = {
         'synMech': 'AMPA', 'sec':'soma', 'loc':0.5}
 
 #Local inhibition
-#I to E
+#I to E within area
 netParams.connParams['IR->ER'] = {
         'preConds': {'pop': 'IR'},
         'postConds': {'pop': 'ER'},
@@ -445,7 +446,7 @@ netParams.connParams['IM->IM'] = {
         'synMech': 'GABA' ,'sec':'soma', 'loc':0.5}
 
 
-#E to E feedforward connections
+#E to E feedforward connections - AMPA
 netParams.connParams['ER->EV1'] = {
         'preConds': {'pop': 'ER'},
         'postConds': {'pop': 'EV1'},
@@ -588,6 +589,7 @@ netParams.connParams['IV4->IIT'] = {
 
 #Add direct connections from lower and higher visual areas to motor cortex
 #Still no idea, how these connections should look like...just trying some numbers: 400 to 25 means convergence factor of 16
+#AMPA
 netParams.connParams['EV1->EMR'] = {
         'preConds': {'pop': 'EV1'},
         'postConds': {'pop': 'EMR'},
@@ -623,6 +625,44 @@ netParams.connParams['EV4->EML'] = {
         'weight': 0.0025 * cfg.EEGain,
         'delay': 2,
         'synMech': 'AMPA',
+        'plast': {'mech': 'STDP', 'params': STDPparamsRL},'sec':'dend', 'loc':0.5}
+
+#NMDA
+netParams.connParams['EV1N->EMRN'] = {
+        'preConds': {'pop': 'EV1'},
+        'postConds': {'pop': 'EMR'},
+        #'connList': blistMItoMO,
+        'convergence': 16,
+        'weight': 0.0025 * cfg.EEGain,
+        'delay': 2,
+        'synMech': 'NMDA',
+        'plast': {'mech': 'STDP', 'params': STDPparamsRL},'sec':'dend', 'loc':0.5}
+netParams.connParams['EV1N->EMLN'] = {
+        'preConds': {'pop': 'EV1'},
+        'postConds': {'pop': 'EML'},
+        #'connList': blistMItoMO,
+        'convergence': 16,
+        'weight': 0.0025 * cfg.EEGain,
+        'delay': 2,
+        'synMech': 'NMDA',
+        'plast': {'mech': 'STDP', 'params': STDPparamsRL},'sec':'dend', 'loc':0.5}
+netParams.connParams['EV4N->EMRN'] = {
+        'preConds': {'pop': 'EV4'},
+        'postConds': {'pop': 'EMR'},
+        #'connList': blistMItoMO,
+        'convergence': 16,
+        'weight': 0.0025 * cfg.EEGain,
+        'delay': 2,
+        'synMech': 'NMDA',
+        'plast': {'mech': 'STDP', 'params': STDPparamsRL},'sec':'dend', 'loc':0.5}
+netParams.connParams['EV4N->EMLN'] = {
+        'preConds': {'pop': 'EV4'},
+        'postConds': {'pop': 'EML'},
+        #'connList': blistMItoMO,
+        'convergence': 16,
+        'weight': 0.0025 * cfg.EEGain,
+        'delay': 2,
+        'synMech': 'NMDA',
         'plast': {'mech': 'STDP', 'params': STDPparamsRL},'sec':'dend', 'loc':0.5}
 
 ###################################################################################################################################
