@@ -243,7 +243,8 @@ def plotSynWeightsPostNeuronID(pdf,postNeuronID):
   plot(actreward.time,actreward.reward,'k',linewidth=4)
   plot(actreward.time,actreward.reward,'ko',markersize=10)  
   xlim((0,simConfig['simConfig']['duration']))
-  ylim((-1.1,1.1))
+  #ylim((-1.1,1.1))
+  ylim((min(actreward.reward),max(actreward.reward)))
   ylabel('critic')
   title('weights of all connections for a post-synaptic neuron')
   pdx = 2    
@@ -278,7 +279,7 @@ def plotSynWeightsPostNeuronID(pdf,postNeuronID):
       subplot(4,1,pdx)
       plot(utimes,np.array(MLweights[src]),'r-o',linewidth=3,markersize=5)
       plot(utimes,np.array(MRweights[src]),'b-o',linewidth=3,markersize=5)
-      legend((src+'->EML'),(src+'->EMR'),loc='upper left')
+      legend((src+'->EML',src+'->EMR'),loc='upper left')
       xlim((0,simConfig['simConfig']['duration']))
       pdx += 1
   
@@ -293,4 +294,8 @@ if __name__ == '__main__':
   #wperPostID = plotavgweightsPerPostSynNeuron1(pdf)
   #plotavgweightsPerPostSynNeuron2(pdf)
   #plotIndividualSynWeights(pdf)
-  plotSynWeightsPostNeuronID(pdf,10)
+  plotSynWeightsPostNeuronID(pdf,5)
+  plotSynWeightsPostNeuronID(pdf,15)
+  plotSynWeightsPostNeuronID(pdf,25)
+  plotSynWeightsPostNeuronID(pdf,35)
+  plotSynWeightsPostNeuronID(pdf,45)

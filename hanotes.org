@@ -1037,7 +1037,7 @@ Journal of Neuroscience 1 January 1997, 17 (1) 204-215; DOI: https://doi.org/10.
 
 **Added NMDA synapses to long range connections between Visual areas and motor areas.
 **plot weights for a single postsynaptic neuron.---> testing
-
+**test plotting weights for a single post synaptic neuron for 5 different neurons.
 
 
 

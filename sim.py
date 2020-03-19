@@ -633,7 +633,7 @@ netParams.connParams['EV1N->EMRN'] = {
         'postConds': {'pop': 'EMR'},
         #'connList': blistMItoMO,
         'convergence': 16,
-        'weight': 0.0025 * cfg.EEGain,
+        'weight': 0.002 * cfg.EEGain,
         'delay': 2,
         'synMech': 'NMDA',
         'plast': {'mech': 'STDP', 'params': STDPparamsRL},'sec':'dend', 'loc':0.5}
@@ -642,7 +642,7 @@ netParams.connParams['EV1N->EMLN'] = {
         'postConds': {'pop': 'EML'},
         #'connList': blistMItoMO,
         'convergence': 16,
-        'weight': 0.0025 * cfg.EEGain,
+        'weight': 0.002 * cfg.EEGain,
         'delay': 2,
         'synMech': 'NMDA',
         'plast': {'mech': 'STDP', 'params': STDPparamsRL},'sec':'dend', 'loc':0.5}
@@ -651,7 +651,7 @@ netParams.connParams['EV4N->EMRN'] = {
         'postConds': {'pop': 'EMR'},
         #'connList': blistMItoMO,
         'convergence': 16,
-        'weight': 0.0025 * cfg.EEGain,
+        'weight': 0.002 * cfg.EEGain,
         'delay': 2,
         'synMech': 'NMDA',
         'plast': {'mech': 'STDP', 'params': STDPparamsRL},'sec':'dend', 'loc':0.5}
@@ -660,7 +660,7 @@ netParams.connParams['EV4N->EMLN'] = {
         'postConds': {'pop': 'EML'},
         #'connList': blistMItoMO,
         'convergence': 16,
-        'weight': 0.0025 * cfg.EEGain,
+        'weight': 0.002 * cfg.EEGain,
         'delay': 2,
         'synMech': 'NMDA',
         'plast': {'mech': 'STDP', 'params': STDPparamsRL},'sec':'dend', 'loc':0.5}
