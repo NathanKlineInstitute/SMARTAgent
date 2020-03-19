@@ -218,12 +218,78 @@ def plotIndividualSynWeights(pdf):
       subplot(position=[0.98,0.1,0.01,0.8])
       imshow(np.transpose(np.array(postNeuronIDs[src+'->EMR'])),aspect = 'auto',cmap=c1, interpolation='None')
 
+def plotSynWeightsPostNeuronID(pdf,postNeuronID):
+  utimes = np.unique(pdf.time)
+  #for a postID, find a neuron in ML and a neuron in MR
+  pdfs_ML = pdf[(pdf.time==utimes[0]) & (pdf.postid>=dstartidx['EML']) & (pdf.postid<=dendidx['EML'])]
+  uIDs_ML = np.unique(pdfs_ML.postid)
+  pdfs_MR = pdf[(pdf.time==utimes[0]) & (pdf.postid>=dstartidx['EMR']) & (pdf.postid<=dendidx['EMR'])]
+  uIDs_MR = np.unique(pdfs_MR.postid)
+  targetML_postID = uIDs_ML[0]-1+postNeuronID
+  targetMR_postID = uIDs_MR[0]-1+postNeuronID
+
+  NBpreN_ML = len(np.unique(pdfs_ML.preID))
+  NBpreN_MR = len(np.unique(pdfs_MR.preID)) 
+  #for every postsynaptic neuron, find total weight of synaptic inputs per area (i.e. synaptic inputs from EV1, EV4 and EIT and treated separately for each cell——if there are 200 unique cells, will get 600 weights as 200 from each originating layer)
+  MLweights = {}
+  MRweights = {}
+
+  preNeuronIDs = {}
+  
+  #for each of those neurons, find presynaptic neuron IDs and the strengths
+  #gdx = 2
+  figure()
+  subplot(4,1,1)
+  plot(actreward.time,actreward.reward,'k',linewidth=4)
+  plot(actreward.time,actreward.reward,'ko',markersize=10)  
+  xlim((0,simConfig['simConfig']['duration']))
+  ylim((-1.1,1.1))
+  ylabel('critic')
+  title('weights of all connections for a post-synaptic neuron')
+  pdx = 2    
+  for src in ['EV1', 'EV4', 'EIT']:
+      MLweights[src] = arrL = []
+      MRweights[src] = arrR = []
+      MLpreNeuronIDs[src] = arrL2 = []
+      MRpreNeuronIDs[src] = arrR2 = []
+      tstep = 0
+      for t in utimes:
+          arrL.append([])
+          arrR.append([])
+          arrL2.append([])
+          arrR2.append([])
+          pdfsL = pdf[(pdf.time==t) & (pdf.postid==targetML_postID) & (pdf.preid>=dstartidx[src]) & (pdf.preid<=dendidx['EML'])]
+          pdfsR = pdf[(pdf.time==t) & (pdf.postid==targetMR_postID) & (pdf.preid>=dstartidx[src]) & (pdf.preid<=dendidx['EMR'])]
+          upreLCells = np.unique(pdfsL.preid)
+          upreRCells = np.unique(pdfsR.preid)
+          for preID in upreLCells:
+              pdfs1 = pdfsL[(pdfsL.preid==preID)]
+              p1 = np.array(pdfs1.weight) #may have more than 1 weight---as two cells may have both AMPA and NMDA syns
+              for w in p1:
+                  arrL[tstep].append(w)
+                  arrL2[tstep].append(preID)
+          for preID in upreRCells:
+              pdfs2 = pdfsR[(pdfsR.preid==preID)]
+              p2 = np.array(pdfs2.weight) #may have more than 1 weight---as two cells may have both AMPA and NMDA syns
+              for w in p2:
+                  arrR[tstep].append(w)
+                  arrR2[tstep].append(preID)
+          tstep += 1
+      subplot(4,1,pdx)
+      plot(utimes,np.array(MLweights[src]),'r-o',linewidth=3,markersize=5)
+      plot(utimes,np.array(MRweights[src]),'b-o',linewidth=3,markersize=5)
+      legend((src+'->EML'),(src+'->EMR'),loc='upper left')
+      xlim((0,simConfig['simConfig']['duration']))
+  
+      
+
 if __name__ == '__main__':
   stepNB = int(sys.argv[1]) #which file(stepNB) want to plot
   if stepNB is None: stepNB = -1
   print(stepNB)
   simConfig, pdf, actreward, dstartidx, dendidx = loadsimdat()
   davgw = plotavgweights(pdf)
-  wperPostID = plotavgweightsPerPostSynNeuron1(pdf)
-  plotavgweightsPerPostSynNeuron2(pdf)
-  plotIndividualSynWeights(pdf)
+  #wperPostID = plotavgweightsPerPostSynNeuron1(pdf)
+  #plotavgweightsPerPostSynNeuron2(pdf)
+  #plotIndividualSynWeights(pdf)
+  plotSynWeightsPostNeuronID(pdf,10)
