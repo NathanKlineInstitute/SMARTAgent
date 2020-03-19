@@ -233,8 +233,8 @@ def plotSynWeightsPostNeuronID(pdf,postNeuronID):
   #for every postsynaptic neuron, find total weight of synaptic inputs per area (i.e. synaptic inputs from EV1, EV4 and EIT and treated separately for each cell——if there are 200 unique cells, will get 600 weights as 200 from each originating layer)
   MLweights = {}
   MRweights = {}
-
-  preNeuronIDs = {}
+  MLpreNeuronIDs = {}
+  MRpreNeuronIDs = {}
   
   #for each of those neurons, find presynaptic neuron IDs and the strengths
   #gdx = 2
