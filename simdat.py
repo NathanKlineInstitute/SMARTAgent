@@ -280,6 +280,7 @@ def plotSynWeightsPostNeuronID(pdf,postNeuronID):
       plot(utimes,np.array(MRweights[src]),'b-o',linewidth=3,markersize=5)
       legend((src+'->EML'),(src+'->EMR'),loc='upper left')
       xlim((0,simConfig['simConfig']['duration']))
+      pdx += 1
   
       
 
