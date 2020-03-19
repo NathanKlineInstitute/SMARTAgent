@@ -225,11 +225,11 @@ def plotSynWeightsPostNeuronID(pdf,postNeuronID):
   uIDs_ML = np.unique(pdfs_ML.postid)
   pdfs_MR = pdf[(pdf.time==utimes[0]) & (pdf.postid>=dstartidx['EMR']) & (pdf.postid<=dendidx['EMR'])]
   uIDs_MR = np.unique(pdfs_MR.postid)
-  targetML_postID = uIDs_ML[0]-1+postNeuronID
-  targetMR_postID = uIDs_MR[0]-1+postNeuronID
+  targetML_postID = min(uIDs_ML)-1+postNeuronID
+  targetMR_postID = min(uIDs_MR)-1+postNeuronID
 
-  NBpreN_ML = len(np.unique(pdfs_ML.preID))
-  NBpreN_MR = len(np.unique(pdfs_MR.preID)) 
+  NBpreN_ML = len(np.unique(pdfs_ML.preid))
+  NBpreN_MR = len(np.unique(pdfs_MR.preid)) 
   #for every postsynaptic neuron, find total weight of synaptic inputs per area (i.e. synaptic inputs from EV1, EV4 and EIT and treated separately for each cell——if there are 200 unique cells, will get 600 weights as 200 from each originating layer)
   MLweights = {}
   MRweights = {}
