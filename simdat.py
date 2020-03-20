@@ -20,7 +20,7 @@ def readinweights (d):
     dsyn = ddsyn[rank]
     for lsyn in dsyn:
       A.append(lsyn)
-  return pd.DataFrame(A,columns=['time','stdptype','preid','postid','weight'])
+  return pd.DataFrame(A,columns=['time','stdptype','preid','postid','weight','syntype'])
 
 def loadsimdat (name=None):
   # load simulation data

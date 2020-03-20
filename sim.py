@@ -677,7 +677,7 @@ def recordAdjustableWeightsPop (sim, t, popname):
         for conn in cell.conns:
             if 'hSTDP' in conn:
                 #print(conn.preGid, cell.gid, conn.synMech) #testing weight saving
-                sim.simData['synweights'][sim.rank].append([t,conn.plast.params.RLon,conn.preGid,cell.gid,float(conn['hObj'].weight[0])], conn.synMech)
+                sim.simData['synweights'][sim.rank].append([t,conn.plast.params.RLon,conn.preGid,cell.gid,float(conn['hObj'].weight[0]),conn.synMech])
     return len(lcell)
                     
 def recordAdjustableWeights (sim, t, lpop = ['EMR', 'EML']):
