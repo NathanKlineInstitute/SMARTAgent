@@ -1044,8 +1044,13 @@ Journal of Neuroscience 1 January 1997, 17 (1) 204-215; DOI: https://doi.org/10.
 **Record synMech with weights.
 
 *20mar23
-**plot weights of synaptic connections for only 10% of postsynaptic neurons.
-
+**plot weights of synaptic connections for only 10% of postsynaptic neurons. --->still not very informative.
+**synaptic strengths evolve very similarly.
+***May be need to reconsider: what is the purpose of using 2 different types of synapses between two neurons at the same location. since both synapses share same pre and postsynaptic activity, and same RL mechanism, they evolve with same dynamics. We didn't include those 2 types of synapses to behave same. our goal was to introduce multiple time scales in the model. 
+**Other options to introduce multiple time scales:
+1. use different RL rule AMPA (shorter eligibility) vs NMDA (longer eligibility):
+STDPparamsRL1 with 'RLlenhebb': 50 ,'RLlenanti': 50 and 'useRLexp': 1
+STDPparamsRL2 with 'RLlenhebb': 800 ,'RLlenanti': 100 and 'useRLexp': 0
 
 
 

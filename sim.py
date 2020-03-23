@@ -64,7 +64,11 @@ netParams.synMechParams['GABA'] = {'mod': 'Exp2Syn', 'tau1': 0.07, 'tau2': 9.1, 
 STDPparams = {'hebbwt': 0.0001, 'antiwt':-0.00001, 'wbase': 0.0012, 'wmax': 50, 'RLon': 0 , 'RLhebbwt': 0.001, 'RLantiwt': -0.000,
         'tauhebb': 10, 'RLwindhebb': 50, 'useRLexp': 0, 'softthresh': 0, 'verbose':0}
 
-STDPparamsRL = {'hebbwt': 0.0000, 'antiwt':-0.0000, 'wbase': 0.0005, 'wmax': 1, 'RLon': 1 , 'RLhebbwt': 0.001 , 'RLantiwt': -0.000,
+#For AMPA-faster synapses
+STDPparamsRL1 = {'hebbwt': 0.0000, 'antiwt':-0.0000, 'wbase': 0.0005, 'wmax': 1, 'RLon': 1 , 'RLhebbwt': 0.001 , 'RLantiwt': -0.000,
+                'tauhebb': 10, 'RLlenhebb': 50 ,'RLlenanti': 50, 'RLwindhebb': 50, 'useRLexp': 1, 'softthresh': 0, 'verbose':0}
+#for NMDA (slower) synapses
+STDPparamsRL2 = {'hebbwt': 0.0000, 'antiwt':-0.0000, 'wbase': 0.0005, 'wmax': 1, 'RLon': 1 , 'RLhebbwt': 0.001 , 'RLantiwt': -0.000,
                 'tauhebb': 10, 'RLlenhebb': 800 ,'RLlenanti': 100, 'RLwindhebb': 50, 'useRLexp': 0, 'softthresh': 0, 'verbose':0}
 
 # these are the image-based inputs provided to the R (retinal) cells
@@ -478,7 +482,7 @@ netParams.connParams['EIT->EML'] = {
         'weight': 0.0025 * cfg.EEGain,
         'delay': 2,
         'synMech': 'AMPA',
-        'plast': {'mech': 'STDP', 'params': STDPparamsRL},'sec':'dend', 'loc':0.5}
+        'plast': {'mech': 'STDP', 'params': STDPparamsRL1},'sec':'dend', 'loc':0.5}
 netParams.connParams['EIT->EMR'] = {
         'preConds': {'pop': 'EIT'},
         'postConds': {'pop': 'EMR'},
@@ -487,7 +491,7 @@ netParams.connParams['EIT->EMR'] = {
         'weight': 0.0025 * cfg.EEGain,
         'delay': 2,
         'synMech': 'AMPA',
-        'plast': {'mech': 'STDP', 'params': STDPparamsRL},'sec':'dend', 'loc':0.5}
+        'plast': {'mech': 'STDP', 'params': STDPparamsRL1},'sec':'dend', 'loc':0.5}
 
 #E to I feedforward connections
 netParams.connParams['ER->IV1'] = {
@@ -598,7 +602,7 @@ netParams.connParams['EV1->EMR'] = {
         'weight': 0.0025 * cfg.EEGain,
         'delay': 2,
         'synMech': 'AMPA',
-        'plast': {'mech': 'STDP', 'params': STDPparamsRL},'sec':'dend', 'loc':0.5}
+        'plast': {'mech': 'STDP', 'params': STDPparamsRL1},'sec':'dend', 'loc':0.5}
 netParams.connParams['EV1->EML'] = {
         'preConds': {'pop': 'EV1'},
         'postConds': {'pop': 'EML'},
@@ -607,7 +611,7 @@ netParams.connParams['EV1->EML'] = {
         'weight': 0.0025 * cfg.EEGain,
         'delay': 2,
         'synMech': 'AMPA',
-        'plast': {'mech': 'STDP', 'params': STDPparamsRL},'sec':'dend', 'loc':0.5}
+        'plast': {'mech': 'STDP', 'params': STDPparamsRL1},'sec':'dend', 'loc':0.5}
 netParams.connParams['EV4->EMR'] = {
         'preConds': {'pop': 'EV4'},
         'postConds': {'pop': 'EMR'},
@@ -616,7 +620,7 @@ netParams.connParams['EV4->EMR'] = {
         'weight': 0.0025 * cfg.EEGain,
         'delay': 2,
         'synMech': 'AMPA',
-        'plast': {'mech': 'STDP', 'params': STDPparamsRL},'sec':'dend', 'loc':0.5}
+        'plast': {'mech': 'STDP', 'params': STDPparamsRL1},'sec':'dend', 'loc':0.5}
 netParams.connParams['EV4->EML'] = {
         'preConds': {'pop': 'EV4'},
         'postConds': {'pop': 'EML'},
@@ -625,7 +629,7 @@ netParams.connParams['EV4->EML'] = {
         'weight': 0.0025 * cfg.EEGain,
         'delay': 2,
         'synMech': 'AMPA',
-        'plast': {'mech': 'STDP', 'params': STDPparamsRL},'sec':'dend', 'loc':0.5}
+        'plast': {'mech': 'STDP', 'params': STDPparamsRL1},'sec':'dend', 'loc':0.5}
 
 #NMDA
 netParams.connParams['EV1N->EMRN'] = {
@@ -636,7 +640,7 @@ netParams.connParams['EV1N->EMRN'] = {
         'weight': 0.002 * cfg.EEGain,
         'delay': 2,
         'synMech': 'NMDA',
-        'plast': {'mech': 'STDP', 'params': STDPparamsRL},'sec':'dend', 'loc':0.5}
+        'plast': {'mech': 'STDP', 'params': STDPparamsRL2},'sec':'dend', 'loc':0.5}
 netParams.connParams['EV1N->EMLN'] = {
         'preConds': {'pop': 'EV1'},
         'postConds': {'pop': 'EML'},
@@ -645,7 +649,7 @@ netParams.connParams['EV1N->EMLN'] = {
         'weight': 0.002 * cfg.EEGain,
         'delay': 2,
         'synMech': 'NMDA',
-        'plast': {'mech': 'STDP', 'params': STDPparamsRL},'sec':'dend', 'loc':0.5}
+        'plast': {'mech': 'STDP', 'params': STDPparamsRL2},'sec':'dend', 'loc':0.5}
 netParams.connParams['EV4N->EMRN'] = {
         'preConds': {'pop': 'EV4'},
         'postConds': {'pop': 'EMR'},
@@ -654,7 +658,7 @@ netParams.connParams['EV4N->EMRN'] = {
         'weight': 0.002 * cfg.EEGain,
         'delay': 2,
         'synMech': 'NMDA',
-        'plast': {'mech': 'STDP', 'params': STDPparamsRL},'sec':'dend', 'loc':0.5}
+        'plast': {'mech': 'STDP', 'params': STDPparamsRL2},'sec':'dend', 'loc':0.5}
 netParams.connParams['EV4N->EMLN'] = {
         'preConds': {'pop': 'EV4'},
         'postConds': {'pop': 'EML'},
@@ -663,7 +667,7 @@ netParams.connParams['EV4N->EMLN'] = {
         'weight': 0.002 * cfg.EEGain,
         'delay': 2,
         'synMech': 'NMDA',
-        'plast': {'mech': 'STDP', 'params': STDPparamsRL},'sec':'dend', 'loc':0.5}
+        'plast': {'mech': 'STDP', 'params': STDPparamsRL2},'sec':'dend', 'loc':0.5}
 
 ###################################################################################################################################
 
