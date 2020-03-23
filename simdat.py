@@ -175,7 +175,7 @@ def plotIndividualSynWeights(pdf):
               arr3.append([])
               pdfs = pdf[(pdf.time==t) & (pdf.postid>=dstartidx[trg]) & (pdf.postid<=dendidx[trg]) & (pdf.preid>=dstartidx[src]) & (pdf.preid<=dendidx[trg])]
               uniqueCells = np.unique(pdfs.postid)
-              for cell in np.random.choice(uniqueCells,(0.1*len(uniqueCells)).astype(int)):
+              for cell in np.random.choice(uniqueCells,int([0.1*len(uniqueCells)])):
                   pdfs1 = pdfs[(pdfs.postid==cell)]
                   p1 = np.array(pdfs1.weight)
                   preIDs1 = np.array(pdfs1.preid) #ID of pre synaptic neuron
