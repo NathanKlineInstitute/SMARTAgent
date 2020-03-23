@@ -1043,6 +1043,8 @@ Journal of Neuroscience 1 January 1997, 17 (1) 204-215; DOI: https://doi.org/10.
 **Problem plotting 'AMPA' and 'NMDA' weights for a pair of neurons. -->probably problem saving weights....test using print
 **Record synMech with weights.
 
+*20mar23
+**plot weights of synaptic connections for only 10% of postsynaptic neurons.
 
 
 

@@ -147,6 +147,7 @@ def plotavgweightsPerPostSynNeuron2(pdf):
       xlabel('Time (ms)')
   
 def plotIndividualSynWeights(pdf):
+  #plot 10% randomly selected connections
   utimes = np.unique(pdf.time)
   #for every postsynaptic neuron, find total weight of synaptic inputs per area (i.e. synaptic inputs from EV1, EV4 and EIT and treated separately for each cell——if there are 200 unique cells, will get 600 weights as 200 from each originating layer)
   allweights = {}
@@ -174,7 +175,7 @@ def plotIndividualSynWeights(pdf):
               arr3.append([])
               pdfs = pdf[(pdf.time==t) & (pdf.postid>=dstartidx[trg]) & (pdf.postid<=dendidx[trg]) & (pdf.preid>=dstartidx[src]) & (pdf.preid<=dendidx[trg])]
               uniqueCells = np.unique(pdfs.postid)
-              for cell in uniqueCells:
+              for cell in np.random.choice(uniqueCells,(0.1*len(uniqueCells)).astype(int)):
                   pdfs1 = pdfs[(pdfs.postid==cell)]
                   p1 = np.array(pdfs1.weight)
                   preIDs1 = np.array(pdfs1.preid) #ID of pre synaptic neuron
@@ -293,7 +294,7 @@ if __name__ == '__main__':
   davgw = plotavgweights(pdf)
   #wperPostID = plotavgweightsPerPostSynNeuron1(pdf)
   #plotavgweightsPerPostSynNeuron2(pdf)
-  #plotIndividualSynWeights(pdf)
+  plotIndividualSynWeights(pdf)
   plotSynWeightsPostNeuronID(pdf,5)
   plotSynWeightsPostNeuronID(pdf,15)
   plotSynWeightsPostNeuronID(pdf,25)
