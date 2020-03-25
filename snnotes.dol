@@ -892,3 +892,37 @@ can try:
 "rewardcodes": {"scorePoint": 1, "losePoint": -1, "followBall": 0.5, "avoidBall": -0.001, "hitBall": 0.75},
 
 myrun 16
+
+*20mar25
+** zlib error
+
+cd ~/SM*
+py3env
+myrun 16
+
+ImportError: /lib/x86_64-linux-gnu/libz.so.1: version `ZLIB_1.2.9' not found (required by
+/usr/site/nrniv/local/python/anaconda3/envs/py36/lib/python3.6/site-packages/matplotlib/../../.././libpng16.so.16)
+
+https://stackoverflow.com/questions/48306849/lib-x86-64-linux-gnu-libz-so-1-version-zlib-1-2-9-not-found
+
+fix?
+
+download:
+https://sourceforge.net/projects/libpng/files/zlib/1.2.9/zlib-1.2.9.tar.gz/download
+
+then:
+cd ~/Downloads
+tar -xvf ~/Downloads/zlib-1.2.9.tar.gz
+cd zlib-1.2.9
+sudo -s
+./configure; make; make install
+cd /lib/x86_64-linux-gnu
+ln -s -f /usr/local/lib/libz.so.1.2.9/lib libz.so.1
+cd ~/Downloads
+rm -rf zlib-1.2.9
+
+cd ~/SM*
+myrun 16
+
+ok, runs now without an error ...
+
