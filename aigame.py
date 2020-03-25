@@ -41,7 +41,10 @@ class AIGame:
         self.countAll = 0
         self.fvec = h.Vector()
         self.firing_rates = np.zeros(dconf['net']['ER'])  # image-based input firing rates; 20x20 = 400 pixels
-        self.directions = np.zeros(int(0.25*(dconf['net']['ER']))) #assuming i will use this architecture...compute directions using 9 pixels for every other pixel 
+        self.directionsR = np.zeros(int(0.25*(dconf['net']['ER']))) #assuming i will use this architecture...compute directions using 9 pixels for every other pixel 
+        self.directionsL = np.zeros(int(0.25*(dconf['net']['ER']))) #assuming i will use this architecture...compute directions using 9 pixels for every other pixel 
+        self.directionsUp = np.zeros(int(0.25*(dconf['net']['ER']))) #assuming i will use this architecture...compute directions using 9 pixels for every other pixel 
+        self.directionsDown = np.zeros(int(0.25*(dconf['net']['ER']))) #assuming i will use this architecture...compute directions using 9 pixels for every other pixel 
         self.intaction = 5 # integrate this many actions together before returning reward information to model
     ################################
     ### PLAY GAME
@@ -54,6 +57,10 @@ class AIGame:
         input_dim = np.sqrt(dconf['net']['ER'])
         dirSensitiveNeurons_dim = int(0.5*input_dim)
         dirSensitiveNeurons = np.zeros(shape=(dirSensitiveNeurons_dim,dirSensitiveNeurons_dim))
+        dirR = np.zeros(shape=(dirSensitiveNeurons_dim,dirSensitiveNeurons_dim))
+        dirL = np.zeros(shape=(dirSensitiveNeurons_dim,dirSensitiveNeurons_dim))
+        dirU = np.zeros(shape=(dirSensitiveNeurons_dim,dirSensitiveNeurons_dim))
+        dirD = np.zeros(shape=(dirSensitiveNeurons_dim,dirSensitiveNeurons_dim))
         dsum_Images = np.zeros(shape=(input_dim,input_dim)) #previously we merged 2x2 pixels into 1 value. Now we merge 8x8 pixels into 1 value. so the original 160x160 pixels will result into 20x20 values instead of previously used 80x80.
         #print(actions)
         gray_Image = np.zeros(shape=(160,160))
@@ -206,6 +213,18 @@ class AIGame:
                 if dir1[0]<0:
                     theta = theta+180 
                 dirSensitiveNeurons[dSNeuron_x,dSNeuron_y] = theta
+        Rinds = np.where((dirSensitiveNeurons>314) and (dirSensitiveNeurons<46))
+        Linds = np.where((dirSensitiveNeurons>134) and (dirSensitiveNeurons<226))
+        Upinds = np.where((dirSensitiveNeurons>44) and (dirSensitiveNeurons<136))
+        Downinds = np.where((dirSensitiveNeurons>224) and (dirSensitiveNeurons<316))
+        dirR[Rinds] = 10 #10Hz firing rate---later should be used as a parameter with some noise.
+        dirL[Linds] = 10
+        dirU[Uinds] = 10
+        dirD[Dinds] = 10 
+        self.directionsR = np.reshape(dirR,100)
+        self.directionsL = np.reshape(dirL,100)
+        self.directionsUp = np.reshape(dirU,100)
+        self.directionsDown = np.reshape(dirD,100)
         InputImages.append(dsum_Images)
         #fr_Images = np.where(dsum_Images>1.0,100,dsum_Images) #Using this to check what number would work for firing rate
         #fr_Images = np.where(dsum_Images<10.0,0,dsum_Images)
