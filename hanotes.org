@@ -1052,6 +1052,19 @@ Journal of Neuroscience 1 January 1997, 17 (1) 204-215; DOI: https://doi.org/10.
 STDPparamsRL1 with 'RLlenhebb': 50 ,'RLlenanti': 50 and 'useRLexp': 1
 STDPparamsRL2 with 'RLlenhebb': 800 ,'RLlenanti': 100 and 'useRLexp': 0
 
+*20mar24
+**retina has direction selective neurons.
+**V1 has direction selective neurons.
+**V1 direction selective neurons' functionality doesn't completely depend on retinal direction selective neurons. (Morrie and Feller 2017, Current Biology) 
+**should change IT to MT as that is the part of dorsal pathway (Retina-dLGN-V1-V2-MT).
+**Probably, V2 also has direction selective neurons but didnt find any paper about that yet.
+**MT also has direction selective neurons.
+**Include direstion selective neurons in all areas. Start with R and V1.
+
+*20mar25
+**create layers of direction selective neurons for V1. (Use information of R for direction selective neurons in V1).
+**computing direction of object motion in 3x3 block for visual input.
+***if input is 20x20, direction sensitive neurons are 10x10. each direction sensitive neuron captures direction of object in 3x3 blocks with center of the block sliding over 2 neurons in each direction.
 
 
 

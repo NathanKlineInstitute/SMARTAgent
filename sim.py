@@ -33,9 +33,9 @@ fid4 = open(sim.MotorOutputsfilename,'w')
 
 scale = dconf['net']['scale']
 
-ETypes = ['ER','EV1','EV4','EIT', 'EML', 'EMR']
+ETypes = ['ER','EV1','EV1D0','EV1D90','EV1D180','EV1D270','EV4','EIT', 'EML', 'EMR']
 ITypes = ['IR','IV1','IV4','IIT','IM']
-allpops = ['ER','IR','EV1','IV1','EV4','IV4','EIT','IIT','EML','EMR','IM']
+allpops = ['ER','IR','EV1','EV1D0','EV1D90','EV1D180','EV1D270','IV1','EV4','IV4','EIT','IIT','EML','EMR','IM']
 dnumc = OrderedDict({ty:dconf['net'][ty]*scale for ty in allpops}) # number of neurons of a given type
 
 # Network parameters
