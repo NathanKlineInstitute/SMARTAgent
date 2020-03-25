@@ -202,7 +202,9 @@ class AIGame:
                 dirMain = [0,1] #using a reference for 0 degrees....considering first is for rows and second is for columns
                 ndir1 = dir1 / np.linalg.norm(dir1)
                 ndirMain = dirMain / np.linalg.norm(dirMain)
-                theta = np.degrees(np.arccos(np.dot(ndir1,ndirMain))) #if theta is nan, no movement is detected 
+                theta = np.degrees(np.arccos(np.dot(ndir1,ndirMain))) #if theta is nan, no movement is detected
+                if dir1[0]<0:
+                    theta = theta+180 
                 dirSensitiveNeurons[dSNeuron_x,dSNeuron_y] = theta
         InputImages.append(dsum_Images)
         #fr_Images = np.where(dsum_Images>1.0,100,dsum_Images) #Using this to check what number would work for firing rate
