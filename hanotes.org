@@ -1065,6 +1065,7 @@ STDPparamsRL2 with 'RLlenhebb': 800 ,'RLlenanti': 100 and 'useRLexp': 0
 **create layers of direction selective neurons for V1. (Use information of R for direction selective neurons in V1).
 **computing direction of object motion in 3x3 block for visual input.
 ***if input is 20x20, direction sensitive neurons are 10x10. each direction sensitive neuron captures direction of object in 3x3 blocks with center of the block sliding over 2 neurons in each direction.
+***some comments added to the computation of direction of object motion.
 
 
 
