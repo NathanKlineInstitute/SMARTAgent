@@ -58,7 +58,7 @@ class AIGame:
         rewards = []
         proposed_actions =[]
         total_hits = []
-        input_dim = np.sqrt(dconf['net']['ER'])
+        input_dim = int(np.sqrt(dconf['net']['ER']))
         dirSensitiveNeurons_dim = 10 #int(0.5*input_dim)
         dirSensitiveNeurons = np.zeros(shape=(dirSensitiveNeurons_dim,dirSensitiveNeurons_dim))
         dirR = np.zeros(shape=(dirSensitiveNeurons_dim,dirSensitiveNeurons_dim))
