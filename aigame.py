@@ -203,6 +203,7 @@ class AIGame:
                 else:
                     Rys = [Ry-1,Ry,Ry+1]
                 FOV = dsum_Images[Rxs,Rys]
+                print(FOV)
                 max_ind = np.unravel_index(np.argmax(FOV, axis=None), FOV.shape)
                 print('max inds', max_ind) 
                 #since the most recent frame has highest pixel intensity, any pixel with the maximum intensity will be most probably the final instance of the object motion in that field of view
