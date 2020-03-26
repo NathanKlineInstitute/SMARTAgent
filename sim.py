@@ -885,6 +885,10 @@ def updateInputRates ():
                 stim['hObj'].interval = 1000.0/firing_rates[int(cell.gid)] # interval in ms as a function of rate; is cell.gid correct index???
     # update input firing rates for stimuli to R-direction cells
     lRDircell = [c for c in sim.net.cells if c.gid in sim.net.pops['EV1D0'].cellGids] # this is the set of 0-degree direction selective cells
+    lRDircell_gids = []
+    for cell in lRDircell:
+        lRDircell_gids.append(int(cell.gid))
+    print(lRDircell_gids)
     RDir_offset = 801 #hard coded number--change later
     if dconf['verbose'] > 1: print(sim.rank,'updating len(lRDircell)=',len(lRDircell),'source firing rates. len(firing_rates_dirR)=',len(firing_rates_dirR))
     for cell in lRDircell:  
