@@ -40,6 +40,10 @@ class AIGame:
         self.count = 0 
         self.countAll = 0
         self.fvec = h.Vector()
+        self.fvecR = h.Vector()
+        self.fvecL = h.Vector()
+        self.fvecU = h.Vector()
+        self.fvecD = h.Vector()
         self.firing_rates = np.zeros(dconf['net']['ER'])  # image-based input firing rates; 20x20 = 400 pixels
         self.directionsR = np.zeros(int(0.25*(dconf['net']['ER']))) #assuming i will use this architecture...compute directions using 9 pixels for every other pixel 
         self.directionsL = np.zeros(int(0.25*(dconf['net']['ER']))) #assuming i will use this architecture...compute directions using 9 pixels for every other pixel 

@@ -1071,6 +1071,11 @@ STDPparamsRL2 with 'RLlenhebb': 800 ,'RLlenanti': 100 and 'useRLexp': 0
 ***if the angle theta is between 135 and 225, should activate L direction neuron.
 ***if the angle theta is between 45 and 135, should activate Up direction neuron.
 ***if the angle theta is between 225 and 315, should activate Down direction neuron.
+***add NetStim to direction selective neurons.
+***broadcast firing rates for direction selective cells from root/Master node to all workers.
+***receive firing rates for direction selective cells and assign those firing rates to all direction selective neurons.
+***assign firing rates to direction selective neurons.
+
 
 
 

@@ -74,7 +74,7 @@ STDPparamsRL2 = {'hebbwt': 0.0000, 'antiwt':-0.0000, 'wbase': 0.0005, 'wmax': 1,
 # these are the image-based inputs provided to the R (retinal) cells
 netParams.stimSourceParams['stimMod'] = {'type': 'NetStim', 'rate': 'variable', 'noise': 0}
 netParams.stimTargetParams['stimMod->all'] = {'source': 'stimMod',
-        'conds': {'pop': 'ER'},
+        'conds': {'pop': ['ER','EV1D0','EV1D90','EV1D180','EV1D270']},
         'convergence': 1,
         'weight': 1,
         'delay': 1,
@@ -844,15 +844,36 @@ def trainAgentFake(t):
 
 def updateInputRates ():
     # update the source firing rates for the R neuron population, based on image contents
+    #also update the firing rates for the direction sensitive neurons based on image contents
     if sim.rank == 0:
         if dconf['verbose'] > 1:
           print(sim.rank,'broadcasting firing rates:',np.where(sim.AIGame.firing_rates==np.amax(sim.AIGame.firing_rates)),np.amax(sim.AIGame.firing_rates))        
         sim.pc.broadcast(sim.AIGame.fvec.from_python(sim.AIGame.firing_rates),0)
         firing_rates = sim.AIGame.firing_rates
+        sim.pc.broadcast(sim.AIGame.fvecR.from_python(sim.AIGame.directionsR),0)
+        firing_rates_dirR = sim.AIGame.directionsR
+        sim.pc.broadcast(sim.AIGame.fvecL.from_python(sim.AIGame.directionsL),0)
+        firing_rates_dirL = sim.AIGame.directionsL
+        sim.pc.broadcast(sim.AIGame.fvecU.from_python(sim.AIGame.directionsUp),0)
+        firing_rates_dirUp = sim.AIGame.directionsUp
+        sim.pc.broadcast(sim.AIGame.fvecD.from_python(sim.AIGame.directionsDown),0)
+        firing_rates_dirDown = sim.AIGame.directionsDown
     else:
         fvec = h.Vector()
         sim.pc.broadcast(fvec,0)
         firing_rates = fvec.to_python()
+        fvecR = h.Vector()
+        sim.pc.broadcast(fvecR,0)
+        firing_rates_dirR = fvecR.to_python()
+        fvecL = h.Vector()
+        sim.pc.broadcast(fvecL,0)
+        firing_rates_dirL = fvecL.to_python()
+        fvecU = h.Vector()
+        sim.pc.broadcast(fvecU,0)
+        firing_rates_dirUp = fvecU.to_python()
+        fvecD = h.Vector()
+        sim.pc.broadcast(fvecD,0)
+        firing_rates_dirDown = fvecD.to_python()
         if dconf['verbose'] > 1:
           print(sim.rank,'received firing rates:',np.where(firing_rates==np.amax(firing_rates)),np.amax(firing_rates))                
     # update input firing rates for stimuli to R cells
@@ -862,7 +883,35 @@ def updateInputRates ():
         for stim in cell.stims:
             if stim['source'] == 'stimMod':
                 stim['hObj'].interval = 1000.0/firing_rates[int(cell.gid)] # interval in ms as a function of rate; is cell.gid correct index???
-          
+    # update input firing rates for stimuli to R-direction cells
+    lRDircell = [c for c in sim.net.cells if c.gid in sim.net.pops['EV1D0'].cellGids] # this is the set of 0-degree direction selective cells
+    if dconf['verbose'] > 1: print(sim.rank,'updating len(lRDircell)=',len(lRDircell),'source firing rates. len(firing_rates_dirR)=',len(firing_rates_dirR))
+    for cell in lRDircell:  
+        for stim in cell.stims:
+            if stim['source'] == 'stimMod':
+                stim['hObj'].interval = 1000.0/firing_rates_dirR[int(cell.gid)] # interval in ms as a function of rate; is cell.gid correct index???
+    # update input firing rates for stimuli to L-direction cells
+    lLDircell = [c for c in sim.net.cells if c.gid in sim.net.pops['EV1D180'].cellGids] # this is the set of 180-degree direction selective cells
+    if dconf['verbose'] > 1: print(sim.rank,'updating len(lLDircell)=',len(lLDircell),'source firing rates. len(firing_rates_dirL)=',len(firing_rates_dirL))
+    for cell in lLDircell:  
+        for stim in cell.stims:
+            if stim['source'] == 'stimMod':
+                stim['hObj'].interval = 1000.0/firing_rates_dirL[int(cell.gid)] # interval in ms as a function of rate; is cell.gid correct index???
+    # update input firing rates for stimuli to Up-direction cells
+    lUDircell = [c for c in sim.net.cells if c.gid in sim.net.pops['EV1D90'].cellGids] # this is the set of 90-degree direction selective cells
+    if dconf['verbose'] > 1: print(sim.rank,'updating len(lUDircell)=',len(lUDircell),'source firing rates. len(firing_rates_dirUp)=',len(firing_rates_dirUp))
+    for cell in lUDircell:  
+        for stim in cell.stims:
+            if stim['source'] == 'stimMod':
+                stim['hObj'].interval = 1000.0/firing_rates_dirUp[int(cell.gid)] # interval in ms as a function of rate; is cell.gid correct index???
+    # update input firing rates for stimuli to Down-direction cells
+    lDDircell = [c for c in sim.net.cells if c.gid in sim.net.pops['EV1D270'].cellGids] # this is the set of 270-degree direction selective cells
+    if dconf['verbose'] > 1: print(sim.rank,'updating len(lDDircell)=',len(lDDircell),'source firing rates. len(firing_rates_dirDown)=',len(firing_rates_dirDown))
+    for cell in lDDircell:  
+        for stim in cell.stims:
+            if stim['source'] == 'stimMod':
+                stim['hObj'].interval = 1000.0/firing_rates_dirDown[int(cell.gid)] # interval in ms as a function of rate; is cell.gid correct index???
+
 def trainAgent (t):
     """ training interface between simulation and game environment
     """
