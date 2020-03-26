@@ -1083,7 +1083,7 @@ STDPparamsRL2 with 'RLlenhebb': 800 ,'RLlenanti': 100 and 'useRLexp': 0
 **debug firing rate assignments
 ***print cells.gids for RDir sensitive neurons.
 ***cell properties properly assigned
-
+**plot raster.
 
 
 
