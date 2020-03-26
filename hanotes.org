@@ -1077,6 +1077,7 @@ STDPparamsRL2 with 'RLlenhebb': 800 ,'RLlenanti': 100 and 'useRLexp': 0
 ***assign firing rates to direction selective neurons.
 ***test sim...2000ms
 ***Assigning firing rates to stimMod gave error----out of index. It worked for R neurons because there was no offset. cells were from 0-399. But now the cells have offset. so included offset....hopefully will work.
+***Ah another mistake--better use hard coded number for now. change later.
 
 
 
