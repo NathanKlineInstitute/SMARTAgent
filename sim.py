@@ -1137,12 +1137,13 @@ sim.runSimWithIntervalFunc(100.0,trainAgent) # has periodic callback to adjust S
 sim.gatherData() # gather data from different nodes
 sim.saveData() # save data to disk
 
+
+if dconf['sim']['doplot']:
+    print('plot raster:')
+    sim.analysis.plotRaster()
+    sim.analysis.plotData()    
+    if sim.plotWeights: plotWeights() 
 if sim.rank == 0: # only rank 0 should save. otherwise all the other nodes could over-write the output or quit first; rank 0 plots
-    if dconf['sim']['doplot']:
-        print('plot raster:')
-        sim.analysis.plotRaster()
-        sim.analysis.plotData()    
-        if sim.plotWeights: plotWeights() 
     if sim.saveWeights:
         #saveWeights(sim, recordWeightDCells)
         saveGameBehavior(sim)
