@@ -1075,6 +1075,7 @@ STDPparamsRL2 with 'RLlenhebb': 800 ,'RLlenanti': 100 and 'useRLexp': 0
 ***broadcast firing rates for direction selective cells from root/Master node to all workers.
 ***receive firing rates for direction selective cells and assign those firing rates to all direction selective neurons.
 ***assign firing rates to direction selective neurons.
+***test sim...2000ms
 
 
 
