@@ -231,8 +231,8 @@ class AIGame:
         Downinds = np.where(np.logical_and(dirSensitiveNeurons>224,dirSensitiveNeurons<316))
         dirR[Rinds] = 10 #10Hz firing rate---later should be used as a parameter with some noise.
         dirL[Linds] = 10
-        dirU[Uinds] = 10
-        dirD[Dinds] = 10 
+        dirU[Upinds] = 10
+        dirD[Downinds] = 10 
         self.directionsR = np.reshape(dirR,100)
         self.directionsL = np.reshape(dirL,100)
         self.directionsUp = np.reshape(dirU,100)
