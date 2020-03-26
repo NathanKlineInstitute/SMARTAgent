@@ -225,10 +225,10 @@ class AIGame:
                 if dir1[0]<0:
                     theta = theta+180 
                 dirSensitiveNeurons[dSNeuron_x,dSNeuron_y] = theta
-        Rinds = np.where((dirSensitiveNeurons>314) and (dirSensitiveNeurons<46))
-        Linds = np.where((dirSensitiveNeurons>134) and (dirSensitiveNeurons<226))
-        Upinds = np.where((dirSensitiveNeurons>44) and (dirSensitiveNeurons<136))
-        Downinds = np.where((dirSensitiveNeurons>224) and (dirSensitiveNeurons<316))
+        Rinds = np.where(np.logical_and(dirSensitiveNeurons>314,dirSensitiveNeurons<46))
+        Linds = np.where(np.logical_and(dirSensitiveNeurons>134,dirSensitiveNeurons<226))
+        Upinds = np.where(np.logical_and(dirSensitiveNeurons>44,dirSensitiveNeurons<136))
+        Downinds = np.where(np.logical_and(dirSensitiveNeurons>224,dirSensitiveNeurons<316))
         dirR[Rinds] = 10 #10Hz firing rate---later should be used as a parameter with some noise.
         dirL[Linds] = 10
         dirU[Uinds] = 10
