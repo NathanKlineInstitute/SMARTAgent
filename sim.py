@@ -875,7 +875,12 @@ def updateInputRates ():
         sim.pc.broadcast(fvecD,0)
         firing_rates_dirDown = fvecD.to_python()
         if dconf['verbose'] > 1:
-          print(sim.rank,'received firing rates:',np.where(firing_rates==np.amax(firing_rates)),np.amax(firing_rates))                
+          print(sim.rank,'received firing rates:',np.where(firing_rates==np.amax(firing_rates)),np.amax(firing_rates))
+          print(sim.rank,'received R-firing rates:',np.where(firing_rates_dirR==np.amax(firing_rates_dirR)),np.amax(firing_rates_dirR))
+          print(sim.rank,'received L-firing rates:',np.where(firing_rates_dirL==np.amax(firing_rates_dirL)),np.amax(firing_rates_dirL))
+          print(sim.rank,'received U-firing rates:',np.where(firing_rates_dirUp==np.amax(firing_rates_dirUp)),np.amax(firing_rates_dirUp))
+          print(sim.rank,'received D-firing rates:',np.where(firing_rates_dirDown==np.amax(firing_rates_dirDown)),np.amax(firing_rates_dirDown))
+
     # update input firing rates for stimuli to R cells
     lRcell = [c for c in sim.net.cells if c.gid in sim.net.pops['ER'].cellGids] # this is the set of R cells
     if dconf['verbose'] > 1: print(sim.rank,'updating len(lRcell)=',len(lRcell),'source firing rates. len(firing_rates)=',len(firing_rates))
@@ -1137,28 +1142,28 @@ sim.runSimWithIntervalFunc(100.0,trainAgent) # has periodic callback to adjust S
 sim.gatherData() # gather data from different nodes
 sim.saveData() # save data to disk
 if sim.rank==0:
-    print('Saving raster data')
-    sim.analysis.plotRaster(include = ['allCells'],saveData = dconf['sim']['name']+'raster.pkl')
+    print('SAVING RASTER DATA')
+    sim.analysis.plotRaster(include = ['allCells'],saveData = dconf['sim']['name']+'raster.pkl',showFig=True)
 
-if sim.rank == 0: # only rank 0 should save. otherwise all the other nodes could over-write the output or quit first; rank 0 plots
-    if dconf['sim']['doplot']:
-        print('plot raster:')
-        sim.analysis.plotRaster()
-        sim.analysis.plotData()    
-        if sim.plotWeights: plotWeights() 
-    if sim.saveWeights:
-        #saveWeights(sim, recordWeightDCells)
-        saveGameBehavior(sim)
-        fid5 = open('data/'+dconf['sim']['name']+'ActionsPerEpisode.txt','w')
-        for i in range(len(epCount)):
-            fid5.write('\t%0.1f' % epCount[i])
-            fid5.write('\n')
-    if sim.saveInputImages:
-        InputImages = np.array(InputImages)
-        print(InputImages.shape)  
-        with open('data/'+dconf['sim']['name']+'InputImages.txt', 'w') as outfile:
-            outfile.write('# Array shape: {0}\n'.format(InputImages.shape))
-            for Input_Image in InputImages:
-                np.savetxt(outfile, Input_Image, fmt='%-7.2f')
-                outfile.write('# New slice\n')
-    if dconf['sim']['doquit']: quit()
+#if sim.rank == 0: # only rank 0 should save. otherwise all the other nodes could over-write the output or quit first; rank 0 plots
+#    if dconf['sim']['doplot']:
+#        print('plot raster:')
+#        sim.analysis.plotRaster()
+#        sim.analysis.plotData()    
+#        if sim.plotWeights: plotWeights() 
+#    if sim.saveWeights:
+#        #saveWeights(sim, recordWeightDCells)
+#        saveGameBehavior(sim)
+#        fid5 = open('data/'+dconf['sim']['name']+'ActionsPerEpisode.txt','w')
+#        for i in range(len(epCount)):
+#            fid5.write('\t%0.1f' % epCount[i])
+#            fid5.write('\n')
+#    if sim.saveInputImages:
+#        InputImages = np.array(InputImages)
+#        print(InputImages.shape)  
+#        with open('data/'+dconf['sim']['name']+'InputImages.txt', 'w') as outfile:
+#            outfile.write('# Array shape: {0}\n'.format(InputImages.shape))
+#            for Input_Image in InputImages:
+#                np.savetxt(outfile, Input_Image, fmt='%-7.2f')
+#                outfile.write('# New slice\n')
+#    if dconf['sim']['doquit']: quit()
