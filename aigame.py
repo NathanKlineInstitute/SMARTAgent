@@ -45,10 +45,10 @@ class AIGame:
         self.fvecU = h.Vector()
         self.fvecD = h.Vector()
         self.firing_rates = np.zeros(dconf['net']['ER'])  # image-based input firing rates; 20x20 = 400 pixels
-        self.directionsR = np.zeros(int(0.25*(dconf['net']['ER']))) #assuming i will use this architecture...compute directions using 9 pixels for every other pixel 
-        self.directionsL = np.zeros(int(0.25*(dconf['net']['ER']))) #assuming i will use this architecture...compute directions using 9 pixels for every other pixel 
-        self.directionsUp = np.zeros(int(0.25*(dconf['net']['ER']))) #assuming i will use this architecture...compute directions using 9 pixels for every other pixel 
-        self.directionsDown = np.zeros(int(0.25*(dconf['net']['ER']))) #assuming i will use this architecture...compute directions using 9 pixels for every other pixel 
+        self.directionsR = np.ones(int(0.25*(dconf['net']['ER']))) #assuming i will use this architecture...compute directions using 9 pixels for every other pixel 
+        self.directionsL = np.ones(int(0.25*(dconf['net']['ER']))) #assuming i will use this architecture...compute directions using 9 pixels for every other pixel 
+        self.directionsUp = np.ones(int(0.25*(dconf['net']['ER']))) #assuming i will use this architecture...compute directions using 9 pixels for every other pixel 
+        self.directionsDown = np.ones(int(0.25*(dconf['net']['ER']))) #assuming i will use this architecture...compute directions using 9 pixels for every other pixel 
         self.intaction = 5 # integrate this many actions together before returning reward information to model
     ################################
     ### PLAY GAME
