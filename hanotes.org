@@ -1085,6 +1085,7 @@ STDPparamsRL2 with 'RLlenhebb': 800 ,'RLlenanti': 100 and 'useRLexp': 0
 ***cell properties properly assigned
 **plot raster.
 **use 30Hz instead of 5 Hz. firing for direction selective neurons.
+**save raster data in pickle.
 
 
 
