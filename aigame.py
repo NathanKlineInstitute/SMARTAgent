@@ -204,7 +204,10 @@ class AIGame:
                     Rys = [Ry-1,Ry,Ry+1]
                 print('Xinds',Rxs)
                 print('Yinds',Rys)
-                FOV = dsum_Images[Rxs,Rys]
+                FOV = np.zeros(shape=(len(Rxs),len(Rys)))
+                for xinds in range(len(Rxs)):
+                    for yinds in range(len(Rys)):
+                        FOV[xinds,yinds] = dsum_Images[Rxs[xinds],Rys[yinds]]
                 print(FOV)
                 max_ind = np.unravel_index(np.argmax(FOV, axis=None), FOV.shape)
                 print('max inds', max_ind) 
