@@ -885,32 +885,36 @@ def updateInputRates ():
                 stim['hObj'].interval = 1000.0/firing_rates[int(cell.gid)] # interval in ms as a function of rate; is cell.gid correct index???
     # update input firing rates for stimuli to R-direction cells
     lRDircell = [c for c in sim.net.cells if c.gid in sim.net.pops['EV1D0'].cellGids] # this is the set of 0-degree direction selective cells
+    RDir_offset = np.amin(lRDircell)
     if dconf['verbose'] > 1: print(sim.rank,'updating len(lRDircell)=',len(lRDircell),'source firing rates. len(firing_rates_dirR)=',len(firing_rates_dirR))
     for cell in lRDircell:  
         for stim in cell.stims:
             if stim['source'] == 'stimMod':
-                stim['hObj'].interval = 1000.0/firing_rates_dirR[int(cell.gid)] # interval in ms as a function of rate; is cell.gid correct index???
+                stim['hObj'].interval = 1000.0/firing_rates_dirR[int(cell.gid-RDir_offset)] # interval in ms as a function of rate; is cell.gid correct index???
     # update input firing rates for stimuli to L-direction cells
     lLDircell = [c for c in sim.net.cells if c.gid in sim.net.pops['EV1D180'].cellGids] # this is the set of 180-degree direction selective cells
+    LDir_offset = np.amin(lLDircell)
     if dconf['verbose'] > 1: print(sim.rank,'updating len(lLDircell)=',len(lLDircell),'source firing rates. len(firing_rates_dirL)=',len(firing_rates_dirL))
     for cell in lLDircell:  
         for stim in cell.stims:
             if stim['source'] == 'stimMod':
-                stim['hObj'].interval = 1000.0/firing_rates_dirL[int(cell.gid)] # interval in ms as a function of rate; is cell.gid correct index???
+                stim['hObj'].interval = 1000.0/firing_rates_dirL[int(cell.gid-LDir_offset)] # interval in ms as a function of rate; is cell.gid correct index???
     # update input firing rates for stimuli to Up-direction cells
     lUDircell = [c for c in sim.net.cells if c.gid in sim.net.pops['EV1D90'].cellGids] # this is the set of 90-degree direction selective cells
+    UDir_offset = np.amin(lUDircell)
     if dconf['verbose'] > 1: print(sim.rank,'updating len(lUDircell)=',len(lUDircell),'source firing rates. len(firing_rates_dirUp)=',len(firing_rates_dirUp))
     for cell in lUDircell:  
         for stim in cell.stims:
             if stim['source'] == 'stimMod':
-                stim['hObj'].interval = 1000.0/firing_rates_dirUp[int(cell.gid)] # interval in ms as a function of rate; is cell.gid correct index???
+                stim['hObj'].interval = 1000.0/firing_rates_dirUp[int(cell.gid-UDir_offset)] # interval in ms as a function of rate; is cell.gid correct index???
     # update input firing rates for stimuli to Down-direction cells
     lDDircell = [c for c in sim.net.cells if c.gid in sim.net.pops['EV1D270'].cellGids] # this is the set of 270-degree direction selective cells
+    DDir_offset = np.amin(lDDircell)
     if dconf['verbose'] > 1: print(sim.rank,'updating len(lDDircell)=',len(lDDircell),'source firing rates. len(firing_rates_dirDown)=',len(firing_rates_dirDown))
     for cell in lDDircell:  
         for stim in cell.stims:
             if stim['source'] == 'stimMod':
-                stim['hObj'].interval = 1000.0/firing_rates_dirDown[int(cell.gid)] # interval in ms as a function of rate; is cell.gid correct index???
+                stim['hObj'].interval = 1000.0/firing_rates_dirDown[int(cell.gid-DDir_offset)] # interval in ms as a function of rate; is cell.gid correct index???
 
 def trainAgent (t):
     """ training interface between simulation and game environment
