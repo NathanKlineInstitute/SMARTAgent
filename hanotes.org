@@ -1104,6 +1104,7 @@ STDPparamsRL2 with 'RLlenhebb': 800 ,'RLlenanti': 100 and 'useRLexp': 0
 ***get rid of offset for assigning rates to R neurons.
 ***see different firing patterns when use int(cell.gid) vs int(cell.gid-R_offset) ---PROBLEM HERE these two values dont match.
 ***use 10 ms interval for Rneurons.
+***print R offset
 
 
 

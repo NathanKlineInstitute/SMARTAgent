@@ -885,6 +885,7 @@ def updateInputRates ():
     # update input firing rates for stimuli to R cells
     lRcell = [c for c in sim.net.cells if c.gid in sim.net.pops['ER'].cellGids] # this is the set of R cells
     R_offset = np.amin(sim.net.pops['ER'].cellGids)
+    print('R offset:', R_offset)
     if dconf['verbose'] > 1: print(sim.rank,'updating len(lRcell)=',len(lRcell),'source firing rates. len(firing_rates)=',len(firing_rates))
     for cell in lRcell:  
         for stim in cell.stims:
