@@ -884,7 +884,7 @@ def updateInputRates ():
 
     # update input firing rates for stimuli to R cells
     lRcell = [c for c in sim.net.cells if c.gid in sim.net.pops['ER'].cellGids] # this is the set of R cells
-    R_offset = 900 #np.amin(sim.net.pops['ER'].cellGids)
+    R_offset = 0 #np.amin(sim.net.pops['ER'].cellGids)
     print('R offset:', R_offset)
     if dconf['verbose'] > 1: print(sim.rank,'updating len(lRcell)=',len(lRcell),'source firing rates. len(firing_rates)=',len(firing_rates))
     for cell in lRcell:  
@@ -894,7 +894,7 @@ def updateInputRates ():
                 #print('cell GID: ', int(cell.gid), 'vs cell ID with offset: ', int(cell.gid-R_offset)) # interval in ms as a function of rate; is cell.gid correct index???
     # update input firing rates for stimuli to R-direction cells
     lRDircell = [c for c in sim.net.cells if c.gid in sim.net.pops['EV1D0'].cellGids] # this is the set of 0-degree direction selective cells
-    RDir_offset = np.amin(sim.net.pops['EV1D0'].cellGids) #hard coded number--change later
+    RDir_offset = 900 #np.amin(sim.net.pops['EV1D0'].cellGids) #hard coded number--change later
     if dconf['verbose'] > 1: print(sim.rank,'updating len(lRDircell)=',len(lRDircell),'source firing rates. len(firing_rates_dirR)=',len(firing_rates_dirR))
     for cell in lRDircell:  
         for stim in cell.stims:
