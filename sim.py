@@ -852,6 +852,7 @@ def updateInputRates ():
         firing_rates = sim.AIGame.firing_rates
         sim.pc.broadcast(sim.AIGame.fvecR.from_python(sim.AIGame.directionsR),0)
         firing_rates_dirR = sim.AIGame.directionsR
+        print('Firing Rates of R-DIR:',firing_rates_dirR)
         sim.pc.broadcast(sim.AIGame.fvecL.from_python(sim.AIGame.directionsL),0)
         firing_rates_dirL = sim.AIGame.directionsL
         sim.pc.broadcast(sim.AIGame.fvecU.from_python(sim.AIGame.directionsUp),0)
