@@ -1098,7 +1098,9 @@ STDPparamsRL2 with 'RLlenhebb': 800 ,'RLlenanti': 100 and 'useRLexp': 0
 ***again use print('Neuron ', cell, 'on', sim.rank,' was assigned ISI of ', stim['hObj'].interval, ' ms')---assigned correctly but still no spike.
 ***to check if 30Hz is a good number or not, may be try using firing rates for R neurons. ---still no firing in raster plot.
 ***use 10 ms for stim-interval---->same results...no spikes.
-***only use stim with RDir neurons.
+***only use stim with RDir neurons.---->same results
+***change the sequence of cell creation. first create EV1RDir0 and then ER. same with stimMod->all connections.
+
 
 
 

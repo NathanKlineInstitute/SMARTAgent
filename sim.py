@@ -32,8 +32,8 @@ global fid4
 fid4 = open(sim.MotorOutputsfilename,'w')
 
 scale = dconf['net']['scale']
-
-ETypes = ['ER','EV1','EV1D0','EV1D90','EV1D180','EV1D270','EV4','EIT', 'EML', 'EMR']
+ETypes = ['EV1D0','ER','EV1','EV1D90','EV1D180','EV1D270','EV4','EIT', 'EML', 'EMR']
+#ETypes = ['ER','EV1','EV1D0','EV1D90','EV1D180','EV1D270','EV4','EIT', 'EML', 'EMR']
 ITypes = ['IR','IV1','IV4','IIT','IM']
 allpops = ['ER','IR','EV1','EV1D0','EV1D90','EV1D180','EV1D270','IV1','EV4','IV4','EIT','IIT','EML','EMR','IM']
 dnumc = OrderedDict({ty:dconf['net'][ty]*scale for ty in allpops}) # number of neurons of a given type
@@ -74,7 +74,7 @@ STDPparamsRL2 = {'hebbwt': 0.0000, 'antiwt':-0.0000, 'wbase': 0.0005, 'wmax': 1,
 # these are the image-based inputs provided to the R (retinal) cells
 netParams.stimSourceParams['stimMod'] = {'type': 'NetStim', 'rate': 'variable', 'noise': 0}
 netParams.stimTargetParams['stimMod->all'] = {'source': 'stimMod',
-        'conds': {'pop': 'EV1D0'},
+        'conds': {'pop': ['EV1D0','ER','EV1D90','EV1D180','EV1D270']},
         #'conds': {'pop': ['ER','EV1D0','EV1D90','EV1D180','EV1D270']},
         'convergence': 1,
         'weight': 1,
@@ -886,11 +886,12 @@ def updateInputRates ():
 
     # update input firing rates for stimuli to R cells
     lRcell = [c for c in sim.net.cells if c.gid in sim.net.pops['ER'].cellGids] # this is the set of R cells
+    R_offset = np.amin(sim.net.pops['ER'].cellGids)
     if dconf['verbose'] > 1: print(sim.rank,'updating len(lRcell)=',len(lRcell),'source firing rates. len(firing_rates)=',len(firing_rates))
     for cell in lRcell:  
         for stim in cell.stims:
             if stim['source'] == 'stimMod':
-                stim['hObj'].interval = 1000.0/firing_rates[int(cell.gid)] # interval in ms as a function of rate; is cell.gid correct index???
+                stim['hObj'].interval = 1000.0/firing_rates[int(cell.gid-R_offset)] # interval in ms as a function of rate; is cell.gid correct index???
     # update input firing rates for stimuli to R-direction cells
     lRDircell = [c for c in sim.net.cells if c.gid in sim.net.pops['EV1D0'].cellGids] # this is the set of 0-degree direction selective cells
     RDir_offset = np.amin(sim.net.pops['EV1D0'].cellGids) #hard coded number--change later
