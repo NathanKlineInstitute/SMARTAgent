@@ -1107,6 +1107,8 @@ STDPparamsRL2 with 'RLlenhebb': 800 ,'RLlenanti': 100 and 'useRLexp': 0
 ***print R offset---R offset is different everytime. Use fix values for now.
 ***set RDir_offset to 900.
 ***print list of RDir neurons.
+**So the PROBLEM all the way was not with the assignment of ISI for the stim to drive Direction selective neurons, but because the strength was too high and was causing neurons to go into depolarization block.
+**started reducing weight from 1 to 0.1 (still high) and now to 0.02.
 
 
 

@@ -75,7 +75,7 @@ netParams.stimSourceParams['stimMod'] = {'type': 'NetStim', 'rate': 'variable', 
 netParams.stimTargetParams['stimMod->all'] = {'source': 'stimMod',
         'conds': {'pop': ['ER','EV1D0','EV1D90','EV1D180','EV1D270']},
         'convergence': 1,
-        'weight': 0.1,
+        'weight': 0.02,
         'delay': 1,
         'synMech': 'AMPA'}
 
