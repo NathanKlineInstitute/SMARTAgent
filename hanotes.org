@@ -1091,5 +1091,6 @@ STDPparamsRL2 with 'RLlenhebb': 800 ,'RLlenanti': 100 and 'useRLexp': 0
 *20mar27
 **to understand why direction selective neurons are not firing, pass 30 hz firing rate to all neurons of pop 'EV1RDir0'
 **print firing_rates_dirR ---to see if the correct firing rates are broadcasted.
+**print firing_rates_dirR in all nodes --- to see if the broadcast was successful or not.
 
 

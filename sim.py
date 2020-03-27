@@ -866,6 +866,7 @@ def updateInputRates ():
         fvecR = h.Vector()
         sim.pc.broadcast(fvecR,0)
         firing_rates_dirR = fvecR.to_python()
+        print(sim.rank,'recrived firing Rates of R-DIR:',firing_rates_dirR)
         fvecL = h.Vector()
         sim.pc.broadcast(fvecL,0)
         firing_rates_dirL = fvecL.to_python()
