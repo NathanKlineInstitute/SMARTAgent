@@ -1052,6 +1052,63 @@ Journal of Neuroscience 1 January 1997, 17 (1) 204-215; DOI: https://doi.org/10.
 STDPparamsRL1 with 'RLlenhebb': 50 ,'RLlenanti': 50 and 'useRLexp': 1
 STDPparamsRL2 with 'RLlenhebb': 800 ,'RLlenanti': 100 and 'useRLexp': 0
 
+*20mar24
+**retina has direction selective neurons.
+**V1 has direction selective neurons.
+**V1 direction selective neurons' functionality doesn't completely depend on retinal direction selective neurons. (Morrie and Feller 2017, Current Biology) 
+**should change IT to MT as that is the part of dorsal pathway (Retina-dLGN-V1-V2-MT).
+**Probably, V2 also has direction selective neurons but didnt find any paper about that yet.
+**MT also has direction selective neurons.
+**Include direstion selective neurons in all areas. Start with R and V1.
+
+*20mar25
+**create layers of direction selective neurons for V1. (Use information of R for direction selective neurons in V1).
+**computing direction of object motion in 3x3 block for visual input.
+***if input is 20x20, direction sensitive neurons are 10x10. each direction sensitive neuron captures direction of object in 3x3 blocks with center of the block sliding over 2 neurons in each direction.
+***some comments added to the computation of direction of object motion.
+***arccos give angle between 0 and 180 degrees. so to extend it from 0 to 360 degrees, add 180 if the object motion direction is in 3 or 4th quadrant.
+***if the angle theta is between 315 and 45, should activate R direction neuron.
+***if the angle theta is between 135 and 225, should activate L direction neuron.
+***if the angle theta is between 45 and 135, should activate Up direction neuron.
+***if the angle theta is between 225 and 315, should activate Down direction neuron.
+***add NetStim to direction selective neurons.
+***broadcast firing rates for direction selective cells from root/Master node to all workers.
+***receive firing rates for direction selective cells and assign those firing rates to all direction selective neurons.
+***assign firing rates to direction selective neurons.
+***test sim...2000ms
+***Assigning firing rates to stimMod gave error----out of index. It worked for R neurons because there was no offset. cells were from 0-399. But now the cells have offset. so included offset....hopefully will work.
+***Ah another mistake--better use hard coded number for now. change later.
+
+*20mar26
+**debug firing rate assignments
+***print cells.gids for RDir sensitive neurons.
+***cell properties properly assigned
+**plot raster.
+**use 30Hz instead of 5 Hz. firing for direction selective neurons.
+**save raster data in pickle.
+**Direction sensitive cells fired only once (all at the same time) during 2s simulation. Should not be the case.
+
+*20mar27
+**to understand why direction selective neurons are not firing, pass 30 hz firing rate to all neurons of pop 'EV1RDir0'
+**print firing_rates_dirR ---to see if the correct firing rates are broadcasted. ---->correct firing rates are broadcasted.
+**print firing_rates_dirR in all nodes --- to see if the broadcast was successful or not. ---->broadcast is working.
+**now check if the ISI was assigned to the R-dir selective neuron or not?
+***using the statement print('Neuron ', cell, 'on', sim.rank,' was assigned ISI of ', stim['hObj'].interval, ' ms') gave error. The error was probably related with Neuron update on zn.
+***remove this statement and rerun. The error was probably related with Neuron update on zn.
+***again use print('Neuron ', cell, 'on', sim.rank,' was assigned ISI of ', stim['hObj'].interval, ' ms')---assigned correctly but still no spike.
+***to check if 30Hz is a good number or not, may be try using firing rates for R neurons. ---still no firing in raster plot.
+***use 10 ms for stim-interval---->same results...no spikes.
+***only use stim with RDir neurons.---->same results
+***change the sequence of cell creation. first create EV1RDir0 and then ER. same with stimMod->all connections.
+***revert changes in sequence of cell creation.
+***get rid of offset for assigning rates to R neurons.
+***see different firing patterns when use int(cell.gid) vs int(cell.gid-R_offset) ---PROBLEM HERE these two values dont match.
+***use 10 ms interval for Rneurons.
+***print R offset---R offset is different everytime. Use fix values for now.
+***set RDir_offset to 900.
+***print list of RDir neurons.
+
+
 
 
 

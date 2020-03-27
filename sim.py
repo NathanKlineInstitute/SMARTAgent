@@ -32,10 +32,9 @@ global fid4
 fid4 = open(sim.MotorOutputsfilename,'w')
 
 scale = dconf['net']['scale']
-
-ETypes = ['ER','EV1','EV4','EIT', 'EML', 'EMR']
+ETypes = ['ER','EV1','EV1D0','EV1D90','EV1D180','EV1D270','EV4','EIT', 'EML', 'EMR']
 ITypes = ['IR','IV1','IV4','IIT','IM']
-allpops = ['ER','IR','EV1','IV1','EV4','IV4','EIT','IIT','EML','EMR','IM']
+allpops = ['ER','IR','EV1','EV1D0','EV1D90','EV1D180','EV1D270','IV1','EV4','IV4','EIT','IIT','EML','EMR','IM']
 dnumc = OrderedDict({ty:dconf['net'][ty]*scale for ty in allpops}) # number of neurons of a given type
 
 # Network parameters
@@ -74,7 +73,7 @@ STDPparamsRL2 = {'hebbwt': 0.0000, 'antiwt':-0.0000, 'wbase': 0.0005, 'wmax': 1,
 # these are the image-based inputs provided to the R (retinal) cells
 netParams.stimSourceParams['stimMod'] = {'type': 'NetStim', 'rate': 'variable', 'noise': 0}
 netParams.stimTargetParams['stimMod->all'] = {'source': 'stimMod',
-        'conds': {'pop': 'ER'},
+        'conds': {'pop': ['ER','EV1D0','EV1D90','EV1D180','EV1D270']},
         'convergence': 1,
         'weight': 1,
         'delay': 1,
@@ -844,25 +843,91 @@ def trainAgentFake(t):
 
 def updateInputRates ():
     # update the source firing rates for the R neuron population, based on image contents
+    #also update the firing rates for the direction sensitive neurons based on image contents
     if sim.rank == 0:
         if dconf['verbose'] > 1:
           print(sim.rank,'broadcasting firing rates:',np.where(sim.AIGame.firing_rates==np.amax(sim.AIGame.firing_rates)),np.amax(sim.AIGame.firing_rates))        
         sim.pc.broadcast(sim.AIGame.fvec.from_python(sim.AIGame.firing_rates),0)
         firing_rates = sim.AIGame.firing_rates
+        sim.pc.broadcast(sim.AIGame.fvecR.from_python(sim.AIGame.directionsR),0)
+        firing_rates_dirR = sim.AIGame.directionsR
+        #print('Firing Rates of R-DIR:',firing_rates_dirR)
+        sim.pc.broadcast(sim.AIGame.fvecL.from_python(sim.AIGame.directionsL),0)
+        firing_rates_dirL = sim.AIGame.directionsL
+        sim.pc.broadcast(sim.AIGame.fvecU.from_python(sim.AIGame.directionsUp),0)
+        firing_rates_dirUp = sim.AIGame.directionsUp
+        sim.pc.broadcast(sim.AIGame.fvecD.from_python(sim.AIGame.directionsDown),0)
+        firing_rates_dirDown = sim.AIGame.directionsDown
     else:
         fvec = h.Vector()
         sim.pc.broadcast(fvec,0)
         firing_rates = fvec.to_python()
+        fvecR = h.Vector()
+        sim.pc.broadcast(fvecR,0)
+        firing_rates_dirR = fvecR.to_python()
+        print(sim.rank,'recrived firing Rates of R-DIR:',firing_rates_dirR)
+        fvecL = h.Vector()
+        sim.pc.broadcast(fvecL,0)
+        firing_rates_dirL = fvecL.to_python()
+        fvecU = h.Vector()
+        sim.pc.broadcast(fvecU,0)
+        firing_rates_dirUp = fvecU.to_python()
+        fvecD = h.Vector()
+        sim.pc.broadcast(fvecD,0)
+        firing_rates_dirDown = fvecD.to_python()
         if dconf['verbose'] > 1:
-          print(sim.rank,'received firing rates:',np.where(firing_rates==np.amax(firing_rates)),np.amax(firing_rates))                
+          print(sim.rank,'received firing rates:',np.where(firing_rates==np.amax(firing_rates)),np.amax(firing_rates))
+          print(sim.rank,'received R-firing rates:',np.where(firing_rates_dirR==np.amax(firing_rates_dirR)),np.amax(firing_rates_dirR))
+          print(sim.rank,'received L-firing rates:',np.where(firing_rates_dirL==np.amax(firing_rates_dirL)),np.amax(firing_rates_dirL))
+          print(sim.rank,'received U-firing rates:',np.where(firing_rates_dirUp==np.amax(firing_rates_dirUp)),np.amax(firing_rates_dirUp))
+          print(sim.rank,'received D-firing rates:',np.where(firing_rates_dirDown==np.amax(firing_rates_dirDown)),np.amax(firing_rates_dirDown))
+
     # update input firing rates for stimuli to R cells
     lRcell = [c for c in sim.net.cells if c.gid in sim.net.pops['ER'].cellGids] # this is the set of R cells
+    R_offset = 0 #np.amin(sim.net.pops['ER'].cellGids)
+    print('R offset:', R_offset)
     if dconf['verbose'] > 1: print(sim.rank,'updating len(lRcell)=',len(lRcell),'source firing rates. len(firing_rates)=',len(firing_rates))
     for cell in lRcell:  
         for stim in cell.stims:
             if stim['source'] == 'stimMod':
-                stim['hObj'].interval = 1000.0/firing_rates[int(cell.gid)] # interval in ms as a function of rate; is cell.gid correct index???
-          
+                stim['hObj'].interval = 10 #1000.0/firing_rates[int(cell.gid)]
+                #print('cell GID: ', int(cell.gid), 'vs cell ID with offset: ', int(cell.gid-R_offset)) # interval in ms as a function of rate; is cell.gid correct index???
+    # update input firing rates for stimuli to R-direction cells
+    lRDircell = [c for c in sim.net.cells if c.gid in sim.net.pops['EV1D0'].cellGids] # this is the set of 0-degree direction selective cells
+    RDir_offset = 900 #np.amin(sim.net.pops['EV1D0'].cellGids) #hard coded number--change later
+    if dconf['verbose'] > 1: print(sim.rank,'updating len(lRDircell)=',len(lRDircell),'source firing rates. len(firing_rates_dirR)=',len(firing_rates_dirR))
+    for cell in lRDircell:  
+        for stim in cell.stims:
+            if stim['source'] == 'stimMod':
+                stim['hObj'].interval = 10
+                print('R-Dir Neurons:',sim.net.pops['EV1D0'].cellGids, 'cells:', lRDircell,'Neuron: ', cell, 'cell gid: ', cell.gid)
+                #stim['hObj'].interval = 1000.0/firing_rates_dirR[int(cell.gid-RDir_offset)] # interval in ms as a function of rate; is cell.gid correct index???
+                #print('Neuron ', cell, 'on', sim.rank,' was assigned ISI of ', stim['hObj'].interval, ' ms')
+    # update input firing rates for stimuli to L-direction cells
+    lLDircell = [c for c in sim.net.cells if c.gid in sim.net.pops['EV1D180'].cellGids] # this is the set of 180-degree direction selective cells
+    LDir_offset = np.amin(sim.net.pops['EV1D180'].cellGids)
+    if dconf['verbose'] > 1: print(sim.rank,'updating len(lLDircell)=',len(lLDircell),'source firing rates. len(firing_rates_dirL)=',len(firing_rates_dirL))
+    for cell in lLDircell:  
+        for stim in cell.stims:
+            if stim['source'] == 'stimMod':
+                stim['hObj'].interval = 1000.0/firing_rates_dirL[int(cell.gid-LDir_offset)] # interval in ms as a function of rate; is cell.gid correct index???
+    # update input firing rates for stimuli to Up-direction cells
+    lUDircell = [c for c in sim.net.cells if c.gid in sim.net.pops['EV1D90'].cellGids] # this is the set of 90-degree direction selective cells
+    UDir_offset = np.amin(sim.net.pops['EV1D90'].cellGids)
+    if dconf['verbose'] > 1: print(sim.rank,'updating len(lUDircell)=',len(lUDircell),'source firing rates. len(firing_rates_dirUp)=',len(firing_rates_dirUp))
+    for cell in lUDircell:  
+        for stim in cell.stims:
+            if stim['source'] == 'stimMod':
+                stim['hObj'].interval = 1000.0/firing_rates_dirUp[int(cell.gid-UDir_offset)] # interval in ms as a function of rate; is cell.gid correct index???
+    # update input firing rates for stimuli to Down-direction cells
+    lDDircell = [c for c in sim.net.cells if c.gid in sim.net.pops['EV1D270'].cellGids] # this is the set of 270-degree direction selective cells
+    DDir_offset = np.amin(sim.net.pops['EV1D270'].cellGids)
+    if dconf['verbose'] > 1: print(sim.rank,'updating len(lDDircell)=',len(lDDircell),'source firing rates. len(firing_rates_dirDown)=',len(firing_rates_dirDown))
+    for cell in lDDircell:  
+        for stim in cell.stims:
+            if stim['source'] == 'stimMod':
+                stim['hObj'].interval = 1000.0/firing_rates_dirDown[int(cell.gid-DDir_offset)] # interval in ms as a function of rate; is cell.gid correct index???
+
 def trainAgent (t):
     """ training interface between simulation and game environment
     """
@@ -1083,24 +1148,29 @@ if sim.rank == 0:
 sim.runSimWithIntervalFunc(100.0,trainAgent) # has periodic callback to adjust STDP weights based on RL signal
 sim.gatherData() # gather data from different nodes
 sim.saveData() # save data to disk
+if sim.rank==0:
+    print('SAVING RASTER DATA')
+    sim.analysis.plotRaster(include = ['allCells'],saveData = dconf['sim']['name']+'raster.pkl',showFig=True)
 
-if sim.rank == 0: # only rank 0 should save. otherwise all the other nodes could over-write the output or quit first; rank 0 plots
-    if dconf['sim']['doplot']:
-        sim.analysis.plotData()    
-        if sim.plotWeights: plotWeights() 
-    if sim.saveWeights:
-        #saveWeights(sim, recordWeightDCells)
-        saveGameBehavior(sim)
-        fid5 = open('data/'+dconf['sim']['name']+'ActionsPerEpisode.txt','w')
-        for i in range(len(epCount)):
-            fid5.write('\t%0.1f' % epCount[i])
-            fid5.write('\n')
-    if sim.saveInputImages:
-        InputImages = np.array(InputImages)
-        print(InputImages.shape)  
-        with open('data/'+dconf['sim']['name']+'InputImages.txt', 'w') as outfile:
-            outfile.write('# Array shape: {0}\n'.format(InputImages.shape))
-            for Input_Image in InputImages:
-                np.savetxt(outfile, Input_Image, fmt='%-7.2f')
-                outfile.write('# New slice\n')
-    if dconf['sim']['doquit']: quit()
+#if sim.rank == 0: # only rank 0 should save. otherwise all the other nodes could over-write the output or quit first; rank 0 plots
+#    if dconf['sim']['doplot']:
+#        print('plot raster:')
+#        sim.analysis.plotRaster()
+#        sim.analysis.plotData()    
+#        if sim.plotWeights: plotWeights() 
+#    if sim.saveWeights:
+#        #saveWeights(sim, recordWeightDCells)
+#        saveGameBehavior(sim)
+#        fid5 = open('data/'+dconf['sim']['name']+'ActionsPerEpisode.txt','w')
+#        for i in range(len(epCount)):
+#            fid5.write('\t%0.1f' % epCount[i])
+#            fid5.write('\n')
+#    if sim.saveInputImages:
+#        InputImages = np.array(InputImages)
+#        print(InputImages.shape)  
+#        with open('data/'+dconf['sim']['name']+'InputImages.txt', 'w') as outfile:
+#            outfile.write('# Array shape: {0}\n'.format(InputImages.shape))
+#            for Input_Image in InputImages:
+#                np.savetxt(outfile, Input_Image, fmt='%-7.2f')
+#                outfile.write('# New slice\n')
+#    if dconf['sim']['doquit']: quit()
