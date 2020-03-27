@@ -894,13 +894,13 @@ def updateInputRates ():
                 #print('cell GID: ', int(cell.gid), 'vs cell ID with offset: ', int(cell.gid-R_offset)) # interval in ms as a function of rate; is cell.gid correct index???
     # update input firing rates for stimuli to R-direction cells
     lRDircell = [c for c in sim.net.cells if c.gid in sim.net.pops['EV1D0'].cellGids] # this is the set of 0-degree direction selective cells
-    print('R-Dir Neurons',sim.net.pops['EV1D0'].cellGids)
     RDir_offset = 900 #np.amin(sim.net.pops['EV1D0'].cellGids) #hard coded number--change later
     if dconf['verbose'] > 1: print(sim.rank,'updating len(lRDircell)=',len(lRDircell),'source firing rates. len(firing_rates_dirR)=',len(firing_rates_dirR))
     for cell in lRDircell:  
         for stim in cell.stims:
             if stim['source'] == 'stimMod':
                 stim['hObj'].interval = 10
+                print('R-Dir Neurons:',sim.net.pops['EV1D0'].cellGids, 'cells:', lRDircell,'Neuron: ', cell, 'cell gid: ', cell.gid)
                 #stim['hObj'].interval = 1000.0/firing_rates_dirR[int(cell.gid-RDir_offset)] # interval in ms as a function of rate; is cell.gid correct index???
                 #print('Neuron ', cell, 'on', sim.rank,' was assigned ISI of ', stim['hObj'].interval, ' ms')
     # update input firing rates for stimuli to L-direction cells
