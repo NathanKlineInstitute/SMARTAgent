@@ -1101,6 +1101,7 @@ STDPparamsRL2 with 'RLlenhebb': 800 ,'RLlenanti': 100 and 'useRLexp': 0
 ***only use stim with RDir neurons.---->same results
 ***change the sequence of cell creation. first create EV1RDir0 and then ER. same with stimMod->all connections.
 ***revert changes in sequence of cell creation.
+***get rid of offset for assigning rates to R neurons.
 
 
 

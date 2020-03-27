@@ -889,7 +889,7 @@ def updateInputRates ():
     for cell in lRcell:  
         for stim in cell.stims:
             if stim['source'] == 'stimMod':
-                stim['hObj'].interval = 1000.0/firing_rates[int(cell.gid-R_offset)] # interval in ms as a function of rate; is cell.gid correct index???
+                stim['hObj'].interval = 1000.0/firing_rates[int(cell.gid)] # interval in ms as a function of rate; is cell.gid correct index???
     # update input firing rates for stimuli to R-direction cells
     lRDircell = [c for c in sim.net.cells if c.gid in sim.net.pops['EV1D0'].cellGids] # this is the set of 0-degree direction selective cells
     RDir_offset = np.amin(sim.net.pops['EV1D0'].cellGids) #hard coded number--change later
