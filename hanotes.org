@@ -1093,7 +1093,9 @@ STDPparamsRL2 with 'RLlenhebb': 800 ,'RLlenanti': 100 and 'useRLexp': 0
 **print firing_rates_dirR ---to see if the correct firing rates are broadcasted. ---->correct firing rates are broadcasted.
 **print firing_rates_dirR in all nodes --- to see if the broadcast was successful or not. ---->broadcast is working.
 **now check if the ISI was assigned to the R-dir selective neuron or not?
-***using the statement print('Neuron ', cell, 'on', sim.rank,' was assigned ISI of ', stim['hObj'].interval, ' ms') gave error.
-***remove this statement and rerun.
+***using the statement print('Neuron ', cell, 'on', sim.rank,' was assigned ISI of ', stim['hObj'].interval, ' ms') gave error. The error was probably related with Neuron update on zn.
+***remove this statement and rerun. The error was probably related with Neuron update on zn.
+***again use print('Neuron ', cell, 'on', sim.rank,' was assigned ISI of ', stim['hObj'].interval, ' ms')
+
 
 
