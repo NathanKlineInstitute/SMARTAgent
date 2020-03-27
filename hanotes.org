@@ -1100,6 +1100,7 @@ STDPparamsRL2 with 'RLlenhebb': 800 ,'RLlenanti': 100 and 'useRLexp': 0
 ***use 10 ms for stim-interval---->same results...no spikes.
 ***only use stim with RDir neurons.---->same results
 ***change the sequence of cell creation. first create EV1RDir0 and then ER. same with stimMod->all connections.
+***revert changes in sequence of cell creation.
 
 
 

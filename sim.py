@@ -32,10 +32,9 @@ global fid4
 fid4 = open(sim.MotorOutputsfilename,'w')
 
 scale = dconf['net']['scale']
-ETypes = ['EV1D0','ER','EV1','EV1D90','EV1D180','EV1D270','EV4','EIT', 'EML', 'EMR']
-#ETypes = ['ER','EV1','EV1D0','EV1D90','EV1D180','EV1D270','EV4','EIT', 'EML', 'EMR']
+ETypes = ['ER','EV1','EV1D0','EV1D90','EV1D180','EV1D270','EV4','EIT', 'EML', 'EMR']
 ITypes = ['IR','IV1','IV4','IIT','IM']
-allpops = ['EV1D0','ER','IR','EV1','EV1D90','EV1D180','EV1D270','IV1','EV4','IV4','EIT','IIT','EML','EMR','IM']
+allpops = ['ER','IR','EV1','EV1D0','EV1D90','EV1D180','EV1D270','IV1','EV4','IV4','EIT','IIT','EML','EMR','IM']
 dnumc = OrderedDict({ty:dconf['net'][ty]*scale for ty in allpops}) # number of neurons of a given type
 
 # Network parameters
@@ -74,8 +73,7 @@ STDPparamsRL2 = {'hebbwt': 0.0000, 'antiwt':-0.0000, 'wbase': 0.0005, 'wmax': 1,
 # these are the image-based inputs provided to the R (retinal) cells
 netParams.stimSourceParams['stimMod'] = {'type': 'NetStim', 'rate': 'variable', 'noise': 0}
 netParams.stimTargetParams['stimMod->all'] = {'source': 'stimMod',
-        'conds': {'pop': ['EV1D0','ER','EV1D90','EV1D180','EV1D270']},
-        #'conds': {'pop': ['ER','EV1D0','EV1D90','EV1D180','EV1D270']},
+        'conds': {'pop': ['ER','EV1D0','EV1D90','EV1D180','EV1D270']},
         'convergence': 1,
         'weight': 1,
         'delay': 1,
