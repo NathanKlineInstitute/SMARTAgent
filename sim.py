@@ -1151,7 +1151,7 @@ sim.saveData() # save data to disk
 if sim.rank==0:
     print('SAVING RASTER DATA')
     sim.analysis.plotRaster(include = ['allCells'],saveData = dconf['sim']['name']+'raster.pkl',showFig=True)
-
+    sim.analysis.plotData()
 #if sim.rank == 0: # only rank 0 should save. otherwise all the other nodes could over-write the output or quit first; rank 0 plots
 #    if dconf['sim']['doplot']:
 #        print('plot raster:')
