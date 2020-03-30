@@ -208,9 +208,9 @@ class AIGame:
                 Rxs = [Rx,Rx+1,Rx+2]
             elif Rx==1:
                 Rxs = [Rx-1, Rx, Rx+1, Rx+2]
-            elif Rx==dirSensitiveNeurons_dim:
-                Rxs = [Rx-2,Rx-1,Rx]
             elif Rx==dirSensitiveNeurons_dim-1:
+                Rxs = [Rx-2,Rx-1,Rx]
+            elif Rx==dirSensitiveNeurons_dim-2:
                 Rxs = [Rx-2,Rx-1,Rx,Rx+1]
             else:
                 Rxs = [Rx-2,Rx-1,Rx,Rx+1,Rx+2]
@@ -220,9 +220,9 @@ class AIGame:
                     Rys = [Ry, Ry+1, Ry+2]
                 elif Ry==1:
                     Rys = [Ry-1, Ry, Ry+1, Ry+2]
-                elif Ry==dirSensitiveNeurons_dim:
-                    Rys = [Ry-2,Ry-1,Ry]
                 elif Ry==dirSensitiveNeurons_dim-1:
+                    Rys = [Ry-2,Ry-1,Ry]
+                elif Ry==dirSensitiveNeurons_dim-2:
                      Rys = [Ry-2,Ry-1,Ry,Ry+1]
                 else:
                     Rys = [Ry-2,Ry-1,Ry,Ry+1,Ry+2]
