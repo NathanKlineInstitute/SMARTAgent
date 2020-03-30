@@ -1120,7 +1120,10 @@ STDPparamsRL2 with 'RLlenhebb': 800 ,'RLlenanti': 100 and 'useRLexp': 0
 **add more direction selective neurons (for 8 directions now: 'EV1D0','EV1D45','EV1D90','EV1D135','EV1D180','EV1D225','EV1D270','EV1D315')
 **Increase the Field of View (FOV) from 3x3 pixels to 5x5 pixels. (to have a better estimate for the direction). This may help in estimating direction of movement better for most of the times, except when ball is very close to the racket.
 **Print theta and field of view when theta is not nan.
-**debug FOV indexing.
+**debug FOV indexing.--->debugged
+**looking at the raster and voltage traces saved as "20Mar30_G0_step_0_g0_02_CellX_200sec_FOV5x5.png" and raster plot ""20Mar30_G0_step_0_g0_02_raster_200sec_FOV5x5.png"", it seems that the strength is too much because 2 cells recorded show block. But at the same time, we need to be careful that the strength is enough to relay the pixel intensities in image. But for now focus on direction.
+**In stimtargetparams for direction selective neurons, change connection strength to 0.01.
+
 
 
 
