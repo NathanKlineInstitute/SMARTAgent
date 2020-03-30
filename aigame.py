@@ -210,7 +210,7 @@ class AIGame:
                 Rxs = [Rx-1, Rx, Rx+1, Rx+2]
             #elif Rx==dirSensitiveNeurons_dim-1:
             #    Rxs = [Rx-2,Rx-1,Rx]
-            elif Rx==dirSensitiveNeurons_dim-2:
+            elif Rx==((2*dirSensitiveNeurons_dim)-2):
                 Rxs = [Rx-2,Rx-1,Rx,Rx+1]
             else:
                 Rxs = [Rx-2,Rx-1,Rx,Rx+1,Rx+2]
@@ -223,12 +223,12 @@ class AIGame:
                     Rys = [Ry-1, Ry, Ry+1, Ry+2]
                 #elif Ry==dirSensitiveNeurons_dim-1:
                 #    Rys = [Ry-2,Ry-1,Ry]
-                elif Ry==dirSensitiveNeurons_dim-2:
+                elif Ry==((2*dirSensitiveNeurons_dim)-2):
                      Rys = [Ry-2,Ry-1,Ry,Ry+1]
                 else:
                     Rys = [Ry-2,Ry-1,Ry,Ry+1,Ry+2]
-                print('Xinds',Rxs)
-                print('Yinds',Rys)
+                #print('Xinds',Rxs)
+                #print('Yinds',Rys)
                 FOV = np.zeros(shape=(len(Rxs),len(Rys)))
                 for xinds in range(len(Rxs)):
                     for yinds in range(len(Rys)):
