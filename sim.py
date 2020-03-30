@@ -851,28 +851,29 @@ def updateInputRates ():
         firing_rates = sim.AIGame.firing_rates
         sim.pc.broadcast(sim.AIGame.fvecE.from_python(sim.AIGame.directionsE),0)
         firing_rates_dirE = sim.AIGame.directionsE
-        print('Firing Rates of EAST:',firing_rates_dirE)
         sim.pc.broadcast(sim.AIGame.fvecNE.from_python(sim.AIGame.directionsNE),0)
         firing_rates_dirNE = sim.AIGame.directionsNE
-        print('Firing Rates of NORTH-EAST:',firing_rates_dirNE)
         sim.pc.broadcast(sim.AIGame.fvecN.from_python(sim.AIGame.directionsN),0)
         firing_rates_dirN = sim.AIGame.directionsN
-        print('Firing Rates of NORTH:',firing_rates_dirN)
         sim.pc.broadcast(sim.AIGame.fvecNW.from_python(sim.AIGame.directionsNW),0)
         firing_rates_dirNW = sim.AIGame.directionsNW
-        print('Firing Rates of NORTH-WEST:',firing_rates_dirNW)
         sim.pc.broadcast(sim.AIGame.fvecW.from_python(sim.AIGame.directionsW),0)
         firing_rates_dirW = sim.AIGame.directionsW
-        print('Firing Rates of WEST:',firing_rates_dirW)
         sim.pc.broadcast(sim.AIGame.fvecSW.from_python(sim.AIGame.directionsSW),0)
         firing_rates_dirSW = sim.AIGame.directionsSW
-        print('Firing Rates of SOUTH-WEST:',firing_rates_dirSW)
         sim.pc.broadcast(sim.AIGame.fvecS.from_python(sim.AIGame.directionsS),0)
         firing_rates_dirS = sim.AIGame.directionsS
-        print('Firing Rates of SOUTH:',firing_rates_dirS)
         sim.pc.broadcast(sim.AIGame.fvecSE.from_python(sim.AIGame.directionsSE),0)
         firing_rates_dirSE = sim.AIGame.directionsSE
-        print('Firing Rates of SOUTH-EAST:',firing_rates_dirSE)
+        if dconf['verbose'] > 1:
+            print('Firing Rates of EAST:',firing_rates_dirE)
+            print('Firing Rates of NORTH-EAST:',firing_rates_dirNE)
+            print('Firing Rates of NORTH:',firing_rates_dirN)
+            print('Firing Rates of NORTH-WEST:',firing_rates_dirNW)
+            print('Firing Rates of WEST:',firing_rates_dirW)
+            print('Firing Rates of SOUTH-WEST:',firing_rates_dirSW)
+            print('Firing Rates of SOUTH:',firing_rates_dirS)
+            print('Firing Rates of SOUTH-EAST:',firing_rates_dirSE)
     else:
         fvec = h.Vector()
         sim.pc.broadcast(fvec,0)
@@ -945,7 +946,7 @@ def updateInputRates ():
     # update input firing rates for stimuli to R cells
     lRcell = [c for c in sim.net.cells if c.gid in sim.net.pops['ER'].cellGids] # this is the set of R cells
     R_offset = np.amin(R_gids)
-    print('R offset:', R_offset)
+    #print('R offset:', R_offset)
     if dconf['verbose'] > 1: print(sim.rank,'updating len(lRcell)=',len(lRcell),'source firing rates. len(firing_rates)=',len(firing_rates))
     for cell in lRcell:  
         for stim in cell.stims:
@@ -955,7 +956,7 @@ def updateInputRates ():
     # update input firing rates for stimuli to E-direction cells
     lEDircell = [c for c in sim.net.cells if c.gid in sim.net.pops['EV1D0'].cellGids] # this is the set of 0-degree direction selective cells
     EDir_offset = np.amin(Edir_gids)
-    print('E-Dir offset:', EDir_offset)
+    #print('E-Dir offset:', EDir_offset)
     if dconf['verbose'] > 1: print(sim.rank,'updating len(lEDircell)=',len(lEDircell),'source firing rates. len(firing_rates_dirE)=',len(firing_rates_dirE))
     for cell in lEDircell:  
         for stim in cell.stims:
@@ -966,7 +967,7 @@ def updateInputRates ():
     # update input firing rates for stimuli to E-direction cells
     lNEDircell = [c for c in sim.net.cells if c.gid in sim.net.pops['EV1D45'].cellGids] # this is the set of 45-degree direction selective cells
     NEDir_offset = np.amin(NEdir_gids)
-    print('NE-Dir offset:', NEDir_offset)
+    #print('NE-Dir offset:', NEDir_offset)
     if dconf['verbose'] > 1: print(sim.rank,'updating len(lNEDircell)=',len(lNEDircell),'source firing rates. len(firing_rates_dirNE)=',len(firing_rates_dirNE))
     for cell in lNEDircell:  
         for stim in cell.stims:
@@ -977,7 +978,7 @@ def updateInputRates ():
     # update input firing rates for stimuli to N-direction cells
     lNDircell = [c for c in sim.net.cells if c.gid in sim.net.pops['EV1D90'].cellGids] # this is the set of 90-degree direction selective cells
     NDir_offset = np.amin(Ndir_gids)
-    print('N-Dir offset:', NDir_offset)
+    #print('N-Dir offset:', NDir_offset)
     if dconf['verbose'] > 1: print(sim.rank,'updating len(lNDircell)=',len(lNDircell),'source firing rates. len(firing_rates_dirN)=',len(firing_rates_dirN))
     for cell in lNDircell:  
         for stim in cell.stims:
@@ -986,7 +987,7 @@ def updateInputRates ():
     # update input firing rates for stimuli to NW-direction cells
     lNWDircell = [c for c in sim.net.cells if c.gid in sim.net.pops['EV1D135'].cellGids] # this is the set of 135-degree direction selective cells
     NWDir_offset = np.amin(NWdir_gids)
-    print('NW-Dir offset:', NWDir_offset) 
+    #print('NW-Dir offset:', NWDir_offset) 
     if dconf['verbose'] > 1: print(sim.rank,'updating len(lNWDircell)=',len(lNWDircell),'source firing rates. len(firing_rates_dirNW)=',len(firing_rates_dirNW))
     for cell in lNWDircell:  
         for stim in cell.stims:
@@ -995,7 +996,7 @@ def updateInputRates ():
     # update input firing rates for stimuli to W-direction cells
     lWDircell = [c for c in sim.net.cells if c.gid in sim.net.pops['EV1D180'].cellGids] # this is the set of 180-degree direction selective cells
     WDir_offset = np.amin(Wdir_gids)
-    print('W-Dir offset:', WDir_offset)
+    #print('W-Dir offset:', WDir_offset)
     if dconf['verbose'] > 1: print(sim.rank,'updating len(lWDircell)=',len(lWDircell),'source firing rates. len(firing_rates_dirW)=',len(firing_rates_dirW))
     for cell in lWDircell:  
         for stim in cell.stims:
@@ -1004,7 +1005,7 @@ def updateInputRates ():
     # update input firing rates for stimuli to South-West-direction cells
     lSWDircell = [c for c in sim.net.cells if c.gid in sim.net.pops['EV1D225'].cellGids] # this is the set of 225-degree direction selective cells
     SWDir_offset = np.amin(SWdir_gids)
-    print('SW-Dir offset:', SWDir_offset)
+    #print('SW-Dir offset:', SWDir_offset)
     if dconf['verbose'] > 1: print(sim.rank,'updating len(lSWDircell)=',len(lSWDircell),'source firing rates. len(firing_rates_dirSW)=',len(firing_rates_dirSW))
     for cell in lSWDircell:  
         for stim in cell.stims:
@@ -1013,7 +1014,7 @@ def updateInputRates ():
     # update input firing rates for stimuli to South-direction cells
     lSDircell = [c for c in sim.net.cells if c.gid in sim.net.pops['EV1D270'].cellGids] # this is the set of 270-degree direction selective cells
     SDir_offset = np.amin(Sdir_gids)
-    print('S-Dir offset:', SDir_offset)
+    #print('S-Dir offset:', SDir_offset)
     if dconf['verbose'] > 1: print(sim.rank,'updating len(lSDircell)=',len(lSDircell),'source firing rates. len(firing_rates_dirS)=',len(firing_rates_dirS))
     for cell in lSDircell:  
         for stim in cell.stims:
@@ -1022,7 +1023,7 @@ def updateInputRates ():
     # update input firing rates for stimuli to South-EAST-direction cells
     lSEDircell = [c for c in sim.net.cells if c.gid in sim.net.pops['EV1D315'].cellGids] # this is the set of 315-degree direction selective cells
     SEDir_offset = np.amin(SEdir_gids)
-    print('SE-Dir offset:', SEDir_offset)
+    #print('SE-Dir offset:', SEDir_offset)
     if dconf['verbose'] > 1: print(sim.rank,'updating len(lSEDircell)=',len(lSEDircell),'source firing rates. len(firing_rates_dirSE)=',len(firing_rates_dirSE))
     for cell in lSEDircell:  
         for stim in cell.stims:
