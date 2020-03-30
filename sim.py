@@ -881,6 +881,9 @@ def updateInputRates ():
           print(sim.rank,'received U-firing rates:',np.where(firing_rates_dirUp==np.amax(firing_rates_dirUp)),np.amax(firing_rates_dirUp))
           print(sim.rank,'received D-firing rates:',np.where(firing_rates_dirDown==np.amax(firing_rates_dirDown)),np.amax(firing_rates_dirDown))
 
+    #gather cell tags
+    alltags = sim._gatherAllCellTags()
+    print(alltags)
     # update input firing rates for stimuli to R cells
     lRcell = [c for c in sim.net.cells if c.gid in sim.net.pops['ER'].cellGids] # this is the set of R cells
     #R_offset = 0 #np.amin(sim.net.pops['ER'].cellGids)

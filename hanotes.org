@@ -1112,6 +1112,8 @@ STDPparamsRL2 with 'RLlenhebb': 800 ,'RLlenanti': 100 and 'useRLexp': 0
 ***to fix connection strengths of stim input, restore original firing rates except for EV1Dir0 (30 Hz.)
 **restore all original firing rates.
 
+*20mar30
+**Sal suggested to use sim._gatherAllCellTags() to gather tags for all cells. gather and print to see what information is there.
 
 
 
