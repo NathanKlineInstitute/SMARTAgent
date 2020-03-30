@@ -883,7 +883,8 @@ def updateInputRates ():
 
     #gather cell tags
     alltags = sim._gatherAllCellTags()
-    print(alltags)
+    for c in alltags:
+        print(c.gid)
     # update input firing rates for stimuli to R cells
     lRcell = [c for c in sim.net.cells if c.gid in sim.net.pops['ER'].cellGids] # this is the set of R cells
     #R_offset = 0 #np.amin(sim.net.pops['ER'].cellGids)
