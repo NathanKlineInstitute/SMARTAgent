@@ -1120,6 +1120,7 @@ STDPparamsRL2 with 'RLlenhebb': 800 ,'RLlenanti': 100 and 'useRLexp': 0
 **add more direction selective neurons (for 8 directions now: 'EV1D0','EV1D45','EV1D90','EV1D135','EV1D180','EV1D225','EV1D270','EV1D315')
 **Increase the Field of View (FOV) from 3x3 pixels to 5x5 pixels. (to have a better estimate for the direction). This may help in estimating direction of movement better for most of the times, except when ball is very close to the racket.
 **Print theta and field of view when theta is not nan.
+**debug FOV indexing.
 
 
 
