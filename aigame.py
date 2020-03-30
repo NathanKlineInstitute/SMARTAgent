@@ -204,16 +204,28 @@ class AIGame:
         bkgPixel = np.amin(dsum_Images)
         for dSNeuron_x in range(dirSensitiveNeurons_dim):
             Rx = 2*dSNeuron_x
-            if Rx<1:
-                Rxs = [Rx,Rx+1]
+            if Rx==0:
+                Rxs = [Rx,Rx+1,Rx+2]
+            elif Rx==1:
+                Rxs = [Rx-1, Rx, Rx+1, Rx+2]
+            elif Rx==dirSensitiveNeurons_dim:
+                Rxs = [Rx-2,Rx-1,Rx]
+            elif Rx==dirSensitiveNeurons_dim-1:
+                Rxs = [Rx-2,Rx-1,Rx,Rx+1]
             else:
-                Rxs = [Rx-1,Rx,Rx+1]
+                Rxs = [Rx-2,Rx-1,Rx,Rx+1,Rx+2]
             for dSNeuron_y in range(dirSensitiveNeurons_dim):
                 Ry = 2*dSNeuron_y
-                if Rx<1:
-                    Rys = [Ry, Ry+1]
+                if Ry==0:
+                    Rys = [Ry, Ry+1, Ry+2]
+                elif Ry==1:
+                    Rys = [Ry-1, Ry, Ry+1, Ry+2]
+                elif Ry==dirSensitiveNeurons_dim:
+                    Rys = [Ry-2,Ry-1,Ry]
+                elif Ry==dirSensitiveNeurons_dim-1:
+                     Rys = [Ry-2,Ry-1,Ry,Ry+1]
                 else:
-                    Rys = [Ry-1,Ry,Ry+1]
+                    Rys = [Ry-2,Ry-1,Ry,Ry+1,Ry+2]
                 #print('Xinds',Rxs)
                 #print('Yinds',Rys)
                 FOV = np.zeros(shape=(len(Rxs),len(Rys)))
@@ -237,6 +249,8 @@ class AIGame:
                 if dir1[0]<0:
                     theta = theta+180 
                 dirSensitiveNeurons[dSNeuron_x,dSNeuron_y] = theta
+                if np.isnan(theta)=='False':
+                    print('Theta for FOV ',FOV,' is: ', theta)
         Einds = np.where(np.logical_and(dirSensitiveNeurons>337,dirSensitiveNeurons<23)) #EAST
         NEinds = np.where(np.logical_and(dirSensitiveNeurons>22,dirSensitiveNeurons<68)) #NORTH-EAST
         Ninds = np.where(np.logical_and(dirSensitiveNeurons>67,dirSensitiveNeurons<113)) #NORTH
