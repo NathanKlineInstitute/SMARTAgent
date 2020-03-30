@@ -69,14 +69,14 @@ class AIGame:
         input_dim = int(np.sqrt(dconf['net']['ER']))
         dirSensitiveNeurons_dim = 10 #int(0.5*input_dim)
         dirSensitiveNeurons = np.zeros(shape=(dirSensitiveNeurons_dim,dirSensitiveNeurons_dim))
-        dirE = np.ones(shape=(dirSensitiveNeurons_dim,dirSensitiveNeurons_dim))
-        dirNE = np.ones(shape=(dirSensitiveNeurons_dim,dirSensitiveNeurons_dim))
-        dirW = np.ones(shape=(dirSensitiveNeurons_dim,dirSensitiveNeurons_dim))
-        dirSW = np.ones(shape=(dirSensitiveNeurons_dim,dirSensitiveNeurons_dim))
-        dirN = np.ones(shape=(dirSensitiveNeurons_dim,dirSensitiveNeurons_dim))
-        dirNW = np.ones(shape=(dirSensitiveNeurons_dim,dirSensitiveNeurons_dim))
-        dirS = np.ones(shape=(dirSensitiveNeurons_dim,dirSensitiveNeurons_dim))
-        dirSE = np.ones(shape=(dirSensitiveNeurons_dim,dirSensitiveNeurons_dim))
+        dirE = 0.0001*np.ones(shape=(dirSensitiveNeurons_dim,dirSensitiveNeurons_dim))
+        dirNE = 0.0001*np.ones(shape=(dirSensitiveNeurons_dim,dirSensitiveNeurons_dim))
+        dirW = 0.0001*np.ones(shape=(dirSensitiveNeurons_dim,dirSensitiveNeurons_dim))
+        dirSW = 0.0001*np.ones(shape=(dirSensitiveNeurons_dim,dirSensitiveNeurons_dim))
+        dirN = 0.0001*np.ones(shape=(dirSensitiveNeurons_dim,dirSensitiveNeurons_dim))
+        dirNW = 0.0001*np.ones(shape=(dirSensitiveNeurons_dim,dirSensitiveNeurons_dim))
+        dirS = 0.0001*np.ones(shape=(dirSensitiveNeurons_dim,dirSensitiveNeurons_dim))
+        dirSE = 0.0001*np.ones(shape=(dirSensitiveNeurons_dim,dirSensitiveNeurons_dim))
         dsum_Images = np.zeros(shape=(input_dim,input_dim)) #previously we merged 2x2 pixels into 1 value. Now we merge 8x8 pixels into 1 value. so the original 160x160 pixels will result into 20x20 values instead of previously used 80x80.
         #print(actions)
         gray_Image = np.zeros(shape=(160,160))
@@ -260,14 +260,14 @@ class AIGame:
         SWinds = np.where(np.logical_and(dirSensitiveNeurons>202,dirSensitiveNeurons<248)) #SOUTH-WEST
         Sinds = np.where(np.logical_and(dirSensitiveNeurons>247,dirSensitiveNeurons<293)) #SOUTH
         SEinds = np.where(np.logical_and(dirSensitiveNeurons>292,dirSensitiveNeurons<338)) #SOUTH-EAST
-        dirE[Einds] = 30 #30Hz firing rate---later should be used as a parameter with some noise.
-        dirNE[NEinds] = 30
-        dirN[Ninds] = 30
-        dirNW[NWinds] = 30 
-        dirW[Winds] = 30 #30Hz firing rate---later should be used as a parameter with some noise.
-        dirSW[SWinds] = 30
-        dirS[Sinds] = 30
-        dirSE[SEinds] = 30 
+        dirE[Einds] = 10 #30Hz firing rate---later should be used as a parameter with some noise.
+        dirNE[NEinds] = 10
+        dirN[Ninds] = 10
+        dirNW[NWinds] = 10 
+        dirW[Winds] = 10 #30Hz firing rate---later should be used as a parameter with some noise.
+        dirSW[SWinds] = 10
+        dirS[Sinds] = 10
+        dirSE[SEinds] = 10 
         self.directionsE = np.reshape(dirE,100)
         self.directionsNE = np.reshape(dirNE,100)
         self.directionsN = np.reshape(dirN,100)
