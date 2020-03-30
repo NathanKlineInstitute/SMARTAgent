@@ -216,6 +216,7 @@ class AIGame:
                 Rxs = [Rx-2,Rx-1,Rx,Rx+1,Rx+2]
             for dSNeuron_y in range(dirSensitiveNeurons_dim):
                 Ry = 2*dSNeuron_y
+                print('Ry:',Ry)
                 if Ry==0:
                     Rys = [Ry, Ry+1, Ry+2]
                 elif Ry==1:
