@@ -1114,6 +1114,9 @@ STDPparamsRL2 with 'RLlenhebb': 800 ,'RLlenanti': 100 and 'useRLexp': 0
 
 *20mar30
 **Sal suggested to use sim._gatherAllCellTags() to gather tags for all cells. gather and print to see what information is there.
+**make a list of gids and find list of gids for ER, EV1D0, EV1D90, EV1D180, EV1D270 to find the offset. (adding additional computation).
+**use these lists to find the offset to access firing rates of neurons encoding different directions.
+
 
 
 
