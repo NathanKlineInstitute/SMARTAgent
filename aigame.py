@@ -40,15 +40,23 @@ class AIGame:
         self.count = 0 
         self.countAll = 0
         self.fvec = h.Vector()
-        self.fvecR = h.Vector()
-        self.fvecL = h.Vector()
-        self.fvecU = h.Vector()
-        self.fvecD = h.Vector()
+        self.fvecE = h.Vector()
+        self.fvecNE = h.Vector()
+        self.fvecN = h.Vector()
+        self.fvecNW = h.Vector()
+        self.fvecW = h.Vector()
+        self.fvecSW = h.Vector()
+        self.fvecS = h.Vector()
+        self.fvecSE = h.Vector()
         self.firing_rates = np.zeros(dconf['net']['ER'])  # image-based input firing rates; 20x20 = 400 pixels
-        self.directionsR = np.ones(int(0.25*(dconf['net']['ER']))) #assuming i will use this architecture...compute directions using 9 pixels for every other pixel 
-        self.directionsL = np.ones(int(0.25*(dconf['net']['ER']))) #assuming i will use this architecture...compute directions using 9 pixels for every other pixel 
-        self.directionsUp = np.ones(int(0.25*(dconf['net']['ER']))) #assuming i will use this architecture...compute directions using 9 pixels for every other pixel 
-        self.directionsDown = np.ones(int(0.25*(dconf['net']['ER']))) #assuming i will use this architecture...compute directions using 9 pixels for every other pixel 
+        self.directionsE = np.ones(dconf['net']['EV1D0']) #for EAST
+        self.directionsNE = np.ones(dconf['net']['EV1D45']) #for NORTH-EAST
+        self.directionsN = np.ones(dconf['net']['EV1D90']) #for NORTH
+        self.directionsNW = np.ones(dconf['net']['EV1D135']) #for NORTH WEST
+        self.directionsW = np.ones(dconf['net']['EV1D180']) #for WEST
+        self.directionsSW = np.ones(dconf['net']['EV1D225']) #for SOUTH WEST
+        self.directionsS = np.ones(dconf['net']['EV1D270']) # for SOUTH
+        self.directionsSE = np.ones(dconf['net']['EV1D315']) #for SOUTH EAST
         self.intaction = 5 # integrate this many actions together before returning reward information to model
     ################################
     ### PLAY GAME
@@ -61,10 +69,14 @@ class AIGame:
         input_dim = int(np.sqrt(dconf['net']['ER']))
         dirSensitiveNeurons_dim = 10 #int(0.5*input_dim)
         dirSensitiveNeurons = np.zeros(shape=(dirSensitiveNeurons_dim,dirSensitiveNeurons_dim))
-        dirR = np.ones(shape=(dirSensitiveNeurons_dim,dirSensitiveNeurons_dim))
-        dirL = np.ones(shape=(dirSensitiveNeurons_dim,dirSensitiveNeurons_dim))
-        dirU = np.ones(shape=(dirSensitiveNeurons_dim,dirSensitiveNeurons_dim))
-        dirD = np.ones(shape=(dirSensitiveNeurons_dim,dirSensitiveNeurons_dim))
+        dirE = 0.0001*np.ones(shape=(dirSensitiveNeurons_dim,dirSensitiveNeurons_dim))
+        dirNE = 0.0001*np.ones(shape=(dirSensitiveNeurons_dim,dirSensitiveNeurons_dim))
+        dirW = 0.0001*np.ones(shape=(dirSensitiveNeurons_dim,dirSensitiveNeurons_dim))
+        dirSW = 0.0001*np.ones(shape=(dirSensitiveNeurons_dim,dirSensitiveNeurons_dim))
+        dirN = 0.0001*np.ones(shape=(dirSensitiveNeurons_dim,dirSensitiveNeurons_dim))
+        dirNW = 0.0001*np.ones(shape=(dirSensitiveNeurons_dim,dirSensitiveNeurons_dim))
+        dirS = 0.0001*np.ones(shape=(dirSensitiveNeurons_dim,dirSensitiveNeurons_dim))
+        dirSE = 0.0001*np.ones(shape=(dirSensitiveNeurons_dim,dirSensitiveNeurons_dim))
         dsum_Images = np.zeros(shape=(input_dim,input_dim)) #previously we merged 2x2 pixels into 1 value. Now we merge 8x8 pixels into 1 value. so the original 160x160 pixels will result into 20x20 values instead of previously used 80x80.
         #print(actions)
         gray_Image = np.zeros(shape=(160,160))
@@ -192,16 +204,29 @@ class AIGame:
         bkgPixel = np.amin(dsum_Images)
         for dSNeuron_x in range(dirSensitiveNeurons_dim):
             Rx = 2*dSNeuron_x
-            if Rx<1:
-                Rxs = [Rx,Rx+1]
+            if Rx==0:
+                Rxs = [Rx,Rx+1,Rx+2]
+            elif Rx==1:
+                Rxs = [Rx-1, Rx, Rx+1, Rx+2]
+            #elif Rx==dirSensitiveNeurons_dim-1:
+            #    Rxs = [Rx-2,Rx-1,Rx]
+            elif Rx==((2*dirSensitiveNeurons_dim)-2):
+                Rxs = [Rx-2,Rx-1,Rx,Rx+1]
             else:
-                Rxs = [Rx-1,Rx,Rx+1]
+                Rxs = [Rx-2,Rx-1,Rx,Rx+1,Rx+2]
             for dSNeuron_y in range(dirSensitiveNeurons_dim):
                 Ry = 2*dSNeuron_y
-                if Rx<1:
-                    Rys = [Ry, Ry+1]
+                #print('Ry:',Ry)
+                if Ry==0:
+                    Rys = [Ry, Ry+1, Ry+2]
+                elif Ry==1:
+                    Rys = [Ry-1, Ry, Ry+1, Ry+2]
+                #elif Ry==dirSensitiveNeurons_dim-1:
+                #    Rys = [Ry-2,Ry-1,Ry]
+                elif Ry==((2*dirSensitiveNeurons_dim)-2):
+                     Rys = [Ry-2,Ry-1,Ry,Ry+1]
                 else:
-                    Rys = [Ry-1,Ry,Ry+1]
+                    Rys = [Ry-2,Ry-1,Ry,Ry+1,Ry+2]
                 #print('Xinds',Rxs)
                 #print('Yinds',Rys)
                 FOV = np.zeros(shape=(len(Rxs),len(Rys)))
@@ -225,19 +250,32 @@ class AIGame:
                 if dir1[0]<0:
                     theta = theta+180 
                 dirSensitiveNeurons[dSNeuron_x,dSNeuron_y] = theta
-        Rinds = np.where(np.logical_and(dirSensitiveNeurons>314,dirSensitiveNeurons<46))
-        Linds = np.where(np.logical_and(dirSensitiveNeurons>134,dirSensitiveNeurons<226))
-        Upinds = np.where(np.logical_and(dirSensitiveNeurons>44,dirSensitiveNeurons<136))
-        Downinds = np.where(np.logical_and(dirSensitiveNeurons>224,dirSensitiveNeurons<316))
-        dirR = 30*dirR
-        #dirR[Rinds] = 30 #30Hz firing rate---later should be used as a parameter with some noise.
-        dirL[Linds] = 30
-        dirU[Upinds] = 30
-        dirD[Downinds] = 30 
-        self.directionsR = np.reshape(dirR,100)
-        self.directionsL = np.reshape(dirL,100)
-        self.directionsUp = np.reshape(dirU,100)
-        self.directionsDown = np.reshape(dirD,100)
+                if np.isnan(theta)=='False':
+                    print('Theta for FOV ',FOV,' is: ', theta)
+        Einds = np.where(np.logical_and(dirSensitiveNeurons>337,dirSensitiveNeurons<23)) #EAST
+        NEinds = np.where(np.logical_and(dirSensitiveNeurons>22,dirSensitiveNeurons<68)) #NORTH-EAST
+        Ninds = np.where(np.logical_and(dirSensitiveNeurons>67,dirSensitiveNeurons<113)) #NORTH
+        NWinds = np.where(np.logical_and(dirSensitiveNeurons>112,dirSensitiveNeurons<158)) #NORTH-WEST
+        Winds = np.where(np.logical_and(dirSensitiveNeurons>157,dirSensitiveNeurons<203)) #WEST
+        SWinds = np.where(np.logical_and(dirSensitiveNeurons>202,dirSensitiveNeurons<248)) #SOUTH-WEST
+        Sinds = np.where(np.logical_and(dirSensitiveNeurons>247,dirSensitiveNeurons<293)) #SOUTH
+        SEinds = np.where(np.logical_and(dirSensitiveNeurons>292,dirSensitiveNeurons<338)) #SOUTH-EAST
+        dirE[Einds] = 10 #30Hz firing rate---later should be used as a parameter with some noise.
+        dirNE[NEinds] = 10
+        dirN[Ninds] = 10
+        dirNW[NWinds] = 10 
+        dirW[Winds] = 10 #30Hz firing rate---later should be used as a parameter with some noise.
+        dirSW[SWinds] = 10
+        dirS[Sinds] = 10
+        dirSE[SEinds] = 10 
+        self.directionsE = np.reshape(dirE,100)
+        self.directionsNE = np.reshape(dirNE,100)
+        self.directionsN = np.reshape(dirN,100)
+        self.directionsNW = np.reshape(dirNW,100)
+        self.directionsW = np.reshape(dirW,100)
+        self.directionsSW = np.reshape(dirSW,100)
+        self.directionsS = np.reshape(dirS,100)
+        self.directionsSE = np.reshape(dirSE,100)
         InputImages.append(dsum_Images)
         #fr_Images = np.where(dsum_Images>1.0,100,dsum_Images) #Using this to check what number would work for firing rate
         #fr_Images = np.where(dsum_Images<10.0,0,dsum_Images)
