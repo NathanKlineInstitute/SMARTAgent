@@ -1127,6 +1127,8 @@ STDPparamsRL2 with 'RLlenhebb': 800 ,'RLlenanti': 100 and 'useRLexp': 0
 **change baseline firing rate of direction selective neurons to 0.0001 Hz (instead of 1 Hz).
 **change firing rate to 10Hz.
 
+*20mar31
+**print measured angles.
 
 
 
