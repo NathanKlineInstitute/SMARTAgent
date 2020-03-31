@@ -252,6 +252,7 @@ class AIGame:
                 dirSensitiveNeurons[dSNeuron_x,dSNeuron_y] = theta
                 if np.isnan(theta)=='False':
                     print('Theta for FOV ',FOV,' is: ', theta)
+        print('Computed angles:', dirSensitiveNeurons)
         Einds = np.where(np.logical_and(dirSensitiveNeurons>337,dirSensitiveNeurons<23)) #EAST
         NEinds = np.where(np.logical_and(dirSensitiveNeurons>22,dirSensitiveNeurons<68)) #NORTH-EAST
         Ninds = np.where(np.logical_and(dirSensitiveNeurons>67,dirSensitiveNeurons<113)) #NORTH
