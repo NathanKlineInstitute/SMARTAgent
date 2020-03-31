@@ -234,20 +234,28 @@ class AIGame:
                     for yinds in range(len(Rys)):
                         FOV[xinds,yinds] = dsum_Images[Rxs[xinds],Rys[yinds]]
                 #print(FOV)
-                max_ind = np.unravel_index(np.argmax(FOV, axis=None), FOV.shape)
+                max_value = np.amax(FOV)
+                max_ind = np.where(FOV==max_value)
                 #print('max inds', max_ind) 
                 #since the most recent frame has highest pixel intensity, any pixel with the maximum intensity will be most probably the final instance of the object motion in that field of view
                 bkg_inds = np.where(FOV == bkgPixel)
-                np.put(FOV,bkg_inds,1000) #I dont want to compute object motion vector relative to the background. so to ignore background pixels, replacing them with large value
-                min_ind = np.unravel_index(np.argmin(FOV, axis=None), FOV.shape)
+                if len(bkg_inds[0])>0:
+                    for yinds in range(len(bkg_inds[0])):
+                        ix = bkg_inds[0][yinds]
+                        iy = bkg_inds[1][yinds]
+                        FOV[ix,iy] = 1000
+                #np.put(FOV,bkg_inds,1000) #I dont want to compute object motion vector relative to the background. so to ignore background pixels, replacing them with large value
+                min_value = np.amin(FOV)
+                min_ind = np.where(FOV==min_value)
                 #print('min inds', min_ind)
                 #sine the most latest frame has the lowest pixel intensity (after ignoring the background), any pixel with the maximum intensity will be most probably the first instance of the object motion in that field of view
                 dir1 = [max_ind[0]-min_ind[0],max_ind[1]-min_ind[1]] #direction of the object motion in a field of view over last 5 frames/observations.
+                dir2 = [np.median(dir1[1]),np.median(dir1[0])]
                 dirMain = [0,1] #using a reference for 0 degrees....considering first is for rows and second is for columns
-                ndir1 = dir1 / np.linalg.norm(dir1)
+                ndir2 = dir2 / np.linalg.norm(dir2)
                 ndirMain = dirMain / np.linalg.norm(dirMain)
-                theta = np.degrees(np.arccos(np.dot(ndir1,ndirMain))) #if theta is nan, no movement is detected
-                if dir1[0]<0:
+                theta = np.degrees(np.arccos(np.dot(ndir2,ndirMain))) #if theta is nan, no movement is detected
+                if dir2[0]<0:
                     theta = theta+180 
                 dirSensitiveNeurons[dSNeuron_x,dSNeuron_y] = theta
                 if np.isnan(theta)=='False':
