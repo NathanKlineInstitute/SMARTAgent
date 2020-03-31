@@ -1130,6 +1130,8 @@ STDPparamsRL2 with 'RLlenhebb': 800 ,'RLlenanti': 100 and 'useRLexp': 0
 *20mar31
 **print measured angles.
 **was using some numpy functions incorrectly. also was considering best case scenerio with 1 max and 1 min value to measure direction of object motion. sometimes the object does not move in the fielf of view and therefore give same inidices for min and max. so now i take the difference between min and max and then take median to get a direction vector. also was using x direction as y direction. ---->Looks like these issues fixed. IF FIND SOMETHING UNUSUAL, CHECK AGAIN. I CHECKED IT FOR A COUPLE OF IMAGE SEQUENCES AND IT WORKS FINE.
+**error on line 252 in aigame.py computing this equation (dir1 = [max_ind[0]-min_ind[0],max_ind[1]-min_ind[1]])--->not robust.
+**it broke when the dimensions of max_ind is different than min_ind. check it.
 
 
 
