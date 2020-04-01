@@ -249,7 +249,13 @@ class AIGame:
                 min_ind = np.where(FOV==min_value)
                 #print('min inds', min_ind)
                 #sine the most latest frame has the lowest pixel intensity (after ignoring the background), any pixel with the maximum intensity will be most probably the first instance of the object motion in that field of view
-                dir1 = [max_ind[0]-min_ind[0],max_ind[1]-min_ind[1]] #direction of the object motion in a field of view over last 5 frames/observations.
+                if len(max_ind[0])>len(min_ind[0]):
+                    mL = len(min_ind[0])
+                elif len(max_ind[0])<len(min_ind[0]):
+                    mL = len(max_ind[0])
+                else:
+                    mL = len(max_ind[0])
+                dir1 = [max_ind[0][range(mL)]-min_ind[0][range(mL)],max_ind[1][range(mL)]-min_ind[1][range(mL)]] #direction of the object motion in a field of view over last 5 frames/observations.
                 dir2 = [np.median(dir1[1]),np.median(dir1[0])]
                 dirMain = [0,1] #using a reference for 0 degrees....considering first is for rows and second is for columns
                 ndir2 = dir2 / np.linalg.norm(dir2)
