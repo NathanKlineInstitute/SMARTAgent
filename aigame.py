@@ -256,7 +256,7 @@ class AIGame:
                 else:
                     mL = len(max_ind[0])
                 dir1 = [max_ind[0][range(mL)]-min_ind[0][range(mL)],max_ind[1][range(mL)]-min_ind[1][range(mL)]] #direction of the object motion in a field of view over last 5 frames/observations.
-                dir2 = [np.median(dir1[1]),np.median(dir1[0])]
+                dir2 = [np.median(dir1[1]),-1*np.median(dir1[0])] #flip y because indexing starts from top left.
                 dirMain = [1,0] #using a reference for 0 degrees....considering first is for rows and second is for columns
                 ndir2 = dir2 / np.linalg.norm(dir2)
                 ndirMain = dirMain / np.linalg.norm(dirMain)
