@@ -1250,6 +1250,32 @@ if sim.rank == 0:
 sim.runSimWithIntervalFunc(100.0,trainAgent) # has periodic callback to adjust STDP weights based on RL signal
 sim.gatherData() # gather data from different nodes
 sim.saveData() # save data to disk
+
+print('SAVING RASTER DATA')
+if dconf['sim']['doplot']:
+    print('plot raster:')
+    sim.analysis.plotRaster(saveData = dconf['sim']['name']+'raster.pkl',showFig=True)
+    #sim.analysis.plotRaster(include = ['allCells'],saveData = dconf['sim']['name']+'raster.pkl',showFig=True)        
+    sim.analysis.plotData()    
+    if sim.plotWeights: plotWeights() 
+if sim.saveWeights:
+    #saveWeights(sim, recordWeightDCells)
+    saveGameBehavior(sim)
+    fid5 = open('data/'+dconf['sim']['name']+'ActionsPerEpisode.txt','w')
+    for i in range(len(epCount)):
+        fid5.write('\t%0.1f' % epCount[i])
+        fid5.write('\n')
+if sim.saveInputImages:
+    InputImages = np.array(InputImages)
+    print(InputImages.shape)  
+    with open('data/'+dconf['sim']['name']+'InputImages.txt', 'w') as outfile:
+        outfile.write('# Array shape: {0}\n'.format(InputImages.shape))
+        for Input_Image in InputImages:
+            np.savetxt(outfile, Input_Image, fmt='%-7.2f')
+            outfile.write('# New slice\n')
+
+
+
 #sim.analysis.plotRaster(saveData = dconf['sim']['name']+'raster.pkl',showFig=True)
 #sim.analysis.plotData()
 if sim.rank == 0: # only rank 0 should save. otherwise all the other nodes could over-write the output or quit first; rank 0 plots
