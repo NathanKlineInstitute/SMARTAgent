@@ -1250,6 +1250,7 @@ if sim.rank == 0:
 sim.runSimWithIntervalFunc(100.0,trainAgent) # has periodic callback to adjust STDP weights based on RL signal
 sim.gatherData() # gather data from different nodes
 sim.saveData() # save data to disk
+sim.analysis.plotRaster(include = ['allCells'],saveData = dconf['sim']['name']+'raster.pkl',showFig=True)
 
 if sim.rank == 0: # only rank 0 should save. otherwise all the other nodes could over-write the output or quit first; rank 0 plots
     print('SAVING RASTER DATA')
@@ -1273,4 +1274,4 @@ if sim.rank == 0: # only rank 0 should save. otherwise all the other nodes could
             for Input_Image in InputImages:
                 np.savetxt(outfile, Input_Image, fmt='%-7.2f')
                 outfile.write('# New slice\n')
-    if dconf['sim']['doquit']: quit()
+    #if dconf['sim']['doquit']: quit()

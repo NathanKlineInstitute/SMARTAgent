@@ -1139,6 +1139,7 @@ STDPparamsRL2 with 'RLlenhebb': 800 ,'RLlenanti': 100 and 'useRLexp': 0
 **debug angle offset - using x and y inds in matrix is different than x and y axis used to compute angle.
 **i think its fixed now- check the debugged version.
 **flip y coordinate before computing angle because indexing starts from top left corner of the image.
+**again not plotting raster for me. I dont know what is wrong. so trying to plot it outside doplot control.
 
 
 
