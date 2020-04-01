@@ -1038,3 +1038,14 @@ and it has to be topographically arranged
 ** back to testing
 
 myrun 16
+
+*20apr1
+** fixing up plotSpatioTemporalActivity.py
+
+myrun 16
+
+python -i plotSpatioTemporalActivity.py
+
+seems to work now ... there weren't any loops, functions, dictionaries, etc.
+really used in the file ...
+

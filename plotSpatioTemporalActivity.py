@@ -4,6 +4,7 @@ import pickle
 import time
 from conf import dconf
 from collections import OrderedDict
+from pylab import *
 
 Input_Images = np.loadtxt('data/'+dconf['sim']['name']+'InputImages.txt')
 New_InputImages = []
@@ -45,74 +46,46 @@ for pop in lpop:
 t1 = range(0,totalDur,tBin_Size)
 t2 = range(tBin_Size,totalDur+tBin_Size,tBin_Size)
 
-def generateActivityMap(t1, t2, spkt, spkID, numc):
-  Nact = np.zeros(shape=(int(np.sqrt(N)),int(np.sqrt(N)),len(t1)))
-  """
-  for t,ID in zip(spkt,spkID):
-    Nact[i][j][t]
-    N = NCells
-  """    
-  for i in range(int(np.sqrt(N))):
-    for j in range(int(np.sqrt(N))):
-      cNeuronID = j+(i*int(np.sqrt(N)))
-      cNeuron_spkt = NCells_spkTimes[NCells==cNeuronID]
+def generateActivityMap(t1, t2, spkT, spkID, numc, startidx):
+  sN = int(np.sqrt(numc))
+  Nact = np.zeros(shape=(len(t1),sN,sN)) # Nact is 3D array of number of spikes, indexed by: time, y, x
+  for i in range(sN):
+    for j in range(sN):
+      cNeuronID = j+(i*sN) + startidx
+      cNeuron_spkT = spkT[spkID==cNeuronID]
       for t in range(len(t1)):
-        cbinSpikes = cNeuron_spkt[(cNeuron_spkt>t1[t]) & (cNeuron_spkt<=t2[t])]
-        Nact[i][j][t] = len(cbinSpikes)
+        cbinSpikes = cNeuron_spkT[(cNeuron_spkT>t1[t]) & (cNeuron_spkT<=t2[t])]
+        Nact[t][i][j] = len(cbinSpikes)
   return Nact
 
-dact = {pop:generateActivityMap(t1, t2, dnumc[pop], dspkT[pop]) for pop in lpop}
-
+dact = {pop:generateActivityMap(t1, t2, dspkT[pop], dspkID[pop], dnumc[pop], dstartidx[pop]) for pop in lpop}
 dmaxSpk = OrderedDict({pop:np.max(dact[pop]) for pop in lpop})
 max_spks = np.max([dmaxSpk[p] for p in lpop])
 
-fig, axs = plt.subplots(2, 5,figsize=(12,6))
-ax = axs.ravel()
-
-cbaxes = fig.add_axes([0.95, 0.4, 0.01, 0.2]) 
-#cb = plt.colorbar(ax1, cax = cbaxes)  
-
-for t in range(1,len(t1)):
+#
+def plotActivityMaps (pauset=1):
+  fig, axs = plt.subplots(2, 5,figsize=(12,6)); lax = axs.ravel()
+  cbaxes = fig.add_axes([0.95, 0.4, 0.01, 0.2]) 
+  ltitle = ['Input Images', 'Excit R', 'Excit V1', 'Excit V4', 'Excit IT', 'Inhib R', 'Inhib V1', 'Inhib V4', 'Inhib IT']
+  lact = [New_InputImages]; lvmax = [255]; llim = [(-.5,19.5)]
+  for pop in lpop:
+    lact.append(dact[pop])
+    lvmax.append(max_spks)
+    llim.append( (-0.5, lact[-1].shape[1] - 0.5) )
+  for t in range(1,len(t1)):
     fig.suptitle(str(tBin_Size)+' ms binned activity ' + str(t*tBin_Size) + ' ms')
-    ax[0].imshow(New_InputImages[t-1,:,:],cmap='gray', vmin=0, vmax = 255)
-    ax[0].set_xlim(-0.5,19.5)
-    ax[0].set_ylim(-0.5,19.5)
-    ax[0].set_title('Input Images')
-    ax[1].imshow(dact['ER'][:,:,t],cmap='gray', vmin=0, vmax=max_spks)
-    ax[1].set_title('Excit R')
-    ax[1].set_xlim(-0.5,19.5)
-    ax[1].set_ylim(-0.5,19.5)
-    pcm2 = ax[2].imshow(dact['EV1'][:,:,t],cmap='gray', vmin=0, vmax=max_spks)
-    ax[2].set_xlim(-0.5,19.5)
-    ax[2].set_ylim(-0.5,19.5)
-    ax[2].set_title('Excit V1')
-    ax[3].imshow(dact['EV4'][:,:,t],cmap='gray', vmin=0, vmax=max_spks)
-    ax[3].set_xlim(-0.5,9.5)
-    ax[3].set_ylim(-0.5,9.5)
-    ax[3].set_title('Excit V4')
-    ax[4].imshow(dact['EIT'][:,:,t],cmap='gray', vmin=0, vmax=max_spks)
-    ax[4].set_xlim(-0.5,4.5)
-    ax[4].set_ylim(-0.5,4.5)
-    ax[4].set_title('Excit IT')
-    ax[6].imshow(dact['IR'][:,:,t],cmap='gray', vmin=0, vmax=max_spks)
-    ax[6].set_xlim(-0.5,9.5)
-    ax[6].set_ylim(-0.5,9.5)
-    ax[6].set_title('Inhib R')
-    ax[5].axis('off')
-    ax[7].imshow(dact['IV1'][:,:,t],cmap='gray', vmin=0, vmax=max_spks)
-    ax[7].set_xlim(-0.5,9.5)
-    ax[7].set_ylim(-0.5,9.5)
-    ax[7].set_title('Inhib V1')
-    ax[8].imshow(dact['IV4'][:,:,t],cmap='gray', vmin=0, vmax=max_spks)
-    ax[8].set_xlim(-0.5,4.5)
-    ax[8].set_ylim(-0.5,4.5)
-    ax[8].set_title('Inhib V4')
-    ax[9].imshow(dact['IIT'][:,:,t],cmap='gray', vmin=0, vmax=max_spks)
-    ax[9].set_xlim(-0.5,2.5)
-    ax[9].set_ylim(-0.5,2.5)
-    ax[9].set_title('Inhib IT')
-    plt.colorbar(pcm2, cax = cbaxes)  
-    #plt.colorbar(pcm2)
-    plt.pause(2)
-    
+    idx = 0
+    for ldx,ax in enumerate(lax):
+      if ldx == 5:
+        ax.axis('off')
+        continue
+      if ldx==0: offidx=-1
+      else: offidx=0
+      pcm = ax.imshow( lact[idx][t+offidx,:,:], cmap='gray', vmin=0, vmax=lvmax[idx])
+      ax.set_xlim(llim[idx]); ax.set_ylim(llim[idx]); ax.set_title(ltitle[idx])
+      if ldx==2: plt.colorbar(pcm, cax = cbaxes)  
+      idx += 1
+    plt.pause(pauset)  
+  return fig, axs, plt
 
+fig, axs, plt = plotActivityMaps()
