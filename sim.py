@@ -1252,12 +1252,10 @@ sim.gatherData() # gather data from different nodes
 sim.saveData() # save data to disk
 
 print('SAVING RASTER DATA')
-if dconf['sim']['doplot']:
-    print('plot raster:')
-    sim.analysis.plotRaster(saveData = dconf['sim']['name']+'raster.pkl',showFig=True)
-    #sim.analysis.plotRaster(include = ['allCells'],saveData = dconf['sim']['name']+'raster.pkl',showFig=True)        
-    sim.analysis.plotData()    
-    if sim.plotWeights: plotWeights() 
+print('plot raster:')
+sim.analysis.plotRaster(saveData = dconf['sim']['name']+'raster.pkl',showFig=True)
+sim.analysis.plotData()    
+if sim.plotWeights: plotWeights() 
 if sim.saveWeights:
     #saveWeights(sim, recordWeightDCells)
     saveGameBehavior(sim)
