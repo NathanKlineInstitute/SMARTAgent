@@ -224,7 +224,7 @@ class AIGame:
                 #elif Ry==dirSensitiveNeurons_dim-1:
                 #    Rys = [Ry-2,Ry-1,Ry]
                 elif Ry==((2*dirSensitiveNeurons_dim)-2):
-                     Rys = [Ry-2,Ry-1,Ry,Ry+1]
+                    Rys = [Ry-2,Ry-1,Ry,Ry+1]
                 else:
                     Rys = [Ry-2,Ry-1,Ry,Ry+1,Ry+2]
                 #print('Xinds',Rxs)
@@ -257,11 +257,11 @@ class AIGame:
                     mL = len(max_ind[0])
                 dir1 = [max_ind[0][range(mL)]-min_ind[0][range(mL)],max_ind[1][range(mL)]-min_ind[1][range(mL)]] #direction of the object motion in a field of view over last 5 frames/observations.
                 dir2 = [np.median(dir1[1]),np.median(dir1[0])]
-                dirMain = [0,1] #using a reference for 0 degrees....considering first is for rows and second is for columns
+                dirMain = [1,0] #using a reference for 0 degrees....considering first is for rows and second is for columns
                 ndir2 = dir2 / np.linalg.norm(dir2)
                 ndirMain = dirMain / np.linalg.norm(dirMain)
                 theta = np.degrees(np.arccos(np.dot(ndir2,ndirMain))) #if theta is nan, no movement is detected
-                if dir2[0]<0:
+                if dir2[1]<0:
                     theta = theta+180 
                 dirSensitiveNeurons[dSNeuron_x,dSNeuron_y] = theta
                 if np.isnan(theta)=='False':
