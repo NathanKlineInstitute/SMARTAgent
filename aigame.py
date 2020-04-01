@@ -262,7 +262,7 @@ class AIGame:
                 ndirMain = dirMain / np.linalg.norm(dirMain)
                 theta = np.degrees(np.arccos(np.dot(ndir2,ndirMain))) #if theta is nan, no movement is detected
                 if dir2[1]<0:
-                    theta = theta+180 
+                    theta = 360-theta 
                 dirSensitiveNeurons[dSNeuron_x,dSNeuron_y] = theta
                 if np.isnan(theta)=='False':
                     print('Theta for FOV ',FOV,' is: ', theta)

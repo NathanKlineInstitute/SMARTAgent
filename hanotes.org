@@ -1135,6 +1135,9 @@ STDPparamsRL2 with 'RLlenhebb': 800 ,'RLlenanti': 100 and 'useRLexp': 0
 **use the dimensions of max_ind and min_ind to be the lower of both e.g. if one has 2x3 and the other 2x4. Use 2x3 for both.
 **test if the above mentioned solution worked or not.
 
+*20april01
+**debug angle offset - using x and y inds in matrix is different than x and y axis used to compute angle.
+
 
 
 
