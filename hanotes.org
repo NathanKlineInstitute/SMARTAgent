@@ -1145,6 +1145,13 @@ STDPparamsRL2 with 'RLlenhebb': 800 ,'RLlenanti': 100 and 'useRLexp': 0
 
 *20april03
 **seperate targets of StimMod by creating 2 separate stimTargetParams dictionaries. One is stimMod->R and other is stimMod->DirSelInput.
+**Strategy for connections onto EMR and EML neurons.
+***Each presynaptic neurons should connect to only 1 postsynaptic neuron. so if we have neurons projecting onto Motor neurons are in the list {"EV1":400,"EV1D0":100,"EV1D45":100,"EV1D90":100,"EV1D135":100,"EV1D180":100,"EV1D225":100,"EV1D270":100,"EV1D315":100,"EV4":100,"EIT":25} -->Total neurons = 1350. Therefore we shoul dhave 1350 neurons for ML and 1350 neurons for MR.
+**change pop names from directions in angles to directions in terms of E,NE,N,NW,W,SW,S,SE.
+**create a function to make list of connections between neurons in premotor areas and motor areas.
+**create lists of connections between neurons in premotor areas and motor areas.
+**change IT neurons to MT neurons.
+**include long range connections between premotor and motor areas using both AMPA and NMDA synaptic mechanisms. 
 
 
 

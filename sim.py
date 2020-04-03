@@ -32,9 +32,9 @@ global fid4
 fid4 = open(sim.MotorOutputsfilename,'w')
 
 scale = dconf['net']['scale']
-ETypes = ['ER','EV1','EV1D0','EV1D45','EV1D90','EV1D135','EV1D180','EV1D225','EV1D270','EV1D315','EV4','EIT', 'EML', 'EMR']
-ITypes = ['IR','IV1','IV4','IIT','IM']
-allpops = ['ER','IR','EV1','EV1D0','EV1D45','EV1D90','EV1D135','EV1D180','EV1D225','EV1D270','EV1D315','IV1','EV4','IV4','EIT','IIT','EML','EMR','IM']
+ETypes = ['ER','EV1','EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE','EV4','EMT', 'EML', 'EMR']
+ITypes = ['IR','IV1','IV4','IMT','IM']
+allpops = ['ER','IR','EV1','EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE','IV1','EV4','IV4','EMT','IMT','EML','EMR','IM']
 dnumc = OrderedDict({ty:dconf['net'][ty]*scale for ty in allpops}) # number of neurons of a given type
 
 # Network parameters
@@ -79,7 +79,7 @@ netParams.stimTargetParams['stimMod->R'] = {'source': 'stimMod',
         'delay': 1,
         'synMech': 'AMPA'}
 netParams.stimTargetParams['stimMod->DirSelInput'] = {'source': 'stimMod',
-        'conds': {'pop': ['EV1D0','EV1D45','EV1D90','EV1D135','EV1D180','EV1D225','EV1D270','EV1D315']},
+        'conds': {'pop': ['EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE',]},
         'convergence': 1,
         'weight': 0.01,
         'delay': 1,
@@ -89,7 +89,7 @@ netParams.stimTargetParams['stimMod->DirSelInput'] = {'source': 'stimMod',
 # Stimulation parameters
 
 netParams.stimSourceParams['ebkg'] = {'type': 'NetStim', 'rate': 5, 'noise': 1.0}
-netParams.stimTargetParams['ebkg->all'] = {'source': 'ebkg', 'conds': {'cellType': ['EV1','EV4','EIT']}, 'weight': 0.0, 'delay': 'max(1, normal(5,2))', 'synMech': 'AMPA'}
+netParams.stimTargetParams['ebkg->all'] = {'source': 'ebkg', 'conds': {'cellType': ['EV1','EV4','EMT']}, 'weight': 0.0, 'delay': 'max(1, normal(5,2))', 'synMech': 'AMPA'}
 
 netParams.stimSourceParams['MLbkg'] = {'type': 'NetStim', 'rate': 5, 'noise': 1.0}
 netParams.stimTargetParams['MLbkg->all'] = {'source': 'MLbkg', 'conds': {'cellType': ['EML']}, 'weight': 0.0, 'delay': 1, 'synMech': 'AMPA'}
@@ -98,9 +98,16 @@ netParams.stimSourceParams['MRbkg'] = {'type': 'NetStim', 'rate': 5, 'noise': 1.
 netParams.stimTargetParams['MRbkg->all'] = {'source': 'MRbkg', 'conds': {'cellType': ['EMR']}, 'weight': 0.0, 'delay': 1, 'synMech': 'AMPA'}
 
 netParams.stimSourceParams['bkg'] = {'type': 'NetStim', 'rate': 20, 'noise': 1.0}
-netParams.stimTargetParams['bkg->all'] = {'source': 'bkg', 'conds': {'cellType': ['IR','IV1','IV4','IIT']}, 'weight': 0.0, 'delay': 'max(1, normal(5,2))', 'synMech': 'AMPA'}
+netParams.stimTargetParams['bkg->all'] = {'source': 'bkg', 'conds': {'cellType': ['IR','IV1','IV4','IMT']}, 'weight': 0.0, 'delay': 'max(1, normal(5,2))', 'synMech': 'AMPA'}
 
 ######################################################################################
+def connectOnePreNtoOneMNeuron(NBNeurons,offset_pre,offset_post): #this method is used to generate list of connections between preSynNeurons and motor neurons.
+    blist = []
+    for i in range(NBNeurons):
+        preN = i+offset_pre
+        postN = i+offset_post
+        blist.append([preN,postN])
+    return blist
 def connectLayerswithOverlap(NBpreN, NBpostN, overlap_xdir):
     #NBpreN = 6400 	#number of presynaptic neurons
     NBpreN_x = int(np.sqrt(NBpreN))
@@ -211,7 +218,7 @@ def connectLayerswithOverlapDiv(NBpreN, NBpostN, overlap_xdir):
 #E to E - Feedforward connections
 blistERtoEV1 = connectLayerswithOverlap(NBpreN = dnumc['ER'], NBpostN = dnumc['EV1'], overlap_xdir = 3)
 blistEV1toEV4 = connectLayerswithOverlap(NBpreN = dnumc['EV1'], NBpostN = dnumc['EV4'], overlap_xdir = 3)
-blistEV4toEIT = connectLayerswithOverlap(NBpreN = dnumc['EV4'], NBpostN = dnumc['EIT'], overlap_xdir = 3) #was 15
+blistEV4toEMT = connectLayerswithOverlap(NBpreN = dnumc['EV4'], NBpostN = dnumc['EMT'], overlap_xdir = 3) #was 15
 #blistITtoMI = connectLayerswithOverlap(NBpreN = NB_ITneurons, NBpostN = NB_MIneurons, overlap_xdir = 3) #Not sure if this is a good strategy instead of all to all
 #blistMItoMO = connectLayerswithOverlap(NBpreN = NB_MIneurons, NBpostN = NB_MOneurons, overlap_xdir = 3) #was 19
 #blistMItoMO: Feedforward for MI to MO is all to all and can be specified in the connection statement iteself
@@ -219,36 +226,50 @@ blistEV4toEIT = connectLayerswithOverlap(NBpreN = dnumc['EV4'], NBpostN = dnumc[
 #E to I - Feedforward connections
 blistERtoIV1 = connectLayerswithOverlap(NBpreN = dnumc['ER'], NBpostN = dnumc['IV1'], overlap_xdir = 3)
 blistEV1toIV4 = connectLayerswithOverlap(NBpreN = dnumc['EV1'], NBpostN = dnumc['IV4'], overlap_xdir = 3) 
-blistEV4toIIT = connectLayerswithOverlap(NBpreN = dnumc['EV4'], NBpostN = dnumc['IIT'], overlap_xdir = 3) 
+blistEV4toIMT = connectLayerswithOverlap(NBpreN = dnumc['EV4'], NBpostN = dnumc['IMT'], overlap_xdir = 3) 
 
 #E to I - WithinLayer connections
 blistERtoIR = connectLayerswithOverlap(NBpreN = dnumc['ER'], NBpostN = dnumc['IR'], overlap_xdir = 3)
 blistEV1toIV1 = connectLayerswithOverlap(NBpreN = dnumc['EV1'], NBpostN = dnumc['IV1'], overlap_xdir = 3)
 blistEV4toIV4 = connectLayerswithOverlap(NBpreN = dnumc['EV4'], NBpostN = dnumc['IV4'], overlap_xdir = 3)
-blistEITtoIIT = connectLayerswithOverlap(NBpreN = dnumc['EIT'], NBpostN = dnumc['IIT'], overlap_xdir = 3)
+blistEMTtoIMT = connectLayerswithOverlap(NBpreN = dnumc['EMT'], NBpostN = dnumc['IMT'], overlap_xdir = 3)
 
 #I to E - WithinLayer Inhibition
 blistIRtoER = connectLayerswithOverlapDiv(NBpreN = dnumc['IR'], NBpostN = dnumc['ER'], overlap_xdir = 5)
 blistIV1toEV1 = connectLayerswithOverlapDiv(NBpreN = dnumc['IV1'], NBpostN = dnumc['EV1'], overlap_xdir = 5)
 blistIV4toEV4 = connectLayerswithOverlapDiv(NBpreN = dnumc['IV4'], NBpostN = dnumc['EV4'], overlap_xdir = 5)
-blistIITtoEIT = connectLayerswithOverlapDiv(NBpreN = dnumc['IIT'], NBpostN = dnumc['EIT'], overlap_xdir = 5)
+blistIMTtoEMT = connectLayerswithOverlapDiv(NBpreN = dnumc['IMT'], NBpostN = dnumc['EMT'], overlap_xdir = 5)
 
 #Feedbackward excitation
 #E to E  
 blistEV1toER = connectLayerswithOverlapDiv(NBpreN = dnumc['EV1'], NBpostN = dnumc['ER'], overlap_xdir = 3)
 blistEV4toEV1 = connectLayerswithOverlapDiv(NBpreN = dnumc['EV4'], NBpostN = dnumc['EV1'], overlap_xdir = 3)
-blistEITtoEV4 = connectLayerswithOverlapDiv(NBpreN = dnumc['EIT'], NBpostN = dnumc['EV4'], overlap_xdir = 3)
+blistEMTtoEV4 = connectLayerswithOverlapDiv(NBpreN = dnumc['EMT'], NBpostN = dnumc['EV4'], overlap_xdir = 3)
 
 #Feedforward inhibition
 #I to I
 blistIV1toIV4 = connectLayerswithOverlap(NBpreN = dnumc['IV1'], NBpostN = dnumc['IV4'], overlap_xdir = 5)
-blistIV4toIIT = connectLayerswithOverlap(NBpreN = dnumc['IV4'], NBpostN = dnumc['IIT'], overlap_xdir = 5)
+blistIV4toIMT = connectLayerswithOverlap(NBpreN = dnumc['IV4'], NBpostN = dnumc['IMT'], overlap_xdir = 5)
 
 #Feedbackward inhibition
 #I to E 
 blistIV1toER = connectLayerswithOverlapDiv(NBpreN = dnumc['IV1'], NBpostN = dnumc['ER'], overlap_xdir = 5)
 blistIV4toEV1 = connectLayerswithOverlapDiv(NBpreN = dnumc['IV4'], NBpostN = dnumc['EV1'], overlap_xdir = 5)
-blistIITtoEV4 = connectLayerswithOverlapDiv(NBpreN = dnumc['IIT'], NBpostN = dnumc['EV4'], overlap_xdir = 5)
+blistIMTtoEV4 = connectLayerswithOverlapDiv(NBpreN = dnumc['IMT'], NBpostN = dnumc['EV4'], overlap_xdir = 5)
+
+#Feedforward connections between presynaptic neurons and motor neurons
+blistV1toM = connectOnePreNtoOneMNeuron(NBNeurons = dnumc['EV1'],offset_pre = 0, offset_post=0)
+blistV1DEtoM = connectOnePreNtoOneMNeuron(NBNeurons = dnumc['EV1DE'],offset_pre = 0, offset_post=dnumc['EV1'])
+blistV1DNEtoM = connectOnePreNtoOneMNeuron(NBNeurons = dnumc['EV1DNE'],offset_pre = 0, offset_post=dnumc['EV1']+dnumc['EV1DE'])
+blistV1DNtoM = connectOnePreNtoOneMNeuron(NBNeurons = dnumc['EV1DN'],offset_pre = 0, offset_post=dnumc['EV1']+dnumc['EV1DE']+dnumc['EV1DNE'])
+blistV1DNWtoM = connectOnePreNtoOneMNeuron(NBNeurons = dnumc['EV1DNW'],offset_pre = 0, offset_post=dnumc['EV1']+dnumc['EV1DE']+dnumc['EV1DNE']+dnumc['EV1DN'])
+blistV1DWtoM = connectOnePreNtoOneMNeuron(NBNeurons = dnumc['EV1W'],offset_pre = 0, offset_post=dnumc['EV1']+dnumc['EV1DE']+dnumc['EV1DNE']+dnumc['EV1DN']+dnumc['EV1DNW'])
+blistV1DSWtoM = connectOnePreNtoOneMNeuron(NBNeurons = dnumc['EV1SW'],offset_pre = 0, offset_post=dnumc['EV1']+dnumc['EV1DE']+dnumc['EV1DNE']+dnumc['EV1DN']+dnumc['EV1DNW']+dnumc['EV1DW'])
+blistV1DStoM = connectOnePreNtoOneMNeuron(NBNeurons = dnumc['EV1S'],offset_pre = 0, offset_post=dnumc['EV1']+dnumc['EV1DE']+dnumc['EV1DNE']+dnumc['EV1DN']+dnumc['EV1DNW']+dnumc['EV1DW']+dnumc['EV1DSW'])
+blistV1DSEtoM = connectOnePreNtoOneMNeuron(NBNeurons = dnumc['EV1SE'],offset_pre = 0, offset_post=dnumc['EV1']+dnumc['EV1DE']+dnumc['EV1DNE']+dnumc['EV1DN']+dnumc['EV1DNW']+dnumc['EV1DW']+dnumc['EV1DSW']+dnumc['EV1DS'])
+blistV4toM = connectOnePreNtoOneMNeuron(NBNeurons = dnumc['EV4'],offset_pre = 0, offset_post=dnumc['EV1']+dnumc['EV1DE']+dnumc['EV1DNE']+dnumc['EV1DN']+dnumc['EV1DNW']+dnumc['EV1DW']+dnumc['EV1DSW']+dnumc['EV1DS']+dnumc['EV1DSE'])
+blistMTtoM = connectOnePreNtoOneMNeuron(NBNeurons = dnumc['EMT'],offset_pre = 0, offset_post=dnumc['EV1']+dnumc['EV1DE']+dnumc['EV1DNE']+dnumc['EV1DN']+dnumc['EV1DNW']+dnumc['EV1DW']+dnumc['EV1DSW']+dnumc['EV1DS']+dnumc['EV1DSE']+dnumc['EV4'])
+
 
 #Simulation options
 simConfig = specs.SimConfig()           # object of class SimConfig to store simulation configuration
@@ -305,9 +326,9 @@ netParams.connParams['EV4->EV4'] = {
         'weight': 0.000 * cfg.EEGain, #0.0001
         'delay': 2,
         'synMech': 'AMPA', 'sec':'dend', 'loc':0.5}
-netParams.connParams['EIT->EIT'] = {
-        'preConds': {'pop': 'EIT'},
-        'postConds': {'pop': 'EIT'},
+netParams.connParams['EMT->EMT'] = {
+        'preConds': {'pop': 'EMT'},
+        'postConds': {'pop': 'EMT'},
         'probability': 0.02,
         'weight': 0.000 * cfg.EEGain, #0.0001
         'delay': 2,
@@ -348,10 +369,10 @@ netParams.connParams['EV4->IV4'] = {
         'weight': 0.02 * cfg.EIGain,
         'delay': 2,
         'synMech': 'AMPA', 'sec':'soma', 'loc':0.5}
-netParams.connParams['EIT->IIT'] = {
-        'preConds': {'pop': 'EIT'},
-        'postConds': {'pop': 'IIT'},
-        'connList': blistEITtoIIT,
+netParams.connParams['EMT->IMT'] = {
+        'preConds': {'pop': 'EMT'},
+        'postConds': {'pop': 'IMT'},
+        'connList': blistEMTtoIMT,
         'weight': 0.02 * cfg.EIGain,
         'delay': 2,
         'synMech': 'AMPA', 'sec':'soma', 'loc':0.5}
@@ -395,10 +416,10 @@ netParams.connParams['IV4->EV4'] = {
         'weight': 0.02 * cfg.IEGain,
         'delay': 2,
         'synMech': 'GABA', 'sec':'soma', 'loc':0.5}
-netParams.connParams['IIT->EIT'] = {
-        'preConds': {'pop': 'IIT'},
-        'postConds': {'pop': 'EIT'},
-        'connList': blistIITtoEIT,
+netParams.connParams['IMT->EMT'] = {
+        'preConds': {'pop': 'IMT'},
+        'postConds': {'pop': 'EMT'},
+        'connList': blistIMTtoEMT,
         'weight': 0.02 * cfg.IEGain,
         'delay': 2,
         'synMech': 'GABA', 'sec':'soma', 'loc':0.5}
@@ -438,9 +459,9 @@ netParams.connParams['IV4->IV4'] = {
         'weight': 0.005 * cfg.IIGain, #0.000
         'delay': 2,
         'synMech': 'GABA', 'sec':'soma', 'loc':0.5}
-netParams.connParams['IIT->IIT'] = {
-        'preConds': {'pop': 'IIT'},
-        'postConds': {'pop': 'IIT'},
+netParams.connParams['IMT->IMT'] = {
+        'preConds': {'pop': 'IMT'},
+        'postConds': {'pop': 'IMT'},
         'probability': 0.25,
         'weight': 0.005 * cfg.IIGain, #0.000
         'delay': 2,
@@ -470,32 +491,14 @@ netParams.connParams['EV1->EV4'] = {
         'weight': 0.01 * cfg.EEGain,
         'delay': 2,
         'synMech': 'AMPA','sec':'dend', 'loc':0.5}
-netParams.connParams['EV4->EIT'] = {
+netParams.connParams['EV4->EMT'] = {
         'preConds': {'pop': 'EV4'},
-        'postConds': {'pop': 'EIT'},
-        'connList': blistEV4toEIT,
+        'postConds': {'pop': 'EMT'},
+        'connList': blistEV4toEMT,
         #'convergence': 10,
         'weight': 0.01 * cfg.EEGain,
         'delay': 2,
         'synMech': 'AMPA','sec':'dend', 'loc':0.5}
-netParams.connParams['EIT->EML'] = {
-        'preConds': {'pop': 'EIT'},
-        'postConds': {'pop': 'EML'},
-        #'connList': blistITtoMI,
-        'convergence': 16,
-        'weight': 0.0025 * cfg.EEGain,
-        'delay': 2,
-        'synMech': 'AMPA',
-        'plast': {'mech': 'STDP', 'params': STDPparamsRL1},'sec':'dend', 'loc':0.5}
-netParams.connParams['EIT->EMR'] = {
-        'preConds': {'pop': 'EIT'},
-        'postConds': {'pop': 'EMR'},
-        #'connList': blistMItoMO,
-        'convergence': 16,
-        'weight': 0.0025 * cfg.EEGain,
-        'delay': 2,
-        'synMech': 'AMPA',
-        'plast': {'mech': 'STDP', 'params': STDPparamsRL1},'sec':'dend', 'loc':0.5}
 
 #E to I feedforward connections
 netParams.connParams['ER->IV1'] = {
@@ -514,10 +517,10 @@ netParams.connParams['EV1->IV4'] = {
         'weight': 0.00 * cfg.EIGain, #0.002
         'delay': 2,
         'synMech': 'AMPA','sec':'soma', 'loc':0.5}
-netParams.connParams['EV4->IIT'] = {
+netParams.connParams['EV4->IMT'] = {
         'preConds': {'pop': 'EV4'},
-        'postConds': {'pop': 'IIT'},
-        'connList': blistEV4toIIT,
+        'postConds': {'pop': 'IMT'},
+        'connList': blistEV4toIMT,
         #'convergence': 10,
         'weight': 0.00 * cfg.EIGain, #0.002
         'delay': 2,
@@ -542,10 +545,10 @@ netParams.connParams['EV4->EV1'] = {    # <<-- that's E -> I ?? or E -> E ?? wei
         'delay': 2,
         'synMech': 'AMPA','sec':'dend', 'loc':0.5}
 """
-netParams.connParams['EIT->EV4'] = {
-        'preConds': {'pop': 'EIT'},
+netParams.connParams['EMT->EV4'] = {
+        'preConds': {'pop': 'EMT'},
         'postConds': {'pop': 'EV4'},
-        'connList': blistEITtoEV4,
+        'connList': blistEMTtoEV4,
         #'convergence': 10,
         'weight': 0.000 * cfg.EEGain, #0.0001
         'delay': 2,
@@ -568,10 +571,10 @@ netParams.connParams['IV4->EV1'] = {
         'weight': 0.00 * cfg.IEGain, #0.002
         'delay': 2,
         'synMech': 'GABA','sec':'soma', 'loc':0.5}
-netParams.connParams['IIT->EV4'] = {
-        'preConds': {'pop': 'IIT'},
+netParams.connParams['IMT->EV4'] = {
+        'preConds': {'pop': 'IMT'},
         'postConds': {'pop': 'EV4'},
-        'connList': blistIITtoEV4,
+        'connList': blistIMTtoEV4,
         #'convergence': 10,
         'weight': 0.00 * cfg.IEGain, #0.002
         'delay': 2,
@@ -586,10 +589,10 @@ netParams.connParams['IV1->IV4'] = {
         'weight': 0.00075 * cfg.IIGain, #0.00
         'delay': 2,
         'synMech': 'GABA','sec':'soma', 'loc':0.5}
-netParams.connParams['IV4->IIT'] = {
+netParams.connParams['IV4->IMT'] = {
         'preConds': {'pop': 'IV4'},
-        'postConds': {'pop': 'IIT'},
-        'connList': blistIV4toIIT,
+        'postConds': {'pop': 'IMT'},
+        'connList': blistIV4toIMT,
         #'convergence': 10,
         'weight': 0.00075 * cfg.IIGain, #0.00
         'delay': 2,
@@ -598,20 +601,93 @@ netParams.connParams['IV4->IIT'] = {
 #Add direct connections from lower and higher visual areas to motor cortex
 #Still no idea, how these connections should look like...just trying some numbers: 400 to 25 means convergence factor of 16
 #AMPA
+#direct connections between premotor areas to motor areas
 netParams.connParams['EV1->EMR'] = {
         'preConds': {'pop': 'EV1'},
         'postConds': {'pop': 'EMR'},
-        #'connList': blistMItoMO,
-        'convergence': 16,
+        'connList': blistV1toM,
+        #'convergence': 16,
         'weight': 0.0025 * cfg.EEGain,
         'delay': 2,
         'synMech': 'AMPA',
         'plast': {'mech': 'STDP', 'params': STDPparamsRL1},'sec':'dend', 'loc':0.5}
-netParams.connParams['EV1->EML'] = {
-        'preConds': {'pop': 'EV1'},
-        'postConds': {'pop': 'EML'},
-        #'connList': blistMItoMO,
-        'convergence': 16,
+netParams.connParams['EV1DE->EMR'] = {
+        'preConds': {'pop': 'EV1DE'},
+        'postConds': {'pop': 'EMR'},
+        'connList': blistV1DEtoM,
+        #'convergence': 16,
+        'weight': 0.0025 * cfg.EEGain,
+        'delay': 2,
+        'synMech': 'AMPA',
+        'plast': {'mech': 'STDP', 'params': STDPparamsRL1},'sec':'dend', 'loc':0.5}
+netParams.connParams['EV1DNE->EMR'] = {
+        'preConds': {'pop': 'EV1DNE'},
+        'postConds': {'pop': 'EMR'},
+        'connList': blistV1DNEtoM,
+        #'convergence': 16,
+        'weight': 0.0025 * cfg.EEGain,
+        'delay': 2,
+        'synMech': 'AMPA',
+        'plast': {'mech': 'STDP', 'params': STDPparamsRL1},'sec':'dend', 'loc':0.5}
+netParams.connParams['EV1DN->EMR'] = {
+        'preConds': {'pop': 'EV1DN'},
+        'postConds': {'pop': 'EMR'},
+        'connList': blistV1DNtoM,
+        #'convergence': 16,
+        'weight': 0.0025 * cfg.EEGain,
+        'delay': 2,
+        'synMech': 'AMPA',
+        'plast': {'mech': 'STDP', 'params': STDPparamsRL1},'sec':'dend', 'loc':0.5}
+netParams.connParams['EV1DNW->EMR'] = {
+        'preConds': {'pop': 'EV1DNW'},
+        'postConds': {'pop': 'EMR'},
+        'connList': blistV1DNWtoM,
+        #'convergence': 16,
+        'weight': 0.0025 * cfg.EEGain,
+        'delay': 2,
+        'synMech': 'AMPA',
+        'plast': {'mech': 'STDP', 'params': STDPparamsRL1},'sec':'dend', 'loc':0.5}
+netParams.connParams['EV1DW->EMR'] = {
+        'preConds': {'pop': 'EV1DW'},
+        'postConds': {'pop': 'EMR'},
+        'connList': blistV1DWtoM,
+        #'convergence': 16,
+        'weight': 0.0025 * cfg.EEGain,
+        'delay': 2,
+        'synMech': 'AMPA',
+        'plast': {'mech': 'STDP', 'params': STDPparamsRL1},'sec':'dend', 'loc':0.5}
+netParams.connParams['EV1DW->EMR'] = {
+        'preConds': {'pop': 'EV1DW'},
+        'postConds': {'pop': 'EMR'},
+        'connList': blistV1DWtoM,
+        #'convergence': 16,
+        'weight': 0.0025 * cfg.EEGain,
+        'delay': 2,
+        'synMech': 'AMPA',
+        'plast': {'mech': 'STDP', 'params': STDPparamsRL1},'sec':'dend', 'loc':0.5}
+netParams.connParams['EV1DSW->EMR'] = {
+        'preConds': {'pop': 'EV1DSW'},
+        'postConds': {'pop': 'EMR'},
+        'connList': blistV1DSWtoM,
+        #'convergence': 16,
+        'weight': 0.0025 * cfg.EEGain,
+        'delay': 2,
+        'synMech': 'AMPA',
+        'plast': {'mech': 'STDP', 'params': STDPparamsRL1},'sec':'dend', 'loc':0.5}
+netParams.connParams['EV1DS->EMR'] = {
+        'preConds': {'pop': 'EV1DS'},
+        'postConds': {'pop': 'EMR'},
+        'connList': blistV1DStoM,
+        #'convergence': 16,
+        'weight': 0.0025 * cfg.EEGain,
+        'delay': 2,
+        'synMech': 'AMPA',
+        'plast': {'mech': 'STDP', 'params': STDPparamsRL1},'sec':'dend', 'loc':0.5}
+netParams.connParams['EV1DSE->EMR'] = {
+        'preConds': {'pop': 'EV1DSE'},
+        'postConds': {'pop': 'EMR'},
+        'connList': blistV1DSEtoM,
+        #'convergence': 16,
         'weight': 0.0025 * cfg.EEGain,
         'delay': 2,
         'synMech': 'AMPA',
@@ -619,8 +695,110 @@ netParams.connParams['EV1->EML'] = {
 netParams.connParams['EV4->EMR'] = {
         'preConds': {'pop': 'EV4'},
         'postConds': {'pop': 'EMR'},
-        #'connList': blistMItoMO,
-        'convergence': 16,
+        'connList': blistV4toM,
+        #'convergence': 16,
+        'weight': 0.0025 * cfg.EEGain,
+        'delay': 2,
+        'synMech': 'AMPA',
+        'plast': {'mech': 'STDP', 'params': STDPparamsRL1},'sec':'dend', 'loc':0.5}
+netParams.connParams['EMT->EMR'] = {
+        'preConds': {'pop': 'EMT'},
+        'postConds': {'pop': 'EMR'},
+        'connList': blistMTtoM,
+        #'convergence': 16,
+        'weight': 0.0025 * cfg.EEGain,
+        'delay': 2,
+        'synMech': 'AMPA',
+        'plast': {'mech': 'STDP', 'params': STDPparamsRL1},'sec':'dend', 'loc':0.5}
+
+#left motor cortex
+
+netParams.connParams['EV1->EML'] = {
+        'preConds': {'pop': 'EV1'},
+        'postConds': {'pop': 'EML'},
+        'connList': blistV1toM,
+        #'convergence': 16,
+        'weight': 0.0025 * cfg.EEGain,
+        'delay': 2,
+        'synMech': 'AMPA',
+        'plast': {'mech': 'STDP', 'params': STDPparamsRL1},'sec':'dend', 'loc':0.5}
+netParams.connParams['EV1DE->EML'] = {
+        'preConds': {'pop': 'EV1DE'},
+        'postConds': {'pop': 'EML'},
+        'connList': blistV1DEtoM,
+        #'convergence': 16,
+        'weight': 0.0025 * cfg.EEGain,
+        'delay': 2,
+        'synMech': 'AMPA',
+        'plast': {'mech': 'STDP', 'params': STDPparamsRL1},'sec':'dend', 'loc':0.5}
+netParams.connParams['EV1DNE->EML'] = {
+        'preConds': {'pop': 'EV1DNE'},
+        'postConds': {'pop': 'EML'},
+        'connList': blistV1DNEtoM,
+        #'convergence': 16,
+        'weight': 0.0025 * cfg.EEGain,
+        'delay': 2,
+        'synMech': 'AMPA',
+        'plast': {'mech': 'STDP', 'params': STDPparamsRL1},'sec':'dend', 'loc':0.5}
+netParams.connParams['EV1DN->EML'] = {
+        'preConds': {'pop': 'EV1DN'},
+        'postConds': {'pop': 'EML'},
+        'connList': blistV1DNtoM,
+        #'convergence': 16,
+        'weight': 0.0025 * cfg.EEGain,
+        'delay': 2,
+        'synMech': 'AMPA',
+        'plast': {'mech': 'STDP', 'params': STDPparamsRL1},'sec':'dend', 'loc':0.5}
+netParams.connParams['EV1DNW->EML'] = {
+        'preConds': {'pop': 'EV1DNW'},
+        'postConds': {'pop': 'EML'},
+        'connList': blistV1DNWtoM,
+        #'convergence': 16,
+        'weight': 0.0025 * cfg.EEGain,
+        'delay': 2,
+        'synMech': 'AMPA',
+        'plast': {'mech': 'STDP', 'params': STDPparamsRL1},'sec':'dend', 'loc':0.5}
+netParams.connParams['EV1DW->EML'] = {
+        'preConds': {'pop': 'EV1DW'},
+        'postConds': {'pop': 'EML'},
+        'connList': blistV1DWtoM,
+        #'convergence': 16,
+        'weight': 0.0025 * cfg.EEGain,
+        'delay': 2,
+        'synMech': 'AMPA',
+        'plast': {'mech': 'STDP', 'params': STDPparamsRL1},'sec':'dend', 'loc':0.5}
+netParams.connParams['EV1DW->EML'] = {
+        'preConds': {'pop': 'EV1DW'},
+        'postConds': {'pop': 'EML'},
+        'connList': blistV1DWtoM,
+        #'convergence': 16,
+        'weight': 0.0025 * cfg.EEGain,
+        'delay': 2,
+        'synMech': 'AMPA',
+        'plast': {'mech': 'STDP', 'params': STDPparamsRL1},'sec':'dend', 'loc':0.5}
+netParams.connParams['EV1DSW->EML'] = {
+        'preConds': {'pop': 'EV1DSW'},
+        'postConds': {'pop': 'EML'},
+        'connList': blistV1DSWtoM,
+        #'convergence': 16,
+        'weight': 0.0025 * cfg.EEGain,
+        'delay': 2,
+        'synMech': 'AMPA',
+        'plast': {'mech': 'STDP', 'params': STDPparamsRL1},'sec':'dend', 'loc':0.5}
+netParams.connParams['EV1DS->EML'] = {
+        'preConds': {'pop': 'EV1DS'},
+        'postConds': {'pop': 'EML'},
+        'connList': blistV1DStoM,
+        #'convergence': 16,
+        'weight': 0.0025 * cfg.EEGain,
+        'delay': 2,
+        'synMech': 'AMPA',
+        'plast': {'mech': 'STDP', 'params': STDPparamsRL1},'sec':'dend', 'loc':0.5}
+netParams.connParams['EV1DSE->EML'] = {
+        'preConds': {'pop': 'EV1DSE'},
+        'postConds': {'pop': 'EML'},
+        'connList': blistV1DSEtoM,
+        #'convergence': 16,
         'weight': 0.0025 * cfg.EEGain,
         'delay': 2,
         'synMech': 'AMPA',
@@ -628,50 +806,245 @@ netParams.connParams['EV4->EMR'] = {
 netParams.connParams['EV4->EML'] = {
         'preConds': {'pop': 'EV4'},
         'postConds': {'pop': 'EML'},
-        #'connList': blistMItoMO,
-        'convergence': 16,
+        'connList': blistV4toM,
+        #'convergence': 16,
+        'weight': 0.0025 * cfg.EEGain,
+        'delay': 2,
+        'synMech': 'AMPA',
+        'plast': {'mech': 'STDP', 'params': STDPparamsRL1},'sec':'dend', 'loc':0.5}
+netParams.connParams['EMT->EML'] = {
+        'preConds': {'pop': 'EMT'},
+        'postConds': {'pop': 'EML'},
+        'connList': blistMTtoM,
+        #'convergence': 16,
         'weight': 0.0025 * cfg.EEGain,
         'delay': 2,
         'synMech': 'AMPA',
         'plast': {'mech': 'STDP', 'params': STDPparamsRL1},'sec':'dend', 'loc':0.5}
 
 #NMDA
-netParams.connParams['EV1N->EMRN'] = {
+
+#direct connections between premotor areas to motor areas
+netParams.connParams['nEV1->nEMR'] = {
         'preConds': {'pop': 'EV1'},
         'postConds': {'pop': 'EMR'},
-        #'connList': blistMItoMO,
-        'convergence': 16,
+        'connList': blistV1toM,
+        #'convergence': 16,
         'weight': 0.002 * cfg.EEGain,
         'delay': 2,
         'synMech': 'NMDA',
         'plast': {'mech': 'STDP', 'params': STDPparamsRL2},'sec':'dend', 'loc':0.5}
-netParams.connParams['EV1N->EMLN'] = {
-        'preConds': {'pop': 'EV1'},
-        'postConds': {'pop': 'EML'},
-        #'connList': blistMItoMO,
-        'convergence': 16,
+netParams.connParams['nEV1DE->nEMR'] = {
+        'preConds': {'pop': 'EV1DE'},
+        'postConds': {'pop': 'EMR'},
+        'connList': blistV1DEtoM,
+        #'convergence': 16,
         'weight': 0.002 * cfg.EEGain,
         'delay': 2,
         'synMech': 'NMDA',
         'plast': {'mech': 'STDP', 'params': STDPparamsRL2},'sec':'dend', 'loc':0.5}
-netParams.connParams['EV4N->EMRN'] = {
+netParams.connParams['nEV1DNE->nEMR'] = {
+        'preConds': {'pop': 'EV1DNE'},
+        'postConds': {'pop': 'EMR'},
+        'connList': blistV1DNEtoM,
+        #'convergence': 16,
+        'weight': 0.002 * cfg.EEGain,
+        'delay': 2,
+        'synMech': 'NMDA',
+        'plast': {'mech': 'STDP', 'params': STDPparamsRL2},'sec':'dend', 'loc':0.5}
+netParams.connParams['nEV1DN->nEMR'] = {
+        'preConds': {'pop': 'EV1DN'},
+        'postConds': {'pop': 'EMR'},
+        'connList': blistV1DNtoM,
+        #'convergence': 16,
+        'weight': 0.002 * cfg.EEGain,
+        'delay': 2,
+        'synMech': 'NMDA',
+        'plast': {'mech': 'STDP', 'params': STDPparamsRL2},'sec':'dend', 'loc':0.5}
+netParams.connParams['nEV1DNW->nEMR'] = {
+        'preConds': {'pop': 'EV1DNW'},
+        'postConds': {'pop': 'EMR'},
+        'connList': blistV1DNWtoM,
+        #'convergence': 16,
+        'weight': 0.002 * cfg.EEGain,
+        'delay': 2,
+        'synMech': 'NMDA',
+        'plast': {'mech': 'STDP', 'params': STDPparamsRL2},'sec':'dend', 'loc':0.5}
+netParams.connParams['nEV1DW->nEMR'] = {
+        'preConds': {'pop': 'EV1DW'},
+        'postConds': {'pop': 'EMR'},
+        'connList': blistV1DWtoM,
+        #'convergence': 16,
+        'weight': 0.002 * cfg.EEGain,
+        'delay': 2,
+        'synMech': 'NMDA',
+        'plast': {'mech': 'STDP', 'params': STDPparamsRL2},'sec':'dend', 'loc':0.5}
+netParams.connParams['nEV1DW->nEMR'] = {
+        'preConds': {'pop': 'EV1DW'},
+        'postConds': {'pop': 'EMR'},
+        'connList': blistV1DWtoM,
+        #'convergence': 16,
+        'weight': 0.002 * cfg.EEGain,
+        'delay': 2,
+        'synMech': 'NMDA',
+        'plast': {'mech': 'STDP', 'params': STDPparamsRL2},'sec':'dend', 'loc':0.5}
+netParams.connParams['nEV1DSW->nEMR'] = {
+        'preConds': {'pop': 'EV1DSW'},
+        'postConds': {'pop': 'EMR'},
+        'connList': blistV1DSWtoM,
+        #'convergence': 16,
+        'weight': 0.002 * cfg.EEGain,
+        'delay': 2,
+        'synMech': 'NMDA',
+        'plast': {'mech': 'STDP', 'params': STDPparamsRL2},'sec':'dend', 'loc':0.5}
+netParams.connParams['nEV1DS->nEMR'] = {
+        'preConds': {'pop': 'EV1DS'},
+        'postConds': {'pop': 'EMR'},
+        'connList': blistV1DStoM,
+        #'convergence': 16,
+        'weight': 0.002 * cfg.EEGain,
+        'delay': 2,
+        'synMech': 'NMDA',
+        'plast': {'mech': 'STDP', 'params': STDPparamsRL2},'sec':'dend', 'loc':0.5}
+netParams.connParams['nEV1DSE->nEMR'] = {
+        'preConds': {'pop': 'EV1DSE'},
+        'postConds': {'pop': 'EMR'},
+        'connList': blistV1DSEtoM,
+        #'convergence': 16,
+        'weight': 0.002 * cfg.EEGain,
+        'delay': 2,
+        'synMech': 'NMDA',
+        'plast': {'mech': 'STDP', 'params': STDPparamsRL2},'sec':'dend', 'loc':0.5}
+netParams.connParams['nEV4->nEMR'] = {
         'preConds': {'pop': 'EV4'},
         'postConds': {'pop': 'EMR'},
-        #'connList': blistMItoMO,
-        'convergence': 16,
+        'connList': blistV4toM,
+        #'convergence': 16,
         'weight': 0.002 * cfg.EEGain,
         'delay': 2,
         'synMech': 'NMDA',
         'plast': {'mech': 'STDP', 'params': STDPparamsRL2},'sec':'dend', 'loc':0.5}
-netParams.connParams['EV4N->EMLN'] = {
+netParams.connParams['nEMT->nEMR'] = {
+        'preConds': {'pop': 'EMT'},
+        'postConds': {'pop': 'EMR'},
+        'connList': blistMTtoM,
+        #'convergence': 16,
+        'weight': 0.002 * cfg.EEGain,
+        'delay': 2,
+        'synMech': 'NMDA',
+        'plast': {'mech': 'STDP', 'params': STDPparamsRL2},'sec':'dend', 'loc':0.5}
+
+#left motor cortex
+
+netParams.connParams['nEV1->nEML'] = {
+        'preConds': {'pop': 'EV1'},
+        'postConds': {'pop': 'EML'},
+        'connList': blistV1toM,
+        #'convergence': 16,
+        'weight': 0.002 * cfg.EEGain,
+        'delay': 2,
+        'synMech': 'NMDA',
+        'plast': {'mech': 'STDP', 'params': STDPparamsRL2},'sec':'dend', 'loc':0.5}
+netParams.connParams['nEV1DE->nEML'] = {
+        'preConds': {'pop': 'EV1DE'},
+        'postConds': {'pop': 'EML'},
+        'connList': blistV1DEtoM,
+        #'convergence': 16,
+        'weight': 0.002 * cfg.EEGain,
+        'delay': 2,
+        'synMech': 'NMDA',
+        'plast': {'mech': 'STDP', 'params': STDPparamsRL2},'sec':'dend', 'loc':0.5}
+netParams.connParams['nEV1DNE->nEML'] = {
+        'preConds': {'pop': 'EV1DNE'},
+        'postConds': {'pop': 'EML'},
+        'connList': blistV1DNEtoM,
+        #'convergence': 16,
+        'weight': 0.002 * cfg.EEGain,
+        'delay': 2,
+        'synMech': 'NMDA',
+        'plast': {'mech': 'STDP', 'params': STDPparamsRL2},'sec':'dend', 'loc':0.5}
+netParams.connParams['nEV1DN->nEML'] = {
+        'preConds': {'pop': 'EV1DN'},
+        'postConds': {'pop': 'EML'},
+        'connList': blistV1DNtoM,
+        #'convergence': 16,
+        'weight': 0.002 * cfg.EEGain,
+        'delay': 2,
+        'synMech': 'NMDA',
+        'plast': {'mech': 'STDP', 'params': STDPparamsRL2},'sec':'dend', 'loc':0.5}
+netParams.connParams['nEV1DNW->nEML'] = {
+        'preConds': {'pop': 'EV1DNW'},
+        'postConds': {'pop': 'EML'},
+        'connList': blistV1DNWtoM,
+        #'convergence': 16,
+        'weight': 0.002 * cfg.EEGain,
+        'delay': 2,
+        'synMech': 'NMDA',
+        'plast': {'mech': 'STDP', 'params': STDPparamsRL2},'sec':'dend', 'loc':0.5}
+netParams.connParams['nEV1DW->nEML'] = {
+        'preConds': {'pop': 'EV1DW'},
+        'postConds': {'pop': 'EML'},
+        'connList': blistV1DWtoM,
+        #'convergence': 16,
+        'weight': 0.002 * cfg.EEGain,
+        'delay': 2,
+        'synMech': 'NMDA',
+        'plast': {'mech': 'STDP', 'params': STDPparamsRL2},'sec':'dend', 'loc':0.5}
+netParams.connParams['nEV1DW->nEML'] = {
+        'preConds': {'pop': 'EV1DW'},
+        'postConds': {'pop': 'EML'},
+        'connList': blistV1DWtoM,
+        #'convergence': 16,
+        'weight': 0.002 * cfg.EEGain,
+        'delay': 2,
+        'synMech': 'NMDA',
+        'plast': {'mech': 'STDP', 'params': STDPparamsRL2},'sec':'dend', 'loc':0.5}
+netParams.connParams['nEV1DSW->nEML'] = {
+        'preConds': {'pop': 'EV1DSW'},
+        'postConds': {'pop': 'EML'},
+        'connList': blistV1DSWtoM,
+        #'convergence': 16,
+        'weight': 0.002 * cfg.EEGain,
+        'delay': 2,
+        'synMech': 'NMDA',
+        'plast': {'mech': 'STDP', 'params': STDPparamsRL2},'sec':'dend', 'loc':0.5}
+netParams.connParams['nEV1DS->nEML'] = {
+        'preConds': {'pop': 'EV1DS'},
+        'postConds': {'pop': 'EML'},
+        'connList': blistV1DStoM,
+        #'convergence': 16,
+        'weight': 0.002 * cfg.EEGain,
+        'delay': 2,
+        'synMech': 'NMDA',
+        'plast': {'mech': 'STDP', 'params': STDPparamsRL2},'sec':'dend', 'loc':0.5}
+netParams.connParams['nEV1DSE->nEML'] = {
+        'preConds': {'pop': 'EV1DSE'},
+        'postConds': {'pop': 'EML'},
+        'connList': blistV1DSEtoM,
+        #'convergence': 16,
+        'weight': 0.002 * cfg.EEGain,
+        'delay': 2,
+        'synMech': 'NMDA',
+        'plast': {'mech': 'STDP', 'params': STDPparamsRL2},'sec':'dend', 'loc':0.5}
+netParams.connParams['nEV4->nEML'] = {
         'preConds': {'pop': 'EV4'},
         'postConds': {'pop': 'EML'},
-        #'connList': blistMItoMO,
-        'convergence': 16,
+        'connList': blistV4toM,
+        #'convergence': 16,
         'weight': 0.002 * cfg.EEGain,
         'delay': 2,
         'synMech': 'NMDA',
         'plast': {'mech': 'STDP', 'params': STDPparamsRL2},'sec':'dend', 'loc':0.5}
+netParams.connParams['nEMT->nEML'] = {
+        'preConds': {'pop': 'EMT'},
+        'postConds': {'pop': 'EML'},
+        'connList': blistMTtoM,
+        #'convergence': 16,
+        'weight': 0.002 * cfg.EEGain,
+        'delay': 2,
+        'synMech': 'NMDA',
+        'plast': {'mech': 'STDP', 'params': STDPparamsRL2},'sec':'dend', 'loc':0.5}
+
 
 ###################################################################################################################################
 
@@ -932,21 +1305,21 @@ def updateInputRates ():
     for tinds in range(len(alltags)):
         if alltags[tinds]['pop'] == 'ER':
             R_gids.append(tinds)
-        elif alltags[tinds]['pop'] == 'EV1D0':
+        elif alltags[tinds]['pop'] == 'EV1DE':
             Edir_gids.append(tinds)
-        elif alltags[tinds]['pop'] == 'EV1D45':
+        elif alltags[tinds]['pop'] == 'EV1DNE':
             NEdir_gids.append(tinds)
-        elif alltags[tinds]['pop'] == 'EV1D90':
+        elif alltags[tinds]['pop'] == 'EV1DN':
             Ndir_gids.append(tinds)
-        elif alltags[tinds]['pop'] == 'EV1D135':
+        elif alltags[tinds]['pop'] == 'EV1DNW':
             NWdir_gids.append(tinds)
-        elif alltags[tinds]['pop'] == 'EV1D180':
+        elif alltags[tinds]['pop'] == 'EV1DW':
             Wdir_gids.append(tinds)
-        elif alltags[tinds]['pop'] == 'EV1D225':
+        elif alltags[tinds]['pop'] == 'EV1DSW':
             SWdir_gids.append(tinds)
-        elif alltags[tinds]['pop'] == 'EV1D270':
+        elif alltags[tinds]['pop'] == 'EV1DS':
             Sdir_gids.append(tinds)
-        elif alltags[tinds]['pop'] == 'EV1D315':
+        elif alltags[tinds]['pop'] == 'EV1DSE':
             SEdir_gids.append(tinds)
     # update input firing rates for stimuli to R cells
     lRcell = [c for c in sim.net.cells if c.gid in sim.net.pops['ER'].cellGids] # this is the set of R cells
