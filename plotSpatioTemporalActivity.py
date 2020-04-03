@@ -34,10 +34,10 @@ dnumc = {p:dendidx[p]-dstartidx[p]+1 for p in simConfig['net']['pops'].keys()}
 spkID= np.array(spkInds)
 spkT = np.array(spkTimes)
 
-lpop = ['ER', 'EV1', 'EV4', 'EIT', 'IR', 'IV1', 'IV4', 'IIT',\
-        'EV1D180','EV1D135', 'EV1D90', 'EV1D45','EV1D0','EV1D225', 'EV1D270', 'EV1D315']
+lpop = ['ER', 'EV1', 'EV4', 'EMT', 'IR', 'IV1', 'IV4', 'IMT',\
+        'EV1DW','EV1DNW', 'EV1DN', 'EV1DNE','EV1DE','EV1DSW', 'EV1DS', 'EV1DSE']
 
-ddir = OrderedDict({'EV1D180':'W','EV1D135':'NW', 'EV1D90':'N','EV1D45':'NE','EV1D0':'E','EV1D225':'SW','EV1D270':'S','EV1D315':'SE'})
+ddir = OrderedDict({'EV1DW':'W','EV1DNW':'NW', 'EV1DN':'N','EV1DNE':'NE','EV1DE':'E','EV1DSW':'SW','EV1DS':'S','EV1DSE':'SE'})
 
 dspkID,dspkT = {},{}
 for pop in lpop:
@@ -69,7 +69,7 @@ def plotActivityMaps (pauset=1):
   #fig, axs = plt.subplots(4, 5,figsize=(12,6)); lax = axs.ravel()
   fig, axs = plt.subplots(4, 5, figsize=(12,6)); lax = axs.ravel()
   cbaxes = fig.add_axes([0.95, 0.4, 0.01, 0.2]) 
-  ltitle = ['Input Images', 'Excit R', 'Excit V1', 'Excit V4', 'Excit IT', 'Inhib R', 'Inhib V1', 'Inhib V4', 'Inhib IT']
+  ltitle = ['Input Images', 'Excit R', 'Excit V1', 'Excit V4', 'Excit MT', 'Inhib R', 'Inhib V1', 'Inhib V4', 'Inhib MT']
   for p in ddir.keys(): ltitle.append(ddir[p])
   lact = [New_InputImages]; lvmax = [255]; llim = [(-.5,19.5)]
   for pop in lpop:

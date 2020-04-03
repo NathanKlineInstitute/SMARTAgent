@@ -1152,7 +1152,9 @@ STDPparamsRL2 with 'RLlenhebb': 800 ,'RLlenanti': 100 and 'useRLexp': 0
 **create lists of connections between neurons in premotor areas and motor areas.
 **change IT neurons to MT neurons.
 **include long range connections between premotor and motor areas using both AMPA and NMDA synaptic mechanisms.
-**run 2sec sim to test if the model runs with all new changes and to detect any errors/bugs. 
+**run 2sec sim to test if the model runs with all new changes and to detect any errors/bugs.
+**update pop tags in plotSpatioTemporalActivity.py
+**update pop tags in aigame.py 
 
 
 

@@ -49,14 +49,14 @@ class AIGame:
         self.fvecS = h.Vector()
         self.fvecSE = h.Vector()
         self.firing_rates = np.zeros(dconf['net']['ER'])  # image-based input firing rates; 20x20 = 400 pixels
-        self.directionsE = np.ones(dconf['net']['EV1D0']) #for EAST
-        self.directionsNE = np.ones(dconf['net']['EV1D45']) #for NORTH-EAST
-        self.directionsN = np.ones(dconf['net']['EV1D90']) #for NORTH
-        self.directionsNW = np.ones(dconf['net']['EV1D135']) #for NORTH WEST
-        self.directionsW = np.ones(dconf['net']['EV1D180']) #for WEST
-        self.directionsSW = np.ones(dconf['net']['EV1D225']) #for SOUTH WEST
-        self.directionsS = np.ones(dconf['net']['EV1D270']) # for SOUTH
-        self.directionsSE = np.ones(dconf['net']['EV1D315']) #for SOUTH EAST
+        self.directionsE = np.ones(dconf['net']['EV1DE']) #for EAST
+        self.directionsNE = np.ones(dconf['net']['EV1DNE']) #for NORTH-EAST
+        self.directionsN = np.ones(dconf['net']['EV1DN']) #for NORTH
+        self.directionsNW = np.ones(dconf['net']['EV1DNW']) #for NORTH WEST
+        self.directionsW = np.ones(dconf['net']['EV1DW']) #for WEST
+        self.directionsSW = np.ones(dconf['net']['EV1DSW']) #for SOUTH WEST
+        self.directionsS = np.ones(dconf['net']['EV1DS']) # for SOUTH
+        self.directionsSE = np.ones(dconf['net']['EV1DSE']) #for SOUTH EAST
         self.intaction = 5 # integrate this many actions together before returning reward information to model
     ################################
     ### PLAY GAME
