@@ -1156,7 +1156,7 @@ STDPparamsRL2 with 'RLlenhebb': 800 ,'RLlenanti': 100 and 'useRLexp': 0
 **update pop tags in plotSpatioTemporalActivity.py
 **update pop tags in aigame.py
 **correct typo 
-
+**i forgot to update nb of ML and MR neurons in sim.json-----updated NB of ML and MR neurons to 1350 each.
 
 
 
