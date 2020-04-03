@@ -1154,7 +1154,8 @@ STDPparamsRL2 with 'RLlenhebb': 800 ,'RLlenanti': 100 and 'useRLexp': 0
 **include long range connections between premotor and motor areas using both AMPA and NMDA synaptic mechanisms.
 **run 2sec sim to test if the model runs with all new changes and to detect any errors/bugs.
 **update pop tags in plotSpatioTemporalActivity.py
-**update pop tags in aigame.py 
+**update pop tags in aigame.py
+**correct typo 
 
 
 
