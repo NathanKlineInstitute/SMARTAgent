@@ -718,7 +718,7 @@ netParams.connParams['EV1->EML'] = {
         'postConds': {'pop': 'EML'},
         'connList': blistV1toM,
         #'convergence': 16,
-        'weight': 0.0025 * cfg.EEGain,
+        'weight': 0.025 * cfg.EEGain,
         'delay': 2,
         'synMech': 'AMPA',
         'plast': {'mech': 'STDP', 'params': STDPparamsRL1},'sec':'dend', 'loc':0.5}
@@ -727,7 +727,7 @@ netParams.connParams['EV1DE->EML'] = {
         'postConds': {'pop': 'EML'},
         'connList': blistV1DEtoM,
         #'convergence': 16,
-        'weight': 0.0025 * cfg.EEGain,
+        'weight': 0.025 * cfg.EEGain,
         'delay': 2,
         'synMech': 'AMPA',
         'plast': {'mech': 'STDP', 'params': STDPparamsRL1},'sec':'dend', 'loc':0.5}
@@ -736,7 +736,7 @@ netParams.connParams['EV1DNE->EML'] = {
         'postConds': {'pop': 'EML'},
         'connList': blistV1DNEtoM,
         #'convergence': 16,
-        'weight': 0.0025 * cfg.EEGain,
+        'weight': 0.025 * cfg.EEGain,
         'delay': 2,
         'synMech': 'AMPA',
         'plast': {'mech': 'STDP', 'params': STDPparamsRL1},'sec':'dend', 'loc':0.5}
@@ -745,7 +745,7 @@ netParams.connParams['EV1DN->EML'] = {
         'postConds': {'pop': 'EML'},
         'connList': blistV1DNtoM,
         #'convergence': 16,
-        'weight': 0.0025 * cfg.EEGain,
+        'weight': 0.025 * cfg.EEGain,
         'delay': 2,
         'synMech': 'AMPA',
         'plast': {'mech': 'STDP', 'params': STDPparamsRL1},'sec':'dend', 'loc':0.5}
@@ -754,7 +754,7 @@ netParams.connParams['EV1DNW->EML'] = {
         'postConds': {'pop': 'EML'},
         'connList': blistV1DNWtoM,
         #'convergence': 16,
-        'weight': 0.0025 * cfg.EEGain,
+        'weight': 0.025 * cfg.EEGain,
         'delay': 2,
         'synMech': 'AMPA',
         'plast': {'mech': 'STDP', 'params': STDPparamsRL1},'sec':'dend', 'loc':0.5}
@@ -763,7 +763,7 @@ netParams.connParams['EV1DW->EML'] = {
         'postConds': {'pop': 'EML'},
         'connList': blistV1DWtoM,
         #'convergence': 16,
-        'weight': 0.0025 * cfg.EEGain,
+        'weight': 0.025 * cfg.EEGain,
         'delay': 2,
         'synMech': 'AMPA',
         'plast': {'mech': 'STDP', 'params': STDPparamsRL1},'sec':'dend', 'loc':0.5}
@@ -772,7 +772,7 @@ netParams.connParams['EV1DW->EML'] = {
         'postConds': {'pop': 'EML'},
         'connList': blistV1DWtoM,
         #'convergence': 16,
-        'weight': 0.0025 * cfg.EEGain,
+        'weight': 0.025 * cfg.EEGain,
         'delay': 2,
         'synMech': 'AMPA',
         'plast': {'mech': 'STDP', 'params': STDPparamsRL1},'sec':'dend', 'loc':0.5}
@@ -781,7 +781,7 @@ netParams.connParams['EV1DSW->EML'] = {
         'postConds': {'pop': 'EML'},
         'connList': blistV1DSWtoM,
         #'convergence': 16,
-        'weight': 0.0025 * cfg.EEGain,
+        'weight': 0.025 * cfg.EEGain,
         'delay': 2,
         'synMech': 'AMPA',
         'plast': {'mech': 'STDP', 'params': STDPparamsRL1},'sec':'dend', 'loc':0.5}
@@ -790,7 +790,7 @@ netParams.connParams['EV1DS->EML'] = {
         'postConds': {'pop': 'EML'},
         'connList': blistV1DStoM,
         #'convergence': 16,
-        'weight': 0.0025 * cfg.EEGain,
+        'weight': 0.025 * cfg.EEGain,
         'delay': 2,
         'synMech': 'AMPA',
         'plast': {'mech': 'STDP', 'params': STDPparamsRL1},'sec':'dend', 'loc':0.5}
@@ -799,7 +799,7 @@ netParams.connParams['EV1DSE->EML'] = {
         'postConds': {'pop': 'EML'},
         'connList': blistV1DSEtoM,
         #'convergence': 16,
-        'weight': 0.0025 * cfg.EEGain,
+        'weight': 0.025 * cfg.EEGain,
         'delay': 2,
         'synMech': 'AMPA',
         'plast': {'mech': 'STDP', 'params': STDPparamsRL1},'sec':'dend', 'loc':0.5}
@@ -808,7 +808,7 @@ netParams.connParams['EV4->EML'] = {
         'postConds': {'pop': 'EML'},
         'connList': blistV4toM,
         #'convergence': 16,
-        'weight': 0.0025 * cfg.EEGain,
+        'weight': 0.025 * cfg.EEGain,
         'delay': 2,
         'synMech': 'AMPA',
         'plast': {'mech': 'STDP', 'params': STDPparamsRL1},'sec':'dend', 'loc':0.5}
@@ -817,7 +817,7 @@ netParams.connParams['EMT->EML'] = {
         'postConds': {'pop': 'EML'},
         'connList': blistMTtoM,
         #'convergence': 16,
-        'weight': 0.0025 * cfg.EEGain,
+        'weight': 0.025 * cfg.EEGain,
         'delay': 2,
         'synMech': 'AMPA',
         'plast': {'mech': 'STDP', 'params': STDPparamsRL1},'sec':'dend', 'loc':0.5}
@@ -830,7 +830,7 @@ netParams.connParams['nEV1->nEMR'] = {
         'postConds': {'pop': 'EMR'},
         'connList': blistV1toM,
         #'convergence': 16,
-        'weight': 0.002 * cfg.EEGain,
+        'weight': 0.02 * cfg.EEGain,
         'delay': 2,
         'synMech': 'NMDA',
         'plast': {'mech': 'STDP', 'params': STDPparamsRL2},'sec':'dend', 'loc':0.5}
@@ -839,7 +839,7 @@ netParams.connParams['nEV1DE->nEMR'] = {
         'postConds': {'pop': 'EMR'},
         'connList': blistV1DEtoM,
         #'convergence': 16,
-        'weight': 0.002 * cfg.EEGain,
+        'weight': 0.02 * cfg.EEGain,
         'delay': 2,
         'synMech': 'NMDA',
         'plast': {'mech': 'STDP', 'params': STDPparamsRL2},'sec':'dend', 'loc':0.5}
@@ -848,7 +848,7 @@ netParams.connParams['nEV1DNE->nEMR'] = {
         'postConds': {'pop': 'EMR'},
         'connList': blistV1DNEtoM,
         #'convergence': 16,
-        'weight': 0.002 * cfg.EEGain,
+        'weight': 0.02 * cfg.EEGain,
         'delay': 2,
         'synMech': 'NMDA',
         'plast': {'mech': 'STDP', 'params': STDPparamsRL2},'sec':'dend', 'loc':0.5}
@@ -857,7 +857,7 @@ netParams.connParams['nEV1DN->nEMR'] = {
         'postConds': {'pop': 'EMR'},
         'connList': blistV1DNtoM,
         #'convergence': 16,
-        'weight': 0.002 * cfg.EEGain,
+        'weight': 0.02 * cfg.EEGain,
         'delay': 2,
         'synMech': 'NMDA',
         'plast': {'mech': 'STDP', 'params': STDPparamsRL2},'sec':'dend', 'loc':0.5}
@@ -866,7 +866,7 @@ netParams.connParams['nEV1DNW->nEMR'] = {
         'postConds': {'pop': 'EMR'},
         'connList': blistV1DNWtoM,
         #'convergence': 16,
-        'weight': 0.002 * cfg.EEGain,
+        'weight': 0.02 * cfg.EEGain,
         'delay': 2,
         'synMech': 'NMDA',
         'plast': {'mech': 'STDP', 'params': STDPparamsRL2},'sec':'dend', 'loc':0.5}
@@ -875,7 +875,7 @@ netParams.connParams['nEV1DW->nEMR'] = {
         'postConds': {'pop': 'EMR'},
         'connList': blistV1DWtoM,
         #'convergence': 16,
-        'weight': 0.002 * cfg.EEGain,
+        'weight': 0.02 * cfg.EEGain,
         'delay': 2,
         'synMech': 'NMDA',
         'plast': {'mech': 'STDP', 'params': STDPparamsRL2},'sec':'dend', 'loc':0.5}
@@ -884,7 +884,7 @@ netParams.connParams['nEV1DW->nEMR'] = {
         'postConds': {'pop': 'EMR'},
         'connList': blistV1DWtoM,
         #'convergence': 16,
-        'weight': 0.002 * cfg.EEGain,
+        'weight': 0.02 * cfg.EEGain,
         'delay': 2,
         'synMech': 'NMDA',
         'plast': {'mech': 'STDP', 'params': STDPparamsRL2},'sec':'dend', 'loc':0.5}
@@ -893,7 +893,7 @@ netParams.connParams['nEV1DSW->nEMR'] = {
         'postConds': {'pop': 'EMR'},
         'connList': blistV1DSWtoM,
         #'convergence': 16,
-        'weight': 0.002 * cfg.EEGain,
+        'weight': 0.02 * cfg.EEGain,
         'delay': 2,
         'synMech': 'NMDA',
         'plast': {'mech': 'STDP', 'params': STDPparamsRL2},'sec':'dend', 'loc':0.5}
@@ -902,7 +902,7 @@ netParams.connParams['nEV1DS->nEMR'] = {
         'postConds': {'pop': 'EMR'},
         'connList': blistV1DStoM,
         #'convergence': 16,
-        'weight': 0.002 * cfg.EEGain,
+        'weight': 0.02 * cfg.EEGain,
         'delay': 2,
         'synMech': 'NMDA',
         'plast': {'mech': 'STDP', 'params': STDPparamsRL2},'sec':'dend', 'loc':0.5}
@@ -911,7 +911,7 @@ netParams.connParams['nEV1DSE->nEMR'] = {
         'postConds': {'pop': 'EMR'},
         'connList': blistV1DSEtoM,
         #'convergence': 16,
-        'weight': 0.002 * cfg.EEGain,
+        'weight': 0.02 * cfg.EEGain,
         'delay': 2,
         'synMech': 'NMDA',
         'plast': {'mech': 'STDP', 'params': STDPparamsRL2},'sec':'dend', 'loc':0.5}
@@ -920,7 +920,7 @@ netParams.connParams['nEV4->nEMR'] = {
         'postConds': {'pop': 'EMR'},
         'connList': blistV4toM,
         #'convergence': 16,
-        'weight': 0.002 * cfg.EEGain,
+        'weight': 0.02 * cfg.EEGain,
         'delay': 2,
         'synMech': 'NMDA',
         'plast': {'mech': 'STDP', 'params': STDPparamsRL2},'sec':'dend', 'loc':0.5}
@@ -929,7 +929,7 @@ netParams.connParams['nEMT->nEMR'] = {
         'postConds': {'pop': 'EMR'},
         'connList': blistMTtoM,
         #'convergence': 16,
-        'weight': 0.002 * cfg.EEGain,
+        'weight': 0.02 * cfg.EEGain,
         'delay': 2,
         'synMech': 'NMDA',
         'plast': {'mech': 'STDP', 'params': STDPparamsRL2},'sec':'dend', 'loc':0.5}
@@ -941,7 +941,7 @@ netParams.connParams['nEV1->nEML'] = {
         'postConds': {'pop': 'EML'},
         'connList': blistV1toM,
         #'convergence': 16,
-        'weight': 0.002 * cfg.EEGain,
+        'weight': 0.02 * cfg.EEGain,
         'delay': 2,
         'synMech': 'NMDA',
         'plast': {'mech': 'STDP', 'params': STDPparamsRL2},'sec':'dend', 'loc':0.5}
@@ -950,7 +950,7 @@ netParams.connParams['nEV1DE->nEML'] = {
         'postConds': {'pop': 'EML'},
         'connList': blistV1DEtoM,
         #'convergence': 16,
-        'weight': 0.002 * cfg.EEGain,
+        'weight': 0.02 * cfg.EEGain,
         'delay': 2,
         'synMech': 'NMDA',
         'plast': {'mech': 'STDP', 'params': STDPparamsRL2},'sec':'dend', 'loc':0.5}
@@ -959,7 +959,7 @@ netParams.connParams['nEV1DNE->nEML'] = {
         'postConds': {'pop': 'EML'},
         'connList': blistV1DNEtoM,
         #'convergence': 16,
-        'weight': 0.002 * cfg.EEGain,
+        'weight': 0.02 * cfg.EEGain,
         'delay': 2,
         'synMech': 'NMDA',
         'plast': {'mech': 'STDP', 'params': STDPparamsRL2},'sec':'dend', 'loc':0.5}
@@ -968,7 +968,7 @@ netParams.connParams['nEV1DN->nEML'] = {
         'postConds': {'pop': 'EML'},
         'connList': blistV1DNtoM,
         #'convergence': 16,
-        'weight': 0.002 * cfg.EEGain,
+        'weight': 0.02 * cfg.EEGain,
         'delay': 2,
         'synMech': 'NMDA',
         'plast': {'mech': 'STDP', 'params': STDPparamsRL2},'sec':'dend', 'loc':0.5}
@@ -977,7 +977,7 @@ netParams.connParams['nEV1DNW->nEML'] = {
         'postConds': {'pop': 'EML'},
         'connList': blistV1DNWtoM,
         #'convergence': 16,
-        'weight': 0.002 * cfg.EEGain,
+        'weight': 0.02 * cfg.EEGain,
         'delay': 2,
         'synMech': 'NMDA',
         'plast': {'mech': 'STDP', 'params': STDPparamsRL2},'sec':'dend', 'loc':0.5}
@@ -986,7 +986,7 @@ netParams.connParams['nEV1DW->nEML'] = {
         'postConds': {'pop': 'EML'},
         'connList': blistV1DWtoM,
         #'convergence': 16,
-        'weight': 0.002 * cfg.EEGain,
+        'weight': 0.02 * cfg.EEGain,
         'delay': 2,
         'synMech': 'NMDA',
         'plast': {'mech': 'STDP', 'params': STDPparamsRL2},'sec':'dend', 'loc':0.5}
@@ -995,7 +995,7 @@ netParams.connParams['nEV1DW->nEML'] = {
         'postConds': {'pop': 'EML'},
         'connList': blistV1DWtoM,
         #'convergence': 16,
-        'weight': 0.002 * cfg.EEGain,
+        'weight': 0.02 * cfg.EEGain,
         'delay': 2,
         'synMech': 'NMDA',
         'plast': {'mech': 'STDP', 'params': STDPparamsRL2},'sec':'dend', 'loc':0.5}
@@ -1004,7 +1004,7 @@ netParams.connParams['nEV1DSW->nEML'] = {
         'postConds': {'pop': 'EML'},
         'connList': blistV1DSWtoM,
         #'convergence': 16,
-        'weight': 0.002 * cfg.EEGain,
+        'weight': 0.02 * cfg.EEGain,
         'delay': 2,
         'synMech': 'NMDA',
         'plast': {'mech': 'STDP', 'params': STDPparamsRL2},'sec':'dend', 'loc':0.5}
@@ -1013,7 +1013,7 @@ netParams.connParams['nEV1DS->nEML'] = {
         'postConds': {'pop': 'EML'},
         'connList': blistV1DStoM,
         #'convergence': 16,
-        'weight': 0.002 * cfg.EEGain,
+        'weight': 0.02 * cfg.EEGain,
         'delay': 2,
         'synMech': 'NMDA',
         'plast': {'mech': 'STDP', 'params': STDPparamsRL2},'sec':'dend', 'loc':0.5}
@@ -1022,7 +1022,7 @@ netParams.connParams['nEV1DSE->nEML'] = {
         'postConds': {'pop': 'EML'},
         'connList': blistV1DSEtoM,
         #'convergence': 16,
-        'weight': 0.002 * cfg.EEGain,
+        'weight': 0.02 * cfg.EEGain,
         'delay': 2,
         'synMech': 'NMDA',
         'plast': {'mech': 'STDP', 'params': STDPparamsRL2},'sec':'dend', 'loc':0.5}
@@ -1031,7 +1031,7 @@ netParams.connParams['nEV4->nEML'] = {
         'postConds': {'pop': 'EML'},
         'connList': blistV4toM,
         #'convergence': 16,
-        'weight': 0.002 * cfg.EEGain,
+        'weight': 0.02 * cfg.EEGain,
         'delay': 2,
         'synMech': 'NMDA',
         'plast': {'mech': 'STDP', 'params': STDPparamsRL2},'sec':'dend', 'loc':0.5}
@@ -1040,7 +1040,7 @@ netParams.connParams['nEMT->nEML'] = {
         'postConds': {'pop': 'EML'},
         'connList': blistMTtoM,
         #'convergence': 16,
-        'weight': 0.002 * cfg.EEGain,
+        'weight': 0.02 * cfg.EEGain,
         'delay': 2,
         'synMech': 'NMDA',
         'plast': {'mech': 'STDP', 'params': STDPparamsRL2},'sec':'dend', 'loc':0.5}

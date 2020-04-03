@@ -1158,6 +1158,7 @@ STDPparamsRL2 with 'RLlenhebb': 800 ,'RLlenanti': 100 and 'useRLexp': 0
 **correct typo 
 **i forgot to update nb of ML and MR neurons in sim.json-----updated NB of ML and MR neurons to 1350 each.
 **in function updateInputRates(), forgot to update pop tags for direction selective neurons.----done.
+**Looks like the weights are too low. Previously, each neuron in ML and MR was receiving 16 connections. so i decided to change synaptic weights 10 times. for AMPA connections between premotor and motor areas, change synaptic strength from 0.0025 to 0.025. Similarly, change synaptic strength of NMDA connections between premotor and motor areas to 0.02 from 0.002. and run for 20sec.
 
 
 
