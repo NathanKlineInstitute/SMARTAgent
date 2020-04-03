@@ -72,13 +72,18 @@ STDPparamsRL2 = {'hebbwt': 0.0000, 'antiwt':-0.0000, 'wbase': 0.0005, 'wmax': 1,
 
 # these are the image-based inputs provided to the R (retinal) cells
 netParams.stimSourceParams['stimMod'] = {'type': 'NetStim', 'rate': 'variable', 'noise': 0}
-netParams.stimTargetParams['stimMod->all'] = {'source': 'stimMod',
-        'conds': {'pop': ['ER','EV1D0','EV1D45','EV1D90','EV1D135','EV1D180','EV1D225','EV1D270','EV1D315']},
+netParams.stimTargetParams['stimMod->R'] = {'source': 'stimMod',
+        'conds': {'pop': 'ER'},
         'convergence': 1,
         'weight': 0.01,
         'delay': 1,
         'synMech': 'AMPA'}
-
+netParams.stimTargetParams['stimMod->DirSelInput'] = {'source': 'stimMod',
+        'conds': {'pop': ['EV1D0','EV1D45','EV1D90','EV1D135','EV1D180','EV1D225','EV1D270','EV1D315']},
+        'convergence': 1,
+        'weight': 0.01,
+        'delay': 1,
+        'synMech': 'AMPA'}
 #background input to inhibitory neurons to increase their firing rate
 
 # Stimulation parameters

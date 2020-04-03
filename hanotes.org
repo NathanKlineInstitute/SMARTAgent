@@ -1143,6 +1143,9 @@ STDPparamsRL2 with 'RLlenhebb': 800 ,'RLlenanti': 100 and 'useRLexp': 0
 **Saving and plotting is not working when using if sim.rank==0, therefore i remove that statement.
 **when running simulation using "python multistepSim.py sim.json numcores numsteps multirun" plotting and saving doesn't work properly. so include an option usemultirun in the script.
 
+*20april03
+**seperate targets of StimMod by creating 2 separate stimTargetParams dictionaries. One is stimMod->R and other is stimMod->DirSelInput.
+
 
 
 
