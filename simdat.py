@@ -287,8 +287,10 @@ def plotSynWeightsPostNeuronID(pdf,postNeuronID):
       
 
 if __name__ == '__main__':
-  stepNB = int(sys.argv[1]) #which file(stepNB) want to plot
-  if stepNB is None: stepNB = -1
+  if sys.argv[1] is None:
+    stepNB = -1
+  else:
+    stepNB = int(sys.argv[1]) #which file(stepNB) want to plot
   print(stepNB)
   simConfig, pdf, actreward, dstartidx, dendidx = loadsimdat()
   davgw = plotavgweights(pdf)
