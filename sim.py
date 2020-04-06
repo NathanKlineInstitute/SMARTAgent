@@ -302,49 +302,107 @@ cfg.EIGain = 1.0 # E to I scaling factor
 cfg.IEGain = 10.0 # I to E scaling factor
 cfg.IIGain = 10.0  # I to I scaling factor
 
+recWeight = 0.0001 #weight for recurrent connections within each area.
+recProb = 0.2 #probability of recurrent connections within each area.
 
 #Local excitation
 #E to E
 netParams.connParams['ER->ER'] = {
         'preConds': {'pop': 'ER'},
         'postConds': {'pop': 'ER'},
-        'probability': 0.02,
-        'weight': 0.000 * cfg.EEGain, #0.0001
+        'probability': recProb,
+        'weight': recWeight * cfg.EEGain, #0.0001
         'delay': 2,
         'synMech': 'AMPA', 'sec':'dend', 'loc':0.5}
 netParams.connParams['EV1->EV1'] = {
         'preConds': {'pop': 'EV1'},
         'postConds': {'pop': 'EV1'},
-        'probability': 0.02,
-        'weight': 0.000 * cfg.EEGain, #0.0001
+        'probability': recProb,
+        'weight': recWeight * cfg.EEGain, #0.0001
+        'delay': 2,
+        'synMech': 'AMPA', 'sec':'dend', 'loc':0.5}
+netParams.connParams['EV1DE->EV1DE'] = {
+        'preConds': {'pop': 'EV1DE'},
+        'postConds': {'pop': 'EV1DE'},
+        'probability': recProb,
+        'weight': recWeight * cfg.EEGain, #0.0001
+        'delay': 2,
+        'synMech': 'AMPA', 'sec':'dend', 'loc':0.5}
+netParams.connParams['EV1DNE->EV1DNE'] = {
+        'preConds': {'pop': 'EV1DNE'},
+        'postConds': {'pop': 'EV1DNE'},
+        'probability': recProb,
+        'weight': recWeight * cfg.EEGain, #0.0001
+        'delay': 2,
+        'synMech': 'AMPA', 'sec':'dend', 'loc':0.5}
+netParams.connParams['EV1DN->EV1DN'] = {
+        'preConds': {'pop': 'EV1DN'},
+        'postConds': {'pop': 'EV1DN'},
+        'probability': recProb,
+        'weight': recWeight * cfg.EEGain, #0.0001
+        'delay': 2,
+        'synMech': 'AMPA', 'sec':'dend', 'loc':0.5}
+netParams.connParams['EV1DNW->EV1DNW'] = {
+        'preConds': {'pop': 'EV1DNW'},
+        'postConds': {'pop': 'EV1DNW'},
+        'probability': recProb,
+        'weight': recWeight * cfg.EEGain, #0.0001
+        'delay': 2,
+        'synMech': 'AMPA', 'sec':'dend', 'loc':0.5}
+netParams.connParams['EV1DW->EV1DW'] = {
+        'preConds': {'pop': 'EV1DW'},
+        'postConds': {'pop': 'EV1DW'},
+        'probability': recProb,
+        'weight': recWeight * cfg.EEGain, #0.0001
+        'delay': 2,
+        'synMech': 'AMPA', 'sec':'dend', 'loc':0.5}
+netParams.connParams['EV1DSW->EV1DSW'] = {
+        'preConds': {'pop': 'EV1DSW'},
+        'postConds': {'pop': 'EV1DSW'},
+        'probability': recProb,
+        'weight': recWeight * cfg.EEGain, #0.0001
+        'delay': 2,
+        'synMech': 'AMPA', 'sec':'dend', 'loc':0.5}
+netParams.connParams['EV1DS->EV1DS'] = {
+        'preConds': {'pop': 'EV1DS'},
+        'postConds': {'pop': 'EV1DS'},
+        'probability': recProb,
+        'weight': recWeight * cfg.EEGain, #0.0001
+        'delay': 2,
+        'synMech': 'AMPA', 'sec':'dend', 'loc':0.5}
+netParams.connParams['EV1DSE->EV1DSE'] = {
+        'preConds': {'pop': 'EV1DSE'},
+        'postConds': {'pop': 'EV1DSE'},
+        'probability': recProb,
+        'weight': recWeight * cfg.EEGain, #0.0001
         'delay': 2,
         'synMech': 'AMPA', 'sec':'dend', 'loc':0.5}
 netParams.connParams['EV4->EV4'] = {
         'preConds': {'pop': 'EV4'},
         'postConds': {'pop': 'EV4'},
-        'probability': 0.02,
-        'weight': 0.000 * cfg.EEGain, #0.0001
+        'probability': recProb,
+        'weight': recWeight * cfg.EEGain, #0.0001
         'delay': 2,
         'synMech': 'AMPA', 'sec':'dend', 'loc':0.5}
 netParams.connParams['EMT->EMT'] = {
         'preConds': {'pop': 'EMT'},
         'postConds': {'pop': 'EMT'},
-        'probability': 0.02,
-        'weight': 0.000 * cfg.EEGain, #0.0001
+        'probability': recProb,
+        'weight': recWeight * cfg.EEGain, #0.0001
         'delay': 2,
         'synMech': 'AMPA', 'sec':'dend', 'loc':0.5}
 netParams.connParams['EML->EML'] = {
         'preConds': {'pop': 'EML'},
         'postConds': {'pop': 'EML'},
-        'probability': 0.02,
-        'weight': 0.000 * cfg.EEGain, #0.0001
+        'probability': recProb,
+        'weight': recWeight * cfg.EEGain, #0.0001
         'delay': 2,
         'synMech': 'AMPA', 'sec':'dend', 'loc':0.5}
 netParams.connParams['EMR->EMR'] = {
         'preConds': {'pop': 'EMR'},
         'postConds': {'pop': 'EMR'},
-        'probability': 0.02,
-        'weight': 0.000 * cfg.EEGain, #0.0001
+        'probability': recProb,
+        'weight': recWeight * cfg.EEGain, #0.0001
         'delay': 2,
         'synMech': 'AMPA', 'sec':'dend', 'loc':0.5}
 #E to I within area
@@ -535,16 +593,14 @@ netParams.connParams['EV1->ER'] = {
         'weight': 0.000 * cfg.EEGain, #0.0001
         'delay': 2,
         'synMech': 'AMPA','sec':'dend', 'loc':0.5}
-"""
 netParams.connParams['EV4->EV1'] = {    # <<-- that's E -> I ?? or E -> E ?? weight is 0 but something wrong here
         'preConds': {'pop': 'EV4'},
         'postConds': {'pop': 'EV1'},
-        'connList': blistInV4toV1,
+        'connList': blistEV4toEV1,
         #'convergence': 10,
         'weight': 0.000 * cfg.EEGain, #0.0001
         'delay': 2,
         'synMech': 'AMPA','sec':'dend', 'loc':0.5}
-"""
 netParams.connParams['EMT->EV4'] = {
         'preConds': {'pop': 'EMT'},
         'postConds': {'pop': 'EV4'},
