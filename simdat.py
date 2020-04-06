@@ -24,7 +24,7 @@ def readinweights (d):
 
 def loadsimdat (name=None):
   # load simulation data
-  if name is None and stepNB is None: name = dconf['sim']['name']
+  if name is None and stepNB is -1: name = dconf['sim']['name']
   elif name is None and stepNB > -1: name = dconf['sim']['name'] + '_step_' + str(stepNB) + '_'
   simConfig = pickle.load(open('data/'+name+'simConfig.pkl','rb'))
   dstartidx = {p:simConfig['net']['pops'][p]['cellGids'][0] for p in simConfig['net']['pops'].keys()} # starting indices for each population
