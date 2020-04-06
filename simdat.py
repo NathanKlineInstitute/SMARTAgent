@@ -37,7 +37,7 @@ def loadsimdat (name=None):
 def plotavgweights (pdf):
   utimes = np.unique(pdf.time)
   davgw = {}
-  subplot(4,1,1)
+  subplot(12,1,1)
   plot(actreward.time,actreward.reward,'k',linewidth=4)
   plot(actreward.time,actreward.reward,'ko',markersize=10)  
   xlim((0,simConfig['simConfig']['duration']))
@@ -49,7 +49,7 @@ def plotavgweights (pdf):
           for t in utimes:
               pdfs = pdf[(pdf.time==t) & (pdf.postid>=dstartidx[trg]) & (pdf.postid<=dendidx[trg]) & (pdf.preid>=dstartidx[src]) & (pdf.preid<=dendidx[trg])]
               arr.append(np.mean(pdfs.weight))
-      subplot(4,1,gdx)
+      subplot(12,1,gdx)
       plot(utimes,davgw[src+'->EML'],'r-',linewidth=3);
       plot(utimes,davgw[src+'->EMR'],'b-',linewidth=3); 
       legend((src+'->EML',src+'->EMR'),loc='upper left')
@@ -240,7 +240,7 @@ def plotSynWeightsPostNeuronID(pdf,postNeuronID):
   #for each of those neurons, find presynaptic neuron IDs and the strengths
   #gdx = 2
   figure()
-  subplot(4,1,1)
+  subplot(12,1,1)
   plot(actreward.time,actreward.reward,'k',linewidth=4)
   plot(actreward.time,actreward.reward,'ko',markersize=10)  
   xlim((0,simConfig['simConfig']['duration']))
@@ -277,7 +277,7 @@ def plotSynWeightsPostNeuronID(pdf,postNeuronID):
                   arrR[tstep].append(w)
                   arrR2[tstep].append(preID)
           tstep += 1
-      subplot(4,1,pdx)
+      subplot(12,1,pdx)
       plot(utimes,np.array(MLweights[src]),'r-o',linewidth=3,markersize=5)
       plot(utimes,np.array(MRweights[src]),'b-o',linewidth=3,markersize=5)
       legend((src+'->EML',src+'->EMR'),loc='upper left')
