@@ -287,7 +287,7 @@ def plotSynWeightsPostNeuronID(pdf,postNeuronID):
       
 
 if __name__ == '__main__':
-  if sys.argv[1] is None:
+  if sys.argv[1] is -1:
     stepNB = -1
   else:
     stepNB = int(sys.argv[1]) #which file(stepNB) want to plot
