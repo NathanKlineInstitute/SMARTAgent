@@ -1162,6 +1162,8 @@ STDPparamsRL2 with 'RLlenhebb': 800 ,'RLlenanti': 100 and 'useRLexp': 0
 
 *20april06
 **added recurrent connections with weights recWeight = 0.0001 and recProb = 0.2
+**run sim for 20 sec with recurrent connectivity. Raster saved as "20April06_G0_step_0_raster_20sec_RecurEAdded.png"
+**include direction selective neurons in simdat.py for analysis. 
 
 
 

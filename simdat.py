@@ -43,7 +43,7 @@ def plotavgweights (pdf):
   xlim((0,simConfig['simConfig']['duration']))
   ylim((-1.1,1.1))
   gdx = 2
-  for src in ['EV1', 'EV4', 'EIT']:
+  for src in ['EV1','EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE', 'EV4', 'EMT']:
       for trg in ['EML', 'EMR']:
           davgw[src+'->'+trg] = arr = []        
           for t in utimes:
@@ -66,7 +66,7 @@ def plotavgweightsPerPostSynNeuron1(pdf):
   #for every postsynaptic neuron, find total weight of synaptic inputs per area (i.e. synaptic inputs from EV1, EV4 and EIT and treated separately for each cell——if there are 200 unique cells, will get 600 weights as 200 from each originating layer)
   wperPostID = {}
   gdx = 2   
-  for src in ['EV1', 'EV4', 'EIT']:
+  for src in ['EV1','EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE', 'EV4', 'EMT']:
       figure(gdx)
       subplot(3,1,1)
       plot(actreward.time,actreward.reward,'k',linewidth=4)
@@ -105,7 +105,7 @@ def plotavgweightsPerPostSynNeuron2(pdf):
   #for every postsynaptic neuron, find total weight of synaptic inputs per area (i.e. synaptic inputs from EV1, EV4 and EIT and treated separately for each cell——if there are 200 unique cells, will get 600 weights as 200 from each originating layer)
   wperPostID = {}
   #gdx = 2   
-  for src in ['EV1', 'EV4', 'EIT']:
+  for src in ['EV1','EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE', 'EV4', 'EIT']:
       figure()
       subplot(3,1,1)
       plot(actreward.time,actreward.reward,'k',linewidth=4)
@@ -154,7 +154,7 @@ def plotIndividualSynWeights(pdf):
   preNeuronIDs = {}
   postNeuronIDs = {}
   #gdx = 2   
-  for src in ['EV1', 'EV4', 'EIT']:
+  for src in ['EV1','EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE', 'EV4', 'EIT']:
       #figure()
       #subplot(9,1,1)
       #plot(actreward.time,actreward.reward,'k',linewidth=4)
@@ -249,7 +249,7 @@ def plotSynWeightsPostNeuronID(pdf,postNeuronID):
   ylabel('critic')
   title('weights of all connections for a post-synaptic neuron')
   pdx = 2    
-  for src in ['EV1', 'EV4', 'EIT']:
+  for src in ['EV1','EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE', 'EV4', 'EIT']:
       MLweights[src] = arrL = []
       MRweights[src] = arrR = []
       MLpreNeuronIDs[src] = arrL2 = []
