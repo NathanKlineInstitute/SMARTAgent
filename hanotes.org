@@ -1165,6 +1165,6 @@ STDPparamsRL2 with 'RLlenhebb': 800 ,'RLlenanti': 100 and 'useRLexp': 0
 **run sim for 20 sec with recurrent connectivity. Raster saved as "20April06_G0_step_0_raster_20sec_RecurEAdded.png"
 **include direction selective neurons in simdat.py for analysis.
 **debugging simdat.py 
-
+**change firing rate of direction selective neurons to 30 Hz and run for 5 sec.
 
 

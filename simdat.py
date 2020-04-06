@@ -105,7 +105,7 @@ def plotavgweightsPerPostSynNeuron2(pdf):
   #for every postsynaptic neuron, find total weight of synaptic inputs per area (i.e. synaptic inputs from EV1, EV4 and EIT and treated separately for each cell——if there are 200 unique cells, will get 600 weights as 200 from each originating layer)
   wperPostID = {}
   #gdx = 2   
-  for src in ['EV1','EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE', 'EV4', 'EIT']:
+  for src in ['EV1','EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE', 'EV4', 'EMT']:
       figure()
       subplot(3,1,1)
       plot(actreward.time,actreward.reward,'k',linewidth=4)
@@ -154,7 +154,7 @@ def plotIndividualSynWeights(pdf):
   preNeuronIDs = {}
   postNeuronIDs = {}
   #gdx = 2   
-  for src in ['EV1','EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE', 'EV4', 'EIT']:
+  for src in ['EV1','EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE', 'EV4', 'EMT']:
       #figure()
       #subplot(9,1,1)
       #plot(actreward.time,actreward.reward,'k',linewidth=4)
@@ -249,7 +249,7 @@ def plotSynWeightsPostNeuronID(pdf,postNeuronID):
   ylabel('critic')
   title('weights of all connections for a post-synaptic neuron')
   pdx = 2    
-  for src in ['EV1','EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE', 'EV4', 'EIT']:
+  for src in ['EV1','EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE', 'EV4', 'EMT']:
       MLweights[src] = arrL = []
       MRweights[src] = arrR = []
       MLpreNeuronIDs[src] = arrL2 = []
