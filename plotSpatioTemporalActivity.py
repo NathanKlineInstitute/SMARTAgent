@@ -5,6 +5,8 @@ import time
 from conf import dconf
 from collections import OrderedDict
 from pylab import *
+import imageio
+import os
 
 Input_Images = np.loadtxt('data/'+dconf['sim']['name']+'InputImages.txt')
 New_InputImages = []
@@ -64,7 +66,7 @@ dmaxSpk = OrderedDict({pop:np.max(dact[pop]) for pop in lpop})
 max_spks = np.max([dmaxSpk[p] for p in lpop])
 
 #
-def plotActivityMaps (pauset=1):
+def plotActivityMaps (pauset=1, gifpath=None):
   # plot activity in different layers as a function of input images
   #fig, axs = plt.subplots(4, 5,figsize=(12,6)); lax = axs.ravel()
   fig, axs = plt.subplots(4, 5, figsize=(12,6)); lax = axs.ravel()
@@ -72,6 +74,7 @@ def plotActivityMaps (pauset=1):
   ltitle = ['Input Images', 'Excit R', 'Excit V1', 'Excit V4', 'Excit MT', 'Inhib R', 'Inhib V1', 'Inhib V4', 'Inhib MT']
   for p in ddir.keys(): ltitle.append(ddir[p])
   lact = [New_InputImages]; lvmax = [255]; xlim = [(-.5,19.5)]; ylim = [(19.5,-0.5)]
+  lfnimage = []
   for pop in lpop:
     lact.append(dact[pop])
     lvmax.append(max_spks)
@@ -92,7 +95,14 @@ def plotActivityMaps (pauset=1):
       ax.set_ylabel(ltitle[idx])
       if ldx==2: plt.colorbar(pcm, cax = cbaxes)  
       idx += 1
-    plt.pause(pauset)  
+    if gifpath is not None:
+      fnimg = '/tmp/'+str(t)+'.png'
+      savefig(fnimg); lfnimage.append(fnimg)
+    if pauset > 0: plt.pause(pauset)
+  if gifpath is not None:
+    limage = [imageio.imread(fn) for fn in lfnimage]
+    imageio.mimwrite(gifpath, limage)
+    for fn in lfnimage: os.unlink(fn) # remove the tmp files
   return fig, axs, plt
 
 fig, axs, plt = plotActivityMaps()

@@ -1071,3 +1071,11 @@ def animateRateVsWeight(dataFolder, batchLabel, params):
 should adapt for plotSpatioTemporalActivity.py to allow saving output
 and/or for video ...
 
+** test update
+
+a lot more cells now (1e3 more motor cells, and 800 direction selective cells), so runs slower,
++ image processing slows it down some more ... not clear by how much
+
+python -i plotSpatioTemporalActivity.py
+
+fig, axs, plt = plotActivityMaps(pauset=0,gifpath='20apr7_activity.gif')
