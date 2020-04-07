@@ -1049,3 +1049,25 @@ python -i plotSpatioTemporalActivity.py
 seems to work now ... there weren't any loops, functions, dictionaries, etc.
 really used in the file ...
 
+*20apr7
+** sal code for animation
+
+def animateRateVsWeight(dataFolder, batchLabel, params):
+    import imageio
+    from pathlib import Path
+    Lvals = params[0]['values']
+    Ivals = params[1]['values']
+    for ipop, pop in enumerate(Lvals):
+        print('Generating traces gif for pop %s ...' % (pop))
+        #v22_batch1_18_98_traces.png
+        images = ['%s/%s/%s_%d_%d_traces.png' % (dataFolder, batchLabel, batchLabel, ipop, iweight) for iweight in range(len(Ivals))]
+        #images = list(image_path.glob())
+        image_list = []
+        for file_name in images:
+            image_list.append(imageio.imread(file_name))
+        pass
+        imageio.mimwrite('%s/%s/%s_%s_traces.gif' % (dataFolder, batchLabel, batchLabel, pop), image_list)
+
+should adapt for plotSpatioTemporalActivity.py to allow saving output
+and/or for video ...
+
