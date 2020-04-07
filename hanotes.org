@@ -1167,4 +1167,7 @@ STDPparamsRL2 with 'RLlenhebb': 800 ,'RLlenanti': 100 and 'useRLexp': 0
 **debugging simdat.py 
 **change firing rate of direction selective neurons to 30 Hz and run for 5 sec.
 
+*20april07
+**show image upside down in plotSpatioTemporalActivity using origin='upper' in imshow.
+
 
