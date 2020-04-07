@@ -85,7 +85,7 @@ def plotActivityMaps (pauset=1):
         continue
       if ldx==0: offidx=-1
       else: offidx=0
-      pcm = ax.imshow( lact[idx][t+offidx,:,:], cmap='gray', vmin=0, vmax=lvmax[idx], origin='upper')
+      pcm = ax.imshow( lact[idx][t+offidx,:,:], origin='upper', cmap='gray', vmin=0, vmax=lvmax[idx])
       ax.set_xlim(llim[idx]); ax.set_ylim(llim[idx]); ax.set_ylabel(ltitle[idx])
       if ldx==2: plt.colorbar(pcm, cax = cbaxes)  
       idx += 1
