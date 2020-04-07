@@ -71,11 +71,12 @@ def plotActivityMaps (pauset=1):
   cbaxes = fig.add_axes([0.95, 0.4, 0.01, 0.2]) 
   ltitle = ['Input Images', 'Excit R', 'Excit V1', 'Excit V4', 'Excit MT', 'Inhib R', 'Inhib V1', 'Inhib V4', 'Inhib MT']
   for p in ddir.keys(): ltitle.append(ddir[p])
-  lact = [New_InputImages]; lvmax = [255]; llim = [(-.5,19.5)]
+  lact = [New_InputImages]; lvmax = [255]; xlim = [(-.5,19.5)]; ylim = [(19.5,-0.5)]
   for pop in lpop:
     lact.append(dact[pop])
     lvmax.append(max_spks)
-    llim.append( (-0.5, lact[-1].shape[1] - 0.5) )
+    xlim.append( (-0.5, lact[-1].shape[1] - 0.5) )
+    ylim.append( (lact[-1].shape[1] - 0.5, -0.5))
   for t in range(1,len(t1)):
     fig.suptitle(str(tBin_Size)+' ms binned activity ' + str(t*tBin_Size) + ' ms')
     idx = 0
@@ -86,7 +87,9 @@ def plotActivityMaps (pauset=1):
       if ldx==0: offidx=-1
       else: offidx=0
       pcm = ax.imshow( lact[idx][t+offidx,:,:], origin='upper', cmap='gray', vmin=0, vmax=lvmax[idx])
-      ax.set_xlim(llim[idx]); ax.set_ylim(llim[idx]); ax.set_ylabel(ltitle[idx])
+      ax.set_xlim(xlim[idx]) 
+      ax.set_ylim(ylim[idx])
+      ax.set_ylabel(ltitle[idx])
       if ldx==2: plt.colorbar(pcm, cax = cbaxes)  
       idx += 1
     plt.pause(pauset)  

@@ -1169,5 +1169,7 @@ STDPparamsRL2 with 'RLlenhebb': 800 ,'RLlenanti': 100 and 'useRLexp': 0
 
 *20april07
 **show image upside down in plotSpatioTemporalActivity using origin='upper' in imshow.
+**make initial weight between premotor areas and motor areas same.
+**debug plotSpatioTemporalActivity.py 
 
 
