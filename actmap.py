@@ -68,7 +68,7 @@ max_spks = np.max([dmaxSpk[p] for p in lpop])
 #
 def plotActivityMaps (pauset=1, gifpath=None, mp4path=None, framerate=5):
   # plot activity in different layers as a function of input images
-  fig, axs = plt.subplots(4, 5, figsize=(12,6)); lax = axs.ravel()
+  fig, axs = plt.subplots(4, 5, figsize=(24,12)); lax = axs.ravel()
   cbaxes = fig.add_axes([0.95, 0.4, 0.01, 0.2]) 
   ltitle = ['Input Images', 'Excit R', 'Excit V1', 'Excit V4', 'Excit MT', 'Inhib R', 'Inhib V1', 'Inhib V4', 'Inhib MT']
   for p in ddir.keys(): ltitle.append(ddir[p])
@@ -80,7 +80,7 @@ def plotActivityMaps (pauset=1, gifpath=None, mp4path=None, framerate=5):
     xlim.append( (-0.5, lact[-1].shape[1] - 0.5) )
     ylim.append( (lact[-1].shape[1] - 0.5, -0.5))
   for t in range(1,len(t1)):
-    fig.suptitle(str(tBin_Size)+' ms binned activity ' + str(t*tBin_Size) + ' ms')
+    fig.suptitle('Time = ' + str(t*tBin_Size) + ' ms')
     idx = 0
     for ldx,ax in enumerate(lax):
       if ldx == 5 or idx > len(dact.keys()):
