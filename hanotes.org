@@ -1183,3 +1183,4 @@ Corrected as:
 cpdfR = pdf[(pdf.time==t) & (pdf.postid>=dstartidx['EMR']) & (pdf.postid<=dendidx['EMR']) & (pdf.preid>=dstartidx[src]) & (pdf.preid<=dendidx[src])]
 This bug was found in all functions where instead of src, trg was used for dendidx.
 **reshape weights for display
+**R removed from list + axes indexing debugged
