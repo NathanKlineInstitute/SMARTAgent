@@ -271,8 +271,8 @@ blistV4toM = connectOnePreNtoOneMNeuron(NBNeurons = dnumc['EV4'],offset_pre = 0,
 blistMTtoM = connectOnePreNtoOneMNeuron(NBNeurons = dnumc['EMT'],offset_pre = 0, offset_post=dnumc['EV1']+dnumc['EV1DE']+dnumc['EV1DNE']+dnumc['EV1DN']+dnumc['EV1DNW']+dnumc['EV1DW']+dnumc['EV1DSW']+dnumc['EV1DS']+dnumc['EV1DSE']+dnumc['EV4'])
 
 print('V1 to M connections: ', blistV1toM)
-print('V1 to M connections: ', blistV4toM)
-print('V1 to M connections: ', blistMTtoM)
+print('V4 to M connections: ', blistV4toM)
+print('MT to M connections: ', blistMTtoM)
 
 #Simulation options
 simConfig = specs.SimConfig()           # object of class SimConfig to store simulation configuration
