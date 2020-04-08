@@ -1140,3 +1140,44 @@ ok, put that into plotSpatioTemporalActivity.py ...
 
 and added animation saving functions to anim.py
 
+** testing network
+
+number of IM was too low, after the increase in EMR, EML populations
+so increased IM to 690, to be about 20% of IM (690) + EMR (1350) + EML (1350)
+
+now, when run network, get too high firing rates for EMR, EML
+
+savefig('gif/20apr8_rast_a0.png')
+
+is same obtained with fewer IM cells?
+
+reset IM to 50 ... 
+
+myrun 12
+
+hmm, now EMR,EML firing rates look better, but not clear why. no depolarization
+blockade seen in EMR,EML
+
+savefig('gif/20apr8_rast_a1.png')
+
+check connectivity in sim.py ... something off?
+
+might be due to using fixed convergence instead of probability ... for larger pop sizes
+seems better to use probability ... had used convergence before to ensure minimum number
+of inputs (more relevant with smaller populations)
+
+try with probability of 0.25 and larger IM population of 690 ...
+
+myrun 12
+
+ok, rates of EMR, EML went down, and IM rates are OK
+but now activity looks highly synchronized to 100 ms interval when visual inputs come in:
+ gif/20apr8_rast_a2.png
+ gif/20apr8_EMR_a2.png
+ gif/20apr8_IM_a2.png
+
+so, should avoid it ... probably can reduce weights between EMR->IM, EML->IM, IM->IM, IM->EMR, IM->EML
+
+
+
+ 
