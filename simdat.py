@@ -34,6 +34,36 @@ def loadsimdat (name=None):
   return simConfig, pdf, actreward, dstartidx, dendidx
 
 #
+def plotSynWeightsPerTimeStep(pdf):
+    utimes = np.unique(pdf.time)
+    maxNMDAwt = np.max(pdf[pdf.syntype=='NMDA'])
+    maxAMPAwt = np.max(pdf[pdf.syntype=='AMPA'])
+    fig, axs = plt.subplots(3, 8, figsize=(16,10)); lax = axs.ravel()
+    cbaxes = fig.add_axes([0.95, 0.4, 0.01, 0.2]) 
+    ltitle = ['Excit R->ML','Excit R->MR', 'Excit V1->ML','Excit V1->MR', 'Excit V4->ML','Excit V4->MR', 'Excit MT->ML', 'Excit MT->MR','Excit DirE->ML','Excit DirE->MR','Excit DirNE->ML','Excit DirNE->MR','Excit DirN->ML','Excit DirN->MR','Excit DirNW->ML','Excit DirNW->MR','Excit DirW->ML','Excit DirW->MR','Excit DirSW->ML','Excit DirSW->MR','Excit DirS->ML','Excit DirS->MR','Excit DirSE->ML','Excit DirSE->MR']
+    for t in utimes:
+        pinds = 0
+        fig.suptitle('Connection Weights at Time ' + str(t) + ' ms')
+        for src in ['EV1', 'EV4', 'EMT','EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE']:
+            cpdfL = pdf[(pdf.time==t) & (pdf.postid>=dstartidx['EML']) & (pdf.postid<=dendidx['EML']) & (pdf.preid>=dstartidx[src]) & (pdf.preid<=dendidx['EML'])]
+            wts1l = np.array(cpdfL.weight)
+            wts2l = np.reshape(wts1l,(int(len(wts1l)/2),2))
+            wtsl = np.sum(wts2l,1)
+            wtsL = np.reshape(wtsl,int(np.sqrt(len(wtsl))),int(np.sqrt(len(wtsl)))) #assuming neurons in each layer are in square configuration--may need adaptation later
+            cpdfR = pdf[(pdf.time==t) & (pdf.postid>=dstartidx['EMR']) & (pdf.postid<=dendidx['EMR']) & (pdf.preid>=dstartidx[src]) & (pdf.preid<=dendidx['EMR'])]
+            wts1r = np.array(cpdfL.weight)
+            wts2r = np.reshape(wts1r,(int(len(wts1r)/2),2))
+            wtsr = np.sum(wts2r,1)
+            wtsR = np.reshape(wtsr,int(np.sqrt(len(wtsr))),int(np.sqrt(len(wtsr)))) #assuming neurons in each layer are in square configuration--may need adaptation later
+            ax=lax[pinds]
+            pcm = ax.imshow(wtsL, origin='upper', cmap='gray', vmin=0, vmax=maxNMDAwt+maxAMPAwt)
+            ax.set_title(ltitle[pinds])
+            pinds=pinds+1
+            ax=lax[pinds]
+            pcm = ax.imshow(wtsR, origin='upper', cmap='gray', vmin=0, vmax=maxNMDAwt+maxAMPAwt)
+            ax.set_title(ltitle[pinds])
+            if pinds==15: plt.colorbar(pcm, cax = cbaxes)
+
 def plotavgweights (pdf):
   utimes = np.unique(pdf.time)
   davgw = {}
@@ -294,6 +324,7 @@ if __name__ == '__main__':
   print(stepNB)
   simConfig, pdf, actreward, dstartidx, dendidx = loadsimdat()
   davgw = plotavgweights(pdf)
+  plotSynWeightsPerTimeStep(pdf) #plot images
   #wperPostID = plotavgweightsPerPostSynNeuron1(pdf)
   #plotavgweightsPerPostSynNeuron2(pdf)
   #plotIndividualSynWeights(pdf)

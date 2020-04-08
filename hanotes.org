@@ -1173,3 +1173,6 @@ STDPparamsRL2 with 'RLlenhebb': 800 ,'RLlenanti': 100 and 'useRLexp': 0
 **debug plotSpatioTemporalActivity.py 
 
 
+*20april08
+**plot weights evolving with times using function plotSynWeightsPerTimeStep(pdf) in simdat.py
+**while testing plotSynWeightsPerTimeStep(pdf), i noticed that the number of connections between premotor and motor areas were different than what i wanted it to be. For 1-1 connections, only 1 premotor neuron should connect to 1 motor neuron in Left and right motor populations. But this was not the case. So need to find the problem and fix it.
