@@ -1177,3 +1177,15 @@ STDPparamsRL2 with 'RLlenhebb': 800 ,'RLlenanti': 100 and 'useRLexp': 0
 **plot weights evolving with times using function plotSynWeightsPerTimeStep(pdf) in simdat.py
 **while testing plotSynWeightsPerTimeStep(pdf), i noticed that the number of connections between premotor and motor areas were different than what i wanted it to be. For 1-1 connections, only 1 premotor neuron should connect to 1 motor neuron in Left and right motor populations. But this was not the case. So need to find the problem and fix it.
 **run 500 ms sim to check the connections from V1 to M, V4 to M and MT to M.
+**there was a bug in analysis simdat.py:
+cpdfR = pdf[(pdf.time==t) & (pdf.postid>=dstartidx['EMR']) & (pdf.postid<=dendidx['EMR']) & (pdf.preid>=dstartidx[src]) & (pdf.preid<=dendidx['EMR'])]
+Corrected as:
+cpdfR = pdf[(pdf.time==t) & (pdf.postid>=dstartidx['EMR']) & (pdf.postid<=dendidx['EMR']) & (pdf.preid>=dstartidx[src]) & (pdf.preid<=dendidx[src])]
+This bug was found in all functions where instead of src, trg was used for dendidx.
+**reshape weights for display
+**R removed from list + axes indexing debugged
+**increase imshow range by 0.1.
+**add plt.pause.
+**add min range for imshow.
+**remove unused axes.
+**increasing range by 0.1 was too much. increase by 10% of the range of weights.

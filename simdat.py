@@ -36,33 +36,44 @@ def loadsimdat (name=None):
 #
 def plotSynWeightsPerTimeStep(pdf):
     utimes = np.unique(pdf.time)
-    maxNMDAwt = np.max(pdf[pdf.syntype=='NMDA'])
-    maxAMPAwt = np.max(pdf[pdf.syntype=='AMPA'])
+    maxNMDAwt = np.max(pdf[pdf.syntype=='NMDA']).weight
+    maxAMPAwt = np.max(pdf[pdf.syntype=='AMPA']).weight
+    maxwt = maxNMDAwt+maxAMPAwt
+    minNMDAwt = np.min(pdf[pdf.syntype=='NMDA']).weight
+    minAMPAwt = np.min(pdf[pdf.syntype=='AMPA']).weight
+    minwt = minNMDAwt+minAMPAwt
+    wtrange = 0.1*(maxwt-minwt)
     fig, axs = plt.subplots(3, 8, figsize=(16,10)); lax = axs.ravel()
     cbaxes = fig.add_axes([0.95, 0.4, 0.01, 0.2]) 
-    ltitle = ['Excit R->ML','Excit R->MR', 'Excit V1->ML','Excit V1->MR', 'Excit V4->ML','Excit V4->MR', 'Excit MT->ML', 'Excit MT->MR','Excit DirE->ML','Excit DirE->MR','Excit DirNE->ML','Excit DirNE->MR','Excit DirN->ML','Excit DirN->MR','Excit DirNW->ML','Excit DirNW->MR','Excit DirW->ML','Excit DirW->MR','Excit DirSW->ML','Excit DirSW->MR','Excit DirS->ML','Excit DirS->MR','Excit DirSE->ML','Excit DirSE->MR']
+    ltitle = ['Excit V1->ML','Excit V1->MR', 'Excit V4->ML','Excit V4->MR', 'Excit MT->ML', 'Excit MT->MR','Excit DirE->ML','Excit DirE->MR','Excit DirNE->ML','Excit DirNE->MR','Excit DirN->ML','Excit DirN->MR','Excit DirNW->ML','Excit DirNW->MR','Excit DirW->ML','Excit DirW->MR','Excit DirSW->ML','Excit DirSW->MR','Excit DirS->ML','Excit DirS->MR','Excit DirSE->ML','Excit DirSE->MR']
     for t in utimes:
         pinds = 0
         fig.suptitle('Connection Weights at Time ' + str(t) + ' ms')
         for src in ['EV1', 'EV4', 'EMT','EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE']:
-            cpdfL = pdf[(pdf.time==t) & (pdf.postid>=dstartidx['EML']) & (pdf.postid<=dendidx['EML']) & (pdf.preid>=dstartidx[src]) & (pdf.preid<=dendidx['EML'])]
+            cpdfL = pdf[(pdf.time==t) & (pdf.postid>=dstartidx['EML']) & (pdf.postid<=dendidx['EML']) & (pdf.preid>=dstartidx[src]) & (pdf.preid<=dendidx[src])]
             wts1l = np.array(cpdfL.weight)
             wts2l = np.reshape(wts1l,(int(len(wts1l)/2),2))
             wtsl = np.sum(wts2l,1)
-            wtsL = np.reshape(wtsl,int(np.sqrt(len(wtsl))),int(np.sqrt(len(wtsl)))) #assuming neurons in each layer are in square configuration--may need adaptation later
-            cpdfR = pdf[(pdf.time==t) & (pdf.postid>=dstartidx['EMR']) & (pdf.postid<=dendidx['EMR']) & (pdf.preid>=dstartidx[src]) & (pdf.preid<=dendidx['EMR'])]
+            wtsL = np.reshape(wtsl,(int(np.sqrt(len(wtsl))),int(np.sqrt(len(wtsl))))) #assuming neurons in each layer are in square configuration--may need adaptation later
+            cpdfR = pdf[(pdf.time==t) & (pdf.postid>=dstartidx['EMR']) & (pdf.postid<=dendidx['EMR']) & (pdf.preid>=dstartidx[src]) & (pdf.preid<=dendidx[src])]
             wts1r = np.array(cpdfL.weight)
             wts2r = np.reshape(wts1r,(int(len(wts1r)/2),2))
             wtsr = np.sum(wts2r,1)
-            wtsR = np.reshape(wtsr,int(np.sqrt(len(wtsr))),int(np.sqrt(len(wtsr)))) #assuming neurons in each layer are in square configuration--may need adaptation later
+            wtsR = np.reshape(wtsr,(int(np.sqrt(len(wtsr))),int(np.sqrt(len(wtsr))))) #assuming neurons in each layer are in square configuration--may need adaptation later
             ax=lax[pinds]
-            pcm = ax.imshow(wtsL, origin='upper', cmap='gray', vmin=0, vmax=maxNMDAwt+maxAMPAwt)
+            pcm = ax.imshow(wtsL, origin='upper', cmap='gray', vmin=minwt, vmax=maxwt+wtrange)
             ax.set_title(ltitle[pinds])
             pinds=pinds+1
             ax=lax[pinds]
-            pcm = ax.imshow(wtsR, origin='upper', cmap='gray', vmin=0, vmax=maxNMDAwt+maxAMPAwt)
+            pcm = ax.imshow(wtsR, origin='upper', cmap='gray', vmin=minwt, vmax=maxwt+wtrange)
             ax.set_title(ltitle[pinds])
             if pinds==15: plt.colorbar(pcm, cax = cbaxes)
+            pinds = pinds+1
+        lax[22].axis('off')
+        lax[23].axis('off')
+        plt.pause(10)
+        
+
 
 def plotavgweights (pdf):
   utimes = np.unique(pdf.time)
@@ -77,7 +88,7 @@ def plotavgweights (pdf):
       for trg in ['EML', 'EMR']:
           davgw[src+'->'+trg] = arr = []        
           for t in utimes:
-              pdfs = pdf[(pdf.time==t) & (pdf.postid>=dstartidx[trg]) & (pdf.postid<=dendidx[trg]) & (pdf.preid>=dstartidx[src]) & (pdf.preid<=dendidx[trg])]
+              pdfs = pdf[(pdf.time==t) & (pdf.postid>=dstartidx[trg]) & (pdf.postid<=dendidx[trg]) & (pdf.preid>=dstartidx[src]) & (pdf.preid<=dendidx[src])]
               arr.append(np.mean(pdfs.weight))
       subplot(12,1,gdx)
       plot(utimes,davgw[src+'->EML'],'r-',linewidth=3);
@@ -110,7 +121,7 @@ def plotavgweightsPerPostSynNeuron1(pdf):
           tstep = 0
           for t in utimes:
               arr.append([])
-              pdfs = pdf[(pdf.time==t) & (pdf.postid>=dstartidx[trg]) & (pdf.postid<=dendidx[trg]) & (pdf.preid>=dstartidx[src]) & (pdf.preid<=dendidx[trg])]
+              pdfs = pdf[(pdf.time==t) & (pdf.postid>=dstartidx[trg]) & (pdf.postid<=dendidx[trg]) & (pdf.preid>=dstartidx[src]) & (pdf.preid<=dendidx[src])]
               uniqueCells = np.unique(pdfs.postid)
               for cell in uniqueCells:
                   pdfs1 = pdfs[(pdfs.postid==cell)]
@@ -150,7 +161,7 @@ def plotavgweightsPerPostSynNeuron2(pdf):
           tstep = 0
           for t in utimes:
               arr.append([])
-              pdfs = pdf[(pdf.time==t) & (pdf.postid>=dstartidx[trg]) & (pdf.postid<=dendidx[trg]) & (pdf.preid>=dstartidx[src]) & (pdf.preid<=dendidx[trg])]
+              pdfs = pdf[(pdf.time==t) & (pdf.postid>=dstartidx[trg]) & (pdf.postid<=dendidx[trg]) & (pdf.preid>=dstartidx[src]) & (pdf.preid<=dendidx[src])]
               uniqueCells = np.unique(pdfs.postid)
               for cell in uniqueCells:
                   pdfs1 = pdfs[(pdfs.postid==cell)]
@@ -203,7 +214,7 @@ def plotIndividualSynWeights(pdf):
               arr.append([])
               arr2.append([])
               arr3.append([])
-              pdfs = pdf[(pdf.time==t) & (pdf.postid>=dstartidx[trg]) & (pdf.postid<=dendidx[trg]) & (pdf.preid>=dstartidx[src]) & (pdf.preid<=dendidx[trg])]
+              pdfs = pdf[(pdf.time==t) & (pdf.postid>=dstartidx[trg]) & (pdf.postid<=dendidx[trg]) & (pdf.preid>=dstartidx[src]) & (pdf.preid<=dendidx[src])]
               uniqueCells = np.unique(pdfs.postid)
               for cell in np.sort(np.random.choice(uniqueCells,int(0.1*len(uniqueCells)))):
                   pdfs1 = pdfs[(pdfs.postid==cell)]
@@ -290,8 +301,8 @@ def plotSynWeightsPostNeuronID(pdf,postNeuronID):
           arrR.append([])
           arrL2.append([])
           arrR2.append([])
-          pdfsL = pdf[(pdf.time==t) & (pdf.postid==targetML_postID) & (pdf.preid>=dstartidx[src]) & (pdf.preid<=dendidx['EML'])]
-          pdfsR = pdf[(pdf.time==t) & (pdf.postid==targetMR_postID) & (pdf.preid>=dstartidx[src]) & (pdf.preid<=dendidx['EMR'])]
+          pdfsL = pdf[(pdf.time==t) & (pdf.postid==targetML_postID) & (pdf.preid>=dstartidx[src]) & (pdf.preid<=dendidx[src])]
+          pdfsR = pdf[(pdf.time==t) & (pdf.postid==targetMR_postID) & (pdf.preid>=dstartidx[src]) & (pdf.preid<=dendidx[src])]
           upreLCells = np.unique(pdfsL.preid)
           upreRCells = np.unique(pdfsR.preid)
           for preID in upreLCells:
