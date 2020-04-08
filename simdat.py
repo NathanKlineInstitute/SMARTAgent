@@ -49,12 +49,12 @@ def plotSynWeightsPerTimeStep(pdf):
             wts1l = np.array(cpdfL.weight)
             wts2l = np.reshape(wts1l,(int(len(wts1l)/2),2))
             wtsl = np.sum(wts2l,1)
-            wtsL = np.reshape(wtsl,int(np.sqrt(len(wtsl))),int(np.sqrt(len(wtsl)))) #assuming neurons in each layer are in square configuration--may need adaptation later
+            wtsL = np.reshape(wtsl,(int(np.sqrt(len(wtsl))),int(np.sqrt(len(wtsl))))) #assuming neurons in each layer are in square configuration--may need adaptation later
             cpdfR = pdf[(pdf.time==t) & (pdf.postid>=dstartidx['EMR']) & (pdf.postid<=dendidx['EMR']) & (pdf.preid>=dstartidx[src]) & (pdf.preid<=dendidx[src])]
             wts1r = np.array(cpdfL.weight)
             wts2r = np.reshape(wts1r,(int(len(wts1r)/2),2))
             wtsr = np.sum(wts2r,1)
-            wtsR = np.reshape(wtsr,int(np.sqrt(len(wtsr))),int(np.sqrt(len(wtsr)))) #assuming neurons in each layer are in square configuration--may need adaptation later
+            wtsR = np.reshape(wtsr,(int(np.sqrt(len(wtsr))),int(np.sqrt(len(wtsr))))) #assuming neurons in each layer are in square configuration--may need adaptation later
             ax=lax[pinds]
             pcm = ax.imshow(wtsL, origin='upper', cmap='gray', vmin=0, vmax=maxNMDAwt+maxAMPAwt)
             ax.set_title(ltitle[pinds])
