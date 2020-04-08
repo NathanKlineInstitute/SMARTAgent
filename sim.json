@@ -6,6 +6,6 @@
     "rewardcodes": {"scorePoint": 0, "losePoint": -0, "followBall": 0.004, "avoidBall": -0.001, "hitBall": 0.1},
     "verbose": 0,
     "simtype": {"ResumeSim":0,"ResumeSimFromFile":"20mar5_G0_simConfig.pkl"},        
-    "sim": {"duration": 500, "dt": 0.2, "verbose": 0, "recordStep":0.2,"recordWeightStepSize":1,"RLFakeUpRule": 0,"RLFakeDownRule": 0,"RLFakeStayRule": 0,"name":"20april08_TG0_","doquit":0,"doplot":1},
+    "sim": {"duration": 2000, "dt": 0.2, "verbose": 0, "recordStep":0.2,"recordWeightStepSize":1,"RLFakeUpRule": 0,"RLFakeDownRule": 0,"RLFakeStayRule": 0,"name":"20april08_TG0_","doquit":0,"doplot":1},
     "net":{"scale":1,"ER":400,"IR":100,"EV1":400,"EV1DE":100,"EV1DNE":100,"EV1DN":100,"EV1DNW":100,"EV1DW":100,"EV1DSW":100,"EV1DS":100,"EV1DSE":100,"IV1":100,"EV4":100,"IV4":25,"EMT":25,"IMT":9,"EML":1350,"EMR":1350,"IM":690}
 }
