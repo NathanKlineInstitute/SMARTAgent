@@ -440,7 +440,7 @@ netParams.connParams['EMT->IMT'] = {
 netParams.connParams['EML->IM'] = {
         'preConds': {'pop': 'EML'},
         'postConds': {'pop': 'IM'},
-        'probability': 0.25,
+        'probability': 0.125/2.,
         #'convergence': 25,
         'weight': 0.02 * cfg.EIGain,
         'delay': 2,
@@ -448,7 +448,7 @@ netParams.connParams['EML->IM'] = {
 netParams.connParams['EMR->IM'] = {
         'preConds': {'pop': 'EMR'},
         'postConds': {'pop': 'IM'},
-        'probability': 0.25,
+        'probability': 0.125/2.,
         #'convergence': 25,
         'weight': 0.02 * cfg.EIGain,
         'delay': 2,
@@ -487,7 +487,7 @@ netParams.connParams['IMT->EMT'] = {
 netParams.connParams['IM->EML'] = {
         'preConds': {'pop': 'IM'},
         'postConds': {'pop': 'EML'},
-        'probability': 0.25,
+        'probability': 0.125/2.,
         #'divergence': 9,
         #'convergence': 13,
         'weight': 0.02 * cfg.IEGain,
@@ -496,7 +496,7 @@ netParams.connParams['IM->EML'] = {
 netParams.connParams['IM->EMR'] = {
         'preConds': {'pop': 'IM'},
         'postConds': {'pop': 'EMR'},
-        'probability': 0.25,
+        'probability': 0.125/2.,
         #'divergence': 9,
         #'convergence': 13,
         'weight': 0.02 * cfg.IEGain,
@@ -530,7 +530,7 @@ netParams.connParams['IMT->IMT'] = {
 netParams.connParams['IM->IM'] = {
         'preConds': {'pop': 'IM'},
         'postConds': {'pop': 'IM'},
-        'probability': 0.25,
+        'probability': 0.125/2.,
         'weight': 0.005 * cfg.IIGain, #0.000
         'delay': 2,
         'synMech': 'GABA' ,'sec':'soma', 'loc':0.5}
