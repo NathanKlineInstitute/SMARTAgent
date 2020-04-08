@@ -1188,3 +1188,4 @@ This bug was found in all functions where instead of src, trg was used for dendi
 **add plt.pause.
 **add min range for imshow.
 **remove unused axes.
+**increasing range by 0.1 was too much. increase by 10% of the range of weights.

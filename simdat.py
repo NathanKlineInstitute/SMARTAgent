@@ -42,6 +42,7 @@ def plotSynWeightsPerTimeStep(pdf):
     minNMDAwt = np.min(pdf[pdf.syntype=='NMDA']).weight
     minAMPAwt = np.min(pdf[pdf.syntype=='AMPA']).weight
     minwt = minNMDAwt+minAMPAwt
+    wtrange = 0.1*(maxwt-minwt)
     fig, axs = plt.subplots(3, 8, figsize=(16,10)); lax = axs.ravel()
     cbaxes = fig.add_axes([0.95, 0.4, 0.01, 0.2]) 
     ltitle = ['Excit V1->ML','Excit V1->MR', 'Excit V4->ML','Excit V4->MR', 'Excit MT->ML', 'Excit MT->MR','Excit DirE->ML','Excit DirE->MR','Excit DirNE->ML','Excit DirNE->MR','Excit DirN->ML','Excit DirN->MR','Excit DirNW->ML','Excit DirNW->MR','Excit DirW->ML','Excit DirW->MR','Excit DirSW->ML','Excit DirSW->MR','Excit DirS->ML','Excit DirS->MR','Excit DirSE->ML','Excit DirSE->MR']
@@ -60,11 +61,11 @@ def plotSynWeightsPerTimeStep(pdf):
             wtsr = np.sum(wts2r,1)
             wtsR = np.reshape(wtsr,(int(np.sqrt(len(wtsr))),int(np.sqrt(len(wtsr))))) #assuming neurons in each layer are in square configuration--may need adaptation later
             ax=lax[pinds]
-            pcm = ax.imshow(wtsL, origin='upper', cmap='gray', vmin=minwt, vmax=maxwt+0.1)
+            pcm = ax.imshow(wtsL, origin='upper', cmap='gray', vmin=minwt, vmax=maxwt+wtrange)
             ax.set_title(ltitle[pinds])
             pinds=pinds+1
             ax=lax[pinds]
-            pcm = ax.imshow(wtsR, origin='upper', cmap='gray', vmin=minwt, vmax=maxwt+0.1)
+            pcm = ax.imshow(wtsR, origin='upper', cmap='gray', vmin=minwt, vmax=maxwt+wtrange)
             ax.set_title(ltitle[pinds])
             if pinds==15: plt.colorbar(pcm, cax = cbaxes)
             pinds = pinds+1
