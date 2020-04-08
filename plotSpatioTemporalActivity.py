@@ -100,7 +100,7 @@ def plotActivityMaps (pauset=1, gifpath=None, mp4path=None, framerate=5):
     if pauset > 0: plt.pause(pauset)
   if gifpath is not None: anim.savegif(lfnimage, gifpath)
   if mp4path is not None: anim.savemp4('/tmp/*.png', mp4path, framerate)
-  #for fn in lfnimage: os.unlink(fn) # remove the tmp files
+  for fn in lfnimage: os.unlink(fn) # remove the tmp files
   return fig, axs, plt
 
 fig, axs, plt = plotActivityMaps(pauset=0,mp4path='data/'+dconf['sim']['name']+'_movie.mp4', framerate=10)
