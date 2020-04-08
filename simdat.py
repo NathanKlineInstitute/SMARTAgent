@@ -36,8 +36,8 @@ def loadsimdat (name=None):
 #
 def plotSynWeightsPerTimeStep(pdf):
     utimes = np.unique(pdf.time)
-    maxNMDAwt = np.max(pdf[pdf.syntype=='NMDA'])
-    maxAMPAwt = np.max(pdf[pdf.syntype=='AMPA'])
+    maxNMDAwt = np.max(pdf[pdf.syntype=='NMDA']).weight
+    maxAMPAwt = np.max(pdf[pdf.syntype=='AMPA']).weight
     fig, axs = plt.subplots(3, 8, figsize=(16,10)); lax = axs.ravel()
     cbaxes = fig.add_axes([0.95, 0.4, 0.01, 0.2]) 
     ltitle = ['Excit R->ML','Excit R->MR', 'Excit V1->ML','Excit V1->MR', 'Excit V4->ML','Excit V4->MR', 'Excit MT->ML', 'Excit MT->MR','Excit DirE->ML','Excit DirE->MR','Excit DirNE->ML','Excit DirNE->MR','Excit DirN->ML','Excit DirN->MR','Excit DirNW->ML','Excit DirNW->MR','Excit DirW->ML','Excit DirW->MR','Excit DirSW->ML','Excit DirSW->MR','Excit DirS->ML','Excit DirS->MR','Excit DirSE->ML','Excit DirSE->MR']
