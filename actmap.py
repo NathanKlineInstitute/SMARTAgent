@@ -103,6 +103,6 @@ def plotActivityMaps (pauset=1, gifpath=None, mp4path=None, framerate=5):
   for fn in lfnimage: os.unlink(fn) # remove the tmp files
   return fig, axs, plt
 
-fig, axs, plt = plotActivityMaps(pauset=0,mp4path='data/'+dconf['sim']['name']+'_movie.mp4', framerate=10)
+fig, axs, plt = plotActivityMaps(pauset=0,mp4path='data/'+dconf['sim']['name']+'actmap.mp4', framerate=10)
 
   

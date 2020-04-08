@@ -1178,6 +1178,40 @@ but now activity looks highly synchronized to 100 ms interval when visual inputs
 
 so, should avoid it ... probably can reduce weights between EMR->IM, EML->IM, IM->IM, IM->EMR, IM->EML
 
+can try cutting probabilities between those populations in half (from 0.25 to 0.125)
 
+myrun 12
 
- 
+savefig('gif/20apr8_rast_a3.png') 
+looks ~same
+
+try cutting down probabilities further ... 0.0625
+
+myrun 12
+
+little better ...
+
+gif/20apr8_rast_a4.png
+gif/20apr8_EMR_a4.png
+gif/20apr8_IM_a4.png
+
+should run longer to see if remains stable ... 
+some of the other E vs I populations have wrong rates, e.g. EV4 faster than IV4, EV1 faster than IV1
+EMT only a little slower than IMT
+and no inhibitory populations in the direction selective cells...
+
+run for 5 s to see if patterns similar, then may consider adjusting weights/probabilities further ...
+
+myrun 12
+
+ok, looks like decent rates ... less synchrony ... should be OK for now ... can adjust further as needed ... 
+gif/20apr8_rast_a5.png
+gif/20apr8_rast_a5b.png <- some alternation between synch and asynch state
+gif/20apr8_IM_a5.png
+gif/20apr8_EMR_a5.png
+gif/20apr8_EML_a5.png
+
+python -i actmap.py
+
+made this movie: data/20april08_A0__movie.mp4
+
