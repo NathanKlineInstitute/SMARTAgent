@@ -10,7 +10,7 @@ def savegif (lfnimage, outpath):
 # save set of images specified by inpath to output mp4; framerate is frames per second
 # framerate should be >= 10; otherwise ffmpeg may produce buggy output video
 def savemp4 (inpath, outpath, framerate):
-  import ffmpeg # pip install ffmpeg
+  import ffmpeg # pip install ffmpeg-python
   if os.path.isfile(outpath): os.unlink(outpath) # make sure can write to this path  
   (
     ffmpeg
