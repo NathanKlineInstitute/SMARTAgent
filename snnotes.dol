@@ -1215,3 +1215,18 @@ python -i actmap.py
 
 made this movie: data/20april08_A0__movie.mp4
 
+** try longer sim
+
+to test and watch output ...
+
+"rewardcodes": {"scorePoint": 1, "losePoint": -0.01, "followBall": 0.01, "avoidBall": -0.001, "hitBall": 0.25},
+
+"name":"20april08_B0_"
+
+and duration of 100 s ...
+
+myrun 12
+
+started ~17:32 ...
+
+
