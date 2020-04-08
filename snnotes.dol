@@ -1079,3 +1079,64 @@ a lot more cells now (1e3 more motor cells, and 800 direction selective cells), 
 python -i plotSpatioTemporalActivity.py
 
 fig, axs, plt = plotActivityMaps(pauset=0,gifpath='20apr7_activity.gif')
+
+*20apr8
+** save spatiotemporal activity as movie instead (using ffmpeg)
+
+could use imageio ffmpeg interface
+https://imageio.readthedocs.io/en/stable/format_ffmpeg.html#parameters-for-saving
+
+or ffmpeg-python https://github.com/kkroening/ffmpeg-python
+though that is more comprehensive, so may not need full package installed ...
+
+https://imageio.readthedocs.io/en/stable/examples.html#writing-videos-with-ffmpeg-and-vaapi
+
+https://github.com/imageio/imageio-ffmpeg
+
+pip install imageio-ffmpeg
+
+should have used conda to install
+with
+conda install imageio-ffmpeg -c conda-forge
+but without the ffmpeg binary
+
+python -i plotSpatioTemporalActivity.py
+
+lfnimage = ['/tmp/'+str(x)+'.png' for x in range(1,50,1)]
+limage = [imageio.imread(fn) for fn in lfnimage]
+
+
+from imageio_ffmpeg import write_frames
+
+w = imageio.get_writer('my_video.mp4', format='FFMPEG', mode='I', fps=1,
+                       codec='h264_vaapi',
+                       output_params=['format=gray'],
+                       pixelformat='gray')
+
+for img in limage: w.append_data(img)                       
+
+w.close()
+
+gen = write_frames('test.mp4', (limage[0].shape[0],limage[0].shape[1],limage[0].shape[2]), pix_fmt_in="gray")
+gen.send(None)  # seed the generator
+for img in limage: gen.send(img)
+gen.close()  # don't forget this
+
+hmm, getting errors ... ffmpeg-python seems easier to use?
+
+pip install ffmpeg-python
+
+import ffmpeg
+(
+    ffmpeg
+    .input('/tmp/*.png', pattern_type='glob', framerate=10)
+    .output('movie.mp4')
+    .run()
+)
+
+that works ... fast to run and makes small files
+
+ok, put that into plotSpatioTemporalActivity.py ...
+
+and added animation saving functions to anim.py
+

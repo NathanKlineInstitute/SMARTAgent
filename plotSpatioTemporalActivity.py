@@ -5,8 +5,8 @@ import time
 from conf import dconf
 from collections import OrderedDict
 from pylab import *
-import imageio
 import os
+import anim
 
 Input_Images = np.loadtxt('data/'+dconf['sim']['name']+'InputImages.txt')
 New_InputImages = []
@@ -66,9 +66,8 @@ dmaxSpk = OrderedDict({pop:np.max(dact[pop]) for pop in lpop})
 max_spks = np.max([dmaxSpk[p] for p in lpop])
 
 #
-def plotActivityMaps (pauset=1, gifpath=None):
+def plotActivityMaps (pauset=1, gifpath=None, mp4path=None, framerate=5):
   # plot activity in different layers as a function of input images
-  #fig, axs = plt.subplots(4, 5,figsize=(12,6)); lax = axs.ravel()
   fig, axs = plt.subplots(4, 5, figsize=(12,6)); lax = axs.ravel()
   cbaxes = fig.add_axes([0.95, 0.4, 0.01, 0.2]) 
   ltitle = ['Input Images', 'Excit R', 'Excit V1', 'Excit V4', 'Excit MT', 'Inhib R', 'Inhib V1', 'Inhib V4', 'Inhib MT']
@@ -95,16 +94,15 @@ def plotActivityMaps (pauset=1, gifpath=None):
       ax.set_ylabel(ltitle[idx])
       if ldx==2: plt.colorbar(pcm, cax = cbaxes)  
       idx += 1
-    if gifpath is not None:
+    if gifpath is not None or mp4path is not None:
       fnimg = '/tmp/'+str(t)+'.png'
       savefig(fnimg); lfnimage.append(fnimg)
     if pauset > 0: plt.pause(pauset)
-  if gifpath is not None:
-    limage = [imageio.imread(fn) for fn in lfnimage]
-    imageio.mimwrite(gifpath, limage)
-    for fn in lfnimage: os.unlink(fn) # remove the tmp files
+  if gifpath is not None: anim.savegif(lfnimage, gifpath)
+  if mp4path is not None: anim.savemp4('/tmp/*.png', mp4path, framerate)
+  #for fn in lfnimage: os.unlink(fn) # remove the tmp files
   return fig, axs, plt
 
-fig, axs, plt = plotActivityMaps()
+fig, axs, plt = plotActivityMaps(pauset=0,mp4path='data/'+dconf['sim']['name']+'_movie.mp4', framerate=10)
 
   
