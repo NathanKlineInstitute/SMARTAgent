@@ -1193,3 +1193,5 @@ This bug was found in all functions where instead of src, trg was used for dendi
 *20april09
 **save movies of weights evolution as '_weightmap.mp4' in 'data/'
 **test if _weightmap.mp4 is working properly.
+***movie saved but with following issues: 1. the order is not correct. 2. some glitch (purple-pink color instead of gray scale for a couple of frames) in the color.
+**change time-inds instead of time for png files. 
