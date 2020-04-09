@@ -350,7 +350,7 @@ if __name__ == '__main__':
   print(stepNB)
   simConfig, pdf, actreward, dstartidx, dendidx = loadsimdat()
   #davgw = plotavgweights(pdf)
-  plotSynWeightsPerTimeStep(pdf,pauset=1,mp4path='data/'+dconf['sim']['name']+'weightmap.mp4', framerate=10) #plot images
+  plotSynWeightsPerTimeStep(pdf,pauset=1,mp4path='data/'+dconf['sim']['name']+'weightmap.mp4', framerate=1) #plot images
   #wperPostID = plotavgweightsPerPostSynNeuron1(pdf)
   #plotavgweightsPerPostSynNeuron2(pdf)
   #plotIndividualSynWeights(pdf)
