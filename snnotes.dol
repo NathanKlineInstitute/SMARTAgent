@@ -1215,13 +1215,11 @@ python -i actmap.py
 
 made this movie: data/20april08_A0__movie.mp4
 
-** try longer sim
+** try longer sim ("name":"20april08_B0_")
 
 to test and watch output ...
 
 "rewardcodes": {"scorePoint": 1, "losePoint": -0.01, "followBall": 0.01, "avoidBall": -0.001, "hitBall": 0.25},
-
-"name":"20april08_B0_"
 
 and duration of 100 s ...
 
@@ -1229,4 +1227,49 @@ myrun 12
 
 started ~17:32 ...
 
+finished @ ~22:15 ...
+
+rates ok:
+ gif/20apr8_rast_b0.png
+ gif/20apr8_rast_b0b.png
+
+cells look ok?
+ gif/20apr8_IM_b0.png
+ gif/20apr8_EML_b0.png
+ gif/20apr8_EV1DSE_b0.png
+ gif/20apr8_EV1DS_b0.png
+ gif/20apr8_EV1_b0.png
+ yeah, most cells look ok. some populations fire much less than others.
+ direction cells - many directions not firing too mcuh (E, W), could be due to the
+ ball mostly moving at a diagonal; but N,S higher since paddles move up,down
+ 
+and now to create the movie ...
+
+python -i actmap.py
+
+*20apr9 -
+** continue
+
+hmm, took > 12 hours so far to spit out the pngs up to 66 s, and hasn't even started on movie creation yet ...
+
+should stop it and figure out how to speed up that process ...
+
+can make movie from the frames that were produced so far
+
+python
+import anim
+anim.savemp4('/tmp/*.png', 'data/20april08_B0_actmap.mp4', 10)
+
+very slow encoding of mp4 ...
+
+there's support in matplotlib for making animations and exporting to mp4 via ffmpeg but that's
+slow too ...
+
+imagemagick gif writing faster?
+
+sudo apt-get install imagemagick
+
+already have imagemagick ...
+
+hmm, even the imagemagick gif writer is slow . . .
 
