@@ -48,6 +48,7 @@ def plotSynWeightsPerTimeStep(pdf,pauset=1, gifpath=None, mp4path=None, framerat
     ltitle = ['Excit V1->ML','Excit V1->MR', 'Excit V4->ML','Excit V4->MR', 'Excit MT->ML', 'Excit MT->MR','Excit DirE->ML','Excit DirE->MR','Excit DirNE->ML','Excit DirNE->MR','Excit DirN->ML','Excit DirN->MR','Excit DirNW->ML','Excit DirNW->MR','Excit DirW->ML','Excit DirW->MR','Excit DirSW->ML','Excit DirSW->MR','Excit DirS->ML','Excit DirS->MR','Excit DirSE->ML','Excit DirSE->MR']
     lfnimage = []
     tinds = 0
+    maxtstr = len(str(len(utimes)))
     for t in utimes:
         pinds = 0
         tinds = tinds+1
@@ -75,7 +76,11 @@ def plotSynWeightsPerTimeStep(pdf,pauset=1, gifpath=None, mp4path=None, framerat
         lax[22].axis('off')
         lax[23].axis('off')
         if gifpath is not None or mp4path is not None:
-            fnimg = '/tmp/'+str(tinds)+'.png'
+            ctstrl = len(str(len(tinds)))
+            tpre = ''
+            for ttt in range(ctstrl):
+                tpre = tpre+'0'
+            fnimg = '/tmp/tpre'+str(tinds)+'.png'
             savefig(fnimg); lfnimage.append(fnimg)
         if pauset>0: plt.pause(pauset)
     if gifpath is not None: anim.savegif(lfnimage, gifpath)
