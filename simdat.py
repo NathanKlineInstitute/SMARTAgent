@@ -73,8 +73,8 @@ def plotSynWeightsPerTimeStep(pdf,pauset=1, gifpath=None, mp4path=None, framerat
         lax[22].axis('off')
         lax[23].axis('off')
         if gifpath is not None or mp4path is not None:
-        fnimg = '/tmp/'+str(t)+'.png'
-        savefig(fnimg); lfnimage.append(fnimg)
+            fnimg = '/tmp/'+str(t)+'.png'
+            savefig(fnimg); lfnimage.append(fnimg)
         if pauset>0: plt.pause(pauset)
     if gifpath is not None: anim.savegif(lfnimage, gifpath)
     if mp4path is not None: anim.savemp4('/tmp/*.png', mp4path, framerate)
