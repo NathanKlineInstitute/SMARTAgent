@@ -1189,3 +1189,7 @@ This bug was found in all functions where instead of src, trg was used for dendi
 **add min range for imshow.
 **remove unused axes.
 **increasing range by 0.1 was too much. increase by 10% of the range of weights.
+
+*20april09
+**save movies of weights evolution as '_weightmap.mp4' in 'data/'
+**test if _weightmap.mp4 is working properly.

@@ -5,9 +5,9 @@ import pandas as pd
 from conf import dconf
 import os
 import sys
+import anim
 
 ion()
-
 
 global stepNB
 stepNB = -1
@@ -34,7 +34,7 @@ def loadsimdat (name=None):
   return simConfig, pdf, actreward, dstartidx, dendidx
 
 #
-def plotSynWeightsPerTimeStep(pdf):
+def plotSynWeightsPerTimeStep(pdf,pauset=1, gifpath=None, mp4path=None, framerate=5):
     utimes = np.unique(pdf.time)
     maxNMDAwt = np.max(pdf[pdf.syntype=='NMDA']).weight
     maxAMPAwt = np.max(pdf[pdf.syntype=='AMPA']).weight
@@ -43,9 +43,10 @@ def plotSynWeightsPerTimeStep(pdf):
     minAMPAwt = np.min(pdf[pdf.syntype=='AMPA']).weight
     minwt = minNMDAwt+minAMPAwt
     wtrange = 0.1*(maxwt-minwt)
-    fig, axs = plt.subplots(3, 8, figsize=(16,10)); lax = axs.ravel()
+    fig, axs = plt.subplots(3, 8, figsize=(18,10)); lax = axs.ravel()
     cbaxes = fig.add_axes([0.95, 0.4, 0.01, 0.2]) 
     ltitle = ['Excit V1->ML','Excit V1->MR', 'Excit V4->ML','Excit V4->MR', 'Excit MT->ML', 'Excit MT->MR','Excit DirE->ML','Excit DirE->MR','Excit DirNE->ML','Excit DirNE->MR','Excit DirN->ML','Excit DirN->MR','Excit DirNW->ML','Excit DirNW->MR','Excit DirW->ML','Excit DirW->MR','Excit DirSW->ML','Excit DirSW->MR','Excit DirS->ML','Excit DirS->MR','Excit DirSE->ML','Excit DirSE->MR']
+    lfnimage = []
     for t in utimes:
         pinds = 0
         fig.suptitle('Connection Weights at Time ' + str(t) + ' ms')
@@ -71,7 +72,14 @@ def plotSynWeightsPerTimeStep(pdf):
             pinds = pinds+1
         lax[22].axis('off')
         lax[23].axis('off')
-        plt.pause(10)
+        if gifpath is not None or mp4path is not None:
+        fnimg = '/tmp/'+str(t)+'.png'
+        savefig(fnimg); lfnimage.append(fnimg)
+        if pauset>0: plt.pause(pauset)
+    if gifpath is not None: anim.savegif(lfnimage, gifpath)
+    if mp4path is not None: anim.savemp4('/tmp/*.png', mp4path, framerate)
+    for fn in lfnimage: os.unlink(fn) # remove the tmp files
+
         
 
 
@@ -334,8 +342,8 @@ if __name__ == '__main__':
     stepNB = int(sys.argv[1]) #which file(stepNB) want to plot
   print(stepNB)
   simConfig, pdf, actreward, dstartidx, dendidx = loadsimdat()
-  davgw = plotavgweights(pdf)
-  plotSynWeightsPerTimeStep(pdf) #plot images
+  #davgw = plotavgweights(pdf)
+  plotSynWeightsPerTimeStep(pdf,pauset=0,mp4path='data/'+dconf['sim']['name']+'weightmap.mp4', framerate=10) #plot images
   #wperPostID = plotavgweightsPerPostSynNeuron1(pdf)
   #plotavgweightsPerPostSynNeuron2(pdf)
   #plotIndividualSynWeights(pdf)
