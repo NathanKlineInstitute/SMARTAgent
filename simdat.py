@@ -76,9 +76,9 @@ def plotSynWeightsPerTimeStep(pdf,pauset=1, gifpath=None, mp4path=None, framerat
         lax[22].axis('off')
         lax[23].axis('off')
         if gifpath is not None or mp4path is not None:
-            ctstrl = len(str(len(tinds)))
+            ctstrl = len(str(tinds))
             tpre = ''
-            for ttt in range(ctstrl):
+            for ttt in range(maxtstr-ctstrl):
                 tpre = tpre+'0'
             fnimg = '/tmp/tpre'+str(tinds)+'.png'
             savefig(fnimg); lfnimage.append(fnimg)
