@@ -30,7 +30,7 @@ def loadsimdat (name=None):
   dstartidx = {p:simConfig['net']['pops'][p]['cellGids'][0] for p in simConfig['net']['pops'].keys()} # starting indices for each population
   dendidx = {p:simConfig['net']['pops'][p]['cellGids'][-1] for p in simConfig['net']['pops'].keys()} # ending indices for each population
   pdf = readinweights(simConfig)
-  actreward = pd.DataFrame(np.loadtxt('data/'+name+'ActionsRewards.txt'),columns=['time','action','reward','proposed'])   
+  actreward = pd.DataFrame(np.loadtxt('data/'+name+'ActionsRewards.txt'),columns=['time','action','reward','proposed','hit'])   
   return simConfig, pdf, actreward, dstartidx, dendidx
 
 #
@@ -43,7 +43,18 @@ def plotSynWeightsPerTimeStep(pdf,pauset=1, gifpath=None, mp4path=None, framerat
     minAMPAwt = np.min(pdf[pdf.syntype=='AMPA']).weight
     minwt = minNMDAwt+minAMPAwt
     wtrange = 0.1*(maxwt-minwt)
-    fig, axs = plt.subplots(3, 8, figsize=(18,10)); lax = axs.ravel()
+    fig = plt.figure(figsize=(18,10))
+    gs = fig.add_gridspec(4,8)
+    f_ax1 = fig.add_subplot(gs[0,:])
+    f_ax1.plot(actreward.time,actreward.reward,'k',linewidth=4)
+    f_ax1.plot(actreward.time,actreward.reward,'ko',markersize=10)  
+    f_ax1.set_xlim((0,simConfig['simConfig']['duration']))
+    f_ax1.set_ylim((-1.1,1.1))
+    f_ax = []
+    for rows in range(3):
+        for cols in range(8):
+            f_ax.append(fig.add_subplot(gs[rows+1,cols]))
+    #fig, axs = plt.subplots(3, 8, figsize=(18,10)); lax = axs.ravel()
     cbaxes = fig.add_axes([0.95, 0.4, 0.01, 0.2]) 
     ltitle = ['Excit V1->ML','Excit V1->MR', 'Excit V4->ML','Excit V4->MR', 'Excit MT->ML', 'Excit MT->MR','Excit DirE->ML','Excit DirE->MR','Excit DirNE->ML','Excit DirNE->MR','Excit DirN->ML','Excit DirN->MR','Excit DirNW->ML','Excit DirNW->MR','Excit DirW->ML','Excit DirW->MR','Excit DirSW->ML','Excit DirSW->MR','Excit DirS->ML','Excit DirS->MR','Excit DirSE->ML','Excit DirSE->MR']
     lfnimage = []
@@ -64,17 +75,17 @@ def plotSynWeightsPerTimeStep(pdf,pauset=1, gifpath=None, mp4path=None, framerat
             wts2r = np.reshape(wts1r,(int(len(wts1r)/2),2))
             wtsr = np.sum(wts2r,1)
             wtsR = np.reshape(wtsr,(int(np.sqrt(len(wtsr))),int(np.sqrt(len(wtsr))))) #assuming neurons in each layer are in square configuration--may need adaptation later
-            ax=lax[pinds]
+            ax=f_ax[pinds]
             pcm = ax.imshow(wtsL, origin='upper', cmap='gray', vmin=minwt, vmax=maxwt+wtrange)
             ax.set_title(ltitle[pinds])
             pinds=pinds+1
-            ax=lax[pinds]
+            ax=f_ax[pinds]
             pcm = ax.imshow(wtsR, origin='upper', cmap='gray', vmin=minwt, vmax=maxwt+wtrange)
             ax.set_title(ltitle[pinds])
             if pinds==15: plt.colorbar(pcm, cax = cbaxes)
             pinds = pinds+1
-        lax[22].axis('off')
-        lax[23].axis('off')
+        f_ax[22].axis('off')
+        f_ax[23].axis('off')
         if gifpath is not None or mp4path is not None:
             ctstrl = len(str(tinds))
             tpre = ''

@@ -1196,4 +1196,10 @@ This bug was found in all functions where instead of src, trg was used for dendi
 ***movie saved but with following issues: 1. the order is not correct. 2. some glitch (purple-pink color instead of gray scale for a couple of frames) in the color.
 **change time-inds instead of time for png files.
 ***make the name of image.png same for all times by adding tpre using appended '00...' e.g if there are 100 images to be save, images will be saved as 001.png, 002.png .....010.png,020.png,.....,100.png 
-***run 10 sec sim. 
+***run 10 sec sim.
+**To quantify behavior we record:
+1. time point
+2. action performed by the agent
+3. reward (+1 if Agent wins a point, -1 if Agent loses a point)
+4. action proposed to follow the ball (the proposed action is to follow the ball)
+5. 1 if agent hits the ball (this action leads to avoid loss of point)  

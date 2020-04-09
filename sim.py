@@ -13,6 +13,7 @@ sim.allTimes = []
 sim.allRewards = [] # list to store all rewards
 sim.allActions = [] # list to store all actions
 sim.allProposedActions = [] # list to store all proposed actions
+sim.allHits = [] #list to store all hits
 sim.allMotorOutputs = [] # list to store firing rate of output motor neurons.
 sim.ActionsRewardsfilename = 'data/'+dconf['sim']['name']+'ActionsRewards.txt'
 sim.MotorOutputsfilename = 'data/'+dconf['sim']['name']+'MotorOutputs.txt'
@@ -1186,6 +1187,7 @@ def saveGameBehavior(sim):
             fid3.write('\t%0.1f' % sim.allActions[i])
             fid3.write('\t%0.5f' % sim.allRewards[i])
             fid3.write('\t%0.1f' % sim.allProposedActions[i]) #the number of proposed action should be equal to the number of actions
+            fid3.write('\t%0.1f' % sim.allHits[i]) #the number of proposed action should be equal to the number of actions
             fid3.write('\n')
 
 ######################################################################################
@@ -1617,6 +1619,8 @@ def trainAgent (t):
             sim.allProposedActions.append(pactions)
         for reward in rewards: # this generates an error - since rewards only declared for sim.rank==0; bug?
             sim.allRewards.append(reward)
+        for hits in total_hits:
+            sim.allHits.append(hits) #hit or no hit
         for ltpnt in [t-80, t-60, t-40, t-20, t-0]: sim.allTimes.append(ltpnt)
     updateInputRates() # update firing rate of inputs to R population (based on image content)                
     NBsteps = NBsteps+1
