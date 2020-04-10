@@ -45,17 +45,38 @@ def plotSynWeightsPerTimeStep(pdf,pauset=1, gifpath=None, mp4path=None, framerat
     wtrange = 0.1*(maxwt-minwt)
     fig = plt.figure(figsize=(18,10))
     gs = fig.add_gridspec(4,8)
-    f_ax1 = fig.add_subplot(gs[0,:])
+    f_ax1 = fig.add_subplot(gs[0,0:3])
+    f_ax2 = fig.add_subplot(gs[0,4:7])
+    pdfsL = pdf[(pdf.postid>=dstartidx['EML']) & (pdf.postid<=dendidx['EML'])]
+    pdfsR = pdf[(pdf.postid>=dstartidx['EMR']) & (pdf.postid<=dendidx['EMR'])]
+    Lwts = [] #wts of connections onto EML
+    Rwts = [] #wts of connections onto EMR
+    for t in utimes:
+        ct_Lwts = pdfsL[(pdfsL.time==t)].weight
+        ct_Rwts = pdfsR[(pdfsR.time==t)].weight
+        Lwts.append(np.mean(ct_Lwts))
+        Rwts.append(np.mean(ct_Rwts))
     actionvsproposed = actreward.action-actreward.proposed
     followtheball = actreward[actionvsproposed==0]
-    f_ax1.plot(actreward.time,actreward.hit,'go',markersize=4) #mark times when the racket hits the ball
-    f_ax1.plot(followtheball.time,followtheball.action-followtheball.proposed,'ko',markersize=4) #mark times when the racket follows the ball
-    if dconf['rewardcodes']['scorePoint']==1:
-        scoretpnts = actreward.time[actreward.reward>dconf['rewardcodes']['scorePoint']]
-        f_ax1.plot(scoretpnts,2*np.ones(shape=(len(scoretpnts),1)),'bo',markersize=4)  
+    f_ax1.plot(actreward.time,actreward.reward,'ko',markersize=2)
+    #f_ax1.plot(actreward.time,actreward.hit,'go',markersize=4) #mark times when the racket hits the ball
+    #f_ax1.plot(followtheball.time,followtheball.action-followtheball.proposed,'ko',markersize=4) #mark times when the racket follows the ball
+    #if dconf['rewardcodes']['scorePoint']==1:
+    #    scoretpnts = actreward.time[actreward.reward>dconf['rewardcodes']['scorePoint']]
+    #    f_ax1.plot(scoretpnts,2*np.ones(shape=(len(scoretpnts),1)),'bo',markersize=4)  
     f_ax1.set_xlim((0,simConfig['simConfig']['duration']))
-    f_ax1.set_ylim((-0.1,2.1))
-    f_ax1.legend(('HitBall','FollowBall','ScorePoint'),loc='upper left')
+    f_ax1.set_ylim((np.min(actreward.reward),np.max(actreward.reward)))
+    f_ax1.set_ylabel('rewards')
+    f_ax1.set_xlabel('time (msec)')
+    #plot mean weights of all connections onto EML and EMR
+    f_ax2.plot(utimes,Lwts,'r-o',markersize=1)
+    f_ax2.plot(utimes,Rwts,'b-o',markersize=1)
+    f_ax2.set_xlim((0,simConfig['simConfig']['duration']))
+    f_ax2.set_ylim((np.min([np.min(Lwts),np.min(Rwts)]),np.max([np.max(Lwts),np.max(Rwts)])))
+    f_ax2.set_ylabel('total weights')
+    f_ax2.set_xlabel('time (msec)')
+    f_ax2.legend(('->EML','->EMR'),loc='upper left')
+    #f_ax1.legend(('HitBall','FollowBall','ScorePoint'),loc='upper left')
     f_ax = []
     for rows in range(3):
         for cols in range(8):
@@ -67,7 +88,8 @@ def plotSynWeightsPerTimeStep(pdf,pauset=1, gifpath=None, mp4path=None, framerat
     tinds = 0
     maxtstr = len(str(len(utimes)))
     for t in utimes:
-        f_ax1.plot([t,t],[-0.1,2.1],'r',linewidth=2)
+        f_ax1.plot([t,t],[np.min(actreward.reward),np.max(actreward.reward)],'r',linewidth=0.2)
+        f_ax2.plot([t,t],[np.min([np.min(Lwts),np.min(Rwts)]),np.max([np.max(Lwts),np.max(Rwts)])],'r',linewidth=0.2)
         pinds = 0
         tinds = tinds+1
         fig.suptitle('Connection Weights at Time ' + str(t) + ' ms')

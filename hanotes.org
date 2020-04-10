@@ -1206,3 +1206,6 @@ This bug was found in all functions where instead of src, trg was used for dendi
 
 *20april10
 **plot FollowBall, HitBall and scorePoint together with weights.
+**Looks like Hit Ball is not detected correctly in the algorithm. So need to check that.
+**Since there was not hit ball or score point in the behavior, i will plot these behavioral outputs later.
+**Right now i am plotting rewards (total rewards) and mean weights onto EML and EMR and mark time.
