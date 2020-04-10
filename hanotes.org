@@ -1203,3 +1203,6 @@ This bug was found in all functions where instead of src, trg was used for dendi
 3. reward (+1 if Agent wins a point, -1 if Agent loses a point)
 4. action proposed to follow the ball (the proposed action is to follow the ball)
 5. 1 if agent hits the ball (this action leads to avoid loss of point)  
+
+*20april10
+**plot FollowBall, HitBall and scorePoint together with weights.

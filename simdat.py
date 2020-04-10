@@ -46,10 +46,16 @@ def plotSynWeightsPerTimeStep(pdf,pauset=1, gifpath=None, mp4path=None, framerat
     fig = plt.figure(figsize=(18,10))
     gs = fig.add_gridspec(4,8)
     f_ax1 = fig.add_subplot(gs[0,:])
-    f_ax1.plot(actreward.time,actreward.reward,'k',linewidth=4)
-    f_ax1.plot(actreward.time,actreward.reward,'ko',markersize=10)  
+    actionvsproposed = actreward.action-actreward.proposed
+    followtheball = actreward[actionvsproposed==0]
+    f_ax1.plot(followtheball.time,followtheball.action-followtheball.proposed,'ko',markersize=4) #mark times when the racket follows the ball
+    f_ax1.plot(actreward.time[actreward.hit==1],actreward.hit[actreward.hit==1],'go',markersize=4) #mark times when the racket hits the ball
+    if dconf['rewardcodes']['scorePoint']==1:
+        scoretpnts = actreward.time[actreward.reward>dconf['rewardcodes']['scorePoint']]
+        f_ax1.plot(scoretpnts,2*np.ones(shape=(len(scoretpnts),1)),'bo',markersize=4)  
     f_ax1.set_xlim((0,simConfig['simConfig']['duration']))
-    f_ax1.set_ylim((-1.1,1.1))
+    f_ax1.set_ylim((-0.1,2.1))
+    f_ax1.set_legend(('FollowBall','HitBall','ScorePoint'),loc='upper left')
     f_ax = []
     for rows in range(3):
         for cols in range(8):
@@ -61,6 +67,7 @@ def plotSynWeightsPerTimeStep(pdf,pauset=1, gifpath=None, mp4path=None, framerat
     tinds = 0
     maxtstr = len(str(len(utimes)))
     for t in utimes:
+        f_ax1.plot([t,t],[-0.1,2.1],'r',linewidth=2)
         pinds = 0
         tinds = tinds+1
         fig.suptitle('Connection Weights at Time ' + str(t) + ' ms')
