@@ -108,7 +108,7 @@ def plotActivityMaps (pauset=1, gifpath=None, mp4path=None, framerate=5, zf=10):
   return fig, axs, plt
 
 #
-def animActivityMaps (gifpath=None, mp4path=None, framerate=5, figsize=None):
+def animActivityMaps (gifpath=None, mp4path=None, framerate=10, figsize=(7,3)):
   # plot activity in different layers as a function of input images
   if figsize is not None:
     fig, axs = plt.subplots(4, 5, figsize=figsize);
@@ -163,14 +163,13 @@ def animActivityMaps (gifpath=None, mp4path=None, framerate=5, figsize=None):
     ani.save(mp4path, writer=writer)
   if gifpath is not None:
     try:
-      writer = animation.writers['imagemagick']
+      writer = animation.writers['imagemagick'] # need to have imagemagick installed
       writer = writer(fps=framerate)
       ani.save(gifpath, writer=writer)
     except:
       print('imagemagick not available')
   return fig, axs, plt
 
-#fig, axs, plt = plotActivityMaps(pauset=0,mp4path='data/'+dconf['sim']['name']+'actmap.mp4', framerate=10)
-#fig, axs, plt = animActivityMaps(mp4path='data/'+dconf['sim']['name']+'actmap.mp4', framerate=10)
-#fig, axs, plt = animActivityMaps(mp4path='test.mp4', framerate=10)
-  
+fig, axs, plt = animActivityMaps(mp4path='data/'+dconf['sim']['name']+'actmap.mp4', framerate=10)
+
+
