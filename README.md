@@ -1,2 +1,2 @@
 # SMARTAgent
-A neuronal network model that processes dynamic visual information from the AIgame enviroment and uses spike-timing dependent reinforcement learning to learn to play games. 
+A closed-loop neuronal network model that senses dynamic visual information from the AIgame enviroment and learns to produce actions that maximize game reward through spike-timing dependent reinforcement learning.
