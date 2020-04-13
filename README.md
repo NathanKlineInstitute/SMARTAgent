@@ -1,2 +1,2 @@
 # SMARTAgent
-A biological neural network model that can interact with the AIgame enviroment to learn about the environment and actions to maximize the reward. 
+A neuronal network model that processes dynamic visual information from the AIgame enviroment and uses spike-timing dependent reinforcement learning to learn to play games. 
