@@ -1209,3 +1209,9 @@ This bug was found in all functions where instead of src, trg was used for dendi
 **Looks like Hit Ball is not detected correctly in the algorithm. So need to check that.
 **Since there was not hit ball or score point in the behavior, i will plot these behavioral outputs later.
 **Right now i am plotting rewards (total rewards) and mean weights onto EML and EMR and mark time.
+
+*20april13
+**out of sequence image frames in movies using simdat.py fixed. the problem was with naming the files. previously when i tried to fix it. i didnt use the sting concentration function properly. It works now and all movies have images in sequence.
+**plotting only game behavior using testPong.py. This can be integrated with the model output later. This is to understand the game behavior and to validate all the rules used for training the model. Should be run separately.
+**saved 1000 steps random game behavior (not driven by the model).
+

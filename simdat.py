@@ -120,7 +120,8 @@ def plotSynWeightsPerTimeStep(pdf,pauset=1, gifpath=None, mp4path=None, framerat
             tpre = ''
             for ttt in range(maxtstr-ctstrl):
                 tpre = tpre+'0'
-            fnimg = '/tmp/tpre'+str(tinds)+'.png'
+            fname = tpre+str(tinds)+'.png'
+            fnimg = '/tmp/'+fname
             savefig(fnimg); lfnimage.append(fnimg)
         if pauset>0: plt.pause(pauset)
     if gifpath is not None: anim.savegif(lfnimage, gifpath)
@@ -390,7 +391,7 @@ if __name__ == '__main__':
   print(stepNB)
   simConfig, pdf, actreward, dstartidx, dendidx = loadsimdat()
   #davgw = plotavgweights(pdf)
-  plotSynWeightsPerTimeStep(pdf,pauset=1,mp4path='data/'+dconf['sim']['name']+'weightmap.mp4', framerate=1) #plot images
+  plotSynWeightsPerTimeStep(pdf,pauset=1,mp4path='data/'+dconf['sim']['name']+'weightmap.mp4', framerate=10) #plot images
   #wperPostID = plotavgweightsPerPostSynNeuron1(pdf)
   #plotavgweightsPerPostSynNeuron2(pdf)
   #plotIndividualSynWeights(pdf)
