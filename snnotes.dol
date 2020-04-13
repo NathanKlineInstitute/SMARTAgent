@@ -1247,7 +1247,7 @@ and now to create the movie ...
 
 python -i actmap.py
 
-*20apr9 -
+*20apr9 - trying to speed up animation production
 ** continue
 
 hmm, took > 12 hours so far to spit out the pngs up to 66 s, and hasn't even started on movie creation yet ...
@@ -1273,3 +1273,42 @@ already have imagemagick ...
 
 hmm, even the imagemagick gif writer is slow . . .
 
+*20apr13 - animation
+** HA fixing collision detection code since not working in all cases
+algorithm relies on position, direction, score
+** movie fix
+
+would concat of smaller mp4 files together run faster than producing one giant mp4?
+
+https://stackoverflow.com/questions/7333232/how-to-concatenate-two-mp4-files-using-ffmpeg
+
+could try ffmpeg concat demuxer : 
+
+"Use this method when you want to avoid a re-encode and your format does not support file level
+concatenation (most files used by general users do not support file level concatenation).
+
+$ cat mylist.txt
+file '/path/to/file1'
+file '/path/to/file2'
+file '/path/to/file3'
+
+$ ffmpeg -f concat -safe 0 -i mylist.txt -c copy output.mp4"
+
+hmm, problem seems to be that matplotlib takes longer and longer to save output files
+in beginning, saves 15 files per minute, then gradually decreases to 5 per minute ...
+
+and that's particularly true when setting figsize to high resolution values ...
+
+might be due to matplotlib slowing down with all the redrawing ... not even having to do
+with file saving ...
+
+yes, not ffmpeg issue - ffmpeg runs very quickly once all frames are available ... so that
+isolates slowness to matplotlib
+
+this related issue mentions slowing down:
+https://github.com/matplotlib/matplotlib/issues/16182
+
+https://stackoverflow.com/questions/40747181/slow-ploting-using-animation-function-in-matplotlib-python
+also relevant ...
+
+fig, axs, plt = animActivityMaps(mp4path='test.mp4', framerate=10)

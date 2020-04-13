@@ -9,6 +9,8 @@ import os
 import anim
 from matplotlib import animation
 
+rcParams['font.size'] = 6
+
 Input_Images = np.loadtxt('data/'+dconf['sim']['name']+'InputImages.txt')
 New_InputImages = []
 NB_Images = int(Input_Images.shape[0]/Input_Images.shape[1])
@@ -67,9 +69,10 @@ dmaxSpk = OrderedDict({pop:np.max(dact[pop]) for pop in lpop})
 max_spks = np.max([dmaxSpk[p] for p in lpop])
 
 #
-def plotActivityMaps (pauset=1, gifpath=None, mp4path=None, framerate=5):
+def plotActivityMaps (pauset=1, gifpath=None, mp4path=None, framerate=5, zf=10):
   # plot activity in different layers as a function of input images
-  fig, axs = plt.subplots(4, 5, figsize=(24,12)); lax = axs.ravel()
+  #fig, axs = plt.subplots(4, 5, figsize=(12,6)); lax = axs.ravel()
+  fig, axs = plt.subplots(4, 5); lax = axs.ravel()
   cbaxes = fig.add_axes([0.95, 0.4, 0.01, 0.2]) 
   ltitle = ['Input Images', 'Excit R', 'Excit V1', 'Excit V4', 'Excit MT', 'Inhib R', 'Inhib V1', 'Inhib V4', 'Inhib MT']
   for p in ddir.keys(): ltitle.append(ddir[p])
@@ -96,7 +99,7 @@ def plotActivityMaps (pauset=1, gifpath=None, mp4path=None, framerate=5):
       if ldx==2: plt.colorbar(pcm, cax = cbaxes)  
       idx += 1
     if gifpath is not None or mp4path is not None:
-      fnimg = '/tmp/'+str(t)+'.png'
+      fnimg = '/tmp/'+str(t).zfill(zf)+'.png'
       savefig(fnimg); lfnimage.append(fnimg)
     if pauset > 0: plt.pause(pauset)
   if gifpath is not None: anim.savegif(lfnimage, gifpath)
@@ -105,9 +108,13 @@ def plotActivityMaps (pauset=1, gifpath=None, mp4path=None, framerate=5):
   return fig, axs, plt
 
 #
-def animActivityMaps (pauset=1, gifpath=None, mp4path=None, framerate=5):
+def animActivityMaps (gifpath=None, mp4path=None, framerate=10, figsize=(7,3)):
   # plot activity in different layers as a function of input images
-  fig, axs = plt.subplots(4, 5, figsize=(12,6)); lax = axs.ravel()
+  if figsize is not None:
+    fig, axs = plt.subplots(4, 5, figsize=figsize);
+  else:
+    fig, axs = plt.subplots(4, 5);
+  lax = axs.ravel()
   cbaxes = fig.add_axes([0.95, 0.4, 0.01, 0.2]) 
   ltitle = ['Input Images', 'Excit R', 'Excit V1', 'Excit V4', 'Excit MT', 'Inhib R', 'Inhib V1', 'Inhib V4', 'Inhib MT']
   for p in ddir.keys(): ltitle.append(ddir[p])
@@ -118,24 +125,34 @@ def animActivityMaps (pauset=1, gifpath=None, mp4path=None, framerate=5):
     lvmax.append(max_spks)
     xlim.append( (-0.5, lact[-1].shape[1] - 0.5) )
     ylim.append( (lact[-1].shape[1] - 0.5, -0.5))
+  ddat = {}
+  fig.suptitle('Time = ' + str(0*tBin_Size) + ' ms')
+  idx = 0
+  for ldx,ax in enumerate(lax):
+    if ldx == 5 or idx > len(dact.keys()):
+      ax.axis('off')
+      continue
+    if ldx==0: offidx=-1
+    else: offidx=0
+    pcm = ax.imshow( lact[idx][offidx,:,:], origin='upper', cmap='gray', vmin=0, vmax=lvmax[idx])
+    ddat[ldx] = pcm
+    ax.set_xlim(xlim[idx]) 
+    ax.set_ylim(ylim[idx])
+    ax.set_ylabel(ltitle[idx])
+    if ldx==2: plt.colorbar(pcm, cax = cbaxes)  
+    idx += 1
   def updatefig (t):
     print('frame t = ', str(t*tBin_Size))
     fig.suptitle('Time = ' + str(t*tBin_Size) + ' ms')
     idx = 0
     for ldx,ax in enumerate(lax):
-      if ldx == 5 or idx > len(dact.keys()):
-        ax.axis('off')
-        continue
+      if ldx == 5 or idx > len(dact.keys()): continue
       if ldx==0: offidx=-1
       else: offidx=0
-      pcm = ax.imshow( lact[idx][t+offidx,:,:], origin='upper', cmap='gray', vmin=0, vmax=lvmax[idx])
-      ax.set_xlim(xlim[idx]) 
-      ax.set_ylim(ylim[idx])
-      ax.set_ylabel(ltitle[idx])
-      if ldx==2: plt.colorbar(pcm, cax = cbaxes)  
+      ddat[ldx].set_data(lact[idx][t+offidx,:,:])
       idx += 1
     return fig
-  ani = animation.FuncAnimation(fig, updatefig, interval=(1e3/framerate), frames=len(t1))
+  ani = animation.FuncAnimation(fig, updatefig, interval=1, frames=len(t1))
   if mp4path is not None:
     # Either avconv or ffmpeg need to be installed in the system to produce the videos!
     try:
@@ -146,13 +163,13 @@ def animActivityMaps (pauset=1, gifpath=None, mp4path=None, framerate=5):
     ani.save(mp4path, writer=writer)
   if gifpath is not None:
     try:
-      writer = animation.writers['imagemagick']
+      writer = animation.writers['imagemagick'] # need to have imagemagick installed
       writer = writer(fps=framerate)
       ani.save(gifpath, writer=writer)
     except:
       print('imagemagick not available')
   return fig, axs, plt
 
-#fig, axs, plt = plotActivityMaps(pauset=0,mp4path='data/'+dconf['sim']['name']+'actmap.mp4', framerate=10)
-#fig, axs, plt = animActivityMaps(pauset=0,mp4path='data/'+dconf['sim']['name']+'actmap.mp4', framerate=10)
-  
+fig, axs, plt = animActivityMaps(mp4path='data/'+dconf['sim']['name']+'actmap.mp4', framerate=10)
+
+
