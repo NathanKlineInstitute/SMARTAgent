@@ -10,6 +10,8 @@ from matplotlib import animation
 
 ion()
 
+rcParams['font.size'] = 6
+
 global stepNB
 stepNB = -1
 #
@@ -37,19 +39,16 @@ def loadsimdat (name=None):
 #
 def animSynWeights (pdf, outpath, framerate=10, figsize=None):
   print('in animSynWeights')
-  ion()
   utimes = np.unique(pdf.time)
-  maxNMDAwt = np.max(pdf[pdf.syntype=='NMDA']).weight
-  maxAMPAwt = np.max(pdf[pdf.syntype=='AMPA']).weight
+  maxNMDAwt = np.max(pdf[pdf.syntype=='NMDA'].weight)
+  maxAMPAwt = np.max(pdf[pdf.syntype=='AMPA'].weight)
   maxwt = maxNMDAwt+maxAMPAwt
-  minNMDAwt = np.min(pdf[pdf.syntype=='NMDA']).weight
-  minAMPAwt = np.min(pdf[pdf.syntype=='AMPA']).weight
+  minNMDAwt = np.min(pdf[pdf.syntype=='NMDA'].weight)
+  minAMPAwt = np.min(pdf[pdf.syntype=='AMPA'].weight)
   minwt = minNMDAwt+minAMPAwt
   wtrange = 0.1*(maxwt-minwt)
-  if figsize is not None:
-    fig = plt.figure(figsize=figsize)
-  else:
-    fig = plt.figure()
+  if figsize is not None: fig = plt.figure(figsize=figsize)
+  else: fig = plt.figure()
   gs = fig.add_gridspec(4,8)
   f_ax1 = fig.add_subplot(gs[0,0:3])
   f_ax2 = fig.add_subplot(gs[0,4:7])
@@ -58,24 +57,22 @@ def animSynWeights (pdf, outpath, framerate=10, figsize=None):
   Lwts = [] #wts of connections onto EML
   Rwts = [] #wts of connections onto EMR
   for t in utimes:
-    ct_Lwts = pdfsL[(pdfsL.time==t)].weight
-    ct_Rwts = pdfsR[(pdfsR.time==t)].weight
-    Lwts.append(np.mean(ct_Lwts))
-    Rwts.append(np.mean(ct_Rwts))
+    Lwts.append(np.mean(pdfsL[(pdfsL.time==t)].weight))
+    Rwts.append(np.mean(pdfsR[(pdfsR.time==t)].weight))
   actionvsproposed = actreward.action-actreward.proposed
   followtheball = actreward[actionvsproposed==0]
   f_ax1.plot(actreward.time,actreward.reward,'ko',markersize=2)
   f_ax1.set_xlim((0,simConfig['simConfig']['duration']))
   f_ax1.set_ylim((np.min(actreward.reward),np.max(actreward.reward)))
-  f_ax1.set_ylabel('rewards')
-  f_ax1.set_xlabel('time (msec)')
+  f_ax1.set_ylabel('Rewards')
+  f_ax1.set_xlabel('Time (ms)')
   #plot mean weights of all connections onto EML and EMR
   f_ax2.plot(utimes,Lwts,'r-o',markersize=1)
   f_ax2.plot(utimes,Rwts,'b-o',markersize=1)
   f_ax2.set_xlim((0,simConfig['simConfig']['duration']))
   f_ax2.set_ylim((np.min([np.min(Lwts),np.min(Rwts)]),np.max([np.max(Lwts),np.max(Rwts)])))
-  f_ax2.set_ylabel('total weights')
-  f_ax2.set_xlabel('time (msec)')
+  f_ax2.set_ylabel('Total weights')
+  f_ax2.set_xlabel('Time (ms)')
   f_ax2.legend(('->EML','->EMR'),loc='upper left')
   #f_ax1.legend(('HitBall','FollowBall','ScorePoint'),loc='upper left')
   f_ax = []
@@ -83,10 +80,11 @@ def animSynWeights (pdf, outpath, framerate=10, figsize=None):
     for cols in range(8):
       f_ax.append(fig.add_subplot(gs[rows+1,cols]))
   cbaxes = fig.add_axes([0.95, 0.4, 0.01, 0.2]) 
-  ltitle = ['Excit V1->ML','Excit V1->MR', 'Excit V4->ML','Excit V4->MR', 'Excit MT->ML', 'Excit MT->MR','Excit DirE->ML','Excit DirE->MR','Excit DirNE->ML','Excit DirNE->MR','Excit DirN->ML','Excit DirN->MR','Excit DirNW->ML','Excit DirNW->MR','Excit DirW->ML','Excit DirW->MR','Excit DirSW->ML','Excit DirSW->MR','Excit DirS->ML','Excit DirS->MR','Excit DirSE->ML','Excit DirSE->MR']
-  f_ax[22].axis('off')
-  f_ax[23].axis('off')
+  f_ax[22].axis('off'); f_ax[23].axis('off')
   lsrc = ['EV1', 'EV4', 'EMT','EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE']
+  ltitle = []
+  for src in lsrc:
+    for trg in ['ML', 'MR']: ltitle.append(src+'->'+trg)
   dimg = {}
   def getwts (tdx, src):
     t = utimes[tdx]
@@ -108,7 +106,7 @@ def animSynWeights (pdf, outpath, framerate=10, figsize=None):
     f_ax1.plot([t,t],[np.min(actreward.reward),np.max(actreward.reward)],'r',linewidth=0.2)
     f_ax2.plot([t,t],[np.min([np.min(Lwts),np.min(Rwts)]),np.max([np.max(Lwts),np.max(Rwts)])],'r',linewidth=0.2)
     pinds = 0
-    fig.suptitle('t=' + str(t) + ' ms')
+    fig.suptitle('Time=' + str(round(t,2)) + ' ms')
     for src in lsrc:
       wtsL, wtsR = getwts(0, src)
       ax=f_ax[pinds]
@@ -122,10 +120,11 @@ def animSynWeights (pdf, outpath, framerate=10, figsize=None):
       pinds = pinds+1              
   def updatefig (tdx):
     t = utimes[tdx]
+    print('frame t = ', str(round(t,2)))
     f_ax1.plot([t,t],[np.min(actreward.reward),np.max(actreward.reward)],'r',linewidth=0.2)
     f_ax2.plot([t,t],[np.min([np.min(Lwts),np.min(Rwts)]),np.max([np.max(Lwts),np.max(Rwts)])],'r',linewidth=0.2)
     pinds = 0
-    fig.suptitle('t=' + str(t) + ' ms')
+    fig.suptitle('Time=' + str(round(t,2)) + ' ms')
     for src in lsrc:
       wtsL, wtsR = getwts(tdx, src)
       dimg[pinds].set_data(wtsL)
