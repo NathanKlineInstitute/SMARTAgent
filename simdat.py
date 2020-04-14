@@ -85,7 +85,7 @@ def animSynWeights (pdf, outpath, framerate=10, figsize=None):
   ltitle = []
   for src in lsrc:
     for trg in ['ML', 'MR']: ltitle.append(src+'->'+trg)
-  dimg = {}
+  dimg = {}; dlin = {}; dlindat = {}
   def getwts (tdx, src):
     t = utimes[tdx]
     cpdfL = pdf[(pdf.time==t) & (pdf.postid>=dstartidx['EML']) & (pdf.postid<=dendidx['EML']) & (pdf.preid>=dstartidx[src]) & (pdf.preid<=dendidx[src])]
@@ -100,11 +100,15 @@ def animSynWeights (pdf, outpath, framerate=10, figsize=None):
     wtsr = np.sum(wts2r,1)
     #assuming neurons in each layer are in square configuration--may need adaptation later
     wtsR = np.reshape(wtsr,(int(np.sqrt(len(wtsr))),int(np.sqrt(len(wtsr))))) 
-    return wtsL, wtsR    
+    return wtsL, wtsR
+  minR,maxR = np.min(actreward.reward),np.max(actreward.reward)
+  minW,maxW = np.min([np.min(Lwts),np.min(Rwts)]), np.max([np.max(Lwts),np.max(Rwts)])
+  t = utimes[0]
+  dlindat[1] = [[t,t], [minR,maxR]]
+  dlindat[2] = [[t,t],[minW,maxW]]
+  dlin[1] = f_ax1.plot(dlindat[1][0],dlindat[1][1],'r',linewidth=0.2)
+  dlin[2] = f_ax2.plot(dlindat[2][0],dlindat[2][1],'r',linewidth=0.2)  
   for src in lsrc:
-    t = utimes[0]
-    f_ax1.plot([t,t],[np.min(actreward.reward),np.max(actreward.reward)],'r',linewidth=0.2)
-    f_ax2.plot([t,t],[np.min([np.min(Lwts),np.min(Rwts)]),np.max([np.max(Lwts),np.max(Rwts)])],'r',linewidth=0.2)
     pinds = 0
     fig.suptitle('Time=' + str(round(t,2)) + ' ms')
     for src in lsrc:
@@ -121,8 +125,12 @@ def animSynWeights (pdf, outpath, framerate=10, figsize=None):
   def updatefig (tdx):
     t = utimes[tdx]
     print('frame t = ', str(round(t,2)))
-    f_ax1.plot([t,t],[np.min(actreward.reward),np.max(actreward.reward)],'r',linewidth=0.2)
-    f_ax2.plot([t,t],[np.min([np.min(Lwts),np.min(Rwts)]),np.max([np.max(Lwts),np.max(Rwts)])],'r',linewidth=0.2)
+    dlindat[1][0].append(t); dlindat[1][0].append(t); dlindat[1][1].append(minR); dlindat[1][1].append(maxR);
+    dlindat[2][0].append(t); dlindat[2][0].append(t); dlindat[2][0].append(minW); dlindat[2][1].append(maxW);
+    dlin[1][0].set_data(dlindat[1][0]); dlin[1][1].set_data(dlindat[1][1])
+    dlin[2][0].set_data(dlindat[2][0]); dlin[2][1].set_data(dlindat[2][1])   
+    #f_ax1.plot([t,t],[np.min(actreward.reward),np.max(actreward.reward)],'r',linewidth=0.2)
+    #f_ax2.plot([t,t],[np.min([np.min(Lwts),np.min(Rwts)]),np.max([np.max(Lwts),np.max(Rwts)])],'r',linewidth=0.2)
     pinds = 0
     fig.suptitle('Time=' + str(round(t,2)) + ' ms')
     for src in lsrc:
