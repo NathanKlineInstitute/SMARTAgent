@@ -35,7 +35,7 @@ def loadsimdat (name=None):
   return simConfig, pdf, actreward, dstartidx, dendidx
 
 #
-def animSynWeights (pdf, gifpath=None, mp4path=None, framerate=10, figsize=None):
+def animSynWeights (pdf, outpath, framerate=10, figsize=None):
   print('in animSynWeights')
   ion()
   utimes = np.unique(pdf.time)
@@ -82,13 +82,27 @@ def animSynWeights (pdf, gifpath=None, mp4path=None, framerate=10, figsize=None)
   for rows in range(3):
     for cols in range(8):
       f_ax.append(fig.add_subplot(gs[rows+1,cols]))
-  #fig, axs = plt.subplots(3, 8, figsize=(18,10)); lax = axs.ravel()
   cbaxes = fig.add_axes([0.95, 0.4, 0.01, 0.2]) 
   ltitle = ['Excit V1->ML','Excit V1->MR', 'Excit V4->ML','Excit V4->MR', 'Excit MT->ML', 'Excit MT->MR','Excit DirE->ML','Excit DirE->MR','Excit DirNE->ML','Excit DirNE->MR','Excit DirN->ML','Excit DirN->MR','Excit DirNW->ML','Excit DirNW->MR','Excit DirW->ML','Excit DirW->MR','Excit DirSW->ML','Excit DirSW->MR','Excit DirS->ML','Excit DirS->MR','Excit DirSE->ML','Excit DirSE->MR']
   f_ax[22].axis('off')
   f_ax[23].axis('off')
   lsrc = ['EV1', 'EV4', 'EMT','EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE']
   dimg = {}
+  def getwts (tdx, src):
+    t = utimes[tdx]
+    cpdfL = pdf[(pdf.time==t) & (pdf.postid>=dstartidx['EML']) & (pdf.postid<=dendidx['EML']) & (pdf.preid>=dstartidx[src]) & (pdf.preid<=dendidx[src])]
+    wts1l = np.array(cpdfL.weight)
+    wts2l = np.reshape(wts1l,(int(len(wts1l)/2),2))
+    wtsl = np.sum(wts2l,1)
+    #assuming neurons in each layer are in square configuration--may need adaptation later
+    wtsL = np.reshape(wtsl,(int(np.sqrt(len(wtsl))),int(np.sqrt(len(wtsl))))) 
+    cpdfR = pdf[(pdf.time==t) & (pdf.postid>=dstartidx['EMR']) & (pdf.postid<=dendidx['EMR']) & (pdf.preid>=dstartidx[src]) & (pdf.preid<=dendidx[src])]
+    wts1r = np.array(cpdfL.weight)
+    wts2r = np.reshape(wts1r,(int(len(wts1r)/2),2))
+    wtsr = np.sum(wts2r,1)
+    #assuming neurons in each layer are in square configuration--may need adaptation later
+    wtsR = np.reshape(wtsr,(int(np.sqrt(len(wtsr))),int(np.sqrt(len(wtsr))))) 
+    return wtsL, wtsR    
   for src in lsrc:
     t = utimes[0]
     f_ax1.plot([t,t],[np.min(actreward.reward),np.max(actreward.reward)],'r',linewidth=0.2)
@@ -96,18 +110,7 @@ def animSynWeights (pdf, gifpath=None, mp4path=None, framerate=10, figsize=None)
     pinds = 0
     fig.suptitle('t=' + str(t) + ' ms')
     for src in lsrc:
-      cpdfL = pdf[(pdf.time==t) & (pdf.postid>=dstartidx['EML']) & (pdf.postid<=dendidx['EML']) & (pdf.preid>=dstartidx[src]) & (pdf.preid<=dendidx[src])]
-      wts1l = np.array(cpdfL.weight)
-      wts2l = np.reshape(wts1l,(int(len(wts1l)/2),2))
-      wtsl = np.sum(wts2l,1)
-      #assuming neurons in each layer are in square configuration--may need adaptation later
-      wtsL = np.reshape(wtsl,(int(np.sqrt(len(wtsl))),int(np.sqrt(len(wtsl))))) 
-      cpdfR = pdf[(pdf.time==t) & (pdf.postid>=dstartidx['EMR']) & (pdf.postid<=dendidx['EMR']) & (pdf.preid>=dstartidx[src]) & (pdf.preid<=dendidx[src])]
-      wts1r = np.array(cpdfL.weight)
-      wts2r = np.reshape(wts1r,(int(len(wts1r)/2),2))
-      wtsr = np.sum(wts2r,1)
-      #assuming neurons in each layer are in square configuration--may need adaptation later
-      wtsR = np.reshape(wtsr,(int(np.sqrt(len(wtsr))),int(np.sqrt(len(wtsr))))) 
+      wtsL, wtsR = getwts(0, src)
       ax=f_ax[pinds]
       dimg[pinds] = pcm = ax.imshow(wtsL, origin='upper', cmap='gray', vmin=minwt, vmax=maxwt+wtrange)
       ax.set_title(ltitle[pinds])
@@ -124,43 +127,16 @@ def animSynWeights (pdf, gifpath=None, mp4path=None, framerate=10, figsize=None)
     pinds = 0
     fig.suptitle('t=' + str(t) + ' ms')
     for src in lsrc:
-      cpdfL = pdf[(pdf.time==t) & (pdf.postid>=dstartidx['EML']) & (pdf.postid<=dendidx['EML']) & (pdf.preid>=dstartidx[src]) & (pdf.preid<=dendidx[src])]
-      wts1l = np.array(cpdfL.weight)
-      wts2l = np.reshape(wts1l,(int(len(wts1l)/2),2))
-      wtsl = np.sum(wts2l,1)
-      #assuming neurons in each layer are in square configuration--may need adaptation later
-      wtsL = np.reshape(wtsl,(int(np.sqrt(len(wtsl))),int(np.sqrt(len(wtsl))))) 
-      cpdfR = pdf[(pdf.time==t) & (pdf.postid>=dstartidx['EMR']) & (pdf.postid<=dendidx['EMR']) & (pdf.preid>=dstartidx[src]) & (pdf.preid<=dendidx[src])]
-      wts1r = np.array(cpdfL.weight)
-      wts2r = np.reshape(wts1r,(int(len(wts1r)/2),2))
-      wtsr = np.sum(wts2r,1)
-      #assuming neurons in each layer are in square configuration--may need adaptation later
-      wtsR = np.reshape(wtsr,(int(np.sqrt(len(wtsr))),int(np.sqrt(len(wtsr))))) 
+      wtsL, wtsR = getwts(tdx, src)
       dimg[pinds].set_data(wtsL)
       pinds=pinds+1
       dimg[pinds].set_data(wtsR)
       pinds = pinds+1      
     return fig
   ani = animation.FuncAnimation(fig, updatefig, interval=1, frames=len(utimes))
-  if mp4path is not None:
-    # Either avconv or ffmpeg need to be installed in the system to produce the videos!
-    try:
-      writer = animation.writers['ffmpeg']
-    except KeyError:
-      writer = animation.writers['avconv']
-    writer = writer(fps=framerate)
-    ani.save(mp4path, writer=writer)
-  if gifpath is not None:
-    try:
-      writer = animation.writers['imagemagick'] # need to have imagemagick installed
-      writer = writer(fps=framerate)
-      ani.save(gifpath, writer=writer)
-    except:
-      print('imagemagick not available')
-    
+  writer = anim.getwriter(outpath, framerate)
+  ani.save(outpath, writer=writer)    
         
-
-
 def plotavgweights (pdf):
   utimes = np.unique(pdf.time)
   davgw = {}
@@ -409,9 +385,7 @@ def plotSynWeightsPostNeuronID(pdf,postNeuronID):
       plot(utimes,np.array(MRweights[src]),'b-o',linewidth=3,markersize=5)
       legend((src+'->EML',src+'->EMR'),loc='upper left')
       xlim((0,simConfig['simConfig']['duration']))
-      pdx += 1
-  
-      
+      pdx += 1        
 
 if __name__ == '__main__':
   if sys.argv[1] is -1:
@@ -422,7 +396,7 @@ if __name__ == '__main__':
   simConfig, pdf, actreward, dstartidx, dendidx = loadsimdat()
   print('loaded simulation data')
   #davgw = plotavgweights(pdf)
-  animSynWeights(pdf,mp4path='data/'+dconf['sim']['name']+'weightmap.mp4', framerate=10) #plot images
+  animSynWeights(pdf,'data/'+dconf['sim']['name']+'weightmap.mp4', framerate=10) #plot/save images as movie
   #wperPostID = plotavgweightsPerPostSynNeuron1(pdf)
   #plotavgweightsPerPostSynNeuron2(pdf)
   #plotIndividualSynWeights(pdf)

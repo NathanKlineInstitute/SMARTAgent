@@ -108,7 +108,7 @@ def plotActivityMaps (pauset=1, gifpath=None, mp4path=None, framerate=5, zf=10):
   return fig, axs, plt
 
 #
-def animActivityMaps (gifpath=None, mp4path=None, framerate=10, figsize=(7,3)):
+def animActivityMaps (outpath, framerate=10, figsize=(7,3)):
   # plot activity in different layers as a function of input images
   if figsize is not None:
     fig, axs = plt.subplots(4, 5, figsize=figsize);
@@ -153,23 +153,9 @@ def animActivityMaps (gifpath=None, mp4path=None, framerate=10, figsize=(7,3)):
       idx += 1
     return fig
   ani = animation.FuncAnimation(fig, updatefig, interval=1, frames=len(t1))
-  if mp4path is not None:
-    # Either avconv or ffmpeg need to be installed in the system to produce the videos!
-    try:
-      writer = animation.writers['ffmpeg']
-    except KeyError:
-      writer = animation.writers['avconv']
-    writer = writer(fps=framerate)
-    ani.save(mp4path, writer=writer)
-  if gifpath is not None:
-    try:
-      writer = animation.writers['imagemagick'] # need to have imagemagick installed
-      writer = writer(fps=framerate)
-      ani.save(gifpath, writer=writer)
-    except:
-      print('imagemagick not available')
+  writer = anim.getwriter(outpath, framerate=framerate)
+  ani.save(outpath, writer=writer)      
   return fig, axs, plt
 
-fig, axs, plt = animActivityMaps(mp4path='data/'+dconf['sim']['name']+'actmap.mp4', framerate=10)
-
+fig, axs, plt = animActivityMaps('data/'+dconf['sim']['name']+'actmap.mp4', framerate=10)
 
