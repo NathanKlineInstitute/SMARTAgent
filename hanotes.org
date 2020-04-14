@@ -1215,3 +1215,14 @@ This bug was found in all functions where instead of src, trg was used for dendi
 **plotting only game behavior using testPong.py. This can be integrated with the model output later. This is to understand the game behavior and to validate all the rules used for training the model. Should be run separately.
 **saved 1000 steps random game behavior (not driven by the model).
 
+*20april14
+**Improved behavior plotting---still with random game.
+***display: 
+1. Executed actions vs Proposed actions (actions are proposed to follow the ball)
+2. number of rewarding actions (when executed action is same as proposed action) vs punishing actions (when exectued action is different than the proposed action) normalized.
+3. rewards as a function of actions. (0, -1 or +1)
+4. cummulative hits (when racket hits the ball) vs cummulative miss (when racket misses the ball and lose a point).
+5. per episode, how many times followed the ball vs not followed the ball.
+6. per episode, how many times hit the ball vs missed the ball
+7. per episode, how many times scored +1 against the computer.
+***testing the code for many many episodes now. 

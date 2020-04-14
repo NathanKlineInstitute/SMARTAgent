@@ -256,22 +256,92 @@ def playGame (actions, epCount, InputImages, last_obs, last_ball_dir): #actions 
 
 fig = plt.figure(figsize=(12,8))
 gs = fig.add_gridspec(5,4)
-f_ax1 = fig.add_subplot(gs[0:2,0])
-f_ax2 = fig.add_subplot(gs[0:2,1])
-f_axa = fig.add_subplot(gs[0:2,2])
-f_ax3 = fig.add_subplot(gs[2,0:4])
-f_ax4 = fig.add_subplot(gs[3,0:4])
-f_ax5 = fig.add_subplot(gs[4,0:4])
+f_ax1 = fig.add_subplot(gs[0:2,0]) #for 5-image input
+f_ax2 = fig.add_subplot(gs[0:2,1]) #for single image 
+f_axa = fig.add_subplot(gs[0:2,2]) #for direction selectivity
+f_ax3 = fig.add_subplot(gs[2,0:2]) #display executed/proposed actions
+f_ax3a = fig.add_subplot(gs[2,2:4]) #display 
+f_ax4 = fig.add_subplot(gs[3,0:2])
+f_ax4a = fig.add_subplot(gs[3,2:4])
+f_ax5 = fig.add_subplot(gs[4,0])
+f_ax5a = fig.add_subplot(gs[4,1])
+f_ax5b = fig.add_subplot(gs[4,2])
+#f_ax5c = fig.add_subplot(gs[4,3])
 cbaxes = fig.add_axes([0.75, 0.62, 0.01, 0.24])
 tinds = 0
 maxtstr = len(str(100000))
+cumRewardActions = []
+cumPunishingActions = []
 #while cNB_episodes<totalNB_episodes: #play game while number of current episode is less than total number of episodes.
-while tinds<1000:
+while tinds<100:
     actions = []
     for _ in range(5): #choose 5 actions and pass those actions to the playGame
         action = possibleactions[random.randint(0,2)] #pick random action from 1,3 and 4.
         actions.append(action)
     rewards, epCount, InputImages, last_obs, proposed_actions, last_ball_dir, total_hits, Racket_pos, Ball_pos, Images, dirSensitiveNeurons = playGame(actions, epCount, InputImages, last_obs, last_ball_dir)
+    allepisodes_totalHits = []
+    allepisodes_totalMissHits = []
+    allepisodes_totalPoints = []
+    allepisodes_rewardingActions = []
+    allepisodes_punishingActions = []
+    if len(epCount)==0: #first episode is running
+        totalHits_cpeisode = np.sum(allHits) #when the racket hits the ball
+        totalMissHits_cepisode = np.sum(np.where(np.array(allRewards)==-1,1,0)) #when the racket misses the ball and loses a point
+        totalPoints_cepisode = np.sum(np.where(np.array(allRewards)==1,1,0)) #when a point is scored
+        A1_cepisode = np.subtract(allActions,allProposedActions)
+        rewardingActions_cepisode = np.sum(np.where(A1_cepisode==0,1,0))
+        punishingActions_cepisode = np.sum(np.where((A1_cepisode>0) | (A1_cepisode<0),1,0))
+        allepisodes_totalHits.append(totalHits_cpeisode)
+        allepisodes_totalMissHits.append(totalMissHits_cepisode)
+        allepisodes_totalPoints.append(totalPoints_cepisode)
+        allepisodes_rewardingActions.append(rewardingActions_cepisode)
+        allepisodes_punishingActions.append(punishingActions_cepisode)
+    else:
+        nbEpisodes = len(epCount)
+        beg_ep_action = 0
+        for ep in range(nbEpisodes):
+            cEpActions = epCount[ep]
+            end_ep_action = beg_ep_action + cEpActions - 1
+            totalHits_cpeisode = np.sum(allHits[beg_ep_action:end_ep_action]) #when the racket hits the ball
+            totalMissHits_cepisode = np.sum(np.where(np.array(allRewards[beg_ep_action:end_ep_action])==-1,1,0)) #when the racket misses the ball and loses a point
+            totalPoints_cepisode = np.sum(np.where(np.array(allRewards[beg_ep_action:end_ep_action])==1,1,0)) #when a point is scored
+            A1_cepisode = np.subtract(allActions[beg_ep_action:end_ep_action],allProposedActions[beg_ep_action:end_ep_action])
+            beg_ep_action = end_ep_action + 1
+            rewardingActions_cepisode = np.sum(np.where(A1_cepisode==0,1,0))
+            punishingActions_cepisode = np.sum(np.where((A1_cepisode>0) | (A1_cepisode<0),1,0))
+            allepisodes_totalHits.append(totalHits_cpeisode)
+            allepisodes_totalMissHits.append(totalMissHits_cepisode)
+            allepisodes_totalPoints.append(totalPoints_cepisode)
+            allepisodes_rewardingActions.append(rewardingActions_cepisode)
+            allepisodes_punishingActions.append(punishingActions_cepisode)
+        if len(allHits)>end_ep_action: 
+            totalHits_cpeisode = np.sum(allHits[beg_ep_action:len(allHits)]) #when the racket hits the ball
+            totalMissHits_cepisode = np.sum(np.where(np.array(allRewards[beg_ep_action:len(allRewards)])==-1,1,0)) #when the racket misses the ball and loses a point
+            totalPoints_cepisode = np.sum(np.where(np.array(allRewards[beg_ep_action:len(allRewards)])==1,1,0)) #when a point is scored
+            A1_cepisode = np.subtract(allActions[beg_ep_action:len(allActions)],allProposedActions[beg_ep_action:len(allActions)])
+            rewardingActions_cepisode = np.sum(np.where(A1_cepisode==0,1,0))
+            punishingActions_cepisode = np.sum(np.where((A1_cepisode>0) | (A1_cepisode<0),1,0))
+            allepisodes_totalHits.append(totalHits_cpeisode)
+            allepisodes_totalMissHits.append(totalMissHits_cepisode)
+            allepisodes_totalPoints.append(totalPoints_cepisode)
+            allepisodes_rewardingActions.append(rewardingActions_cepisode)
+            allepisodes_punishingActions.append(punishingActions_cepisode)
+    f_ax5.cla()
+    f_ax5.plot(allepisodes_rewardingActions ,'o-',MarkerSize=5,MarkerFaceColor='r',MarkerEdgeColor='r')
+    f_ax5.plot(allepisodes_punishingActions ,'s-',MarkerSize=5,MarkerFaceColor='b',MarkerEdgeColor='b')
+    f_ax5.set_ylabel('Follow|Not')
+    f_ax5.set_xlabel('episodes')
+    f_ax5.legend(('Follow','Not Follow'),loc='upper right')
+    f_ax5a.cla()
+    f_ax5a.plot(allepisodes_totalHits ,'o',MarkerSize=5,MarkerFaceColor='r',MarkerEdgeColor='r')
+    f_ax5a.plot(allepisodes_totalMissHits ,'s',MarkerSize=3,MarkerFaceColor='k',MarkerEdgeColor='k')
+    f_ax5a.set_xlabel('episodes')
+    f_ax5a.legend(('Hits','Miss'),loc='upper right')
+    f_ax5b.cla()
+    f_ax5b.plot(allepisodes_totalPoints ,'o-',MarkerSize=6,MarkerFaceColor='g',MarkerEdgeColor='g')
+    f_ax5b.set_xlabel('episodes')
+    f_ax5b.legend(('Scores'),loc='upper right')
+    #f_ax5a.set_ylabel('Hits')
     for action in actions:
         allActions.append(action)
     for pactions in proposed_actions: #also record proposed actions
@@ -283,6 +353,45 @@ while tinds<1000:
     f_ax1.cla()
     f_ax1.imshow(InputImages[-1])
     f_ax1.set_title('Input Images [t-5,t]')
+    f_axa.cla()
+    fa = f_axa.imshow(dirSensitiveNeurons,origin='upper',vmin=0, vmax=359, cmap='Dark2')
+    f_axa.set_xlim((-0.5,9.5))
+    f_axa.set_ylim((9.5,-0.5))
+    f_axa.set_xticks(ticks=[0,2,4,6,8])
+    #f_axa.set_yticks(ticks=[0,2,4,6,8])
+    f_axa.set_title('direction angles [t-5,t]')
+    c1 = plt.colorbar(fa,cax = cbaxes)
+    c1.set_ticks([22,67,112,157,202,247,292,337])
+    c1.set_ticklabels(['E','NE','N','NW','W','SW','S','SE'])
+    cumHits = np.cumsum(allHits) #cummulative hits evolving with time.
+    missHits = np.where(np.array(allRewards)==-1,1,0)
+    cumMissHits = np.cumsum(missHits) #if a reward is -1, replace it with 1 else replace it with 0.
+    A1 = np.subtract(allActions,allProposedActions)
+    tpnts = range(5,len(A1)+5,5)
+    rewardingActions = np.sum(np.where(A1==0,1,0))
+    punishingActions = np.sum(np.where((A1>0) | (A1<0),1,0))
+    totalActs = rewardingActions + punishingActions
+    print('Total Actions',totalActs)
+    cumRewardActions.append(rewardingActions/totalActs)
+    cumPunishingActions.append(punishingActions/totalActs)
+    f_ax3.plot(allActions,LineStyle="None",Marker=2,MarkerSize=6,MarkerFaceColor="None",MarkerEdgeColor='r')
+    f_ax3.plot(allProposedActions,LineStyle="None",Marker=3,MarkerSize=6,MarkerFaceColor="None",MarkerEdgeColor='b')
+    f_ax3.set_yticks(ticks=[1,3,4])
+    f_ax3.set_yticklabels(labels=['No action','Down','Up'])
+    f_ax3.set_ylim((0.5,4.5))
+    f_ax3.legend(('Executed','Proposed'),loc='upper left')
+    f_ax3a.cla()
+    f_ax3a.plot(tpnts,np.array(cumRewardActions),'o-',MarkerSize=5,MarkerFaceColor='r',MarkerEdgeColor='r')
+    f_ax3a.plot(tpnts,np.array(cumPunishingActions),'s-',MarkerSize=5,MarkerFaceColor='b',MarkerEdgeColor='b')
+    f_ax3a.legend(('Rewarding actions','Punishing Actions'),loc='upper left')
+    f_ax4.cla()
+    f_ax4.plot(allRewards,'o-',MarkerFaceColor="None",MarkerEdgeColor='g')
+    f_ax4.legend('Rewards')
+    f_ax4a.cla()
+    f_ax4a.plot(cumHits,Marker='o',MarkerSize=5,MarkerFaceColor='r',MarkerEdgeColor='r')
+    f_ax4a.plot(cumMissHits,Marker='s',MarkerSize=3,MarkerFaceColor='k',MarkerEdgeColor='k')
+    f_ax4a.legend(('Cumm. Hits','Cumm. Miss'),loc='upper left')
+    plt.pause(1)
     f_ax2.cla()
     for nbi in range(np.shape(Racket_pos)[0]):
         f_ax2.imshow(Images[nbi])
@@ -300,28 +409,5 @@ while tinds<1000:
         plt.savefig(fnimg) 
         #lfnimage.append(fnimg)
         tinds = tinds+1
-    f_axa.cla()
-    fa = f_axa.imshow(dirSensitiveNeurons,origin='upper',vmin=0, vmax=359, cmap='Dark2')
-    f_axa.set_xlim((-0.5,9.5))
-    f_axa.set_ylim((9.5,-0.5))
-    f_axa.set_xticks(ticks=[0,2,4,6,8])
-    #f_axa.set_yticks(ticks=[0,2,4,6,8])
-    f_axa.set_title('direction angles [t-5,t]')
-    c1 = plt.colorbar(fa,cax = cbaxes)
-    c1.set_ticks([22,67,112,157,202,247,292,337])
-    c1.set_ticklabels(['E','NE','N','NW','W','SW','S','SE'])
-    f_ax3.cla()
-    f_ax3.plot(allHits,'o',MarkerFaceColor="None",MarkerEdgeColor='k')
-    f_ax3.set_ylabel('Hits')
-    f_ax4.cla()
-    f_ax4.plot(allActions,'o',MarkerSize=3,MarkerFaceColor="None",MarkerEdgeColor='r')
-    f_ax4.plot(allProposedActions,'s',MarkerFaceColor="None",MarkerEdgeColor='b')
-    f_ax4.set_yticks(ticks=[1,3,4])
-    f_ax4.set_yticklabels(labels=['No action','Down','Up'])
-    f_ax4.set_ylim((0.5,4.5))
-    f_ax4.legend(('Actions','Proposed'),loc='upper left')
-    f_ax5.cla()
-    f_ax5.plot(allRewards,'o',MarkerFaceColor="None",MarkerEdgeColor='g')
-    f_ax5.set_ylabel('Rewards')
-    plt.pause(0.1)
+
 anim.savemp4('/tmp/*.png','data/randGameBehavior.mp4',10)
