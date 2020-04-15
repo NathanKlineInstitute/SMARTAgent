@@ -39,21 +39,12 @@ class AIGame:
         self.env = env
         self.count = 0 
         self.countAll = 0
-        self.fvec = h.Vector()
-        self.ldir = ['E','NE','NW','W','SW','S','SE']
-        self.dDirFVec = {Dir:h.Vector() for Dir in self.ldir}
-        self.firing_rates = np.zeros(dconf['net']['ER'])  # image-based input firing rates; 20x20 = 400 pixels
-        self.dDirections = {np.ones(dconf['net']['EV1D'+Dir]) for Dir in self.ldir}
-        """
-        self.directionsE = np.ones(dconf['net']['EV1DE']) #for EAST
-        self.directionsNE = np.ones(dconf['net']['EV1DNE']) #for NORTH-EAST
-        self.directionsN = np.ones(dconf['net']['EV1DN']) #for NORTH
-        self.directionsNW = np.ones(dconf['net']['EV1DNW']) #for NORTH WEST
-        self.directionsW = np.ones(dconf['net']['EV1DW']) #for WEST
-        self.directionsSW = np.ones(dconf['net']['EV1DSW']) #for SOUTH WEST
-        self.directionsS = np.ones(dconf['net']['EV1DS']) # for SOUTH
-        self.directionsSE = np.ones(dconf['net']['EV1DSE']) #for SOUTH EAST
-        """        
+        self.ldir = ['E','NE','N', 'NW','W','SW','S','SE']
+        self.ldirpop = ['EV1D'+Dir for Dir in self.ldir]
+        self.lratepop = ['ER'] # populations that we calculate rates for
+        for d in self.ldir: self.lratepop.append('EV1D'+d)
+        self.dFVec = {pop:h.Vector() for pop in self.lratepop} # NEURON Vectors for firing rate calculations
+        self.dFiringRates = {pop:np.zeros(dconf['net'][pop]) for pop in lratepop} # python objects for firing rate calculations
         self.intaction = 5 # integrate this many actions together before returning reward information to model
     ################################
     ### PLAY GAME
@@ -279,15 +270,11 @@ class AIGame:
         dirW[Winds] = 30 #30Hz firing rate---later should be used as a parameter with some noise.
         dirSW[SWinds] = 30
         dirS[Sinds] = 30
-        dirSE[SEinds] = 30 
-        self.directionsE = np.reshape(dirE,100)
-        self.directionsNE = np.reshape(dirNE,100)
-        self.directionsN = np.reshape(dirN,100)
-        self.directionsNW = np.reshape(dirNW,100)
-        self.directionsW = np.reshape(dirW,100)
-        self.directionsSW = np.reshape(dirSW,100)
-        self.directionsS = np.reshape(dirS,100)
-        self.directionsSE = np.reshape(dirSE,100)
+        dirSE[SEinds] = 30
+
+        for pop, d in zip(self.ldirpop, [dirE, dirNE, dirN, dirNW, dirW, dirSW, dirS, dirSE]):
+          self.dFiringRates[pop] = np.reshape(d,100)
+        
         InputImages.append(dsum_Images)
         #fr_Images = np.where(dsum_Images>1.0,100,dsum_Images) #Using this to check what number would work for firing rate
         #fr_Images = np.where(dsum_Images<10.0,0,dsum_Images)
