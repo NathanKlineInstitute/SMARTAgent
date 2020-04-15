@@ -6,6 +6,7 @@ from conf import dconf # configuration dictionary
 import pandas as pd
 import pickle
 from collections import OrderedDict
+from connUtils import *
 
 random.seed(1234) # this will not work properly across runs with different number of nodes
 
@@ -102,117 +103,6 @@ netParams.stimSourceParams['bkg'] = {'type': 'NetStim', 'rate': 20, 'noise': 1.0
 netParams.stimTargetParams['bkg->all'] = {'source': 'bkg', 'conds': {'cellType': ['IR','IV1','IV4','IMT']}, 'weight': 0.0, 'delay': 'max(1, normal(5,2))', 'synMech': 'AMPA'}
 
 ######################################################################################
-def connectOnePreNtoOneMNeuron(NBNeurons,offset_pre,offset_post): #this method is used to generate list of connections between preSynNeurons and motor neurons.
-    blist = []
-    for i in range(NBNeurons):
-        preN = i+offset_pre
-        postN = i+offset_post
-        blist.append([preN,postN])
-    return blist
-def connectLayerswithOverlap(NBpreN, NBpostN, overlap_xdir):
-    #NBpreN = 6400 	#number of presynaptic neurons
-    NBpreN_x = int(np.sqrt(NBpreN))
-    NBpreN_y = int(np.sqrt(NBpreN))
-    #NBpostN = 6400	#number of postsynaptic neurons
-    NBpostN_x = int(np.sqrt(NBpostN))
-    NBpostN_y = int(np.sqrt(NBpostN))
-    convergence_factor = NBpreN/NBpostN
-    convergence_factor_x = np.ceil(np.sqrt(convergence_factor))
-    convergence_factor_y = np.ceil(np.sqrt(convergence_factor))
-    #overlap_xdir = 5	#number of rows in a window for overlapping connectivity
-    #overlap_ydir = 5	#number of columns in a window for overlapping connectivity
-    overlap_ydir = overlap_xdir
-    preNIndices = np.zeros((NBpreN_x,NBpreN_y))
-    postNIndices = np.zeros((NBpostN_x,NBpostN_y))		#list created for indices from linear (1-6400) to square indexing (1-80,81-160,....) 
-    blist = []
-    for i in range(NBpreN_x):
-        for j in range(NBpreN_y):
-            preNIndices[i,j]=j+(NBpreN_y*i)
-    for i in range(NBpostN_x):
-        for j in range(NBpostN_y):
-            postNIndices[i,j]=j+(NBpostN_y*i)
-    for i in range(NBpostN_x):				#boundary conditions are implemented here
-        for j in range(NBpostN_y):
-            postN = int(postNIndices[i,j])
-            if convergence_factor_x>1:
-                preN = preNIndices[int(i*convergence_factor_y),int(j*convergence_factor_x)]
-                #preN = int(convergence_factor_x*convergence_factor_y*NBpostN_y*i) + int(convergence_factor_y*j)
-            else:
-                preN = int(postN)
-            preN_ind = np.where(preNIndices==preN)
-            x0 = preN_ind[0][0] - int(overlap_xdir/2)
-            if x0<0:
-                x0 = 0
-            y0 = preN_ind[1][0] - int(overlap_ydir/2)
-            if y0<0:
-                y0 = 0
-            xlast = preN_ind[0][0] + int(overlap_xdir/2)
-            if xlast>NBpreN_x-1:
-                xlast = NBpreN_x-1
-            ylast = preN_ind[1][0] + int(overlap_ydir/2)
-            if ylast>NBpreN_y-1:
-                ylast = NBpreN_y-1
-            xinds = [x0]
-            for _ in range(xlast-x0):
-                xinds.append(xinds[-1]+1)
-            yinds = [y0]
-            for _ in range(ylast-y0):
-                yinds.append(yinds[-1]+1)
-            for xi in range(len(xinds)):
-                for yi in range(len(yinds)):
-                    preN = int(preNIndices[xinds[xi],yinds[yi]])
-                    blist.append([preN,postN]) 			#list of [presynaptic_neuron, postsynaptic_neuron] 
-    return blist
-
-def connectLayerswithOverlapDiv(NBpreN, NBpostN, overlap_xdir):
-    NBpreN_x = int(np.sqrt(NBpreN))
-    NBpreN_y = int(np.sqrt(NBpreN))
-    NBpostN_x = int(np.sqrt(NBpostN))
-    NBpostN_y = int(np.sqrt(NBpostN))
-    divergence_factor = NBpostN/NBpreN
-    divergence_factor_x = np.ceil(np.sqrt(divergence_factor))
-    divergence_factor_y = np.ceil(np.sqrt(divergence_factor))
-    overlap_ydir = overlap_xdir
-    preNIndices = np.zeros((NBpreN_x,NBpreN_y))
-    postNIndices = np.zeros((NBpostN_x,NBpostN_y))		#list created for indices from linear (1-6400) to square indexing (1-80,81-160,....) 
-    blist = []
-    for i in range(NBpreN_x):
-        for j in range(NBpreN_y):
-            preNIndices[i,j]=j+(NBpreN_y*i)
-    for i in range(NBpostN_x):
-        for j in range(NBpostN_y):
-            postNIndices[i,j]=j+(NBpostN_y*i)
-    for i in range(NBpreN_x):				#boundary conditions are implemented here
-        for j in range(NBpreN_y):
-            preN = int(preNIndices[i,j])
-            if divergence_factor_x>1:
-                postN = postNIndices[int(i*divergence_factor_y),int(j*divergence_factor_x)]
-            else:
-                postN = int(preN)
-            postN_ind = np.where(postNIndices==postN)
-            x0 = postN_ind[0][0] - int(overlap_xdir/2)
-            if x0<0:
-                x0 = 0
-            y0 = postN_ind[1][0] - int(overlap_ydir/2)
-            if y0<0:
-                y0 = 0
-            xlast = postN_ind[0][0] + int(overlap_xdir/2)
-            if xlast>NBpostN_x-1:
-                xlast = NBpostN_x-1
-            ylast = postN_ind[1][0] + int(overlap_ydir/2)
-            if ylast>NBpostN_y-1:
-                ylast = NBpostN_y-1
-            xinds = [x0]
-            for _ in range(xlast-x0):
-                xinds.append(xinds[-1]+1)
-            yinds = [y0]
-            for _ in range(ylast-y0):
-                yinds.append(yinds[-1]+1)
-            for xi in range(len(xinds)):
-                for yi in range(len(yinds)):
-                    postN = int(postNIndices[xinds[xi],yinds[yi]])
-                    blist.append([preN,postN]) 			#list of [presynaptic_neuron, postsynaptic_neuron] 
-    return blist
 
 #####################################################################################
 #Feedforward excitation
@@ -1281,193 +1171,38 @@ def trainAgentFake(t):
         recordWeights(sim, t)
 
 def updateInputRates ():
-    # update the source firing rates for the R neuron population, based on image contents
-    #also update the firing rates for the direction sensitive neurons based on image contents
-    if sim.rank == 0:
-        if dconf['verbose'] > 1:
-          print(sim.rank,'broadcasting firing rates:',np.where(sim.AIGame.firing_rates==np.amax(sim.AIGame.firing_rates)),np.amax(sim.AIGame.firing_rates))        
-        sim.pc.broadcast(sim.AIGame.fvec.from_python(sim.AIGame.firing_rates),0)
-        firing_rates = sim.AIGame.firing_rates
-        sim.pc.broadcast(sim.AIGame.fvecE.from_python(sim.AIGame.directionsE),0)
-        firing_rates_dirE = sim.AIGame.directionsE
-        sim.pc.broadcast(sim.AIGame.fvecNE.from_python(sim.AIGame.directionsNE),0)
-        firing_rates_dirNE = sim.AIGame.directionsNE
-        sim.pc.broadcast(sim.AIGame.fvecN.from_python(sim.AIGame.directionsN),0)
-        firing_rates_dirN = sim.AIGame.directionsN
-        sim.pc.broadcast(sim.AIGame.fvecNW.from_python(sim.AIGame.directionsNW),0)
-        firing_rates_dirNW = sim.AIGame.directionsNW
-        sim.pc.broadcast(sim.AIGame.fvecW.from_python(sim.AIGame.directionsW),0)
-        firing_rates_dirW = sim.AIGame.directionsW
-        sim.pc.broadcast(sim.AIGame.fvecSW.from_python(sim.AIGame.directionsSW),0)
-        firing_rates_dirSW = sim.AIGame.directionsSW
-        sim.pc.broadcast(sim.AIGame.fvecS.from_python(sim.AIGame.directionsS),0)
-        firing_rates_dirS = sim.AIGame.directionsS
-        sim.pc.broadcast(sim.AIGame.fvecSE.from_python(sim.AIGame.directionsSE),0)
-        firing_rates_dirSE = sim.AIGame.directionsSE
-        if dconf['verbose'] > 1:
-            print('Firing Rates of EAST:',firing_rates_dirE)
-            print('Firing Rates of NORTH-EAST:',firing_rates_dirNE)
-            print('Firing Rates of NORTH:',firing_rates_dirN)
-            print('Firing Rates of NORTH-WEST:',firing_rates_dirNW)
-            print('Firing Rates of WEST:',firing_rates_dirW)
-            print('Firing Rates of SOUTH-WEST:',firing_rates_dirSW)
-            print('Firing Rates of SOUTH:',firing_rates_dirS)
-            print('Firing Rates of SOUTH-EAST:',firing_rates_dirSE)
-    else:
-        fvec = h.Vector()
-        sim.pc.broadcast(fvec,0)
-        firing_rates = fvec.to_python()
-        fvecE = h.Vector()
-        sim.pc.broadcast(fvecE,0)
-        firing_rates_dirE = fvecE.to_python()
-        fvecNE = h.Vector()
-        sim.pc.broadcast(fvecNE,0)
-        firing_rates_dirNE = fvecNE.to_python()
-        fvecN = h.Vector()
-        sim.pc.broadcast(fvecN,0)
-        firing_rates_dirN = fvecN.to_python()
-        fvecNW = h.Vector()
-        sim.pc.broadcast(fvecNW,0)
-        firing_rates_dirNW = fvecNW.to_python()
-        fvecW = h.Vector()
-        sim.pc.broadcast(fvecW,0)
-        firing_rates_dirW = fvecW.to_python()
-        fvecSW = h.Vector()
-        sim.pc.broadcast(fvecSW,0)
-        firing_rates_dirSW = fvecSW.to_python()
-        fvecS = h.Vector()
-        sim.pc.broadcast(fvecS,0)
-        firing_rates_dirS = fvecS.to_python()
-        fvecSE = h.Vector()
-        sim.pc.broadcast(fvecSE,0)
-        firing_rates_dirSE = fvecSE.to_python()
-        
-        if dconf['verbose'] > 1:
-            print(sim.rank,'received firing rates:',np.where(firing_rates==np.amax(firing_rates)),np.amax(firing_rates))
-            print(sim.rank,'received E-firing rates:',np.where(firing_rates_dirE==np.amax(firing_rates_dirE)),np.amax(firing_rates_dirE))
-            print(sim.rank,'received NE-firing rates:',np.where(firing_rates_dirNE==np.amax(firing_rates_dirNE)),np.amax(firing_rates_dirNE))
-            print(sim.rank,'received N-firing rates:',np.where(firing_rates_dirN==np.amax(firing_rates_dirN)),np.amax(firing_rates_dirN))
-            print(sim.rank,'received NW-firing rates:',np.where(firing_rates_dirNW==np.amax(firing_rates_dirNW)),np.amax(firing_rates_dirNW))
-            print(sim.rank,'received W-firing rates:',np.where(firing_rates_dirW==np.amax(firing_rates_dirW)),np.amax(firing_rates_dirW))
-            print(sim.rank,'received SW-firing rates:',np.where(firing_rates_dirSW==np.amax(firing_rates_dirSW)),np.amax(firing_rates_dirSW))
-            print(sim.rank,'received S-firing rates:',np.where(firing_rates_dirS==np.amax(firing_rates_dirS)),np.amax(firing_rates_dirS))
-            print(sim.rank,'received SE-firing rates:',np.where(firing_rates_dirSE==np.amax(firing_rates_dirSE)),np.amax(firing_rates_dirSE))
-    #gather cell tags
-    alltags = sim._gatherAllCellTags()
-    R_gids = [] #gids for cells in ER population
-    Edir_gids = [] #gids for cells in EV1D0 population--0 degree or right direction
-    NEdir_gids = [] #gids for cells in EV1D45 population--45 degree or left direction
-    Ndir_gids = [] #gids for cells in EV1D90 population - 90 degree or up direction
-    NWdir_gids = [] #gids for cells in EV1D135 population - 135 degree on down direction
-    Wdir_gids = [] #gids for cells in EV1D180 population - 180 degree on down direction
-    SWdir_gids = [] #gids for cells in EV1D225 population - 225 degree on down direction
-    Sdir_gids = [] #gids for cells in EV1D270 population - 270 degree on down direction
-    SEdir_gids = [] #gids for cells in EV1D315 population - 315 degree on down direction
-    for tinds in range(len(alltags)):
-        if alltags[tinds]['pop'] == 'ER':
-            R_gids.append(tinds)
-        elif alltags[tinds]['pop'] == 'EV1DE':
-            Edir_gids.append(tinds)
-        elif alltags[tinds]['pop'] == 'EV1DNE':
-            NEdir_gids.append(tinds)
-        elif alltags[tinds]['pop'] == 'EV1DN':
-            Ndir_gids.append(tinds)
-        elif alltags[tinds]['pop'] == 'EV1DNW':
-            NWdir_gids.append(tinds)
-        elif alltags[tinds]['pop'] == 'EV1DW':
-            Wdir_gids.append(tinds)
-        elif alltags[tinds]['pop'] == 'EV1DSW':
-            SWdir_gids.append(tinds)
-        elif alltags[tinds]['pop'] == 'EV1DS':
-            Sdir_gids.append(tinds)
-        elif alltags[tinds]['pop'] == 'EV1DSE':
-            SEdir_gids.append(tinds)
-    # update input firing rates for stimuli to R cells
-    lRcell = [c for c in sim.net.cells if c.gid in sim.net.pops['ER'].cellGids] # this is the set of R cells
-    R_offset = np.amin(R_gids)
-    #print('R offset:', R_offset)
-    if dconf['verbose'] > 1: print(sim.rank,'updating len(lRcell)=',len(lRcell),'source firing rates. len(firing_rates)=',len(firing_rates))
-    for cell in lRcell:  
-        for stim in cell.stims:
-            if stim['source'] == 'stimMod':
-                stim['hObj'].interval = 1000.0/firing_rates[int(cell.gid-R_offset)]
-                #print('cell GID: ', int(cell.gid), 'vs cell ID with offset: ', int(cell.gid-R_offset)) # interval in ms as a function of rate; is cell.gid correct index???
-    # update input firing rates for stimuli to E-direction cells
-    lEDircell = [c for c in sim.net.cells if c.gid in sim.net.pops['EV1DE'].cellGids] # this is the set of 0-degree direction selective cells
-    EDir_offset = np.amin(Edir_gids)
-    #print('E-Dir offset:', EDir_offset)
-    if dconf['verbose'] > 1: print(sim.rank,'updating len(lEDircell)=',len(lEDircell),'source firing rates. len(firing_rates_dirE)=',len(firing_rates_dirE))
-    for cell in lEDircell:  
-        for stim in cell.stims:
-            if stim['source'] == 'stimMod':
-                stim['hObj'].interval = 1000.0/firing_rates_dirE[int(cell.gid-EDir_offset)] # interval in ms as a function of rate; is cell.gid correct index???
-                #print('E-Dir Neurons:',sim.net.pops['EV1D0'].cellGids, 'cells:', lEDircell,'Neuron: ', cell, 'cell gid: ', cell.gid)
-                #print('Neuron ', cell, 'on', sim.rank,' was assigned ISI of ', stim['hObj'].interval, ' ms')
-    # update input firing rates for stimuli to E-direction cells
-    lNEDircell = [c for c in sim.net.cells if c.gid in sim.net.pops['EV1DNE'].cellGids] # this is the set of 45-degree direction selective cells
-    NEDir_offset = np.amin(NEdir_gids)
-    #print('NE-Dir offset:', NEDir_offset)
-    if dconf['verbose'] > 1: print(sim.rank,'updating len(lNEDircell)=',len(lNEDircell),'source firing rates. len(firing_rates_dirNE)=',len(firing_rates_dirNE))
-    for cell in lNEDircell:  
-        for stim in cell.stims:
-            if stim['source'] == 'stimMod':
-                stim['hObj'].interval = 1000.0/firing_rates_dirNE[int(cell.gid-NEDir_offset)] # interval in ms as a function of rate; is cell.gid correct index???
-                #print('NE-Dir Neurons:',sim.net.pops['EV1D45'].cellGids, 'cells:', lNEDircell,'Neuron: ', cell, 'cell gid: ', cell.gid)
-                #print('Neuron ', cell, 'on', sim.rank,' was assigned ISI of ', stim['hObj'].interval, ' ms')
-    # update input firing rates for stimuli to N-direction cells
-    lNDircell = [c for c in sim.net.cells if c.gid in sim.net.pops['EV1DN'].cellGids] # this is the set of 90-degree direction selective cells
-    NDir_offset = np.amin(Ndir_gids)
-    #print('N-Dir offset:', NDir_offset)
-    if dconf['verbose'] > 1: print(sim.rank,'updating len(lNDircell)=',len(lNDircell),'source firing rates. len(firing_rates_dirN)=',len(firing_rates_dirN))
-    for cell in lNDircell:  
-        for stim in cell.stims:
-            if stim['source'] == 'stimMod':
-                stim['hObj'].interval = 1000.0/firing_rates_dirN[int(cell.gid-NDir_offset)] # interval in ms as a function of rate; is cell.gid correct index???
-    # update input firing rates for stimuli to NW-direction cells
-    lNWDircell = [c for c in sim.net.cells if c.gid in sim.net.pops['EV1DNW'].cellGids] # this is the set of 135-degree direction selective cells
-    NWDir_offset = np.amin(NWdir_gids)
-    #print('NW-Dir offset:', NWDir_offset) 
-    if dconf['verbose'] > 1: print(sim.rank,'updating len(lNWDircell)=',len(lNWDircell),'source firing rates. len(firing_rates_dirNW)=',len(firing_rates_dirNW))
-    for cell in lNWDircell:  
-        for stim in cell.stims:
-            if stim['source'] == 'stimMod':
-                stim['hObj'].interval = 1000.0/firing_rates_dirNW[int(cell.gid-NWDir_offset)] # interval in ms as a function of rate; is cell.gid correct index???
-    # update input firing rates for stimuli to W-direction cells
-    lWDircell = [c for c in sim.net.cells if c.gid in sim.net.pops['EV1DW'].cellGids] # this is the set of 180-degree direction selective cells
-    WDir_offset = np.amin(Wdir_gids)
-    #print('W-Dir offset:', WDir_offset)
-    if dconf['verbose'] > 1: print(sim.rank,'updating len(lWDircell)=',len(lWDircell),'source firing rates. len(firing_rates_dirW)=',len(firing_rates_dirW))
-    for cell in lWDircell:  
-        for stim in cell.stims:
-            if stim['source'] == 'stimMod':
-                stim['hObj'].interval = 1000.0/firing_rates_dirW[int(cell.gid-WDir_offset)] # interval in ms as a function of rate; is cell.gid correct index???
-    # update input firing rates for stimuli to South-West-direction cells
-    lSWDircell = [c for c in sim.net.cells if c.gid in sim.net.pops['EV1DSW'].cellGids] # this is the set of 225-degree direction selective cells
-    SWDir_offset = np.amin(SWdir_gids)
-    #print('SW-Dir offset:', SWDir_offset)
-    if dconf['verbose'] > 1: print(sim.rank,'updating len(lSWDircell)=',len(lSWDircell),'source firing rates. len(firing_rates_dirSW)=',len(firing_rates_dirSW))
-    for cell in lSWDircell:  
-        for stim in cell.stims:
-            if stim['source'] == 'stimMod':
-                stim['hObj'].interval = 1000.0/firing_rates_dirS[int(cell.gid-SWDir_offset)] # interval in ms as a function of rate; is cell.gid correct index???
-    # update input firing rates for stimuli to South-direction cells
-    lSDircell = [c for c in sim.net.cells if c.gid in sim.net.pops['EV1DS'].cellGids] # this is the set of 270-degree direction selective cells
-    SDir_offset = np.amin(Sdir_gids)
-    #print('S-Dir offset:', SDir_offset)
-    if dconf['verbose'] > 1: print(sim.rank,'updating len(lSDircell)=',len(lSDircell),'source firing rates. len(firing_rates_dirS)=',len(firing_rates_dirS))
-    for cell in lSDircell:  
-        for stim in cell.stims:
-            if stim['source'] == 'stimMod':
-                stim['hObj'].interval = 1000.0/firing_rates_dirS[int(cell.gid-SDir_offset)] # interval in ms as a function of rate; is cell.gid correct index???
-    # update input firing rates for stimuli to South-EAST-direction cells
-    lSEDircell = [c for c in sim.net.cells if c.gid in sim.net.pops['EV1DSE'].cellGids] # this is the set of 315-degree direction selective cells
-    SEDir_offset = np.amin(SEdir_gids)
-    #print('SE-Dir offset:', SEDir_offset)
-    if dconf['verbose'] > 1: print(sim.rank,'updating len(lSEDircell)=',len(lSEDircell),'source firing rates. len(firing_rates_dirSE)=',len(firing_rates_dirSE))
-    for cell in lSEDircell:  
-        for stim in cell.stims:
-            if stim['source'] == 'stimMod':
-                stim['hObj'].interval = 1000.0/firing_rates_dirSE[int(cell.gid-SEDir_offset)] # interval in ms as a function of rate; is cell.gid correct index???
+  # update the source firing rates for the ER neuron population, based on image contents
+  # also update the firing rates for the direction sensitive neurons based on image contents
+  lratepop = ['ER', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW', 'EV1DSW', 'EV1DS', 'EV1DSE']  
+  if sim.rank == 0:
+    dFiringRates = sim.AIGame.dFiringRates    
+    for k in sim.AIGame.lratepop:
+      sim.pc.broadcast(sim.AIGame.dFVec[k].from_python(dFiringRates[k]),0)
+      if dconf['verbose'] > 1: print('Firing Rates of',k,np.where(dFiringRates[k]==np.amax(dFiringRates[k])),np.amax(dFiringRates[k]))
+  else:
+    dFiringRates = OrderedDict()
+    for pop in lratepop:
+      vec = h.Vector()
+      sim.pc.broadcast(vec,0)
+      dFiringRates[pop] = vec.to_python()
+      if dconf['verbose'] > 1:
+        print(sim.rank,'received firing rates:',np.where(dFiringRates[pop]==np.amax(dFiringRates[pop])),np.amax(dFiringRates[pop]))          
+  alltags = sim._gatherAllCellTags() #gather cell tags  
+  dGIDs = {pop:[] for pop in lratepop}
+  for tinds in range(len(alltags)):
+    if alltags[tinds]['pop'] in lratepop:
+      dGIDs[alltags[tinds]['pop']].append(tinds)
+  # update input firing rates for stimuli to R and direction sensitive cells
+  for pop in lratepop:
+    lCell = [c for c in sim.net.cells if c.gid in sim.net.pops[pop].cellGids] # this is the set of cells
+    offset = np.amin(dGIDs[pop])
+    if dconf['verbose'] > 1: print(sim.rank,'updating len(',pop,len(lCell),'source firing rates. len(dFiringRates)=',len(dFiringRates[pop]))
+    for cell in lCell:  
+      for stim in cell.stims:
+        if stim['source'] == 'stimMod':
+          stim['hObj'].interval = 1000.0/dFiringRates[pop][int(cell.gid-offset)]
+          #print('cell GID: ', int(cell.gid), 'vs cell ID with offset: ', int(cell.gid-R_offset)) # interval in ms as a function of rate; is cell.gid correct index??? 
+      
 
 def trainAgent (t):
     """ training interface between simulation and game environment
@@ -1635,10 +1370,10 @@ def getAllSTDPObjects (sim):
   # get all the STDP objects from the simulation's cells
   lSTDPmech = []
   for cell in sim.net.cells:
-      for conn in cell.conns:
-          STDPmech = conn.get('hSTDP')  # check if has STDP mechanism
-          if STDPmech:   # make sure it is not None
-            lSTDPmech.append(STDPmech)
+    for conn in cell.conns:
+      STDPmech = conn.get('hSTDP')  # check if has STDP mechanism
+      if STDPmech:   # make sure it is not None
+        lSTDPmech.append(STDPmech)
   return lSTDPmech
         
 #Alterate to create network and run simulation

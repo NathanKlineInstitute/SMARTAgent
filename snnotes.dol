@@ -1482,3 +1482,38 @@ animSynWeights(pdf,'data/'+dconf['sim']['name']+'weightmap.mp4', framerate=10, f
 also turn off interactive mode during animation, goes faster...
 
 animSynWeights(pdf,'data/'+dconf['sim']['name']+'weightmap.mp4', framerate=10, figsize=(7,4)) #plot/save images as movie
+
+** discuss opt (image processing for direction selective neurons vs population reduction)
+** looking through code for what to optimize/improve
+
+moved some connection functions from sim.py to connUtils.py
+
+cleaned up some of the code that calculates firing rates based on image contents
+to use dictionaries and loops instead of previous code duplication ...
+
+that cleanup will help with modifications in future ...
+
+tested network with short run after first adjustments
+
+myrun 12
+
+20april15_A0_rast.png
+20april15_A0_EMR.png
+20april15_A0_IM.png
+20april15_A0_EV4.png
+20april15_A0_EV1DS.png
+
+looks ok ...
+
+check videos ...
+
+python -i simdat.py -1
+
+data/20april15_A0_weightmap.mp4
+
+python -i actmap.py
+
+data/20april15_A0_actmap.mp4
+
+looks ok ... should try more thorough tests to make sure nothing broken ...
+

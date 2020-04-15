@@ -19,6 +19,7 @@ import gym
 import sys
 from gym import wrappers
 from time import time
+from collections import OrderedDict
 
 # make the environment - env is global so that it only gets created on a single node (important when using MPI with > 1 node)
 try:
@@ -36,28 +37,20 @@ class AIGame:
     """ Interface to OpenAI gym game 
     """
     def __init__ (self,fcfg='sim.json'): # initialize variables
-        self.env = env
-        self.count = 0 
-        self.countAll = 0
-        self.fvec = h.Vector()
-        self.fvecE = h.Vector()
-        self.fvecNE = h.Vector()
-        self.fvecN = h.Vector()
-        self.fvecNW = h.Vector()
-        self.fvecW = h.Vector()
-        self.fvecSW = h.Vector()
-        self.fvecS = h.Vector()
-        self.fvecSE = h.Vector()
-        self.firing_rates = np.zeros(dconf['net']['ER'])  # image-based input firing rates; 20x20 = 400 pixels
-        self.directionsE = np.ones(dconf['net']['EV1DE']) #for EAST
-        self.directionsNE = np.ones(dconf['net']['EV1DNE']) #for NORTH-EAST
-        self.directionsN = np.ones(dconf['net']['EV1DN']) #for NORTH
-        self.directionsNW = np.ones(dconf['net']['EV1DNW']) #for NORTH WEST
-        self.directionsW = np.ones(dconf['net']['EV1DW']) #for WEST
-        self.directionsSW = np.ones(dconf['net']['EV1DSW']) #for SOUTH WEST
-        self.directionsS = np.ones(dconf['net']['EV1DS']) # for SOUTH
-        self.directionsSE = np.ones(dconf['net']['EV1DSE']) #for SOUTH EAST
-        self.intaction = 5 # integrate this many actions together before returning reward information to model
+      self.env = env
+      self.count = 0 
+      self.countAll = 0
+      self.ldir = ['E','NE','N', 'NW','W','SW','S','SE']
+      self.ldirpop = ['EV1D'+Dir for Dir in self.ldir]
+      self.lratepop = ['ER'] # populations that we calculate rates for
+      for d in self.ldir: self.lratepop.append('EV1D'+d)
+      self.dFVec = OrderedDict({pop:h.Vector() for pop in self.lratepop}) # NEURON Vectors for firing rate calculations
+      self.dFiringRates = OrderedDict({pop:np.zeros(dconf['net'][pop]) for pop in self.lratepop}) # python objects for firing rate calculations
+      self.dAngRange = OrderedDict({'EV1DE': (337,23),'EV1DNE': (22, 68), # angle ranges by population
+                                    'EV1DN': (67, 113),'EV1DNW': (112, 158),
+                                    'EV1DW': (157, 203),'EV1DSW': (202, 248),
+                                    'EV1DS': (247, 293),'EV1DSE': (292, 338)})
+      self.intaction = 5 # integrate this many actions together before returning reward information to model
     ################################
     ### PLAY GAME
     ###############################
@@ -68,15 +61,7 @@ class AIGame:
         total_hits = []
         input_dim = int(np.sqrt(dconf['net']['ER']))
         dirSensitiveNeurons_dim = 10 #int(0.5*input_dim)
-        dirSensitiveNeurons = np.zeros(shape=(dirSensitiveNeurons_dim,dirSensitiveNeurons_dim))
-        dirE = 0.0001*np.ones(shape=(dirSensitiveNeurons_dim,dirSensitiveNeurons_dim))
-        dirNE = 0.0001*np.ones(shape=(dirSensitiveNeurons_dim,dirSensitiveNeurons_dim))
-        dirW = 0.0001*np.ones(shape=(dirSensitiveNeurons_dim,dirSensitiveNeurons_dim))
-        dirSW = 0.0001*np.ones(shape=(dirSensitiveNeurons_dim,dirSensitiveNeurons_dim))
-        dirN = 0.0001*np.ones(shape=(dirSensitiveNeurons_dim,dirSensitiveNeurons_dim))
-        dirNW = 0.0001*np.ones(shape=(dirSensitiveNeurons_dim,dirSensitiveNeurons_dim))
-        dirS = 0.0001*np.ones(shape=(dirSensitiveNeurons_dim,dirSensitiveNeurons_dim))
-        dirSE = 0.0001*np.ones(shape=(dirSensitiveNeurons_dim,dirSensitiveNeurons_dim))
+        dirSensitiveNeurons = np.zeros(shape=(dirSensitiveNeurons_dim,dirSensitiveNeurons_dim))                
         dsum_Images = np.zeros(shape=(input_dim,input_dim)) #previously we merged 2x2 pixels into 1 value. Now we merge 8x8 pixels into 1 value. so the original 160x160 pixels will result into 20x20 values instead of previously used 80x80.
         #print(actions)
         gray_Image = np.zeros(shape=(160,160))
@@ -267,49 +252,31 @@ class AIGame:
                 if np.isnan(theta)=='False':
                     print('Theta for FOV ',FOV,' is: ', theta)
         print('Computed angles:', dirSensitiveNeurons)
-        Einds = np.where(np.logical_and(dirSensitiveNeurons>337,dirSensitiveNeurons<23)) #EAST
-        NEinds = np.where(np.logical_and(dirSensitiveNeurons>22,dirSensitiveNeurons<68)) #NORTH-EAST
-        Ninds = np.where(np.logical_and(dirSensitiveNeurons>67,dirSensitiveNeurons<113)) #NORTH
-        NWinds = np.where(np.logical_and(dirSensitiveNeurons>112,dirSensitiveNeurons<158)) #NORTH-WEST
-        Winds = np.where(np.logical_and(dirSensitiveNeurons>157,dirSensitiveNeurons<203)) #WEST
-        SWinds = np.where(np.logical_and(dirSensitiveNeurons>202,dirSensitiveNeurons<248)) #SOUTH-WEST
-        Sinds = np.where(np.logical_and(dirSensitiveNeurons>247,dirSensitiveNeurons<293)) #SOUTH
-        SEinds = np.where(np.logical_and(dirSensitiveNeurons>292,dirSensitiveNeurons<338)) #SOUTH-EAST
-        dirE[Einds] = 30 #30Hz firing rate---later should be used as a parameter with some noise.
-        dirNE[NEinds] = 30
-        dirN[Ninds] = 30
-        dirNW[NWinds] = 30 
-        dirW[Winds] = 30 #30Hz firing rate---later should be used as a parameter with some noise.
-        dirSW[SWinds] = 30
-        dirS[Sinds] = 30
-        dirSE[SEinds] = 30 
-        self.directionsE = np.reshape(dirE,100)
-        self.directionsNE = np.reshape(dirNE,100)
-        self.directionsN = np.reshape(dirN,100)
-        self.directionsNW = np.reshape(dirNW,100)
-        self.directionsW = np.reshape(dirW,100)
-        self.directionsSW = np.reshape(dirSW,100)
-        self.directionsS = np.reshape(dirS,100)
-        self.directionsSE = np.reshape(dirSE,100)
+        dAngRange = self.dAngRange
+        dInds = {pop:np.where(np.logical_and(dirSensitiveNeurons>dAngRange[pop][0],dirSensitiveNeurons<dAngRange[pop][1])) for pop in self.ldirpop}
+        for pop in self.ldirpop:
+          dtmp = 0.0001*np.ones(shape=(dirSensitiveNeurons_dim,dirSensitiveNeurons_dim))
+          dtmp[dInds[pop]] = 30 # 30Hz firing rate---later should be used as a parameter with some noise.
+          self.dFiringRates[pop] = np.reshape( dtmp , 100)        
         InputImages.append(dsum_Images)
         #fr_Images = np.where(dsum_Images>1.0,100,dsum_Images) #Using this to check what number would work for firing rate
         #fr_Images = np.where(dsum_Images<10.0,0,dsum_Images)
         fr_Images = 40/(1+np.exp((np.multiply(-1,dsum_Images)+123)/25))
         fr_Images = np.subtract(fr_Images,7.722) #baseline firing rate subtraction. Instead all excitatory neurons are firing at 5Hz.
         #print(np.amax(fr_Images))
-        self.firing_rates = np.reshape(fr_Images,400) #400 for 20*20
+        self.dFiringRates['ER'] = np.reshape(fr_Images,400) #400 for 20*20
         #self.env.render()
         #print(self.countAll)
         if done: # what is done? --- when done == 1, it means that 1 episode of the game ends, so it needs to be reset. 
-            epCount.append(self.countAll)
-            self.env.reset()
-            self.env.frameskip = 3 
-            self.countAll = 0 # should self.count also get set to 0?
+          epCount.append(self.countAll)
+          self.env.reset()
+          self.env.frameskip = 3 
+          self.countAll = 0 # should self.count also get set to 0?
         if np.sum(total_hits)>1:
-            print('ERROR COMPUTING NUMBER OF HITS')
+          print('ERROR COMPUTING NUMBER OF HITS')
         return rewards, epCount, InputImages, last_obs, proposed_actions, last_ball_dir, total_hits
 
-    def playGameFake(self, last_obs, epCount, InputImages): #actions are generated based on Vector Algebra
+    def playGameFake (self, last_obs, epCount, InputImages): #actions are generated based on Vector Algebra
         #rewards = np.zeros(shape=(1,5))
         actions = []
         rewards = []
