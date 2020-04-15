@@ -10,8 +10,6 @@ from matplotlib import animation
 
 ion()
 
-rcParams['font.size'] = 6
-
 global stepNB
 stepNB = -1
 #
@@ -37,8 +35,8 @@ def loadsimdat (name=None):
   return simConfig, pdf, actreward, dstartidx, dendidx
 
 #
-def animSynWeights (pdf, outpath, framerate=10, figsize=None):
-  print('in animSynWeights')
+def animSynWeights (pdf, outpath, framerate=10, figsize=(7,4), cmap='jet'):
+  origfsz = rcParams['font.size']; rcParams['font.size'] = 5; ioff() # save original font size, turn off interactive plotting
   utimes = np.unique(pdf.time)
   maxNMDAwt = np.max(pdf[pdf.syntype=='NMDA'].weight)
   maxAMPAwt = np.max(pdf[pdf.syntype=='AMPA'].weight)
@@ -54,32 +52,26 @@ def animSynWeights (pdf, outpath, framerate=10, figsize=None):
   f_ax2 = fig.add_subplot(gs[0,4:7])
   pdfsL = pdf[(pdf.postid>=dstartidx['EML']) & (pdf.postid<=dendidx['EML'])]
   pdfsR = pdf[(pdf.postid>=dstartidx['EMR']) & (pdf.postid<=dendidx['EMR'])]
-  Lwts = [] #wts of connections onto EML
-  Rwts = [] #wts of connections onto EMR
-  for t in utimes:
-    Lwts.append(np.mean(pdfsL[(pdfsL.time==t)].weight))
-    Rwts.append(np.mean(pdfsR[(pdfsR.time==t)].weight))
+  Lwts = [np.mean(pdfsL[(pdfsL.time==t)].weight) for t in utimes] #wts of connections onto EML
+  Rwts = [np.mean(pdfsR[(pdfsR.time==t)].weight) for t in utimes] #wts of connections onto EMR
   actionvsproposed = actreward.action-actreward.proposed
   followtheball = actreward[actionvsproposed==0]
   f_ax1.plot(actreward.time,actreward.reward,'ko',markersize=2)
   f_ax1.set_xlim((0,simConfig['simConfig']['duration']))
   f_ax1.set_ylim((np.min(actreward.reward),np.max(actreward.reward)))
-  f_ax1.set_ylabel('Rewards')
-  f_ax1.set_xlabel('Time (ms)')
+  f_ax1.set_ylabel('Rewards'); #f_ax1.set_xlabel('Time (ms)')
   #plot mean weights of all connections onto EML and EMR
   f_ax2.plot(utimes,Lwts,'r-o',markersize=1)
   f_ax2.plot(utimes,Rwts,'b-o',markersize=1)
   f_ax2.set_xlim((0,simConfig['simConfig']['duration']))
   f_ax2.set_ylim((np.min([np.min(Lwts),np.min(Rwts)]),np.max([np.max(Lwts),np.max(Rwts)])))
-  f_ax2.set_ylabel('Total weights')
-  f_ax2.set_xlabel('Time (ms)')
+  f_ax2.set_ylabel('Average weight'); #f_ax2.set_xlabel('Time (ms)')
   f_ax2.legend(('->EML','->EMR'),loc='upper left')
   #f_ax1.legend(('HitBall','FollowBall','ScorePoint'),loc='upper left')
   f_ax = []
   for rows in range(3):
-    for cols in range(8):
-      f_ax.append(fig.add_subplot(gs[rows+1,cols]))
-  cbaxes = fig.add_axes([0.95, 0.4, 0.01, 0.2]) 
+    for cols in range(8): f_ax.append(fig.add_subplot(gs[rows+1,cols]))
+  cbaxes = fig.add_axes([0.92, 0.4, 0.01, 0.2]) 
   f_ax[22].axis('off'); f_ax[23].axis('off')
   lsrc = ['EV1', 'EV4', 'EMT','EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE']
   ltitle = []
@@ -104,22 +96,21 @@ def animSynWeights (pdf, outpath, framerate=10, figsize=None):
   minR,maxR = np.min(actreward.reward),np.max(actreward.reward)
   minW,maxW = np.min([np.min(Lwts),np.min(Rwts)]), np.max([np.max(Lwts),np.max(Rwts)])
   t = utimes[0]
-  dline[1], = f_ax1.plot([t,t],[minR,maxR],'r',linewidth=0.2)
-  dline[2], = f_ax2.plot([t,t],[minW,maxW],'r',linewidth=0.2)  
+  dline[1], = f_ax1.plot([t,t],[minR,maxR],'r',linewidth=0.2); f_ax1.set_xticks([])
+  dline[2], = f_ax2.plot([t,t],[minW,maxW],'r',linewidth=0.2); f_ax2.set_xticks([])  
+  pinds = 0
+  fig.suptitle('Time=' + str(round(t,2)) + ' ms')
   for src in lsrc:
-    pinds = 0
-    fig.suptitle('Time=' + str(round(t,2)) + ' ms')
-    for src in lsrc:
-      wtsL, wtsR = getwts(0, src)
-      ax=f_ax[pinds]
-      dimg[pinds] = pcm = ax.imshow(wtsL, origin='upper', cmap='gray', vmin=minwt, vmax=maxwt+wtrange)
-      ax.set_title(ltitle[pinds])
-      pinds=pinds+1
-      ax=f_ax[pinds]
-      dimg[pinds] = pcm = ax.imshow(wtsR, origin='upper', cmap='gray', vmin=minwt, vmax=maxwt+wtrange)
-      ax.set_title(ltitle[pinds])
-      if pinds==15: plt.colorbar(pcm, cax = cbaxes)
-      pinds = pinds+1              
+    wtsL, wtsR = getwts(0, src)
+    ax=f_ax[pinds]
+    dimg[pinds] = ax.imshow(wtsL, origin='upper', cmap=cmap, vmin=minwt, vmax=maxwt+wtrange)
+    ax.set_title(ltitle[pinds]); ax.axis('off')
+    pinds+=1
+    ax=f_ax[pinds]
+    dimg[pinds] = ax.imshow(wtsR, origin='upper', cmap=cmap, vmin=minwt, vmax=maxwt+wtrange)
+    ax.set_title(ltitle[pinds]); ax.axis('off')
+    if pinds==15: plt.colorbar(dimg[pinds], cax = cbaxes)
+    pinds+=1
   def updatefig (tdx):
     t = utimes[tdx]
     print('frame t = ', str(round(t,2)))
@@ -130,13 +121,14 @@ def animSynWeights (pdf, outpath, framerate=10, figsize=None):
     for src in lsrc:
       wtsL, wtsR = getwts(tdx, src)
       dimg[pinds].set_data(wtsL)
-      pinds=pinds+1
+      pinds+=1
       dimg[pinds].set_data(wtsR)
-      pinds = pinds+1      
+      pinds+=1
     return fig
   ani = animation.FuncAnimation(fig, updatefig, interval=1, frames=len(utimes))
   writer = anim.getwriter(outpath, framerate)
-  ani.save(outpath, writer=writer)    
+  ani.save(outpath, writer=writer); print('saved animation to', outpath)
+  rcParams['font.size'] = origfsz; ion() # restore original font size, restore interactive plotting
         
 def plotavgweights (pdf):
   utimes = np.unique(pdf.time)

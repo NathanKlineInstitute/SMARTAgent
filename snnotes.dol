@@ -1472,3 +1472,13 @@ animSynWeights(pdf,'data/'+dconf['sim']['name']+'weightmap.mp4', framerate=10) #
 
 ok, works faster now ...
 
+but some of the text is not visible ... adjust size of fig
+
+python -i simdat.py -1
+animSynWeights(pdf,'data/'+dconf['sim']['name']+'weightmap.mp4', framerate=10, figsize=(8,6)) #plot/save images as movie
+
+animSynWeights(pdf,'data/'+dconf['sim']['name']+'weightmap.mp4', framerate=10, figsize=(7,5)) #plot/save images as movie
+
+also turn off interactive mode during animation, goes faster...
+
+animSynWeights(pdf,'data/'+dconf['sim']['name']+'weightmap.mp4', framerate=10, figsize=(7,4)) #plot/save images as movie

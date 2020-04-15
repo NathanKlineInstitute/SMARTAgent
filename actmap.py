@@ -109,6 +109,7 @@ def plotActivityMaps (pauset=1, gifpath=None, mp4path=None, framerate=5, zf=10):
 
 #
 def animActivityMaps (outpath, framerate=10, figsize=(7,3)):
+  ioff()
   # plot activity in different layers as a function of input images
   if figsize is not None:
     fig, axs = plt.subplots(4, 5, figsize=figsize);
@@ -154,7 +155,8 @@ def animActivityMaps (outpath, framerate=10, figsize=(7,3)):
     return fig
   ani = animation.FuncAnimation(fig, updatefig, interval=1, frames=len(t1))
   writer = anim.getwriter(outpath, framerate=framerate)
-  ani.save(outpath, writer=writer)      
+  ani.save(outpath, writer=writer); print('saved animation to', outpath)
+  ion()
   return fig, axs, plt
 
 fig, axs, plt = animActivityMaps('data/'+dconf['sim']['name']+'actmap.mp4', framerate=10)
