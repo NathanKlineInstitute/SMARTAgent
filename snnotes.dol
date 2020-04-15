@@ -1482,3 +1482,8 @@ animSynWeights(pdf,'data/'+dconf['sim']['name']+'weightmap.mp4', framerate=10, f
 also turn off interactive mode during animation, goes faster...
 
 animSynWeights(pdf,'data/'+dconf['sim']['name']+'weightmap.mp4', framerate=10, figsize=(7,4)) #plot/save images as movie
+
+** discuss opt (image processing for direction selective neurons vs population reduction)
+** looking through code for opt
+
+moved some connection functions from sim.py to connUtils.py
