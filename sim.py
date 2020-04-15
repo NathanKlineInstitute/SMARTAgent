@@ -1188,9 +1188,9 @@ def updateInputRates ():
       if dconf['verbose'] > 1:
         print(sim.rank,'received firing rates:',np.where(dFiringRates[pop]==np.amax(dFiringRates[pop])),np.amax(dFiringRates[pop]))          
   alltags = sim._gatherAllCellTags() #gather cell tags  
-  dGIDs = {pop:[] for pop in lpop}
+  dGIDs = {pop:[] for pop in lratepop}
   for tinds in range(len(alltags)):
-    if alltags[tinds]['pop'] in lpop:
+    if alltags[tinds]['pop'] in lratepop:
       dGIDs[alltags[tinds]['pop']].append(tinds)
   # update input firing rates for stimuli to R and direction sensitive cells
   for pop in lratepop:
@@ -1370,10 +1370,10 @@ def getAllSTDPObjects (sim):
   # get all the STDP objects from the simulation's cells
   lSTDPmech = []
   for cell in sim.net.cells:
-      for conn in cell.conns:
-          STDPmech = conn.get('hSTDP')  # check if has STDP mechanism
-          if STDPmech:   # make sure it is not None
-            lSTDPmech.append(STDPmech)
+    for conn in cell.conns:
+      STDPmech = conn.get('hSTDP')  # check if has STDP mechanism
+      if STDPmech:   # make sure it is not None
+        lSTDPmech.append(STDPmech)
   return lSTDPmech
         
 #Alterate to create network and run simulation

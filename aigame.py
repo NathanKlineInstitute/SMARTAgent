@@ -45,7 +45,7 @@ class AIGame:
       self.lratepop = ['ER'] # populations that we calculate rates for
       for d in self.ldir: self.lratepop.append('EV1D'+d)
       self.dFVec = OrderedDict({pop:h.Vector() for pop in self.lratepop}) # NEURON Vectors for firing rate calculations
-      self.dFiringRates = OrderedDict({pop:np.zeros(dconf['net'][pop]) for pop in lratepop}) # python objects for firing rate calculations
+      self.dFiringRates = OrderedDict({pop:np.zeros(dconf['net'][pop]) for pop in self.lratepop}) # python objects for firing rate calculations
       self.dAngRange = OrderedDict({'EV1DE': (337,23),'EV1DNE': (22, 68), # angle ranges by population
                                     'EV1DN': (67, 113),'EV1DNW': (112, 158),
                                     'EV1DW': (157, 203),'EV1DSW': (202, 248),
