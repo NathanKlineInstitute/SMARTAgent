@@ -1273,7 +1273,7 @@ already have imagemagick ...
 
 hmm, even the imagemagick gif writer is slow . . .
 
-*20apr13 - animation
+*20apr13 - animation fixing
 ** HA fixing collision detection code since not working in all cases
 algorithm relies on position, direction, score
 ** movie fix
@@ -1312,3 +1312,173 @@ https://stackoverflow.com/questions/40747181/slow-ploting-using-animation-functi
 also relevant ...
 
 fig, axs, plt = animActivityMaps(mp4path='test.mp4', framerate=10)
+
+*20apr14
+** HA made nice movie showing activity/dynamics/actions from random game (testPong.py)
+will use it to generate similar with additional inclusion of network dynamics
+
+** other movie fixes needed for simdat.py
+
+first rerun sim for 10 s ... since now have a new column in ActionsRewards.txt
+
+myrun 12
+
+  Cells: 5349
+  Connections: 1103176 (206.24 per cell)
+  Synaptic contacts: 1105826 (206.74 per cell)
+  Spikes: 78992 (1.48 Hz)
+  Simulated time: 10.0 s; 12 workers
+  Run time: 1974.00 s
+Saving output as data/20april14_A0_simConfig.pkl ... 
+Finished saving!
+  Done; saving time = 82.23 s.
+SAVING RASTER DATA
+plot raster:
+Plotting raster...
+QApplication: invalid style override passed, ignoring it.
+Saving figure data as 20april14_A0_raster.pkl ... 
+Plotting recorded cell traces ... cell
+Plotting raster...
+Saving figure data as data/20april14_A0_RasterData.pkl ... 
+  Done; plotting time = 30.80 s
+
+Total time = 2191.62 s
+
+End time:  2020-04-14 12:31:15.408575
+
+output looks ok ... cells and rates in raster
+
+20apr14_rast_a0.png
+20apr14_rast_a0b.png
+20apr14_EV1DN_a0.png
+20apr14_EV1DS_a0.png
+20apr14_EV1DSW_a0.png
+20apr14_IMT_a0.png
+20apr14_IV4_a0.png
+
+let's see actmap.py ... then simdat.py
+
+python -i actmap.py
+
+produces
+data/20april14_A0_actmap.mp4
+fairly quickly...
+
+and simdat.py ...
+
+python -i simdat.py -1
+
+that calls
+plotSynWeightsPerTimeStep(pdf,pauset=1,mp4path='data/'+dconf['sim']['name']+'weightmap.mp4', framerate=10) #plot images
+
+python -i simdat.py -1
+
+** discussion on smooth direction selective RFs
+
+13:17
+samn btw, should E neurons always fire (but at a slower rate) when NE neurons fire?
+13:17
+since they're not orthogonal directions
+13:17
+Haroon Anwar no
+13:17
+samn why
+13:18
+Haroon Anwar E is between 337.5 degrees and 22.5 degrees
+13:18
+and NE is between 22.5 and 67.5 degrees
+13:19
+360 is divided into 8 angular regions
+13:19
+and each population is assigned that
+13:19
+samn understand but that means sharp cutoffs
+13:19
+Haroon Anwar right
+13:19
+samn could also have smooth fall-off and smoother receptive fields
+13:19
+Haroon Anwar possible
+13:20
+might be a good idea…
+13:20
+samn can put that on list for later
+13:20
+seems more realistic (?)
+13:21
+Haroon Anwar sure…more realistic
+13:21
+samn do all neurons of a population have exact same receptive field?
+13:21
+Haroon Anwar will also reduce number of neurons
+13:21
+because we could have directions coded using 4 pops instead of 8
+13:22
+NE will evoke e.g. 5 Hz in N and 5 Hz in E
+13:22
+if its exactly 45 degrees
+13:22
+samn you could have it with 1 pop probably too if you had receptive fields with some width tuning
+13:22
+width to the receptive field around a mean angle
+13:22
+Haroon Anwar that would be unrealistic
+13:23
+samn why?
+13:23
+Haroon Anwar we have neurons with very fine tuned directions
+13:23
+1 pop would not be able to encode all directions
+13:23
+samn it would be 1 pop in the model
+13:23
+where each neuron selects a mean angle randomly
+13:23
+then overall you'd have representations in all directions
+13:24
+Haroon Anwar ok --- yes possible that way---
+13:24
+implementation might be a bit tricky----but yes possible
+13:25
+samn tricky for how they project to other areas?
+13:25
+Haroon Anwar or assigning firing rates to each of the neurons in that pop
+13:25
+and generating connection lists
+13:25
+but yeah thats more realistic
+13:26
+samn if each one had a location in space and there were enough of the full directions in any locatin, seems ok
+13:26
+anyway, can put that on list of things to adjust. reducing # of neurons could help as you said
+13:27
+Haroon Anwar yes definitely to do list--- i need to think.. may be its not as difficult as i think right now…. but i will think about it
+13:27
+samn ok sg
+13:28
+Haroon Anwar will look at it after performance analysis---
+13:28
+samn sg
+
+*20apr15
+** continue fixup of animSynWeights in simdat.py
+
+this example animation https://matplotlib.org/gallery/animation/basic_example.html
+shows how to set line data dynamically ...
+
+and simpler way to save to mp4
+
+animSynWeights(pdf,'data/'+dconf['sim']['name']+'weightmap.mp4', framerate=10) #plot/save images as movie
+
+ok, works faster now ...
+
+but some of the text is not visible ... adjust size of fig
+
+python -i simdat.py -1
+animSynWeights(pdf,'data/'+dconf['sim']['name']+'weightmap.mp4', framerate=10, figsize=(8,6)) #plot/save images as movie
+
+animSynWeights(pdf,'data/'+dconf['sim']['name']+'weightmap.mp4', framerate=10, figsize=(7,5)) #plot/save images as movie
+
+also turn off interactive mode during animation, goes faster...
+
+animSynWeights(pdf,'data/'+dconf['sim']['name']+'weightmap.mp4', framerate=10, figsize=(7,4)) #plot/save images as movie
