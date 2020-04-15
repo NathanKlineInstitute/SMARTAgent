@@ -19,6 +19,7 @@ import gym
 import sys
 from gym import wrappers
 from time import time
+from collections import OrderedDict
 
 # make the environment - env is global so that it only gets created on a single node (important when using MPI with > 1 node)
 try:
@@ -43,12 +44,12 @@ class AIGame:
       self.ldirpop = ['EV1D'+Dir for Dir in self.ldir]
       self.lratepop = ['ER'] # populations that we calculate rates for
       for d in self.ldir: self.lratepop.append('EV1D'+d)
-      self.dFVec = {pop:h.Vector() for pop in self.lratepop} # NEURON Vectors for firing rate calculations
-      self.dFiringRates = {pop:np.zeros(dconf['net'][pop]) for pop in lratepop} # python objects for firing rate calculations
-      self.dAngRange = {'EV1DE': (337,23),'EV1DNE': (22, 68), # angle ranges by population
-                        'EV1DN': (67, 113),'EV1DNW': (112, 158),
-                        'EV1DW': (157, 203),'EV1DSW': (202, 248),
-                        'EV1DS': (247, 293),'EV1DSE': (292, 338)}
+      self.dFVec = OrderedDict({pop:h.Vector() for pop in self.lratepop}) # NEURON Vectors for firing rate calculations
+      self.dFiringRates = OrderedDict({pop:np.zeros(dconf['net'][pop]) for pop in lratepop}) # python objects for firing rate calculations
+      self.dAngRange = OrderedDict({'EV1DE': (337,23),'EV1DNE': (22, 68), # angle ranges by population
+                                    'EV1DN': (67, 113),'EV1DNW': (112, 158),
+                                    'EV1DW': (157, 203),'EV1DSW': (202, 248),
+                                    'EV1DS': (247, 293),'EV1DSE': (292, 338)})
       self.intaction = 5 # integrate this many actions together before returning reward information to model
     ################################
     ### PLAY GAME

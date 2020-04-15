@@ -1171,136 +1171,38 @@ def trainAgentFake(t):
         recordWeights(sim, t)
 
 def updateInputRates ():
-  # update the source firing rates for the R neuron population, based on image contents
-  #also update the firing rates for the direction sensitive neurons based on image contents
+  # update the source firing rates for the ER neuron population, based on image contents
+  # also update the firing rates for the direction sensitive neurons based on image contents
+  lratepop = ['ER', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW', 'EV1DSW', 'EV1DS', 'EV1DSE']  
   if sim.rank == 0:
-      if dconf['verbose'] > 1:
-        print(sim.rank,'broadcasting firing rates:',np.where(sim.AIGame.firing_rates==np.amax(sim.AIGame.firing_rates)),np.amax(sim.AIGame.firing_rates))        
-      sim.pc.broadcast(sim.AIGame.fvec.from_python(sim.AIGame.firing_rates),0)
-      firing_rates = sim.AIGame.firing_rates
-      dfiring_rates_dir = {}
-      for Dir in sim.AIGame.ldir:
-        sim.pc.broadcast(sim.AIGame.dDirFVec[Dir].from_python(sim.AIGame.dDirections[Dir],0))
-        dfiring_rates_dir[Dir] = sim.AIGame.dDirections[Dir]                                             
-        if dconf['verbose'] > 1: print('Firing Rates of',Dir,dfiring_rates_dir[Dir])
+    dFiringRates = sim.AIGame.dFiringRates    
+    for k in sim.AIGame.lratepop:
+      sim.pc.broadcast(sim.AIGame.dFVec[k].from_python(dFiringRates[k]),0)
+      if dconf['verbose'] > 1: print('Firing Rates of',k,np.where(dFiringRates[k]==np.amax(dFiringRates[k])),np.amax(dFiringRates[k]))
   else:
-      fvec = h.Vector(); sim.pc.broadcast(fvec,0); firing_rates = fvec.to_python()
+    dFiringRates = OrderedDict()
+    for pop in lratepop:
+      vec = h.Vector()
+      sim.pc.broadcast(vec,0)
+      dFiringRates[pop] = vec.to_python()
       if dconf['verbose'] > 1:
-        print(sim.rank,'received firing rates:',np.where(firing_rates==np.amax(firing_rates)),np.amax(firing_rates))        
-      dfiring_rates_dir = {}
-      dDirFVec = {Dir:h.Vector() for Dir in ['E','NE','NW','W','SW','S','SE']}
-      for Dir in ['E','NE','NW','W','SW','S','SE']:
-        dDirFVec[Dir] = h.Vector()
-        sim.pc.broadcast(dDirFVec[Dir],0)
-        dfiring_rates_dir = dDirFVec[Dir].to_python()        
-        if dconf['verbose'] > 1:
-          print(sim.rank,'received',Dir,'firing rates:',np.where(dfiring_rates_dir[Dir]==np.amax(dfiring_rates_dir[Dir])),np.amax(dfiring_rates_dir[Dir]))
-  #gather cell tags
-  alltags = sim._gatherAllCellTags()
-  
-  lpop = ['ER', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW', 'EV1DSW', 'EV1DS', 'EV1DSE']  
+        print(sim.rank,'received firing rates:',np.where(dFiringRates[pop]==np.amax(dFiringRates[pop])),np.amax(dFiringRates[pop]))          
+  alltags = sim._gatherAllCellTags() #gather cell tags  
   dGIDs = {pop:[] for pop in lpop}
-  dOffset = {pop:1e9 for pop in lpop}
   for tinds in range(len(alltags)):
     if alltags[tinds]['pop'] in lpop:
       dGIDs[alltags[tinds]['pop']].append(tinds)
-
-  for pop in lpop:
+  # update input firing rates for stimuli to R and direction sensitive cells
+  for pop in lratepop:
     lCell = [c for c in sim.net.cells if c.gid in sim.net.pops[pop].cellGids] # this is the set of cells
     offset = np.amin(dGIDs[pop])
-    if dconf['verbose'] > 1: print(sim.rank,'updating len(',pop,len(lRcell),'source firing rates. len(firing_rates)=',len(firing_rates))
-    for cell in lRcell:  
+    if dconf['verbose'] > 1: print(sim.rank,'updating len(',pop,len(lCell),'source firing rates. len(dFiringRates)=',len(dFiringRates[pop]))
+    for cell in lCell:  
       for stim in cell.stims:
         if stim['source'] == 'stimMod':
-          stim['hObj'].interval = 1000.0/firing_rates[int(cell.gid-R_offset)]
-          #print('cell GID: ', int(cell.gid), 'vs cell ID with offset: ', int(cell.gid-R_offset)) # interval in ms as a function of rate; is cell.gid correct index???    
+          stim['hObj'].interval = 1000.0/dFiringRates[pop][int(cell.gid-offset)]
+          #print('cell GID: ', int(cell.gid), 'vs cell ID with offset: ', int(cell.gid-R_offset)) # interval in ms as a function of rate; is cell.gid correct index??? 
       
-  # update input firing rates for stimuli to R cells
-  lRcell = [c for c in sim.net.cells if c.gid in sim.net.pops['ER'].cellGids] # this is the set of R cells
-  R_offset = np.amin(R_gids)
-  #print('R offset:', R_offset)
-  if dconf['verbose'] > 1: print(sim.rank,'updating len(lRcell)=',len(lRcell),'source firing rates. len(firing_rates)=',len(firing_rates))
-  for cell in lRcell:  
-      for stim in cell.stims:
-          if stim['source'] == 'stimMod':
-              stim['hObj'].interval = 1000.0/firing_rates[int(cell.gid-R_offset)]
-              #print('cell GID: ', int(cell.gid), 'vs cell ID with offset: ', int(cell.gid-R_offset)) # interval in ms as a function of rate; is cell.gid correct index???
-  # update input firing rates for stimuli to E-direction cells
-  lEDircell = [c for c in sim.net.cells if c.gid in sim.net.pops['EV1DE'].cellGids] # this is the set of 0-degree direction selective cells
-  EDir_offset = np.amin(Edir_gids)
-  #print('E-Dir offset:', EDir_offset)
-  if dconf['verbose'] > 1: print(sim.rank,'updating len(lEDircell)=',len(lEDircell),'source firing rates. len(firing_rates_dirE)=',len(firing_rates_dirE))
-  for cell in lEDircell:  
-      for stim in cell.stims:
-          if stim['source'] == 'stimMod':
-              stim['hObj'].interval = 1000.0/firing_rates_dirE[int(cell.gid-EDir_offset)] # interval in ms as a function of rate; is cell.gid correct index???
-              #print('E-Dir Neurons:',sim.net.pops['EV1D0'].cellGids, 'cells:', lEDircell,'Neuron: ', cell, 'cell gid: ', cell.gid)
-              #print('Neuron ', cell, 'on', sim.rank,' was assigned ISI of ', stim['hObj'].interval, ' ms')
-  # update input firing rates for stimuli to E-direction cells
-  lNEDircell = [c for c in sim.net.cells if c.gid in sim.net.pops['EV1DNE'].cellGids] # this is the set of 45-degree direction selective cells
-  NEDir_offset = np.amin(NEdir_gids)
-  #print('NE-Dir offset:', NEDir_offset)
-  if dconf['verbose'] > 1: print(sim.rank,'updating len(lNEDircell)=',len(lNEDircell),'source firing rates. len(firing_rates_dirNE)=',len(firing_rates_dirNE))
-  for cell in lNEDircell:  
-      for stim in cell.stims:
-          if stim['source'] == 'stimMod':
-              stim['hObj'].interval = 1000.0/firing_rates_dirNE[int(cell.gid-NEDir_offset)] # interval in ms as a function of rate; is cell.gid correct index???
-              #print('NE-Dir Neurons:',sim.net.pops['EV1D45'].cellGids, 'cells:', lNEDircell,'Neuron: ', cell, 'cell gid: ', cell.gid)
-              #print('Neuron ', cell, 'on', sim.rank,' was assigned ISI of ', stim['hObj'].interval, ' ms')
-  # update input firing rates for stimuli to N-direction cells
-  lNDircell = [c for c in sim.net.cells if c.gid in sim.net.pops['EV1DN'].cellGids] # this is the set of 90-degree direction selective cells
-  NDir_offset = np.amin(Ndir_gids)
-  #print('N-Dir offset:', NDir_offset)
-  if dconf['verbose'] > 1: print(sim.rank,'updating len(lNDircell)=',len(lNDircell),'source firing rates. len(firing_rates_dirN)=',len(firing_rates_dirN))
-  for cell in lNDircell:  
-      for stim in cell.stims:
-          if stim['source'] == 'stimMod':
-              stim['hObj'].interval = 1000.0/firing_rates_dirN[int(cell.gid-NDir_offset)] # interval in ms as a function of rate; is cell.gid correct index???
-  # update input firing rates for stimuli to NW-direction cells
-  lNWDircell = [c for c in sim.net.cells if c.gid in sim.net.pops['EV1DNW'].cellGids] # this is the set of 135-degree direction selective cells
-  NWDir_offset = np.amin(NWdir_gids)
-  #print('NW-Dir offset:', NWDir_offset) 
-  if dconf['verbose'] > 1: print(sim.rank,'updating len(lNWDircell)=',len(lNWDircell),'source firing rates. len(firing_rates_dirNW)=',len(firing_rates_dirNW))
-  for cell in lNWDircell:  
-      for stim in cell.stims:
-          if stim['source'] == 'stimMod':
-              stim['hObj'].interval = 1000.0/firing_rates_dirNW[int(cell.gid-NWDir_offset)] # interval in ms as a function of rate; is cell.gid correct index???
-  # update input firing rates for stimuli to W-direction cells
-  lWDircell = [c for c in sim.net.cells if c.gid in sim.net.pops['EV1DW'].cellGids] # this is the set of 180-degree direction selective cells
-  WDir_offset = np.amin(Wdir_gids)
-  #print('W-Dir offset:', WDir_offset)
-  if dconf['verbose'] > 1: print(sim.rank,'updating len(lWDircell)=',len(lWDircell),'source firing rates. len(firing_rates_dirW)=',len(firing_rates_dirW))
-  for cell in lWDircell:  
-      for stim in cell.stims:
-          if stim['source'] == 'stimMod':
-              stim['hObj'].interval = 1000.0/firing_rates_dirW[int(cell.gid-WDir_offset)] # interval in ms as a function of rate; is cell.gid correct index???
-  # update input firing rates for stimuli to South-West-direction cells
-  lSWDircell = [c for c in sim.net.cells if c.gid in sim.net.pops['EV1DSW'].cellGids] # this is the set of 225-degree direction selective cells
-  SWDir_offset = np.amin(SWdir_gids)
-  #print('SW-Dir offset:', SWDir_offset)
-  if dconf['verbose'] > 1: print(sim.rank,'updating len(lSWDircell)=',len(lSWDircell),'source firing rates. len(firing_rates_dirSW)=',len(firing_rates_dirSW))
-  for cell in lSWDircell:  
-      for stim in cell.stims:
-          if stim['source'] == 'stimMod':
-              stim['hObj'].interval = 1000.0/firing_rates_dirS[int(cell.gid-SWDir_offset)] # interval in ms as a function of rate; is cell.gid correct index???
-  # update input firing rates for stimuli to South-direction cells
-  lSDircell = [c for c in sim.net.cells if c.gid in sim.net.pops['EV1DS'].cellGids] # this is the set of 270-degree direction selective cells
-  SDir_offset = np.amin(Sdir_gids)
-  #print('S-Dir offset:', SDir_offset)
-  if dconf['verbose'] > 1: print(sim.rank,'updating len(lSDircell)=',len(lSDircell),'source firing rates. len(firing_rates_dirS)=',len(firing_rates_dirS))
-  for cell in lSDircell:  
-      for stim in cell.stims:
-          if stim['source'] == 'stimMod':
-              stim['hObj'].interval = 1000.0/firing_rates_dirS[int(cell.gid-SDir_offset)] # interval in ms as a function of rate; is cell.gid correct index???
-  # update input firing rates for stimuli to South-EAST-direction cells
-  lSEDircell = [c for c in sim.net.cells if c.gid in sim.net.pops['EV1DSE'].cellGids] # this is the set of 315-degree direction selective cells
-  SEDir_offset = np.amin(SEdir_gids)
-  #print('SE-Dir offset:', SEDir_offset)
-  if dconf['verbose'] > 1: print(sim.rank,'updating len(lSEDircell)=',len(lSEDircell),'source firing rates. len(firing_rates_dirSE)=',len(firing_rates_dirSE))
-  for cell in lSEDircell:  
-      for stim in cell.stims:
-          if stim['source'] == 'stimMod':
-              stim['hObj'].interval = 1000.0/firing_rates_dirSE[int(cell.gid-SEDir_offset)] # interval in ms as a function of rate; is cell.gid correct index???
 
 def trainAgent (t):
     """ training interface between simulation and game environment
