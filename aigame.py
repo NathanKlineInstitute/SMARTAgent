@@ -40,15 +40,11 @@ class AIGame:
         self.count = 0 
         self.countAll = 0
         self.fvec = h.Vector()
-        self.fvecE = h.Vector()
-        self.fvecNE = h.Vector()
-        self.fvecN = h.Vector()
-        self.fvecNW = h.Vector()
-        self.fvecW = h.Vector()
-        self.fvecSW = h.Vector()
-        self.fvecS = h.Vector()
-        self.fvecSE = h.Vector()
+        self.ldir = ['E','NE','NW','W','SW','S','SE']
+        self.dDirFVec = {Dir:h.Vector() for Dir in self.ldir}
         self.firing_rates = np.zeros(dconf['net']['ER'])  # image-based input firing rates; 20x20 = 400 pixels
+        self.dDirections = {np.ones(dconf['net']['EV1D'+Dir]) for Dir in self.ldir}
+        """
         self.directionsE = np.ones(dconf['net']['EV1DE']) #for EAST
         self.directionsNE = np.ones(dconf['net']['EV1DNE']) #for NORTH-EAST
         self.directionsN = np.ones(dconf['net']['EV1DN']) #for NORTH
@@ -57,6 +53,7 @@ class AIGame:
         self.directionsSW = np.ones(dconf['net']['EV1DSW']) #for SOUTH WEST
         self.directionsS = np.ones(dconf['net']['EV1DS']) # for SOUTH
         self.directionsSE = np.ones(dconf['net']['EV1DSE']) #for SOUTH EAST
+        """        
         self.intaction = 5 # integrate this many actions together before returning reward information to model
     ################################
     ### PLAY GAME
