@@ -1459,3 +1459,16 @@ samn ok sg
 Haroon Anwar will look at it after performance analysis---
 13:28
 samn sg
+
+*20apr15
+** continue fixup of animSynWeights in simdat.py
+
+this example animation https://matplotlib.org/gallery/animation/basic_example.html
+shows how to set line data dynamically ...
+
+and simpler way to save to mp4
+
+animSynWeights(pdf,'data/'+dconf['sim']['name']+'weightmap.mp4', framerate=10) #plot/save images as movie
+
+ok, works faster now ...
+
