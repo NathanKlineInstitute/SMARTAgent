@@ -51,36 +51,37 @@ class AIGame:
                                     'EV1DW': (157, 203),'EV1DSW': (202, 248),
                                     'EV1DS': (247, 293),'EV1DSE': (292, 338)})
       self.input_dim = int(np.sqrt(dconf['net']['ER']))
-      self.dirSensitiveNeurons_dim = 10 #int(0.5*self.input_dim)
+      self.dirSensitiveNeuronDim = 10 #int(0.5*self.input_dim)
+      self.dirSensitiveNeuronRate = (0.0001, 30) # min, max firing rate (Hz) for dir sensitive neurons
       self.intaction = 5 # integrate this many actions together before returning reward information to model
 
     def computeMotion (self, dsum_Images):
-      bkgPixel = np.min(dsum_Images)
-      dirSensitiveNeurons_dim = self.dirSensitiveNeurons_dim
-      dirSensitiveNeurons = np.zeros(shape=(dirSensitiveNeurons_dim,dirSensitiveNeurons_dim))      
       #compute directions of motion for every other pixel.
-      for dSNeuron_x in range(dirSensitiveNeurons_dim):
-        Rx = 2*dSNeuron_x
+      bkgPixel = np.min(dsum_Images) # background pixel value
+      dirSensitiveNeuronDim = self.dirSensitiveNeuronDim
+      dirSensitiveNeurons = np.zeros(shape=(dirSensitiveNeuronDim,dirSensitiveNeuronDim))
+      for dSNeuronX in range(dirSensitiveNeuronDim):
+        Rx = 2*dSNeuronX
         if Rx==0:
           Rxs = [Rx,Rx+1,Rx+2]
         elif Rx==1:
           Rxs = [Rx-1, Rx, Rx+1, Rx+2]
-        #elif Rx==dirSensitiveNeurons_dim-1:
+        #elif Rx==dirSensitiveNeuronDim-1:
         #    Rxs = [Rx-2,Rx-1,Rx]
-        elif Rx==((2*dirSensitiveNeurons_dim)-2):
+        elif Rx==((2*dirSensitiveNeuronDim)-2):
           Rxs = [Rx-2,Rx-1,Rx,Rx+1]
         else:
           Rxs = [Rx-2,Rx-1,Rx,Rx+1,Rx+2]
-        for dSNeuron_y in range(dirSensitiveNeurons_dim):
-          Ry = 2*dSNeuron_y
+        for dSNeuronY in range(dirSensitiveNeuronDim):
+          Ry = 2*dSNeuronY
           #print('Ry:',Ry)
           if Ry==0:
             Rys = [Ry, Ry+1, Ry+2]
           elif Ry==1:
             Rys = [Ry-1, Ry, Ry+1, Ry+2]
-          #elif Ry==dirSensitiveNeurons_dim-1:
+          #elif Ry==dirSensitiveNeuronDim-1:
           #    Rys = [Ry-2,Ry-1,Ry]
-          elif Ry==((2*dirSensitiveNeurons_dim)-2):
+          elif Ry==((2*dirSensitiveNeuronDim)-2):
             Rys = [Ry-2,Ry-1,Ry,Ry+1]
           else:
             Rys = [Ry-2,Ry-1,Ry,Ry+1,Ry+2]
@@ -120,16 +121,15 @@ class AIGame:
           ndirMain = dirMain / np.linalg.norm(dirMain)
           theta = np.degrees(np.arccos(np.dot(ndir2,ndirMain))) #if theta is nan, no movement is detected
           if dir2[1]<0: theta = 360-theta 
-          dirSensitiveNeurons[dSNeuron_x,dSNeuron_y] = theta
+          dirSensitiveNeurons[dSNeuronX,dSNeuronY] = theta
           if np.isnan(theta)=='False': print('Theta for FOV ',FOV,' is: ', theta)
       print('Computed angles:', dirSensitiveNeurons)
       dAngRange = self.dAngRange
       dInds = {pop:np.where(np.logical_and(dirSensitiveNeurons>dAngRange[pop][0],dirSensitiveNeurons<dAngRange[pop][1])) for pop in self.ldirpop}
       for pop in self.ldirpop:
-        dtmp = 0.0001*np.ones(shape=(dirSensitiveNeurons_dim,dirSensitiveNeurons_dim))
-        dtmp[dInds[pop]] = 30 # 30Hz firing rate---later should be used as a parameter with some noise.
-        self.dFiringRates[pop] = np.reshape( dtmp , 100)
-
+        dtmp = self.dirSensitiveNeuronRate[0] * np.ones(shape=(dirSensitiveNeuronDim,dirSensitiveNeuronDim))
+        dtmp[dInds[pop]] = self.dirSensitiveNeuronRate[1] # firing rate for active dir sensitive neurons; later could include noise.
+        self.dFiringRates[pop] = np.reshape(dtmp , 100) # this assumes 100 neurons in that population
       
     ################################
     ### PLAY GAME
