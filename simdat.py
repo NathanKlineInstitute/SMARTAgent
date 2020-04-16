@@ -69,11 +69,11 @@ def animSynWeights (pdf, outpath, framerate=10, figsize=(7,4), cmap='jet'):
   rewardingActions = np.cumsum(np.where(actionvsproposed==0,1,0)) #rewarding action
   punishingActions = np.cumsum(np.where((actionvsproposed>0) | (actionvsproposed<0),1,0)) #punishing action i.e. when the action leads to move the racket away from the ball
   cumActs = np.array(range(1,len(actionvsproposed)+1))
-  allHits = np.array(actreward.hit)
-  allRewards = np.array(actreward.reward)
-  cumHits = np.cumsum(allHits) #cummulative hits evolving with time.
-  missHits = np.where(np.array(allRewards)<=dconf['rewardcodes']['losePoint'],1,0)
-  cumMissHits = np.cumsum(missHits) #if a reward is -1, replace it with 1 else replace it with 0.
+  Hit_Missed = np.array(actreward.hit)
+  allHit = np.where(Hit_Missed==1,1,0) 
+  allMissed = np.where(Hit_Missed==-1,1,0)
+  cumHits = np.cumsum(allHit) #cummulative hits evolving with time.
+  cumMissed = np.cumsum(allMissed) #if a reward is -1, replace it with 1 else replace it with 0.
   f_ax1.plot(action_times,np.divide(rewardingActions,cumActs),'r.',markersize=1)
   f_ax1.plot(action_times,np.divide(punishingActions,cumActs),'b.',markersize=1)
   f_ax1.set_xlim((0,np.max(action_times)))
@@ -91,9 +91,9 @@ def animSynWeights (pdf, outpath, framerate=10, figsize=(7,4), cmap='jet'):
   f_ax3.set_ylabel('Average weight'); #f_ax2.set_xlabel('Time (ms)')
   f_ax3.legend(('->EML','->EMR'),loc='upper left')
   f_ax4.plot(action_times,cumHits,'g.',markersize=1)
-  f_ax4.plot(action_times,cumMissHits,'k.',markersize=1)
+  f_ax4.plot(action_times,cumMissed,'k.',markersize=1)
   f_ax4.set_xlim((0,np.max(action_times)))
-  f_ax4.set_ylim((0,np.max([cumHits[-1],cumMissHits[-1]])))
+  f_ax4.set_ylim((0,np.max([cumHits[-1],cumMissed[-1]])))
   f_ax4.legend(('Hit Ball','Miss Ball'),loc='upper left')
   lsrc = ['EV1', 'EV4', 'EMT','EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE']
   ltitle = []
