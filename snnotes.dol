@@ -1517,3 +1517,19 @@ data/20april15_A0_actmap.mp4
 
 looks ok ... should try more thorough tests to make sure nothing broken ...
 
+*20apr16
+** cleaning up code in aigame.py
+
+moved motion computations to separate function in aigame.py
+should move pong-specific code to separate place too
+
+myrun 12
+
+python -i simdat.py -1
+
+data/20april16_A0_weightmap.mp4
+
+python -i actmap.py
+
+data/20april16_A0_actmap.mp4
+
