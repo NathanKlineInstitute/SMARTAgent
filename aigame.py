@@ -284,6 +284,8 @@ class AIGame:
           self.countAll = 0 # should self.count also get set to 0?
         if np.sum(total_hits)>1:
           print('ERROR COMPUTING NUMBER OF HITS')
+        for r in range(len(rewards)):
+          if rewards[r]==-1: total_hits[r]=-1 #when the ball misses the racket, the reward is -1
         return rewards, epCount, InputImages, last_obs, proposed_actions, last_ball_dir, total_hits
 
     def playGameFake (self, last_obs, epCount, InputImages): #actions are generated based on Vector Algebra

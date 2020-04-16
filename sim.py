@@ -1077,7 +1077,7 @@ def saveGameBehavior(sim):
             fid3.write('\t%0.1f' % sim.allActions[i])
             fid3.write('\t%0.5f' % sim.allRewards[i])
             fid3.write('\t%0.1f' % sim.allProposedActions[i]) #the number of proposed action should be equal to the number of actions
-            fid3.write('\t%0.1f' % sim.allHits[i]) #the number of proposed action should be equal to the number of actions
+            fid3.write('\t%0.1f' % sim.allHits[i]) #1 when the racket hits the ball and -1 when the racket misses the ball
             fid3.write('\n')
 
 ######################################################################################
@@ -1105,7 +1105,7 @@ epCount = []
 last_obs = [] #make sure this does not introduce a bug
 proposed_actions = [] 
 last_ball_dir = 0 
-total_hits = [] #number of times a ball is hit by racket as the ball changes its direction and player doesn't lose a score.
+total_hits = [] #number of times a ball is hit by racket as the ball changes its direction and player doesn't lose a score (assign 1). if player loses
 lSTDPmech = [] # global list of STDP mechanisms; so do not have to lookup at each interval function call 
     
 def trainAgentFake(t):

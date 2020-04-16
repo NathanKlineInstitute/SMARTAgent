@@ -1238,3 +1238,4 @@ This bug was found in all functions where instead of src, trg was used for dendi
 **included 1 in simdat.py. test now.
 **adjust positions of subplots. 1 is working fine.
 **include 2 in simdat.py. test now.
+**use -1 in hits if the racket misses the ball and loses a point.
