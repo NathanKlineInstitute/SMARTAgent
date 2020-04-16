@@ -69,7 +69,7 @@ def animSynWeights (pdf, outpath, framerate=10, figsize=(7,4), cmap='jet'):
   rewardingActions = np.cumsum(np.where(actionvsproposed==0,1,0)) #rewarding action
   punishingActions = np.cumsum(np.where((actionvsproposed>0) | (actionvsproposed<0),1,0)) #punishing action i.e. when the action leads to move the racket away from the ball
   cumActs = np.array(range(1,len(actionvsproposed)+1))
-  allHits = actreward.hit
+  allHits = np.array(actreward.hit)
   allRewards = np.array(actreward.reward)
   cumHits = np.cumsum(allHits) #cummulative hits evolving with time.
   missHits = np.where(np.array(allRewards)<=dconf['rewardcodes']['losePoint'],1,0)
