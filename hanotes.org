@@ -1237,3 +1237,4 @@ This bug was found in all functions where instead of src, trg was used for dendi
 5. per episode, how many times scored +1 against the computer. (same as mentioned in 7 above for testPong.py)
 **included 1 in simdat.py. test now.
 **adjust positions of subplots. 1 is working fine.
+**include 2 in simdat.py. test now.
