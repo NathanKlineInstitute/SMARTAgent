@@ -57,8 +57,8 @@ def animSynWeights (pdf, outpath, framerate=10, figsize=(7,4), cmap='jet'):
       ax_count = ax_count+1
   cbaxes = fig.add_axes([0.92, 0.4, 0.01, 0.2])
   f_ax1 = fig.add_subplot(gs[3,0:2])
-  f_ax2 = fig.add_subplot(gs[3,2:4])
-  f_ax3 = fig.add_subplot(gs[2,4:6])
+  f_ax2 = fig.add_subplot(gs[3,3:5])
+  f_ax3 = fig.add_subplot(gs[2,5:7])
   pdfsL = pdf[(pdf.postid>=dstartidx['EML']) & (pdf.postid<=dendidx['EML'])]
   pdfsR = pdf[(pdf.postid>=dstartidx['EMR']) & (pdf.postid<=dendidx['EMR'])]
   Lwts = [np.mean(pdfsL[(pdfsL.time==t)].weight) for t in utimes] #wts of connections onto EML
@@ -68,19 +68,19 @@ def animSynWeights (pdf, outpath, framerate=10, figsize=(7,4), cmap='jet'):
   rewardingActions = np.cumsum(np.where(actionvsproposed==0,1,0)) #rewarding action
   punishingActions = np.cumsum(np.where((actionvsproposed>0) | (actionvsproposed<0),1,0)) #punishing action i.e. when the action leads to move the racket away from the ball
   cumActs = np.array(range(1,len(actionvsproposed)+1))
-  f_ax1.plot(actreward.time,actreward.reward,'ko',markersize=2)
+  f_ax1.plot(actreward.time,actreward.reward,'ko-',markersize=1)
   f_ax1.set_xlim((0,simConfig['simConfig']['duration']))
   f_ax1.set_ylim((np.min(actreward.reward),np.max(actreward.reward)))
   f_ax1.set_ylabel('Rewards'); #f_ax1.set_xlabel('Time (ms)')
   #plot mean weights of all connections onto EML and EMR
-  f_ax2.plot(utimes,Lwts,'r-o',markersize=1)
-  f_ax2.plot(utimes,Rwts,'b-o',markersize=1)
+  f_ax2.plot(utimes,Lwts,'r.',markersize=1)
+  f_ax2.plot(utimes,Rwts,'b.',markersize=1)
   f_ax2.set_xlim((0,simConfig['simConfig']['duration']))
   f_ax2.set_ylim((np.min([np.min(Lwts),np.min(Rwts)]),np.max([np.max(Lwts),np.max(Rwts)])))
   f_ax2.set_ylabel('Average weight'); #f_ax2.set_xlabel('Time (ms)')
   f_ax2.legend(('->EML','->EMR'),loc='upper left')
-  f_ax3.plot(action_times,np.divide(rewardingActions,cumActs),'ro',markersize=3)
-  f_ax3.plot(action_times,np.divide(punishingActions,cumActs),'bo',markersize=3)
+  f_ax3.plot(action_times,np.divide(rewardingActions,cumActs),'r.',markersize=1)
+  f_ax3.plot(action_times,np.divide(punishingActions,cumActs),'b.',markersize=1)
   f_ax3.set_xlim((0,np.max(action_times)))
   f_ax3.set_ylim((0,1))
   f_ax3.legend(('Follow Ball','Not Follow'),loc='upper left')
