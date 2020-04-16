@@ -58,7 +58,7 @@ def animSynWeights (pdf, outpath, framerate=10, figsize=(7,4), cmap='jet'):
   cbaxes = fig.add_axes([0.92, 0.4, 0.01, 0.2])
   f_ax1 = fig.add_subplot(gs[3,0:2])
   f_ax2 = fig.add_subplot(gs[3,3:5])
-  f_ax3 = fig.add_subplot(gs[2,5:7])
+  f_ax3 = fig.add_subplot(gs[2,6:8])
   pdfsL = pdf[(pdf.postid>=dstartidx['EML']) & (pdf.postid<=dendidx['EML'])]
   pdfsR = pdf[(pdf.postid>=dstartidx['EMR']) & (pdf.postid<=dendidx['EMR'])]
   Lwts = [np.mean(pdfsL[(pdfsL.time==t)].weight) for t in utimes] #wts of connections onto EML
