@@ -50,6 +50,8 @@ class AIGame:
                                     'EV1DN': (67, 113),'EV1DNW': (112, 158),
                                     'EV1DW': (157, 203),'EV1DSW': (202, 248),
                                     'EV1DS': (247, 293),'EV1DSE': (292, 338)})
+      self.input_dim = int(np.sqrt(dconf['net']['ER']))
+      self.dirSensitiveNeurons_dim = 10 #int(0.5*self.input_dim)
       self.intaction = 5 # integrate this many actions together before returning reward information to model
     ################################
     ### PLAY GAME
@@ -59,10 +61,12 @@ class AIGame:
         rewards = []
         proposed_actions =[]
         total_hits = []
-        input_dim = int(np.sqrt(dconf['net']['ER']))
-        dirSensitiveNeurons_dim = 10 #int(0.5*input_dim)
-        dirSensitiveNeurons = np.zeros(shape=(dirSensitiveNeurons_dim,dirSensitiveNeurons_dim))                
-        dsum_Images = np.zeros(shape=(input_dim,input_dim)) #previously we merged 2x2 pixels into 1 value. Now we merge 8x8 pixels into 1 value. so the original 160x160 pixels will result into 20x20 values instead of previously used 80x80.
+        input_dim = self.input_dim
+        dirSensitiveNeurons_dim = self.dirSensitiveNeurons_dim
+        dirSensitiveNeurons = np.zeros(shape=(dirSensitiveNeurons_dim,dirSensitiveNeurons_dim))
+        # previously we merged 2x2 pixels into 1 value. Now we merge 8x8 pixels into 1 value.
+        # so the original 160x160 pixels will result into 20x20 values instead of previously used 80x80.
+        dsum_Images = np.zeros(shape=(input_dim,input_dim)) 
         #print(actions)
         gray_Image = np.zeros(shape=(160,160))
         done = False
@@ -185,6 +189,7 @@ class AIGame:
         dsum_Images = np.maximum(dsum_Images,i2)
         dsum_Images = np.maximum(dsum_Images,i3)
         dsum_Images = np.maximum(dsum_Images,i4)
+        
         #compute directions of motion for every other pixel.
         bkgPixel = np.amin(dsum_Images)
         for dSNeuron_x in range(dirSensitiveNeurons_dim):
@@ -257,7 +262,8 @@ class AIGame:
         for pop in self.ldirpop:
           dtmp = 0.0001*np.ones(shape=(dirSensitiveNeurons_dim,dirSensitiveNeurons_dim))
           dtmp[dInds[pop]] = 30 # 30Hz firing rate---later should be used as a parameter with some noise.
-          self.dFiringRates[pop] = np.reshape( dtmp , 100)        
+          self.dFiringRates[pop] = np.reshape( dtmp , 100)
+          
         InputImages.append(dsum_Images)
         #fr_Images = np.where(dsum_Images>1.0,100,dsum_Images) #Using this to check what number would work for firing rate
         #fr_Images = np.where(dsum_Images<10.0,0,dsum_Images)
