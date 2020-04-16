@@ -1226,3 +1226,13 @@ This bug was found in all functions where instead of src, trg was used for dendi
 6. per episode, how many times hit the ball vs missed the ball
 7. per episode, how many times scored +1 against the computer.
 ***testing the code for many many episodes now. 
+
+*20april16
+**performance parameters mentioned in 5,6 and 7 are not displaying as i wanted it to be (i.e. as a function of episodes)----Need to be fixed.
+**Need to plot following for the performance evaluation.
+1. number of rewarding actions (when executed action is same as proposed action) vs punishing actions (when exectued action is different than the proposed action) normalized. (same as mentioned in 2 above for testPong.py)
+2. cummulative hits (when racket hits the ball) vs cummulative miss (when racket misses the ball and lose a point). (same as mentioned in 4 above for testPong.py)
+3. per episode, how many times followed the ball vs not followed the ball. (same as mentioned in 5 above for testPong.py)
+4. per episode, how many times hit the ball vs missed the ball. (same as mentioned in 6 above for testPong.py)
+5. per episode, how many times scored +1 against the computer. (same as mentioned in 7 above for testPong.py)
+**included 1 in simdat.py. test now.

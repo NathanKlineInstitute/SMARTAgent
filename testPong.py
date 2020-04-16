@@ -273,7 +273,8 @@ maxtstr = len(str(100000))
 cumRewardActions = []
 cumPunishingActions = []
 #while cNB_episodes<totalNB_episodes: #play game while number of current episode is less than total number of episodes.
-while tinds<100:
+while tinds<50000:
+    print('Actions executed:',tinds)
     actions = []
     for _ in range(5): #choose 5 actions and pass those actions to the playGame
         action = possibleactions[random.randint(0,2)] #pick random action from 1,3 and 4.
@@ -391,7 +392,7 @@ while tinds<100:
     f_ax4a.plot(cumHits,Marker='o',MarkerSize=5,MarkerFaceColor='r',MarkerEdgeColor='r')
     f_ax4a.plot(cumMissHits,Marker='s',MarkerSize=3,MarkerFaceColor='k',MarkerEdgeColor='k')
     f_ax4a.legend(('Cumm. Hits','Cumm. Miss'),loc='upper left')
-    plt.pause(1)
+    #plt.pause(1)
     f_ax2.cla()
     for nbi in range(np.shape(Racket_pos)[0]):
         f_ax2.imshow(Images[nbi])
@@ -399,7 +400,7 @@ while tinds<100:
             f_ax2.plot(Racket_pos[nbi][0],Racket_pos[nbi][1],'o',MarkerSize=5, MarkerFaceColor="None",MarkerEdgeColor='r')
             f_ax2.plot(Ball_pos[nbi][0],Ball_pos[nbi][1],'o',MarkerSize=5, MarkerFaceColor="None",MarkeredgeColor='b')
         f_ax2.set_title('last obs')
-        plt.pause(0.1)
+        #plt.pause(0.1)
         ctstrl = len(str(tinds))
         tpre = ''
         for ttt in range(maxtstr-ctstrl):

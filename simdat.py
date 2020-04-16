@@ -48,14 +48,26 @@ def animSynWeights (pdf, outpath, framerate=10, figsize=(7,4), cmap='jet'):
   if figsize is not None: fig = plt.figure(figsize=figsize)
   else: fig = plt.figure()
   gs = fig.add_gridspec(4,8)
-  f_ax1 = fig.add_subplot(gs[0,0:3])
-  f_ax2 = fig.add_subplot(gs[0,4:7])
+  f_ax = []
+  ax_count = 0
+  for rows in range(3):
+    for cols in range(8): 
+      if ax_count<22: 
+        f_ax.append(fig.add_subplot(gs[rows,cols]))
+      ax_count = ax_count+1
+  cbaxes = fig.add_axes([0.92, 0.4, 0.01, 0.2])
+  f_ax1 = fig.add_subplot(gs[3,0:2])
+  f_ax2 = fig.add_subplot(gs[3,2:4])
+  f_ax3 = fig.add_subplot(gs[2,4:6])
   pdfsL = pdf[(pdf.postid>=dstartidx['EML']) & (pdf.postid<=dendidx['EML'])]
   pdfsR = pdf[(pdf.postid>=dstartidx['EMR']) & (pdf.postid<=dendidx['EMR'])]
   Lwts = [np.mean(pdfsL[(pdfsL.time==t)].weight) for t in utimes] #wts of connections onto EML
   Rwts = [np.mean(pdfsR[(pdfsR.time==t)].weight) for t in utimes] #wts of connections onto EMR
-  actionvsproposed = actreward.action-actreward.proposed
-  followtheball = actreward[actionvsproposed==0]
+  action_times = np.array(actreward.time)
+  actionvsproposed = np.array(actreward.action-actreward.proposed)
+  rewardingActions = np.cumsum(np.where(actionvsproposed==0,1,0)) #rewarding action
+  punishingActions = np.cumsum(np.where((actionvsproposed>0) | (actionvsproposed<0),1,0)) #punishing action i.e. when the action leads to move the racket away from the ball
+  cumActs = np.array(range(1,len(actionvsproposed)+1))
   f_ax1.plot(actreward.time,actreward.reward,'ko',markersize=2)
   f_ax1.set_xlim((0,simConfig['simConfig']['duration']))
   f_ax1.set_ylim((np.min(actreward.reward),np.max(actreward.reward)))
@@ -67,12 +79,11 @@ def animSynWeights (pdf, outpath, framerate=10, figsize=(7,4), cmap='jet'):
   f_ax2.set_ylim((np.min([np.min(Lwts),np.min(Rwts)]),np.max([np.max(Lwts),np.max(Rwts)])))
   f_ax2.set_ylabel('Average weight'); #f_ax2.set_xlabel('Time (ms)')
   f_ax2.legend(('->EML','->EMR'),loc='upper left')
-  #f_ax1.legend(('HitBall','FollowBall','ScorePoint'),loc='upper left')
-  f_ax = []
-  for rows in range(3):
-    for cols in range(8): f_ax.append(fig.add_subplot(gs[rows+1,cols]))
-  cbaxes = fig.add_axes([0.92, 0.4, 0.01, 0.2]) 
-  f_ax[22].axis('off'); f_ax[23].axis('off')
+  f_ax3.plot(action_times,np.divide(rewardingActions,cumActs),'ro',markersize=3)
+  f_ax3.plot(action_times,np.divide(punishingActions,cumActs),'bo',markersize=3)
+  f_ax3.set_xlim((0,np.max(action_times)))
+  f_ax3.set_ylim((0,1))
+  f_ax3.legend(('Follow Ball','Not Follow'),loc='upper left')
   lsrc = ['EV1', 'EV4', 'EMT','EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE']
   ltitle = []
   for src in lsrc:
