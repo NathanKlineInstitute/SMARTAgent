@@ -53,6 +53,84 @@ class AIGame:
       self.input_dim = int(np.sqrt(dconf['net']['ER']))
       self.dirSensitiveNeurons_dim = 10 #int(0.5*self.input_dim)
       self.intaction = 5 # integrate this many actions together before returning reward information to model
+
+    def computeMotion (self, dsum_Images):
+      bkgPixel = np.min(dsum_Images)
+      dirSensitiveNeurons_dim = self.dirSensitiveNeurons_dim
+      dirSensitiveNeurons = np.zeros(shape=(dirSensitiveNeurons_dim,dirSensitiveNeurons_dim))      
+      #compute directions of motion for every other pixel.
+      for dSNeuron_x in range(dirSensitiveNeurons_dim):
+        Rx = 2*dSNeuron_x
+        if Rx==0:
+          Rxs = [Rx,Rx+1,Rx+2]
+        elif Rx==1:
+          Rxs = [Rx-1, Rx, Rx+1, Rx+2]
+        #elif Rx==dirSensitiveNeurons_dim-1:
+        #    Rxs = [Rx-2,Rx-1,Rx]
+        elif Rx==((2*dirSensitiveNeurons_dim)-2):
+          Rxs = [Rx-2,Rx-1,Rx,Rx+1]
+        else:
+          Rxs = [Rx-2,Rx-1,Rx,Rx+1,Rx+2]
+        for dSNeuron_y in range(dirSensitiveNeurons_dim):
+          Ry = 2*dSNeuron_y
+          #print('Ry:',Ry)
+          if Ry==0:
+            Rys = [Ry, Ry+1, Ry+2]
+          elif Ry==1:
+            Rys = [Ry-1, Ry, Ry+1, Ry+2]
+          #elif Ry==dirSensitiveNeurons_dim-1:
+          #    Rys = [Ry-2,Ry-1,Ry]
+          elif Ry==((2*dirSensitiveNeurons_dim)-2):
+            Rys = [Ry-2,Ry-1,Ry,Ry+1]
+          else:
+            Rys = [Ry-2,Ry-1,Ry,Ry+1,Ry+2]
+          #print('Xinds',Rxs)
+          #print('Yinds',Rys)
+          FOV = np.zeros(shape=(len(Rxs),len(Rys)))
+          for xinds in range(len(Rxs)):
+            for yinds in range(len(Rys)):
+              FOV[xinds,yinds] = dsum_Images[Rxs[xinds],Rys[yinds]]
+          #print(FOV)
+          max_value = np.amax(FOV)
+          max_ind = np.where(FOV==max_value)
+          #print('max inds', max_ind) 
+          #since the most recent frame has highest pixel intensity, any pixel with the maximum intensity will be most probably the final instance of the object motion in that field of view
+          bkg_inds = np.where(FOV == bkgPixel)
+          if len(bkg_inds[0])>0:
+            for yinds in range(len(bkg_inds[0])):
+              ix = bkg_inds[0][yinds]
+              iy = bkg_inds[1][yinds]
+              FOV[ix,iy] = 1000
+          #I dont want to compute object motion vector relative to the background. so to ignore background pixels, replacing them with large value
+          #np.put(FOV,bkg_inds,1000) 
+          min_value = np.amin(FOV)
+          min_ind = np.where(FOV==min_value)
+          #print('min inds', min_ind)
+          #since latest frame has lowest pixel intensity (after ignoring background), any pixel with max intensity will most probably be first instance of object motion in that field of view
+          if len(max_ind[0])>len(min_ind[0]):
+            mL = len(min_ind[0])
+          elif len(max_ind[0])<len(min_ind[0]):
+            mL = len(max_ind[0])
+          else:
+            mL = len(max_ind[0])
+          dir1 = [max_ind[0][range(mL)]-min_ind[0][range(mL)],max_ind[1][range(mL)]-min_ind[1][range(mL)]] #direction of the object motion in a field of view over last 5 frames/observations.
+          dir2 = [np.median(dir1[1]),-1*np.median(dir1[0])] #flip y because indexing starts from top left.
+          dirMain = [1,0] #using a reference for 0 degrees....considering first is for rows and second is for columns
+          ndir2 = dir2 / np.linalg.norm(dir2)
+          ndirMain = dirMain / np.linalg.norm(dirMain)
+          theta = np.degrees(np.arccos(np.dot(ndir2,ndirMain))) #if theta is nan, no movement is detected
+          if dir2[1]<0: theta = 360-theta 
+          dirSensitiveNeurons[dSNeuron_x,dSNeuron_y] = theta
+          if np.isnan(theta)=='False': print('Theta for FOV ',FOV,' is: ', theta)
+      print('Computed angles:', dirSensitiveNeurons)
+      dAngRange = self.dAngRange
+      dInds = {pop:np.where(np.logical_and(dirSensitiveNeurons>dAngRange[pop][0],dirSensitiveNeurons<dAngRange[pop][1])) for pop in self.ldirpop}
+      for pop in self.ldirpop:
+        dtmp = 0.0001*np.ones(shape=(dirSensitiveNeurons_dim,dirSensitiveNeurons_dim))
+        dtmp[dInds[pop]] = 30 # 30Hz firing rate---later should be used as a parameter with some noise.
+        self.dFiringRates[pop] = np.reshape( dtmp , 100)
+
+      
     ################################
     ### PLAY GAME
     ###############################
@@ -62,8 +140,6 @@ class AIGame:
         proposed_actions =[]
         total_hits = []
         input_dim = self.input_dim
-        dirSensitiveNeurons_dim = self.dirSensitiveNeurons_dim
-        dirSensitiveNeurons = np.zeros(shape=(dirSensitiveNeurons_dim,dirSensitiveNeurons_dim))
         # previously we merged 2x2 pixels into 1 value. Now we merge 8x8 pixels into 1 value.
         # so the original 160x160 pixels will result into 20x20 values instead of previously used 80x80.
         dsum_Images = np.zeros(shape=(input_dim,input_dim)) 
@@ -189,80 +265,8 @@ class AIGame:
         dsum_Images = np.maximum(dsum_Images,i2)
         dsum_Images = np.maximum(dsum_Images,i3)
         dsum_Images = np.maximum(dsum_Images,i4)
-        
-        #compute directions of motion for every other pixel.
-        bkgPixel = np.amin(dsum_Images)
-        for dSNeuron_x in range(dirSensitiveNeurons_dim):
-            Rx = 2*dSNeuron_x
-            if Rx==0:
-                Rxs = [Rx,Rx+1,Rx+2]
-            elif Rx==1:
-                Rxs = [Rx-1, Rx, Rx+1, Rx+2]
-            #elif Rx==dirSensitiveNeurons_dim-1:
-            #    Rxs = [Rx-2,Rx-1,Rx]
-            elif Rx==((2*dirSensitiveNeurons_dim)-2):
-                Rxs = [Rx-2,Rx-1,Rx,Rx+1]
-            else:
-                Rxs = [Rx-2,Rx-1,Rx,Rx+1,Rx+2]
-            for dSNeuron_y in range(dirSensitiveNeurons_dim):
-                Ry = 2*dSNeuron_y
-                #print('Ry:',Ry)
-                if Ry==0:
-                    Rys = [Ry, Ry+1, Ry+2]
-                elif Ry==1:
-                    Rys = [Ry-1, Ry, Ry+1, Ry+2]
-                #elif Ry==dirSensitiveNeurons_dim-1:
-                #    Rys = [Ry-2,Ry-1,Ry]
-                elif Ry==((2*dirSensitiveNeurons_dim)-2):
-                    Rys = [Ry-2,Ry-1,Ry,Ry+1]
-                else:
-                    Rys = [Ry-2,Ry-1,Ry,Ry+1,Ry+2]
-                #print('Xinds',Rxs)
-                #print('Yinds',Rys)
-                FOV = np.zeros(shape=(len(Rxs),len(Rys)))
-                for xinds in range(len(Rxs)):
-                    for yinds in range(len(Rys)):
-                        FOV[xinds,yinds] = dsum_Images[Rxs[xinds],Rys[yinds]]
-                #print(FOV)
-                max_value = np.amax(FOV)
-                max_ind = np.where(FOV==max_value)
-                #print('max inds', max_ind) 
-                #since the most recent frame has highest pixel intensity, any pixel with the maximum intensity will be most probably the final instance of the object motion in that field of view
-                bkg_inds = np.where(FOV == bkgPixel)
-                if len(bkg_inds[0])>0:
-                    for yinds in range(len(bkg_inds[0])):
-                        ix = bkg_inds[0][yinds]
-                        iy = bkg_inds[1][yinds]
-                        FOV[ix,iy] = 1000
-                #np.put(FOV,bkg_inds,1000) #I dont want to compute object motion vector relative to the background. so to ignore background pixels, replacing them with large value
-                min_value = np.amin(FOV)
-                min_ind = np.where(FOV==min_value)
-                #print('min inds', min_ind)
-                #sine the most latest frame has the lowest pixel intensity (after ignoring the background), any pixel with the maximum intensity will be most probably the first instance of the object motion in that field of view
-                if len(max_ind[0])>len(min_ind[0]):
-                    mL = len(min_ind[0])
-                elif len(max_ind[0])<len(min_ind[0]):
-                    mL = len(max_ind[0])
-                else:
-                    mL = len(max_ind[0])
-                dir1 = [max_ind[0][range(mL)]-min_ind[0][range(mL)],max_ind[1][range(mL)]-min_ind[1][range(mL)]] #direction of the object motion in a field of view over last 5 frames/observations.
-                dir2 = [np.median(dir1[1]),-1*np.median(dir1[0])] #flip y because indexing starts from top left.
-                dirMain = [1,0] #using a reference for 0 degrees....considering first is for rows and second is for columns
-                ndir2 = dir2 / np.linalg.norm(dir2)
-                ndirMain = dirMain / np.linalg.norm(dirMain)
-                theta = np.degrees(np.arccos(np.dot(ndir2,ndirMain))) #if theta is nan, no movement is detected
-                if dir2[1]<0:
-                    theta = 360-theta 
-                dirSensitiveNeurons[dSNeuron_x,dSNeuron_y] = theta
-                if np.isnan(theta)=='False':
-                    print('Theta for FOV ',FOV,' is: ', theta)
-        print('Computed angles:', dirSensitiveNeurons)
-        dAngRange = self.dAngRange
-        dInds = {pop:np.where(np.logical_and(dirSensitiveNeurons>dAngRange[pop][0],dirSensitiveNeurons<dAngRange[pop][1])) for pop in self.ldirpop}
-        for pop in self.ldirpop:
-          dtmp = 0.0001*np.ones(shape=(dirSensitiveNeurons_dim,dirSensitiveNeurons_dim))
-          dtmp[dInds[pop]] = 30 # 30Hz firing rate---later should be used as a parameter with some noise.
-          self.dFiringRates[pop] = np.reshape( dtmp , 100)
+
+        self.computeMotion(dsum_Images) # compute directions of motion for every other pixel.        
           
         InputImages.append(dsum_Images)
         #fr_Images = np.where(dsum_Images>1.0,100,dsum_Images) #Using this to check what number would work for firing rate
