@@ -21,6 +21,7 @@ from time import time
 import os
 
 import anim
+from matplotlib import animation
 
 env = gym.make('Pong-v0',frameskip=3)
 env.reset()

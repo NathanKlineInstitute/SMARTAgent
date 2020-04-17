@@ -67,7 +67,7 @@ class AIGame:
     #fr_Images = np.where(dsum_Images>1.0,100,dsum_Images) #Using this to check what number would work for firing rate
     #fr_Images = np.where(dsum_Images<10.0,0,dsum_Images)
     fr_Images = 40/(1+np.exp((np.multiply(-1,dsum_Images)+123)/25))
-    fr_Images = np.subtract(fr_Images,7.722) #baseline firing rate subtraction. Instead all excitatory neurons are firing at 5Hz.
+    fr_Images = np.subtract(fr_Images,np.min(fr_Images)) #baseline firing rate subtraction. Instead all excitatory neurons are firing at 5Hz.
     #print(np.amax(fr_Images))
     self.dFiringRates['ER'] = np.reshape(fr_Images,400) #400 for 20*20
 
