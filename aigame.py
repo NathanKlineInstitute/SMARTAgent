@@ -55,6 +55,10 @@ class AIGame:
       self.dirSensitiveNeuronDim = 10 #int(0.5*self.input_dim)
       self.dirSensitiveNeuronRate = (0.0001, 30) # min, max firing rate (Hz) for dir sensitive neurons
       self.intaction = 5 # integrate this many actions together before returning reward information to model
+      # these are Pong-specific coordinate ranges; should later move out of this function into Pong-specific functions
+      self.courtYRng = (34, 194)
+      self.courtXRng = (20, 140)
+      self.racketXRng = (141, 144)      
 
     def updateInputRates (self, dsum_Images):
       # update input rates to retinal neurons
@@ -160,21 +164,14 @@ class AIGame:
         xpos = np.median(Obj_inds,0)[1] #x position of the center of mass of the object
       return xpos, ypos
             
-    ################################
-    ### PLAY GAME
-    ###############################
     def playGame (self, actions, epCount, InputImages, last_obs, last_ball_dir): #actions need to be generated from motor cortex
+      # PLAY GAME
       rewards = []
       proposed_actions =[]
       total_hits = []
       input_dim = self.input_dim
       done = False
-
-      # these are Pong-specific - should later move out of this function into Pong-specific function
-      courtYRng = (34, 194)
-      courtXRng = (20, 140)
-      racketXRng = (141, 144)
-
+      courtYRng, courtXRng, racketXRng = self.courtYRng, self.courtXRng, self.racketXRng # coordinate ranges for different objects (PONG-specific)      
       lgwght = np.linspace(0.6, 1, self.intaction) # time-decay grayscale image weights (earlier indices with lower weights are from older frames)
       lgimage = [] # grayscale images with decaying time-lagged input
       
@@ -184,16 +181,15 @@ class AIGame:
 
         if np.shape(last_obs)[0]>0: #if last_obs is not empty              
           xpos_Ball, ypos_Ball = self.findobj(last_obs, courtXRng, courtYRng) # get x,y positions of ball
-          xpos_Racket, ypos_Racket = self.findobj(last_obs, racketXRng, courtYRng) # get x,y positions of racket
-          
+          xpos_Racket, ypos_Racket = self.findobj(last_obs, racketXRng, courtYRng) # get x,y positions of racket          
           #Now we know the position of racket relative to the ball. We can suggest the action for the racket so that it doesn't miss the ball.
           #For the time being, I am implementing a simple rule i.e. based on only the ypos of racket relative to the ball
           if ypos_Racket>ypos_Ball: #if the racket is lower than the ball the suggestion is to move up
-            proposed_action = 4 #move up
+            proposed_action = dconf['moves']['UP'] #move up
           elif ypos_Racket<ypos_Ball: #if the racket is higher than the ball the suggestion is to move down
-            proposed_action = 3 #move down
+            proposed_action = dconf['moves']['DOWN'] #move down
           elif ypos_Racket==ypos_Ball:
-            proposed_action = 1 #no move
+            proposed_action = dconf['moves']['NOMOVE'] #no move
           elif ypos_Ball==-1: #guess about proposed move can't be made because ball was not visible in the court
             proposed_action = -1 #no valid action guessed
         else:
@@ -204,8 +200,7 @@ class AIGame:
         observation, reward, done, info = self.env.step(caction)
 
         #find position of ball after action
-        xpos_Ball2, ypos_Ball2 = self.findobj(observation, courtXRng, courtYRng)
-        
+        xpos_Ball2, ypos_Ball2 = self.findobj(observation, courtXRng, courtYRng)        
         if xpos_Ball>0 and xpos_Ball2>0:
           if xpos_Ball2-xpos_Ball>0:
             ball_moves_towards_racket = 1 #use proposed action for reward only when the ball moves towards the racket
