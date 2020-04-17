@@ -235,7 +235,7 @@ class AIGame:
       rewards.append(reward)
       proposed_actions.append(proposed_action)
 
-      gray_Image = rgb2gray(observation[courtYRng[0]:courtYRng[1],:,:]) # convert to grayscale
+      gray_Image = 255.0*rgb2gray(observation[courtYRng[0]:courtYRng[1],:,:]) # convert to grayscale; rgb2gray has 0-1 range so mul by 255
       gray_ds = downscale_local_mean(gray_Image,(8,8)) # then downsample
       gray_ds = np.where(gray_ds>np.min(gray_ds)+1,255,gray_ds) # Different thresholding
       lgimage.append(lgwght[adx]*gray_ds) # save weighted grayscale image from current frame
@@ -287,7 +287,7 @@ class AIGame:
       observation, reward, done, info = self.env.step(caction)
       self.last_obs = observation
       rewards.append(reward)
-      gray_Image = rgb2gray(observation[courtYRng[0]:courtYRng[1],:,:]) # convert to grayscale
+      gray_Image = 255.0*rgb2gray(observation[courtYRng[0]:courtYRng[1],:,:]) # convert to grayscale; rgb2gray has 0-1 range so mul by 255
       gray_ds = downscale_local_mean(gray_Image,(8,8)) # then downsample
       gray_ds = np.where(gray_ds>np.min(gray_ds)+1,255,gray_ds) # Different thresholding
       lgimage.append(lgwght[adx]*gray_ds) # save weighted grayscale image from current frame
