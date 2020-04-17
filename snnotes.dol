@@ -1533,3 +1533,20 @@ python -i actmap.py
 
 data/20april16_A0_actmap.mp4
 
+*20apr17
+** continue adjustments/cleanup
+
+myrun 12
+
+hmm, getting depolarization blockade and black input images
+values were between 0-1 after rgb2gray, so need to multiply by 255
+
+try again ...
+
+myrun 12
+
+python -i actmap.py
+
+data/20april17_A0_actmap.mp4
+
+python -i simdat.py -1
