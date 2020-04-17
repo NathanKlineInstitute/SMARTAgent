@@ -1197,7 +1197,10 @@ def updateInputRates ():
     for cell in lCell:  
       for stim in cell.stims:
         if stim['source'] == 'stimMod':
-          stim['hObj'].interval = 1000.0/dFiringRates[pop][int(cell.gid-offset)]
+          if dFiringRates[pop][int(cell.gid-offset)]==0:
+            stim['hObj'].interval = 1e12
+          else:  
+            stim['hObj'].interval = 1000.0/dFiringRates[pop][int(cell.gid-offset)]
           #print('cell GID: ', int(cell.gid), 'vs cell ID with offset: ', int(cell.gid-R_offset)) # interval in ms as a function of rate; is cell.gid correct index??? 
       
 
