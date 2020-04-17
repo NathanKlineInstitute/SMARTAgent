@@ -14,6 +14,7 @@ from matplotlib import pyplot as plt
 import random
 import numpy as np
 from skimage.transform import downscale_local_mean
+from skimage.color import rgb2gray
 import json
 import gym
 import sys
@@ -169,7 +170,7 @@ class AIGame:
       input_dim = self.input_dim
       # previously we merged 2x2 pixels into 1 value. Now we merge 8x8 pixels into 1 value.
       # so the original 160x160 pixels will result into 20x20 values instead of previously used 80x80.
-      dsum_Images = np.zeros(shape=(input_dim,input_dim)) 
+      dsum_Images = np.zeros(shape=(input_dim,input_dim)) # input image with decaying time-lagged input
       gray_Image = np.zeros(shape=(160,160))
       done = False
 
@@ -239,12 +240,9 @@ class AIGame:
         rewards.append(reward)
         proposed_actions.append(proposed_action)
 
-        Image = observation[courtYRng[0]:courtYRng[1],:,:] # why does it only use rows 34 through 194?
-        for i in range(Image.shape[0]):
-          for j in range(Image.shape[1]):
-            gray_Image[i][j]= 0.2989*Image[i][j][0] + 0.5870*Image[i][j][1] + 0.1140*Image[i][j][2]
-        gray_ds = downscale_local_mean(gray_Image,(8,8))
-        gray_ds = np.where(gray_ds>np.min(gray_ds)+1,255,gray_ds) #Different thresholding
+        gray_Image = rgb2gray(observation[courtYRng[0]:courtYRng[1],:,:]) # convert to grayscale
+        gray_ds = downscale_local_mean(gray_Image,(8,8)) # then downsample
+        gray_ds = np.where(gray_ds>np.min(gray_ds)+1,255,gray_ds) # Different thresholding
         if self.count==0: # 
           i0 = 0.6*gray_ds
           self.count = self.count+1
