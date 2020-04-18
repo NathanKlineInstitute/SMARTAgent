@@ -1543,10 +1543,32 @@ values were between 0-1 after rgb2gray, so need to multiply by 255
 
 try again ...
 
+after Haroon's last fix (input firing rates re-adjusted), no dep blockade with the newer version of the code/image processing...
+
+run a bit longer
+
 myrun 12
+
+10 s sim
+
+Total time = 1888.37 s
+
+20april17_A0_rast.png
+
+rates look ok, as do neuron membrane potentials ...
 
 python -i actmap.py
 
 data/20april17_A0_actmap.mp4
 
 python -i simdat.py -1
+
+data/20april17_A0_weightmap.mp4
+
+looks interesting but does not seem to improve over 10 s ... can run longer ...
+
+try longer ...
+
+100 s ...
+
+myrun 12
