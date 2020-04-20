@@ -1188,7 +1188,7 @@ def updateBehaviorPlot (sim,InputImages,Images,dirSensitiveNeurons,Racket_pos,Ba
     f_ax.append(fig.add_subplot(gs[2,2:4])) #display - 4 
     f_ax.append(fig.add_subplot(gs[3,0:2])) #- 5
     f_ax.append(fig.add_subplot(gs[3,2:4])) #- 6
-    cbaxes = fig.add_axes([0.75, 0.62, 0.01, 0.24])
+  cbaxes = fig.add_axes([0.75, 0.62, 0.01, 0.24])
   f_ax[0].cla()
   f_ax[0].imshow(InputImages[-1])
   f_ax[0].set_title('Input Images [t-5,t]')
