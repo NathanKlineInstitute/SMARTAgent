@@ -1176,17 +1176,17 @@ current_time_stepNB = 0
 def updateBehaviorPlot (sim,InputImages,Images,dirSensitiveNeurons,Racket_pos,Ball_pos, current_time_stepNB):
   global cumRewardActions, cumPunishingActions
   maxtstr = len(str(100000))
-  if current_time_stepNB==0:
-    fig = plt.figure(figsize=(12,8))
-    gs = fig.add_gridspec(4,4)
-    f_ax1 = fig.add_subplot(gs[0:2,0]) #for 5-image input
-    f_ax2 = fig.add_subplot(gs[0:2,1]) #for single image 
-    f_axa = fig.add_subplot(gs[0:2,2]) #for direction selectivity
-    f_ax3 = fig.add_subplot(gs[2,0:2]) #display executed/proposed actions
-    f_ax3a = fig.add_subplot(gs[2,2:4]) #display 
-    f_ax4 = fig.add_subplot(gs[3,0:2])
-    f_ax4a = fig.add_subplot(gs[3,2:4])
-    cbaxes = fig.add_axes([0.75, 0.62, 0.01, 0.24])
+  #if current_time_stepNB==0:
+  fig = plt.figure(figsize=(12,8))
+  gs = fig.add_gridspec(4,4)
+  f_ax1 = fig.add_subplot(gs[0:2,0]) #for 5-image input
+  f_ax2 = fig.add_subplot(gs[0:2,1]) #for single image 
+  f_axa = fig.add_subplot(gs[0:2,2]) #for direction selectivity
+  f_ax3 = fig.add_subplot(gs[2,0:2]) #display executed/proposed actions
+  f_ax3a = fig.add_subplot(gs[2,2:4]) #display 
+  f_ax4 = fig.add_subplot(gs[3,0:2])
+  f_ax4a = fig.add_subplot(gs[3,2:4])
+  cbaxes = fig.add_axes([0.75, 0.62, 0.01, 0.24])
   f_ax1.cla()
   f_ax1.imshow(InputImages[-1])
   f_ax1.set_title('Input Images [t-5,t]')
@@ -1241,7 +1241,8 @@ def updateBehaviorPlot (sim,InputImages,Images,dirSensitiveNeurons,Racket_pos,Ba
       tpre = tpre+'0'
     fn = tpre+str(current_time_stepNB)+'.png'
     fnimg = '/tmp/'+fn
-    plt.savefig(fnimg) 
+    plt.savefig(fnimg)
+    plt.close() 
     #lfnimage.append(fnimg)
     current_time_stepNB = current_time_stepNB+1
   return current_time_stepNB
