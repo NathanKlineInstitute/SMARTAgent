@@ -52,7 +52,6 @@ class AIGame:
                                   'EV1DW': (157, 203),'EV1DSW': (202, 248),
                                   'EV1DS': (247, 293),'EV1DSE': (292, 338)})
     self.input_dim = int(np.sqrt(dconf['net']['ER']))
-    self.dirSensitiveNeurons = np.zeros(shape=(10,10))
     self.dirSensitiveNeuronDim = 10 #int(0.5*self.input_dim)
     self.dirSensitiveNeuronRate = (0.0001, 30) # min, max firing rate (Hz) for dir sensitive neurons
     self.intaction = 5 # integrate this many actions together before returning reward information to model
@@ -147,6 +146,7 @@ class AIGame:
       dtmp = self.dirSensitiveNeuronRate[0] * np.ones(shape=(dirSensitiveNeuronDim,dirSensitiveNeuronDim))
       dtmp[dInds[pop]] = self.dirSensitiveNeuronRate[1] # firing rate for active dir sensitive neurons; later could include noise.
       self.dFiringRates[pop] = np.reshape(dtmp , 100) # this assumes 100 neurons in that population
+    return dirSensitiveNeurons
 
   def findobj (self, img, xrng, yrng):
     # find an object's x, y position in the image (assumes bright object on dark background)
@@ -254,7 +254,7 @@ class AIGame:
       dsum_Images = lgimage[0]
     InputImages.append(dsum_Images) # save the input image
 
-    self.computeMotion(dsum_Images) # compute directions of motion for every other pixel and update motion sensitive neuron input rates
+    dirs = self.computeMotion(dsum_Images) # compute directions of motion for every other pixel and update motion sensitive neuron input rates
     self.updateInputRates(dsum_Images) # update input rates to retinal neurons
 
     if done: # what is done? --- when done == 1, it means that 1 episode of the game ends, so it needs to be reset. 
@@ -266,7 +266,7 @@ class AIGame:
       print('ERROR COMPUTING NUMBER OF HITS')
     for r in range(len(rewards)):
       if rewards[r]==-1: total_hits[r]=-1 #when the ball misses the racket, the reward is -1
-    return rewards, epCount, InputImages, proposed_actions, total_hits, Racket_pos, Ball_pos, Images, self.dirSensitiveNeurons
+    return rewards, epCount, InputImages, proposed_actions, total_hits, Racket_pos, Ball_pos, Images, dirs
 
   def playGameFake (self, epCount, InputImages): #actions are generated based on Vector Algebra
     actions = []
