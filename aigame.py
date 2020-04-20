@@ -168,7 +168,7 @@ class AIGame:
 
   def playGame (self, actions, epCount, InputImages): #actions need to be generated from motor cortex
     # PLAY GAME
-    rewards = []; proposed_actions =[]; total_hits = []
+    rewards = []; proposed_actions =[]; total_hits = []; Images = []; Ball_pos = []; Racket_pos = []
     input_dim = self.input_dim
     done = False
     courtYRng, courtXRng, racketXRng = self.courtYRng, self.courtXRng, self.racketXRng # coordinate ranges for different objects (PONG-specific)      
@@ -192,6 +192,9 @@ class AIGame:
           proposed_action = dconf['moves']['NOMOVE'] #no move
         elif ypos_Ball==-1: #guess about proposed move can't be made because ball was not visible in the court
           proposed_action = -1 #no valid action guessed
+        Images.append(np.sum(last_obs[34:194,:,:],2))
+        Ball_pos.append([19+xpos_Ball,ypos_Ball])
+        Racket_pos.append([140+xpos_Racket,ypos_Racket])
       else:
         proposed_action = -1 #if there is no last_obs
         ypos_Ball = -1 #if there is no last_obs, no position of ball
@@ -262,7 +265,7 @@ class AIGame:
       print('ERROR COMPUTING NUMBER OF HITS')
     for r in range(len(rewards)):
       if rewards[r]==-1: total_hits[r]=-1 #when the ball misses the racket, the reward is -1
-    return rewards, epCount, InputImages, proposed_actions, total_hits
+    return rewards, epCount, InputImages, proposed_actions, total_hits, Racket_pos, Ball_pos, Images, self.dirSensitiveNeurons
 
   def playGameFake (self, epCount, InputImages): #actions are generated based on Vector Algebra
     actions = []

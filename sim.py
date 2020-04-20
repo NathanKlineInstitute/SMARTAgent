@@ -1167,6 +1167,70 @@ def trainAgentFake(t):
         print('Weights Recording Time:', t) 
         recordWeights(sim, t)
 
+cumRewardActions = []
+cumPunishingActions = []
+def plotBehavior (sim,InputImages,dirSensitiveNeurons,Racket_pos,Ball_pos):
+    f_ax1.cla()
+    f_ax1.imshow(InputImages[-1])
+    f_ax1.set_title('Input Images [t-5,t]')
+    f_axa.cla()
+    fa = f_axa.imshow(dirSensitiveNeurons,origin='upper',vmin=0, vmax=359, cmap='Dark2')
+    f_axa.set_xlim((-0.5,9.5))
+    f_axa.set_ylim((9.5,-0.5))
+    f_axa.set_xticks(ticks=[0,2,4,6,8])
+    #f_axa.set_yticks(ticks=[0,2,4,6,8])
+    f_axa.set_title('direction angles [t-5,t]')
+    c1 = plt.colorbar(fa,cax = cbaxes)
+    c1.set_ticks([22,67,112,157,202,247,292,337])
+    c1.set_ticklabels(['E','NE','N','NW','W','SW','S','SE'])
+    cumHits = np.cumsum(sim.allHits) #cummulative hits evolving with time.
+    missHits = np.where(np.array(sim.allRewards)==-1,1,0)
+    cumMissHits = np.cumsum(missHits) #if a reward is -1, replace it with 1 else replace it with 0.
+    Diff_Actions_Proposed = np.subtract(sim.allActions,sim.allProposedActions)
+    tpnts = range(5,len(Diff_Actions_Proposed)+5,5)
+    rewardingActions = np.sum(np.where(Diff_Actions_Proposed==0,1,0))
+    punishingActions = np.sum(np.where((Diff_Actions_Proposed>0) | (Diff_Actions_Proposed<0),1,0))
+    totalActs = rewardingActions + punishingActions
+    cumRewardActions.append(rewardingActions/totalActs)
+    cumPunishingActions.append(punishingActions/totalActs)
+    f_ax3.plot(sim.allActions,LineStyle="None",Marker=2,MarkerSize=6,MarkerFaceColor="None",MarkerEdgeColor='r')
+    f_ax3.plot(sim.allProposedActions,LineStyle="None",Marker=3,MarkerSize=6,MarkerFaceColor="None",MarkerEdgeColor='b')
+    f_ax3.set_yticks(ticks=[1,3,4])
+    f_ax3.set_yticklabels(labels=['No action','Down','Up'])
+    f_ax3.set_ylim((0.5,4.5))
+    f_ax3.legend(('Executed','Proposed'),loc='upper left')
+    f_ax3a.cla()
+    f_ax3a.plot(tpnts,np.array(cumRewardActions),'o-',MarkerSize=5,MarkerFaceColor='r',MarkerEdgeColor='r')
+    f_ax3a.plot(tpnts,np.array(cumPunishingActions),'s-',MarkerSize=5,MarkerFaceColor='b',MarkerEdgeColor='b')
+    f_ax3a.legend(('Rewarding actions','Punishing Actions'),loc='upper left')
+    f_ax4.cla()
+    f_ax4.plot(sim.allRewards,'o-',MarkerFaceColor="None",MarkerEdgeColor='g')
+    f_ax4.legend('Rewards')
+    f_ax4a.cla()
+    f_ax4a.plot(cumHits,Marker='o',MarkerSize=5,MarkerFaceColor='r',MarkerEdgeColor='r')
+    f_ax4a.plot(cumMissHits,Marker='s',MarkerSize=3,MarkerFaceColor='k',MarkerEdgeColor='k')
+    f_ax4a.legend(('Cumm. Hits','Cumm. Miss'),loc='upper left')
+    #plt.pause(1)
+    f_ax2.cla()
+    for nbi in range(np.shape(Racket_pos)[0]):
+        f_ax2.imshow(Images[nbi])
+        if Ball_pos[nbi][0]>18: #to account for offset for the court
+            f_ax2.plot(Racket_pos[nbi][0],Racket_pos[nbi][1],'o',MarkerSize=5, MarkerFaceColor="None",MarkerEdgeColor='r')
+            f_ax2.plot(Ball_pos[nbi][0],Ball_pos[nbi][1],'o',MarkerSize=5, MarkerFaceColor="None",MarkeredgeColor='b')
+        f_ax2.set_title('last obs')
+        #plt.pause(0.1)
+        ctstrl = len(str(tinds))
+        tpre = ''
+        for ttt in range(maxtstr-ctstrl):
+            tpre = tpre+'0'
+        fn = tpre+str(tinds)+'.png'
+        fnimg = '/tmp/'+fn
+        plt.savefig(fnimg) 
+        #lfnimage.append(fnimg)
+        tinds = tinds+1
+
+#anim.savemp4('/tmp/*.png','data/randGameBehavior.mp4',10)
+
 def updateInputRates ():
   # update the source firing rates for the ER neuron population, based on image contents
   # also update the firing rates for the direction sensitive neurons based on image contents
@@ -1203,11 +1267,10 @@ def updateInputRates ():
             stim['hObj'].interval = 1000.0/dFiringRates[pop][int(cell.gid-offset)]
           #print('cell GID: ', int(cell.gid), 'vs cell ID with offset: ', int(cell.gid-R_offset)) # interval in ms as a function of rate; is cell.gid correct index??? 
       
-
 def trainAgent (t):
     """ training interface between simulation and game environment
     """
-    global NBsteps, epCount, InputImages, proposed_actions, total_hits
+    global NBsteps, epCount, InputImages, proposed_actions, total_hits, Racket_pos, Ball_pos, Images, dirSelectiveNeurons
     vec = h.Vector()
     if t<100.0: # for the first time interval use randomly selected actions
         actions =[]
@@ -1294,7 +1357,7 @@ def trainAgent (t):
             # actions = [dconf['moves']['UP'] for i in range(5)] # force move UP for testing            
     if sim.rank == 0:
         print('Model actions:', actions)
-        rewards, epCount, InputImages, proposed_actions, total_hits = sim.AIGame.playGame(actions, epCount, InputImages)
+        rewards, epCount, InputImages, proposed_actions, total_hits, Racket_pos, Ball_pos, Images, dirSensitiveNeurons = sim.AIGame.playGame(actions, epCount, InputImages)
         print('Proposed actions:', proposed_actions)
         if dconf['sim']['RLFakeUpRule']: # fake rule for testing reinforcing of up moves
           critic = np.sign(actions.count(dconf['moves']['UP']) - actions.count(dconf['moves']['DOWN']))          

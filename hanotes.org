@@ -1240,3 +1240,7 @@ This bug was found in all functions where instead of src, trg was used for dendi
 **include 2 in simdat.py. test now.
 **use -1 in hits if the racket misses the ball and loses a point.
 **update behavior plot in simdat.py using hit values of 1 for hit and -1 for miss.
+
+*20April20
+**return Images (of pong without downsampling), racket position, ball position and computed angles of object motion from playGame in aigame.py.
+**implementing a plotBehavior function in sim.py using all the behavior related parameters returned from playGame.
