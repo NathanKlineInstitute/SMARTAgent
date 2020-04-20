@@ -130,19 +130,21 @@ class AIGame:
           mL = len(max_ind[0])
         else:
           mL = len(max_ind[0])
-        dir1 = [max_ind[0][range(mL)]-min_ind[0][range(mL)],max_ind[1][range(mL)]-min_ind[1][range(mL)]] #direction of the object motion in a field of view over last 5 frames/observations.
+        #direction of the object motion in a field of view over last 5 frames/observations.
+        dir1 = [max_ind[0][range(mL)]-min_ind[0][range(mL)],max_ind[1][range(mL)]-min_ind[1][range(mL)]] 
         dir2 = [np.median(dir1[1]),-1*np.median(dir1[0])] #flip y because indexing starts from top left.
         dirMain = [1,0] #using a reference for 0 degrees....considering first is for rows and second is for columns
         ndir2 = dir2 / np.linalg.norm(dir2)
         ndirMain = dirMain / np.linalg.norm(dirMain)
         theta = np.degrees(np.arccos(np.dot(ndir2,ndirMain))) #if theta is nan, no movement is detected
         if dir2[1]<0: theta = 360-theta 
-        dirSensitiveNeurons[dSNeuronX,dSNeuronY] = theta
+        dirSensitiveNeurons[dSNeuronX,dSNeuronY] = theta # the motion angle (theta) at position dSNeuronX,dSNeuronY is stored
         if np.isnan(theta)=='False': print('Theta for FOV ',FOV,' is: ', theta)
     print('Computed angles:', dirSensitiveNeurons)
     dAngRange = self.dAngRange
+    # logical and means that any location where correct direction detected will have maximal firing
     dInds = {pop:np.where(np.logical_and(dirSensitiveNeurons>dAngRange[pop][0],dirSensitiveNeurons<dAngRange[pop][1])) for pop in self.ldirpop}
-    for pop in self.ldirpop:
+    for pop in self.ldirpop: # now iterate over all motion sensitive populations and set their firing rates
       dtmp = self.dirSensitiveNeuronRate[0] * np.ones(shape=(dirSensitiveNeuronDim,dirSensitiveNeuronDim))
       dtmp[dInds[pop]] = self.dirSensitiveNeuronRate[1] # firing rate for active dir sensitive neurons; later could include noise.
       self.dFiringRates[pop] = np.reshape(dtmp , 100) # this assumes 100 neurons in that population
