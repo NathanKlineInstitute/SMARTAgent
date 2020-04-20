@@ -1572,3 +1572,49 @@ try longer ...
 100 s ...
 
 myrun 12
+
+Total time = 16952.75 s
+
+End time:  2020-04-18 04:30:30.562465
+
+*20apr18
+** check output from last run
+
+20april17_A0B_EV1DN.png
+20april17_A0B_EV1DW.png
+20april17_A0B_EV1DS.png
+20april17_A0B_EV1D4.png
+20april17_A0B_IV1.png
+20april17_A0B_IMT.png
+20april17_A0B_EMT.png
+20april17_A0B_IM.png
+20april17_A0B_rast.png
+20april17_A0B_rastB.png
+
+rates and activity looks ok
+
+some populations almost silent EV1DE (east direction sensitive; maybe get rid of them or adjust/reduce numbers?)
+
+python -i simdat.py -1
+
+data/20april17_A0_weightmap.mp4
+
+python -i actmap.py
+data/20april17_A0_actmap.mp4
+
+does not improve in terms of following ball after 100 s ... can run longer ...
+
+can continue for 100 s from there ... see if it improves at all ...
+
+"simtype": {"ResumeSim":1,"ResumeSimFromFile":"20april17_A0_simConfig.pkl"},
+
+"sim": {"duration": 100000, "dt": 0.2, "verbose": 0, "recordStep":0.2,"recordWeightStepSize":1,"RLFakeUpRule": 0,"RLFakeDownRule": 0,"RLFakeStayRule": 0,"name":"20april18_B0_","doquit":0,"doplot":1},
+
+myrun 12
+
+hmm, restore sim not working ... can run for 200 s ... see if improves ... fix resume later ...
+
+    "simtype": {"ResumeSim":0,"ResumeSimFromFile":"20april17_A0_simConfig.pkl"},        
+    "sim": {"duration": 200000, "dt": 0.2, "verbose": 0, "recordStep":0.2,"recordWeightStepSize":1,"RLFakeUpRule": 0,"RLFakeDownRule": 0,"RLFakeStayRule": 0,"name":"20april18_A0_","doquit":0,"doplot":1},
+
+myrun 12    
