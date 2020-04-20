@@ -1173,29 +1173,31 @@ def trainAgentFake(t):
 cumRewardActions = []
 cumPunishingActions = []
 current_time_stepNB = 0
-def updateBehaviorPlot (sim,InputImages,Images,dirSensitiveNeurons,Racket_pos,Ball_pos, current_time_stepNB):
+f_ax = []
+def updateBehaviorPlot (sim,InputImages,Images,dirSensitiveNeurons,Racket_pos,Ball_pos, current_time_stepNB,f_ax):
   global cumRewardActions, cumPunishingActions
   maxtstr = len(str(100000))
-  #if current_time_stepNB==0:
-  fig = plt.figure(figsize=(12,8))
-  gs = fig.add_gridspec(4,4)
-  f_ax1 = fig.add_subplot(gs[0:2,0]) #for 5-image input
-  f_ax2 = fig.add_subplot(gs[0:2,1]) #for single image 
-  f_axa = fig.add_subplot(gs[0:2,2]) #for direction selectivity
-  f_ax3 = fig.add_subplot(gs[2,0:2]) #display executed/proposed actions
-  f_ax3a = fig.add_subplot(gs[2,2:4]) #display 
-  f_ax4 = fig.add_subplot(gs[3,0:2])
-  f_ax4a = fig.add_subplot(gs[3,2:4])
-  cbaxes = fig.add_axes([0.75, 0.62, 0.01, 0.24])
-  f_ax1.cla()
-  f_ax1.imshow(InputImages[-1])
-  f_ax1.set_title('Input Images [t-5,t]')
-  f_axa.cla()
-  fa = f_axa.imshow(dirSensitiveNeurons,origin='upper',vmin=0, vmax=359, cmap='Dark2')
-  f_axa.set_xlim((-0.5,9.5))
-  f_axa.set_ylim((9.5,-0.5))
-  f_axa.set_xticks(ticks=[0,2,4,6,8])
-  f_axa.set_title('direction angles [t-5,t]')
+  if current_time_stepNB==0:
+    fig = plt.figure(figsize=(12,8))
+    gs = fig.add_gridspec(4,4)
+    f_ax = []
+    f_ax.append(fig.add_subplot(gs[0:2,0])) #for 5-image input - 0
+    f_ax.append(fig.add_subplot(gs[0:2,1])) #for single image  - 1
+    f_ax.append(fig.add_subplot(gs[0:2,2])) #for direction selectivity - 2
+    f_ax.append(fig.add_subplot(gs[2,0:2])) #display executed/proposed actions - 3
+    f_ax.append(fig.add_subplot(gs[2,2:4])) #display - 4 
+    f_ax.append(fig.add_subplot(gs[3,0:2])) #- 5
+    f_ax.append(fig.add_subplot(gs[3,2:4])) #- 6
+    cbaxes = fig.add_axes([0.75, 0.62, 0.01, 0.24])
+  f_ax[0].cla()
+  f_ax[0].imshow(InputImages[-1])
+  f_ax[0].set_title('Input Images [t-5,t]')
+  f_ax[2].cla()
+  fa = f_ax[2].imshow(dirSensitiveNeurons,origin='upper',vmin=0, vmax=359, cmap='Dark2')
+  f_ax[2].set_xlim((-0.5,9.5))
+  f_ax[2].set_ylim((9.5,-0.5))
+  f_ax[2].set_xticks(ticks=[0,2,4,6,8])
+  f_ax[2].set_title('direction angles [t-5,t]')
   c1 = plt.colorbar(fa,cax = cbaxes)
   c1.set_ticks([22,67,112,157,202,247,292,337])
   c1.set_ticklabels(['E','NE','N','NW','W','SW','S','SE'])
@@ -1209,31 +1211,31 @@ def updateBehaviorPlot (sim,InputImages,Images,dirSensitiveNeurons,Racket_pos,Ba
   totalActs = rewardingActions + punishingActions
   cumRewardActions.append(rewardingActions/totalActs)
   cumPunishingActions.append(punishingActions/totalActs)
-  f_ax3.plot(sim.allActions,LineStyle="None",Marker=2,MarkerSize=6,MarkerFaceColor="None",MarkerEdgeColor='r')
-  f_ax3.plot(sim.allProposedActions,LineStyle="None",Marker=3,MarkerSize=6,MarkerFaceColor="None",MarkerEdgeColor='b')
-  f_ax3.set_yticks(ticks=[1,3,4])
-  f_ax3.set_yticklabels(labels=['No action','Down','Up'])
-  f_ax3.set_ylim((0.5,4.5))
-  f_ax3.legend(('Executed','Proposed'),loc='upper left')
-  f_ax3a.cla()
-  f_ax3a.plot(tpnts,np.array(cumRewardActions),'o-',MarkerSize=5,MarkerFaceColor='r',MarkerEdgeColor='r')
-  f_ax3a.plot(tpnts,np.array(cumPunishingActions),'s-',MarkerSize=5,MarkerFaceColor='b',MarkerEdgeColor='b')
-  f_ax3a.legend(('Rewarding actions','Punishing Actions'),loc='upper left')
-  f_ax4.cla()
-  f_ax4.plot(sim.allRewards,'o-',MarkerFaceColor="None",MarkerEdgeColor='g')
-  f_ax4.legend('Rewards')
-  f_ax4a.cla()
-  f_ax4a.plot(cumHits,Marker='o',MarkerSize=5,MarkerFaceColor='r',MarkerEdgeColor='r')
-  f_ax4a.plot(cumMissHits,Marker='s',MarkerSize=3,MarkerFaceColor='k',MarkerEdgeColor='k')
-  f_ax4a.legend(('Cumm. Hits','Cumm. Miss'),loc='upper left')
+  f_ax[3].plot(sim.allActions,LineStyle="None",Marker=2,MarkerSize=6,MarkerFaceColor="None",MarkerEdgeColor='r')
+  f_ax[3].plot(sim.allProposedActions,LineStyle="None",Marker=3,MarkerSize=6,MarkerFaceColor="None",MarkerEdgeColor='b')
+  f_ax[3].set_yticks(ticks=[1,3,4])
+  f_ax[3].set_yticklabels(labels=['No action','Down','Up'])
+  f_ax[3].set_ylim((0.5,4.5))
+  f_ax[3].legend(('Executed','Proposed'),loc='upper left')
+  f_ax[4].cla()
+  f_ax[4].plot(tpnts,np.array(cumRewardActions),'o-',MarkerSize=5,MarkerFaceColor='r',MarkerEdgeColor='r')
+  f_ax[4].plot(tpnts,np.array(cumPunishingActions),'s-',MarkerSize=5,MarkerFaceColor='b',MarkerEdgeColor='b')
+  f_ax[4].legend(('Rewarding actions','Punishing Actions'),loc='upper left')
+  f_ax[5].cla()
+  f_ax[5].plot(sim.allRewards,'o-',MarkerFaceColor="None",MarkerEdgeColor='g')
+  f_ax[5].legend('Rewards')
+  f_ax[6].cla()
+  f_ax[6].plot(cumHits,Marker='o',MarkerSize=5,MarkerFaceColor='r',MarkerEdgeColor='r')
+  f_ax[6].plot(cumMissHits,Marker='s',MarkerSize=3,MarkerFaceColor='k',MarkerEdgeColor='k')
+  f_ax[6].legend(('Cumm. Hits','Cumm. Miss'),loc='upper left')
   #plt.pause(1)
-  f_ax2.cla()
+  f_ax[1].cla()
   for nbi in range(np.shape(Racket_pos)[0]):
-    f_ax2.imshow(Images[nbi])
+    f_ax[1].imshow(Images[nbi])
     if Ball_pos[nbi][0]>18: #to account for offset for the court
-      f_ax2.plot(Racket_pos[nbi][0],Racket_pos[nbi][1],'o',MarkerSize=5, MarkerFaceColor="None",MarkerEdgeColor='r')
-      f_ax2.plot(Ball_pos[nbi][0],Ball_pos[nbi][1],'o',MarkerSize=5, MarkerFaceColor="None",MarkeredgeColor='b')
-    f_ax2.set_title('last obs')
+      f_ax[1].plot(Racket_pos[nbi][0],Racket_pos[nbi][1],'o',MarkerSize=5, MarkerFaceColor="None",MarkerEdgeColor='r')
+      f_ax[1].plot(Ball_pos[nbi][0],Ball_pos[nbi][1],'o',MarkerSize=5, MarkerFaceColor="None",MarkeredgeColor='b')
+    f_ax[1].set_title('last obs')
     #plt.pause(0.1)
     ctstrl = len(str(current_time_stepNB))
     tpre = ''
@@ -1242,10 +1244,10 @@ def updateBehaviorPlot (sim,InputImages,Images,dirSensitiveNeurons,Racket_pos,Ba
     fn = tpre+str(current_time_stepNB)+'.png'
     fnimg = '/tmp/'+fn
     plt.savefig(fnimg)
-    plt.close() 
+    #plt.close() 
     #lfnimage.append(fnimg)
     current_time_stepNB = current_time_stepNB+1
-  return current_time_stepNB
+  return current_time_stepNB, f_ax
 
 
 def updateInputRates ():
@@ -1288,6 +1290,7 @@ def trainAgent (t):
     """ training interface between simulation and game environment
     """
     global NBsteps, epCount, InputImages, proposed_actions, total_hits, Racket_pos, Ball_pos, Images, dirSelectiveNeurons, current_time_stepNB
+    global f_ax
     vec = h.Vector()
     if t<100.0: # for the first time interval use randomly selected actions
         actions =[]
@@ -1437,7 +1440,7 @@ def trainAgent (t):
         for hits in total_hits:
             sim.allHits.append(hits) #hit or no hit
         for ltpnt in [t-80, t-60, t-40, t-20, t-0]: sim.allTimes.append(ltpnt)
-        current_time_stepNB = updateBehaviorPlot (sim,InputImages,Images,dirSensitiveNeurons,Racket_pos,Ball_pos,current_time_stepNB)
+        current_time_stepNB, f_ax = updateBehaviorPlot (sim,InputImages,Images,dirSensitiveNeurons,Racket_pos,Ball_pos,current_time_stepNB, f_ax)
         current_time_stepNB = current_time_stepNB + 1
     updateInputRates() # update firing rate of inputs to R population (based on image content)                
     NBsteps = NBsteps+1
