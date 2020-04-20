@@ -192,7 +192,7 @@ class AIGame:
           proposed_action = dconf['moves']['NOMOVE'] #no move
         elif ypos_Ball==-1: #guess about proposed move can't be made because ball was not visible in the court
           proposed_action = -1 #no valid action guessed
-        Images.append(np.sum(last_obs[courtYRng[0]:courtYRng[1],:,:],2))
+        Images.append(np.sum(self.last_obs[courtYRng[0]:courtYRng[1],:,:],2))
         Ball_pos.append([courtXRng[0]-1+xpos_Ball,ypos_Ball])
         Racket_pos.append([racketXRng[0]-1+xpos_Racket,ypos_Racket])
       else:
