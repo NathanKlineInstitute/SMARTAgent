@@ -52,6 +52,7 @@ class AIGame:
                                   'EV1DW': (157, 203),'EV1DSW': (202, 248),
                                   'EV1DS': (247, 293),'EV1DSE': (292, 338)})
     self.input_dim = int(np.sqrt(dconf['net']['ER']))
+    self.dirSensitiveNeurons = np.zeros(shape=(10,10))
     self.dirSensitiveNeuronDim = 10 #int(0.5*self.input_dim)
     self.dirSensitiveNeuronRate = (0.0001, 30) # min, max firing rate (Hz) for dir sensitive neurons
     self.intaction = 5 # integrate this many actions together before returning reward information to model
