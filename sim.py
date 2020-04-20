@@ -7,6 +7,11 @@ import pandas as pd
 import pickle
 from collections import OrderedDict
 from connUtils import *
+from matplotlib import pyplot as plt
+import os
+
+import anim
+from matplotlib import animation
 
 random.seed(1234) # this will not work properly across runs with different number of nodes
 
@@ -1104,8 +1109,7 @@ NBsteps = 0 # this is a counter for recording the plastic weights
 epCount = []
 proposed_actions = [] 
 total_hits = [] #number of times a ball is hit by racket as the ball changes its direction and player doesn't lose a score (assign 1). if player loses
-lSTDPmech = [] # global list of STDP mechanisms; so do not have to lookup at each interval function call 
-    
+lSTDPmech = [] # global list of STDP mechanisms; so do not have to lookup at each interval function call     
 def trainAgentFake(t):
     """ training interface between simulation and game environment
     """
@@ -1166,70 +1170,81 @@ def trainAgentFake(t):
         #if t%recordWeightDT==0:
         print('Weights Recording Time:', t) 
         recordWeights(sim, t)
-
 cumRewardActions = []
 cumPunishingActions = []
-def plotBehavior (sim,InputImages,dirSensitiveNeurons,Racket_pos,Ball_pos):
-    f_ax1.cla()
-    f_ax1.imshow(InputImages[-1])
-    f_ax1.set_title('Input Images [t-5,t]')
-    f_axa.cla()
-    fa = f_axa.imshow(dirSensitiveNeurons,origin='upper',vmin=0, vmax=359, cmap='Dark2')
-    f_axa.set_xlim((-0.5,9.5))
-    f_axa.set_ylim((9.5,-0.5))
-    f_axa.set_xticks(ticks=[0,2,4,6,8])
-    #f_axa.set_yticks(ticks=[0,2,4,6,8])
-    f_axa.set_title('direction angles [t-5,t]')
-    c1 = plt.colorbar(fa,cax = cbaxes)
-    c1.set_ticks([22,67,112,157,202,247,292,337])
-    c1.set_ticklabels(['E','NE','N','NW','W','SW','S','SE'])
-    cumHits = np.cumsum(sim.allHits) #cummulative hits evolving with time.
-    missHits = np.where(np.array(sim.allRewards)==-1,1,0)
-    cumMissHits = np.cumsum(missHits) #if a reward is -1, replace it with 1 else replace it with 0.
-    Diff_Actions_Proposed = np.subtract(sim.allActions,sim.allProposedActions)
-    tpnts = range(5,len(Diff_Actions_Proposed)+5,5)
-    rewardingActions = np.sum(np.where(Diff_Actions_Proposed==0,1,0))
-    punishingActions = np.sum(np.where((Diff_Actions_Proposed>0) | (Diff_Actions_Proposed<0),1,0))
-    totalActs = rewardingActions + punishingActions
-    cumRewardActions.append(rewardingActions/totalActs)
-    cumPunishingActions.append(punishingActions/totalActs)
-    f_ax3.plot(sim.allActions,LineStyle="None",Marker=2,MarkerSize=6,MarkerFaceColor="None",MarkerEdgeColor='r')
-    f_ax3.plot(sim.allProposedActions,LineStyle="None",Marker=3,MarkerSize=6,MarkerFaceColor="None",MarkerEdgeColor='b')
-    f_ax3.set_yticks(ticks=[1,3,4])
-    f_ax3.set_yticklabels(labels=['No action','Down','Up'])
-    f_ax3.set_ylim((0.5,4.5))
-    f_ax3.legend(('Executed','Proposed'),loc='upper left')
-    f_ax3a.cla()
-    f_ax3a.plot(tpnts,np.array(cumRewardActions),'o-',MarkerSize=5,MarkerFaceColor='r',MarkerEdgeColor='r')
-    f_ax3a.plot(tpnts,np.array(cumPunishingActions),'s-',MarkerSize=5,MarkerFaceColor='b',MarkerEdgeColor='b')
-    f_ax3a.legend(('Rewarding actions','Punishing Actions'),loc='upper left')
-    f_ax4.cla()
-    f_ax4.plot(sim.allRewards,'o-',MarkerFaceColor="None",MarkerEdgeColor='g')
-    f_ax4.legend('Rewards')
-    f_ax4a.cla()
-    f_ax4a.plot(cumHits,Marker='o',MarkerSize=5,MarkerFaceColor='r',MarkerEdgeColor='r')
-    f_ax4a.plot(cumMissHits,Marker='s',MarkerSize=3,MarkerFaceColor='k',MarkerEdgeColor='k')
-    f_ax4a.legend(('Cumm. Hits','Cumm. Miss'),loc='upper left')
-    #plt.pause(1)
-    f_ax2.cla()
-    for nbi in range(np.shape(Racket_pos)[0]):
-        f_ax2.imshow(Images[nbi])
-        if Ball_pos[nbi][0]>18: #to account for offset for the court
-            f_ax2.plot(Racket_pos[nbi][0],Racket_pos[nbi][1],'o',MarkerSize=5, MarkerFaceColor="None",MarkerEdgeColor='r')
-            f_ax2.plot(Ball_pos[nbi][0],Ball_pos[nbi][1],'o',MarkerSize=5, MarkerFaceColor="None",MarkeredgeColor='b')
-        f_ax2.set_title('last obs')
-        #plt.pause(0.1)
-        ctstrl = len(str(tinds))
-        tpre = ''
-        for ttt in range(maxtstr-ctstrl):
-            tpre = tpre+'0'
-        fn = tpre+str(tinds)+'.png'
-        fnimg = '/tmp/'+fn
-        plt.savefig(fnimg) 
-        #lfnimage.append(fnimg)
-        tinds = tinds+1
+current_time_stepNB = 0
+def updateBehaviorPlot (sim,InputImages,Images,dirSensitiveNeurons,Racket_pos,Ball_pos):
+  global cumRewardActions, cumPunishingActions, current_time_stepNB
+  maxtstr = len(str(100000))
+  if current_time_stepNB==0:
+    fig = plt.figure(figsize=(12,8))
+    gs = fig.add_gridspec(4,4)
+    f_ax1 = fig.add_subplot(gs[0:2,0]) #for 5-image input
+    f_ax2 = fig.add_subplot(gs[0:2,1]) #for single image 
+    f_axa = fig.add_subplot(gs[0:2,2]) #for direction selectivity
+    f_ax3 = fig.add_subplot(gs[2,0:2]) #display executed/proposed actions
+    f_ax3a = fig.add_subplot(gs[2,2:4]) #display 
+    f_ax4 = fig.add_subplot(gs[3,0:2])
+    f_ax4a = fig.add_subplot(gs[3,2:4])
+    cbaxes = fig.add_axes([0.75, 0.62, 0.01, 0.24])
+  f_ax1.cla()
+  f_ax1.imshow(InputImages[-1])
+  f_ax1.set_title('Input Images [t-5,t]')
+  f_axa.cla()
+  fa = f_axa.imshow(dirSensitiveNeurons,origin='upper',vmin=0, vmax=359, cmap='Dark2')
+  f_axa.set_xlim((-0.5,9.5))
+  f_axa.set_ylim((9.5,-0.5))
+  f_axa.set_xticks(ticks=[0,2,4,6,8])
+  f_axa.set_title('direction angles [t-5,t]')
+  c1 = plt.colorbar(fa,cax = cbaxes)
+  c1.set_ticks([22,67,112,157,202,247,292,337])
+  c1.set_ticklabels(['E','NE','N','NW','W','SW','S','SE'])
+  cumHits = np.cumsum(sim.allHits) #cummulative hits evolving with time.
+  missHits = np.where(np.array(sim.allRewards)==-1,1,0)
+  cumMissHits = np.cumsum(missHits) #if a reward is -1, replace it with 1 else replace it with 0.
+  Diff_Actions_Proposed = np.subtract(sim.allActions,sim.allProposedActions)
+  tpnts = range(5,len(Diff_Actions_Proposed)+5,5)
+  rewardingActions = np.sum(np.where(Diff_Actions_Proposed==0,1,0))
+  punishingActions = np.sum(np.where((Diff_Actions_Proposed>0) | (Diff_Actions_Proposed<0),1,0))
+  totalActs = rewardingActions + punishingActions
+  cumRewardActions.append(rewardingActions/totalActs)
+  cumPunishingActions.append(punishingActions/totalActs)
+  f_ax3.plot(sim.allActions,LineStyle="None",Marker=2,MarkerSize=6,MarkerFaceColor="None",MarkerEdgeColor='r')
+  f_ax3.plot(sim.allProposedActions,LineStyle="None",Marker=3,MarkerSize=6,MarkerFaceColor="None",MarkerEdgeColor='b')
+  f_ax3.set_yticks(ticks=[1,3,4])
+  f_ax3.set_yticklabels(labels=['No action','Down','Up'])
+  f_ax3.set_ylim((0.5,4.5))
+  f_ax3.legend(('Executed','Proposed'),loc='upper left')
+  f_ax3a.cla()
+  f_ax3a.plot(tpnts,np.array(cumRewardActions),'o-',MarkerSize=5,MarkerFaceColor='r',MarkerEdgeColor='r')
+  f_ax3a.plot(tpnts,np.array(cumPunishingActions),'s-',MarkerSize=5,MarkerFaceColor='b',MarkerEdgeColor='b')
+  f_ax3a.legend(('Rewarding actions','Punishing Actions'),loc='upper left')
+  f_ax4.cla()
+  f_ax4.plot(sim.allRewards,'o-',MarkerFaceColor="None",MarkerEdgeColor='g')
+  f_ax4.legend('Rewards')
+  f_ax4a.cla()
+  f_ax4a.plot(cumHits,Marker='o',MarkerSize=5,MarkerFaceColor='r',MarkerEdgeColor='r')
+  f_ax4a.plot(cumMissHits,Marker='s',MarkerSize=3,MarkerFaceColor='k',MarkerEdgeColor='k')
+  f_ax4a.legend(('Cumm. Hits','Cumm. Miss'),loc='upper left')
+  #plt.pause(1)
+  f_ax2.cla()
+  for nbi in range(np.shape(Racket_pos)[0]):
+    f_ax2.imshow(Images[nbi])
+    if Ball_pos[nbi][0]>18: #to account for offset for the court
+      f_ax2.plot(Racket_pos[nbi][0],Racket_pos[nbi][1],'o',MarkerSize=5, MarkerFaceColor="None",MarkerEdgeColor='r')
+      f_ax2.plot(Ball_pos[nbi][0],Ball_pos[nbi][1],'o',MarkerSize=5, MarkerFaceColor="None",MarkeredgeColor='b')
+    f_ax2.set_title('last obs')
+    #plt.pause(0.1)
+    ctstrl = len(str(current_time_stepNB))
+    tpre = ''
+    for ttt in range(maxtstr-ctstrl):
+      tpre = tpre+'0'
+    fn = tpre+str(current_time_stepNB)+'.png'
+    fnimg = '/tmp/'+fn
+    plt.savefig(fnimg) 
+    #lfnimage.append(fnimg)
+    current_time_stepNB = current_time_stepNB+1
 
-#anim.savemp4('/tmp/*.png','data/randGameBehavior.mp4',10)
 
 def updateInputRates ():
   # update the source firing rates for the ER neuron population, based on image contents
@@ -1420,6 +1435,8 @@ def trainAgent (t):
         for hits in total_hits:
             sim.allHits.append(hits) #hit or no hit
         for ltpnt in [t-80, t-60, t-40, t-20, t-0]: sim.allTimes.append(ltpnt)
+        current_time_stepNB = updateBehaviorPlot (sim,InputImages,Images,dirSensitiveNeurons,Racket_pos,Ball_pos,current_time_stepNB)
+        current_time_stepNB = current_time_stepNB + 1
     updateInputRates() # update firing rate of inputs to R population (based on image content)                
     NBsteps = NBsteps+1
     if NBsteps % recordWeightStepSize == 0:
@@ -1535,4 +1552,5 @@ if sim.rank == 0: # only rank 0 should save. otherwise all the other nodes could
             for Input_Image in InputImages:
                 np.savetxt(outfile, Input_Image, fmt='%-7.2f')
                 outfile.write('# New slice\n')
+    anim.savemp4('/tmp/*.png','data/'+dconf['sim']['name']+'randGameBehavior.mp4',10)
     if dconf['sim']['doquit']: quit()

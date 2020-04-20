@@ -1244,3 +1244,4 @@ This bug was found in all functions where instead of src, trg was used for dendi
 *20April20
 **return Images (of pong without downsampling), racket position, ball position and computed angles of object motion from playGame in aigame.py.
 **implementing a plotBehavior function in sim.py using all the behavior related parameters returned from playGame.
+**plot behavior with sim. testing now.
