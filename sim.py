@@ -1174,7 +1174,8 @@ cumRewardActions = []
 cumPunishingActions = []
 current_time_stepNB = 0
 f_ax = []
-def updateBehaviorPlot (sim,InputImages,Images,dirSensitiveNeurons,Racket_pos,Ball_pos, current_time_stepNB,f_ax):
+fig = []
+def updateBehaviorPlot (sim,InputImages,Images,dirSensitiveNeurons,Racket_pos,Ball_pos, current_time_stepNB,f_ax,fig):
   global cumRewardActions, cumPunishingActions
   maxtstr = len(str(100000))
   if current_time_stepNB==0:
@@ -1247,7 +1248,7 @@ def updateBehaviorPlot (sim,InputImages,Images,dirSensitiveNeurons,Racket_pos,Ba
     #plt.close() 
     #lfnimage.append(fnimg)
     current_time_stepNB = current_time_stepNB+1
-  return current_time_stepNB, f_ax
+  return current_time_stepNB, f_ax, fig
 
 
 def updateInputRates ():
@@ -1290,7 +1291,7 @@ def trainAgent (t):
     """ training interface between simulation and game environment
     """
     global NBsteps, epCount, InputImages, proposed_actions, total_hits, Racket_pos, Ball_pos, Images, dirSelectiveNeurons, current_time_stepNB
-    global f_ax
+    global f_ax, fig
     vec = h.Vector()
     if t<100.0: # for the first time interval use randomly selected actions
         actions =[]
@@ -1440,7 +1441,7 @@ def trainAgent (t):
         for hits in total_hits:
             sim.allHits.append(hits) #hit or no hit
         for ltpnt in [t-80, t-60, t-40, t-20, t-0]: sim.allTimes.append(ltpnt)
-        current_time_stepNB, f_ax = updateBehaviorPlot (sim,InputImages,Images,dirSensitiveNeurons,Racket_pos,Ball_pos,current_time_stepNB, f_ax)
+        current_time_stepNB, f_ax, fig = updateBehaviorPlot (sim,InputImages,Images,dirSensitiveNeurons,Racket_pos,Ball_pos,current_time_stepNB, f_ax, fig)
         current_time_stepNB = current_time_stepNB + 1
     updateInputRates() # update firing rate of inputs to R population (based on image content)                
     NBsteps = NBsteps+1
