@@ -1568,7 +1568,7 @@ if sim.rank == 0:
     from utils import backupcfg
     backupcfg(dconf['sim']['name']) 
 tPerPlay = tstepPerAction*dconf['actionsPerPlay']
-sim.runSimWithIntervalFunc(tperPlay,trainAgent) # has periodic callback to adjust STDP weights based on RL signal
+sim.runSimWithIntervalFunc(tPerPlay,trainAgent) # has periodic callback to adjust STDP weights based on RL signal
 sim.gatherData() # gather data from different nodes
 sim.saveData() # save data to disk
 
