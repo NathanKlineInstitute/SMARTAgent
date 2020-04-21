@@ -1111,7 +1111,9 @@ proposed_actions = []
 total_hits = [] #number of times a ball is hit by racket as the ball changes its direction and player doesn't lose a score (assign 1). if player loses
 lSTDPmech = [] # global list of STDP mechanisms; so do not have to lookup at each interval function call
 mlSTDPmech = []
-mrSTDPmech = []     
+mrSTDPmech = []
+Ractions = 0
+Lactions = 0     
 def trainAgentFake(t):
     """ training interface between simulation and game environment
     """
@@ -1294,6 +1296,7 @@ def trainAgent (t):
     """
     global NBsteps, epCount, InputImages, proposed_actions, total_hits, Racket_pos, Ball_pos, Images, dirSelectiveNeurons, current_time_stepNB
     global f_ax, fig
+    global Ractions, Lactions
     vec = h.Vector()
     if t<100.0: # for the first time interval use randomly selected actions
         actions =[]
@@ -1431,15 +1434,16 @@ def trainAgent (t):
         critic = vec.to_python()[0] # critic is first element of the array
     if critic != 0: # if critic signal indicates punishment (-1) or reward (+1)
         if sim.rank==0: print('t=',t,'- adjusting weights based on RL critic value:', critic)
-        Ractions = np.sum(np.where(actions==dconf['moves']['UP'],1,0))
-        Lactions = np.sum(np.where(actions==dconf['moves']['DOWN'],1,0))
-        print('Number of R-actions: ', Ractions)
-        print('Number of L-actions:', Lactions)
+        if sim.rank==0: Ractions = np.sum(np.where(actions==dconf['moves']['UP'],1,0))
+        if sim.rank==0: Lactions = np.sum(np.where(actions==dconf['moves']['DOWN'],1,0))
         if Ractions==Lactions:
+          print('APPLY RL to both EMR and EML')
           for STDPmech in lSTDPmech: STDPmech.reward_punish(float(critic))
         elif Ractions>Lactions:
+          print('APPLY RL to EMR')
           for STDPmech in rlSTDPmech: STDPmech.reward_punish(float(critic))
         elif Lactions>Ractions:
+          print('APPLY RL to EML')
           for STDPmech in mlSTDPmech: STDPmech.reward_punish(float(critic))
     if sim.rank==0:
         print('Game rewards:', rewards) # only rank 0 has access to rewards      
