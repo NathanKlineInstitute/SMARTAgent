@@ -54,7 +54,7 @@ class AIGame:
     self.input_dim = int(np.sqrt(dconf['net']['ER']))
     self.dirSensitiveNeuronDim = 10 #int(0.5*self.input_dim)
     self.dirSensitiveNeuronRate = (0.0001, 30) # min, max firing rate (Hz) for dir sensitive neurons
-    self.intaction = 5 # integrate this many actions together before returning reward information to model
+    self.intaction = int(dconf['actionsPerPlay']) # integrate this many actions together before returning reward information to model
     # these are Pong-specific coordinate ranges; should later move out of this function into Pong-specific functions
     self.courtYRng = (34, 194)
     self.courtXRng = (20, 140)
