@@ -1293,5 +1293,6 @@ This bug was found in all functions where instead of src, trg was used for dendi
                 else:
                     actions.append(dconf['moves']['NOMOVE']) # No move 
 ***test changes in sim.py using 5 actionsPerPlay = 5
-*** use vec.to_python() instead of vec.to_python()[0]; since passing vector. -- looks good.
-**clean the code.    
+*** use vec.to_python() instead of vec.to_python()[0]; since passing vector. -- looks good. "20april21_A0_"
+**clean the code.
+**run with actionsPerPlay = 2 in file with prefix "20april21_B0_"    
