@@ -1438,7 +1438,9 @@ def trainAgent (t):
     else: # other workers
         sim.pc.broadcast(vec, 0) # receive critic value from master node
         critic = vec.to_python()[0] # critic is first element of the array
+        sim.pc.broadcast(vec2, 0)
         Ractions = vec2.to_python()[0]
+        sim.pc.broadcast(vec3, 0)
         Lactions = vec3.to_python()[0]
     if critic != 0: # if critic signal indicates punishment (-1) or reward (+1)
         if sim.rank==0: print('t=',t,'- adjusting weights based on RL critic value:', critic)
