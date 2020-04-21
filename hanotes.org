@@ -1259,4 +1259,5 @@ This bug was found in all functions where instead of src, trg was used for dendi
 ***need to broadcast this signal to all nodes. implemented broacdcasting and receiving vec2 with [Ractions, Lactions]. Test if works or not.
 ***using seperate vectors for each Ractions and Lactions.
 ****was missing receive call. added receive call for both vec2 and vec3. should work now. testing again.
-**remove Ractions and Lactions from global variable list. print values of Ractions and Lactions to figure out why not working. 
+**remove Ractions and Lactions from global variable list. print values of Ractions and Lactions to figure out why not working.
+**convert list to array before applying np.where. 

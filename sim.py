@@ -1428,8 +1428,8 @@ def trainAgent (t):
           else:
             print('CRITIC=0')                    
         sim.pc.broadcast(vec.from_python([critic]), 0) # convert python list to hoc vector to broadcast critic value to other nodes
-        Ractions = np.sum(np.where(actions==dconf['moves']['UP'],1,0))
-        Lactions = np.sum(np.where(actions==dconf['moves']['DOWN'],1,0))
+        Ractions = np.sum(np.where(np.array(actions)==dconf['moves']['UP'],1,0))
+        Lactions = np.sum(np.where(np.array(actions)==dconf['moves']['DOWN'],1,0))
         sim.pc.broadcast(vec2.from_python([Ractions]),0)
         sim.pc.broadcast(vec3.from_python([Lactions]),0)
     else: # other workers
