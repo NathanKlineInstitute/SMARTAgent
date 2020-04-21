@@ -1448,7 +1448,7 @@ def trainAgent (t):
           for STDPmech in lSTDPmech: STDPmech.reward_punish(float(critic))
         elif Ractions>Lactions:
           print('APPLY RL to EMR')
-          for STDPmech in rlSTDPmech: STDPmech.reward_punish(float(critic))
+          for STDPmech in mrSTDPmech: STDPmech.reward_punish(float(critic))
         elif Lactions>Ractions:
           print('APPLY RL to EML')
           for STDPmech in mlSTDPmech: STDPmech.reward_punish(float(critic))
