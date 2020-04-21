@@ -1172,12 +1172,15 @@ def trainAgentFake(t):
         #if t%recordWeightDT==0:
         print('Weights Recording Time:', t) 
         recordWeights(sim, t)
+
 cumRewardActions = []
 cumPunishingActions = []
 current_time_stepNB = 0
 f_ax = []
 fig = []
+
 def updateBehaviorPlot (sim,InputImages,Images,dirSensitiveNeurons,Racket_pos,Ball_pos, current_time_stepNB,f_ax,fig):
+  # update 
   global cumRewardActions, cumPunishingActions
   maxtstr = len(str(100000))
   if current_time_stepNB==0:
@@ -1231,7 +1234,6 @@ def updateBehaviorPlot (sim,InputImages,Images,dirSensitiveNeurons,Racket_pos,Ba
   f_ax[6].plot(cumHits,Marker='o',MarkerSize=5,MarkerFaceColor='r',MarkerEdgeColor='r')
   f_ax[6].plot(cumMissHits,Marker='s',MarkerSize=3,MarkerFaceColor='k',MarkerEdgeColor='k')
   f_ax[6].legend(('Cumm. Hits','Cumm. Miss'),loc='upper left')
-  #plt.pause(1)
   f_ax[1].cla()
   for nbi in range(np.shape(Racket_pos)[0]):
     f_ax[1].imshow(Images[nbi])
@@ -1594,6 +1596,7 @@ if usemultirun==1:
             for Input_Image in InputImages:
                 np.savetxt(outfile, Input_Image, fmt='%-7.2f')
                 outfile.write('# New slice\n')
+                
 if sim.rank == 0: # only rank 0 should save. otherwise all the other nodes could over-write the output or quit first; rank 0 plots
     print('SAVING RASTER DATA')
     if dconf['sim']['doplot']:
@@ -1601,21 +1604,21 @@ if sim.rank == 0: # only rank 0 should save. otherwise all the other nodes could
         sim.analysis.plotRaster(saveData = dconf['sim']['name']+'raster.pkl',showFig=True)
         #sim.analysis.plotRaster(include = ['allCells'],saveData = dconf['sim']['name']+'raster.pkl',showFig=True)        
         sim.analysis.plotData()    
-        if sim.plotWeights: plotWeights() 
-    if sim.saveWeights:
-        #saveWeights(sim, recordWeightDCells)
-        saveGameBehavior(sim)
-        fid5 = open('data/'+dconf['sim']['name']+'ActionsPerEpisode.txt','w')
-        for i in range(len(epCount)):
-            fid5.write('\t%0.1f' % epCount[i])
-            fid5.write('\n')
-    if sim.saveInputImages:
-        InputImages = np.array(InputImages)
-        print(InputImages.shape)  
-        with open('data/'+dconf['sim']['name']+'InputImages.txt', 'w') as outfile:
-            outfile.write('# Array shape: {0}\n'.format(InputImages.shape))
-            for Input_Image in InputImages:
-                np.savetxt(outfile, Input_Image, fmt='%-7.2f')
-                outfile.write('# New slice\n')
+    if sim.plotWeights: plotWeights() 
+if sim.saveWeights:
+    #saveWeights(sim, recordWeightDCells)
+    saveGameBehavior(sim)
+    fid5 = open('data/'+dconf['sim']['name']+'ActionsPerEpisode.txt','w')
+    for i in range(len(epCount)):
+        fid5.write('\t%0.1f' % epCount[i])
+        fid5.write('\n')
+if sim.saveInputImages:
+    InputImages = np.array(InputImages)
+    print(InputImages.shape)  
+    with open('data/'+dconf['sim']['name']+'InputImages.txt', 'w') as outfile:
+        outfile.write('# Array shape: {0}\n'.format(InputImages.shape))
+        for Input_Image in InputImages:
+            np.savetxt(outfile, Input_Image, fmt='%-7.2f')
+            outfile.write('# New slice\n')
     anim.savemp4('/tmp/*.png','data/'+dconf['sim']['name']+'randGameBehavior.mp4',10)
     if dconf['sim']['doquit']: quit()
