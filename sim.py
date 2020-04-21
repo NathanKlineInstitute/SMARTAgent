@@ -1112,8 +1112,6 @@ total_hits = [] #number of times a ball is hit by racket as the ball changes its
 lSTDPmech = [] # global list of STDP mechanisms; so do not have to lookup at each interval function call
 mlSTDPmech = []
 mrSTDPmech = []
-Ractions = 0
-Lactions = 0     
 def trainAgentFake(t):
     """ training interface between simulation and game environment
     """
@@ -1296,7 +1294,6 @@ def trainAgent (t):
     """
     global NBsteps, epCount, InputImages, proposed_actions, total_hits, Racket_pos, Ball_pos, Images, dirSelectiveNeurons, current_time_stepNB
     global f_ax, fig
-    global Ractions, Lactions
     vec = h.Vector()
     vec2 = h.Vector()
     vec3 = h.Vector()
@@ -1442,6 +1439,8 @@ def trainAgent (t):
         Ractions = vec2.to_python()[0]
         sim.pc.broadcast(vec3, 0)
         Lactions = vec3.to_python()[0]
+        print('Ractions: ', Ractions)
+        print('Lactions: ', Lactions)
     if critic != 0: # if critic signal indicates punishment (-1) or reward (+1)
         if sim.rank==0: print('t=',t,'- adjusting weights based on RL critic value:', critic)
         if Ractions==Lactions:
