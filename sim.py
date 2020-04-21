@@ -1312,9 +1312,9 @@ def trainAgent (t):
             F_Rs.append(getFiringRatesWithInterval([ts_end,ts_beg], sim.net.pops['EMR'].cellGids))
             F_Ls.append(getFiringRatesWithInterval([ts_end,ts_beg], sim.net.pops['EML'].cellGids))
         sim.pc.allreduce(vec.from_python(F_Rs),1) #sum
-        F_Rs = vec.to_python()[0]
+        F_Rs = vec.to_python()
         sim.pc.allreduce(vec.from_python(F_Ls),1) #sum
-        F_Ls = vec.to_python()[0]
+        F_Ls = vec.to_python()
         #F_R1 = getFiringRatesWithInterval([t-100,t-80], sim.net.pops['EMR'].cellGids) 
         #sim.pc.allreduce(vec.from_python([F_R1]), 1) # sum
         #F_R1 = vec.to_python()[0] 
