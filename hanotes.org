@@ -1255,4 +1255,5 @@ This bug was found in all functions where instead of src, trg was used for dendi
 ***if number of R actions is larger than the number of L actions, apply RL to STDP mechanisms related to EMR.
 ****CAUTION: This is very crude form of scheme. Originally each action has a reward associated with it and therefore RL should be applied for each action individually. Here testing the concept and if there is a slight hint of improved behavior, should pursue further.
 ***BUG Ractions and Lactions could not be computed because actions were available only to sim.rank of 0.
-****computed Ractions and Lactions on sim.rank of 0. Declared Ractions and Lactions as global variables expecting that these variables will be available to all nodes. Now hoping that Ractions and Lactions are updated in correct order----not sure how to test that. testing using print statements.
+****computed Ractions and Lactions on sim.rank of 0. Declared Ractions and Lactions as global variables expecting that these variables will be available to all nodes. Now hoping that Ractions and Lactions are updated in correct order----not sure how to test that. testing using print statements.---->Didn't work.
+***need to broadcast this signal to all nodes. implemented broacdcasting and receiving vec2 with [Ractions, Lactions]. Test if works or not.

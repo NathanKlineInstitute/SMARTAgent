@@ -1298,6 +1298,7 @@ def trainAgent (t):
     global f_ax, fig
     global Ractions, Lactions
     vec = h.Vector()
+    vec2 = h.Vector()
     if t<100.0: # for the first time interval use randomly selected actions
         actions =[]
         for _ in range(5):
@@ -1429,13 +1430,16 @@ def trainAgent (t):
           else:
             print('CRITIC=0')                    
         sim.pc.broadcast(vec.from_python([critic]), 0) # convert python list to hoc vector to broadcast critic value to other nodes
+        Ractions = np.sum(np.where(actions==dconf['moves']['UP'],1,0))
+        Lactions = np.sum(np.where(actions==dconf['moves']['DOWN'],1,0))
+        sim.pc.broadcast(vec2.from_python([Ractions, Lactions]),0)
     else: # other workers
         sim.pc.broadcast(vec, 0) # receive critic value from master node
         critic = vec.to_python()[0] # critic is first element of the array
+        Ractions = vec2.to_python()[0]
+        Lactions = vec2.to_python()[1]
     if critic != 0: # if critic signal indicates punishment (-1) or reward (+1)
         if sim.rank==0: print('t=',t,'- adjusting weights based on RL critic value:', critic)
-        if sim.rank==0: Ractions = np.sum(np.where(actions==dconf['moves']['UP'],1,0))
-        if sim.rank==0: Lactions = np.sum(np.where(actions==dconf['moves']['DOWN'],1,0))
         if Ractions==Lactions:
           print('APPLY RL to both EMR and EML')
           for STDPmech in lSTDPmech: STDPmech.reward_punish(float(critic))
