@@ -33,7 +33,7 @@ sim.saveInputImages = 1 #save Input Images (5 game frames)
 recordWeightStepSize = dconf['sim']['recordWeightStepSize']
 #recordWeightDT = 1000 # interval for recording synaptic weights (change later)
 recordWeightDCells = 1 # to record weights for sub samples of neurons
-
+tstepPerAction = 20
 global fid4
 
 fid4 = open(sim.MotorOutputsfilename,'w')
@@ -1294,90 +1294,114 @@ def trainAgent (t):
     """
     global NBsteps, epCount, InputImages, proposed_actions, total_hits, Racket_pos, Ball_pos, Images, dirSelectiveNeurons, current_time_stepNB
     global f_ax, fig
+    global tstepPerAction
     vec = h.Vector()
     vec2 = h.Vector()
     vec3 = h.Vector()
-    if t<100.0: # for the first time interval use randomly selected actions
+    if t<(tstepPerAction*dconf['actionsPerPlay']): # for the first time interval use randomly selected actions
         actions =[]
-        for _ in range(5):
+        for _ in range(int(dconf['actionsPerPlay'])):
             action = dconf['movecodes'][random.randint(0,len(dconf['movecodes'])-1)]
             actions.append(action)
     else: #the actions should be based on the activity of motor cortex (MO) 1085-1093
-        F_R1 = getFiringRatesWithInterval([t-100,t-80], sim.net.pops['EMR'].cellGids) 
-        sim.pc.allreduce(vec.from_python([F_R1]), 1) # sum
-        F_R1 = vec.to_python()[0] 
-        F_R2 = getFiringRatesWithInterval([t-80,t-60], sim.net.pops['EMR'].cellGids)
-        sim.pc.allreduce(vec.from_python([F_R2]), 1) # sum
-        F_R2 = vec.to_python()[0] 
-        F_R3 = getFiringRatesWithInterval([t-60,t-40], sim.net.pops['EMR'].cellGids)
-        sim.pc.allreduce(vec.from_python([F_R3]), 1) # sum
-        F_R3 = vec.to_python()[0] 
-        F_R4 = getFiringRatesWithInterval([t-40,t-20], sim.net.pops['EMR'].cellGids)
-        sim.pc.allreduce(vec.from_python([F_R4]), 1) # sum
-        F_R4 = vec.to_python()[0] 
-        F_R5 = getFiringRatesWithInterval([t-20,t], sim.net.pops['EMR'].cellGids)
-        sim.pc.allreduce(vec.from_python([F_R5]), 1) # sum
-        F_R5 = vec.to_python()[0] 
-        F_L1 = getFiringRatesWithInterval([t-100,t-80], sim.net.pops['EML'].cellGids) 
-        sim.pc.allreduce(vec.from_python([F_L1]), 1) # sum
-        F_L1 = vec.to_python()[0] 
-        F_L2 = getFiringRatesWithInterval([t-80,t-60], sim.net.pops['EML'].cellGids)
-        sim.pc.allreduce(vec.from_python([F_L2]), 1) # sum
-        F_L2 = vec.to_python()[0] 
-        F_L3 = getFiringRatesWithInterval([t-60,t-40], sim.net.pops['EML'].cellGids)
-        sim.pc.allreduce(vec.from_python([F_L3]), 1) # sum
-        F_L3 = vec.to_python()[0] 
-        F_L4 = getFiringRatesWithInterval([t-40,t-20], sim.net.pops['EML'].cellGids)
-        sim.pc.allreduce(vec.from_python([F_L4]), 1) # sum
-        F_L4 = vec.to_python()[0] 
-        F_L5 = getFiringRatesWithInterval([t-20,t], sim.net.pops['EML'].cellGids)
-        sim.pc.allreduce(vec.from_python([F_L5]), 1) # sum
-        F_L5 = vec.to_python()[0] 
+        F_Rs = []
+        F_Ls = []
+        for ts in range(int(dconf['actionsPerPlay'])):
+            ts_end = t-tstepPerAction*(dconf['actionsPerPlay']-ts)
+            ts_beg = t-tstepPerAction*(dconf['actionsPerPlay']-ts-1)
+            F_Rs.append(getFiringRatesWithInterval([ts_end,ts_beg], sim.net.pops['EMR'].cellGids))
+            F_Ls.append(getFiringRatesWithInterval([ts_end,ts_beg], sim.net.pops['EML'].cellGids))
+        sim.pc.allreduce(vec.from_python(F_Rs),1) #sum
+        F_Rs = vec.to_python()[0]
+        sim.pc.allreduce(vec.from_python(F_Ls),1) #sum
+        F_Ls = vec.to_python()[0]
+        #F_R1 = getFiringRatesWithInterval([t-100,t-80], sim.net.pops['EMR'].cellGids) 
+        #sim.pc.allreduce(vec.from_python([F_R1]), 1) # sum
+        #F_R1 = vec.to_python()[0] 
+        #F_R2 = getFiringRatesWithInterval([t-80,t-60], sim.net.pops['EMR'].cellGids)
+        #sim.pc.allreduce(vec.from_python([F_R2]), 1) # sum
+        #F_R2 = vec.to_python()[0] 
+        #F_R3 = getFiringRatesWithInterval([t-60,t-40], sim.net.pops['EMR'].cellGids)
+        #sim.pc.allreduce(vec.from_python([F_R3]), 1) # sum
+        #F_R3 = vec.to_python()[0] 
+        #F_R4 = getFiringRatesWithInterval([t-40,t-20], sim.net.pops['EMR'].cellGids)
+        #sim.pc.allreduce(vec.from_python([F_R4]), 1) # sum
+        #F_R4 = vec.to_python()[0] 
+        #F_R5 = getFiringRatesWithInterval([t-20,t], sim.net.pops['EMR'].cellGids)
+        #sim.pc.allreduce(vec.from_python([F_R5]), 1) # sum
+        #F_R5 = vec.to_python()[0] 
+        #F_L1 = getFiringRatesWithInterval([t-100,t-80], sim.net.pops['EML'].cellGids) 
+        #sim.pc.allreduce(vec.from_python([F_L1]), 1) # sum
+        #F_L1 = vec.to_python()[0] 
+        #F_L2 = getFiringRatesWithInterval([t-80,t-60], sim.net.pops['EML'].cellGids)
+        #sim.pc.allreduce(vec.from_python([F_L2]), 1) # sum
+        #F_L2 = vec.to_python()[0] 
+        #F_L3 = getFiringRatesWithInterval([t-60,t-40], sim.net.pops['EML'].cellGids)
+        #sim.pc.allreduce(vec.from_python([F_L3]), 1) # sum
+        #F_L3 = vec.to_python()[0] 
+        #F_L4 = getFiringRatesWithInterval([t-40,t-20], sim.net.pops['EML'].cellGids)
+        #sim.pc.allreduce(vec.from_python([F_L4]), 1) # sum
+        #F_L4 = vec.to_python()[0] 
+        #F_L5 = getFiringRatesWithInterval([t-20,t], sim.net.pops['EML'].cellGids)
+        #sim.pc.allreduce(vec.from_python([F_L5]), 1) # sum
+        #F_L5 = vec.to_python()[0] 
         if sim.rank==0:
-            print('Firing rates: ', F_R1, F_R2, F_R3, F_R4, F_R5, F_L1, F_L2, F_L3, F_L4, F_L5)
+            print('Firing rates: ', F_Rs, F_Ls)
+            #print('Firing rates: ', F_R1, F_R2, F_R3, F_R4, F_R5, F_L1, F_L2, F_L3, F_L4, F_L5)
             fid4.write('%0.1f' % t)
-            fid4.write('\t%0.1f' % F_R1)
-            fid4.write('\t%0.1f' % F_R2)
-            fid4.write('\t%0.1f' % F_R3)
-            fid4.write('\t%0.1f' % F_R4)
-            fid4.write('\t%0.1f' % F_R5)
-            fid4.write('\t%0.1f' % F_L1)
-            fid4.write('\t%0.1f' % F_L2)
-            fid4.write('\t%0.1f' % F_L3)
-            fid4.write('\t%0.1f' % F_L4)
-            fid4.write('\t%0.1f' % F_L5)
+            for ts in range(int(dconf['actionsPerPlay'])):
+                fid4.write('\t%0.1f' % F_Rs[ts])
+            for ts in range(int(dconf['actionsPerPlay'])):
+                fid4.write('\t%0.1f' % F_Ls[ts])
+            #fid4.write('\t%0.1f' % F_R1)
+            #fid4.write('\t%0.1f' % F_R2)
+            #fid4.write('\t%0.1f' % F_R3)
+            #fid4.write('\t%0.1f' % F_R4)
+            #fid4.write('\t%0.1f' % F_R5)
+            #fid4.write('\t%0.1f' % F_L1)
+            #fid4.write('\t%0.1f' % F_L2)
+            #fid4.write('\t%0.1f' % F_L3)
+            #fid4.write('\t%0.1f' % F_L4)
+            #fid4.write('\t%0.1f' % F_L5)
             fid4.write('\n')
             actions = []
-            if F_R1>F_L1:
-                actions.append(dconf['moves']['UP']) #UP
-            elif F_R1<F_L1:
-                actions.append(dconf['moves']['DOWN']) # Down
-            else:
-                actions.append(dconf['moves']['NOMOVE']) # No move 
-            if F_R2>F_L2:
-                actions.append(dconf['moves']['UP']) #UP
-            elif F_R2<F_L2:
-                actions.append(dconf['moves']['DOWN']) #Down
-            else:
-                actions.append(dconf['moves']['NOMOVE']) #No move
-            if F_R3>F_L3:
-                actions.append(dconf['moves']['UP']) #UP
-            elif F_R3<F_L3:
-                actions.append(dconf['moves']['DOWN']) #Down
-            else:
-                actions.append(dconf['moves']['NOMOVE']) #No move
-            if F_R4>F_L4:
-                actions.append(dconf['moves']['UP']) #UP
-            elif F_R4<F_L4:
-                actions.append(dconf['moves']['DOWN']) #Down
-            else:
-                actions.append(dconf['moves']['NOMOVE']) #No move
-            if F_R5>F_L5:
-                actions.append(dconf['moves']['UP']) #UP
-            elif F_R5<F_L5:
-                actions.append(dconf['moves']['DOWN']) #Down
-            else:
-                actions.append(dconf['moves']['NOMOVE']) #No move
+            for ts in range(int(dconf['actionsPerPlay'])):
+                if F_Rs[ts]>F_Ls[ts]:
+                    actions.append(dconf['moves']['UP'])
+                elif F_Ls[ts]>F_Rs[ts]:
+                    actions.append(dconf['moves']['DOWN'])
+                else:
+                    actions.append(dconf['moves']['NOMOVE']) # No move        
+            #if F_R1>F_L1:
+            #    actions.append(dconf['moves']['UP']) #UP
+            #elif F_R1<F_L1:
+            #    actions.append(dconf['moves']['DOWN']) # Down
+            #else:
+            #    actions.append(dconf['moves']['NOMOVE']) # No move 
+            #if F_R2>F_L2:
+            #    actions.append(dconf['moves']['UP']) #UP
+            #elif F_R2<F_L2:
+            #    actions.append(dconf['moves']['DOWN']) #Down
+            #else:
+            #    actions.append(dconf['moves']['NOMOVE']) #No move
+            #if F_R3>F_L3:
+            #    actions.append(dconf['moves']['UP']) #UP
+            #elif F_R3<F_L3:
+            #    actions.append(dconf['moves']['DOWN']) #Down
+            #else:
+            #    actions.append(dconf['moves']['NOMOVE']) #No move
+            #if F_R4>F_L4:
+            #    actions.append(dconf['moves']['UP']) #UP
+            #elif F_R4<F_L4:
+            #    actions.append(dconf['moves']['DOWN']) #Down
+            #else:
+            #    actions.append(dconf['moves']['NOMOVE']) #No move
+            #if F_R5>F_L5:
+            #    actions.append(dconf['moves']['UP']) #UP
+            #elif F_R5<F_L5:
+            #    actions.append(dconf['moves']['DOWN']) #Down
+            #else:
+            #    actions.append(dconf['moves']['NOMOVE']) #No move
             #print('actions generated by model are: ', actions)
             # actions = [dconf['moves']['UP'] for i in range(5)] # force move UP for testing            
     if sim.rank == 0:
@@ -1462,7 +1486,11 @@ def trainAgent (t):
             sim.allRewards.append(reward)
         for hits in total_hits:
             sim.allHits.append(hits) #hit or no hit
-        for ltpnt in [t-80, t-60, t-40, t-20, t-0]: sim.allTimes.append(ltpnt)
+        tvec_actions = []
+        for ts in range(len(actions)):
+            tvec_actions.append(t-tstepPerAction*(len(actions)-ts-1))
+        #for ltpnt in [t-80, t-60, t-40, t-20, t-0]: sim.allTimes.append(ltpnt)
+        for ltpnt in tvec_actions: sim.allTimes.append(ltpnt)
         current_time_stepNB, f_ax, fig = updateBehaviorPlot (sim,InputImages,Images,dirSensitiveNeurons,Racket_pos,Ball_pos,current_time_stepNB, f_ax, fig)
         current_time_stepNB = current_time_stepNB + 1
     updateInputRates() # update firing rate of inputs to R population (based on image content)                
@@ -1539,8 +1567,8 @@ if sim.rank == 0:
     # this is just a precaution since simConfig pkl file has MOST of the info; ideally should adjust simConfig to contain ALL of the required info
     from utils import backupcfg
     backupcfg(dconf['sim']['name']) 
-    
-sim.runSimWithIntervalFunc(100.0,trainAgent) # has periodic callback to adjust STDP weights based on RL signal
+tPerPlay = tstepPerAction*dconf['actionsPerPlay']
+sim.runSimWithIntervalFunc(tperPlay,trainAgent) # has periodic callback to adjust STDP weights based on RL signal
 sim.gatherData() # gather data from different nodes
 sim.saveData() # save data to disk
 

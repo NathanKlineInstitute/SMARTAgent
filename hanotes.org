@@ -1262,4 +1262,34 @@ This bug was found in all functions where instead of src, trg was used for dendi
 **remove Ractions and Lactions from global variable list. print values of Ractions and Lactions to figure out why not working.
 **convert list to array before applying np.where.
 **typo mrSTDPmech was used as rlSTDPmech
-**SEEMS TO BE WORKING-----RUN THE SIM FOR 100sec  overnight with recording behavior. prefix "20april20_B0_"  
+**SEEMS TO BE WORKING-----RUN THE SIM FOR 100sec  overnight with recording behavior. prefix "20april20_B0_"
+
+*20April21
+**test running sim using a single action of game.
+***CHANGES: 
+1. tstepPerAction = 20.0
+2. dconf['actionsPerPlay'] = 1
+3. tPerPlay = tstepPerAction*dconf['actionsPerPlay']
+4. sim.runSimWithIntervalFunc(tPerPlay,trainAgent)
+5. range(dconf['actionsPerPlay']) in trainAgent(t) func---line 1302 in sim.py
+6. t<tPerPlay: in trainAgent(t) func -- line 1300 in sim.py
+7.      F_Rs = []
+        F_Ls = []
+        for ts in range(int(dconf['actionsPerPlay'])):
+            ts_end = t-tstepPerAction*(dconf['actionsPerPlay']-ts)
+            ts_beg = t-tstepPerAction*(dconf['actionsPerPlay']-ts-1)
+            F_Rs.append(getFiringRatesWithInterval([ts_end,ts_beg], sim.net.pops['EMR'].cellGids))
+            F_Ls.append(getFiringRatesWithInterval([ts_end,ts_beg], sim.net.pops['EML'].cellGids))
+        sim.pc.allreduce(vec.from_python(F_Rs),1) #sum
+        F_Rs = vec.to_python()[0]
+        sim.pc.allreduce(vec.from_python(F_Ls),1) #sum
+        F_Ls = vec.to_python()[0]
+-----------------------------------------------------        
+8.            for ts in range(int(dconf['actionsPerPlay'])):
+                if F_Rs[ts]>F_Ls[ts]:
+                    actions.append(dconf['moves']['UP'])
+                elif F_Ls[ts]>F_Rs[ts]:
+                    actions.append(dconf['moves']['DOWN'])
+                else:
+                    actions.append(dconf['moves']['NOMOVE']) # No move 
+***test changes in sim.py using 5 actionsPerPlay = 5    
