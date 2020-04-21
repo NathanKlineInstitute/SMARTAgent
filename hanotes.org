@@ -1246,3 +1246,10 @@ This bug was found in all functions where instead of src, trg was used for dendi
 **implementing a plotBehavior function in sim.py using all the behavior related parameters returned from playGame.
 **plot behavior with sim. testing now.---->movie not recorded properly.
 **may be not close the figure and pass figure handles in and out of function.---try this.
+**USE NEW RL SCHEME:
+***create 2 lists of STDPmech with postsynaptic neurons in EML and EMR.
+***count number of L actions (in 5 steps) and number of R actions (in 5 steps)
+***if number of L actions is equal to number of R actions, apply RL to all STDP mechanisms.
+***if number of L actions is larger than the number of R actions, apply RL to STDP mechanisms related to EML.
+***if number of R actions is larger than the number of L actions, apply RL to STDP mechanisms related to EMR.
+****CAUTION: This is very crude form of scheme. Originally each action has a reward associated with it and therefore RL should be applied for each action individually. Here testing the concept and if there is a slight hint of improved behavior, should pursue further.

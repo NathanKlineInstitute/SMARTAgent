@@ -1109,7 +1109,9 @@ NBsteps = 0 # this is a counter for recording the plastic weights
 epCount = []
 proposed_actions = [] 
 total_hits = [] #number of times a ball is hit by racket as the ball changes its direction and player doesn't lose a score (assign 1). if player loses
-lSTDPmech = [] # global list of STDP mechanisms; so do not have to lookup at each interval function call     
+lSTDPmech = [] # global list of STDP mechanisms; so do not have to lookup at each interval function call
+mlSTDPmech = []
+mrSTDPmech = []     
 def trainAgentFake(t):
     """ training interface between simulation and game environment
     """
@@ -1429,7 +1431,16 @@ def trainAgent (t):
         critic = vec.to_python()[0] # critic is first element of the array
     if critic != 0: # if critic signal indicates punishment (-1) or reward (+1)
         if sim.rank==0: print('t=',t,'- adjusting weights based on RL critic value:', critic)
-        for STDPmech in lSTDPmech: STDPmech.reward_punish(float(critic))        
+        Ractions = np.sum(np.where(actions==dconf['moves']['UP'],1,0))
+        Lactions = np.sum(np.where(actions==dconf['moves']['DOWN'],1,0))
+        print('Number of R-actions: ', Ractions)
+        print('Number of L-actions:', Lactions)
+        if Ractions==Lactions:
+          for STDPmech in lSTDPmech: STDPmech.reward_punish(float(critic))
+        elif Ractions>Lactions:
+          for STDPmech in rlSTDPmech: STDPmech.reward_punish(float(critic))
+        elif Lactions>Ractions:
+          for STDPmech in mlSTDPmech: STDPmech.reward_punish(float(critic))
     if sim.rank==0:
         print('Game rewards:', rewards) # only rank 0 has access to rewards      
         for action in actions:
@@ -1454,13 +1465,20 @@ def trainAgent (t):
 
 def getAllSTDPObjects (sim):
   # get all the STDP objects from the simulation's cells
-  lSTDPmech = []
+  lSTDPmech = [] #all STDP objects
+  mlSTDPmech = [] # all STDP objects associated with Left motor area
+  mrSTDPmech = [] #all STDP objects associated with right motor area
+  sim.net.pops['EMR'].cellGids
   for cell in sim.net.cells:
     for conn in cell.conns:
       STDPmech = conn.get('hSTDP')  # check if has STDP mechanism
-      if STDPmech:   # make sure it is not None
+      if STDPmech:
         lSTDPmech.append(STDPmech)
-  return lSTDPmech
+        if cell.gid in sim.net.pops['EMR'].cellGids:
+          mrSTDPmech.append(STDPmech)
+        elif cell.gid in sim.net.pops['EML'].cellGids:
+          mlSTDPmech.append(STDPmech)
+  return lSTDPmech, mlSTDPmech, mrSTDPmech
         
 #Alterate to create network and run simulation
 # create network object and set cfg and net params; pass simulation config and network params as arguments
@@ -1471,8 +1489,10 @@ sim.net.connectCells()                    # create connections between cells bas
 sim.net.addStims()                      #instantiate netStim
 sim.setupRecording()                  # setup variables to record for each cell (spikes, V traces, etc)
 
-lSTDPmech = getAllSTDPObjects(sim) # get all the STDP objects up-front
-
+lSTDPmech, mlSTDPmech, mrSTDPmech = getAllSTDPObjects(sim) # get all the STDP objects up-front
+print('Total number of STDP mech for MR are: ', len(mrSTDPmech))
+print('Total number of STDP mech for ML are: ', len(mlSTDPmech))
+print('Total number of STDP mech are: ', len(lSTDPmech))
 def updateSTDPWeights (sim, W):
     #this function assign weights stored in 'ResumeSimFromFile' to all connections by matching pre and post neuron ids  
     # get all the simulation's cells (on a given node)
