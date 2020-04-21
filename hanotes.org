@@ -1246,6 +1246,7 @@ This bug was found in all functions where instead of src, trg was used for dendi
 **implementing a plotBehavior function in sim.py using all the behavior related parameters returned from playGame.
 **plot behavior with sim. testing now.---->movie not recorded properly.
 **may be not close the figure and pass figure handles in and out of function.---try this.
+**above test looks OK. saved actmap, weightsmap and behavior as movies with name '20april20_A0_'. Time simulated was 10 sec.
 **USE NEW RL SCHEME:
 ***create 2 lists of STDPmech with postsynaptic neurons in EML and EMR.
 ***count number of L actions (in 5 steps) and number of R actions (in 5 steps)
