@@ -140,21 +140,38 @@ class AIGame:
         theta = np.degrees(np.arccos(np.dot(ndir2,ndirMain))) #if theta is nan, no movement is detected
         if dir2[1]<0: theta = 360-theta 
         dirSensitiveNeurons[dSNeuronX,dSNeuronY] = theta # the motion angle (theta) at position dSNeuronX,dSNeuronY is stored
-        if np.isnan(theta)=='False': print('Theta for FOV ',FOV,' is: ', theta)
+        if not np.isnan(theta): print('Theta for FOV ',FOV,' is: ', theta)
     print('Computed angles:', dirSensitiveNeurons)
     return dirSensitiveNeurons
 
   def updateDirSensitiveRates (self, motiondir):
     # update firing rate of dir sensitive neurons using dirs (2D array with motion direction at each coordinate)
     dAngRange = self.dAngRange
+    dAngPk = {pop:dAngRange[pop][0]+(dAngRange[pop][1]-dAngRange[pop][0])/2.0 for pop in self.ldirpop}
+    print(self.ldirpop,dAngRange, dAngPk)
     dirSensitiveNeuronDim = self.dirSensitiveNeuronDim
+    AngSigma = 10.
+    AngVal = self.dirSensitiveNeuronRate[1]
+    for pop in self.ldirpop:
+      self.dFiringRates[pop] = self.dirSensitiveNeuronRate[0] * np.ones(shape=(dirSensitiveNeuronDim,dirSensitiveNeuronDim))
+    for y in range(motiondir.shape[0]):
+      for x in range(motiondir.shape[1]):
+        theta = motiondir[y][x]
+        if np.isnan(theta): continue
+        for pop in self.ldirpop:
+          fctr = np.exp(-0.5*(((theta - dAngPk[pop]) / AngSigma)**2))
+          print('updateDirSensitiveRates',pop,x,y,fctr,dAngPk[pop],motiondir[y][x])
+          #if fctr > 0.:
+          #  self.dFiringRates[pop][y,x] = AngVal * fctr
+    """
     # logical and means that any location where correct direction detected will have maximal firing
     dInds = {pop:np.where(np.logical_and(motiondir>dAngRange[pop][0],motiondir<dAngRange[pop][1])) for pop in self.ldirpop}
     for pop in self.ldirpop: # now iterate over all motion sensitive populations and set their firing rates
       dtmp = self.dirSensitiveNeuronRate[0] * np.ones(shape=(dirSensitiveNeuronDim,dirSensitiveNeuronDim))
       dtmp[dInds[pop]] = self.dirSensitiveNeuronRate[1] # firing rate for active dir sensitive neurons; later could include noise.
       self.dFiringRates[pop] = np.reshape(dtmp , 100) # this assumes 100 neurons in that population    
-  
+    """
+          
   def findobj (self, img, xrng, yrng):
     # find an object's x, y position in the image (assumes bright object on dark background)
     subimg = img[yrng[0]:yrng[1],xrng[0]:xrng[1],:]
