@@ -101,9 +101,8 @@ class AIGame:
           Rys = [Ry-2,Ry-1,Ry,Ry+1]
         else:
           Rys = [Ry-2,Ry-1,Ry,Ry+1,Ry+2]
-        #print('Xinds',Rxs)
-        #print('Yinds',Rys)
-        FOV = np.zeros(shape=(len(Rxs),len(Rys)))
+        #print('Xinds',Rxs,'Yinds',Rys)
+        FOV = np.zeros(shape=(len(Rxs),len(Rys))) # field of view
         for xinds in range(len(Rxs)):
           for yinds in range(len(Rys)):
             FOV[xinds,yinds] = dsum_Images[Rxs[xinds],Rys[yinds]]
@@ -111,7 +110,8 @@ class AIGame:
         max_value = np.amax(FOV)
         max_ind = np.where(FOV==max_value)
         #print('max inds', max_ind) 
-        #since the most recent frame has highest pixel intensity, any pixel with the maximum intensity will be most probably the final instance of the object motion in that field of view
+        #since the most recent frame has highest pixel intensity, any pixel with the maximum intensity will be
+        #most probably the final instance of the object motion in that field of view
         bkg_inds = np.where(FOV == bkgPixel)
         if len(bkg_inds[0])>0:
           for yinds in range(len(bkg_inds[0])):
@@ -123,7 +123,8 @@ class AIGame:
         min_value = np.amin(FOV)
         min_ind = np.where(FOV==min_value)
         #print('min inds', min_ind)
-        #since latest frame has lowest pixel intensity (after ignoring background), any pixel with max intensity will most probably be first instance of object motion in that field of view
+        #since latest frame has lowest pixel intensity (after ignoring background), any pixel with max intensity will
+        #most probably be first instance of object motion in that field of view
         if len(max_ind[0])>len(min_ind[0]):
           mL = len(min_ind[0])
         elif len(max_ind[0])<len(min_ind[0]):
@@ -141,15 +142,19 @@ class AIGame:
         dirSensitiveNeurons[dSNeuronX,dSNeuronY] = theta # the motion angle (theta) at position dSNeuronX,dSNeuronY is stored
         if np.isnan(theta)=='False': print('Theta for FOV ',FOV,' is: ', theta)
     print('Computed angles:', dirSensitiveNeurons)
+    return dirSensitiveNeurons
+
+  def updateDirSensitiveRates (self, motiondir):
+    # update firing rate of dir sensitive neurons using dirs (2D array with motion direction at each coordinate)
     dAngRange = self.dAngRange
+    dirSensitiveNeuronDim = self.dirSensitiveNeuronDim
     # logical and means that any location where correct direction detected will have maximal firing
-    dInds = {pop:np.where(np.logical_and(dirSensitiveNeurons>dAngRange[pop][0],dirSensitiveNeurons<dAngRange[pop][1])) for pop in self.ldirpop}
+    dInds = {pop:np.where(np.logical_and(motiondir>dAngRange[pop][0],motiondir<dAngRange[pop][1])) for pop in self.ldirpop}
     for pop in self.ldirpop: # now iterate over all motion sensitive populations and set their firing rates
       dtmp = self.dirSensitiveNeuronRate[0] * np.ones(shape=(dirSensitiveNeuronDim,dirSensitiveNeuronDim))
       dtmp[dInds[pop]] = self.dirSensitiveNeuronRate[1] # firing rate for active dir sensitive neurons; later could include noise.
-      self.dFiringRates[pop] = np.reshape(dtmp , 100) # this assumes 100 neurons in that population
-    return dirSensitiveNeurons
-
+      self.dFiringRates[pop] = np.reshape(dtmp , 100) # this assumes 100 neurons in that population    
+  
   def findobj (self, img, xrng, yrng):
     # find an object's x, y position in the image (assumes bright object on dark background)
     subimg = img[yrng[0]:yrng[1],xrng[0]:xrng[1],:]
@@ -256,7 +261,8 @@ class AIGame:
       dsum_Images = lgimage[0]
     InputImages.append(dsum_Images) # save the input image
 
-    dirs = self.computeMotion(dsum_Images) # compute directions of motion for every other pixel and update motion sensitive neuron input rates
+    dirs = self.computeMotion(dsum_Images) # compute directions of motion for every other pixel
+    self.updateDirSensitiveRates(dirs) # update motion sensitive neuron input rates
     self.updateInputRates(dsum_Images) # update input rates to retinal neurons
 
     if done: # what is done? --- when done == 1, it means that 1 episode of the game ends, so it needs to be reset. 
