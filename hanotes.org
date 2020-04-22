@@ -1296,4 +1296,8 @@ This bug was found in all functions where instead of src, trg was used for dendi
 *** use vec.to_python() instead of vec.to_python()[0]; since passing vector. -- looks good. "20april21_A0_"
 **clean the code.
 **run with actionsPerPlay = 2 in file with prefix "20april21_B0_"---Bug
-***Fix bug: update intaction from sim.json    
+***Fix bug: update intaction from sim.json   
+
+*20April22
+**problem in plotting behavior when using 2 actionsPerPlay.
+***run sim using 2 actionsPerPlay without plotting behavior.
