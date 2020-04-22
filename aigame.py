@@ -152,8 +152,7 @@ class AIGame:
     dirSensitiveNeuronDim = self.dirSensitiveNeuronDim
     AngSigma = 10.
     AngVal = self.dirSensitiveNeuronRate[1]
-    for pop in self.ldirpop:
-      self.dFiringRates[pop] = self.dirSensitiveNeuronRate[0] * np.ones(shape=(dirSensitiveNeuronDim,dirSensitiveNeuronDim))
+    for pop in self.ldirpop: self.dFiringRates[pop] = self.dirSensitiveNeuronRate[0] * np.ones(shape=(dirSensitiveNeuronDim,dirSensitiveNeuronDim))
     for y in range(motiondir.shape[0]):
       for x in range(motiondir.shape[1]):
         theta = motiondir[y][x]
@@ -163,6 +162,7 @@ class AIGame:
           print('updateDirSensitiveRates',pop,x,y,fctr,dAngPk[pop],motiondir[y][x])
           #if fctr > 0.:
           #  self.dFiringRates[pop][y,x] = AngVal * fctr
+    for pop in self.ldirpop: self.dFiringRates[pop]=np.reshape(self.dFiringRates[pop],100) # this assumes 100 neurons in that population    
     """
     # logical and means that any location where correct direction detected will have maximal firing
     dInds = {pop:np.where(np.logical_and(motiondir>dAngRange[pop][0],motiondir<dAngRange[pop][1])) for pop in self.ldirpop}
