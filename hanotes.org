@@ -1301,3 +1301,5 @@ This bug was found in all functions where instead of src, trg was used for dendi
 *20April22
 **problem in plotting behavior when using 2 actionsPerPlay.
 ***run sim using 2 actionsPerPlay without plotting behavior.
+**fixed hits/miss-hits plot in recording behavior. also run simdat.py and actmap.py for "20april21_B0_" for 2 actionsPerPlay. No behavior saved while runing simulation.
+**run sim with 2 actionsPerPlay for 100 sec with prefix "20april21_C0_"
