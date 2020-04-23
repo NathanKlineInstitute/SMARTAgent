@@ -1618,3 +1618,176 @@ hmm, restore sim not working ... can run for 200 s ... see if improves ... fix r
     "sim": {"duration": 200000, "dt": 0.2, "verbose": 0, "recordStep":0.2,"recordWeightStepSize":1,"RLFakeUpRule": 0,"RLFakeDownRule": 0,"RLFakeStayRule": 0,"name":"20april18_A0_","doquit":0,"doplot":1},
 
 myrun 12    
+*20apr22 - RFs for direction selective neurons
+** add gaussian profile to direction selective neurons
+
+most of that can go into aigame.py where the rates for those neurons are set
+
+may want to try other optical flow algorithm first ... might be faster to
+use a standard implementation
+
+https://scikit-image.org/docs/dev/auto_examples/registration/plot_opticalflow.html#sphx-glr-auto-examples-registration-plot-opticalflow-py
+
+"By definition, the optical flow is the vector field (u, v) verifying image1(x+u, y+v) =
+image0(x, y), where (image0, image1) is a couple of consecutive 2D frames from a sequence. This
+vector field can then be used for registration by image warping."
+
+try images saved from game ...
+
+python
+
+import numpy as np
+
+Input_Images = np.loadtxt('data/20april21_A0_InputImages.txt')
+New_InputImages = []
+NB_Images = int(Input_Images.shape[0]/Input_Images.shape[1])
+for x in range(NB_Images):
+    fp = x*Input_Images.shape[1]
+    cImage = Input_Images[fp:fp+20,:] # 20 is sqrt of 400 (20x20 pixels)
+    New_InputImages.append(cImage)
+New_InputImages = np.array(New_InputImages)
+
+New_InputImages.shape # (10, 20, 20)
+
+from pylab import *
+
+ion()
+imshow(New_InputImages[3,:,:],cmap='gray'); savefig('gif/20apr22_a0.png')
+imshow(New_InputImages[4,:,:],cmap='gray'); savefig('gif/20apr22_a1.png')
+
+from skimage.color import rgb2gray
+from skimage.data import stereo_motorcycle
+from skimage.registration import optical_flow_tvl1
+# --- Convert the images to gray level: color is not supported.
+image0 = New_InputImages[3,:,:]
+image1 = New_InputImages[4,:,:]
+flow = optical_flow_tvl1(image1, image0)
+
+imshow(flow[0,:,:],cmap='gray'); savefig('gif/20apr22_a2.png')
+imshow(flow[1,:,:],cmap='gray'); savefig('gif/20apr22_a3.png')
+
+amin(flow[0,:,:]) # -29.32014
+amax(flow[0,:,:]) # 16.496756
+amin(flow[1,:,:]) # -19.863085
+amax(flow[1,:,:]) # 32.638676
+
+those colors don't have directions ... 
+
+in the example here:
+ https://scikit-image.org/docs/dev/auto_examples/registration/plot_opticalflow.html#sphx-glr-auto-examples-registration-plot-opticalflow-py
+
+the two arrays returned by optical flow are the row and column displacements?
+
+e.g.:
+# --- Compute the optical flow
+v, u = optical_flow_tvl1(image0, image1)
+# --- Use the estimated optical flow for registration
+nr, nc = image0.shape
+row_coords, col_coords = np.meshgrid(np.arange(nr), np.arange(nc), indexing='ij')
+image1_warp = warp(image1, np.array([row_coords + v, col_coords + u]), mode='nearest')
+
+other simple code for motion detection/tracking:
+ https://www.pyimagesearch.com/2015/05/25/basic-motion-detection-and-tracking-with-python-and-opencv/
+more general ... uses opencv2
+
+implemented exp decay in each direction as
+           fctr = np.exp(-1.0*((theta-dAngPk[pop])**2)/AngSigma**2)
+          print('updateDirSensitiveRates',pop,x,y,fctr,dAngPk[pop],motiondir[y][x])
+          if fctr > 0.:
+            self.dFiringRates[pop][y,x] = AngVal * fctr
+
+with AngSigma as 45 ... (can tweak) and AngVal as 30
+            
+... ran a small test ... (still have to fix E direction!!)
+
+gif/20apr22_rast_a4.png
+gif/20apr22_EV1DS_a4.png
+
+not sure what data/20april22_A0_randGameBehavior.mp4 is supposed to show but looks incomplete ... only runs
+up to 50 ms ... yeah, used old files from hours ago ... should cleanup the pngs
+
+python -i actmap.py
+
+data/20april22_A0_actmap.mp4
+
+looks OK but E needs to be fixed
+
+python -i simdat.py -1
+
+data/20april22_A0_weightmap.mp4
+
+*20apr23 - RFs for direction selective neurons
+** RFs for direction selective neurons
+
+right now the RFs are setup to have peaks every 45 degrees with 45 degree sigma for exp fall-off
+in magnitude of firing rate ...
+
+could randomize directions between 0-360 degrees and potentially reduce number of direction selective neurons?
+8 directions for RF is also somewhat limiting. movement can occur in other directions ...
+
+or increase spread of RFs ...
+
+also can change size of direction selective neuron populations ...
+
+original values:
+"net":{"scale":1,"ER":400,"IR":100,"EV1":400,"EV1DE":100,"EV1DNE":100,"EV1DN":100,"EV1DNW":100,"EV1DW":100,"EV1DSW":100,"EV1DS":100,"EV1DSE":100,"IV1":100,"EV4":100,"IV4":25,"EMT":25,"IMT":9,"EML":1350,"EMR":1350,"IM":690,"AngRFSigma":45,"DirMinRate":0.0001,"DirMaxRate":30.0}
+
+change to:
+"net":{"scale":1,"ER":400,"IR":100,"EV1":400,"EV1DE":49,"EV1DNE":49,"EV1DN":49,"EV1DNW":49,"EV1DW":49,"EV1DSW":49,"EV1DS":49,"EV1DSE":49,"IV1":100,"EV4":100,"IV4":25,"EMT":25,"IMT":9,"EML":1350,"EMR":1350,"IM":690,"AngRFSigma":90,"DirMinRate":0.0001,"DirMaxRate":30.0}
+
+to cut the number of dir sensitive neurons in ~1/2 and have wider RFs...
+
+sim name ... 20april23_A0
+
+myrun 12
+
+Done; run time = 432.66 s; real-time ratio: 0.00.
+
+python -i actmap.py
+
+data/20april23_A0_actmap.mp4
+
+python -i simdat.py -1
+
+data/20april23_A0_weightmap.mp4
+
+right now there are 1350 EMR and 1350 EML neurons
+
+reduced direction selection neurons from 10x10 to 7x7
+and there are 8 pops, so 51*8=408 fewer neurons
+then HA mentioned number of EMR is equal to number of all other E neurons projecting to them
+so can reduce those as well ...
+
+original EMR was 400 (EV1) + 100*8 (dir sensitive) + 100 (EV4) + 25 (EMT) = 1325
+but there were 1350 ... 25 extra?
+
+was supposed to be 1325
+
+so new number for current architecture should be
+
+400 + 49*8 + 100 + 25  = 917
+
+try that one ... noticeable faster?
+
+"net":{"scale":1,"ER":400,"IR":100,"EV1":400,"EV1DE":49,"EV1DNE":49,"EV1DN":49,"EV1DNW":49,"EV1DW":49,"EV1DSW":49,"EV1DS":49,"EV1DSE":49,"IV1":100,"EV4":100,"IV4":25,"EMT":25,"IMT":9,"EML":917,"EMR":917,"IM":690,"AngRFSigma":90,"DirMinRate":0.0001,"DirMaxRate":30.0}
+
+20april23_A1_
+
+myrun 12
+
+Done; run time = 291.53 s; real-time ratio: 0.00.
+
+yeah, noticeably faster ...
+
+savefig('gif/20apr23_rast_a1.png')
+
+rates and cell activity looks ok
+
+python -i actmap.py
+
+data/20april23_A1_actmap.mp4
+
+python -i simdat.py -1
+
+data/20april23_A1_weightmap.mp4
+

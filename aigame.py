@@ -34,12 +34,24 @@ except:
   env = wrappers.Monitor(env, './videos/' + str(time()) + '/',force=True)
   env.reset()
 
+# get smallest angle difference
+def getangdiff (ang1, ang2):
+  if ang1 > 180.0:
+    ang1 -= 360.0
+  if ang2 > 180.0:
+    ang2 -= 360.0
+  angdiff = ang1 - ang2
+  if angdiff > 180.0:
+    angdiff-=360.0
+  elif angdiff < -180.0:
+    angdiff+=360.0
+  return angdiff
+  
 class AIGame:
   """ Interface to OpenAI gym game 
   """
   def __init__ (self,fcfg='sim.json'): # initialize variables
     self.env = env
-    self.count = 0 
     self.countAll = 0
     self.ldir = ['E','NE','N', 'NW','W','SW','S','SE']
     self.ldirpop = ['EV1D'+Dir for Dir in self.ldir]
@@ -47,13 +59,14 @@ class AIGame:
     for d in self.ldir: self.lratepop.append('EV1D'+d)
     self.dFVec = OrderedDict({pop:h.Vector() for pop in self.lratepop}) # NEURON Vectors for firing rate calculations
     self.dFiringRates = OrderedDict({pop:np.zeros(dconf['net'][pop]) for pop in self.lratepop}) # python objects for firing rate calculations
-    self.dAngRange = OrderedDict({'EV1DE': (337,23),'EV1DNE': (22, 68), # angle ranges by population
-                                  'EV1DN': (67, 113),'EV1DNW': (112, 158),
-                                  'EV1DW': (157, 203),'EV1DSW': (202, 248),
-                                  'EV1DS': (247, 293),'EV1DSE': (292, 338)})
-    self.input_dim = int(np.sqrt(dconf['net']['ER']))
-    self.dirSensitiveNeuronDim = 10 #int(0.5*self.input_dim)
-    self.dirSensitiveNeuronRate = (0.0001, 30) # min, max firing rate (Hz) for dir sensitive neurons
+    self.dAngPeak = OrderedDict({'EV1DE': 0.0,'EV1DNE': 45.0, # receptive field peak angles for the direction selective populations
+                                'EV1DN': 90.0,'EV1DNW': 135.0,
+                                'EV1DW': 180.0,'EV1DSW': 235.0,
+                                'EV1DS': 270.0,'EV1DSE': 315.0})
+    self.AngRFSigma2 = dconf['net']['AngRFSigma']**2 # angular receptive field (RF) sigma squared used for dir selective neuron RFs
+    self.input_dim = int(np.sqrt(dconf['net']['ER'])) # input image XY plane width,height
+    self.dirSensitiveNeuronDim = int(np.sqrt(dconf['net']['EV1DE'])) # direction sensitive neuron XY plane width,height
+    self.dirSensitiveNeuronRate = (dconf['net']['DirMinRate'], dconf['net']['DirMaxRate']) # min, max firing rate (Hz) for dir sensitive neurons
     self.intaction = int(dconf['actionsPerPlay']) # integrate this many actions together before returning reward information to model
     # these are Pong-specific coordinate ranges; should later move out of this function into Pong-specific functions
     self.courtYRng = (34, 194)
@@ -101,9 +114,8 @@ class AIGame:
           Rys = [Ry-2,Ry-1,Ry,Ry+1]
         else:
           Rys = [Ry-2,Ry-1,Ry,Ry+1,Ry+2]
-        #print('Xinds',Rxs)
-        #print('Yinds',Rys)
-        FOV = np.zeros(shape=(len(Rxs),len(Rys)))
+        #print('Xinds',Rxs,'Yinds',Rys)
+        FOV = np.zeros(shape=(len(Rxs),len(Rys))) # field of view
         for xinds in range(len(Rxs)):
           for yinds in range(len(Rys)):
             FOV[xinds,yinds] = dsum_Images[Rxs[xinds],Rys[yinds]]
@@ -111,7 +123,8 @@ class AIGame:
         max_value = np.amax(FOV)
         max_ind = np.where(FOV==max_value)
         #print('max inds', max_ind) 
-        #since the most recent frame has highest pixel intensity, any pixel with the maximum intensity will be most probably the final instance of the object motion in that field of view
+        #since the most recent frame has highest pixel intensity, any pixel with the maximum intensity will be
+        #most probably the final instance of the object motion in that field of view
         bkg_inds = np.where(FOV == bkgPixel)
         if len(bkg_inds[0])>0:
           for yinds in range(len(bkg_inds[0])):
@@ -123,7 +136,8 @@ class AIGame:
         min_value = np.amin(FOV)
         min_ind = np.where(FOV==min_value)
         #print('min inds', min_ind)
-        #since latest frame has lowest pixel intensity (after ignoring background), any pixel with max intensity will most probably be first instance of object motion in that field of view
+        #since latest frame has lowest pixel intensity (after ignoring background), any pixel with max intensity will
+        #most probably be first instance of object motion in that field of view
         if len(max_ind[0])>len(min_ind[0]):
           mL = len(min_ind[0])
         elif len(max_ind[0])<len(min_ind[0]):
@@ -139,17 +153,28 @@ class AIGame:
         theta = np.degrees(np.arccos(np.dot(ndir2,ndirMain))) #if theta is nan, no movement is detected
         if dir2[1]<0: theta = 360-theta 
         dirSensitiveNeurons[dSNeuronX,dSNeuronY] = theta # the motion angle (theta) at position dSNeuronX,dSNeuronY is stored
-        if np.isnan(theta)=='False': print('Theta for FOV ',FOV,' is: ', theta)
+        #if not np.isnan(theta): print('Theta for FOV ',FOV,' is: ', theta)
     print('Computed angles:', dirSensitiveNeurons)
-    dAngRange = self.dAngRange
-    # logical and means that any location where correct direction detected will have maximal firing
-    dInds = {pop:np.where(np.logical_and(dirSensitiveNeurons>dAngRange[pop][0],dirSensitiveNeurons<dAngRange[pop][1])) for pop in self.ldirpop}
-    for pop in self.ldirpop: # now iterate over all motion sensitive populations and set their firing rates
-      dtmp = self.dirSensitiveNeuronRate[0] * np.ones(shape=(dirSensitiveNeuronDim,dirSensitiveNeuronDim))
-      dtmp[dInds[pop]] = self.dirSensitiveNeuronRate[1] # firing rate for active dir sensitive neurons; later could include noise.
-      self.dFiringRates[pop] = np.reshape(dtmp , 100) # this assumes 100 neurons in that population
     return dirSensitiveNeurons
-
+      
+  def updateDirSensitiveRates (self, motiondir):
+    # update firing rate of dir sensitive neurons using dirs (2D array with motion direction at each coordinate)
+    dAngPeak = self.dAngPeak
+    dirSensitiveNeuronDim = self.dirSensitiveNeuronDim
+    AngRFSigma2 = self.AngRFSigma2
+    MaxRate = self.dirSensitiveNeuronRate[1]
+    for pop in self.ldirpop: self.dFiringRates[pop] = self.dirSensitiveNeuronRate[0] * np.ones(shape=(dirSensitiveNeuronDim,dirSensitiveNeuronDim))
+    for y in range(motiondir.shape[0]):
+      for x in range(motiondir.shape[1]):
+        theta = motiondir[y][x]
+        if np.isnan(theta): continue # skip invalid angles
+        for pop in self.ldirpop:
+          fctr = np.exp(-1.0*(getangdiff(theta,dAngPeak[pop])**2)/AngRFSigma2)
+          # print('updateDirSensitiveRates',pop,x,y,fctr,dAngPeak[pop],motiondir[y][x])
+          if fctr > 0.:
+            self.dFiringRates[pop][y,x] += MaxRate * fctr
+    for pop in self.ldirpop: self.dFiringRates[pop]=np.reshape(self.dFiringRates[pop],dirSensitiveNeuronDim**2) 
+          
   def findobj (self, img, xrng, yrng):
     # find an object's x, y position in the image (assumes bright object on dark background)
     subimg = img[yrng[0]:yrng[1],xrng[0]:xrng[1],:]
@@ -265,8 +290,8 @@ class AIGame:
     if self.intaction==1: #if only one frame used per play, then add the downsampled and scaled image from last_obs for direction computation 
       if len(lobs_gimage_ds)>0:
         dsum_Images = np.maximum(dsum_Images,lobs_gimage_ds)
-    dirs = self.computeMotion(dsum_Images) # compute directions of motion for every other pixel and update motion sensitive neuron input rates
-    
+    dirs = self.computeMotion(dsum_Images) # compute directions of motion for every other pixel
+    self.updateDirSensitiveRates(dirs) # update motion sensitive neuron input rates                
 
     if done: # what is done? --- when done == 1, it means that 1 episode of the game ends, so it needs to be reset. 
       epCount.append(self.countAll)
