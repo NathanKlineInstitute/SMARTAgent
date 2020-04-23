@@ -1618,7 +1618,7 @@ hmm, restore sim not working ... can run for 200 s ... see if improves ... fix r
     "sim": {"duration": 200000, "dt": 0.2, "verbose": 0, "recordStep":0.2,"recordWeightStepSize":1,"RLFakeUpRule": 0,"RLFakeDownRule": 0,"RLFakeStayRule": 0,"name":"20april18_A0_","doquit":0,"doplot":1},
 
 myrun 12    
-*20apr22
+*20apr22 - RFs for direction selective neurons
 ** add gaussian profile to direction selective neurons
 
 most of that can go into aigame.py where the rates for those neurons are set
@@ -1689,4 +1689,41 @@ image1_warp = warp(image1, np.array([row_coords + v, col_coords + u]), mode='nea
 other simple code for motion detection/tracking:
  https://www.pyimagesearch.com/2015/05/25/basic-motion-detection-and-tracking-with-python-and-opencv/
 more general ... uses opencv2
+
+implemented exp decay in each direction as
+           fctr = np.exp(-1.0*((theta-dAngPk[pop])**2)/AngSigma**2)
+          print('updateDirSensitiveRates',pop,x,y,fctr,dAngPk[pop],motiondir[y][x])
+          if fctr > 0.:
+            self.dFiringRates[pop][y,x] = AngVal * fctr
+
+with AngSigma as 45 ... (can tweak) and AngVal as 30
+            
+... ran a small test ... (still have to fix E direction!!)
+
+gif/20apr22_rast_a4.png
+gif/20apr22_EV1DS_a4.png
+
+not sure what data/20april22_A0_randGameBehavior.mp4 is supposed to show but looks incomplete ... only runs
+up to 50 ms ... yeah, used old files from hours ago ... should cleanup the pngs
+
+python -i actmap.py
+
+data/20april22_A0_actmap.mp4
+
+looks OK but E needs to be fixed
+
+python -i simdat.py -1
+
+data/20april22_A0_weightmap.mp4
+
+*20apr23 - RFs for direction selective neurons
+** RFs for direction selective neurons
+
+right now the RFs are setup to have peaks every 45 degrees with 45 degree sigma for exp fall-off
+in magnitude of firing rate ...
+
+could randomize directions between 0-360 degrees and potentially reduce number of direction selective neurons?
+8 directions for RF is also somewhat limiting. movement can occur in other directions ...
+
+or increase spread of RFs ...
 

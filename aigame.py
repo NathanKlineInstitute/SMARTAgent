@@ -52,7 +52,6 @@ class AIGame:
   """
   def __init__ (self,fcfg='sim.json'): # initialize variables
     self.env = env
-    self.count = 0 
     self.countAll = 0
     self.ldir = ['E','NE','N', 'NW','W','SW','S','SE']
     self.ldirpop = ['EV1D'+Dir for Dir in self.ldir]
@@ -60,14 +59,14 @@ class AIGame:
     for d in self.ldir: self.lratepop.append('EV1D'+d)
     self.dFVec = OrderedDict({pop:h.Vector() for pop in self.lratepop}) # NEURON Vectors for firing rate calculations
     self.dFiringRates = OrderedDict({pop:np.zeros(dconf['net'][pop]) for pop in self.lratepop}) # python objects for firing rate calculations
-    self.dAngPeak = OrderedDict({'EV1DE': 0.0,'EV1DNE': 45.0, # angle ranges by population
-                             'EV1DN': 90.0,'EV1DNW': 135.0,
-                             'EV1DW': 180.0,'EV1DSW': 235.0,
-                             'EV1DS': 270.0,'EV1DSE': 315.0})
-    self.dAngSigma2 = 45.0**2
-    self.input_dim = int(np.sqrt(dconf['net']['ER']))
-    self.dirSensitiveNeuronDim = 10 #int(0.5*self.input_dim)
-    self.dirSensitiveNeuronRate = (0.0001, 30) # min, max firing rate (Hz) for dir sensitive neurons
+    self.dAngPeak = OrderedDict({'EV1DE': 0.0,'EV1DNE': 45.0, # receptive field peak angles for the direction selective populations
+                                'EV1DN': 90.0,'EV1DNW': 135.0,
+                                'EV1DW': 180.0,'EV1DSW': 235.0,
+                                'EV1DS': 270.0,'EV1DSE': 315.0})
+    self.dAngRFSigma2 = dconf['net']['AngRFSigma']**2 # angular receptive field (RF) sigma squared used for dir selective neuron RFs
+    self.input_dim = int(np.sqrt(dconf['net']['ER'])) # input image XY plane width,height
+    self.dirSensitiveNeuronDim = int(np.sqrt(dconf['net']['EV1DE'])) # direction sensitive neuron XY plane width,height
+    self.dirSensitiveNeuronRate = (dconf['net']['DirMinRate'], dconf['net']['DirMaxRate']) # min, max firing rate (Hz) for dir sensitive neurons
     self.intaction = int(dconf['actionsPerPlay']) # integrate this many actions together before returning reward information to model
     # these are Pong-specific coordinate ranges; should later move out of this function into Pong-specific functions
     self.courtYRng = (34, 194)
@@ -154,7 +153,7 @@ class AIGame:
         theta = np.degrees(np.arccos(np.dot(ndir2,ndirMain))) #if theta is nan, no movement is detected
         if dir2[1]<0: theta = 360-theta 
         dirSensitiveNeurons[dSNeuronX,dSNeuronY] = theta # the motion angle (theta) at position dSNeuronX,dSNeuronY is stored
-        if not np.isnan(theta): print('Theta for FOV ',FOV,' is: ', theta)
+        #if not np.isnan(theta): print('Theta for FOV ',FOV,' is: ', theta)
     print('Computed angles:', dirSensitiveNeurons)
     return dirSensitiveNeurons
       
@@ -162,19 +161,19 @@ class AIGame:
     # update firing rate of dir sensitive neurons using dirs (2D array with motion direction at each coordinate)
     dAngPeak = self.dAngPeak
     dirSensitiveNeuronDim = self.dirSensitiveNeuronDim
-    AngSigma2 = self.dAngSigma2
-    AngVal = self.dirSensitiveNeuronRate[1]
+    AngRFSigma2 = self.AngRFSigma2
+    MaxRate = self.dirSensitiveNeuronRate[1]
     for pop in self.ldirpop: self.dFiringRates[pop] = self.dirSensitiveNeuronRate[0] * np.ones(shape=(dirSensitiveNeuronDim,dirSensitiveNeuronDim))
     for y in range(motiondir.shape[0]):
       for x in range(motiondir.shape[1]):
         theta = motiondir[y][x]
-        if np.isnan(theta): continue
+        if np.isnan(theta): continue # skip invalid angles
         for pop in self.ldirpop:
-          fctr = np.exp(-1.0*(getangdiff(theta,dAngPeak[pop])**2)/AngSigma2)
-          print('updateDirSensitiveRates',pop,x,y,fctr,dAngPeak[pop],motiondir[y][x])
+          fctr = np.exp(-1.0*(getangdiff(theta,dAngPeak[pop])**2)/AngRFSigma2)
+          # print('updateDirSensitiveRates',pop,x,y,fctr,dAngPeak[pop],motiondir[y][x])
           if fctr > 0.:
-            self.dFiringRates[pop][y,x] = max(self.dirSensitiveNeuronRate[0], AngVal * fctr)
-    for pop in self.ldirpop: self.dFiringRates[pop]=np.reshape(self.dFiringRates[pop],100) # this assumes 100 neurons in that population    
+            self.dFiringRates[pop][y,x] += MaxRate * fctr
+    for pop in self.ldirpop: self.dFiringRates[pop]=np.reshape(self.dFiringRates[pop],dirSensitiveNeuronDim**2) 
           
   def findobj (self, img, xrng, yrng):
     # find an object's x, y position in the image (assumes bright object on dark background)

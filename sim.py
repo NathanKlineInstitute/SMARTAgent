@@ -1548,5 +1548,5 @@ if sim.rank == 0: # only rank 0 should save. otherwise all the other nodes could
             for Input_Image in InputImages:
                 np.savetxt(outfile, Input_Image, fmt='%-7.2f')
                 outfile.write('# New slice\n')
-        anim.savemp4('/tmp/*.png','data/'+dconf['sim']['name']+'randGameBehavior.mp4',10)
+        #anim.savemp4('/tmp/*.png','data/'+dconf['sim']['name']+'randGameBehavior.mp4',10)
         if dconf['sim']['doquit']: quit()
