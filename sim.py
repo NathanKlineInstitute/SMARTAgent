@@ -1207,11 +1207,14 @@ def updateBehaviorPlot (sim,InputImages,Images,dirSensitiveNeurons,Racket_pos,Ba
   c1 = plt.colorbar(fa,cax = cbaxes)
   c1.set_ticks([22,67,112,157,202,247,292,337])
   c1.set_ticklabels(['E','NE','N','NW','W','SW','S','SE'])
-  cumHits = np.cumsum(sim.allHits) #cummulative hits evolving with time.
-  missHits = np.where(np.array(sim.allRewards)==-1,1,0)
-  cumMissHits = np.cumsum(missHits) #if a reward is -1, replace it with 1 else replace it with 0.
+  Hit_Missed = np.array(sim.allHits)
+  allHit = np.where(Hit_Missed==1,1,0) 
+  allMissed = np.where(Hit_Missed==-1,1,0)
+  cumHits = np.cumsum(allHit) #cummulative hits evolving with time.
+  cumMissHits = np.cumsum(allMissed) #if a reward is -1, replace it with 1 else replace it with 0.
   Diff_Actions_Proposed = np.subtract(sim.allActions,sim.allProposedActions)
-  tpnts = range(5,len(Diff_Actions_Proposed)+5,5)
+  t0 = int(dconf['actionsPerPlay'])
+  tpnts = range(t0,len(Diff_Actions_Proposed)+t0,t0)
   rewardingActions = np.sum(np.where(Diff_Actions_Proposed==0,1,0))
   punishingActions = np.sum(np.where((Diff_Actions_Proposed>0) | (Diff_Actions_Proposed<0),1,0))
   totalActs = rewardingActions + punishingActions
@@ -1421,8 +1424,8 @@ def trainAgent (t):
             tvec_actions.append(t-tstepPerAction*(len(actions)-ts-1))
         #for ltpnt in [t-80, t-60, t-40, t-20, t-0]: sim.allTimes.append(ltpnt)
         for ltpnt in tvec_actions: sim.allTimes.append(ltpnt)
-        #current_time_stepNB, f_ax, fig = updateBehaviorPlot (sim,InputImages,Images,dirSensitiveNeurons,Racket_pos,Ball_pos,current_time_stepNB, f_ax, fig)
-        #current_time_stepNB = current_time_stepNB + 1
+        current_time_stepNB, f_ax, fig = updateBehaviorPlot (sim,InputImages,Images,dirSensitiveNeurons,Racket_pos,Ball_pos,current_time_stepNB, f_ax, fig)
+        current_time_stepNB = current_time_stepNB + 1
     updateInputRates() # update firing rate of inputs to R population (based on image content)                
     NBsteps = NBsteps+1
     if NBsteps % recordWeightStepSize == 0:
