@@ -1791,3 +1791,10 @@ python -i simdat.py -1
 
 data/20april23_A1_weightmap.mp4
 
+** adjust one-to-one to random connectivity
+
+will have to reduce convergence most likely ...
+
+20april23_B0_
+
+myrun 12
