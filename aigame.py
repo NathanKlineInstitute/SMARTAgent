@@ -34,6 +34,19 @@ except:
   env = wrappers.Monitor(env, './videos/' + str(time()) + '/',force=True)
   env.reset()
 
+# get smallest angle difference
+def getangdiff (ang1, ang2):
+  if ang1 > 180.0:
+    ang1 -= 360.0
+  if ang2 > 180.0:
+    ang2 -= 360.0
+  angdiff = ang1 - ang2
+  if angdiff > 180.0:
+    angdiff-=360.0
+  elif angdiff < -180.0:
+    angdiff+=360.0
+  return angdiff
+  
 class AIGame:
   """ Interface to OpenAI gym game 
   """
@@ -47,10 +60,11 @@ class AIGame:
     for d in self.ldir: self.lratepop.append('EV1D'+d)
     self.dFVec = OrderedDict({pop:h.Vector() for pop in self.lratepop}) # NEURON Vectors for firing rate calculations
     self.dFiringRates = OrderedDict({pop:np.zeros(dconf['net'][pop]) for pop in self.lratepop}) # python objects for firing rate calculations
-    self.dAngRange = OrderedDict({'EV1DE': (337,23),'EV1DNE': (22, 68), # angle ranges by population
-                                  'EV1DN': (67, 113),'EV1DNW': (112, 158),
-                                  'EV1DW': (157, 203),'EV1DSW': (202, 248),
-                                  'EV1DS': (247, 293),'EV1DSE': (292, 338)})
+    self.dAngPeak = OrderedDict({'EV1DE': 0.0,'EV1DNE': 45.0, # angle ranges by population
+                             'EV1DN': 90.0,'EV1DNW': 135.0,
+                             'EV1DW': 180.0,'EV1DSW': 235.0,
+                             'EV1DS': 270.0,'EV1DSE': 315.0})
+    self.dAngSigma2 = 45.0**2
     self.input_dim = int(np.sqrt(dconf['net']['ER']))
     self.dirSensitiveNeuronDim = 10 #int(0.5*self.input_dim)
     self.dirSensitiveNeuronRate = (0.0001, 30) # min, max firing rate (Hz) for dir sensitive neurons
@@ -143,14 +157,12 @@ class AIGame:
         if not np.isnan(theta): print('Theta for FOV ',FOV,' is: ', theta)
     print('Computed angles:', dirSensitiveNeurons)
     return dirSensitiveNeurons
-
+      
   def updateDirSensitiveRates (self, motiondir):
     # update firing rate of dir sensitive neurons using dirs (2D array with motion direction at each coordinate)
-    dAngRange = self.dAngRange
-    dAngPk = {pop:dAngRange[pop][0]+(dAngRange[pop][1]-dAngRange[pop][0])/2.0 for pop in self.ldirpop}
-    print(self.ldirpop,dAngRange, dAngPk)
+    dAngPk = self.dAngPk
     dirSensitiveNeuronDim = self.dirSensitiveNeuronDim
-    AngSigma = 45.
+    AngSigma2 = self.dAngSigma2
     AngVal = self.dirSensitiveNeuronRate[1]
     for pop in self.ldirpop: self.dFiringRates[pop] = self.dirSensitiveNeuronRate[0] * np.ones(shape=(dirSensitiveNeuronDim,dirSensitiveNeuronDim))
     for y in range(motiondir.shape[0]):
@@ -158,19 +170,11 @@ class AIGame:
         theta = motiondir[y][x]
         if np.isnan(theta): continue
         for pop in self.ldirpop:
-          fctr = np.exp(-1.0*((theta-dAngPk[pop])**2)/AngSigma**2)
+          fctr = np.exp(-1.0*(getangdiff(theta,dAngPk[pop])**2)/AngSigma2)
           print('updateDirSensitiveRates',pop,x,y,fctr,dAngPk[pop],motiondir[y][x])
           if fctr > 0.:
-            self.dFiringRates[pop][y,x] = AngVal * fctr
+            self.dFiringRates[pop][y,x] = max(self.dirSensitiveNeuronRate[0], AngVal * fctr)
     for pop in self.ldirpop: self.dFiringRates[pop]=np.reshape(self.dFiringRates[pop],100) # this assumes 100 neurons in that population    
-    """
-    # logical and means that any location where correct direction detected will have maximal firing
-    dInds = {pop:np.where(np.logical_and(motiondir>dAngRange[pop][0],motiondir<dAngRange[pop][1])) for pop in self.ldirpop}
-    for pop in self.ldirpop: # now iterate over all motion sensitive populations and set their firing rates
-      dtmp = self.dirSensitiveNeuronRate[0] * np.ones(shape=(dirSensitiveNeuronDim,dirSensitiveNeuronDim))
-      dtmp[dInds[pop]] = self.dirSensitiveNeuronRate[1] # firing rate for active dir sensitive neurons; later could include noise.
-      self.dFiringRates[pop] = np.reshape(dtmp , 100) # this assumes 100 neurons in that population    
-    """
           
   def findobj (self, img, xrng, yrng):
     # find an object's x, y position in the image (assumes bright object on dark background)
