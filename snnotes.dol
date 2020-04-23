@@ -1740,3 +1740,54 @@ to cut the number of dir sensitive neurons in ~1/2 and have wider RFs...
 sim name ... 20april23_A0
 
 myrun 12
+
+Done; run time = 432.66 s; real-time ratio: 0.00.
+
+python -i actmap.py
+
+data/20april23_A0_actmap.mp4
+
+python -i simdat.py -1
+
+data/20april23_A0_weightmap.mp4
+
+right now there are 1350 EMR and 1350 EML neurons
+
+reduced direction selection neurons from 10x10 to 7x7
+and there are 8 pops, so 51*8=408 fewer neurons
+then HA mentioned number of EMR is equal to number of all other E neurons projecting to them
+so can reduce those as well ...
+
+original EMR was 400 (EV1) + 100*8 (dir sensitive) + 100 (EV4) + 25 (EMT) = 1325
+but there were 1350 ... 25 extra?
+
+was supposed to be 1325
+
+so new number for current architecture should be
+
+400 + 49*8 + 100 + 25  = 917
+
+try that one ... noticeable faster?
+
+"net":{"scale":1,"ER":400,"IR":100,"EV1":400,"EV1DE":49,"EV1DNE":49,"EV1DN":49,"EV1DNW":49,"EV1DW":49,"EV1DSW":49,"EV1DS":49,"EV1DSE":49,"IV1":100,"EV4":100,"IV4":25,"EMT":25,"IMT":9,"EML":917,"EMR":917,"IM":690,"AngRFSigma":90,"DirMinRate":0.0001,"DirMaxRate":30.0}
+
+20april23_A1_
+
+myrun 12
+
+Done; run time = 291.53 s; real-time ratio: 0.00.
+
+yeah, noticeably faster ...
+
+savefig('gif/20apr23_rast_a1.png')
+
+rates and cell activity looks ok
+
+python -i actmap.py
+
+data/20april23_A1_actmap.mp4
+
+python -i simdat.py -1
+
+data/20april23_A1_weightmap.mp4
+
