@@ -1320,5 +1320,5 @@ This bug was found in all functions where instead of src, trg was used for dendi
       if len(lobs_gimage_ds)>0:
         dsum_Images = np.maximum(dsum_Images,lobs_gimage_ds)
     dirs = self.computeMotion(dsum_Images)
-***run sim of 5 sec to test the code for actionsPerPlay = 1 and save with prefix: "20april22_B0_"
+***run sim of 100 sec to test the code for actionsPerPlay = 1 and save with prefix: "20april22_B0_"
 ***sim working, needs to check if directions are computed correctly. so better plotbehavior with sim.
