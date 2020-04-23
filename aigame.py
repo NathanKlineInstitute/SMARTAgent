@@ -160,7 +160,7 @@ class AIGame:
       
   def updateDirSensitiveRates (self, motiondir):
     # update firing rate of dir sensitive neurons using dirs (2D array with motion direction at each coordinate)
-    dAngPk = self.dAngPk
+    dAngPeak = self.dAngPeak
     dirSensitiveNeuronDim = self.dirSensitiveNeuronDim
     AngSigma2 = self.dAngSigma2
     AngVal = self.dirSensitiveNeuronRate[1]
@@ -170,8 +170,8 @@ class AIGame:
         theta = motiondir[y][x]
         if np.isnan(theta): continue
         for pop in self.ldirpop:
-          fctr = np.exp(-1.0*(getangdiff(theta,dAngPk[pop])**2)/AngSigma2)
-          print('updateDirSensitiveRates',pop,x,y,fctr,dAngPk[pop],motiondir[y][x])
+          fctr = np.exp(-1.0*(getangdiff(theta,dAngPeak[pop])**2)/AngSigma2)
+          print('updateDirSensitiveRates',pop,x,y,fctr,dAngPeak[pop],motiondir[y][x])
           if fctr > 0.:
             self.dFiringRates[pop][y,x] = max(self.dirSensitiveNeuronRate[0], AngVal * fctr)
     for pop in self.ldirpop: self.dFiringRates[pop]=np.reshape(self.dFiringRates[pop],100) # this assumes 100 neurons in that population    
