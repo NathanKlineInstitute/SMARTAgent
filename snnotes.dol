@@ -1727,3 +1727,16 @@ could randomize directions between 0-360 degrees and potentially reduce number o
 
 or increase spread of RFs ...
 
+also can change size of direction selective neuron populations ...
+
+original values:
+"net":{"scale":1,"ER":400,"IR":100,"EV1":400,"EV1DE":100,"EV1DNE":100,"EV1DN":100,"EV1DNW":100,"EV1DW":100,"EV1DSW":100,"EV1DS":100,"EV1DSE":100,"IV1":100,"EV4":100,"IV4":25,"EMT":25,"IMT":9,"EML":1350,"EMR":1350,"IM":690,"AngRFSigma":45,"DirMinRate":0.0001,"DirMaxRate":30.0}
+
+change to:
+"net":{"scale":1,"ER":400,"IR":100,"EV1":400,"EV1DE":49,"EV1DNE":49,"EV1DN":49,"EV1DNW":49,"EV1DW":49,"EV1DSW":49,"EV1DS":49,"EV1DSE":49,"IV1":100,"EV4":100,"IV4":25,"EMT":25,"IMT":9,"EML":1350,"EMR":1350,"IM":690,"AngRFSigma":90,"DirMinRate":0.0001,"DirMaxRate":30.0}
+
+to cut the number of dir sensitive neurons in ~1/2 and have wider RFs...
+
+sim name ... 20april23_A0
+
+myrun 12
