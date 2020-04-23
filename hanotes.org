@@ -1302,4 +1302,22 @@ This bug was found in all functions where instead of src, trg was used for dendi
 **problem in plotting behavior when using 2 actionsPerPlay.
 ***run sim using 2 actionsPerPlay without plotting behavior.
 **fixed hits/miss-hits plot in recording behavior. also run simdat.py and actmap.py for "20april21_B0_" for 2 actionsPerPlay. No behavior saved while runing simulation.
-**run sim with 2 actionsPerPlay for 100 sec with prefix "20april21_C0_"
+**run sim with 2 actionsPerPlay for 100 sec with prefix "20april21_C0_". No behavior movie. only weightsmap and actmap movies.
+**ran sim with 2 actionsPerPlay for 5 sec with prefix "20april22_A0_" with randomBehavior movie to test if the brhavior plotting is working fine. updateBehaviorPlot worked FINE with 2 actionsPerPlay. only behavior movie saved.
+**Now need to start testing for 1 actionPerPlay.
+**function computMotion needs atleast 2 images to compute the motion direction. when we are using 1 actionPerPlay, use previous image with one image to compute the direction.
+**CHANGES in aigame.py:
+***always process last_obs, whenever it is not empty.
+    if len(self.last_obs)==0: #if its the first action of the episode, there won't be any last_obs, therefore no last image
+      lobs_gimage_ds = []
+    else:
+      lobs_gimage = 255.0*rgb2gray(self.last_obs[courtYRng[0]:courtYRng[1],:,:]) 
+      lobs_gimage_ds = downscale_local_mean(lobs_gimage,(8,8))
+      lobs_gimage_ds = np.where(lobs_gimage_ds>np.min(lobs_gimage_ds)+1,255,lobs_gimage_ds)
+      lobs_gimage_ds = 0.5*lobs_gimage_ds #use this image for motion computation only
+***Do this only after computing firing rates for E, when number of actionsPerPlay is 1:
+    if self.intaction==1: #if only one frame used per play, then add the downsampled and scaled image from last_obs for direction computation 
+      if len(lobs_gimage_ds)>0:
+        dsum_Images = np.maximum(dsum_Images,lobs_gimage_ds)
+    dirs = self.computeMotion(dsum_Images)
+***run sim of 5 sec to test the code for actionsPerPlay = 1 and save with prefix: "20april22_B0_"
