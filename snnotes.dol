@@ -1926,3 +1926,5 @@ hmm, keep getting those errors in animSynWeights in getwts
 
 must happen since have probabilistic connectivity, no longer exact number of inputs specified ... ?
 
+will fix ... also reduce weight to EML, EMR ... try that out ...
+
