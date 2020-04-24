@@ -1798,3 +1798,24 @@ will have to reduce convergence most likely ...
 20april23_B0_
 
 myrun 12
+
+something making this run very slowly now ... not clear why ...
+
+also, did not adjust number of IM neurons ... should be lower
+
+x / (917*2+x) = 0.2
+0.2*(917*2+x) = x
+366.8 + .2x = x
+.8x = 366.8
+x = 366.8/.8 = 458.5
+
+459/(917*2+459) # 0.20017444395987788
+
+so should have 459 IM neurons ...
+
+but doubt that's reason for slowdown ...
+
+there were some bugs in connectivity from visual to motor areas and from premotor to motor areas
+EV1DW connected to EML and EMR two times both for AMPA and NMDA
+
+used loops to reduce those errors ... 
