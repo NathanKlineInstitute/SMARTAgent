@@ -1798,3 +1798,174 @@ will have to reduce convergence most likely ...
 20april23_B0_
 
 myrun 12
+
+something making this run very slowly now ... not clear why ...
+
+also, did not adjust number of IM neurons ... should be lower
+
+x / (917*2+x) = 0.2
+0.2*(917*2+x) = x
+366.8 + .2x = x
+.8x = 366.8
+x = 366.8/.8 = 458.5
+
+459/(917*2+459) # 0.20017444395987788
+
+so should have 459 IM neurons ...
+
+but doubt that's reason for slowdown ...
+
+there were some bugs in connectivity from visual to motor areas and from premotor to motor areas
+EV1DW connected to EML and EMR two times both for AMPA and NMDA
+
+used loops to reduce those errors ... 
+
+*20apr24
+** debug connectivity/speed issues
+
+myrun 12
+
+  Done; run time = 257.86 s; real-time ratio: 0.00.
+  Done; gather time = 455.45 s.
+
+that's for 1 s of sim time ... seems a bit faster to run sim ... why is gather so slow?
+
+getting hyperactivation/synchrony ... probably too much EE connectivity  
+
+python -i actmap.py
+
+data/20april24_A0_actmap.mp4
+
+python -i simdat.py -1
+
+got an error about wrong size in image ... 
+
+** discuss net/motion selectivity with HA
+
+also i think after neuron reduction in direction selective cells, motioncomputation is not capturing whole image
+samn ok, i'll restore their number
+but may keep EML, EMR numbers lower
+Haroon Anwar yes, probably that way we can narrow down the issue…. can lower direction selective neuron nb later
+samn sg
+one other question i had was ...
+Haroon Anwar sure
+samn now we use 2 frames to compute direction
+and we did that to have 1 action for each frame
+could we use 5 frames for motion calculation but still have 1 action for 5 frames?
+Haroon Anwar so in sim.json, we specify 1 frame….but in aigame.py, it uses last_obs to compute motion direction.
+i dont think so
+we could do so but back in time
+so for time t, we could use t-4,t-3,t-2,t-1 and t
+and use 1 action
+samn so we could do 5 frames for motion, 1 action for 5 frames?
+Haroon Anwar for 1 action for 1 frame
+1 action for 5 frames will compromise the performance severly
+samn ok, so we can keep as is.
+think any problems with how you modified it to? if we have 100 neurons for each direction population
+Haroon Anwar how i modified it to? — which part?
+samn 1 action per 1 frame
+and 2 frames for motion
+Haroon Anwar no it should not effect
+samn so it should be good
+ok, and to follow up, 20 ms is time for 1 frame. if it's longer, will that help?
+Haroon Anwar problem is with computing motion not activating neurons
+samn so there is a problem of computing motion from 2 frames. and possibly optical flow algorithm will help
+Haroon Anwar 20 ms for 1 frame should nicely scale, as we were using 100 ms for 5 frames. so it
+means that firing rate has to be 50 Hz to have one spike per action
+samn ok sg
+
+
+** restore # dir selective neurons but reduce # motor neurons & debug/test
+
+x / (400*2+x) = 0.2
+0.2*(400*2+x) = x
+160 + 0.2x = x
+0.8x = 160
+x=160/.8=200
+
+"EML":400,"EMR":400,"IM":200
+
+    "net":{"scale":1,"ER":400,"IR":100,"EV1":400,"EV1DE":100,"EV1DNE":100,"EV1DN":100,"EV1DNW":100,"EV1DW":100,"EV1DSW":100,"EV1DS":100,"EV1DSE":100,"IV1":100,"EV4":100,"IV4":25,"EMT":25,"IMT":9,"EML":400,"EMR":400,"IM":200,"AngRFSigma":90,"DirMinRate":0.0001,"DirMaxRate":30.0}
+
+20april24_B0_
+
+myrun 12
+
+Done; run time = 159.11 s; real-time ratio: 0.01.
+
+most cells at decent rates, runs quicker than before ... but EMR,EML,IM cells fire too fast and with depolarization blockade 
+20apr24_rast_a1.png
+20apr24_IM_a1.png
+20apr24_EML_a1.png
+
+to remove that problem could reduce probability of inputs to EML,EMR neurons ...
+
+python -i actmap.py
+
+data/20april24_B0_actmap.mp4
+
+python -i simdat.py -1
+
+simdat.py:97: UserWarning: Attempting to set identical bottom == top == 0 results in singular transformations; automatically expanding.
+  f_ax4.set_ylim((0,np.max([cumHits[-1],cumMissed[-1]])))
+Traceback (most recent call last):
+  File "simdat.py", line 415, in <module>
+    animSynWeights(pdf,'data/'+dconf['sim']['name']+'weightmap.mp4', framerate=10) #plot/save images as movie
+  File "simdat.py", line 127, in animSynWeights
+    wtsL, wtsR = getwts(0, src)
+  File "simdat.py", line 111, in getwts
+    wtsL = np.reshape(wtsl,(int(np.sqrt(len(wtsl))),int(np.sqrt(len(wtsl))))) 
+  File "<__array_function__ internals>", line 6, in reshape
+  File "/usr/site/nrniv/local/python/anaconda3/envs/py36/lib/python3.6/site-packages/numpy/core/fromnumeric.py", line 301, in reshape
+    return _wrapfunc(a, 'reshape', newshape, order=order)
+  File "/usr/site/nrniv/local/python/anaconda3/envs/py36/lib/python3.6/site-packages/numpy/core/fromnumeric.py", line 61, in _wrapfunc
+    return bound(*args, **kwds)
+ValueError: cannot reshape array of size 15964 into shape (126,126)
+
+hmm, keep getting those errors in animSynWeights in getwts
+
+must happen since have probabilistic connectivity, no longer exact number of inputs specified ... ?
+
+will fix ... also reduce weight to EML, EMR ... try that out ...
+
+myrun 12
+
+Run time: 156.21 s
+Done; saving time = 121.36 s.
+
+raster looks ok ...
+
+20apr22_rast_b0.png
+most cells look ok, though EML,EMR rates still a little high ...
+20apr22_EMR_b0.png
+20apr22_IM_b0.png
+20apr22_EML_b0.png
+
+python -i actmap.py
+
+data/20april24_B0_actmap.mp4
+
+directions look decent but mabe the RF angle sigma is too high ...
+
+python -i simdat.py -1
+
+simdat.py:97: UserWarning: Attempting to set identical bottom == top == 0 results in singular transformations; automatically expanding.
+  f_ax4.set_ylim((0,np.max([cumHits[-1],cumMissed[-1]])))
+Traceback (most recent call last):
+  File "simdat.py", line 415, in <module>
+    animSynWeights(pdf,'data/'+dconf['sim']['name']+'weightmap.mp4', framerate=10) #plot/save images as movie
+  File "simdat.py", line 127, in animSynWeights
+    wtsL, wtsR = getwts(0, src)
+  File "simdat.py", line 111, in getwts
+    wtsL = np.reshape(wtsl,(int(np.sqrt(len(wtsl))),int(np.sqrt(len(wtsl))))) 
+  File "<__array_function__ internals>", line 6, in reshape
+  File "/usr/site/nrniv/local/python/anaconda3/envs/py36/lib/python3.6/site-packages/numpy/core/fromnumeric.py", line 301, in reshape
+    return _wrapfunc(a, 'reshape', newshape, order=order)
+  File "/usr/site/nrniv/local/python/anaconda3/envs/py36/lib/python3.6/site-packages/numpy/core/fromnumeric.py", line 61, in _wrapfunc
+    return bound(*args, **kwds)
+ValueError: cannot reshape array of size 15964 into shape (126,126)
+
+have to fix simdat.py ! ! !
+
+
+

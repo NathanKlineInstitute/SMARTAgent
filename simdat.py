@@ -54,7 +54,7 @@ def animSynWeights (pdf, outpath, framerate=10, figsize=(7,4), cmap='jet'):
     for cols in range(8): 
       if ax_count<22: 
         f_ax.append(fig.add_subplot(gs[rows,cols]))
-      ax_count = ax_count+1
+      ax_count += 1
   cbaxes = fig.add_axes([0.92, 0.4, 0.01, 0.2])
   f_ax1 = fig.add_subplot(gs[2,6:8])
   f_ax2 = fig.add_subplot(gs[3,0:2])
@@ -67,12 +67,13 @@ def animSynWeights (pdf, outpath, framerate=10, figsize=(7,4), cmap='jet'):
   action_times = np.array(actreward.time)
   actionvsproposed = np.array(actreward.action-actreward.proposed)
   rewardingActions = np.cumsum(np.where(actionvsproposed==0,1,0)) #rewarding action
-  punishingActions = np.cumsum(np.where((actionvsproposed>0) | (actionvsproposed<0),1,0)) #punishing action i.e. when the action leads to move the racket away from the ball
+  #punishing action i.e. when the action leads to move the racket away from the ball
+  punishingActions = np.cumsum(np.where((actionvsproposed>0) | (actionvsproposed<0),1,0)) 
   cumActs = np.array(range(1,len(actionvsproposed)+1))
   Hit_Missed = np.array(actreward.hit)
   allHit = np.where(Hit_Missed==1,1,0) 
   allMissed = np.where(Hit_Missed==-1,1,0)
-  cumHits = np.cumsum(allHit) #cummulative hits evolving with time.
+  cumHits = np.cumsum(allHit) #cumulative hits evolving with time.
   cumMissed = np.cumsum(allMissed) #if a reward is -1, replace it with 1 else replace it with 0.
   f_ax1.plot(action_times,np.divide(rewardingActions,cumActs),'r.',markersize=1)
   f_ax1.plot(action_times,np.divide(punishingActions,cumActs),'b.',markersize=1)

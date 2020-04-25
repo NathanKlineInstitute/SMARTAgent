@@ -293,7 +293,7 @@ class AIGame:
     dirs = self.computeMotion(dsum_Images) # compute directions of motion for every other pixel
     self.updateDirSensitiveRates(dirs) # update motion sensitive neuron input rates                
 
-    if done: # what is done? --- when done == 1, it means that 1 episode of the game ends, so it needs to be reset. 
+    if done: # done means that 1 episode of the game finished, so the environment needs to be reset. 
       epCount.append(self.countAll)
       self.env.reset()
       self.env.frameskip = 3 
