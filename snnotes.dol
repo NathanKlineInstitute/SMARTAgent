@@ -1928,3 +1928,44 @@ must happen since have probabilistic connectivity, no longer exact number of inp
 
 will fix ... also reduce weight to EML, EMR ... try that out ...
 
+myrun 12
+
+Run time: 156.21 s
+Done; saving time = 121.36 s.
+
+raster looks ok ...
+
+20apr22_rast_b0.png
+most cells look ok, though EML,EMR rates still a little high ...
+20apr22_EMR_b0.png
+20apr22_IM_b0.png
+20apr22_EML_b0.png
+
+python -i actmap.py
+
+data/20april24_B0_actmap.mp4
+
+directions look decent but mabe the RF angle sigma is too high ...
+
+python -i simdat.py -1
+
+simdat.py:97: UserWarning: Attempting to set identical bottom == top == 0 results in singular transformations; automatically expanding.
+  f_ax4.set_ylim((0,np.max([cumHits[-1],cumMissed[-1]])))
+Traceback (most recent call last):
+  File "simdat.py", line 415, in <module>
+    animSynWeights(pdf,'data/'+dconf['sim']['name']+'weightmap.mp4', framerate=10) #plot/save images as movie
+  File "simdat.py", line 127, in animSynWeights
+    wtsL, wtsR = getwts(0, src)
+  File "simdat.py", line 111, in getwts
+    wtsL = np.reshape(wtsl,(int(np.sqrt(len(wtsl))),int(np.sqrt(len(wtsl))))) 
+  File "<__array_function__ internals>", line 6, in reshape
+  File "/usr/site/nrniv/local/python/anaconda3/envs/py36/lib/python3.6/site-packages/numpy/core/fromnumeric.py", line 301, in reshape
+    return _wrapfunc(a, 'reshape', newshape, order=order)
+  File "/usr/site/nrniv/local/python/anaconda3/envs/py36/lib/python3.6/site-packages/numpy/core/fromnumeric.py", line 61, in _wrapfunc
+    return bound(*args, **kwds)
+ValueError: cannot reshape array of size 15964 into shape (126,126)
+
+have to fix simdat.py ! ! !
+
+
+
