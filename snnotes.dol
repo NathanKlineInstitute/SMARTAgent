@@ -1967,5 +1967,15 @@ ValueError: cannot reshape array of size 15964 into shape (126,126)
 
 have to fix simdat.py ! ! !
 
+*20apr27
+** fixup simdat.py
 
+ok, adjusted - separating out AMPA, NMDA weights
+
+  animSynWeights(pdf[pdf.syntype=='AMPA'],'data/'+dconf['sim']['name']+'_AMPA_weightmap.mp4', framerate=10) #plot/save images as movie
+  animSynWeights(pdf[pdf.syntype=='NMDA'],'data/'+dconf['sim']['name']+'_NMDA_weightmap.mp4', framerate=10) #plot/save images as movie  
+
+can combine AMPA and NMDA later if needed ...
+
+though no reason to assume the two sets of weights should change at same time-scale
 

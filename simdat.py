@@ -36,15 +36,21 @@ def loadsimdat (name=None):
 
 #
 def animSynWeights (pdf, outpath, framerate=10, figsize=(7,4), cmap='jet'):
+  # animate the synaptic weights along with some stats on behavior
   origfsz = rcParams['font.size']; rcParams['font.size'] = 5; ioff() # save original font size, turn off interactive plotting
   utimes = np.unique(pdf.time)
-  maxNMDAwt = np.max(pdf[pdf.syntype=='NMDA'].weight)
-  maxAMPAwt = np.max(pdf[pdf.syntype=='AMPA'].weight)
-  maxwt = maxNMDAwt+maxAMPAwt
-  minNMDAwt = np.min(pdf[pdf.syntype=='NMDA'].weight)
-  minAMPAwt = np.min(pdf[pdf.syntype=='AMPA'].weight)
-  minwt = minNMDAwt+minAMPAwt
+  #maxNMDAwt = np.max(pdf[pdf.syntype=='NMDA'].weight)
+  #maxAMPAwt = np.max(pdf[pdf.syntype=='AMPA'].weight)
+  #maxwt = max(amax(maxNMDAwt),amax(maxAMPAwt))
+  #maxwt = maxNMDAwt+maxAMPAwt
+  #minNMDAwt = np.min(pdf[pdf.syntype=='NMDA'].weight)
+  #minAMPAwt = np.min(pdf[pdf.syntype=='AMPA'].weight)
+  #minwt = min(amin(minNMDAwt),amin(minAMPAwt))
+  #minwt = minNMDAwt+minAMPAwt
+  minwt = np.min(pdf.weight)
+  maxwt = np.max(pdf.weight)
   wtrange = 0.1*(maxwt-minwt)
+  print('minwt:',minwt,'maxwt:',maxwt)
   if figsize is not None: fig = plt.figure(figsize=figsize)
   else: fig = plt.figure()
   gs = fig.add_gridspec(4,8)
@@ -103,19 +109,20 @@ def animSynWeights (pdf, outpath, framerate=10, figsize=(7,4), cmap='jet'):
   dimg = {}; dline = {}; 
   def getwts (tdx, src):
     t = utimes[tdx]
-    cpdfL = pdf[(pdf.time==t) & (pdf.postid>=dstartidx['EML']) & (pdf.postid<=dendidx['EML']) & (pdf.preid>=dstartidx[src]) & (pdf.preid<=dendidx[src])]
-    wts1l = np.array(cpdfL.weight)
-    wts2l = np.reshape(wts1l,(int(len(wts1l)/2),2))
-    wtsl = np.sum(wts2l,1)
-    #assuming neurons in each layer are in square configuration--may need adaptation later
-    wtsL = np.reshape(wtsl,(int(np.sqrt(len(wtsl))),int(np.sqrt(len(wtsl))))) 
-    cpdfR = pdf[(pdf.time==t) & (pdf.postid>=dstartidx['EMR']) & (pdf.postid<=dendidx['EMR']) & (pdf.preid>=dstartidx[src]) & (pdf.preid<=dendidx[src])]
-    wts1r = np.array(cpdfL.weight)
-    wts2r = np.reshape(wts1r,(int(len(wts1r)/2),2))
-    wtsr = np.sum(wts2r,1)
-    #assuming neurons in each layer are in square configuration--may need adaptation later
-    wtsR = np.reshape(wtsr,(int(np.sqrt(len(wtsr))),int(np.sqrt(len(wtsr))))) 
-    return wtsL, wtsR
+    ltarg = ['EML', 'EMR']
+    lout = []
+    for targ in ltarg:
+      cpdf = pdf[(pdf.time==t) & (pdf.postid>=dstartidx[targ]) & (pdf.postid<=dendidx[targ]) & (pdf.preid>=dstartidx[src]) & (pdf.preid<=dendidx[src])]
+      wts = np.array(cpdf.weight)
+      sz = int(ceil(np.sqrt(len(wts))))
+      sz2 = sz*sz
+      #print(targ,len(wts),sz,sz2)
+      lwt = [x for x in wts]
+      while len(lwt) < sz2: lwt.append(lwt[-1])
+      lwt=np.array(lwt)
+      lwt = np.reshape(lwt, (sz,sz))
+      lout.append(lwt)
+    return lout[0], lout[1]    
   minR,maxR = np.min(actreward.reward),np.max(actreward.reward)
   minW,maxW = np.min([np.min(Lwts),np.min(Rwts)]), np.max([np.max(Lwts),np.max(Rwts)])
   t = utimes[0]
@@ -412,7 +419,8 @@ if __name__ == '__main__':
   simConfig, pdf, actreward, dstartidx, dendidx = loadsimdat()
   print('loaded simulation data')
   #davgw = plotavgweights(pdf)
-  animSynWeights(pdf,'data/'+dconf['sim']['name']+'weightmap.mp4', framerate=10) #plot/save images as movie
+  animSynWeights(pdf[pdf.syntype=='AMPA'],'data/'+dconf['sim']['name']+'_AMPA_weightmap.mp4', framerate=10) #plot/save images as movie
+  animSynWeights(pdf[pdf.syntype=='NMDA'],'data/'+dconf['sim']['name']+'_NMDA_weightmap.mp4', framerate=10) #plot/save images as movie  
   #wperPostID = plotavgweightsPerPostSynNeuron1(pdf)
   #plotavgweightsPerPostSynNeuron2(pdf)
   #plotIndividualSynWeights(pdf)
