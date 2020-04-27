@@ -1967,5 +1967,51 @@ ValueError: cannot reshape array of size 15964 into shape (126,126)
 
 have to fix simdat.py ! ! !
 
+*20apr27 - fixup simdat.py animation (AMPA & NMDA separate); continue tuning network
+** fixup simdat.py
 
+ok, adjusted - separating out AMPA, NMDA weights
+
+  animSynWeights(pdf[pdf.syntype=='AMPA'],'data/'+dconf['sim']['name']+'_AMPA_weightmap.mp4', framerate=10) #plot/save images as movie
+  animSynWeights(pdf[pdf.syntype=='NMDA'],'data/'+dconf['sim']['name']+'_NMDA_weightmap.mp4', framerate=10) #plot/save images as movie  
+
+can combine AMPA and NMDA later if needed ...
+
+though no reason to assume the two sets of weights should change at same time-scale
+
+** continue adjusting network - reduce hyperexcit
+
+well, EML, EMR rates were a bit high ... can adjust that ...
+
+try cutting down E -> EML, EMR weights by 1/2
+
+for strty,synmech,weight,plastty in zip(['','n'],['AMPA', 'NMDA'],[0.005*cfg.EEGain, 0.0005*cfg.EEGain],[STDPparamsRL1,STDPparamsRL2]):
+
+myrun 12
+
+Done; run time = 160.28 s; real-time ratio: 0.01.
+Done; gather time = 280.91 s.
+Total time = 604.62 s
+
+rates a little better ...
+20apr27_rast_a0.png
+
+would rather have higher density and lower starting weights, so have possibility for right structure to develop
+
+for now will continue from here ... will try longer sim ... 
+
+python -i actmap.py
+
+saved animation to data/20april27_A0_actmap.mp4
+
+python -i simdat.py -1
+
+saved animation to data/20april27_A0__AMPA_weightmap.mp4
+saved animation to data/20april27_A0__NMDA_weightmap.mp4
+
+weights to EMR increased more than EML ... and this is without fake rule
+
+anyway, try longer sim now ...
+
+myrun 12
 
