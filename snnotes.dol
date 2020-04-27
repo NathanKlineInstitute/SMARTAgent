@@ -1991,7 +1991,18 @@ myrun 12
 
 Done; run time = 160.28 s; real-time ratio: 0.01.
 Done; gather time = 280.91 s.
+Total time = 604.62 s
+
+rates a little better ...
+20apr27_rast_a0.png
+
+would rather have higher density and lower starting weights, so have possibility for right structure to develop
+
+for now will continue from here ... will try longer sim ... 
 
 python -i actmap.py
 
+saved animation to data/20april27_A0_actmap.mp4
+
 python -i simdat.py -1
+
