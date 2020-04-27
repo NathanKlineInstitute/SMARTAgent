@@ -1967,7 +1967,7 @@ ValueError: cannot reshape array of size 15964 into shape (126,126)
 
 have to fix simdat.py ! ! !
 
-*20apr27
+*20apr27 - fixup simdat.py animation (AMPA & NMDA separate); continue tuning network
 ** fixup simdat.py
 
 ok, adjusted - separating out AMPA, NMDA weights
@@ -1979,3 +1979,19 @@ can combine AMPA and NMDA later if needed ...
 
 though no reason to assume the two sets of weights should change at same time-scale
 
+** continue adjusting network - reduce hyperexcit
+
+well, EML, EMR rates were a bit high ... can adjust that ...
+
+try cutting down E -> EML, EMR weights by 1/2
+
+for strty,synmech,weight,plastty in zip(['','n'],['AMPA', 'NMDA'],[0.005*cfg.EEGain, 0.0005*cfg.EEGain],[STDPparamsRL1,STDPparamsRL2]):
+
+myrun 12
+
+Done; run time = 160.28 s; real-time ratio: 0.01.
+Done; gather time = 280.91 s.
+
+python -i actmap.py
+
+python -i simdat.py -1
