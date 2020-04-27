@@ -2006,3 +2006,12 @@ saved animation to data/20april27_A0_actmap.mp4
 
 python -i simdat.py -1
 
+saved animation to data/20april27_A0__AMPA_weightmap.mp4
+saved animation to data/20april27_A0__NMDA_weightmap.mp4
+
+weights to EMR increased more than EML ... and this is without fake rule
+
+anyway, try longer sim now ...
+
+myrun 12
+
