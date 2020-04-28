@@ -2015,3 +2015,114 @@ anyway, try longer sim now ...
 
 myrun 12
 
+*20apr28 - adjusting network
+** optical flow in python
+
+https://nanonets.com/blog/optical-flow/
+https://opencv-python-tutroals.readthedocs.io/en/latest/py_tutorials/py_video/py_lucas_kanade/py_lucas_kanade.html
+
+** sim crashes with memory problem
+
+occurs even for 2.5 s sim during gatherdata
+
+what if only recorded weights every 5 steps? with "recordWeightStepSize":5
+
+myrun 12
+
+  Done; run time = 191.75 s; real-time ratio: 0.01.
+Gathering data...
+  Done; gather time = 108.16 s.
+    Cells: 2959
+  Connections: 299852 (101.34 per cell)
+  Synaptic contacts: 405671 (137.10 per cell)
+  Spikes: 30546 (4.13 Hz)
+  Simulated time: 2.5 s; 12 workers
+  Run time: 191.75 s
+Saving output as data/20april28_A0_simConfig.pkl ...
+
+Total time = 383.88 s
+
+ok, good, did not crash ...
+
+20apr28_rast_a0.png
+
+rates and membrane potential traces look ok but EMR,EML,IM rates somewhat high ... (~5-6 Hz for
+EMR,EML and ~18 Hz for IM); could reduce weights to EMR,EML further ...
+
+python -i actmap.py
+
+data/20april28_A0_actmap.mp4
+
+python -i simdat.py -1
+
+data/20april28_A0__AMPA_weightmap.mp4
+data/20april28_A0__NMDA_weightmap.mp4
+
+try again with:
+ larger recordStep and comment out the connection rules for weights that are 0 (feedback connections)
+ do not need to plot raster twice and to save raster data in separate file
+ do not need to plot voltage traces from every direction cells, one type should be enough to see if looks ok
+ also reduce weight to EMR,EML
+ 
+does this simConfig.recordTraces = {'V_soma':{'sec':'soma','loc':0.5,'var':'v'}}  # Dict with traces to record
+cause recording of all cells' membrane potential? probably do not want that ...
+
+based on this:
+"recordCells - List of cells from which to record traces. Can include cell gids (e.g. 5 or [2,
+3]), population labels (e.g. 'S' to record from one cell of the ‘S’ population), or 'all', to
+record from all cells. NOTE: All cells selected in the include argument of
+simConfig.analysis['plotTraces'] will be automatically included in recordCells. (default: [])
+
+recordTraces - Dict of traces to record (default: {} ; example: {‘V_soma’:{‘sec’:’soma’,’loc’:0.5,’var’:’v’}})"
+
+... it does NOT record ALL cells; just the ones in include:
+simConfig.analysis['plotTraces'] = {'include': [(pop, 0) for pop in ['ER','IR','EV1','EV1DE','IV1','EV4','IV4','EMT','IMT','EML','EMR','IM']]}
+
+myrun 12
+
+  Done; gather time = 108.10 s.
+
+hmm, did not save much time or space ... must be saving a lot of other stuff in the 680 MB 20april28_A0_simConfig.pkl
+also rate of EMR,EML did not decrease ...
+
+https://www.neuron.yale.edu/phpBB/viewtopic.php?f=45&t=3770&p=16227&hilit=memory#p16122
+
+so try with those options, see if saves time/space ...
+
+myrun 12
+
+Gathering data...
+  Gathering only sim data...
+  Done; gather time = 70.73 s.
+
+  saved some time ...
+
+  but got error:
+  File "sim.py", line 983, in <module>
+    sim.saveData() # save data to disk
+  File "/u/samn/netpyne/netpyne/sim/save.py", line 127, in saveData
+    pickle.dump(dataSave, fileObj)
+    TypeError: HocObject: Only Vector instance can be pickled
+    
+  and then simConfig.pkl output was empty ...
+
+ so will run as it was before ... but still need to adjust the weights
+
+ok, first try with higher ->EMR, ->EML weights
+for strty,synmech,weight,plastty in zip(['','n'],['AMPA', 'NMDA'],[0.00375*cfg.EEGain, 0.000375*cfg.EEGain],[STDPparamsRL1,STDPparamsRL2]):
+to make sure those synapses have an impact ...
+
+when the weights were 0.005*cfg.EEGain and 0.0005*cfg.EEGain had similar rates ... which means other inputs driving most
+of the activity ... 
+
+also see recurrent connectivity ... should adjust for EMR->EMR and EML->EML to allow some plasticity ...
+
+python -i simdat.py
+
+simConfig, pdf, actreward, dstartidx, dendidx = loadsimdat()
+simConfig.keys() # dict_keys(['netpyne_version', 'netpyne_changeset', 'net', 'simConfig', 'simData'])
+simConfig['simData'].keys() # dict_keys(['spkt', 'spkid', 'V_soma', 't', 'synweights', 'avgRate'])
+len(simConfig['simData']['spkt']) # 29862
+len(simConfig['simData']['spkid']) # 29862
+
+python -i actmap.py

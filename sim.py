@@ -170,10 +170,13 @@ simConfig.saveFolder = 'data'
 # simConfig.backupCfg = ['sim.json', 'backupcfg/'+dconf['sim']['name']+'sim.json']
 
 #simConfig.analysis['plotRaster'] = True                         # Plot a raster
-simConfig.analysis['plotTraces'] = {'include': [(pop, 0) for pop in allpops]}
+# ['ER','IR','EV1','EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE','IV1','EV4','IV4','EMT','IMT','EML','EMR','IM']
+#simConfig.analysis['plotTraces'] = {'include': [(pop, 0) for pop in allpops]}
+simConfig.analysis['plotTraces'] = {'include': [(pop, 0) for pop in ['ER','IR','EV1','EV1DE','IV1','EV4','IV4','EMT','IMT','EML','EMR','IM']]}
 
 #simConfig.analysis['plotRaster'] = {'timeRange': [500,1000],'popRates':'overlay','saveData':'data/RasterData.pkl','showFig':True}
-simConfig.analysis['plotRaster'] = {'popRates':'overlay','saveData':'data/'+dconf['sim']['name']+'RasterData.pkl','showFig':dconf['sim']['doplot']}
+#simConfig.analysis['plotRaster'] = {'popRates':'overlay','saveData':'data/'+dconf['sim']['name']+'RasterData.pkl','showFig':dconf['sim']['doplot']}
+simConfig.analysis['plotRaster'] = {'popRates':'overlay','showFig':dconf['sim']['doplot']}
 #simConfig.analysis['plot2Dnet'] = True 
 #simConfig.analysis['plotConn'] = True           # plot connectivity matrix
 
@@ -184,11 +187,17 @@ cfg.EIGain = 1.0 # E to I scaling factor
 cfg.IEGain = 10.0 # I to E scaling factor
 cfg.IIGain = 10.0  # I to I scaling factor
 
+### from https://www.neuron.yale.edu/phpBB/viewtopic.php?f=45&t=3770&p=16227&hilit=memory#p16122
+# cfg.saveCellSecs = False     # removes all data on cell sections prior to gathering from nodes
+# cfg.saveCellConns = False    # removes all data on cell connections prior to gathering from nodes
+# cfg.gatherOnlySimData = True # gathers from nodes only the output simulation data (not the network instance)
+###
+
 recWeight = 0.0001 #weight for recurrent connections within each area.
 recProb = 0.2 #probability of recurrent connections within each area.
 
 #Local excitation
-#E to E
+#E to E - may want plasticity between EML<>EML and EMR<>EMR
 for epop in ['ER', 'EV1', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW', 'EV1DSW', 'EV1DS','EV1DSE','EV4','EMT','EML','EMR']:
   netParams.connParams[epop+'->'+epop] = {
     'preConds': {'pop': epop},
@@ -378,6 +387,7 @@ netParams.connParams['EV4->IMT'] = {
         'delay': 2,
         'synMech': 'AMPA','sec':'soma', 'loc':0.5}
 
+"""
 #E to E feedbackward connections
 netParams.connParams['EV1->ER'] = {
         'preConds': {'pop': 'EV1'},
@@ -429,6 +439,7 @@ netParams.connParams['IMT->EV4'] = {
         'weight': 0.00 * cfg.IEGain, #0.002
         'delay': 2,
         'synMech': 'GABA','sec':'soma', 'loc':0.5}
+"""
 
 #I to I
 netParams.connParams['IV1->IV4'] = {
@@ -452,7 +463,7 @@ netParams.connParams['IV4->IMT'] = {
 # and direct connections between premotor to motor areas
 for prety in ['EV1', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW','EV1DSW', 'EV1DS','EV1DSE', 'EV4', 'EMT']:
   for posty in ['EMR', 'EML']:
-    for strty,synmech,weight,plastty in zip(['','n'],['AMPA', 'NMDA'],[0.005*cfg.EEGain, 0.0005*cfg.EEGain],[STDPparamsRL1,STDPparamsRL2]):
+    for strty,synmech,weight,plastty in zip(['','n'],['AMPA', 'NMDA'],[0.00375*cfg.EEGain, 0.000375*cfg.EEGain],[STDPparamsRL1,STDPparamsRL2]):
       netParams.connParams[strty+prety+'->'+strty+posty] = {
         'preConds': {'pop': prety},
         'postConds': {'pop': posty},
@@ -890,7 +901,7 @@ def trainAgent (t):
         #current_time_stepNB, f_ax, fig = updateBehaviorPlot (sim,InputImages,Images,dirSensitiveNeurons,Racket_pos,Ball_pos,current_time_stepNB, f_ax, fig)
         #current_time_stepNB = current_time_stepNB + 1
     updateInputRates() # update firing rate of inputs to R population (based on image content)                
-    NBsteps = NBsteps+1
+    NBsteps += 1
     if NBsteps % recordWeightStepSize == 0:
         #if t%recordWeightDT==0:
         if dconf['verbose'] > 0 and sim.rank==0:
@@ -925,9 +936,11 @@ sim.net.addStims()                      #instantiate netStim
 sim.setupRecording()                  # setup variables to record for each cell (spikes, V traces, etc)
 
 lSTDPmech, mlSTDPmech, mrSTDPmech = getAllSTDPObjects(sim) # get all the STDP objects up-front
+
 print('Total number of STDP mech for MR are: ', len(mrSTDPmech))
 print('Total number of STDP mech for ML are: ', len(mlSTDPmech))
 print('Total number of STDP mech are: ', len(lSTDPmech))
+
 def updateSTDPWeights (sim, W):
     #this function assign weights stored in 'ResumeSimFromFile' to all connections by matching pre and post neuron ids  
     # get all the simulation's cells (on a given node)
@@ -963,6 +976,7 @@ if sim.rank == 0:
     # this is just a precaution since simConfig pkl file has MOST of the info; ideally should adjust simConfig to contain ALL of the required info
     from utils import backupcfg
     backupcfg(dconf['sim']['name']) 
+
 tPerPlay = tstepPerAction*dconf['actionsPerPlay']
 sim.runSimWithIntervalFunc(tPerPlay,trainAgent) # has periodic callback to adjust STDP weights based on RL signal
 sim.gatherData() # gather data from different nodes
@@ -995,7 +1009,7 @@ if sim.rank == 0: # only rank 0 should save. otherwise all the other nodes could
     print('SAVING RASTER DATA')
     if dconf['sim']['doplot']:
         print('plot raster:')
-        sim.analysis.plotRaster(saveData = dconf['sim']['name']+'raster.pkl',showFig=True)
+        #sim.analysis.plotRaster(saveData = dconf['sim']['name']+'raster.pkl',showFig=True)
         #sim.analysis.plotRaster(include = ['allCells'],saveData = dconf['sim']['name']+'raster.pkl',showFig=True)        
         sim.analysis.plotData()    
     if sim.plotWeights: plotWeights() 
