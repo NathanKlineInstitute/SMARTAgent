@@ -870,18 +870,17 @@ def trainAgent (t):
         Ractions = vec2.to_python()[0]
         sim.pc.broadcast(vec3, 0)
         Lactions = vec3.to_python()[0]
-        print('Ractions: ', Ractions)
-        print('Lactions: ', Lactions)
+        if dconf['verbose']: print('Ractions: ', Ractions,'Lactions: ', Lactions)
     if critic != 0: # if critic signal indicates punishment (-1) or reward (+1)
         if sim.rank==0: print('t=',t,'- adjusting weights based on RL critic value:', critic)
-        if Ractions==Lactions:
-          print('APPLY RL to both EMR and EML')
+        if not dconf['sim']['targettedRL'] or Ractions==Lactions:
+          if dconf['verbose']: print('APPLY RL to both EMR and EML')
           for STDPmech in lSTDPmech: STDPmech.reward_punish(float(critic))
         elif Ractions>Lactions:
-          print('APPLY RL to EMR')
+          if dconf['verbose']: print('APPLY RL to EMR')
           for STDPmech in mrSTDPmech: STDPmech.reward_punish(float(critic))
         elif Lactions>Ractions:
-          print('APPLY RL to EML')
+          if dconf['verbose']: print('APPLY RL to EML')
           for STDPmech in mlSTDPmech: STDPmech.reward_punish(float(critic))
     if sim.rank==0:
         print('Game rewards:', rewards) # only rank 0 has access to rewards      
@@ -894,9 +893,7 @@ def trainAgent (t):
         for hits in total_hits:
             sim.allHits.append(hits) #hit or no hit
         tvec_actions = []
-        for ts in range(len(actions)):
-            tvec_actions.append(t-tstepPerAction*(len(actions)-ts-1))
-        #for ltpnt in [t-80, t-60, t-40, t-20, t-0]: sim.allTimes.append(ltpnt)
+        for ts in range(len(actions)): tvec_actions.append(t-tstepPerAction*(len(actions)-ts-1))
         for ltpnt in tvec_actions: sim.allTimes.append(ltpnt)
         #current_time_stepNB, f_ax, fig = updateBehaviorPlot (sim,InputImages,Images,dirSensitiveNeurons,Racket_pos,Ball_pos,current_time_stepNB, f_ax, fig)
         #current_time_stepNB = current_time_stepNB + 1

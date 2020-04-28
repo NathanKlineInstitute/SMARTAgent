@@ -2149,3 +2149,40 @@ python -i simdat.py -1
 
 can put that into option in sim.json ... in case want connectivity info at some point
 
+** test the targetted RL rule in fake up
+
+added option to sim.json to specify whether to use targetted rule (only rewards actions to
+motor neurons responsible for the action)
+
+first without targetted RL:
+10 s sim with name 20april28_T0_
+myrun 12
+
+20apr28_rast_T0.png
+20apr28_rast_T0b.png
+
+EMR,EML get too fast  ...
+IM hits depolarization blockade: 20apr28_IM_T0.png
+so does EMR, EML: 20apr28_EMR_T0.png, 20apr28_EML_T0.png
+
+python -i actmap.py
+
+data/20april28_T0_actmap.mp4
+
+doesn't seem like direction selective neurons activating properly ... all activity
+in each population seems to go together ...
+
+python -i simdat.py -1
+
+data/20april28_T0__AMPA_weightmap.mp4
+data/20april28_T0__NMDA_weightmap.mp4 <<-- NMDA weights look much different compared to AMPA, perhaps NMDA weights
+are not helping, as the populations are not differentiated. strange pattern for NMDA, spikes and decays...similar times with AMPA
+what is the cause for those spikes? high rate of rewards??
+
+UP is 4, DOWN is 3; EMR is for UP, EML is for DOWN; so in those movies, overall
+the weights to EMR are larger
+
+and next with targetted RL:
+10 s sim with name 20april28_T1_
+myrun 12
+
