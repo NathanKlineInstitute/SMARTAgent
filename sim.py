@@ -188,9 +188,9 @@ cfg.IEGain = 10.0 # I to E scaling factor
 cfg.IIGain = 10.0  # I to I scaling factor
 
 ### from https://www.neuron.yale.edu/phpBB/viewtopic.php?f=45&t=3770&p=16227&hilit=memory#p16122
-# cfg.saveCellSecs = False     # removes all data on cell sections prior to gathering from nodes
-# cfg.saveCellConns = False    # removes all data on cell connections prior to gathering from nodes
-# cfg.gatherOnlySimData = True # gathers from nodes only the output simulation data (not the network instance)
+cfg.saveCellSecs = bool(dconf['sim']['saveCellSecs']) # if False removes all data on cell sections prior to gathering from nodes
+cfg.saveCellConns = bool(dconf['sim']['saveCellConns']) # if False removes all data on cell connections prior to gathering from nodes
+# cfg.gatherOnlySimData = True # do not set to True, when True gathers from nodes only the output simulation data (not the network instance)
 ###
 
 recWeight = 0.0001 #weight for recurrent connections within each area.

@@ -2126,3 +2126,26 @@ len(simConfig['simData']['spkt']) # 29862
 len(simConfig['simData']['spkid']) # 29862
 
 python -i actmap.py
+
+also see if these options make output smaller:
+cfg.saveCellSecs = False     # removes all data on cell sections prior to gathering from nodes
+cfg.saveCellConns = False    # removes all data on cell connections prior to gathering from nodes
+
+myrun 12
+
+Gathering data...
+Done; gather time = 72.30 s.
+
+ok, that reduced main output file size to ~210 MB vs ~690 MB (for 2.5 s sim)
+and a shorter gather time (without a crash)
+
+python -i actmap.py
+
+data/20april28_A0_actmap.mp4
+
+python -i simdat.py -1
+
+...
+
+can put that into option in sim.json ... in case want connectivity info at some point
+
