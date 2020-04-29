@@ -33,7 +33,7 @@ sim.saveInputImages = 1 #save Input Images (5 game frames)
 recordWeightStepSize = dconf['sim']['recordWeightStepSize']
 #recordWeightDT = 1000 # interval for recording synaptic weights (change later)
 recordWeightDCells = 1 # to record weights for sub samples of neurons
-tstepPerAction = 20 # time step per action (in ms)
+tstepPerAction = dconf['sim']['tstepPerAction'] # time step per action (in ms)
 global fid4
 
 fid4 = open(sim.MotorOutputsfilename,'w')

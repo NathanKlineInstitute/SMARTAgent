@@ -27,12 +27,26 @@ def loadsimdat (name=None):
   # load simulation data
   if name is None and stepNB is -1: name = dconf['sim']['name']
   elif name is None and stepNB > -1: name = dconf['sim']['name'] + '_step_' + str(stepNB) + '_'
+  print('loading data from', name)
   simConfig = pickle.load(open('data/'+name+'simConfig.pkl','rb'))
   dstartidx = {p:simConfig['net']['pops'][p]['cellGids'][0] for p in simConfig['net']['pops'].keys()} # starting indices for each population
   dendidx = {p:simConfig['net']['pops'][p]['cellGids'][-1] for p in simConfig['net']['pops'].keys()} # ending indices for each population
   pdf = readinweights(simConfig)
-  actreward = pd.DataFrame(np.loadtxt('data/'+name+'ActionsRewards.txt'),columns=['time','action','reward','proposed','hit'])   
-  return simConfig, pdf, actreward, dstartidx, dendidx
+  actreward = pd.DataFrame(np.loadtxt('data/'+name+'ActionsRewards.txt'),columns=['time','action','reward','proposed','hit'])
+  dnumc = {p:dendidx[p]-dstartidx[p]+1 for p in simConfig['net']['pops'].keys()}
+  return simConfig, pdf, actreward, dstartidx, dendidx, dnumc
+
+def loadInputImages (fn):
+  print('loading input images from', fn)
+  Input_Images = np.loadtxt(fn)
+  New_InputImages = []
+  NB_Images = int(Input_Images.shape[0]/Input_Images.shape[1])
+  for x in range(NB_Images):
+    fp = x*Input_Images.shape[1]
+    cImage = Input_Images[fp:fp+20,:] # 20 is sqrt of 400 (20x20 pixels)
+    New_InputImages.append(cImage)
+  New_InputImages = np.array(New_InputImages)
+  return New_InputImages
 
 #
 def animSynWeights (pdf, outpath, framerate=10, figsize=(7,4), cmap='jet'):

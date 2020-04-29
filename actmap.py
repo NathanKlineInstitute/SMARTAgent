@@ -8,25 +8,15 @@ from pylab import *
 import os
 import anim
 from matplotlib import animation
+from simdat import loadInputImages, loadsimdat
 
 rcParams['font.size'] = 6
 
-Input_Images = np.loadtxt('data/'+dconf['sim']['name']+'InputImages.txt')
-New_InputImages = []
-NB_Images = int(Input_Images.shape[0]/Input_Images.shape[1])
-for x in range(NB_Images):
-    fp = x*Input_Images.shape[1]
-    cImage = Input_Images[fp:fp+20,:] # 20 is sqrt of 400 (20x20 pixels)
-    New_InputImages.append(cImage)
-New_InputImages = np.array(New_InputImages)
+New_InputImages = loadInputImages('data/'+dconf['sim']['name']+'InputImages.txt')
+simConfig, pdf, actreward, dstartidx, dendidx, dnumc = loadsimdat(dconf['sim']['name'])
 
 totalDur = int(dconf['sim']['duration'])
-tBin_Size = 100
-
-simConfig = pickle.load(open('data/'+dconf['sim']['name']+'simConfig.pkl','rb'))
-dstartidx = {p:simConfig['net']['pops'][p]['cellGids'][0] for p in simConfig['net']['pops'].keys()} # starting indices for each population
-dendidx = {p:simConfig['net']['pops'][p]['cellGids'][-1] for p in simConfig['net']['pops'].keys()} # ending indices for each population
-dnumc = {p:dendidx[p]-dstartidx[p]+1 for p in simConfig['net']['pops'].keys()}
+tstepPerAction = dconf['sim']['tstepPerAction'] # time step per action (in ms)
 
 spkID= np.array(simConfig['simData']['spkid'])
 spkT = np.array(simConfig['simData']['spkt'])
@@ -41,8 +31,8 @@ for pop in lpop:
   dspkID[pop] = spkID[(spkID >= dstartidx[pop]) & (spkID <= dendidx[pop])]
   dspkT[pop] = spkT[(spkID >= dstartidx[pop]) & (spkID <= dendidx[pop])]
 
-t1 = range(0,totalDur,tBin_Size)
-t2 = range(tBin_Size,totalDur+tBin_Size,tBin_Size)
+t1 = range(0,totalDur,tstepPerAction)
+t2 = range(tstepPerAction,totalDur+tstepPerAction,tstepPerAction)
 
 def generateActivityMap(t1, t2, spkT, spkID, numc, startidx):
   sN = int(np.sqrt(numc))
@@ -68,15 +58,15 @@ def plotActivityMaps (pauset=1, gifpath=None, mp4path=None, framerate=5, zf=10):
   cbaxes = fig.add_axes([0.95, 0.4, 0.01, 0.2]) 
   ltitle = ['Input Images', 'Excit R', 'Excit V1', 'Excit V4', 'Excit MT', 'Inhib R', 'Inhib V1', 'Inhib V4', 'Inhib MT']
   for p in ddir.keys(): ltitle.append(ddir[p])
-  lact = [New_InputImages]; lvmax = [255]; xlim = [(-.5,19.5)]; ylim = [(19.5,-0.5)]
+  lact = [New_InputImages]; lvmax = [255]; xl = [(-.5,19.5)]; yl = [(19.5,-0.5)]
   lfnimage = []
   for pop in lpop:
     lact.append(dact[pop])
     lvmax.append(max_spks)
-    xlim.append( (-0.5, lact[-1].shape[1] - 0.5) )
-    ylim.append( (lact[-1].shape[1] - 0.5, -0.5))
+    xl.append( (-0.5, lact[-1].shape[1] - 0.5) )
+    yl.append( (lact[-1].shape[1] - 0.5, -0.5))
   for t in range(1,len(t1)):
-    fig.suptitle('Time = ' + str(t*tBin_Size) + ' ms')
+    fig.suptitle('Time = ' + str(t*tstepPerAction) + ' ms')
     idx = 0
     for ldx,ax in enumerate(lax):
       if ldx == 5 or idx > len(dact.keys()):
@@ -85,8 +75,8 @@ def plotActivityMaps (pauset=1, gifpath=None, mp4path=None, framerate=5, zf=10):
       if ldx==0: offidx=-1
       else: offidx=0
       pcm = ax.imshow( lact[idx][t+offidx,:,:], origin='upper', cmap='gray', vmin=0, vmax=lvmax[idx])
-      ax.set_xlim(xlim[idx]) 
-      ax.set_ylim(ylim[idx])
+      ax.set_xlim(xl[idx]) 
+      ax.set_ylim(yl[idx])
       ax.set_ylabel(ltitle[idx])
       if ldx==2: plt.colorbar(pcm, cax = cbaxes)  
       idx += 1
@@ -103,23 +93,19 @@ def plotActivityMaps (pauset=1, gifpath=None, mp4path=None, framerate=5, zf=10):
 def animActivityMaps (outpath, framerate=10, figsize=(7,3)):
   ioff()
   # plot activity in different layers as a function of input images
-  if figsize is not None:
-    fig, axs = plt.subplots(4, 5, figsize=figsize);
-  else:
-    fig, axs = plt.subplots(4, 5);
+  if figsize is not None: fig, axs = plt.subplots(4, 5, figsize=figsize);
+  else: fig, axs = plt.subplots(4, 5);
   lax = axs.ravel()
   cbaxes = fig.add_axes([0.95, 0.4, 0.01, 0.2]) 
   ltitle = ['Input Images', 'Excit R', 'Excit V1', 'Excit V4', 'Excit MT', 'Inhib R', 'Inhib V1', 'Inhib V4', 'Inhib MT']
   for p in ddir.keys(): ltitle.append(ddir[p])
-  lact = [New_InputImages]; lvmax = [255]; xlim = [(-.5,19.5)]; ylim = [(19.5,-0.5)]
+  lact = [New_InputImages]; lvmax = [255];
   lfnimage = []
   for pop in lpop:
     lact.append(dact[pop])
     lvmax.append(max_spks)
-    xlim.append( (-0.5, lact[-1].shape[1] - 0.5) )
-    ylim.append( (lact[-1].shape[1] - 0.5, -0.5))
   ddat = {}
-  fig.suptitle('Time = ' + str(0*tBin_Size) + ' ms')
+  fig.suptitle('Time = ' + str(0*tstepPerAction) + ' ms')
   idx = 0
   for ldx,ax in enumerate(lax):
     if ldx == 5 or idx > len(dact.keys()):
@@ -127,16 +113,14 @@ def animActivityMaps (outpath, framerate=10, figsize=(7,3)):
       continue
     if ldx==0: offidx=-1
     else: offidx=0
-    pcm = ax.imshow( lact[idx][offidx,:,:], origin='upper', cmap='gray', vmin=0, vmax=lvmax[idx])
+    pcm = ax.imshow(lact[idx][offidx,:,:],origin='upper',cmap='gray',vmin=0,vmax=lvmax[idx])
     ddat[ldx] = pcm
-    ax.set_xlim(xlim[idx]) 
-    ax.set_ylim(ylim[idx])
     ax.set_ylabel(ltitle[idx])
     if ldx==2: plt.colorbar(pcm, cax = cbaxes)  
     idx += 1
   def updatefig (t):
-    print('frame t = ', str(t*tBin_Size))
-    fig.suptitle('Time = ' + str(t*tBin_Size) + ' ms')
+    print('frame t = ', str(t*tstepPerAction))
+    fig.suptitle('Time = ' + str(t*tstepPerAction) + ' ms')
     idx = 0
     for ldx,ax in enumerate(lax):
       if ldx == 5 or idx > len(dact.keys()): continue
@@ -151,5 +135,43 @@ def animActivityMaps (outpath, framerate=10, figsize=(7,3)):
   ion()
   return fig, axs, plt
 
+def animInput (InputImages, outpath, framerate=10, figsize=None):
+  # animate the input images
+  ioff()
+  # plot activity in different layers as a function of input images
+  if figsize is not None:
+    fig = figure(figsize=figsize)
+  else:
+    fig = figure()
+  lax = [gca()]
+  cbaxes = fig.add_axes([0.95, 0.4, 0.01, 0.2]) 
+  ltitle = ['Input Images']
+  lact = [InputImages]; lvmax = [255]; xl = [(-.5,19.5)]; yl = [(19.5,-0.5)]
+  ddat = {}
+  fig.suptitle('Time = ' + str(0*tstepPerAction) + ' ms')
+  idx = 0
+  for ldx,ax in enumerate(lax):
+    offidx=0
+    pcm = ax.imshow( lact[idx][offidx,:,:], origin='upper', cmap='gray', vmin=0, vmax=lvmax[idx])
+    ddat[ldx] = pcm
+    ax.set_ylabel(ltitle[idx])
+    plt.colorbar(pcm, cax = cbaxes)  
+    idx += 1
+  def updatefig (t):
+    print('frame t = ', str(t*tstepPerAction))
+    fig.suptitle('Time = ' + str(t*tstepPerAction) + ' ms')
+    idx = 0
+    for ldx,ax in enumerate(lax):
+      offidx = -1
+      ddat[ldx].set_data(lact[idx][t+offidx,:,:])
+      idx += 1
+    return fig
+  ani = animation.FuncAnimation(fig, updatefig, interval=1, frames=len(t1))
+  writer = anim.getwriter(outpath, framerate=framerate)
+  ani.save(outpath, writer=writer); print('saved animation to', outpath)
+  ion()
+  return fig
+
+#fig, axs, plt = animActivityMaps('test2.mp4')
 fig, axs, plt = animActivityMaps('data/'+dconf['sim']['name']+'actmap.mp4', framerate=10)
 

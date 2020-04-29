@@ -2257,4 +2257,27 @@ anyway, getting back to why actmap.py appears incorrect ... need to check that .
 
 the depolarization blockade issues suggest need for homeostasis built-in to the synapse ... should also try adding that ...
 
+*20apr29
+** check actmap.py
+
+make sure has input images / activity displayed at right times
+
+python -i actmap.py
+
+fig = animInput(New_InputImages, 'test.mp4')
+
+hmm, maybe y-axis for input images should be reversed ...
+
+fig, axs, plt = animActivityMaps('test2.mp4', framerate=10)
+
+limg = New_InputImages = loadInputImages('data/'+dconf['sim']['name']+'InputImages.txt')
+
+limg.shape # (500, 20, 20)
+imshow(limg[0,:,:],origin='upper')
+imshow(limg[7,:,:],origin='upper')
+
+row 0 of input images is top
+
+was using wrong timestep in actmap.py ... made a variable for it tstepPerAction, also used in sim.json
+and sim.py
 
