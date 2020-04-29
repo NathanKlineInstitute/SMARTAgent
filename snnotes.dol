@@ -2186,3 +2186,75 @@ and next with targetted RL:
 10 s sim with name 20april28_T1_
 myrun 12
 
+Done; run time = 2946.54 s; real-time ratio: 0.00.
+Gathering data...
+  Done; gather time = 1267.64 s.
+Analyzing...
+  Cells: 2959
+  Connections: 0 (0.00 per cell)
+  Spikes: 598894 (20.24 Hz)
+  Simulated time: 10.0 s; 12 workers
+  Run time: 2946.54 s
+Saving output as data/20april28_T1_simConfig.pkl ... 
+Finished saving!
+  Done; saving time = 436.50 s.
+SAVING RASTER DATA
+plot raster:
+Plotting recorded cell traces ... cell
+QApplication: invalid style override passed, ignoring it.
+Plotting raster...
+  Done; plotting time = 828.98 s
+
+Total time = 5536.42 s
+End time:  2020-04-28 17:36:51.533489
+
+takes a surprisingly long time to save and plot the data ... 
+
+well, there's depolarization blockade:
+
+20apr28_IM_T1.png
+20apr28_EMR_T1.png
+20apr28_EML_T1.png
+20apr28_rast_T1.png <<-- very high rates for EML
+IM,EMR are in depolarization blockade. weights to EMR probably increased too much.
+better if there was some homeostasis built in
+
+python -i actmap.py
+
+data/20april28_T1_actmap.mp4   <<-- paddle goes up fairly quickly but then goes way down near end of sim and stays
+there, probably due to depolarization blockade of EMR cells; EML might be firing quickly since does not receive and
+inhibition from IM since IM in depolarization blockade. but then why does the racket stay near top of court for most
+of the simulation, until the very end. is it drawn incorrectly??
+
+python -i simdat.py -1
+
+data/20april28_T1__AMPA_weightmap.mp4
+data/20april28_T1__NMDA_weightmap.mp4
+
+weights diverge towards EMR population quickly, weights to EML drop quickly, and then they stay that way
+same pattern with AMPA and NMDA weights ...
+
+
+confused by the variable names (ts_end is end time? ts_beg is beginning time? or opposite?)
+            ts_end = t-tstepPerAction*(dconf['actionsPerPlay']-ts)
+            ts_beg = t-tstepPerAction*(dconf['actionsPerPlay']-ts-1)
+            F_Rs.append(getFiringRatesWithInterval([ts_end,ts_beg], sim.net.pops['EMR'].cellGids))
+
+            and
+def getFiringRatesWithInterval (trange = None, neuronal_pop = None):
+has
+if trange[0] <= spkts[i] <= trange[1] and spkids[i] in neuronal_pop:
+
+
+tstepPerAction = 20
+actionsPerPlay = 1
+ts_beg = t - 20*(1-0-1) = t - 0
+ts_end = t - 20*(1-0) = t - 20
+
+ok, so ts_end is smaller, so it's correct, but the names are confusing ...
+
+anyway, getting back to why actmap.py appears incorrect ... need to check that ...
+
+the depolarization blockade issues suggest need for homeostasis built-in to the synapse ... should also try adding that ...
+
+

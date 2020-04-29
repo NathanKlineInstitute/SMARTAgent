@@ -560,7 +560,7 @@ def saveGameBehavior(sim):
 
 ######################################################################################
 
-def getFiringRatesWithInterval(trange = None, neuronal_pop = None):
+def getFiringRatesWithInterval (trange = None, neuronal_pop = None):
     #sim.gatherData()
     spkts = sim.simData['spkt']
     spkids = sim.simData['spkid']
@@ -786,8 +786,8 @@ def trainAgent (t):
         F_Rs = []
         F_Ls = []
         for ts in range(int(dconf['actionsPerPlay'])):
+            ts_beg = t-tstepPerAction*(dconf['actionsPerPlay']-ts-1) 
             ts_end = t-tstepPerAction*(dconf['actionsPerPlay']-ts)
-            ts_beg = t-tstepPerAction*(dconf['actionsPerPlay']-ts-1)
             F_Rs.append(getFiringRatesWithInterval([ts_end,ts_beg], sim.net.pops['EMR'].cellGids))
             F_Ls.append(getFiringRatesWithInterval([ts_end,ts_beg], sim.net.pops['EML'].cellGids))
         sim.pc.allreduce(vec.from_python(F_Rs),1) #sum
