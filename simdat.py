@@ -38,7 +38,7 @@ def loadsimdat (name=None):
 
 def loadInputImages (fn):
   print('loading input images from', fn)
-  Input_Images = np.loadtxt()
+  Input_Images = np.loadtxt(fn)
   New_InputImages = []
   NB_Images = int(Input_Images.shape[0]/Input_Images.shape[1])
   for x in range(NB_Images):
