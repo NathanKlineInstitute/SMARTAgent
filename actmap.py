@@ -8,25 +8,15 @@ from pylab import *
 import os
 import anim
 from matplotlib import animation
+from simdat import loadInputImages, loadsimdat
 
 rcParams['font.size'] = 6
 
-Input_Images = np.loadtxt('data/'+dconf['sim']['name']+'InputImages.txt')
-New_InputImages = []
-NB_Images = int(Input_Images.shape[0]/Input_Images.shape[1])
-for x in range(NB_Images):
-    fp = x*Input_Images.shape[1]
-    cImage = Input_Images[fp:fp+20,:] # 20 is sqrt of 400 (20x20 pixels)
-    New_InputImages.append(cImage)
-New_InputImages = np.array(New_InputImages)
+New_InputImages = loadInputImages('data/'+dconf['sim']['name']+'InputImages.txt')
+simConfig, pdf, actreward, dstartidx, dendidx, dnumc = loadsimdat(dconf['sim']['name'])
 
 totalDur = int(dconf['sim']['duration'])
 tBin_Size = 100
-
-simConfig = pickle.load(open('data/'+dconf['sim']['name']+'simConfig.pkl','rb'))
-dstartidx = {p:simConfig['net']['pops'][p]['cellGids'][0] for p in simConfig['net']['pops'].keys()} # starting indices for each population
-dendidx = {p:simConfig['net']['pops'][p]['cellGids'][-1] for p in simConfig['net']['pops'].keys()} # ending indices for each population
-dnumc = {p:dendidx[p]-dstartidx[p]+1 for p in simConfig['net']['pops'].keys()}
 
 spkID= np.array(simConfig['simData']['spkid'])
 spkT = np.array(simConfig['simData']['spkt'])

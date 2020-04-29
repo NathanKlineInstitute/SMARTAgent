@@ -2257,4 +2257,8 @@ anyway, getting back to why actmap.py appears incorrect ... need to check that .
 
 the depolarization blockade issues suggest need for homeostasis built-in to the synapse ... should also try adding that ...
 
+*20apr29
+** check actmap.py
+
+make sure has input images / activity displayed at right times
 
