@@ -20,14 +20,6 @@ for x in range(NB_Images):
     New_InputImages.append(cImage)
 New_InputImages = np.array(New_InputImages)
 
-##Change the rasterdata file below
-phl_file = open('data/'+dconf['sim']['name']+'RasterData.pkl','rb')
-data1 = pickle.load(phl_file)
-spkTimes = data1["spkTimes"]
-spkInds = data1["spkInds"]
-cellIDs = data1["cellGids"]
-skColors = data1["spkColors"] 
-
 totalDur = int(dconf['sim']['duration'])
 tBin_Size = 100
 
@@ -36,8 +28,8 @@ dstartidx = {p:simConfig['net']['pops'][p]['cellGids'][0] for p in simConfig['ne
 dendidx = {p:simConfig['net']['pops'][p]['cellGids'][-1] for p in simConfig['net']['pops'].keys()} # ending indices for each population
 dnumc = {p:dendidx[p]-dstartidx[p]+1 for p in simConfig['net']['pops'].keys()}
 
-spkID= np.array(spkInds)
-spkT = np.array(spkTimes)
+spkID= np.array(simConfig['simData']['spkid'])
+spkT = np.array(simConfig['simData']['spkt'])
 
 lpop = ['ER', 'EV1', 'EV4', 'EMT', 'IR', 'IV1', 'IV4', 'IMT',\
         'EV1DW','EV1DNW', 'EV1DN', 'EV1DNE','EV1DE','EV1DSW', 'EV1DS', 'EV1DSE']

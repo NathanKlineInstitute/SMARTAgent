@@ -2015,3 +2015,246 @@ anyway, try longer sim now ...
 
 myrun 12
 
+*20apr28 - adjusting network
+** optical flow in python
+
+https://nanonets.com/blog/optical-flow/
+https://opencv-python-tutroals.readthedocs.io/en/latest/py_tutorials/py_video/py_lucas_kanade/py_lucas_kanade.html
+
+** sim crashes with memory problem
+
+occurs even for 2.5 s sim during gatherdata
+
+what if only recorded weights every 5 steps? with "recordWeightStepSize":5
+
+myrun 12
+
+  Done; run time = 191.75 s; real-time ratio: 0.01.
+Gathering data...
+  Done; gather time = 108.16 s.
+    Cells: 2959
+  Connections: 299852 (101.34 per cell)
+  Synaptic contacts: 405671 (137.10 per cell)
+  Spikes: 30546 (4.13 Hz)
+  Simulated time: 2.5 s; 12 workers
+  Run time: 191.75 s
+Saving output as data/20april28_A0_simConfig.pkl ...
+
+Total time = 383.88 s
+
+ok, good, did not crash ...
+
+20apr28_rast_a0.png
+
+rates and membrane potential traces look ok but EMR,EML,IM rates somewhat high ... (~5-6 Hz for
+EMR,EML and ~18 Hz for IM); could reduce weights to EMR,EML further ...
+
+python -i actmap.py
+
+data/20april28_A0_actmap.mp4
+
+python -i simdat.py -1
+
+data/20april28_A0__AMPA_weightmap.mp4
+data/20april28_A0__NMDA_weightmap.mp4
+
+try again with:
+ larger recordStep and comment out the connection rules for weights that are 0 (feedback connections)
+ do not need to plot raster twice and to save raster data in separate file
+ do not need to plot voltage traces from every direction cells, one type should be enough to see if looks ok
+ also reduce weight to EMR,EML
+ 
+does this simConfig.recordTraces = {'V_soma':{'sec':'soma','loc':0.5,'var':'v'}}  # Dict with traces to record
+cause recording of all cells' membrane potential? probably do not want that ...
+
+based on this:
+"recordCells - List of cells from which to record traces. Can include cell gids (e.g. 5 or [2,
+3]), population labels (e.g. 'S' to record from one cell of the ‘S’ population), or 'all', to
+record from all cells. NOTE: All cells selected in the include argument of
+simConfig.analysis['plotTraces'] will be automatically included in recordCells. (default: [])
+
+recordTraces - Dict of traces to record (default: {} ; example: {‘V_soma’:{‘sec’:’soma’,’loc’:0.5,’var’:’v’}})"
+
+... it does NOT record ALL cells; just the ones in include:
+simConfig.analysis['plotTraces'] = {'include': [(pop, 0) for pop in ['ER','IR','EV1','EV1DE','IV1','EV4','IV4','EMT','IMT','EML','EMR','IM']]}
+
+myrun 12
+
+  Done; gather time = 108.10 s.
+
+hmm, did not save much time or space ... must be saving a lot of other stuff in the 680 MB 20april28_A0_simConfig.pkl
+also rate of EMR,EML did not decrease ...
+
+https://www.neuron.yale.edu/phpBB/viewtopic.php?f=45&t=3770&p=16227&hilit=memory#p16122
+
+so try with those options, see if saves time/space ...
+
+myrun 12
+
+Gathering data...
+  Gathering only sim data...
+  Done; gather time = 70.73 s.
+
+  saved some time ...
+
+  but got error:
+  File "sim.py", line 983, in <module>
+    sim.saveData() # save data to disk
+  File "/u/samn/netpyne/netpyne/sim/save.py", line 127, in saveData
+    pickle.dump(dataSave, fileObj)
+    TypeError: HocObject: Only Vector instance can be pickled
+    
+  and then simConfig.pkl output was empty ...
+
+ so will run as it was before ... but still need to adjust the weights
+
+ok, first try with higher ->EMR, ->EML weights
+for strty,synmech,weight,plastty in zip(['','n'],['AMPA', 'NMDA'],[0.00375*cfg.EEGain, 0.000375*cfg.EEGain],[STDPparamsRL1,STDPparamsRL2]):
+to make sure those synapses have an impact ...
+
+when the weights were 0.005*cfg.EEGain and 0.0005*cfg.EEGain had similar rates ... which means other inputs driving most
+of the activity ... 
+
+also see recurrent connectivity ... should adjust for EMR->EMR and EML->EML to allow some plasticity ...
+
+python -i simdat.py
+
+simConfig, pdf, actreward, dstartidx, dendidx = loadsimdat()
+simConfig.keys() # dict_keys(['netpyne_version', 'netpyne_changeset', 'net', 'simConfig', 'simData'])
+simConfig['simData'].keys() # dict_keys(['spkt', 'spkid', 'V_soma', 't', 'synweights', 'avgRate'])
+len(simConfig['simData']['spkt']) # 29862
+len(simConfig['simData']['spkid']) # 29862
+
+python -i actmap.py
+
+also see if these options make output smaller:
+cfg.saveCellSecs = False     # removes all data on cell sections prior to gathering from nodes
+cfg.saveCellConns = False    # removes all data on cell connections prior to gathering from nodes
+
+myrun 12
+
+Gathering data...
+Done; gather time = 72.30 s.
+
+ok, that reduced main output file size to ~210 MB vs ~690 MB (for 2.5 s sim)
+and a shorter gather time (without a crash)
+
+python -i actmap.py
+
+data/20april28_A0_actmap.mp4
+
+python -i simdat.py -1
+
+...
+
+can put that into option in sim.json ... in case want connectivity info at some point
+
+** test the targetted RL rule in fake up
+
+added option to sim.json to specify whether to use targetted rule (only rewards actions to
+motor neurons responsible for the action)
+
+first without targetted RL:
+10 s sim with name 20april28_T0_
+myrun 12
+
+20apr28_rast_T0.png
+20apr28_rast_T0b.png
+
+EMR,EML get too fast  ...
+IM hits depolarization blockade: 20apr28_IM_T0.png
+so does EMR, EML: 20apr28_EMR_T0.png, 20apr28_EML_T0.png
+
+python -i actmap.py
+
+data/20april28_T0_actmap.mp4
+
+doesn't seem like direction selective neurons activating properly ... all activity
+in each population seems to go together ...
+
+python -i simdat.py -1
+
+data/20april28_T0__AMPA_weightmap.mp4
+data/20april28_T0__NMDA_weightmap.mp4 <<-- NMDA weights look much different compared to AMPA, perhaps NMDA weights
+are not helping, as the populations are not differentiated. strange pattern for NMDA, spikes and decays...similar times with AMPA
+what is the cause for those spikes? high rate of rewards??
+
+UP is 4, DOWN is 3; EMR is for UP, EML is for DOWN; so in those movies, overall
+the weights to EMR are larger
+
+and next with targetted RL:
+10 s sim with name 20april28_T1_
+myrun 12
+
+Done; run time = 2946.54 s; real-time ratio: 0.00.
+Gathering data...
+  Done; gather time = 1267.64 s.
+Analyzing...
+  Cells: 2959
+  Connections: 0 (0.00 per cell)
+  Spikes: 598894 (20.24 Hz)
+  Simulated time: 10.0 s; 12 workers
+  Run time: 2946.54 s
+Saving output as data/20april28_T1_simConfig.pkl ... 
+Finished saving!
+  Done; saving time = 436.50 s.
+SAVING RASTER DATA
+plot raster:
+Plotting recorded cell traces ... cell
+QApplication: invalid style override passed, ignoring it.
+Plotting raster...
+  Done; plotting time = 828.98 s
+
+Total time = 5536.42 s
+End time:  2020-04-28 17:36:51.533489
+
+takes a surprisingly long time to save and plot the data ... 
+
+well, there's depolarization blockade:
+
+20apr28_IM_T1.png
+20apr28_EMR_T1.png
+20apr28_EML_T1.png
+20apr28_rast_T1.png <<-- very high rates for EML
+IM,EMR are in depolarization blockade. weights to EMR probably increased too much.
+better if there was some homeostasis built in
+
+python -i actmap.py
+
+data/20april28_T1_actmap.mp4   <<-- paddle goes up fairly quickly but then goes way down near end of sim and stays
+there, probably due to depolarization blockade of EMR cells; EML might be firing quickly since does not receive and
+inhibition from IM since IM in depolarization blockade. but then why does the racket stay near top of court for most
+of the simulation, until the very end. is it drawn incorrectly??
+
+python -i simdat.py -1
+
+data/20april28_T1__AMPA_weightmap.mp4
+data/20april28_T1__NMDA_weightmap.mp4
+
+weights diverge towards EMR population quickly, weights to EML drop quickly, and then they stay that way
+same pattern with AMPA and NMDA weights ...
+
+
+confused by the variable names (ts_end is end time? ts_beg is beginning time? or opposite?)
+            ts_end = t-tstepPerAction*(dconf['actionsPerPlay']-ts)
+            ts_beg = t-tstepPerAction*(dconf['actionsPerPlay']-ts-1)
+            F_Rs.append(getFiringRatesWithInterval([ts_end,ts_beg], sim.net.pops['EMR'].cellGids))
+
+            and
+def getFiringRatesWithInterval (trange = None, neuronal_pop = None):
+has
+if trange[0] <= spkts[i] <= trange[1] and spkids[i] in neuronal_pop:
+
+
+tstepPerAction = 20
+actionsPerPlay = 1
+ts_beg = t - 20*(1-0-1) = t - 0
+ts_end = t - 20*(1-0) = t - 20
+
+ok, so ts_end is smaller, so it's correct, but the names are confusing ...
+
+anyway, getting back to why actmap.py appears incorrect ... need to check that ...
+
+the depolarization blockade issues suggest need for homeostasis built-in to the synapse ... should also try adding that ...
+
+
