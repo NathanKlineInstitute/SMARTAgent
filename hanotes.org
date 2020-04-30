@@ -1427,3 +1427,74 @@ plt.show()
 
 **Tried Method Nb. 3 (https://opencv-python-tutroals.readthedocs.io/en/latest/py_tutorials/py_video/py_lucas_kanade/py_lucas_kanade.html)
 ***The function p1, st, err = cv2.calcOpticalFlowPyrLK(old_gray, frame_gray, p0, None, **lk_params) gave me errors. Probably didnt provide p0 properly. In the example, they use p0 = cv2.goodFeaturesToTrack(old_gray, mask = None, **feature_params) to extract corners using these parameters (feature_params = dict( maxCorners = 100,qualityLevel = 0.3,minDistance = 7,blockSize = 7 ))
+
+*20April29
+**Trying Nb. 3 again.
+
+import cv2
+flow45 = cv2.calcOpticalFlowFarneback(o4,o5, None, 0.5, 3, 15, 3, 5, 1.2, 0)
+mag45, ang45 = cv2.cartToPolar(flow45[...,0], flow45[...,1])
+goodInds = np.where(mag45<1e-10,0,1)
+plt.imshow(np.degrees(np.multiply(ang45,goodInds)))
+plt.colorbar()
+plt.show()
+
+0.5 - image pyramid or simple image scale
+3 - nb of pyramidal layer. if used 1 means flow is calculated only from previous image.
+15 - win size. flow is computed over the window....larger value is more robust to the noise.
+3 - nb of iterations
+5 - polynominal degree expansion. (recommended 5-7)
+1.2 - standard deviation used to smooth used derivatives. (recommended 1.1-1.5)
+
+flow45 = cv2.calcOpticalFlowFarneback(o4,o5, None, 0.5, 3, 15, 3, 5, 1.2, 0)
+mag45, ang45 = cv2.cartToPolar(flow45[...,0], flow45[...,1])
+goodInds = np.where(mag45<1e-10,0,1)
+plt.subplot(2,2,1)
+plt.imshow(o4)
+plt.colorbar()
+plt.subplot(2,2,2)
+plt.imshow(o5)
+plt.colorbar()
+plt.subplot(2,2,3)
+plt.imshow(np.degrees(np.multiply(ang45,goodInds)))
+plt.colorbar()
+plt.subplot(2,2,4)
+plt.imshow(np.multiply(mag45,goodInds))
+plt.colorbar()
+plt.show()
+
+
+flow35 = cv2.calcOpticalFlowFarneback(o3,o5, None, 0.5, 1, 5, 3, 5, 1.2, 0)
+mag35, ang35 = cv2.cartToPolar(flow35[...,0], flow35[...,1])
+goodInds = np.where(mag35<1e-10,0,1)
+plt.subplot(2,2,1)
+plt.imshow(o3)
+plt.colorbar()
+plt.subplot(2,2,2)
+plt.imshow(o5)
+plt.colorbar()
+plt.subplot(2,2,3)
+plt.imshow(np.degrees(np.multiply(ang35,goodInds)))
+plt.colorbar()
+plt.subplot(2,2,4)
+plt.imshow(np.multiply(mag35,goodInds))
+plt.colorbar()
+plt.show()
+
+
+flow34 = cv2.calcOpticalFlowFarneback(o3,o4, None, 0, 1, 10, 3, 5, 1.2, 0)
+mag34, ang34 = cv2.cartToPolar(flow34[...,0], flow34[...,1])
+goodInds = np.where(mag34<1e-10,0,1)
+plt.subplot(2,2,1)
+plt.imshow(o3)
+plt.colorbar()
+plt.subplot(2,2,2)
+plt.imshow(o4)
+plt.colorbar()
+plt.subplot(2,2,3)
+plt.imshow(np.degrees(np.multiply(ang34,goodInds)))
+plt.colorbar()
+plt.subplot(2,2,4)
+plt.imshow(np.multiply(mag34,goodInds))
+plt.colorbar()
+plt.show()
