@@ -2257,7 +2257,7 @@ anyway, getting back to why actmap.py appears incorrect ... need to check that .
 
 the depolarization blockade issues suggest need for homeostasis built-in to the synapse ... should also try adding that ...
 
-*20apr29
+*20apr29 - debug actmap.py animations
 ** check actmap.py
 
 make sure has input images / activity displayed at right times
@@ -2280,4 +2280,80 @@ row 0 of input images is top
 
 was using wrong timestep in actmap.py ... made a variable for it tstepPerAction, also used in sim.json
 and sim.py
+
+*20apr30
+** optical flow
+
+this is what haroon tried last time:
+(/u/samn/SMARTAgent/hanotes.org:1432)
+
+see how to use it to produce direction vectors at each pixel ...
+
+python
+
+from pylab import *
+import numpy as np
+import gym
+import cv2 # opencv
+from skimage.color import rgb2gray
+from skimage.registration import optical_flow_tvl1
+
+env = gym.make('Pong-v0')
+env.reset()
+observation, reward, done, info = env.step(3)
+
+for _ in range(30): #running 30 times, so that ball appears in the court.
+  observation, reward, done, info = env.step(3)
+  observation, reward, done, info = env.step(4)
+  observation, reward, done, info = env.step(4)
+  observation, reward, done, info = env.step(4)
+  observation, reward, done, info = env.step(4)
+  
+o1, reward, done, info = env.step(4)
+o2, reward, done, info = env.step(4)
+o3, reward, done, info = env.step(4)
+o4, reward, done, info = env.step(4)
+o5, reward, done, info = env.step(4)
+
+imshow(o1); savefig('gif/20apr30_a0.png')
+imshow(o2); savefig('gif/20apr30_a1.png')
+imshow(o3); savefig('gif/20apr30_a2.png')
+imshow(o4); savefig('gif/20apr30_a3.png')
+imshow(o5); savefig('gif/20apr30_a4.png')
+
+g1 = rgb2gray(o1)
+g2 = rgb2gray(o2)
+g3 = rgb2gray(o3)
+
+subplot(1,2,1); imshow(g1,cmap='gray'); subplot(1,2,2); imshow(g3,cmap='gray')
+savefig('gif/20apr30_a5.png')
+
+#
+winsz = 10 # win size. flow is computed over the window....larger value is more robust to the noise.
+imgscale = 1.0 # image pyramid or simple image scale
+nlayer = 1 # nb of pyramidal layer. if used 1 means flow is calculated only from previous image.
+niter = 3 # num iterations
+polydeg = 5 # polynominal degree expansion. (recommended 5-7)
+smooth = 1.2 # standard deviation used to smooth used derivatives. (recommended 1.1-1.5)
+flow = cv2.calcOpticalFlowFarneback(g1,g3, None, imgscale, nlayer, winsz, niter, polydeg, smooth, 0)
+mag, ang = cv2.cartToPolar(flow[...,0], flow[...,1])
+goodInds = np.where(mag<1e-10,0,1)
+
+#
+clf()
+subplot(2,2,1); imshow(g1,cmap='gray'); title('Frame1'); subplot(2,2,2); imshow(g3,cmap='gray'); title('Frame2');
+subplot(2,2,3); imshow(np.multiply(mag,goodInds),cmap='gray'); title('Mag'); colorbar()
+subplot(2,2,4); imshow(np.degrees(np.multiply(ang,goodInds)),cmap='gray'); title('Dir'); colorbar()
+
+savefig('gif/20apr30_a6.png')
+
+try quiver for directions:
+https://matplotlib.org/3.1.0/api/_as_gen/matplotlib.pyplot.quiver.html
+https://matplotlib.org/3.1.0/gallery/images_contours_and_fields/quiver_simple_demo.html#sphx-glr-gallery-images-contours-and-fields-quiver-simple-demo-py
+
+figure(); quiver(flow[:,:,0],flow[:,:,1])
+
+savefig('gif/20apr30_a7.png')
+
+looks upside down ...
 
