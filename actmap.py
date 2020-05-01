@@ -9,6 +9,7 @@ import os
 import anim
 from matplotlib import animation
 from simdat import loadInputImages, loadsimdat
+from imgutils import getoptflow
 
 rcParams['font.size'] = 6
 
@@ -135,43 +136,53 @@ def animActivityMaps (outpath, framerate=10, figsize=(7,3)):
   ion()
   return fig, axs, plt
 
-def animInput (InputImages, outpath, framerate=10, figsize=None):
-  # animate the input images
+#
+def animInput (InputImages, outpath, framerate=10, figsize=None, showflow=True):
+  # animate the input images; showflow specifies whether to calculate/animate optical flow
   ioff()
-  # plot activity in different layers as a function of input images
+  # plot input images and optionally optical flow
+  ncol = 1
+  if showflow: ncol+=1
   if figsize is not None:
     fig = figure(figsize=figsize)
   else:
     fig = figure()
-  lax = [gca()]
-  cbaxes = fig.add_axes([0.95, 0.4, 0.01, 0.2]) 
+  lax = [subplot(1,ncol,i+1) for i in range(ncol)]
   ltitle = ['Input Images']
   lact = [InputImages]; lvmax = [255]; xl = [(-.5,19.5)]; yl = [(19.5,-0.5)]
   ddat = {}
   fig.suptitle('Time = ' + str(0*tstepPerAction) + ' ms')
   idx = 0
+  lflow = []
+  if showflow: lflow = getoptflowframes(InputImages)
   for ldx,ax in enumerate(lax):
-    offidx=0
-    pcm = ax.imshow( lact[idx][offidx,:,:], origin='upper', cmap='gray', vmin=0, vmax=lvmax[idx])
-    ddat[ldx] = pcm
-    ax.set_ylabel(ltitle[idx])
-    plt.colorbar(pcm, cax = cbaxes)  
+    if ldx==0:
+      pcm = ax.imshow( lact[idx][0,:,:], origin='upper', cmap='gray', vmin=0, vmax=lvmax[idx])
+      ddat[ldx] = pcm
+      ax.set_ylabel(ltitle[idx])
+    else:
+      X, Y = np.meshgrid(np.arange(0, InputImages[0].shape[1], 1), np.arange(0,InputImages[0].shape[0],1))
+      ddat[ldx] = ax.quiver(X,Y,lflow[0]['flow'][:,:,0],-lflow[0]['flow'][:,:,1], pivot='mid', units='inches',width=0.022,scale=1/0.15)
+      ax.set_xlim((0,InputImages[0].shape[1])); ax.set_ylim((0,InputImages[0].shape[0]))
+      ax.invert_yaxis()
     idx += 1
   def updatefig (t):
     print('frame t = ', str(t*tstepPerAction))
     fig.suptitle('Time = ' + str(t*tstepPerAction) + ' ms')
-    idx = 0
     for ldx,ax in enumerate(lax):
-      offidx = -1
-      ddat[ldx].set_data(lact[idx][t+offidx,:,:])
-      idx += 1
+      if ldx == 0:
+        ddat[ldx].set_data(lact[0][t-1,:,:])
+      else:
+        ddat[ldx].set_UVC(lflow[t]['flow'][:,:,0],-lflow[t]['flow'][:,:,1])        
     return fig
-  ani = animation.FuncAnimation(fig, updatefig, interval=1, frames=len(t1))
+  nframe = len(t1)
+  if showflow: nframe-=1
+  ani = animation.FuncAnimation(fig, updatefig, interval=1, frames=nframe)
   writer = anim.getwriter(outpath, framerate=framerate)
   ani.save(outpath, writer=writer); print('saved animation to', outpath)
   ion()
   return fig
 
 #fig, axs, plt = animActivityMaps('test2.mp4')
-fig, axs, plt = animActivityMaps('data/'+dconf['sim']['name']+'actmap.mp4', framerate=10)
+# fig, axs, plt = animActivityMaps('data/'+dconf['sim']['name']+'actmap.mp4', framerate=10)
 
