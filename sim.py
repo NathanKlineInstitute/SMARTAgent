@@ -30,6 +30,7 @@ sim.allNonRLWeights = [] # list to store weights --- should remove that
 sim.plotWeights = 0  # plot weights
 sim.saveWeights = 1  # save weights
 sim.saveInputImages = 1 #save Input Images (5 game frames)
+sim.saveMotionFields = 1 # whether to save the motion fields
 recordWeightStepSize = dconf['sim']['recordWeightStepSize']
 #recordWeightDT = 1000 # interval for recording synaptic weights (change later)
 recordWeightDCells = 1 # to record weights for sub samples of neurons
@@ -914,6 +915,12 @@ tPerPlay = tstepPerAction*dconf['actionsPerPlay']
 sim.runSimWithIntervalFunc(tPerPlay,trainAgent) # has periodic callback to adjust STDP weights based on RL signal
 sim.gatherData() # gather data from different nodes
 sim.saveData() # save data to disk
+
+"""
+def saveMotionFields (ldflow):
+  pickle.dump
+  pass
+"""
 
 def saveInputImages (Images):
   InputImages = np.array(Images)
