@@ -13,7 +13,7 @@ from random import uniform, seed, sample, randint
 from matplotlib import pyplot as plt
 import random
 import numpy as np
-from skimage.transform import downscale_local_mean
+from skimage.transform import downscale_local_mean, resize
 from skimage.color import rgb2gray
 import json
 import gym
@@ -70,13 +70,14 @@ class AIGame:
     self.dirSensitiveNeuronRate = (dconf['net']['DirMinRate'], dconf['net']['DirMaxRate']) # min, max firing rate (Hz) for dir sensitive neurons
     self.intaction = int(dconf['actionsPerPlay']) # integrate this many actions together before returning reward information to model
     # these are Pong-specific coordinate ranges; should later move out of this function into Pong-specific functions
-    self.courtYRng = (34, 194)
-    self.courtXRng = (20, 140)
-    self.racketXRng = (141, 144)
-    self.last_obs = []
-    self.last_ball_dir = 0
+    self.courtYRng = (34, 194) # court y range
+    self.courtXRng = (20, 140) # court x range
+    self.racketXRng = (141, 144) # racket x range
+    self.last_obs = [] # previous observation
+    self.last_ball_dir = 0 # last ball direction
     self.FullImages = [] # full resolution images from game environment
-    self.ReducedImages = [] # low resolution images from game yeaenvironment used as input to model
+    self.ReducedImages = [] # low resolution images from game environment used as input to neuronal network model
+    self.ldflow = [] # list of dictionary of optical flow (motion) fields
 
   def updateInputRates (self, dsum_Images):
     # update input rates to retinal neurons
@@ -87,83 +88,24 @@ class AIGame:
     #print(np.amax(fr_Images))
     self.dFiringRates['ER'] = np.reshape(fr_Images,400) #400 for 20*20
 
-  def computeMotion (self, dsum_Images):
-    #compute directions of motion for every other pixel.
-    bkgPixel = np.min(dsum_Images) # background pixel value
-    dirSensitiveNeuronDim = self.dirSensitiveNeuronDim
-    dirSensitiveNeurons = np.zeros(shape=(dirSensitiveNeuronDim,dirSensitiveNeuronDim))
-    for dSNeuronX in range(dirSensitiveNeuronDim):
-      Rx = 2*dSNeuronX
-      if Rx==0:
-        Rxs = [Rx,Rx+1,Rx+2]
-      elif Rx==1:
-        Rxs = [Rx-1, Rx, Rx+1, Rx+2]
-      #elif Rx==dirSensitiveNeuronDim-1:
-      #    Rxs = [Rx-2,Rx-1,Rx]
-      elif Rx==((2*dirSensitiveNeuronDim)-2):
-        Rxs = [Rx-2,Rx-1,Rx,Rx+1]
-      else:
-        Rxs = [Rx-2,Rx-1,Rx,Rx+1,Rx+2]
-      for dSNeuronY in range(dirSensitiveNeuronDim):
-        Ry = 2*dSNeuronY
-        #print('Ry:',Ry)
-        if Ry==0:
-          Rys = [Ry, Ry+1, Ry+2]
-        elif Ry==1:
-          Rys = [Ry-1, Ry, Ry+1, Ry+2]
-        #elif Ry==dirSensitiveNeuronDim-1:
-        #    Rys = [Ry-2,Ry-1,Ry]
-        elif Ry==((2*dirSensitiveNeuronDim)-2):
-          Rys = [Ry-2,Ry-1,Ry,Ry+1]
-        else:
-          Rys = [Ry-2,Ry-1,Ry,Ry+1,Ry+2]
-        #print('Xinds',Rxs,'Yinds',Rys)
-        FOV = np.zeros(shape=(len(Rxs),len(Rys))) # field of view
-        for xinds in range(len(Rxs)):
-          for yinds in range(len(Rys)):
-            FOV[xinds,yinds] = dsum_Images[Rxs[xinds],Rys[yinds]]
-        #print(FOV)
-        max_value = np.amax(FOV)
-        max_ind = np.where(FOV==max_value)
-        #print('max inds', max_ind) 
-        #since the most recent frame has highest pixel intensity, any pixel with the maximum intensity will be
-        #most probably the final instance of the object motion in that field of view
-        bkg_inds = np.where(FOV == bkgPixel)
-        if len(bkg_inds[0])>0:
-          for yinds in range(len(bkg_inds[0])):
-            ix = bkg_inds[0][yinds]
-            iy = bkg_inds[1][yinds]
-            FOV[ix,iy] = 1000
-        #I dont want to compute object motion vector relative to the background. so to ignore background pixels, replacing them with large value
-        #np.put(FOV,bkg_inds,1000) 
-        min_value = np.amin(FOV)
-        min_ind = np.where(FOV==min_value)
-        #print('min inds', min_ind)
-        #since latest frame has lowest pixel intensity (after ignoring background), any pixel with max intensity will
-        #most probably be first instance of object motion in that field of view
-        if len(max_ind[0])>len(min_ind[0]):
-          mL = len(min_ind[0])
-        elif len(max_ind[0])<len(min_ind[0]):
-          mL = len(max_ind[0])
-        else:
-          mL = len(max_ind[0])
-        #direction of the object motion in a field of view over last 5 frames/observations.
-        dir1 = [max_ind[0][range(mL)]-min_ind[0][range(mL)],max_ind[1][range(mL)]-min_ind[1][range(mL)]] 
-        dir2 = [np.median(dir1[1]),-1*np.median(dir1[0])] #flip y because indexing starts from top left.
-        dirMain = [1,0] #using a reference for 0 degrees....considering first is for rows and second is for columns
-        ndir2 = dir2 / np.linalg.norm(dir2)
-        ndirMain = dirMain / np.linalg.norm(dirMain)
-        theta = np.degrees(np.arccos(np.dot(ndir2,ndirMain))) #if theta is nan, no movement is detected
-        if dir2[1]<0: theta = 360-theta 
-        dirSensitiveNeurons[dSNeuronX,dSNeuronY] = theta # the motion angle (theta) at position dSNeuronX,dSNeuronY is stored
-        #if not np.isnan(theta): print('Theta for FOV ',FOV,' is: ', theta)
-    print('Computed angles:', dirSensitiveNeurons)
-    return dirSensitiveNeurons
-      
-  def updateDirSensitiveRates (self, motiondir):
+  def computeMotionFields (self, UseFull=False):
+    # compute and store the motion fields and associated data
+    if UseFull:
+      limage = self.FullImages
+    else:
+      limage = self.ReducedImages
+    if len(limage) < 2: return
+    self.ldflow.append(getoptflow(limage[-2],limage[-1]))
+          
+  def updateDirSensitiveRates (self):
     # update firing rate of dir sensitive neurons using dirs (2D array with motion direction at each coordinate)
+    if len(self.ldflow) < 1: return
+    dflow = self.ldflow[-1]
+    motiondir = dflow['ang']
     dAngPeak = self.dAngPeak
     dirSensitiveNeuronDim = self.dirSensitiveNeuronDim
+    if motiondir.shape[0] != dirSensitiveNeuronDim or motiondir.shape[1] != dirSensitiveNeuronDim:
+      motiondir = resize(motiondir, dirSensitiveNeuronDim, dirSensitiveNeuronDim)    
     AngRFSigma2 = self.AngRFSigma2
     MaxRate = self.dirSensitiveNeuronRate[1]
     for pop in self.ldirpop: self.dFiringRates[pop] = self.dirSensitiveNeuronRate[0] * np.ones(shape=(dirSensitiveNeuronDim,dirSensitiveNeuronDim))
@@ -202,8 +144,11 @@ class AIGame:
     rewards = []; proposed_actions =[]; total_hits = []; Images = []; Ball_pos = []; Racket_pos = []
     input_dim = self.input_dim
     done = False
-    courtYRng, courtXRng, racketXRng = self.courtYRng, self.courtXRng, self.racketXRng # coordinate ranges for different objects (PONG-specific)
-    lgwght = np.linspace(0.6, 1, self.intaction) # time-decay grayscale image weights (earlier indices with lower weights are from older frames)
+    courtYRng, courtXRng, racketXRng = self.courtYRng, self.courtXRng, self.racketXRng # coordinate ranges for different objects (PONG-specific)    
+    if self.intaction==1:
+      lgwght = [1.0]
+    else:
+      lgwght = np.linspace(0.6, 1, self.intaction) # time-decay grayscale image weights (earlier indices with lower weights are from older frames)
     lgimage = [] # grayscale images with decaying time-lagged input
     if len(self.last_obs)==0: #if its the first action of the episode, there won't be any last_obs, therefore no last image
       lobs_gimage_ds = []
@@ -294,8 +239,9 @@ class AIGame:
     if self.intaction==1: #if only one frame used per play, then add the downsampled and scaled image from last_obs for direction computation 
       if len(lobs_gimage_ds)>0:
         dsum_Images = np.maximum(dsum_Images,lobs_gimage_ds)
-    dirs = self.computeMotion(dsum_Images) # compute directions of motion for every other pixel
-    self.updateDirSensitiveRates(dirs) # update motion sensitive neuron input rates                
+
+    self.computeMotionFields() # compute the motion fields
+    self.updateDirSensitiveRates() # update motion sensitive neuron input rates
 
     if done: # done means that 1 episode of the game finished, so the environment needs to be reset. 
       epCount.append(self.countAll)
@@ -306,5 +252,5 @@ class AIGame:
       print('ERROR COMPUTING NUMBER OF HITS')
     for r in range(len(rewards)):
       if rewards[r]==-1: total_hits[r]=-1 #when the ball misses the racket, the reward is -1
-    return rewards, epCount, proposed_actions, total_hits, Racket_pos, Ball_pos, dirs
+    return rewards, epCount, proposed_actions, total_hits, Racket_pos, Ball_pos
             

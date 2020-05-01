@@ -749,7 +749,7 @@ def trainAgent (t):
                     actions.append(dconf['moves']['NOMOVE']) # No move        
     if sim.rank == 0:
         print('Model actions:', actions)
-        rewards, epCount, proposed_actions, total_hits, Racket_pos, Ball_pos, dirSensitiveNeurons = sim.AIGame.playGame(actions, epCount)
+        rewards, epCount, proposed_actions, total_hits, Racket_pos, Ball_pos = sim.AIGame.playGame(actions, epCount)
         print('Proposed actions:', proposed_actions)
         if dconf['sim']['RLFakeUpRule']: # fake rule for testing reinforcing of up moves
           critic = np.sign(actions.count(dconf['moves']['UP']) - actions.count(dconf['moves']['DOWN']))          
