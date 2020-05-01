@@ -2357,3 +2357,35 @@ savefig('gif/20apr30_a7.png')
 
 looks upside down ...
 
+flow.shape # (210, 160, 2)
+
+g1.shape # (210, 160)
+top is row 0
+
+what is value at x=17, y=120
+flow[120][17][0],flow[120][17][1] # (1.1408521e-09, -1.1311174e-06)
+
+figure(); plot(flow[120,:,1])
+savefig('gif/20apr30_a8.png')
+so that's negative, movement towards smaller y-values, which in original frame is up
+
+so draw quiver with negated flow in y direction to make easier to visualize ...
+
+#
+clf()
+subplot(2,3,1); imshow(g1,cmap='gray'); title('Frame1'); subplot(2,3,2); imshow(g3,cmap='gray'); title('Frame2');
+subplot(2,3,4); imshow(np.multiply(mag,goodInds),cmap='gray'); title('Mag'); colorbar()
+subplot(2,3,5); imshow(np.degrees(np.multiply(ang,goodInds)),cmap='gray'); title('Dir'); colorbar()
+
+X, Y = np.meshgrid(np.arange(0, 160, 1), np.arange(0, 210, 1))
+subplot(2,3,6); quiver(X, Y, flow[:,:,0],-flow[:,:,1], units='width')
+
+savefig('gif/20apr30_a9.png')
+
+looks ok ... zoom-in shows mostly pointing in right direction ... could make movie to show
+and then use that for dir selective neurons; doesn't have to be completely accurate ... 
+
+#imshow(np.degrees(np.multiply(ang,goodInds)),cmap='gray'); title('Dir'); colorbar()
+#
+#X,Y = np.meshgrid(flow.shape[1], -flow.shape[0])
+
