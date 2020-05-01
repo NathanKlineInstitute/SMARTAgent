@@ -105,7 +105,7 @@ class AIGame:
     dAngPeak = self.dAngPeak
     dirSensitiveNeuronDim = self.dirSensitiveNeuronDim
     if motiondir.shape[0] != dirSensitiveNeuronDim or motiondir.shape[1] != dirSensitiveNeuronDim:
-      motiondir = resize(motiondir, dirSensitiveNeuronDim, dirSensitiveNeuronDim)    
+      motiondir = resize(motiondir, (dirSensitiveNeuronDim, dirSensitiveNeuronDim), anti_aliasing=True)
     AngRFSigma2 = self.AngRFSigma2
     MaxRate = self.dirSensitiveNeuronRate[1]
     for pop in self.ldirpop: self.dFiringRates[pop] = self.dirSensitiveNeuronRate[0] * np.ones(shape=(dirSensitiveNeuronDim,dirSensitiveNeuronDim))
