@@ -2548,3 +2548,60 @@ run a short 2 s sim for testing ... named 20may4_A0_
 
 myrun 12
 
+  Cells: 2959
+  Connections: 0 (0.00 per cell)
+  Spikes: 79757 (13.48 Hz)
+  Simulated time: 2.0 s; 12 workers
+  Run time: 412.59 s
+Saving output as data/20may4_A0_simConfig.pkl ... 
+Finished saving!
+  Done; saving time = 95.63 s.
+SAVING RASTER DATA
+plot raster:
+Plotting recorded cell traces ... cell
+QApplication: invalid style override passed, ignoring it.
+Plotting raster...
+  Done; plotting time = 117.68 s
+
+Total time = 925.17 s
+
+End time:  2020-05-04 12:45:31.363310
+
+lot of cells go into block ...
+20may4_a0_rast.png
+20may4_a0_IM.png
+20may4_a0_EML.png
+20may4_a0_EV1DE.png
+
+probably since direction selective cells not setup properly with the new optical flow ...
+
+motion fields saved ... 20may4_A0_MotionFields.pkl
+
+now check the output
+
+python -i actmap.py
+
+len(ldflow) # 99
+99*20 # 1980 - that's amount of time covered, since first frame has no optical flow
+and used 20 ms interval
+
+first adjust animInput
+
+fig=animInput(InputImages,'testflow.mp4',ldflow=ldflow)
+
+something wrong with the output movie ...
+
+same problem if calc the optflow here?
+
+from imgutils import getoptflowframes
+ldflow2 = getoptflowframes(InputImages)
+fig=animInput(InputImages,'testflow.mp4',ldflow=ldflow2)
+
+hmm, same error opening in vlc ...
+
+opens fine in parole media player
+
+fig=animInput(InputImages,'testflow.mp4',ldflow=ldflow)
+
+in general it's working but probably need higher spatial resolution ...
+

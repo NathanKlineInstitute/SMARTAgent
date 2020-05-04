@@ -148,7 +148,7 @@ def animActivityMaps (outpath, framerate=10, figsize=(7,3)):
   return fig, axs, plt
 
 #
-def animInput (InputImages, outpath, framerate=10, figsize=None, showflow=True):
+def animInput (InputImages, outpath, framerate=10, figsize=None, showflow=True, ldflow=None):
   # animate the input images; showflow specifies whether to calculate/animate optical flow
   ioff()
   # plot input images and optionally optical flow
@@ -165,7 +165,7 @@ def animInput (InputImages, outpath, framerate=10, figsize=None, showflow=True):
   fig.suptitle('Time = ' + str(0*tstepPerAction) + ' ms')
   idx = 0
   lflow = []
-  if showflow: lflow = getoptflowframes(InputImages)
+  if showflow and ldflow is None: ldflow = getoptflowframes(InputImages)
   for ldx,ax in enumerate(lax):
     if ldx==0:
       pcm = ax.imshow( lact[idx][0,:,:], origin='upper', cmap='gray', vmin=0, vmax=lvmax[idx])
@@ -173,7 +173,7 @@ def animInput (InputImages, outpath, framerate=10, figsize=None, showflow=True):
       ax.set_ylabel(ltitle[idx])
     else:
       X, Y = np.meshgrid(np.arange(0, InputImages[0].shape[1], 1), np.arange(0,InputImages[0].shape[0],1))
-      ddat[ldx] = ax.quiver(X,Y,lflow[0]['flow'][:,:,0],-lflow[0]['flow'][:,:,1], pivot='mid', units='inches',width=0.022,scale=1/0.15)
+      ddat[ldx] = ax.quiver(X,Y,ldflow[0]['flow'][:,:,0],-ldflow[0]['flow'][:,:,1], pivot='mid', units='inches',width=0.022,scale=1/0.15)
       ax.set_xlim((0,InputImages[0].shape[1])); ax.set_ylim((0,InputImages[0].shape[0]))
       ax.invert_yaxis()
     idx += 1
@@ -184,7 +184,7 @@ def animInput (InputImages, outpath, framerate=10, figsize=None, showflow=True):
       if ldx == 0:
         ddat[ldx].set_data(lact[0][t-1,:,:])
       else:
-        ddat[ldx].set_UVC(lflow[t]['flow'][:,:,0],-lflow[t]['flow'][:,:,1])        
+        ddat[ldx].set_UVC(ldflow[t]['flow'][:,:,0],-ldflow[t]['flow'][:,:,1])        
     return fig
   nframe = len(t1)
   if showflow: nframe-=1
