@@ -24,7 +24,8 @@ spkID= np.array(simConfig['simData']['spkid'])
 spkT = np.array(simConfig['simData']['spkt'])
 
 lpop = ['ER', 'EV1', 'EV4', 'EMT', 'IR', 'IV1', 'IV4', 'IMT',\
-        'EV1DW','EV1DNW', 'EV1DN', 'EV1DNE','EV1DE','EV1DSW', 'EV1DS', 'EV1DSE']
+        'EV1DW','EV1DNW', 'EV1DN', 'EV1DNE','EV1DE','EV1DSW', 'EV1DS', 'EV1DSE',\
+        'EML','EMR']
 
 ddir = OrderedDict({'EV1DW':'W','EV1DNW':'NW', 'EV1DN':'N','EV1DNE':'NE','EV1DE':'E','EV1DSW':'SW','EV1DS':'S','EV1DSE':'SE'})
 
@@ -110,38 +111,45 @@ def animActivityMaps (outpath, framerate=10, figsize=(7,3)):
   fig.suptitle('Time = ' + str(0*tstepPerAction) + ' ms')
   idx = 0
   for ldx,ax in enumerate(lax):
-    if ldx == 5 or idx > len(dact.keys()):
+    if idx > len(dact.keys()):
       ax.axis('off')
-      if ldx == 5:
-        X, Y = np.meshgrid(np.arange(0, InputImages[0].shape[1], 1), np.arange(0,InputImages[0].shape[0],1))
-        ddat[ldx] = ax.quiver(X,Y,ldflow[0]['flow'][:,:,0],-ldflow[0]['flow'][:,:,1], pivot='mid', units='inches',width=0.022,scale=1/0.15)
-        ax.set_xlim((0,InputImages[0].shape[1])); ax.set_ylim((0,InputImages[0].shape[0]))
-        ax.invert_yaxis()        
-        pass
       continue
-    if ldx==0: offidx=-1
-    else: offidx=0
-    pcm = ax.imshow(lact[idx][offidx,:,:],origin='upper',cmap='gray',vmin=0,vmax=lvmax[idx])
-    ddat[ldx] = pcm
+    if ldx==0:
+      offidx=-1
+    elif ldx==5:
+      offidx=1
+    else:
+      offidx=0
+    if ldx==5:
+      X, Y = np.meshgrid(np.arange(0, InputImages[0].shape[1], 1), np.arange(0,InputImages[0].shape[0],1))
+      ddat[ldx] = ax.quiver(X,Y,ldflow[0]['flow'][:,:,0],-ldflow[0]['flow'][:,:,1], pivot='mid', units='inches',width=0.022,scale=1/0.15)
+      ax.set_xlim((0,InputImages[0].shape[1])); ax.set_ylim((0,InputImages[0].shape[0]))
+      ax.invert_yaxis()              
+      continue
+    else:
+      pcm = ax.imshow(lact[idx][offidx,:,:],origin='upper',cmap='gray',vmin=0,vmax=lvmax[idx])
+      ddat[ldx] = pcm
     ax.set_ylabel(ltitle[idx])
     if ldx==2: plt.colorbar(pcm, cax = cbaxes)  
     idx += 1
   def updatefig (t):
+    fig.suptitle('Time = ' + str(t*tstepPerAction) + ' ms')    
+    if t<1: return fig # already rendered t=0 above; skip last for optical flow
     print('frame t = ', str(t*tstepPerAction))
-    fig.suptitle('Time = ' + str(t*tstepPerAction) + ' ms')
     idx = 0
     for ldx,ax in enumerate(lax):
-      if ldx == 5 or idx > len(dact.keys()):
-        if ldx == 5:
-          
-          pass
-        continue
-      if ldx==0: offidx=-1
-      else: offidx=0
-      ddat[ldx].set_data(lact[idx][t+offidx,:,:])
-      idx += 1
+      if idx > len(dact.keys()): continue
+      if ldx==0 or ldx==5:
+        offidx=-1
+      else:
+        offidx=0
+      if ldx == 5:
+        ddat[ldx].set_UVC(ldflow[t+offidx]['flow'][:,:,0],-ldflow[t]['flow'][:,:,1])        
+      else:
+        ddat[ldx].set_data(lact[idx][t+offidx,:,:])
+        idx += 1
     return fig
-  ani = animation.FuncAnimation(fig, updatefig, interval=1, frames=len(t1))
+  ani = animation.FuncAnimation(fig, updatefig, interval=1, frames=len(t1)-1)
   writer = anim.getwriter(outpath, framerate=framerate)
   ani.save(outpath, writer=writer); print('saved animation to', outpath)
   ion()
@@ -173,18 +181,19 @@ def animInput (InputImages, outpath, framerate=10, figsize=None, showflow=True, 
       ax.set_ylabel(ltitle[idx])
     else:
       X, Y = np.meshgrid(np.arange(0, InputImages[0].shape[1], 1), np.arange(0,InputImages[0].shape[0],1))
-      ddat[ldx] = ax.quiver(X,Y,ldflow[0]['flow'][:,:,0],-ldflow[0]['flow'][:,:,1], pivot='mid', units='inches',width=0.022,scale=1/0.15)
+      ddat[ldx] = ax.quiver(X,Y,ldflow[0]['flow'][:,:,0],-ldflow[0]['flow'][:,:,1], pivot='mid', units='inches',width=0.01,scale=1/0.3)#,width=0.022,scale=1/0.15)
       ax.set_xlim((0,InputImages[0].shape[1])); ax.set_ylim((0,InputImages[0].shape[0]))
       ax.invert_yaxis()
     idx += 1
   def updatefig (t):
-    print('frame t = ', str(t*tstepPerAction))
     fig.suptitle('Time = ' + str(t*tstepPerAction) + ' ms')
+    if t < 1: return fig # already rendered t=0 above
+    print('frame t = ', str(t*tstepPerAction))    
     for ldx,ax in enumerate(lax):
       if ldx == 0:
-        ddat[ldx].set_data(lact[0][t-1,:,:])
+        ddat[ldx].set_data(lact[0][t,:,:])
       else:
-        ddat[ldx].set_UVC(ldflow[t]['flow'][:,:,0],-ldflow[t]['flow'][:,:,1])        
+        ddat[ldx].set_UVC(ldflow[t-1]['flow'][:,:,0],-ldflow[t]['flow'][:,:,1])        
     return fig
   nframe = len(t1)
   if showflow: nframe-=1

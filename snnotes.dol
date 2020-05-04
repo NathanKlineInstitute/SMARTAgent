@@ -2605,3 +2605,14 @@ fig=animInput(InputImages,'testflow.mp4',ldflow=ldflow)
 
 in general it's working but probably need higher spatial resolution ...
 
+fig, axs, plt = animActivityMaps('testact2.mp4', framerate=10)
+
+looks interesting but hard to see what's going on in motion fields there because so small ... should reduce size/width of arrows
+
+hmm, may need bigger figure size ... 
+
+fig, axs, plt = animActivityMaps('testact3.mp4', framerate=10,figsize=(9,5))
+
+well, optical flow generally follows motion with wide spread, but the direction selective populations not following
+the motion directions properly ... 
+
