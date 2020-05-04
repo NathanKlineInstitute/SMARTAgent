@@ -13,7 +13,7 @@ from random import uniform, seed, sample, randint
 from matplotlib import pyplot as plt
 import random
 import numpy as np
-from skimage.transform import downscale_local_mean
+from skimage.transform import downscale_local_mean, resize
 from skimage.color import rgb2gray
 import json
 import gym
@@ -21,6 +21,7 @@ import sys
 from gym import wrappers
 from time import time
 from collections import OrderedDict
+from imgutils import getoptflow
 
 # make the environment - env is global so that it only gets created on a single node (important when using MPI with > 1 node)
 try:
@@ -69,11 +70,14 @@ class AIGame:
     self.dirSensitiveNeuronRate = (dconf['net']['DirMinRate'], dconf['net']['DirMaxRate']) # min, max firing rate (Hz) for dir sensitive neurons
     self.intaction = int(dconf['actionsPerPlay']) # integrate this many actions together before returning reward information to model
     # these are Pong-specific coordinate ranges; should later move out of this function into Pong-specific functions
-    self.courtYRng = (34, 194)
-    self.courtXRng = (20, 140)
-    self.racketXRng = (141, 144)
-    self.last_obs = []
-    self.last_ball_dir = 0
+    self.courtYRng = (34, 194) # court y range
+    self.courtXRng = (20, 140) # court x range
+    self.racketXRng = (141, 144) # racket x range
+    self.last_obs = [] # previous observation
+    self.last_ball_dir = 0 # last ball direction
+    self.FullImages = [] # full resolution images from game environment
+    self.ReducedImages = [] # low resolution images from game environment used as input to neuronal network model
+    self.ldflow = [] # list of dictionary of optical flow (motion) fields
 
   def updateInputRates (self, dsum_Images):
     # update input rates to retinal neurons
@@ -84,83 +88,24 @@ class AIGame:
     #print(np.amax(fr_Images))
     self.dFiringRates['ER'] = np.reshape(fr_Images,400) #400 for 20*20
 
-  def computeMotion (self, dsum_Images):
-    #compute directions of motion for every other pixel.
-    bkgPixel = np.min(dsum_Images) # background pixel value
-    dirSensitiveNeuronDim = self.dirSensitiveNeuronDim
-    dirSensitiveNeurons = np.zeros(shape=(dirSensitiveNeuronDim,dirSensitiveNeuronDim))
-    for dSNeuronX in range(dirSensitiveNeuronDim):
-      Rx = 2*dSNeuronX
-      if Rx==0:
-        Rxs = [Rx,Rx+1,Rx+2]
-      elif Rx==1:
-        Rxs = [Rx-1, Rx, Rx+1, Rx+2]
-      #elif Rx==dirSensitiveNeuronDim-1:
-      #    Rxs = [Rx-2,Rx-1,Rx]
-      elif Rx==((2*dirSensitiveNeuronDim)-2):
-        Rxs = [Rx-2,Rx-1,Rx,Rx+1]
-      else:
-        Rxs = [Rx-2,Rx-1,Rx,Rx+1,Rx+2]
-      for dSNeuronY in range(dirSensitiveNeuronDim):
-        Ry = 2*dSNeuronY
-        #print('Ry:',Ry)
-        if Ry==0:
-          Rys = [Ry, Ry+1, Ry+2]
-        elif Ry==1:
-          Rys = [Ry-1, Ry, Ry+1, Ry+2]
-        #elif Ry==dirSensitiveNeuronDim-1:
-        #    Rys = [Ry-2,Ry-1,Ry]
-        elif Ry==((2*dirSensitiveNeuronDim)-2):
-          Rys = [Ry-2,Ry-1,Ry,Ry+1]
-        else:
-          Rys = [Ry-2,Ry-1,Ry,Ry+1,Ry+2]
-        #print('Xinds',Rxs,'Yinds',Rys)
-        FOV = np.zeros(shape=(len(Rxs),len(Rys))) # field of view
-        for xinds in range(len(Rxs)):
-          for yinds in range(len(Rys)):
-            FOV[xinds,yinds] = dsum_Images[Rxs[xinds],Rys[yinds]]
-        #print(FOV)
-        max_value = np.amax(FOV)
-        max_ind = np.where(FOV==max_value)
-        #print('max inds', max_ind) 
-        #since the most recent frame has highest pixel intensity, any pixel with the maximum intensity will be
-        #most probably the final instance of the object motion in that field of view
-        bkg_inds = np.where(FOV == bkgPixel)
-        if len(bkg_inds[0])>0:
-          for yinds in range(len(bkg_inds[0])):
-            ix = bkg_inds[0][yinds]
-            iy = bkg_inds[1][yinds]
-            FOV[ix,iy] = 1000
-        #I dont want to compute object motion vector relative to the background. so to ignore background pixels, replacing them with large value
-        #np.put(FOV,bkg_inds,1000) 
-        min_value = np.amin(FOV)
-        min_ind = np.where(FOV==min_value)
-        #print('min inds', min_ind)
-        #since latest frame has lowest pixel intensity (after ignoring background), any pixel with max intensity will
-        #most probably be first instance of object motion in that field of view
-        if len(max_ind[0])>len(min_ind[0]):
-          mL = len(min_ind[0])
-        elif len(max_ind[0])<len(min_ind[0]):
-          mL = len(max_ind[0])
-        else:
-          mL = len(max_ind[0])
-        #direction of the object motion in a field of view over last 5 frames/observations.
-        dir1 = [max_ind[0][range(mL)]-min_ind[0][range(mL)],max_ind[1][range(mL)]-min_ind[1][range(mL)]] 
-        dir2 = [np.median(dir1[1]),-1*np.median(dir1[0])] #flip y because indexing starts from top left.
-        dirMain = [1,0] #using a reference for 0 degrees....considering first is for rows and second is for columns
-        ndir2 = dir2 / np.linalg.norm(dir2)
-        ndirMain = dirMain / np.linalg.norm(dirMain)
-        theta = np.degrees(np.arccos(np.dot(ndir2,ndirMain))) #if theta is nan, no movement is detected
-        if dir2[1]<0: theta = 360-theta 
-        dirSensitiveNeurons[dSNeuronX,dSNeuronY] = theta # the motion angle (theta) at position dSNeuronX,dSNeuronY is stored
-        #if not np.isnan(theta): print('Theta for FOV ',FOV,' is: ', theta)
-    print('Computed angles:', dirSensitiveNeurons)
-    return dirSensitiveNeurons
-      
-  def updateDirSensitiveRates (self, motiondir):
+  def computeMotionFields (self, UseFull=False):
+    # compute and store the motion fields and associated data
+    if UseFull:
+      limage = self.FullImages
+    else:
+      limage = self.ReducedImages
+    if len(limage) < 2: return
+    self.ldflow.append(getoptflow(limage[-2],limage[-1]))
+          
+  def updateDirSensitiveRates (self):
     # update firing rate of dir sensitive neurons using dirs (2D array with motion direction at each coordinate)
+    if len(self.ldflow) < 1: return
+    dflow = self.ldflow[-1]
+    motiondir = dflow['ang']
     dAngPeak = self.dAngPeak
     dirSensitiveNeuronDim = self.dirSensitiveNeuronDim
+    if motiondir.shape[0] != dirSensitiveNeuronDim or motiondir.shape[1] != dirSensitiveNeuronDim:
+      motiondir = resize(motiondir, (dirSensitiveNeuronDim, dirSensitiveNeuronDim), anti_aliasing=True)
     AngRFSigma2 = self.AngRFSigma2
     MaxRate = self.dirSensitiveNeuronRate[1]
     for pop in self.ldirpop: self.dFiringRates[pop] = self.dirSensitiveNeuronRate[0] * np.ones(shape=(dirSensitiveNeuronDim,dirSensitiveNeuronDim))
@@ -194,13 +139,16 @@ class AIGame:
       xpos = np.median(Obj_inds,0)[1] #x position of the center of mass of the object
     return xpos, ypos
 
-  def playGame (self, actions, epCount, InputImages): #actions need to be generated from motor cortex
+  def playGame (self, actions, epCount): #actions need to be generated from motor cortex
     # PLAY GAME
     rewards = []; proposed_actions =[]; total_hits = []; Images = []; Ball_pos = []; Racket_pos = []
     input_dim = self.input_dim
     done = False
-    courtYRng, courtXRng, racketXRng = self.courtYRng, self.courtXRng, self.racketXRng # coordinate ranges for different objects (PONG-specific)      
-    lgwght = np.linspace(0.6, 1, self.intaction) # time-decay grayscale image weights (earlier indices with lower weights are from older frames)
+    courtYRng, courtXRng, racketXRng = self.courtYRng, self.courtXRng, self.racketXRng # coordinate ranges for different objects (PONG-specific)    
+    if self.intaction==1:
+      lgwght = [1.0]
+    else:
+      lgwght = np.linspace(0.6, 1, self.intaction) # time-decay grayscale image weights (earlier indices with lower weights are from older frames)
     lgimage = [] # grayscale images with decaying time-lagged input
     if len(self.last_obs)==0: #if its the first action of the episode, there won't be any last_obs, therefore no last image
       lobs_gimage_ds = []
@@ -209,6 +157,7 @@ class AIGame:
       lobs_gimage_ds = downscale_local_mean(lobs_gimage,(8,8))
       lobs_gimage_ds = np.where(lobs_gimage_ds>np.min(lobs_gimage_ds)+1,255,lobs_gimage_ds)
       lobs_gimage_ds = 0.5*lobs_gimage_ds #use this image for motion computation only
+      
     for adx in range(self.intaction):
       #for each action generated by the firing rate of the motor cortex, find the suggested-action by comparing the position of the ball and racket 
       caction = actions[adx] #action generated by the firing rate of the motor cortex
@@ -226,7 +175,7 @@ class AIGame:
           proposed_action = dconf['moves']['NOMOVE'] #no move
         elif ypos_Ball==-1: #guess about proposed move can't be made because ball was not visible in the court
           proposed_action = -1 #no valid action guessed
-        Images.append(np.sum(self.last_obs[courtYRng[0]:courtYRng[1],:,:],2))
+        self.FullImages.append(np.sum(self.last_obs[courtYRng[0]:courtYRng[1],:,:],2))
         Ball_pos.append([courtXRng[0]-1+xpos_Ball,ypos_Ball])
         Racket_pos.append([racketXRng[0]-1+xpos_Racket,ypos_Racket])
       else:
@@ -284,14 +233,15 @@ class AIGame:
       for gimage in lgimage[2:]: dsum_Images = np.maximum(dsum_Images,gimage)
     else:
       dsum_Images = lgimage[0]
-    InputImages.append(dsum_Images) # save the input image
+    self.ReducedImages.append(dsum_Images) # save the input image
 
     self.updateInputRates(dsum_Images) # update input rates to retinal neurons
     if self.intaction==1: #if only one frame used per play, then add the downsampled and scaled image from last_obs for direction computation 
       if len(lobs_gimage_ds)>0:
         dsum_Images = np.maximum(dsum_Images,lobs_gimage_ds)
-    dirs = self.computeMotion(dsum_Images) # compute directions of motion for every other pixel
-    self.updateDirSensitiveRates(dirs) # update motion sensitive neuron input rates                
+
+    self.computeMotionFields() # compute the motion fields
+    self.updateDirSensitiveRates() # update motion sensitive neuron input rates
 
     if done: # done means that 1 episode of the game finished, so the environment needs to be reset. 
       epCount.append(self.countAll)
@@ -302,52 +252,5 @@ class AIGame:
       print('ERROR COMPUTING NUMBER OF HITS')
     for r in range(len(rewards)):
       if rewards[r]==-1: total_hits[r]=-1 #when the ball misses the racket, the reward is -1
-    return rewards, epCount, InputImages, proposed_actions, total_hits, Racket_pos, Ball_pos, Images, dirs
-
-  def playGameFake (self, epCount, InputImages): #actions are generated based on Vector Algebra
-    actions = []
-    rewards = []
-    courtYRng, courtXRng, racketXRng = self.courtYRng, self.courtXRng, self.racketXRng # coordinate ranges for different objects (PONG-specific)      
-    lgwght = np.linspace(0.6, 1, self.intaction) # time-decay grayscale image weights (earlier indices with lower weights are from older frames)
-    lgimage = [] # grayscale images with decaying time-lagged input    
-    for adx in range(self.intaction):
-      if len(self.last_obs)==0:
-        caction = random.randint(3,4)
-      else:
-        ImageCourt = self.last_obs[courtYRng[0]:courtYRng[1],courtXRng[0]:courtXRng[1],:]
-        ImageAgent = self.last_obs[courtYRng[0]:courtYRng[1],racketXRng[0]:racketXRng[1],:]
-        posBall = np.unravel_index(np.argmax(ImageCourt),ImageCourt.shape)
-        posAgent = np.unravel_index(np.argmax(ImageAgent),ImageAgent.shape)
-        yBall = posBall[0]
-        yAgent = posAgent[0]
-        if yBall>yAgent: caction = dconf['moves']['DOWN']
-        elif yAgent>yBall: caction = dconf['moves']['UP']
-        else: caction = dconf['moves']['NOMOVE']
-      actions.append(caction)
-      observation, reward, done, info = self.env.step(caction)
-      self.last_obs = observation
-      rewards.append(reward)
-      gray_Image = 255.0*rgb2gray(observation[courtYRng[0]:courtYRng[1],:,:]) # convert to grayscale; rgb2gray has 0-1 range so mul by 255
-      gray_ds = downscale_local_mean(gray_Image,(8,8)) # then downsample
-      gray_ds = np.where(gray_ds>np.min(gray_ds)+1,255,gray_ds) # Different thresholding
-      lgimage.append(lgwght[adx]*gray_ds) # save weighted grayscale image from current frame
-      self.countAll += 1
-    # NB: previously we merged 2x2 pixels into 1 value. Now we merge 8x8 pixels into 1 value.
-    # so the original 160x160 pixels will result into 20x20 values instead of previously used 80x80.        
-    if len(lgimage)>1:
-      dsum_Images = np.maximum(lgimage[0],lgimage[1])
-      for gimage in lgimage[2:]: dsum_Images = np.maximum(dsum_Images,gimage)
-    else:
-      dsum_Images = lgimage[0]
-    InputImages.append(dsum_Images) # save the input image
-    self.updateInputRates(dsum_Images) # update input rates to retinal neurons    
-    self.env.render()
-    if done:
-      epCount.append(self.countAll)
-      self.env.reset()
-      self.env.frameskip = 3
-      self.countAll = 0
-      self.last_obs=[]
-      self.last_bill_dir=0
-    return rewards, actions, epCount, InputImages
+    return rewards, epCount, proposed_actions, total_hits, Racket_pos, Ball_pos
             

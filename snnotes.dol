@@ -2257,7 +2257,7 @@ anyway, getting back to why actmap.py appears incorrect ... need to check that .
 
 the depolarization blockade issues suggest need for homeostasis built-in to the synapse ... should also try adding that ...
 
-*20apr29
+*20apr29 - debug actmap.py animations
 ** check actmap.py
 
 make sure has input images / activity displayed at right times
@@ -2280,4 +2280,346 @@ row 0 of input images is top
 
 was using wrong timestep in actmap.py ... made a variable for it tstepPerAction, also used in sim.json
 and sim.py
+
+*20apr30 - opt flow/quiver
+** optical flow
+
+this is what haroon tried last time:
+(/u/samn/SMARTAgent/hanotes.org:1432)
+
+see how to use it to produce direction vectors at each pixel ...
+
+python
+
+from pylab import *
+import numpy as np
+import gym
+import cv2 # opencv
+from skimage.color import rgb2gray
+from skimage.registration import optical_flow_tvl1
+
+env = gym.make('Pong-v0')
+env.reset()
+observation, reward, done, info = env.step(3)
+
+for _ in range(30): #running 30 times, so that ball appears in the court.
+  observation, reward, done, info = env.step(3)
+  observation, reward, done, info = env.step(4)
+  observation, reward, done, info = env.step(4)
+  observation, reward, done, info = env.step(4)
+  observation, reward, done, info = env.step(4)
+  
+o1, reward, done, info = env.step(4)
+o2, reward, done, info = env.step(4)
+o3, reward, done, info = env.step(4)
+o4, reward, done, info = env.step(4)
+o5, reward, done, info = env.step(4)
+
+imshow(o1); savefig('gif/20apr30_a0.png')
+imshow(o2); savefig('gif/20apr30_a1.png')
+imshow(o3); savefig('gif/20apr30_a2.png')
+imshow(o4); savefig('gif/20apr30_a3.png')
+imshow(o5); savefig('gif/20apr30_a4.png')
+
+g1 = rgb2gray(o1)
+g2 = rgb2gray(o2)
+g3 = rgb2gray(o3)
+
+subplot(1,2,1); imshow(g1,cmap='gray'); subplot(1,2,2); imshow(g3,cmap='gray')
+savefig('gif/20apr30_a5.png')
+
+#
+winsz = 10 # win size. flow is computed over the window....larger value is more robust to the noise.
+imgscale = 1.0 # image pyramid or simple image scale
+nlayer = 1 # nb of pyramidal layer. if used 1 means flow is calculated only from previous image.
+niter = 3 # num iterations
+polydeg = 5 # polynominal degree expansion. (recommended 5-7)
+smooth = 1.2 # standard deviation used to smooth used derivatives. (recommended 1.1-1.5)
+flow = cv2.calcOpticalFlowFarneback(g1,g3, None, imgscale, nlayer, winsz, niter, polydeg, smooth, 0)
+flow = cv2.calcOpticalFlowFarneback(g1,g3, None, 0.5, 3, 15, 3, 5, 1.2, 0)
+flow = cv2.calcOpticalFlowFarneback(g1,g3, None, 1.0, 3, 15, 3, 5, 1.2, 0)
+mag, ang = cv2.cartToPolar(flow[...,0], flow[...,1])
+goodInds = np.where(mag<1e-10,0,1)
+
+#
+clf()
+subplot(2,2,1); imshow(g1,cmap='gray'); title('Frame1'); subplot(2,2,2); imshow(g3,cmap='gray'); title('Frame2');
+subplot(2,2,3); imshow(np.multiply(mag,goodInds),cmap='gray'); title('Mag'); colorbar()
+subplot(2,2,4); imshow(np.degrees(np.multiply(ang,goodInds)),cmap='gray'); title('Dir'); colorbar()
+
+savefig('gif/20apr30_a6.png')
+
+try quiver for directions:
+https://matplotlib.org/3.1.0/api/_as_gen/matplotlib.pyplot.quiver.html
+https://matplotlib.org/3.1.0/gallery/images_contours_and_fields/quiver_simple_demo.html#sphx-glr-gallery-images-contours-and-fields-quiver-simple-demo-py
+
+figure(); quiver(flow[:,:,0],flow[:,:,1])
+
+savefig('gif/20apr30_a7.png')
+
+looks upside down ...
+
+flow.shape # (210, 160, 2)
+
+g1.shape # (210, 160)
+top is row 0
+
+what is value at x=17, y=120
+flow[120][17][0],flow[120][17][1] # (1.1408521e-09, -1.1311174e-06)
+
+figure(); plot(flow[120,:,1])
+savefig('gif/20apr30_a8.png')
+so that's negative, movement towards smaller y-values, which in original frame is up
+
+so draw quiver with negated flow in y direction to make easier to visualize ...
+
+#
+clf()
+subplot(2,3,1); imshow(g1,cmap='gray'); title('Frame1'); subplot(2,3,2); imshow(g3,cmap='gray'); title('Frame2');
+subplot(2,3,4); imshow(np.multiply(mag,goodInds),cmap='gray'); title('Mag'); colorbar()
+subplot(2,3,5); imshow(np.degrees(np.multiply(ang,goodInds)),cmap='gray'); title('Dir'); colorbar()
+
+X, Y = np.meshgrid(np.arange(0, 160, 1), np.arange(0, 210, 1))
+subplot(2,3,6); quiver(X, Y, flow[:,:,0],-flow[:,:,1], units='width')
+
+savefig('gif/20apr30_a9.png')
+
+looks ok ... zoom-in shows mostly pointing in right direction ... could make movie to show
+and then use that for dir selective neurons; doesn't have to be completely accurate ... 
+
+#imshow(np.degrees(np.multiply(ang,goodInds)),cmap='gray'); title('Dir'); colorbar()
+#
+#X,Y = np.meshgrid(flow.shape[1], -flow.shape[0])
+
+*20may1 - tested optical flow / integrated with sim/model
+** continue optical flow
+
+restart to make sure params correct ...
+
+python
+
+from pylab import *
+import numpy as np
+import gym
+import cv2 # opencv
+from skimage.color import rgb2gray
+from skimage.registration import optical_flow_tvl1
+
+env = gym.make('Pong-v0')
+env.reset()
+observation, reward, done, info = env.step(3)
+
+for _ in range(30): #running 30 times, so that ball appears in the court.
+  observation, reward, done, info = env.step(3)
+  observation, reward, done, info = env.step(4)
+  observation, reward, done, info = env.step(4)
+  observation, reward, done, info = env.step(4)
+  observation, reward, done, info = env.step(4)
+  
+o1, reward, done, info = env.step(4)
+o2, reward, done, info = env.step(4)
+o3, reward, done, info = env.step(4)
+o4, reward, done, info = env.step(4)
+o5, reward, done, info = env.step(4)
+
+g1 = rgb2gray(o1)
+g2 = rgb2gray(o2)
+g3 = rgb2gray(o3)
+
+help(calcOpticalFlowFarneback)
+
+ calcOpticalFlowFarneback(prev, next, flow, pyr_scale, levels, winsize, iterations, poly_n, poly_sigma, flags) -> flow
+    .   @brief Computes a dense optical flow using the Gunnar Farneback's algorithm.
+    .   @param prev first 8-bit single-channel input image.
+    .   @param next second input image of the same size and the same type as prev.
+    .   @param flow computed flow image that has the same size as prev and type CV_32FC2.
+    .   @param pyr_scale parameter, specifying the image scale (\<1) to build pyramids for each image;
+    .   pyr_scale=0.5 means a classical pyramid, where each next layer is twice smaller than the previous
+    .   one.
+    .   @param levels number of pyramid layers including the initial image; levels=1 means that no extra
+    .   layers are created and only the original images are used.
+    .   @param winsize averaging window size; larger values increase the algorithm robustness to image
+    .   noise and give more chances for fast motion detection, but yield more blurred motion field.
+    .   @param iterations number of iterations the algorithm does at each pyramid level.
+    .   @param poly_n size of the pixel neighborhood used to find polynomial expansion in each pixel;
+    .   larger values mean that the image will be approximated with smoother surfaces, yielding more
+    .   robust algorithm and more blurred motion field, typically poly_n =5 or 7.
+    .   @param poly_sigma standard deviation of the Gaussian that is used to smooth derivatives used as a
+    .   basis for the polynomial expansion; for poly_n=5, you can set poly_sigma=1.1, for poly_n=7, a
+    .   good value would be poly_sigma=1.5.
+    .   @param flags operation flags that can be a combination of the following:
+    .    -   **OPTFLOW_USE_INITIAL_FLOW** uses the input flow as an initial flow approximation.
+    .    -   **OPTFLOW_FARNEBACK_GAUSSIAN** uses the Gaussian \f$\texttt{winsize}\times\texttt{winsize}\f$
+    .        filter instead of a box filter of the same size for optical flow estimation; usually, this
+    .        option gives z more accurate flow than with a box filter, at the cost of lower speed;
+    .        normally, winsize for a Gaussian window should be set to a larger value to achieve the same
+    .        level of robustness.
+
+#
+winsz = 10 # win size. flow is computed over the window....larger value is more robust to the noise.
+pyrscale = 0.5 # image pyramid or simple image scale
+nlayer = 3 # nb of pyramidal layer. if used 1 means flow is calculated only from previous image.
+niter = 3 # num iterations
+polyn = 7 # polynominal degree expansion. (recommended 5-7)
+polysigma = 1.5 # standard deviation used to smooth used derivatives. (recommended 1.1-1.5)
+flow = cv2.calcOpticalFlowFarneback(g1,g3, None, pyrscale, nlayer, winsz, niter, polyn, polysigma, 0)
+mag, ang = cv2.cartToPolar(flow[...,0], flow[...,1])
+goodInds = np.where(mag<1e-10,0,1)
+clf()
+subplot(2,3,1); imshow(g1,cmap='gray'); title('Frame1'); subplot(2,3,2); imshow(g3,cmap='gray'); title('Frame2');
+subplot(2,3,4); imshow(np.multiply(mag,goodInds),cmap='gray'); title('Mag'); colorbar()
+subplot(2,3,5); imshow(np.degrees(np.multiply(ang,goodInds)),cmap='gray'); title('Dir'); colorbar()
+X, Y = np.meshgrid(np.arange(0, 160, 1), np.arange(210, 0, -1))
+ax=subplot(2,3,6); quiver(X, Y, flow[:,:,0],-flow[:,:,1], units='width', color='r')
+ax.set_xlim((0,160)); ax.set_ylim((0,210))
+ax.invert_yaxis()
+
+savefig('gif/20may1_a0.png')
+
+looks decent ...
+
+ok...will try that in a movie to make sure looks ok
+
+may not want to use the thresholding?
+
+#
+winsz = 10 # win size. flow is computed over the window....larger value is more robust to the noise.
+pyrscale = 0.5 # image pyramid or simple image scale
+nlayer = 3 # nb of pyramidal layer. if used 1 means flow is calculated only from previous image.
+niter = 3 # num iterations
+polyn = 7 # polynominal degree expansion. (recommended 5-7)
+polysigma = 1.5 # standard deviation used to smooth used derivatives. (recommended 1.1-1.5)
+flow = cv2.calcOpticalFlowFarneback(g1,g3, None, pyrscale, nlayer, winsz, niter, polyn, polysigma, 0)
+mag, ang = cv2.cartToPolar(flow[...,0], flow[...,1])
+clf()
+subplot(2,3,1); imshow(g1,cmap='gray'); title('Frame1'); subplot(2,3,2); imshow(g3,cmap='gray'); title('Frame2');
+subplot(2,3,4); imshow(mag,cmap='gray'); title('Mag'); colorbar()
+subplot(2,3,5); imshow(np.degrees(ang),cmap='gray'); title('Dir'); colorbar()
+X, Y = np.meshgrid(np.arange(0, 160, 1), np.arange(210, 0, -1))
+ax=subplot(2,3,6); qdat=quiver(X, Y, flow[:,:,0],-flow[:,:,1], units='width', color='k')
+ax.set_xlim((0,160)); ax.set_ylim((0,210))
+ax.invert_yaxis()
+
+savefig('gif/20may1_a1.png')
+
+can use quiver.set_UVC from within an animation set_UVC(U, V, C=None) method of matplotlib.quiver.Quiver instance
+to update its data ...
+
+qdat.set_UVC([],[])
+
+or follow example here ...
+
+https://stackoverflow.com/questions/19329039/plotting-animated-quivers-in-python
+
+fig = animInput(New_InputImages, 'test.mp4', showflow=True)
+
+looks pretty good ...
+
+added imgutils.py as wrapper that calculates optical flow for 2 images and for a set of frames
+can put other image processing utilities there
+
+should put the direction fields into actmap animation too ...
+
+will make it easier to assess whether the direction selective populations are firing properly ...
+after that should plugin the optical flow into aigame.py
+
+hmm, should actually save the direction fields calculated during the simulation
+so make sure calculated same way as displayed ...
+
+** integrating optical flow with game,sim
+
+cleaning up some of the code since have to adjust it to use different type of motion calculation ...
+having AIGame save its own InputImages (ReducedImages) and Images (FullImages)
+to avoid passing that info back and forth between AIGame and sim ...
+
+based on discussion with HA could use 20x20 or even 160x160 input images to calculate motion
+directions, then downsample to 10x10 direction field that is projected to the direction
+selective neurons ...
+
+*20may4
+** check opt flow integration, make sure working properly
+
+when ran it last time, there was incorrect activity in different populations
+
+actually, had started saving the motion fields computed so need to finish that
+for display in the movies ...
+
+run a short 2 s sim for testing ... named 20may4_A0_
+
+myrun 12
+
+  Cells: 2959
+  Connections: 0 (0.00 per cell)
+  Spikes: 79757 (13.48 Hz)
+  Simulated time: 2.0 s; 12 workers
+  Run time: 412.59 s
+Saving output as data/20may4_A0_simConfig.pkl ... 
+Finished saving!
+  Done; saving time = 95.63 s.
+SAVING RASTER DATA
+plot raster:
+Plotting recorded cell traces ... cell
+QApplication: invalid style override passed, ignoring it.
+Plotting raster...
+  Done; plotting time = 117.68 s
+
+Total time = 925.17 s
+
+End time:  2020-05-04 12:45:31.363310
+
+lot of cells go into block ...
+20may4_a0_rast.png
+20may4_a0_IM.png
+20may4_a0_EML.png
+20may4_a0_EV1DE.png
+
+probably since direction selective cells not setup properly with the new optical flow ...
+
+motion fields saved ... 20may4_A0_MotionFields.pkl
+
+now check the output
+
+python -i actmap.py
+
+len(ldflow) # 99
+99*20 # 1980 - that's amount of time covered, since first frame has no optical flow
+and used 20 ms interval
+
+first adjust animInput
+
+fig=animInput(InputImages,'testflow.mp4',ldflow=ldflow)
+
+something wrong with the output movie ...
+
+same problem if calc the optflow here?
+
+from imgutils import getoptflowframes
+ldflow2 = getoptflowframes(InputImages)
+fig=animInput(InputImages,'testflow.mp4',ldflow=ldflow2)
+
+hmm, same error opening in vlc ...
+
+opens fine in parole media player
+
+fig=animInput(InputImages,'testflow.mp4',ldflow=ldflow)
+
+in general it's working but probably need higher spatial resolution ...
+
+fig, axs, plt = animActivityMaps('testact2.mp4', framerate=10)
+
+looks interesting but hard to see what's going on in motion fields there because so small ... should reduce size/width of arrows
+
+hmm, may need bigger figure size ... 
+
+fig, axs, plt = animActivityMaps('testact3.mp4', framerate=10,figsize=(9,5))
+
+well, optical flow generally follows motion with wide spread, but the direction selective populations not following
+the motion directions properly ... 
+
+also add motor pops to activity map ...
+
+fig, axs, plt = animActivityMaps('testact4.mp4', framerate=10,figsize=(9,5))
+
+looks interesting ... need IM too ... and the rewards, and the weights, etc.
+first fixup direction selectivity ...
 

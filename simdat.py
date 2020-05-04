@@ -23,10 +23,15 @@ def readinweights (d):
       A.append(lsyn)
   return pd.DataFrame(A,columns=['time','stdptype','preid','postid','weight','syntype'])
 
+def getsimname (name=None):
+  if name is None:
+    if stepNB is -1: name = dconf['sim']['name']
+    elif stepNB > -1: name = dconf['sim']['name'] + '_step_' + str(stepNB) + '_'
+  return name
+  
 def loadsimdat (name=None):
   # load simulation data
-  if name is None and stepNB is -1: name = dconf['sim']['name']
-  elif name is None and stepNB > -1: name = dconf['sim']['name'] + '_step_' + str(stepNB) + '_'
+  name = getsimname(name)
   print('loading data from', name)
   simConfig = pickle.load(open('data/'+name+'simConfig.pkl','rb'))
   dstartidx = {p:simConfig['net']['pops'][p]['cellGids'][0] for p in simConfig['net']['pops'].keys()} # starting indices for each population
@@ -36,17 +41,19 @@ def loadsimdat (name=None):
   dnumc = {p:dendidx[p]-dstartidx[p]+1 for p in simConfig['net']['pops'].keys()}
   return simConfig, pdf, actreward, dstartidx, dendidx, dnumc
 
-def loadInputImages (fn):
+def loadInputImages (name=None):
+  fn = 'data/'+getsimname(name)+'InputImages.txt'
   print('loading input images from', fn)
   Input_Images = np.loadtxt(fn)
   New_InputImages = []
   NB_Images = int(Input_Images.shape[0]/Input_Images.shape[1])
   for x in range(NB_Images):
     fp = x*Input_Images.shape[1]
-    cImage = Input_Images[fp:fp+20,:] # 20 is sqrt of 400 (20x20 pixels)
-    New_InputImages.append(cImage)
-  New_InputImages = np.array(New_InputImages)
-  return New_InputImages
+    # 20 is sqrt of 400 (20x20 pixels). what is 400? number of ER neurons? or getting rid of counter @ top of screen?
+    New_InputImages.append(Input_Images[fp:fp+20,:])
+  return np.array(New_InputImages)
+
+def loadMotionFields (name=None): return pickle.load(open('data/'+getsimname(name)+'MotionFields.pkl','rb'))
 
 #
 def animSynWeights (pdf, outpath, framerate=10, figsize=(7,4), cmap='jet'):

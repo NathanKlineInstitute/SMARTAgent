@@ -8,12 +8,14 @@ from pylab import *
 import os
 import anim
 from matplotlib import animation
-from simdat import loadInputImages, loadsimdat
+from simdat import loadInputImages, loadsimdat, loadMotionFields
+from imgutils import getoptflow
 
 rcParams['font.size'] = 6
 
-New_InputImages = loadInputImages('data/'+dconf['sim']['name']+'InputImages.txt')
+InputImages = loadInputImages(dconf['sim']['name'])
 simConfig, pdf, actreward, dstartidx, dendidx, dnumc = loadsimdat(dconf['sim']['name'])
+ldflow = loadMotionFields(dconf['sim']['name'])
 
 totalDur = int(dconf['sim']['duration'])
 tstepPerAction = dconf['sim']['tstepPerAction'] # time step per action (in ms)
@@ -22,7 +24,8 @@ spkID= np.array(simConfig['simData']['spkid'])
 spkT = np.array(simConfig['simData']['spkt'])
 
 lpop = ['ER', 'EV1', 'EV4', 'EMT', 'IR', 'IV1', 'IV4', 'IMT',\
-        'EV1DW','EV1DNW', 'EV1DN', 'EV1DNE','EV1DE','EV1DSW', 'EV1DS', 'EV1DSE']
+        'EV1DW','EV1DNW', 'EV1DN', 'EV1DNE','EV1DE','EV1DSW', 'EV1DS', 'EV1DSE',\
+        'EML','EMR']
 
 ddir = OrderedDict({'EV1DW':'W','EV1DNW':'NW', 'EV1DN':'N','EV1DNE':'NE','EV1DE':'E','EV1DSW':'SW','EV1DS':'S','EV1DSE':'SE'})
 
@@ -58,7 +61,7 @@ def plotActivityMaps (pauset=1, gifpath=None, mp4path=None, framerate=5, zf=10):
   cbaxes = fig.add_axes([0.95, 0.4, 0.01, 0.2]) 
   ltitle = ['Input Images', 'Excit R', 'Excit V1', 'Excit V4', 'Excit MT', 'Inhib R', 'Inhib V1', 'Inhib V4', 'Inhib MT']
   for p in ddir.keys(): ltitle.append(ddir[p])
-  lact = [New_InputImages]; lvmax = [255]; xl = [(-.5,19.5)]; yl = [(19.5,-0.5)]
+  lact = [InputImages]; lvmax = [255]; xl = [(-.5,19.5)]; yl = [(19.5,-0.5)]
   lfnimage = []
   for pop in lpop:
     lact.append(dact[pop])
@@ -99,7 +102,8 @@ def animActivityMaps (outpath, framerate=10, figsize=(7,3)):
   cbaxes = fig.add_axes([0.95, 0.4, 0.01, 0.2]) 
   ltitle = ['Input Images', 'Excit R', 'Excit V1', 'Excit V4', 'Excit MT', 'Inhib R', 'Inhib V1', 'Inhib V4', 'Inhib MT']
   for p in ddir.keys(): ltitle.append(ddir[p])
-  lact = [New_InputImages]; lvmax = [255];
+  for p in ['Excit ML', 'Excit MR']: ltitle.append(p)
+  lact = [InputImages]; lvmax = [255];
   lfnimage = []
   for pop in lpop:
     lact.append(dact[pop])
@@ -108,70 +112,98 @@ def animActivityMaps (outpath, framerate=10, figsize=(7,3)):
   fig.suptitle('Time = ' + str(0*tstepPerAction) + ' ms')
   idx = 0
   for ldx,ax in enumerate(lax):
-    if ldx == 5 or idx > len(dact.keys()):
+    if idx > len(dact.keys()):
       ax.axis('off')
       continue
-    if ldx==0: offidx=-1
-    else: offidx=0
-    pcm = ax.imshow(lact[idx][offidx,:,:],origin='upper',cmap='gray',vmin=0,vmax=lvmax[idx])
-    ddat[ldx] = pcm
+    if ldx==0:
+      offidx=-1
+    elif ldx==5:
+      offidx=1
+    else:
+      offidx=0
+    if ldx==5:
+      X, Y = np.meshgrid(np.arange(0, InputImages[0].shape[1], 1), np.arange(0,InputImages[0].shape[0],1))
+      ddat[ldx] = ax.quiver(X,Y,ldflow[0]['flow'][:,:,0],-ldflow[0]['flow'][:,:,1], pivot='mid', units='inches',width=0.022,scale=1/0.15)
+      ax.set_xlim((0,InputImages[0].shape[1])); ax.set_ylim((0,InputImages[0].shape[0]))
+      ax.invert_yaxis()              
+      continue
+    else:
+      pcm = ax.imshow(lact[idx][offidx,:,:],origin='upper',cmap='gray',vmin=0,vmax=lvmax[idx])
+      ddat[ldx] = pcm
     ax.set_ylabel(ltitle[idx])
     if ldx==2: plt.colorbar(pcm, cax = cbaxes)  
     idx += 1
   def updatefig (t):
+    fig.suptitle('Time = ' + str(t*tstepPerAction) + ' ms')    
+    if t<1: return fig # already rendered t=0 above; skip last for optical flow
     print('frame t = ', str(t*tstepPerAction))
-    fig.suptitle('Time = ' + str(t*tstepPerAction) + ' ms')
     idx = 0
     for ldx,ax in enumerate(lax):
-      if ldx == 5 or idx > len(dact.keys()): continue
-      if ldx==0: offidx=-1
-      else: offidx=0
-      ddat[ldx].set_data(lact[idx][t+offidx,:,:])
-      idx += 1
+      if idx > len(dact.keys()): continue
+      if ldx==0 or ldx==5:
+        offidx=-1
+      else:
+        offidx=0
+      if ldx == 5:
+        ddat[ldx].set_UVC(ldflow[t+offidx]['flow'][:,:,0],-ldflow[t]['flow'][:,:,1])        
+      else:
+        ddat[ldx].set_data(lact[idx][t+offidx,:,:])
+        idx += 1
     return fig
-  ani = animation.FuncAnimation(fig, updatefig, interval=1, frames=len(t1))
+  ani = animation.FuncAnimation(fig, updatefig, interval=1, frames=len(t1)-1)
   writer = anim.getwriter(outpath, framerate=framerate)
   ani.save(outpath, writer=writer); print('saved animation to', outpath)
   ion()
   return fig, axs, plt
 
-def animInput (InputImages, outpath, framerate=10, figsize=None):
-  # animate the input images
+#
+def animInput (InputImages, outpath, framerate=10, figsize=None, showflow=True, ldflow=None):
+  # animate the input images; showflow specifies whether to calculate/animate optical flow
   ioff()
-  # plot activity in different layers as a function of input images
+  # plot input images and optionally optical flow
+  ncol = 1
+  if showflow: ncol+=1
   if figsize is not None:
     fig = figure(figsize=figsize)
   else:
     fig = figure()
-  lax = [gca()]
-  cbaxes = fig.add_axes([0.95, 0.4, 0.01, 0.2]) 
+  lax = [subplot(1,ncol,i+1) for i in range(ncol)]
   ltitle = ['Input Images']
   lact = [InputImages]; lvmax = [255]; xl = [(-.5,19.5)]; yl = [(19.5,-0.5)]
   ddat = {}
   fig.suptitle('Time = ' + str(0*tstepPerAction) + ' ms')
   idx = 0
+  lflow = []
+  if showflow and ldflow is None: ldflow = getoptflowframes(InputImages)
   for ldx,ax in enumerate(lax):
-    offidx=0
-    pcm = ax.imshow( lact[idx][offidx,:,:], origin='upper', cmap='gray', vmin=0, vmax=lvmax[idx])
-    ddat[ldx] = pcm
-    ax.set_ylabel(ltitle[idx])
-    plt.colorbar(pcm, cax = cbaxes)  
+    if ldx==0:
+      pcm = ax.imshow( lact[idx][0,:,:], origin='upper', cmap='gray', vmin=0, vmax=lvmax[idx])
+      ddat[ldx] = pcm
+      ax.set_ylabel(ltitle[idx])
+    else:
+      X, Y = np.meshgrid(np.arange(0, InputImages[0].shape[1], 1), np.arange(0,InputImages[0].shape[0],1))
+      ddat[ldx] = ax.quiver(X,Y,ldflow[0]['flow'][:,:,0],-ldflow[0]['flow'][:,:,1], pivot='mid', units='inches',width=0.01,scale=1/0.3)#,width=0.022,scale=1/0.15)
+      ax.set_xlim((0,InputImages[0].shape[1])); ax.set_ylim((0,InputImages[0].shape[0]))
+      ax.invert_yaxis()
     idx += 1
   def updatefig (t):
-    print('frame t = ', str(t*tstepPerAction))
     fig.suptitle('Time = ' + str(t*tstepPerAction) + ' ms')
-    idx = 0
+    if t < 1: return fig # already rendered t=0 above
+    print('frame t = ', str(t*tstepPerAction))    
     for ldx,ax in enumerate(lax):
-      offidx = -1
-      ddat[ldx].set_data(lact[idx][t+offidx,:,:])
-      idx += 1
+      if ldx == 0:
+        ddat[ldx].set_data(lact[0][t,:,:])
+      else:
+        ddat[ldx].set_UVC(ldflow[t-1]['flow'][:,:,0],-ldflow[t]['flow'][:,:,1])        
     return fig
-  ani = animation.FuncAnimation(fig, updatefig, interval=1, frames=len(t1))
+  nframe = len(t1)
+  if showflow: nframe-=1
+  ani = animation.FuncAnimation(fig, updatefig, interval=1, frames=nframe)
   writer = anim.getwriter(outpath, framerate=framerate)
   ani.save(outpath, writer=writer); print('saved animation to', outpath)
   ion()
   return fig
 
 #fig, axs, plt = animActivityMaps('test2.mp4')
-fig, axs, plt = animActivityMaps('data/'+dconf['sim']['name']+'actmap.mp4', framerate=10)
+# fig, axs, plt = animActivityMaps('data/'+dconf['sim']['name']+'actmap.mp4', framerate=10)
 
