@@ -24,8 +24,8 @@ spkID= np.array(simConfig['simData']['spkid'])
 spkT = np.array(simConfig['simData']['spkt'])
 
 lpop = ['ER', 'EV1', 'EV4', 'EMT', 'IR', 'IV1', 'IV4', 'IMT',\
-        'EV1DW','EV1DNW', 'EV1DN', 'EV1DNE','EV1DE','EV1DSW', 'EV1DS', 'EV1DSE']
-#'EML','EMR']
+        'EV1DW','EV1DNW', 'EV1DN', 'EV1DNE','EV1DE','EV1DSW', 'EV1DS', 'EV1DSE',\
+        'EML','EMR']
 
 ddir = OrderedDict({'EV1DW':'W','EV1DNW':'NW', 'EV1DN':'N','EV1DNE':'NE','EV1DE':'E','EV1DSW':'SW','EV1DS':'S','EV1DSE':'SE'})
 
@@ -102,6 +102,7 @@ def animActivityMaps (outpath, framerate=10, figsize=(7,3)):
   cbaxes = fig.add_axes([0.95, 0.4, 0.01, 0.2]) 
   ltitle = ['Input Images', 'Excit R', 'Excit V1', 'Excit V4', 'Excit MT', 'Inhib R', 'Inhib V1', 'Inhib V4', 'Inhib MT']
   for p in ddir.keys(): ltitle.append(ddir[p])
+  for p in ['Excit ML', 'Excit MR']: ltitle.append(p)
   lact = [InputImages]; lvmax = [255];
   lfnimage = []
   for pop in lpop:

@@ -2616,3 +2616,10 @@ fig, axs, plt = animActivityMaps('testact3.mp4', framerate=10,figsize=(9,5))
 well, optical flow generally follows motion with wide spread, but the direction selective populations not following
 the motion directions properly ... 
 
+also add motor pops to activity map ...
+
+fig, axs, plt = animActivityMaps('testact4.mp4', framerate=10,figsize=(9,5))
+
+looks interesting ... need IM too ... and the rewards, and the weights, etc.
+first fixup direction selectivity ...
+
