@@ -8,13 +8,14 @@ from pylab import *
 import os
 import anim
 from matplotlib import animation
-from simdat import loadInputImages, loadsimdat
+from simdat import loadInputImages, loadsimdat, loadMotionFields
 from imgutils import getoptflow
 
 rcParams['font.size'] = 6
 
-New_InputImages = loadInputImages('data/'+dconf['sim']['name']+'InputImages.txt')
+InputImages = loadInputImages(dconf['sim']['name'])
 simConfig, pdf, actreward, dstartidx, dendidx, dnumc = loadsimdat(dconf['sim']['name'])
+ldflow = loadMotionFields(dconf['sim']['name'])
 
 totalDur = int(dconf['sim']['duration'])
 tstepPerAction = dconf['sim']['tstepPerAction'] # time step per action (in ms)
@@ -59,7 +60,7 @@ def plotActivityMaps (pauset=1, gifpath=None, mp4path=None, framerate=5, zf=10):
   cbaxes = fig.add_axes([0.95, 0.4, 0.01, 0.2]) 
   ltitle = ['Input Images', 'Excit R', 'Excit V1', 'Excit V4', 'Excit MT', 'Inhib R', 'Inhib V1', 'Inhib V4', 'Inhib MT']
   for p in ddir.keys(): ltitle.append(ddir[p])
-  lact = [New_InputImages]; lvmax = [255]; xl = [(-.5,19.5)]; yl = [(19.5,-0.5)]
+  lact = [InputImages]; lvmax = [255]; xl = [(-.5,19.5)]; yl = [(19.5,-0.5)]
   lfnimage = []
   for pop in lpop:
     lact.append(dact[pop])
@@ -100,7 +101,7 @@ def animActivityMaps (outpath, framerate=10, figsize=(7,3)):
   cbaxes = fig.add_axes([0.95, 0.4, 0.01, 0.2]) 
   ltitle = ['Input Images', 'Excit R', 'Excit V1', 'Excit V4', 'Excit MT', 'Inhib R', 'Inhib V1', 'Inhib V4', 'Inhib MT']
   for p in ddir.keys(): ltitle.append(ddir[p])
-  lact = [New_InputImages]; lvmax = [255];
+  lact = [InputImages]; lvmax = [255];
   lfnimage = []
   for pop in lpop:
     lact.append(dact[pop])
@@ -111,6 +112,12 @@ def animActivityMaps (outpath, framerate=10, figsize=(7,3)):
   for ldx,ax in enumerate(lax):
     if ldx == 5 or idx > len(dact.keys()):
       ax.axis('off')
+      if ldx == 5:
+        X, Y = np.meshgrid(np.arange(0, InputImages[0].shape[1], 1), np.arange(0,InputImages[0].shape[0],1))
+        ddat[ldx] = ax.quiver(X,Y,ldflow[0]['flow'][:,:,0],-ldflow[0]['flow'][:,:,1], pivot='mid', units='inches',width=0.022,scale=1/0.15)
+        ax.set_xlim((0,InputImages[0].shape[1])); ax.set_ylim((0,InputImages[0].shape[0]))
+        ax.invert_yaxis()        
+        pass
       continue
     if ldx==0: offidx=-1
     else: offidx=0
@@ -124,7 +131,11 @@ def animActivityMaps (outpath, framerate=10, figsize=(7,3)):
     fig.suptitle('Time = ' + str(t*tstepPerAction) + ' ms')
     idx = 0
     for ldx,ax in enumerate(lax):
-      if ldx == 5 or idx > len(dact.keys()): continue
+      if ldx == 5 or idx > len(dact.keys()):
+        if ldx == 5:
+          
+          pass
+        continue
       if ldx==0: offidx=-1
       else: offidx=0
       ddat[ldx].set_data(lact[idx][t+offidx,:,:])

@@ -2391,7 +2391,7 @@ and then use that for dir selective neurons; doesn't have to be completely accur
 #
 #X,Y = np.meshgrid(flow.shape[1], -flow.shape[0])
 
-*20may1
+*20may1 - tested optical flow / integrated with sim/model
 ** continue optical flow
 
 restart to make sure params correct ...
@@ -2535,4 +2535,16 @@ to avoid passing that info back and forth between AIGame and sim ...
 based on discussion with HA could use 20x20 or even 160x160 input images to calculate motion
 directions, then downsample to 10x10 direction field that is projected to the direction
 selective neurons ...
+
+*20may4
+** check opt flow integration, make sure working properly
+
+when ran it last time, there was incorrect activity in different populations
+
+actually, had started saving the motion fields computed so need to finish that
+for display in the movies ...
+
+run a short 2 s sim for testing ... named 20may4_A0_
+
+myrun 12
 

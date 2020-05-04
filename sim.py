@@ -916,11 +916,7 @@ sim.runSimWithIntervalFunc(tPerPlay,trainAgent) # has periodic callback to adjus
 sim.gatherData() # gather data from different nodes
 sim.saveData() # save data to disk
 
-"""
-def saveMotionFields (ldflow):
-  pickle.dump
-  pass
-"""
+def saveMotionFields (ldflow): pickle.dump(ldflow, open('data/'+dconf['sim']['name']+'MotionFields.pkl', 'wb'))
 
 def saveInputImages (Images):
   InputImages = np.array(Images)
@@ -946,6 +942,7 @@ if usemultirun==1:
             fid5.write('\t%0.1f' % epCount[i])
             fid5.write('\n')
     if sim.saveInputImages and sim.rank==0: saveInputImages(sim.AIGame.ReducedImages)
+    if sim.saveMotionFields and sim.rank==0: saveMotionFields(sim.AIGame.ldflow)
                 
 if sim.rank == 0: # only rank 0 should save. otherwise all the other nodes could over-write the output or quit first; rank 0 plots
     print('SAVING RASTER DATA')
@@ -964,4 +961,5 @@ if sim.rank == 0: # only rank 0 should save. otherwise all the other nodes could
             fid5.write('\n')
     if sim.saveInputImages: saveInputImages(sim.AIGame.ReducedImages)
     #anim.savemp4('/tmp/*.png','data/'+dconf['sim']['name']+'randGameBehavior.mp4',10)
+    if sim.saveMotionFields: saveMotionFields(sim.AIGame.ldflow)
     if dconf['sim']['doquit']: quit()
