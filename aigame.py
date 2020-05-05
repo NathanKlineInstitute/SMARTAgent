@@ -112,7 +112,9 @@ class AIGame:
     for y in range(motiondir.shape[0]):
       for x in range(motiondir.shape[1]):
         theta = motiondir[y][x]
-        if np.isnan(theta): continue # skip invalid angles
+        if np.isnan(theta):
+          print('nan')
+          continue # skip invalid angles
         for pop in self.ldirpop:
           fctr = np.exp(-1.0*(getangdiff(theta,dAngPeak[pop])**2)/AngRFSigma2)
           # print('updateDirSensitiveRates',pop,x,y,fctr,dAngPeak[pop],motiondir[y][x])

@@ -2674,3 +2674,62 @@ a little better ... for some reason only E, NE cells getting activated ... and n
 so have to debug the projections from optical flow -> direction selective populations
 
 
+*20may5
+** fixing optical flow input
+
+looks like motiondir units are in radians ...
+
+myrun 12
+
+sim.AIGame.ldflow[0].keys() # dict_keys(['flow', 'mag', 'ang', 'goodInds'])
+np.amin(sim.AIGame.ldflow[0]['ang']),np.amax(sim.AIGame.ldflow[0]['ang']) # (5.553319e-13, 6.2265844)
+
+so use this in imgutils.py:
+  return {'flow':flow,'mag':mag,'ang':np.rad2deg(ang),'goodInds':goodInds}
+
+ok, now rerun 2 s sim ... 
+  
+myrun 12
+
+  Cells: 2959
+  Connections: 0 (0.00 per cell)
+  Spikes: 55939 (9.45 Hz)
+  Simulated time: 2.0 s; 12 workers
+  Run time: 178.73 s
+Saving output as data/20may5_A0_simConfig.pkl ... 
+Finished saving!
+  Done; saving time = 25.08 s.
+SAVING RASTER DATA
+plot raster:
+Plotting recorded cell traces ... cell
+QApplication: invalid style override passed, ignoring it.
+Plotting raster...
+  Done; plotting time = 23.70 s
+
+Total time = 315.73 s
+
+End time:  2020-05-05 10:03:32.129322
+
+
+20may5_a0_EV1DE.png
+20may5_a0_IM.png
+20may5_a0_EMR.png
+20may5_a0_rast.png
+
+overall better since there appears to be some direction selectivity, though the rate of direciton selective cells
+remains too high ... leading to depolarization blockade of EMR,EML,IM cells ...
+can reduce rate of direction selective neurons by reducing DirMaxRate from 30 down to x ...
+
+python -i actmap.py
+
+fig, axs, plt = animActivityMaps('data/20may5_A0_actmap.mp4', framerate=10,figsize=(9,5))
+
+triy lower DirMaxRate ... 5 Hz ...
+
+20may5_A1_
+
+myrun 12
+
+still hard to see what's going on but the rates are better ...
+
+also do not see much activity in ER that corresponds with the input images ... ER is very subdued
