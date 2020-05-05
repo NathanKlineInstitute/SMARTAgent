@@ -2623,3 +2623,54 @@ fig, axs, plt = animActivityMaps('testact4.mp4', framerate=10,figsize=(9,5))
 looks interesting ... need IM too ... and the rewards, and the weights, etc.
 first fixup direction selectivity ...
 
+does activity look more clear without vmax restriction?
+fig, axs, plt = animActivityMaps('testact5.mp4', framerate=10,figsize=(9,5))
+looks even worse ... 
+
+how about reducing AngRFSigma from 45 to 22.5 ... ??
+since there's 45 degrees between primary directions but only 22.5 half-way in either direction ...
+
+20may4_A1_
+
+AngRFSigma:22.5
+
+myrun 12
+
+  Cells: 2959
+  Connections: 0 (0.00 per cell)
+  Spikes: 43011 (7.27 Hz)
+  Simulated time: 2.0 s; 12 workers
+  Run time: 445.23 s
+Saving output as data/20may4_A1_simConfig.pkl ... 
+Finished saving!
+  Done; saving time = 87.67 s.
+SAVING RASTER DATA
+plot raster:
+Plotting recorded cell traces ... cell
+QApplication: invalid style override passed, ignoring it.
+Plotting raster...
+  Done; plotting time = 64.77 s
+
+Total time = 894.50 s
+
+End time:  2020-05-04 22:54:32.382426
+
+20may4_a1_IM.png
+20may4_a1_EMR.png
+20may4_a1_EV1DE.png
+20may4_a1_rast.png
+
+still hyperactive, but not as much as last run ...
+E, NE only directions that seem to be activated
+and then too strongly activating EML, EMR?
+
+python -i actmap.py
+
+fig, axs, plt = animActivityMaps('data/20may4_A1_actmap.mp4', framerate=10,figsize=(9,5))
+
+data/20may4_A1_actmap.mp4
+
+a little better ... for some reason only E, NE cells getting activated ... and not even at right times ...
+so have to debug the projections from optical flow -> direction selective populations
+
+
