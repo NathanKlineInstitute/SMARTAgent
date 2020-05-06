@@ -2724,7 +2724,7 @@ python -i actmap.py
 
 fig, axs, plt = animActivityMaps('data/20may5_A0_actmap.mp4', framerate=10,figsize=(9,5))
 
-triy lower DirMaxRate ... 5 Hz ...
+triy lower DirMaxRate ... 1 Hz ...
 
 20may5_A1_
 
@@ -2733,3 +2733,71 @@ myrun 12
 still hard to see what's going on but the rates are better ...
 
 also do not see much activity in ER that corresponds with the input images ... ER is very subdued
+
+fig, axs, plt = animActivityMaps('data/20may5_A1_actmap.mp4', framerate=10,figsize=(9,5))
+
+firing rates for most populations are decent ... but don't see much direction selectivity that would expect/want to see ...
+seems somewhat random ... 
+
+20may5_a1_EV1DE.png
+20may5_a1_EMR.png
+20may5_a1_IM.png
+20may5_a1_rast.png
+
+fig=animInput(InputImages,'testflow.mp4',ldflow=ldflow)
+
+should find better params to increase resolution for the optical flow ...
+
+ldflow2 = getoptflowframes(InputImages,winsz=3, pyrscale=0.5, nlayer=3, niter=3, polyn=5, polysigma=1.1)
+fig=animInput(InputImages,'testflow.mp4',ldflow=ldflow2)
+
+ok, those param values a bit better in getting higher resolution optical flow, but then somewhat more noisy ...
+
+will try that in sim ...
+
+20may5_A2_
+
+myrun 12
+
+python -i actmap.py
+
+fig, axs, plt = animActivityMaps('gif/20may5_A2_actmap.mp4', framerate=10,figsize=(9,5))
+
+hmm, most of the activity appears to be due to the recurrent connectivity ... getting rid of that
+and the direction selective neurons do not fire any more ... and do not seem to receive any inputs (EPSPs) ...
+must be a bug somewhere ...
+
+does it have to do with 20x20 for direction image and 10x10 for each population of E dir selective neurons??
+
+check in actmap.py animInput ...
+
+from skimage.transform import downscale_local_mean, resize
+
+ldflow = loadMotionFields(dconf['sim']['name'])
+for dflow in ldflow:
+  u = resize(dflow['flow'][:,:,0], (10,10), anti_aliasing=True)
+  v = resize(dflow['flow'][:,:,1], (10,10), anti_aliasing=True)
+  dflow['flow'] = np.array([u,v]).T
+
+fig=animInput(InputImages,'testflow2.mp4',ldflow=ldflow)
+
+yeah, looks like the resize operation is messing things up ... which means may
+need to use more neurons for direction selective ... or distribute their RFs
+over all angles and assign each a coordinate in 2D grid ... hmm, already have
+that, so maybe need to restore 3200 neurons ... 
+
+*20may6
+** restore each dir selective neuron as 20x20 - motion fields better?
+
+doesnt run too slowly ...
+
+myrun 12
+
+has 5359 neurons ... 
+
+fig, axs, plt = animActivityMaps('gif/20may6_A0_actmap.mp4', framerate=10,figsize=(9,5))
+
+looks better but still very noisy ...
+
+needs more debugging ...
+
