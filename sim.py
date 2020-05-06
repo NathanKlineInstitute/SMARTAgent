@@ -182,7 +182,7 @@ simConfig.saveFolder = 'data'
 #simConfig.analysis['plotRaster'] = True                         # Plot a raster
 # ['ER','IR','EV1','EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE','IV1','EV4','IV4','EMT','IMT','EML','EMR','IM']
 #simConfig.analysis['plotTraces'] = {'include': [(pop, 0) for pop in allpops]}
-simConfig.analysis['plotTraces'] = {'include': [(pop, 0) for pop in ['ER','IR','EV1','EV1DE','IV1','EV4','IV4','EMT','IMT','EML','EMR','IM']]}
+simConfig.analysis['plotTraces'] = {'include': [(pop, 0) for pop in ['ER','IR','EV1','EV1DE','EV1DN','IV1','EV4','IV4','EMT','IMT','EML','EMR','IM']]}
 
 #simConfig.analysis['plotRaster'] = {'timeRange': [500,1000],'popRates':'overlay','saveData':'data/RasterData.pkl','showFig':True}
 #simConfig.analysis['plotRaster'] = {'popRates':'overlay','saveData':'data/'+dconf['sim']['name']+'RasterData.pkl','showFig':dconf['sim']['doplot']}
