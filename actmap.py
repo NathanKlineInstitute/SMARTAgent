@@ -206,6 +206,86 @@ def animInput (InputImages, outpath, framerate=10, figsize=None, showflow=True, 
   ion()
   return fig
 
+#
+def getmaxdir (dact, ddir):
+  maxdirX = np.zeros(dact['EV1DW'].shape)
+  maxdirY = np.zeros(dact['EV1DW'].shape)
+  dAngDir = OrderedDict({'EV1DE': [1,0],'EV1DNE': [np.sqrt(2),np.sqrt(2)], # receptive field peak angles for the direction selective populations
+                            'EV1DN': [0,1],'EV1DNW': [-np.sqrt(2),np.sqrt(2)],
+                            'EV1DW': [-1,0],'EV1DSW': [-np.sqrt(2),-np.sqrt(2)],
+                            'EV1DS': [0,-1],'EV1DSE': [np.sqrt(2),-np.sqrt(2)],
+                            'NOMOVE':[0,0]})
+  for k in dAngDir.keys():
+    dAngDir[k][0] *= .4
+    dAngDir[k][1] *= -.4
+  for tdx in range(maxdirX.shape[0]):
+    for y in range(maxdirX.shape[1]):
+      for x in range(maxdirX.shape[2]):
+        maxval = 0
+        maxdir = 'NOMOVE'
+        for pop in ddir.keys():
+          if dact[pop][tdx,y,x] > maxval:
+            maxval = dact[pop][tdx,y,x]
+            maxdir = pop
+        maxdirX[tdx,y,x] = dAngDir[maxdir][0]
+        maxdirY[tdx,y,x] = dAngDir[maxdir][1]
+  return maxdirX,maxdirY
+
+#
+def animDetectedMotionMaps (outpath, framerate=10, figsize=(7,3)):
+  ioff()
+  # plot activity in different layers as a function of input images
+  if figsize is not None: fig, axs = plt.subplots(1, 3, figsize=figsize);
+  else: fig, axs = plt.subplots(1, 3);
+  lax = axs.ravel()
+  ltitle = ['Input Images', 'Motion', 'Detected Motion']
+  lact = [InputImages]; lvmax = [255];
+  lfnimage = []
+  for pop in lpop:
+    lact.append(dact[pop])
+    lvmax.append(max_spks)
+  ddat = {}
+  fig.suptitle('Time = ' + str(0*tstepPerAction) + ' ms')
+  maxdirX,maxdirY = getmaxdir(dact,ddir)
+  for ldx,ax in enumerate(lax):
+    if ldx == 0:
+      offidx = -1
+      pcm = ax.imshow(lact[0][offidx,:,:],origin='upper',cmap='gray',vmin=0,vmax=lvmax[0])
+      ddat[ldx] = pcm            
+    elif ldx == 1:
+      X, Y = np.meshgrid(np.arange(0, InputImages[0].shape[1], 1), np.arange(0,InputImages[0].shape[0],1))
+      ddat[ldx] = ax.quiver(X,Y,ldflow[0]['flow'][:,:,0],-ldflow[0]['flow'][:,:,1], pivot='mid', units='inches',width=0.022,scale=1/0.15)
+      ax.set_xlim((0,InputImages[0].shape[1])); ax.set_ylim((0,InputImages[0].shape[0]))
+      ax.invert_yaxis()                    
+    elif ldx == 2:
+      X, Y = np.meshgrid(np.arange(0, InputImages[0].shape[1], 1), np.arange(0,InputImages[0].shape[0],1))
+      ddat[ldx] = ax.quiver(X,Y,maxdirX[0,:,:],maxdirY[0,:,:], pivot='mid', units='inches',width=0.022,scale=1/0.15)
+      ax.set_xlim((0,InputImages[0].shape[1])); ax.set_ylim((0,InputImages[0].shape[0]))
+      ax.invert_yaxis()
+    ax.set_ylabel(ltitle[ldx])
+  def updatefig (t):
+    fig.suptitle('Time = ' + str(t*tstepPerAction) + ' ms')    
+    if t<1: return fig # already rendered t=0 above; skip last for optical flow
+    print('frame t = ', str(t*tstepPerAction))
+    for ldx,ax in enumerate(lax):
+      if ldx==0 or ldx==5:
+        offidx=-1
+      else:
+        offidx=0
+      if ldx == 0:
+        ddat[ldx].set_data(lact[0][t+offidx,:,:])
+      elif ldx == 1:
+        ddat[ldx].set_UVC(ldflow[t+offidx]['flow'][:,:,0],-ldflow[t]['flow'][:,:,1])        
+      else:
+        ddat[ldx].set_UVC(maxdirX[t+offidx,:,:],maxdirY[t+offidx,:,:])
+    return fig
+  ani = animation.FuncAnimation(fig, updatefig, interval=1, frames=len(t1)-1)
+  writer = anim.getwriter(outpath, framerate=framerate)
+  ani.save(outpath, writer=writer); print('saved animation to', outpath)
+  ion()
+  return fig, axs, plt
+
+
 #fig, axs, plt = animActivityMaps('test2.mp4')
 # fig, axs, plt = animActivityMaps('data/'+dconf['sim']['name']+'actmap.mp4', framerate=10)
 

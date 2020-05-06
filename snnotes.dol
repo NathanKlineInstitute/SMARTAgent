@@ -2801,3 +2801,20 @@ looks better but still very noisy ...
 
 needs more debugging ...
 
+would longer time windows help??
+
+can try 50 ms tstepPerAction instead of 20 ...
+
+200 ms needed for 5 Hz max rate ...
+
+probably easier to see if motion field info sent/detected properly by combining activity of
+all the motion selective neurons together to produce estimated direction map
+
+maxdirX,maxdirY = getmaxdir(dact,ddir)
+
+fig=animDetectedMotionMaps('testdetectm.mp4', framerate=10, figsize=(7,3))
+
+estimates based on max firing of direction selective neurons looks way off
+
+for some reason E (EV1DE) neurons are almost always firing ...
+
