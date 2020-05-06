@@ -16,7 +16,7 @@ def getoptflow (gimg0, gimg1, winsz=10, pyrscale=0.5, nlayer=3, niter=3, polyn=7
   flow = cv2.calcOpticalFlowFarneback(gimg0,gimg1, None, pyrscale, nlayer, winsz, niter, polyn, polysigma, 0)
   mag, ang = cv2.cartToPolar(flow[...,0], flow[...,1])
   goodInds = np.where(mag<1e-10,0,1)
-  return {'flow':flow,'mag':mag,'ang':ang,'goodInds':goodInds}
+  return {'flow':flow,'mag':mag,'ang':np.rad2deg(ang),'goodInds':goodInds}
 
 def getoptflowframes (Images):
   # get optical flow between all frames in 3D array of frames; index 0 is frame; next indices are y,x

@@ -2623,3 +2623,181 @@ fig, axs, plt = animActivityMaps('testact4.mp4', framerate=10,figsize=(9,5))
 looks interesting ... need IM too ... and the rewards, and the weights, etc.
 first fixup direction selectivity ...
 
+does activity look more clear without vmax restriction?
+fig, axs, plt = animActivityMaps('testact5.mp4', framerate=10,figsize=(9,5))
+looks even worse ... 
+
+how about reducing AngRFSigma from 45 to 22.5 ... ??
+since there's 45 degrees between primary directions but only 22.5 half-way in either direction ...
+
+20may4_A1_
+
+AngRFSigma:22.5
+
+myrun 12
+
+  Cells: 2959
+  Connections: 0 (0.00 per cell)
+  Spikes: 43011 (7.27 Hz)
+  Simulated time: 2.0 s; 12 workers
+  Run time: 445.23 s
+Saving output as data/20may4_A1_simConfig.pkl ... 
+Finished saving!
+  Done; saving time = 87.67 s.
+SAVING RASTER DATA
+plot raster:
+Plotting recorded cell traces ... cell
+QApplication: invalid style override passed, ignoring it.
+Plotting raster...
+  Done; plotting time = 64.77 s
+
+Total time = 894.50 s
+
+End time:  2020-05-04 22:54:32.382426
+
+20may4_a1_IM.png
+20may4_a1_EMR.png
+20may4_a1_EV1DE.png
+20may4_a1_rast.png
+
+still hyperactive, but not as much as last run ...
+E, NE only directions that seem to be activated
+and then too strongly activating EML, EMR?
+
+python -i actmap.py
+
+fig, axs, plt = animActivityMaps('data/20may4_A1_actmap.mp4', framerate=10,figsize=(9,5))
+
+data/20may4_A1_actmap.mp4
+
+a little better ... for some reason only E, NE cells getting activated ... and not even at right times ...
+so have to debug the projections from optical flow -> direction selective populations
+
+
+*20may5
+** fixing optical flow input
+
+looks like motiondir units are in radians ...
+
+myrun 12
+
+sim.AIGame.ldflow[0].keys() # dict_keys(['flow', 'mag', 'ang', 'goodInds'])
+np.amin(sim.AIGame.ldflow[0]['ang']),np.amax(sim.AIGame.ldflow[0]['ang']) # (5.553319e-13, 6.2265844)
+
+so use this in imgutils.py:
+  return {'flow':flow,'mag':mag,'ang':np.rad2deg(ang),'goodInds':goodInds}
+
+ok, now rerun 2 s sim ... 
+  
+myrun 12
+
+  Cells: 2959
+  Connections: 0 (0.00 per cell)
+  Spikes: 55939 (9.45 Hz)
+  Simulated time: 2.0 s; 12 workers
+  Run time: 178.73 s
+Saving output as data/20may5_A0_simConfig.pkl ... 
+Finished saving!
+  Done; saving time = 25.08 s.
+SAVING RASTER DATA
+plot raster:
+Plotting recorded cell traces ... cell
+QApplication: invalid style override passed, ignoring it.
+Plotting raster...
+  Done; plotting time = 23.70 s
+
+Total time = 315.73 s
+
+End time:  2020-05-05 10:03:32.129322
+
+
+20may5_a0_EV1DE.png
+20may5_a0_IM.png
+20may5_a0_EMR.png
+20may5_a0_rast.png
+
+overall better since there appears to be some direction selectivity, though the rate of direciton selective cells
+remains too high ... leading to depolarization blockade of EMR,EML,IM cells ...
+can reduce rate of direction selective neurons by reducing DirMaxRate from 30 down to x ...
+
+python -i actmap.py
+
+fig, axs, plt = animActivityMaps('data/20may5_A0_actmap.mp4', framerate=10,figsize=(9,5))
+
+triy lower DirMaxRate ... 1 Hz ...
+
+20may5_A1_
+
+myrun 12
+
+still hard to see what's going on but the rates are better ...
+
+also do not see much activity in ER that corresponds with the input images ... ER is very subdued
+
+fig, axs, plt = animActivityMaps('data/20may5_A1_actmap.mp4', framerate=10,figsize=(9,5))
+
+firing rates for most populations are decent ... but don't see much direction selectivity that would expect/want to see ...
+seems somewhat random ... 
+
+20may5_a1_EV1DE.png
+20may5_a1_EMR.png
+20may5_a1_IM.png
+20may5_a1_rast.png
+
+fig=animInput(InputImages,'testflow.mp4',ldflow=ldflow)
+
+should find better params to increase resolution for the optical flow ...
+
+ldflow2 = getoptflowframes(InputImages,winsz=3, pyrscale=0.5, nlayer=3, niter=3, polyn=5, polysigma=1.1)
+fig=animInput(InputImages,'testflow.mp4',ldflow=ldflow2)
+
+ok, those param values a bit better in getting higher resolution optical flow, but then somewhat more noisy ...
+
+will try that in sim ...
+
+20may5_A2_
+
+myrun 12
+
+python -i actmap.py
+
+fig, axs, plt = animActivityMaps('gif/20may5_A2_actmap.mp4', framerate=10,figsize=(9,5))
+
+hmm, most of the activity appears to be due to the recurrent connectivity ... getting rid of that
+and the direction selective neurons do not fire any more ... and do not seem to receive any inputs (EPSPs) ...
+must be a bug somewhere ...
+
+does it have to do with 20x20 for direction image and 10x10 for each population of E dir selective neurons??
+
+check in actmap.py animInput ...
+
+from skimage.transform import downscale_local_mean, resize
+
+ldflow = loadMotionFields(dconf['sim']['name'])
+for dflow in ldflow:
+  u = resize(dflow['flow'][:,:,0], (10,10), anti_aliasing=True)
+  v = resize(dflow['flow'][:,:,1], (10,10), anti_aliasing=True)
+  dflow['flow'] = np.array([u,v]).T
+
+fig=animInput(InputImages,'testflow2.mp4',ldflow=ldflow)
+
+yeah, looks like the resize operation is messing things up ... which means may
+need to use more neurons for direction selective ... or distribute their RFs
+over all angles and assign each a coordinate in 2D grid ... hmm, already have
+that, so maybe need to restore 3200 neurons ... 
+
+*20may6
+** restore each dir selective neuron as 20x20 - motion fields better?
+
+doesnt run too slowly ...
+
+myrun 12
+
+has 5359 neurons ... 
+
+fig, axs, plt = animActivityMaps('gif/20may6_A0_actmap.mp4', framerate=10,figsize=(9,5))
+
+looks better but still very noisy ...
+
+needs more debugging ...
+

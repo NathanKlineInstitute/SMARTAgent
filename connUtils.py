@@ -40,6 +40,7 @@ def connectLayerswithOverlap (NBpreN, NBpostN, overlap_xdir):
             else:
                 preN = int(postN)
             preN_ind = np.where(preNIndices==preN)
+            #print(preN_ind)
             x0 = preN_ind[0][0] - int(overlap_xdir/2)
             if x0<0:
                 x0 = 0

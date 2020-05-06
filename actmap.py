@@ -181,9 +181,11 @@ def animInput (InputImages, outpath, framerate=10, figsize=None, showflow=True, 
       ddat[ldx] = pcm
       ax.set_ylabel(ltitle[idx])
     else:
-      X, Y = np.meshgrid(np.arange(0, InputImages[0].shape[1], 1), np.arange(0,InputImages[0].shape[0],1))
+      #X, Y = np.meshgrid(np.arange(0, InputImages[0].shape[1], 1), np.arange(0,InputImages[0].shape[0],1))
+      X, Y = np.meshgrid(np.arange(0, 10, 1), np.arange(0,10,1))
       ddat[ldx] = ax.quiver(X,Y,ldflow[0]['flow'][:,:,0],-ldflow[0]['flow'][:,:,1], pivot='mid', units='inches',width=0.01,scale=1/0.3)#,width=0.022,scale=1/0.15)
-      ax.set_xlim((0,InputImages[0].shape[1])); ax.set_ylim((0,InputImages[0].shape[0]))
+      #ax.set_xlim((0,InputImages[0].shape[1])); ax.set_ylim((0,InputImages[0].shape[0]))w
+      ax.set_xlim((0,10)); ax.set_ylim((0,10))
       ax.invert_yaxis()
     idx += 1
   def updatefig (t):
