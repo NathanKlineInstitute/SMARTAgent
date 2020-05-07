@@ -102,7 +102,7 @@ class AIGame:
     # update firing rate of dir sensitive neurons using dirs (2D array with motion direction at each coordinate)
     if len(self.ldflow) < 1: return
     dflow = self.ldflow[-1]
-    motiondir = dflow['ang'] # angles in degrees
+    motiondir = dflow['thang'] # angles in degrees, but thresholded for significant motion; negative value means not used
     dAngPeak = self.dAngPeak
     dirSensitiveNeuronDim = self.dirSensitiveNeuronDim
     if motiondir.shape[0] != dirSensitiveNeuronDim or motiondir.shape[1] != dirSensitiveNeuronDim:
@@ -112,10 +112,11 @@ class AIGame:
     for pop in self.ldirpop: self.dFiringRates[pop] = self.dirSensitiveNeuronRate[0] * np.ones(shape=(dirSensitiveNeuronDim,dirSensitiveNeuronDim))
     for y in range(motiondir.shape[0]):
       for x in range(motiondir.shape[1]):
-        for pop in self.ldirpop:
-          fctr = np.exp(-1.0*(getangdiff(motiondir[y][x],dAngPeak[pop])**2)/AngRFSigma2)
-          #print('updateDirRates',pop,x,y,fctr,dAngPeak[pop],motiondir[y][x])
-          self.dFiringRates[pop][y,x] += MaxRate * fctr
+        if motiondir[y,x] >= 0.0: # make sure it's a valid angle
+          for pop in self.ldirpop:
+            fctr = np.exp(-1.0*(getangdiff(motiondir[y][x],dAngPeak[pop])**2)/AngRFSigma2)
+            #print('updateDirRates',pop,x,y,fctr,dAngPeak[pop],motiondir[y][x])
+            self.dFiringRates[pop][y,x] += MaxRate * fctr
     #print('motiondir',motiondir)
     for pop in self.ldirpop:
       self.dFiringRates[pop]=np.reshape(self.dFiringRates[pop],dirSensitiveNeuronDim**2)

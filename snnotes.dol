@@ -2820,3 +2820,127 @@ for some reason E (EV1DE) neurons are almost always firing ...
 
 something about 0 degrees for E ... when change it to have peak at 2 degrees much less firing ...
 
+*20may7
+** discuss optical flow with ha
+
+conclusion: will see if can tweak params to get example motion below to produce correct results
+with existing params, detected motion didn't look great
+
+** ha example code to test optical flow on single frame motion
+
+python
+from netpyne import specs, sim
+from neuron import h
+import numpy as np
+import random
+from conf import dconf # configuration dictionary
+import pandas as pd
+import pickle
+from collections import OrderedDict
+from connUtils import *
+from matplotlib import pyplot as plt
+import os
+import anim
+from matplotlib import animation
+from aigame import AIGame
+sim.AIGame = AIGame()
+rewards, epCount, proposed_actions, total_hits, Racket_pos, Ball_pos = sim.AIGame.playGame(actions=[3], epCount = 0)
+rewards, epCount, proposed_actions, total_hits, Racket_pos, Ball_pos = sim.AIGame.playGame(actions=[3], epCount = 0)
+rewards, epCount, proposed_actions, total_hits, Racket_pos, Ball_pos = sim.AIGame.playGame(actions=[3], epCount = 0)
+rewards, epCount, proposed_actions, total_hits, Racket_pos, Ball_pos = sim.AIGame.playGame(actions=[3], epCount = 0)
+rewards, epCount, proposed_actions, total_hits, Racket_pos, Ball_pos = sim.AIGame.playGame(actions=[3], epCount = 0)
+rewards, epCount, proposed_actions, total_hits, Racket_pos, Ball_pos = sim.AIGame.playGame(actions=[4], epCount = 0)
+sim.AIGame.dFiringRates # to see the firing rates of 8 different populations
+sim.AIGame.ldflow[-1]['ang'] # to see the angle computed for object motion
+
+from pylab import *
+ion()
+
+#
+fig = figure(figsize=(8,4))
+cbaxes = fig.add_axes([0.92, 0.3, 0.01, 0.5])
+subplot(1,3,1); imshow(sim.AIGame.FullImages[-2]); title('Frame1')
+subplot(1,3,2); imshow(sim.AIGame.FullImages[-1]); title('Frame2')
+subplot(1,3,3); imshow(sim.AIGame.ldflow[-1]['ang'],vmin=0, vmax=359, cmap='Dark2'); title('Angle')
+c1 = colorbar(fa,cax = cbaxes)
+c1.set_ticks([22,67,112,157,202,247,292,337])
+c1.set_ticklabels(['E','NE','N','NW','W','SW','S','SE'])
+
+savefig('gif/20may7_test_ha_0.png')
+
+ha suggests thresholding by magnitude
+
+E directions might dominate if angle 0 is default
+
+opposite sign in y direction?
+
+
+from imgutils import getoptflow
+
+#
+dflow = getoptflow(sim.AIGame.ReducedImages[-2], sim.AIGame.ReducedImages[-1],winsz=3,nlayer=3,niter=3,polyn=5,polysigma=1.1)
+thflow = np.zeros(dflow['ang'].shape)
+th = mean(dflow['mag']) + std(dflow['mag'])
+for y in range(thflow.shape[0]):
+  for x in range(thflow.shape[1]):
+    if dflow['mag'][y,x] < th:
+      thflow[y,x] = -100
+    else:
+      thflow[y,x] = dflow['ang'][y,x]
+
+fig = figure(figsize=(8,4))
+
+#
+clf()
+cbaxes = fig.add_axes([0.92, 0.3, 0.01, 0.5])
+subplot(1,3,1); imshow(sim.AIGame.ReducedImages[-2]); title('Frame1')
+subplot(1,3,2); imshow(sim.AIGame.ReducedImages[-1]); title('Frame2')
+subplot(1,3,3); imshow(thflow,vmin=-100, vmax=359, cmap='Dark2'); title('Angle')
+c1 = colorbar(fa,cax = cbaxes)
+c1.set_ticks([22,67,112,157,202,247,292,337])
+c1.set_ticklabels(['NONE','E','NE','N','NW','W','SW','S','SE'])
+
+savefig('gif/20may7_test_2.png')
+
+not terrible ...
+
+python -i actmap.py
+fig=animInput(InputImages,'testflow2.mp4',ldflow=None)
+
+looks better than before ...
+
+try in sim after checking for valid angles there ...
+
+myrun 12
+
+python -i actmap.py
+
+fig, axs, plt = animActivityMaps('gif/20may7_A0_actmap.mp4', framerate=10,figsize=(9,5))
+
+saved animation to gif/20may7_A0_actmap.mp4
+
+looks much better ...
+
+20may7_a0_rast.png
+most rates ok but EMR,EML fire too much and are too synchronized
+possibly due to high drive from EV1DN, EV1DS which fire a lot more than the other direction selective cells (since
+most motion is up and down due to paddles moving in those directions)
+20may7_a0_IM.png
+20may7_a0_EML.png
+
+next will test with some angular RF spread ... also need to make sure EMR,EML fire less frequently/synchronously ...
+
+** other discussion with ha points towards potential benefits of explicit object detection/tracking
+
+e.g. threshold image, extract bbox, then use that to see motion
+
+opencv supports this with efficient algorithms, though also have some code for it in OEvent
+
+problem with this approach is some loss of generality
+and may not even need image pixels as inputs if use explicit object locations as
+neuronal representations
+
+** put some object detection, bbox, image code into imgutils.py
+
+can possibly use them for object detection/tracking, though opencv code probably more efficient
+
