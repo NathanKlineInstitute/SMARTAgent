@@ -1498,3 +1498,157 @@ plt.subplot(2,2,4)
 plt.imshow(np.multiply(mag34,goodInds))
 plt.colorbar()
 plt.show()
+
+*20may1
+**create a toy model to understand the homeostatic-synaptic plasticity model 'hsyn'.
+***The model has 2 cells, cell 0 is driven by stimMod at 10 Hz, cell 1 is driven by a background firing rate of 5 Hz. 
+
+
+*20may4
+**Using toymodel 
+***with STDP-RL:
+{preGid: 0, sec: 'soma', loc: 0.5, synMech: 'AMPA', weight: 0.02, delay: 20, plast: {mech: 'STDP', params: {hebbwt: 0.001, antiwt: -0.0005, wmax: 50, STDPon: 1, RLon: 1, RLhebbwt: 0.001, RLantiwt: -0.0002, tauhebb: 10, RLwindhebb: 100, useRLexp: 0, softthresh: 0, verbose: 1}}, label: 'R->M', hObj: NetCon[0], hSTDP: STDP[0], hSTDPprecon: NetCon[1], hSTDPpstcon: NetCon[2], STDPdata: {'preGid': 0, 'postGid': 1, 'receptor': 0}}
+***with hsyn:
+{preGid: 0, sec: 'soma', loc: 0.5, synMech: 'AMPA', weight: 0.02, delay: 20, plast: {mech: 'hsyn', params: {targetrate: 1, scaling: 1, rateinc: 1, ratedectau: 1000.0, scaleratefctr: 0.001}}, label: 'R->M', hObj: NetCon[0]}
+***I thought i could either use STDP-RL or homeostatic synaptic plasticity as 'plasticity' in connections. But in fact, i can use hsyn in the synMechParams and then use STDP-RL for connParams.
+**To play with the model:
+1. 2Hz stimMod drives 1 ER neuron which in turn drives 1 EM neuron. In the absence of STDP-RL, and targetfiring rate = 0, both neurons ER and EM fire at 2 Hz.
+2. Use targetrate = 1:
+
+For 2Hz presynaptic spiking: B is increasing as scalefactor is increasing.
+      A = A + w * factor * scalefactor
+      B = B + w * factor * scalefactor
+NET_RECEIVE@t=6.4: w=0.01: firingrate=0: A=0: B=0: factor=1.05537 scalefactor=1.0064:in
+NET_RECEIVE@t=528.4: w=0.01: firingrate=0: A=0: B=1.78758e-45: factor=1.05537 scalefactor=1.5284:in NET_RECEIVE@t=1028.4: w=0.01: firingrate=0: A=0: B=1.72371e-43: factor=1.05537 scalefactor=2.0284:in NET_RECEIVE@t=1528.4: w=0.01: firingrate=0: A=0: B=2.28761e-43: factor=1.05537 scalefactor=2.5284:in NET_RECEIVE@t=2028.4: w=0.01: firingrate=0: A=0: B=2.8515e-43: factor=1.05537 scalefactor=3.0284:in NET_RECEIVE@t=2528.4: w=0.01: firingrate=0: A=0: B=3.41539e-43: factor=1.05537 scalefactor=3.5284:in NET_RECEIVE@t=3028.4: w=0.01: firingrate=0: A=0: B=3.97929e-43: factor=1.05537 scalefactor=4.0284:in NET_RECEIVE@t=3528.4: w=0.01: firingrate=0: A=0: B=4.54318e-43: factor=1.05537 scalefactor=4.5284:in NET_RECEIVE@t=4028.4: w=0.01: firingrate=0: A=0: B=5.10708e-43: factor=1.05537 scalefactor=5.0284:in NET_RECEIVE@t=4528.4: w=0.01: firingrate=0: A=0: B=5.67097e-43: factor=1.05537 scalefactor=5.5284:in NET_RECEIVE@t=5028.4: w=0.01: firingrate=0: A=0: B=6.23487e-43: factor=1.05537 scalefactor=6.0284:in NET_RECEIVE@t=5528.4: w=0.01: firingrate=0: A=0: B=6.79876e-43: factor=1.05537 scalefactor=6.5284:in NET_RECEIVE@t=6028.4: w=0.01: firingrate=0: A=0: B=7.36265e-43: factor=1.05537 scalefactor=7.0284:in NET_RECEIVE@t=6528.4: w=0.01: firingrate=0: A=0: B=7.92655e-43: factor=1.05537 scalefactor=7.5284:in NET_RECEIVE@t=7028.4: w=0.01: firingrate=0: A=0: B=8.49044e-43: factor=1.05537 scalefactor=8.0284:in NET_RECEIVE@t=7528.4: w=0.01: firingrate=0: A=0: B=9.05434e-43: factor=1.05537 scalefactor=8.5284:in NET_RECEIVE@t=8028.4: w=0.01: firingrate=0: A=0: B=9.61823e-43: factor=1.05537 scalefactor=9.0284:in NET_RECEIVE@t=8528.4: w=0.01: firingrate=0: A=0: B=1.01821e-42: factor=1.05537 scalefactor=9.5284:in NET_RECEIVE@t=9028.4: w=0.01: firingrate=0: A=0: B=1.0746e-42: factor=1.05537 scalefactor=10.0284:in NET_RECEIVE@t=9528.4: w=0.01: firingrate=0: A=0: B=1.13099e-42: factor=1.05537 scalefactor=10.5284:in
+
+--i dont understand how A and B are evolving differently.
+print before and after A and B assignments.
+
+For 2Hz presynaptic spiking: B is increasing as scalefactor is increasing.
+      A = A + w * factor * scalefactor
+      B = B + w * factor * scalefactor
+NET_RECEIVE@t=6.4: w=0.01: firingrate=0: A=0: B=0: factor=1.05537 scalefactor=1.0064:in 
+NET_RECEIVE@t=6.4: A=0.0106213: B=0.0106213:in 
+NET_RECEIVE@t=528.4: w=0.01: firingrate=0: A=0: B=1.78758e-45: factor=1.05537 scalefactor=1.5284:in NET_RECEIVE@t=528.4: A=0.0161303: B=0.0161303:in 
+NET_RECEIVE@t=1028.4: w=0.01: firingrate=0: A=0: B=1.72371e-43: factor=1.05537 scalefactor=2.0284:in NET_RECEIVE@t=1028.4: A=0.0214071: B=0.0214071:in 
+NET_RECEIVE@t=1528.4: w=0.01: firingrate=0: A=0: B=2.28761e-43: factor=1.05537 scalefactor=2.5284:in NET_RECEIVE@t=1528.4: A=0.026684: B=0.026684:in 
+NET_RECEIVE@t=2028.4: w=0.01: firingrate=0: A=0: B=2.8515e-43: factor=1.05537 scalefactor=3.0284:in NET_RECEIVE@t=2028.4: A=0.0319609: B=0.0319609:in 
+NET_RECEIVE@t=2528.4: w=0.01: firingrate=0: A=0: B=3.41539e-43: factor=1.05537 scalefactor=3.5284:in NET_RECEIVE@t=2528.4: A=0.0372377: B=0.0372377:in 
+NET_RECEIVE@t=3028.4: w=0.01: firingrate=0: A=0: B=3.97929e-43: factor=1.05537 scalefactor=4.0284:in NET_RECEIVE@t=3028.4: A=0.0425146: B=0.0425146:in 
+NET_RECEIVE@t=3528.4: w=0.01: firingrate=0: A=0: B=4.54318e-43: factor=1.05537 scalefactor=4.5284:in NET_RECEIVE@t=3528.4: A=0.0477914: B=0.0477914:in 
+NET_RECEIVE@t=4028.4: w=0.01: firingrate=0: A=0: B=5.10708e-43: factor=1.05537 scalefactor=5.0284:in NET_RECEIVE@t=4028.4: A=0.0530683: B=0.0530683:in 
+NET_RECEIVE@t=4528.4: w=0.01: firingrate=0: A=0: B=5.67097e-43: factor=1.05537 scalefactor=5.5284:in NET_RECEIVE@t=4528.4: A=0.0583451: B=0.0583451:in 
+NET_RECEIVE@t=5028.4: w=0.01: firingrate=0: A=0: B=6.23487e-43: factor=1.05537 scalefactor=6.0284:in NET_RECEIVE@t=5028.4: A=0.063622: B=0.063622:in 
+NET_RECEIVE@t=5528.4: w=0.01: firingrate=0: A=0: B=6.79876e-43: factor=1.05537 scalefactor=6.5284:in NET_RECEIVE@t=5528.4: A=0.0688988: B=0.0688988:in 
+NET_RECEIVE@t=6028.4: w=0.01: firingrate=0: A=0: B=7.36265e-43: factor=1.05537 scalefactor=7.0284:in NET_RECEIVE@t=6028.4: A=0.0741757: B=0.0741757:in 
+NET_RECEIVE@t=6528.4: w=0.01: firingrate=0: A=0: B=7.92655e-43: factor=1.05537 scalefactor=7.5284:in 
+NET_RECEIVE@t=6528.4: A=0.0794526: B=0.0794526:in 
+NET_RECEIVE@t=7028.4: w=0.01: firingrate=0: A=0: B=8.49044e-43: factor=1.05537 scalefactor=8.0284:in NET_RECEIVE@t=7028.4: A=0.0847294: B=0.0847294:in 
+NET_RECEIVE@t=7528.4: w=0.01: firingrate=0: A=0: B=9.05434e-43: factor=1.05537 scalefactor=8.5284:in NET_RECEIVE@t=7528.4: A=0.0900063: B=0.0900063:in 
+NET_RECEIVE@t=8028.4: w=0.01: firingrate=0: A=0: B=9.61823e-43: factor=1.05537 scalefactor=9.0284:in NET_RECEIVE@t=8028.4: A=0.0952831: B=0.0952831:in 
+NET_RECEIVE@t=8528.4: w=0.01: firingrate=0: A=0: B=1.01821e-42: factor=1.05537 scalefactor=9.5284:in NET_RECEIVE@t=8528.4: A=0.10056: B=0.10056:in 
+NET_RECEIVE@t=9028.4: w=0.01: firingrate=0: A=0: B=1.0746e-42: factor=1.05537 scalefactor=10.0284:in NET_RECEIVE@t=9028.4: A=0.105837: B=0.105837:in 
+NET_RECEIVE@t=9528.4: w=0.01: firingrate=0: A=0: B=1.13099e-42: factor=1.05537 scalefactor=10.5284:in NET_RECEIVE@t=9528.4: A=0.111114: B=0.111114
+
+g = B-A
+
+A is 0 whenever a spike is received. B is a very small value inclreasing with spikes.
+so based on this, g should be 0 at each time step.
+still dont understand
+
+print with NET_RECEIVE and state:
+
+before a spike is received
+in state @t=0.2: A=0: B=0: firingrate:0 scalefactor:1.0002
+in state @t=0.4: A=0: B=0: firingrate:0 scalefactor:1.0004
+in state @t=0.6: A=0: B=0: firingrate:0 scalefactor:1.0006
+in state @t=0.8: A=0: B=0: firingrate:0 scalefactor:1.0008
+in state @t=1: A=0: B=0: firingrate:0 scalefactor:1.001
+in state @t=1.2: A=0: B=0: firingrate:0 scalefactor:1.0012
+in state @t=1.4: A=0: B=0: firingrate:0 scalefactor:1.0014
+in state @t=1.6: A=0: B=0: firingrate:0 scalefactor:1.0016
+in state @t=1.8: A=0: B=0: firingrate:0 scalefactor:1.0018
+in state @t=2: A=0: B=0: firingrate:0 scalefactor:1.002
+in state @t=2.2: A=0: B=0: firingrate:0 scalefactor:1.0022
+in state @t=2.4: A=0: B=0: firingrate:0 scalefactor:1.0024
+in state @t=2.6: A=0: B=0: firingrate:0 scalefactor:1.0026
+in state @t=2.8: A=0: B=0: firingrate:0 scalefactor:1.0028
+in state @t=3: A=0: B=0: firingrate:0 scalefactor:1.003
+in state @t=3.2: A=0: B=0: firingrate:0 scalefactor:1.0032
+in state @t=3.4: A=0: B=0: firingrate:0 scalefactor:1.0034
+in state @t=3.6: A=0: B=0: firingrate:0 scalefactor:1.0036
+in state @t=3.8: A=0: B=0: firingrate:0 scalefactor:1.0038
+in state @t=4: A=0: B=0: firingrate:0 scalefactor:1.004
+in state @t=4.2: A=0: B=0: firingrate:0 scalefactor:1.0042
+in state @t=4.4: A=0: B=0: firingrate:0 scalefactor:1.0044
+in state @t=4.6: A=0: B=0: firingrate:0 scalefactor:1.0046
+in state @t=4.8: A=0: B=0: firingrate:0 scalefactor:1.0048
+in state @t=5: A=0: B=0: firingrate:0 scalefactor:1.005
+in state @t=5.2: A=0: B=0: firingrate:0 scalefactor:1.0052
+in state @t=5.4: A=0: B=0: firingrate:0 scalefactor:1.0054
+in state @t=5.6: A=0: B=0: firingrate:0 scalefactor:1.0056
+in state @t=5.8: A=0: B=0: firingrate:0 scalefactor:1.0058
+in state @t=6: A=0: B=0: firingrate:0 scalefactor:1.006
+in state @t=6.2: A=0: B=0: firingrate:0 scalefactor:1.0062
+in state @t=6.4: A=0: B=0: firingrate:0 scalefactor:1.0064
+in NET_RECEIVE@t=6.4: w=0.01: firingrate=0: A=0: B=0: factor=1.05537 scalefactor=1.0064:
+in NET_RECEIVE@t=6.4: A=0.0106213: B=0.0106213:
+in state @t=6.6: A=0.000194535: B=0.0102279: firingrate:0 scalefactor:1.0066
+in state @t=6.8: A=3.56303e-06: B=0.00984915: firingrate:0 scalefactor:1.0068
+in state @t=7: A=6.52592e-08: B=0.00948441: firingrate:0 scalefactor:1.007
+in state @t=7.2: A=1.19526e-09: B=0.00913318: firingrate:0 scalefactor:1.0072
+in state @t=7.4: A=2.1892e-11: B=0.00879495: firingrate:0 scalefactor:1.0074
+in state @t=7.6: A=4.00967e-13: B=0.00846925: firingrate:0 scalefactor:1.0076
+...... scalefactor is increasing by 0.0002
+...... A and B increased same fraction when a spike is received. 
+...... However, A decays very fast whereas B decays much slower at each time step ----> where did that happen? and which parameters are controling the decay ('tau1':0.05,'tau2':5.3--->these are the parameters defining the AMPA properties).
+...... this faster vs slower decay is the reason why A is 0 and B is a very small value when next spike is received.
+
+--- SO NEED TO ASSIGN FIRING RATE TO THE MECHANISM.
+-assign firing rate using the following:
+sim.net.modifySynMechs({'conds':{'label':'AMPA','sec':'soma'}, 'cellConds':{'pop':'EM'},'firingrate':2})
+--firingrate needs to be calculated and fed back here.
+--ratedectau should be large enough (using 1000ms for now) otherwise when the next spike arrives, synapse already forgets about the activity of the neuron.
+
+
+
+sim.net.cells[0].secs['soma']['hObj'](0.5).v
+
+---DEBUGGING OPTIC FLOW:
+-
+from netpyne import specs, sim
+from neuron import h
+import numpy as np
+import random
+from conf import dconf # configuration dictionary
+import pandas as pd
+import pickle
+from collections import OrderedDict
+from connUtils import *
+from matplotlib import pyplot as plt
+import os
+import anim
+from matplotlib import animation
+from aigame import AIGame
+sim.AIGame = AIGame()
+rewards, epCount, proposed_actions, total_hits, Racket_pos, Ball_pos = sim.AIGame.playGame(actions=[3], epCount = 0)
+rewards, epCount, proposed_actions, total_hits, Racket_pos, Ball_pos = sim.AIGame.playGame(actions=[3], epCount = 0)
+rewards, epCount, proposed_actions, total_hits, Racket_pos, Ball_pos = sim.AIGame.playGame(actions=[3], epCount = 0)
+rewards, epCount, proposed_actions, total_hits, Racket_pos, Ball_pos = sim.AIGame.playGame(actions=[3], epCount = 0)
+rewards, epCount, proposed_actions, total_hits, Racket_pos, Ball_pos = sim.AIGame.playGame(actions=[3], epCount = 0)
+rewards, epCount, proposed_actions, total_hits, Racket_pos, Ball_pos = sim.AIGame.playGame(actions=[4], epCount = 0)
+sim.AIGame.dFiringRates # to see the firing rates of 8 different populations
+sim.AIGame.ldflow[-1]['ang'] # to see the angle computed for object motion
+
+fig = plt.figure(figsize=(8,4))
+gs = fig.add_gridspec(1,2)
+f_ax = []
+f_ax.append(fig.add_subplot(gs[0,0])) #for 5-image input - 0
+f_ax.append(fig.add_subplot(gs[0,1])) #for single image  - 1
+cbaxes = fig.add_axes([0.92, 0.3, 0.01, 0.5])
+f_ax[0].imshow(np.add(sim.AIGame.FullImages[-1],sim.AIGame.FullImages[-2]))
+fa = f_ax[1].imshow(sim.AIGame.ldflow[-1]['ang'],vmin=0, vmax=359, cmap='Dark2')
+c1 = plt.colorbar(fa,cax = cbaxes)
+c1.set_ticks([22,67,112,157,202,247,292,337])
+c1.set_ticklabels(['E','NE','N','NW','W','SW','S','SE'])
+plt.show()
