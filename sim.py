@@ -36,8 +36,7 @@ recordWeightStepSize = dconf['sim']['recordWeightStepSize']
 recordWeightDCells = 1 # to record weights for sub samples of neurons
 tstepPerAction = dconf['sim']['tstepPerAction'] # time step per action (in ms)
 
-fid4=None
-if sim.rank == 0: fid4 = open(sim.MotorOutputsfilename,'w')
+fid4=None # only used by rank 0
 
 scale = dconf['net']['scale']
 ETypes = ['ER','EV1','EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE','EV4','EMT', 'EML', 'EMR']
@@ -743,7 +742,7 @@ def updateInputRates ():
 def trainAgent (t):
     """ training interface between simulation and game environment
     """
-    global NBsteps, epCount, proposed_actions, total_hits, Racket_pos, Ball_pos, current_time_stepNB
+    global NBsteps, epCount, proposed_actions, total_hits, Racket_pos, Ball_pos, current_time_stepNB, fid4
     global f_ax, fig
     global tstepPerAction
     vec = h.Vector()
@@ -767,6 +766,7 @@ def trainAgent (t):
         sim.pc.allreduce(vec.from_python(F_Ls),1) #sum
         F_Ls = vec.to_python()
         if sim.rank==0:
+            if fid4 is None: fid4 = open(sim.MotorOutputsfilename,'w')
             print('Firing rates: ', F_Rs, F_Ls)
             #print('Firing rates: ', F_R1, F_R2, F_R3, F_R4, F_R5, F_L1, F_L2, F_L3, F_L4, F_L5)
             fid4.write('%0.1f' % t)
