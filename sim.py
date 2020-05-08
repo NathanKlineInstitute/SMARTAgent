@@ -514,14 +514,20 @@ for prety in ['EV1', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW','EV1DSW', 'EV
 sim.AIGame = None # placeholder
 
 def recordAdjustableWeightsPop (sim, t, popname):
-    if 'synweights' not in sim.simData: sim.simData['synweights'] = {sim.rank:[]}
+    if 'synweights' not in sim.simData: sim.simData['synweights'] = {sim.rank:{}}
     # record the plastic weights for specified popname
     lcell = [c for c in sim.net.cells if c.gid in sim.net.pops[popname].cellGids] # this is the set of MR cells
     for cell in lcell:
         for conn in cell.conns:
             if 'hSTDP' in conn:
                 #print(conn.preGid, cell.gid, conn.synMech) #testing weight saving
-                sim.simData['synweights'][sim.rank].append([t,conn.preGid,cell.gid,float(conn['hObj'].weight[0]),conn.synMech])
+                if conn.preGid not in sim.simData['synweights'][sim.rank]:
+                    sim.simData['synweights'][sim.rank][conn.preGid] = {}
+                if cell.gid not in sim.simData['synweights'][sim.rank][conn.preGid]:
+                    sim.simData['synweights'][sim.rank][conn.preGid][cell.gid] = {}
+                if conn.synMech not in sim.simData['synweights'][sim.rank][conn.preGid][cell.gid]: # not efficient to check everything each time
+                    sim.simData['synweights'][sim.rank][conn.preGid][cell.gid][conn.synMech] = [] 
+                sim.simData['synweights'][sim.rank][conn.preGid][cell.gid][conn.synMech].append([t,float(conn['hObj'].weight[0])])
     return len(lcell)
                     
 def recordAdjustableWeights (sim, t, lpop = ['EMR', 'EML']):

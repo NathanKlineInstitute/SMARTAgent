@@ -3105,4 +3105,16 @@ probably do not need the RLon flag ...
 could also use preGid, gid, synmech as index so don't have to save them each time ...
 or could save to separate files for each rank and then join them together in simdat.py ...
 
+still crashes:
+  Done; run time = 1321.29 s; real-time ratio: 0.01.
+
+Gathering data...
+terminate called after throwing an instance of 'std::bad_alloc'
+  what():  std::bad_alloc
+[samndp7730:15458] *** Process received signal ***
+[samndp7730:15458] Signal: Aborted (6)
+[samndp7730:15458] Signal code:  (-6)
+[samndp7730:15458] [ 0] /lib/x86_64-linux-gnu/libpthread.so.0(+0x11390)[0x7fe32f7dd390]
+[samndp7730:15458] [ 1] /lib/x86_64-linux-gnu/libc.so.6(gsignal+0x38)[0x7fe32f437428]
+
 
