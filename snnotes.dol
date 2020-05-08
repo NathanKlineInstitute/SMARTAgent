@@ -3093,3 +3093,8 @@ if network activity looks decent could run longer sims on zn ...
 
 same problem/crash on zn?
 
+yeah, crashes on zn in gatherdata, zn with 12 cores takes ~900s to run instead of 1413 on laptop ...
+
+try with fewer traces recorded from ... and longer recording interval (recordStep=0.6)
+only record voltage from 1 cell of these pops: ['ER','IR','EV1','EV1DE','IV1','EML','IM']
+

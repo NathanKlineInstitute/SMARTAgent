@@ -35,9 +35,9 @@ recordWeightStepSize = dconf['sim']['recordWeightStepSize']
 #recordWeightDT = 1000 # interval for recording synaptic weights (change later)
 recordWeightDCells = 1 # to record weights for sub samples of neurons
 tstepPerAction = dconf['sim']['tstepPerAction'] # time step per action (in ms)
-global fid4
 
-fid4 = open(sim.MotorOutputsfilename,'w')
+fid4=None
+if sim.rank == 0: fid4 = open(sim.MotorOutputsfilename,'w')
 
 scale = dconf['net']['scale']
 ETypes = ['ER','EV1','EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE','EV4','EMT', 'EML', 'EMR']
@@ -186,7 +186,8 @@ simConfig.saveFolder = 'data'
 #simConfig.analysis['plotRaster'] = True                         # Plot a raster
 # ['ER','IR','EV1','EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE','IV1','EV4','IV4','EMT','IMT','EML','EMR','IM']
 #simConfig.analysis['plotTraces'] = {'include': [(pop, 0) for pop in allpops]}
-simConfig.analysis['plotTraces'] = {'include': [(pop, 0) for pop in ['ER','IR','EV1','EV1DE','EV1DN','IV1','EV4','IV4','EMT','IMT','EML','EMR','IM']]}
+#simConfig.analysis['plotTraces'] = {'include': [(pop, 0) for pop in ['ER','IR','EV1','EV1DE','IV1','EV4','IV4','EMT','IMT','EML','IM']]}
+simConfig.analysis['plotTraces'] = {'include': [(pop, 0) for pop in ['ER','IR','EV1','EV1DE','IV1','EML','IM']]}
 
 #simConfig.analysis['plotRaster'] = {'timeRange': [500,1000],'popRates':'overlay','saveData':'data/RasterData.pkl','showFig':True}
 #simConfig.analysis['plotRaster'] = {'popRates':'overlay','saveData':'data/'+dconf['sim']['name']+'RasterData.pkl','showFig':dconf['sim']['doplot']}
@@ -204,7 +205,7 @@ cfg.IIGain = 10.0  # I to I scaling factor
 ### from https://www.neuron.yale.edu/phpBB/viewtopic.php?f=45&t=3770&p=16227&hilit=memory#p16122
 cfg.saveCellSecs = bool(dconf['sim']['saveCellSecs']) # if False removes all data on cell sections prior to gathering from nodes
 cfg.saveCellConns = bool(dconf['sim']['saveCellConns']) # if False removes all data on cell connections prior to gathering from nodes
-# cfg.gatherOnlySimData = True # do not set to True, when True gathers from nodes only the output simulation data (not the network instance)
+#cfg.gatherOnlySimData = True # do not set to True, when True gathers from nodes only the output simulation data (not the network instance)
 ###
 
 recWeight = 0.0001 #weight for recurrent connections within each area.
@@ -947,6 +948,7 @@ if sim.rank == 0:
 
 tPerPlay = tstepPerAction*dconf['actionsPerPlay']
 sim.runSimWithIntervalFunc(tPerPlay,trainAgent) # has periodic callback to adjust STDP weights based on RL signal
+if sim.rank==0: fid4.close()
 sim.gatherData() # gather data from different nodes
 sim.saveData() # save data to disk
 
