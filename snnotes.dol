@@ -2930,6 +2930,35 @@ most motion is up and down due to paddles moving in those directions)
 
 next will test with some angular RF spread ... also need to make sure EMR,EML fire less frequently/synchronously ...
 
+set AngRFSigma to 22.5 and run again
+
+name = 20may7_A1_
+
+myrun 12
+
+python -i actmap.py
+
+fig, axs, plt = animActivityMaps('gif/20may7_A1_actmap.mp4', framerate=10,figsize=(9,5))
+
+saved animation to gif/20may7_A1_actmap.mp4
+
+animation looks ok ... rates all right?
+
+all rates decent but EML,EMR,IM rates too high ...
+20may7_a1_rast.png
+20may7_a1_EML.png
+20may7_a1_EMR.png
+20may7_a1_IM.png
+
+so, next try decreasing the E projection weights to the EMR,EML neurons ...
+
+20may7_A2_
+
+set down from 0.00375, 0.000375 to 0.002, 0.0002 in this loop in sim.py to:
+    for strty,synmech,weight,plastty in zip(['','n'],['AMPA', 'NMDA'],[0.0001*cfg.EEGain, 0.00001*cfg.EEGain],[STDPparamsRL1,STDPparamsRL2]):
+
+EMR,EML still firing too much , though slightly lower ... 
+    
 ** other discussion with ha points towards potential benefits of explicit object detection/tracking
 
 e.g. threshold image, extract bbox, then use that to see motion
