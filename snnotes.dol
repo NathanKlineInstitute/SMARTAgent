@@ -2820,13 +2820,13 @@ for some reason E (EV1DE) neurons are almost always firing ...
 
 something about 0 degrees for E ... when change it to have peak at 2 degrees much less firing ...
 
-*20may7
+*20may7 - more on optical flow; some fixes
 ** discuss optical flow with ha
 
 conclusion: will see if can tweak params to get example motion below to produce correct results
 with existing params, detected motion didn't look great
 
-** ha example code to test optical flow on single frame motion
+** ha example code to test optical flow on single frame motion, fix, start testing network
 
 python
 from netpyne import specs, sim
@@ -2972,4 +2972,124 @@ neuronal representations
 ** put some object detection, bbox, image code into imgutils.py
 
 can possibly use them for object detection/tracking, though opencv code probably more efficient
+
+*20may8 - continue optical flow, testing
+** reduce EMR,EML,IM rates
+
+adding these params to control from json file:
+"EEMWghtAM":0.0001,"EEMWghtNM":0.0001
+
+will continue reducing until get better rates ...
+
+20may8_A0_
+
+make sure no firing of EMR,EML when those values are at 0...
+
+strange, EMR,EML still firing ... :
+ 20may8_test_rast_a0.png
+
+dconf['net']['EEMWghtAM'], dconf['net']['EEMWghtNM'] # (0.0, 0.0)
+
+so what's driving them so strongly ...
+
+maybe it's because of the wbase param of RL STDP mechanism?
+
+#For AMPA-faster synapses
+STDPparamsRL1 = {'hebbwt': 0.0000, 'antiwt':-0.0000, 'wbase': 0.0005, 'wmax': 1, 'RLon': 1 , 'RLhebbwt': 0.001 , 'RLantiwt': -0.000,
+                'tauhebb': 10, 'RLlenhebb': 50 ,'RLlenanti': 50, 'RLwindhebb': 50, 'useRLexp': 1, 'softthresh': 0, 'verbose':0}
+#for NMDA (slower) synapses
+STDPparamsRL2 = {'hebbwt': 0.0000, 'antiwt':-0.0000, 'wbase': 0.0005, 'wmax': 1, 'RLon': 1 , 'RLhebbwt': 0.001 , 'RLantiwt': -0.000,
+                'tauhebb': 10, 'RLlenhebb': 800 ,'RLlenanti': 100, 'RLwindhebb': 50, 'useRLexp': 0, 'softthresh': 0, 'verbose':0}
+
+wbase sets a lower limit for the weights ... try setting wbase to 0 to see if reduces the EMR,EML activity ...
+
+myrun 12                               
+
+20may8_test_rast_a1.png
+
+yeah, that's reason why EMR,EML were firing so fast ... so, will have to set wbase to starting value
+for those params, or even lower ...
+
+adding these:
+"RL":{"AMPA":{"WBase":0.0,"WMax":1.0,"ON":1,"lenhebb":50,"lenanti":50,"exp":1},"NMDA":{"WBase":0.0,"WMax":1.0,"ON":1,"lenhebb":800,"lenanti":100,"exp":0}}
+to sim.json
+can add other RL params, as needed
+
+wbase was 0.0005 before and even that had high rates, so set the start weight much lower ...
+
+myrun 12
+
+  Cells: 5359
+  Connections: 0 (0.00 per cell)
+  Spikes: 13277 (2.48 Hz)
+  Simulated time: 1.0 s; 12 workers
+  Run time: 131.85 s
+Saving output as data/20may8_A0_simConfig.pkl ... 
+Finished saving!
+  Done; saving time = 35.32 s.
+SAVING RASTER DATA
+plot raster:
+Plotting recorded cell traces ... cell
+QApplication: invalid style override passed, ignoring it.
+Plotting raster...
+  Done; plotting time = 7.62 s
+
+Total time = 298.91 s
+
+these params seem ok:
+
+    "net":{"scale":1,"ER":400,"IR":100,"EV1":400,"EV1DE":400,"EV1DNE":400,"EV1DN":400,"EV1DNW":400,"EV1DW":400,"EV1DSW":400,"EV1DS":400,"EV1DSE":400,"IV1":100,"EV4":100,"IV4":25,"EMT":25,"IMT":9,"EML":400,"EMR":400,"IM":200,"AngRFSigma":22.5,"DirMinRate":0.0,"DirMaxRate":50.0,"EEMWghtAM":0.0001,"EEMWghtNM":0.00001},
+    "RL":{"AMPA":
+	  {"WBase":0.0001,"WMax":1.0,"ON":1,"lenhebb":50,"lenanti":50,"exp":1},
+	  "NMDA":
+	  {"WBase":0.00001,"WMax":1.0,"ON":1,"lenhebb":800,"lenanti":100,"exp":1}
+    }
+
+there are a few initial M pop spikes but then desynchronizes ... 20may8_test_rast_a2.png
+20may8_test_EMR_a3.png
+20may8_test_IM_a4.png
+
+
+should have WMax much lower ... maybe at 0.00075, 0.000075
+
+python -i actmap.py
+
+fig, axs, plt = animActivityMaps('gif/20may8_actmap_a5.mp4', framerate=10,figsize=(9,5))
+
+looks ok ...
+
+python -i simdat.py
+
+animSynWeights(pdf[pdf.syntype=='AMPA'],'gif/20may8_AMPA_weightmap_a6.mp4', framerate=10) #plot/save images as movie
+animSynWeights(pdf[pdf.syntype=='NMDA'],'gif/20may8_NMDA_weightmap_a7.mp4', framerate=10) #plot/save images as movie
+
+try longer run to see if activity remains reasonable ...
+
+tried run for 10 s ... but crashed in gatherdata ... 
+
+  Done; run time = 1413.07 s; real-time ratio: 0.01.
+
+Gathering data...
+[samndp7730:08851] *** Process received signal ***
+[samndp7730:08851] Signal: Segmentation fault (11)
+[samndp7730:08851] Associated errno: Unknown error 32686 (32686)
+[samndp7730:08851] Signal code:  (334043992)
+[samndp7730:08851] Failing at address: 0x7fff13e91b54
+[samndp7730:08851] [ 0] /lib/x86_64-linux-gnu/libc.so.6(+0x354b0)[0x7fae6d8cd4b0]
+[samndp7730:08851] [ 1] /lib/x86_64-linux-gnu/libc.so.6(+0x14e156)[0x7fae6d9e6156]
+[samndp7730:08851] [ 2] /usr/lib/libopen-pal.so.13(opal_convertor_unpack+0xa8)[0x7fae6c4596b8]
+[samndp7730:08851] [ 3] /usr/lib/openmpi/lib/openmpi/mca_pml_ob1.so(mca_pml_ob1_recv_request_progress_rndv+0x181)[0x7fae5fcdc2b1]
+[samndp7730:08851] [ 4] /usr/lib/openmpi/lib/openmpi/mca_pml_ob1.so(mca_pml_ob1_recv_frag_callback_rndv+0x271)[0x7fae5fcd7cd1]
+[samndp7730:08851] [ 5] /usr/lib/openmpi/lib/openmpi/mca_btl_vader.so(mca_btl_vader_poll_handle_frag+0x93)[0x7fae60523813]
+[samndp7730:08851] [ 6] /usr/lib/openmpi/lib/openmpi/mca_btl_vader.so(+0x3cc3)[0x7fae60523cc3]
+[samndp7730:08851] [ 7] /usr/lib/libopen-pal.so.13(opal_progress+0x4a)[0x7fae6c44d1ea]
+[samndp7730:08851] [ 8] /usr/lib/libmpi.so.12(ompi_request_default_wait_all+0x315)[0x7fae6d0f4f65]
+[samndp7730:08851] [ 9] /usr/lib/openmpi/lib/openmpi/mca_coll_tuned.so(ompi_coll_tuned_sendrecv_nonzero_actual+0x11a)[0x7fae5f24faca]
+[samndp7730:08851] [10] /usr/lib/openmpi/lib/openmpi/mca_coll_tuned.so(ompi_coll_tuned_alltoallv_intra_pairwise+0x150)[0x7fae5f256780]
+[samndp7730:08851] [11] /usr/lib/libmpi.so.12(PMPI_Alltoallv+0x1fc)[0x7fae6d105c9c]
+[samndp7730:08851] [12] /usr/site/../arch/nrn/x86_64/lib/libnrnmpi.so.0(nrnmpi_char_alltoallv+0x25)[0x7fae6f7b7d35]
+
+if network activity looks decent could run longer sims on zn ...
+
+same problem/crash on zn?
 
