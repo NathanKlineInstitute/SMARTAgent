@@ -3098,3 +3098,11 @@ yeah, crashes on zn in gatherdata, zn with 12 cores takes ~900s to run instead o
 try with fewer traces recorded from ... and longer recording interval (recordStep=0.6)
 only record voltage from 1 cell of these pops: ['ER','IR','EV1','EV1DE','IV1','EML','IM']
 
+this may be where the extra data causing gather crash is coming from:
+ sim.simData['synweights'][sim.rank].append([t,conn.plast.params.RLon,conn.preGid,cell.gid,float(conn['hObj'].weight[0]),conn.synMech])
+
+probably do not need the RLon flag ...
+could also use preGid, gid, synmech as index so don't have to save them each time ...
+or could save to separate files for each rank and then join them together in simdat.py ...
+
+

@@ -21,7 +21,7 @@ def readinweights (d):
     dsyn = ddsyn[rank]
     for lsyn in dsyn:
       A.append(lsyn)
-  return pd.DataFrame(A,columns=['time','stdptype','preid','postid','weight','syntype'])
+  return pd.DataFrame(A,columns=['time','preid','postid','weight','syntype'])
 
 def getsimname (name=None):
   if name is None:
