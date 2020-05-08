@@ -503,7 +503,7 @@ netParams.connParams['IV4->IMT'] = {
 # and direct connections between premotor to motor areas
 for prety in ['EV1', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW','EV1DSW', 'EV1DS','EV1DSE', 'EV4', 'EMT']:
   for posty in ['EMR', 'EML']:
-    for strty,synmech,weight,plastty in zip(['','n'],['AMPA', 'NMDA'],[0.00375*cfg.EEGain, 0.000375*cfg.EEGain],[STDPparamsRL1,STDPparamsRL2]):
+    for strty,synmech,weight,plastty in zip(['','n'],['AMPA', 'NMDA'],[0.0001*cfg.EEGain, 0.00001*cfg.EEGain],[STDPparamsRL1,STDPparamsRL2]):
       netParams.connParams[strty+prety+'->'+strty+posty] = {
         'preConds': {'pop': prety},
         'postConds': {'pop': posty},

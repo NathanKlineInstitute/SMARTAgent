@@ -181,11 +181,10 @@ def getblobsfrompeaks (imnorm,impk,imorig,medthresh,fctr=0.5,T=None,F=None):
 
 #
 def getmergesets (lblob,prct):
-  """ get the merged blobs (bounding boxes)
-  lblob is a list of blos (input)
-  prct is the threshold for fraction of overlap required to merge two blobs (boxes)
-  returns a list of sets of merged blobs and a bool list of whether each original blob was merged
-  """                                         
+  #get the merged blobs (bounding boxes)
+  #lblob is a list of blos (input)
+  #prct is the threshold for fraction of overlap required to merge two blobs (boxes)
+  #returns a list of sets of merged blobs and a bool list of whether each original blob was merged
   sz = len(lblob)
   bmerged = [False for i in range(sz)]
   for i,blob in enumerate(lblob): blob.ID = i # make sure ID assigned
@@ -213,8 +212,7 @@ def getmergesets (lblob,prct):
 
 #
 def getmergedblobs (lblob,lmergeset,bmerged):
-  """ create a new list of blobs (boxes) based on lmergeset, and update the new blobs' properties
-  """ 
+  # create a new list of blobs (boxes) based on lmergeset, and update the new blobs' properties
   lblobnew = [] # list of new blobs
   for i,blob in enumerate(lblob):
     if not bmerged[i]: lblobnew.append(blob) # non-merged blobs are copied as is
