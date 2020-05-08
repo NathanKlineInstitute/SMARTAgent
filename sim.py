@@ -948,7 +948,7 @@ if sim.rank == 0:
 
 tPerPlay = tstepPerAction*dconf['actionsPerPlay']
 sim.runSimWithIntervalFunc(tPerPlay,trainAgent) # has periodic callback to adjust STDP weights based on RL signal
-if sim.rank==0: fid4.close()
+if sim.rank==0 and fid4 is not None: fid4.close()
 sim.gatherData() # gather data from different nodes
 sim.saveData() # save data to disk
 
