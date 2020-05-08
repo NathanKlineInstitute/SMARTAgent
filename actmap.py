@@ -285,5 +285,5 @@ def animDetectedMotionMaps (outpath, framerate=10, figsize=(7,3)):
 
 
 #fig, axs, plt = animActivityMaps('test2.mp4')
-# fig, axs, plt = animActivityMaps('data/'+dconf['sim']['name']+'actmap.mp4', framerate=10)
+# fig, axs, plt = animActivityMaps('gif/'+dconf['sim']['name']+'actmap.mp4', framerate=10)
 

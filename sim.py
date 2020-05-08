@@ -47,6 +47,7 @@ ITypes = ['IR','IV1','IV4','IMT','IM'] #
 allpops = ['ER','IR','EV1','EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE','IV1','EV4','IV4','EMT','IMT','EML','EMR','IM']
 #EDirPops = ['EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE']
 #IDirPops = ['IV1D']
+EMotorPops = ['EML', 'EMR'] # excitatory neuron motor populations
 dnumc = OrderedDict({ty:dconf['net'][ty]*scale for ty in allpops}) # number of neurons of a given type
 
 # Network parameters
@@ -75,12 +76,15 @@ netParams.synMechParams['GABA'] = {'mod': 'Exp2Syn', 'tau1': 0.07, 'tau2': 9.1, 
 STDPparams = {'hebbwt': 0.0001, 'antiwt':-0.00001, 'wbase': 0.0012, 'wmax': 50, 'RLon': 0 , 'RLhebbwt': 0.001, 'RLantiwt': -0.000,
         'tauhebb': 10, 'RLwindhebb': 50, 'useRLexp': 0, 'softthresh': 0, 'verbose':0}
 
-#For AMPA-faster synapses
-STDPparamsRL1 = {'hebbwt': 0.0000, 'antiwt':-0.0000, 'wbase': 0.0005, 'wmax': 1, 'RLon': 1 , 'RLhebbwt': 0.001 , 'RLantiwt': -0.000,
-                'tauhebb': 10, 'RLlenhebb': 50 ,'RLlenanti': 50, 'RLwindhebb': 50, 'useRLexp': 1, 'softthresh': 0, 'verbose':0}
-#for NMDA (slower) synapses
-STDPparamsRL2 = {'hebbwt': 0.0000, 'antiwt':-0.0000, 'wbase': 0.0005, 'wmax': 1, 'RLon': 1 , 'RLhebbwt': 0.001 , 'RLantiwt': -0.000,
-                'tauhebb': 10, 'RLlenhebb': 800 ,'RLlenanti': 100, 'RLwindhebb': 50, 'useRLexp': 0, 'softthresh': 0, 'verbose':0}
+
+dSTDPparamsRL = {} # STDP-RL parameters for AMPA,NMDA synapses; generally uses shorter/longer eligibility traces
+for sy in ['AMPA', 'NMDA']:
+  dRLprm = dconf['RL'][sy]
+  dSTDPparamsRL[sy] = {'hebbwt': 0.0000, 'antiwt':-0.0000, 'wbase': dRLprm['WBase'], 'wmax': dRLprm['WMax'],\
+                       'RLon': dRLprm['ON'] , 'RLhebbwt': 0.001 , 'RLantiwt': -0.000,\
+                       'tauhebb': 10, 'RLlenhebb': dRLprm['lenhebb'] ,'RLlenanti': dRLprm['lenanti'], 'RLwindhebb': 50, \
+                       'useRLexp': dRLprm['exp'], 'softthresh': 0, 'verbose':0
+  }
 
 # these are the image-based inputs provided to the R (retinal) cells
 netParams.stimSourceParams['stimMod'] = {'type': 'NetStim', 'rate': 'variable', 'noise': 0}
@@ -321,25 +325,17 @@ netParams.connParams['IMT->EMT'] = {
         'weight': 0.02 * cfg.IEGain,
         'delay': 2,
         'synMech': 'GABA', 'sec':'soma', 'loc':0.5}
-netParams.connParams['IM->EML'] = {
-        'preConds': {'pop': 'IM'},
-        'postConds': {'pop': 'EML'},
-        'probability': 0.125,
-        #'divergence': 9,
-        #'convergence': 13,
-        'weight': 0.02 * cfg.IEGain,
-        'delay': 2,
-        'synMech': 'GABA', 'sec':'soma', 'loc':0.5}
-netParams.connParams['IM->EMR'] = {
-        'preConds': {'pop': 'IM'},
-        'postConds': {'pop': 'EMR'},
-        'probability': 0.125,
-        #'divergence': 9,
-        #'convergence': 13,
-        'weight': 0.02 * cfg.IEGain,
-        'delay': 2,
-        'synMech': 'GABA', 'sec':'soma', 'loc':0.5}
 
+for poty in EMotorPops: # I -> E for motor populations
+  netParams.connParams['IM->'+poty] = {
+    'preConds': {'pop': 'IM'},
+    'postConds': {'pop': poty},
+    'probability': 0.125,
+    #'divergence': 9,
+    #'convergence': 13,
+    'weight': 0.02 * cfg.IEGain,
+    'delay': 2,
+    'synMech': 'GABA', 'sec':'soma', 'loc':0.5}
 
 #I to I
 netParams.connParams['IV1->IV1'] = {
@@ -381,7 +377,6 @@ netParams.connParams['ER->EV1'] = {
         'weight': 0.02 * cfg.EEGain,
         'delay': 2,
         'synMech': 'AMPA','sec':'dend', 'loc':0.5}
-
 netParams.connParams['EV1->EV4'] = {
         'preConds': {'pop': 'EV1'},
         'postConds': {'pop': 'EV4'},
@@ -502,17 +497,17 @@ netParams.connParams['IV4->IMT'] = {
 # Add connections from lower and higher visual areas to motor cortex
 # and direct connections between premotor to motor areas
 for prety in ['EV1', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW','EV1DSW', 'EV1DS','EV1DSE', 'EV4', 'EMT']:
-  for posty in ['EMR', 'EML']:
-    for strty,synmech,weight,plastty in zip(['','n'],['AMPA', 'NMDA'],[0.0001*cfg.EEGain, 0.00001*cfg.EEGain],[STDPparamsRL1,STDPparamsRL2]):
-      netParams.connParams[strty+prety+'->'+strty+posty] = {
+  for poty in EMotorPops:
+    for strty,synmech,weight in zip(['','n'],['AMPA', 'NMDA'],[dconf['net']['EEMWghtAM']*cfg.EEGain, dconf['net']['EEMWghtNM']*cfg.EEGain]):
+      netParams.connParams[strty+prety+'->'+strty+poty] = {
         'preConds': {'pop': prety},
-        'postConds': {'pop': posty},
+        'postConds': {'pop': poty},
         'probability': 0.1,
         #'convergence': 16,
         'weight': weight,
         'delay': 2,
         'synMech': synmech,
-        'plast': {'mech': 'STDP', 'params': plastty},'sec':'dend', 'loc':0.5}
+        'plast': {'mech': 'STDP', 'params': dSTDPparamsRL[synmech]},'sec':'dend', 'loc':0.5}
 
 ###################################################################################################################################
 

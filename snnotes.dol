@@ -2820,13 +2820,13 @@ for some reason E (EV1DE) neurons are almost always firing ...
 
 something about 0 degrees for E ... when change it to have peak at 2 degrees much less firing ...
 
-*20may7
+*20may7 - more on optical flow; some fixes
 ** discuss optical flow with ha
 
 conclusion: will see if can tweak params to get example motion below to produce correct results
 with existing params, detected motion didn't look great
 
-** ha example code to test optical flow on single frame motion
+** ha example code to test optical flow on single frame motion, fix, start testing network
 
 python
 from netpyne import specs, sim
@@ -2973,3 +2973,48 @@ neuronal representations
 
 can possibly use them for object detection/tracking, though opencv code probably more efficient
 
+*20may8 - continue optical flow, testing
+** reduce EMR,EML,IM rates
+
+adding these params to control from json file:
+"EEMWghtAM":0.0001,"EEMWghtNM":0.0001
+
+will continue reducing until get better rates ...
+
+20may8_A0_
+
+make sure no firing of EMR,EML when those values are at 0...
+
+strange, EMR,EML still firing ... :
+ 20may8_test_rast_a0.png
+
+dconf['net']['EEMWghtAM'], dconf['net']['EEMWghtNM'] # (0.0, 0.0)
+
+so what's driving them so strongly ...
+
+maybe it's because of the wbase param of RL STDP mechanism?
+
+#For AMPA-faster synapses
+STDPparamsRL1 = {'hebbwt': 0.0000, 'antiwt':-0.0000, 'wbase': 0.0005, 'wmax': 1, 'RLon': 1 , 'RLhebbwt': 0.001 , 'RLantiwt': -0.000,
+                'tauhebb': 10, 'RLlenhebb': 50 ,'RLlenanti': 50, 'RLwindhebb': 50, 'useRLexp': 1, 'softthresh': 0, 'verbose':0}
+#for NMDA (slower) synapses
+STDPparamsRL2 = {'hebbwt': 0.0000, 'antiwt':-0.0000, 'wbase': 0.0005, 'wmax': 1, 'RLon': 1 , 'RLhebbwt': 0.001 , 'RLantiwt': -0.000,
+                'tauhebb': 10, 'RLlenhebb': 800 ,'RLlenanti': 100, 'RLwindhebb': 50, 'useRLexp': 0, 'softthresh': 0, 'verbose':0}
+
+wbase sets a lower limit for the weights ... try setting wbase to 0 to see if reduces the EMR,EML activity ...
+
+myrun 12                               
+
+20may8_test_rast_a1.png
+
+yeah, that's reason why EMR,EML were firing so fast ... so, will have to set wbase to starting value
+for those params, or even lower ...
+
+adding these:
+"RL":{"AMPA":{"WBase":0.0,"WMax":1.0,"ON":1,"lenhebb":50,"lenanti":50,"exp":1},"NMDA":{"WBase":0.0,"WMax":1.0,"ON":1,"lenhebb":800,"lenanti":100,"exp":0}}
+to sim.json
+can add other RL params, as needed
+
+wbase was 0.0005 before and even that had high rates, so set the start weight much lower ...
+
+myrun 12
