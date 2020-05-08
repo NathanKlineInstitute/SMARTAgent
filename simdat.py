@@ -432,16 +432,14 @@ def plotSynWeightsPostNeuronID(pdf,postNeuronID):
       pdx += 1        
 
 if __name__ == '__main__':
-  if sys.argv[1] is -1:
-    stepNB = -1
-  else:
-    stepNB = int(sys.argv[1]) #which file(stepNB) want to plot
+  stepNB = -1
+  if len(sys.argv) > 1: stepNB = int(sys.argv[1]) #which file(stepNB) want to plot
   print(stepNB)
-  simConfig, pdf, actreward, dstartidx, dendidx = loadsimdat()
+  simConfig, pdf, actreward, dstartidx, dendidx, dnumc = loadsimdat()
   print('loaded simulation data')
   #davgw = plotavgweights(pdf)
-  animSynWeights(pdf[pdf.syntype=='AMPA'],'data/'+dconf['sim']['name']+'_AMPA_weightmap.mp4', framerate=10) #plot/save images as movie
-  animSynWeights(pdf[pdf.syntype=='NMDA'],'data/'+dconf['sim']['name']+'_NMDA_weightmap.mp4', framerate=10) #plot/save images as movie  
+  #animSynWeights(pdf[pdf.syntype=='AMPA'],'gif/'+dconf['sim']['name']+'_AMPA_weightmap.mp4', framerate=10) #plot/save images as movie
+  #animSynWeights(pdf[pdf.syntype=='NMDA'],'gif/'+dconf['sim']['name']+'_NMDA_weightmap.mp4', framerate=10) #plot/save images as movie  
   #wperPostID = plotavgweightsPerPostSynNeuron1(pdf)
   #plotavgweightsPerPostSynNeuron2(pdf)
   #plotIndividualSynWeights(pdf)

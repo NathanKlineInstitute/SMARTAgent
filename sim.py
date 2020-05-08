@@ -742,7 +742,7 @@ def updateInputRates ():
 def trainAgent (t):
     """ training interface between simulation and game environment
     """
-    global NBsteps, epCount, proposed_actions, total_hits, Racket_pos, Ball_pos, dirSelectiveNeurons, current_time_stepNB
+    global NBsteps, epCount, proposed_actions, total_hits, Racket_pos, Ball_pos, current_time_stepNB
     global f_ax, fig
     global tstepPerAction
     vec = h.Vector()
