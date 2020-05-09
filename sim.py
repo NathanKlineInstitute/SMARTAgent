@@ -726,7 +726,7 @@ def updateInputRates ():
       dFiringRates[pop] = vec.to_python()
       if dconf['verbose'] > 1:
         print(sim.rank,'received firing rates:',np.where(dFiringRates[pop]==np.amax(dFiringRates[pop])),np.amax(dFiringRates[pop]))          
-  alltags = sim._gatherAllCellTags() #gather cell tags  
+  alltags = sim._gatherAllCellTags() #gather cell tags; see https://github.com/Neurosim-lab/netpyne/blob/development/netpyne/sim/gather.py
   dGIDs = {pop:[] for pop in lratepop}
   for tinds in range(len(alltags)):
     if alltags[tinds]['pop'] in lratepop:
@@ -881,7 +881,7 @@ def trainAgent (t):
         #if t%recordWeightDT==0:
         if dconf['verbose'] > 0 and sim.rank==0:
             print('Weights Recording Time:', t, 'NBsteps:',NBsteps,'recordWeightStepSize:',recordWeightStepSize)
-        recordAdjustableWeights(sim, t) 
+        #recordAdjustableWeights(sim, t) 
         #recordWeights(sim, t)
 
 def getAllSTDPObjects (sim):

@@ -3105,7 +3105,7 @@ probably do not need the RLon flag ...
 could also use preGid, gid, synmech as index so don't have to save them each time ...
 or could save to separate files for each rank and then join them together in simdat.py ...
 
-still crashes:
+still crashes at GatherData:
   Done; run time = 1321.29 s; real-time ratio: 0.01.
 
 Gathering data...
@@ -3117,4 +3117,53 @@ terminate called after throwing an instance of 'std::bad_alloc'
 [samndp7730:15458] [ 0] /lib/x86_64-linux-gnu/libpthread.so.0(+0x11390)[0x7fe32f7dd390]
 [samndp7730:15458] [ 1] /lib/x86_64-linux-gnu/libc.so.6(gsignal+0x38)[0x7fe32f437428]
 
+if shut off the record weights same problem?
+
+myrun 12
+
+Game rewards: [-0.001]
+  Done; run time = 1297.58 s; real-time ratio: 0.01.
+
+Gathering data...
+  Done; gather time = 1.49 s.
+
+Analyzing...
+>>> >>> >>> >>> >>> >>> >>> >>> >>> >>> 
+
+
+
+
+
+
+
+
+
+  Cells: 5359
+  Connections: 0 (0.00 per cell)
+  Spikes: 105073 (1.96 Hz)
+  Simulated time: 10.0 s; 12 workers
+  Run time: 1297.58 s
+>>> 
+Saving output as data/20may8_A0_simConfig.pkl ... 
+Finished saving!
+  Done; saving time = 1.09 s.
+SAVING RASTER DATA
+plot raster:
+Plotting recorded cell traces ... cell
+QApplication: invalid style override passed, ignoring it.
+Plotting raster...
+  Done; plotting time = 38.63 s
+
+Total time = 1360.35 s
+
+ok, this time it did not crash in gatherdata ... 
+
+may not want to gather all cell tags each time input rates updated, assuming the tags
+do not change during simulation, seems ok... and there's a clear,del in there
+which might cause a memory problem later on in gatherdata, which has same deletes??
+https://github.com/Neurosim-lab/netpyne/blob/development/netpyne/sim/gather.py
+py_alltoall
+
+can also rewrite code to have each node save its own synaptic weight data and then at end
+merge the data into a single file ...
 
