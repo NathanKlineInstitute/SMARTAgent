@@ -12,6 +12,7 @@ ion()
 
 global stepNB
 stepNB = -1
+
 #
 def readinweights (d):
   # read the synaptic plasticity weights into a pandas dataframe

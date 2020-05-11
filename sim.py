@@ -9,7 +9,7 @@ from collections import OrderedDict
 from connUtils import *
 from matplotlib import pyplot as plt
 import os
-
+import time
 import anim
 from matplotlib import animation
 
@@ -514,26 +514,16 @@ for prety in ['EV1', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW','EV1DSW', 'EV
 
 sim.AIGame = None # placeholder
 
-dsynweights = {}
+lsynweights = [] # list of syn weights, per node
 
 def recordAdjustableWeightsPop (sim, t, popname):
-    if sim.rank not in dsynweights: dsynweights[sim.rank] = {}
-    #if 'synweights' not in sim.simData: sim.simData['synweights'] = {sim.rank:{}}
-    # dsynweights = sim.simData['synweights'][sim.rank]
-    # record the plastic weights for specified popname
-    lcell = [c for c in sim.net.cells if c.gid in sim.net.pops[popname].cellGids] # this is the set of MR cells
-    for cell in lcell:
-        for conn in cell.conns:
-            if 'hSTDP' in conn:
-                #print(conn.preGid, cell.gid, conn.synMech) #testing weight saving
-                if conn.preGid not in dsynweights:
-                    dsynweights[conn.preGid] = {}
-                if cell.gid not in dsynweights[conn.preGid]:
-                    dsynweights[conn.preGid][cell.gid] = {}
-                if conn.synMech not in dsynweights[conn.preGid][cell.gid]: # not efficient to check everything each time
-                    dsynweights[conn.preGid][cell.gid][conn.synMech] = [] 
-                dsynweights[conn.preGid][cell.gid][conn.synMech].append([t,float(conn['hObj'].weight[0])])
-    return len(lcell)
+  # record the plastic weights for specified popname
+  lcell = [c for c in sim.net.cells if c.gid in sim.net.pops[popname].cellGids] # this is the set of MR cells
+  for cell in lcell:
+    for conn in cell.conns:
+      if 'hSTDP' in conn:
+        lsynweights.append([t,conn.preGid,cell.gid,conn.synMech,float(conn['hObj'].weight[0])])
+  return len(lcell)
                     
 def recordAdjustableWeights (sim, t, lpop = ['EMR', 'EML']):
     """ record the STDP weights during the simulation - called in trainAgent
@@ -971,19 +961,26 @@ if sim.rank==0 and fid4 is not None: fid4.close()
 #sim._gatherCells()
 sim.gatherData() # gather data from different nodes
 sim.saveData() # save data to disk
-if sim.saveWeights: saveSynWeights()
 
 def saveSynWeights ():
-    pickle.dump(dsynweights[sim.rank], open('data/'+dconf['sim']['name']+'synWeights_'+str(sim.rank)+'.pkl', 'wb'))
-    sim.pc.barrier()
-    if sim.rank == 0:
-      D = {}
-      for i in range(sim.nhost):
-          fn = 'data/'+dconf['sim']['name']+'synWeights_'+str(sim.rank)+'.pkl'
-          dw = pickle.load(open(fn,'rb'))
-          os.unlink(fn)
-          D.update(dw)
-      pickle.dump(D,open('data/'+dconf['sim']['name']+'synWeights.pkl', 'wb'))
+  fn = 'data/'+dconf['sim']['name']+'synWeights_'+str(sim.rank)+'.pkl'
+  pickle.dump(lsynweights, open(fn, 'wb'))
+  sim.pc.barrier()
+  time.sleep(1)    
+  if sim.rank == 0:
+    L = []
+    for i in range(sim.nhosts):
+      fn = 'data/'+dconf['sim']['name']+'synWeights_'+str(i)+'.pkl'
+      while not os.path.isfile(fn):
+        print('saveSynWeights: waiting for finish write of', fn)
+        time.sleep(1)      
+      lw = pickle.load(open(fn,'rb'))
+      print(fn,'len(lw)=',len(lw),type(lw),type(lw[0]),lw[0])
+      os.unlink(fn)
+      L = L + lw
+    pickle.dump(L,open('data/'+dconf['sim']['name']+'synWeights.pkl', 'wb'))
+
+if sim.saveWeights: saveSynWeights()
 
 def saveMotionFields (ldflow): pickle.dump(ldflow, open('data/'+dconf['sim']['name']+'MotionFields.pkl', 'wb'))
 
