@@ -3162,3 +3162,37 @@ merge the data into a single file ...
 *20may11 - continue fixes
 ** debugging gatherdata issue, way to avoid it
 
+still crashes without all the extra calls to sim._gatherAllCellTags
+main issue is that the plasticity data is getting saved ...
+
+other option sal suggested:
+sim.runSimWithIntervalFunc(cfg.saveInterval, sim.saveSimDataInNode)
+use that instead of sim.runSim()
+if already running a different interval func, would need to call sim.saveSimDataInNode()
+
+got this error:
+AttributeError: module 'netpyne.sim' has no attribute 'saveSimDataInNode'
+
+must not have latest version of netpyne ...
+
+netpyne.__version__ # '0.9.5'
+
+looks like that interval saving functionality was added in version 0.9.6:
+https://github.com/Neurosim-lab/netpyne/releases
+
+pip install netpyne --upgrade
+
+python
+import netpyne
+netpyne.__version__ '0.9.6'
+quit()
+
+myrun 12
+
+seemed to work but also caused some errors ...
+
+and did not plot properly since sim.net.allCells was not created
+
+can use sim._gatherCells()
+to get all the cells gathered ...
+

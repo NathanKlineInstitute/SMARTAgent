@@ -514,21 +514,25 @@ for prety in ['EV1', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW','EV1DSW', 'EV
 
 sim.AIGame = None # placeholder
 
+dsynweights = {}
+
 def recordAdjustableWeightsPop (sim, t, popname):
-    if 'synweights' not in sim.simData: sim.simData['synweights'] = {sim.rank:{}}
+    if sim.rank not in dsynweights: dsynweights[sim.rank] = {}
+    #if 'synweights' not in sim.simData: sim.simData['synweights'] = {sim.rank:{}}
+    # dsynweights = sim.simData['synweights'][sim.rank]
     # record the plastic weights for specified popname
     lcell = [c for c in sim.net.cells if c.gid in sim.net.pops[popname].cellGids] # this is the set of MR cells
     for cell in lcell:
         for conn in cell.conns:
             if 'hSTDP' in conn:
                 #print(conn.preGid, cell.gid, conn.synMech) #testing weight saving
-                if conn.preGid not in sim.simData['synweights'][sim.rank]:
-                    sim.simData['synweights'][sim.rank][conn.preGid] = {}
-                if cell.gid not in sim.simData['synweights'][sim.rank][conn.preGid]:
-                    sim.simData['synweights'][sim.rank][conn.preGid][cell.gid] = {}
-                if conn.synMech not in sim.simData['synweights'][sim.rank][conn.preGid][cell.gid]: # not efficient to check everything each time
-                    sim.simData['synweights'][sim.rank][conn.preGid][cell.gid][conn.synMech] = [] 
-                sim.simData['synweights'][sim.rank][conn.preGid][cell.gid][conn.synMech].append([t,float(conn['hObj'].weight[0])])
+                if conn.preGid not in dsynweights:
+                    dsynweights[conn.preGid] = {}
+                if cell.gid not in dsynweights[conn.preGid]:
+                    dsynweights[conn.preGid][cell.gid] = {}
+                if conn.synMech not in dsynweights[conn.preGid][cell.gid]: # not efficient to check everything each time
+                    dsynweights[conn.preGid][cell.gid][conn.synMech] = [] 
+                dsynweights[conn.preGid][cell.gid][conn.synMech].append([t,float(conn['hObj'].weight[0])])
     return len(lcell)
                     
 def recordAdjustableWeights (sim, t, lpop = ['EMR', 'EML']):
@@ -879,6 +883,7 @@ def trainAgent (t):
             print('Weights Recording Time:', t, 'NBsteps:',NBsteps,'recordWeightStepSize:',recordWeightStepSize)
         recordAdjustableWeights(sim, t) 
         #recordWeights(sim, t)
+    #sim.saveSimDataInNode() ###
 
 def getAllSTDPObjects (sim):
   # get all the STDP objects from the simulation's cells
@@ -963,8 +968,22 @@ setdminID(sim, ['ER', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW', 'EV1DSW', '
 tPerPlay = tstepPerAction*dconf['actionsPerPlay']
 sim.runSimWithIntervalFunc(tPerPlay,trainAgent) # has periodic callback to adjust STDP weights based on RL signal
 if sim.rank==0 and fid4 is not None: fid4.close()
+#sim._gatherCells()
 sim.gatherData() # gather data from different nodes
 sim.saveData() # save data to disk
+if sim.saveWeights: saveSynWeights()
+
+def saveSynWeights ():
+    pickle.dump(dsynweights[sim.rank], open('data/'+dconf['sim']['name']+'synWeights_'+str(sim.rank)+'.pkl', 'wb'))
+    sim.pc.barrier()
+    if sim.rank == 0:
+      D = {}
+      for i in range(sim.nhost):
+          fn = 'data/'+dconf['sim']['name']+'synWeights_'+str(sim.rank)+'.pkl'
+          dw = pickle.load(open(fn,'rb'))
+          os.unlink(fn)
+          D.update(dw)
+      pickle.dump(D,open('data/'+dconf['sim']['name']+'synWeights.pkl', 'wb'))
 
 def saveMotionFields (ldflow): pickle.dump(ldflow, open('data/'+dconf['sim']['name']+'MotionFields.pkl', 'wb'))
 
@@ -998,8 +1017,6 @@ if sim.rank == 0: # only rank 0 should save. otherwise all the other nodes could
     print('SAVING RASTER DATA')
     if dconf['sim']['doplot']:
         print('plot raster:')
-        #sim.analysis.plotRaster(saveData = dconf['sim']['name']+'raster.pkl',showFig=True)
-        #sim.analysis.plotRaster(include = ['allCells'],saveData = dconf['sim']['name']+'raster.pkl',showFig=True)        
         sim.analysis.plotData()    
     if sim.plotWeights: plotWeights() 
     if sim.saveWeights:
