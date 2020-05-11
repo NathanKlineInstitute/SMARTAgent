@@ -177,6 +177,7 @@ simConfig.recordTraces = {'V_soma':{'sec':'soma','loc':0.5,'var':'v'}}  # Dict w
 simConfig.recordCellsSpikes = [-1]
 simConfig.recordStep = dconf['sim']['recordStep'] # Step size in ms to save data (e.g. V traces, LFP, etc)
 simConfig.filename = 'data/'+dconf['sim']['name']+'simConfig'  # Set file output name
+simConfig.saveJson = False
 simConfig.savePickle = True            # Save params, network and sim output to pickle file
 simConfig.saveMat = False
 simConfig.saveFolder = 'data'
@@ -726,15 +727,10 @@ def updateInputRates ():
       dFiringRates[pop] = vec.to_python()
       if dconf['verbose'] > 1:
         print(sim.rank,'received firing rates:',np.where(dFiringRates[pop]==np.amax(dFiringRates[pop])),np.amax(dFiringRates[pop]))          
-  alltags = sim._gatherAllCellTags() #gather cell tags; see https://github.com/Neurosim-lab/netpyne/blob/development/netpyne/sim/gather.py
-  dGIDs = {pop:[] for pop in lratepop}
-  for tinds in range(len(alltags)):
-    if alltags[tinds]['pop'] in lratepop:
-      dGIDs[alltags[tinds]['pop']].append(tinds)
   # update input firing rates for stimuli to R and direction sensitive cells
   for pop in lratepop:
     lCell = [c for c in sim.net.cells if c.gid in sim.net.pops[pop].cellGids] # this is the set of cells
-    offset = np.amin(dGIDs[pop])
+    offset = sim.simData['dminID'][pop]
     if dconf['verbose'] > 1: print(sim.rank,'updating len(',pop,len(lCell),'source firing rates. len(dFiringRates)=',len(dFiringRates[pop]))
     for cell in lCell:  
       for stim in cell.stims:
@@ -881,7 +877,7 @@ def trainAgent (t):
         #if t%recordWeightDT==0:
         if dconf['verbose'] > 0 and sim.rank==0:
             print('Weights Recording Time:', t, 'NBsteps:',NBsteps,'recordWeightStepSize:',recordWeightStepSize)
-        #recordAdjustableWeights(sim, t) 
+        recordAdjustableWeights(sim, t) 
         #recordWeights(sim, t)
 
 def getAllSTDPObjects (sim):
@@ -948,9 +944,21 @@ if sim.rank == 0:
     from aigame import AIGame
     sim.AIGame = AIGame() # only create AIGame on node 0
     # node 0 saves the json config file
-    # this is just a precaution since simConfig pkl file has MOST of the info; ideally should adjust simConfig to contain ALL of the required info
+    # this is just a precaution since simConfig pkl file has MOST of the info; ideally should adjust simConfig to contain
+    # ALL of the required info
     from utils import backupcfg
-    backupcfg(dconf['sim']['name']) 
+    backupcfg(dconf['sim']['name'])
+
+def setdminID (sim, lpop):
+  # setup min ID for each population in lpop
+  alltags = sim._gatherAllCellTags() #gather cell tags; see https://github.com/Neurosim-lab/netpyne/blob/development/netpyne/sim/gather.py
+  dGIDs = {pop:[] for pop in lpop}
+  for tinds in range(len(alltags)):
+    if alltags[tinds]['pop'] in lpop:
+      dGIDs[alltags[tinds]['pop']].append(tinds)
+  sim.simData['dminID'] = {pop:np.amin(dGIDs[pop]) for pop in lpop}
+
+setdminID(sim, ['ER', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW', 'EV1DSW', 'EV1DS', 'EV1DSE'])
 
 tPerPlay = tstepPerAction*dconf['actionsPerPlay']
 sim.runSimWithIntervalFunc(tPerPlay,trainAgent) # has periodic callback to adjust STDP weights based on RL signal

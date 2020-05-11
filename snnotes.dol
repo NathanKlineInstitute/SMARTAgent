@@ -3130,14 +3130,6 @@ Gathering data...
 Analyzing...
 >>> >>> >>> >>> >>> >>> >>> >>> >>> >>> 
 
-
-
-
-
-
-
-
-
   Cells: 5359
   Connections: 0 (0.00 per cell)
   Spikes: 105073 (1.96 Hz)
@@ -3166,4 +3158,7 @@ py_alltoall
 
 can also rewrite code to have each node save its own synaptic weight data and then at end
 merge the data into a single file ...
+
+*20may11 - continue fixes
+** debugging gatherdata issue, way to avoid it
 
