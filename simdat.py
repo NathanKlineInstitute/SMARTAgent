@@ -14,15 +14,10 @@ global stepNB
 stepNB = -1
 
 #
-def readinweights (d):
+def readinweights (name):
   # read the synaptic plasticity weights into a pandas dataframe
-  A = []
-  ddsyn = d['simData']['synweights']
-  for rank in ddsyn.keys():
-    dsyn = ddsyn[rank]
-    for lsyn in dsyn:
-      A.append(lsyn)
-  return pd.DataFrame(A,columns=['time','preid','postid','weight','syntype'])
+  A = pickle.load(open('data/'+name+'synWeights.pkl','rb'))  
+  return pd.DataFrame(A,columns=['time','preid','postid','syntype','weight'])
 
 def getsimname (name=None):
   if name is None:
@@ -37,7 +32,7 @@ def loadsimdat (name=None):
   simConfig = pickle.load(open('data/'+name+'simConfig.pkl','rb'))
   dstartidx = {p:simConfig['net']['pops'][p]['cellGids'][0] for p in simConfig['net']['pops'].keys()} # starting indices for each population
   dendidx = {p:simConfig['net']['pops'][p]['cellGids'][-1] for p in simConfig['net']['pops'].keys()} # ending indices for each population
-  pdf = readinweights(simConfig)
+  pdf = readinweights(name)
   actreward = pd.DataFrame(np.loadtxt('data/'+name+'ActionsRewards.txt'),columns=['time','action','reward','proposed','hit'])
   dnumc = {p:dendidx[p]-dstartidx[p]+1 for p in simConfig['net']['pops'].keys()}
   return simConfig, pdf, actreward, dstartidx, dendidx, dnumc
