@@ -3093,3 +3093,144 @@ if network activity looks decent could run longer sims on zn ...
 
 same problem/crash on zn?
 
+yeah, crashes on zn in gatherdata, zn with 12 cores takes ~900s to run instead of 1413 on laptop ...
+
+try with fewer traces recorded from ... and longer recording interval (recordStep=0.6)
+only record voltage from 1 cell of these pops: ['ER','IR','EV1','EV1DE','IV1','EML','IM']
+
+this may be where the extra data causing gather crash is coming from:
+ sim.simData['synweights'][sim.rank].append([t,conn.plast.params.RLon,conn.preGid,cell.gid,float(conn['hObj'].weight[0]),conn.synMech])
+
+probably do not need the RLon flag ...
+could also use preGid, gid, synmech as index so don't have to save them each time ...
+or could save to separate files for each rank and then join them together in simdat.py ...
+
+still crashes at GatherData:
+  Done; run time = 1321.29 s; real-time ratio: 0.01.
+
+Gathering data...
+terminate called after throwing an instance of 'std::bad_alloc'
+  what():  std::bad_alloc
+[samndp7730:15458] *** Process received signal ***
+[samndp7730:15458] Signal: Aborted (6)
+[samndp7730:15458] Signal code:  (-6)
+[samndp7730:15458] [ 0] /lib/x86_64-linux-gnu/libpthread.so.0(+0x11390)[0x7fe32f7dd390]
+[samndp7730:15458] [ 1] /lib/x86_64-linux-gnu/libc.so.6(gsignal+0x38)[0x7fe32f437428]
+
+if shut off the record weights same problem?
+
+myrun 12
+
+Game rewards: [-0.001]
+  Done; run time = 1297.58 s; real-time ratio: 0.01.
+
+Gathering data...
+  Done; gather time = 1.49 s.
+
+Analyzing...
+>>> >>> >>> >>> >>> >>> >>> >>> >>> >>> 
+
+  Cells: 5359
+  Connections: 0 (0.00 per cell)
+  Spikes: 105073 (1.96 Hz)
+  Simulated time: 10.0 s; 12 workers
+  Run time: 1297.58 s
+>>> 
+Saving output as data/20may8_A0_simConfig.pkl ... 
+Finished saving!
+  Done; saving time = 1.09 s.
+SAVING RASTER DATA
+plot raster:
+Plotting recorded cell traces ... cell
+QApplication: invalid style override passed, ignoring it.
+Plotting raster...
+  Done; plotting time = 38.63 s
+
+Total time = 1360.35 s
+
+ok, this time it did not crash in gatherdata ... 
+
+may not want to gather all cell tags each time input rates updated, assuming the tags
+do not change during simulation, seems ok... and there's a clear,del in there
+which might cause a memory problem later on in gatherdata, which has same deletes??
+https://github.com/Neurosim-lab/netpyne/blob/development/netpyne/sim/gather.py
+py_alltoall
+
+can also rewrite code to have each node save its own synaptic weight data and then at end
+merge the data into a single file ...
+
+*20may11 - continue fixes
+** debugging gatherdata issue, way to avoid it -->> save syn weights on each node, then combine
+
+still crashes without all the extra calls to sim._gatherAllCellTags
+main issue is that the plasticity data is getting saved ...
+
+other option sal suggested:
+sim.runSimWithIntervalFunc(cfg.saveInterval, sim.saveSimDataInNode)
+use that instead of sim.runSim()
+if already running a different interval func, would need to call sim.saveSimDataInNode()
+
+got this error:
+AttributeError: module 'netpyne.sim' has no attribute 'saveSimDataInNode'
+
+must not have latest version of netpyne ...
+
+netpyne.__version__ # '0.9.5'
+
+looks like that interval saving functionality was added in version 0.9.6:
+https://github.com/Neurosim-lab/netpyne/releases
+
+pip install netpyne --upgrade
+
+python
+import netpyne
+netpyne.__version__ '0.9.6'
+quit()
+
+myrun 12
+
+seemed to work but also caused some errors ...
+
+and did not plot properly since sim.net.allCells was not created
+
+can use sim._gatherCells()
+to get all the cells gathered ...
+
+ok, saving as a list for now ... each node saves it and then it's merged together
+at the end of the sim; takes a lot of space ~2 GB, but works pretty quickly (much
+faster than gatherdata)
+
+myrun 12
+
+Analyzing...
+  Cells: 5359
+  Connections: 0 (0.00 per cell)
+  Spikes: 104487 (1.95 Hz)
+  Simulated time: 10.0 s; 12 workers
+  Run time: 989.55 s
+fatal: No names found, cannot describe anything.
+Saving output as data/20may11_A0_simConfig.pkl ... 
+Finished saving!
+Done; saving time = 1.34 s.
+
+20may11_a0_rast.png
+
+note that EML fires much less than EMR ... could be due to initial bias
+in wiring from probabalistic connectivity ... could fix with convergence if that's the issue
+
+also had targettedRL==1...that could also lead to a bias towards one population dominating..?
+will retry with targettedRL off ... 
+
+python -i actmap.py
+  
+fig, axs, plt = animActivityMaps('gif/20may11_actmap_a0.mp4', framerate=10,figsize=(9,5))
+
+gif/20may11_actmap_a0.mp4
+
+python -i simdat.py
+
+hmm, using matplotlib 2.2.4 (newer ones not supported in netpyne) there's an error about fig.add_gridspec ...
+in simdat.py animsynweights ... fixup to use matplotlib.gridspec.GridSpec
+
+animSynWeights(pdf[pdf.syntype=='AMPA'],'gif/20may11_AMPA_weightmap_a0.mp4', framerate=10) #plot/save images as movie
+animSynWeights(pdf[pdf.syntype=='NMDA'],'gif/20may11_NMDA_weightmap_a0.mp4', framerate=10) #plot/save images as movie

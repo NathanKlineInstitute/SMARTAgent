@@ -9,7 +9,7 @@ from collections import OrderedDict
 from connUtils import *
 from matplotlib import pyplot as plt
 import os
-
+import time
 import anim
 from matplotlib import animation
 
@@ -35,9 +35,8 @@ recordWeightStepSize = dconf['sim']['recordWeightStepSize']
 #recordWeightDT = 1000 # interval for recording synaptic weights (change later)
 recordWeightDCells = 1 # to record weights for sub samples of neurons
 tstepPerAction = dconf['sim']['tstepPerAction'] # time step per action (in ms)
-global fid4
 
-fid4 = open(sim.MotorOutputsfilename,'w')
+fid4=None # only used by rank 0
 
 scale = dconf['net']['scale']
 ETypes = ['ER','EV1','EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE','EV4','EMT', 'EML', 'EMR']
@@ -178,6 +177,7 @@ simConfig.recordTraces = {'V_soma':{'sec':'soma','loc':0.5,'var':'v'}}  # Dict w
 simConfig.recordCellsSpikes = [-1]
 simConfig.recordStep = dconf['sim']['recordStep'] # Step size in ms to save data (e.g. V traces, LFP, etc)
 simConfig.filename = 'data/'+dconf['sim']['name']+'simConfig'  # Set file output name
+simConfig.saveJson = False
 simConfig.savePickle = True            # Save params, network and sim output to pickle file
 simConfig.saveMat = False
 simConfig.saveFolder = 'data'
@@ -186,7 +186,8 @@ simConfig.saveFolder = 'data'
 #simConfig.analysis['plotRaster'] = True                         # Plot a raster
 # ['ER','IR','EV1','EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE','IV1','EV4','IV4','EMT','IMT','EML','EMR','IM']
 #simConfig.analysis['plotTraces'] = {'include': [(pop, 0) for pop in allpops]}
-simConfig.analysis['plotTraces'] = {'include': [(pop, 0) for pop in ['ER','IR','EV1','EV1DE','EV1DN','IV1','EV4','IV4','EMT','IMT','EML','EMR','IM']]}
+#simConfig.analysis['plotTraces'] = {'include': [(pop, 0) for pop in ['ER','IR','EV1','EV1DE','IV1','EV4','IV4','EMT','IMT','EML','IM']]}
+simConfig.analysis['plotTraces'] = {'include': [(pop, 0) for pop in ['ER','IR','EV1','EV1DE','IV1','EML','IM']]}
 
 #simConfig.analysis['plotRaster'] = {'timeRange': [500,1000],'popRates':'overlay','saveData':'data/RasterData.pkl','showFig':True}
 #simConfig.analysis['plotRaster'] = {'popRates':'overlay','saveData':'data/'+dconf['sim']['name']+'RasterData.pkl','showFig':dconf['sim']['doplot']}
@@ -204,7 +205,7 @@ cfg.IIGain = 10.0  # I to I scaling factor
 ### from https://www.neuron.yale.edu/phpBB/viewtopic.php?f=45&t=3770&p=16227&hilit=memory#p16122
 cfg.saveCellSecs = bool(dconf['sim']['saveCellSecs']) # if False removes all data on cell sections prior to gathering from nodes
 cfg.saveCellConns = bool(dconf['sim']['saveCellConns']) # if False removes all data on cell connections prior to gathering from nodes
-# cfg.gatherOnlySimData = True # do not set to True, when True gathers from nodes only the output simulation data (not the network instance)
+#cfg.gatherOnlySimData = True # do not set to True, when True gathers from nodes only the output simulation data (not the network instance)
 ###
 
 recWeight = 0.0001 #weight for recurrent connections within each area.
@@ -513,16 +514,16 @@ for prety in ['EV1', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW','EV1DSW', 'EV
 
 sim.AIGame = None # placeholder
 
+lsynweights = [] # list of syn weights, per node
+
 def recordAdjustableWeightsPop (sim, t, popname):
-    if 'synweights' not in sim.simData: sim.simData['synweights'] = {sim.rank:[]}
-    # record the plastic weights for specified popname
-    lcell = [c for c in sim.net.cells if c.gid in sim.net.pops[popname].cellGids] # this is the set of MR cells
-    for cell in lcell:
-        for conn in cell.conns:
-            if 'hSTDP' in conn:
-                #print(conn.preGid, cell.gid, conn.synMech) #testing weight saving
-                sim.simData['synweights'][sim.rank].append([t,conn.plast.params.RLon,conn.preGid,cell.gid,float(conn['hObj'].weight[0]),conn.synMech])
-    return len(lcell)
+  # record the plastic weights for specified popname
+  lcell = [c for c in sim.net.cells if c.gid in sim.net.pops[popname].cellGids] # this is the set of MR cells
+  for cell in lcell:
+    for conn in cell.conns:
+      if 'hSTDP' in conn:
+        lsynweights.append([t,conn.preGid,cell.gid,conn.synMech,float(conn['hObj'].weight[0])])
+  return len(lcell)
                     
 def recordAdjustableWeights (sim, t, lpop = ['EMR', 'EML']):
     """ record the STDP weights during the simulation - called in trainAgent
@@ -720,15 +721,10 @@ def updateInputRates ():
       dFiringRates[pop] = vec.to_python()
       if dconf['verbose'] > 1:
         print(sim.rank,'received firing rates:',np.where(dFiringRates[pop]==np.amax(dFiringRates[pop])),np.amax(dFiringRates[pop]))          
-  alltags = sim._gatherAllCellTags() #gather cell tags  
-  dGIDs = {pop:[] for pop in lratepop}
-  for tinds in range(len(alltags)):
-    if alltags[tinds]['pop'] in lratepop:
-      dGIDs[alltags[tinds]['pop']].append(tinds)
   # update input firing rates for stimuli to R and direction sensitive cells
   for pop in lratepop:
     lCell = [c for c in sim.net.cells if c.gid in sim.net.pops[pop].cellGids] # this is the set of cells
-    offset = np.amin(dGIDs[pop])
+    offset = sim.simData['dminID'][pop]
     if dconf['verbose'] > 1: print(sim.rank,'updating len(',pop,len(lCell),'source firing rates. len(dFiringRates)=',len(dFiringRates[pop]))
     for cell in lCell:  
       for stim in cell.stims:
@@ -742,7 +738,7 @@ def updateInputRates ():
 def trainAgent (t):
     """ training interface between simulation and game environment
     """
-    global NBsteps, epCount, proposed_actions, total_hits, Racket_pos, Ball_pos, current_time_stepNB
+    global NBsteps, epCount, proposed_actions, total_hits, Racket_pos, Ball_pos, current_time_stepNB, fid4
     global f_ax, fig
     global tstepPerAction
     vec = h.Vector()
@@ -766,6 +762,7 @@ def trainAgent (t):
         sim.pc.allreduce(vec.from_python(F_Ls),1) #sum
         F_Ls = vec.to_python()
         if sim.rank==0:
+            if fid4 is None: fid4 = open(sim.MotorOutputsfilename,'w')
             print('Firing rates: ', F_Rs, F_Ls)
             #print('Firing rates: ', F_R1, F_R2, F_R3, F_R4, F_R5, F_L1, F_L2, F_L3, F_L4, F_L5)
             fid4.write('%0.1f' % t)
@@ -876,6 +873,7 @@ def trainAgent (t):
             print('Weights Recording Time:', t, 'NBsteps:',NBsteps,'recordWeightStepSize:',recordWeightStepSize)
         recordAdjustableWeights(sim, t) 
         #recordWeights(sim, t)
+    #sim.saveSimDataInNode() ###
 
 def getAllSTDPObjects (sim):
   # get all the STDP objects from the simulation's cells
@@ -941,14 +939,48 @@ if sim.rank == 0:
     from aigame import AIGame
     sim.AIGame = AIGame() # only create AIGame on node 0
     # node 0 saves the json config file
-    # this is just a precaution since simConfig pkl file has MOST of the info; ideally should adjust simConfig to contain ALL of the required info
+    # this is just a precaution since simConfig pkl file has MOST of the info; ideally should adjust simConfig to contain
+    # ALL of the required info
     from utils import backupcfg
-    backupcfg(dconf['sim']['name']) 
+    backupcfg(dconf['sim']['name'])
+
+def setdminID (sim, lpop):
+  # setup min ID for each population in lpop
+  alltags = sim._gatherAllCellTags() #gather cell tags; see https://github.com/Neurosim-lab/netpyne/blob/development/netpyne/sim/gather.py
+  dGIDs = {pop:[] for pop in lpop}
+  for tinds in range(len(alltags)):
+    if alltags[tinds]['pop'] in lpop:
+      dGIDs[alltags[tinds]['pop']].append(tinds)
+  sim.simData['dminID'] = {pop:np.amin(dGIDs[pop]) for pop in lpop}
+
+setdminID(sim, ['ER', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW', 'EV1DSW', 'EV1DS', 'EV1DSE'])
 
 tPerPlay = tstepPerAction*dconf['actionsPerPlay']
 sim.runSimWithIntervalFunc(tPerPlay,trainAgent) # has periodic callback to adjust STDP weights based on RL signal
+if sim.rank==0 and fid4 is not None: fid4.close()
+#sim._gatherCells()
 sim.gatherData() # gather data from different nodes
 sim.saveData() # save data to disk
+
+def saveSynWeights ():
+  fn = 'data/'+dconf['sim']['name']+'synWeights_'+str(sim.rank)+'.pkl'
+  pickle.dump(lsynweights, open(fn, 'wb'))
+  sim.pc.barrier()
+  time.sleep(1)    
+  if sim.rank == 0:
+    L = []
+    for i in range(sim.nhosts):
+      fn = 'data/'+dconf['sim']['name']+'synWeights_'+str(i)+'.pkl'
+      while not os.path.isfile(fn):
+        print('saveSynWeights: waiting for finish write of', fn)
+        time.sleep(1)      
+      lw = pickle.load(open(fn,'rb'))
+      print(fn,'len(lw)=',len(lw),type(lw),type(lw[0]),lw[0])
+      os.unlink(fn)
+      L = L + lw
+    pickle.dump(L,open('data/'+dconf['sim']['name']+'synWeights.pkl', 'wb'))
+
+if sim.saveWeights: saveSynWeights()
 
 def saveMotionFields (ldflow): pickle.dump(ldflow, open('data/'+dconf['sim']['name']+'MotionFields.pkl', 'wb'))
 
@@ -982,8 +1014,6 @@ if sim.rank == 0: # only rank 0 should save. otherwise all the other nodes could
     print('SAVING RASTER DATA')
     if dconf['sim']['doplot']:
         print('plot raster:')
-        #sim.analysis.plotRaster(saveData = dconf['sim']['name']+'raster.pkl',showFig=True)
-        #sim.analysis.plotRaster(include = ['allCells'],saveData = dconf['sim']['name']+'raster.pkl',showFig=True)        
         sim.analysis.plotData()    
     if sim.plotWeights: plotWeights() 
     if sim.saveWeights:

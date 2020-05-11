@@ -12,16 +12,12 @@ ion()
 
 global stepNB
 stepNB = -1
+
 #
-def readinweights (d):
+def readinweights (name):
   # read the synaptic plasticity weights into a pandas dataframe
-  A = []
-  ddsyn = d['simData']['synweights']
-  for rank in ddsyn.keys():
-    dsyn = ddsyn[rank]
-    for lsyn in dsyn:
-      A.append(lsyn)
-  return pd.DataFrame(A,columns=['time','stdptype','preid','postid','weight','syntype'])
+  A = pickle.load(open('data/'+name+'synWeights.pkl','rb'))  
+  return pd.DataFrame(A,columns=['time','preid','postid','syntype','weight'])
 
 def getsimname (name=None):
   if name is None:
@@ -36,7 +32,7 @@ def loadsimdat (name=None):
   simConfig = pickle.load(open('data/'+name+'simConfig.pkl','rb'))
   dstartidx = {p:simConfig['net']['pops'][p]['cellGids'][0] for p in simConfig['net']['pops'].keys()} # starting indices for each population
   dendidx = {p:simConfig['net']['pops'][p]['cellGids'][-1] for p in simConfig['net']['pops'].keys()} # ending indices for each population
-  pdf = readinweights(simConfig)
+  pdf = readinweights(name)
   actreward = pd.DataFrame(np.loadtxt('data/'+name+'ActionsRewards.txt'),columns=['time','action','reward','proposed','hit'])
   dnumc = {p:dendidx[p]-dstartidx[p]+1 for p in simConfig['net']['pops'].keys()}
   return simConfig, pdf, actreward, dstartidx, dendidx, dnumc
@@ -57,6 +53,7 @@ def loadMotionFields (name=None): return pickle.load(open('data/'+getsimname(nam
 
 #
 def animSynWeights (pdf, outpath, framerate=10, figsize=(7,4), cmap='jet'):
+  import matplotlib.gridspec as gridspec
   # animate the synaptic weights along with some stats on behavior
   origfsz = rcParams['font.size']; rcParams['font.size'] = 5; ioff() # save original font size, turn off interactive plotting
   utimes = np.unique(pdf.time)
@@ -74,7 +71,8 @@ def animSynWeights (pdf, outpath, framerate=10, figsize=(7,4), cmap='jet'):
   print('minwt:',minwt,'maxwt:',maxwt)
   if figsize is not None: fig = plt.figure(figsize=figsize)
   else: fig = plt.figure()
-  gs = fig.add_gridspec(4,8)
+  #gs = fig.add_gridspec(4,8)
+  gs = gridspec.GridSpec(4,8)
   f_ax = []
   ax_count = 0
   for rows in range(3):
