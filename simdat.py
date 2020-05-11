@@ -53,6 +53,7 @@ def loadMotionFields (name=None): return pickle.load(open('data/'+getsimname(nam
 
 #
 def animSynWeights (pdf, outpath, framerate=10, figsize=(7,4), cmap='jet'):
+  import matplotlib.gridspec as gridspec
   # animate the synaptic weights along with some stats on behavior
   origfsz = rcParams['font.size']; rcParams['font.size'] = 5; ioff() # save original font size, turn off interactive plotting
   utimes = np.unique(pdf.time)
@@ -70,7 +71,8 @@ def animSynWeights (pdf, outpath, framerate=10, figsize=(7,4), cmap='jet'):
   print('minwt:',minwt,'maxwt:',maxwt)
   if figsize is not None: fig = plt.figure(figsize=figsize)
   else: fig = plt.figure()
-  gs = fig.add_gridspec(4,8)
+  #gs = fig.add_gridspec(4,8)
+  gs = gridspec.GridSpec(4,8)
   f_ax = []
   ax_count = 0
   for rows in range(3):
