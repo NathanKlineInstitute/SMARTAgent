@@ -55,10 +55,10 @@ netParams.defaultThreshold = 0.0 # spike threshold, 10 mV is NetCon default, low
 
 #Population parameters
 for ty in allpops:
-    if ty in ETypes:
-        netParams.popParams[ty] = {'cellType':ty, 'numCells': dnumc[ty], 'cellModel': 'Mainen'}
-    else:
-        netParams.popParams[ty] = {'cellType':ty, 'numCells': dnumc[ty], 'cellModel': 'FS_BasketCell'}
+  if ty in ETypes:
+    netParams.popParams[ty] = {'cellType':ty, 'numCells': dnumc[ty], 'cellModel': 'Mainen'}
+  else:
+    netParams.popParams[ty] = {'cellType':ty, 'numCells': dnumc[ty], 'cellModel': 'FS_BasketCell'}
     
 netParams.importCellParams(label='PYR_Mainen_rule', conds={'cellType': ETypes}, fileName='cells/mainen.py', cellName='PYR2')
 netParams.importCellParams(label='FS_BasketCell_rule', conds={'cellType': ITypes}, fileName='cells/FS_BasketCell.py', cellName='Bas')
@@ -268,16 +268,16 @@ netParams.connParams['EMT->IMT'] = {
 netParams.connParams['EML->IM'] = {
         'preConds': {'pop': 'EML'},
         'postConds': {'pop': 'IM'},
-        'probability': 0.125/2.,
-        #'convergence': 25,
+        #'probability': 0.125/2.,
+        'convergence': prob2conv(0.125/2, dnumc['EML']),
         'weight': 0.02 * cfg.EIGain,
         'delay': 2,
         'synMech': 'AMPA', 'sec':'soma', 'loc':0.5}
 netParams.connParams['EMR->IM'] = {
         'preConds': {'pop': 'EMR'},
         'postConds': {'pop': 'IM'},
-        'probability': 0.125/2.,
-        #'convergence': 25,
+        #'probability': 0.125/2.,
+        'convergence': prob2conv(0.125/2, dnumc['EMR']),
         'weight': 0.02 * cfg.EIGain,
         'delay': 2,
         'synMech': 'AMPA', 'sec':'soma', 'loc':0.5}
@@ -331,44 +331,23 @@ for poty in EMotorPops: # I -> E for motor populations
   netParams.connParams['IM->'+poty] = {
     'preConds': {'pop': 'IM'},
     'postConds': {'pop': poty},
-    'probability': 0.125,
+    #'probability': 0.125,
     #'divergence': 9,
-    #'convergence': 13,
+    'convergence': prob2conv(0.125, dnumc['IM']),
     'weight': 0.02 * cfg.IEGain,
     'delay': 2,
     'synMech': 'GABA', 'sec':'soma', 'loc':0.5}
 
 #I to I
-netParams.connParams['IV1->IV1'] = {
-        'preConds': {'pop': 'IV1'},
-        'postConds': {'pop': 'IV1'},
-        'probability': 0.25,
-        'weight': 0.005 * cfg.IIGain, # 0.000
-        'delay': 2,
-        'synMech': 'GABA', 'sec':'soma', 'loc':0.5}
-
-netParams.connParams['IV4->IV4'] = {
-        'preConds': {'pop': 'IV4'},
-        'postConds': {'pop': 'IV4'},
-        'probability': 0.25,
-        'weight': 0.005 * cfg.IIGain, #0.000
-        'delay': 2,
-        'synMech': 'GABA', 'sec':'soma', 'loc':0.5}
-netParams.connParams['IMT->IMT'] = {
-        'preConds': {'pop': 'IMT'},
-        'postConds': {'pop': 'IMT'},
-        'probability': 0.25,
-        'weight': 0.005 * cfg.IIGain, #0.000
-        'delay': 2,
-        'synMech': 'GABA' ,'sec':'soma', 'loc':0.5}
-netParams.connParams['IM->IM'] = {
-        'preConds': {'pop': 'IM'},
-        'postConds': {'pop': 'IM'},
-        'probability': 0.125/2.,
-        'weight': 0.005 * cfg.IIGain, #0.000
-        'delay': 2,
-        'synMech': 'GABA' ,'sec':'soma', 'loc':0.5}
-
+for IType in ['IV1', 'IV4', 'IMT', 'IM']:
+  netParams.connParams[IType+'->'+IType] = {
+    'preConds': {'pop': IType},
+    'postConds': {'pop': IType},
+    #'probability': 0.25,
+    'convergence': prob2conv(0.25, dnumc[IType]),
+    'weight': 0.005 * cfg.IIGain, 
+    'delay': 2,
+    'synMech': 'GABA', 'sec':'soma', 'loc':0.5}  
 
 #E to E feedforward connections - AMPA
 netParams.connParams['ER->EV1'] = {
@@ -477,7 +456,7 @@ netParams.connParams['IMT->EV4'] = {
         'synMech': 'GABA','sec':'soma', 'loc':0.5}
 """
 
-#I to I
+#I to I - between areas
 netParams.connParams['IV1->IV4'] = {
         'preConds': {'pop': 'IV1'},
         'postConds': {'pop': 'IV4'},
@@ -503,8 +482,8 @@ for prety in ['EV1', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW','EV1DSW', 'EV
       netParams.connParams[strty+prety+'->'+strty+poty] = {
         'preConds': {'pop': prety},
         'postConds': {'pop': poty},
-        'probability': 0.1,
-        #'convergence': 16,
+        #'probability': 0.1,
+        'convergence': prob2conv(0.1, dnumc[prety]),
         'weight': weight,
         'delay': 2,
         'synMech': synmech,

@@ -58,10 +58,10 @@ def loadInputImages (name=None):
 def loadMotionFields (name=None): return pickle.load(open('data/'+getsimname(name)+'MotionFields.pkl','rb'))
 
 #
-def animSynWeights (pdf, outpath, framerate=10, figsize=(7,4), cmap='jet'):
+def animSynWeights (pdf, outpath, framerate=10, figsize=(14,8), cmap='jet'):
   import matplotlib.gridspec as gridspec
   # animate the synaptic weights along with some stats on behavior
-  origfsz = rcParams['font.size']; rcParams['font.size'] = 5; ioff() # save original font size, turn off interactive plotting
+  origfsz = rcParams['font.size']; rcParams['font.size'] = 12; ioff() # save original font size, turn off interactive plotting
   utimes = np.unique(pdf.time)
   #maxNMDAwt = np.max(pdf[pdf.syntype=='NMDA'].weight)
   #maxAMPAwt = np.max(pdf[pdf.syntype=='AMPA'].weight)

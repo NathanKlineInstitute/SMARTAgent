@@ -11,7 +11,7 @@ from matplotlib import animation
 from simdat import loadInputImages, loadsimdat, loadMotionFields
 from imgutils import getoptflow, getoptflowframes
 
-rcParams['font.size'] = 6
+rcParams['font.size'] = 12
 
 InputImages = loadInputImages(dconf['sim']['name'])
 simConfig, pdf, actreward, dstartidx, dendidx, dnumc = loadsimdat(dconf['sim']['name'])
@@ -93,7 +93,7 @@ def plotActivityMaps (pauset=1, gifpath=None, mp4path=None, framerate=5, zf=10):
   return fig, axs, plt
 
 #
-def animActivityMaps (outpath, framerate=10, figsize=(7,3)):
+def animActivityMaps (outpath, framerate=10, figsize=(18,10)):
   ioff()
   # plot activity in different layers as a function of input images
   if figsize is not None: fig, axs = plt.subplots(4, 5, figsize=figsize);

@@ -3354,5 +3354,55 @@ otherwise there will be biases in relative activation of the two populations
 
 IM -> EML, EMR has probability of 0.125
 
-pij
+conv = int(0.5 + pij * numfrom)
+
+could make a pmat to use ...
+
+EML -> IM, EMR -> IM
+had connection probability of 0.125/2 and 400 EML, EMR neurons ...
+conv = int(0.5 + 0.125/2 * dnumc[EML]) = 25
+
+IM -> EML, IM -> EMR
+had connection probability of 0.125 and 200 IM neurons
+conv = int(0.5 + 0.125 * 200) = 25
+
+ok, put in a helper function in connUtils to get convergence from probability and num presynaptic neurons
+and used it to get convergence number in the connection rules ... will see if that produces more similar
+firing rates for EMR and EML ...
+
+and try sim with the new ~equivalent convergence-based connectivity ...
+
+20may12_B0_
+
+myrun 12
+
+  Cells: 5359
+  Connections: 0 (0.00 per cell) <<-- that's because not saving cellconn, there are synapses in this simulation
+  Spikes: 222076 (4.14 Hz)
+  Simulated time: 10.0 s; 12 workers
+  Run time: 1002.30 s
+
+ok, rates for EMR, EML are more similar now:
+ 20may12_rast_b0.png
+ 20may12_EML_b0.png
+ 20may12_IM_b0.png
+
+the paddle does get stuck at top for part of simulation ... seems less likely
+to get stuck at bottom? 
+ 
+the network also transitions to too much synchronous EMR,EML activity quickly ... should reduce that
+maybe via different starting and max weights ... 
+
+python -i actmap.py
+
+fig, axs, plt = animActivityMaps('gif/20may12_actmap_b0.mp4', framerate=10,figsize=(18,10))
+
+python -i simdat.py
+
+animSynWeights(pdf[pdf.syntype=='AMPA'],'gif/20may12_AMPA_weightmap_b0.mp4', framerate=10, figsize=(14,8)) 
+animSynWeights(pdf[pdf.syntype=='NMDA'],'gif/20may12_NMDA_weightmap_b0.mp4', framerate=10, figsize=(14,8))
+
+** change EMR -> EMUP, EML -> EMDOWN
+
+since confusing to read code ...
 
