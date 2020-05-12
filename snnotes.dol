@@ -3159,7 +3159,7 @@ py_alltoall
 can also rewrite code to have each node save its own synaptic weight data and then at end
 merge the data into a single file ...
 
-*20may11 - continue fixes
+*20may11 - continue fixes - gatherdata issue, workaround
 ** debugging gatherdata issue, way to avoid it -->> save syn weights on each node, then combine
 
 still crashes without all the extra calls to sim._gatherAllCellTags
@@ -3274,4 +3274,13 @@ pickle.dump(dout, open('tmp.pkl','wb'))
 saves some space, but not enough:
 (-rw-rw-r-- 1 samn samn 1562509212 May 11 23:06 tmp.pkl; new size is ~1.6 GB)
 (original size is ~2.2GB  -rw-rw-r-- 1 samn samn 2193401415 May 11 16:26 20may11_A0_synWeights.pkl)
+
+*20may12 - 
+** try reducing size of output synaptic weight data
+
+could also run for 100 s and save weights every 1 s instead of every 100 ms ...
+
+** other question: why were EMR weights only increasing?
+
+get same when have targettedRL off?
 

@@ -616,10 +616,8 @@ def getFiringRatesWithInterval (trange = None, neuronal_pop = None):
 NBsteps = 0 # this is a counter for recording the plastic weights
 epCount = []
 proposed_actions = [] 
-total_hits = [] #number of times a ball is hit by racket as the ball changes its direction and player doesn't lose a score (assign 1). if player loses
-lSTDPmech = [] # global list of STDP mechanisms; so do not have to lookup at each interval function call
-mlSTDPmech = []
-mrSTDPmech = []
+total_hits = [] #numbertimes ball is hit by racket as ball changes its direction and player doesn't lose a score (assign 1). if player loses
+dSTDPmech = {} # dictionary of list of STDP mechanisms
 cumRewardActions = []
 cumPunishingActions = []
 current_time_stepNB = 0
@@ -843,13 +841,13 @@ def trainAgent (t):
         if sim.rank==0: print('t=',t,'- adjusting weights based on RL critic value:', critic)
         if not dconf['sim']['targettedRL'] or Ractions==Lactions:
           if dconf['verbose']: print('APPLY RL to both EMR and EML')
-          for STDPmech in lSTDPmech: STDPmech.reward_punish(float(critic))
+          for STDPmech in dSTDPmech['all']: STDPmech.reward_punish(float(critic))
         elif Ractions>Lactions:
           if dconf['verbose']: print('APPLY RL to EMR')
-          for STDPmech in mrSTDPmech: STDPmech.reward_punish(float(critic))
+          for STDPmech in dSTDPmech['EMR']: STDPmech.reward_punish(float(critic))
         elif Lactions>Ractions:
           if dconf['verbose']: print('APPLY RL to EML')
-          for STDPmech in mlSTDPmech: STDPmech.reward_punish(float(critic))
+          for STDPmech in dSTDPmech['EML']: STDPmech.reward_punish(float(critic))
     if sim.rank==0:
         print('Game rewards:', rewards) # only rank 0 has access to rewards      
         for action in actions:
@@ -877,20 +875,17 @@ def trainAgent (t):
 
 def getAllSTDPObjects (sim):
   # get all the STDP objects from the simulation's cells
-  lSTDPmech = [] #all STDP objects
-  mlSTDPmech = [] # all STDP objects associated with Left motor area
-  mrSTDPmech = [] #all STDP objects associated with right motor area
-  sim.net.pops['EMR'].cellGids
+  dSTDPmech = {'all':[], 'EMR':[], 'EML':[]} # dictionary of STDP objects keyed by type (all, for EMR, EML populations)
   for cell in sim.net.cells:
     for conn in cell.conns:
       STDPmech = conn.get('hSTDP')  # check if has STDP mechanism
       if STDPmech:
-        lSTDPmech.append(STDPmech)
+        dSTDPmech['all'].append(STDPmech)
         if cell.gid in sim.net.pops['EMR'].cellGids:
-          mrSTDPmech.append(STDPmech)
+          dSTDPmech['EMR'].append(STDPmech)
         elif cell.gid in sim.net.pops['EML'].cellGids:
-          mlSTDPmech.append(STDPmech)
-  return lSTDPmech, mlSTDPmech, mrSTDPmech
+          dSTDPmech['EML'].append(STDPmech)
+  return dSTDPmech
         
 #Alterate to create network and run simulation
 # create network object and set cfg and net params; pass simulation config and network params as arguments
@@ -901,11 +896,7 @@ sim.net.connectCells()                    # create connections between cells bas
 sim.net.addStims()                      #instantiate netStim
 sim.setupRecording()                  # setup variables to record for each cell (spikes, V traces, etc)
 
-lSTDPmech, mlSTDPmech, mrSTDPmech = getAllSTDPObjects(sim) # get all the STDP objects up-front
-
-print('Total number of STDP mech for MR are: ', len(mrSTDPmech))
-print('Total number of STDP mech for ML are: ', len(mlSTDPmech))
-print('Total number of STDP mech are: ', len(lSTDPmech))
+dSTDPmech = getAllSTDPObjects(sim) # get all the STDP objects up-front
 
 def updateSTDPWeights (sim, W):
     #this function assign weights stored in 'ResumeSimFromFile' to all connections by matching pre and post neuron ids  
@@ -958,7 +949,6 @@ setdminID(sim, ['ER', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW', 'EV1DSW', '
 tPerPlay = tstepPerAction*dconf['actionsPerPlay']
 sim.runSimWithIntervalFunc(tPerPlay,trainAgent) # has periodic callback to adjust STDP weights based on RL signal
 if sim.rank==0 and fid4 is not None: fid4.close()
-#sim._gatherCells()
 sim.gatherData() # gather data from different nodes
 sim.saveData() # save data to disk
 
