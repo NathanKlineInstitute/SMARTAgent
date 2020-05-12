@@ -3430,6 +3430,8 @@ myrun 12
 
 looks better overall...but only a matter of time until epileptic/highly synchronized activity returns ...
 without homeostatic plasticity that's likely to occur...unless use soft thresholding and have lower wmax values?
+could also have easier homeostatic plasticity rule to check rates of all populations and increase random
+inhibitory noise when cells begin to fire too fast
 
 python -i actmap.py
 
@@ -3439,3 +3441,26 @@ python -i simdat.py
 
 animSynWeights(pdf[pdf.syntype=='AMPA'],'gif/20may12_AMPA_weightmap_c0.mp4', framerate=10, figsize=(14,8)) 
 animSynWeights(pdf[pdf.syntype=='NMDA'],'gif/20may12_NMDA_weightmap_c0.mp4', framerate=10, figsize=(14,8))
+
+ok, will try a soft threshold and 10 s sim ...
+
+not sure if want NMDA RL plasticity yet ... has very long eligibility trace (~800 ms) ...
+
+dynamics look decent overall, but have to run longer and see if remains stable,
+since rates seem to increase somewhat over time ...
+
+20may12_rast_c1.png
+20may12_IM_c1.png
+20may12_EMDOWN_c1.png
+20may12_IV1_C1.png
+
+python -i actmap.py
+
+fig, axs, plt = animActivityMaps('gif/20may12_actmap_c1.mp4', framerate=10,figsize=(18,10))
+
+python -i simdat.py
+
+animSynWeights(pdf[pdf.syntype=='AMPA'],'gif/20may12_AMPA_weightmap_c1.mp4', framerate=10, figsize=(14,8));animSynWeights(pdf[pdf.syntype=='NMDA'],'gif/20may12_NMDA_weightmap_c1.mp4', framerate=10, figsize=(14,8))
+
+ok, try a 100 s sim with same params ...
+

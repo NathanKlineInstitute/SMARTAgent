@@ -130,7 +130,7 @@ def animSynWeights (pdf, outpath, framerate=10, figsize=(14,8), cmap='jet'):
   lsrc = ['EV1', 'EV4', 'EMT','EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE']
   ltitle = []
   for src in lsrc:
-    for trg in ['ML', 'MR']: ltitle.append(src+'->'+trg)
+    for trg in ['EMDOWN', 'EMUP']: ltitle.append(src+'->'+trg)
   dimg = {}; dline = {}; 
   def getwts (tdx, src):
     t = utimes[tdx]
@@ -372,21 +372,21 @@ def plotIndividualSynWeights(pdf):
 
 def plotSynWeightsPostNeuronID(pdf,postNeuronID):
   utimes = np.unique(pdf.time)
-  #for a postID, find a neuron in ML and a neuron in MR
-  pdfs_ML = pdf[(pdf.time==utimes[0]) & (pdf.postid>=dstartidx['EMDOWN']) & (pdf.postid<=dendidx['EMDOWN'])]
-  uIDs_ML = np.unique(pdfs_ML.postid)
-  pdfs_MR = pdf[(pdf.time==utimes[0]) & (pdf.postid>=dstartidx['EMUP']) & (pdf.postid<=dendidx['EMUP'])]
-  uIDs_MR = np.unique(pdfs_MR.postid)
-  targetML_postID = min(uIDs_ML)-1+postNeuronID
-  targetMR_postID = min(uIDs_MR)-1+postNeuronID
+  #for a postID, find a neuron in ML and a neuron in MUP
+  pdfs_MDOWN = pdf[(pdf.time==utimes[0]) & (pdf.postid>=dstartidx['EMDOWN']) & (pdf.postid<=dendidx['EMDOWN'])]
+  uIDs_MDOWN = np.unique(pdfs_MDOWN.postid)
+  pdfs_MUP = pdf[(pdf.time==utimes[0]) & (pdf.postid>=dstartidx['EMUP']) & (pdf.postid<=dendidx['EMUP'])]
+  uIDs_MUP = np.unique(pdfs_MUP.postid)
+  targetMDOWN_postID = min(uIDs_MDOWN)-1+postNeuronID
+  targetMUP_postID = min(uIDs_MUP)-1+postNeuronID
 
-  NBpreN_ML = len(np.unique(pdfs_ML.preid))
-  NBpreN_MR = len(np.unique(pdfs_MR.preid)) 
+  NBpreN_MDOWN = len(np.unique(pdfs_MDOWN.preid))
+  NBpreN_MUP = len(np.unique(pdfs_MUP.preid)) 
   #for every postsynaptic neuron, find total weight of synaptic inputs per area (i.e. synaptic inputs from EV1, EV4 and EIT and treated separately for each cell——if there are 200 unique cells, will get 600 weights as 200 from each originating layer)
-  MLweights = {}
-  MRweights = {}
-  MLpreNeuronIDs = {}
-  MRpreNeuronIDs = {}
+  MDOWNweights = {}
+  MUPweights = {}
+  MDOWNpreNeuronIDs = {}
+  MUPpreNeuronIDs = {}
   
   #for each of those neurons, find presynaptic neuron IDs and the strengths
   #gdx = 2
@@ -401,18 +401,18 @@ def plotSynWeightsPostNeuronID(pdf,postNeuronID):
   title('weights of all connections for a post-synaptic neuron')
   pdx = 2    
   for src in ['EV1','EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE', 'EV4', 'EMT']:
-      MLweights[src] = arrL = []
-      MRweights[src] = arrR = []
-      MLpreNeuronIDs[src] = arrL2 = []
-      MRpreNeuronIDs[src] = arrR2 = []
+      MDOWNweights[src] = arrL = []
+      MUPweights[src] = arrR = []
+      MDOWNpreNeuronIDs[src] = arrL2 = []
+      MUPpreNeuronIDs[src] = arrR2 = []
       tstep = 0
       for t in utimes:
           arrL.append([])
           arrR.append([])
           arrL2.append([])
           arrR2.append([])
-          pdfsL = pdf[(pdf.time==t) & (pdf.postid==targetML_postID) & (pdf.preid>=dstartidx[src]) & (pdf.preid<=dendidx[src])]
-          pdfsR = pdf[(pdf.time==t) & (pdf.postid==targetMR_postID) & (pdf.preid>=dstartidx[src]) & (pdf.preid<=dendidx[src])]
+          pdfsL = pdf[(pdf.time==t) & (pdf.postid==targetMDOWN_postID) & (pdf.preid>=dstartidx[src]) & (pdf.preid<=dendidx[src])]
+          pdfsR = pdf[(pdf.time==t) & (pdf.postid==targetMUP_postID) & (pdf.preid>=dstartidx[src]) & (pdf.preid<=dendidx[src])]
           upreLCells = np.unique(pdfsL.preid)
           upreRCells = np.unique(pdfsR.preid)
           for preID in upreLCells:
@@ -429,8 +429,8 @@ def plotSynWeightsPostNeuronID(pdf,postNeuronID):
                   arrR2[tstep].append(preID)
           tstep += 1
       subplot(12,1,pdx)
-      plot(utimes,np.array(MLweights[src]),'r-o',linewidth=3,markersize=5)
-      plot(utimes,np.array(MRweights[src]),'b-o',linewidth=3,markersize=5)
+      plot(utimes,np.array(MDOWNweights[src]),'r-o',linewidth=3,markersize=5)
+      plot(utimes,np.array(MUPweights[src]),'b-o',linewidth=3,markersize=5)
       legend((src+'->EMDOWN',src+'->EMUP'),loc='upper left')
       xlim((0,simConfig['simConfig']['duration']))
       pdx += 1        
