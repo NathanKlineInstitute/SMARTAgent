@@ -39,14 +39,14 @@ tstepPerAction = dconf['sim']['tstepPerAction'] # time step per action (in ms)
 fid4=None # only used by rank 0
 
 scale = dconf['net']['scale']
-ETypes = ['ER','EV1','EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE','EV4','EMT', 'EML', 'EMR']
+ETypes = ['ER','EV1','EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE','EV4','EMT', 'EMDOWN', 'EMUP']
 #ITypes = ['IR','IV1','IV1D','IV4','IMT','IM'] #
 ITypes = ['IR','IV1','IV4','IMT','IM'] # 
-#allpops = ['ER','IR','EV1','EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE','IV1','IV1D','EV4','IV4','EMT','IMT','EML','EMR','IM']
-allpops = ['ER','IR','EV1','EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE','IV1','EV4','IV4','EMT','IMT','EML','EMR','IM']
+#allpops = ['ER','IR','EV1','EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE','IV1','IV1D','EV4','IV4','EMT','IMT','EMDOWN','EMUP','IM']
+allpops = ['ER','IR','EV1','EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE','IV1','EV4','IV4','EMT','IMT','EMDOWN','EMUP','IM']
 #EDirPops = ['EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE']
 #IDirPops = ['IV1D']
-EMotorPops = ['EML', 'EMR'] # excitatory neuron motor populations
+EMotorPops = ['EMDOWN', 'EMUP'] # excitatory neuron motor populations
 dnumc = OrderedDict({ty:dconf['net'][ty]*scale for ty in allpops}) # number of neurons of a given type
 
 # Network parameters
@@ -109,10 +109,10 @@ netParams.stimSourceParams['ebkg'] = {'type': 'NetStim', 'rate': 5, 'noise': 1.0
 netParams.stimTargetParams['ebkg->all'] = {'source': 'ebkg', 'conds': {'cellType': ['EV1','EV4','EMT']}, 'weight': 0.0, 'delay': 'max(1, normal(5,2))', 'synMech': 'AMPA'}
 
 netParams.stimSourceParams['MLbkg'] = {'type': 'NetStim', 'rate': 5, 'noise': 1.0}
-netParams.stimTargetParams['MLbkg->all'] = {'source': 'MLbkg', 'conds': {'cellType': ['EML']}, 'weight': 0.0, 'delay': 1, 'synMech': 'AMPA'}
+netParams.stimTargetParams['MLbkg->all'] = {'source': 'MLbkg', 'conds': {'cellType': ['EMDOWN']}, 'weight': 0.0, 'delay': 1, 'synMech': 'AMPA'}
 
 netParams.stimSourceParams['MRbkg'] = {'type': 'NetStim', 'rate': 5, 'noise': 1.0}
-netParams.stimTargetParams['MRbkg->all'] = {'source': 'MRbkg', 'conds': {'cellType': ['EMR']}, 'weight': 0.0, 'delay': 1, 'synMech': 'AMPA'}
+netParams.stimTargetParams['MRbkg->all'] = {'source': 'MRbkg', 'conds': {'cellType': ['EMUP']}, 'weight': 0.0, 'delay': 1, 'synMech': 'AMPA'}
 
 netParams.stimSourceParams['bkg'] = {'type': 'NetStim', 'rate': 20, 'noise': 1.0}
 netParams.stimTargetParams['bkg->all'] = {'source': 'bkg', 'conds': {'cellType': ['IR','IV1','IV4','IMT']}, 'weight': 0.0, 'delay': 'max(1, normal(5,2))', 'synMech': 'AMPA'}
@@ -184,10 +184,10 @@ simConfig.saveFolder = 'data'
 # simConfig.backupCfg = ['sim.json', 'backupcfg/'+dconf['sim']['name']+'sim.json']
 
 #simConfig.analysis['plotRaster'] = True                         # Plot a raster
-# ['ER','IR','EV1','EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE','IV1','EV4','IV4','EMT','IMT','EML','EMR','IM']
+# ['ER','IR','EV1','EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE','IV1','EV4','IV4','EMT','IMT','EMDOWN','EMUP','IM']
 #simConfig.analysis['plotTraces'] = {'include': [(pop, 0) for pop in allpops]}
-#simConfig.analysis['plotTraces'] = {'include': [(pop, 0) for pop in ['ER','IR','EV1','EV1DE','IV1','EV4','IV4','EMT','IMT','EML','IM']]}
-simConfig.analysis['plotTraces'] = {'include': [(pop, 0) for pop in ['ER','IR','EV1','EV1DE','IV1','EML','IM']]}
+#simConfig.analysis['plotTraces'] = {'include': [(pop, 0) for pop in ['ER','IR','EV1','EV1DE','IV1','EV4','IV4','EMT','IMT','EMDOWN','IM']]}
+simConfig.analysis['plotTraces'] = {'include': [(pop, 0) for pop in ['ER','IR','EV1','EV1DE','IV1','EMDOWN','IM']]}
 
 #simConfig.analysis['plotRaster'] = {'timeRange': [500,1000],'popRates':'overlay','saveData':'data/RasterData.pkl','showFig':True}
 #simConfig.analysis['plotRaster'] = {'popRates':'overlay','saveData':'data/'+dconf['sim']['name']+'RasterData.pkl','showFig':dconf['sim']['doplot']}
@@ -212,8 +212,8 @@ cfg.saveCellConns = bool(dconf['sim']['saveCellConns']) # if False removes all d
 recWeight = 0.0001 #weight for recurrent connections within each area.
 recProb = 0.2 #probability of recurrent connections within each area.
 #Local excitation
-#E to E - may want plasticity between EML<>EML and EMR<>EMR
-for epop in ['ER', 'EV1', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW', 'EV1DSW', 'EV1DS','EV1DSE','EV4','EMT','EML','EMR']:
+#E to E - may want plasticity between EMDOWN<>EMDOWN and EMUP<>EMUP
+for epop in ['ER', 'EV1', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW', 'EV1DSW', 'EV1DS','EV1DSE','EV4','EMT','EMDOWN','EMUP']:
   netParams.connParams[epop+'->'+epop] = {
     'preConds': {'pop': epop},
     'postConds': {'pop': epop},
@@ -265,19 +265,19 @@ netParams.connParams['EMT->IMT'] = {
         'weight': 0.02 * cfg.EIGain,
         'delay': 2,
         'synMech': 'AMPA', 'sec':'soma', 'loc':0.5}
-netParams.connParams['EML->IM'] = {
-        'preConds': {'pop': 'EML'},
+netParams.connParams['EMDOWN->IM'] = {
+        'preConds': {'pop': 'EMDOWN'},
         'postConds': {'pop': 'IM'},
         #'probability': 0.125/2.,
-        'convergence': prob2conv(0.125/2, dnumc['EML']),
+        'convergence': prob2conv(0.125/2, dnumc['EMDOWN']),
         'weight': 0.02 * cfg.EIGain,
         'delay': 2,
         'synMech': 'AMPA', 'sec':'soma', 'loc':0.5}
-netParams.connParams['EMR->IM'] = {
-        'preConds': {'pop': 'EMR'},
+netParams.connParams['EMUP->IM'] = {
+        'preConds': {'pop': 'EMUP'},
         'postConds': {'pop': 'IM'},
         #'probability': 0.125/2.,
-        'convergence': prob2conv(0.125/2, dnumc['EMR']),
+        'convergence': prob2conv(0.125/2, dnumc['EMUP']),
         'weight': 0.02 * cfg.EIGain,
         'delay': 2,
         'synMech': 'AMPA', 'sec':'soma', 'loc':0.5}
@@ -504,7 +504,7 @@ def recordAdjustableWeightsPop (sim, t, popname):
         lsynweights.append([t,conn.preGid,cell.gid,conn.synMech,float(conn['hObj'].weight[0])])
   return len(lcell)
                     
-def recordAdjustableWeights (sim, t, lpop = ['EMR', 'EML']):
+def recordAdjustableWeights (sim, t, lpop = ['EMUP', 'EMDOWN']):
     """ record the STDP weights during the simulation - called in trainAgent
     """
     for pop in lpop: recordAdjustableWeightsPop(sim, t, pop)
@@ -732,8 +732,8 @@ def trainAgent (t):
         for ts in range(int(dconf['actionsPerPlay'])):
             ts_beg = t-tstepPerAction*(dconf['actionsPerPlay']-ts-1) 
             ts_end = t-tstepPerAction*(dconf['actionsPerPlay']-ts)
-            F_Rs.append(getFiringRatesWithInterval([ts_end,ts_beg], sim.net.pops['EMR'].cellGids))
-            F_Ls.append(getFiringRatesWithInterval([ts_end,ts_beg], sim.net.pops['EML'].cellGids))
+            F_Rs.append(getFiringRatesWithInterval([ts_end,ts_beg], sim.net.pops['EMUP'].cellGids))
+            F_Ls.append(getFiringRatesWithInterval([ts_end,ts_beg], sim.net.pops['EMDOWN'].cellGids))
         sim.pc.allreduce(vec.from_python(F_Rs),1) #sum
         F_Rs = vec.to_python()
         sim.pc.allreduce(vec.from_python(F_Ls),1) #sum
@@ -819,14 +819,14 @@ def trainAgent (t):
     if critic != 0: # if critic signal indicates punishment (-1) or reward (+1)
         if sim.rank==0: print('t=',t,'- adjusting weights based on RL critic value:', critic)
         if not dconf['sim']['targettedRL'] or Ractions==Lactions:
-          if dconf['verbose']: print('APPLY RL to both EMR and EML')
+          if dconf['verbose']: print('APPLY RL to both EMUP and EMDOWN')
           for STDPmech in dSTDPmech['all']: STDPmech.reward_punish(float(critic))
         elif Ractions>Lactions:
-          if dconf['verbose']: print('APPLY RL to EMR')
-          for STDPmech in dSTDPmech['EMR']: STDPmech.reward_punish(float(critic))
+          if dconf['verbose']: print('APPLY RL to EMUP')
+          for STDPmech in dSTDPmech['EMUP']: STDPmech.reward_punish(float(critic))
         elif Lactions>Ractions:
-          if dconf['verbose']: print('APPLY RL to EML')
-          for STDPmech in dSTDPmech['EML']: STDPmech.reward_punish(float(critic))
+          if dconf['verbose']: print('APPLY RL to EMDOWN')
+          for STDPmech in dSTDPmech['EMDOWN']: STDPmech.reward_punish(float(critic))
     if sim.rank==0:
         print('Game rewards:', rewards) # only rank 0 has access to rewards      
         for action in actions:
@@ -854,16 +854,16 @@ def trainAgent (t):
 
 def getAllSTDPObjects (sim):
   # get all the STDP objects from the simulation's cells
-  dSTDPmech = {'all':[], 'EMR':[], 'EML':[]} # dictionary of STDP objects keyed by type (all, for EMR, EML populations)
+  dSTDPmech = {'all':[], 'EMUP':[], 'EMDOWN':[]} # dictionary of STDP objects keyed by type (all, for EMUP, EMDOWN populations)
   for cell in sim.net.cells:
     for conn in cell.conns:
       STDPmech = conn.get('hSTDP')  # check if has STDP mechanism
       if STDPmech:
         dSTDPmech['all'].append(STDPmech)
-        if cell.gid in sim.net.pops['EMR'].cellGids:
-          dSTDPmech['EMR'].append(STDPmech)
-        elif cell.gid in sim.net.pops['EML'].cellGids:
-          dSTDPmech['EML'].append(STDPmech)
+        if cell.gid in sim.net.pops['EMUP'].cellGids:
+          dSTDPmech['EMUP'].append(STDPmech)
+        elif cell.gid in sim.net.pops['EMDOWN'].cellGids:
+          dSTDPmech['EMDOWN'].append(STDPmech)
   return dSTDPmech
         
 #Alterate to create network and run simulation

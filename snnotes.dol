@@ -3406,3 +3406,5 @@ animSynWeights(pdf[pdf.syntype=='NMDA'],'gif/20may12_NMDA_weightmap_b0.mp4', fra
 
 since confusing to read code ...
 
+ok ... adjusted in sim.py, sim.json, simdat.py, actmap.py
+
