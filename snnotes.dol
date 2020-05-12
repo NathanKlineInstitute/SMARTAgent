@@ -3234,3 +3234,44 @@ in simdat.py animsynweights ... fixup to use matplotlib.gridspec.GridSpec
 
 animSynWeights(pdf[pdf.syntype=='AMPA'],'gif/20may11_AMPA_weightmap_a0.mp4', framerate=10) #plot/save images as movie
 animSynWeights(pdf[pdf.syntype=='NMDA'],'gif/20may11_NMDA_weightmap_a0.mp4', framerate=10) #plot/save images as movie
+
+compress pickle to reduce file size?
+
+https://lucianopaz.github.io/compress_pickle/html/
+
+pip install lz4
+pip install compress_pickle
+
+python
+import pickle, compress_pickle
+d = pickle.load(open('data/20may11_A0_synWeights.pkl','rb'))
+compress_pickle.dump(d, 'tmp.pkl', compression="lzma", set_default_extension=False)
+
+takes too long ...
+
+see if reformatting weights as dict will save space ...
+
+python
+import pickle
+din = pickle.load(open('data/20may11_A0_synWeights.pkl','rb'))
+len(din) # 59676000
+# [t,conn.preGid,cell.gid,conn.synMech,float(conn['hObj'].weight[0])]
+
+#
+dout = {}
+for row in din:
+  t,preID,poID,syn,w = row
+  if preID not in dout:
+    dout[preID] = {}
+  if poID not in dout[preID]:
+    dout[preID][poID] = {}
+  if syn not in dout[preID][poID]:
+    dout[preID][poID][syn] = []
+  dout[preID][poID][syn].append([t,w])
+
+pickle.dump(dout, open('tmp.pkl','wb'))
+
+saves some space, but not enough:
+(-rw-rw-r-- 1 samn samn 1562509212 May 11 23:06 tmp.pkl; new size is ~1.6 GB)
+(original size is ~2.2GB  -rw-rw-r-- 1 samn samn 2193401415 May 11 16:26 20may11_A0_synWeights.pkl)
+
