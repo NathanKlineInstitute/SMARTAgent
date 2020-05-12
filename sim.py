@@ -39,14 +39,14 @@ tstepPerAction = dconf['sim']['tstepPerAction'] # time step per action (in ms)
 fid4=None # only used by rank 0
 
 scale = dconf['net']['scale']
-ETypes = ['ER','EV1','EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE','EV4','EMT', 'EML', 'EMR']
+ETypes = ['ER','EV1','EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE','EV4','EMT', 'EMDOWN', 'EMUP']
 #ITypes = ['IR','IV1','IV1D','IV4','IMT','IM'] #
 ITypes = ['IR','IV1','IV4','IMT','IM'] # 
-#allpops = ['ER','IR','EV1','EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE','IV1','IV1D','EV4','IV4','EMT','IMT','EML','EMR','IM']
-allpops = ['ER','IR','EV1','EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE','IV1','EV4','IV4','EMT','IMT','EML','EMR','IM']
+#allpops = ['ER','IR','EV1','EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE','IV1','IV1D','EV4','IV4','EMT','IMT','EMDOWN','EMUP','IM']
+allpops = ['ER','IR','EV1','EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE','IV1','EV4','IV4','EMT','IMT','EMDOWN','EMUP','IM']
 #EDirPops = ['EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE']
 #IDirPops = ['IV1D']
-EMotorPops = ['EML', 'EMR'] # excitatory neuron motor populations
+EMotorPops = ['EMDOWN', 'EMUP'] # excitatory neuron motor populations
 dnumc = OrderedDict({ty:dconf['net'][ty]*scale for ty in allpops}) # number of neurons of a given type
 
 # Network parameters
@@ -55,10 +55,10 @@ netParams.defaultThreshold = 0.0 # spike threshold, 10 mV is NetCon default, low
 
 #Population parameters
 for ty in allpops:
-    if ty in ETypes:
-        netParams.popParams[ty] = {'cellType':ty, 'numCells': dnumc[ty], 'cellModel': 'Mainen'}
-    else:
-        netParams.popParams[ty] = {'cellType':ty, 'numCells': dnumc[ty], 'cellModel': 'FS_BasketCell'}
+  if ty in ETypes:
+    netParams.popParams[ty] = {'cellType':ty, 'numCells': dnumc[ty], 'cellModel': 'Mainen'}
+  else:
+    netParams.popParams[ty] = {'cellType':ty, 'numCells': dnumc[ty], 'cellModel': 'FS_BasketCell'}
     
 netParams.importCellParams(label='PYR_Mainen_rule', conds={'cellType': ETypes}, fileName='cells/mainen.py', cellName='PYR2')
 netParams.importCellParams(label='FS_BasketCell_rule', conds={'cellType': ITypes}, fileName='cells/FS_BasketCell.py', cellName='Bas')
@@ -77,13 +77,7 @@ STDPparams = {'hebbwt': 0.0001, 'antiwt':-0.00001, 'wbase': 0.0012, 'wmax': 50, 
 
 
 dSTDPparamsRL = {} # STDP-RL parameters for AMPA,NMDA synapses; generally uses shorter/longer eligibility traces
-for sy in ['AMPA', 'NMDA']:
-  dRLprm = dconf['RL'][sy]
-  dSTDPparamsRL[sy] = {'hebbwt': 0.0000, 'antiwt':-0.0000, 'wbase': dRLprm['WBase'], 'wmax': dRLprm['WMax'],\
-                       'RLon': dRLprm['ON'] , 'RLhebbwt': 0.001 , 'RLantiwt': -0.000,\
-                       'tauhebb': 10, 'RLlenhebb': dRLprm['lenhebb'] ,'RLlenanti': dRLprm['lenanti'], 'RLwindhebb': 50, \
-                       'useRLexp': dRLprm['exp'], 'softthresh': 0, 'verbose':0
-  }
+for sy in ['AMPA', 'NMDA']: dSTDPparamsRL[sy] = dconf['RL'][sy]
 
 # these are the image-based inputs provided to the R (retinal) cells
 netParams.stimSourceParams['stimMod'] = {'type': 'NetStim', 'rate': 'variable', 'noise': 0}
@@ -109,10 +103,10 @@ netParams.stimSourceParams['ebkg'] = {'type': 'NetStim', 'rate': 5, 'noise': 1.0
 netParams.stimTargetParams['ebkg->all'] = {'source': 'ebkg', 'conds': {'cellType': ['EV1','EV4','EMT']}, 'weight': 0.0, 'delay': 'max(1, normal(5,2))', 'synMech': 'AMPA'}
 
 netParams.stimSourceParams['MLbkg'] = {'type': 'NetStim', 'rate': 5, 'noise': 1.0}
-netParams.stimTargetParams['MLbkg->all'] = {'source': 'MLbkg', 'conds': {'cellType': ['EML']}, 'weight': 0.0, 'delay': 1, 'synMech': 'AMPA'}
+netParams.stimTargetParams['MLbkg->all'] = {'source': 'MLbkg', 'conds': {'cellType': ['EMDOWN']}, 'weight': 0.0, 'delay': 1, 'synMech': 'AMPA'}
 
 netParams.stimSourceParams['MRbkg'] = {'type': 'NetStim', 'rate': 5, 'noise': 1.0}
-netParams.stimTargetParams['MRbkg->all'] = {'source': 'MRbkg', 'conds': {'cellType': ['EMR']}, 'weight': 0.0, 'delay': 1, 'synMech': 'AMPA'}
+netParams.stimTargetParams['MRbkg->all'] = {'source': 'MRbkg', 'conds': {'cellType': ['EMUP']}, 'weight': 0.0, 'delay': 1, 'synMech': 'AMPA'}
 
 netParams.stimSourceParams['bkg'] = {'type': 'NetStim', 'rate': 20, 'noise': 1.0}
 netParams.stimTargetParams['bkg->all'] = {'source': 'bkg', 'conds': {'cellType': ['IR','IV1','IV4','IMT']}, 'weight': 0.0, 'delay': 'max(1, normal(5,2))', 'synMech': 'AMPA'}
@@ -184,10 +178,10 @@ simConfig.saveFolder = 'data'
 # simConfig.backupCfg = ['sim.json', 'backupcfg/'+dconf['sim']['name']+'sim.json']
 
 #simConfig.analysis['plotRaster'] = True                         # Plot a raster
-# ['ER','IR','EV1','EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE','IV1','EV4','IV4','EMT','IMT','EML','EMR','IM']
+# ['ER','IR','EV1','EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE','IV1','EV4','IV4','EMT','IMT','EMDOWN','EMUP','IM']
 #simConfig.analysis['plotTraces'] = {'include': [(pop, 0) for pop in allpops]}
-#simConfig.analysis['plotTraces'] = {'include': [(pop, 0) for pop in ['ER','IR','EV1','EV1DE','IV1','EV4','IV4','EMT','IMT','EML','IM']]}
-simConfig.analysis['plotTraces'] = {'include': [(pop, 0) for pop in ['ER','IR','EV1','EV1DE','IV1','EML','IM']]}
+#simConfig.analysis['plotTraces'] = {'include': [(pop, 0) for pop in ['ER','IR','EV1','EV1DE','IV1','EV4','IV4','EMT','IMT','EMDOWN','IM']]}
+simConfig.analysis['plotTraces'] = {'include': [(pop, 0) for pop in ['ER','IR','EV1','EV1DE','IV1','EMDOWN','IM']]}
 
 #simConfig.analysis['plotRaster'] = {'timeRange': [500,1000],'popRates':'overlay','saveData':'data/RasterData.pkl','showFig':True}
 #simConfig.analysis['plotRaster'] = {'popRates':'overlay','saveData':'data/'+dconf['sim']['name']+'RasterData.pkl','showFig':dconf['sim']['doplot']}
@@ -208,12 +202,12 @@ cfg.saveCellConns = bool(dconf['sim']['saveCellConns']) # if False removes all d
 #cfg.gatherOnlySimData = True # do not set to True, when True gathers from nodes only the output simulation data (not the network instance)
 ###
 
+"""
 recWeight = 0.0001 #weight for recurrent connections within each area.
 recProb = 0.2 #probability of recurrent connections within each area.
-"""
 #Local excitation
-#E to E - may want plasticity between EML<>EML and EMR<>EMR
-for epop in ['ER', 'EV1', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW', 'EV1DSW', 'EV1DS','EV1DSE','EV4','EMT','EML','EMR']:
+#E to E - may want plasticity between EMDOWN<>EMDOWN and EMUP<>EMUP
+for epop in ['ER', 'EV1', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW', 'EV1DSW', 'EV1DS','EV1DSE','EV4','EMT','EMDOWN','EMUP']:
   netParams.connParams[epop+'->'+epop] = {
     'preConds': {'pop': epop},
     'postConds': {'pop': epop},
@@ -265,19 +259,19 @@ netParams.connParams['EMT->IMT'] = {
         'weight': 0.02 * cfg.EIGain,
         'delay': 2,
         'synMech': 'AMPA', 'sec':'soma', 'loc':0.5}
-netParams.connParams['EML->IM'] = {
-        'preConds': {'pop': 'EML'},
+netParams.connParams['EMDOWN->IM'] = {
+        'preConds': {'pop': 'EMDOWN'},
         'postConds': {'pop': 'IM'},
-        'probability': 0.125/2.,
-        #'convergence': 25,
+        #'probability': 0.125/2.,
+        'convergence': prob2conv(0.125/2, dnumc['EMDOWN']),
         'weight': 0.02 * cfg.EIGain,
         'delay': 2,
         'synMech': 'AMPA', 'sec':'soma', 'loc':0.5}
-netParams.connParams['EMR->IM'] = {
-        'preConds': {'pop': 'EMR'},
+netParams.connParams['EMUP->IM'] = {
+        'preConds': {'pop': 'EMUP'},
         'postConds': {'pop': 'IM'},
-        'probability': 0.125/2.,
-        #'convergence': 25,
+        #'probability': 0.125/2.,
+        'convergence': prob2conv(0.125/2, dnumc['EMUP']),
         'weight': 0.02 * cfg.EIGain,
         'delay': 2,
         'synMech': 'AMPA', 'sec':'soma', 'loc':0.5}
@@ -331,44 +325,23 @@ for poty in EMotorPops: # I -> E for motor populations
   netParams.connParams['IM->'+poty] = {
     'preConds': {'pop': 'IM'},
     'postConds': {'pop': poty},
-    'probability': 0.125,
+    #'probability': 0.125,
     #'divergence': 9,
-    #'convergence': 13,
+    'convergence': prob2conv(0.125, dnumc['IM']),
     'weight': 0.02 * cfg.IEGain,
     'delay': 2,
     'synMech': 'GABA', 'sec':'soma', 'loc':0.5}
 
 #I to I
-netParams.connParams['IV1->IV1'] = {
-        'preConds': {'pop': 'IV1'},
-        'postConds': {'pop': 'IV1'},
-        'probability': 0.25,
-        'weight': 0.005 * cfg.IIGain, # 0.000
-        'delay': 2,
-        'synMech': 'GABA', 'sec':'soma', 'loc':0.5}
-
-netParams.connParams['IV4->IV4'] = {
-        'preConds': {'pop': 'IV4'},
-        'postConds': {'pop': 'IV4'},
-        'probability': 0.25,
-        'weight': 0.005 * cfg.IIGain, #0.000
-        'delay': 2,
-        'synMech': 'GABA', 'sec':'soma', 'loc':0.5}
-netParams.connParams['IMT->IMT'] = {
-        'preConds': {'pop': 'IMT'},
-        'postConds': {'pop': 'IMT'},
-        'probability': 0.25,
-        'weight': 0.005 * cfg.IIGain, #0.000
-        'delay': 2,
-        'synMech': 'GABA' ,'sec':'soma', 'loc':0.5}
-netParams.connParams['IM->IM'] = {
-        'preConds': {'pop': 'IM'},
-        'postConds': {'pop': 'IM'},
-        'probability': 0.125/2.,
-        'weight': 0.005 * cfg.IIGain, #0.000
-        'delay': 2,
-        'synMech': 'GABA' ,'sec':'soma', 'loc':0.5}
-
+for IType in ['IV1', 'IV4', 'IMT', 'IM']:
+  netParams.connParams[IType+'->'+IType] = {
+    'preConds': {'pop': IType},
+    'postConds': {'pop': IType},
+    #'probability': 0.25,
+    'convergence': prob2conv(0.25, dnumc[IType]),
+    'weight': 0.005 * cfg.IIGain, 
+    'delay': 2,
+    'synMech': 'GABA', 'sec':'soma', 'loc':0.5}  
 
 #E to E feedforward connections - AMPA
 netParams.connParams['ER->EV1'] = {
@@ -477,7 +450,7 @@ netParams.connParams['IMT->EV4'] = {
         'synMech': 'GABA','sec':'soma', 'loc':0.5}
 """
 
-#I to I
+#I to I - between areas
 netParams.connParams['IV1->IV4'] = {
         'preConds': {'pop': 'IV1'},
         'postConds': {'pop': 'IV4'},
@@ -503,8 +476,8 @@ for prety in ['EV1', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW','EV1DSW', 'EV
       netParams.connParams[strty+prety+'->'+strty+poty] = {
         'preConds': {'pop': prety},
         'postConds': {'pop': poty},
-        'probability': 0.1,
-        #'convergence': 16,
+        #'probability': 0.1,
+        'convergence': prob2conv(0.1, dnumc[prety]),
         'weight': weight,
         'delay': 2,
         'synMech': synmech,
@@ -525,7 +498,7 @@ def recordAdjustableWeightsPop (sim, t, popname):
         lsynweights.append([t,conn.preGid,cell.gid,conn.synMech,float(conn['hObj'].weight[0])])
   return len(lcell)
                     
-def recordAdjustableWeights (sim, t, lpop = ['EMR', 'EML']):
+def recordAdjustableWeights (sim, t, lpop = ['EMUP', 'EMDOWN']):
     """ record the STDP weights during the simulation - called in trainAgent
     """
     for pop in lpop: recordAdjustableWeightsPop(sim, t, pop)
@@ -616,10 +589,8 @@ def getFiringRatesWithInterval (trange = None, neuronal_pop = None):
 NBsteps = 0 # this is a counter for recording the plastic weights
 epCount = []
 proposed_actions = [] 
-total_hits = [] #number of times a ball is hit by racket as the ball changes its direction and player doesn't lose a score (assign 1). if player loses
-lSTDPmech = [] # global list of STDP mechanisms; so do not have to lookup at each interval function call
-mlSTDPmech = []
-mrSTDPmech = []
+total_hits = [] #numbertimes ball is hit by racket as ball changes its direction and player doesn't lose a score (assign 1). if player loses
+dSTDPmech = {} # dictionary of list of STDP mechanisms
 cumRewardActions = []
 cumPunishingActions = []
 current_time_stepNB = 0
@@ -750,32 +721,32 @@ def trainAgent (t):
             action = dconf['movecodes'][random.randint(0,len(dconf['movecodes'])-1)]
             actions.append(action)
     else: #the actions should be based on the activity of motor cortex (MO) 1085-1093
-        F_Rs = []
-        F_Ls = []
+        F_UPs = []
+        F_DOWNs = []
         for ts in range(int(dconf['actionsPerPlay'])):
             ts_beg = t-tstepPerAction*(dconf['actionsPerPlay']-ts-1) 
             ts_end = t-tstepPerAction*(dconf['actionsPerPlay']-ts)
-            F_Rs.append(getFiringRatesWithInterval([ts_end,ts_beg], sim.net.pops['EMR'].cellGids))
-            F_Ls.append(getFiringRatesWithInterval([ts_end,ts_beg], sim.net.pops['EML'].cellGids))
-        sim.pc.allreduce(vec.from_python(F_Rs),1) #sum
-        F_Rs = vec.to_python()
-        sim.pc.allreduce(vec.from_python(F_Ls),1) #sum
-        F_Ls = vec.to_python()
+            F_UPs.append(getFiringRatesWithInterval([ts_end,ts_beg], sim.net.pops['EMUP'].cellGids))
+            F_DOWNs.append(getFiringRatesWithInterval([ts_end,ts_beg], sim.net.pops['EMDOWN'].cellGids))
+        sim.pc.allreduce(vec.from_python(F_UPs),1) #sum
+        F_UPs = vec.to_python()
+        sim.pc.allreduce(vec.from_python(F_DOWNs),1) #sum
+        F_DOWNs = vec.to_python()
         if sim.rank==0:
             if fid4 is None: fid4 = open(sim.MotorOutputsfilename,'w')
-            print('Firing rates: ', F_Rs, F_Ls)
+            print('Firing rates: ', F_UPs, F_DOWNs)
             #print('Firing rates: ', F_R1, F_R2, F_R3, F_R4, F_R5, F_L1, F_L2, F_L3, F_L4, F_L5)
             fid4.write('%0.1f' % t)
             for ts in range(int(dconf['actionsPerPlay'])):
-                fid4.write('\t%0.1f' % F_Rs[ts])
+                fid4.write('\t%0.1f' % F_UPs[ts])
             for ts in range(int(dconf['actionsPerPlay'])):
-                fid4.write('\t%0.1f' % F_Ls[ts])
+                fid4.write('\t%0.1f' % F_DOWNs[ts])
             fid4.write('\n')
             actions = []
             for ts in range(int(dconf['actionsPerPlay'])):
-                if F_Rs[ts]>F_Ls[ts]:
+                if F_UPs[ts]>F_DOWNs[ts]:
                     actions.append(dconf['moves']['UP'])
-                elif F_Ls[ts]>F_Rs[ts]:
+                elif F_DOWNs[ts]>F_UPs[ts]:
                     actions.append(dconf['moves']['DOWN'])
                 else:
                     actions.append(dconf['moves']['NOMOVE']) # No move        
@@ -827,29 +798,29 @@ def trainAgent (t):
           else:
             print('CRITIC=0')                    
         sim.pc.broadcast(vec.from_python([critic]), 0) # convert python list to hoc vector to broadcast critic value to other nodes
-        Ractions = np.sum(np.where(np.array(actions)==dconf['moves']['UP'],1,0))
-        Lactions = np.sum(np.where(np.array(actions)==dconf['moves']['DOWN'],1,0))
-        sim.pc.broadcast(vec2.from_python([Ractions]),0)
-        sim.pc.broadcast(vec3.from_python([Lactions]),0)
+        UPactions = np.sum(np.where(np.array(actions)==dconf['moves']['UP'],1,0))
+        DOWNactions = np.sum(np.where(np.array(actions)==dconf['moves']['DOWN'],1,0))
+        sim.pc.broadcast(vec2.from_python([UPactions]),0)
+        sim.pc.broadcast(vec3.from_python([DOWNactions]),0)
     else: # other workers
         sim.pc.broadcast(vec, 0) # receive critic value from master node
         critic = vec.to_python()[0] # critic is first element of the array
         sim.pc.broadcast(vec2, 0)
-        Ractions = vec2.to_python()[0]
+        UPactions = vec2.to_python()[0]
         sim.pc.broadcast(vec3, 0)
-        Lactions = vec3.to_python()[0]
-        if dconf['verbose']: print('Ractions: ', Ractions,'Lactions: ', Lactions)
+        DOWNactions = vec3.to_python()[0]
+        if dconf['verbose']: print('UPactions: ', UPactions,'DOWNactions: ', DOWNactions)
     if critic != 0: # if critic signal indicates punishment (-1) or reward (+1)
         if sim.rank==0: print('t=',t,'- adjusting weights based on RL critic value:', critic)
-        if not dconf['sim']['targettedRL'] or Ractions==Lactions:
-          if dconf['verbose']: print('APPLY RL to both EMR and EML')
-          for STDPmech in lSTDPmech: STDPmech.reward_punish(float(critic))
-        elif Ractions>Lactions:
-          if dconf['verbose']: print('APPLY RL to EMR')
-          for STDPmech in mrSTDPmech: STDPmech.reward_punish(float(critic))
-        elif Lactions>Ractions:
-          if dconf['verbose']: print('APPLY RL to EML')
-          for STDPmech in mlSTDPmech: STDPmech.reward_punish(float(critic))
+        if not dconf['sim']['targettedRL'] or UPactions==DOWNactions:
+          if dconf['verbose']: print('APPLY RL to both EMUP and EMDOWN')
+          for STDPmech in dSTDPmech['all']: STDPmech.reward_punish(float(critic))
+        elif UPactions>DOWNactions:
+          if dconf['verbose']: print('APPLY RL to EMUP')
+          for STDPmech in dSTDPmech['EMUP']: STDPmech.reward_punish(float(critic))
+        elif DOWNactions>UPactions:
+          if dconf['verbose']: print('APPLY RL to EMDOWN')
+          for STDPmech in dSTDPmech['EMDOWN']: STDPmech.reward_punish(float(critic))
     if sim.rank==0:
         print('Game rewards:', rewards) # only rank 0 has access to rewards      
         for action in actions:
@@ -873,24 +844,20 @@ def trainAgent (t):
             print('Weights Recording Time:', t, 'NBsteps:',NBsteps,'recordWeightStepSize:',recordWeightStepSize)
         recordAdjustableWeights(sim, t) 
         #recordWeights(sim, t)
-    #sim.saveSimDataInNode() ###
 
 def getAllSTDPObjects (sim):
   # get all the STDP objects from the simulation's cells
-  lSTDPmech = [] #all STDP objects
-  mlSTDPmech = [] # all STDP objects associated with Left motor area
-  mrSTDPmech = [] #all STDP objects associated with right motor area
-  sim.net.pops['EMR'].cellGids
+  dSTDPmech = {'all':[], 'EMUP':[], 'EMDOWN':[]} # dictionary of STDP objects keyed by type (all, for EMUP, EMDOWN populations)
   for cell in sim.net.cells:
     for conn in cell.conns:
       STDPmech = conn.get('hSTDP')  # check if has STDP mechanism
       if STDPmech:
-        lSTDPmech.append(STDPmech)
-        if cell.gid in sim.net.pops['EMR'].cellGids:
-          mrSTDPmech.append(STDPmech)
-        elif cell.gid in sim.net.pops['EML'].cellGids:
-          mlSTDPmech.append(STDPmech)
-  return lSTDPmech, mlSTDPmech, mrSTDPmech
+        dSTDPmech['all'].append(STDPmech)
+        if cell.gid in sim.net.pops['EMUP'].cellGids:
+          dSTDPmech['EMUP'].append(STDPmech)
+        elif cell.gid in sim.net.pops['EMDOWN'].cellGids:
+          dSTDPmech['EMDOWN'].append(STDPmech)
+  return dSTDPmech
         
 #Alterate to create network and run simulation
 # create network object and set cfg and net params; pass simulation config and network params as arguments
@@ -901,11 +868,7 @@ sim.net.connectCells()                    # create connections between cells bas
 sim.net.addStims()                      #instantiate netStim
 sim.setupRecording()                  # setup variables to record for each cell (spikes, V traces, etc)
 
-lSTDPmech, mlSTDPmech, mrSTDPmech = getAllSTDPObjects(sim) # get all the STDP objects up-front
-
-print('Total number of STDP mech for MR are: ', len(mrSTDPmech))
-print('Total number of STDP mech for ML are: ', len(mlSTDPmech))
-print('Total number of STDP mech are: ', len(lSTDPmech))
+dSTDPmech = getAllSTDPObjects(sim) # get all the STDP objects up-front
 
 def updateSTDPWeights (sim, W):
     #this function assign weights stored in 'ResumeSimFromFile' to all connections by matching pre and post neuron ids  
@@ -958,27 +921,44 @@ setdminID(sim, ['ER', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW', 'EV1DSW', '
 tPerPlay = tstepPerAction*dconf['actionsPerPlay']
 sim.runSimWithIntervalFunc(tPerPlay,trainAgent) # has periodic callback to adjust STDP weights based on RL signal
 if sim.rank==0 and fid4 is not None: fid4.close()
-#sim._gatherCells()
 sim.gatherData() # gather data from different nodes
 sim.saveData() # save data to disk
 
+def LSynWeightToD (L):
+  # convert list of synaptic weights to dictionary to save disk space
+  print('converting synaptic weight list to dictionary...')
+  dout = {}
+  for row in L:
+    t,preID,poID,syn,w = row
+    if preID not in dout:
+      dout[preID] = {}
+    if poID not in dout[preID]:
+      dout[preID][poID] = {}
+    if syn not in dout[preID][poID]:
+      dout[preID][poID][syn] = []
+    dout[preID][poID][syn].append([t,w])
+  return dout
+
 def saveSynWeights ():
+  # save synaptic weights 
   fn = 'data/'+dconf['sim']['name']+'synWeights_'+str(sim.rank)+'.pkl'
-  pickle.dump(lsynweights, open(fn, 'wb'))
-  sim.pc.barrier()
+  pickle.dump(lsynweights, open(fn, 'wb')) # save synaptic weights to disk for this node
+  sim.pc.barrier() # wait for other nodes
   time.sleep(1)    
-  if sim.rank == 0:
+  if sim.rank == 0: # rank 0 reads and assembles the synaptic weights into a single output file
     L = []
     for i in range(sim.nhosts):
       fn = 'data/'+dconf['sim']['name']+'synWeights_'+str(i)+'.pkl'
-      while not os.path.isfile(fn):
+      while not os.path.isfile(fn): # wait until the file is written/available
         print('saveSynWeights: waiting for finish write of', fn)
         time.sleep(1)      
       lw = pickle.load(open(fn,'rb'))
       print(fn,'len(lw)=',len(lw),type(lw),type(lw[0]),lw[0])
-      os.unlink(fn)
-      L = L + lw
-    pickle.dump(L,open('data/'+dconf['sim']['name']+'synWeights.pkl', 'wb'))
+      os.unlink(fn) # remove the temporary file
+      L = L + lw # concatenate to the list L
+    #pickle.dump(L,open('data/'+dconf['sim']['name']+'synWeights.pkl', 'wb')) # this would save as a List
+    # now convert the list to a dictionary to save space, and save it to disk
+    pickle.dump(LSynWeightToD(L),open('data/'+dconf['sim']['name']+'synWeights.pkl', 'wb'))    
 
 if sim.saveWeights: saveSynWeights()
 

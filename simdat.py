@@ -16,7 +16,13 @@ stepNB = -1
 #
 def readinweights (name):
   # read the synaptic plasticity weights into a pandas dataframe
-  A = pickle.load(open('data/'+name+'synWeights.pkl','rb'))  
+  D = pickle.load(open('data/'+name+'synWeights.pkl','rb'))
+  A = []
+  for preID in D.keys():
+    for poID in D[preID].keys():
+      for syn in D[preID][poID].keys():
+        for row in D[preID][poID][syn]:
+          A.append([row[0], preID, poID, syn, row[1]])
   return pd.DataFrame(A,columns=['time','preid','postid','syntype','weight'])
 
 def getsimname (name=None):
@@ -52,10 +58,10 @@ def loadInputImages (name=None):
 def loadMotionFields (name=None): return pickle.load(open('data/'+getsimname(name)+'MotionFields.pkl','rb'))
 
 #
-def animSynWeights (pdf, outpath, framerate=10, figsize=(7,4), cmap='jet'):
+def animSynWeights (pdf, outpath, framerate=10, figsize=(14,8), cmap='jet'):
   import matplotlib.gridspec as gridspec
   # animate the synaptic weights along with some stats on behavior
-  origfsz = rcParams['font.size']; rcParams['font.size'] = 5; ioff() # save original font size, turn off interactive plotting
+  origfsz = rcParams['font.size']; rcParams['font.size'] = 12; ioff() # save original font size, turn off interactive plotting
   utimes = np.unique(pdf.time)
   #maxNMDAwt = np.max(pdf[pdf.syntype=='NMDA'].weight)
   #maxAMPAwt = np.max(pdf[pdf.syntype=='AMPA'].weight)
@@ -85,10 +91,10 @@ def animSynWeights (pdf, outpath, framerate=10, figsize=(7,4), cmap='jet'):
   f_ax2 = fig.add_subplot(gs[3,0:2])
   f_ax3 = fig.add_subplot(gs[3,3:5])
   f_ax4 = fig.add_subplot(gs[3,6:8])
-  pdfsL = pdf[(pdf.postid>=dstartidx['EML']) & (pdf.postid<=dendidx['EML'])]
-  pdfsR = pdf[(pdf.postid>=dstartidx['EMR']) & (pdf.postid<=dendidx['EMR'])]
-  Lwts = [np.mean(pdfsL[(pdfsL.time==t)].weight) for t in utimes] #wts of connections onto EML
-  Rwts = [np.mean(pdfsR[(pdfsR.time==t)].weight) for t in utimes] #wts of connections onto EMR
+  pdfsL = pdf[(pdf.postid>=dstartidx['EMDOWN']) & (pdf.postid<=dendidx['EMDOWN'])]
+  pdfsR = pdf[(pdf.postid>=dstartidx['EMUP']) & (pdf.postid<=dendidx['EMUP'])]
+  Lwts = [np.mean(pdfsL[(pdfsL.time==t)].weight) for t in utimes] #wts of connections onto EMDOWN
+  Rwts = [np.mean(pdfsR[(pdfsR.time==t)].weight) for t in utimes] #wts of connections onto EMUP
   action_times = np.array(actreward.time)
   actionvsproposed = np.array(actreward.action-actreward.proposed)
   rewardingActions = np.cumsum(np.where(actionvsproposed==0,1,0)) #rewarding action
@@ -109,13 +115,13 @@ def animSynWeights (pdf, outpath, framerate=10, figsize=(7,4), cmap='jet'):
   f_ax2.set_xlim((0,simConfig['simConfig']['duration']))
   f_ax2.set_ylim((np.min(actreward.reward),np.max(actreward.reward)))
   f_ax2.set_ylabel('Rewards'); #f_ax1.set_xlabel('Time (ms)')
-  #plot mean weights of all connections onto EML and EMR
+  #plot mean weights of all connections onto EMDOWN and EMUP
   f_ax3.plot(utimes,Lwts,'r-o',markersize=1)
   f_ax3.plot(utimes,Rwts,'b-o',markersize=1)
   f_ax3.set_xlim((0,simConfig['simConfig']['duration']))
   f_ax3.set_ylim((np.min([np.min(Lwts),np.min(Rwts)]),np.max([np.max(Lwts),np.max(Rwts)])))
   f_ax3.set_ylabel('Average weight'); #f_ax2.set_xlabel('Time (ms)')
-  f_ax3.legend(('->EML','->EMR'),loc='upper left')
+  f_ax3.legend(('->EMDOWN','->EMUP'),loc='upper left')
   f_ax4.plot(action_times,cumHits,'g-o',markersize=1)
   f_ax4.plot(action_times,cumMissed,'k-o',markersize=1)
   f_ax4.set_xlim((0,np.max(action_times)))
@@ -124,11 +130,11 @@ def animSynWeights (pdf, outpath, framerate=10, figsize=(7,4), cmap='jet'):
   lsrc = ['EV1', 'EV4', 'EMT','EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE']
   ltitle = []
   for src in lsrc:
-    for trg in ['ML', 'MR']: ltitle.append(src+'->'+trg)
+    for trg in ['EMDOWN', 'EMUP']: ltitle.append(src+'->'+trg)
   dimg = {}; dline = {}; 
   def getwts (tdx, src):
     t = utimes[tdx]
-    ltarg = ['EML', 'EMR']
+    ltarg = ['EMDOWN', 'EMUP']
     lout = []
     for targ in ltarg:
       cpdf = pdf[(pdf.time==t) & (pdf.postid>=dstartidx[targ]) & (pdf.postid<=dendidx[targ]) & (pdf.preid>=dstartidx[src]) & (pdf.preid<=dendidx[src])]
@@ -189,17 +195,17 @@ def plotavgweights (pdf):
   ylim((-1.1,1.1))
   gdx = 2
   for src in ['EV1','EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE', 'EV4', 'EMT']:
-      for trg in ['EML', 'EMR']:
+      for trg in ['EMDOWN', 'EMUP']:
           davgw[src+'->'+trg] = arr = []        
           for t in utimes:
               pdfs = pdf[(pdf.time==t) & (pdf.postid>=dstartidx[trg]) & (pdf.postid<=dendidx[trg]) & (pdf.preid>=dstartidx[src]) & (pdf.preid<=dendidx[src])]
               arr.append(np.mean(pdfs.weight))
       subplot(12,1,gdx)
-      plot(utimes,davgw[src+'->EML'],'r-',linewidth=3);
-      plot(utimes,davgw[src+'->EMR'],'b-',linewidth=3); 
-      legend((src+'->EML',src+'->EMR'),loc='upper left')
-      plot(utimes,davgw[src+'->EML'],'ro',markersize=10);
-      plot(utimes,davgw[src+'->EMR'],'bo',markersize=10);       
+      plot(utimes,davgw[src+'->EMDOWN'],'r-',linewidth=3);
+      plot(utimes,davgw[src+'->EMUP'],'b-',linewidth=3); 
+      legend((src+'->EMDOWN',src+'->EMUP'),loc='upper left')
+      plot(utimes,davgw[src+'->EMDOWN'],'ro',markersize=10);
+      plot(utimes,davgw[src+'->EMUP'],'bo',markersize=10);       
       xlim((0,simConfig['simConfig']['duration']))
       ylabel('RL weights') 
       gdx += 1
@@ -220,7 +226,7 @@ def plotavgweightsPerPostSynNeuron1(pdf):
       ylim((-1.1,1.1))
       ylabel('critic')
       title('sum of weights on to post-synaptic neurons')
-      for trg in ['EML', 'EMR']:
+      for trg in ['EMDOWN', 'EMUP']:
           wperPostID[src+'->'+trg] = arr = []
           tstep = 0
           for t in utimes:
@@ -232,15 +238,15 @@ def plotavgweightsPerPostSynNeuron1(pdf):
                   arr[tstep].append(np.mean(pdfs1.weight))
               tstep += 1
       subplot(3,1,2)
-      plot(utimes,np.array(wperPostID[src+'->EML']),'r-o',linewidth=3,markersize=5)
-      #legend((src+'->EML'),loc='upper left')
+      plot(utimes,np.array(wperPostID[src+'->EMDOWN']),'r-o',linewidth=3,markersize=5)
+      #legend((src+'->EMDOWN'),loc='upper left')
       xlim((0,simConfig['simConfig']['duration']))
-      ylabel(src+'->EML weights')
+      ylabel(src+'->EMDOWN weights')
       subplot(3,1,3)
-      plot(utimes,np.array(wperPostID[src+'->EMR']),'b-o',linewidth=3,markersize=5) 
-      #legend((src+'->EMR'),loc='upper left')       
+      plot(utimes,np.array(wperPostID[src+'->EMUP']),'b-o',linewidth=3,markersize=5) 
+      #legend((src+'->EMUP'),loc='upper left')       
       xlim((0,simConfig['simConfig']['duration']))
-      ylabel(src+'->EMR weights') 
+      ylabel(src+'->EMUP weights') 
       gdx += 1
       xlabel('Time (ms)')  
   return wperPostID
@@ -260,7 +266,7 @@ def plotavgweightsPerPostSynNeuron2(pdf):
       ylabel('critic')
       colorbar
       title('sum of weights on to post-synaptic neurons')
-      for trg in ['EML', 'EMR']:
+      for trg in ['EMDOWN', 'EMUP']:
           wperPostID[src+'->'+trg] = arr = []
           tstep = 0
           for t in utimes:
@@ -272,23 +278,23 @@ def plotavgweightsPerPostSynNeuron2(pdf):
                   arr[tstep].append(np.mean(pdfs1.weight))
               tstep += 1
       subplot(3,1,2)
-      imshow(np.transpose(np.array(wperPostID[src+'->EML'])),aspect = 'auto',cmap='hot', interpolation='None')
+      imshow(np.transpose(np.array(wperPostID[src+'->EMDOWN'])),aspect = 'auto',cmap='hot', interpolation='None')
       b1 = gca().get_xticks()
       gca().set_xticks(b1-1)
       gca().set_xticklabels((100*b1).astype(int))
       colorbar(orientation='horizontal',fraction=0.05)
-      #legend((src+'->EML'),loc='upper left')
+      #legend((src+'->EMDOWN'),loc='upper left')
       xlim((-1,b1[-1]-1))
-      ylabel(src+'->EML weights')
+      ylabel(src+'->EMDOWN weights')
       subplot(3,1,3)
-      imshow(np.transpose(np.array(wperPostID[src+'->EMR'])),aspect = 'auto',cmap='hot', interpolation='None') 
+      imshow(np.transpose(np.array(wperPostID[src+'->EMUP'])),aspect = 'auto',cmap='hot', interpolation='None') 
       b2 = gca().get_xticks()
       gca().set_xticks(b2-1)
       gca().set_xticklabels((100*b2).astype(int))
       colorbar(orientation='horizontal',fraction=0.05)
-      #legend((src+'->EMR'),loc='upper left')       
+      #legend((src+'->EMUP'),loc='upper left')       
       xlim((-1,b2[-1]-1))
-      ylabel(src+'->EMR weights') 
+      ylabel(src+'->EMUP weights') 
       xlabel('Time (ms)')
   
 def plotIndividualSynWeights(pdf):
@@ -309,7 +315,7 @@ def plotIndividualSynWeights(pdf):
       #ylabel('critic')
       #colorbar
       #title('sum of weights on to post-synaptic neurons')
-      for trg in ['EML', 'EMR']:
+      for trg in ['EMDOWN', 'EMUP']:
           allweights[src+'->'+trg] = arr = []
           preNeuronIDs[src+'->'+trg] = arr2 = []
           postNeuronIDs[src+'->'+trg] = arr3 = []
@@ -334,53 +340,53 @@ def plotIndividualSynWeights(pdf):
       figure()
       subplot(position=[0.05,0.1,0.01,0.8])
       c1 = get_cmap('viridis',1028)
-      imshow(np.transpose(np.array(preNeuronIDs[src+'->EML'])),aspect = 'auto',cmap=c1, interpolation='None')
+      imshow(np.transpose(np.array(preNeuronIDs[src+'->EMDOWN'])),aspect = 'auto',cmap=c1, interpolation='None')
       subplot(position=[0.15,0.1,0.8,0.8])
-      imshow(np.transpose(np.array(allweights[src+'->EML'])),aspect = 'auto',cmap='hot', interpolation='None')
+      imshow(np.transpose(np.array(allweights[src+'->EMDOWN'])),aspect = 'auto',cmap='hot', interpolation='None')
       b1 = gca().get_xticks()
       gca().set_xticks(b1-1)
       gca().set_xticklabels((100*b1).astype(int))
       colorbar(orientation='vertical',fraction=0.01)
-      #legend((src+'->EML'),loc='upper left')
+      #legend((src+'->EMDOWN'),loc='upper left')
       xlim((-1,b1[-1]-1))
-      ylabel(src+'->EML weights')
+      ylabel(src+'->EMDOWN weights')
       xlabel('Time (ms)')
       subplot(position=[0.98,0.1,0.01,0.8])
-      imshow(np.transpose(np.array(postNeuronIDs[src+'->EML'])),aspect = 'auto',cmap=c1, interpolation='None')
+      imshow(np.transpose(np.array(postNeuronIDs[src+'->EMDOWN'])),aspect = 'auto',cmap=c1, interpolation='None')
       #subplot(2,1,2)
       figure()
       subplot(position=[0.05,0.1,0.01,0.8])
-      imshow(np.transpose(np.array(preNeuronIDs[src+'->EMR'])),aspect = 'auto',cmap=c1, interpolation='None')
+      imshow(np.transpose(np.array(preNeuronIDs[src+'->EMUP'])),aspect = 'auto',cmap=c1, interpolation='None')
       subplot(position=[0.15,0.1,0.8,0.8])
-      imshow(np.transpose(np.array(allweights[src+'->EMR'])),aspect = 'auto',cmap='hot', interpolation='None') 
+      imshow(np.transpose(np.array(allweights[src+'->EMUP'])),aspect = 'auto',cmap='hot', interpolation='None') 
       b2 = gca().get_xticks()
       gca().set_xticks(b2-1)
       gca().set_xticklabels((100*b2).astype(int))
       colorbar(orientation='vertical',fraction=0.01)
-      #legend((src+'->EMR'),loc='upper left')       
+      #legend((src+'->EMUP'),loc='upper left')       
       xlim((-1,b2[-1]-1))
-      ylabel(src+'->EMR weights') 
+      ylabel(src+'->EMUP weights') 
       xlabel('Time (ms)')
       subplot(position=[0.98,0.1,0.01,0.8])
-      imshow(np.transpose(np.array(postNeuronIDs[src+'->EMR'])),aspect = 'auto',cmap=c1, interpolation='None')
+      imshow(np.transpose(np.array(postNeuronIDs[src+'->EMUP'])),aspect = 'auto',cmap=c1, interpolation='None')
 
 def plotSynWeightsPostNeuronID(pdf,postNeuronID):
   utimes = np.unique(pdf.time)
-  #for a postID, find a neuron in ML and a neuron in MR
-  pdfs_ML = pdf[(pdf.time==utimes[0]) & (pdf.postid>=dstartidx['EML']) & (pdf.postid<=dendidx['EML'])]
-  uIDs_ML = np.unique(pdfs_ML.postid)
-  pdfs_MR = pdf[(pdf.time==utimes[0]) & (pdf.postid>=dstartidx['EMR']) & (pdf.postid<=dendidx['EMR'])]
-  uIDs_MR = np.unique(pdfs_MR.postid)
-  targetML_postID = min(uIDs_ML)-1+postNeuronID
-  targetMR_postID = min(uIDs_MR)-1+postNeuronID
+  #for a postID, find a neuron in ML and a neuron in MUP
+  pdfs_MDOWN = pdf[(pdf.time==utimes[0]) & (pdf.postid>=dstartidx['EMDOWN']) & (pdf.postid<=dendidx['EMDOWN'])]
+  uIDs_MDOWN = np.unique(pdfs_MDOWN.postid)
+  pdfs_MUP = pdf[(pdf.time==utimes[0]) & (pdf.postid>=dstartidx['EMUP']) & (pdf.postid<=dendidx['EMUP'])]
+  uIDs_MUP = np.unique(pdfs_MUP.postid)
+  targetMDOWN_postID = min(uIDs_MDOWN)-1+postNeuronID
+  targetMUP_postID = min(uIDs_MUP)-1+postNeuronID
 
-  NBpreN_ML = len(np.unique(pdfs_ML.preid))
-  NBpreN_MR = len(np.unique(pdfs_MR.preid)) 
+  NBpreN_MDOWN = len(np.unique(pdfs_MDOWN.preid))
+  NBpreN_MUP = len(np.unique(pdfs_MUP.preid)) 
   #for every postsynaptic neuron, find total weight of synaptic inputs per area (i.e. synaptic inputs from EV1, EV4 and EIT and treated separately for each cell——if there are 200 unique cells, will get 600 weights as 200 from each originating layer)
-  MLweights = {}
-  MRweights = {}
-  MLpreNeuronIDs = {}
-  MRpreNeuronIDs = {}
+  MDOWNweights = {}
+  MUPweights = {}
+  MDOWNpreNeuronIDs = {}
+  MUPpreNeuronIDs = {}
   
   #for each of those neurons, find presynaptic neuron IDs and the strengths
   #gdx = 2
@@ -395,18 +401,18 @@ def plotSynWeightsPostNeuronID(pdf,postNeuronID):
   title('weights of all connections for a post-synaptic neuron')
   pdx = 2    
   for src in ['EV1','EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE', 'EV4', 'EMT']:
-      MLweights[src] = arrL = []
-      MRweights[src] = arrR = []
-      MLpreNeuronIDs[src] = arrL2 = []
-      MRpreNeuronIDs[src] = arrR2 = []
+      MDOWNweights[src] = arrL = []
+      MUPweights[src] = arrR = []
+      MDOWNpreNeuronIDs[src] = arrL2 = []
+      MUPpreNeuronIDs[src] = arrR2 = []
       tstep = 0
       for t in utimes:
           arrL.append([])
           arrR.append([])
           arrL2.append([])
           arrR2.append([])
-          pdfsL = pdf[(pdf.time==t) & (pdf.postid==targetML_postID) & (pdf.preid>=dstartidx[src]) & (pdf.preid<=dendidx[src])]
-          pdfsR = pdf[(pdf.time==t) & (pdf.postid==targetMR_postID) & (pdf.preid>=dstartidx[src]) & (pdf.preid<=dendidx[src])]
+          pdfsL = pdf[(pdf.time==t) & (pdf.postid==targetMDOWN_postID) & (pdf.preid>=dstartidx[src]) & (pdf.preid<=dendidx[src])]
+          pdfsR = pdf[(pdf.time==t) & (pdf.postid==targetMUP_postID) & (pdf.preid>=dstartidx[src]) & (pdf.preid<=dendidx[src])]
           upreLCells = np.unique(pdfsL.preid)
           upreRCells = np.unique(pdfsR.preid)
           for preID in upreLCells:
@@ -423,9 +429,9 @@ def plotSynWeightsPostNeuronID(pdf,postNeuronID):
                   arrR2[tstep].append(preID)
           tstep += 1
       subplot(12,1,pdx)
-      plot(utimes,np.array(MLweights[src]),'r-o',linewidth=3,markersize=5)
-      plot(utimes,np.array(MRweights[src]),'b-o',linewidth=3,markersize=5)
-      legend((src+'->EML',src+'->EMR'),loc='upper left')
+      plot(utimes,np.array(MDOWNweights[src]),'r-o',linewidth=3,markersize=5)
+      plot(utimes,np.array(MUPweights[src]),'b-o',linewidth=3,markersize=5)
+      legend((src+'->EMDOWN',src+'->EMUP'),loc='upper left')
       xlim((0,simConfig['simConfig']['duration']))
       pdx += 1        
 

@@ -1,6 +1,10 @@
 # neuronal network connection functions
 import numpy as np
 
+def prob2conv (prob, npre):
+  # probability to convergence; prob is connection probability, npre is number of presynaptic neurons
+  return int(0.5 + prob * npre)
+
 def connectOnePreNtoOneMNeuron (NBNeurons,offset_pre,offset_post): #this method is used to generate list of connections between preSynNeurons and motor neurons.
     blist = []
     for i in range(NBNeurons):
