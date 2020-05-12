@@ -3280,7 +3280,79 @@ saves some space, but not enough:
 
 could also run for 100 s and save weights every 1 s instead of every 100 ms ...
 
+python
+
+import pickle
+din = pickle.load(open('data/20may11_A0_synWeights.pkl','rb'))
+len(din) # 59676000
+# [t,conn.preGid,cell.gid,conn.synMech,float(conn['hObj'].weight[0])]
+
+import pandas as pd
+pdf = pd.DataFrame(din,columns=['time','preid','postid','syntype','weight'])
+
+first need to run
+conda install PyTables
+
+pdf.to_hdf('tmp.hdf',key='synweight')
+
+-rw-rw-r-- 1 samn samn 2507588016 May 12 11:57 tmp.hdf
+
+hmm, that's too big, so not much help ... 
+
+pdf.to_pickle('tmp.pkl',compression='bz2') # takes way too long
+
+#
+dout = {}
+for row in din:
+  t,preID,poID,syn,w = row
+  if preID not in dout:
+    dout[preID] = {}
+  if poID not in dout[preID]:
+    dout[preID][poID] = {}
+  if syn not in dout[preID][poID]:
+    dout[preID][poID][syn] = []
+  dout[preID][poID][syn].append([t,w])
+
+pickle.dump(dout, open('tmp.pkl','wb'))
+
+will use the dictionary format since it saves ~30% of the total size ...
+
 ** other question: why were EMR weights only increasing?
 
 get same when have targettedRL off?
+
+try that with recording weights every 1 s
+
+myrun 12
+
+20may12_rast_a0.png
+20may12_IM_a0.png
+12may12_EML_a0.png
+12may12_IV1_a0.png
+
+paddle seems to get stuck at top of screen ...
+
+python -i actmap.py
+
+fig, axs, plt = animActivityMaps('gif/20may12_actmap_a0.mp4', framerate=10,figsize=(9,5))
+
+gif/20may12_actmap_a0.mp4
+
+yes, paddle stuck at top and EMR fires more than EML ... then hypersynchrony develops
+
+python -i simdat.py
+
+animSynWeights(pdf[pdf.syntype=='AMPA'],'gif/20may12_AMPA_weightmap_a0.mp4', framerate=10) 
+animSynWeights(pdf[pdf.syntype=='NMDA'],'gif/20may12_NMDA_weightmap_a0.mp4', framerate=10) 
+
+this time weights go up for both populations ...
+
+** make sure balanced inputs to E motor populations
+
+all EMR, EML neurons should have same number of inputs ... use convergence instead of probability
+otherwise there will be biases in relative activation of the two populations
+
+IM -> EML, EMR has probability of 0.125
+
+pij
 

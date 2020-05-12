@@ -208,9 +208,9 @@ cfg.saveCellConns = bool(dconf['sim']['saveCellConns']) # if False removes all d
 #cfg.gatherOnlySimData = True # do not set to True, when True gathers from nodes only the output simulation data (not the network instance)
 ###
 
+"""
 recWeight = 0.0001 #weight for recurrent connections within each area.
 recProb = 0.2 #probability of recurrent connections within each area.
-"""
 #Local excitation
 #E to E - may want plasticity between EML<>EML and EMR<>EMR
 for epop in ['ER', 'EV1', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW', 'EV1DSW', 'EV1DS','EV1DSE','EV4','EMT','EML','EMR']:
@@ -952,23 +952,41 @@ if sim.rank==0 and fid4 is not None: fid4.close()
 sim.gatherData() # gather data from different nodes
 sim.saveData() # save data to disk
 
+def LSynWeightToD (L):
+  # convert list of synaptic weights to dictionary to save disk space
+  print('converting synaptic weight list to dictionary...')
+  dout = {}
+  for row in L:
+    t,preID,poID,syn,w = row
+    if preID not in dout:
+      dout[preID] = {}
+    if poID not in dout[preID]:
+      dout[preID][poID] = {}
+    if syn not in dout[preID][poID]:
+      dout[preID][poID][syn] = []
+    dout[preID][poID][syn].append([t,w])
+  return dout
+
 def saveSynWeights ():
+  # save synaptic weights 
   fn = 'data/'+dconf['sim']['name']+'synWeights_'+str(sim.rank)+'.pkl'
-  pickle.dump(lsynweights, open(fn, 'wb'))
-  sim.pc.barrier()
+  pickle.dump(lsynweights, open(fn, 'wb')) # save synaptic weights to disk for this node
+  sim.pc.barrier() # wait for other nodes
   time.sleep(1)    
-  if sim.rank == 0:
+  if sim.rank == 0: # rank 0 reads and assembles the synaptic weights into a single output file
     L = []
     for i in range(sim.nhosts):
       fn = 'data/'+dconf['sim']['name']+'synWeights_'+str(i)+'.pkl'
-      while not os.path.isfile(fn):
+      while not os.path.isfile(fn): # wait until the file is written/available
         print('saveSynWeights: waiting for finish write of', fn)
         time.sleep(1)      
       lw = pickle.load(open(fn,'rb'))
       print(fn,'len(lw)=',len(lw),type(lw),type(lw[0]),lw[0])
-      os.unlink(fn)
-      L = L + lw
-    pickle.dump(L,open('data/'+dconf['sim']['name']+'synWeights.pkl', 'wb'))
+      os.unlink(fn) # remove the temporary file
+      L = L + lw # concatenate to the list L
+    #pickle.dump(L,open('data/'+dconf['sim']['name']+'synWeights.pkl', 'wb')) # this would save as a List
+    # now convert the list to a dictionary to save space, and save it to disk
+    pickle.dump(LSynWeightToD(L),open('data/'+dconf['sim']['name']+'synWeights.pkl', 'wb'))    
 
 if sim.saveWeights: saveSynWeights()
 

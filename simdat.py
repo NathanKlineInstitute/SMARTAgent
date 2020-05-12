@@ -16,7 +16,13 @@ stepNB = -1
 #
 def readinweights (name):
   # read the synaptic plasticity weights into a pandas dataframe
-  A = pickle.load(open('data/'+name+'synWeights.pkl','rb'))  
+  D = pickle.load(open('data/'+name+'synWeights.pkl','rb'))
+  A = []
+  for preID in D.keys():
+    for poID in D[preID].keys():
+      for syn in D[preID][poID].keys():
+        for row in D[preID][poID][syn]:
+          A.append([row[0], preID, poID, syn, row[1]])
   return pd.DataFrame(A,columns=['time','preid','postid','syntype','weight'])
 
 def getsimname (name=None):
