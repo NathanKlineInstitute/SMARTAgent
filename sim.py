@@ -77,13 +77,7 @@ STDPparams = {'hebbwt': 0.0001, 'antiwt':-0.00001, 'wbase': 0.0012, 'wmax': 50, 
 
 
 dSTDPparamsRL = {} # STDP-RL parameters for AMPA,NMDA synapses; generally uses shorter/longer eligibility traces
-for sy in ['AMPA', 'NMDA']:
-  dRLprm = dconf['RL'][sy]
-  dSTDPparamsRL[sy] = {'hebbwt': 0.0000, 'antiwt':-0.0000, 'wbase': dRLprm['WBase'], 'wmax': dRLprm['WMax'],\
-                       'RLon': dRLprm['ON'] , 'RLhebbwt': 0.001 , 'RLantiwt': -0.000,\
-                       'tauhebb': 10, 'RLlenhebb': dRLprm['lenhebb'] ,'RLlenanti': dRLprm['lenanti'], 'RLwindhebb': 50, \
-                       'useRLexp': dRLprm['exp'], 'softthresh': 0, 'verbose':0
-  }
+for sy in ['AMPA', 'NMDA']: dSTDPparamsRL[sy] = dconf['RL'][sy]
 
 # these are the image-based inputs provided to the R (retinal) cells
 netParams.stimSourceParams['stimMod'] = {'type': 'NetStim', 'rate': 'variable', 'noise': 0}

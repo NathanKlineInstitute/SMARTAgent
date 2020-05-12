@@ -3408,3 +3408,34 @@ since confusing to read code ...
 
 ok ... adjusted in sim.py, sim.json, simdat.py, actmap.py
 
+** get rid of hypersynch
+
+can reduce "EEMWghtAM":0.0001,"EEMWghtNM":0.00001 to lower values ...
+
+and also the RL weight increment ... which variable is that ... ?
+'RLhebbwt': 0.001 , 'RLantiwt': -0.000, ??
+
+yeah, looks like RLhebbwt ... and it's very large compared to starting weights ... so should
+reduce it and add as a param for sim.json ...
+
+note that RLhebbwt may be ok since it's multiplied by the reward/punishment value in mod/stdp.mod ...
+so it only moves by a fraction anyway (when using critic values of 0.001, 0.01, etc.)
+(/u/samn/SMARTAgent/mod/stdp.mod:156)
+
+ok, try adjustments ...
+
+myrun 12
+
+20may12_EMDOWN_c0.png
+
+looks better overall...but only a matter of time until epileptic/highly synchronized activity returns ...
+without homeostatic plasticity that's likely to occur...unless use soft thresholding and have lower wmax values?
+
+python -i actmap.py
+
+fig, axs, plt = animActivityMaps('gif/20may12_actmap_c0.mp4', framerate=10,figsize=(18,10))
+
+python -i simdat.py
+
+animSynWeights(pdf[pdf.syntype=='AMPA'],'gif/20may12_AMPA_weightmap_c0.mp4', framerate=10, figsize=(14,8)) 
+animSynWeights(pdf[pdf.syntype=='NMDA'],'gif/20may12_NMDA_weightmap_c0.mp4', framerate=10, figsize=(14,8))
