@@ -727,32 +727,32 @@ def trainAgent (t):
             action = dconf['movecodes'][random.randint(0,len(dconf['movecodes'])-1)]
             actions.append(action)
     else: #the actions should be based on the activity of motor cortex (MO) 1085-1093
-        F_Rs = []
-        F_Ls = []
+        F_UPs = []
+        F_DOWNs = []
         for ts in range(int(dconf['actionsPerPlay'])):
             ts_beg = t-tstepPerAction*(dconf['actionsPerPlay']-ts-1) 
             ts_end = t-tstepPerAction*(dconf['actionsPerPlay']-ts)
-            F_Rs.append(getFiringRatesWithInterval([ts_end,ts_beg], sim.net.pops['EMUP'].cellGids))
-            F_Ls.append(getFiringRatesWithInterval([ts_end,ts_beg], sim.net.pops['EMDOWN'].cellGids))
-        sim.pc.allreduce(vec.from_python(F_Rs),1) #sum
-        F_Rs = vec.to_python()
-        sim.pc.allreduce(vec.from_python(F_Ls),1) #sum
-        F_Ls = vec.to_python()
+            F_UPs.append(getFiringRatesWithInterval([ts_end,ts_beg], sim.net.pops['EMUP'].cellGids))
+            F_DOWNs.append(getFiringRatesWithInterval([ts_end,ts_beg], sim.net.pops['EMDOWN'].cellGids))
+        sim.pc.allreduce(vec.from_python(F_UPs),1) #sum
+        F_UPs = vec.to_python()
+        sim.pc.allreduce(vec.from_python(F_DOWNs),1) #sum
+        F_DOWNs = vec.to_python()
         if sim.rank==0:
             if fid4 is None: fid4 = open(sim.MotorOutputsfilename,'w')
-            print('Firing rates: ', F_Rs, F_Ls)
+            print('Firing rates: ', F_UPs, F_DOWNs)
             #print('Firing rates: ', F_R1, F_R2, F_R3, F_R4, F_R5, F_L1, F_L2, F_L3, F_L4, F_L5)
             fid4.write('%0.1f' % t)
             for ts in range(int(dconf['actionsPerPlay'])):
-                fid4.write('\t%0.1f' % F_Rs[ts])
+                fid4.write('\t%0.1f' % F_UPs[ts])
             for ts in range(int(dconf['actionsPerPlay'])):
-                fid4.write('\t%0.1f' % F_Ls[ts])
+                fid4.write('\t%0.1f' % F_DOWNs[ts])
             fid4.write('\n')
             actions = []
             for ts in range(int(dconf['actionsPerPlay'])):
-                if F_Rs[ts]>F_Ls[ts]:
+                if F_UPs[ts]>F_DOWNs[ts]:
                     actions.append(dconf['moves']['UP'])
-                elif F_Ls[ts]>F_Rs[ts]:
+                elif F_DOWNs[ts]>F_UPs[ts]:
                     actions.append(dconf['moves']['DOWN'])
                 else:
                     actions.append(dconf['moves']['NOMOVE']) # No move        
@@ -804,27 +804,27 @@ def trainAgent (t):
           else:
             print('CRITIC=0')                    
         sim.pc.broadcast(vec.from_python([critic]), 0) # convert python list to hoc vector to broadcast critic value to other nodes
-        Ractions = np.sum(np.where(np.array(actions)==dconf['moves']['UP'],1,0))
-        Lactions = np.sum(np.where(np.array(actions)==dconf['moves']['DOWN'],1,0))
-        sim.pc.broadcast(vec2.from_python([Ractions]),0)
-        sim.pc.broadcast(vec3.from_python([Lactions]),0)
+        UPactions = np.sum(np.where(np.array(actions)==dconf['moves']['UP'],1,0))
+        DOWNactions = np.sum(np.where(np.array(actions)==dconf['moves']['DOWN'],1,0))
+        sim.pc.broadcast(vec2.from_python([UPactions]),0)
+        sim.pc.broadcast(vec3.from_python([DOWNactions]),0)
     else: # other workers
         sim.pc.broadcast(vec, 0) # receive critic value from master node
         critic = vec.to_python()[0] # critic is first element of the array
         sim.pc.broadcast(vec2, 0)
-        Ractions = vec2.to_python()[0]
+        UPactions = vec2.to_python()[0]
         sim.pc.broadcast(vec3, 0)
-        Lactions = vec3.to_python()[0]
-        if dconf['verbose']: print('Ractions: ', Ractions,'Lactions: ', Lactions)
+        DOWNactions = vec3.to_python()[0]
+        if dconf['verbose']: print('UPactions: ', UPactions,'DOWNactions: ', DOWNactions)
     if critic != 0: # if critic signal indicates punishment (-1) or reward (+1)
         if sim.rank==0: print('t=',t,'- adjusting weights based on RL critic value:', critic)
-        if not dconf['sim']['targettedRL'] or Ractions==Lactions:
+        if not dconf['sim']['targettedRL'] or UPactions==DOWNactions:
           if dconf['verbose']: print('APPLY RL to both EMUP and EMDOWN')
           for STDPmech in dSTDPmech['all']: STDPmech.reward_punish(float(critic))
-        elif Ractions>Lactions:
+        elif UPactions>DOWNactions:
           if dconf['verbose']: print('APPLY RL to EMUP')
           for STDPmech in dSTDPmech['EMUP']: STDPmech.reward_punish(float(critic))
-        elif Lactions>Ractions:
+        elif DOWNactions>UPactions:
           if dconf['verbose']: print('APPLY RL to EMDOWN')
           for STDPmech in dSTDPmech['EMDOWN']: STDPmech.reward_punish(float(critic))
     if sim.rank==0:
@@ -850,7 +850,6 @@ def trainAgent (t):
             print('Weights Recording Time:', t, 'NBsteps:',NBsteps,'recordWeightStepSize:',recordWeightStepSize)
         recordAdjustableWeights(sim, t) 
         #recordWeights(sim, t)
-    #sim.saveSimDataInNode() ###
 
 def getAllSTDPObjects (sim):
   # get all the STDP objects from the simulation's cells
