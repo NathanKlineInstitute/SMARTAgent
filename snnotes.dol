@@ -3159,7 +3159,7 @@ py_alltoall
 can also rewrite code to have each node save its own synaptic weight data and then at end
 merge the data into a single file ...
 
-*20may11 - continue fixes
+*20may11 - continue fixes - gatherdata issue, workaround
 ** debugging gatherdata issue, way to avoid it -->> save syn weights on each node, then combine
 
 still crashes without all the extra calls to sim._gatherAllCellTags
@@ -3234,3 +3234,233 @@ in simdat.py animsynweights ... fixup to use matplotlib.gridspec.GridSpec
 
 animSynWeights(pdf[pdf.syntype=='AMPA'],'gif/20may11_AMPA_weightmap_a0.mp4', framerate=10) #plot/save images as movie
 animSynWeights(pdf[pdf.syntype=='NMDA'],'gif/20may11_NMDA_weightmap_a0.mp4', framerate=10) #plot/save images as movie
+
+compress pickle to reduce file size?
+
+https://lucianopaz.github.io/compress_pickle/html/
+
+pip install lz4
+pip install compress_pickle
+
+python
+import pickle, compress_pickle
+d = pickle.load(open('data/20may11_A0_synWeights.pkl','rb'))
+compress_pickle.dump(d, 'tmp.pkl', compression="lzma", set_default_extension=False)
+
+takes too long ...
+
+see if reformatting weights as dict will save space ...
+
+python
+import pickle
+din = pickle.load(open('data/20may11_A0_synWeights.pkl','rb'))
+len(din) # 59676000
+# [t,conn.preGid,cell.gid,conn.synMech,float(conn['hObj'].weight[0])]
+
+#
+dout = {}
+for row in din:
+  t,preID,poID,syn,w = row
+  if preID not in dout:
+    dout[preID] = {}
+  if poID not in dout[preID]:
+    dout[preID][poID] = {}
+  if syn not in dout[preID][poID]:
+    dout[preID][poID][syn] = []
+  dout[preID][poID][syn].append([t,w])
+
+pickle.dump(dout, open('tmp.pkl','wb'))
+
+saves some space, but not enough:
+(-rw-rw-r-- 1 samn samn 1562509212 May 11 23:06 tmp.pkl; new size is ~1.6 GB)
+(original size is ~2.2GB  -rw-rw-r-- 1 samn samn 2193401415 May 11 16:26 20may11_A0_synWeights.pkl)
+
+*20may12 - 
+** try reducing size of output synaptic weight data
+
+could also run for 100 s and save weights every 1 s instead of every 100 ms ...
+
+python
+
+import pickle
+din = pickle.load(open('data/20may11_A0_synWeights.pkl','rb'))
+len(din) # 59676000
+# [t,conn.preGid,cell.gid,conn.synMech,float(conn['hObj'].weight[0])]
+
+import pandas as pd
+pdf = pd.DataFrame(din,columns=['time','preid','postid','syntype','weight'])
+
+first need to run
+conda install PyTables
+
+pdf.to_hdf('tmp.hdf',key='synweight')
+
+-rw-rw-r-- 1 samn samn 2507588016 May 12 11:57 tmp.hdf
+
+hmm, that's too big, so not much help ... 
+
+pdf.to_pickle('tmp.pkl',compression='bz2') # takes way too long
+
+#
+dout = {}
+for row in din:
+  t,preID,poID,syn,w = row
+  if preID not in dout:
+    dout[preID] = {}
+  if poID not in dout[preID]:
+    dout[preID][poID] = {}
+  if syn not in dout[preID][poID]:
+    dout[preID][poID][syn] = []
+  dout[preID][poID][syn].append([t,w])
+
+pickle.dump(dout, open('tmp.pkl','wb'))
+
+will use the dictionary format since it saves ~30% of the total size ...
+
+** other question: why were EMR weights only increasing?
+
+get same when have targettedRL off?
+
+try that with recording weights every 1 s
+
+myrun 12
+
+20may12_rast_a0.png
+20may12_IM_a0.png
+12may12_EML_a0.png
+12may12_IV1_a0.png
+
+paddle seems to get stuck at top of screen ...
+
+python -i actmap.py
+
+fig, axs, plt = animActivityMaps('gif/20may12_actmap_a0.mp4', framerate=10,figsize=(9,5))
+
+gif/20may12_actmap_a0.mp4
+
+yes, paddle stuck at top and EMR fires more than EML ... then hypersynchrony develops
+
+python -i simdat.py
+
+animSynWeights(pdf[pdf.syntype=='AMPA'],'gif/20may12_AMPA_weightmap_a0.mp4', framerate=10) 
+animSynWeights(pdf[pdf.syntype=='NMDA'],'gif/20may12_NMDA_weightmap_a0.mp4', framerate=10) 
+
+this time weights go up for both populations ...
+
+** make sure balanced inputs to E motor populations
+
+all EMR, EML neurons should have same number of inputs ... use convergence instead of probability
+otherwise there will be biases in relative activation of the two populations
+
+IM -> EML, EMR has probability of 0.125
+
+conv = int(0.5 + pij * numfrom)
+
+could make a pmat to use ...
+
+EML -> IM, EMR -> IM
+had connection probability of 0.125/2 and 400 EML, EMR neurons ...
+conv = int(0.5 + 0.125/2 * dnumc[EML]) = 25
+
+IM -> EML, IM -> EMR
+had connection probability of 0.125 and 200 IM neurons
+conv = int(0.5 + 0.125 * 200) = 25
+
+ok, put in a helper function in connUtils to get convergence from probability and num presynaptic neurons
+and used it to get convergence number in the connection rules ... will see if that produces more similar
+firing rates for EMR and EML ...
+
+and try sim with the new ~equivalent convergence-based connectivity ...
+
+20may12_B0_
+
+myrun 12
+
+  Cells: 5359
+  Connections: 0 (0.00 per cell) <<-- that's because not saving cellconn, there are synapses in this simulation
+  Spikes: 222076 (4.14 Hz)
+  Simulated time: 10.0 s; 12 workers
+  Run time: 1002.30 s
+
+ok, rates for EMR, EML are more similar now:
+ 20may12_rast_b0.png
+ 20may12_EML_b0.png
+ 20may12_IM_b0.png
+
+the paddle does get stuck at top for part of simulation ... seems less likely
+to get stuck at bottom? 
+ 
+the network also transitions to too much synchronous EMR,EML activity quickly ... should reduce that
+maybe via different starting and max weights ... 
+
+python -i actmap.py
+
+fig, axs, plt = animActivityMaps('gif/20may12_actmap_b0.mp4', framerate=10,figsize=(18,10))
+
+python -i simdat.py
+
+animSynWeights(pdf[pdf.syntype=='AMPA'],'gif/20may12_AMPA_weightmap_b0.mp4', framerate=10, figsize=(14,8)) 
+animSynWeights(pdf[pdf.syntype=='NMDA'],'gif/20may12_NMDA_weightmap_b0.mp4', framerate=10, figsize=(14,8))
+
+** change EMR -> EMUP, EML -> EMDOWN
+
+since confusing to read code ...
+
+ok ... adjusted in sim.py, sim.json, simdat.py, actmap.py
+
+** get rid of hypersynch
+
+can reduce "EEMWghtAM":0.0001,"EEMWghtNM":0.00001 to lower values ...
+
+and also the RL weight increment ... which variable is that ... ?
+'RLhebbwt': 0.001 , 'RLantiwt': -0.000, ??
+
+yeah, looks like RLhebbwt ... and it's very large compared to starting weights ... so should
+reduce it and add as a param for sim.json ...
+
+note that RLhebbwt may be ok since it's multiplied by the reward/punishment value in mod/stdp.mod ...
+so it only moves by a fraction anyway (when using critic values of 0.001, 0.01, etc.)
+(/u/samn/SMARTAgent/mod/stdp.mod:156)
+
+ok, try adjustments ...
+
+myrun 12
+
+20may12_EMDOWN_c0.png
+
+looks better overall...but only a matter of time until epileptic/highly synchronized activity returns ...
+without homeostatic plasticity that's likely to occur...unless use soft thresholding and have lower wmax values?
+could also have easier homeostatic plasticity rule to check rates of all populations and increase random
+inhibitory noise when cells begin to fire too fast
+
+python -i actmap.py
+
+fig, axs, plt = animActivityMaps('gif/20may12_actmap_c0.mp4', framerate=10,figsize=(18,10))
+
+python -i simdat.py
+
+animSynWeights(pdf[pdf.syntype=='AMPA'],'gif/20may12_AMPA_weightmap_c0.mp4', framerate=10, figsize=(14,8)) 
+animSynWeights(pdf[pdf.syntype=='NMDA'],'gif/20may12_NMDA_weightmap_c0.mp4', framerate=10, figsize=(14,8))
+
+ok, will try a soft threshold and 10 s sim ...
+
+not sure if want NMDA RL plasticity yet ... has very long eligibility trace (~800 ms) ...
+
+dynamics look decent overall, but have to run longer and see if remains stable,
+since rates seem to increase somewhat over time ...
+
+20may12_rast_c1.png
+20may12_IM_c1.png
+20may12_EMDOWN_c1.png
+20may12_IV1_C1.png
+
+python -i actmap.py
+
+fig, axs, plt = animActivityMaps('gif/20may12_actmap_c1.mp4', framerate=10,figsize=(18,10))
+
+python -i simdat.py
+
+animSynWeights(pdf[pdf.syntype=='AMPA'],'gif/20may12_AMPA_weightmap_c1.mp4', framerate=10, figsize=(14,8));animSynWeights(pdf[pdf.syntype=='NMDA'],'gif/20may12_NMDA_weightmap_c1.mp4', framerate=10, figsize=(14,8))
+
+ok, try a 100 s sim with same params ...
+
