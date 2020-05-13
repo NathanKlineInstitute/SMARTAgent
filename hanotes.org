@@ -1652,3 +1652,318 @@ c1 = plt.colorbar(fa,cax = cbaxes)
 c1.set_ticks([22,67,112,157,202,247,292,337])
 c1.set_ticklabels(['E','NE','N','NW','W','SW','S','SE'])
 plt.show()
+
+**I think it will be better to use object tracking to compute direction of motion.
+**some example codes are discussed here:
+https://www.learnopencv.com/multitracker-multiple-object-tracking-using-opencv-c-python/
+https://gist.github.com/adioshun/72106c82674fd6cd7b06fe9105c2ab86
+
+**Use K-MEAN CLUSTERING TO DETECT OBJECTS
+
+
+***INPUTS
+1. Input data or Image for CLUSTERING
+2. number of clusters required at the end.
+3. Critera:
+  cv2.TERM_CRITERIA_EPS --stop the algorithm if specified accuracy (epsilon) is reached.
+  cv2.TERM_CRITERIA_MAX_ITER --stop the algorithm after specified number of iterations (max_iter)
+  cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER --stop when any of the above condition is met.
+  max_iter = 10
+  epsilon = 1.0
+4. attempts = 10 ---- flag to specify the number of times the algorithm is executed using different initial labeling. the algorithm ruturns the labels that yield the best compactness. This compactness is returned as output.
+5. cv2.KMEANS_RANDOM_CENTERS
+***outputs
+1. compactness: sum of squared distance from each point to their corresponding centers.
+2. labels: this is the label array where ach element marked '0','1' and so on depending on number of clusters
+3. centers: array of centers of clusters.
+
+
+***TRY FOLLOWING CODE TO TEST OBJECTS
+I = sim.AIGame.FullImages[-1]
+inds = np.where(I>np.min(I))
+Z = np.transpose(np.array(inds))
+# convert to np.float32
+Z = np.float32(Z)
+criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 5, 1.0)
+ret,label,center=cv2.kmeans(Z,3,None,criteria,5,cv2.KMEANS_RANDOM_CENTERS)
+A = Z[label.ravel()==0]
+B = Z[label.ravel()==1]
+C = Z[label.ravel()==2]
+plt.scatter(A[:,1],A[:,0],c='b')
+plt.scatter(B[:,1],B[:,0],c = 'r')
+plt.scatter(C[:,1],C[:,0],c = 'g')
+
+o1_x = np.min(A[0])
+o1_w = np.max(A[0])-np.min(A[0])
+o1_y = np.min(A[1])
+o1_h = np.max(A[1])-np.min(A[1])
+
+o2_x = np.min(B[0])
+o2_w = np.max(B[0])-np.min(B[0])
+o2_y = np.min(B[1])
+o2_h = np.max(B[1])-np.min(B[1])
+
+o3_x = np.min(C[0])
+o3_w = np.max(C[0])-np.min(C[0])
+o3_y = np.min(C[1])
+o3_h = np.max(C[1])-np.min(C[1])
+
+
+
+--->This was complicated way to do.
+
+** sam suggested much straight forward way of doing this.
+
+mask = im > thresh
+from scipy import ndimage
+labelim, nlabels = ndimage.label(mask)
+  return labelim, nlabels
+
+check details here: https://scipy-lectures.org/intro/scipy/auto_examples/plot_connect_measurements.html
+
+*20may11
+**continue with motion direction using object identification and then object racking.
+I is a grayscale image with an instance (observation) of aigame 'Pong'.
+mask = I > np.min(I)
+from scipy import ndimage
+labelim, nlabels = ndimage.label(mask)
+each pixel in labelim contains labels of the object it belongs to.
+>>> np.unique(labelim)
+array([0, 1, 2, 3], dtype=int32) ----here 0 is for background and then there are 3 objects labeled 1,2 and 3.
+
+o1 = ndimage.find_objects(labelim==1)
+o2 = ndimage.find_objects(labelim==2)
+o3 = ndimage.find_objects(labelim==3)
+
+>>> o1
+[(slice(0, 6, None), slice(140, 144, None))]
+>>> o2
+[(slice(115, 131, None), slice(16, 20, None))]
+>>> o3
+[(slice(115, 119, None), slice(44, 46, None))]
+
+to get a bounding box
+x1_o1 = o1[0][0].start
+x2_o1 = o1[0][0].stop
+y1_o1 = o1[0][1].start
+y2_o1 = o1[0][1].stop
+
+# use object tracking code as an example: Code i used to test the tracking is presented below this code.
+
+# initialize a dictionary that maps strings to their corresponding
+# OpenCV object tracker implementations
+OPENCV_OBJECT_TRACKERS = {
+	"csrt": cv2.TrackerCSRT_create,
+	"kcf": cv2.TrackerKCF_create,
+	"boosting": cv2.TrackerBoosting_create,
+	"mil": cv2.TrackerMIL_create,
+	"tld": cv2.TrackerTLD_create,
+	"medianflow": cv2.TrackerMedianFlow_create,
+	"mosse": cv2.TrackerMOSSE_create
+}
+# KCF: Fast and accurate
+# CSRT: More accurate than KCF but slower
+# MOSSE: Extremely fast but not as accurate as either KCF or CSRT
+
+# initialize OpenCV's special multi-object tracker
+trackers = cv2.MultiTracker_create()
+# loop over frames from the video stream
+for _ in range(100):
+	# grab the current frame, then handle if we are using a
+	# VideoStream or VideoCapture object
+  rewards, epCount, proposed_actions, total_hits, Racket_pos, Ball_pos = sim.AIGame.playGame(actions=[4], epCount = 0)
+  frame = sim.AIGame.FullImages[-1]
+  # grab the updated bounding box coordinates (if any) for each
+  # object that is being tracked
+  (success, boxes) = trackers.update(frame)
+  # loop over the bounding boxes and draw then on the frame
+  for box in boxes:
+	  (x, y, w, h) = [int(v) for v in box]
+	  cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
+# create a new object tracker for the bounding box and add it
+# to our multi-object tracker
+
+box = [x1_o1, y1_o1, x2_o1-x1_o1, y2_o1, y1_o1]
+
+x1_o1 = o1[0][0].start
+x2_o1 = o1[0][0].stop
+y1_o1 = o1[0][1].start
+y2_o1 = o1[0][1].stop
+tracker = OPENCV_OBJECT_TRACKERS[args["moose"]]()
+trackers.add(tracker, frame, box)
+
+
+###################################################
+from netpyne import specs, sim
+from neuron import h
+import numpy as np
+import random
+from conf import dconf # configuration dictionary
+import pandas as pd
+import pickle
+from collections import OrderedDict
+from connUtils import *
+from matplotlib import pyplot as plt
+import os
+import anim
+from matplotlib import animation
+from aigame import AIGame
+sim.AIGame = AIGame()
+for _ in range(30):
+  cact = random.randint(3,4)
+  rewards, epCount, proposed_actions, total_hits, Racket_pos, Ball_pos = sim.AIGame.playGame(actions=[cact], epCount = 0)
+import cv2
+# object detection and finding bounding boxes
+frame = sim.AIGame.FullImages[-1]
+mask = frame > np.min(frame)
+from scipy import ndimage
+labelim, nlabels = ndimage.label(mask)
+# each pixel in labelim contains labels of the object it belongs to.
+o1 = ndimage.find_objects(labelim==1)
+o2 = ndimage.find_objects(labelim==2)
+o3 = ndimage.find_objects(labelim==3)
+
+# to get a bounding box
+x1_o1 = o1[0][0].start
+x2_o1 = o1[0][0].stop
+y1_o1 = o1[0][1].start
+y2_o1 = o1[0][1].stop
+
+x1_o2 = o2[0][0].start
+x2_o2 = o2[0][0].stop
+y1_o2 = o2[0][1].start
+y2_o2 = o2[0][1].stop
+
+x1_o3 = o3[0][0].start
+x2_o3 = o3[0][0].stop
+y1_o3 = o3[0][1].start
+y2_o3 = o3[0][1].stop
+
+bbox1 = (x1_o1, y1_o1, x2_o1-x1_o1, y2_o1-y1_o1)
+bbox2 = (x1_o2, y1_o2, x2_o2-x1_o2, y2_o2-y1_o2)
+bbox3 = (x1_o3, y1_o3, x2_o3-x1_o3, y2_o3-y1_o3)
+
+frame = np.ascontiguousarray(frame, dtype=np.uint8)
+cv2.rectangle(frame, (y1_o1,x1_o1), (y2_o1,x2_o1), (0, 255, 0),1)
+cv2.rectangle(frame, (y1_o2,x1_o2), (y2_o2,x2_o2), (255, 0, 0),1)
+cv2.rectangle(frame, (y1_o3,x1_o3), (y2_o3,x2_o3), (0, 0, 255),1)
+plt.imshow(frame)
+plt.show()
+
+# initialize OpenCV's special multi-object tracker
+tracker = cv2.TrackerMIL_create()
+bbox = ()
+# grab the updated bounding box coordinates (if any) for each object that is being tracked
+ret, bbox = tracker.update(frame) # probably dont need this
+bbox = (x1_o1, y1_o1, x2_o1-x1_o1, y2_o1-y1_o1)
+tracker = cv2.TrackerMIL_create()
+tracker.init(frame, bbox)
+steps = 0
+cact = 3
+while steps<10:
+  if (steps/10)==int((steps/10)):
+    if cact==3: 
+      cact = 4
+    else: 
+      cact = 3
+  rewards, epCount, proposed_actions, total_hits, Racket_pos, Ball_pos = sim.AIGame.playGame(actions=[cact], epCount = 0)
+  frame = sim.AIGame.FullImages[-1]
+  bbox1 = bbox
+  # tracker.init(frame, bbox)
+  frame = np.ascontiguousarray(frame, dtype=np.uint8)
+  ret, bbox = tracker.update(frame)
+  steps = steps+1
+  # (x, y, w, h) = [int(v) for v in bbox1] # mark previous frame 
+ 	# cv2.rectangle(frame, (y, x), (y + h, x + w), (0, 255, 0), 2)
+  (x, y, w, h) = [int(v) for v in bbox] # mark tracked and updated frame
+	cv2.rectangle(frame, (y, x), (y + h, x + w), (0, 255, 0), 2)
+  cv2.imshow("frame",frame)
+  #plt.show()
+
+########################################################################
+
+bug in KCF tracker: https://github.com/opencv/opencv_contrib/issues/640 ---- spent lot of time thinking that i was doing something wrong but found that there was a bug in python version of this tracker.
+
+trackers.add(tracker, frame, box)
+
+
+
+
+#Try other method ----problem with this method was that i could not install dlib to test the code below.
+code here: https://www.pyimagesearch.com/2018/10/22/object-tracking-with-dlib/
+
+from netpyne import specs, sim
+from neuron import h
+import numpy as np
+import random
+from conf import dconf # configuration dictionary
+import pandas as pd
+import pickle
+from collections import OrderedDict
+from connUtils import *
+from matplotlib import pyplot as plt
+import os
+import anim
+from matplotlib import animation
+from aigame import AIGame
+sim.AIGame = AIGame()
+rewards, epCount, proposed_actions, total_hits, Racket_pos, Ball_pos = sim.AIGame.playGame(actions=[3], epCount = 0)
+import dlib
+import cv2
+frame = sim.AIGame.FullImages[-1]
+mask = frame > np.min(frame)
+from scipy import ndimage
+labelim, nlabels = ndimage.label(mask)
+# each pixel in labelim contains labels of the object it belongs to.
+o1 = ndimage.find_objects(labelim==1)
+o2 = ndimage.find_objects(labelim==2)
+o3 = ndimage.find_objects(labelim==3)
+# to get a bounding box
+x1_o1 = o1[0][0].start
+x2_o1 = o1[0][0].stop
+y1_o1 = o1[0][1].start
+y2_o1 = o1[0][1].stop
+# compute the (x, y)-coordinates of the bounding box for the object
+startX = o1[0][0].start
+startY = o1[0][1].start
+endX = o1[0][0].stop
+endY = o1[0][1].stop
+# construct a dlib rectangle object from the bounding box coordinates and then start the dlib correlation 
+# tracker
+tracker = dlib.correlation_tracker()
+rect = dlib.rectangle(startX, startY, endX, endY)
+tracker.start_track(frame, rect)
+# draw the bounding box and text for the object
+cv2.rectangle(frame, (startX, startY), (endX, endY),(0, 255, 0), 2)
+steps = 0
+cact = 3
+while steps<10:
+  if (steps/10)==int((steps/10)):
+    if cact==3: 
+      cact = 4
+    else: 
+      cact = 3
+  rewards, epCount, proposed_actions, total_hits, Racket_pos, Ball_pos = sim.AIGame.playGame(actions=[cact], epCount = 0)
+  frame = sim.AIGame.FullImages[-1]
+	tracker.update(frame)
+	pos = tracker.get_position()
+	# unpack the position object
+	startX = int(pos.left())
+	startY = int(pos.top())
+	endX = int(pos.right())
+	endY = int(pos.bottom())
+	# draw the bounding box from the correlation object tracker
+	cv2.rectangle(frame, (startX, startY), (endX, endY),(0, 255, 0), 2)
+  plt.imshow(frame)
+  plt.show()
+
+
+frame = sim.AIGame.FullImages[-1]
+bbox1 = bbox
+# tracker.init(frame, bbox)
+frame = np.ascontiguousarray(frame, dtype=np.uint8)
+ret, bbox = tracker.update(frame)
+(x, y, w, h) = [int(v) for v in bbox] # mark tracked and updated frame
+cv2.rectangle(frame, (y,x), (y + h, x + w), (0, 255, 0), 2)
+plt.imshow(frame)
+plt.show()
