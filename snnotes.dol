@@ -3464,3 +3464,29 @@ animSynWeights(pdf[pdf.syntype=='AMPA'],'gif/20may12_AMPA_weightmap_c1.mp4', fra
 
 ok, try a 100 s sim with same params ...
 
+ran to completion & saved output but then crashed some time after display ... so did
+not have chance to save raster ... can redraw from data ... looked like hypersynch
+emerged eventually with fairly high rates for EMUP,EMDOWN,IM populations
+
+synweights file is ~1.6 GB
+simconfig ~540 MB
+
+python -i actmap.py
+
+fig, axs, plt = animActivityMaps('gif/20may12_actmap_c2.mp4', framerate=10,figsize=(18,10))
+
+that movie shows it does seem to improve by the end, though paddle gets stuck a lot ... 
+
+python -i simdat.py
+
+animSynWeights(pdf[pdf.syntype=='AMPA'],'gif/20may12_AMPA_weightmap_c2.mp4', framerate=10, figsize=(14,8));animSynWeights(pdf[pdf.syntype=='NMDA'],'gif/20may12_NMDA_weightmap_c2.mp4', framerate=10, figsize=(14,8))
+
+some slight improvement in performance near the end ... looks like would need a lot longer to get anywhere reasonable, though
+the hypersynchrony could cause problems far sooner ...
+
+also worth testing the targetted RL rule keeping everything else the same ...
+
+not sure need the NMDA RL since ball can get across screen in a few 100 ms ... can keep for now ...
+
+can try two 300 s sims on zn and see which does better (with or without targetted RL)
+
