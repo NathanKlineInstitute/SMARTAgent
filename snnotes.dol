@@ -3408,7 +3408,7 @@ since confusing to read code ...
 
 ok ... adjusted in sim.py, sim.json, simdat.py, actmap.py
 
-** get rid of hypersynch
+** get rid of hypersynch -->> ends up developing after ~10 s even with lower starting weights some improvement in performance?
 
 can reduce "EEMWghtAM":0.0001,"EEMWghtNM":0.00001 to lower values ...
 
@@ -3489,4 +3489,18 @@ also worth testing the targetted RL rule keeping everything else the same ...
 not sure need the NMDA RL since ball can get across screen in a few 100 ms ... can keep for now ...
 
 can try two 300 s sims on zn and see which does better (with or without targetted RL)
+
+
+** longer sims
+*** 300 s same params as last (20may12_NOTARG_Z0_)
+
+myrun 12
+
+started ~23:29
+
+*** 300 s same params as last but with targetted RL on (20may12_TARG_Z0_)
+
+myrun 12
+
+started ~23:31
 
