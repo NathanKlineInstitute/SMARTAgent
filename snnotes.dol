@@ -3558,6 +3558,9 @@ action and avoiding other action, which gets suppressed if no more activation
 should redo this sim but without the targetted RL , just to check if one M pop gets suppressed
 ...
 
+ok, run 20may13_B0_
+with targettedRL == 0  , all else same ...
+
 
 ** does readinweights work properly with AMPA and NMDA weights?
 
