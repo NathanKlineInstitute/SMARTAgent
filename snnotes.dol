@@ -3669,8 +3669,40 @@ animSynWeights(pdf[pdf.syntype=='AMPA'],'gif/20may14_A0_AMPA_weightmap_3s.mp4', 
 looks ok ... those videos show reward after ball hit and point scored but not in the hit ball / miss ball panel ...
 is that a bug? probably hit/miss code just needs a minor adjustment
 
-** weight rescaling every so often?
+** weight rescaling every so often? seems to work/prevent hyperexcit
 
 could normalize incoming AMPA/NMDA weights of EMUP,EMDOWN populations
 to have same average or sum as start with ... 
+
+ok, implemented some of that, testing it now ...
+
+normalizeWeightStepSize in sim.json controls how many action steps to use for normalizing the
+weights; uses a mult factor for each population based on EEMWghtAM
+so when average weights dip below, they're pushed towards that value, and when they're above, they are reduced
+scaling as EEMWghtAM / average_weight
+
+seems to work based on printouts ... and some short sims
+
+tried in 10 s sim ... with weight normalization every 500 ms ...
+
+average weights moved in both directions and were scaled up or down ... 
+
+maybe works ... ?
+
+at least no hyperexcit here:
+20may14_T0_rast.png
+
+python -i actmap.py
+
+fig, axs, plt = animActivityMaps('gif/20may14_T0_actmap_10s.mp4', framerate=10,figsize=(18,10))
+
+python -i simdat.py
+
+animSynWeights(pdf[pdf.syntype=='AMPA'],'gif/20may14_T0_AMPA_weightmap_10s.mp4', framerate=10, figsize=(14,8))
+
+looks like ~avg value maintained fairly well, and some hotspots with high weight emerge too ... 
+
+next, to test in longer sim ... can use 1 s between normalizations ... 
+
+run for 200 s ... with 12 cores ... on zn
 

@@ -15,6 +15,7 @@ from matplotlib import animation
 
 random.seed(1234) # this will not work properly across runs with different number of nodes
 
+sim.davgW = {} # average adjustable weights on a target population
 sim.allTimes = []
 sim.allRewards = [] # list to store all rewards
 sim.allActions = [] # list to store all actions
@@ -32,6 +33,7 @@ sim.saveWeights = 1  # save weights
 sim.saveInputImages = 1 #save Input Images (5 game frames)
 sim.saveMotionFields = 1 # whether to save the motion fields
 recordWeightStepSize = dconf['sim']['recordWeightStepSize']
+normalizeWeightStepSize = dconf['sim']['normalizeWeightStepSize']
 #recordWeightDT = 1000 # interval for recording synaptic weights (change later)
 recordWeightDCells = 1 # to record weights for sub samples of neurons
 tstepPerAction = dconf['sim']['tstepPerAction'] # time step per action (in ms)
@@ -492,6 +494,17 @@ sim.AIGame = None # placeholder
 
 lsynweights = [] # list of syn weights, per node
 
+def sumAdjustableWeightsPop (sim, popname):
+  # record the plastic weights for specified popname
+  lcell = [c for c in sim.net.cells if c.gid in sim.net.pops[popname].cellGids] # this is the set of MR cells
+  W = N = 0
+  for cell in lcell:
+    for conn in cell.conns:
+      if 'hSTDP' in conn:
+        W += float(conn['hObj'].weight[0])
+        N += 1
+  return W, N
+  
 def recordAdjustableWeightsPop (sim, t, popname):
   # record the plastic weights for specified popname
   lcell = [c for c in sim.net.cells if c.gid in sim.net.pops[popname].cellGids] # this is the set of MR cells
@@ -559,6 +572,48 @@ def plotWeights():
   ylabel('Synaptic connection id')
   colorbar()
   show()
+
+def getAverageAdjustableWeights (sim, lpop = ['EMUP', 'EMDOWN']):
+  # get average adjustable weights on a target population
+  davg = {pop:0.0 for pop in lpop}
+  for pop in lpop:
+    WSum = 0; NSum = 0    
+    W, N = sumAdjustableWeightsPop(sim, pop)
+    # destlist_on_root = pc.py_gather(srcitem, root)
+    lw = sim.pc.py_gather(W, 0)
+    ln = sim.pc.py_gather(N, 0)
+    if sim.rank == 0:
+      WSum = W + np.sum(lw)
+      NSum = N + np.sum(ln)
+      #print('rank= 0, pop=',pop,'W=',W,'N=',N,'wsum=',WSum,'NSum=',NSum)
+      if NSum > 0: davg[pop] = WSum / NSum    
+    else:
+      #destitem_from_root = sim.pc.py_scatter(srclist, root)
+      pass
+      #print('rank=',sim.rank,'pop=',pop,'Wm=',W,'N=',N)
+  lsrc = [davg for i in range(sim.nhosts)] if sim.rank==0 else None
+  dest = sim.pc.py_scatter(lsrc, 0)
+  return dest
+
+def mulAdjustableWeights (sim, dfctr):
+  # multiply adjustable STDP/RL weights by dfctr[pop] value for each population keyed in dfctr
+  for pop in dfctr.keys():
+    lcell = [c for c in sim.net.cells if c.gid in sim.net.pops[pop].cellGids] # this is the set of cells
+    for cell in lcell:
+      for conn in cell.conns:
+        if 'hSTDP' in conn:    
+          conn['hObj'].weight[0] *= dfctr[pop] 
+
+def normalizeAdjustableWeights (sim, t, lpop = ['EMUP', 'EMDOWN']):
+  """ record the STDP weights during the simulation - called in trainAgent
+  """
+  davg = getAverageAdjustableWeights(sim, lpop)
+  try:
+    dfctr = {k:dconf['net']['EEMWghtAM']/davg[k] for k in lpop}
+    if sim.rank==0: print('sim.rank=',sim.rank,'davg:',davg, dconf['net']['EEMWghtAM'], 'dfctr:',dfctr)
+    mulAdjustableWeights(sim,dfctr)
+  except:
+    print('Exception; davg:',davg)
 
 def saveGameBehavior(sim):
   with open(sim.ActionsRewardsfilename,'w') as fid3:
@@ -737,13 +792,11 @@ def trainAgent (t):
     F_DOWNs = vec.to_python()
     if sim.rank==0:
       if fid4 is None: fid4 = open(sim.MotorOutputsfilename,'w')
-      print('Firing rates: ', F_UPs, F_DOWNs)
+      print('U,D firing rates: ', F_UPs, F_DOWNs)
       #print('Firing rates: ', F_R1, F_R2, F_R3, F_R4, F_R5, F_L1, F_L2, F_L3, F_L4, F_L5)
       fid4.write('%0.1f' % t)
-      for ts in range(int(dconf['actionsPerPlay'])):
-        fid4.write('\t%0.1f' % F_UPs[ts])
-      for ts in range(int(dconf['actionsPerPlay'])):
-        fid4.write('\t%0.1f' % F_DOWNs[ts])
+      for ts in range(int(dconf['actionsPerPlay'])): fid4.write('\t%0.1f' % F_UPs[ts])
+      for ts in range(int(dconf['actionsPerPlay'])): fid4.write('\t%0.1f' % F_DOWNs[ts])
       fid4.write('\n')
       actions = []
       for ts in range(int(dconf['actionsPerPlay'])):
@@ -846,6 +899,10 @@ def trainAgent (t):
       print('Weights Recording Time:', t, 'NBsteps:',NBsteps,'recordWeightStepSize:',recordWeightStepSize)
     recordAdjustableWeights(sim, t) 
     #recordWeights(sim, t)
+  if NBsteps % normalizeWeightStepSize == 0:
+    if dconf['verbose'] > 0 and sim.rank==0:
+      print('Weight Normalize Time:', t, 'NBsteps:',NBsteps,'normalizeWeightStepSize:',normalizeWeightStepSize)
+    normalizeAdjustableWeights(sim, t)     
 
 def getAllSTDPObjects (sim):
   # get all the STDP objects from the simulation's cells
