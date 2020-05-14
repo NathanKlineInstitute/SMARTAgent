@@ -434,7 +434,11 @@ def plotSynWeightsPostNeuronID(pdf,postNeuronID):
 
 if __name__ == '__main__':
   stepNB = -1
-  if len(sys.argv) > 1: stepNB = int(sys.argv[1]) #which file(stepNB) want to plot
+  if len(sys.argv) > 1:
+    try:
+      stepNB = int(sys.argv[1]) #which file(stepNB) want to plot
+    except:
+      pass
   print(stepNB)
   simConfig, pdf, actreward, dstartidx, dendidx, dnumc = loadsimdat()
   print('loaded simulation data')
