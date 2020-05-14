@@ -2184,3 +2184,195 @@ while True:
 		break
 # do a bit of cleanup
 cv2.destroyAllWindows()
+
+
+*20May14
+**Before I resolve issue dealing with overlapped objects in centroidtracking.py... i will look into hitBall tracking in the aigame.py
+
+
+I will need the following code to test it.
+
+import numpy as np
+import cv2
+import random
+from matplotlib import pyplot as plt
+from scipy import ndimage
+from aigame import AIGame
+AIGame = AIGame()
+
+
+courtYRng = (34, 194) # court y range
+courtXRng = (20, 140) # court x range
+last_obs = []
+last_ball_dir = 0
+
+def findobj (img, xrng, yrng):
+  # find an object's x, y position in the image (assumes bright object on dark background)
+  subimg = img[yrng[0]:yrng[1],xrng[0]:xrng[1],:]
+  sIC = np.sum(subimg,2) #assuming the color of object is uniform, add values or r,g,b to get a single value      
+  pixelVal = np.amax(sIC) #find the pixel value representing object assuming a black background
+  sIC[sIC<pixelVal]=0 #make binary image
+  Obj_inds = []
+  for i in range(sIC.shape[0]):
+    for j in range(sIC.shape[1]):
+      if sIC[i,j]>0:
+        Obj_inds.append([i,j])
+  if sIC.shape[0]*sIC.shape[1]==np.shape(Obj_inds)[0]: #if there is no object in the subimage
+    ypos = -1
+    xpos = -1
+  else:
+    ypos = np.median(Obj_inds,0)[0] #y position of the center of mass of the object
+    xpos = np.median(Obj_inds,0)[1] #x position of the center of mass of the object
+  return xpos, ypos
+
+if np.shape(last_obs)[0]>0: #if last_obs is not empty              
+  xpos_Ball, ypos_Ball = findobj(last_obs, courtXRng, courtYRng)
+observation, reward, done, info = env.step(caction)
+#find position of ball after action
+xpos_Ball2, ypos_Ball2 = findobj(observation, courtXRng, courtYRng)        
+if xpos_Ball>0 and xpos_Ball2>0:
+  if xpos_Ball2-xpos_Ball>0:
+    ball_moves_towards_racket = 1 #use proposed action for reward only when the ball moves towards the racket
+    current_ball_dir = 1 
+  elif xpos_Ball2-xpos_Ball<0:
+    ball_moves_towards_racket = 0
+    current_ball_dir = -1
+  else:
+    ball_moves_towards_racket = 0
+    current_ball_dir = 0 #direction can't be determinted  prob. because the ball didn't move in x dir.
+else:
+  ball_moves_towards_racket = 0
+  current_ball_dir = 0 #direction can't be determined because either current or last position of the ball is outside the court
+
+ball_hits_racket = 0
+if last_ball_dir==0 or current_ball_dir==0: # no way to find out if the ball hit the racket
+  ball_hits_racket = 0 #therefore assumed that ball didn't hit the racket--weak/bad assumption
+else:
+  if last_ball_dir==1 and current_ball_dir==-1 and reward==0:
+    #if the ball was moving towards the racket and now its moving away from racket and didnt lose
+    ball_hits_racket = 1
+last_ball_dir = current_ball_dir
+
+**OUTPUT of testing script:
+
+1 instance:
+np.shape(last_obs)[0]: 210
+xpos_Ball: 115.5
+xpos_Ball: 115.5
+xpos_Ball2: 118.5
+reward:  0.0
+last ball direction: 1
+current ball direction: 1
+0  <--- hitBall signal
+4
+np.shape(last_obs)[0]: 210
+xpos_Ball: 118.5
+xpos_Ball: 118.5
+xpos_Ball2: 115.5
+reward:  0.0
+last ball direction: 1
+current ball direction: -1
+1   <--- hitBall signal
+
+2nd instance:
+np.shape(last_obs)[0]: 210
+xpos_Ball: 115.5
+xpos_Ball: 115.5
+xpos_Ball2: 118.5
+reward:  0.0
+last ball direction: 1
+current ball direction: 1
+0   <--- hitBall signal
+3
+np.shape(last_obs)[0]: 210
+xpos_Ball: 118.5
+xpos_Ball: 118.5
+xpos_Ball2: 117.5
+reward:  0.0
+last ball direction: 1
+current ball direction: -1
+1   <--- hitBall signal
+
+
+an instance where the algorithm didn't work-----
+
+
+np.shape(last_obs)[0]: 210
+xpos_Ball: 114.5
+xpos_Ball: 114.5
+xpos_Ball2: 117.5
+reward:  0.0
+last ball direction: 1
+current ball direction: 1
+0
+4
+np.shape(last_obs)[0]: 210
+xpos_Ball: 117.5
+xpos_Ball: 117.5
+xpos_Ball2: 117.5
+reward:  0.0
+last ball direction: 1
+current ball direction: 0
+0
+4
+np.shape(last_obs)[0]: 210
+xpos_Ball: 117.5
+xpos_Ball: 117.5
+xpos_Ball2: 111.5
+reward:  0.0
+last ball direction: 0
+current ball direction: -1
+0
+
+***CHANGE CODE IS aigame.py
+
+
+      if self.last_ball_dir==1 and reward==0:
+        # i noticed that sometimesthe ball don't move when it is very close to the racket/edge of the court.
+        if current_ball_dir==0 and xpos_Ball2>courtXRng[1]-courtXRng[0]-3: 
+          ball_hits_racket = 1 
+        elif self.last_ball_dir==1 and current_ball_dir==-1:
+          #if the ball was moving towards the racket and now its moving away from racket and didnt lose
+          ball_hits_racket = 1
+        else: ball_hits_racket = 0
+      else: ball_hits_racket = 0
+
+
+
+
+**Looks like its fixed....
+
+np.shape(last_obs)[0]: 210
+xpos_Ball: 115.5
+xpos_Ball: 115.5
+xpos_Ball2: 118.5
+reward:  0.0
+last ball direction: 1
+current ball direction: 1
+0
+4
+np.shape(last_obs)[0]: 210
+xpos_Ball: 118.5
+xpos_Ball: 118.5
+xpos_Ball2: 118.5
+reward:  0.0
+last ball direction: 1
+current ball direction: 0
+1   <--- hitBall signal
+4
+np.shape(last_obs)[0]: 210
+xpos_Ball: 118.5
+xpos_Ball: 118.5
+xpos_Ball2: 112.5
+reward:  0.0
+last ball direction: 0
+current ball direction: -1
+
+** found another problem.... sometimes ball is outside court and still get hit by the racket.
+
+
+    if current_ball_dir-last_ball_dir<0 and reward==0 and xpos_Ball2>courtXRng[1]-courtXRng[0]-3:
+      ball_hits_racket = 1
+    elif xpos_Ball==-1 and reward==0 and xpos_Ball2>courtXRng[1]-courtXRng[0]-3:
+      ball_hits_racket = 1
+** so far works for all tested conditions  

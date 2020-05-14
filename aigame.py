@@ -205,15 +205,14 @@ class AIGame:
         current_ball_dir = 0 #direction can't be determined because either current or last position of the ball is outside the court
 
       ball_hits_racket = 0
-      if self.last_ball_dir==0 or current_ball_dir==0: # no way to find out if the ball hit the racket
-        ball_hits_racket = 0 #therefore assumed that ball didn't hit the racket--weak/bad assumption
-      else:
-        if self.last_ball_dir==1 and current_ball_dir==-1 and reward==0:
-          #if the ball was moving towards the racket and now its moving away from racket and didnt lose
-          ball_hits_racket = 1
+      # previously I assumed when current_ball_dir is 0 there is no way to find out if the ball hit the racket
+      if current_ball_dir-self.last_ball_dir<0 and reward==0 and xpos_Ball2>courtXRng[1]-courtXRng[0]-3:
+        ball_hits_racket = 1
+      elif xpos_Ball==-1 and reward==0 and xpos_Ball2>courtXRng[1]-courtXRng[0]-3:
+        ball_hits_racket = 1  
+      print(ball_hits_racket)
       self.last_ball_dir = current_ball_dir
       total_hits.append(ball_hits_racket) # i dont think this can be more than a single hit in 5 moves. so check if sum is greater than 1, print error
-
       self.env.render()
       self.last_obs = observation # current observation will be used as last_obs for the next action
       if done:
