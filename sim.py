@@ -502,92 +502,92 @@ def recordAdjustableWeightsPop (sim, t, popname):
   return len(lcell)
                     
 def recordAdjustableWeights (sim, t, lpop = ['EMUP', 'EMDOWN']):
-    """ record the STDP weights during the simulation - called in trainAgent
-    """
-    for pop in lpop: recordAdjustableWeightsPop(sim, t, pop)
+  """ record the STDP weights during the simulation - called in trainAgent
+  """
+  for pop in lpop: recordAdjustableWeightsPop(sim, t, pop)
 
 def recordWeights (sim, t):
-    """ record the STDP weights during the simulation - called in trainAgent
-    """
-    #lRcell = [c for c in sim.net.cells if c.gid in sim.net.pops['ER'].cellGids]
-    sim.WeightsRecordingTimes.append(t)
-    sim.allRLWeights.append([]) # Save this time
-    sim.allNonRLWeights.append([])
-    for cell in sim.net.cells:
-        for conn in cell.conns:
-            if 'hSTDP' in conn:
-                if conn.plast.params.RLon ==1:
-                    sim.allRLWeights[-1].append(float(conn['hObj'].weight[0])) # save weight only for Rl-STDP conns
-                else:
-                    sim.allNonRLWeights[-1].append(float(conn['hObj'].weight[0])) # save weight only for nonRL-STDP conns
+  """ record the STDP weights during the simulation - called in trainAgent
+  """
+  #lRcell = [c for c in sim.net.cells if c.gid in sim.net.pops['ER'].cellGids]
+  sim.WeightsRecordingTimes.append(t)
+  sim.allRLWeights.append([]) # Save this time
+  sim.allNonRLWeights.append([])
+  for cell in sim.net.cells:
+    for conn in cell.conns:
+      if 'hSTDP' in conn:
+        if conn.plast.params.RLon ==1:
+          sim.allRLWeights[-1].append(float(conn['hObj'].weight[0])) # save weight only for Rl-STDP conns
+        else:
+          sim.allNonRLWeights[-1].append(float(conn['hObj'].weight[0])) # save weight only for nonRL-STDP conns
     
 def saveWeights(sim, downSampleCells):
-    ''' Save the weights for each plastic synapse '''
-    with open(sim.RLweightsfilename,'w') as fid1:
-        count1 = 0
-        for weightdata in sim.allRLWeights:
-            #fid.write('%0.0f' % weightdata[0]) # Time
-            #print(len(weightdata))
-            fid1.write('%0.1f' %sim.WeightsRecordingTimes[count1])
-            count1 = count1+1
-            for i in range(0,len(weightdata), downSampleCells): fid1.write('\t%0.8f' % weightdata[i])
-            fid1.write('\n')
-    print(('Saved RL weights as %s' % sim.RLweightsfilename))
-    with open(sim.NonRLweightsfilename,'w') as fid2:
-        count2 = 0
-        for weightdata in sim.allNonRLWeights:
-            #fid.write('%0.0f' % weightdata[0]) # Time
-            #print(len(weightdata))
-            fid2.write('%0.1f' %sim.WeightsRecordingTimes[count2])
-            count2 = count2+1
-            for i in range(0,len(weightdata), downSampleCells): fid2.write('\t%0.8f' % weightdata[i])
-            fid2.write('\n')
-    print(('Saved Non-RL weights as %s' % sim.NonRLweightsfilename))    
+  ''' Save the weights for each plastic synapse '''
+  with open(sim.RLweightsfilename,'w') as fid1:
+    count1 = 0
+    for weightdata in sim.allRLWeights:
+      #fid.write('%0.0f' % weightdata[0]) # Time
+      #print(len(weightdata))
+      fid1.write('%0.1f' %sim.WeightsRecordingTimes[count1])
+      count1 = count1+1
+      for i in range(0,len(weightdata), downSampleCells): fid1.write('\t%0.8f' % weightdata[i])
+      fid1.write('\n')
+  print(('Saved RL weights as %s' % sim.RLweightsfilename))
+  with open(sim.NonRLweightsfilename,'w') as fid2:
+    count2 = 0
+    for weightdata in sim.allNonRLWeights:
+      #fid.write('%0.0f' % weightdata[0]) # Time
+      #print(len(weightdata))
+      fid2.write('%0.1f' %sim.WeightsRecordingTimes[count2])
+      count2 = count2+1
+      for i in range(0,len(weightdata), downSampleCells): fid2.write('\t%0.8f' % weightdata[i])
+      fid2.write('\n')
+  print(('Saved Non-RL weights as %s' % sim.NonRLweightsfilename))    
 
 #    
 def plotWeights():
-    from pylab import figure, loadtxt, xlabel, ylabel, xlim, ylim, show, pcolor, array, colorbar
-    figure()
-    weightdata = loadtxt(sim.weightsfilename)
-    weightdataT=list(map(list, list(zip(*weightdata))))
-    vmax = max([max(row) for row in weightdata])
-    vmin = min([min(row) for row in weightdata])
-    pcolor(array(weightdataT), cmap='hot_r', vmin=vmin, vmax=vmax)
-    xlim((0,len(weightdata)))
-    ylim((0,len(weightdata[0])))
-    xlabel('Time (weight updates)')
-    ylabel('Synaptic connection id')
-    colorbar()
-    show()
+  from pylab import figure, loadtxt, xlabel, ylabel, xlim, ylim, show, pcolor, array, colorbar
+  figure()
+  weightdata = loadtxt(sim.weightsfilename)
+  weightdataT=list(map(list, list(zip(*weightdata))))
+  vmax = max([max(row) for row in weightdata])
+  vmin = min([min(row) for row in weightdata])
+  pcolor(array(weightdataT), cmap='hot_r', vmin=vmin, vmax=vmax)
+  xlim((0,len(weightdata)))
+  ylim((0,len(weightdata[0])))
+  xlabel('Time (weight updates)')
+  ylabel('Synaptic connection id')
+  colorbar()
+  show()
 
 def saveGameBehavior(sim):
-    with open(sim.ActionsRewardsfilename,'w') as fid3:
-        for i in range(len(sim.allActions)):
-            fid3.write('%0.1f' % sim.allTimes[i])
-            fid3.write('\t%0.1f' % sim.allActions[i])
-            fid3.write('\t%0.5f' % sim.allRewards[i])
-            fid3.write('\t%0.1f' % sim.allProposedActions[i]) #the number of proposed action should be equal to the number of actions
-            fid3.write('\t%0.1f' % sim.allHits[i]) #1 when the racket hits the ball and -1 when the racket misses the ball
-            fid3.write('\n')
+  with open(sim.ActionsRewardsfilename,'w') as fid3:
+    for i in range(len(sim.allActions)):
+      fid3.write('%0.1f' % sim.allTimes[i])
+      fid3.write('\t%0.1f' % sim.allActions[i])
+      fid3.write('\t%0.5f' % sim.allRewards[i])
+      fid3.write('\t%0.1f' % sim.allProposedActions[i]) #the number of proposed action should be equal to the number of actions
+      fid3.write('\t%0.1f' % sim.allHits[i]) #1 when the racket hits the ball and -1 when the racket misses the ball
+      fid3.write('\n')
 
 ######################################################################################
 
 def getFiringRatesWithInterval (trange = None, neuronal_pop = None):
-    #sim.gatherData()
-    spkts = sim.simData['spkt']
-    spkids = sim.simData['spkid']
-    pop_spikes = 0
-    if len(spkts)>0:
-        for i in range(len(spkids)):
-            if trange[0] <= spkts[i] <= trange[1] and spkids[i] in neuronal_pop:
-                pop_spikes = pop_spikes+1
-        tsecs = float((trange[1]-trange[0]))/1000.0
-        numCells = float(len(neuronal_pop))
-        avgRates = pop_spikes/numCells/tsecs
-    else:
-        avgRates = 0.0
-    #print('Firing rate : %.3f Hz'%(avgRates))
-    return avgRates
+  #sim.gatherData()
+  spkts = sim.simData['spkt']
+  spkids = sim.simData['spkid']
+  pop_spikes = 0
+  if len(spkts)>0:
+    for i in range(len(spkids)):
+      if trange[0] <= spkts[i] <= trange[1] and spkids[i] in neuronal_pop:
+        pop_spikes = pop_spikes+1
+    tsecs = float((trange[1]-trange[0]))/1000.0
+    numCells = float(len(neuronal_pop))
+    avgRates = pop_spikes/numCells/tsecs
+  else:
+    avgRates = 0.0
+  #print('Firing rate : %.3f Hz'%(avgRates))
+  return avgRates
 
 NBsteps = 0 # this is a counter for recording the plastic weights
 epCount = []
@@ -710,142 +710,142 @@ def updateInputRates ():
           #print('cell GID: ', int(cell.gid), 'vs cell ID with offset: ', int(cell.gid-R_offset)) # interval in ms as a function of rate; is cell.gid correct index??? 
       
 def trainAgent (t):
-    """ training interface between simulation and game environment
-    """
-    global NBsteps, epCount, proposed_actions, total_hits, Racket_pos, Ball_pos, current_time_stepNB, fid4
-    global f_ax, fig
-    global tstepPerAction
-    vec = h.Vector()
-    vec2 = h.Vector()
-    vec3 = h.Vector()
-    if t<(tstepPerAction*dconf['actionsPerPlay']): # for the first time interval use randomly selected actions
-        actions =[]
-        for _ in range(int(dconf['actionsPerPlay'])):
-            action = dconf['movecodes'][random.randint(0,len(dconf['movecodes'])-1)]
-            actions.append(action)
-    else: #the actions should be based on the activity of motor cortex (MO) 1085-1093
-        F_UPs = []
-        F_DOWNs = []
-        for ts in range(int(dconf['actionsPerPlay'])):
-            ts_beg = t-tstepPerAction*(dconf['actionsPerPlay']-ts-1) 
-            ts_end = t-tstepPerAction*(dconf['actionsPerPlay']-ts)
-            F_UPs.append(getFiringRatesWithInterval([ts_end,ts_beg], sim.net.pops['EMUP'].cellGids))
-            F_DOWNs.append(getFiringRatesWithInterval([ts_end,ts_beg], sim.net.pops['EMDOWN'].cellGids))
-        sim.pc.allreduce(vec.from_python(F_UPs),1) #sum
-        F_UPs = vec.to_python()
-        sim.pc.allreduce(vec.from_python(F_DOWNs),1) #sum
-        F_DOWNs = vec.to_python()
-        if sim.rank==0:
-            if fid4 is None: fid4 = open(sim.MotorOutputsfilename,'w')
-            print('Firing rates: ', F_UPs, F_DOWNs)
-            #print('Firing rates: ', F_R1, F_R2, F_R3, F_R4, F_R5, F_L1, F_L2, F_L3, F_L4, F_L5)
-            fid4.write('%0.1f' % t)
-            for ts in range(int(dconf['actionsPerPlay'])):
-                fid4.write('\t%0.1f' % F_UPs[ts])
-            for ts in range(int(dconf['actionsPerPlay'])):
-                fid4.write('\t%0.1f' % F_DOWNs[ts])
-            fid4.write('\n')
-            actions = []
-            for ts in range(int(dconf['actionsPerPlay'])):
-                if F_UPs[ts]>F_DOWNs[ts]:
-                    actions.append(dconf['moves']['UP'])
-                elif F_DOWNs[ts]>F_UPs[ts]:
-                    actions.append(dconf['moves']['DOWN'])
-                else:
-                    actions.append(dconf['moves']['NOMOVE']) # No move        
-    if sim.rank == 0:
-        print('Model actions:', actions)
-        rewards, epCount, proposed_actions, total_hits, Racket_pos, Ball_pos = sim.AIGame.playGame(actions, epCount)
-        print('Proposed actions:', proposed_actions)
-        if dconf['sim']['RLFakeUpRule']: # fake rule for testing reinforcing of up moves
-          critic = np.sign(actions.count(dconf['moves']['UP']) - actions.count(dconf['moves']['DOWN']))          
-          rewards = [critic for i in range(len(rewards))]
-        elif dconf['sim']['RLFakeDownRule']: # fake rule for testing reinforcing of down moves
-          critic = np.sign(actions.count(dconf['moves']['DOWN']) - actions.count(dconf['moves']['UP']))
-          rewards = [critic for i in range(len(rewards))]
-        elif dconf['sim']['RLFakeStayRule']: # fake rule for testing reinforcing of stay still
-          critic = np.sign(actions.count(dconf['moves']['NOMOVE']) - actions.count(dconf['moves']['DOWN']) - actions.count(dconf['moves']['UP']))
-          rewards = [critic for i in range(len(rewards))]                    
-        else: # normal game play scoring rules
-          #normal game based rewards
-          critic = sum(rewards) # get critic signal (-1, 0 or 1)
-          if critic>0:
-            critic  = dconf['rewardcodes']['scorePoint'] 
-          elif critic<0:
-            critic = dconf['rewardcodes']['losePoint']  #-0.01, e.g. to reduce magnitude of punishment so rewards dominate
-          else:
-            critic = 0
-          #starting from here not tested
-          #rewards for hitting the ball
-          critic_for_avoidingloss = 0
-          if sum(total_hits)>0:
-            critic_for_avoidingloss = dconf['rewardcodes']['hitBall'] #should be able to change this number from config file
-          #rewards for following or avoiding the ball
-          critic_for_following_ball = 0
-          for ai in range(len(actions)):
-              caction = actions[ai]
-              cproposed_action = proposed_actions[ai]
-              if caction - cproposed_action == 0:
-                critic_for_following_ball += dconf['rewardcodes']['followBall'] #follow the ball
-              else:
-                critic_for_following_ball += dconf['rewardcodes']['avoidBall'] # didn't follow the ball
-          #total rewards
-          critic = critic + critic_for_avoidingloss + critic_for_following_ball
-          rewards = [critic for i in range(len(rewards))]  # reset rewards to modified critic signal - should use more granular recording
-        #till here not tested
-        if dconf['verbose']:
-          if critic > 0:
-            print('REWARD, critic=',critic)
-          elif critic < 0:
-            print('PUNISH, critic=',critic)
-          else:
-            print('CRITIC=0')                    
-        sim.pc.broadcast(vec.from_python([critic]), 0) # convert python list to hoc vector to broadcast critic value to other nodes
-        UPactions = np.sum(np.where(np.array(actions)==dconf['moves']['UP'],1,0))
-        DOWNactions = np.sum(np.where(np.array(actions)==dconf['moves']['DOWN'],1,0))
-        sim.pc.broadcast(vec2.from_python([UPactions]),0)
-        sim.pc.broadcast(vec3.from_python([DOWNactions]),0)
-    else: # other workers
-        sim.pc.broadcast(vec, 0) # receive critic value from master node
-        critic = vec.to_python()[0] # critic is first element of the array
-        sim.pc.broadcast(vec2, 0)
-        UPactions = vec2.to_python()[0]
-        sim.pc.broadcast(vec3, 0)
-        DOWNactions = vec3.to_python()[0]
-        if dconf['verbose']: print('UPactions: ', UPactions,'DOWNactions: ', DOWNactions)
-    if critic != 0: # if critic signal indicates punishment (-1) or reward (+1)
-        if sim.rank==0: print('t=',t,'- adjusting weights based on RL critic value:', critic)
-        if not dconf['sim']['targettedRL'] or UPactions==DOWNactions:
-          if dconf['verbose']: print('APPLY RL to both EMUP and EMDOWN')
-          for STDPmech in dSTDPmech['all']: STDPmech.reward_punish(float(critic))
-        elif UPactions>DOWNactions:
-          if dconf['verbose']: print('APPLY RL to EMUP')
-          for STDPmech in dSTDPmech['EMUP']: STDPmech.reward_punish(float(critic))
-        elif DOWNactions>UPactions:
-          if dconf['verbose']: print('APPLY RL to EMDOWN')
-          for STDPmech in dSTDPmech['EMDOWN']: STDPmech.reward_punish(float(critic))
+  """ training interface between simulation and game environment
+  """
+  global NBsteps, epCount, proposed_actions, total_hits, Racket_pos, Ball_pos, current_time_stepNB, fid4
+  global f_ax, fig
+  global tstepPerAction
+  vec = h.Vector()
+  vec2 = h.Vector()
+  vec3 = h.Vector()
+  if t<(tstepPerAction*dconf['actionsPerPlay']): # for the first time interval use randomly selected actions
+    actions =[]
+    for _ in range(int(dconf['actionsPerPlay'])):
+      action = dconf['movecodes'][random.randint(0,len(dconf['movecodes'])-1)]
+      actions.append(action)
+  else: #the actions should be based on the activity of motor cortex (MO) 1085-1093
+    F_UPs = []
+    F_DOWNs = []
+    for ts in range(int(dconf['actionsPerPlay'])):
+      ts_beg = t-tstepPerAction*(dconf['actionsPerPlay']-ts-1) 
+      ts_end = t-tstepPerAction*(dconf['actionsPerPlay']-ts)
+      F_UPs.append(getFiringRatesWithInterval([ts_end,ts_beg], sim.net.pops['EMUP'].cellGids))
+      F_DOWNs.append(getFiringRatesWithInterval([ts_end,ts_beg], sim.net.pops['EMDOWN'].cellGids))
+    sim.pc.allreduce(vec.from_python(F_UPs),1) #sum
+    F_UPs = vec.to_python()
+    sim.pc.allreduce(vec.from_python(F_DOWNs),1) #sum
+    F_DOWNs = vec.to_python()
     if sim.rank==0:
-        print('Game rewards:', rewards) # only rank 0 has access to rewards      
-        for action in actions:
-            sim.allActions.append(action)
-        for pactions in proposed_actions: #also record proposed actions
-            sim.allProposedActions.append(pactions)
-        for reward in rewards: # this generates an error - since rewards only declared for sim.rank==0; bug?
-            sim.allRewards.append(reward)
-        for hits in total_hits:
-            sim.allHits.append(hits) #hit or no hit
-        tvec_actions = []
-        for ts in range(len(actions)): tvec_actions.append(t-tstepPerAction*(len(actions)-ts-1))
-        for ltpnt in tvec_actions: sim.allTimes.append(ltpnt)
-        #current_time_stepNB, f_ax, fig = updateBehaviorPlot (sim,sim.AIGame.ReducedImages,sim.AIGame.FullImages,dirSensitiveNeurons,Racket_pos,Ball_pos,current_time_stepNB, f_ax, fig)
-        #current_time_stepNB = current_time_stepNB + 1
-    updateInputRates() # update firing rate of inputs to R population (based on image content)                
-    NBsteps += 1
-    if NBsteps % recordWeightStepSize == 0:
-        if dconf['verbose'] > 0 and sim.rank==0:
-            print('Weights Recording Time:', t, 'NBsteps:',NBsteps,'recordWeightStepSize:',recordWeightStepSize)
-        recordAdjustableWeights(sim, t) 
-        #recordWeights(sim, t)
+      if fid4 is None: fid4 = open(sim.MotorOutputsfilename,'w')
+      print('Firing rates: ', F_UPs, F_DOWNs)
+      #print('Firing rates: ', F_R1, F_R2, F_R3, F_R4, F_R5, F_L1, F_L2, F_L3, F_L4, F_L5)
+      fid4.write('%0.1f' % t)
+      for ts in range(int(dconf['actionsPerPlay'])):
+        fid4.write('\t%0.1f' % F_UPs[ts])
+      for ts in range(int(dconf['actionsPerPlay'])):
+        fid4.write('\t%0.1f' % F_DOWNs[ts])
+      fid4.write('\n')
+      actions = []
+      for ts in range(int(dconf['actionsPerPlay'])):
+        if F_UPs[ts]>F_DOWNs[ts]:
+          actions.append(dconf['moves']['UP'])
+        elif F_DOWNs[ts]>F_UPs[ts]:
+          actions.append(dconf['moves']['DOWN'])
+        else:
+          actions.append(dconf['moves']['NOMOVE']) # No move        
+  if sim.rank == 0:
+    print('Model actions:', actions)
+    rewards, epCount, proposed_actions, total_hits, Racket_pos, Ball_pos = sim.AIGame.playGame(actions, epCount)
+    print('Proposed actions:', proposed_actions)
+    if dconf['sim']['RLFakeUpRule']: # fake rule for testing reinforcing of up moves
+      critic = np.sign(actions.count(dconf['moves']['UP']) - actions.count(dconf['moves']['DOWN']))          
+      rewards = [critic for i in range(len(rewards))]
+    elif dconf['sim']['RLFakeDownRule']: # fake rule for testing reinforcing of down moves
+      critic = np.sign(actions.count(dconf['moves']['DOWN']) - actions.count(dconf['moves']['UP']))
+      rewards = [critic for i in range(len(rewards))]
+    elif dconf['sim']['RLFakeStayRule']: # fake rule for testing reinforcing of stay still
+      critic = np.sign(actions.count(dconf['moves']['NOMOVE']) - actions.count(dconf['moves']['DOWN']) - actions.count(dconf['moves']['UP']))
+      rewards = [critic for i in range(len(rewards))]                    
+    else: # normal game play scoring rules
+      #normal game based rewards
+      critic = sum(rewards) # get critic signal (-1, 0 or 1)
+      if critic>0:
+        critic  = dconf['rewardcodes']['scorePoint'] 
+      elif critic<0:
+        critic = dconf['rewardcodes']['losePoint']  #-0.01, e.g. to reduce magnitude of punishment so rewards dominate
+      else:
+        critic = 0
+      #starting from here not tested
+      #rewards for hitting the ball
+      critic_for_avoidingloss = 0
+      if sum(total_hits)>0:
+        critic_for_avoidingloss = dconf['rewardcodes']['hitBall'] #should be able to change this number from config file
+      #rewards for following or avoiding the ball
+      critic_for_following_ball = 0
+      for ai in range(len(actions)):
+        caction = actions[ai]
+        cproposed_action = proposed_actions[ai]
+        if caction - cproposed_action == 0:
+          critic_for_following_ball += dconf['rewardcodes']['followBall'] #follow the ball
+        else:
+          critic_for_following_ball += dconf['rewardcodes']['avoidBall'] # didn't follow the ball
+      #total rewards
+      critic = critic + critic_for_avoidingloss + critic_for_following_ball
+      rewards = [critic for i in range(len(rewards))]  # reset rewards to modified critic signal - should use more granular recording
+    #till here not tested
+    if dconf['verbose']:
+      if critic > 0:
+        print('REWARD, critic=',critic)
+      elif critic < 0:
+        print('PUNISH, critic=',critic)
+      else:
+        print('CRITIC=0')                    
+    sim.pc.broadcast(vec.from_python([critic]), 0) # convert python list to hoc vector to broadcast critic value to other nodes
+    UPactions = np.sum(np.where(np.array(actions)==dconf['moves']['UP'],1,0))
+    DOWNactions = np.sum(np.where(np.array(actions)==dconf['moves']['DOWN'],1,0))
+    sim.pc.broadcast(vec2.from_python([UPactions]),0)
+    sim.pc.broadcast(vec3.from_python([DOWNactions]),0)
+  else: # other workers
+    sim.pc.broadcast(vec, 0) # receive critic value from master node
+    critic = vec.to_python()[0] # critic is first element of the array
+    sim.pc.broadcast(vec2, 0)
+    UPactions = vec2.to_python()[0]
+    sim.pc.broadcast(vec3, 0)
+    DOWNactions = vec3.to_python()[0]
+    if dconf['verbose']: print('UPactions: ', UPactions,'DOWNactions: ', DOWNactions)
+  if critic != 0: # if critic signal indicates punishment (-1) or reward (+1)
+    if sim.rank==0: print('t=',t,'- adjusting weights based on RL critic value:', critic)
+    if not dconf['sim']['targettedRL'] or UPactions==DOWNactions:
+      if dconf['verbose']: print('APPLY RL to both EMUP and EMDOWN')
+      for STDPmech in dSTDPmech['all']: STDPmech.reward_punish(float(critic))
+    elif UPactions>DOWNactions:
+      if dconf['verbose']: print('APPLY RL to EMUP')
+      for STDPmech in dSTDPmech['EMUP']: STDPmech.reward_punish(float(critic))
+    elif DOWNactions>UPactions:
+      if dconf['verbose']: print('APPLY RL to EMDOWN')
+      for STDPmech in dSTDPmech['EMDOWN']: STDPmech.reward_punish(float(critic))
+  if sim.rank==0:
+    print('Game rewards:', rewards) # only rank 0 has access to rewards      
+    for action in actions:
+        sim.allActions.append(action)
+    for pactions in proposed_actions: #also record proposed actions
+        sim.allProposedActions.append(pactions)
+    for reward in rewards: # this generates an error - since rewards only declared for sim.rank==0; bug?
+        sim.allRewards.append(reward)
+    for hits in total_hits:
+        sim.allHits.append(hits) #hit or no hit
+    tvec_actions = []
+    for ts in range(len(actions)): tvec_actions.append(t-tstepPerAction*(len(actions)-ts-1))
+    for ltpnt in tvec_actions: sim.allTimes.append(ltpnt)
+    #current_time_stepNB, f_ax, fig = updateBehaviorPlot (sim,sim.AIGame.ReducedImages,sim.AIGame.FullImages,dirSensitiveNeurons,Racket_pos,Ball_pos,current_time_stepNB, f_ax, fig)
+    #current_time_stepNB = current_time_stepNB + 1
+  updateInputRates() # update firing rate of inputs to R population (based on image content)                
+  NBsteps += 1
+  if NBsteps % recordWeightStepSize == 0:
+    if dconf['verbose'] > 0 and sim.rank==0:
+      print('Weights Recording Time:', t, 'NBsteps:',NBsteps,'recordWeightStepSize:',recordWeightStepSize)
+    recordAdjustableWeights(sim, t) 
+    #recordWeights(sim, t)
 
 def getAllSTDPObjects (sim):
   # get all the STDP objects from the simulation's cells
@@ -872,41 +872,41 @@ sim.setupRecording()                  # setup variables to record for each cell 
 dSTDPmech = getAllSTDPObjects(sim) # get all the STDP objects up-front
 
 def updateSTDPWeights (sim, W):
-    #this function assign weights stored in 'ResumeSimFromFile' to all connections by matching pre and post neuron ids  
-    # get all the simulation's cells (on a given node)
-    for cell in sim.net.cells:
-        cpostID = cell.gid#find postID
-        for conn in cell.conns:
-            cpreID = conn.preGid  #find preID
-            cConnW = W[(W.postid==cpostID) & (W.preid==cpreID)] #find the record for a connection with pre and post neuron ID
-            #find weight for the STDP connection between preID and postID
-            for idx in cConnW.index: 
-                cW = cConnW.at[idx,'weight']
-                cstdp = cConnW.at[idx,'stdptype'] 
-                #STDPmech = conn.get('hSTDP')  # check if has STDP mechanism
-                if dconf['verbose'] > 1:
-                    print('weight updated:', cW, cstdp)
-                if cstdp:   # make sure it is not None
-                    conn['hObj'].weight[0] = cW
+  #this function assign weights stored in 'ResumeSimFromFile' to all connections by matching pre and post neuron ids  
+  # get all the simulation's cells (on a given node)
+  for cell in sim.net.cells:
+    cpostID = cell.gid#find postID
+    for conn in cell.conns:
+      cpreID = conn.preGid  #find preID
+      cConnW = W[(W.postid==cpostID) & (W.preid==cpreID)] #find the record for a connection with pre and post neuron ID
+      #find weight for the STDP connection between preID and postID
+      for idx in cConnW.index: 
+        cW = cConnW.at[idx,'weight']
+        cstdp = cConnW.at[idx,'stdptype'] 
+        #STDPmech = conn.get('hSTDP')  # check if has STDP mechanism
+        if dconf['verbose'] > 1:
+          print('weight updated:', cW, cstdp)
+        if cstdp:   # make sure it is not None
+          conn['hObj'].weight[0] = cW
 
 #if specified 'ResumeSim' = 1, load the connection data from 'ResumeSimFromFile' and assign weights to STDP synapses  
 if dconf['simtype']['ResumeSim']:
-    try:
-        from simdat import readinweights
-        A = readinweights(pickle.load(open(dconf['simtype']['ResumeSimFromFile'],'rb')))
-        updateSTDPWeights(sim, A[A.time == max(A.time)]) # take the latest weights saved
-        if sim.rank==0: print('Updated STDP weights')
-    except:
-        print('Could not restore STDP weights from file.')
+  try:
+    from simdat import readinweights
+    A = readinweights(pickle.load(open(dconf['simtype']['ResumeSimFromFile'],'rb')))
+    updateSTDPWeights(sim, A[A.time == max(A.time)]) # take the latest weights saved
+    if sim.rank==0: print('Updated STDP weights')
+  except:
+    print('Could not restore STDP weights from file.')
 
 if sim.rank == 0: 
-    from aigame import AIGame
-    sim.AIGame = AIGame() # only create AIGame on node 0
-    # node 0 saves the json config file
-    # this is just a precaution since simConfig pkl file has MOST of the info; ideally should adjust simConfig to contain
-    # ALL of the required info
-    from utils import backupcfg
-    backupcfg(dconf['sim']['name'])
+  from aigame import AIGame
+  sim.AIGame = AIGame() # only create AIGame on node 0
+  # node 0 saves the json config file
+  # this is just a precaution since simConfig pkl file has MOST of the info; ideally should adjust simConfig to contain
+  # ALL of the required info
+  from utils import backupcfg
+  backupcfg(dconf['sim']['name'])
 
 def setdminID (sim, lpop):
   # setup min ID for each population in lpop
@@ -976,35 +976,35 @@ def saveInputImages (Images):
   
 usemultirun=0 #not sure why but when using multirun script plotting and saving after if sim.rank==0 does not work
 if usemultirun==1:
-    print('SAVING RASTER DATA')
-    print('plot raster:')
-    sim.analysis.plotRaster(saveData = dconf['sim']['name']+'raster.pkl',showFig=True)
-    sim.analysis.plotData()    
-    if sim.plotWeights: plotWeights() 
-    if sim.saveWeights:
-        #saveWeights(sim, recordWeightDCells)
-        saveGameBehavior(sim)
-        fid5 = open('data/'+dconf['sim']['name']+'ActionsPerEpisode.txt','w')
-        for i in range(len(epCount)):
-            fid5.write('\t%0.1f' % epCount[i])
-            fid5.write('\n')
-    if sim.saveInputImages and sim.rank==0: saveInputImages(sim.AIGame.ReducedImages)
-    if sim.saveMotionFields and sim.rank==0: saveMotionFields(sim.AIGame.ldflow)
+  print('SAVING RASTER DATA')
+  print('plot raster:')
+  sim.analysis.plotRaster(saveData = dconf['sim']['name']+'raster.pkl',showFig=True)
+  sim.analysis.plotData()    
+  if sim.plotWeights: plotWeights() 
+  if sim.saveWeights:
+    #saveWeights(sim, recordWeightDCells)
+    saveGameBehavior(sim)
+    fid5 = open('data/'+dconf['sim']['name']+'ActionsPerEpisode.txt','w')
+    for i in range(len(epCount)):
+      fid5.write('\t%0.1f' % epCount[i])
+      fid5.write('\n')
+  if sim.saveInputImages and sim.rank==0: saveInputImages(sim.AIGame.ReducedImages)
+  if sim.saveMotionFields and sim.rank==0: saveMotionFields(sim.AIGame.ldflow)
                 
 if sim.rank == 0: # only rank 0 should save. otherwise all the other nodes could over-write the output or quit first; rank 0 plots
-    print('SAVING RASTER DATA')
-    if dconf['sim']['doplot']:
-        print('plot raster:')
-        sim.analysis.plotData()    
-    if sim.plotWeights: plotWeights() 
-    if sim.saveWeights:
-        #saveWeights(sim, recordWeightDCells)
-        saveGameBehavior(sim)
-        fid5 = open('data/'+dconf['sim']['name']+'ActionsPerEpisode.txt','w')
-        for i in range(len(epCount)):
-            fid5.write('\t%0.1f' % epCount[i])
-            fid5.write('\n')
-    if sim.saveInputImages: saveInputImages(sim.AIGame.ReducedImages)
-    #anim.savemp4('/tmp/*.png','data/'+dconf['sim']['name']+'randGameBehavior.mp4',10)
-    if sim.saveMotionFields: saveMotionFields(sim.AIGame.ldflow)
-    if dconf['sim']['doquit']: quit()
+  print('SAVING RASTER DATA')
+  if dconf['sim']['doplot']:
+    print('plot raster:')
+    sim.analysis.plotData()    
+  if sim.plotWeights: plotWeights() 
+  if sim.saveWeights:
+    #saveWeights(sim, recordWeightDCells)
+    saveGameBehavior(sim)
+    fid5 = open('data/'+dconf['sim']['name']+'ActionsPerEpisode.txt','w')
+    for i in range(len(epCount)):
+      fid5.write('\t%0.1f' % epCount[i])
+      fid5.write('\n')
+  if sim.saveInputImages: saveInputImages(sim.AIGame.ReducedImages)
+  #anim.savemp4('/tmp/*.png','data/'+dconf['sim']['name']+'randGameBehavior.mp4',10)
+  if sim.saveMotionFields: saveMotionFields(sim.AIGame.ldflow)
+  if dconf['sim']['doquit']: quit()
