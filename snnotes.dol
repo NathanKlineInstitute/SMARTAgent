@@ -3704,5 +3704,7 @@ looks like ~avg value maintained fairly well, and some hotspots with high weight
 
 next, to test in longer sim ... can use 1 s between normalizations ... 
 
-run for 200 s ... with 12 cores ... on zn
+run for 300 s ... with 12 cores ... on zn
+
+myrun 12
 
