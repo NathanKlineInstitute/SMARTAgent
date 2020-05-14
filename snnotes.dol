@@ -3275,7 +3275,7 @@ saves some space, but not enough:
 (-rw-rw-r-- 1 samn samn 1562509212 May 11 23:06 tmp.pkl; new size is ~1.6 GB)
 (original size is ~2.2GB  -rw-rw-r-- 1 samn samn 2193401415 May 11 16:26 20may11_A0_synWeights.pkl)
 
-*20may12 - 
+*20may12 - check balanced inputs to EMR,EML, rename pops, avoid hypersynch, longer sims, targettedRL prob?
 ** try reducing size of output synaptic weight data
 
 could also run for 100 s and save weights every 1 s instead of every 100 ms ...
@@ -3317,7 +3317,7 @@ pickle.dump(dout, open('tmp.pkl','wb'))
 
 will use the dictionary format since it saves ~30% of the total size ...
 
-** other question: why were EMR weights only increasing?
+** other question: why were EMR weights only increasing? targettedRL seems to bias towards one population
 
 get same when have targettedRL off?
 
@@ -3498,11 +3498,43 @@ myrun 12
 
 started ~23:29
 
+End time:  2020-05-14 01:14:01.856790
+
+too much time in plotting, which is not needed ... synweights ~4.6 GB
+weights of EMDOWN,EMUP get too high by the end, as usual
+20may12_NOTARG_Z0_rast.png
+20may12_NOTARG_Z0_EMDOWN.png
+20may12_NOTARG_Z0_IM.png
+
+python -i actmap.py backupcfg/20may12_NOTARG_Z0_sim.json
+
+fig, axs, plt = animActivityMaps('gif/20may12_NOTARG_Z0_actmap_300s.mp4', framerate=10,figsize=(18,10))
+
+python -i simdat.py backupcfg/20may12_NOTARG_Z0_sim.json
+
+animSynWeights(pdf[pdf.syntype=='AMPA'],'gif/20may12_NOTARG_Z0_AMPA_weightmap_300s.mp4', framerate=10, figsize=(14,8));animSynWeights(pdf[pdf.syntype=='NMDA'],'gif/20may12_NOTARG_Z0_NMDA_weightmap_300s.mp4', framerate=10, figsize=(14,8))
+
+
 *** 300 s same params as last but with targetted RL on (20may12_TARG_Z0_)
 
 myrun 12
 
 started ~23:31
+
+  Run time: 82911.72 s
+Total time = 86993.01 s
+
+End time:  2020-05-13 23:41:08.873020
+
+that's on zn with 12 cores (but many other jobs were running so took longer)
+
+rates for EMUP,EMDOWN very unbalanced, with EMDOWN very low
+
+20may12_TARG_Z0_rast.png
+20may12_TARG_Z0_IM.png
+20may12_TAG_Z0_EMDOWN.png
+
+get rid of the 4.6GB data from this sim since did not work properly ... 
 
 *20may13
 ** 300 s sims still running on zn ~12 hours later (~1/2 done)
@@ -3560,6 +3592,30 @@ should redo this sim but without the targetted RL , just to check if one M pop g
 
 ok, run 20may13_B0_
 with targettedRL == 0  , all else same ...
+
+myrun 12
+
+  Spikes: 2149938 (4.01 Hz)
+  Simulated time: 100.0 s; 12 workers
+  Run time: 12102.82 s
+Saving output as data/20may13_B0_simConfig.pkl ... 
+Finished saving!
+  Done; saving time = 13.08 s.
+  Done; plotting time = 1262.04 s
+Total time = 13866.31 s
+
+20may13_B0_rast.png
+20may13_B0_IM.png
+20may13_B0_EMDOWN.png
+looks like gets to hypersynch ... but at least both populations of M neurons firing
+
+python -i actmap.py
+
+fig, axs, plt = animActivityMaps('gif/20may13_B0_actmap_100s.mp4', framerate=10,figsize=(18,10))
+
+python -i simdat.py
+
+animSynWeights(pdf[pdf.syntype=='AMPA'],'gif/20may13_B0_AMPA_weightmap_100s.mp4', framerate=10, figsize=(14,8));animSynWeights(pdf[pdf.syntype=='NMDA'],'gif/20may13_B0_NMDA_weightmap_100s.mp4', framerate=10, figsize=(14,8))
 
 
 ** does readinweights work properly with AMPA and NMDA weights?
