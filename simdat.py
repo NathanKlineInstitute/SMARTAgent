@@ -138,14 +138,11 @@ def animSynWeights (pdf, outpath, framerate=10, figsize=(14,8), cmap='jet'):
     lout = []
     for targ in ltarg:
       cpdf = pdf[(pdf.time==t) & (pdf.postid>=dstartidx[targ]) & (pdf.postid<=dendidx[targ]) & (pdf.preid>=dstartidx[src]) & (pdf.preid<=dendidx[src])]
-      wts = np.array(cpdf.weight)
-      sz = int(ceil(np.sqrt(len(wts))))
+      lwt = list(np.array(cpdf.weight))
+      sz = int(ceil(np.sqrt(len(lwt))))
       sz2 = sz*sz
-      #print(targ,len(wts),sz,sz2)
-      lwt = [x for x in wts]
       while len(lwt) < sz2: lwt.append(lwt[-1])
-      lwt=np.array(lwt)
-      lwt = np.reshape(lwt, (sz,sz))
+      lwt = np.reshape(np.array(lwt), (sz,sz))
       lout.append(lwt)
     return lout[0], lout[1]    
   minR,maxR = np.min(actreward.reward),np.max(actreward.reward)
