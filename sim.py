@@ -473,15 +473,18 @@ netParams.connParams['IV4->IMT'] = {
 for prety in ['EV1', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW','EV1DSW', 'EV1DS','EV1DSE', 'EV4', 'EMT']:
   for poty in EMotorPops:
     for strty,synmech,weight in zip(['','n'],['AMPA', 'NMDA'],[dconf['net']['EEMWghtAM']*cfg.EEGain, dconf['net']['EEMWghtNM']*cfg.EEGain]):
-      netParams.connParams[strty+prety+'->'+strty+poty] = {
+      k = strty+prety+'->'+strty+poty
+      netParams.connParams[k] = {
         'preConds': {'pop': prety},
         'postConds': {'pop': poty},
-        #'probability': 0.1,
         'convergence': prob2conv(0.1, dnumc[prety]),
         'weight': weight,
         'delay': 2,
         'synMech': synmech,
-        'plast': {'mech': 'STDP', 'params': dSTDPparamsRL[synmech]},'sec':'dend', 'loc':0.5}
+        'sec':'dend', 'loc':0.5
+      }
+      if dSTDPparamsRL[synmech]['RLon']: # only turn on plasticity when specified to do so
+        netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL[synmech]}
 
 ###################################################################################################################################
 
@@ -839,7 +842,6 @@ def trainAgent (t):
     updateInputRates() # update firing rate of inputs to R population (based on image content)                
     NBsteps += 1
     if NBsteps % recordWeightStepSize == 0:
-        #if t%recordWeightDT==0:
         if dconf['verbose'] > 0 and sim.rank==0:
             print('Weights Recording Time:', t, 'NBsteps:',NBsteps,'recordWeightStepSize:',recordWeightStepSize)
         recordAdjustableWeights(sim, t) 
@@ -853,10 +855,9 @@ def getAllSTDPObjects (sim):
       STDPmech = conn.get('hSTDP')  # check if has STDP mechanism
       if STDPmech:
         dSTDPmech['all'].append(STDPmech)
-        if cell.gid in sim.net.pops['EMUP'].cellGids:
-          dSTDPmech['EMUP'].append(STDPmech)
-        elif cell.gid in sim.net.pops['EMDOWN'].cellGids:
-          dSTDPmech['EMDOWN'].append(STDPmech)
+        for pop in ['EMUP', 'EMDOWN']:
+          if cell.gid in sim.net.pops[pop].cellGids:
+            dSTDPmech[pop].append(STDPmech)
   return dSTDPmech
         
 #Alterate to create network and run simulation

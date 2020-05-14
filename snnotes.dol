@@ -3625,3 +3625,52 @@ do not see any check for AMPA vs NMDA ...
 not clear the NMDA plasticity needed ... could just have long time constant for AMPA eligibility
 trace with exp decay ...
 
+*20may14
+** get rid of the NMDA RL plasticity for now
+
+ok, check the RLon option in sim.json to determine whether to use plasticity for the specific
+synapse
+
+    "RL":{"AMPA":
+	  {"wbase":0.00001,"wmax":0.00075,"RLon":1,"RLlenhebb":50,"RLlenanti":50,"useRLexp":1,"RLhebbwt":0.0005,"RLantiwt":-0.0,"hebbwt":0,"antiwt":0,"tauhebb":10,"RLwindhebb":50,"softthresh":1,"verbose":0},
+	  "NMDA":
+	  {"wbase":0.000001,"wmax":0.000075,"RLon":0,"RLlenhebb":800,"RLlenanti":100,"useRLexp":1,"RLhebbwt":0.0005,"RLantiwt":-0.0,"hebbwt":0,"antiwt":0,"tauhebb":10,"RLwindhebb":50,"softthresh":1,"verbose":0}
+	 }
+
+there, it's specified to shut off RL for NMDA ...
+
+may want to adjust the NMDA weights too since they're pretty low and probably just as well to leave
+them off ...
+
+try a fast sim to test with the NMDA RL off ...
+
+myrun 12
+
+  Cells: 5359
+  Connections: 0 (0.00 per cell)
+  Spikes: 32264 (2.01 Hz)
+  Simulated time: 3.0 s; 12 workers
+  Run time: 300.88 s
+
+using 100 ms resolution for the AMPA weights ...
+
+20may14_A0_rast.png
+
+looks ok ... did it run any faster? perhaps ...
+
+python -i actmap.py
+
+fig, axs, plt = animActivityMaps('gif/20may14_A0_actmap_3s.mp4', framerate=10,figsize=(18,10))
+
+python -i simdat.py
+
+animSynWeights(pdf[pdf.syntype=='AMPA'],'gif/20may14_A0_AMPA_weightmap_3s.mp4', framerate=10, figsize=(14,8))
+
+looks ok ... those videos show reward after ball hit and point scored but not in the hit ball / miss ball panel ...
+is that a bug? probably hit/miss code just needs a minor adjustment
+
+** weight rescaling every so often?
+
+could normalize incoming AMPA/NMDA weights of EMUP,EMDOWN populations
+to have same average or sum as start with ... 
+
