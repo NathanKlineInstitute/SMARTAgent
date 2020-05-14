@@ -3504,3 +3504,65 @@ myrun 12
 
 started ~23:31
 
+*20may13
+** 300 s sims still running on zn ~12 hours later (~1/2 done)
+** discuss object detection / optical flow
+
+had suggestion to use object detection as a mask for optical flow to
+constrain spatial resolution for the flow
+
+** still have issue of hyperexcit
+
+reduce the min weights for RL, use targetted RL, and run for 10 s
+
+20may13_A0_rast.png
+
+prevents the hyperexcit; enough M activity generated? will hyperexcit just emerge later?
+
+python -i actmap.py
+
+fig, axs, plt = animActivityMaps('gif/20may13_A0_actmap.mp4', framerate=10,figsize=(18,10))
+
+python -i simdat.py
+
+animSynWeights(pdf[pdf.syntype=='AMPA'],'gif/20may13_A0_AMPA_weightmap.mp4', framerate=10, figsize=(14,8));animSynWeights(pdf[pdf.syntype=='NMDA'],'gif/20may13_A0_NMDA_weightmap.mp4', framerate=10, figsize=(14,8))
+
+not much M activity generated ... could run for 100 s to see if emerges ... or goes overboard
+
+myrun 12
+
+  Done; plotting time = 284.79 s
+
+Total time = 10613.54 s
+
+20may13_A0_rast_1.png
+2-may13_A0_IM_1.png
+
+one of the E populations ends up dominating, so that's a problem ... due to targetted rule?
+the rates are for EMUP are not terrible though...so params apart from targetted might be ok?
+
+python -i actmap.py
+
+fig, axs, plt = animActivityMaps('gif/20may13_A0_actmap_100s.mp4', framerate=10,figsize=(18,10))
+
+python -i simdat.py
+
+animSynWeights(pdf[pdf.syntype=='AMPA'],'gif/20may13_A0_AMPA_weightmap_100s.mp4', framerate=10, figsize=(14,8));animSynWeights(pdf[pdf.syntype=='NMDA'],'gif/20may13_A0_NMDA_weightmap_100s.mp4', framerate=10, figsize=(14,8))
+
+targetted rule seems not to be working properly ... ?? is it due to slight bias in beginning
+that gets amplified by other M population getting suppressed through lower weights, and other
+populations getting strengthened ... ? or it could occur if one population gets strengthened
+for right reason a couple of times, and that strengthening increases bias towards that
+action and avoiding other action, which gets suppressed if no more activation
+
+should redo this sim but without the targetted RL , just to check if one M pop gets suppressed
+...
+
+
+** does readinweights work properly with AMPA and NMDA weights?
+
+do not see any check for AMPA vs NMDA ...
+
+not clear the NMDA plasticity needed ... could just have long time constant for AMPA eligibility
+trace with exp decay ...
+
