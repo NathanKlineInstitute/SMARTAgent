@@ -511,7 +511,7 @@ def recordAdjustableWeightsPop (sim, t, popname):
   for cell in lcell:
     for conn in cell.conns:
       if 'hSTDP' in conn:
-        lsynweights.append([t,conn.preGid,cell.gid,conn.synMech,float(conn['hObj'].weight[0])])
+        lsynweights.append([t,conn.preGid,cell.gid,float(conn['hObj'].weight[0])])
   return len(lcell)
                     
 def recordAdjustableWeights (sim, t, lpop = ['EMUP', 'EMDOWN']):
@@ -941,23 +941,21 @@ def updateSTDPWeights (sim, W):
   for cell in sim.net.cells:
     cpostID = cell.gid#find postID
     for conn in cell.conns:
+      if not 'hSTDP' in conn: continue
       cpreID = conn.preGid  #find preID
+      if type(cpreID) != int: continue
       cConnW = W[(W.postid==cpostID) & (W.preid==cpreID)] #find the record for a connection with pre and post neuron ID
       #find weight for the STDP connection between preID and postID
-      for idx in cConnW.index: 
+      for idx in cConnW.index:
         cW = cConnW.at[idx,'weight']
-        cstdp = cConnW.at[idx,'stdptype'] 
-        #STDPmech = conn.get('hSTDP')  # check if has STDP mechanism
-        if dconf['verbose'] > 1:
-          print('weight updated:', cW, cstdp)
-        if cstdp:   # make sure it is not None
-          conn['hObj'].weight[0] = cW
+        conn['hObj'].weight[0] = cW
+        if dconf['verbose'] > 1: print('weight updated:', cW)
 
 #if specified 'ResumeSim' = 1, load the connection data from 'ResumeSimFromFile' and assign weights to STDP synapses  
 if dconf['simtype']['ResumeSim']:
   try:
-    from simdat import readinweights
-    A = readinweights(pickle.load(open(dconf['simtype']['ResumeSimFromFile'],'rb')))
+    from simdat import readweightsfile2pdf
+    A = readweightsfile2pdf(dconf['simtype']['ResumeSimFromFile'])
     updateSTDPWeights(sim, A[A.time == max(A.time)]) # take the latest weights saved
     if sim.rank==0: print('Updated STDP weights')
   except:
@@ -998,10 +996,8 @@ def LSynWeightToD (L):
     if preID not in dout:
       dout[preID] = {}
     if poID not in dout[preID]:
-      dout[preID][poID] = {}
-    if syn not in dout[preID][poID]:
-      dout[preID][poID][syn] = []
-    dout[preID][poID][syn].append([t,w])
+      dout[preID][poID] = []
+    dout[preID][poID].append([t,w])
   return dout
 
 def saveSynWeights ():
