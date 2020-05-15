@@ -3960,7 +3960,23 @@ one thing that seems to recur is paddle getting stuck at top ... that bias
 seems difficult to overcome, hopefully not an intrinsic bias ...e.g. in the
 wiring ... 
 
-** setup long multistep sim on zn
+** setup long multistep sim on zn (20may15_ZN_MultiStep_A_)
 
 python multistepSim.py sim.json 12 10 multirun
+
+sim base name is 20may15_ZN_MultiStep_A_
+
+with "EEMWghtThreshMax":0.000375
+
+started ~17:16 ... 10 steps of 300 s ... total of 3000 s ...
+
+** other multistep sim on zn (20may15_ZN_MultiStep_B_)
+
+with slightly higher max weight ...
+
+with "EEMWghtThreshMax":0.0005
+
+python multistepSim.py sim.json 12 10 multirun
+
+started ~17:27 ...
 
