@@ -993,10 +993,8 @@ def LSynWeightToD (L):
   dout = {}
   for row in L:
     t,preID,poID,w = row
-    if preID not in dout:
-      dout[preID] = {}
-    if poID not in dout[preID]:
-      dout[preID][poID] = []
+    if preID not in dout: dout[preID] = {}
+    if poID not in dout[preID]: dout[preID][poID] = []
     dout[preID][poID].append([t,w])
   return dout
 
