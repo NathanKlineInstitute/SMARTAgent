@@ -14,25 +14,17 @@ from imgutils import getoptflow, getoptflowframes
 rcParams['font.size'] = 12
 
 InputImages = loadInputImages(dconf['sim']['name'])
-simConfig, pdf, actreward, dstartidx, dendidx, dnumc = loadsimdat(dconf['sim']['name'])
+simConfig, pdf, actreward, dstartidx, dendidx, dnumc, dspkID, dspkT = loadsimdat(dconf['sim']['name'])
 ldflow = loadMotionFields(dconf['sim']['name'])
 
 totalDur = int(dconf['sim']['duration'])
 tstepPerAction = dconf['sim']['tstepPerAction'] # time step per action (in ms)
-
-spkID= np.array(simConfig['simData']['spkid'])
-spkT = np.array(simConfig['simData']['spkt'])
 
 lpop = ['ER', 'EV1', 'EV4', 'EMT', 'IR', 'IV1', 'IV4', 'IMT',\
         'EV1DW','EV1DNW', 'EV1DN', 'EV1DNE','EV1DE','EV1DSW', 'EV1DS', 'EV1DSE',\
         'EMDOWN','EMUP']
 
 ddir = OrderedDict({'EV1DW':'W','EV1DNW':'NW', 'EV1DN':'N','EV1DNE':'NE','EV1DE':'E','EV1DSW':'SW','EV1DS':'S','EV1DSE':'SE'})
-
-dspkID,dspkT = {},{}
-for pop in lpop:
-  dspkID[pop] = spkID[(spkID >= dstartidx[pop]) & (spkID <= dendidx[pop])]
-  dspkT[pop] = spkT[(spkID >= dstartidx[pop]) & (spkID <= dendidx[pop])]
 
 t1 = range(0,totalDur,tstepPerAction)
 t2 = range(tstepPerAction,totalDur+tstepPerAction,tstepPerAction)
@@ -93,9 +85,9 @@ def plotActivityMaps (pauset=1, gifpath=None, mp4path=None, framerate=5, zf=10):
   return fig, axs, plt
 
 #
-def animActivityMaps (outpath, framerate=10, figsize=(18,10)):
+def animActivityMaps (outpath='gif/'+dconf['sim']['name']+'actmap.mp4', framerate=10, figsize=(18,10)):
+  # plot activity in different layers as a function of input images  
   ioff()
-  # plot activity in different layers as a function of input images
   if figsize is not None: fig, axs = plt.subplots(4, 5, figsize=figsize);
   else: fig, axs = plt.subplots(4, 5);
   lax = axs.ravel()

@@ -3536,7 +3536,7 @@ rates for EMUP,EMDOWN very unbalanced, with EMDOWN very low
 
 get rid of the 4.6GB data from this sim since did not work properly ... 
 
-*20may13
+*20may13 - longer sims; hyperexcit; read weights works with AM/NM?
 ** 300 s sims still running on zn ~12 hours later (~1/2 done)
 ** discuss object detection / optical flow
 
@@ -3625,7 +3625,7 @@ do not see any check for AMPA vs NMDA ...
 not clear the NMDA plasticity needed ... could just have long time constant for AMPA eligibility
 trace with exp decay ...
 
-*20may14
+*20may14 - no NMDAR RL plasticity; implement/test simple weight normalization
 ** get rid of the NMDA RL plasticity for now
 
 ok, check the RLon option in sim.json to determine whether to use plasticity for the specific
@@ -3669,6 +3669,7 @@ animSynWeights(pdf[pdf.syntype=='AMPA'],'gif/20may14_A0_AMPA_weightmap_3s.mp4', 
 looks ok ... those videos show reward after ball hit and point scored but not in the hit ball / miss ball panel ...
 is that a bug? probably hit/miss code just needs a minor adjustment
 
+** there was a bug in paddle/ball hit detection, ha fixed
 ** weight rescaling every so often? seems to work/prevent hyperexcit
 
 could normalize incoming AMPA/NMDA weights of EMUP,EMDOWN populations
@@ -3806,3 +3807,105 @@ python -i simdat.py
 
 animSynWeights(pdf[pdf.syntype=='AMPA'],'gif/20may14_Min1Max2Thresh_Z0_AMPA_weightmap_300s.mp4', framerate=10, figsize=(14,8))
 
+*20may15
+** check the weight normalization
+
+why does hyperexcit not emerge when weights are below the max, but
+continuously increasing?
+
+due to soft thresholding? should the min,max weight thresholds be closer to the wbase, wmax params for the
+STPD/RL??
+
+if starting EEMWghtAM is at max for RL weights (0.00075) is there hyperexcit?
+
+myrun 12
+
+20may15_rast_a0.png
+
+yeah, there's hyperexcit, then after weights normalized (lower) at t=500 ms, the hyperexcit
+disappears
+
+t= 500.0000000000452 - adjusting weights based on RL critic value: -0.001
+sim.rank= 0 davg: {'EMUP': 0.0005615105765452703, 'EMDOWN': 0.0005615055487169171} dfctr: {'EMUP': 0.26713655319350277, 'EMDOWN': 0.2671389451854241}
+
+then later it moves up a bit and is normalized downward some more:
+t= 1000.0000000001588 - adjusting weights based on RL critic value: -0.001
+sim.rank= 0 davg: {'EMUP': 0.00015004612430169018, 'EMDOWN': 0.0001500624095345771} dfctr:
+{'EMUP': 0.9996925991797199, 'EMDOWN': 0.9995841094730473}
+
+what if EEMWghtAM starts at 0.00015 ... ?
+
+myrun 12
+
+savefig('gif/20may15_rast_a0.png') # hmm, overwrote last file
+
+less hypersynch and it decays anyway from the RL ... if RL was off, what would happen?
+
+myrun 12
+
+savefig('gif/20may15_rast_a1.png') # not much hypersynch ...
+
+so 0.00015 would be a decent upper limit ... can it be higher?
+
+try with "EEMWghtAM":0.000375
+
+myrun 12
+
+savefig('gif/20may15_rast_a2.png') # mostly ok but some periods of overly (?) synchronous firing
+
+so, that might be ok as upper bound ... higher upper bound could allow larger set of weights ...
+but could run another sim with lower upper bound for comparison ... 
+
+** movies from zn 300 s sims -->> gradual increase in probability of following ball?
+
+20may14_Min1Max2Thresh_Z0_AMPA_weightmap_300s.mp4 <<-- that one looks better
+than 20may14_T0_Z0_AMPA_weightmap_300s.mp4
+
+the better sim (20may14_Min1Max2Thresh_Z0_) has higher max weight before normalization, and follow ball probability is
+increasing with the weights. longer duration might allow the follow ball probability to surpass the not follow ball probability
+
+the other sim (20may14_T0_Z0_) has lower max weight before normalization, and the probability of follow and not follow seem
+to have hit a plateau corresponding with the weights, or at least a lower slope compared to the other simulation
+
+that suggests higher max weight would perform better in the long run... at least encouraging that the follow
+ball probability seems to be increasing ... 
+
+** fixup/check resumesim
+
+also check if can run sim saving everything but not drawing the raster ... that takes a long time
+
+first run with raster for comparison ...
+
+savefig('gif/20may15_b0_rast.png')
+
+ok, with doplot==0, doquit==1 it runs ok
+
+and then should have quick func to draw raster ...
+
+python -i simdat.py
+
+simConfig.keys() # dict_keys(['netpyne_version', 'netpyne_changeset', 'net', 'simConfig', 'simData'])
+simConfig['simData'].keys() # dict_keys(['spkt', 'spkid', 'V_soma', 't', 'dminID', 'avgRate'])
+simConfig['simData']['avgRate'] # 1.9083784288113455
+
+plot(simConfig['simData']['spkt'],simConfig['simData']['spkid'],'ko',markersize=2)
+
+savefig('gif/20may15_rast_b1.png')
+
+looks ok, though no color/type/rate, can add that in or see if netpyne raster func supported here ...
+
+simConfig['simData']['V_soma'].keys() 
+dict_keys(['cell_0', 'cell_900', 'cell_4359', 'cell_400', 'cell_4759', 'cell_500', 'cell_4100', 'cell_5159'])
+
+python -i simdat.py
+
+dspkID.keys() # dict_keys(['ER', 'IR', 'EV1', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW', 'EV1DSW', 'EV1DS', 'EV1DSE', 'IV1', 'EV4', 'IV4', 'EMT', 'IMT', 'EMDOWN', 'EMUP', 'IM'])
+dspkT.keys() # dict_keys(['ER', 'IR', 'EV1', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW', 'EV1DSW', 'EV1DS', 'EV1DSE', 'IV1', 'EV4', 'IV4', 'EMT', 'IMT', 'EMDOWN', 'EMUP', 'IM'])
+
+drawraster(dspkT,dspkID)
+
+savefig('gif/20may15_rast_b2.png')
+
+looks pretty good...
+
+should run much longer sim with resume ... with sim duration on order of 1000 of s ...

@@ -1030,6 +1030,7 @@ if sim.saveWeights: saveSynWeights()
 def saveMotionFields (ldflow): pickle.dump(ldflow, open('data/'+dconf['sim']['name']+'MotionFields.pkl', 'wb'))
 
 def saveInputImages (Images):
+  # save input images to txt file (switch to pkl?)
   InputImages = np.array(Images)
   print(InputImages.shape)  
   with open('data/'+dconf['sim']['name']+'InputImages.txt', 'w') as outfile:
@@ -1037,37 +1038,17 @@ def saveInputImages (Images):
     for Input_Image in InputImages:
       np.savetxt(outfile, Input_Image, fmt='%-7.2f')
       outfile.write('# New slice\n')
-  
-usemultirun=0 #not sure why but when using multirun script plotting and saving after if sim.rank==0 does not work
-if usemultirun==1:
-  print('SAVING RASTER DATA')
-  print('plot raster:')
-  sim.analysis.plotRaster(saveData = dconf['sim']['name']+'raster.pkl',showFig=True)
-  sim.analysis.plotData()    
-  if sim.plotWeights: plotWeights() 
-  if sim.saveWeights:
-    #saveWeights(sim, recordWeightDCells)
-    saveGameBehavior(sim)
-    fid5 = open('data/'+dconf['sim']['name']+'ActionsPerEpisode.txt','w')
-    for i in range(len(epCount)):
-      fid5.write('\t%0.1f' % epCount[i])
-      fid5.write('\n')
-  if sim.saveInputImages and sim.rank==0: saveInputImages(sim.AIGame.ReducedImages)
-  if sim.saveMotionFields and sim.rank==0: saveMotionFields(sim.AIGame.ldflow)
-                
+      
 if sim.rank == 0: # only rank 0 should save. otherwise all the other nodes could over-write the output or quit first; rank 0 plots
-  print('SAVING RASTER DATA')
   if dconf['sim']['doplot']:
     print('plot raster:')
     sim.analysis.plotData()    
   if sim.plotWeights: plotWeights() 
-  if sim.saveWeights:
-    #saveWeights(sim, recordWeightDCells)
-    saveGameBehavior(sim)
-    fid5 = open('data/'+dconf['sim']['name']+'ActionsPerEpisode.txt','w')
-    for i in range(len(epCount)):
-      fid5.write('\t%0.1f' % epCount[i])
-      fid5.write('\n')
+  saveGameBehavior(sim)
+  fid5 = open('data/'+dconf['sim']['name']+'ActionsPerEpisode.txt','w')
+  for i in range(len(epCount)):
+    fid5.write('\t%0.1f' % epCount[i])
+    fid5.write('\n')
   if sim.saveInputImages: saveInputImages(sim.AIGame.ReducedImages)
   #anim.savemp4('/tmp/*.png','data/'+dconf['sim']['name']+'randGameBehavior.mp4',10)
   if sim.saveMotionFields: saveMotionFields(sim.AIGame.ldflow)
