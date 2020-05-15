@@ -3920,3 +3920,45 @@ got error about not being able to restore STDP weights ...
 
 ok, fixed up ...
 
+try 3 steps to make sure working ...
+
+python multistepSim.py sim.json 12 3 multirun
+
+well, no crashes, so that's good ... check rasters
+
+python -i simdat.py backupcfg/20may15_C0__step_0_sim.json
+drawraster(dspkT,dspkID)
+savefig('gif/20may15_step0_b3.png')
+quit()
+
+python -i simdat.py backupcfg/20may15_C0__step_1_sim.json
+drawraster(dspkT,dspkID)
+savefig('gif/20may15_step1_b3.png')
+quit()
+
+python -i simdat.py backupcfg/20may15_C0__step_2_sim.json
+drawraster(dspkT,dspkID)
+savefig('gif/20may15_step2_b3.png')
+
+there are some diffs in firing patterns and rates ... check the weights too ...
+
+python -i simdat.py backupcfg/20may15_C0__step_0_sim.json
+animSynWeights(pdf)
+gif/20may15_C0__step_0_weightmap.mp4
+
+python -i simdat.py backupcfg/20may15_C0__step_1_sim.json
+animSynWeights(pdf)
+gif/20may15_C0__step_1_weightmap.mp4
+
+python -i simdat.py backupcfg/20may15_C0__step_2_sim.json
+animSynWeights(pdf)
+gif/20may15_C0__step_2_weightmap.mp4
+
+seems like the weights are properly loaded, and sim continues from there ...
+
+one thing that seems to recur is paddle getting stuck at top ... that bias
+seems difficult to overcome, hopefully not an intrinsic bias ...e.g. in the
+wiring ... 
+
+** setup long multistep sim on zn
+
