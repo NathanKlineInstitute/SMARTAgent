@@ -15,17 +15,20 @@ ion()
 global stepNB
 stepNB = -1
 
-#
-def readinweights (name):
-  # read the synaptic plasticity weights into a pandas dataframe
-  D = pickle.load(open('data/'+name+'synWeights.pkl','rb'))
+def readweightsfile2pdf (fn):
+  # read the synaptic plasticity weights saved as a dictionary into a pandas dataframe  
+  D = pickle.load(open(fn,'rb'))
   A = []
   for preID in D.keys():
     for poID in D[preID].keys():
-      for syn in D[preID][poID].keys():
-        for row in D[preID][poID][syn]:
-          A.append([row[0], preID, poID, syn, row[1]])
-  return pd.DataFrame(A,columns=['time','preid','postid','syntype','weight'])
+      for row in D[preID][poID]:
+        A.append([row[0], preID, poID, row[1]])
+  return pd.DataFrame(A,columns=['time','preid','postid','weight'])
+
+#
+def readinweights (name):
+  # read the synaptic plasticity weights associated with sim name into a pandas dataframe
+  return readweightsfile2pdf('data/'+name+'synWeights.pkl')
 
 def getsimname (name=None):
   if name is None:
@@ -103,21 +106,12 @@ def animSynWeights (pdf, outpath='gif/'+dconf['sim']['name']+'weightmap.mp4', fr
   # animate the synaptic weights along with some stats on behavior
   origfsz = rcParams['font.size']; rcParams['font.size'] = 12; ioff() # save original font size, turn off interactive plotting
   utimes = np.unique(pdf.time)
-  #maxNMDAwt = np.max(pdf[pdf.syntype=='NMDA'].weight)
-  #maxAMPAwt = np.max(pdf[pdf.syntype=='AMPA'].weight)
-  #maxwt = max(amax(maxNMDAwt),amax(maxAMPAwt))
-  #maxwt = maxNMDAwt+maxAMPAwt
-  #minNMDAwt = np.min(pdf[pdf.syntype=='NMDA'].weight)
-  #minAMPAwt = np.min(pdf[pdf.syntype=='AMPA'].weight)
-  #minwt = min(amin(minNMDAwt),amin(minAMPAwt))
-  #minwt = minNMDAwt+minAMPAwt
   minwt = np.min(pdf.weight)
   maxwt = np.max(pdf.weight)
   wtrange = 0.1*(maxwt-minwt)
   print('minwt:',minwt,'maxwt:',maxwt)
   if figsize is not None: fig = plt.figure(figsize=figsize)
   else: fig = plt.figure()
-  #gs = fig.add_gridspec(4,8)
   gs = gridspec.GridSpec(4,8)
   f_ax = []
   ax_count = 0
@@ -483,8 +477,7 @@ if __name__ == '__main__':
   simConfig, pdf, actreward, dstartidx, dendidx, dnumc, dspkID, dspkT = loadsimdat()
   print('loaded simulation data')
   #davgw = plotavgweights(pdf)
-  #animSynWeights(pdf[pdf.syntype=='AMPA'],'gif/'+dconf['sim']['name']+'_AMPA_weightmap.mp4', framerate=10) #plot/save images as movie
-  #animSynWeights(pdf[pdf.syntype=='NMDA'],'gif/'+dconf['sim']['name']+'_NMDA_weightmap.mp4', framerate=10) #plot/save images as movie  
+  #animSynWeights(pdf,'gif/'+dconf['sim']['name']+'weightmap.mp4', framerate=10) #plot/save images as movie
   #wperPostID = plotavgweightsPerPostSynNeuron1(pdf)
   #plotavgweightsPerPostSynNeuron2(pdf)
   #plotIndividualSynWeights(pdf)
