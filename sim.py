@@ -992,7 +992,7 @@ def LSynWeightToD (L):
   print('converting synaptic weight list to dictionary...')
   dout = {}
   for row in L:
-    t,preID,poID,syn,w = row
+    t,preID,poID,w = row
     if preID not in dout:
       dout[preID] = {}
     if poID not in dout[preID]:
