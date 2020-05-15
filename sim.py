@@ -598,6 +598,7 @@ def getAverageAdjustableWeights (sim, lpop = ['EMUP', 'EMDOWN']):
 def mulAdjustableWeights (sim, dfctr):
   # multiply adjustable STDP/RL weights by dfctr[pop] value for each population keyed in dfctr
   for pop in dfctr.keys():
+    if dfctr[pop] == 1.0: continue
     lcell = [c for c in sim.net.cells if c.gid in sim.net.pops[pop].cellGids] # this is the set of cells
     for cell in lcell:
       for conn in cell.conns:
@@ -605,12 +606,18 @@ def mulAdjustableWeights (sim, dfctr):
           conn['hObj'].weight[0] *= dfctr[pop] 
 
 def normalizeAdjustableWeights (sim, t, lpop = ['EMUP', 'EMDOWN']):
-  """ record the STDP weights during the simulation - called in trainAgent
-  """
+  # normalize the STDP/RL weights during the simulation - called in trainAgent
   davg = getAverageAdjustableWeights(sim, lpop)
   try:
-    dfctr = {k:dconf['net']['EEMWghtAM']/davg[k] for k in lpop}
-    if sim.rank==0: print('sim.rank=',sim.rank,'davg:',davg, dconf['net']['EEMWghtAM'], 'dfctr:',dfctr)
+    dfctr = {}
+    for k in lpop:
+      if davg[k] < dconf['net']['EEMWghtThreshMin']:
+        dfctr[k] = dconf['net']['EEMWghtThreshMin'] / davg[k]
+      elif davg[k] > dconf['net']['EEMWghtThreshMax']:
+        dfctr[k] = dconf['net']['EEMWghtThreshMax'] / davg[k]
+      else:
+        dfctr[k] = 1.0
+    if sim.rank==0: print('sim.rank=',sim.rank,'davg:',davg,'dfctr:',dfctr)
     mulAdjustableWeights(sim,dfctr)
   except:
     print('Exception; davg:',davg)

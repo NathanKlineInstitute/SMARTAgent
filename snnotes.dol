@@ -3708,3 +3708,64 @@ run for 300 s ... with 12 cores ... on zn
 
 myrun 12
 
+also run same on laptop for 100 s with 12 cores
+
+Analyzing...
+  Cells: 5359
+  Connections: 0 (0.00 per cell)
+  Spikes: 1076136 (2.01 Hz)
+  Simulated time: 100.0 s; 12 workers
+  Run time: 9454.24 s
+
+20may14_T0_L0_rast.png
+20may14_T0_L0_EMDOWN.png
+20may14_T0_L0_IM.png
+20may14_T0_L0_EMUP.png
+
+activity looks ok - EMUP,EMDOWN,IM rates pretty low
+  
+python -i actmap.py
+
+fig, axs, plt = animActivityMaps('gif/20may14_T0_L0_actmap_100s.mp4', framerate=10,figsize=(18,10))
+
+python -i simdat.py
+
+animSynWeights(pdf[pdf.syntype=='AMPA'],'gif/20may14_T0_L0_AMPA_weightmap_100s.mp4', framerate=10, figsize=(14,8))
+
+looks ok though seems to need a lot more time to improve, if ever ... may want to adjust normalization
+rule to only scale weights down if they pass some threshold, and at a higher threshold than initial average weight
+
+or perhaps maintaining the initial average weight would allow for sparse firing and more efficient coding??
+
+probably need long runs with comparisons to determine ...
+
+could have upper and lower threshold for normalizing weights; when average weight higher than upper threshold
+scale down; when average weight below lower threshold scale up. lower threshold could be set to starting
+average weight but upper threshold could be set to some positive multiple of starting weight. that way normalization
+would push average weight to be within a reasonable range...
+
+ok, try that rule with lower bound of original and upper bound of 5X original ... weights will likely go up
+and hover around upper bound ... 
+
+myrun 12
+
+20may14_T0_M0_rast.png
+
+rates look ok so far ... 
+
+python -i actmap.py
+
+fig, axs, plt = animActivityMaps('gif/20may14_T0_M0_actmap_10s.mp4', framerate=10,figsize=(18,10))
+
+python -i simdat.py
+
+animSynWeights(pdf[pdf.syntype=='AMPA'],'gif/20may14_T0_M0_AMPA_weightmap_10s.mp4', framerate=10, figsize=(14,8))
+
+based on previous sims 2X original weight probably high enough and even that may produce hypersynchrony ...
+can try the 2X anyway to check ... see if it does any better than the 1X original weight rule (same min
+and max threshold)
+
+will run that on zn for 300 s ... and compare to other sim currently running ...
+
+myrun 12
+
