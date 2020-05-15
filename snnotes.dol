@@ -3962,3 +3962,5 @@ wiring ...
 
 ** setup long multistep sim on zn
 
+python multistepSim.py sim.json 12 10 multirun
+
