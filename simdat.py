@@ -7,6 +7,8 @@ import os
 import sys
 import anim
 from matplotlib import animation
+import matplotlib.gridspec as gridspec
+import matplotlib.patches as mpatches
 
 ion()
 
@@ -41,7 +43,13 @@ def loadsimdat (name=None):
   pdf = readinweights(name)
   actreward = pd.DataFrame(np.loadtxt('data/'+name+'ActionsRewards.txt'),columns=['time','action','reward','proposed','hit'])
   dnumc = {p:dendidx[p]-dstartidx[p]+1 for p in simConfig['net']['pops'].keys()}
-  return simConfig, pdf, actreward, dstartidx, dendidx, dnumc
+  spkID= np.array(simConfig['simData']['spkid'])
+  spkT = np.array(simConfig['simData']['spkt'])
+  dspkID,dspkT = {},{}
+  for pop in simConfig['net']['pops'].keys():
+    dspkID[pop] = spkID[(spkID >= dstartidx[pop]) & (spkID <= dendidx[pop])]
+    dspkT[pop] = spkT[(spkID >= dstartidx[pop]) & (spkID <= dendidx[pop])]    
+  return simConfig, pdf, actreward, dstartidx, dendidx, dnumc, dspkID, dspkT
 
 def loadInputImages (name=None):
   fn = 'data/'+getsimname(name)+'InputImages.txt'
@@ -57,9 +65,41 @@ def loadInputImages (name=None):
 
 def loadMotionFields (name=None): return pickle.load(open('data/'+getsimname(name)+'MotionFields.pkl','rb'))
 
+totalDur = int(dconf['sim']['duration']) # total simulation duration
+
 #
-def animSynWeights (pdf, outpath, framerate=10, figsize=(14,8), cmap='jet'):
-  import matplotlib.gridspec as gridspec
+def getrate (dspkT,dspkID, pop, dnumc):
+  # get average firing rate for the population, over entire simulation
+  nspk = len(dspkT[pop])
+  ncell = dnumc[pop]
+  rate = 1e3*nspk/(totalDur*ncell)
+  return rate
+
+def pravgrates(dspkT,dspkID,dnumc):
+  # print average firing rates over simulation duration
+  for pop in dspkT.keys(): print(pop,round(getrate(dspkT,dspkID,pop,dnumc),2),'Hz')
+
+#
+def drawraster (dspkT,dspkID,tlim=None,msz=2):
+  # draw raster (x-axis: time, y-axis: neuron ID)
+  csm=cm.ScalarMappable(cmap=cm.prism); csm.set_clim(0,len(dspkT.keys()))
+  lclr = []
+  for pdx,pop in enumerate(list(dspkT.keys())):
+    color = csm.to_rgba(pdx); lclr.append(color)
+    plot(dspkT[pop],dspkID[pop],'o',color=color,markersize=msz)
+  if tlim is not None:
+    xlim(tlim)
+  else:
+    xlim((0,totalDur))
+  xlabel('Time (ms)')
+  lclr.reverse(); lpop=list(dspkT.keys()); lpop.reverse()
+  lpatch = [mpatches.Patch(color=c,label=s+' '+str(round(getrate(dspkT,dspkID,s,dnumc),2))+' Hz') for c,s in zip(lclr,lpop)]
+  ax=gca()
+  ax.legend(handles=lpatch,handlelength=1,loc='best')
+  
+
+#
+def animSynWeights (pdf, outpath='gif/'+dconf['sim']['name']+'weightmap.mp4', framerate=10, figsize=(14,8), cmap='jet'):  
   # animate the synaptic weights along with some stats on behavior
   origfsz = rcParams['font.size']; rcParams['font.size'] = 12; ioff() # save original font size, turn off interactive plotting
   utimes = np.unique(pdf.time)
@@ -440,7 +480,7 @@ if __name__ == '__main__':
     except:
       pass
   print(stepNB)
-  simConfig, pdf, actreward, dstartidx, dendidx, dnumc = loadsimdat()
+  simConfig, pdf, actreward, dstartidx, dendidx, dnumc, dspkID, dspkT = loadsimdat()
   print('loaded simulation data')
   #davgw = plotavgweights(pdf)
   #animSynWeights(pdf[pdf.syntype=='AMPA'],'gif/'+dconf['sim']['name']+'_AMPA_weightmap.mp4', framerate=10) #plot/save images as movie

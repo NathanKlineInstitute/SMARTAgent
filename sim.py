@@ -183,7 +183,7 @@ simConfig.saveFolder = 'data'
 # ['ER','IR','EV1','EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE','IV1','EV4','IV4','EMT','IMT','EMDOWN','EMUP','IM']
 #simConfig.analysis['plotTraces'] = {'include': [(pop, 0) for pop in allpops]}
 #simConfig.analysis['plotTraces'] = {'include': [(pop, 0) for pop in ['ER','IR','EV1','EV1DE','IV1','EV4','IV4','EMT','IMT','EMDOWN','IM']]}
-simConfig.analysis['plotTraces'] = {'include': [(pop, 0) for pop in ['ER','IR','EV1','EV1DE','IV1','EMDOWN','IM']]}
+simConfig.analysis['plotTraces'] = {'include': [(pop, 0) for pop in ['ER','IR','EV1','EV1DE','IV1','EMDOWN','EMUP','IM']]}
 
 #simConfig.analysis['plotRaster'] = {'timeRange': [500,1000],'popRates':'overlay','saveData':'data/RasterData.pkl','showFig':True}
 #simConfig.analysis['plotRaster'] = {'popRates':'overlay','saveData':'data/'+dconf['sim']['name']+'RasterData.pkl','showFig':dconf['sim']['doplot']}
@@ -598,6 +598,7 @@ def getAverageAdjustableWeights (sim, lpop = ['EMUP', 'EMDOWN']):
 def mulAdjustableWeights (sim, dfctr):
   # multiply adjustable STDP/RL weights by dfctr[pop] value for each population keyed in dfctr
   for pop in dfctr.keys():
+    if dfctr[pop] == 1.0: continue
     lcell = [c for c in sim.net.cells if c.gid in sim.net.pops[pop].cellGids] # this is the set of cells
     for cell in lcell:
       for conn in cell.conns:
@@ -605,12 +606,18 @@ def mulAdjustableWeights (sim, dfctr):
           conn['hObj'].weight[0] *= dfctr[pop] 
 
 def normalizeAdjustableWeights (sim, t, lpop = ['EMUP', 'EMDOWN']):
-  """ record the STDP weights during the simulation - called in trainAgent
-  """
+  # normalize the STDP/RL weights during the simulation - called in trainAgent
   davg = getAverageAdjustableWeights(sim, lpop)
   try:
-    dfctr = {k:dconf['net']['EEMWghtAM']/davg[k] for k in lpop}
-    if sim.rank==0: print('sim.rank=',sim.rank,'davg:',davg, dconf['net']['EEMWghtAM'], 'dfctr:',dfctr)
+    dfctr = {}
+    for k in lpop:
+      if davg[k] < dconf['net']['EEMWghtThreshMin']:
+        dfctr[k] = dconf['net']['EEMWghtThreshMin'] / davg[k]
+      elif davg[k] > dconf['net']['EEMWghtThreshMax']:
+        dfctr[k] = dconf['net']['EEMWghtThreshMax'] / davg[k]
+      else:
+        dfctr[k] = 1.0
+    if sim.rank==0: print('sim.rank=',sim.rank,'davg:',davg,'dfctr:',dfctr)
     mulAdjustableWeights(sim,dfctr)
   except:
     print('Exception; davg:',davg)
@@ -1023,6 +1030,7 @@ if sim.saveWeights: saveSynWeights()
 def saveMotionFields (ldflow): pickle.dump(ldflow, open('data/'+dconf['sim']['name']+'MotionFields.pkl', 'wb'))
 
 def saveInputImages (Images):
+  # save input images to txt file (switch to pkl?)
   InputImages = np.array(Images)
   print(InputImages.shape)  
   with open('data/'+dconf['sim']['name']+'InputImages.txt', 'w') as outfile:
@@ -1030,37 +1038,17 @@ def saveInputImages (Images):
     for Input_Image in InputImages:
       np.savetxt(outfile, Input_Image, fmt='%-7.2f')
       outfile.write('# New slice\n')
-  
-usemultirun=0 #not sure why but when using multirun script plotting and saving after if sim.rank==0 does not work
-if usemultirun==1:
-  print('SAVING RASTER DATA')
-  print('plot raster:')
-  sim.analysis.plotRaster(saveData = dconf['sim']['name']+'raster.pkl',showFig=True)
-  sim.analysis.plotData()    
-  if sim.plotWeights: plotWeights() 
-  if sim.saveWeights:
-    #saveWeights(sim, recordWeightDCells)
-    saveGameBehavior(sim)
-    fid5 = open('data/'+dconf['sim']['name']+'ActionsPerEpisode.txt','w')
-    for i in range(len(epCount)):
-      fid5.write('\t%0.1f' % epCount[i])
-      fid5.write('\n')
-  if sim.saveInputImages and sim.rank==0: saveInputImages(sim.AIGame.ReducedImages)
-  if sim.saveMotionFields and sim.rank==0: saveMotionFields(sim.AIGame.ldflow)
-                
+      
 if sim.rank == 0: # only rank 0 should save. otherwise all the other nodes could over-write the output or quit first; rank 0 plots
-  print('SAVING RASTER DATA')
   if dconf['sim']['doplot']:
     print('plot raster:')
     sim.analysis.plotData()    
   if sim.plotWeights: plotWeights() 
-  if sim.saveWeights:
-    #saveWeights(sim, recordWeightDCells)
-    saveGameBehavior(sim)
-    fid5 = open('data/'+dconf['sim']['name']+'ActionsPerEpisode.txt','w')
-    for i in range(len(epCount)):
-      fid5.write('\t%0.1f' % epCount[i])
-      fid5.write('\n')
+  saveGameBehavior(sim)
+  fid5 = open('data/'+dconf['sim']['name']+'ActionsPerEpisode.txt','w')
+  for i in range(len(epCount)):
+    fid5.write('\t%0.1f' % epCount[i])
+    fid5.write('\n')
   if sim.saveInputImages: saveInputImages(sim.AIGame.ReducedImages)
   #anim.savemp4('/tmp/*.png','data/'+dconf['sim']['name']+'randGameBehavior.mp4',10)
   if sim.saveMotionFields: saveMotionFields(sim.AIGame.ldflow)
