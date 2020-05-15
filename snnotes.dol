@@ -3704,7 +3704,24 @@ looks like ~avg value maintained fairly well, and some hotspots with high weight
 
 next, to test in longer sim ... can use 1 s between normalizations ... 
 
-run for 300 s ... with 12 cores ... on zn
+run for 300 s ... with 12 cores ... on zn (20may14_T0_Z0_)
+
+myrun 12
+
+  Simulated time: 300.0 s; 12 workers
+  Run time: 22489.13 s
+
+20may14_T0_Z0_rast.png
+
+rates are ok
+
+python -i actmap.py backupcfg/20may14_T0_Z0_sim.json
+
+fig, axs, plt = animActivityMaps('gif/20may14_T0_Z0_300s.mp4')
+
+python -i simdat.py backupcfg/20may14_T0_Z0_sim.json
+
+animSynWeights(pdf[pdf.syntype=='AMPA'],'gif/20may14_T0_Z0_AMPA_weightmap_300s.mp4')
 
 myrun 12
 
@@ -3753,7 +3770,7 @@ myrun 12
 
 rates look ok so far ... 
 
-python -i actmap.py
+python -i actmap.py 
 
 fig, axs, plt = animActivityMaps('gif/20may14_T0_M0_actmap_10s.mp4', framerate=10,figsize=(18,10))
 
@@ -3768,4 +3785,24 @@ and max threshold)
 will run that on zn for 300 s ... and compare to other sim currently running ...
 
 myrun 12
+
+  Simulated time: 300.0 s; 12 workers
+  Run time: 21025.55 s
+  Done; plotting time = 1867.69 s  
+  Total time = 23540.60 s
+
+20may14_Min1Max2Thresh_Z0_rast.png
+rates look ok at end, only slightly higher than other sim
+but the scaling factor used was 1.0 for most of simulation (after initial scaling up
+of all stdp/rl weights). the 1.0 scaling means that the weights never got up to the
+upper limit; so then it's surprising the network did not reach hypersynchrony ...
+something seems off ...
+
+python -i actmap.py
+
+fig, axs, plt = animActivityMaps('gif/20may14_Min1Max2Thresh_Z0_300s.mp4')
+
+python -i simdat.py
+
+animSynWeights(pdf[pdf.syntype=='AMPA'],'gif/20may14_Min1Max2Thresh_Z0_AMPA_weightmap_300s.mp4', framerate=10, figsize=(14,8))
 
