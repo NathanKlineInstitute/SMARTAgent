@@ -4163,3 +4163,12 @@ even 100 s worth trying ...
 
 myrun 12
 
+** info
+
+right now, convergence onto any EM neuron is from 10% of presynaptic neurons
+so that's 40 neurons of each direction selective class ... 40 x 8 = 320
+40 from EV1, 10 from EV4, 2.5 from EMT, ... most of the inputs are from direction selective
+neurons . . . is that reasonable?
+
+when 20%, 80 neurons ...
+
