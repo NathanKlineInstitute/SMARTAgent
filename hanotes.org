@@ -2402,4 +2402,14 @@ current ball direction: -1
 ** Debugging aigame.....
 *** need to explicitly import deepcopy from copy
 *** import cv2
+*** adjusted plotting in actmap.py because when using CentroidTracking 'flow' is used instead of 'thflow'. Also 'flow' has a different data structure.
+
+*** i think it might be better to change the structure of flow and also save thflow.
+
+    flow = np.zeros(shape=(np.shape(cimage)[0],np.shape(cimage)[1],2))
+    flow[:,:,0] = dirX
+    flow[:,:,1] = dirY
+    goodInds = np.zeros(shape=(np.shape(cimage)[0],np.shape(cimage)[1],2))
+    self.ldflow.append({'flow':flow,'mag':mag,'ang':ang,'goodInds':goodInds,'thang':ang,'thflow':flow})
+
 

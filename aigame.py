@@ -123,8 +123,11 @@ class AIGame:
     mag, ang = cv2.cartToPolar(dirY, dirX)
     ang = np.rad2deg(ang)
     self.last_objects = deepcopy(self.objects)
-    flow = [dirX, dirY]
-    self.ldflow.append({'flow':flow,'mag':mag,'ang':ang})
+    flow = np.zeros(shape=(np.shape(cimage)[0],np.shape(cimage)[1],2))
+    flow[:,:,0] = dirX
+    flow[:,:,1] = dirY
+    goodInds = np.zeros(shape=(np.shape(cimage)[0],np.shape(cimage)[1],2))
+    self.ldflow.append({'flow':flow,'mag':mag,'ang':ang,'goodInds':goodInds,'thang':ang,'thflow':flow})
 
   def updateDirSensitiveRates (self):
     # update firing rate of dir sensitive neurons using dirs (2D array with motion direction at each coordinate)
