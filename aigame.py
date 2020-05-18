@@ -115,22 +115,22 @@ class AIGame:
     self.objects = self.ct.update(rects)
     if len(self.last_objects)==0: 
       self.last_objects = deepcopy(self.objects)
-      flow = np.zeros(shape=(dirSensitiveNeuronDim,dirSensitiveNeuronDim,2))
-      mag = np.zeros(shape=(dirSensitiveNeuronDim,dirSensitiveNeuronDim))
-      ang = np.zeros(shape=(dirSensitiveNeuronDim,dirSensitiveNeuronDim))
-      goodInds = np.zeros(shape=(dirSensitiveNeuronDim,dirSensitiveNeuronDim))
+      flow = np.zeros(shape=(self.dirSensitiveNeuronDim,self.dirSensitiveNeuronDim,2))
+      mag = np.zeros(shape=(self.dirSensitiveNeuronDim,self.dirSensitiveNeuronDim))
+      ang = np.zeros(shape=(self.dirSensitiveNeuronDim,self.dirSensitiveNeuronDim))
+      goodInds = np.zeros(shape=(self.dirSensitiveNeuronDim,self.dirSensitiveNeuronDim))
     else:
       dirX, dirY = getObjectMotionDirection(self.objects, self.last_objects, rects, dims=np.shape(cimage)[0])
-      if np.shape(cimage)[0] != dirSensitiveNeuronDim or np.shape(cimage)[1] != dirSensitiveNeuronDim:
-        dirX = resize(dirX, (dirSensitiveNeuronDim, dirSensitiveNeuronDim), anti_aliasing=True)
-        dirY = resize(dirY, (dirSensitiveNeuronDim, dirSensitiveNeuronDim), anti_aliasing=True)
+      if np.shape(cimage)[0] != self.dirSensitiveNeuronDim or np.shape(cimage)[1] != self.dirSensitiveNeuronDim:
+        dirX = resize(dirX, (self.dirSensitiveNeuronDim, self.dirSensitiveNeuronDim), anti_aliasing=True)
+        dirY = resize(dirY, (self.dirSensitiveNeuronDim, self.dirSensitiveNeuronDim), anti_aliasing=True)
       mag, ang = cv2.cartToPolar(dirY, dirX)
       ang = np.rad2deg(ang)
       self.last_objects = deepcopy(self.objects)
-      flow = np.zeros(shape=(dirSensitiveNeuronDim,dirSensitiveNeuronDim,2))
+      flow = np.zeros(shape=(self.dirSensitiveNeuronDim,self.dirSensitiveNeuronDim,2))
       flow[:,:,0] = dirX
       flow[:,:,1] = dirY
-      goodInds = np.zeros(shape=(dirSensitiveNeuronDim,dirSensitiveNeuronDim))
+      goodInds = np.zeros(shape=(self.dirSensitiveNeuronDim,self.dirSensitiveNeuronDim))
     self.ldflow.append({'flow':flow,'mag':mag,'ang':ang,'goodInds':goodInds,'thang':ang,'thflow':flow})
 
   def updateDirSensitiveRates (self):
