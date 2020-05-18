@@ -36,10 +36,10 @@ def getObjectsBoundingBoxes(frame):
     rects.append(box.astype("int"))
   return rects
 
-def getObjectMotionDirection(objects, last_objects, rects):
-  dirX = np.zeros(shape=(160,160))
-  dirY = np.zeros(shape=(160,160))
-  MotionAngles = np.zeros(shape=(160,160))
+def getObjectMotionDirection(objects, last_objects, rects, dims):
+  dirX = np.zeros(shape=(dims,dims))
+  dirY = np.zeros(shape=(dims,dims))
+  MotionAngles = np.zeros(shape=(dims,dims))
   objectIDs = list(objects.keys())
   objectCentroids = list(objects.values())
   last_objectIDs = list(last_objects.keys())
@@ -69,9 +69,7 @@ def getObjectMotionDirection(objects, last_objects, rects):
       locations.append([cobj_centroid[1],cobj_centroid[0]])
     else:
       lobj_centroid = []
-  #print('LOCATIONS:', locations)
-  #print('DIRECTIONS:', directions)
-  return dirX, dirY
+  return dirX, -1*dirY
 
 # initialize our centroid tracker and frame dimensions
 ct = CentroidTracker()
@@ -89,6 +87,7 @@ while steps<NB_steps:
   # read the next frame from the AIGame
   rewards, epCount, proposed_actions, total_hits, Racket_pos, Ball_pos = AIGame.playGame(actions=[caction], epCount = 0)
   frame = AIGame.FullImages[-1]
+  #frame  = downscale_local_mean(frame,(8,8))
   # Detect the objects, and initialize the list of bounding box rectangles
   rects = getObjectsBoundingBoxes(frame)
   frame = np.ascontiguousarray(frame, dtype=np.uint8)
@@ -101,25 +100,27 @@ while steps<NB_steps:
     cv2.rectangle(frame, (startY, startX), (endY, endX),(0, 255, 0), 1)
   # update our centroid tracker using the computed set of bounding box rectangles
   objects = ct.update(rects)
-  dirX, dirY = getObjectMotionDirection(objects, last_objects, rects)
+  dirX, dirY = getObjectMotionDirection(objects, last_objects, rects, dims=160)
   dirX_ds = downscale_local_mean(dirX,(8,8))
   dirY_ds = downscale_local_mean(dirY,(8,8))
-  #mag, ang = cv2.cartToPolar(dirY_ds, dirX_ds)
-  #print(np.degrees(ang))
+  mag, ang = cv2.cartToPolar(dirY_ds, dirX_ds)
+  #mag, ang = cv2.cartToPolar(dirX, dirY)
+  ang = np.rad2deg(ang)
+  print(ang)
   last_objects = copy.deepcopy(objects)
   # loop over the tracked objects
   for (objectID, centroid) in objects.items():
-    cv2.circle(frame, (centroid[1], centroid[0]), 4, (0, 255, 0), -1)
+    cv2.circle(frame, (centroid[1], centroid[0]), 1, (0, 255, 0), -1)
   if steps==0:
     im0 = f_ax[0].imshow(frame, origin='upper')
-    X, Y = np.meshgrid(np.arange(0, dirX_ds.shape[1], 1), np.arange(0,dirX_ds.shape[0],1))
-    im1 = f_ax[1].quiver(X,Y,dirX_ds,-1*dirY_ds, pivot='mid', units='inches',width=0.022,scale=1/0.15)
-    f_ax[1].set_xlim((0,dirX_ds.shape[1])); f_ax[1].set_ylim((dirX_ds.shape[0]),0,-1)
+    X, Y = np.meshgrid(np.arange(0, 20, 1), np.arange(0,20,1))
+    im1 = f_ax[1].quiver(X,Y,dirX_ds,dirY_ds, pivot='mid', units='inches',width=0.022,scale=1/0.15)
+    f_ax[1].set_xlim(0,20,1); f_ax[1].set_ylim(20,0,-1)
     plt.draw()
     plt.pause(1)
   else:
     im0.set_data(frame)
-    im1.set_UVC(dirX_ds,-1*dirY_ds)
+    im1.set_UVC(dirX_ds,dirY_ds)
     plt.draw()
     plt.pause(1)
   last_object = objects

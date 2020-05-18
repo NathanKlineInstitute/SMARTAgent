@@ -1,3 +1,7 @@
+'''
+code adapted by Haroon Anwar (haroon.anwar@gmail.com)
+code obtained from pyimagesearch (https://www.pyimagesearch.com/2018/07/23/simple-object-tracking-with-opencv/) 
+'''
 from scipy.spatial import distance as dist
 from collections import OrderedDict
 import numpy as np

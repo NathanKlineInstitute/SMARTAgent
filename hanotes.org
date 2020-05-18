@@ -2380,3 +2380,22 @@ current ball direction: -1
 ** displaying object tracking and plotting direction of motion.
 
 ** still need to integrate the code in the model.
+
+* 2020may18
+** in testCentroidTracking.py, i use FULLImage to compute motion vectors and then downsample matrices with motion vectors to match the number of neurons.
+*** This is better to preserve the direction of object motion. Using downsampled image gives less accurate motion directions.
+** Part of lack of accuracy seems to be due to downsampling.
+** Two options included in sim.json to compute direction flow:
+  "DirectionDetectionAlgo":{"CentroidTracker":1,"OpticFlow":0}
+** added function in imgutils to get the coordinates of the bounding boxes for non-ovelaping objects.
+  -- def getObjectsBoundingBoxes(frame):
+** added function in imgutils to get the flow of motion of all existing objects. New objects or disappeaered objects are ignored. 
+  -- def getObjectMotionDirection(objects, last_objects, rects, dims):
+** initialize the CentroidTracker and related objects in init()
+    if dconf['DirectionDetectionAlgo']['CentroidTracker']==1:
+      self.ct = CentroidTracker()
+      self.objects = OrderedDict() # objects detected in current frame
+      self.last_objects = OrderedDict() # objects detected in previous frame
+** added function to compute angles of motion.
+  -- computeAllObjectsMotionDirections(self, UseFull=True)
+

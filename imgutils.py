@@ -5,6 +5,9 @@ import cv2 # opencv
 from scipy import ndimage
 from scipy.ndimage.filters import maximum_filter
 from scipy.ndimage.morphology import generate_binary_structure, binary_erosion  
+from collections import OrderedDict
+import copy
+from skimage.transform import downscale_local_mean, rescale
 
 def getoptflow (gimg0, gimg1, winsz=3, pyrscale=0.5, nlayer=3, niter=3, polyn=5, polysigma=1.1):
   # gets dense optical flow between two grayscale images (gimg0, gimg1)
@@ -70,6 +73,61 @@ def detectpeaks (image):
   #by removing the background from the local_max mask (xor operation)
   detected_peaks = local_max ^ eroded_background
   return detected_peaks
+
+def getObjectsBoundingBoxes(frame):
+  mask = frame > np.min(frame)
+  labelim, nlabels = ndimage.label(mask)
+  # each pixel in labelim contains labels of the object it belongs to.
+  rects = []
+  for labels in range(nlabels):
+    clabel = labels+1
+    o = ndimage.find_objects(labelim==clabel)
+    # to get a bounding box
+    # compute the (x, y)-coordinates of the bounding box for the object
+    startX = o[0][0].start
+    startY = o[0][1].start
+    endX = o[0][0].stop
+    endY = o[0][1].stop
+    box = np.array([startX, startY, endX, endY])
+    #print('box centroid is:',[int((startX + endX) / 2.0),int((startY + endY) / 2.0)])
+    rects.append(box.astype("int"))
+  return rects
+
+def getObjectMotionDirection(objects, last_objects, rects, dims):
+  dirX = np.zeros(shape=(dims,dims))
+  dirY = np.zeros(shape=(dims,dims))
+  MotionAngles = np.zeros(shape=(dims,dims))
+  objectIDs = list(objects.keys())
+  objectCentroids = list(objects.values())
+  last_objectIDs = list(last_objects.keys())
+  last_objectCentroids = list(last_objects.values())
+  directions = []
+  locations = []
+  for cvalue in objectIDs:
+    cid = objectIDs.index(cvalue)
+    cobj_centroid = objectCentroids[cid]
+    if cvalue in last_objectIDs:
+      lid = last_objectIDs.index(cvalue)
+      lobj_centroid = last_objectCentroids[lid]
+      for i in range(np.shape(rects)[0]):
+        startX = rects[i][0]
+        startY = rects[i][1]
+        endX = rects[i][2]
+        endY = rects[i][3]
+        if cobj_centroid[1]>=startY and cobj_centroid[1]<=endY and cobj_centroid[0]>=startX and cobj_centroid[0]<=endX:
+          targetX = range(startX,endX,1)
+          targetY = range(startY,endY,1)
+      for ix in targetX:
+        for iy in targetY:
+          dirX[ix][iy]= cobj_centroid[1]-lobj_centroid[1] #x direction
+          dirY[ix][iy]= cobj_centroid[0]-lobj_centroid[0] #y direction
+      cdir = [cobj_centroid[1]-lobj_centroid[1],cobj_centroid[0]-lobj_centroid[0]]
+      directions.append(cdir)
+      locations.append([cobj_centroid[1],cobj_centroid[0]])
+    else:
+      lobj_centroid = []
+  return dirX, -1*dirY
+
 
 """
 # get oscillatory events
