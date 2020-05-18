@@ -126,6 +126,7 @@ class AIGame:
         dirY = resize(dirY, (self.dirSensitiveNeuronDim, self.dirSensitiveNeuronDim), anti_aliasing=True)
       mag, ang = cv2.cartToPolar(dirX, -1*dirY)
       ang = np.rad2deg(ang)
+      ang[mag == 0] = 'nan'
       self.last_objects = deepcopy(self.objects)
       flow = np.zeros(shape=(self.dirSensitiveNeuronDim,self.dirSensitiveNeuronDim,2))
       flow[:,:,0] = dirX
