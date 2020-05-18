@@ -2,7 +2,7 @@ from scipy.spatial import distance as dist
 from collections import OrderedDict
 import numpy as np
 class CentroidTracker:
-  def __init__(self, maxDisappeared=50):
+  def __init__(self, maxDisappeared=0):
     self.nextObjectID = 0
     self.objects = OrderedDict()
     self.disappeared = OrderedDict()
@@ -12,8 +12,8 @@ class CentroidTracker:
     self.disappeared[self.nextObjectID] = 0
     self.nextObjectID += 1
   def deregister(self,objectID):
-    self.objects[objectID]
-    self.disappeared[objectID]
+    del self.objects[objectID]
+    del self.disappeared[objectID]
   def update(self, rects):
     if len(rects) == 0:
       for objectID in list(self.disappeared.keys()):
@@ -32,10 +32,7 @@ class CentroidTracker:
     else:
       objectIDs = list(self.objects.keys())
       objectCentroids = list(self.objects.values())
-      print('Existing Objects:',objectCentroids)
-      print('New position:',inputCentroids)
       D = dist.cdist(np.array(objectCentroids), inputCentroids)
-      print('Distance:', D)
       rows = D.min(axis=1).argsort()
       cols = D.argmin(axis=1)[rows]
       usedRows = set()
@@ -48,12 +45,8 @@ class CentroidTracker:
         self.disappeared[objectID] = 0
         usedRows.add(row)
         usedCols.add(col)
-      #print('used rows:', usedRows)
-      #print('used cols:', usedCols)
       unusedRows = set(range(0, D.shape[0])).difference(usedRows)
       unusedCols = set(range(0, D.shape[1])).difference(usedCols)
-      #print('unused rows:', unusedRows)
-      #print('unused cols:', unusedCols)
       if D.shape[0] >= D.shape[1]:
         for row in unusedRows:
           objectID = objectIDs[row]
@@ -62,5 +55,5 @@ class CentroidTracker:
             self.deregister(objectID)
       else:
         for col in unusedCols:
-          self.register(inputCentroids[col])
+          self.register(inputCentroids[col])    
     return self.objects

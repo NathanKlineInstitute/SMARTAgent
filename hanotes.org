@@ -2375,4 +2375,8 @@ current ball direction: -1
       ball_hits_racket = 1
     elif xpos_Ball==-1 and reward==0 and xpos_Ball2>courtXRng[1]-courtXRng[0]-3:
       ball_hits_racket = 1
-** so far works for all tested conditions  
+** so far works for all tested conditions
+** object tracking fixed--- working nicely.....
+** displaying object tracking and plotting direction of motion.
+
+** still need to integrate the code in the model.
