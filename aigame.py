@@ -124,7 +124,7 @@ class AIGame:
       goodInds = np.zeros(shape=(np.shape(cimage)[0],np.shape(cimage)[1]))
     else:    
       dirX, dirY = getObjectMotionDirection(self.objects, self.last_objects, rects, dims=np.shape(cimage)[0])
-       mag, ang = cv2.cartToPolar(dirY, dirX)
+      mag, ang = cv2.cartToPolar(dirY, dirX)
       ang = np.rad2deg(ang)
       self.last_objects = deepcopy(self.objects)
       flow = np.zeros(shape=(np.shape(cimage)[0],np.shape(cimage)[1],2))
