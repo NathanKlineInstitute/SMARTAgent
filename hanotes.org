@@ -2425,4 +2425,6 @@ probably need more testing.
 *** too much activity for 0 degrees  i.e. E neurons.
 ---> solution: ang[mag == 0] = 'nan'
 *** looks like 'nan' doesnt work. so use -100.
+*** use centroidtracker with both FullImage and ReducedImage.
+*** Run for 100 sec.
 

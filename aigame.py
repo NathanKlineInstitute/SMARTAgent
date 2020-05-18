@@ -105,10 +105,13 @@ class AIGame:
     if len(limage) < 2: return
     self.ldflow.append(getoptflow(limage[-2],limage[-1]))
 
-  def computeAllObjectsMotionDirections(self):
+  def computeAllObjectsMotionDirections(self, UseFull=False):
     #Detect the objects, and initialize the list of bounding box rectangles
-    if len(self.FullImages)==0: return    
-    cimage = self.FullImages[-1]
+    if len(self.FullImages)==0: return
+    if UseFull:
+      cimage = self.FullImages[-1]
+    else:
+      cimage = self.ReducedImages[-1]
     rects = getObjectsBoundingBoxes(cimage)
     cimage = np.ascontiguousarray(cimage, dtype=np.uint8)
     # update our centroid tracker using the computed set of bounding box rectangles
@@ -138,10 +141,7 @@ class AIGame:
     # update firing rate of dir sensitive neurons using dirs (2D array with motion direction at each coordinate)
     if len(self.ldflow) < 1: return
     dflow = self.ldflow[-1]
-    if dconf['DirectionDetectionAlgo']['OpticFlow']==1:
-      motiondir = dflow['thang'] # angles in degrees, but thresholded for significant motion; negative value means not used
-    elif dconf['DirectionDetectionAlgo']['CentroidTracker']==1:
-      motiondir = dflow['ang']
+    motiondir = dflow['thang'] # angles in degrees, but thresholded for significant motion; negative value means not used
     dAngPeak = self.dAngPeak
     dirSensitiveNeuronDim = self.dirSensitiveNeuronDim
     if motiondir.shape[0] != dirSensitiveNeuronDim or motiondir.shape[1] != dirSensitiveNeuronDim:
