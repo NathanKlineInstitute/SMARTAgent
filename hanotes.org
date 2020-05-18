@@ -2412,4 +2412,5 @@ current ball direction: -1
     goodInds = np.zeros(shape=(np.shape(cimage)[0],np.shape(cimage)[1],2))
     self.ldflow.append({'flow':flow,'mag':mag,'ang':ang,'goodInds':goodInds,'thang':ang,'thflow':flow})
 
+*** add zeros when the last objects is empty.
 
