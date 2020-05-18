@@ -99,8 +99,63 @@ def drawraster (dspkT,dspkID,tlim=None,msz=2):
   lpatch = [mpatches.Patch(color=c,label=s+' '+str(round(getrate(dspkT,dspkID,s,dnumc),2))+' Hz') for c,s in zip(lclr,lpop)]
   ax=gca()
   ax.legend(handles=lpatch,handlelength=1,loc='best')
-  
 
+#  
+def plotFollowBall (actreward, ax=None,msz=1):
+  if ax is None: ax = gca()
+  action_times = np.array(actreward.time)
+  actionvsproposed = np.array(actreward.action-actreward.proposed)
+  rewardingActions = np.cumsum(np.where(actionvsproposed==0,1,0)) #rewarding action
+  #punishing action i.e. when the action leads to move the racket away from the ball
+  punishingActions = np.cumsum(np.where((actionvsproposed>0) | (actionvsproposed<0),1,0)) 
+  cumActs = np.array(range(1,len(actionvsproposed)+1))
+  Hit_Missed = np.array(actreward.hit)
+  ax.plot([0,np.max(action_times)],[0.5,0.5],'--',color='gray')
+  ax.plot(action_times,np.divide(rewardingActions,cumActs),'r.',markersize=msz)
+  ax.plot(action_times,np.divide(punishingActions,cumActs),'b.',markersize=msz)
+  ax.set_xlim((0,np.max(action_times)))
+  ax.set_ylim((0,1))
+  ax.legend(('Follow Ball','Not Follow'),loc='best')
+  ax.set_xlabel('Time (ms)'); ax.set_ylabel('Probability')
+
+#  
+def plotHitMiss (actreward,ax=None,msz=1):
+  if ax is None: ax = gca()
+  action_times = np.array(actreward.time)
+  Hit_Missed = np.array(actreward.hit)
+  allHit = np.where(Hit_Missed==1,1,0) 
+  allMissed = np.where(Hit_Missed==-1,1,0)
+  cumHits = np.cumsum(allHit) #cumulative hits evolving with time.
+  cumMissed = np.cumsum(allMissed) #if a reward is -1, replace it with 1 else replace it with 0.
+  ax.plot(action_times,cumHits,'g-o',markersize=msz)
+  ax.plot(action_times,cumMissed,'k-o',markersize=msz)
+  ax.set_xlim((0,np.max(action_times)))
+  ax.set_ylim((0,np.max([cumHits[-1],cumMissed[-1]])))
+  ax.legend(('Hit Ball','Miss Ball'),loc='best')  
+
+#
+def plotRewards (actreward,ax=None,msz=1,xl=None):
+  if ax is None: ax = gca()  
+  ax.plot(actreward.time,actreward.reward,'ko-',markersize=msz)
+  if xl is not None: ax.set_xlim(xl)
+  ax.set_ylim((np.min(actreward.reward),np.max(actreward.reward)))
+  ax.set_ylabel('Rewards'); #f_ax1.set_xlabel('Time (ms)')
+
+def plotMeanWeights (pdf,ax=None,msz=1,xl=None):
+  #plot mean weights of all connections onto EMDOWN and EMUP  
+  if ax is None: ax = gca()
+  utimes = np.unique(pdf.time)
+  pdfsDOWN = pdf[(pdf.postid>=dstartidx['EMDOWN']) & (pdf.postid<=dendidx['EMDOWN'])]
+  pdfdsUP = pdf[(pdf.postid>=dstartidx['EMUP']) & (pdf.postid<=dendidx['EMUP'])]
+  DOWNwts = [np.mean(pdfsDOWN[(pdfsDOWN.time==t)].weight) for t in utimes] #wts of connections onto EMDOWN
+  UPwts = [np.mean(pdfdsUP[(pdfdsUP.time==t)].weight) for t in utimes] #wts of connections onto EMUP  
+  ax.plot(utimes,DOWNwts,'r-o',markersize=msz)
+  ax.plot(utimes,UPwts,'b-o',markersize=msz)
+  if xl is not None: ax.set_xlim(xl)
+  ax.set_ylim((np.min([np.min(DOWNwts),np.min(UPwts)]),np.max([np.max(DOWNwts),np.max(UPwts)])))
+  ax.set_ylabel('Average weight'); #f_ax2.set_xlabel('Time (ms)')
+  ax.legend(('->EMDOWN','->EMUP'),loc='best')
+  
 #
 def animSynWeights (pdf, outpath='gif/'+dconf['sim']['name']+'weightmap.mp4', framerate=10, figsize=(14,8), cmap='jet'):  
   # animate the synaptic weights along with some stats on behavior
@@ -125,42 +180,10 @@ def animSynWeights (pdf, outpath='gif/'+dconf['sim']['name']+'weightmap.mp4', fr
   f_ax2 = fig.add_subplot(gs[3,0:2])
   f_ax3 = fig.add_subplot(gs[3,3:5])
   f_ax4 = fig.add_subplot(gs[3,6:8])
-  pdfsL = pdf[(pdf.postid>=dstartidx['EMDOWN']) & (pdf.postid<=dendidx['EMDOWN'])]
-  pdfsR = pdf[(pdf.postid>=dstartidx['EMUP']) & (pdf.postid<=dendidx['EMUP'])]
-  Lwts = [np.mean(pdfsL[(pdfsL.time==t)].weight) for t in utimes] #wts of connections onto EMDOWN
-  Rwts = [np.mean(pdfsR[(pdfsR.time==t)].weight) for t in utimes] #wts of connections onto EMUP
-  action_times = np.array(actreward.time)
-  actionvsproposed = np.array(actreward.action-actreward.proposed)
-  rewardingActions = np.cumsum(np.where(actionvsproposed==0,1,0)) #rewarding action
-  #punishing action i.e. when the action leads to move the racket away from the ball
-  punishingActions = np.cumsum(np.where((actionvsproposed>0) | (actionvsproposed<0),1,0)) 
-  cumActs = np.array(range(1,len(actionvsproposed)+1))
-  Hit_Missed = np.array(actreward.hit)
-  allHit = np.where(Hit_Missed==1,1,0) 
-  allMissed = np.where(Hit_Missed==-1,1,0)
-  cumHits = np.cumsum(allHit) #cumulative hits evolving with time.
-  cumMissed = np.cumsum(allMissed) #if a reward is -1, replace it with 1 else replace it with 0.
-  f_ax1.plot(action_times,np.divide(rewardingActions,cumActs),'r.',markersize=1)
-  f_ax1.plot(action_times,np.divide(punishingActions,cumActs),'b.',markersize=1)
-  f_ax1.set_xlim((0,np.max(action_times)))
-  f_ax1.set_ylim((0,1))
-  f_ax1.legend(('Follow Ball','Not Follow'),loc='upper left')
-  f_ax2.plot(actreward.time,actreward.reward,'ko-',markersize=1)
-  f_ax2.set_xlim((0,simConfig['simConfig']['duration']))
-  f_ax2.set_ylim((np.min(actreward.reward),np.max(actreward.reward)))
-  f_ax2.set_ylabel('Rewards'); #f_ax1.set_xlabel('Time (ms)')
-  #plot mean weights of all connections onto EMDOWN and EMUP
-  f_ax3.plot(utimes,Lwts,'r-o',markersize=1)
-  f_ax3.plot(utimes,Rwts,'b-o',markersize=1)
-  f_ax3.set_xlim((0,simConfig['simConfig']['duration']))
-  f_ax3.set_ylim((np.min([np.min(Lwts),np.min(Rwts)]),np.max([np.max(Lwts),np.max(Rwts)])))
-  f_ax3.set_ylabel('Average weight'); #f_ax2.set_xlabel('Time (ms)')
-  f_ax3.legend(('->EMDOWN','->EMUP'),loc='upper left')
-  f_ax4.plot(action_times,cumHits,'g-o',markersize=1)
-  f_ax4.plot(action_times,cumMissed,'k-o',markersize=1)
-  f_ax4.set_xlim((0,np.max(action_times)))
-  f_ax4.set_ylim((0,np.max([cumHits[-1],cumMissed[-1]])))
-  f_ax4.legend(('Hit Ball','Miss Ball'),loc='upper left')
+  plotFollowBall(actreward,f_ax1)
+  plotRewards(actreward,f_ax2,xl=(0,simConfig['simConfig']['duration']))
+  plotMeanWeights(pdf,f_ax3,xl=(0,simConfig['simConfig']['duration']))
+  plotHitMiss(actreward,f_ax4)
   lsrc = ['EV1', 'EV4', 'EMT','EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE']
   ltitle = []
   for src in lsrc:
@@ -180,20 +203,20 @@ def animSynWeights (pdf, outpath='gif/'+dconf['sim']['name']+'weightmap.mp4', fr
       lout.append(lwt)
     return lout[0], lout[1]    
   minR,maxR = np.min(actreward.reward),np.max(actreward.reward)
-  minW,maxW = np.min([np.min(Lwts),np.min(Rwts)]), np.max([np.max(Lwts),np.max(Rwts)])
+  minW,maxW = np.min([np.min(DOWNwts),np.min(UPwts)]), np.max([np.max(DOWNwts),np.max(UPwts)])
   t = utimes[0]
   dline[1], = f_ax1.plot([t,t],[minR,maxR],'r',linewidth=0.2); f_ax1.set_xticks([])
   dline[2], = f_ax2.plot([t,t],[minW,maxW],'r',linewidth=0.2); f_ax2.set_xticks([])  
   pinds = 0
   fig.suptitle('Time=' + str(round(t,2)) + ' ms')
   for src in lsrc:
-    wtsL, wtsR = getwts(0, src)
+    wtsDOWN, wtsUP = getwts(0, src)
     ax=f_ax[pinds]
-    dimg[pinds] = ax.imshow(wtsL, origin='upper', cmap=cmap, vmin=minwt, vmax=maxwt+wtrange)
+    dimg[pinds] = ax.imshow(wtsDOWN, origin='upper', cmap=cmap, vmin=minwt, vmax=maxwt+wtrange)
     ax.set_title(ltitle[pinds]); ax.axis('off')
     pinds+=1
     ax=f_ax[pinds]
-    dimg[pinds] = ax.imshow(wtsR, origin='upper', cmap=cmap, vmin=minwt, vmax=maxwt+wtrange)
+    dimg[pinds] = ax.imshow(wtsUP, origin='upper', cmap=cmap, vmin=minwt, vmax=maxwt+wtrange)
     ax.set_title(ltitle[pinds]); ax.axis('off')
     if pinds==15: plt.colorbar(dimg[pinds], cax = cbaxes)
     pinds+=1
@@ -205,10 +228,10 @@ def animSynWeights (pdf, outpath='gif/'+dconf['sim']['name']+'weightmap.mp4', fr
     pinds = 0
     fig.suptitle('Time=' + str(round(t,2)) + ' ms')
     for src in lsrc:
-      wtsL, wtsR = getwts(tdx, src)
-      dimg[pinds].set_data(wtsL)
+      wtsDOWN, wtsUP = getwts(tdx, src)
+      dimg[pinds].set_data(wtsDOWN)
       pinds+=1
-      dimg[pinds].set_data(wtsR)
+      dimg[pinds].set_data(wtsUP)
       pinds+=1
     return fig
   ani = animation.FuncAnimation(fig, updatefig, interval=1, frames=len(utimes))
@@ -442,18 +465,18 @@ def plotSynWeightsPostNeuronID(pdf,postNeuronID):
           arrR.append([])
           arrL2.append([])
           arrR2.append([])
-          pdfsL = pdf[(pdf.time==t) & (pdf.postid==targetMDOWN_postID) & (pdf.preid>=dstartidx[src]) & (pdf.preid<=dendidx[src])]
-          pdfsR = pdf[(pdf.time==t) & (pdf.postid==targetMUP_postID) & (pdf.preid>=dstartidx[src]) & (pdf.preid<=dendidx[src])]
-          upreLCells = np.unique(pdfsL.preid)
-          upreRCells = np.unique(pdfsR.preid)
+          pdfsDOWN = pdf[(pdf.time==t) & (pdf.postid==targetMDOWN_postID) & (pdf.preid>=dstartidx[src]) & (pdf.preid<=dendidx[src])]
+          pdfdsUP = pdf[(pdf.time==t) & (pdf.postid==targetMUP_postID) & (pdf.preid>=dstartidx[src]) & (pdf.preid<=dendidx[src])]
+          upreLCells = np.unique(pdfsDOWN.preid)
+          upreRCells = np.unique(pdfdsUP.preid)
           for preID in upreLCells:
-              pdfs1 = pdfsL[(pdfsL.preid==preID)]
+              pdfs1 = pdfsDOWN[(pdfsDOWN.preid==preID)]
               p1 = np.array(pdfs1.weight) #may have more than 1 weight---as two cells may have both AMPA and NMDA syns
               for w in p1:
                   arrL[tstep].append(w)
                   arrL2[tstep].append(preID)
           for preID in upreRCells:
-              pdfs2 = pdfsR[(pdfsR.preid==preID)]
+              pdfs2 = pdfdsUP[(pdfdsUP.preid==preID)]
               p2 = np.array(pdfs2.weight) #may have more than 1 weight---as two cells may have both AMPA and NMDA syns
               for w in p2:
                   arrR[tstep].append(w)
