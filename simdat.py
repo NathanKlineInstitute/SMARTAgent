@@ -155,6 +155,7 @@ def plotMeanWeights (pdf,ax=None,msz=1,xl=None):
   ax.set_ylim((np.min([np.min(DOWNwts),np.min(UPwts)]),np.max([np.max(DOWNwts),np.max(UPwts)])))
   ax.set_ylabel('Average weight'); #f_ax2.set_xlabel('Time (ms)')
   ax.legend(('->EMDOWN','->EMUP'),loc='best')
+  return DOWNwts,UPwts
   
 #
 def animSynWeights (pdf, outpath='gif/'+dconf['sim']['name']+'weightmap.mp4', framerate=10, figsize=(14,8), cmap='jet'):  
@@ -182,7 +183,7 @@ def animSynWeights (pdf, outpath='gif/'+dconf['sim']['name']+'weightmap.mp4', fr
   f_ax4 = fig.add_subplot(gs[3,6:8])
   plotFollowBall(actreward,f_ax1)
   plotRewards(actreward,f_ax2,xl=(0,simConfig['simConfig']['duration']))
-  plotMeanWeights(pdf,f_ax3,xl=(0,simConfig['simConfig']['duration']))
+  DOWNwts,UPwts = plotMeanWeights(pdf,f_ax3,xl=(0,simConfig['simConfig']['duration']))
   plotHitMiss(actreward,f_ax4)
   lsrc = ['EV1', 'EV4', 'EMT','EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE']
   ltitle = []

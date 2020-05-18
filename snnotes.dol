@@ -4116,3 +4116,40 @@ otherwise will not know if architecture supports proper decision making
 
 that will increase likelihood that M populations have enough info to make decisions
 
+can make a param to control it ... EEMProb, and as scale up prob, scale down the incoming weights ...
+
+EEMProb ... original was 0.1 ... try at double probability ... and 1/2 weight ... 
+
+change "EEMWghtAM":0.000075,"EEMWghtNM":0.0000075
+to
+"EEMWghtAM":0.0000375,"EEMWghtNM":0.00000375
+
+also change "EEMWghtThreshMin":0.000075,"EEMWghtThreshMax":0.0005
+to
+"EEMWghtThreshMin":0.0000375,"EEMWghtThreshMax":0.0005
+
+myrun 12
+
+ok...
+
+python -i simdat.py
+
+drawraster(dspkT,dspkID)
+savefig('gif/20may18_d0.png')
+
+rates are ok ... 
+
+animSynWeights(pdf,'gif/20may18_d0_weightmap.mp4')
+
+python -i actmap.py
+
+fig, axs, plt = animActivityMaps('gif/20may18_d0_actmap.mp4')
+
+well, activity not epileptic ... could run a long sim to compare to how others performing ...
+
+even 100 s worth trying ...
+
+20may18_L0_
+
+myrun 12
+
