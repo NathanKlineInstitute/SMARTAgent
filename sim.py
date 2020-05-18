@@ -473,13 +473,15 @@ netParams.connParams['IV4->IMT'] = {
 # Add connections from lower and higher visual areas to motor cortex
 # and direct connections between premotor to motor areas
 for prety in ['EV1', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW','EV1DSW', 'EV1DS','EV1DSE', 'EV4', 'EMT']:
+  EEMProb = 0.1 # default
+  if "EEMProb" in dconf['net']: EEMProb = dconf['net']['EEMProb']
   for poty in EMotorPops:
     for strty,synmech,weight in zip(['','n'],['AMPA', 'NMDA'],[dconf['net']['EEMWghtAM']*cfg.EEGain, dconf['net']['EEMWghtNM']*cfg.EEGain]):
       k = strty+prety+'->'+strty+poty
       netParams.connParams[k] = {
         'preConds': {'pop': prety},
         'postConds': {'pop': poty},
-        'convergence': prob2conv(0.1, dnumc[prety]),
+        'convergence': prob2conv(EEMProb, dnumc[prety]),
         'weight': weight,
         'delay': 2,
         'synMech': synmech,
