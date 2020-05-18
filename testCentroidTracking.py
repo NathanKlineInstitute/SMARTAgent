@@ -11,7 +11,7 @@ from matplotlib import animation
 import anim
 from collections import OrderedDict
 import copy
-from skimage.transform import downscale_local_mean, rescale
+from skimage.transform import downscale_local_mean, rescale, resize
 
 AIGame = AIGame()
 #for _ in range(20):
@@ -101,9 +101,11 @@ while steps<NB_steps:
   # update our centroid tracker using the computed set of bounding box rectangles
   objects = ct.update(rects)
   dirX, dirY = getObjectMotionDirection(objects, last_objects, rects, dims=160)
-  dirX_ds = downscale_local_mean(dirX,(8,8))
-  dirY_ds = downscale_local_mean(dirY,(8,8))
-  mag, ang = cv2.cartToPolar(dirY_ds, dirX_ds)
+  #dirX_ds = downscale_local_mean(dirX,(8,8))
+  #dirY_ds = downscale_local_mean(dirY,(8,8))
+  dirX_ds = resize(dirX,(20,20),anti_aliasing=True)
+  dirY_ds = resize(dirY,(20,20),anti_aliasing=True)
+  mag, ang = cv2.cartToPolar(dirX_ds, dirY_ds)
   #mag, ang = cv2.cartToPolar(dirX, dirY)
   ang = np.rad2deg(ang)
   print(ang)

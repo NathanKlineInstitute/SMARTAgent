@@ -2421,3 +2421,5 @@ current ball direction: -1
 
 probably need more testing.
 
+*** X and Y were replaced. Fixed now.
+
