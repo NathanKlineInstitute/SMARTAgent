@@ -274,6 +274,7 @@ class AIGame:
       self.computeMotionFields() # compute the motion fields
     elif dconf['DirectionDetectionAlgo']['CentroidTracker']==1:
       self.computeAllObjectsMotionDirections() # compute the motion field using CetroidTracking
+    print('Number of Images saved:', np.shape(self.FullImages))
     self.updateDirSensitiveRates() # update motion sensitive neuron input rates
 
     if done: # done means that 1 episode of the game finished, so the environment needs to be reset. 
