@@ -2424,4 +2424,5 @@ probably need more testing.
 *** X and Y were replaced. Fixed now.
 *** too much activity for 0 degrees  i.e. E neurons.
 ---> solution: ang[mag == 0] = 'nan'
+*** looks like 'nan' doesnt work. so use -100.
 
