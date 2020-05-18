@@ -2414,3 +2414,7 @@ current ball direction: -1
 
 *** add zeros when the last objects is empty.
 
+** More debugging centroid tracking in aigame
+*** always compute motion flow using FullImages
+*** if dirSensitiveNeuronDim!= cimage.shape[0], resize the direction vectors, angles etc.
+

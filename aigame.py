@@ -105,32 +105,32 @@ class AIGame:
     if len(limage) < 2: return
     self.ldflow.append(getoptflow(limage[-2],limage[-1]))
 
-  def computeAllObjectsMotionDirections(self, UseFull=True):
+  def computeAllObjectsMotionDirections(self):
   # Detect the objects, and initialize the list of bounding box rectangles
     if len(self.FullImages)==0: return    
-    if UseFull:
-      cimage = self.FullImages[-1]
-    else:
-      cimage = self.ReducedImages[-1] 
+    cimage = self.FullImages[-1]
     rects = getObjectsBoundingBoxes(cimage)
     cimage = np.ascontiguousarray(cimage, dtype=np.uint8)
     # update our centroid tracker using the computed set of bounding box rectangles
     self.objects = self.ct.update(rects)
     if len(self.last_objects)==0: 
       self.last_objects = deepcopy(self.objects)
-      flow = np.zeros(shape=(np.shape(cimage)[0],np.shape(cimage)[1],2))
-      mag = np.zeros(shape=(np.shape(cimage)[0],np.shape(cimage)[1]))
-      ang = np.zeros(shape=(np.shape(cimage)[0],np.shape(cimage)[1]))
-      goodInds = np.zeros(shape=(np.shape(cimage)[0],np.shape(cimage)[1]))
+      flow = np.zeros(shape=(dirSensitiveNeuronDim,dirSensitiveNeuronDim,2))
+      mag = np.zeros(shape=(dirSensitiveNeuronDim,dirSensitiveNeuronDim))
+      ang = np.zeros(shape=(dirSensitiveNeuronDim,dirSensitiveNeuronDim))
+      goodInds = np.zeros(shape=(dirSensitiveNeuronDim,dirSensitiveNeuronDim)
     else:    
       dirX, dirY = getObjectMotionDirection(self.objects, self.last_objects, rects, dims=np.shape(cimage)[0])
+      if np.shape(cimage)[0] != dirSensitiveNeuronDim or np.shape(cimage)[1] != dirSensitiveNeuronDim:
+        dirX = resize(dirX, (dirSensitiveNeuronDim, dirSensitiveNeuronDim), anti_aliasing=True)
+        dirY = resize(dirY, (dirSensitiveNeuronDim, dirSensitiveNeuronDim), anti_aliasing=True)
       mag, ang = cv2.cartToPolar(dirY, dirX)
       ang = np.rad2deg(ang)
       self.last_objects = deepcopy(self.objects)
-      flow = np.zeros(shape=(np.shape(cimage)[0],np.shape(cimage)[1],2))
+      flow = np.zeros(shape=(dirSensitiveNeuronDim,dirSensitiveNeuronDim,2))
       flow[:,:,0] = dirX
       flow[:,:,1] = dirY
-      goodInds = np.zeros(shape=(np.shape(cimage)[0],np.shape(cimage)[1]))
+      goodInds = np.zeros(shape=(dirSensitiveNeuronDim,dirSensitiveNeuronDim))
     self.ldflow.append({'flow':flow,'mag':mag,'ang':ang,'goodInds':goodInds,'thang':ang,'thflow':flow})
 
   def updateDirSensitiveRates (self):
