@@ -23,6 +23,7 @@ from time import time
 from collections import OrderedDict
 from imgutils import getoptflow
 from imgutils import getObjectsBoundingBoxes, getObjectMotionDirection
+import cv2
 from centroidtracker import CentroidTracker
 
 # make the environment - env is global so that it only gets created on a single node (important when using MPI with > 1 node)

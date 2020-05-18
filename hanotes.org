@@ -2401,4 +2401,5 @@ current ball direction: -1
 
 ** Debugging aigame.....
 *** need to explicitly import deepcopy from copy
+*** import cv2
 
