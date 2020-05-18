@@ -2451,3 +2451,7 @@ or prety in ['EV1', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW','EV1DSW', 'EV1
         Change prob2conv(0.1, dnumc[prety]) to prob2conv(2*0.1, dnumc[prety])
 
 and set doplot=1, doquit=0
+
+*** still racket not moving----probably no activity in motor neurons.
+
+"EEMWghtAM":0.000075,"EEMWghtNM":0.0000075 increase 10 times to "EEMWghtAM":0.00075,"EEMWghtNM":0.000075
