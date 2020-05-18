@@ -107,7 +107,7 @@ class AIGame:
   def computeAllObjectsMotionDirections(self, UseFull=True):
   # Detect the objects, and initialize the list of bounding box rectangles
     if UseFull:
-      cimage = self.FUllImages[-1]
+      cimage = self.FullImages[-1]
     else:
       cimage = self.ReducedImages[-1] 
     rects = getObjectsBoundingBoxes(cimage)
