@@ -2427,4 +2427,27 @@ probably need more testing.
 *** looks like 'nan' doesnt work. so use -100.
 *** use centroidtracker with both FullImage and ReducedImage.
 *** Run for 100 sec.
+*** seems too low activity. try increasing the probability of RL connections.
 
+
+or prety in ['EV1', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW','EV1DSW', 'EV1DS','EV1DSE', 'EV4', 'EMT']:
+  for poty in EMotorPops:
+    for strty,synmech,weight in zip(['','n'],['AMPA', 'NMDA'],[dconf['net']['EEMWghtAM']*cfg.EEGain, dconf['net']['EEMWghtNM']*cfg.EEGain]):
+      k = strty+prety+'->'+strty+poty
+      netParams.connParams[k] = {
+        'preConds': {'pop': prety},
+        'postConds': {'pop': poty},
+        'convergence': prob2conv(0.1, dnumc[prety]), #using 0.2 instead of 0.1 dated May18,2020
+        'weight': weight,
+        'delay': 2,
+        'synMech': synmech,
+        'sec':'dend', 'loc':0.5
+      }
+      if dSTDPparamsRL[synmech]['RLon']: # only turn on plasticity when specified to do so
+        netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL[synmech]}
+
+
+
+        Change prob2conv(0.1, dnumc[prety]) to prob2conv(2*0.1, dnumc[prety])
+
+and set doplot=1, doquit=0

@@ -479,7 +479,7 @@ for prety in ['EV1', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW','EV1DSW', 'EV
       netParams.connParams[k] = {
         'preConds': {'pop': prety},
         'postConds': {'pop': poty},
-        'convergence': prob2conv(0.1, dnumc[prety]),
+        'convergence': prob2conv(2*0.1, dnumc[prety]), #using 0.2 instead of 0.1 dated May18,2020
         'weight': weight,
         'delay': 2,
         'synMech': synmech,
