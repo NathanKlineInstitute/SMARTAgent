@@ -4106,7 +4106,17 @@ sum(lpda[1].reward) # 289.36
 so, almost identical total reward ...
 
 may as well let those sims run some more to see if they improve further ... possible that
-learning is taking place, just at a slow rate ... 
+learning is taking place, just at a slow rate ...
+
+make movies to see how weights changing ... use last available step
+
+python -i simdat.py backupcfg/20may15_ZN_MultiStep_A__step_4_sim.json
+animSynWeights(pdf)
+
+python -i simdat.py backupcfg/20may15_ZN_MultiStep_B__step_4_sim.json
+animSynWeights(pdf)
+
+
 
 ** build a map of which info received by each/all M neurons
 
