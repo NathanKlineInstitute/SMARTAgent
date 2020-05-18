@@ -8,7 +8,7 @@ Modified 2019-2020 samn
 
 from neuron import h
 from pylab import concatenate, figure, show, ion, ioff, pause,xlabel, ylabel, plot, Circle, sqrt, arctan, arctan2, close
-from copy import copy
+from copy import copy, deepcopy
 from random import uniform, seed, sample, randint
 from matplotlib import pyplot as plt
 import random
@@ -116,12 +116,12 @@ class AIGame:
     # update our centroid tracker using the computed set of bounding box rectangles
     self.objects = self.ct.update(rects)
     if len(self.last_objects)==0: 
-      self.last_objects = copy.deepcopy(self.objects)
+      self.last_objects = deepcopy(self.objects)
       return
     dirX, dirY = getObjectMotionDirection(self.objects, self.last_objects, rects, dims=np.shape(cimage)[0])
     mag, ang = cv2.cartToPolar(dirY, dirX)
     ang = np.rad2deg(ang)
-    self.last_objects = copy.deepcopy(self.objects)
+    self.last_objects = deepcopy(self.objects)
     flow = [dirX, dirY]
     self.ldflow.append({'flow':flow,'mag':mag,'ang':ang})
 

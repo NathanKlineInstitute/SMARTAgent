@@ -2399,3 +2399,6 @@ current ball direction: -1
 ** added function to compute angles of motion.
   -- computeAllObjectsMotionDirections(self, UseFull=True)
 
+** Debugging aigame.....
+*** need to explicitly import deepcopy from copy
+
