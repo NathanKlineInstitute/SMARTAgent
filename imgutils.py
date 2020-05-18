@@ -126,7 +126,7 @@ def getObjectMotionDirection(objects, last_objects, rects, dims):
       locations.append([cobj_centroid[1],cobj_centroid[0]])
     else:
       lobj_centroid = []
-  return dirX, -1*dirY
+  return dirX, dirY
 
 
 """

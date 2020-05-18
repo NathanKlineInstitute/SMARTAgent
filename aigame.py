@@ -124,7 +124,7 @@ class AIGame:
       if np.shape(cimage)[0] != self.dirSensitiveNeuronDim or np.shape(cimage)[1] != self.dirSensitiveNeuronDim:
         dirX = resize(dirX, (self.dirSensitiveNeuronDim, self.dirSensitiveNeuronDim), anti_aliasing=True)
         dirY = resize(dirY, (self.dirSensitiveNeuronDim, self.dirSensitiveNeuronDim), anti_aliasing=True)
-      mag, ang = cv2.cartToPolar(dirY, dirX)
+      mag, ang = cv2.cartToPolar(-1*dirY, dirX)
       ang = np.rad2deg(ang)
       self.last_objects = deepcopy(self.objects)
       flow = np.zeros(shape=(self.dirSensitiveNeuronDim,self.dirSensitiveNeuronDim,2))

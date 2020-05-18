@@ -2417,4 +2417,7 @@ current ball direction: -1
 ** More debugging centroid tracking in aigame
 *** always compute motion flow using FullImages
 *** if dirSensitiveNeuronDim!= cimage.shape[0], resize the direction vectors, angles etc.
+*** to match the format of optical flow. keep the flow inverted in y direction.
+
+probably need more testing.
 
