@@ -106,7 +106,7 @@ class AIGame:
     self.ldflow.append(getoptflow(limage[-2],limage[-1]))
 
   def computeAllObjectsMotionDirections(self):
-  # Detect the objects, and initialize the list of bounding box rectangles
+    #Detect the objects, and initialize the list of bounding box rectangles
     if len(self.FullImages)==0: return    
     cimage = self.FullImages[-1]
     rects = getObjectsBoundingBoxes(cimage)
@@ -118,8 +118,8 @@ class AIGame:
       flow = np.zeros(shape=(dirSensitiveNeuronDim,dirSensitiveNeuronDim,2))
       mag = np.zeros(shape=(dirSensitiveNeuronDim,dirSensitiveNeuronDim))
       ang = np.zeros(shape=(dirSensitiveNeuronDim,dirSensitiveNeuronDim))
-      goodInds = np.zeros(shape=(dirSensitiveNeuronDim,dirSensitiveNeuronDim)
-    else:    
+      goodInds = np.zeros(shape=(dirSensitiveNeuronDim,dirSensitiveNeuronDim))
+    else:
       dirX, dirY = getObjectMotionDirection(self.objects, self.last_objects, rects, dims=np.shape(cimage)[0])
       if np.shape(cimage)[0] != dirSensitiveNeuronDim or np.shape(cimage)[1] != dirSensitiveNeuronDim:
         dirX = resize(dirX, (dirSensitiveNeuronDim, dirSensitiveNeuronDim), anti_aliasing=True)
