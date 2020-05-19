@@ -327,8 +327,6 @@ for poty in EMotorPops: # I -> E for motor populations
   netParams.connParams['IM->'+poty] = {
     'preConds': {'pop': 'IM'},
     'postConds': {'pop': poty},
-    #'probability': 0.125,
-    #'divergence': 9,
     'convergence': prob2conv(0.125, dnumc['IM']),
     'weight': 0.02 * cfg.IEGain,
     'delay': 2,
@@ -339,7 +337,6 @@ for IType in ['IV1', 'IV4', 'IMT', 'IM']:
   netParams.connParams[IType+'->'+IType] = {
     'preConds': {'pop': IType},
     'postConds': {'pop': IType},
-    #'probability': 0.25,
     'convergence': prob2conv(0.25, dnumc[IType]),
     'weight': 0.005 * cfg.IIGain, 
     'delay': 2,
@@ -472,14 +469,22 @@ netParams.connParams['IV4->IMT'] = {
 
 # Add connections from lower and higher visual areas to motor cortex
 # and direct connections between premotor to motor areas
-for prety in ['EV1', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW','EV1DSW', 'EV1DS','EV1DSE', 'EV4', 'EMT']:
+for prety in ['EV1', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW','EV1DSW', 'EV1DS','EV1DSE', 'EV4', 'EMT', 'EMUP', 'EMDOWN']:
+  EEMProb = 0.1 # default
+  if "EEMProb" in dconf['net']: EEMProb = dconf['net']['EEMProb']
+  EEMRecProb = 0.0 # default
+  if "EEMRecProb" in dconf['net']: EEMRecProb = dconf['net']['EEMRecProb']
   for poty in EMotorPops:
+    if (prety == 'EMUP' and poty == 'EMDOWN') or (prety == 'EMDOWN' and poty == 'EMUP'): continue # no recurrent btwn two EM pops
+    if EEMRecProb == 0.0:
+      if prety == 'EMUP' and poty == 'EMUP': continue
+      if prety == 'EMDOWN' and poty == 'EMDOWN': continue      
     for strty,synmech,weight in zip(['','n'],['AMPA', 'NMDA'],[dconf['net']['EEMWghtAM']*cfg.EEGain, dconf['net']['EEMWghtNM']*cfg.EEGain]):
       k = strty+prety+'->'+strty+poty
       netParams.connParams[k] = {
         'preConds': {'pop': prety},
         'postConds': {'pop': poty},
-        'convergence': prob2conv(2*0.1, dnumc[prety]), #using 0.2 instead of 0.1 dated May18,2020
+        'convergence': prob2conv(EEMProb, dnumc[prety]),
         'weight': weight,
         'delay': 2,
         'synMech': synmech,

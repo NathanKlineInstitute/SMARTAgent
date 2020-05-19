@@ -3807,7 +3807,7 @@ python -i simdat.py
 
 animSynWeights(pdf[pdf.syntype=='AMPA'],'gif/20may14_Min1Max2Thresh_Z0_AMPA_weightmap_300s.mp4', framerate=10, figsize=(14,8))
 
-*20may15
+*20may15 - check weight norm, fix resumesim (multistep)
 ** check the weight normalization
 
 why does hyperexcit not emerge when weights are below the max, but
@@ -3979,4 +3979,286 @@ with "EEMWghtThreshMax":0.0005
 python multistepSim.py sim.json 12 10 multirun
 
 started ~17:27 ...
+
+*20may18 - looking at output from long multistep runs, M encoding issues?
+** start looking at output from latest multistep runs
+
+each sim finished ~4 steps each for total of ~1200 s
+
+first just look at hit/miss ball probabilities ... 
+
+*** simA 20may15_ZN_MultiStep_A_
+
+python
+import numpy as np
+import pandas as pd
+from pylab import *
+from simdat import plotRewards,plotFollowBall,plotHitMiss
+
+name = '20may15_ZN_MultiStep_A__step_0_'
+pda = pd.DataFrame(np.loadtxt('data/'+name+'ActionsRewards.txt'),columns=['time','action','reward','proposed','hit'])
+
+for i in range(1,4,1):
+  name = '20may15_ZN_MultiStep_A__step_'+str(i)+'_'
+  tmp = pd.DataFrame(np.loadtxt('data/'+name+'ActionsRewards.txt'),columns=['time','action','reward','proposed','hit'])
+  tmp.time += i*300e3
+  pda = pda.append(tmp)
+
+np.amax(pda.time) # 1200000.0
+  
+pda.columns # Index(['time', 'action', 'reward', 'proposed', 'hit'], dtype='object')
+
+#
+plotRewards(pda,ax=subplot(3,1,1),msz=3,xl=(0,120e3))
+plotFollowBall(pda,ax=subplot(3,1,2),msz=3)
+plotHitMiss(pda,ax=subplot(3,1,3),msz=3)
+
+tight_layout()
+
+savefig('gif/20may18_multistep_A_reward_1200s_a0.png')
+
+in middle panel follow vs not follow might be improving, though somewhat slowly...could also just be converging towards 50/50 (random)
+
+*** simB 20may15_ZN_MultiStep_B_
+
+python
+import numpy as np
+import pandas as pd
+from pylab import *
+from simdat import plotRewards,plotFollowBall,plotHitMiss
+
+name = '20may15_ZN_MultiStep_B__step_0_'
+pda = pd.DataFrame(np.loadtxt('data/'+name+'ActionsRewards.txt'),columns=['time','action','reward','proposed','hit'])
+
+for i in range(1,4,1):
+  name = '20may15_ZN_MultiStep_B__step_'+str(i)+'_'
+  tmp = pd.DataFrame(np.loadtxt('data/'+name+'ActionsRewards.txt'),columns=['time','action','reward','proposed','hit'])
+  tmp.time += i*300e3
+  pda = pda.append(tmp)
+
+np.amax(pda.time) # 1200000.0
+  
+pda.columns # Index(['time', 'action', 'reward', 'proposed', 'hit'], dtype='object')
+
+#
+clf()
+plotRewards(pda,ax=subplot(3,1,1),msz=3,xl=(0,120e3))
+plotFollowBall(pda,ax=subplot(3,1,2),msz=3)
+plotHitMiss(pda,ax=subplot(3,1,3),msz=3)
+
+tight_layout()
+
+savefig('gif/20may18_multistep_B_reward_1200s_b0.png')
+
+*** compare the two
+
+python
+import numpy as np
+import pandas as pd
+from pylab import *
+from simdat import plotRewards,plotFollowBall,plotHitMiss
+
+lpda = []
+
+name = '20may15_ZN_MultiStep_A__step_0_'
+pda = pd.DataFrame(np.loadtxt('data/'+name+'ActionsRewards.txt'),columns=['time','action','reward','proposed','hit'])
+
+for i in range(1,4,1):
+  name = '20may15_ZN_MultiStep_A__step_'+str(i)+'_'
+  tmp = pd.DataFrame(np.loadtxt('data/'+name+'ActionsRewards.txt'),columns=['time','action','reward','proposed','hit'])
+  tmp.time += i*300e3
+  pda = pda.append(tmp)
+
+lpda.append(pda)
+  
+name = '20may15_ZN_MultiStep_B__step_0_'
+pda = pd.DataFrame(np.loadtxt('data/'+name+'ActionsRewards.txt'),columns=['time','action','reward','proposed','hit'])
+
+for i in range(1,4,1):
+  name = '20may15_ZN_MultiStep_B__step_'+str(i)+'_'
+  tmp = pd.DataFrame(np.loadtxt('data/'+name+'ActionsRewards.txt'),columns=['time','action','reward','proposed','hit'])
+  tmp.time += i*300e3
+  pda = pda.append(tmp)
+  
+lpda.append(pda)
+
+# sim A on left (lower max weight threshold), sim B on right (higher max weight threshold)
+plotFollowBall(lpda[0],ax=subplot(1,2,1),msz=3); plotFollowBall(lpda[1],ax=subplot(1,2,2),msz=3)
+
+savefig('gif/20may18_multistep_A_B_reward_1200s_c0.png')
+
+the one with lower max weights seems to converge faster ... and get toward slightly higher accuracy ... ?
+
+plotHitMiss(lpda[0],ax=subplot(1,2,1),msz=3); plotHitMiss(lpda[1],ax=subplot(1,2,2),msz=3)
+
+savefig('gif/20may18_multistep_A_B_hit_miss_1200s_c1.png')
+
+for hit,miss the one with higher max weights gets slightly higher number of hits
+
+plotRewards(lpda[0],ax=subplot(1,2,1),msz=3); plotRewards(lpda[1],ax=subplot(1,2,2),msz=3)
+
+savefig('gif/20may18_multistep_A_B_rewards_1200s_c2.png')
+
+can't see diffs from reward fig ...
+
+sum(lpda[0].reward) # 290.6
+sum(lpda[1].reward) # 289.36
+so, almost identical total reward ...
+
+may as well let those sims run some more to see if they improve further ... possible that
+learning is taking place, just at a slow rate ...
+
+make movies to see how weights changing ... use last available step
+
+python -i simdat.py backupcfg/20may15_ZN_MultiStep_A__step_4_sim.json
+animSynWeights(pdf)
+
+python -i simdat.py backupcfg/20may15_ZN_MultiStep_B__step_4_sim.json
+animSynWeights(pdf)
+
+
+
+** build a map of which info received by each/all M neurons
+
+otherwise will not know if architecture supports proper decision making
+
+** try higher conn probability for inputs to M populations
+
+that will increase likelihood that M populations have enough info to make decisions
+
+can make a param to control it ... EEMProb, and as scale up prob, scale down the incoming weights ...
+
+EEMProb ... original was 0.1 ... try at double probability ... and 1/2 weight ... 
+
+change "EEMWghtAM":0.000075,"EEMWghtNM":0.0000075
+to
+"EEMWghtAM":0.0000375,"EEMWghtNM":0.00000375
+
+also change "EEMWghtThreshMin":0.000075,"EEMWghtThreshMax":0.0005
+to
+"EEMWghtThreshMin":0.0000375,"EEMWghtThreshMax":0.0005
+
+myrun 12
+
+ok...
+
+python -i simdat.py
+
+drawraster(dspkT,dspkID)
+savefig('gif/20may18_d0.png')
+
+rates are ok ... 
+
+animSynWeights(pdf,'gif/20may18_d0_weightmap.mp4')
+
+python -i actmap.py
+
+fig, axs, plt = animActivityMaps('gif/20may18_d0_actmap.mp4')
+
+well, activity not epileptic ... could run a long sim to compare to how others performing ...
+
+even 100 s worth trying ...
+
+20may18_L0_
+
+myrun 12
+
+hmm, laptop got closed in middle of run ... 
+
+** info
+
+right now, convergence onto any EM neuron is from 10% of presynaptic neurons
+so that's 40 neurons of each direction selective class ... 40 x 8 = 320
+40 from EV1, 10 from EV4, 2.5 from EMT, ... most of the inputs are from direction selective
+neurons . . . is that reasonable?
+
+when 20%, 80 neurons ...
+
+** do M neurons need topography? recurrent connectivity with RL synapses? 
+
+any E M neuron could receive information from spatially separated locations ...
+
+if no topography, then should have recurrent connectivity in EM neurons with RL synapses ...
+
+topographic arrangement of M neurons might allow better prediction on when to move ... for
+example if ball is far away but moving in a certain direction, might want to initiate movement
+in advance of the ball getting to the paddle ...
+
+so while there's some spatial information with random connectivity, it's less organized/useful if
+receiving random (from spatial perspective) inputs?
+
+if ball in middle of screen moving SE, and paddle is at top right stationary, EM Down should be
+activated ... so there should be at least one EM Down neuron that receives strong V1 input at top
+right and middle of screen SE neuron ... if there was a topographic arrangement of EM neurons,
+would that be possible? not if there are restriction of connectivity across spatially distant
+neurons... but having additional recurrent connectivity in EM might still allow that encoding to emerge
+
+tried that out briefly with some recurrent connectivity between EMUP<>EMUP and EMDOWN<>EMDOWN
+
+gif/20may18_M0_weightmap.mp4
+gif/20may18_M0_actmap.mp4
+savefig('gif/20may18_M0_rast.png')
+
+why do weights start below "EEMWghtAM":0.0000375 and only jump up at weight normalization time?
+have noticed that in other simulations ... also, almost no EM activity after first two burst
+until that weight norm ... 
+
+will have to put in param to control whether to include recurrent/RL connectivity
+between the EM populations ...
+
+*20may19
+** check latest from multistep -- sim with higher max weight still improving
+
+python
+import numpy as np
+import pandas as pd
+from pylab import *
+from simdat import plotRewards,plotFollowBall,plotHitMiss
+
+lpda = []
+
+name = '20may15_ZN_MultiStep_A__step_0_'
+pda = pd.DataFrame(np.loadtxt('data/'+name+'ActionsRewards.txt'),columns=['time','action','reward','proposed','hit'])
+
+for i in range(1,5,1):
+  name = '20may15_ZN_MultiStep_A__step_'+str(i)+'_'
+  tmp = pd.DataFrame(np.loadtxt('data/'+name+'ActionsRewards.txt'),columns=['time','action','reward','proposed','hit'])
+  tmp.time += i*300e3
+  pda = pda.append(tmp)
+
+lpda.append(pda)
+  
+name = '20may15_ZN_MultiStep_B__step_0_'
+pda = pd.DataFrame(np.loadtxt('data/'+name+'ActionsRewards.txt'),columns=['time','action','reward','proposed','hit'])
+
+for i in range(1,5,1):
+  name = '20may15_ZN_MultiStep_B__step_'+str(i)+'_'
+  tmp = pd.DataFrame(np.loadtxt('data/'+name+'ActionsRewards.txt'),columns=['time','action','reward','proposed','hit'])
+  tmp.time += i*300e3
+  pda = pda.append(tmp)
+  
+lpda.append(pda)
+
+# sim A on left (lower max weight threshold), sim B on right (higher max weight threshold)
+clf(); plotFollowBall(lpda[0],ax=subplot(1,2,1),msz=3); ylim((0.3,.51)); plotFollowBall(lpda[1],ax=subplot(1,2,2),msz=3); ylim((.3,.51))
+
+savefig('gif/20may19_multistep_A_B_reward_1500s_a0.png')
+
+the one with lower max weights seems to converge faster ... and get toward slightly higher accuracy ...
+but the one with higher max weights still has a slightly upward slope
+
+clf(); plotHitMiss(lpda[0],ax=subplot(1,2,1),msz=3); ylim((0,100)); plotHitMiss(lpda[1],ax=subplot(1,2,2),msz=3); ylim((0,100));
+
+savefig('gif/20may19_multistep_A_B_hit_miss_1500s_a1.png')
+
+the one with higher max weights is doing a little better in terms of hits vs misses ... 
+
+clf(); plotRewards(lpda[0],ax=subplot(1,2,1),msz=3); plotRewards(lpda[1],ax=subplot(1,2,2),msz=3)
+
+savefig('gif/20may19_multistep_A_B_rewards_1500s_a2.png')
+
+sum(lpda[0].reward) # 358.09000000000003
+sum(lpda[1].reward) # 369.83099999999996
+
+higher overall reward for second sim (higher max weights) ...
 
