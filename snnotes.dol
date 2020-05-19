@@ -4262,10 +4262,41 @@ sum(lpda[1].reward) # 369.83099999999996
 
 higher overall reward for second sim (higher max weights) ...
 
-** try new object tracker
 ** couple new options
 
 "EEMProb":0.2, <<-- sets probability of connections
 "EEMRecProb":0.0 <<-- sets recurrent connectivity probability between neurons in EM populations
 (same command directions only)
 
+** try new object tracker
+
+with EEMRecProb of 0.1, EEMProb of 0.1
+
+myrun 12
+
+  Cells: 5359
+  Connections: 0 (0.00 per cell)
+  Spikes: 17288 (0.65 Hz)
+  Simulated time: 5.0 s; 12 workers
+  Run time: 604.94 s
+
+python -i simdat.py
+
+drawraster(dspkT,dspkID)
+savefig('gif/20may19_a0.png')
+
+animSynWeights(pdf)
+
+gif/20may19_A0_weightmap.mp4
+
+python -i actmap.py
+
+fig, axs, plt = animActivityMaps()
+
+gif/20may19_A0_actmap.mp4
+
+object-detection-based direction fields look much more refined than before from optical flow
+
+adjust weights ... to inc firing ...
+
+savefig('gif/20may19_a1.png')
