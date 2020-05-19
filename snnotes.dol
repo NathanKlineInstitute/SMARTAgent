@@ -4174,3 +4174,35 @@ neurons . . . is that reasonable?
 
 when 20%, 80 neurons ...
 
+** do M neurons need topography? recurrent connectivity with RL synapses? 
+
+any E M neuron could receive information from spatially separated locations ...
+
+if no topography, then should have recurrent connectivity in EM neurons with RL synapses ...
+
+topographic arrangement of M neurons might allow better prediction on when to move ... for
+example if ball is far away but moving in a certain direction, might want to initiate movement
+in advance of the ball getting to the paddle ...
+
+so while there's some spatial information with random connectivity, it's less organized/useful if
+receiving random (from spatial perspective) inputs?
+
+if ball in middle of screen moving SE, and paddle is at top right stationary, EM Down should be
+activated ... so there should be at least one EM Down neuron that receives strong V1 input at top
+right and middle of screen SE neuron ... if there was a topographic arrangement of EM neurons,
+would that be possible? not if there are restriction of connectivity across spatially distant
+neurons... but having additional recurrent connectivity in EM might still allow that encoding to emerge
+
+tried that out briefly with some recurrent connectivity between EMUP<>EMUP and EMDOWN<>EMDOWN
+
+gif/20may18_M0_weightmap.mp4
+gif/20may18_M0_actmap.mp4
+savefig('gif/20may18_M0_rast.png')
+
+why do weights start below "EEMWghtAM":0.0000375 and only jump up at weight normalization time?
+have noticed that in other simulations ... also, almost no EM activity after first two burst
+until that weight norm ... 
+
+will have to put in param to control whether to include recurrent/RL connectivity
+between the EM populations ...
+
