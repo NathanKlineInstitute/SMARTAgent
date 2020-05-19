@@ -4262,3 +4262,10 @@ sum(lpda[1].reward) # 369.83099999999996
 
 higher overall reward for second sim (higher max weights) ...
 
+** try new object tracker
+** couple new options
+
+"EEMProb":0.2, <<-- sets probability of connections
+"EEMRecProb":0.0 <<-- sets recurrent connectivity probability between neurons in EM populations
+(same command directions only)
+
