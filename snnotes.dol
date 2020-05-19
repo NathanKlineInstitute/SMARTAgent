@@ -4394,6 +4394,29 @@ WARNING: 'flex' is missing on your system.
 
 https://github.com/westes/flex/releases
 
+cd ~/Downloads
+tar -xvf flex-2.6.4.tar.gz
+cd flex-2.6.4
+./autogen.sh
+
+Can't exec "autopoint": No such file or directory at /usr/share/autoconf/Autom4te/FileUtils.pm line 345.
+autoreconf: failed to run autopoint: No such file or directory
+autoreconf: autopoint is needed because this package uses Gettext
+
+./configure --prefix=/home/samn/bin
+
+/bin/bash: ../build-aux/depcomp: No such file or directory
+Makefile:804: recipe for target 'libmain.lo' failed
+make[2]: *** [libmain.lo] Error 127
+make[2]: Leaving directory '/home/samn/Downloads/flex-2.6.4/src'
+Makefile:546: recipe for target 'all' failed
+make[1]: *** [all] Error 2
+make[1]: Leaving directory '/home/samn/Downloads/flex-2.6.4/src'
+Makefile:533: recipe for target 'all-recursive' failed
+make: *** [all-recursive] Error 1
+
+make
+
 up to here ... 
 
 make install
