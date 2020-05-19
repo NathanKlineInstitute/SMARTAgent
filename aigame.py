@@ -8,7 +8,7 @@ Modified 2019-2020 samn
 
 from neuron import h
 from pylab import concatenate, figure, show, ion, ioff, pause,xlabel, ylabel, plot, Circle, sqrt, arctan, arctan2, close
-from copy import copy
+from copy import copy, deepcopy
 from random import uniform, seed, sample, randint
 from matplotlib import pyplot as plt
 import random
@@ -22,6 +22,9 @@ from gym import wrappers
 from time import time
 from collections import OrderedDict
 from imgutils import getoptflow
+from imgutils import getObjectsBoundingBoxes, getObjectMotionDirection
+import cv2
+from centroidtracker import CentroidTracker
 
 # make the environment - env is global so that it only gets created on a single node (important when using MPI with > 1 node)
 try:
@@ -79,6 +82,10 @@ class AIGame:
     self.FullImages = [] # full resolution images from game environment
     self.ReducedImages = [] # low resolution images from game environment used as input to neuronal network model
     self.ldflow = [] # list of dictionary of optical flow (motion) fields
+    if dconf['DirectionDetectionAlgo']['CentroidTracker']==1:
+      self.ct = CentroidTracker()
+      self.objects = OrderedDict() # objects detected in current frame
+      self.last_objects = OrderedDict() # objects detected in previous frame
 
   def updateInputRates (self, dsum_Images):
     # update input rates to retinal neurons
@@ -97,7 +104,39 @@ class AIGame:
       limage = self.ReducedImages
     if len(limage) < 2: return
     self.ldflow.append(getoptflow(limage[-2],limage[-1]))
-          
+
+  def computeAllObjectsMotionDirections(self, UseFull=False):
+    #Detect the objects, and initialize the list of bounding box rectangles
+    if len(self.FullImages)==0: return
+    if UseFull:
+      cimage = self.FullImages[-1]
+    else:
+      cimage = self.ReducedImages[-1]
+    rects = getObjectsBoundingBoxes(cimage)
+    cimage = np.ascontiguousarray(cimage, dtype=np.uint8)
+    # update our centroid tracker using the computed set of bounding box rectangles
+    self.objects = self.ct.update(rects)
+    if len(self.last_objects)==0: 
+      self.last_objects = deepcopy(self.objects)
+      flow = np.zeros(shape=(self.dirSensitiveNeuronDim,self.dirSensitiveNeuronDim,2))
+      mag = np.zeros(shape=(self.dirSensitiveNeuronDim,self.dirSensitiveNeuronDim))
+      ang = np.zeros(shape=(self.dirSensitiveNeuronDim,self.dirSensitiveNeuronDim))
+      goodInds = np.zeros(shape=(self.dirSensitiveNeuronDim,self.dirSensitiveNeuronDim))
+    else:
+      dirX, dirY = getObjectMotionDirection(self.objects, self.last_objects, rects, dims=np.shape(cimage)[0])
+      if np.shape(cimage)[0] != self.dirSensitiveNeuronDim or np.shape(cimage)[1] != self.dirSensitiveNeuronDim:
+        dirX = resize(dirX, (self.dirSensitiveNeuronDim, self.dirSensitiveNeuronDim), anti_aliasing=True)
+        dirY = resize(dirY, (self.dirSensitiveNeuronDim, self.dirSensitiveNeuronDim), anti_aliasing=True)
+      mag, ang = cv2.cartToPolar(dirX, -1*dirY)
+      ang = np.rad2deg(ang)
+      ang[mag == 0] = -100
+      self.last_objects = deepcopy(self.objects)
+      flow = np.zeros(shape=(self.dirSensitiveNeuronDim,self.dirSensitiveNeuronDim,2))
+      flow[:,:,0] = dirX
+      flow[:,:,1] = dirY
+      goodInds = np.zeros(shape=(self.dirSensitiveNeuronDim,self.dirSensitiveNeuronDim))
+    self.ldflow.append({'flow':flow,'mag':mag,'ang':ang,'goodInds':goodInds,'thang':ang,'thflow':flow})
+
   def updateDirSensitiveRates (self):
     # update firing rate of dir sensitive neurons using dirs (2D array with motion direction at each coordinate)
     if len(self.ldflow) < 1: return
@@ -241,8 +280,10 @@ class AIGame:
     if self.intaction==1: #if only one frame used per play, then add the downsampled and scaled image from last_obs for direction computation 
       if len(lobs_gimage_ds)>0:
         dsum_Images = np.maximum(dsum_Images,lobs_gimage_ds)
-
-    self.computeMotionFields() # compute the motion fields
+    if dconf['DirectionDetectionAlgo']['OpticFlow']==1:
+      self.computeMotionFields() # compute the motion fields
+    elif dconf['DirectionDetectionAlgo']['CentroidTracker']==1:
+      self.computeAllObjectsMotionDirections() # compute the motion field using CetroidTracking
     self.updateDirSensitiveRates() # update motion sensitive neuron input rates
 
     if done: # done means that 1 episode of the game finished, so the environment needs to be reset. 

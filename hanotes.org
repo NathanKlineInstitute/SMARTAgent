@@ -2375,4 +2375,83 @@ current ball direction: -1
       ball_hits_racket = 1
     elif xpos_Ball==-1 and reward==0 and xpos_Ball2>courtXRng[1]-courtXRng[0]-3:
       ball_hits_racket = 1
-** so far works for all tested conditions  
+** so far works for all tested conditions
+** object tracking fixed--- working nicely.....
+** displaying object tracking and plotting direction of motion.
+
+** still need to integrate the code in the model.
+
+* 2020may18
+** in testCentroidTracking.py, i use FULLImage to compute motion vectors and then downsample matrices with motion vectors to match the number of neurons.
+*** This is better to preserve the direction of object motion. Using downsampled image gives less accurate motion directions.
+** Part of lack of accuracy seems to be due to downsampling.
+** Two options included in sim.json to compute direction flow:
+  "DirectionDetectionAlgo":{"CentroidTracker":1,"OpticFlow":0}
+** added function in imgutils to get the coordinates of the bounding boxes for non-ovelaping objects.
+  -- def getObjectsBoundingBoxes(frame):
+** added function in imgutils to get the flow of motion of all existing objects. New objects or disappeaered objects are ignored. 
+  -- def getObjectMotionDirection(objects, last_objects, rects, dims):
+** initialize the CentroidTracker and related objects in init()
+    if dconf['DirectionDetectionAlgo']['CentroidTracker']==1:
+      self.ct = CentroidTracker()
+      self.objects = OrderedDict() # objects detected in current frame
+      self.last_objects = OrderedDict() # objects detected in previous frame
+** added function to compute angles of motion.
+  -- computeAllObjectsMotionDirections(self, UseFull=True)
+
+** Debugging aigame.....
+*** need to explicitly import deepcopy from copy
+*** import cv2
+*** adjusted plotting in actmap.py because when using CentroidTracking 'flow' is used instead of 'thflow'. Also 'flow' has a different data structure.
+
+*** i think it might be better to change the structure of flow and also save thflow.
+
+    flow = np.zeros(shape=(np.shape(cimage)[0],np.shape(cimage)[1],2))
+    flow[:,:,0] = dirX
+    flow[:,:,1] = dirY
+    goodInds = np.zeros(shape=(np.shape(cimage)[0],np.shape(cimage)[1],2))
+    self.ldflow.append({'flow':flow,'mag':mag,'ang':ang,'goodInds':goodInds,'thang':ang,'thflow':flow})
+
+*** add zeros when the last objects is empty.
+
+** More debugging centroid tracking in aigame
+*** always compute motion flow using FullImages
+*** if dirSensitiveNeuronDim!= cimage.shape[0], resize the direction vectors, angles etc.
+*** to match the format of optical flow. keep the flow inverted in y direction.
+
+probably need more testing.
+
+*** X and Y were replaced. Fixed now.
+*** too much activity for 0 degrees  i.e. E neurons.
+---> solution: ang[mag == 0] = 'nan'
+*** looks like 'nan' doesnt work. so use -100.
+*** use centroidtracker with both FullImage and ReducedImage.
+*** Run for 100 sec.
+*** seems too low activity. try increasing the probability of RL connections.
+
+
+or prety in ['EV1', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW','EV1DSW', 'EV1DS','EV1DSE', 'EV4', 'EMT']:
+  for poty in EMotorPops:
+    for strty,synmech,weight in zip(['','n'],['AMPA', 'NMDA'],[dconf['net']['EEMWghtAM']*cfg.EEGain, dconf['net']['EEMWghtNM']*cfg.EEGain]):
+      k = strty+prety+'->'+strty+poty
+      netParams.connParams[k] = {
+        'preConds': {'pop': prety},
+        'postConds': {'pop': poty},
+        'convergence': prob2conv(0.1, dnumc[prety]), #using 0.2 instead of 0.1 dated May18,2020
+        'weight': weight,
+        'delay': 2,
+        'synMech': synmech,
+        'sec':'dend', 'loc':0.5
+      }
+      if dSTDPparamsRL[synmech]['RLon']: # only turn on plasticity when specified to do so
+        netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL[synmech]}
+
+
+
+        Change prob2conv(0.1, dnumc[prety]) to prob2conv(2*0.1, dnumc[prety])
+
+and set doplot=1, doquit=0
+
+*** still racket not moving----probably no activity in motor neurons.
+
+"EEMWghtAM":0.000075,"EEMWghtNM":0.0000075 increase 10 times to "EEMWghtAM":0.00075,"EEMWghtNM":0.000075

@@ -5,6 +5,7 @@
     "movecodes": [1,3,4],
     "rewardcodes": {"scorePoint": 1, "losePoint": -0.01, "followBall": 0.01, "avoidBall": -0.001, "hitBall": 0.25},
     "actionsPerPlay": 1,
+    "DirectionDetectionAlgo":{"CentroidTracker":0,"OpticFlow":1},
     "verbose": 0,
     "simtype": {"ResumeSim":0,"ResumeSimFromFile":"20mar5_G0_simConfig.pkl"},        
     "sim": {"duration": 5000, "dt": 0.2, "verbose": 0, "recordStep":0.6,"recordWeightStepSize":5,"normalizeWeightStepSize":50,"RLFakeUpRule": 0,"RLFakeDownRule": 0,"RLFakeStayRule": 0,"name":"20may18_M0_","doquit":1,"doplot":0,"saveCellSecs":0,"saveCellConns":0,"targettedRL":0,"tstepPerAction":20},
