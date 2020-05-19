@@ -467,18 +467,11 @@ netParams.connParams['IV4->IMT'] = {
         'delay': 2,
         'synMech': 'GABA','sec':'soma', 'loc':0.5}
 
-# Add connections from lower and higher visual areas to motor cortex
-# and direct connections between premotor to motor areas
-for prety in ['EV1', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW','EV1DSW', 'EV1DS','EV1DSE', 'EV4', 'EMT', 'EMUP', 'EMDOWN']:
+# Add connections from lower and higher visual areas to motor cortex and direct connections between premotor to motor areas
+for prety in ['EV1', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW','EV1DSW', 'EV1DS','EV1DSE', 'EV4', 'EMT']:
   EEMProb = 0.1 # default
   if "EEMProb" in dconf['net']: EEMProb = dconf['net']['EEMProb']
-  EEMRecProb = 0.0 # default
-  if "EEMRecProb" in dconf['net']: EEMRecProb = dconf['net']['EEMRecProb']
   for poty in EMotorPops:
-    if (prety == 'EMUP' and poty == 'EMDOWN') or (prety == 'EMDOWN' and poty == 'EMUP'): continue # no recurrent btwn two EM pops
-    if EEMRecProb == 0.0:
-      if prety == 'EMUP' and poty == 'EMUP': continue
-      if prety == 'EMDOWN' and poty == 'EMDOWN': continue      
     for strty,synmech,weight in zip(['','n'],['AMPA', 'NMDA'],[dconf['net']['EEMWghtAM']*cfg.EEGain, dconf['net']['EEMWghtNM']*cfg.EEGain]):
       k = strty+prety+'->'+strty+poty
       netParams.connParams[k] = {
@@ -493,6 +486,25 @@ for prety in ['EV1', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW','EV1DSW', 'EV
       if dSTDPparamsRL[synmech]['RLon']: # only turn on plasticity when specified to do so
         netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL[synmech]}
 
+# add recurrent connectivity within EM populations
+EEMRecProb = 0.0 # default
+if "EEMRecProb" in dconf['net']: EEMRecProb = dconf['net']['EEMRecProb']
+if EEMRecProb > 0.0:
+  for ty in EMotorPops:
+    for strty,synmech,weight in zip(['','n'],['AMPA', 'NMDA'],[dconf['net']['EEMWghtAM']*cfg.EEGain, dconf['net']['EEMWghtNM']*cfg.EEGain]):
+      k = ty+ty+'->'+strty+ty
+      netParams.connParams[k] = {
+        'preConds': {'pop': ty},
+        'postConds': {'pop': ty},
+        'convergence': prob2conv(EEMRecProb, dnumc[ty]),
+        'weight': weight,
+        'delay': 2,
+        'synMech': synmech,
+        'sec':'dend', 'loc':0.5
+      }
+      if dSTDPparamsRL[synmech]['RLon']: # only turn on plasticity when specified to do so
+        netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL[synmech]}  
+        
 ###################################################################################################################################
 
 sim.AIGame = None # placeholder
