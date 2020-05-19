@@ -4300,3 +4300,109 @@ object-detection-based direction fields look much more refined than before from 
 adjust weights ... to inc firing ...
 
 savefig('gif/20may19_a1.png')
+
+** setting up on falcor
+
+first need to install miniconda (to save space)
+
+downloaded and installed for python3.7
+
+Miniconda3-latest-Linux-x86_64.sh
+
+in /home/samn/miniconda3
+
+note that is uses bash and modifies .bashrc
+have to modify .tcshrc to use it
+or can use bash ...
+
+falcor:~/SMARTAgent> bash
+(base) samn@falcor:~/SMARTAgent$ which python
+/home/samn/miniconda3/bin/python
+
+(base) samn@falcor:~/SMARTAgent$ python
+Python 3.7.6 (default, Jan  8 2020, 19:59:22) 
+[GCC 7.3.0] :: Anaconda, Inc. on linux
+Type "help", "copyright", "credits" or "license" for more information.
+>>>
+
+mkdir ~/neuron
+cd ~/neuron/
+git clone https://github.com/neuronsimulator/nrn
+git clone https://github.com/neuronsimulator/iv
+
+export IVB=~/neuron/iv; cd $IVB   
+./build.sh
+./configure --prefix=$PWD
+make
+make install
+
+conda install numpy scipy matplotlib pandas scikit-image
+pip install 'gym[atari]'
+
+## pip install imageio-ffmpeg## ??
+
+conda install imageio-ffmpeg -c conda-forge
+
+export ND=~/neuron/nrn; cd $ND
+./build.sh
+./configure --with-iv=$IVB --prefix=$ND --with-nrnpython=dynamic --with-paranrn --with-mpi --with-pyexe=python3
+
+hmm, no MPI installed on Falcor ...
+
+checking for mpicc... no
+checking for hcc... no
+checking for mpcc... no
+checking for mpcc_r... no
+checking for mpxlc... no
+checking for cmpicc... no
+checking for MPI_Init... no
+checking for MPI_Init in -lmpi... no
+checking for MPI_Init in -lmpich... no
+configure: error: Cannot compile MPI program
+
+downloaded and install open-mpi
+
+https://www.open-mpi.org/faq/?category=building
+
+cd ~/Downloads
+gunzip -c openmpi-4.0.3.tar.gz | tar xf -
+cd openmpi-4.0.3
+./configure --prefix=/home/samn/openmpi
+make all install
+
+then make sure that openmpi in the path so NEURON's configure can detect it ...
+
+echo $PATH
+/home/samn/miniconda3/bin:/home/samn/miniconda3/condabin:/home/samn/bin:/home/samn/.local/bin:/home/samn/bin:/home/samn/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games
+
+export PATH="/home/samn/openmpi/bin:$PATH"
+
+and put that into .bashrc
+
+which mpicc
+/home/samn/openmpi/bin/mpicc
+
+export ND=~/neuron/nrn; cd $ND
+./configure --with-iv=$IVB --prefix=$ND --with-nrnpython=dynamic --with-paranrn --with-mpi --with-pyexe=python3
+make -j 10  # OPTIONAL  -j 10 will multithread the make and speed up ~10x
+
+/home/samn/neuron/nrn/missing: line 81: flex: command not found
+WARNING: 'flex' is missing on your system.
+         You should only need it if you modified a '.l' file.
+         You may want to install the Fast Lexical Analyzer package:
+         <http://flex.sourceforge.net/>
+
+https://github.com/westes/flex/releases
+
+up to here ... 
+
+make install
+
+echo $ND
+/home/samn/neuron/nrn
+
+echo $PYTHONPATH
+
+Make sure that PYTHONPATH includes $ND/share/python/lib/python
+Add $ND/x86_64/bin to $PATH
+
