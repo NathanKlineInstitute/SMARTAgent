@@ -2490,4 +2490,5 @@ changes in imgutils.py
 
 and change in aigame.py
 dirX, dirY = getObjectMotionDirection(self.objects, self.last_objects, rects, dims=np.shape(cimage)[0],FlowWidth=8)
-*** test directions and network activity.
+*** test directions and network activity in file "20may20_A_"
+
