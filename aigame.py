@@ -82,7 +82,7 @@ class AIGame:
     self.FullImages = [] # full resolution images from game environment
     self.ReducedImages = [] # low resolution images from game environment used as input to neuronal network model
     self.ldflow = [] # list of dictionary of optical flow (motion) fields
-    if dconf['DirectionDetectionAlgo']['CentroidTracker']==1:
+    if dconf['DirectionDetectionAlgo']['CentroidTracker']:
       self.ct = CentroidTracker()
       self.objects = OrderedDict() # objects detected in current frame
       self.last_objects = OrderedDict() # objects detected in previous frame
@@ -280,10 +280,10 @@ class AIGame:
     if self.intaction==1: #if only one frame used per play, then add the downsampled and scaled image from last_obs for direction computation 
       if len(lobs_gimage_ds)>0:
         dsum_Images = np.maximum(dsum_Images,lobs_gimage_ds)
-    if dconf['DirectionDetectionAlgo']['OpticFlow']==1:
+    if dconf['DirectionDetectionAlgo']['OpticFlow']:
       self.computeMotionFields() # compute the motion fields
-    elif dconf['DirectionDetectionAlgo']['CentroidTracker']==1:
-      self.computeAllObjectsMotionDirections(UseFull=True) # compute the motion field using CetroidTracking
+    elif dconf['DirectionDetectionAlgo']['CentroidTracker']:
+      self.computeAllObjectsMotionDirections() # compute the motion field using CetroidTracking
     self.updateDirSensitiveRates() # update motion sensitive neuron input rates
 
     if done: # done means that 1 episode of the game finished, so the environment needs to be reset. 

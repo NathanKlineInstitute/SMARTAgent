@@ -1,0 +1,29 @@
+
+first need to install anaconda or miniconda (to save space)
+
+downloaded and ran Miniconda3-latest-Linux-x86_64.sh
+installed in /home/samn/miniconda3
+
+then some python packages via conda and pip
+conda install numpy scipy matplotlib pandas scikit-image
+pip install 'gym[atari]'
+conda install imageio-ffmpeg -c conda-forge
+
+also need to make sure mpi available; if missing can
+download and install open-mpi
+https://www.open-mpi.org/faq/?category=building
+cd ~/Downloads
+gunzip -c openmpi-4.0.3.tar.gz | tar xf -
+cd openmpi-4.0.3
+./configure --prefix=/home/samn/openmpi
+make all install
+
+echo $PATH
+/home/samn/miniconda3/bin:/home/samn/miniconda3/condabin:/home/samn/bin:/home/samn/.local/bin:/home/samn/bin:/home/samn/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games
+
+export PATH="/home/samn/openmpi/bin:$PATH"
+and put that into .bashrc
+
+pip install neuron-nightly
+pip install netpyne --upgrade
+

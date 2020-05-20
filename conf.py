@@ -10,5 +10,7 @@ for i in range(len(sys.argv)):
 
 with open(fnjson,'r') as fp:
   dconf = json.load(fp)
+  if 'DirectionDetectionAlgo' not in dconf:
+    dconf['DirectionDetectionAlgo'] = {'CentroidTracker':0, 'OpticFlow':1}
   #print(dconf)
 
