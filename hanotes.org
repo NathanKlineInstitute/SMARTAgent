@@ -2495,4 +2495,9 @@ dirX, dirY = getObjectMotionDirection(self.objects, self.last_objects, rects, di
 *** reduce the weights and rerun in file "20may20_B_"
 ------ "EEMWghtAM":0.0005,"EEMWghtNM":0.00005,"EEMWghtThreshMin":0.0005 ---> "EEMWghtAM":0.0002,"EEMWghtNM":0.00002,"EEMWghtThreshMin":0.0002
 **** still high firing rate (~15 Hz)....
-*** also change ,"EEMWghtThreshMax":0.005 --> "EEMWghtThreshMax":0.002
+*** also change ,"EEMWghtThreshMax":0.005 --> "EEMWghtThreshMax":0.002 in file "20may20_B2_"
+**** still high firing rate (~11 Hz) ....
+*** change the parameters are below and rerun sim in "20may20_C_"
+------ "EEMWghtAM":0.0001,"EEMWghtNM":0.00001,"EEMWghtThreshMin":0.0001, "EEMWghtThreshMax":0.001
+ 
+
