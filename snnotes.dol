@@ -4779,3 +4779,29 @@ export LD_LIBRARY_PATH="/usr/lib/x86_64-linux-gnu:$LD_LIBRARY_PATH"
 
 hmm, did not help ...
 
+ryan upgraded libc package ... try again
+
+now get this when compile with nrnivmodl:
+
+/bin/sh: 1: x86_64-conda_cos6-linux-gnu-c++: not found
+/home/samn/miniconda3/lib/python3.7/site-packages/neuron/.data/bin/nrnmech_makefile:76: recipe for target 'x86_64/libnrnmech.0.0.so' failed
+make: *** [x86_64/libnrnmech.0.0.so] Error 127
+
+may need to redo conda install again ...
+
+condensed commands:
+bash ~/Downloads/Miniconda3-latest-Linux-x86_64.sh
+conda install numpy scipy matplotlib pandas scikit-image
+
+pip install 'gym[atari]'
+conda install imageio-ffmpeg -c conda-forge
+
+conda install gcc_linux-64 openmpi mpi4py cython
+conda install openmpi mpi4py cython
+conda install gcc_linux-64
+
+pip install neuron-nightly
+pip install netpyne --upgrade
+cd ~/SMARTAgent
+nrnivmodl mod
+

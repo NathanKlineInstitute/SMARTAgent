@@ -10,18 +10,6 @@ conda install numpy scipy matplotlib pandas scikit-image
 pip install 'gym[atari]'
 conda install imageio-ffmpeg -c conda-forge
 
-also need to make sure mpi available; if missing can
-download and install open-mpi
-https://www.open-mpi.org/faq/?category=building
-cd ~/Downloads
-gunzip -c openmpi-4.0.3.tar.gz | tar xf -
-cd openmpi-4.0.3
-./configure --prefix=/home/samn/openmpi
-make all install
-may need to set LD_LIBRARY_PATH, e.g.:
-export LD_LIBRARY_PATH="/home/samn/openmpi/lib"
-in .bashrc
-
 this is easier way to install openmpi and other requirements too:
 conda install gcc_linux-64 openmpi mpi4py cython
 
@@ -37,4 +25,15 @@ pip install netpyne --upgrade
 then from terminal in the SMARTAgent folder:
 nrnivmodl mod
 to compile the NEURON mod files
+
+condensed commands:
+bash ~/Downloads/Miniconda3-latest-Linux-x86_64.sh
+conda install numpy scipy matplotlib pandas scikit-image
+pip install 'gym[atari]'
+conda install imageio-ffmpeg -c conda-forge
+conda install gcc_linux-64 openmpi mpi4py cython
+pip install neuron-nightly
+pip install netpyne --upgrade
+cd ~/SMARTAgent
+nrnivmodl mod
 
