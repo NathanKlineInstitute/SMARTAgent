@@ -4317,6 +4317,13 @@ sum(lpda[1].reward) # 507.49799999999993
 similar overall rewards ... and similar overall performance ...  looks like the learning has mostly stopped improving ...
 need to figure out what's preventing improvement
 
+could continue set B ... steps 7,8,9 ... just to check ...
+
+will adjust multirun and make conf.py check for new option (if absent, defaults to opticflow for now since that's
+what started this set of sims from)
+
+multirun
+
 ** couple new options
 
 "EEMProb":0.2, <<-- sets probability of connections
