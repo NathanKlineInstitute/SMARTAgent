@@ -93,7 +93,7 @@ def getObjectsBoundingBoxes(frame):
     rects.append(box.astype("int"))
   return rects
 
-def getObjectMotionDirection(objects, last_objects, rects, dims):
+def getObjectMotionDirection(objects, last_objects, rects, dims, FlowWidth):
   dirX = np.zeros(shape=(dims,dims))
   dirY = np.zeros(shape=(dims,dims))
   MotionAngles = np.zeros(shape=(dims,dims))
@@ -111,12 +111,28 @@ def getObjectMotionDirection(objects, last_objects, rects, dims):
       lobj_centroid = last_objectCentroids[lid]
       for i in range(np.shape(rects)[0]):
         startX = rects[i][0]
+        if startX<(FlowWidth/2):
+          startX =  0
+        else:
+          startX = startX-(FlowWidth/2) 
         startY = rects[i][1]
+        if startY<(FlowWidth/2):
+          startY = 0
+        else:
+          startY = startY-(FlowWidth/2)
         endX = rects[i][2]
+        if endX>dims-(FlowWidth/2):
+          endX = dims
+        else:
+          endX = endX+(FlowWidth/2)
         endY = rects[i][3]
+        if endY>dims-(FlowWidth/2):
+          endY = dims
+        else:
+          endY = endY+(FlowWidth/2)
         if cobj_centroid[1]>=startY and cobj_centroid[1]<=endY and cobj_centroid[0]>=startX and cobj_centroid[0]<=endX:
-          targetX = range(startX,endX,1)
-          targetY = range(startY,endY,1)
+          targetX = range(int(startX),int(endX),1)
+          targetY = range(int(startY),int(endY),1)
       for ix in targetX:
         for iy in targetY:
           dirX[ix][iy]= cobj_centroid[1]-lobj_centroid[1] #x direction

@@ -36,7 +36,7 @@ def getObjectsBoundingBoxes(frame):
     rects.append(box.astype("int"))
   return rects
 
-def getObjectMotionDirection(objects, last_objects, rects, dims):
+def getObjectMotionDirection(objects, last_objects, rects, dims,FlowWidth):
   dirX = np.zeros(shape=(dims,dims))
   dirY = np.zeros(shape=(dims,dims))
   MotionAngles = np.zeros(shape=(dims,dims))
@@ -54,12 +54,28 @@ def getObjectMotionDirection(objects, last_objects, rects, dims):
       lobj_centroid = last_objectCentroids[lid]
       for i in range(np.shape(rects)[0]):
         startX = rects[i][0]
+        if startX<(FlowWidth/2):
+          startX =  0
+        else:
+          startX = startX-(FlowWidth/2) 
         startY = rects[i][1]
+        if startY<(FlowWidth/2):
+          startY = 0
+        else:
+          startY = startY-(FlowWidth/2)
         endX = rects[i][2]
+        if endX>dims-(FlowWidth/2):
+          endX = dims
+        else:
+          endX = endX+(FlowWidth/2)
         endY = rects[i][3]
+        if endY>dims-(FlowWidth/2):
+          endY = dims
+        else:
+          endY = endY+(FlowWidth/2)
         if cobj_centroid[1]>=startY and cobj_centroid[1]<=endY and cobj_centroid[0]>=startX and cobj_centroid[0]<=endX:
-          targetX = range(startX,endX,1)
-          targetY = range(startY,endY,1)
+          targetX = range(int(startX),int(endX),1)
+          targetY = range(int(startY),int(endY),1)
       for ix in targetX:
         for iy in targetY:
           dirX[ix][iy]= cobj_centroid[1]-lobj_centroid[1] #x direction
@@ -69,7 +85,7 @@ def getObjectMotionDirection(objects, last_objects, rects, dims):
       locations.append([cobj_centroid[1],cobj_centroid[0]])
     else:
       lobj_centroid = []
-  return dirX, -1*dirY
+  return dirX, dirY
 
 # initialize our centroid tracker and frame dimensions
 ct = CentroidTracker()
@@ -100,12 +116,12 @@ while steps<NB_steps:
     cv2.rectangle(frame, (startY, startX), (endY, endX),(0, 255, 0), 1)
   # update our centroid tracker using the computed set of bounding box rectangles
   objects = ct.update(rects)
-  dirX, dirY = getObjectMotionDirection(objects, last_objects, rects, dims=160)
+  dirX, dirY = getObjectMotionDirection(objects, last_objects, rects, dims=160, FlowWidth=8)
   #dirX_ds = downscale_local_mean(dirX,(8,8))
   #dirY_ds = downscale_local_mean(dirY,(8,8))
   dirX_ds = resize(dirX,(20,20),anti_aliasing=True)
   dirY_ds = resize(dirY,(20,20),anti_aliasing=True)
-  mag, ang = cv2.cartToPolar(dirX_ds, dirY_ds)
+  mag, ang = cv2.cartToPolar(dirX_ds, -1*dirY_ds)
   #mag, ang = cv2.cartToPolar(dirX, dirY)
   ang = np.rad2deg(ang)
   print(ang)
@@ -116,13 +132,13 @@ while steps<NB_steps:
   if steps==0:
     im0 = f_ax[0].imshow(frame, origin='upper')
     X, Y = np.meshgrid(np.arange(0, 20, 1), np.arange(0,20,1))
-    im1 = f_ax[1].quiver(X,Y,dirX_ds,dirY_ds, pivot='mid', units='inches',width=0.022,scale=1/0.15)
+    im1 = f_ax[1].quiver(X,Y,dirX_ds,-1*dirY_ds, pivot='mid', units='inches',width=0.022,scale=1/0.15)
     f_ax[1].set_xlim(0,20,1); f_ax[1].set_ylim(20,0,-1)
     plt.draw()
     plt.pause(1)
   else:
     im0.set_data(frame)
-    im1.set_UVC(dirX_ds,dirY_ds)
+    im1.set_UVC(dirX_ds,-1*dirY_ds)
     plt.draw()
     plt.pause(1)
   last_object = objects

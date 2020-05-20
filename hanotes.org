@@ -2455,3 +2455,49 @@ and set doplot=1, doquit=0
 *** still racket not moving----probably no activity in motor neurons.
 
 "EEMWghtAM":0.000075,"EEMWghtNM":0.0000075 increase 10 times to "EEMWghtAM":0.00075,"EEMWghtNM":0.000075
+
+raster saves as: 20may18_ZN_B_100sec_raster.png
+saving actmap movie .....
+
+** Try running simulation with same parameters but targeted RL in 20may18_ZN_C_....
+
+*20may20
+**broadening the flow of each object.... using FlowWidth
+*** In addition to assigning direction vectors to the object pixels, now i expand direction vector assignment to additional FlowWidth pixels in each dimension. 
+**** e.g. if FlowWith is 8, the direction vectors are assigned to 4 pixels berfor startX of the object and 4 pixels after the endX of the object, similarly 4 pixels before startY of the object and 4 pixels after the endY of the object. 
+changes in imgutils.py 
+      for i in range(np.shape(rects)[0]):
+        startX = rects[i][0]
+        if startX<(FlowWidth/2):
+          startX =  0
+        else:
+          startX = startX-(FlowWidth/2) 
+        startY = rects[i][1]
+        if startY<(FlowWidth/2):
+          startY = 0
+        else:
+          startY = startY-(FlowWidth/2)
+        endX = rects[i][2]
+        if endX>dims-(FlowWidth/2):
+          endX = dims
+        else:
+          endX = endX+(FlowWidth/2)
+        endY = rects[i][3]
+        if endY>dims-(FlowWidth/2):
+          endY = dims
+        else:
+          endY = endY+(FlowWidth/2)
+
+and change in aigame.py
+dirX, dirY = getObjectMotionDirection(self.objects, self.last_objects, rects, dims=np.shape(cimage)[0],FlowWidth=8)
+*** test directions and network activity in file "20may20_A_"
+**** Too high activity in motor cortex (~19 Hz).... very few actions during 10 sec sim.
+*** reduce the weights and rerun in file "20may20_B_"
+------ "EEMWghtAM":0.0005,"EEMWghtNM":0.00005,"EEMWghtThreshMin":0.0005 ---> "EEMWghtAM":0.0002,"EEMWghtNM":0.00002,"EEMWghtThreshMin":0.0002
+**** still high firing rate (~15 Hz)....
+*** also change ,"EEMWghtThreshMax":0.005 --> "EEMWghtThreshMax":0.002 in file "20may20_B2_"
+**** still high firing rate (~11 Hz) ....
+*** change the parameters are below and rerun sim in "20may20_C_"
+------ "EEMWghtAM":0.0001,"EEMWghtNM":0.00001,"EEMWghtThreshMin":0.0001, "EEMWghtThreshMax":0.001
+ 
+
