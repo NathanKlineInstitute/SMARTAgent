@@ -4669,3 +4669,113 @@ first compile model ...
 
 nrnivmodl mod
 
+ok, needed aux_fun.inc ... added to repo ...
+
+then error about not finding mpi libraries and should set LD_LIBRARY_PATH
+
+export LD_LIBRARY_PATH="/home/samn/openmpi/lib"
+
+error about missing glibc used by scipy fft ...
+
+conda install -c asmeurer glibc
+
+./myrun 16
+
+--------------------------------------------------------------------------
+Primary job  terminated normally, but 1 process returned
+a non-zero exit code. Per user-direction, the job has been aborted.
+--------------------------------------------------------------------------
+--------------------------------------------------------------------------
+mpiexec noticed that process rank 0 with PID 0 on node falcor exited on signal 11 (Segmentation fault).
+--------------------------------------------------------------------------
+
+conda remove asmeurer glibc
+
+hmm, now conda messed up ...
+
+so did
+
+bash ~/Downloads/Miniconda3-latest-Linux-x86_64.sh -u
+to fix ...
+
+/home/samn/Downloads/Miniconda3-latest-Linux-x86_64.sh: line 449: 42131 Segmentation fault      (core dumped) $PREFIX/bin/python -E -s "$PREFIX/pkgs/.cio-config.py" "$THIS_PATH"
+
+hmm, better start over with conda/neuron ... !
+
+look in install.txt for instructions ...
+
+conda install gcc_linux-64 openmpi mpi4py
+
+which mpicc
+/home/samn/miniconda3/bin/mpicc
+
+ok, so that's using conda's version of openmpi ... easier than compiling openmpi directly
+
+./myrun 16
+
+Traceback (most recent call last):
+  File "sim.py", line 1, in <module>
+    from netpyne import specs, sim
+  File "/home/samn/miniconda3/lib/python3.7/site-packages/netpyne/sim/__init__.py", line 72, in <module>
+    from .. import analysis
+  File "/home/samn/miniconda3/lib/python3.7/site-packages/netpyne/analysis/__init__.py", line 39, in <module>
+    from .spikes import calculateRate, plotRates, plotSyncs, plotRaster, plotSpikeHist, plotSpikeStats, plotRatePSD, plotRateSpectrogram, popAvgRates
+  File "/home/samn/miniconda3/lib/python3.7/site-packages/netpyne/analysis/spikes.py", line 34, in <module>
+    import scipy
+  File "/home/samn/miniconda3/lib/python3.7/site-packages/scipy/__init__.py", line 156, in <module>
+    from . import fft
+  File "/home/samn/miniconda3/lib/python3.7/site-packages/scipy/fft/__init__.py", line 81, in <module>
+    from ._helper import next_fast_len
+  File "/home/samn/miniconda3/lib/python3.7/site-packages/scipy/fft/_helper.py", line 4, in <module>
+    from . import _pocketfft
+  File "/home/samn/miniconda3/lib/python3.7/site-packages/scipy/fft/_pocketfft/__init__.py", line 3, in <module>
+    from .basic import *
+  File "/home/samn/miniconda3/lib/python3.7/site-packages/scipy/fft/_pocketfft/basic.py", line 8, in <module>
+    from . import pypocketfft as pfft
+ImportError: /usr/lib/x86_64-linux-gnu/libstdc++.so.6: version `GLIBCXX_3.4.22' not found (required by /home/samn/miniconda3/lib/python3.7/site-packages/scipy/fft/_pocketfft/pypocketfft.cpython-37m-x86_64-linux-gnu.so)
+
+conda install cython
+
+./myrun 16
+
+same error ...
+
+ strings /usr/lib/x86_64-linux-gnu/libstdc++.so.6 | grep GLIBC
+GLIBCXX_3.4
+GLIBCXX_3.4.1
+GLIBCXX_3.4.2
+GLIBCXX_3.4.3
+GLIBCXX_3.4.4
+GLIBCXX_3.4.5
+GLIBCXX_3.4.6
+GLIBCXX_3.4.7
+GLIBCXX_3.4.8
+GLIBCXX_3.4.9
+GLIBCXX_3.4.10
+GLIBCXX_3.4.11
+GLIBCXX_3.4.12
+GLIBCXX_3.4.13
+GLIBCXX_3.4.14
+GLIBCXX_3.4.15
+GLIBCXX_3.4.16
+GLIBCXX_3.4.17
+GLIBCXX_3.4.18
+GLIBCXX_3.4.19
+GLIBCXX_3.4.20
+GLIBCXX_3.4.21
+GLIBC_2.3
+GLIBC_2.2.5
+GLIBC_2.14
+GLIBC_2.4
+GLIBC_2.18
+GLIBC_2.3.4
+GLIBC_2.17
+GLIBC_2.3.2
+GLIBCXX_DEBUG_MESSAGE_LENGTH
+
+export LD_LIBRARY_PATH="/usr/lib/x86_64-linux-gnu:$LD_LIBRARY_PATH"
+
+./myrun 16
+
+hmm, did not help ...
+

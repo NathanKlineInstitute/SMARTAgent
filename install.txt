@@ -3,6 +3,7 @@ first need to install anaconda or miniconda (to save space)
 
 downloaded and ran Miniconda3-latest-Linux-x86_64.sh
 installed in /home/samn/miniconda3
+bash ~/Downloads/Miniconda3-latest-Linux-x86_64.sh
 
 then some python packages via conda and pip
 conda install numpy scipy matplotlib pandas scikit-image
@@ -17,6 +18,12 @@ gunzip -c openmpi-4.0.3.tar.gz | tar xf -
 cd openmpi-4.0.3
 ./configure --prefix=/home/samn/openmpi
 make all install
+may need to set LD_LIBRARY_PATH, e.g.:
+export LD_LIBRARY_PATH="/home/samn/openmpi/lib"
+in .bashrc
+
+this is easier way to install openmpi and other requirements too:
+conda install gcc_linux-64 openmpi mpi4py cython
 
 echo $PATH
 /home/samn/miniconda3/bin:/home/samn/miniconda3/condabin:/home/samn/bin:/home/samn/.local/bin:/home/samn/bin:/home/samn/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games
