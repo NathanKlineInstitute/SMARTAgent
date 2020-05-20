@@ -4557,3 +4557,27 @@ could have some smoothing function on firing rates and minimum difference in rat
 
 will stop multistep B from continuing for now ...
 
+** normalize inputs to populations to avoid any bias (on average) ?
+
+not all actions should be equal probability ... but avoiding bias on average might help ...
+worth a try ...
+
+myrun 12
+
+python -i simdat.py
+
+drawraster(dspkT,dspkID)
+savefig('gif/20may20_b0.png')
+
+animSynWeights(pdf)
+
+gif/20may20_A0_weightmap.mp4
+
+python -i actmap.py
+
+fig, axs, plt = animActivityMaps()
+
+gif/20may20_A0_actmap.mp4
+
+hmm, still getting stuck at top for a while
+
