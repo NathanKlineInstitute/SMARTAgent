@@ -4665,3 +4665,7 @@ ok ... anything else missing? should consolidate install instructions somewhere 
 
 ** try run on falcor
 
+first compile model ...
+
+nrnivmodl mod
+

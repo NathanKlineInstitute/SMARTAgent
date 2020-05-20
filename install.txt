@@ -27,3 +27,7 @@ and put that into .bashrc
 pip install neuron-nightly
 pip install netpyne --upgrade
 
+then from terminal in the SMARTAgent folder:
+nrnivmodl mod
+to compile the NEURON mod files
+
