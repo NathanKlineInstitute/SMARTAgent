@@ -2491,4 +2491,7 @@ changes in imgutils.py
 and change in aigame.py
 dirX, dirY = getObjectMotionDirection(self.objects, self.last_objects, rects, dims=np.shape(cimage)[0],FlowWidth=8)
 *** test directions and network activity in file "20may20_A_"
+**** Too high activity in motor cortex (~19 Hz).... very few actions during 10 sec sim.
+*** reduce the weights and rerun in file "20may20_B_"
+------ "EEMWghtAM":0.0005,"EEMWghtNM":0.00005,"EEMWghtThreshMin":0.0005 ---> "EEMWghtAM":0.0002,"EEMWghtNM":0.00002,"EEMWghtThreshMin":0.0002
 
