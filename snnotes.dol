@@ -4206,7 +4206,7 @@ until that weight norm ...
 will have to put in param to control whether to include recurrent/RL connectivity
 between the EM populations ...
 
-*20may19
+*20may19 - look at multistep output; other new options; setting up on falcor
 ** check latest from multistep -- sim with higher max weight still improving
 
 python
@@ -4261,6 +4261,61 @@ sum(lpda[0].reward) # 358.09000000000003
 sum(lpda[1].reward) # 369.83099999999996
 
 higher overall reward for second sim (higher max weights) ...
+
+finished step 6 (total of 2100 s; 35 hours) for both sims ... next steps were not completed due to crash
+from missing new param in the previously made json files ... take a look at the output ... to
+see whether worth continuing either
+
+python
+import numpy as np
+import pandas as pd
+from pylab import *
+from simdat import plotRewards,plotFollowBall,plotHitMiss
+
+lpda = []
+
+name = '20may15_ZN_MultiStep_A__step_0_'
+pda = pd.DataFrame(np.loadtxt('data/'+name+'ActionsRewards.txt'),columns=['time','action','reward','proposed','hit'])
+
+for i in range(1,7,1):
+  name = '20may15_ZN_MultiStep_A__step_'+str(i)+'_'
+  tmp = pd.DataFrame(np.loadtxt('data/'+name+'ActionsRewards.txt'),columns=['time','action','reward','proposed','hit'])
+  tmp.time += i*300e3
+  pda = pda.append(tmp)
+
+lpda.append(pda)
+  
+name = '20may15_ZN_MultiStep_B__step_0_'
+pda = pd.DataFrame(np.loadtxt('data/'+name+'ActionsRewards.txt'),columns=['time','action','reward','proposed','hit'])
+
+for i in range(1,7,1):
+  name = '20may15_ZN_MultiStep_B__step_'+str(i)+'_'
+  tmp = pd.DataFrame(np.loadtxt('data/'+name+'ActionsRewards.txt'),columns=['time','action','reward','proposed','hit'])
+  tmp.time += i*300e3
+  pda = pda.append(tmp)
+  
+lpda.append(pda)
+
+# sim A on left (lower max weight threshold), sim B on right (higher max weight threshold)
+clf(); plotFollowBall(lpda[0],ax=subplot(1,2,1),msz=3); ylim((0.3,.51)); plotFollowBall(lpda[1],ax=subplot(1,2,2),msz=3); ylim((.3,.51))
+
+savefig('gif/20may19_multistep_A_B_reward_2100s_a0.png')
+
+clf(); plotHitMiss(lpda[0],ax=subplot(1,2,1),msz=3); ylim((0,120)); plotHitMiss(lpda[1],ax=subplot(1,2,2),msz=3); ylim((0,120));
+
+savefig('gif/20may19_multistep_A_B_hit_miss_2100s_a1.png')
+
+the one with higher max weights is a little worse in terms of hits vs misses ... 
+
+clf(); plotRewards(lpda[0],ax=subplot(1,2,1),msz=3); plotRewards(lpda[1],ax=subplot(1,2,2),msz=3)
+
+savefig('gif/20may19_multistep_A_B_rewards_2100s_a2.png')
+
+sum(lpda[0].reward) # 505.499
+sum(lpda[1].reward) # 507.49799999999993
+
+similar overall rewards ... and similar overall performance ...  looks like the learning has mostly stopped improving ...
+need to figure out what's preventing improvement
 
 ** couple new options
 
