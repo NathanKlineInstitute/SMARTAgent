@@ -2494,4 +2494,5 @@ dirX, dirY = getObjectMotionDirection(self.objects, self.last_objects, rects, di
 **** Too high activity in motor cortex (~19 Hz).... very few actions during 10 sec sim.
 *** reduce the weights and rerun in file "20may20_B_"
 ------ "EEMWghtAM":0.0005,"EEMWghtNM":0.00005,"EEMWghtThreshMin":0.0005 ---> "EEMWghtAM":0.0002,"EEMWghtNM":0.00002,"EEMWghtThreshMin":0.0002
-
+**** still high firing rate (~15 Hz)....
+*** also change ,"EEMWghtThreshMax":0.005 --> "EEMWghtThreshMax":0.002
