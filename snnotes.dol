@@ -4456,6 +4456,7 @@ WARNING: 'flex' is missing on your system.
 
 https://github.com/westes/flex/releases
 
+
 cd ~/Downloads
 tar -xvf flex-2.6.4.tar.gz
 cd flex-2.6.4
@@ -4580,4 +4581,85 @@ fig, axs, plt = animActivityMaps()
 gif/20may20_A0_actmap.mp4
 
 hmm, still getting stuck at top for a while
+
+** continue setup on falcor
+
+ryan installed flex on falcor ... 
+
+export ND=~/neuron/nrn; cd $ND
+./configure --with-iv=$IVB --prefix=$ND --with-nrnpython=dynamic --with-paranrn --with-mpi --with-pyexe=python3
+make -j 10  # OPTIONAL  -j 10 will multithread the make and speed up ~10x
+
+yacc missing ... asked & ryan installed yac
+
+make -j 10  # OPTIONAL  -j 10 will multithread the make and speed up ~10x
+
+make install
+
+echo $ND
+/home/samn/neuron/nrn
+
+echo $PYTHONPATH
+
+Make sure that PYTHONPATH includes $ND/share/lib/python
+export PYTHONPATH="$ND/share/lib/python"
+Add $ND/x86_64/bin to $PATH
+and put into .bashrc
+
+hmm, neuron starts with python but from neuron import h does not work ...
+
+(base) samn@falcor:~$ python
+Python 3.7.6 (default, Jan  8 2020, 19:59:22) 
+[GCC 7.3.0] :: Anaconda, Inc. on linux
+Type "help", "copyright", "credits" or "license" for more information.
+>>> from neuron import h
+Traceback (most recent call last):
+  File "/home/samn/neuron/nrn/share/lib/python/neuron/__init__.py", line 124, in <module>
+    import hoc
+ModuleNotFoundError: No module named 'hoc'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/samn/neuron/nrn/share/lib/python/neuron/__init__.py", line 128, in <module>
+    import neuron.hoc
+ModuleNotFoundError: No module named 'neuron.hoc'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+  File "/home/samn/neuron/nrn/share/lib/python/neuron/__init__.py", line 130, in <module>
+    exec("import neuron.hoc%d%d as hoc" % (sys.version_info[0], sys.version_info[1]))
+  File "<string>", line 1, in <module>
+ModuleNotFoundError: No module named 'neuron.hoc37'
+
+maybe HOC_LIBRARY_PATH not set properly?
+
+export HOC_LIBRARY_PATH="$ND/share/nrn/lib/hoc"
+
+python
+from neuron import h
+
+no, same error ...
+
+cd /home/samn/neuron/nrn/src/nrnpython
+python setup.py install --home=$ND/share/lib/python
+
+this is a much easier way to install neuron (without compilation): 
+pip install neuron-nightly
+
+export PYTHONPATH=''
+
+python
+from neuron import h
+
+works now ...
+
+which nrniv
+/home/samn/miniconda3/bin/nrniv
+
+pip install netpyne --upgrade
+
+ok ... anything else missing? should consolidate install instructions somewhere ...
 
