@@ -2594,5 +2594,5 @@ neurons... but having additional recurrent connectivity in EM might still allow 
 
 *** samn: yeah, and that raises whether we want some antag inhib effects, one M pop activated I -> M of another pop ... suppose lot of things to try :slightly_smiling_face:
 
-
-** test sim using centroid tracking in file "20may20_D_" with broader flow and with FullImage 
+** test sim using optical flow in file "20may20_D_" - run time: 581 sec
+** test sim using centroid tracking in file "20may20_E_" with broader flow and with FullImage 
