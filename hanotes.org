@@ -2595,7 +2595,12 @@ neurons... but having additional recurrent connectivity in EM might still allow 
 *** samn: yeah, and that raises whether we want some antag inhib effects, one M pop activated I -> M of another pop ... suppose lot of things to try :slightly_smiling_face:
 
 ** test sim using optical flow in file "20may20_D_" - run time: 581 sec
+----> the raster is saved as "20may20-D0"
 ** test sim using centroid tracking in file "20may20_D_" with broader flow and with FullImage - run time: 572.71 sec
+----> the raster is saved as "20may20-D"
 ----> Didnt change the file name, so the results for sim with optical flow got overridden.
 *** potential problem in plotting actmap.... i noticed that for 10000 ms sim, actmap was plotted for 9960 ms. i.e. roughly 2 frames are skipped. so probably this is the reason why the firing rates of direction selective neurons dont look aligned to the quiver plot.
 **** check aigame.py----FullImages were not saved correctly. always previous image was saved. now saving current image.
+** test sim using centroid tracking in file "20may20_E_" --- run time: 1257 s --- quite slow.
+*** looks like still one frame off.. also sometimes wierd directionsin quiver plot. Not sure why? because when i run testCentroidTracking no such effect appears.
+*** test with optic flow in file "20may20_F_"
