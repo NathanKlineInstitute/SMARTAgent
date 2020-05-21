@@ -4806,7 +4806,7 @@ cd ~/SMARTAgent
 nrnivmodl mod
 
 *20may21
-** continue with falcor install/setup
+** continue with falcor install/setup -->> works now
 
 ryan suggests:
 conda install gxx_linux-64
@@ -4831,7 +4831,33 @@ can set LD_LIBRARY_PATH to /home/samn/miniconda3/lib
 
 export LD_LIBRARY_PATH="/home/samn/miniconda3/lib"
 
+** try a sim on falcor
+
 ./myrun 16
 
 seems to be working!
+
+it runs but even with doquit==1 does not stop ... will have to debug that
+for multistep ...
+
+check output ...
+
+python -i simdat.py
+
+drawraster(dspkT,dspkID)
+
+savefig('gif/20may21_rast_a0.png')
+xlim((19e3,20e3))
+savefig('gif/20may21_rast_a0b.png')
+
+animSynWeights(pdf)
+
+python -i actmap.py
+
+fig, axs, plt = animActivityMaps()
+
+activity looks typical - this is with the new weight normalization that
+equalizes inputs to the two M populations
+even with that weight normalization the paddle gets stuck at top
+and even with the weights ~equal to both sets of EM neurons ... that suggests a bug...??
 

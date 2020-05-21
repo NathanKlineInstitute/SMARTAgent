@@ -635,10 +635,11 @@ def normalizeAdjustableWeights (sim, t, lpop = ['EMUP', 'EMDOWN']):
       else:
         dfctr[k] = 1.0
     # normalize weights across populations to avoid bias
-    mxw = np.amax([davg[k] for k in lpop])
-    for k in lpop:
-      if davg[k]>0.0:
-        dfctr[k] *= mxw / davg[k]        
+    if dconf['net']['EEMPopNorm']:
+      mxw = np.amax([davg[k] for k in lpop])
+      for k in lpop:
+        if davg[k]>0.0:
+          dfctr[k] *= mxw / davg[k]        
     if sim.rank==0: print('sim.rank=',sim.rank,'davg:',davg,'dfctr:',dfctr)
     mulAdjustableWeights(sim,dfctr)
   except:
