@@ -4861,3 +4861,52 @@ equalizes inputs to the two M populations
 even with that weight normalization the paddle gets stuck at top
 and even with the weights ~equal to both sets of EM neurons ... that suggests a bug...??
 
+try inc EEMProb ... to 0.3
+
+./myrun 16
+
+  Connections: 0 (0.00 per cell)
+  Spikes: 37701 (3.52 Hz)
+  Simulated time: 2.0 s; 16 workers
+  Run time: 182.41 s
+fatal: Not a git repository (or any parent up to mount point /home)
+Stopping at filesystem boundary (GIT_DISCOVERY_ACROSS_FILESYSTEM not set).
+Saving output as data/20may21_B0_simConfig.pkl ... 
+Finished saving!
+  Done; saving time = 1.52 s.
+
+what's the git error ...
+
+python -i simdat.py
+
+drawraster(dspkT,dspkID)
+savefig('gif/20may21_rast_b0.png')
+hypersynch from the larger number of inputs ...
+
+animSynWeights(pdf)
+gif/20may21_B0_weightmap.mp4
+
+python -i actmap.py
+fig, axs, plt = animActivityMaps()
+
+also reduce the weights ...
+
+python -i simdat.py
+drawraster(dspkT,dspkID)
+savefig('gif/20may21_rast_b1.png')
+those rates are fine
+
+could add a margin factor to different between rates for movement directions ... otherwise hold still ...
+will try longer sim first (300 s) ...
+
+./myrun 16
+
+python -i simdat.py
+drawraster(dspkT,dspkID)
+savefig('gif/20may21_rast_b2.png')
+
+animSynWeights(pdf) # gif/20may21_B0_weightmap.mp4
+
+python -i actmap.py
+fig, axs, plt = animActivityMaps() # gif/20may21_B0_actmap.mp4
+
