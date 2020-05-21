@@ -4897,7 +4897,7 @@ savefig('gif/20may21_rast_b1.png')
 those rates are fine
 
 could add a margin factor to different between rates for movement directions ... otherwise hold still ...
-will try longer sim first (300 s) ...
+will try longer sim first (300 s) ... (20may21_B0_)
 
 ./myrun 16
 
@@ -4909,4 +4909,10 @@ animSynWeights(pdf) # gif/20may21_B0_weightmap.mp4
 
 python -i actmap.py
 fig, axs, plt = animActivityMaps() # gif/20may21_B0_actmap.mp4
+
+try another sim in parallel (20may21_C0_) with different scoring ...
+instead of
+    "rewardcodes": {"scorePoint": 1, "losePoint": -0.01, "followBall": 0.01, "avoidBall": -0.001, "hitBall": 0.25},
+try:
+    "rewardcodes": {"scorePoint": 1, "losePoint": -0.1, "followBall": 0.1, "avoidBall": -0.01, "hitBall": 0.5},
 
