@@ -4798,10 +4798,40 @@ conda install imageio-ffmpeg -c conda-forge
 
 conda install gcc_linux-64 openmpi mpi4py cython
 conda install openmpi mpi4py cython
-conda install gcc_linux-64
+## conda install gcc_linux-64
 
 pip install neuron-nightly
 pip install netpyne --upgrade
 cd ~/SMARTAgent
 nrnivmodl mod
+
+*20may21
+** continue with falcor install/setup
+
+ryan suggests:
+conda install gxx_linux-64
+based on https://github.com/RcppCore/Rcpp/issues/770
+
+installed successfully ... now try compile
+
+nrnivmodl mod
+
+Successfully created x86_64/special
+great...now let's see if it runs ...
+
+./myrun 16
+
+Try loading libmpi and libmpich
+load_mpi: libmpich.so: cannot open shared object file: No such file or directory
+Is openmpi, mpich, intel-mpi, sgi-mpt etc. installed? If not in default location, need a LD_LIBRARY_PATH.
+
+hmm, thought openmpi already installed ...
+
+can set LD_LIBRARY_PATH to /home/samn/miniconda3/lib
+
+export LD_LIBRARY_PATH="/home/samn/miniconda3/lib"
+
+./myrun 16
+
+seems to be working!
 

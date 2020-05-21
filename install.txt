@@ -32,6 +32,7 @@ conda install numpy scipy matplotlib pandas scikit-image
 pip install 'gym[atari]'
 conda install imageio-ffmpeg -c conda-forge
 conda install gcc_linux-64 openmpi mpi4py cython
+conda install gxx_linux-64
 pip install neuron-nightly
 pip install netpyne --upgrade
 cd ~/SMARTAgent
