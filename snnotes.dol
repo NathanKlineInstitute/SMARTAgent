@@ -4663,3 +4663,258 @@ pip install netpyne --upgrade
 
 ok ... anything else missing? should consolidate install instructions somewhere ...
 
+** try run on falcor
+
+first compile model ...
+
+nrnivmodl mod
+
+ok, needed aux_fun.inc ... added to repo ...
+
+then error about not finding mpi libraries and should set LD_LIBRARY_PATH
+
+export LD_LIBRARY_PATH="/home/samn/openmpi/lib"
+
+error about missing glibc used by scipy fft ...
+
+conda install -c asmeurer glibc
+
+./myrun 16
+
+--------------------------------------------------------------------------
+Primary job  terminated normally, but 1 process returned
+a non-zero exit code. Per user-direction, the job has been aborted.
+--------------------------------------------------------------------------
+--------------------------------------------------------------------------
+mpiexec noticed that process rank 0 with PID 0 on node falcor exited on signal 11 (Segmentation fault).
+--------------------------------------------------------------------------
+
+conda remove asmeurer glibc
+
+hmm, now conda messed up ...
+
+so did
+
+bash ~/Downloads/Miniconda3-latest-Linux-x86_64.sh -u
+to fix ...
+
+/home/samn/Downloads/Miniconda3-latest-Linux-x86_64.sh: line 449: 42131 Segmentation fault      (core dumped) $PREFIX/bin/python -E -s "$PREFIX/pkgs/.cio-config.py" "$THIS_PATH"
+
+hmm, better start over with conda/neuron ... !
+
+look in install.txt for instructions ...
+
+conda install gcc_linux-64 openmpi mpi4py
+
+which mpicc
+/home/samn/miniconda3/bin/mpicc
+
+ok, so that's using conda's version of openmpi ... easier than compiling openmpi directly
+
+./myrun 16
+
+Traceback (most recent call last):
+  File "sim.py", line 1, in <module>
+    from netpyne import specs, sim
+  File "/home/samn/miniconda3/lib/python3.7/site-packages/netpyne/sim/__init__.py", line 72, in <module>
+    from .. import analysis
+  File "/home/samn/miniconda3/lib/python3.7/site-packages/netpyne/analysis/__init__.py", line 39, in <module>
+    from .spikes import calculateRate, plotRates, plotSyncs, plotRaster, plotSpikeHist, plotSpikeStats, plotRatePSD, plotRateSpectrogram, popAvgRates
+  File "/home/samn/miniconda3/lib/python3.7/site-packages/netpyne/analysis/spikes.py", line 34, in <module>
+    import scipy
+  File "/home/samn/miniconda3/lib/python3.7/site-packages/scipy/__init__.py", line 156, in <module>
+    from . import fft
+  File "/home/samn/miniconda3/lib/python3.7/site-packages/scipy/fft/__init__.py", line 81, in <module>
+    from ._helper import next_fast_len
+  File "/home/samn/miniconda3/lib/python3.7/site-packages/scipy/fft/_helper.py", line 4, in <module>
+    from . import _pocketfft
+  File "/home/samn/miniconda3/lib/python3.7/site-packages/scipy/fft/_pocketfft/__init__.py", line 3, in <module>
+    from .basic import *
+  File "/home/samn/miniconda3/lib/python3.7/site-packages/scipy/fft/_pocketfft/basic.py", line 8, in <module>
+    from . import pypocketfft as pfft
+ImportError: /usr/lib/x86_64-linux-gnu/libstdc++.so.6: version `GLIBCXX_3.4.22' not found (required by /home/samn/miniconda3/lib/python3.7/site-packages/scipy/fft/_pocketfft/pypocketfft.cpython-37m-x86_64-linux-gnu.so)
+
+conda install cython
+
+./myrun 16
+
+same error ...
+
+ strings /usr/lib/x86_64-linux-gnu/libstdc++.so.6 | grep GLIBC
+GLIBCXX_3.4
+GLIBCXX_3.4.1
+GLIBCXX_3.4.2
+GLIBCXX_3.4.3
+GLIBCXX_3.4.4
+GLIBCXX_3.4.5
+GLIBCXX_3.4.6
+GLIBCXX_3.4.7
+GLIBCXX_3.4.8
+GLIBCXX_3.4.9
+GLIBCXX_3.4.10
+GLIBCXX_3.4.11
+GLIBCXX_3.4.12
+GLIBCXX_3.4.13
+GLIBCXX_3.4.14
+GLIBCXX_3.4.15
+GLIBCXX_3.4.16
+GLIBCXX_3.4.17
+GLIBCXX_3.4.18
+GLIBCXX_3.4.19
+GLIBCXX_3.4.20
+GLIBCXX_3.4.21
+GLIBC_2.3
+GLIBC_2.2.5
+GLIBC_2.14
+GLIBC_2.4
+GLIBC_2.18
+GLIBC_2.3.4
+GLIBC_2.17
+GLIBC_2.3.2
+GLIBCXX_DEBUG_MESSAGE_LENGTH
+
+export LD_LIBRARY_PATH="/usr/lib/x86_64-linux-gnu:$LD_LIBRARY_PATH"
+
+./myrun 16
+
+hmm, did not help ...
+
+ryan upgraded libc package ... try again
+
+now get this when compile with nrnivmodl:
+
+/bin/sh: 1: x86_64-conda_cos6-linux-gnu-c++: not found
+/home/samn/miniconda3/lib/python3.7/site-packages/neuron/.data/bin/nrnmech_makefile:76: recipe for target 'x86_64/libnrnmech.0.0.so' failed
+make: *** [x86_64/libnrnmech.0.0.so] Error 127
+
+may need to redo conda install again ...
+
+condensed commands:
+bash ~/Downloads/Miniconda3-latest-Linux-x86_64.sh
+conda install numpy scipy matplotlib pandas scikit-image
+
+pip install 'gym[atari]'
+conda install imageio-ffmpeg -c conda-forge
+
+conda install gcc_linux-64 openmpi mpi4py cython
+conda install openmpi mpi4py cython
+## conda install gcc_linux-64
+
+pip install neuron-nightly
+pip install netpyne --upgrade
+cd ~/SMARTAgent
+nrnivmodl mod
+
+*20may21
+** continue with falcor install/setup -->> works now
+
+ryan suggests:
+conda install gxx_linux-64
+based on https://github.com/RcppCore/Rcpp/issues/770
+
+installed successfully ... now try compile
+
+nrnivmodl mod
+
+Successfully created x86_64/special
+great...now let's see if it runs ...
+
+./myrun 16
+
+Try loading libmpi and libmpich
+load_mpi: libmpich.so: cannot open shared object file: No such file or directory
+Is openmpi, mpich, intel-mpi, sgi-mpt etc. installed? If not in default location, need a LD_LIBRARY_PATH.
+
+hmm, thought openmpi already installed ...
+
+can set LD_LIBRARY_PATH to /home/samn/miniconda3/lib
+
+export LD_LIBRARY_PATH="/home/samn/miniconda3/lib"
+
+** try a sim on falcor
+
+./myrun 16
+
+seems to be working!
+
+it runs but even with doquit==1 does not stop ... will have to debug that
+for multistep ...
+
+check output ...
+
+python -i simdat.py
+
+drawraster(dspkT,dspkID)
+
+savefig('gif/20may21_rast_a0.png')
+xlim((19e3,20e3))
+savefig('gif/20may21_rast_a0b.png')
+
+animSynWeights(pdf)
+
+python -i actmap.py
+
+fig, axs, plt = animActivityMaps()
+
+activity looks typical - this is with the new weight normalization that
+equalizes inputs to the two M populations
+even with that weight normalization the paddle gets stuck at top
+and even with the weights ~equal to both sets of EM neurons ... that suggests a bug...??
+
+try inc EEMProb ... to 0.3
+
+./myrun 16
+
+  Connections: 0 (0.00 per cell)
+  Spikes: 37701 (3.52 Hz)
+  Simulated time: 2.0 s; 16 workers
+  Run time: 182.41 s
+fatal: Not a git repository (or any parent up to mount point /home)
+Stopping at filesystem boundary (GIT_DISCOVERY_ACROSS_FILESYSTEM not set).
+Saving output as data/20may21_B0_simConfig.pkl ... 
+Finished saving!
+  Done; saving time = 1.52 s.
+
+what's the git error ...
+
+python -i simdat.py
+
+drawraster(dspkT,dspkID)
+savefig('gif/20may21_rast_b0.png')
+hypersynch from the larger number of inputs ...
+
+animSynWeights(pdf)
+gif/20may21_B0_weightmap.mp4
+
+python -i actmap.py
+fig, axs, plt = animActivityMaps()
+
+also reduce the weights ...
+
+python -i simdat.py
+drawraster(dspkT,dspkID)
+savefig('gif/20may21_rast_b1.png')
+those rates are fine
+
+could add a margin factor to different between rates for movement directions ... otherwise hold still ...
+will try longer sim first (300 s) ... (20may21_B0_)
+
+./myrun 16
+
+python -i simdat.py
+drawraster(dspkT,dspkID)
+savefig('gif/20may21_rast_b2.png')
+
+animSynWeights(pdf) # gif/20may21_B0_weightmap.mp4
+
+python -i actmap.py
+fig, axs, plt = animActivityMaps() # gif/20may21_B0_actmap.mp4
+
+try another sim in parallel (20may21_C0_) with different scoring ...
+instead of
+    "rewardcodes": {"scorePoint": 1, "losePoint": -0.01, "followBall": 0.01, "avoidBall": -0.001, "hitBall": 0.25},
+try:
+    "rewardcodes": {"scorePoint": 1, "losePoint": -0.1, "followBall": 0.1, "avoidBall": -0.01, "hitBall": 0.5},
+
+hmm, right now by accident running two of 20may21_B0 ... kill one and start 20may21_C0 
+
