@@ -4918,3 +4918,23 @@ try:
 
 hmm, right now by accident running two of 20may21_B0 ... kill one and start 20may21_C0 
 
+*20may22
+** sims on falcor still running
+
+for some reason they didn't complete yet ... do they get stalled when pause the x2go connection?
+
+can try running on my too ... zn over-booked
+
+also asked ryan (nki) about availability of other machines ...
+
+** try run on my
+
+20may22_D0_
+
+add in the recurrent/plastic connectivity to EM populations (~10%)
+see if existing weights ok ...
+
+myrun 12
+
+somewhat slow ... may as well use laptop ... 
+
