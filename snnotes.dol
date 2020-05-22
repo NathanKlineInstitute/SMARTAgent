@@ -4957,3 +4957,10 @@ run 100 s ...
 
 myrun 12
 
+pretty slow on laptop as well ... must be due to all the extra connections ...
+
+will add a separate json file for myself to avoid conflicts with what haroon's doing ...
+
+cp sim.json sn.json
+
+git add sn.json snnotes.dol; git commit -m 'separate json file for self'; gpushdev
