@@ -4938,3 +4938,22 @@ myrun 12
 
 somewhat slow ... may as well use laptop ... 
 
+myrun 12
+
+python -i simdat.py
+
+drawraster(dspkT,dspkID)
+savefig('gif/20may22_rast_d0.png')
+
+animSynWeights(pdf) # 
+
+python -i actmap.py
+fig, axs, plt = animActivityMaps() # gif/20may22_D0_actmap.mp4
+
+bug in optical flow at right side of image ... always pointing west around right paddle location ...
+at least it's ~constant ... but note to fix it ...
+
+run 100 s ...
+
+myrun 12
+
