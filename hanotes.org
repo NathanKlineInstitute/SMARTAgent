@@ -2499,5 +2499,108 @@ dirX, dirY = getObjectMotionDirection(self.objects, self.last_objects, rects, di
 **** still high firing rate (~11 Hz) ....
 *** change the parameters are below and rerun sim in "20may20_C_"
 ------ "EEMWghtAM":0.0001,"EEMWghtNM":0.00001,"EEMWghtThreshMin":0.0001, "EEMWghtThreshMax":0.001
- 
 
+
+** DISCUSSION WITH SAM:
+
+*** Haroon: "one problem i see is: we assume where ever the racket is, up and down action should be generated independently which might be right but it kills the purpose of having different associations built between different motor neurons and sensory neurons coz we are summing up the activity"
+
+*** Sam: "why? if the correct inputs activate the right subpopulation through learning ... isn't that the association?" 
+
+*** Haroon: "not saying that associations are not being built properly saying that the actions are not generated based on associations because spatial element is completely lost"
+
+*** Sam: "spatial element = spatial information provided to M?""
+
+*** Haroon: "spatial element for action not for input. if we assume that a sub pop of motor neurons take action when the ball is on top right quadrant and another subpop take action when the ball is on top bottom quadrant, the associations will result in topologically relevant actions"
+
+*** Sam: "so you're saying M should have topographic layout too"
+
+*** Haroon: "yes for outputs, not for inputs"
+
+*** Sam: "not sure what that means for outputs, since your example was dependent on ball's position , which is input related (?)"
+
+*** Haroon: "for inputs it should be probabilistic or even may be all to all, for outputs we just use a map and say neuron 1-10 decides action when the ball is at one region, 1-10 in both UP and DOWN regions"
+
+*** Sam: "so that is input dependent selection of M subpops"
+
+*** Haroon: "or this doesn’t make any sense? yes. no idea how to make that selection though"
+
+*** Sam: "hoping that learning would allow that selection. is there a way to build it into the architecture in a general way?"
+
+*** Haroon: "no idea how to make that selection though biologically speaking"
+
+*** Sam: "yeah, not sure"
+
+*** Haroon: "but one thing is sure , generating action by comparing pop firing rates is incorrect"
+
+*** Sam: "probably. would spatial layout of M help though?"
+
+*** Haroon: "it could"
+
+*** Sam: "it would mean most of the time most M neurons are silent/irrelevant. possibly..."
+
+*** Sam: "seems worth trying anyway...at least the spatial info would then be provided to M. well, more spatial info. so sg. and could possibly allow some prediction..if ball moving right, activate M neurons in a sequence..."
+
+*** Haroon: "yes and then within that pop, some neurons will learn associations between actions, location and direction"
+
+*** Sam: "sg, guess you should implement that...seems like most major change. good idea"
+
+*** Haroon: "ok… will have more questions/problems/challenges when i start building that up. so stay tuned"
+
+*** Sam: "sg. was also looking at adjusting the weight normalization. to additionally match weights to each M pop ... to avoid any bias in output. but that has drawbacks since specific actions should be preferred"
+
+In personal chat:
+
+*** Sam: "was thinking about some of those questions a few days ago (from notebook): "any E M neuron could receive information from spatially separated locations ...
+if no topography, then should have recurrent connectivity in EM neurons with RL synapses ...
+topographic arrangement of M neurons might allow better prediction on when to move ... for
+example if ball is far away but moving in a certain direction, might want to initiate movement
+in advance of the ball getting to the paddle ...
+so while there's some spatial information with random connectivity, it's less organized/useful if
+receiving random (from spatial perspective) inputs?
+if ball in middle of screen moving SE, and paddle is at top right stationary, EM Down should be
+activated ... so there should be at least one EM Down neuron that receives strong V1 input at top
+right and middle of screen SE neuron ... if there was a topographic arrangement of EM neurons,
+would that be possible? not if there are restriction of connectivity across spatially distant
+neurons... but having additional recurrent connectivity in EM might still allow that encoding to emerge"
+
+*** Sam: "not sure if useful/understandable"
+
+*** Sam: "this case was why wasn't sure: "if ball in middle of screen moving SE, and paddle is at top right stationary, EM Down should be activated ... so there should be at least one EM Down neuron that receives strong V1 input at top right and middle of screen SE neuron""
+
+*** Sam:is that possible with topography. if need both inputs to know to move down
+
+*** Haroon: seems so---need to think more
+
+*** samn: ic, sure. and if recurrent conn could help. difficult/interesting problem here :slightly_smiling_face:
+
+*** Haroon: yes… it is…. i wonder how motor systems are studied… what kind of topological mapping is there. based on input/output or combined
+
+*** samn: good q. suppose if there's no obvious drawback to topographic setup of M should try it
+
+*** Haroon: i think we both agree here that topological setup would be probably helpful, what needs to be determined is how actions will be generated
+
+*** samn: well, i'm not completely sure
+
+*** Haroon: still pop activity?
+
+*** samn: if it will help. since could be useful for a M neuron to gather info from spatially separated locations in space. e..g that example (ball in middle of screen moving SE and paddle at top right), you might want one M neuron to integrate that info. unless the population of M could do it together somehow. pop activity - another good q
+
+*** Haroon: yeah- recurrent conns will make it hard to guess i think
+
+*** samn: for command output - might it help to have a minimum margin between firing rates to generate an action (to avoid noise),recurrent conns make it harder?,suppose could have topology but also some recurrent connectivity,though at that point why not just high recurrent...not really sure
+
+*** Haroon: if some lingering activity left from last time step, due to recurrency, i guess will depend on the architcture, if we keep it recurrency strictly local then probably not or if inhibition is setup in a way to filter those effects spatially
+
+*** samn: yeah, and that raises whether we want some antag inhib effects, one M pop activated I -> M of another pop ... suppose lot of things to try :slightly_smiling_face:
+
+** test sim using optical flow in file "20may20_D_" - run time: 581 sec
+----> the raster is saved as "20may20-D0"
+** test sim using centroid tracking in file "20may20_D_" with broader flow and with FullImage - run time: 572.71 sec
+----> the raster is saved as "20may20-D"
+----> Didnt change the file name, so the results for sim with optical flow got overridden.
+*** potential problem in plotting actmap.... i noticed that for 10000 ms sim, actmap was plotted for 9960 ms. i.e. roughly 2 frames are skipped. so probably this is the reason why the firing rates of direction selective neurons dont look aligned to the quiver plot.
+**** check aigame.py----FullImages were not saved correctly. always previous image was saved. now saving current image.
+** test sim using centroid tracking in file "20may20_E_" --- run time: 1257 s --- quite slow.
+*** looks like still one frame off.. also sometimes wierd directionsin quiver plot. Not sure why? because when i run testCentroidTracking no such effect appears.
+*** test with optic flow in file "20may20_F_"

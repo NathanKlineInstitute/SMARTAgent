@@ -121,6 +121,7 @@ class AIGame:
       flow = np.zeros(shape=(self.dirSensitiveNeuronDim,self.dirSensitiveNeuronDim,2))
       mag = np.zeros(shape=(self.dirSensitiveNeuronDim,self.dirSensitiveNeuronDim))
       ang = np.zeros(shape=(self.dirSensitiveNeuronDim,self.dirSensitiveNeuronDim))
+      ang[mag == 0] = -100
       goodInds = np.zeros(shape=(self.dirSensitiveNeuronDim,self.dirSensitiveNeuronDim))
     else:
       dirX, dirY = getObjectMotionDirection(self.objects, self.last_objects, rects, dims=np.shape(cimage)[0],FlowWidth=8)
@@ -191,7 +192,8 @@ class AIGame:
       lgwght = [1.0]
     else:
       lgwght = np.linspace(0.6, 1, self.intaction) # time-decay grayscale image weights (earlier indices with lower weights are from older frames)
-    lgimage = [] # grayscale images with decaying time-lagged input
+    lgimage = [] # grayscale down-sampled images with decaying time-lagged input
+    lgimage_ns = [] #grayscale full images with decaying time-lagged input 
     if len(self.last_obs)==0: #if its the first action of the episode, there won't be any last_obs, therefore no last image
       lobs_gimage_ds = []
     else:
@@ -217,7 +219,7 @@ class AIGame:
           proposed_action = dconf['moves']['NOMOVE'] #no move
         elif ypos_Ball==-1: #guess about proposed move can't be made because ball was not visible in the court
           proposed_action = -1 #no valid action guessed
-        self.FullImages.append(np.sum(self.last_obs[courtYRng[0]:courtYRng[1],:,:],2))
+        #self.FullImages.append(np.sum(self.last_obs[courtYRng[0]:courtYRng[1],:,:],2))
         Ball_pos.append([courtXRng[0]-1+xpos_Ball,ypos_Ball])
         Racket_pos.append([racketXRng[0]-1+xpos_Racket,ypos_Racket])
       else:
@@ -226,7 +228,6 @@ class AIGame:
         xpos_Ball = -1 #if there is no last_obs, no position of ball
 
       observation, reward, done, info = self.env.step(caction)
-
       #find position of ball after action
       xpos_Ball2, ypos_Ball2 = self.findobj(observation, courtXRng, courtYRng)        
       if xpos_Ball>0 and xpos_Ball2>0:
@@ -264,6 +265,8 @@ class AIGame:
       gray_Image = 255.0*rgb2gray(observation[courtYRng[0]:courtYRng[1],:,:]) # convert to grayscale; rgb2gray has 0-1 range so mul by 255
       gray_ds = downscale_local_mean(gray_Image,(8,8)) # then downsample
       gray_ds = np.where(gray_ds>np.min(gray_ds)+1,255,gray_ds) # Different thresholding
+      gray_ns = np.where(gray_Image>np.min(gray_Image)+1,255,gray_Image)
+      lgimage_ns.append(lgwght[adx]*gray_ns)
       lgimage.append(lgwght[adx]*gray_ds) # save weighted grayscale image from current frame
       self.countAll += 1
 
@@ -271,9 +274,13 @@ class AIGame:
     # so the original 160x160 pixels will result into 20x20 values instead of previously used 80x80.        
     if len(lgimage)>1:
       dsum_Images = np.maximum(lgimage[0],lgimage[1])
+      nsum_Images = np.maximum(lgimage_ns[0],lgimage_ns[1])
       for gimage in lgimage[2:]: dsum_Images = np.maximum(dsum_Images,gimage)
+      for gimage in lgimage_ns[2:]: nsum_Images = np.maximum(nsum_Images,gimage)
     else:
       dsum_Images = lgimage[0]
+      nsum_Images = lgimage_ns[0]
+    self.FullImages.append(nsum_Images) # save full images ----> THIS IS JUST USED FOR DIRECTIONS (for accuracy)
     self.ReducedImages.append(dsum_Images) # save the input image
 
     self.updateInputRates(dsum_Images) # update input rates to retinal neurons
@@ -283,7 +290,7 @@ class AIGame:
     if dconf['DirectionDetectionAlgo']['OpticFlow']:
       self.computeMotionFields() # compute the motion fields
     elif dconf['DirectionDetectionAlgo']['CentroidTracker']:
-      self.computeAllObjectsMotionDirections() # compute the motion field using CetroidTracking
+      self.computeAllObjectsMotionDirections(UseFull=True) # compute the motion field using CetroidTracking
     self.updateDirSensitiveRates() # update motion sensitive neuron input rates
 
     if done: # done means that 1 episode of the game finished, so the environment needs to be reset. 
