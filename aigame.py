@@ -102,8 +102,16 @@ class AIGame:
       limage = self.FullImages
     else:
       limage = self.ReducedImages
-    if len(limage) < 2: return
-    self.ldflow.append(getoptflow(limage[-2],limage[-1]))
+    if len(limage) < 2:
+      flow = np.zeros(shape=(limage[-1].shape[0],limage[-1].shape[1],2))
+      mag = np.zeros(shape=(limage[-1].shape[0],limage[-1].shape[1]))
+      ang = np.zeros(shape=(limage[-1].shape[0],limage[-1].shape[1]))
+      ang[mag == 0] = -100
+      goodInds = np.zeros(shape=(limage[-1].shape[0],limage[-1].shape[1]))
+      self.ldflow.append({'flow':flow,'mag':mag,'ang':ang,'goodInds':goodInds,'thang':ang,'thflow':flow})
+      #return
+    else:
+      self.ldflow.append(getoptflow(limage[-2],limage[-1]))
 
   def computeAllObjectsMotionDirections(self, UseFull=False):
     #Detect the objects, and initialize the list of bounding box rectangles
