@@ -4916,3 +4916,5 @@ instead of
 try:
     "rewardcodes": {"scorePoint": 1, "losePoint": -0.1, "followBall": 0.1, "avoidBall": -0.01, "hitBall": 0.5},
 
+hmm, right now by accident running two of 20may21_B0 ... kill one and start 20may21_C0 
+
