@@ -4964,3 +4964,44 @@ will add a separate json file for myself to avoid conflicts with what haroon's d
 cp sim.json sn.json
 
 git add sn.json snnotes.dol; git commit -m 'separate json file for self'; gpushdev
+
+** try further doubling connectivity onto EM (20may22_E0_)
+
+and also reducing the weight to avoid epi
+
+can try 12 cores on zn ...
+
+"EEMProb":0.6,"EEMRecProb":0.2
+
+myrun 12 sn.json
+
+  Cells: 5359
+  Connections: 0 (0.00 per cell)
+  Spikes: 20147 (1.88 Hz)
+  Simulated time: 2.0 s; 12 workers
+  Run time: 2183.28 s
+
+
+"EEMWghtAM":0.0000125,"EEMWghtNM":0.00000125,"EEMWghtThreshMin":0.000025,"EEMWghtThreshMax":0.000075
+
+same reward codes as used on laptop:
+    "rewardcodes": {"scorePoint": 1, "losePoint": -0.1, "followBall": 0.1, "avoidBall": -0.01,
+    "hitBall": 0.5},
+
+python -i simdat.py backupcfg/20may22_E0_sim.json
+animSynWeights(pdf) #
+
+drawraster(dspkT,dspkID)
+savefig('gif/20may22_e0_rast.png')
+
+python -i actmap.py backupcfg/20may22_E0_sim.json
+fig, axs, plt = animActivityMaps()
+
+hmm, only ran for 2 s ...
+
+if running with so many synapses values saved, have to limit to every 5-10 s
+
+ok, start for 100 s ... saving weights every 10 s ...
+
+myrun 12 sn.json
+
