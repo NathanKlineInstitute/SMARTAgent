@@ -4927,7 +4927,7 @@ can try running on my too ... zn over-booked
 
 also asked ryan (nki) about availability of other machines ...
 
-** try run on my
+** try run with recurrent/plasticity in EM (10%) 20may22_D0_ on laptop (crashed in middle)
 
 20may22_D0_
 
@@ -4956,4 +4956,157 @@ at least it's ~constant ... but note to fix it ...
 run 100 s ...
 
 myrun 12
+
+pretty slow on laptop as well ... must be due to all the extra connections ...
+
+will add a separate json file for myself to avoid conflicts with what haroon's doing ...
+
+cp sim.json sn.json
+
+git add sn.json snnotes.dol; git commit -m 'separate json file for self'; gpushdev
+
+run on laptop crashed in middle ... 
+
+** try further doubling connectivity onto EM (20may22_E0_)
+
+and also reducing the weight to avoid epi
+
+can try 12 cores on zn ...
+
+"EEMProb":0.6,"EEMRecProb":0.2
+
+myrun 12 sn.json
+
+  Cells: 5359
+  Connections: 0 (0.00 per cell)
+  Spikes: 20147 (1.88 Hz)
+  Simulated time: 2.0 s; 12 workers
+  Run time: 2183.28 s
+
+
+"EEMWghtAM":0.0000125,"EEMWghtNM":0.00000125,"EEMWghtThreshMin":0.000025,"EEMWghtThreshMax":0.000075
+
+same reward codes as used on laptop:
+    "rewardcodes": {"scorePoint": 1, "losePoint": -0.1, "followBall": 0.1, "avoidBall": -0.01,
+    "hitBall": 0.5},
+
+python -i simdat.py backupcfg/20may22_E0_sim.json
+animSynWeights(pdf) #
+
+drawraster(dspkT,dspkID)
+savefig('gif/20may22_e0_rast.png')
+
+python -i actmap.py backupcfg/20may22_E0_sim.json
+fig, axs, plt = animActivityMaps()
+
+hmm, only ran for 2 s ...
+
+if running with so many synapses values saved, have to limit to every 5-10 s
+
+ok, start for 200 s ... saving weights every 10 s ...
+
+myrun 12 sn.json
+
+<<<<<<< HEAD
+** sims on falcor did not save output properly, had memory errors
+
+20may21_B0_sim.json
+20may21_C0_sim.json
+
+well, have some of the output (actions rewards for B0) ... may as well take a look ... and see
+whether worth rerunning for more of the output...
+
+python
+#
+import numpy as np
+import pandas as pd
+from pylab import *
+from simdat import plotRewards,plotFollowBall,plotHitMiss
+  
+name = '20may21_B0_'; pda = pd.DataFrame(np.loadtxt('data/'+name+'ActionsRewards.txt'),columns=['time','action','reward','proposed','hit'])
+  
+np.amax(pda.time) # 2000.0
+
+so do not even have that output ... 
+
+so all the output lost from those two simulations ...
+
+** try same 20may22_D0_ on falcor, but rename sim name to 20may22_D0_falcor_
+
+in sn.json
+
+will use recordWeightStepSize of 500 (smaller file output and RAM use) and only use 12 cores instead of 16 ...
+
+will also only run a single sim at a time ... see if that helps ...
+
+here are some of the relevant params:
+
+    "rewardcodes": {"scorePoint": 1, "losePoint": -0.1, "followBall": 0.1, "avoidBall": -0.01, "hitBall": 0.5},
+    "actionsPerPlay": 1,
+    "DirectionDetectionAlgo":{"CentroidTracker":0,"OpticFlow":1},
+
+    "net":{"scale":1,"ER":400,"IR":100,"EV1":400,"EV1DE":400,"EV1DNE":400,"EV1DN":400,"EV1DNW":400,"EV1DW":400,"EV1DSW":400,"EV1DS":400,"EV1DSE":400,"IV1":100,"EV4":100,"IV4":25,"EMT":25,"IMT":9,"EMDOWN":400,"EMUP":400,"IM":200,"AngRFSigma":22.5,"DirMinRate":0.0,"DirMaxRate":50.0,"EEMWghtAM":0.000025,"EEMWghtNM":0.0000025,"EEMWghtThreshMin":0.000025,"EEMWghtThreshMax":0.000075,"EEMProb":0.3,"EEMRecProb":0.1,"EEMPopNorm":0},
+    "RL":{"AMPA":
+	  {"wbase":0.0000001,"wmax":0.0001,"RLon":1,"RLlenhebb":50,"RLlenanti":50,"useRLexp":1,"RLhebbwt":0.0005,"RLantiwt":-0.0,"hebbwt":0,"antiwt":0,"tauhebb":10,"RLwindhebb":50,"softthresh":0,"verbose":0},
+
+./myrun 12 sn.json
+
+*20may23
+** sim on zn getting rates too high (~400 Hz periodically), have to lower max weight, restart as 20may23_A0_zn_
+
+may as well stop it and set the max weight lower to avoid hyperxcit
+
+transition to hyperexcit occurred around 55 s when weights got up to ~6.2e-5 for both EMDOWN and
+EMUP:
+t= 54999.99999948014 - adjusting weights based on RL critic value: -0.01
+Game rewards: [-0.01]
+sim.rank= 0 davg: {'EMUP': 6.192818441676834e-05, 'EMDOWN': 6.168511982260213e-05} dfctr: {'EMUP': 1.0, 'EMDOWN': 1.0}
+U,D firing rates:  [0.0] [0.0]
+Model actions: [1]
+
+so set max at 6.15e-5
+at t=54 s:
+t= 53999.99999949469 - adjusting weights based on RL critic value: 0.1
+Game rewards: [0.1]
+sim.rank= 0 davg: {'EMUP': 6.159468527383135e-05, 'EMDOWN': 6.117707481808665e-05} dfctr: {'EMUP': 1.0, 'EMDOWN': 1.0}
+U,D firing rates:  [7.575757575757575] [3.0303030303030303]
+
+"EEMWghtThreshMax":0.0000615
+
+"name":"20may23_A0_zn_"
+
+recordWeightStepSize":250
+
+ok, restart on zn ...
+
+myrun 12 sn.json
+
+** meanwhile, check output from falcor (20may22_D0_falcor_) -> did not get great result
+
+python -i simdat.py backupcfg/20may22_D0_falcor_sim.json
+
+animSynWeights(pdf) # gif/20may22_D0_falcor_weightmap.mp4
+
+python -i actmap.py backupcfg/20may22_D0_falcor_sim.json
+
+fig, axs, plt = animActivityMaps() # gif/20may22_D0_falcor_actmap.mp4
+
+to view mp4s, first download to laptop ...
+scp 'samn@falcor.rfmh.org://home/samn/SMARTAgent/gif/20may22_D0_falcor*mp4' ./gif/
+scp samn@falcor.rfmh.org://home/samn/SMARTAgent/backupcfg/20may22_D0_falcor_sim.json ./backupcfg
+
+from looking at output mp4s, looks like model reachesbest performance pretty quickly and doesn't improve much after ...
+also still seeing biases with higher activation of EMUP compared to EMDOWN ...
+
+but weights did reach ~max quicker than in prior sims ... is that a good thing?
+
+** try another sim on falcor with longer RLlenhebb (100 ms instead of previous 50 ms; name = 20may23_A0_falcor_)
+
+same params as backupcfg/20may22_D0_falcor_sim.json otherwise
+
+"RLlenhebb":100
+
+"name":"20may23_A0_falcor_"
+
+./myrun 12 sn.json
 
