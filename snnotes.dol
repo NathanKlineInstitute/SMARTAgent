@@ -5008,37 +5008,6 @@ ok, start for 200 s ... saving weights every 10 s ...
 myrun 12 sn.json
 
 <<<<<<< HEAD
-*20may23
-** sim on zn getting rates too high (~400 Hz periodically), have to lower max weight, restart as 20may23_A0_zn_
-
-may as well stop it and set the max weight lower to avoid hyperxcit
-
-transition to hyperexcit occurred around 55 s when weights got up to ~6.2e-5 for both EMDOWN and
-EMUP:
-t= 54999.99999948014 - adjusting weights based on RL critic value: -0.01
-Game rewards: [-0.01]
-sim.rank= 0 davg: {'EMUP': 6.192818441676834e-05, 'EMDOWN': 6.168511982260213e-05} dfctr: {'EMUP': 1.0, 'EMDOWN': 1.0}
-U,D firing rates:  [0.0] [0.0]
-Model actions: [1]
-
-so set max at 6.15e-5
-at t=54 s:
-t= 53999.99999949469 - adjusting weights based on RL critic value: 0.1
-Game rewards: [0.1]
-sim.rank= 0 davg: {'EMUP': 6.159468527383135e-05, 'EMDOWN': 6.117707481808665e-05} dfctr: {'EMUP': 1.0, 'EMDOWN': 1.0}
-U,D firing rates:  [7.575757575757575] [3.0303030303030303]
-
-"EEMWghtThreshMax":0.0000615
-
-"name":"20may23_A0_zn_"
-
-recordWeightStepSize":250
-
-ok, restart on zn ...
-
-myrun 12 sn.json
-=======
-
 ** sims on falcor did not save output properly, had memory errors
 
 20may21_B0_sim.json
@@ -5081,5 +5050,35 @@ here are some of the relevant params:
 	  {"wbase":0.0000001,"wmax":0.0001,"RLon":1,"RLlenhebb":50,"RLlenanti":50,"useRLexp":1,"RLhebbwt":0.0005,"RLantiwt":-0.0,"hebbwt":0,"antiwt":0,"tauhebb":10,"RLwindhebb":50,"softthresh":0,"verbose":0},
 
 ./myrun 12 sn.json
->>>>>>> 6560a4a6da4e2c81805c9f4760e1e7e16c8b10d9
+
+
+*20may23
+** sim on zn getting rates too high (~400 Hz periodically), have to lower max weight, restart as 20may23_A0_zn_
+
+may as well stop it and set the max weight lower to avoid hyperxcit
+
+transition to hyperexcit occurred around 55 s when weights got up to ~6.2e-5 for both EMDOWN and
+EMUP:
+t= 54999.99999948014 - adjusting weights based on RL critic value: -0.01
+Game rewards: [-0.01]
+sim.rank= 0 davg: {'EMUP': 6.192818441676834e-05, 'EMDOWN': 6.168511982260213e-05} dfctr: {'EMUP': 1.0, 'EMDOWN': 1.0}
+U,D firing rates:  [0.0] [0.0]
+Model actions: [1]
+
+so set max at 6.15e-5
+at t=54 s:
+t= 53999.99999949469 - adjusting weights based on RL critic value: 0.1
+Game rewards: [0.1]
+sim.rank= 0 davg: {'EMUP': 6.159468527383135e-05, 'EMDOWN': 6.117707481808665e-05} dfctr: {'EMUP': 1.0, 'EMDOWN': 1.0}
+U,D firing rates:  [7.575757575757575] [3.0303030303030303]
+
+"EEMWghtThreshMax":0.0000615
+
+"name":"20may23_A0_zn_"
+
+recordWeightStepSize":250
+
+ok, restart on zn ...
+
+myrun 12 sn.json
 
