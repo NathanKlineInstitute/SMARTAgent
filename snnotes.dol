@@ -4927,7 +4927,7 @@ can try running on my too ... zn over-booked
 
 also asked ryan (nki) about availability of other machines ...
 
-** try run on my
+** try run with recurrent/plasticity in EM (10%) 20may22_D0_ on laptop (crashed in middle)
 
 20may22_D0_
 
@@ -4964,6 +4964,8 @@ will add a separate json file for myself to avoid conflicts with what haroon's d
 cp sim.json sn.json
 
 git add sn.json snnotes.dol; git commit -m 'separate json file for self'; gpushdev
+
+run on laptop crashed in middle ... 
 
 ** try further doubling connectivity onto EM (20may22_E0_)
 
@@ -5005,6 +5007,7 @@ ok, start for 200 s ... saving weights every 10 s ...
 
 myrun 12 sn.json
 
+<<<<<<< HEAD
 *20may23
 ** sim on zn getting rates too high (~400 Hz periodically), have to lower max weight, restart as 20may23_A0_zn_
 
@@ -5034,4 +5037,49 @@ recordWeightStepSize":250
 ok, restart on zn ...
 
 myrun 12 sn.json
+=======
+
+** sims on falcor did not save output properly, had memory errors
+
+20may21_B0_sim.json
+20may21_C0_sim.json
+
+well, have some of the output (actions rewards for B0) ... may as well take a look ... and see
+whether worth rerunning for more of the output...
+
+python
+#
+import numpy as np
+import pandas as pd
+from pylab import *
+from simdat import plotRewards,plotFollowBall,plotHitMiss
+  
+name = '20may21_B0_'; pda = pd.DataFrame(np.loadtxt('data/'+name+'ActionsRewards.txt'),columns=['time','action','reward','proposed','hit'])
+  
+np.amax(pda.time) # 2000.0
+
+so do not even have that output ... 
+
+so all the output lost from those two simulations ...
+
+** try same 20may22_D0_ on falcor, but rename sim name to 20may22_D0_falcor_
+
+in sn.json
+
+will use recordWeightStepSize of 500 (smaller file output and RAM use) and only use 12 cores instead of 16 ...
+
+will also only run a single sim at a time ... see if that helps ...
+
+here are some of the relevant params:
+
+    "rewardcodes": {"scorePoint": 1, "losePoint": -0.1, "followBall": 0.1, "avoidBall": -0.01, "hitBall": 0.5},
+    "actionsPerPlay": 1,
+    "DirectionDetectionAlgo":{"CentroidTracker":0,"OpticFlow":1},
+
+    "net":{"scale":1,"ER":400,"IR":100,"EV1":400,"EV1DE":400,"EV1DNE":400,"EV1DN":400,"EV1DNW":400,"EV1DW":400,"EV1DSW":400,"EV1DS":400,"EV1DSE":400,"IV1":100,"EV4":100,"IV4":25,"EMT":25,"IMT":9,"EMDOWN":400,"EMUP":400,"IM":200,"AngRFSigma":22.5,"DirMinRate":0.0,"DirMaxRate":50.0,"EEMWghtAM":0.000025,"EEMWghtNM":0.0000025,"EEMWghtThreshMin":0.000025,"EEMWghtThreshMax":0.000075,"EEMProb":0.3,"EEMRecProb":0.1,"EEMPopNorm":0},
+    "RL":{"AMPA":
+	  {"wbase":0.0000001,"wmax":0.0001,"RLon":1,"RLlenhebb":50,"RLlenanti":50,"useRLexp":1,"RLhebbwt":0.0005,"RLantiwt":-0.0,"hebbwt":0,"antiwt":0,"tauhebb":10,"RLwindhebb":50,"softthresh":0,"verbose":0},
+
+./myrun 12 sn.json
+>>>>>>> 6560a4a6da4e2c81805c9f4760e1e7e16c8b10d9
 
