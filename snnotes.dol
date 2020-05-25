@@ -5051,7 +5051,6 @@ here are some of the relevant params:
 
 ./myrun 12 sn.json
 
-
 *20may23
 ** sim on zn getting rates too high (~400 Hz periodically), have to lower max weight, restart as 20may23_A0_zn_
 
@@ -5081,6 +5080,35 @@ recordWeightStepSize":250
 ok, restart on zn ...
 
 myrun 12 sn.json
+
+** meanwhile, check output from falcor (20may22_D0_falcor_) -> did not get great result
+
+python -i simdat.py backupcfg/20may22_D0_falcor_sim.json
+
+animSynWeights(pdf) # gif/20may22_D0_falcor_weightmap.mp4
+
+python -i actmap.py backupcfg/20may22_D0_falcor_sim.json
+
+fig, axs, plt = animActivityMaps() # gif/20may22_D0_falcor_actmap.mp4
+
+to view mp4s, first download to laptop ...
+scp 'samn@falcor.rfmh.org://home/samn/SMARTAgent/gif/20may22_D0_falcor*mp4' ./gif/
+scp samn@falcor.rfmh.org://home/samn/SMARTAgent/backupcfg/20may22_D0_falcor_sim.json ./backupcfg
+
+from looking at output mp4s, looks like model reachesbest performance pretty quickly and doesn't improve much after ...
+also still seeing biases with higher activation of EMUP compared to EMDOWN ...
+
+but weights did reach ~max quicker than in prior sims ... is that a good thing?
+
+** try another sim on falcor with longer RLlenhebb (100 ms instead of previous 50 ms; name = 20may23_A0_falcor_)
+
+same params as backupcfg/20may22_D0_falcor_sim.json otherwise
+
+"RLlenhebb":100
+
+"name":"20may23_A0_falcor_"
+
+./myrun 12 sn.json
 
 *20may24
 ** sim on zn (20may23_A0_zn_) still develops hyperexcit?
