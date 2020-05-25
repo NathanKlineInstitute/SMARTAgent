@@ -5117,3 +5117,37 @@ or at least periods where it's firing at very high rates, not every action ...
 hyperexcit also comes much later ... let it finish since from printouts appeared to have
 some decent bhavior early on ... 
 
+** check output on falcor's latest sim (20may23_A0_falcor_)
+
+python -i simdat.py backupcfg/20may23_A0_falcor_sim.json
+
+animSynWeights(pdf) # gif/20may23_A0_falcor_weightmap.mp4
+
+python -i actmap.py backupcfg/20may23_A0_falcor_sim.json
+
+fig, axs, plt = animActivityMaps() # gif/20may23_A0_falcor_actmap.mp4
+
+to view mp4s, first download to laptop ...
+scp 'samn@falcor.rfmh.org://home/samn/SMARTAgent/gif/20may23_A0_falcor*mp4' ./gif/
+scp samn@falcor.rfmh.org://home/samn/SMARTAgent/backupcfg/20may23_A0_falcor_sim.json ./backupcfg
+
+in weightmap, there appears to be less difference between average input weights to EMDOWN and EMUP populations
+suggesting possibly less bias in movement directions ... in terms of following vs not following ball, there
+is not a clear difference ... in terms of hit vs miss, there appears to be a slightly higher number of hits
+for the latter simulation, with the longer time constant for eligibility trace (100 ms vs previous 50 ms)
+
+overall, follow ball probability does not pass ~50% / random level ... actually, is 50% random level?
+or 33% if no move is the appropriate answer sometimes ... ?
+
+still have to look at actmap movie to see if bias really absent ... 
+
+** start another sim on falcor
+
+same as last but even longer time constant for eligibility trace (200 ms)
+
+"RLlenhebb":200
+
+run it a little longer too ... 400 s ...
+
+./myrun 12 sn.json
+
