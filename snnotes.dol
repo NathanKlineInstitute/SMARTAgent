@@ -5477,3 +5477,33 @@ savefig('gif/20may26_racketposhist_b1.png')
 
 yeah, looks like racket spending more time at top or bottom ... 
 
+try a bit longer run with slightly higher weights to see if firing ok ... 
+
+./myrun 12 sn.json
+
+python -i simdat.py backupcfg/20may26_A0_falcor_sim.json
+
+drawraster(dspkT,dspkID)
+savefig('gif/20may26_A0_falcor_rast_b2.png')
+savefig('gif/20may26_A0_falcor_rast_b2b.png')
+
+overall rates are ok but some hypersynch will likely emerge eventually since max weight pretty high
+with 0.3 prob of conn to EM and 0.1 recurr conn in EM
+
+animSynWeights(pdf) # gif/20may26_A0_falcor_weightmap.mp4
+
+python -i actmap.py backupcfg/20may26_A0_falcor_sim.json
+
+dobjpos = loadObjPos(); fig, axs, plt = animActivityMaps(dobjpos=dobjpos) # 
+
+scp 'samn@falcor.rfmh.org://home/samn/SMARTAgent/gif/20may26_A0_falcor*mp4' ./gif/
+scp samn@falcor.rfmh.org://home/samn/SMARTAgent/backupcfg/20may26_A0_falcor_sim.json ./backupcfg
+
+looks decent ... can run longer ... 
+
+./myrun 12 sn.json
+
+** setup rule for larger firing rates (by factor, prior to movement) ?
+
+may help stability and avoiding bias ... ?
+
