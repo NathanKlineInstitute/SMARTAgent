@@ -5152,15 +5152,43 @@ run it a little longer too ... 400 s ...
 ./myrun 12 sn.json
 
 *20may25
-** sim finished on zn (20may23_A0_zn_sim.json) -->> check output
+** sim finished on zn (20may23_A0_zn_sim.json) -->> check output, start new (20may25_A0_zn_)
 
 python -i simdat.py backupcfg/20may23_A0_zn_sim.json
 
-animSynWeights(pdf) # 
+animSynWeights(pdf) # gif/20may23_A0_zn_weightmap.mp4
+
+drawraster(dspkT,dspkID)
+savefig('gif/20may25_20may23_A0_zn_rast.png')
+on average, rates are not terrible ... 
+savefig('gif/20may25_20may23_A0_zn_rast_b.png')
+but the hypersynchronized firing pattern is a problem ... 
+savefig('gif/20may25_20may23_A0_zn_rast_c.png')
+should also look at membrane potential ... 
+
+follow ball probability looks like transitions, first rises, then decays ... possibly due
+to hyperactivity?
 
 python -i actmap.py backupcfg/20may23_A0_zn_sim.json
 
 fig, axs, plt = animActivityMaps() # 
+
+so based on above, should have lower max weights ... and possibly lower min weights as well... 
+
+some of the params just used in 20may23_A0_zn_ seem off:
+    "net":{"scale":1,"ER":400,"IR":100,"EV1":400,"EV1DE":400,"EV1DNE":400,"EV1DN":400,"EV1DNW":400,"EV1DW":400,"EV1DSW":400,"EV1DS":400,"EV1DSE":400,"IV1":100,"EV4":100,"IV4":25,"EMT":25,"IMT":9,"EMDOWN":400,"EMUP":400,"IM":200,"AngRFSigma":22.5,"DirMinRate":0.0,"DirMaxRate":50.0,"EEMWghtAM":0.0000125,"EEMWghtNM":0.00000125,"EEMWghtThreshMin":0.000025,"EEMWghtThreshMax":0.0000615,"EEMProb":0.6,"EEMRecProb":0.2,"EEMPopNorm":0},
+
+EEMWghtAM had lower value than EEMWghtThreshMin, so that means weights got pushed up through
+normalization pretty early (and for no good reason)
+
+"name":"20may25_A0_zn_"
+
+set "EEMWghtThreshMin":0.0000125
+and "EEMWghtThreshMax" from 0.0000615 to 0.00005
+
+ok, start that ... for 200 s ...
+
+myrun 16 sn.json
 
 ** sim finished on falcor (20may24_A0_falcor_sim.json) -->> check output
 
