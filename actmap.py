@@ -8,7 +8,7 @@ from pylab import *
 import os
 import anim
 from matplotlib import animation
-from simdat import loadInputImages, loadsimdat, loadMotionFields
+from simdat import loadInputImages, loadsimdat, loadMotionFields, loadObjPos
 from imgutils import getoptflow, getoptflowframes
 
 rcParams['font.size'] = 12
