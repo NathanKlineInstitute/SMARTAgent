@@ -5141,7 +5141,7 @@ or 33% if no move is the appropriate answer sometimes ... ?
 
 still have to look at actmap movie to see if bias really absent ... 
 
-** start another sim on falcor
+** start another sim on falcor (20may24_A0_falcor_)
 
 same as last but even longer time constant for eligibility trace (200 ms)
 
@@ -5150,4 +5150,15 @@ same as last but even longer time constant for eligibility trace (200 ms)
 run it a little longer too ... 400 s ...
 
 ./myrun 12 sn.json
+
+*20may25
+** sim finished on zn (20may23_A0_zn_sim.json)
+
+python -i simdat.py backupcfg/20may23_A0_zn_sim.json
+
+animSynWeights(pdf) # 
+
+python -i actmap.py backupcfg/20may23_A0_zn_sim.json
+
+fig, axs, plt = animActivityMaps() # 
 
