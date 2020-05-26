@@ -5379,6 +5379,26 @@ samn ic
 for most of its duration and paddle gets stuck on top for majority of time (once
 the hypersynchrony develops) so that's another indicator of origin of bias
 
+** this sim (20may25_A0_zn_sim.json) on zn also has hypersynch/high rates develop & likely poor performance
+so should kill that and start one with even lower max weights ...
+
+set "EEMWghtThreshMax":0.00005
+to ~1/2 that value ... "EEMWghtThreshMax":0.000025
+
+"name":"20may26_A0_zn_"
+
+can also try longer time constant for RL (based on sims on falcor)
+set "RLlenhebb":50
+to 100 ...
+
+also lower
+"EEMWghtThreshMin":0.0000125
+to
+"EEMWghtThreshMin":0.00000625
+so weights could go down further before getting pushed back up through normalization
+
+myrun 16 sn.json
+
 ** summary from latest sims on falcor
 
 20may22_D0_falcor_sim.json -->> "RLlenhebb":50 <<-- original default
