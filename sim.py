@@ -32,6 +32,7 @@ sim.plotWeights = 0  # plot weights
 sim.saveWeights = 1  # save weights
 sim.saveInputImages = 1 #save Input Images (5 game frames)
 sim.saveMotionFields = 1 # whether to save the motion fields
+sim.saveObjPos = 1 # save ball and paddle position to file
 recordWeightStepSize = dconf['sim']['recordWeightStepSize']
 normalizeWeightStepSize = dconf['sim']['normalizeWeightStepSize']
 #recordWeightDT = 1000 # interval for recording synaptic weights (change later)
@@ -797,7 +798,7 @@ def updateInputRates ():
 def trainAgent (t):
   """ training interface between simulation and game environment
   """
-  global NBsteps, epCount, proposed_actions, total_hits, Racket_pos, Ball_pos, current_time_stepNB, fid4
+  global NBsteps, epCount, proposed_actions, total_hits, current_time_stepNB, fid4
   global f_ax, fig
   global tstepPerAction
   vec = h.Vector()
@@ -838,7 +839,7 @@ def trainAgent (t):
           actions.append(dconf['moves']['NOMOVE']) # No move        
   if sim.rank == 0:
     print('Model actions:', actions)
-    rewards, epCount, proposed_actions, total_hits, Racket_pos, Ball_pos = sim.AIGame.playGame(actions, epCount)
+    rewards, epCount, proposed_actions, total_hits = sim.AIGame.playGame(actions, epCount)
     print('Proposed actions:', proposed_actions)
     if dconf['sim']['RLFakeUpRule']: # fake rule for testing reinforcing of up moves
       critic = np.sign(actions.count(dconf['moves']['UP']) - actions.count(dconf['moves']['DOWN']))          
@@ -1046,6 +1047,11 @@ if sim.saveWeights: saveSynWeights()
 
 def saveMotionFields (ldflow): pickle.dump(ldflow, open('data/'+dconf['sim']['name']+'MotionFields.pkl', 'wb'))
 
+def saveObjPos (dobjpos):
+  # save object position dictionary
+  for k in dobjpos.keys(): dobjpos[k] = np.array(dobjpos[k])
+  pickle.dump(dobjpos, open('data/'+dconf['sim']['name']+'objpos.pkl', 'wb'))
+
 def saveInputImages (Images):
   # save input images to txt file (switch to pkl?)
   InputImages = np.array(Images)
@@ -1069,4 +1075,5 @@ if sim.rank == 0: # only rank 0 should save. otherwise all the other nodes could
   if sim.saveInputImages: saveInputImages(sim.AIGame.ReducedImages)
   #anim.savemp4('/tmp/*.png','data/'+dconf['sim']['name']+'randGameBehavior.mp4',10)
   if sim.saveMotionFields: saveMotionFields(sim.AIGame.ldflow)
+  if sim.saveObjPos: saveObjPos(sim.AIGame.dObjPos)
   if dconf['sim']['doquit']: quit()

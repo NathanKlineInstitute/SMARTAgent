@@ -5408,5 +5408,72 @@ myrun 16 sn.json
 
 can look at how much time spent at every y position ... but not saving estimated racket and ball positions ... 
 
+try a quick sim saving the ball and racket (paddle) positions ...
 
+may as well try the object tracker too ...
+
+./myrun 12 sn.json
+
+hmm, no firing for these param weights...have to adjust ... 
+
+python -i simdat.py backupcfg/20may26_A0_falcor_sim.json
+
+animSynWeights(pdf) # gif/20may26_A0_falcor_weightmap.mp4
+
+drawraster(dspkT,dspkID)
+savefig('gif/20may26_A0_falcor_rast.png')
+not much activity for EM pops ... 
+
+python -i actmap.py backupcfg/20may26_A0_falcor_sim.json
+
+fig, axs, plt = animActivityMaps() # 
+
+scp 'samn@falcor.rfmh.org://home/samn/SMARTAgent/gif/20may26_A0_falcor*mp4' ./gif/
+scp samn@falcor.rfmh.org://home/samn/SMARTAgent/backupcfg/20may26_A0_falcor_sim.json ./backupcfg
+
+and can adjust flowwidth for object tracker too
+
+try with double the flow width (16, compared to original 8)
+
+python -i simdat.py backupcfg/20may26_A0_falcor_sim.json
+
+animSynWeights(pdf) # gif/20may26_A0_falcor_weightmap.mp4
+
+drawraster(dspkT,dspkID)
+savefig('gif/20may26_A0_falcor_rast_b.png')
+ok, a little more activity for EM ... 
+
+python -i actmap.py backupcfg/20may26_A0_falcor_sim.json
+
+fig, axs, plt = animActivityMaps() # 
+
+scp 'samn@falcor.rfmh.org://home/samn/SMARTAgent/gif/20may26_A0_falcor*mp4' ./gif/
+scp samn@falcor.rfmh.org://home/samn/SMARTAgent/backupcfg/20may26_A0_falcor_sim.json ./backupcfg
+
+ok, object detection-based flow is a little wider ... though EM rates still lower than when using optical flow algorithm
+
+dobjpos = loadObjPos()
+
+dobjpos['ball'] = np.array(dobjpos['ball'])
+dobjpos['ball'].shape # (249, 2)
+
+dobjpos['racket'] = np.array(dobjpos['racket'])
+
+plot(dobjpos['ball'][:,0],dobjpos['ball'][:,1])
+plot(dobjpos['racket'][:,0],dobjpos['racket'][:,1])
+
+fig=animInput(InputImages,'testflow2.mp4',ldflow=ldflow,dobjpos=dobjpos)
+
+fig, axs, plt = animActivityMaps(outpath='testact.mp4',dobjpos=dobjpos) # 
+
+#
+clf()
+subplot(1,2,1); xlabel('Racket X position')
+hist(dobjpos['racket'][:,0])
+subplot(1,2,2); xlabel('Racket Y position')
+hist(dobjpos['racket'][:,1])
+
+savefig('gif/20may26_racketposhist_b1.png')
+
+yeah, looks like racket spending more time at top or bottom ... 
 

@@ -85,7 +85,7 @@ def plotActivityMaps (pauset=1, gifpath=None, mp4path=None, framerate=5, zf=10):
   return fig, axs, plt
 
 #
-def animActivityMaps (outpath='gif/'+dconf['sim']['name']+'actmap.mp4', framerate=10, figsize=(18,10)):
+def animActivityMaps (outpath='gif/'+dconf['sim']['name']+'actmap.mp4', framerate=10, figsize=(18,10), dobjpos=None):
   # plot activity in different layers as a function of input images  
   ioff()
   if figsize is not None: fig, axs = plt.subplots(4, 5, figsize=figsize);
@@ -103,6 +103,8 @@ def animActivityMaps (outpath='gif/'+dconf['sim']['name']+'actmap.mp4', framerat
   ddat = {}
   fig.suptitle('Time = ' + str(0*tstepPerAction) + ' ms')
   idx = 0
+  objfctr = 1.0
+  if dconf['DirectionDetectionAlgo']['UseFull']: objfctr=1/8.  
   for ldx,ax in enumerate(lax):
     if idx > len(dact.keys()):
       ax.axis('off')
@@ -122,6 +124,9 @@ def animActivityMaps (outpath='gif/'+dconf['sim']['name']+'actmap.mp4', framerat
     else:
       pcm = ax.imshow(lact[idx][offidx,:,:],origin='upper',cmap='gray',vmin=0,vmax=lvmax[idx])
       ddat[ldx] = pcm
+      if ldx==0 and dobjpos is not None:
+        lobjx,lobjy = [objfctr*dobjpos[k][0,0] for k in dobjpos.keys()], [objfctr*dobjpos[k][0,1] for k in dobjpos.keys()]
+        ddat['objpos'], = ax.plot(lobjx,lobjy,'ro')      
     ax.set_ylabel(ltitle[idx])
     if ldx==2: plt.colorbar(pcm, cax = cbaxes)  
     idx += 1
@@ -140,6 +145,9 @@ def animActivityMaps (outpath='gif/'+dconf['sim']['name']+'actmap.mp4', framerat
         ddat[ldx].set_UVC(ldflow[t+offidx]['thflow'][:,:,0],-ldflow[t]['thflow'][:,:,1])        
       else:
         ddat[ldx].set_data(lact[idx][t+offidx,:,:])
+        if ldx==0 and dobjpos is not None:
+          lobjx,lobjy = [objfctr*dobjpos[k][t,0] for k in dobjpos.keys()], [objfctr*dobjpos[k][t,1] for k in dobjpos.keys()]
+          ddat['objpos'].set_data(lobjx,lobjy)        
         idx += 1
     return fig
   ani = animation.FuncAnimation(fig, updatefig, interval=1, frames=len(t1)-1)
@@ -149,16 +157,14 @@ def animActivityMaps (outpath='gif/'+dconf['sim']['name']+'actmap.mp4', framerat
   return fig, axs, plt
 
 #
-def animInput (InputImages, outpath, framerate=10, figsize=None, showflow=True, ldflow=None):
+def animInput (InputImages, outpath, framerate=10, figsize=None, showflow=True, ldflow=None, dobjpos=None):
   # animate the input images; showflow specifies whether to calculate/animate optical flow
   ioff()
   # plot input images and optionally optical flow
   ncol = 1
   if showflow: ncol+=1
-  if figsize is not None:
-    fig = figure(figsize=figsize)
-  else:
-    fig = figure()
+  if figsize is not None: fig = figure(figsize=figsize)
+  else: fig = figure()
   lax = [subplot(1,ncol,i+1) for i in range(ncol)]
   ltitle = ['Input Images']
   lact = [InputImages]; lvmax = [255]; xl = [(-.5,19.5)]; yl = [(19.5,-0.5)]
@@ -167,14 +173,19 @@ def animInput (InputImages, outpath, framerate=10, figsize=None, showflow=True, 
   idx = 0
   lflow = []
   if showflow and ldflow is None: ldflow = getoptflowframes(InputImages)
+  objfctr = 1.0
+  if dconf['DirectionDetectionAlgo']['UseFull']: objfctr=1/8.
   for ldx,ax in enumerate(lax):
     if ldx==0:
       pcm = ax.imshow( lact[idx][0,:,:], origin='upper', cmap='gray', vmin=0, vmax=lvmax[idx])
       ddat[ldx] = pcm
       ax.set_ylabel(ltitle[idx])
+      if dobjpos is not None:
+        lobjx,lobjy = [objfctr*dobjpos[k][0,0] for k in dobjpos.keys()], [objfctr*dobjpos[k][0,1] for k in dobjpos.keys()]
+        ddat['objpos'], = ax.plot(lobjx,lobjy,'ro')
     else:
       X, Y = np.meshgrid(np.arange(0, InputImages[0].shape[1], 1), np.arange(0,InputImages[0].shape[0],1))
-      ddat[ldx] = ax.quiver(X,Y,ldflow[0]['thflow'][:,:,0],-ldflow[0]['thflow'][:,:,1], pivot='mid', units='inches',width=0.01,scale=1/0.3)#,width=0.022,scale=1/0.15)
+      ddat[ldx] = ax.quiver(X,Y,ldflow[0]['thflow'][:,:,0],-ldflow[0]['thflow'][:,:,1], pivot='mid', units='inches',width=0.01,scale=1/0.3)
       ax.set_xlim((0,InputImages[0].shape[1])); ax.set_ylim((0,InputImages[0].shape[0]))
       ax.invert_yaxis()
     idx += 1
@@ -185,6 +196,9 @@ def animInput (InputImages, outpath, framerate=10, figsize=None, showflow=True, 
     for ldx,ax in enumerate(lax):
       if ldx == 0:
         ddat[ldx].set_data(lact[0][t,:,:])
+        if dobjpos is not None:
+          lobjx,lobjy = [objfctr*dobjpos[k][t,0] for k in dobjpos.keys()], [objfctr*dobjpos[k][t,1] for k in dobjpos.keys()]
+          ddat['objpos'].set_data(lobjx,lobjy)
       else:
         ddat[ldx].set_UVC(ldflow[t-1]['thflow'][:,:,0],-ldflow[t]['thflow'][:,:,1])        
     return fig
