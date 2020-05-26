@@ -5152,7 +5152,7 @@ run it a little longer too ... 400 s ...
 ./myrun 12 sn.json
 
 *20may25
-** sim finished on zn (20may23_A0_zn_sim.json)
+** sim finished on zn (20may23_A0_zn_sim.json) -->> check output
 
 python -i simdat.py backupcfg/20may23_A0_zn_sim.json
 
@@ -5161,4 +5161,32 @@ animSynWeights(pdf) #
 python -i actmap.py backupcfg/20may23_A0_zn_sim.json
 
 fig, axs, plt = animActivityMaps() # 
+
+** sim finished on falcor (20may24_A0_falcor_sim.json) -->> check output
+
+python -i simdat.py backupcfg/20may24_A0_falcor_sim.json
+
+animSynWeights(pdf) #
+
+python -i actmap.py backupcfg/20may24_A0_falcor_sim.json
+
+fig, axs, plt = animActivityMaps() # 
+
+scp 'samn@falcor.rfmh.org://home/samn/SMARTAgent/gif/20may24_A0_falcor*mp4' ./gif/
+scp samn@falcor.rfmh.org://home/samn/SMARTAgent/backupcfg/20may24_A0_falcor_sim.json ./backupcfg
+
+similar patternt to last simulation run on falcor seen here, with longer time constant for
+eligibility trace (200 ms, compared to original 50 ms), there is less bias/difference between
+weights to EMUP and EMDOWN populations. however probability of move toward/away from ball
+is no better than the 100 ms eligibility trace.
+
+for comparison, worth running a sim with shorter eligibility trace time constants ... (25 ms vs original 50 ms)
+
+will make duration 200 s ...
+
+"name":"20may25_A0_falcor_"
+
+"RLlenhebb":25
+
+./myrun 12 sn.json
 
