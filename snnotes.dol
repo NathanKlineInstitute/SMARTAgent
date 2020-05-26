@@ -5235,3 +5235,25 @@ in firing between the two populations can lead to movement. there's no wide-marg
 ground allowing the paddle to stay still ... could implement that as factor higher rate
 for one population to move ... would at least mean some ability to hold paddle still ... 
 
+*20may26
+** check 20may25_A0_falcor_ output (25 ms tau for rl eligibility trace)
+
+python -i simdat.py backupcfg/20may25_A0_falcor_sim.json
+
+animSynWeights(pdf) # gif/20may25_A0_falcor_weightmap.mp4
+
+drawraster(dspkT,dspkID)
+savefig('gif/20may26_20may25_A0_falcor_rast.png')
+overall rates are ok...
+savefig('gif/20may26_20may25_A0_falcor_rast_b.png')
+too much hypersynch, once in a while...
+
+python -i actmap.py backupcfg/20may25_A0_falcor_sim.json
+
+fig, axs, plt = animActivityMaps() # 
+
+scp 'samn@falcor.rfmh.org://home/samn/SMARTAgent/gif/20may25_A0_falcor*mp4' ./gif/
+scp samn@falcor.rfmh.org://home/samn/SMARTAgent/backupcfg/20may25_A0_falcor_sim.json ./backupcfg
+
+most of the time the weights to EMUP are higher ... so that's effect seen with the shorter time constant ... 
+
