@@ -5218,3 +5218,20 @@ will make duration 200 s ...
 
 ./myrun 12 sn.json
 
+** 20may23_A0_falcor_actmap.mp4 <- does not look as terrible as usual, in terms of performance
+(though many of the usual biases remain)
+20may23_A0_falcor_weightmap.mp4
+
+that's with the 100 ms RL eligiblity trace ... and higher connectivity to EMUP, EMDOWN
+
+there are some sequences where the model hits the ball back a few times in a row ... number of
+hits between points could be another metric but hit vs miss is more basic and still captures that
+
+could compare performance of the model to naive model or one with equal rewards distributed
+randomly over time
+
+other thing to note is that it's difficult for the paddle to remain still, since any difference
+in firing between the two populations can lead to movement. there's no wide-margin / middle
+ground allowing the paddle to stay still ... could implement that as factor higher rate
+for one population to move ... would at least mean some ability to hold paddle still ... 
+
