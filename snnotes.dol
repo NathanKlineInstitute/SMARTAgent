@@ -5257,3 +5257,136 @@ scp samn@falcor.rfmh.org://home/samn/SMARTAgent/backupcfg/20may25_A0_falcor_sim.
 
 most of the time the weights to EMUP are higher ... so that's effect seen with the shorter time constant ... 
 
+** some discussion with ha
+
+10:15
+samn was running different sims over the weekend ... with higher connectivity to M populations
+10:15
+Haroon Anwar so different sims---- any useful results
+10:18
+samn ran with higher connectivity to M populations, and some recurrent connectivity
+sims with longer time constant for eligiliblity trace have less difference in weights to the diff pops - so that's possibly good to avoid bias
+there are some sequences where the model hits the ball back a few times in a row ... number of
+hits between points could be another metric but hit vs miss is more basic and still captures that
+could compare performance of the model to naive model or one with equal rewards distributed
+randomly over time
+other thing to note is that it's difficult for the paddle to remain still, since any difference
+in firing between the two populations can lead to movement. there's no wide-margin / middle
+ground allowing the paddle to stay still ... could implement that as factor higher rate
+for one population to move ... would at least mean some ability to hold paddle still ... or could have a population that specifically encodes "NO MOVE"
+10:21
+Haroon Anwar hard to say which one is better, factor high or separate pop…. probably should try both
+10:21
+better to try factor high firing rate first
+10:23
+samn which better - well, too much bias interferes with performance
+10:23
+even a slight average bias
+10:25
+Haroon Anwar do we have a quantification for that?--- i mean i am trying to understand what kind of biases are we talking about here and what are the origins of those biases
+10:25
+samn quantification - average weight to each  poulation
+10:26
+should also measure time paddle is at each location
+10:26
+seems clear from movies that it stays at top or bottom too much
+10:26
+origin - it's either the weights or a bug
+10:26
+yeah, would be good to look into all of that
+10:27
+Haroon Anwar i agree
+10:27
+samn you were working on the object detection?
+10:28
+Haroon Anwar that was done… was having some issues with movies,
+10:28
+and had hard time testing the accuracy of direction selective neurons
+10:29
+samn done with wider distribution of flow?
+10:29
+Haroon Anwar yes, had done that
+10:29
+samn can you show how it looks?
+10:30
+Haroon Anwar let me see if i can find a movie with wider flow
+10:30
+else i will have to generate one
+10:31
+samn probably useful if width could be a param
+10:31
+Haroon Anwar yes it is
+10:31
+oh but not in json
+10:31
+i can make that too
+10:32
+samn so rates ~same as when using optical flow?
+10:32
+and runtime ~same?
+10:33
+Haroon Anwar it was very similar…. but i was skeptical about the runtime comparison because i noticed things were slow on zn on friday…. but yes looked similar
+10:33
+samn ok sg
+10:34
+param in json - sg
+10:34
+other than that you had idea about topology of M
+10:34
+Haroon Anwar hopefully i will be satisfied with more testing today to move on to topology of M
+10:35
+samn ic, testing of obj detection
+10:35
+Haroon Anwar movies
+10:35
+testing movies
+10:35
+i feel something is off
+10:35
+samn ic
+10:35
+Haroon Anwar i added a frame in the beginning
+10:35
+samn actma or synweight or both
+10:36
+Haroon Anwar actmap
+10:36
+samn ic
+10:36
+ok
+10:36
+Haroon Anwar but for 10000 ms it goes till 99960 ms
+10:36
+samn i'll paste some fo this to games channel so interns can read later ... they're starting next week btw
+10:36
+99960 - ok, so might be off by 1 frame
+10:37
+Haroon Anwar may be — but that makes comparison impossible
+10:37
+samn yeah, should have everything aligned
+10:38
+Haroon Anwar hopefully will be a small thing
+10:38
+samn but single frame for display, don't think will make huge diff, yeah, good to check, thx
+10:38
+especially if means bug in the main sim code
+10:39
+Haroon Anwar everything seems good from sim
+10:41
+samn ic
+
+** last sim completed on zn (20may23_A0_zn_) with hypersynchrony, has poor performance
+for most of its duration and paddle gets stuck on top for majority of time (once
+the hypersynchrony develops) so that's another indicator of origin of bias
+
+** summary from latest sims on falcor
+
+20may22_D0_falcor_sim.json -->> "RLlenhebb":50 <<-- original default
+20may23_A0_falcor_sim.json -->> "RLlenhebb":100 <<-- has lower bias
+20may24_A0_falcor_sim.json -->> "RLlenhebb":200 <<-- has lower bias
+20may25_A0_falcor_sim.json -->> "RLlenhebb":25 <<-- has higher bias
+
+can look at how much time spent at every y position ... but not saving estimated racket and ball positions ... 
+
+
+
