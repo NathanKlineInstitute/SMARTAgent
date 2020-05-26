@@ -68,6 +68,8 @@ def loadInputImages (name=None):
 
 def loadMotionFields (name=None): return pickle.load(open('data/'+getsimname(name)+'MotionFields.pkl','rb'))
 
+def loadObjPos (name=None): return pickle.load(open('data/'+getsimname(name)+'objpos.pkl','rb'))
+
 totalDur = int(dconf['sim']['duration']) # total simulation duration
 
 #

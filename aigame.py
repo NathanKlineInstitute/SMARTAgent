@@ -77,6 +77,7 @@ class AIGame:
     self.courtYRng = (34, 194) # court y range
     self.courtXRng = (20, 140) # court x range
     self.racketXRng = (141, 144) # racket x range
+    self.dObjPos = {'racket':[], 'ball':[]}
     self.last_obs = [] # previous observation
     self.last_ball_dir = 0 # last ball direction
     self.FullImages = [] # full resolution images from game environment
@@ -132,7 +133,8 @@ class AIGame:
       ang[mag == 0] = -100
       goodInds = np.zeros(shape=(self.dirSensitiveNeuronDim,self.dirSensitiveNeuronDim))
     else:
-      dirX, dirY = getObjectMotionDirection(self.objects, self.last_objects, rects, dims=np.shape(cimage)[0],FlowWidth=8)
+      dirX, dirY = getObjectMotionDirection(self.objects, self.last_objects, rects, dims=np.shape(cimage)[0],\
+                                            FlowWidth=dconf['DirectionDetectionAlgo']['FlowWidth'])
       if np.shape(cimage)[0] != self.dirSensitiveNeuronDim or np.shape(cimage)[1] != self.dirSensitiveNeuronDim:
         dirX = resize(dirX, (self.dirSensitiveNeuronDim, self.dirSensitiveNeuronDim), anti_aliasing=True)
         dirY = resize(dirY, (self.dirSensitiveNeuronDim, self.dirSensitiveNeuronDim), anti_aliasing=True)
@@ -192,7 +194,7 @@ class AIGame:
 
   def playGame (self, actions, epCount): #actions need to be generated from motor cortex
     # PLAY GAME
-    rewards = []; proposed_actions =[]; total_hits = []; Images = []; Ball_pos = []; Racket_pos = []
+    rewards = []; proposed_actions =[]; total_hits = []; Images = []
     input_dim = self.input_dim
     done = False
     courtYRng, courtXRng, racketXRng = self.courtYRng, self.courtXRng, self.racketXRng # coordinate ranges for different objects (PONG-specific)    
@@ -228,8 +230,8 @@ class AIGame:
         elif ypos_Ball==-1: #guess about proposed move can't be made because ball was not visible in the court
           proposed_action = -1 #no valid action guessed
         #self.FullImages.append(np.sum(self.last_obs[courtYRng[0]:courtYRng[1],:,:],2))
-        Ball_pos.append([courtXRng[0]-1+xpos_Ball,ypos_Ball])
-        Racket_pos.append([racketXRng[0]-1+xpos_Racket,ypos_Racket])
+        self.dObjPos['ball'].append([courtXRng[0]-1+xpos_Ball,ypos_Ball])
+        self.dObjPos['racket'].append([racketXRng[0]-1+xpos_Racket,ypos_Racket])
       else:
         proposed_action = -1 #if there is no last_obs
         ypos_Ball = -1 #if there is no last_obs, no position of ball
@@ -296,9 +298,9 @@ class AIGame:
       if len(lobs_gimage_ds)>0:
         dsum_Images = np.maximum(dsum_Images,lobs_gimage_ds)
     if dconf['DirectionDetectionAlgo']['OpticFlow']:
-      self.computeMotionFields() # compute the motion fields
+      self.computeMotionFields(UseFull=dconf['DirectionDetectionAlgo']['UseFull']) # compute the motion fields
     elif dconf['DirectionDetectionAlgo']['CentroidTracker']:
-      self.computeAllObjectsMotionDirections(UseFull=True) # compute the motion field using CetroidTracking
+      self.computeAllObjectsMotionDirections(UseFull=dconf['DirectionDetectionAlgo']['UseFull']) # compute the motion field using CetroidTracking
     self.updateDirSensitiveRates() # update motion sensitive neuron input rates
 
     if done: # done means that 1 episode of the game finished, so the environment needs to be reset. 
@@ -310,5 +312,5 @@ class AIGame:
       print('ERROR COMPUTING NUMBER OF HITS')
     for r in range(len(rewards)):
       if rewards[r]==-1: total_hits[r]=-1 #when the ball misses the racket, the reward is -1
-    return rewards, epCount, proposed_actions, total_hits, Racket_pos, Ball_pos
+    return rewards, epCount, proposed_actions, total_hits
             
