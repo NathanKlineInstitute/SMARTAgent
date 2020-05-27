@@ -102,6 +102,19 @@ def drawraster (dspkT,dspkID,tlim=None,msz=2):
   ax=gca()
   ax.legend(handles=lpatch,handlelength=1,loc='best')
 
+#
+def drawcellVm (simConfig):
+  csm=cm.ScalarMappable(cmap=cm.prism); csm.set_clim(0,len(dspkT.keys()))
+  lclr = []; lpop = []
+  for kdx,k in enumerate(list(simConfig['simData']['V_soma'].keys())):  
+    color = csm.to_rgba(kdx); lclr.append(color)
+    lpop.append(simConfig['net']['cells'][int(k.split('_')[1])]['tags']['cellType'])
+  for kdx,k in enumerate(list(simConfig['simData']['V_soma'].keys())):
+    plot(simConfig['simData']['t'],simConfig['simData']['V_soma'][k],color=lclr[kdx])
+  lpatch = [mpatches.Patch(color=c,label=s) for c,s in zip(lclr,lpop)]
+  ax=gca()
+  ax.legend(handles=lpatch,handlelength=1,loc='best')    
+  
 #  
 def plotFollowBall (actreward, ax=None,msz=1):
   if ax is None: ax = gca()

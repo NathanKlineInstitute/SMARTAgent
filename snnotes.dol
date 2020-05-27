@@ -5514,3 +5514,42 @@ firing rates getting too high ... should lower min and max weights ...
 
 may help stability and avoiding bias ... ?
 
+*20may27
+** make movies/check output from full 20may26_A0_falcor_ 
+
+python -i simdat.py backupcfg/20may26_A0_falcor_sim.json
+
+drawraster(dspkT,dspkID)
+savefig('gif/20may27_20may26_A0_falcor_rast_a.png')
+decent overall rates
+savefig('gif/20may27_20may26_A0_falcor_rast_b.png')
+but overly synchronous ... 
+
+animSynWeights(pdf) # gif/20may26_A0_falcor_weightmap.mp4
+
+check cells too ...
+
+simConfig['simData'].keys()
+dict_keys(['spkt', 'spkid', 'V_soma', 't', 'dminID', 'avgRate'])
+
+simConfig['simData']['V_soma'].keys()
+dict_keys(['cell_0', 'cell_900', 'cell_4359', 'cell_400', 'cell_4759', 'cell_500', 'cell_4100', 'cell_5159'])
+
+len(simConfig['simData']['V_soma']['cell_0'])
+
+plot(simConfig['simData']['t'],simConfig['simData']['V_soma']['cell_0'])
+savefig('gif/20may27_20may26_A0_falcor_cell_0_V.png')
+
+simConfig['net']['cells'][0]
+
+drawcellVm(simConfig); xlim((190e3,200e3))
+savefig('gif/20may27_20may26_A0_falcor_cellVm.png')
+
+looks mostly ok, no depolarization blockade ... though a lot of synchrony between different types
+and very strong osc. - that could prevent good performance...if everything time-locked into
+hypersynch osc.
+
+python -i actmap.py backupcfg/20may26_A0_falcor_sim.json
+
+dobjpos = loadObjPos(); fig, axs, plt = animActivityMaps(dobjpos=dobjpos) # 
+
