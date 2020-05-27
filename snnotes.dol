@@ -5624,3 +5624,10 @@ still bias in positions ... at both extremes ...
 
 fig, axs, plt = animActivityMaps(dobjpos=None) # 
 
+while making adjustments to model can continue this one ...
+
+    "simtype": {"ResumeSim":1,"ResumeSimFromFile":"data/20may26_B0_falcor_synWeights.pkl"},        
+"name":"20may27_B1_falcor_"
+
+./myrun 12 sn.json
+
