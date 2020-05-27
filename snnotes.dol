@@ -5553,3 +5553,74 @@ python -i actmap.py backupcfg/20may26_A0_falcor_sim.json
 
 dobjpos = loadObjPos(); fig, axs, plt = animActivityMaps(dobjpos=dobjpos) # 
 
+frame t =  199800
+frame t =  199820
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+  File "actmap.py", line 155, in animActivityMaps
+    ani.save(outpath, writer=writer); print('saved animation to', outpath)
+  File "/home/samn/miniconda3/lib/python3.7/site-packages/matplotlib/animation.py", line 1199, in save
+    anim._draw_next_frame(d, blit=False)
+  File "/home/samn/miniconda3/lib/python3.7/site-packages/matplotlib/animation.py", line 1236, in _draw_next_frame
+    self._draw_frame(framedata)
+  File "/home/samn/miniconda3/lib/python3.7/site-packages/matplotlib/animation.py", line 1772, in _draw_frame
+    self._drawn_artists = self._func(framedata, *self._args)
+  File "actmap.py", line 149, in updatefig
+    lobjx,lobjy = [objfctr*dobjpos[k][t,0] for k in dobjpos.keys()], [objfctr*dobjpos[k][t,1] for k in dobjpos.keys()]
+  File "actmap.py", line 149, in <listcomp>
+    lobjx,lobjy = [objfctr*dobjpos[k][t,0] for k in dobjpos.keys()], [objfctr*dobjpos[k][t,1] for k in dobjpos.keys()]
+IndexError: index 9991 is out of bounds for axis 0 with size 9991
+>>> len(dobjpos['racket'])
+9991
+
+hmm...positions must not be recorded for every step... definitely not for first few time steps
+but apparently 9 positions not recorded (9*20 + 199820) == 200000
+
+will draw without positions for now ... 
+
+#
+clf()
+subplot(1,2,1); xlabel('Racket X position')
+hist(dobjpos['racket'][:,0])
+subplot(1,2,2); xlabel('Racket Y position')
+hist(dobjpos['racket'][:,1])
+
+savefig('gif/20may27_20may26_A0_falcor_racketposhist_b.png') # <<-- shows a lot of bias towards one y position
+
+fig, axs, plt = animActivityMaps(dobjpos=None) # 
+
+** make movies/check output from 20may26_B0_falcor_ 
+
+python -i simdat.py backupcfg/20may26_B0_falcor_sim.json
+
+drawraster(dspkT,dspkID)
+savefig('gif/20may27_20may26_B0_falcor_rast_a.png')
+xlim((190e3,200e3))
+not much going on in beginning of simulation
+savefig('gif/20may27_20may26_B0_falcor_rast_b.png')
+then becomes more synchronized, but not continuously
+
+drawcellVm(simConfig); xlim((190e3,200e3))
+savefig('gif/20may27_20may26_B0_falcor_cellVm.png')
+
+animSynWeights(pdf) # gif/20may26_B0_falcor_weightmap.mp4
+
+hmm, there's more of a difference between the synaptic weights to the two M populations here
+not sure this model is performing better than previous with optical flow ... 
+
+python -i actmap.py backupcfg/20may26_B0_falcor_sim.json
+
+dobjpos = loadObjPos()
+
+#
+clf()
+subplot(1,2,1); xlabel('Racket X position')
+hist(dobjpos['racket'][:,0])
+subplot(1,2,2); xlabel('Racket Y position')
+hist(dobjpos['racket'][:,1])
+
+savefig('gif/20may27_20may26_B0_falcor_racketposhist_b.png') # 
+still bias in positions ... at both extremes ...
+
+fig, axs, plt = animActivityMaps(dobjpos=None) # 
+
