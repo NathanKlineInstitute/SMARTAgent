@@ -2608,3 +2608,8 @@ neurons... but having additional recurrent connectivity in EM might still allow 
 *** In computeMotionFields, append zero-valued arrays for all except ang and thang, where 0 were replaced with -100 to avoid 0 considered as movement towards 0 degrees i.e. E.
 *** test sim using optic flow in file "20may22_A_"
 **** "EEMWghtAM":0.000025,"EEMWghtNM":0.0000025,"EEMWghtThreshMin":0.000025,"EEMWghtThreshMax":0.000075,"EEMProb":0.3,"EEMRecProb":0.0,"EEMPopNorm":0
+
+*20may27
+** Needs to confirm: 1) actmap movie is accurate. 2) direction selective neurons are activated properly in both optic flow and centroid tracking cases.
+*** add UseFull in sim configuration: "DirectionDetectionAlgo":{"CentroidTracker":0,"OpticFlow":1,"UseFull":0}, For Optic flow set UseFull = 0
+*** test sim (2 sec) using optic flow in file "20may27_A0_"
