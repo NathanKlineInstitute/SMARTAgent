@@ -5503,6 +5503,13 @@ looks decent ... can run longer ...
 
 ./myrun 12 sn.json
 
+firing rates getting too high ... should lower min and max weights ...
+"name":"20may26_B0_falcor_"
+"EEMWghtAM":0.00004,"EEMWghtNM":0.0000025,"EEMWghtThreshMin":0.00002,"EEMWghtThreshMax":0.00008,"EEMProb":0.3,"EEMRecProb":0.1,"EEMPopNorm":0
+"wbase":0.0000001,"wmax":0.00012
+
+./myrun 12 sn.json
+
 ** setup rule for larger firing rates (by factor, prior to movement) ?
 
 may help stability and avoiding bias ... ?
