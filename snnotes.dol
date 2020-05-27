@@ -5631,3 +5631,59 @@ while making adjustments to model can continue this one ...
 
 ./myrun 12 sn.json
 
+** add dconf['movefctr'] to require margin between EM pop rates for move generation
+
+default can be 1.0 to have same activity
+uses this logic:
+        if F_UPs[ts]>F_DOWNs[ts] * dconf['movefctr']:
+          actions.append(dconf['moves']['UP'])
+        elif F_DOWNs[ts]>F_UPs[ts] * dconf['movefctr']:
+          actions.append(dconf['moves']['DOWN'])
+        else:
+          actions.append(dconf['moves']['NOMOVE']) # No move        
+
+start weights higher than sim on falcor to see if any moves:
+"EEMWghtAM":0.00006
+
+testing this on laptop first ... 
+
+myrun 12 sn.json
+
+  Done; run time = 1176.29 s; real-time ratio: 0.00.
+
+Analyzing...
+  Cells: 5359
+  Connections: 0 (0.00 per cell)
+  Spikes: 32154 (1.20 Hz)
+  Simulated time: 5.0 s; 12 workers
+  Run time: 1176.29 s
+Saving output as data/20may27_C0_laptop_simConfig.pkl ... 
+Finished saving!
+  Done; saving time = 1.66 s.
+
+python -i simdat.py backupcfg/20may27_C0_laptop_sim.json
+
+drawraster(dspkT,dspkID)
+savefig('gif/20may27_C0_rast_a.png')
+less firing for EM pops
+
+drawcellVm(simConfig); 
+savefig('gif/20may27_C0_laptop_cellVm.png')
+
+animSynWeights(pdf) # 
+
+python -i actmap.py backupcfg/20may27_C0_laptop_sim.json
+
+dobjpos = loadObjPos()
+
+#
+subplot(1,2,1); xlabel('Racket X position'); hist(dobjpos['racket'][:,0])
+subplot(1,2,2); xlabel('Racket Y position'); hist(dobjpos['racket'][:,1])
+
+savefig('gif/20may27_C0_laptop_racketposhist_b.png') # 
+some bias, also stuck in middle (no moves)
+
+fig, axs, plt = animActivityMaps(dobjpos=None) # gif/20may27_C0_laptop_actmap.mp4
+
+well, certainly less movement ... 
+
