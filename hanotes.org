@@ -2687,3 +2687,8 @@ unset __conda_setup
 --- testing sims on falcor
 -- ran 2 sec sim with optical flow named 20may27_A0_
 -- running 2 sec sim with centroid tracking named 20may27_A1_
+-- both sims successful---actmap movies copied to local drive SMARTAgent/gif/ using
+scp hanwar@falcor.rfmh.org://home/hanwar/GamesProject/SMARTAgent/gif/* Documents/NKI-modeling/SMARTAgent/gif/
+-- run 100 sec sim with centroid tracking and flowwidth of 16 and using these parameters
+"EEMWghtAM":0.00005,"EEMWghtNM":0.0000025,"EEMWghtThreshMin":0.00005,"EEMWghtThreshMax":0.0001,"EEMProb":0.3,"EEMRecProb":0.1,"EEMPopNorm":0
+save results in file 20may28_A0_
