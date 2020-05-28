@@ -60,7 +60,7 @@ def loadsimdat (name=None):
   global totalDur, tstepPerAction
   name = getsimname(name)
   print('loading data from', name)
-  conf.dconf = readconf('backupcfg/'+name+'sim.json')
+  conf.dconf = conf.readconf('backupcfg/'+name+'sim.json')
   simConfig = pickle.load(open('data/'+name+'simConfig.pkl','rb'))
   dstartidx = {p:simConfig['net']['pops'][p]['cellGids'][0] for p in simConfig['net']['pops'].keys()} # starting indices for each population
   dendidx = {p:simConfig['net']['pops'][p]['cellGids'][-1] for p in simConfig['net']['pops'].keys()} # ending indices for each population
