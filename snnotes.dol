@@ -5734,3 +5734,13 @@ animSynWeights(pdf) #
 python -i actmap.py  backupcfg/20may26_A0_zn_sim.json
 
 fig, axs, plt = animActivityMaps(dobjpos=None) # gif/20may27_20may26_A0_zn_actmap.mp4
+
+*20may28
+** check output from 20may27_B1_falcor_
+
+python -i simdat.py backupcfg/20may27_B1_falcor_sim.json
+
+
+
+** check output from 20may27_D0_movefctr_1.25_falcor_
+
