@@ -13,12 +13,12 @@ import matplotlib.gridspec as gridspec
 import matplotlib.patches as mpatches
 from collections import OrderedDict
 from imgutils import getoptflow, getoptflowframes
+from connUtils import gid2pos
 
 ion()
 
 rcParams['font.size'] = 12
-
-global stepNB
+tl=tight_layout
 stepNB = -1
 totalDur = int(dconf['sim']['duration']) # total simulation duration
 
@@ -73,6 +73,8 @@ def loadsimdat (name=None):
   for pop in simConfig['net']['pops'].keys():
     dspkID[pop] = spkID[(spkID >= dstartidx[pop]) & (spkID <= dendidx[pop])]
     dspkT[pop] = spkT[(spkID >= dstartidx[pop]) & (spkID <= dendidx[pop])]
+  ###################################################################################################################
+  ## could separate this part into another function to get input images and activity maps
   InputImages = loadInputImages(dconf['sim']['name'])
   ldflow = loadMotionFields(dconf['sim']['name'])
   totalDur = int(dconf['sim']['duration'])
@@ -82,7 +84,8 @@ def loadsimdat (name=None):
           'EMDOWN','EMUP']
   t1 = range(0,totalDur,tstepPerAction)
   t2 = range(tstepPerAction,totalDur+tstepPerAction,tstepPerAction)  
-  dact = {pop:generateActivityMap(t1, t2, dspkT[pop], dspkID[pop], dnumc[pop], dstartidx[pop]) for pop in lpop}  
+  dact = {pop:generateActivityMap(t1, t2, dspkT[pop], dspkID[pop], dnumc[pop], dstartidx[pop]) for pop in lpop}
+  ###################################################################################################################
   return simConfig, pdf, actreward, dstartidx, dendidx, dnumc, dspkID, dspkT, InputImages, ldflow, dact
 
 #
@@ -158,6 +161,7 @@ def animActivityMaps (outpath='gif/'+dconf['sim']['name']+'actmap.mp4', framerat
           ddat['objpos'].set_data(lobjx,lobjy)        
         idx += 1
     return fig
+  t1 = range(0,totalDur,tstepPerAction)
   ani = animation.FuncAnimation(fig, updatefig, interval=1, frames=len(t1)-1)
   writer = anim.getwriter(outpath, framerate=framerate)
   ani.save(outpath, writer=writer); print('saved animation to', outpath)
@@ -211,6 +215,7 @@ def animInput (InputImages, outpath, framerate=10, figsize=None, showflow=True, 
       else:
         ddat[ldx].set_UVC(ldflow[t-1]['thflow'][:,:,0],-ldflow[t]['thflow'][:,:,1])        
     return fig
+  t1 = range(0,totalDur,tstepPerAction)
   nframe = len(t1)
   if showflow: nframe-=1
   ani = animation.FuncAnimation(fig, updatefig, interval=1, frames=nframe)
@@ -374,12 +379,12 @@ def plotFollowBall (actreward, ax=None,msz=1):
   punishingActions = np.cumsum(np.where((actionvsproposed>0) | (actionvsproposed<0),1,0)) 
   cumActs = np.array(range(1,len(actionvsproposed)+1))
   Hit_Missed = np.array(actreward.hit)
-  ax.plot([0,np.max(action_times)],[0.5,0.5],'--',color='gray')
   ax.plot(action_times,np.divide(rewardingActions,cumActs),'r.',markersize=msz)
   ax.plot(action_times,np.divide(punishingActions,cumActs),'b.',markersize=msz)
   ax.set_xlim((0,np.max(action_times)))
   ax.set_ylim((0,1))
   ax.legend(('Follow Ball','Not Follow'),loc='best')
+  ax.plot([0,np.max(action_times)],[0.5,0.5],'--',color='gray')  
   ax.set_xlabel('Time (ms)'); ax.set_ylabel('Probability')
 
 #  
@@ -754,6 +759,34 @@ def plotSynWeightsPostNeuronID(pdf,postNeuronID):
       xlim((0,simConfig['simConfig']['duration']))
       pdx += 1        
 
+#
+def getinputmap (pdf, t, prety, postid, poty, dnumc, dstartidx, dendidx):
+  nrow = ncol = int(np.sqrt(dnumc[poty]))
+  rfmap = np.zeros((nrow,ncol))
+  pdfs = pdf[(pdf.postid==postid) & (pdf.preid>dstartidx[prety]) & (pdf.preid<=dendidx[prety]) & (pdf.time==t)]
+  if len(pdfs) < 1: return rfmap
+  for idx in pdfs.index:
+    preid = int(pdfs.at[idx,'preid'])
+    x,y = gid2pos(dnumc[prety], dstartidx[prety], preid)
+    rfmap[y,x] += 1
+  return rfmap
+
+#
+def getallinputmaps (pdf, t, postid, poty, dnumc, dstartidx, dendidx, lprety = ['EV1DNW', 'EV1DN', 'EV1DNE', 'EV1DW', 'EV1','EV1DE','EV1DSW', 'EV1DS', 'EV1DSE']):
+  # gets all input maps onto postid
+  return {prety:getinputmap(pdf, t, prety, postid, poty, dnumc, dstartidx, dendidx) for prety in lprety}
+
+#
+def plotallinputmaps (pdf, t, postid, poty, dnumc, dstartidx, dendidx, lprety=['EV1DNW', 'EV1DN', 'EV1DNE', 'EV1DW', 'EV1','EV1DE','EV1DSW', 'EV1DS', 'EV1DSE']):
+  drfmap = getallinputmaps(pdf, t, postid, poty, dnumc, dstartidx, dendidx, lprety)
+  for tdx,prety in enumerate(lprety):
+    subplot(3,3,tdx+1)
+    imshow(drfmap[prety],cmap='gray',origin='upper');
+    title(prety+'->'+poty+str(postid));
+  return drfmap
+  
+  
+      
 if __name__ == '__main__':
   stepNB = -1
   if len(sys.argv) > 1:

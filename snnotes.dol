@@ -5740,7 +5740,164 @@ fig, axs, plt = animActivityMaps(dobjpos=None) # gif/20may27_20may26_A0_zn_actma
 
 python -i simdat.py backupcfg/20may27_B1_falcor_sim.json
 
+reading  backupcfg/20may27_B1_falcor_sim.json
+-1
+loading data from 20may27_B1_falcor_
+loading input images from data/20may27_B1_falcor_InputImages.txt
+loaded simulation data
 
+#
+plotFollowBall(actreward,ax=subplot(1,3,1),msz=3); ylim((0,.51))
+plotHitMiss(actreward,ax=subplot(1,3,2),msz=3); ylim((0,120)); 
+plotRewards(actreward,ax=subplot(1,3,3),msz=3); 
+
+savefig('gif/20may28_20may27_B1_falcor_behav_a0.png')
+
+drawraster(dspkT,dspkID)
+xlim((190e3,200e3))
+savefig('gif/20may28_20may27_B1_falcor_rast_a1.png')
+
+drawcellVm(simConfig); xlim((190e3,200e3))
+savefig('gif/20may28_20may27_B1_falcor_cellVm_a2.png')
+
+everything looks ok except for performance ... 
+
+fig, axs, plt = animActivityMaps()
+
+#
+dobjpos = loadObjPos()
+subplot(1,2,1); xlabel('Racket X position'); hist(dobjpos['racket'][:,0])
+subplot(1,2,2); xlabel('Racket Y position'); hist(dobjpos['racket'][:,1])
+
+savefig('gif/20may28_20may27_B1_falcor_racket_pos_hist_a3.png')
+
+is there any stability to the weights over time?
+can take a few synapses and see how they vary ... whether there's a similar pattern
+
+pdf.columns
+Index(['time', 'preid', 'postid', 'weight'], dtype='object')
+
+dstartidx['EMUP'] # 4759
+dendidx['EMUP'] # 5158
+pdfs = pdf[pdf.postid==4759]
+len(pdfs) # 23160
+pdfs.at[pdfs.index[0],'preid'] # 528
+
+dstartidx['EV1'] # 500
+dendidx['EV1'] # 899
+
+pdfs = pdf[(pdf.postid==4759) & (pdf.preid==528)]
+len(pdfs) # 20
+
+plot(pdfs.time,pdfs.weight,'k')
+savefig('gif/20may28_20may27_B1_falcor_synweight_a4.png')
+rises, then decays ...
+
+postid = dstartidx['EMUP']
+pdfs = pdf[(pdf.postid==postid) & (pdf.preid>dstartidx['EV1']) & (pdf.preid<=dendidx['EV1'])]
+lpreid = pdfs.preid
+len(lpreid) # 2400
+
+connectLayerswithOverlap in connUtils.py
+cells seem to be arranged in square with first index as row and second as column
+so that gives the coordinates based on gid ... ? 
+
+dnumc['ER'] # 400
+dstartidx['ER'] # 0
+dendidx['ER'] # 399
+
+lx,ly=[],[]
+for gid in range(dstartidx['ER'],dendidx['ER']+1,1):
+  x,y = gid2pos(dnumc['ER'], dstartidx['ER'], gid)
+  lx.append(x)
+  ly.append(y)
+
+lx
+[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
+ly
+[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19]
+>>> 
+
+works ok when the grid is evenly spaced and each neuron occupies a point ... so could use it to map ER, EV1, and direction
+selective RFs ... all populations which have 400 neurons ... for V4 and MT and the interneurons will have to adjust scale
+
+postid = dstartidx['EMUP']
+pdfs = pdf[(pdf.postid==postid) & (pdf.preid>dstartidx['EV1']) & (pdf.preid<=dendidx['EV1'])]
+lpreid = pdfs.preid
+
+rfmap = getinputmap(pdf, pdf.time[0], 'EV1', dstartidx['EMUP'], 'EMUP', dnumc, dstartidx, dendidx)
+
+imshow(rfmap,cmap='gray',origin='upper')
+colorbar()
+savefig('gif/20may28_20may27_B1_falcor_rfmap_a5.png')
+ok, that EMUP neuron gets pretty broad coverage ... (white pixels where it gets input from EV1)
+
+lrfmap = [getinputmap(pdf, pdf.time[0], 'EV1', postid, 'EMUP', dnumc, dstartidx, dendidx) for postid in range(dstartidx['EMUP'],dendidx['EMUP']+1,1)]
+
+len(lrfmap) # 400
+
+nprfmap = np.array(lrfmap)
+nprfmap.shape # (400, 20, 20)
+imshow(np.sum(nprfmap,axis=0),cmap='gray',origin='upper'); colorbar()
+savefig('gif/20may28_20may27_B1_falcor_rfmap_a6.png')
+hmm, one pixel always empty ... but otherwise, as a population EMUP has full coverage of visual space from EV1 inputs...
+
+lprety = ['EV1DNW', 'EV1DN', 'EV1DNE', 'EV1DW', 'EV1','EV1DE','EV1DSW', 'EV1DS', 'EV1DSE']
+drfmap = {prety:getinputmap(pdf, pdf.time[0], prety, dstartidx['EMUP'], 'EMUP', dnumc, dstartidx, dendidx) for prety in lprety}
+
+#
+for tdx,prety in enumerate(lprety):
+  subplot(3,3,tdx+1)
+  imshow(drfmap[prety],cmap='gray',origin='upper'); title(prety+'->EMUP0'); 
+
+savefig('gif/20may28_20may27_B1_falcor_rfmap_a7.png')
+
+so, somewhat broad coverage. but which locations have info about intensity and all directions? 
+
+drfmap = plotallinputmaps(pdf, pdf.time[0], dstartidx['EMUP'] + 0, 'EMUP', dnumc, dstartidx, dendidx, lprety)
+drfmap = plotallinputmaps(pdf, pdf.time[0], dstartidx['EMUP'] + 1, 'EMUP', dnumc, dstartidx, dendidx, lprety)
+
+lmap = [drfmap[x] for x in drfmap.keys()]
+mask = lmap[0]
+for i in range(1,len(lmap),1): mask = np.logical_and(mask, lmap[i])
+np.amax(mask) # False
+
+lmap = np.array(lmap)
+nps = np.sum(lmap,axis=0)
+imshow(nps,cmap='gray',origin='upper')
+colorbar()
+savefig('gif/20may28_20may27_B1_falcor_rfmap_a8.png')
+some locations have lot of info, others not ... 
+
+np.amin(nps), np.amax(nps), mean(nps) # (0.0, 7.0, 2.695)
+so average has ~2.7/9 of total info, which is ~1/3 ... which is around EEMProb of 0.3
+so the recurrent connectivity becomes important for making decisions ... right now EEMRecProb was at 0.1
+could make it higher ... 
 
 ** check output from 20may27_D0_movefctr_1.25_falcor_
 
+python -i simdat.py backupcfg/20may27_D0_movefctr_1.25_falcor_sim.json
+
+
+#
+plotFollowBall(actreward,ax=subplot(1,3,1),msz=3); ylim((0,.51))
+plotHitMiss(actreward,ax=subplot(1,3,2),msz=3); ylim((0,120)); 
+plotRewards(actreward,ax=subplot(1,3,3),msz=3); 
+
+savefig('gif/20may28_20may27_D0_movefctr_1.25_falcor_a0.png')
+
+drawraster(dspkT,dspkID); xlim((190e3,200e3))
+savefig('gif/20may28_20may27_D0_movefctr_1.25_falcor_rast_a1.png')
+
+drawcellVm(simConfig); xlim((190e3,200e3))
+savefig('gif/20may28_20may27_D0_movefctr_1.25_falcor_cellVm_a2.png')
+
+#
+dobjpos = loadObjPos()
+subplot(1,2,1); xlabel('Racket X position'); hist(dobjpos['racket'][:,0])
+subplot(1,2,2); xlabel('Racket Y position'); hist(dobjpos['racket'][:,1])
+
+savefig('gif/20may28_20may27_D0_movefctr_1.25_falcor_racket_pos_hist_a3.png')
+still a large bias in positions ... 
+
+fig, axs, plt = animActivityMaps()

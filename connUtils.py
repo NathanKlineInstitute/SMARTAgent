@@ -1,17 +1,25 @@
 # neuronal network connection functions
 import numpy as np
 
+#
+def gid2pos (numc, startgid, gid):
+  nrow = ncol = int(np.sqrt(numc))
+  y = int((gid - startgid) / nrow)
+  x = (gid - startgid) % ncol
+  return (x,y)
+
 def prob2conv (prob, npre):
   # probability to convergence; prob is connection probability, npre is number of presynaptic neurons
   return int(0.5 + prob * npre)
 
-def connectOnePreNtoOneMNeuron (NBNeurons,offset_pre,offset_post): #this method is used to generate list of connections between preSynNeurons and motor neurons.
-    blist = []
-    for i in range(NBNeurons):
-        preN = i+offset_pre
-        postN = i+offset_post
-        blist.append([preN,postN])
-    return blist
+def connectOnePreNtoOneMNeuron (NBNeurons,offset_pre,offset_post):
+  #this method is used to generate list of connections between preSynNeurons and motor neurons.
+  blist = []
+  for i in range(NBNeurons):
+    preN = i+offset_pre
+    postN = i+offset_post
+    blist.append([preN,postN])
+  return blist
   
 def connectLayerswithOverlap (NBpreN, NBpostN, overlap_xdir):
     #NBpreN = 6400 	#number of presynaptic neurons
