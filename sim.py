@@ -830,10 +830,12 @@ def trainAgent (t):
       for ts in range(int(dconf['actionsPerPlay'])): fid4.write('\t%0.1f' % F_DOWNs[ts])
       fid4.write('\n')
       actions = []
+      movefctr=1.0
+      if 'movefctr' in dconf: movefctr=dconf['movefctr']
       for ts in range(int(dconf['actionsPerPlay'])):
-        if F_UPs[ts]>F_DOWNs[ts]:
+        if F_UPs[ts]>F_DOWNs[ts] * movefctr:
           actions.append(dconf['moves']['UP'])
-        elif F_DOWNs[ts]>F_UPs[ts]:
+        elif F_DOWNs[ts]>F_UPs[ts] * movefctr:
           actions.append(dconf['moves']['DOWN'])
         else:
           actions.append(dconf['moves']['NOMOVE']) # No move        

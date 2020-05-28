@@ -2,18 +2,25 @@ import numpy as np
 from pylab import *
 import pickle
 import pandas as pd
+import conf
 from conf import dconf
 import os
 import sys
 import anim
+import matplotlib.pyplot as plt
 from matplotlib import animation
 import matplotlib.gridspec as gridspec
 import matplotlib.patches as mpatches
+from collections import OrderedDict
+from imgutils import getoptflow, getoptflowframes
+from connUtils import gid2pos
 
 ion()
 
-global stepNB
+rcParams['font.size'] = 12
+tl=tight_layout
 stepNB = -1
+totalDur = int(dconf['sim']['duration']) # total simulation duration
 
 def readweightsfile2pdf (fn):
   # read the synaptic plasticity weights saved as a dictionary into a pandas dataframe  
@@ -35,11 +42,25 @@ def getsimname (name=None):
     if stepNB is -1: name = dconf['sim']['name']
     elif stepNB > -1: name = dconf['sim']['name'] + '_step_' + str(stepNB) + '_'
   return name
-  
+
+def generateActivityMap(t1, t2, spkT, spkID, numc, startidx):
+  sN = int(np.sqrt(numc))
+  Nact = np.zeros(shape=(len(t1),sN,sN)) # Nact is 3D array of number of spikes, indexed by: time, y, x
+  for i in range(sN):
+    for j in range(sN):
+      cNeuronID = j+(i*sN) + startidx
+      cNeuron_spkT = spkT[spkID==cNeuronID]
+      for t in range(len(t1)):
+        cbinSpikes = cNeuron_spkT[(cNeuron_spkT>t1[t]) & (cNeuron_spkT<=t2[t])]
+        Nact[t][i][j] = len(cbinSpikes)
+  return Nact
+
 def loadsimdat (name=None):
   # load simulation data
+  global totalDur, tstepPerAction
   name = getsimname(name)
   print('loading data from', name)
+  conf.dconf = conf.readconf('backupcfg/'+name+'sim.json')
   simConfig = pickle.load(open('data/'+name+'simConfig.pkl','rb'))
   dstartidx = {p:simConfig['net']['pops'][p]['cellGids'][0] for p in simConfig['net']['pops'].keys()} # starting indices for each population
   dendidx = {p:simConfig['net']['pops'][p]['cellGids'][-1] for p in simConfig['net']['pops'].keys()} # ending indices for each population
@@ -51,8 +72,243 @@ def loadsimdat (name=None):
   dspkID,dspkT = {},{}
   for pop in simConfig['net']['pops'].keys():
     dspkID[pop] = spkID[(spkID >= dstartidx[pop]) & (spkID <= dendidx[pop])]
-    dspkT[pop] = spkT[(spkID >= dstartidx[pop]) & (spkID <= dendidx[pop])]    
-  return simConfig, pdf, actreward, dstartidx, dendidx, dnumc, dspkID, dspkT
+    dspkT[pop] = spkT[(spkID >= dstartidx[pop]) & (spkID <= dendidx[pop])]
+  ###################################################################################################################
+  ## could separate this part into another function to get input images and activity maps
+  InputImages = loadInputImages(dconf['sim']['name'])
+  ldflow = loadMotionFields(dconf['sim']['name'])
+  totalDur = int(dconf['sim']['duration'])
+  tstepPerAction = dconf['sim']['tstepPerAction'] # time step per action (in ms)
+  lpop = ['ER', 'EV1', 'EV4', 'EMT', 'IR', 'IV1', 'IV4', 'IMT',\
+          'EV1DW','EV1DNW', 'EV1DN', 'EV1DNE','EV1DE','EV1DSW', 'EV1DS', 'EV1DSE',\
+          'EMDOWN','EMUP']
+  t1 = range(0,totalDur,tstepPerAction)
+  t2 = range(tstepPerAction,totalDur+tstepPerAction,tstepPerAction)  
+  dact = {pop:generateActivityMap(t1, t2, dspkT[pop], dspkID[pop], dnumc[pop], dstartidx[pop]) for pop in lpop}
+  ###################################################################################################################
+  return simConfig, pdf, actreward, dstartidx, dendidx, dnumc, dspkID, dspkT, InputImages, ldflow, dact
+
+#
+def animActivityMaps (outpath='gif/'+dconf['sim']['name']+'actmap.mp4', framerate=10, figsize=(18,10), dobjpos=None):
+  # plot activity in different layers as a function of input images  
+  ioff()
+  if figsize is not None: fig, axs = plt.subplots(4, 5, figsize=figsize);
+  else: fig, axs = plt.subplots(4, 5);
+  lax = axs.ravel()
+  cbaxes = fig.add_axes([0.95, 0.4, 0.01, 0.2]) 
+  ltitle = ['Input Images', 'Excit R', 'Excit V1', 'Excit V4', 'Excit MT', 'Inhib R', 'Inhib V1', 'Inhib V4', 'Inhib MT']
+  ddir = OrderedDict({'EV1DW':'W','EV1DNW':'NW', 'EV1DN':'N','EV1DNE':'NE','EV1DE':'E','EV1DSW':'SW','EV1DS':'S','EV1DSE':'SE'})
+  for p in ddir.keys(): ltitle.append(ddir[p])
+  for p in ['Excit M DOWN', 'Excit M UP']: ltitle.append(p)
+  lact = [InputImages]; lvmax = [255];
+  lfnimage = []
+  lpop = ['ER', 'EV1', 'EV4', 'EMT', 'IR', 'IV1', 'IV4', 'IMT',\
+          'EV1DW','EV1DNW', 'EV1DN', 'EV1DNE','EV1DE','EV1DSW', 'EV1DS', 'EV1DSE',\
+          'EMDOWN','EMUP']  
+  dmaxSpk = OrderedDict({pop:np.max(dact[pop]) for pop in lpop})
+  max_spks = np.max([dmaxSpk[p] for p in lpop])  
+  for pop in lpop:
+    lact.append(dact[pop])
+    lvmax.append(max_spks)
+  ddat = {}
+  fig.suptitle('Time = ' + str(0*tstepPerAction) + ' ms')
+  idx = 0
+  objfctr = 1.0
+  if 'UseFull' in dconf['DirectionDetectionAlgo']:
+    if dconf['DirectionDetectionAlgo']['UseFull']: objfctr=1/8.  
+  for ldx,ax in enumerate(lax):
+    if idx > len(dact.keys()):
+      ax.axis('off')
+      continue
+    if ldx==0:
+      offidx=-1
+    elif ldx==5:
+      offidx=1
+    else:
+      offidx=0
+    if ldx==5:
+      X, Y = np.meshgrid(np.arange(0, InputImages[0].shape[1], 1), np.arange(0,InputImages[0].shape[0],1))
+      ddat[ldx] = ax.quiver(X,Y,ldflow[0]['thflow'][:,:,0],-ldflow[0]['thflow'][:,:,1], pivot='mid', units='inches',width=0.022,scale=1/0.15)
+      ax.set_xlim((0,InputImages[0].shape[1])); ax.set_ylim((0,InputImages[0].shape[0]))
+      ax.invert_yaxis()              
+      continue
+    else:
+      pcm = ax.imshow(lact[idx][offidx,:,:],origin='upper',cmap='gray',vmin=0,vmax=lvmax[idx])
+      ddat[ldx] = pcm
+      if ldx==0 and dobjpos is not None:
+        lobjx,lobjy = [objfctr*dobjpos[k][0,0] for k in dobjpos.keys()], [objfctr*dobjpos[k][0,1] for k in dobjpos.keys()]
+        ddat['objpos'], = ax.plot(lobjx,lobjy,'ro')      
+    ax.set_ylabel(ltitle[idx])
+    if ldx==2: plt.colorbar(pcm, cax = cbaxes)  
+    idx += 1
+  def updatefig (t):
+    fig.suptitle('Time = ' + str(t*tstepPerAction) + ' ms')    
+    if t<1: return fig # already rendered t=0 above; skip last for optical flow
+    print('frame t = ', str(t*tstepPerAction))
+    idx = 0
+    for ldx,ax in enumerate(lax):
+      if idx > len(dact.keys()): continue
+      if ldx==0 or ldx==5:
+        offidx=-1
+      else:
+        offidx=0
+      if ldx == 5:
+        ddat[ldx].set_UVC(ldflow[t+offidx]['thflow'][:,:,0],-ldflow[t]['thflow'][:,:,1])        
+      else:
+        ddat[ldx].set_data(lact[idx][t+offidx,:,:])
+        if ldx==0 and dobjpos is not None:
+          lobjx,lobjy = [objfctr*dobjpos[k][t,0] for k in dobjpos.keys()], [objfctr*dobjpos[k][t,1] for k in dobjpos.keys()]
+          ddat['objpos'].set_data(lobjx,lobjy)        
+        idx += 1
+    return fig
+  t1 = range(0,totalDur,tstepPerAction)
+  ani = animation.FuncAnimation(fig, updatefig, interval=1, frames=len(t1)-1)
+  writer = anim.getwriter(outpath, framerate=framerate)
+  ani.save(outpath, writer=writer); print('saved animation to', outpath)
+  ion()
+  return fig, axs, plt
+
+#
+def animInput (InputImages, outpath, framerate=10, figsize=None, showflow=True, ldflow=None, dobjpos=None):
+  # animate the input images; showflow specifies whether to calculate/animate optical flow
+  ioff()
+  # plot input images and optionally optical flow
+  ncol = 1
+  if showflow: ncol+=1
+  if figsize is not None: fig = figure(figsize=figsize)
+  else: fig = figure()
+  lax = [subplot(1,ncol,i+1) for i in range(ncol)]
+  ltitle = ['Input Images']
+  lact = [InputImages]; lvmax = [255]; xl = [(-.5,19.5)]; yl = [(19.5,-0.5)]
+  ddat = {}
+  fig.suptitle('Time = ' + str(0*tstepPerAction) + ' ms')
+  idx = 0
+  lflow = []
+  if showflow and ldflow is None: ldflow = getoptflowframes(InputImages)
+  objfctr = 1.0
+  if 'UseFull' in dconf['DirectionDetectionAlgo']:
+    if dconf['DirectionDetectionAlgo']['UseFull']: objfctr=1/8.
+  for ldx,ax in enumerate(lax):
+    if ldx==0:
+      pcm = ax.imshow( lact[idx][0,:,:], origin='upper', cmap='gray', vmin=0, vmax=lvmax[idx])
+      ddat[ldx] = pcm
+      ax.set_ylabel(ltitle[idx])
+      if dobjpos is not None:
+        lobjx,lobjy = [objfctr*dobjpos[k][0,0] for k in dobjpos.keys()], [objfctr*dobjpos[k][0,1] for k in dobjpos.keys()]
+        ddat['objpos'], = ax.plot(lobjx,lobjy,'ro')
+    else:
+      X, Y = np.meshgrid(np.arange(0, InputImages[0].shape[1], 1), np.arange(0,InputImages[0].shape[0],1))
+      ddat[ldx] = ax.quiver(X,Y,ldflow[0]['thflow'][:,:,0],-ldflow[0]['thflow'][:,:,1], pivot='mid', units='inches',width=0.01,scale=1/0.3)
+      ax.set_xlim((0,InputImages[0].shape[1])); ax.set_ylim((0,InputImages[0].shape[0]))
+      ax.invert_yaxis()
+    idx += 1
+  def updatefig (t):
+    fig.suptitle('Time = ' + str(t*tstepPerAction) + ' ms')
+    if t < 1: return fig # already rendered t=0 above
+    print('frame t = ', str(t*tstepPerAction))    
+    for ldx,ax in enumerate(lax):
+      if ldx == 0:
+        ddat[ldx].set_data(lact[0][t,:,:])
+        if dobjpos is not None:
+          lobjx,lobjy = [objfctr*dobjpos[k][t,0] for k in dobjpos.keys()], [objfctr*dobjpos[k][t,1] for k in dobjpos.keys()]
+          ddat['objpos'].set_data(lobjx,lobjy)
+      else:
+        ddat[ldx].set_UVC(ldflow[t-1]['thflow'][:,:,0],-ldflow[t]['thflow'][:,:,1])        
+    return fig
+  t1 = range(0,totalDur,tstepPerAction)
+  nframe = len(t1)
+  if showflow: nframe-=1
+  ani = animation.FuncAnimation(fig, updatefig, interval=1, frames=nframe)
+  writer = anim.getwriter(outpath, framerate=framerate)
+  ani.save(outpath, writer=writer); print('saved animation to', outpath)
+  ion()
+  return fig
+
+#
+def getmaxdir (dact, ddir):
+  ddir = OrderedDict({'EV1DW':'W','EV1DNW':'NW', 'EV1DN':'N','EV1DNE':'NE','EV1DE':'E','EV1DSW':'SW','EV1DS':'S','EV1DSE':'SE'})
+  maxdirX = np.zeros(dact['EV1DW'].shape)
+  maxdirY = np.zeros(dact['EV1DW'].shape)
+  dAngDir = OrderedDict({'EV1DE': [1,0],'EV1DNE': [np.sqrt(2),np.sqrt(2)], # receptive field peak angles for the direction selective populations
+                            'EV1DN': [0,1],'EV1DNW': [-np.sqrt(2),np.sqrt(2)],
+                            'EV1DW': [-1,0],'EV1DSW': [-np.sqrt(2),-np.sqrt(2)],
+                            'EV1DS': [0,-1],'EV1DSE': [np.sqrt(2),-np.sqrt(2)],
+                            'NOMOVE':[0,0]})
+  for k in dAngDir.keys():
+    dAngDir[k][0] *= .4
+    dAngDir[k][1] *= -.4
+  for tdx in range(maxdirX.shape[0]):
+    for y in range(maxdirX.shape[1]):
+      for x in range(maxdirX.shape[2]):
+        maxval = 0
+        maxdir = 'NOMOVE'
+        for pop in ddir.keys():
+          if dact[pop][tdx,y,x] > maxval:
+            maxval = dact[pop][tdx,y,x]
+            maxdir = pop
+        maxdirX[tdx,y,x] = dAngDir[maxdir][0]
+        maxdirY[tdx,y,x] = dAngDir[maxdir][1]
+  return maxdirX,maxdirY
+
+#
+def animDetectedMotionMaps (outpath, framerate=10, figsize=(7,3)):
+  ioff()
+  # plot activity in different layers as a function of input images
+  ddir = OrderedDict({'EV1DW':'W','EV1DNW':'NW', 'EV1DN':'N','EV1DNE':'NE','EV1DE':'E','EV1DSW':'SW','EV1DS':'S','EV1DSE':'SE'})
+  if figsize is not None: fig, axs = plt.subplots(1, 3, figsize=figsize);
+  else: fig, axs = plt.subplots(1, 3);
+  lax = axs.ravel()
+  ltitle = ['Input Images', 'Motion', 'Detected Motion']
+  lact = [InputImages]; lvmax = [255];
+  lfnimage = []
+  lpop = ['ER', 'EV1', 'EV4', 'EMT', 'IR', 'IV1', 'IV4', 'IMT',\
+          'EV1DW','EV1DNW', 'EV1DN', 'EV1DNE','EV1DE','EV1DSW', 'EV1DS', 'EV1DSE',\
+          'EMDOWN','EMUP']  
+  dmaxSpk = OrderedDict({pop:np.max(dact[pop]) for pop in lpop})
+  max_spks = np.max([dmaxSpk[p] for p in lpop])
+  for pop in lpop:
+    lact.append(dact[pop])
+    lvmax.append(max_spks)
+  ddat = {}
+  fig.suptitle('Time = ' + str(0*tstepPerAction) + ' ms')
+  maxdirX,maxdirY = getmaxdir(dact,ddir)
+  for ldx,ax in enumerate(lax):
+    if ldx == 0:
+      offidx = -1
+      pcm = ax.imshow(lact[0][offidx,:,:],origin='upper',cmap='gray',vmin=0,vmax=lvmax[0])
+      ddat[ldx] = pcm            
+    elif ldx == 1:
+      X, Y = np.meshgrid(np.arange(0, InputImages[0].shape[1], 1), np.arange(0,InputImages[0].shape[0],1))
+      ddat[ldx] = ax.quiver(X,Y,ldflow[0]['thflow'][:,:,0],-ldflow[0]['thflow'][:,:,1], pivot='mid', units='inches',width=0.022,scale=1/0.15)
+      ax.set_xlim((0,InputImages[0].shape[1])); ax.set_ylim((0,InputImages[0].shape[0]))
+      ax.invert_yaxis()                    
+    elif ldx == 2:
+      X, Y = np.meshgrid(np.arange(0, InputImages[0].shape[1], 1), np.arange(0,InputImages[0].shape[0],1))
+      ddat[ldx] = ax.quiver(X,Y,maxdirX[0,:,:],maxdirY[0,:,:], pivot='mid', units='inches',width=0.022,scale=1/0.15)
+      ax.set_xlim((0,InputImages[0].shape[1])); ax.set_ylim((0,InputImages[0].shape[0]))
+      ax.invert_yaxis()
+    ax.set_ylabel(ltitle[ldx])
+  def updatefig (t):
+    fig.suptitle('Time = ' + str(t*tstepPerAction) + ' ms')    
+    if t<1: return fig # already rendered t=0 above; skip last for optical flow
+    print('frame t = ', str(t*tstepPerAction))
+    for ldx,ax in enumerate(lax):
+      if ldx==0 or ldx==5:
+        offidx=-1
+      else:
+        offidx=0
+      if ldx == 0:
+        ddat[ldx].set_data(lact[0][t+offidx,:,:])
+      elif ldx == 1:
+        ddat[ldx].set_UVC(ldflow[t+offidx]['thflow'][:,:,0],-ldflow[t]['thflow'][:,:,1])        
+      else:
+        ddat[ldx].set_UVC(maxdirX[t+offidx,:,:],maxdirY[t+offidx,:,:])
+    return fig
+  ani = animation.FuncAnimation(fig, updatefig, interval=1, frames=len(t1)-1)
+  writer = anim.getwriter(outpath, framerate=framerate)
+  ani.save(outpath, writer=writer); print('saved animation to', outpath)
+  ion()
+  return fig, axs, plt
 
 def loadInputImages (name=None):
   fn = 'data/'+getsimname(name)+'InputImages.txt'
@@ -69,8 +325,6 @@ def loadInputImages (name=None):
 def loadMotionFields (name=None): return pickle.load(open('data/'+getsimname(name)+'MotionFields.pkl','rb'))
 
 def loadObjPos (name=None): return pickle.load(open('data/'+getsimname(name)+'objpos.pkl','rb'))
-
-totalDur = int(dconf['sim']['duration']) # total simulation duration
 
 #
 def getrate (dspkT,dspkID, pop, dnumc):
@@ -102,6 +356,19 @@ def drawraster (dspkT,dspkID,tlim=None,msz=2):
   ax=gca()
   ax.legend(handles=lpatch,handlelength=1,loc='best')
 
+#
+def drawcellVm (simConfig):
+  csm=cm.ScalarMappable(cmap=cm.prism); csm.set_clim(0,len(dspkT.keys()))
+  lclr = []; lpop = []
+  for kdx,k in enumerate(list(simConfig['simData']['V_soma'].keys())):  
+    color = csm.to_rgba(kdx); lclr.append(color)
+    lpop.append(simConfig['net']['cells'][int(k.split('_')[1])]['tags']['cellType'])
+  for kdx,k in enumerate(list(simConfig['simData']['V_soma'].keys())):
+    plot(simConfig['simData']['t'],simConfig['simData']['V_soma'][k],color=lclr[kdx])
+  lpatch = [mpatches.Patch(color=c,label=s) for c,s in zip(lclr,lpop)]
+  ax=gca()
+  ax.legend(handles=lpatch,handlelength=1,loc='best')    
+  
 #  
 def plotFollowBall (actreward, ax=None,msz=1):
   if ax is None: ax = gca()
@@ -112,12 +379,12 @@ def plotFollowBall (actreward, ax=None,msz=1):
   punishingActions = np.cumsum(np.where((actionvsproposed>0) | (actionvsproposed<0),1,0)) 
   cumActs = np.array(range(1,len(actionvsproposed)+1))
   Hit_Missed = np.array(actreward.hit)
-  ax.plot([0,np.max(action_times)],[0.5,0.5],'--',color='gray')
   ax.plot(action_times,np.divide(rewardingActions,cumActs),'r.',markersize=msz)
   ax.plot(action_times,np.divide(punishingActions,cumActs),'b.',markersize=msz)
   ax.set_xlim((0,np.max(action_times)))
   ax.set_ylim((0,1))
   ax.legend(('Follow Ball','Not Follow'),loc='best')
+  ax.plot([0,np.max(action_times)],[0.5,0.5],'--',color='gray')  
   ax.set_xlabel('Time (ms)'); ax.set_ylabel('Probability')
 
 #  
@@ -492,6 +759,34 @@ def plotSynWeightsPostNeuronID(pdf,postNeuronID):
       xlim((0,simConfig['simConfig']['duration']))
       pdx += 1        
 
+#
+def getinputmap (pdf, t, prety, postid, poty, dnumc, dstartidx, dendidx):
+  nrow = ncol = int(np.sqrt(dnumc[poty]))
+  rfmap = np.zeros((nrow,ncol))
+  pdfs = pdf[(pdf.postid==postid) & (pdf.preid>dstartidx[prety]) & (pdf.preid<=dendidx[prety]) & (pdf.time==t)]
+  if len(pdfs) < 1: return rfmap
+  for idx in pdfs.index:
+    preid = int(pdfs.at[idx,'preid'])
+    x,y = gid2pos(dnumc[prety], dstartidx[prety], preid)
+    rfmap[y,x] += 1
+  return rfmap
+
+#
+def getallinputmaps (pdf, t, postid, poty, dnumc, dstartidx, dendidx, lprety = ['EV1DNW', 'EV1DN', 'EV1DNE', 'EV1DW', 'EV1','EV1DE','EV1DSW', 'EV1DS', 'EV1DSE']):
+  # gets all input maps onto postid
+  return {prety:getinputmap(pdf, t, prety, postid, poty, dnumc, dstartidx, dendidx) for prety in lprety}
+
+#
+def plotallinputmaps (pdf, t, postid, poty, dnumc, dstartidx, dendidx, lprety=['EV1DNW', 'EV1DN', 'EV1DNE', 'EV1DW', 'EV1','EV1DE','EV1DSW', 'EV1DS', 'EV1DSE']):
+  drfmap = getallinputmaps(pdf, t, postid, poty, dnumc, dstartidx, dendidx, lprety)
+  for tdx,prety in enumerate(lprety):
+    subplot(3,3,tdx+1)
+    imshow(drfmap[prety],cmap='gray',origin='upper');
+    title(prety+'->'+poty+str(postid));
+  return drfmap
+  
+  
+      
 if __name__ == '__main__':
   stepNB = -1
   if len(sys.argv) > 1:
@@ -500,7 +795,7 @@ if __name__ == '__main__':
     except:
       pass
   print(stepNB)
-  simConfig, pdf, actreward, dstartidx, dendidx, dnumc, dspkID, dspkT = loadsimdat()
+  simConfig, pdf, actreward, dstartidx, dendidx, dnumc, dspkID, dspkT, InputImages, ldflow, dact = loadsimdat()
   print('loaded simulation data')
   #davgw = plotavgweights(pdf)
   #animSynWeights(pdf,'gif/'+dconf['sim']['name']+'weightmap.mp4', framerate=10) #plot/save images as movie
