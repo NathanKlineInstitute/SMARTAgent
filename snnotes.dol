@@ -5901,3 +5901,14 @@ savefig('gif/20may28_20may27_D0_movefctr_1.25_falcor_racket_pos_hist_a3.png')
 still a large bias in positions ... 
 
 fig, axs, plt = animActivityMaps()
+
+** try sim with higher recurrent conn and no (or less frequent?) weight norm
+
+less frequent weight norm (every 20 s)
+
+and higher recurrent connectivity (0.3 instead of previous 0.1)
+
+"name":"20may28_A0_falcor_"
+
+./myrun 12 sn.json
+
