@@ -2613,3 +2613,77 @@ neurons... but having additional recurrent connectivity in EM might still allow 
 ** Needs to confirm: 1) actmap movie is accurate. 2) direction selective neurons are activated properly in both optic flow and centroid tracking cases.
 *** add UseFull in sim configuration: "DirectionDetectionAlgo":{"CentroidTracker":0,"OpticFlow":1,"UseFull":0}, For Optic flow set UseFull = 0
 *** test sim (2 sec) using optic flow in file "20may27_A0_"
+checking details:
+InputImages.shape -- prints -- (100,20,20)
+np.shape(ldflow) -- prints -- (100,)
+t1 -- prints -- range(0,2000,20)
+t2 -- prints -- range(20,2020,20)
+np.shape(ldflow[0]['thflow']) -- prints -- (20,20,2).... where ldflow[0]['thflow'][:,:,0] is X component of direction vectors and ldflow[0]['thflow'][:,:,1] is Y component of direction vectors.
+-- the racket moves south from timestep 6 to timestep 7 (from top edge of racket at 6.5 to top edge of racket at 7.5)
+-- quiver plot at timestep 7 shows correct directions (for most of the pixels)
+-- the ball moves south west from timestep 20 to timestep 21. rackets dont move.
+-- quiver plot at timestep 21 shows correct directions (for most of the pixels)
+-- now check the direcrtion sensitive neurons during that timestep.
+-- there seems to be a difference of 2 timesteps in datastructures e.g. dact['EV1DSW'][23,:,:] showed the activity for ldflow[21]['thflow']
+---- This doesn't make sense... how is this possible. 
+dact['EV1DSW'][0,:,:] has activity between 0-20 ms
+ldflow[0]['thflow'] has optical flow recorded at 20 ms.---> This will be used to drive activity between 20-40 ms.
+InputImage[0] is recorded at 20 ms.
+
+dact['EV1DSW'][1,:,:] has activity between 20-40 ms ---> This should be associated with ldflow[0]
+InputImage[1] is recorded at 40 ms.
+ldflow[1]['thflow'] is recorded at 40 ms.   
+
+-- run 100 ms sim in 20may27_A1_
+
+
+*20may28
+**setting up falcor
+---got instructions from sam
+** NKI VPN notes
+To access the new VPN, go to https://sshvpn.rfmh.org and login with your NKI username and password.
+After signing in, there will be links to download the VPN client for your operating system and
+well as instructions for connecting.
+to access the VPN from outside of NKI use cisco anyconnect and go to https://63.117.203.75
+then use this username: sneymotin
+and the rfmh live.com password
+is there x2go for falcor?
+alias snnki ssh -X samn@10.76.253.150
+alias nkisftp sftp samn@10.76.253.150
+alias falcor ssh -X samn@falcor.rfmh.org
+alias falcorsftp sftp samn@falcor.rfmh.org
+alias vnc2falcor 'ssh -X -L 5901:localhost:5901 samn@falcor.rfmh.org'
+alias vncv 'vncviewer localhost:5901'
+to use x2go
+x2goclient
+make sure to use xfce for falcor
+
+-------
+using cisco vpn connect using 63.117.203.75 and nki password
+login to falcor ssh -X hanwar@falcor.rfmh.org
+change session type to xfce
+host is falcor.rfmh.org
+login is your username on falcor
+
+copy this in .bashrc
+
+export LD_LIBRARY_PATH="/home/samn/miniconda3/lib"
+export SITE="/home/samn/site"
+# >>> conda initialize >>>
+# !! Contents within this block are managed by 'conda init' !!
+__conda_setup="$('/home/samn/miniconda3/bin/conda' 'shell.bash' 'hook' 2> /dev/null)"
+if [ $? -eq 0 ]; then
+    eval "$__conda_setup"
+else
+    if [ -f "/home/samn/miniconda3/etc/profile.d/conda.sh" ]; then
+        . "/home/samn/miniconda3/etc/profile.d/conda.sh"
+    else
+        export PATH="/home/samn/miniconda3/bin:$PATH"
+    fi
+fi
+unset __conda_setup
+# <<< conda initialize <<<
+
+--- testing sims on falcor
+-- ran 2 sec sim with optical flow named 20may27_A0_
+-- running 2 sec sim with centroid tracking named 20may27_A1_
