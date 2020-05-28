@@ -5691,3 +5691,46 @@ run longer ... 100 s ...
 
 also adjust weights ... 
 
+** check output from 20may26_A0_zn_
+
+t= 199999.80000715362 - adjusting weights based on RL critic value: -0.01
+Game rewards: [-0.01]
+sim.rank= 0 davg: {'EMUP': 2.5309090724359646e-05, 'EMDOWN': 2.54674733529361e-05} dfctr: {'EMUP': 0.9877873635317073, 'EMDOWN': 0.9816442979459442}
+  Done; run time = 105017.57 s; real-time ratio: 0.00.
+
+Gathering data...
+  Done; gather time = 5.29 s.
+
+Analyzing...
+  Cells: 5359
+  Connections: 0 (0.00 per cell)
+  Spikes: 2388616 (2.23 Hz)
+  Simulated time: 200.0 s; 16 workers
+  Run time: 105017.57 s
+Saving output as data/20may26_A0_zn_simConfig.pkl ... 
+Finished saving!
+  Done; saving time = 18.70 s.
+
+python -i simdat.py backupcfg/20may26_A0_zn_sim.json
+
+drawraster(dspkT,dspkID)
+savefig('gif/20may27_20may26_A0_zn_rast_a.png')
+overall, rates are ok
+xlim((190e3,200e3))
+savefig('gif/20may27_20may26_A0_zn_rast_b.png')
+xlim((195e3,200e3))
+savefig('gif/20may27_20may26_A0_zn_rast_c.png')
+but do have periods of hypersynch activity ...
+
+drawcellVm(simConfig); 
+savefig('gif/20may27_20may26_A0_zn_cellVm.png')
+xlim((190e3,200e3))
+savefig('gif/20may27_20may26_A0_zn_cellVm_b.png')
+xlim((195e3,200e3))
+savefig('gif/20may27_20may26_A0_zn_cellVm_c.png')
+
+animSynWeights(pdf) # 
+
+python -i actmap.py  backupcfg/20may26_A0_zn_sim.json
+
+fig, axs, plt = animActivityMaps(dobjpos=None) # gif/20may27_20may26_A0_zn_actmap.mp4

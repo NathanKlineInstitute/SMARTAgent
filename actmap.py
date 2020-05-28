@@ -104,7 +104,8 @@ def animActivityMaps (outpath='gif/'+dconf['sim']['name']+'actmap.mp4', framerat
   fig.suptitle('Time = ' + str(0*tstepPerAction) + ' ms')
   idx = 0
   objfctr = 1.0
-  if dconf['DirectionDetectionAlgo']['UseFull']: objfctr=1/8.  
+  if 'UseFull' in dconf['DirectionDetectionAlgo']:
+    if dconf['DirectionDetectionAlgo']['UseFull']: objfctr=1/8.  
   for ldx,ax in enumerate(lax):
     if idx > len(dact.keys()):
       ax.axis('off')
@@ -174,7 +175,8 @@ def animInput (InputImages, outpath, framerate=10, figsize=None, showflow=True, 
   lflow = []
   if showflow and ldflow is None: ldflow = getoptflowframes(InputImages)
   objfctr = 1.0
-  if dconf['DirectionDetectionAlgo']['UseFull']: objfctr=1/8.
+  if 'UseFull' in dconf['DirectionDetectionAlgo']:
+    if dconf['DirectionDetectionAlgo']['UseFull']: objfctr=1/8.
   for ldx,ax in enumerate(lax):
     if ldx==0:
       pcm = ax.imshow( lact[idx][0,:,:], origin='upper', cmap='gray', vmin=0, vmax=lvmax[idx])
