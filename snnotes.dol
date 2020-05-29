@@ -5902,7 +5902,7 @@ still a large bias in positions ...
 
 fig, axs, plt = animActivityMaps()
 
-** try sim with higher recurrent conn and no (or less frequent?) weight norm
+** try sim with higher recurrent conn and no (or less frequent?) weight norm (20may28_A0_falcor_)
 
 less frequent weight norm (every 40 s)
 
@@ -5971,4 +5971,116 @@ clf(); drfmap = plotallinputmaps(pdf, np.amax(pdf.time), dstartidx['EMUP'] + 0, 
 
 savefig('gif/20may28_e9.png')
 
-hmm, did not div those values properly ... 
+hmm, did not div those values properly ... and that obscures relative value in each location
+
+*20may29
+** check output from 20may28_A0_falcor_
+
+  Cells: 5359
+  Connections: 0 (0.00 per cell) <<-- that's not right, just because not saving all network info
+  Spikes: 2046943 (1.91 Hz)
+  Simulated time: 200.0 s; 12 workers
+  Run time: 44290.63 s
+
+python -i simdat.py backupcfg/20may28_A0_falcor_sim.json
+
+#
+plotFollowBall(actreward,ax=subplot(1,3,1),msz=3); ylim((0,.51))
+plotHitMiss(actreward,ax=subplot(1,3,2),msz=3); ylim((0,120)); 
+plotRewards(actreward,ax=subplot(1,3,3),msz=3); 
+subplot(1,3,1); plot([40e3,80e3,120e3,160e3,200e3],[0.45,.45,.45,.45,.45],'bo',markersize=10) # times of weight norm
+
+savefig('gif/20may29_a0.png')
+rises initially but then decays ... 
+
+drawraster(dspkT,dspkID); 
+xlim((20e3,30e3)); savefig('gif/20may29_a1.png')
+xlim((190e3,200e3)); savefig('gif/20may29_a2.png')
+
+activity much more synchronized at end when performance worse ... but not clear if that's the reason performance worse
+
+drawcellVm(simConfig); 
+xlim((20e3,30e3)); savefig('gif/20may29_a3.png')
+xlim((190e3,200e3)); savefig('gif/20may29_a4.png')
+
+#
+dobjpos = loadObjPos()
+subplot(1,2,1); xlabel('Racket X position'); hist(dobjpos['racket'][:,0])
+subplot(1,2,2); xlabel('Racket Y position'); hist(dobjpos['racket'][:,1])
+
+savefig('gif/20may29_a5.png')
+
+## fig, axs, plt = animActivityMaps()
+
+drfmap = plotallinputmaps(pdf, np.amin(pdf.time), dstartidx['EMUP'] + 0, 'EMUP', dnumc, dstartidx, dendidx, asweight=True,cmap='jet')
+savefig('gif/20may29_a6.png')
+
+clf(); drfmap = plotallinputmaps(pdf, np.amax(pdf.time), dstartidx['EMUP'] + 0, 'EMUP', dnumc, dstartidx, dendidx, asweight=True,cmap='jet')
+savefig('gif/20may29_a7.png')
+
+drfmap = plotallinputmaps(pdf, np.amin(pdf.time), dstartidx['EMUP'] + 0, 'EMUP', dnumc, dstartidx, dendidx, asweight=True,cmap='jet')
+#
+lmap = [drfmap[x] for x in drfmap.keys()]
+lmap = np.array(lmap)
+nps = np.sum(lmap,axis=0)
+clf(); imshow(nps,cmap='jet',origin='upper'); colorbar()
+savefig('gif/20may29_a8.png')
+
+#
+drfmap = plotallinputmaps(pdf, np.amax(pdf.time), dstartidx['EMUP'] + 0, 'EMUP', dnumc, dstartidx, dendidx, asweight=True,cmap='jet')
+lmap = [drfmap[x] for x in drfmap.keys()]
+lmap = np.array(lmap)
+nps = np.sum(lmap,axis=0)
+clf(); imshow(nps,cmap='jet',origin='upper'); colorbar()
+savefig('gif/20may29_a9.png')
+
+** are weight step sizes reasonable? no, too large. try with smaller (~5% max)
+
+seemed like optic flow did a little better ... ? 
+or could be due to EEMRecProb of 0.3 ... or many other things ... 
+
+for last sim (backupcfg/20may28_A0_falcor_sim.json):
+    "rewardcodes": {"scorePoint": 1, "losePoint": -0.1, "followBall": 0.1, "avoidBall": -0.01, "hitBall": 0.5},
+
+	  {"wbase":0.0000001,"wmax":0.00024,"RLon":1,"RLlenhebb":100,"RLlenanti":50,"useRLexp":1,"RLhebbwt":0.0005,"RLantiwt":-0.0,"hebbwt":0,"antiwt":0,"tauhebb":10,"RLwindhebb":50,"softthresh":0,"verbose":0},
+
+"EEMWghtAM":0.00008,"EEMWghtNM":0.0000025,"EEMWghtThreshMin":0.00004,"EEMWghtThreshMax":0.00016,"EEMProb":0.3,"EEMRecProb":0.3,"EEMPopNorm":0
+
+so starting weight is 0.00008
+RLhebbwt is 0.0005 -- increment is much larger than starting weight (0.0005 / 0.00008 = 6.25)
+but then it gets multiplied by reward value; for a scorePoint (1) it goes up too much
+for losePoint (-0.1) it goes down 0.0005*0.1 = 0.00005 > 50% of original value; 0.0005*0.1/0.00008 (0.625)
+for followball (0.1) it goes up > 50% of original value
+for avoidBall (-0.01) it goes down by 6.25% of original value
+for hitBall (0.5)  too much as well ... 
+
+so none of the reward increments make sense ... they should all be relatively small ... ~5% change should be the maximum
+
+0.00008 * 0.05 # 4.000000000000001e-06
+that should be value of RLhebbwt (0.000004)
+relative values for rewardcodes can be maintained ...
+
+"name":"20may29_A0_falcor_"
+
+ok, try that out ...
+
+./myrun 12 sn.json
+
+and another with less recurrent connectivity (EEMRecProb) ... at 0.1 instead of 0.3 in 20may29_A0_falcor_
+
+"name":"20may29_B0_falcor_"
+
+
+
+** simpler architecture?
+
+population for opponent racket position (1D)
+population for player racket position (1D)
+population for ball position (2D)
+
+it might work (even that architecture is not guaranteed) but loses generality ... 
+
+** simpler cells?
+
+switch to izhikevich neurons?
+
