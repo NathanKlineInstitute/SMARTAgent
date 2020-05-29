@@ -760,29 +760,48 @@ def plotSynWeightsPostNeuronID(pdf,postNeuronID):
       pdx += 1        
 
 #
-def getinputmap (pdf, t, prety, postid, poty, dnumc, dstartidx, dendidx):
+def getinputmap (pdf, t, prety, postid, poty, dnumc, dstartidx, dendidx, asweight=False):
   nrow = ncol = int(np.sqrt(dnumc[poty]))
   rfmap = np.zeros((nrow,ncol))
   pdfs = pdf[(pdf.postid==postid) & (pdf.preid>dstartidx[prety]) & (pdf.preid<=dendidx[prety]) & (pdf.time==t)]
   if len(pdfs) < 1: return rfmap
-  for idx in pdfs.index:
-    preid = int(pdfs.at[idx,'preid'])
-    x,y = gid2pos(dnumc[prety], dstartidx[prety], preid)
-    rfmap[y,x] += 1
+  if not asweight:
+    for idx in pdfs.index:
+      preid = int(pdfs.at[idx,'preid'])
+      x,y = gid2pos(dnumc[prety], dstartidx[prety], preid)
+      rfmap[y,x] += 1
+  else:
+    rfcnt = np.zeros((nrow,ncol))    
+    for idx in pdfs.index:
+      preid = int(pdfs.at[idx,'preid'])
+      x,y = gid2pos(dnumc[prety], dstartidx[prety], preid)
+      rfcnt[y,x] += 1
+      rfmap[y,x] += pdfs.at[idx,'weight']
+    for y in range(nrow):
+      for x in range(ncol):
+        if rfcnt[y,x]>0: rfmap[y,x]/=rfcnt[y,x]
   return rfmap
 
 #
-def getallinputmaps (pdf, t, postid, poty, dnumc, dstartidx, dendidx, lprety = ['EV1DNW', 'EV1DN', 'EV1DNE', 'EV1DW', 'EV1','EV1DE','EV1DSW', 'EV1DS', 'EV1DSE']):
+def getallinputmaps (pdf, t, postid, poty, dnumc, dstartidx, dendidx, lprety = ['EV1DNW', 'EV1DN', 'EV1DNE', 'EV1DW', 'EV1','EV1DE','EV1DSW', 'EV1DS', 'EV1DSE'], asweight=False):
   # gets all input maps onto postid
-  return {prety:getinputmap(pdf, t, prety, postid, poty, dnumc, dstartidx, dendidx) for prety in lprety}
+  return {prety:getinputmap(pdf, t, prety, postid, poty, dnumc, dstartidx, dendidx, asweight=asweight) for prety in lprety}
 
 #
-def plotallinputmaps (pdf, t, postid, poty, dnumc, dstartidx, dendidx, lprety=['EV1DNW', 'EV1DN', 'EV1DNE', 'EV1DW', 'EV1','EV1DE','EV1DSW', 'EV1DS', 'EV1DSE']):
-  drfmap = getallinputmaps(pdf, t, postid, poty, dnumc, dstartidx, dendidx, lprety)
+def plotallinputmaps (pdf, t, postid, poty, dnumc, dstartidx, dendidx, lprety=['EV1DNW', 'EV1DN', 'EV1DNE', 'EV1DW', 'EV1','EV1DE','EV1DSW', 'EV1DS', 'EV1DSE'], asweight=False, cmap='jet',dmap=None):
+  if dmap is None:
+    drfmap = getallinputmaps(pdf, t, postid, poty, dnumc, dstartidx, dendidx, lprety, asweight=asweight)
+  else:
+    drfmap = dmap
+  vmin,vmax = 1e9,-1e9
+  for prety in lprety:
+    vmin = min(vmin, np.amin(drfmap[prety]))
+    vmax = max(vmax, np.amax(drfmap[prety]))    
   for tdx,prety in enumerate(lprety):
     subplot(3,3,tdx+1)
-    imshow(drfmap[prety],cmap='gray',origin='upper');
+    imshow(drfmap[prety],cmap=cmap,origin='upper',vmin=vmin,vmax=vmax);
     title(prety+'->'+poty+str(postid));
+    colorbar()
   return drfmap
   
   
