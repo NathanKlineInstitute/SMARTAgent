@@ -5901,3 +5901,74 @@ savefig('gif/20may28_20may27_D0_movefctr_1.25_falcor_racket_pos_hist_a3.png')
 still a large bias in positions ... 
 
 fig, axs, plt = animActivityMaps()
+
+** try sim with higher recurrent conn and no (or less frequent?) weight norm
+
+less frequent weight norm (every 40 s)
+
+and higher recurrent connectivity (0.3 instead of previous 0.1)
+
+"name":"20may28_A0_falcor_"
+
+./myrun 12 sn.json
+
+** check input maps using weight as sim progresses
+
+python -i simdat.py backupcfg/20may27_B1_falcor_sim.json
+
+drfmap = plotallinputmaps(pdf, pdf.time[0], dstartidx['EMUP'] + 0, 'EMUP', dnumc, dstartidx, dendidx, asweight=False)
+savefig('gif/20may28_e0.png')
+
+drfmap = plotallinputmaps(pdf, pdf.time[0], dstartidx['EMUP'] + 0, 'EMUP', dnumc, dstartidx, dendidx, asweight=True)
+savefig('gif/20may28_e1.png')
+
+hmm, when plotting as weight, only EV1 synapses have some weights lowered ... 
+pdf.time[0] # 10000.000000018848
+but the others do not ... why?? since nothing moved at the locations specific to those direction selective neurons yet
+so those neurons did not yet fire ...
+
+drfmap = plotallinputmaps(pdf, pdf.time[1], dstartidx['EMUP'] + 0, 'EMUP', dnumc, dstartidx, dendidx, asweight=True)
+savefig('gif/20may28_e2.png')
+
+drfmap = plotallinputmaps(pdf, pdf.time[2], dstartidx['EMUP'] + 0, 'EMUP', dnumc, dstartidx, dendidx, asweight=True)
+savefig('gif/20may28_e3.png')
+
+drfmap = plotallinputmaps(pdf, pdf.time[3], dstartidx['EMUP'] + 0, 'EMUP', dnumc, dstartidx, dendidx, asweight=True)
+savefig('gif/20may28_e4.png')
+pdf.time[3] # 39999.99999969842
+by that time, a lot more synapses have become depressed ... ? or some have been potentiated ... need colorbars ...
+
+drfmap = plotallinputmaps(pdf, np.amax(pdf.time), dstartidx['EMUP'] + 0, 'EMUP', dnumc, dstartidx, dendidx, asweight=True)
+savefig('gif/20may28_e5.png')
+
+drfmap = plotallinputmaps(pdf, np.amax(pdf.time), dstartidx['EMUP'] + 0, 'EMUP', dnumc, dstartidx, dendidx, asweight=True,cmap='jet')
+savefig('gif/20may28_e6.png')
+ok, easier to compare this way ... 
+
+clf(); drfmap = plotallinputmaps(pdf, np.amin(pdf.time), dstartidx['EMUP'] + 0, 'EMUP', dnumc, dstartidx, dendidx, asweight=True,cmap='jet')
+savefig('gif/20may28_e7.png')
+and at first time recorded, weights from EV1 were already heightened ... 
+
+lmap = [drfmap[x] for x in drfmap.keys()]
+lmap = np.array(lmap)
+nps = np.sum(lmap,axis=0)
+clf(); imshow(nps,cmap='jet',origin='upper'); colorbar()
+savefig('gif/20may28_e8.png')
+
+how does pattern look when combine across postsynaptic neurons of a given population?
+
+#
+dtmp = None
+for postid in range(dstartidx['EMUP'],dendidx['EMUP']+1,1):
+  print(postid)
+  drfmap = getallinputmaps(pdf, np.amax(pdf.time), postid, 'EMUP', dnumc, dstartidx, dendidx)
+  if dtmp is None: 
+    dtmp = drfmap
+  else:
+    for k in dtmp.keys(): dtmp[k] += drfmap[k]
+
+clf(); drfmap = plotallinputmaps(pdf, np.amax(pdf.time), dstartidx['EMUP'] + 0, 'EMUP', dnumc, dstartidx, dendidx, asweight=True,cmap='jet', dmap=dtmp)
+
+savefig('gif/20may28_e9.png')
+
+hmm, did not div those values properly ... 
