@@ -6084,3 +6084,13 @@ it might work (even that architecture is not guaranteed) but loses generality ..
 
 switch to izhikevich neurons?
 
+** other notes from neco 2013 paper
+
+model from neco 2013 seemed to have recurrent plastic connectivity between different motor neuron command populations 
+also had RL plasticity within sensory areas and feedback RL plasticity from M -> S
+
+noise was important component of the M neurons since drove the motor system to "babble" and produce
+random movements which were then reinforced/punished
+
+so may want to incorporate some of that into the present model
+
