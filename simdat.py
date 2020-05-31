@@ -22,6 +22,18 @@ tl=tight_layout
 stepNB = -1
 totalDur = int(dconf['sim']['duration']) # total simulation duration
 
+def pdf2weightsdict (pdf):
+  # convert the pandas dataframe with synaptic weights into a dictionary
+  D = {}
+  for idx in pdf.index:
+    t, preid, postid, weight = pdf.loc[idx]
+    preid=int(preid)
+    postid=int(postid)
+    if preid not in D: D[preid] = {}
+    if postid not in D[preid]: D[preid][postid] = []
+    D[preid][postid].append([t,weight])
+  return D
+
 def readweightsfile2pdf (fn):
   # read the synaptic plasticity weights saved as a dictionary into a pandas dataframe  
   D = pickle.load(open(fn,'rb'))
