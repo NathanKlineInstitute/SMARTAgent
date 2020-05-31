@@ -6094,3 +6094,84 @@ random movements which were then reinforced/punished
 
 so may want to incorporate some of that into the present model
 
+*20may30
+** check output from 20may29_A0_falcor_
+
+python -i simdat.py backupcfg/20may29_A0_falcor_sim.json
+
+#
+plotFollowBall(actreward,ax=subplot(1,3,1),msz=3); ylim((0,.51))
+plotHitMiss(actreward,ax=subplot(1,3,2),msz=3); ylim((0,120)); 
+plotRewards(actreward,ax=subplot(1,3,3),msz=3); 
+subplot(1,3,1); plot([40e3,80e3,120e3,160e3,200e3],[0.45,.45,.45,.45,.45],'bo',markersize=10) # times of weight norm
+
+savefig('gif/20may30_a0.png')
+
+early spike, decay, then slow rise ... that's possibly a good sign if improvements continue ...
+
+drawraster(dspkT,dspkID); 
+xlim((190e3,200e3)); savefig('gif/20may30_a2.png')
+low rates overall, no hypersynch
+
+drawcellVm(simConfig); xlim((190e3,200e3)); savefig('gif/20may30_a4.png')
+
+#
+dobjpos = loadObjPos()
+subplot(1,2,1); xlabel('Racket X position'); hist(dobjpos['racket'][:,0])
+subplot(1,2,2); xlabel('Racket Y position'); hist(dobjpos['racket'][:,1])
+savefig('gif/20may30_a5.png')savefig('gif/20may30_a5.png')
+
+save final output weights for continuation ...
+
+pdfs = pdf[pdf.time==np.amax(pdf.time)]; D = pdf2weightsdict(pdfs) 
+len(pdfs) # 990400
+pickle.dump(D, open('data/20may29_A0_falcor_synWeights_final.pkl','wb')) # ~36 MB
+ok, can use that to continue sim ...
+
+** check output from 20may29_B0_falcor_
+
+python -i simdat.py backupcfg/20may29_B0_falcor_sim.json
+
+#
+plotFollowBall(actreward,ax=subplot(1,3,1),msz=3); ylim((0,.51))
+plotHitMiss(actreward,ax=subplot(1,3,2),msz=3); ylim((0,120)); 
+plotRewards(actreward,ax=subplot(1,3,3),msz=3); 
+subplot(1,3,1); plot([40e3,80e3,120e3,160e3,200e3],[0.45,.45,.45,.45,.45],'bo',markersize=10) # times of weight norm
+
+savefig('gif/20may30_b0.png')
+
+similar pattern but the one with more recurrent EM connectivity seems to be doing better overall ?
+
+clf(); drawraster(dspkT,dspkID); xlim((190e3,200e3)); savefig('gif/20may30_b2.png')
+
+clf(); drawcellVm(simConfig);  xlim((190e3,200e3)); savefig('gif/20may30_b4.png')
+
+save final output weights for continuation ...
+
+pdfs = pdf[pdf.time==np.amax(pdf.time)]; D = pdf2weightsdict(pdfs)
+len(pdfs) # 926400
+pickle.dump(D, open('data/20may29_B0_falcor_synWeights_final.pkl','wb')) # ~33 MB
+ok, can use that to continue sim ...
+
+** continue 20may29_A0_falcor_ as 20may30_A1_falcor_
+
+    "simtype": {"ResumeSim":1,"ResumeSimFromFile":"data/20may29_A0_falcor_synWeights_final.pkl"},        
+
+running for 400 s ... saving weights every 10 s ... (instead of every 5 s)
+
+./myrun 12 sn.json
+
+** continue 20may29_B0_falcor_ as 20may30_B1_falcor_
+
+./myrun 12 sn.json
+
+hmm, not loading weights properly ... 
+they seem to have run out of memory ... later should fix to save final weights for easier reload 
+(fixed with selecting last time and then dumping output of pdf2weightsdict -- see above)
+
+    "simtype": {"ResumeSim":1,"ResumeSimFromFile":"data/20may29_B0_falcor_synWeights_final.pkl"},        
+
+./myrun 12 sn.json
+
+running for 400 s ... saving weights every 10 s ... (instead of every 5 s)
+
