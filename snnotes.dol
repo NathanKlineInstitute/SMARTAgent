@@ -6263,3 +6263,52 @@ continue from there ...
 
 optical flow may have performed a little better?, possibly due to higher noise or just a diff param regime
 
+can use ~same params on zn ... (12-16 cores?)
+but use optical flow instead of object track ... 
+
+myrun 16 sn.json
+
+weights too high ... have to reduce for optical flow (since more widesread activation)
+
+python -i simdat.py backupcfg/20jun1_C0_zn_sim.json
+
+drawraster(dspkT,dspkID); 
+savefig('gif/20jun1_c0.png')
+
+clf(); drawcellVm(simConfig)
+savefig('gif/20jun1_c1.png')
+
+last time used optic flow had these weight params:
+
+    "net":{"scale":1,"ER":400,"IR":100,"EV1":400,"EV1DE":400,"EV1DNE":400,"EV1DN":400,"EV1DNW":400,"EV1DW":400,"EV1DSW":400,"EV1DS":400,"EV1DSE":400,"IV1":100,"EV4":100,"IV4":25,"EMT":25,"IMT":9,"EMDOWN":400,"EMUP":400,"IM":200,"AngRFSigma":22.5,"DirMinRate":0.0,"DirMaxRate":50.0,"EEMWghtAM":0.000025,"EEMWghtNM":0.0000025,"EEMWghtThreshMin":0.000025,"EEMWghtThreshMax":0.000075,"EEMProb":0.3,"EEMRecProb":0.1,"EEMPopNorm":0},
+    "RL":{"AMPA":
+	  {"wbase":0.0000001,"wmax":0.0001,"RLon":1,"RLlenhebb":50,"RLlenanti":50,"useRLexp":1,"RLhebbwt":0.0005,"RLantiwt":-0.0,"hebbwt":0,"antiwt":0,"tauhebb":10,"RLwindhebb":50,"softthresh":0,"verbose":0},
+
+can use similar but have lower minthresh, smaller weight inc, and longer lenhebb
+
+    "net":{"scale":1,"ER":400,"IR":100,"EV1":400,"EV1DE":400,"EV1DNE":400,"EV1DN":400,"EV1DNW":400,"EV1DW":400,"EV1DSW":400,"EV1DS":400,"EV1DSE":400,"IV1":100,"EV4":100,"IV4":25,"EMT":25,"IMT":9,"EMDOWN":400,"EMUP":400,"IM":200,"AngRFSigma":22.5,"DirMinRate":0.0,"DirMaxRate":50.0,"EEMWghtAM":0.000025,"EEMWghtNM":0.0000025,"EEMWghtThreshMin":0.00000625,"EEMWghtThreshMax":0.0001,"EEMProb":0.3,"EEMRecProb":0.3,"EEMPopNorm":0},
+    "RL":{"AMPA":
+	  {"wbase":0.0000001,"wmax":0.0001,"RLon":1,"RLlenhebb":100,"RLlenanti":50,"useRLexp":1,"RLhebbwt":0.00000125,"RLantiwt":-0.0,"hebbwt":0,"antiwt":0,"tauhebb":10,"RLwindhebb":50,"softthresh":0,"verbose":0},
+
+weight change (RLhebbwt): 0.000025 * .05
+
+also change usefull to off:
+    "DirectionDetectionAlgo":{"CentroidTracker":0,"OpticFlow":1,"FlowWidth":16,"UseFull":0},
+
+ok, try quick sim...
+
+myrun 16 sn.json
+
+python -i simdat.py backupcfg/20jun1_C0_zn_sim.json
+
+drawraster(dspkT,dspkID); 
+savefig('gif/20jun1_c2.png')
+
+clf(); drawcellVm(simConfig); savefig('gif/20jun1_c3.png')
+
+looks ok...
+
+may as well run long sim for comparison ... 
+
+running for 400 s ... 
+
