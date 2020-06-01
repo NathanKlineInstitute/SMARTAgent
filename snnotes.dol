@@ -6175,3 +6175,91 @@ they seem to have run out of memory ... later should fix to save final weights f
 
 running for 400 s ... saving weights every 10 s ... (instead of every 5 s)
 
+*20jun1
+** check output from 20may30_A1_falcor_ and continue as 20jun1_A2_falcor_
+
+dfctr never increased > 1, so weight normalization never occurred (due to small weight increments)
+
+  Simulated time: 400.0 s; 12 workers
+  Run time: 117071.13 s
+
+synweights file is ~1GB
+
+python -i simdat.py backupcfg/20may30_A1_falcor_sim.json
+
+#
+plotFollowBall(actreward,ax=subplot(1,3,1),msz=3); ylim((0,.51))
+plotHitMiss(actreward,ax=subplot(1,3,2),msz=3); ylim((0,120)); 
+plotRewards(actreward,ax=subplot(1,3,3),msz=3); 
+subplot(1,3,1); plot([40e3,80e3,120e3,160e3,200e3,240e3,280e3,320e3,360e3,400e3],[.45,.45,.45,.45,.45,0.45,.45,.45,.45,.45],'bo',markersize=10) # times of weight norm
+
+savefig('gif/20jun1_a0.png')
+continued to improve?, possibly, but slowly ... 
+
+drawraster(dspkT,dspkID); xlim((390e3,400e3)); savefig('gif/20jun1_a2.png')
+
+clf(); drawcellVm(simConfig); xlim((390e3,400e3)); savefig('gif/20jun1_a4.png')
+
+#
+clf(); dobjpos = loadObjPos()
+subplot(1,2,1); xlabel('Racket X position'); hist(dobjpos['racket'][:,0])
+subplot(1,2,2); xlabel('Racket Y position'); hist(dobjpos['racket'][:,1])
+savefig('gif/20jun1_a5.png')
+
+pdfs = pdf[pdf.time==np.amax(pdf.time)]; D = pdf2weightsdict(pdfs) 
+len(pdfs) # 990400
+pickle.dump(D, open('data/20may30_A1_falcor_synWeights_final.pkl','wb')) # ~36 MB
+
+continue from there ...
+
+    "simtype": {"ResumeSim":1,"ResumeSimFromFile":"data/20may30_A1_falcor_synWeights_final.pkl"}, 
+"name":"20jun1_A2_falcor_"
+
+./myrun 12 sn.json
+
+** check output from 20may30_B1_falcor_ -- mistake, the json file has the same params as 20may30_A1_falcor_ ? no, continue as 20jun1_B2_falcor_
+
+so did not properly continue the sim with the lower recurrent connectivity ... ? but then why are the B1
+output files produced ?
+
+will leave that one out for now ...
+
+hmm, but file output sizes are different, so different parameters were used
+
+check if output looks different in corrected json file ...
+
+python -i simdat.py backupcfg/20may30_B1_falcor_sim.json
+
+#
+plotFollowBall(actreward,ax=subplot(1,3,1),msz=3); ylim((0,.51))
+plotHitMiss(actreward,ax=subplot(1,3,2),msz=3); ylim((0,120)); 
+plotRewards(actreward,ax=subplot(1,3,3),msz=3); 
+subplot(1,3,1); plot([40e3,80e3,120e3,160e3,200e3,240e3,280e3,320e3,360e3,400e3],[.45,.45,.45,.45,.45,0.45,.45,.45,.45,.45],'bo',markersize=10) # times of weight norm
+
+savefig('gif/20jun1_b0.png') # ok that looks somewhat different from A0 above
+
+clf(); drawraster(dspkT,dspkID); xlim((390e3,400e3)); savefig('gif/20jun1_b2.png')
+
+clf(); drawcellVm(simConfig); xlim((390e3,400e3)); savefig('gif/20jun1_b4.png')
+
+#
+clf(); dobjpos = loadObjPos()
+subplot(1,2,1); xlabel('Racket X position'); hist(dobjpos['racket'][:,0])
+subplot(1,2,2); xlabel('Racket Y position'); hist(dobjpos['racket'][:,1])
+savefig('gif/20jun1_b5.png')
+
+pdfs = pdf[pdf.time==np.amax(pdf.time)]; D = pdf2weightsdict(pdfs) 
+len(pdfs) # 926400
+pickle.dump(D, open('data/20may30_B1_falcor_synWeights_final.pkl','wb')) # ~33 MB
+
+continue from there ...
+
+    "simtype": {"ResumeSim":1,"ResumeSimFromFile":"data/20may30_B1_falcor_synWeights_final.pkl"}, 
+"name":"20jun1_B2_falcor_"
+
+./myrun 12 sn.json
+
+** sim with optical flow as comparison?
+
+optical flow may have performed a little better?, possibly due to higher noise or just a diff param regime
+
