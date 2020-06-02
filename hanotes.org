@@ -2725,3 +2725,5 @@ Option 1: Make topological connections between visual and motor cortices.
 "architecurePreMtoM": {"useProbabilistic":1,"useTopological":0}
 
 ** start testing topological architecture between preMotor and Motor areas. run 10 sec in "20june02_A_"
+
+** also change sn.json --- add "architecurePreMtoM": {"useProbabilistic":1,"useTopological":0},
