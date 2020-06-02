@@ -2727,3 +2727,6 @@ Option 1: Make topological connections between visual and motor cortices.
 ** start testing topological architecture between preMotor and Motor areas. run 10 sec in "20june02_A_"
 
 ** also change sn.json --- add "architecurePreMtoM": {"useProbabilistic":1,"useTopological":0},
+-- no activity generated in M, probably too weak connection stengths---> increase weights
+"EEMWghtAM":0.00008,"EEMWghtNM":0.0000025 ---> "EEMWghtAM":0.0008,"EEMWghtNM":0.000025
+-- run with new weights.
