@@ -2637,7 +2637,7 @@ ldflow[1]['thflow'] is recorded at 40 ms.
 -- run 100 ms sim in 20may27_A1_
 
 
-*20may28
+* 20may28
 **setting up falcor
 ---got instructions from sam
 ** NKI VPN notes
@@ -2689,6 +2689,39 @@ unset __conda_setup
 -- running 2 sec sim with centroid tracking named 20may27_A1_
 -- both sims successful---actmap movies copied to local drive SMARTAgent/gif/ using
 scp hanwar@falcor.rfmh.org://home/hanwar/GamesProject/SMARTAgent/gif/* Documents/NKI-modeling/SMARTAgent/gif/
--- run 100 sec sim with centroid tracking and flowwidth of 16 and using these parameters
+-- run 100 sec sim with optical flow and using these parameters
 "EEMWghtAM":0.00005,"EEMWghtNM":0.0000025,"EEMWghtThreshMin":0.00005,"EEMWghtThreshMax":0.0001,"EEMProb":0.3,"EEMRecProb":0.1,"EEMPopNorm":0
 save results in file 20may28_A0_
+-- run 100 sec sim with centroid tracking and flowwidth of 16 and using these parameters
+"EEMWghtAM":0.00005,"EEMWghtNM":0.0000025,"EEMWghtThreshMin":0.00005,"EEMWghtThreshMax":0.0001,"EEMProb":0.3,"EEMRecProb":0.1,"EEMPopNorm":0
+save results in file 20may28_A1_
+
+**some  potentially useful articles
+1. Learning robust cortico-cortical associations with the basal ganglia: An integrative review.
+2. From reinforcement learning models of the basal ganglia to the pathophysiology of psychiatric and neurological disorders.
+3. The Basal ganglia : a vertebrate solution to the selection problem.
+4. Anticipatory control of movement in a thalamo-cortical curcuit model ---- not exactly what i am looking for but may provide some inspirational ideas.
+
+* 20june02
+
+** EMUP and EMDOWN each population has 400 neurons.
+-- I want only 3x3 or 5x5 neurons centered around a neuron that represents the location of the object in the game environment to be active.
+-- All other neurons should be inhibited.
+-- I hope that this will allow actions based on position and direction of objects in the environment.
+-- HOW TO ACHIEVE THIS?
+
+Option 1: Make topological connections between visual and motor cortices.
+-- For connections from ['EV1', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW','EV1DSW', 'EV1DS','EV1DSE'] to ['EMUP', 'EMDOWN'] use
+    (400 neurons to 400 neurons with 3x3 overlap.) 
+    use blistEV1toEM = connectLayerswithOverlap(NBpreN = dnumc['EV1'], NBpostN = dnumc['EMUP'], overlap_xdir = 3)
+-- For connections from ['EV1DN4'] to ['EMUP', 'EMDOWN'] 
+    use blistEV4toEM = connectLayerswithOverlapDiv(NBpreN = dnumc['EV4'], NBpostN = dnumc['EMUP'], overlap_xdir = 3)
+-- For connections from ['EMT'] to ['EMUP', 'EMDOWN']
+    use blistEMTtoEM = connectLayerswithOverlapDiv(NBpreN = dnumc['EMT'], NBpostN = dnumc['EMUP'], overlap_xdir = 5)
+-- Use recurrent connections as in case of non-topological architecture.
+-- Leave local E->I->E architecture in motor areas same as before.
+
+** ability to choose architecture type from sim.json
+"architecurePreMtoM": {"useProbabilistic":1,"useTopological":0}
+
+** start testing topological architecture between preMotor and Motor areas. run 10 sec in "20june02_A_"
