@@ -6359,3 +6359,120 @@ also better than hypersynch...
 
     "simtype": {"ResumeSim":1,"ResumeSimFromFile":"data/20jun1_C0_zn_synWeights_final.pkl"}, 
 
+** check output from 20jun1_A2_falcor_ and continue as 20jun2_A3_falcor_
+
+python -i simdat.py backupcfg/20jun1_A2_falcor_sim.json
+
+dstr = '20jun2_'; simstr = dconf['sim']['name'] # date and sim string
+
+#
+plotFollowBall(actreward,ax=subplot(1,3,1),msz=3); ylim((0,.6))
+plotHitMiss(actreward,ax=subplot(1,3,2),msz=3); ylim((0,120)); 
+plotRewards(actreward,ax=subplot(1,3,3),msz=3); 
+subplot(1,3,1); plot([40e3,80e3,120e3,160e3,200e3,240e3,280e3,320e3,360e3,400e3],[.45,.45,.45,.45,.45,0.45,.45,.45,.45,.45],'bo',markersize=10) # times of weight norm
+
+savefig('gif/'+dstr+simstr+'perf.png')
+interesting ... does pass 50% probability of following ball in beginning but then decays ... should look at combined
+cumulative probability ...
+
+clf(); drawraster(dspkT,dspkID); xlim((390e3,400e3)); savefig('gif/'+dstr+simstr+'rast.png')
+xlim((0,10e3)); savefig('gif/'+dstr+simstr+'rast_b.png')
+looks like more firing in beginning compared to end; could too much punishment screw up performance? perhaps ...
+
+clf(); drawcellVm(simConfig); xlim((390e3,400e3)); savefig('gif/'+dstr+simstr+'Vm.png')
+
+#
+clf(); dobjpos = loadObjPos()
+subplot(1,2,1); xlabel('Racket X position'); hist(dobjpos['racket'][:,0])
+subplot(1,2,2); xlabel('Racket Y position'); hist(dobjpos['racket'][:,1])
+savefig('gif/'+dstr+simstr+'poshist.png')
+
+#
+sim = '20may29_A0_falcor_'
+pda = pd.DataFrame(np.loadtxt('data/'+sim+'ActionsRewards.txt'),columns=['time','action','reward','proposed','hit'])
+curt = 200e3
+for sim,maxdur in zip(['20may30_A1_falcor_', '20jun1_A2_falcor_'],[400e3,400e3]):
+  tmp = pd.DataFrame(np.loadtxt('data/'+sim+'ActionsRewards.txt'),columns=['time','action','reward','proposed','hit'])
+  tmp.time += curt
+  curt += maxdur
+  pda = pda.append(tmp)
+
+#
+clf()
+plotFollowBall(pda,ax=subplot(1,3,1),msz=3); ylim((0,.6))
+plotHitMiss(pda,ax=subplot(1,3,2),msz=3); ylim((0,120)); 
+plotRewards(pda,ax=subplot(1,3,3),msz=3); 
+
+savefig('gif/'+dstr+simstr+'perf_total.png')
+
+just looks like inaccuracy in measurement leading to initial overestimation of follow probability ...
+but at least it does appear follow ball probability is increasing ... though fairly slowly ... and
+possibly slowing down - so reached a peak ... 
+
+pdfs = pdf[pdf.time==np.amax(pdf.time)]; D = pdf2weightsdict(pdfs); pickle.dump(D, open('data/'+simstr+'synWeights_final.pkl','wb')) 
+
+ok, restart as ... 20jun2_A3_falcor_
+
+"name":"20jun2_A3_falcor_"
+    "simtype": {"ResumeSim":1,"ResumeSimFromFile":"data/20jun1_A2_falcor_synWeights_final.pkl"}, 
+
+duration of 500 s ...
+
+./myrun 12 sn.json
+ 
+** check output from 20jun1_B2_falcor_
+
+python -i simdat.py backupcfg/20jun1_B2_falcor_sim.json
+
+dstr = '20jun2_'; simstr = dconf['sim']['name'] # date and sim string
+
+#
+plotFollowBall(actreward,ax=subplot(1,3,1),msz=3); ylim((0,.6))
+plotHitMiss(actreward,ax=subplot(1,3,2),msz=3); ylim((0,120)); 
+plotRewards(actreward,ax=subplot(1,3,3),msz=3); 
+subplot(1,3,1); plot([40e3,80e3,120e3,160e3,200e3,240e3,280e3,320e3,360e3,400e3],[.45,.45,.45,.45,.45,0.45,.45,.45,.45,.45],'bo',markersize=10) # times of weight norm
+
+savefig('gif/'+dstr+simstr+'perf.png')
+
+clf(); drawraster(dspkT,dspkID); xlim((390e3,400e3)); savefig('gif/'+dstr+simstr+'rast.png')
+rates look ok overall
+
+clf(); drawcellVm(simConfig); xlim((390e3,400e3)); savefig('gif/'+dstr+simstr+'Vm.png')
+
+#
+clf(); dobjpos = loadObjPos()
+subplot(1,2,1); xlabel('Racket X position'); hist(dobjpos['racket'][:,0])
+subplot(1,2,2); xlabel('Racket Y position'); hist(dobjpos['racket'][:,1])
+savefig('gif/'+dstr+simstr+'poshist.png')
+
+#
+sim = '20may29_B0_falcor_'
+pda = pd.DataFrame(np.loadtxt('data/'+sim+'ActionsRewards.txt'),columns=['time','action','reward','proposed','hit'])
+curt = 200e3
+for sim,maxdur in zip(['20may30_B1_falcor_', '20jun1_B2_falcor_'],[400e3,400e3]):
+  tmp = pd.DataFrame(np.loadtxt('data/'+sim+'ActionsRewards.txt'),columns=['time','action','reward','proposed','hit'])
+  tmp.time += curt
+  curt += maxdur
+  pda = pda.append(tmp)
+
+#
+clf()
+plotFollowBall(pda,ax=subplot(1,3,1),msz=3); ylim((0,.6))
+plotHitMiss(pda,ax=subplot(1,3,2),msz=3); ylim((0,120)); 
+plotRewards(pda,ax=subplot(1,3,3),msz=3); 
+
+savefig('gif/'+dstr+simstr+'perf_total.png')
+
+these cumulative probabilities look pretty clearly increasing ... so worth continuing further ... 
+
+pdfs = pdf[pdf.time==np.amax(pdf.time)]; D = pdf2weightsdict(pdfs); pickle.dump(D, open('data/'+simstr+'synWeights_final.pkl','wb')) # 
+
+ok, restart as ... 20jun2_A3_falcor_
+
+"name":"20jun2_B3_falcor_"
+    "simtype": {"ResumeSim":1,"ResumeSimFromFile":"data/20jun1_B2_falcor_synWeights_final.pkl"}, 
+
+duration of 500 s ...
+
+./myrun 12 sn.json
+

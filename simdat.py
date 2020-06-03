@@ -392,12 +392,12 @@ def plotFollowBall (actreward, ax=None,msz=1):
   cumActs = np.array(range(1,len(actionvsproposed)+1))
   Hit_Missed = np.array(actreward.hit)
   ax.plot(action_times,np.divide(rewardingActions,cumActs),'r.',markersize=msz)
-  ax.plot(action_times,np.divide(punishingActions,cumActs),'b.',markersize=msz)
+  #ax.plot(action_times,np.divide(punishingActions,cumActs),'b.',markersize=msz)# do not need to plot, just 1-p(follow ball)
   ax.set_xlim((0,np.max(action_times)))
   ax.set_ylim((0,1))
-  ax.legend(('Follow Ball','Not Follow'),loc='best')
+  #ax.legend(('Follow Ball'),loc='best')
   ax.plot([0,np.max(action_times)],[0.5,0.5],'--',color='gray')  
-  ax.set_xlabel('Time (ms)'); ax.set_ylabel('Probability')
+  ax.set_xlabel('Time (ms)'); ax.set_ylabel('p(Follow Ball)')
 
 #  
 def plotHitMiss (actreward,ax=None,msz=1):
