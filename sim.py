@@ -950,9 +950,19 @@ def getAllSTDPObjects (sim):
             dSTDPmech[pop].append(STDPmech)
   return dSTDPmech
         
-#Alterate to create network and run simulation
+# Alternate to create network and run simulation
 # create network object and set cfg and net params; pass simulation config and network params as arguments
 sim.initialize(simConfig = simConfig, netParams = netParams)
+
+if sim.rank == 0:  # sim rank 0 specific init and backup of config file
+  from aigame import AIGame
+  sim.AIGame = AIGame() # only create AIGame on node 0
+  # node 0 saves the json config file
+  # this is just a precaution since simConfig pkl file has MOST of the info; ideally should adjust simConfig to contain
+  # ALL of the required info
+  from utils import backupcfg
+  backupcfg(dconf['sim']['name'])
+
 sim.net.createPops()                      # instantiate network populations
 sim.net.createCells()                     # instantiate network cells based on defined populations
 sim.net.connectCells()                    # create connections between cells based on params
@@ -976,7 +986,7 @@ def updateSTDPWeights (sim, W):
         cW = cConnW.at[idx,'weight']
         conn['hObj'].weight[0] = cW
         if dconf['verbose'] > 1: print('weight updated:', cW)
-
+        
 #if specified 'ResumeSim' = 1, load the connection data from 'ResumeSimFromFile' and assign weights to STDP synapses  
 if dconf['simtype']['ResumeSim']:
   try:
@@ -986,15 +996,6 @@ if dconf['simtype']['ResumeSim']:
     if sim.rank==0: print('Updated STDP weights')
   except:
     print('Could not restore STDP weights from file.')
-
-if sim.rank == 0: 
-  from aigame import AIGame
-  sim.AIGame = AIGame() # only create AIGame on node 0
-  # node 0 saves the json config file
-  # this is just a precaution since simConfig pkl file has MOST of the info; ideally should adjust simConfig to contain
-  # ALL of the required info
-  from utils import backupcfg
-  backupcfg(dconf['sim']['name'])
 
 def setdminID (sim, lpop):
   # setup min ID for each population in lpop
