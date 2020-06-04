@@ -6175,3 +6175,508 @@ they seem to have run out of memory ... later should fix to save final weights f
 
 running for 400 s ... saving weights every 10 s ... (instead of every 5 s)
 
+*20jun1
+** check output from 20may30_A1_falcor_ and continue as 20jun1_A2_falcor_
+
+dfctr never increased > 1, so weight normalization never occurred (due to small weight increments)
+
+  Simulated time: 400.0 s; 12 workers
+  Run time: 117071.13 s
+
+synweights file is ~1GB
+
+python -i simdat.py backupcfg/20may30_A1_falcor_sim.json
+
+#
+plotFollowBall(actreward,ax=subplot(1,3,1),msz=3); ylim((0,.51))
+plotHitMiss(actreward,ax=subplot(1,3,2),msz=3); ylim((0,120)); 
+plotRewards(actreward,ax=subplot(1,3,3),msz=3); 
+subplot(1,3,1); plot([40e3,80e3,120e3,160e3,200e3,240e3,280e3,320e3,360e3,400e3],[.45,.45,.45,.45,.45,0.45,.45,.45,.45,.45],'bo',markersize=10) # times of weight norm
+
+savefig('gif/20jun1_a0.png')
+continued to improve?, possibly, but slowly ... 
+
+drawraster(dspkT,dspkID); xlim((390e3,400e3)); savefig('gif/20jun1_a2.png')
+
+clf(); drawcellVm(simConfig); xlim((390e3,400e3)); savefig('gif/20jun1_a4.png')
+
+#
+clf(); dobjpos = loadObjPos()
+subplot(1,2,1); xlabel('Racket X position'); hist(dobjpos['racket'][:,0])
+subplot(1,2,2); xlabel('Racket Y position'); hist(dobjpos['racket'][:,1])
+savefig('gif/20jun1_a5.png')
+
+pdfs = pdf[pdf.time==np.amax(pdf.time)]; D = pdf2weightsdict(pdfs) 
+len(pdfs) # 990400
+pickle.dump(D, open('data/20may30_A1_falcor_synWeights_final.pkl','wb')) # ~36 MB
+
+continue from there ...
+
+    "simtype": {"ResumeSim":1,"ResumeSimFromFile":"data/20may30_A1_falcor_synWeights_final.pkl"}, 
+"name":"20jun1_A2_falcor_"
+
+./myrun 12 sn.json
+
+** check output from 20may30_B1_falcor_ -- mistake, the json file has the same params as 20may30_A1_falcor_ ? no, continue as 20jun1_B2_falcor_
+
+so did not properly continue the sim with the lower recurrent connectivity ... ? but then why are the B1
+output files produced ?
+
+will leave that one out for now ...
+
+hmm, but file output sizes are different, so different parameters were used
+
+check if output looks different in corrected json file ...
+
+python -i simdat.py backupcfg/20may30_B1_falcor_sim.json
+
+#
+plotFollowBall(actreward,ax=subplot(1,3,1),msz=3); ylim((0,.51))
+plotHitMiss(actreward,ax=subplot(1,3,2),msz=3); ylim((0,120)); 
+plotRewards(actreward,ax=subplot(1,3,3),msz=3); 
+subplot(1,3,1); plot([40e3,80e3,120e3,160e3,200e3,240e3,280e3,320e3,360e3,400e3],[.45,.45,.45,.45,.45,0.45,.45,.45,.45,.45],'bo',markersize=10) # times of weight norm
+
+savefig('gif/20jun1_b0.png') # ok that looks somewhat different from A0 above
+
+clf(); drawraster(dspkT,dspkID); xlim((390e3,400e3)); savefig('gif/20jun1_b2.png')
+
+clf(); drawcellVm(simConfig); xlim((390e3,400e3)); savefig('gif/20jun1_b4.png')
+
+#
+clf(); dobjpos = loadObjPos()
+subplot(1,2,1); xlabel('Racket X position'); hist(dobjpos['racket'][:,0])
+subplot(1,2,2); xlabel('Racket Y position'); hist(dobjpos['racket'][:,1])
+savefig('gif/20jun1_b5.png')
+
+pdfs = pdf[pdf.time==np.amax(pdf.time)]; D = pdf2weightsdict(pdfs) 
+len(pdfs) # 926400
+pickle.dump(D, open('data/20may30_B1_falcor_synWeights_final.pkl','wb')) # ~33 MB
+
+continue from there ...
+
+    "simtype": {"ResumeSim":1,"ResumeSimFromFile":"data/20may30_B1_falcor_synWeights_final.pkl"}, 
+"name":"20jun1_B2_falcor_"
+
+./myrun 12 sn.json
+
+** sim with optical flow as comparison?
+
+optical flow may have performed a little better?, possibly due to higher noise or just a diff param regime
+
+can use ~same params on zn ... (12-16 cores?)
+but use optical flow instead of object track ... 
+
+myrun 16 sn.json
+
+weights too high ... have to reduce for optical flow (since more widesread activation)
+
+python -i simdat.py backupcfg/20jun1_C0_zn_sim.json
+
+drawraster(dspkT,dspkID); 
+savefig('gif/20jun1_c0.png')
+
+clf(); drawcellVm(simConfig)
+savefig('gif/20jun1_c1.png')
+
+last time used optic flow had these weight params:
+
+    "net":{"scale":1,"ER":400,"IR":100,"EV1":400,"EV1DE":400,"EV1DNE":400,"EV1DN":400,"EV1DNW":400,"EV1DW":400,"EV1DSW":400,"EV1DS":400,"EV1DSE":400,"IV1":100,"EV4":100,"IV4":25,"EMT":25,"IMT":9,"EMDOWN":400,"EMUP":400,"IM":200,"AngRFSigma":22.5,"DirMinRate":0.0,"DirMaxRate":50.0,"EEMWghtAM":0.000025,"EEMWghtNM":0.0000025,"EEMWghtThreshMin":0.000025,"EEMWghtThreshMax":0.000075,"EEMProb":0.3,"EEMRecProb":0.1,"EEMPopNorm":0},
+    "RL":{"AMPA":
+	  {"wbase":0.0000001,"wmax":0.0001,"RLon":1,"RLlenhebb":50,"RLlenanti":50,"useRLexp":1,"RLhebbwt":0.0005,"RLantiwt":-0.0,"hebbwt":0,"antiwt":0,"tauhebb":10,"RLwindhebb":50,"softthresh":0,"verbose":0},
+
+can use similar but have lower minthresh, smaller weight inc, and longer lenhebb
+
+    "net":{"scale":1,"ER":400,"IR":100,"EV1":400,"EV1DE":400,"EV1DNE":400,"EV1DN":400,"EV1DNW":400,"EV1DW":400,"EV1DSW":400,"EV1DS":400,"EV1DSE":400,"IV1":100,"EV4":100,"IV4":25,"EMT":25,"IMT":9,"EMDOWN":400,"EMUP":400,"IM":200,"AngRFSigma":22.5,"DirMinRate":0.0,"DirMaxRate":50.0,"EEMWghtAM":0.000025,"EEMWghtNM":0.0000025,"EEMWghtThreshMin":0.00000625,"EEMWghtThreshMax":0.0001,"EEMProb":0.3,"EEMRecProb":0.3,"EEMPopNorm":0},
+    "RL":{"AMPA":
+	  {"wbase":0.0000001,"wmax":0.0001,"RLon":1,"RLlenhebb":100,"RLlenanti":50,"useRLexp":1,"RLhebbwt":0.00000125,"RLantiwt":-0.0,"hebbwt":0,"antiwt":0,"tauhebb":10,"RLwindhebb":50,"softthresh":0,"verbose":0},
+
+weight change (RLhebbwt): 0.000025 * .05
+
+also change usefull to off:
+    "DirectionDetectionAlgo":{"CentroidTracker":0,"OpticFlow":1,"FlowWidth":16,"UseFull":0},
+
+ok, try quick sim...
+
+myrun 16 sn.json
+
+python -i simdat.py backupcfg/20jun1_C0_zn_sim.json
+
+drawraster(dspkT,dspkID); 
+savefig('gif/20jun1_c2.png')
+
+clf(); drawcellVm(simConfig); savefig('gif/20jun1_c3.png')
+
+looks ok...
+
+may as well run long sim for comparison ... 
+
+running for 400 s ... 
+
+*20jun2
+** check output from 20jun1_C0_zn_ (uses optical flow)
+
+  Cells: 5359
+  Connections: 0 (0.00 per cell)
+  Spikes: 4317394 (2.01 Hz)
+  Simulated time: 400.0 s; 16 workers
+  Run time: 56524.00 s
+Saving output as data/20jun1_C0_zn_simConfig.pkl ... 
+
+synweights output file is ~2 GB
+
+python -i simdat.py backupcfg/20jun1_C0_zn_sim.json
+
+#
+plotFollowBall(actreward,ax=subplot(1,3,1),msz=3); ylim((0,.51))
+plotHitMiss(actreward,ax=subplot(1,3,2),msz=3); ylim((0,120)); 
+plotRewards(actreward,ax=subplot(1,3,3),msz=3); 
+subplot(1,3,1); plot([40e3,80e3,120e3,160e3,200e3,240e3,280e3,320e3,360e3,400e3],[.45,.45,.45,.45,.45,0.45,.45,.45,.45,.45],'bo',markersize=10) # times of weight norm
+
+savefig('gif/20jun2_a0.png') # 
+so far, this one doing worse than the others with object tracking...likely not due to object
+tracking itself...but low firing rates...
+
+clf(); drawraster(dspkT,dspkID); xlim((390e3,400e3)); savefig('gif/20jun2_a2.png')
+
+clf(); drawcellVm(simConfig); xlim((390e3,400e3)); savefig('gif/20jun2_a4.png')
+
+#
+clf(); dobjpos = loadObjPos()
+subplot(1,2,1); xlabel('Racket X position'); hist(dobjpos['racket'][:,0])
+subplot(1,2,2); xlabel('Racket Y position'); hist(dobjpos['racket'][:,1])
+savefig('gif/20jun2_a5.png')
+
+pdfs = pdf[pdf.time==np.amax(pdf.time)]; D = pdf2weightsdict(pdfs) 
+len(pdfs) # 
+pickle.dump(D, open('data/20jun1_C0_zn_synWeights_final.pkl','wb')) # 
+
+can continue from there ... 
+
+current weights are only ~20% of max and increasing slowly ... so there's room to improve
+also better than hypersynch...
+
+"name":"20jun2_C1_zn_"
+
+    "simtype": {"ResumeSim":1,"ResumeSimFromFile":"data/20jun1_C0_zn_synWeights_final.pkl"}, 
+
+** check output from 20jun1_A2_falcor_ and continue as 20jun2_A3_falcor_
+
+python -i simdat.py backupcfg/20jun1_A2_falcor_sim.json
+
+dstr = '20jun2_'; simstr = dconf['sim']['name'] # date and sim string
+
+#
+plotFollowBall(actreward,ax=subplot(1,3,1),msz=3); ylim((0,.6))
+plotHitMiss(actreward,ax=subplot(1,3,2),msz=3); ylim((0,120)); 
+plotRewards(actreward,ax=subplot(1,3,3),msz=3); 
+subplot(1,3,1); plot([40e3,80e3,120e3,160e3,200e3,240e3,280e3,320e3,360e3,400e3],[.45,.45,.45,.45,.45,0.45,.45,.45,.45,.45],'bo',markersize=10) # times of weight norm
+
+savefig('gif/'+dstr+simstr+'perf.png')
+interesting ... does pass 50% probability of following ball in beginning but then decays ... should look at combined
+cumulative probability ...
+
+clf(); drawraster(dspkT,dspkID); xlim((390e3,400e3)); savefig('gif/'+dstr+simstr+'rast.png')
+xlim((0,10e3)); savefig('gif/'+dstr+simstr+'rast_b.png')
+looks like more firing in beginning compared to end; could too much punishment screw up performance? perhaps ...
+
+clf(); drawcellVm(simConfig); xlim((390e3,400e3)); savefig('gif/'+dstr+simstr+'Vm.png')
+
+#
+clf(); dobjpos = loadObjPos()
+subplot(1,2,1); xlabel('Racket X position'); hist(dobjpos['racket'][:,0])
+subplot(1,2,2); xlabel('Racket Y position'); hist(dobjpos['racket'][:,1])
+savefig('gif/'+dstr+simstr+'poshist.png')
+
+#
+sim = '20may29_A0_falcor_'
+pda = pd.DataFrame(np.loadtxt('data/'+sim+'ActionsRewards.txt'),columns=['time','action','reward','proposed','hit'])
+curt = 200e3
+for sim,maxdur in zip(['20may30_A1_falcor_', '20jun1_A2_falcor_'],[400e3,400e3]):
+  tmp = pd.DataFrame(np.loadtxt('data/'+sim+'ActionsRewards.txt'),columns=['time','action','reward','proposed','hit'])
+  tmp.time += curt
+  curt += maxdur
+  pda = pda.append(tmp)
+
+#
+clf()
+plotFollowBall(pda,ax=subplot(1,3,1),msz=3); ylim((0,.6))
+plotHitMiss(pda,ax=subplot(1,3,2),msz=3); ylim((0,120)); 
+plotRewards(pda,ax=subplot(1,3,3),msz=3); 
+
+savefig('gif/'+dstr+simstr+'perf_total.png')
+
+just looks like inaccuracy in measurement leading to initial overestimation of follow probability ...
+but at least it does appear follow ball probability is increasing ... though fairly slowly ... and
+possibly slowing down - so reached a peak ... 
+
+pdfs = pdf[pdf.time==np.amax(pdf.time)]; D = pdf2weightsdict(pdfs); pickle.dump(D, open('data/'+simstr+'synWeights_final.pkl','wb')) 
+
+ok, restart as ... 20jun2_A3_falcor_
+
+"name":"20jun2_A3_falcor_"
+    "simtype": {"ResumeSim":1,"ResumeSimFromFile":"data/20jun1_A2_falcor_synWeights_final.pkl"}, 
+
+duration of 500 s ...
+
+./myrun 12 sn.json
+ 
+** check output from 20jun1_B2_falcor_ and continue as 20jun2_B3_falcor_
+
+python -i simdat.py backupcfg/20jun1_B2_falcor_sim.json
+
+dstr = '20jun2_'; simstr = dconf['sim']['name'] # date and sim string
+
+#
+plotFollowBall(actreward,ax=subplot(1,3,1),msz=3); ylim((0,.6))
+plotHitMiss(actreward,ax=subplot(1,3,2),msz=3); ylim((0,120)); 
+plotRewards(actreward,ax=subplot(1,3,3),msz=3); 
+subplot(1,3,1); plot([40e3,80e3,120e3,160e3,200e3,240e3,280e3,320e3,360e3,400e3],[.45,.45,.45,.45,.45,0.45,.45,.45,.45,.45],'bo',markersize=10) # times of weight norm
+
+savefig('gif/'+dstr+simstr+'perf.png')
+
+clf(); drawraster(dspkT,dspkID); xlim((390e3,400e3)); savefig('gif/'+dstr+simstr+'rast.png')
+rates look ok overall
+
+clf(); drawcellVm(simConfig); xlim((390e3,400e3)); savefig('gif/'+dstr+simstr+'Vm.png')
+
+#
+clf(); dobjpos = loadObjPos()
+subplot(1,2,1); xlabel('Racket X position'); hist(dobjpos['racket'][:,0])
+subplot(1,2,2); xlabel('Racket Y position'); hist(dobjpos['racket'][:,1])
+savefig('gif/'+dstr+simstr+'poshist.png')
+
+#
+sim = '20may29_B0_falcor_'
+pda = pd.DataFrame(np.loadtxt('data/'+sim+'ActionsRewards.txt'),columns=['time','action','reward','proposed','hit'])
+curt = 200e3
+for sim,maxdur in zip(['20may30_B1_falcor_', '20jun1_B2_falcor_'],[400e3,400e3]):
+  tmp = pd.DataFrame(np.loadtxt('data/'+sim+'ActionsRewards.txt'),columns=['time','action','reward','proposed','hit'])
+  tmp.time += curt
+  curt += maxdur
+  pda = pda.append(tmp)
+
+#
+clf()
+plotFollowBall(pda,ax=subplot(1,3,1),msz=3); ylim((0,.6))
+plotHitMiss(pda,ax=subplot(1,3,2),msz=3); ylim((0,120)); 
+plotRewards(pda,ax=subplot(1,3,3),msz=3); 
+
+savefig('gif/'+dstr+simstr+'perf_total.png')
+
+these cumulative probabilities look pretty clearly increasing ... so worth continuing further ... 
+
+pdfs = pdf[pdf.time==np.amax(pdf.time)]; D = pdf2weightsdict(pdfs); pickle.dump(D, open('data/'+simstr+'synWeights_final.pkl','wb')) # 
+
+ok, restart as ... 20jun2_A3_falcor_
+
+"name":"20jun2_B3_falcor_"
+    "simtype": {"ResumeSim":1,"ResumeSimFromFile":"data/20jun1_B2_falcor_synWeights_final.pkl"}, 
+
+duration of 500 s ...
+
+./myrun 12 sn.json
+
+*20jun4
+** check output from 20jun1_C0_zn_ -- still at pretty low probability of follow -->> too low firing rate?
+
+  Cells: 5359
+  Connections: 0 (0.00 per cell)
+  Spikes: 4292836 (2.00 Hz)
+  Simulated time: 400.0 s; 16 workers
+  Run time: 127753.46 s
+
+python -i simdat.py backupcfg/20jun1_C0_zn_sim.json
+
+dstr = '20jun4_'; simstr = dconf['sim']['name'] # date and sim string
+
+#
+plotFollowBall(actreward,ax=subplot(1,3,1),msz=3); ylim((0,.6))
+plotHitMiss(actreward,ax=subplot(1,3,2),msz=3); ylim((0,120)); 
+plotRewards(actreward,ax=subplot(1,3,3),msz=3); 
+
+savefig('gif/'+dstr+simstr+'perf.png')
+
+still rising, but not even approaching 50% yet ...
+
+clf(); drawraster(dspkT,dspkID); xlim((390e3,400e3)); savefig('gif/'+dstr+simstr+'rast.png')
+clf(); drawcellVm(simConfig); xlim((390e3,400e3)); savefig('gif/'+dstr+simstr+'Vm.png')
+
+#
+clf(); dobjpos = loadObjPos()
+subplot(1,2,1); xlabel('Racket X position'); hist(dobjpos['racket'][:,0])
+subplot(1,2,2); xlabel('Racket Y position'); hist(dobjpos['racket'][:,1])
+savefig('gif/'+dstr+simstr+'poshist.png')
+
+hmm, looks like the weights/output was overwritten since did not update the sim name properly
+when started the last sim on zn
+
+overall, looks like weights decreased from original:
+2.101540571002588e-05/0.000025 == 0.8406162284010351
+
+should start from the sims that had close to 50% probability of success? they had lower level of
+recurr conn
+
+less punishment or higher min value might help ... or higher starting value ... 
+
+## pdfs = pdf[pdf.time==np.amax(pdf.time)]; D = pdf2weightsdict(pdfs); pickle.dump(D, open('data/'+simstr+'synWeights_final.pkl','wb')) # 
+
+** start from my
+
+some errors on my ... 
+
+** check output from 20jun2_A3_falcor_ and continue as 20jun4_A4_falcor_
+
+python -i simdat.py backupcfg/20jun2_A3_falcor_sim.json
+
+dstr = '20jun4_'; simstr = dconf['sim']['name'] # date and sim string
+
+#
+plotFollowBall(actreward,ax=subplot(1,3,1),msz=3); ylim((0,.6))
+plotHitMiss(actreward,ax=subplot(1,3,2),msz=3); ylim((0,120)); 
+plotRewards(actreward,ax=subplot(1,3,3),msz=3); 
+
+savefig('gif/'+dstr+simstr+'perf.png')
+finally got close to 50% follow ball probability previously achieved, but then decays downwards ... 
+and looks like starts decaying when gets more rewards ... so reward strength might be too high??
+
+clf(); drawraster(dspkT,dspkID); xlim((90e3,100e3)); savefig('gif/'+dstr+simstr+'rast.png')
+xlim((490e3,500e3)); savefig('gif/'+dstr+simstr+'rast_b.png')
+already much more hypersynchrony near the end ... 
+
+clf(); drawcellVm(simConfig); xlim((90e3,100e3)); savefig('gif/'+dstr+simstr+'Vm.png')
+xlim((490e3,500e3)); savefig('gif/'+dstr+simstr+'Vm_b.png')
+
+#
+clf(); dobjpos = loadObjPos()
+subplot(1,2,1); xlabel('Racket X position'); hist(dobjpos['racket'][:,0])
+subplot(1,2,2); xlabel('Racket Y position'); hist(dobjpos['racket'][:,1])
+savefig('gif/'+dstr+simstr+'poshist.png')
+
+#
+sim = '20may29_A0_falcor_'
+pda = pd.DataFrame(np.loadtxt('data/'+sim+'ActionsRewards.txt'),columns=['time','action','reward','proposed','hit'])
+curt = 200e3
+for sim,maxdur in zip(['20may30_A1_falcor_', '20jun1_A2_falcor_','20jun2_A3_falcor_'],[400e3,400e3,500e3]):
+  tmp = pd.DataFrame(np.loadtxt('data/'+sim+'ActionsRewards.txt'),columns=['time','action','reward','proposed','hit'])
+  tmp.time += curt
+  curt += maxdur
+  pda = pda.append(tmp)
+
+#
+clf()
+plotFollowBall(pda,ax=subplot(1,3,1),msz=3); ylim((0,.6))
+plotHitMiss(pda,ax=subplot(1,3,2),msz=3); ylim((0,120)); 
+plotRewards(pda,ax=subplot(1,3,3),msz=3); 
+
+savefig('gif/'+dstr+simstr+'perf_total.png')
+
+hmm...using total cumulative, still seems to be increasing ...
+
+clf()
+actreward = pda
+action_times = np.array(actreward.time)
+actionvsproposed = np.array(actreward.action-actreward.proposed)
+Hit_Missed = np.array(actreward.hit)
+followact = np.where(actionvsproposed==0,1,0)
+nbin = int(1e3 / (action_times[1]-action_times[0]))
+avgfollow = [mean(followact[sidx:sidx+nbin]) for sidx in arange(0,len(followact),nbin)]
+plot(20*arange(0,len(followact),nbin), avgfollow)
+savefig('gif/'+dstr+simstr+'perf_follow_ball_prob.png')
+
+probability gradually increasing but lot of variability ... 
+
+DOWNwts,UPwts = plotMeanWeights(pdf, gca(), xl=(0,simConfig['simConfig']['duration']))
+
+savefig('gif/'+dstr+simstr+'avg_weight.png')
+
+pdfs = pdf[pdf.time==np.amax(pdf.time)]; D = pdf2weightsdict(pdfs); pickle.dump(D, open('data/'+simstr+'synWeights_final.pkl','wb')) 
+
+so, not clear if worth continuing this sim ... since getting towards hypersynch at end ... 
+can reduce RLhebbwt ... ? so weights stop increasing as quickly ... 
+
+this was value used up to now: "RLhebbwt":0.000004
+try
+"RLhebbwt":0.000002
+and also increase RLlenhebb from 100 to 200 ... see if reduces some of the bias towards EMUP
+
+ok, restart as ... 20jun4_A4_falcor_
+
+"name":"20jun4_A4_falcor_"
+
+duration of 200 s ...
+
+./myrun 12 sn.json
+
+** check output from 20jun2_B3_falcor_ and continue as 20jun4_B4_falcor_ <<-- will not continue this one
+
+python -i simdat.py backupcfg/20jun2_B3_falcor_sim.json
+
+dstr = '20jun4_'; simstr = dconf['sim']['name'] # date and sim string
+
+#
+plotFollowBall(actreward,ax=subplot(1,3,1),msz=3); ylim((0,.6))
+plotHitMiss(actreward,ax=subplot(1,3,2),msz=3); ylim((0,120)); 
+plotRewards(actreward,ax=subplot(1,3,3),msz=3); 
+
+savefig('gif/'+dstr+simstr+'perf.png')
+
+clf(); drawraster(dspkT,dspkID); xlim((390e3,400e3)); savefig('gif/'+dstr+simstr+'rast.png')
+xlim((0,10e3)); savefig('gif/'+dstr+simstr+'rast_b.png')
+
+clf(); drawcellVm(simConfig); xlim((390e3,400e3)); savefig('gif/'+dstr+simstr+'Vm.png')
+
+#
+clf(); dobjpos = loadObjPos()
+subplot(1,2,1); xlabel('Racket X position'); hist(dobjpos['racket'][:,0])
+subplot(1,2,2); xlabel('Racket Y position'); hist(dobjpos['racket'][:,1])
+savefig('gif/'+dstr+simstr+'poshist.png')
+
+#
+sim = '20may29_B0_falcor_'
+pda = pd.DataFrame(np.loadtxt('data/'+sim+'ActionsRewards.txt'),columns=['time','action','reward','proposed','hit'])
+curt = 200e3
+for sim,maxdur in zip(['20may30_B1_falcor_', '20jun1_B2_falcor_','20jun2_B3_falcor_'],[400e3,400e3,500e3]):
+  tmp = pd.DataFrame(np.loadtxt('data/'+sim+'ActionsRewards.txt'),columns=['time','action','reward','proposed','hit'])
+  tmp.time += curt
+  curt += maxdur
+  pda = pda.append(tmp)
+
+#
+clf()
+plotFollowBall(pda,ax=subplot(1,3,1),msz=3); ylim((0,.6))
+plotHitMiss(pda,ax=subplot(1,3,2),msz=3); ylim((0,120)); 
+plotRewards(pda,ax=subplot(1,3,3),msz=3); 
+
+savefig('gif/'+dstr+simstr+'perf_total.png')
+
+clf()
+actreward = pda
+action_times = np.array(actreward.time)
+actionvsproposed = np.array(actreward.action-actreward.proposed)
+Hit_Missed = np.array(actreward.hit)
+followact = np.where(actionvsproposed==0,1,0)
+nbin = int(1e3 / (action_times[1]-action_times[0]))
+avgfollow = [mean(followact[sidx:sidx+nbin]) for sidx in arange(0,len(followact),nbin)]
+plot(20*arange(0,len(followact),nbin), avgfollow)
+savefig('gif/'+dstr+simstr+'perf_follow_ball_prob.png')
+
+DOWNwts,UPwts = plotMeanWeights(pdf, gca(), xl=(0,simConfig['simConfig']['duration']))
+
+savefig('gif/'+dstr+simstr+'avg_weight.png')
+
+pdfs = pdf[pdf.time==np.amax(pdf.time)]; D = pdf2weightsdict(pdfs); pickle.dump(D, open('data/'+simstr+'synWeights_final.pkl','wb')) 
+
+ok, restart as ... 20jun4_B4_falcor_
+
+"name":"20jun4_B4_falcor_"
+
+duration of 500 s ...
+
+./myrun 12 sn.json
+
+** architecture changes?
+
+feedback connections
+plast between EM pops
+bigger net?
+
