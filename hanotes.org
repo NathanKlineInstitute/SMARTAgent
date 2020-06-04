@@ -2608,3 +2608,130 @@ neurons... but having additional recurrent connectivity in EM might still allow 
 *** In computeMotionFields, append zero-valued arrays for all except ang and thang, where 0 were replaced with -100 to avoid 0 considered as movement towards 0 degrees i.e. E.
 *** test sim using optic flow in file "20may22_A_"
 **** "EEMWghtAM":0.000025,"EEMWghtNM":0.0000025,"EEMWghtThreshMin":0.000025,"EEMWghtThreshMax":0.000075,"EEMProb":0.3,"EEMRecProb":0.0,"EEMPopNorm":0
+
+*20may27
+** Needs to confirm: 1) actmap movie is accurate. 2) direction selective neurons are activated properly in both optic flow and centroid tracking cases.
+*** add UseFull in sim configuration: "DirectionDetectionAlgo":{"CentroidTracker":0,"OpticFlow":1,"UseFull":0}, For Optic flow set UseFull = 0
+*** test sim (2 sec) using optic flow in file "20may27_A0_"
+checking details:
+InputImages.shape -- prints -- (100,20,20)
+np.shape(ldflow) -- prints -- (100,)
+t1 -- prints -- range(0,2000,20)
+t2 -- prints -- range(20,2020,20)
+np.shape(ldflow[0]['thflow']) -- prints -- (20,20,2).... where ldflow[0]['thflow'][:,:,0] is X component of direction vectors and ldflow[0]['thflow'][:,:,1] is Y component of direction vectors.
+-- the racket moves south from timestep 6 to timestep 7 (from top edge of racket at 6.5 to top edge of racket at 7.5)
+-- quiver plot at timestep 7 shows correct directions (for most of the pixels)
+-- the ball moves south west from timestep 20 to timestep 21. rackets dont move.
+-- quiver plot at timestep 21 shows correct directions (for most of the pixels)
+-- now check the direcrtion sensitive neurons during that timestep.
+-- there seems to be a difference of 2 timesteps in datastructures e.g. dact['EV1DSW'][23,:,:] showed the activity for ldflow[21]['thflow']
+---- This doesn't make sense... how is this possible. 
+dact['EV1DSW'][0,:,:] has activity between 0-20 ms
+ldflow[0]['thflow'] has optical flow recorded at 20 ms.---> This will be used to drive activity between 20-40 ms.
+InputImage[0] is recorded at 20 ms.
+
+dact['EV1DSW'][1,:,:] has activity between 20-40 ms ---> This should be associated with ldflow[0]
+InputImage[1] is recorded at 40 ms.
+ldflow[1]['thflow'] is recorded at 40 ms.   
+
+-- run 100 ms sim in 20may27_A1_
+
+
+* 20may28
+**setting up falcor
+---got instructions from sam
+** NKI VPN notes
+To access the new VPN, go to https://sshvpn.rfmh.org and login with your NKI username and password.
+After signing in, there will be links to download the VPN client for your operating system and
+well as instructions for connecting.
+to access the VPN from outside of NKI use cisco anyconnect and go to https://63.117.203.75
+then use this username: sneymotin
+and the rfmh live.com password
+is there x2go for falcor?
+alias snnki ssh -X samn@10.76.253.150
+alias nkisftp sftp samn@10.76.253.150
+alias falcor ssh -X samn@falcor.rfmh.org
+alias falcorsftp sftp samn@falcor.rfmh.org
+alias vnc2falcor 'ssh -X -L 5901:localhost:5901 samn@falcor.rfmh.org'
+alias vncv 'vncviewer localhost:5901'
+to use x2go
+x2goclient
+make sure to use xfce for falcor
+
+-------
+using cisco vpn connect using 63.117.203.75 and nki password
+login to falcor ssh -X hanwar@falcor.rfmh.org
+change session type to xfce
+host is falcor.rfmh.org
+login is your username on falcor
+
+copy this in .bashrc
+
+export LD_LIBRARY_PATH="/home/samn/miniconda3/lib"
+export SITE="/home/samn/site"
+# >>> conda initialize >>>
+# !! Contents within this block are managed by 'conda init' !!
+__conda_setup="$('/home/samn/miniconda3/bin/conda' 'shell.bash' 'hook' 2> /dev/null)"
+if [ $? -eq 0 ]; then
+    eval "$__conda_setup"
+else
+    if [ -f "/home/samn/miniconda3/etc/profile.d/conda.sh" ]; then
+        . "/home/samn/miniconda3/etc/profile.d/conda.sh"
+    else
+        export PATH="/home/samn/miniconda3/bin:$PATH"
+    fi
+fi
+unset __conda_setup
+# <<< conda initialize <<<
+
+--- testing sims on falcor
+-- ran 2 sec sim with optical flow named 20may27_A0_
+-- running 2 sec sim with centroid tracking named 20may27_A1_
+-- both sims successful---actmap movies copied to local drive SMARTAgent/gif/ using
+scp hanwar@falcor.rfmh.org://home/hanwar/GamesProject/SMARTAgent/gif/* Documents/NKI-modeling/SMARTAgent/gif/
+-- run 100 sec sim with optical flow and using these parameters
+"EEMWghtAM":0.00005,"EEMWghtNM":0.0000025,"EEMWghtThreshMin":0.00005,"EEMWghtThreshMax":0.0001,"EEMProb":0.3,"EEMRecProb":0.1,"EEMPopNorm":0
+save results in file 20may28_A0_
+-- run 100 sec sim with centroid tracking and flowwidth of 16 and using these parameters
+"EEMWghtAM":0.00005,"EEMWghtNM":0.0000025,"EEMWghtThreshMin":0.00005,"EEMWghtThreshMax":0.0001,"EEMProb":0.3,"EEMRecProb":0.1,"EEMPopNorm":0
+save results in file 20may28_A1_
+
+**some  potentially useful articles
+1. Learning robust cortico-cortical associations with the basal ganglia: An integrative review.
+2. From reinforcement learning models of the basal ganglia to the pathophysiology of psychiatric and neurological disorders.
+3. The Basal ganglia : a vertebrate solution to the selection problem.
+4. Anticipatory control of movement in a thalamo-cortical curcuit model ---- not exactly what i am looking for but may provide some inspirational ideas.
+
+* 20june02
+
+** EMUP and EMDOWN each population has 400 neurons.
+-- I want only 3x3 or 5x5 neurons centered around a neuron that represents the location of the object in the game environment to be active.
+-- All other neurons should be inhibited.
+-- I hope that this will allow actions based on position and direction of objects in the environment.
+-- HOW TO ACHIEVE THIS?
+
+Option 1: Make topological connections between visual and motor cortices.
+-- For connections from ['EV1', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW','EV1DSW', 'EV1DS','EV1DSE'] to ['EMUP', 'EMDOWN'] use
+    (400 neurons to 400 neurons with 3x3 overlap.) 
+    use blistEV1toEM = connectLayerswithOverlap(NBpreN = dnumc['EV1'], NBpostN = dnumc['EMUP'], overlap_xdir = 3)
+-- For connections from ['EV1DN4'] to ['EMUP', 'EMDOWN'] 
+    use blistEV4toEM = connectLayerswithOverlapDiv(NBpreN = dnumc['EV4'], NBpostN = dnumc['EMUP'], overlap_xdir = 3)
+-- For connections from ['EMT'] to ['EMUP', 'EMDOWN']
+    use blistEMTtoEM = connectLayerswithOverlapDiv(NBpreN = dnumc['EMT'], NBpostN = dnumc['EMUP'], overlap_xdir = 5)
+-- Use recurrent connections as in case of non-topological architecture.
+-- Leave local E->I->E architecture in motor areas same as before.
+
+** ability to choose architecture type from sim.json
+"architecurePreMtoM": {"useProbabilistic":1,"useTopological":0}
+
+** start testing topological architecture between preMotor and Motor areas. run 10 sec in "20june02_A_"
+
+-- no activity generated in M, probably too weak connection stengths---> increase weights
+"EEMWghtAM":0.00008,"EEMWghtNM":0.0000025 ---> "EEMWghtAM":0.0008,"EEMWghtNM":0.000025
+-- run with new weights.
+-- still low firing rates--- but the firing rate in motor areas produced movements.
+
+** also change sn.json --- add "architecurePreMtoM": {"useProbabilistic":1,"useTopological":0},
+
+** Using topological architecture between preMotor and Motor areas. run 200 sec sim in "20june02_B_"
+
