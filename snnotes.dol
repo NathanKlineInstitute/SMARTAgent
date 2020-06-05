@@ -6747,3 +6747,39 @@ also reduce the probability ... down to 0.1 ...
 
 for simplicity should also set the gains in file to 1.0 and adjust weights used accordingly ... 
 
+  Cells: 5359
+  Connections: 0 (0.00 per cell)
+  Spikes: 930526 (1.74 Hz)
+  Simulated time: 100.0 s; 12 workers
+  Run time: 14030.12 s
+
+python -i simdat.py backupcfg/20jun5_A0_falcor_sim.json
+
+dstr = getdatestr(); simstr = dconf['sim']['name'] # date and sim string
+
+#
+plotFollowBall(actreward,ax=subplot(1,3,1),cumulative=True,msz=3,color='k'); ylim((0,.6))
+plotFollowBall(actreward,ax=subplot(1,3,1),cumulative=False,msz=3,color='r'); ylim((0,.6))
+plotHitMiss(actreward,ax=subplot(1,3,2),msz=3); ylim((0,120)); 
+plotRewards(actreward,ax=subplot(1,3,3),msz=3); 
+
+savefig('gif/'+dstr+simstr+'perf.png')
+
+clf(); drawraster(dspkT,dspkID); xlim((90e3,100e3)); savefig('gif/'+dstr+simstr+'rast.png')
+
+clf(); drawcellVm(simConfig); xlim((90e3,100e3)); savefig('gif/'+dstr+simstr+'Vm.png')
+
+#
+clf(); dobjpos = loadObjPos()
+subplot(1,2,1); xlabel('Racket X position'); hist(dobjpos['racket'][:,0])
+subplot(1,2,2); xlabel('Racket Y position'); hist(dobjpos['racket'][:,1])
+savefig('gif/'+dstr+simstr+'poshist.png')
+
+still bias ... 
+
+clf(); DOWNwts,UPwts = plotMeanWeights(pdf, gca(), xl=(0,simConfig['simConfig']['duration'])); savefig('gif/'+dstr+simstr+'avg_weight.png')
+
+ok, so that approach did not help much . . . 
+
+** bigger network?
+
