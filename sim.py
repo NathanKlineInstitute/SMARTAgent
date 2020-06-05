@@ -468,24 +468,65 @@ netParams.connParams['IV4->IMT'] = {
         'delay': 2,
         'synMech': 'GABA','sec':'soma', 'loc':0.5}
 
-# Add connections from lower and higher visual areas to motor cortex and direct connections between premotor to motor areas
-for prety in ['EV1', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW','EV1DSW', 'EV1DS','EV1DSE', 'EV4', 'EMT']:
-  EEMProb = 0.1 # default
-  if "EEMProb" in dconf['net']: EEMProb = dconf['net']['EEMProb']
-  for poty in EMotorPops:
-    for strty,synmech,weight in zip(['','n'],['AMPA', 'NMDA'],[dconf['net']['EEMWghtAM']*cfg.EEGain, dconf['net']['EEMWghtNM']*cfg.EEGain]):
-      k = strty+prety+'->'+strty+poty
-      netParams.connParams[k] = {
-        'preConds': {'pop': prety},
-        'postConds': {'pop': poty},
-        'convergence': prob2conv(EEMProb, dnumc[prety]),
-        'weight': weight,
-        'delay': 2,
-        'synMech': synmech,
-        'sec':'dend', 'loc':0.5
-      }
-      if dSTDPparamsRL[synmech]['RLon']: # only turn on plasticity when specified to do so
-        netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL[synmech]}
+if dconf['architecurePreMtoM']['useTopological']==1:
+  blistEV1toEM = connectLayerswithOverlap(NBpreN = dnumc['EV1'], NBpostN = dnumc['EMUP'], overlap_xdir = 3)
+  blistEV4toEM = connectLayerswithOverlapDiv(NBpreN = dnumc['EV4'], NBpostN = dnumc['EMUP'], overlap_xdir = 3)
+  blistEMTtoEM = connectLayerswithOverlapDiv(NBpreN = dnumc['EMT'], NBpostN = dnumc['EMUP'], overlap_xdir = 5)
+  for prety in ['EV1', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW','EV1DSW', 'EV1DS','EV1DSE','EV4','EMT']:
+    for poty in EMotorPops:
+      for strty,synmech,weight in zip(['','n'],['AMPA', 'NMDA'],[dconf['net']['EEMWghtAM']*cfg.EEGain, dconf['net']['EEMWghtNM']*cfg.EEGain]):
+        k = strty+prety+'->'+strty+poty
+        if prety=='EV4':
+          netParams.connParams[k] = {
+            'preConds': {'pop': prety},
+            'postConds': {'pop': poty},
+            'connList': blistEV4toEM, 
+            'weight': weight,
+            'delay': 2,
+            'synMech': synmech,
+            'sec':'dend', 'loc':0.5
+          }
+        elif prety=='EMT':
+          netParams.connParams[k] = {
+            'preConds': {'pop': prety},
+            'postConds': {'pop': poty},
+            'connList': blistEMTtoEM, 
+            'weight': weight,
+            'delay': 2,
+            'synMech': synmech,
+            'sec':'dend', 'loc':0.5
+          }
+        else:
+          netParams.connParams[k] = {
+            'preConds': {'pop': prety},
+            'postConds': {'pop': poty},
+            'connList': blistEV1toEM, 
+            'weight': weight,
+            'delay': 2,
+            'synMech': synmech,
+            'sec':'dend', 'loc':0.5
+          }
+        if dSTDPparamsRL[synmech]['RLon']: # only turn on plasticity when specified to do so
+          netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL[synmech]}
+elif dconf['architecurePreMtoM']['useProbabilistic']==1:
+  # Add connections from lower and higher visual areas to motor cortex and direct connections between premotor to motor areas
+  for prety in ['EV1', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW','EV1DSW', 'EV1DS','EV1DSE', 'EV4', 'EMT']:
+    EEMProb = 0.1 # default
+    if "EEMProb" in dconf['net']: EEMProb = dconf['net']['EEMProb']
+    for poty in EMotorPops:
+      for strty,synmech,weight in zip(['','n'],['AMPA', 'NMDA'],[dconf['net']['EEMWghtAM']*cfg.EEGain, dconf['net']['EEMWghtNM']*cfg.EEGain]):
+        k = strty+prety+'->'+strty+poty
+        netParams.connParams[k] = {
+          'preConds': {'pop': prety},
+          'postConds': {'pop': poty},
+          'convergence': prob2conv(EEMProb, dnumc[prety]),
+          'weight': weight,
+          'delay': 2,
+          'synMech': synmech,
+          'sec':'dend', 'loc':0.5
+        }
+        if dSTDPparamsRL[synmech]['RLon']: # only turn on plasticity when specified to do so
+          netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL[synmech]}
 
 # add recurrent connectivity within EM populations
 EEMRecProb = 0.0 # default
