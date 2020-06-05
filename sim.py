@@ -468,7 +468,7 @@ netParams.connParams['IV4->IMT'] = {
         'delay': 2,
         'synMech': 'GABA','sec':'soma', 'loc':0.5}
 
-if dconf['architecurePreMtoM']['useTopological']==1:
+if dconf['architecturePreMtoM']['useTopological']:
   blistEV1toEM = connectLayerswithOverlap(NBpreN = dnumc['EV1'], NBpostN = dnumc['EMUP'], overlap_xdir = 3)
   blistEV4toEM = connectLayerswithOverlapDiv(NBpreN = dnumc['EV4'], NBpostN = dnumc['EMUP'], overlap_xdir = 3)
   blistEMTtoEM = connectLayerswithOverlapDiv(NBpreN = dnumc['EMT'], NBpostN = dnumc['EMUP'], overlap_xdir = 5)
@@ -508,7 +508,7 @@ if dconf['architecurePreMtoM']['useTopological']==1:
           }
         if dSTDPparamsRL[synmech]['RLon']: # only turn on plasticity when specified to do so
           netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL[synmech]}
-elif dconf['architecurePreMtoM']['useProbabilistic']==1:
+elif dconf['architecturePreMtoM']['useProbabilistic']:
   # Add connections from lower and higher visual areas to motor cortex and direct connections between premotor to motor areas
   for prety in ['EV1', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW','EV1DSW', 'EV1DS','EV1DSE', 'EV4', 'EMT']:
     EEMProb = 0.1 # default
