@@ -6799,6 +6799,8 @@ and EEPreMWghtAM, EEPreNWghtNM
 
 ok...see if it helps ... 
 
+./myrun 16 sn.json
+
 python -i simdat.py backupcfg/20jun5_B0_falcor_sim.json
 
 dstr = getdatestr(); simstr = dconf['sim']['name'] # date and sim string
