@@ -205,21 +205,27 @@ cfg.saveCellConns = bool(dconf['sim']['saveCellConns']) # if False removes all d
 #cfg.gatherOnlySimData = True # do not set to True, when True gathers from nodes only the output simulation data (not the network instance)
 ###
 
-"""
-recWeight = 0.0001 #weight for recurrent connections within each area.
-recProb = 0.2 #probability of recurrent connections within each area.
+
 #Local excitation
-#E to E - may want plasticity between EMDOWN<>EMDOWN and EMUP<>EMUP
-for epop in ['ER', 'EV1', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW', 'EV1DSW', 'EV1DS','EV1DSE','EV4','EMT','EMDOWN','EMUP']:
-  netParams.connParams[epop+'->'+epop] = {
-    'preConds': {'pop': epop},
-    'postConds': {'pop': epop},
-    'probability': recProb,
-    'weight': recWeight * cfg.EEGain, #0.0001
-    'delay': 2,
-    'synMech': 'AMPA', 'sec':'dend', 'loc':0.5}
-"""  
-             
+#E to E recurrent connectivity in premotor areas
+for epop in ['ER', 'EV1', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW', 'EV1DSW', 'EV1DS','EV1DSE','EV4','EMT']:
+  prety = poty = epop
+  EEPreMProb = 0.0 # default - 0
+  if "EEPreMProb" in dconf['net']: EEPreMProb = dconf['net']['EEPreMProb']  
+  for strty,synmech,weight in zip(['','n'],['AMPA', 'NMDA'],[dconf['net']['EEPreMWghtAM']*cfg.EEGain, dconf['net']['EEPreMWghtNM']*cfg.EEGain]):
+    k = strty+prety+'->'+strty+poty
+    netParams.connParams[k] = {
+      'preConds': {'pop': prety},
+      'postConds': {'pop': poty},
+      'convergence': prob2conv(EEPreMProb, dnumc[prety]),
+      'weight': weight,
+      'delay': 2,
+      'synMech': synmech,
+      'sec':'dend', 'loc':0.5
+    }
+    if dSTDPparamsRL[synmech]['RLon']: # only turn on plasticity when specified to do so
+      netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL[synmech]}
+               
 #E to I within area
 netParams.connParams['ER->IR'] = {
         'preConds': {'pop': 'ER'},
@@ -511,7 +517,7 @@ if dconf['architecturePreMtoM']['useTopological']:
 elif dconf['architecturePreMtoM']['useProbabilistic']:
   # Add connections from lower and higher visual areas to motor cortex and direct connections between premotor to motor areas
   for prety in ['EV1', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW','EV1DSW', 'EV1DS','EV1DSE', 'EV4', 'EMT']:
-    EEMProb = 0.1 # default
+    EEMProb = 0.1 # default - feedforward connectivity
     if "EEMProb" in dconf['net']: EEMProb = dconf['net']['EEMProb']
     for poty in EMotorPops:
       for strty,synmech,weight in zip(['','n'],['AMPA', 'NMDA'],[dconf['net']['EEMWghtAM']*cfg.EEGain, dconf['net']['EEMWghtNM']*cfg.EEGain]):
@@ -534,6 +540,7 @@ if "EEMRecProb" in dconf['net']: EEMRecProb = dconf['net']['EEMRecProb']
 if EEMRecProb > 0.0:
   for prety in EMotorPops:
     for poty in EMotorPops:
+      if prety==poty or dconf['net']['EEMRecProbCross']: continue # cross EM population connectivity?
       for strty,synmech,weight in zip(['','n'],['AMPA', 'NMDA'],[dconf['net']['EEMWghtAM']*cfg.EEGain, dconf['net']['EEMWghtNM']*cfg.EEGain]):
         k = strty+prety+'->'+strty+poty
         netParams.connParams[k] = {
