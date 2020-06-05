@@ -14,6 +14,7 @@ import matplotlib.patches as mpatches
 from collections import OrderedDict
 from imgutils import getoptflow, getoptflowframes
 from connUtils import gid2pos
+from utils import getdatestr
 
 ion()
 
