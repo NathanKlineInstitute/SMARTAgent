@@ -194,10 +194,10 @@ simConfig.analysis['plotRaster'] = {'popRates':'overlay','showFig':dconf['sim'][
 
 # synaptic weight gain (based on E, I types)
 cfg = simConfig
-cfg.EEGain = 0.75  # E to E scaling factor
+cfg.EEGain = 1.0  # E to E scaling factor
 cfg.EIGain = 1.0 # E to I scaling factor
-cfg.IEGain = 10.0 # I to E scaling factor
-cfg.IIGain = 10.0  # I to I scaling factor
+cfg.IEGain = 1.0 # I to E scaling factor
+cfg.IIGain = 1.0  # I to I scaling factor
 
 ### from https://www.neuron.yale.edu/phpBB/viewtopic.php?f=45&t=3770&p=16227&hilit=memory#p16122
 cfg.saveCellSecs = bool(dconf['sim']['saveCellSecs']) # if False removes all data on cell sections prior to gathering from nodes
@@ -285,7 +285,7 @@ netParams.connParams['IR->ER'] = {
         'preConds': {'pop': 'IR'},
         'postConds': {'pop': 'ER'},
         'connList': blistIRtoER,
-        'weight': 0.02 * cfg.IEGain,
+        'weight': 0.2 * cfg.IEGain,
         'delay': 2,
         'synMech': 'GABA', 'sec':'soma', 'loc':0.5}
 
@@ -293,7 +293,7 @@ netParams.connParams['IV1->EV1'] = {
         'preConds': {'pop': 'IV1'},
         'postConds': {'pop': 'EV1'},
         'connList': blistIV1toEV1,
-        'weight': 0.02 * cfg.IEGain,
+        'weight': 0.2 * cfg.IEGain,
         'delay': 2,
         'synMech': 'GABA', 'sec':'soma', 'loc':0.5}
 
@@ -304,7 +304,7 @@ for prety in IDirPops:
       'preConds': {'pop': prety},
       'postConds': {'pop': poty},
       'connList': blistIV1DtoEV1D,
-      'weight': 0.02 * cfg.IEGain,
+      'weight': 0.2 * cfg.IEGain,
       'delay': 2,
       'synMech': 'GABA', 'sec':'soma', 'loc':0.5}
 """
@@ -313,14 +313,14 @@ netParams.connParams['IV4->EV4'] = {
         'preConds': {'pop': 'IV4'},
         'postConds': {'pop': 'EV4'},
         'connList': blistIV4toEV4,
-        'weight': 0.02 * cfg.IEGain,
+        'weight': 0.2 * cfg.IEGain,
         'delay': 2,
         'synMech': 'GABA', 'sec':'soma', 'loc':0.5}
 netParams.connParams['IMT->EMT'] = {
         'preConds': {'pop': 'IMT'},
         'postConds': {'pop': 'EMT'},
         'connList': blistIMTtoEMT,
-        'weight': 0.02 * cfg.IEGain,
+        'weight': 0.2 * cfg.IEGain,
         'delay': 2,
         'synMech': 'GABA', 'sec':'soma', 'loc':0.5}
 
@@ -329,7 +329,7 @@ for poty in EMotorPops: # I -> E for motor populations
     'preConds': {'pop': 'IM'},
     'postConds': {'pop': poty},
     'convergence': prob2conv(0.125, dnumc['IM']),
-    'weight': 0.02 * cfg.IEGain,
+    'weight': 0.2 * cfg.IEGain,
     'delay': 2,
     'synMech': 'GABA', 'sec':'soma', 'loc':0.5}
 
@@ -339,7 +339,7 @@ for IType in ['IV1', 'IV4', 'IMT', 'IM']:
     'preConds': {'pop': IType},
     'postConds': {'pop': IType},
     'convergence': prob2conv(0.25, dnumc[IType]),
-    'weight': 0.005 * cfg.IIGain, 
+    'weight': 0.05 * cfg.IIGain, 
     'delay': 2,
     'synMech': 'GABA', 'sec':'soma', 'loc':0.5}  
 
@@ -348,14 +348,14 @@ netParams.connParams['ER->EV1'] = {
         'preConds': {'pop': 'ER'},
         'postConds': {'pop': 'EV1'},
         'connList': blistERtoEV1,
-        'weight': 0.02 * cfg.EEGain,
+        'weight': 0.015 * cfg.EEGain,
         'delay': 2,
         'synMech': 'AMPA','sec':'dend', 'loc':0.5}
 netParams.connParams['EV1->EV4'] = {
         'preConds': {'pop': 'EV1'},
         'postConds': {'pop': 'EV4'},
         'connList': blistEV1toEV4,
-        'weight': 0.01 * cfg.EEGain,
+        'weight': 0.0075 * cfg.EEGain,
         'delay': 2,
         'synMech': 'AMPA','sec':'dend', 'loc':0.5}
 netParams.connParams['EV4->EMT'] = {
@@ -363,7 +363,7 @@ netParams.connParams['EV4->EMT'] = {
         'postConds': {'pop': 'EMT'},
         'connList': blistEV4toEMT,
         #'convergence': 10,
-        'weight': 0.01 * cfg.EEGain,
+        'weight': 0.0075 * cfg.EEGain,
         'delay': 2,
         'synMech': 'AMPA','sec':'dend', 'loc':0.5}
 
@@ -429,7 +429,7 @@ netParams.connParams['IV1->ER'] = {
         'postConds': {'pop': 'ER'},
         'connList': blistIV1toER,
         #'convergence': 10,
-        'weight': 0.00 * cfg.IEGain, #0.002
+        'weight': 0.00 * cfg.IEGain, #0.02
         'delay': 2,
         'synMech': 'GABA','sec':'soma', 'loc':0.5}
 netParams.connParams['IV4->EV1'] = {
@@ -437,7 +437,7 @@ netParams.connParams['IV4->EV1'] = {
         'postConds': {'pop': 'EV1'},
         'connList': blistIV4toEV1,
         #'convergence': 10,
-        'weight': 0.00 * cfg.IEGain, #0.002
+        'weight': 0.00 * cfg.IEGain, #0.02
         'delay': 2,
         'synMech': 'GABA','sec':'soma', 'loc':0.5}
 netParams.connParams['IMT->EV4'] = {
@@ -445,7 +445,7 @@ netParams.connParams['IMT->EV4'] = {
         'postConds': {'pop': 'EV4'},
         'connList': blistIMTtoEV4,
         #'convergence': 10,
-        'weight': 0.00 * cfg.IEGain, #0.002
+        'weight': 0.00 * cfg.IEGain, #0.02
         'delay': 2,
         'synMech': 'GABA','sec':'soma', 'loc':0.5}
 """
@@ -456,7 +456,7 @@ netParams.connParams['IV1->IV4'] = {
         'postConds': {'pop': 'IV4'},
         'connList': blistIV1toIV4,
         #'convergence': 10,
-        'weight': 0.00075 * cfg.IIGain, #0.00
+        'weight': 0.0075 * cfg.IIGain,
         'delay': 2,
         'synMech': 'GABA','sec':'soma', 'loc':0.5}
 netParams.connParams['IV4->IMT'] = {
@@ -464,7 +464,7 @@ netParams.connParams['IV4->IMT'] = {
         'postConds': {'pop': 'IMT'},
         'connList': blistIV4toIMT,
         #'convergence': 10,
-        'weight': 0.00075 * cfg.IIGain, #0.00
+        'weight': 0.0075 * cfg.IIGain,
         'delay': 2,
         'synMech': 'GABA','sec':'soma', 'loc':0.5}
 
@@ -528,24 +528,25 @@ elif dconf['architecturePreMtoM']['useProbabilistic']:
         if dSTDPparamsRL[synmech]['RLon']: # only turn on plasticity when specified to do so
           netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL[synmech]}
 
-# add recurrent connectivity within EM populations
+# add recurrent plastic connectivity within EM populations
 EEMRecProb = 0.0 # default
 if "EEMRecProb" in dconf['net']: EEMRecProb = dconf['net']['EEMRecProb']
 if EEMRecProb > 0.0:
-  for ty in EMotorPops:
-    for strty,synmech,weight in zip(['','n'],['AMPA', 'NMDA'],[dconf['net']['EEMWghtAM']*cfg.EEGain, dconf['net']['EEMWghtNM']*cfg.EEGain]):
-      k = ty+ty+'->'+strty+ty
-      netParams.connParams[k] = {
-        'preConds': {'pop': ty},
-        'postConds': {'pop': ty},
-        'convergence': prob2conv(EEMRecProb, dnumc[ty]),
-        'weight': weight,
-        'delay': 2,
-        'synMech': synmech,
-        'sec':'dend', 'loc':0.5
-      }
-      if dSTDPparamsRL[synmech]['RLon']: # only turn on plasticity when specified to do so
-        netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL[synmech]}  
+  for prety in EMotorPops:
+    for poty in EMotorPops:
+      for strty,synmech,weight in zip(['','n'],['AMPA', 'NMDA'],[dconf['net']['EEMWghtAM']*cfg.EEGain, dconf['net']['EEMWghtNM']*cfg.EEGain]):
+        k = strty+prety+'->'+strty+poty
+        netParams.connParams[k] = {
+          'preConds': {'pop': prety},
+          'postConds': {'pop': poty},
+          'convergence': prob2conv(EEMRecProb, dnumc[prety]),
+          'weight': weight,
+          'delay': 2,
+          'synMech': synmech,
+          'sec':'dend', 'loc':0.5
+        }
+        if dSTDPparamsRL[synmech]['RLon']: # only turn on plasticity when specified to do so
+          netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL[synmech]}  
         
 ###################################################################################################################################
 

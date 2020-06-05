@@ -6739,3 +6739,11 @@ not improvement
 DOWNwts,UPwts = plotMeanWeights(pdf, gca(), xl=(0,simConfig['simConfig']['duration'])); savefig('gif/'+dstr+simstr+'avg_weight.png')
 and some separation between weights, causing large bias in movement ... 
 
+** try adjustment to recurrent connectivity between EMotor Pops
+
+allow connectivity across the populations
+
+also reduce the probability ... down to 0.1 ... 
+
+for simplicity should also set the gains in file to 1.0 and adjust weights used accordingly ... 
+
