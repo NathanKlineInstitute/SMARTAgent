@@ -221,14 +221,14 @@ class AIGame:
         xpos_Racket, ypos_Racket = self.findobj(self.last_obs, racketXRng, courtYRng) # get x,y positions of racket          
         #Now we know the position of racket relative to the ball. We can suggest the action for the racket so that it doesn't miss the ball.
         #For the time being, I am implementing a simple rule i.e. based on only the ypos of racket relative to the ball
-        if ypos_Racket>ypos_Ball: #if the racket is lower than the ball the suggestion is to move up
+        if ypos_Ball==-1: #guess about proposed move can't be made because ball was not visible in the court
+          proposed_action = -1 #no valid action guessed        
+        elif ypos_Racket>ypos_Ball: #if the racket is lower than the ball the suggestion is to move up
           proposed_action = dconf['moves']['UP'] #move up
         elif ypos_Racket<ypos_Ball: #if the racket is higher than the ball the suggestion is to move down
           proposed_action = dconf['moves']['DOWN'] #move down
         elif ypos_Racket==ypos_Ball:
           proposed_action = dconf['moves']['NOMOVE'] #no move
-        elif ypos_Ball==-1: #guess about proposed move can't be made because ball was not visible in the court
-          proposed_action = -1 #no valid action guessed
         #self.FullImages.append(np.sum(self.last_obs[courtYRng[0]:courtYRng[1],:,:],2))
         self.dObjPos['ball'].append([courtXRng[0]-1+xpos_Ball,ypos_Ball])
         self.dObjPos['racket'].append([racketXRng[0]-1+xpos_Racket,ypos_Racket])

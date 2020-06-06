@@ -858,7 +858,7 @@ def trainAgent (t):
     for _ in range(int(dconf['actionsPerPlay'])):
       action = dconf['movecodes'][random.randint(0,len(dconf['movecodes'])-1)]
       actions.append(action)
-  else: #the actions should be based on the activity of motor cortex (MO) 1085-1093
+  else: #the actions should be based on the activity of motor cortex (EMUP, EMDOWN)
     F_UPs = []
     F_DOWNs = []
     for ts in range(int(dconf['actionsPerPlay'])):
@@ -910,31 +910,22 @@ def trainAgent (t):
         critic = dconf['rewardcodes']['losePoint']  #-0.01, e.g. to reduce magnitude of punishment so rewards dominate
       else:
         critic = 0
-      #starting from here not tested
       #rewards for hitting the ball
       critic_for_avoidingloss = 0
       if sum(total_hits)>0:
         critic_for_avoidingloss = dconf['rewardcodes']['hitBall'] #should be able to change this number from config file
       #rewards for following or avoiding the ball
       critic_for_following_ball = 0
-      for ai in range(len(actions)):
-        caction = actions[ai]
-        cproposed_action = proposed_actions[ai]
-        if caction - cproposed_action == 0:
+      for caction, cproposed_action in zip(actions, proposed_actions):
+        if cproposed_action == -1: # invalid action since e.g. ball not visible
+          continue
+        elif caction - cproposed_action == 0: # model followed proposed action - gets a reward
           critic_for_following_ball += dconf['rewardcodes']['followBall'] #follow the ball
-        else:
+        else: # model did not follow proposed action - gets a punishment
           critic_for_following_ball += dconf['rewardcodes']['avoidBall'] # didn't follow the ball
       #total rewards
       critic = critic + critic_for_avoidingloss + critic_for_following_ball
       rewards = [critic for i in range(len(rewards))]  # reset rewards to modified critic signal - should use more granular recording
-    #till here not tested
-    if dconf['verbose']:
-      if critic > 0:
-        print('REWARD, critic=',critic)
-      elif critic < 0:
-        print('PUNISH, critic=',critic)
-      else:
-        print('CRITIC=0')                    
     sim.pc.broadcast(vec.from_python([critic]), 0) # convert python list to hoc vector to broadcast critic value to other nodes
     UPactions = np.sum(np.where(np.array(actions)==dconf['moves']['UP'],1,0))
     DOWNactions = np.sum(np.where(np.array(actions)==dconf['moves']['DOWN'],1,0))
