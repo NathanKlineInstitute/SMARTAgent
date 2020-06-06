@@ -6680,3 +6680,265 @@ feedback connections
 plast between EM pops
 bigger net?
 
+*20jun5
+** check output from 20jun4_A4_falcor_
+
+python -i simdat.py backupcfg/20jun4_A4_falcor_sim.json
+
+dstr = getdatestr(); simstr = dconf['sim']['name'] # date and sim string
+
+#
+plotFollowBall(actreward,ax=subplot(1,3,1),msz=3); ylim((0,.6))
+plotHitMiss(actreward,ax=subplot(1,3,2),msz=3); ylim((0,120)); 
+plotRewards(actreward,ax=subplot(1,3,3),msz=3); 
+
+savefig('gif/'+dstr+simstr+'perf.png')
+
+clf(); drawraster(dspkT,dspkID); xlim((190e3,200e3)); savefig('gif/'+dstr+simstr+'rast.png')
+xlim((0,10e3)); savefig('gif/'+dstr+simstr+'rast_b.png')
+it's not really doing better with these params ...
+
+clf(); drawcellVm(simConfig); xlim((190e3,200e3)); savefig('gif/'+dstr+simstr+'Vm.png')
+
+#
+clf(); dobjpos = loadObjPos()
+subplot(1,2,1); xlabel('Racket X position'); hist(dobjpos['racket'][:,0])
+subplot(1,2,2); xlabel('Racket Y position'); hist(dobjpos['racket'][:,1])
+savefig('gif/'+dstr+simstr+'poshist.png')
+
+#
+sim = '20may29_A0_falcor_'
+pda = pd.DataFrame(np.loadtxt('data/'+sim+'ActionsRewards.txt'),columns=['time','action','reward','proposed','hit'])
+curt = 200e3
+for sim,maxdur in zip(['20may30_A1_falcor_', '20jun1_A2_falcor_','20jun2_A3_falcor_','20jun4_A4_falcor_'],[400e3,400e3,500e3,200e3]):
+  tmp = pd.DataFrame(np.loadtxt('data/'+sim+'ActionsRewards.txt'),columns=['time','action','reward','proposed','hit'])
+  tmp.time += curt
+  curt += maxdur
+  pda = pda.append(tmp)
+
+#
+clf()
+plotFollowBall(pda,ax=subplot(1,3,1),msz=3); ylim((0,.6))
+plotHitMiss(pda,ax=subplot(1,3,2),msz=3); ylim((0,120)); 
+plotRewards(pda,ax=subplot(1,3,3),msz=3); 
+
+savefig('gif/'+dstr+simstr+'perf_total.png')
+
+clf()
+actreward = pda
+action_times = np.array(actreward.time)
+actionvsproposed = np.array(actreward.action-actreward.proposed)
+Hit_Missed = np.array(actreward.hit)
+followact = np.where(actionvsproposed==0,1,0)
+nbin = int(1e3 / (action_times[1]-action_times[0]))
+avgfollow = [mean(followact[sidx:sidx+nbin]) for sidx in arange(0,len(followact),nbin)]
+plot(20*arange(0,len(followact),nbin), avgfollow)
+savefig('gif/'+dstr+simstr+'perf_follow_ball_prob.png')
+not improvement
+
+DOWNwts,UPwts = plotMeanWeights(pdf, gca(), xl=(0,simConfig['simConfig']['duration'])); savefig('gif/'+dstr+simstr+'avg_weight.png')
+and some separation between weights, causing large bias in movement ... 
+
+** try adjustment to recurrent connectivity between EMotor Pops
+
+allow connectivity across the populations
+
+also reduce the probability ... down to 0.1 ... 
+
+for simplicity should also set the gains in file to 1.0 and adjust weights used accordingly ... 
+
+  Cells: 5359
+  Connections: 0 (0.00 per cell)
+  Spikes: 930526 (1.74 Hz)
+  Simulated time: 100.0 s; 12 workers
+  Run time: 14030.12 s
+
+python -i simdat.py backupcfg/20jun5_A0_falcor_sim.json
+
+dstr = getdatestr(); simstr = dconf['sim']['name'] # date and sim string
+
+#
+plotFollowBall(actreward,ax=subplot(1,3,1),cumulative=True,msz=3,color='k'); ylim((0,.6))
+plotFollowBall(actreward,ax=subplot(1,3,1),cumulative=False,msz=3,color='r'); ylim((0,.6))
+plotHitMiss(actreward,ax=subplot(1,3,2),msz=3); ylim((0,120)); 
+plotRewards(actreward,ax=subplot(1,3,3),msz=3); 
+
+savefig('gif/'+dstr+simstr+'perf.png')
+
+clf(); drawraster(dspkT,dspkID); xlim((90e3,100e3)); savefig('gif/'+dstr+simstr+'rast.png')
+
+clf(); drawcellVm(simConfig); xlim((90e3,100e3)); savefig('gif/'+dstr+simstr+'Vm.png')
+
+#
+clf(); dobjpos = loadObjPos()
+subplot(1,2,1); xlabel('Racket X position'); hist(dobjpos['racket'][:,0])
+subplot(1,2,2); xlabel('Racket Y position'); hist(dobjpos['racket'][:,1])
+savefig('gif/'+dstr+simstr+'poshist.png')
+
+still bias ... 
+
+clf(); DOWNwts,UPwts = plotMeanWeights(pdf, gca(), xl=(0,simConfig['simConfig']['duration'])); savefig('gif/'+dstr+simstr+'avg_weight.png')
+
+ok, so that approach did not help much . . . 
+
+** adjust rewards?
+
+more punishment?
+"rewardcodes": {"scorePoint": 1, "losePoint": -0.1, "followBall": 0.1, "avoidBall": -0.01, "hitBall": 0.5},
+to
+"rewardcodes": {"scorePoint": 1, "losePoint": -1, "followBall": 0.1, "avoidBall": -0.1, "hitBall": 0.5},
+
+** bigger network?
+
+hmm, why ... 
+
+** plasticity within premotor areas?
+
+add option for it dconf['net']['EEPreMProb']  
+and EEPreMWghtAM, EEPreNWghtNM
+
+ok...see if it helps ... 
+
+./myrun 16 sn.json
+
+python -i simdat.py backupcfg/20jun5_B0_falcor_sim.json
+
+dstr = getdatestr(); simstr = dconf['sim']['name'] # date and sim string
+
+#
+plotFollowBall(actreward,ax=subplot(1,3,1),cumulative=True,msz=3,color='k'); ylim((0,.6))
+plotFollowBall(actreward,ax=subplot(1,3,1),cumulative=False,msz=3,color='r'); ylim((0,.6))
+plotHitMiss(actreward,ax=subplot(1,3,2),msz=3); ylim((0,120)); 
+plotRewards(actreward,ax=subplot(1,3,3),msz=3); 
+
+savefig('gif/'+dstr+simstr+'perf.png')
+
+clf(); drawraster(dspkT,dspkID); xlim((90e3,100e3)); savefig('gif/'+dstr+simstr+'rast.png')
+clf(); drawcellVm(simConfig); xlim((90e3,100e3)); savefig('gif/'+dstr+simstr+'Vm.png')
+
+#
+clf(); dobjpos = loadObjPos()
+subplot(1,2,1); xlabel('Racket X position'); hist(dobjpos['racket'][:,0])
+subplot(1,2,2); xlabel('Racket Y position'); hist(dobjpos['racket'][:,1])
+savefig('gif/'+dstr+simstr+'poshist.png')
+
+clf(); DOWNwts,UPwts = plotMeanWeights(pdf, gca(), xl=(0,simConfig['simConfig']['duration'])); savefig('gif/'+dstr+simstr+'avg_weight.png')
+
+firing rates seem ok ... performance not great ... so maybe did not help ...
+
+#
+lpop = ['ER', 'EV1', 'EV4', 'EMT', 'IR', 'IV1', 'IV4', 'IMT','EV1DW','EV1DNW', 'EV1DN', 'EV1DNE','EV1DE','EV1DSW', 'EV1DS', 'EV1DSE','EMDOWN','EMUP']  
+dact = getdActMap(totalDur, tstepPerAction, lpop)
+fig, axs, plt = animActivityMaps()
+
+...based on results of next entry below should rerun (proposed action invalid sometimes, leading to bias in up direction)...
+
+** use noframeskip?? -->> there was a mistake in proposed action when ball not visible -->> fixed -- always check ball position first!
+
+is frameskip making it more difficult to train model? frameskip > 1 means same action taken several times before updating
+
+'PongNoFrameskip-v4'
+
+20jun5_C0_falcor_
+
+./myrun 16 sn.json
+
+hmm, nothing happens ... no ball visible, though reward = 0.01 throughout 
+
+python -i simdat.py backupcfg/20jun5_C0_falcor_sim.json
+
+lpop = ['ER', 'EV1', 'EV4', 'EMT', 'IR', 'IV1', 'IV4', 'IMT','EV1DW','EV1DNW', 'EV1DN', 'EV1DNE','EV1DE','EV1DSW', 'EV1DS', 'EV1DSE','EMDOWN','EMUP']  
+dact = getdActMap(totalDur, tstepPerAction, lpop)
+
+fig, axs, plt = animActivityMaps()
+
+hmm: gif/20jun5_C0_falcor_actmap.mp4
+
+in that movie there was no movement, and ball was not present at all but the punishment signal of 0.01
+was almost always there ... and there were two instances of 0.1 reward ...
+
+dstr = getdatestr(); simstr = dconf['sim']['name'] # date and sim string
+
+plotRewards(actreward,ax=gca(),msz=3); 
+ylim((-0.02,0.12))
+savefig('gif/'+dstr+simstr+'reward.png')
+
+hmm, this logic in aigame.py seems incorrect?
+
+        if ypos_Racket>ypos_Ball: #if the racket is lower than the ball the suggestion is to move up
+          proposed_action = dconf['moves']['UP'] #move up
+        elif ypos_Racket<ypos_Ball: #if the racket is higher than the ball the suggestion is to move down
+          proposed_action = dconf['moves']['DOWN'] #move down
+        elif ypos_Racket==ypos_Ball:
+          proposed_action = dconf['moves']['NOMOVE'] #no move
+        elif ypos_Ball==-1: #guess about proposed move can't be made because ball was not visible in the court
+          proposed_action = -1 #no valid action guessed
+
+since when ball is not found (via aigame.findobj), its coordinates are -1,-1
+racket could have valid coordinates but ball could have invalid coordinates ... 
+
+also, note that lower values in the image array are closer to top
+so moving 'up' means moving towards smaller y values (top of screen)
+
+try again with this ordering:
+
+        if ypos_Ball==-1: #guess about proposed move can't be made because ball was not visible in the court
+          proposed_action = -1 #no valid action guessed        
+        elif ypos_Racket>ypos_Ball: #if the racket is lower than the ball the suggestion is to move up
+          proposed_action = dconf['moves']['UP'] #move up
+        elif ypos_Racket<ypos_Ball: #if the racket is higher than the ball the suggestion is to move down
+          proposed_action = dconf['moves']['DOWN'] #move down
+        elif ypos_Racket==ypos_Ball:
+          proposed_action = dconf['moves']['NOMOVE'] #no move
+
+20jun5_C1_falcor_
+
+in sim.py, this seems like a mistake too? 
+
+      for ai in range(len(actions)):
+        caction = actions[ai]
+        cproposed_action = proposed_actions[ai]
+        if caction - cproposed_action == 0:
+          critic_for_following_ball += dconf['rewardcodes']['followBall'] #follow the ball
+        else:
+          critic_for_following_ball += dconf['rewardcodes']['avoidBall'] # didn't follow the ball
+
+since does not check if proposed action is valid (not equal to -1)
+
+ok, adjusted that too to check if proposed action == -1
+
+try that again ...
+
+hmm, maybe the incorrect check for ball position is why biased towards up moves? since racket usually on screen
+and when ball off-screen has y position of -1, leading to proposed move being up ... 
+
+python -i simdat.py backupcfg/20jun5_C1_falcor_sim.json
+
+#
+dstr = getdatestr(); simstr = dconf['sim']['name'] # date and sim string
+plotRewards(actreward,ax=gca(),msz=3); 
+ylim((-0.02,0.12))
+savefig('gif/'+dstr+simstr+'reward.png')
+
+ok, now has 0 rewards ... so that's correct ... but still not clear
+why frameskip of 1 with noframeskip version of pong not updating frames properly ... 
+
+** run 20jun5_PreMRecurr_falcor_ (with premotor recurrent plasticity)
+
+running for 300 s ...
+
+    "architecturePreMtoM": {"useProbabilistic":1,"useTopological":0},
+    "net":{"scale":1,"ER":400,"IR":100,"EV1":400,"EV1DE":400,"EV1DNE":400,"EV1DN":400,"EV1DNW":400,"EV1DW":400,"EV1DSW":400,"EV1DS":400,"EV1DSE":400,"IV1":100,"EV4":100,"IV4":25,"EMT":25,"IMT":9,"EMDOWN":400,"EMUP":400,"IM":200,"AngRFSigma":22.5,"DirMinRate":0.0,"DirMaxRate":50.0,"EEMWghtAM":0.00008,"EEMWghtNM":0.0000025,"EEPreMWghtAM":0.00008,"EEPreMWghtNM":0.0000025,"EEMWghtThreshMin":0.00004,"EEMWghtThreshMax":0.00016,"EEMProb":0.3,"EEMRecProb":0.1,"EEPreMProb":0.1,"EEMPopNorm":0,"EEMRecProbCross":1},
+
+./myrun 12 sn.json
+
+** run 20jun5_NoPreMRecurrCross_falcor_ (no premotor recurrent plasticity, no cross-EM population plasticity)
+
+running for 300 s ...
+
+    "net":{"scale":1,"ER":400,"IR":100,"EV1":400,"EV1DE":400,"EV1DNE":400,"EV1DN":400,"EV1DNW":400,"EV1DW":400,"EV1DSW":400,"EV1DS":400,"EV1DSE":400,"IV1":100,"EV4":100,"IV4":25,"EMT":25,"IMT":9,"EMDOWN":400,"EMUP":400,"IM":200,"AngRFSigma":22.5,"DirMinRate":0.0,"DirMaxRate":50.0,"EEMWghtAM":0.00008,"EEMWghtNM":0.0000025,"EEPreMWghtAM":0.00008,"EEPreMWghtNM":0.0000025,"EEMWghtThreshMin":0.00004,"EEMWghtThreshMax":0.00016,"EEMProb":0.3,"EEMRecProb":0.1,"EEPreMProb":0.0,"EEMPopNorm":0,"EEMRecProbCross":0},
+
+./myrun 12 sn.json
+
+** still need to check how to get frameskip==0 to work
+

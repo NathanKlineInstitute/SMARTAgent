@@ -14,6 +14,7 @@ import matplotlib.patches as mpatches
 from collections import OrderedDict
 from imgutils import getoptflow, getoptflowframes
 from connUtils import gid2pos
+from utils import getdatestr
 
 ion()
 
@@ -67,7 +68,14 @@ def generateActivityMap(t1, t2, spkT, spkID, numc, startidx):
         Nact[t][i][j] = len(cbinSpikes)
   return Nact
 
-def loadsimdat (name=None):
+def getdActMap (totalDur, tstepPerAction, lpop = ['ER', 'EV1', 'EV4', 'EMT', 'IR', 'IV1', 'IV4', 'IMT',\
+                                                  'EV1DW','EV1DNW', 'EV1DN', 'EV1DNE','EV1DE','EV1DSW', 'EV1DS', 'EV1DSE',\
+                                                  'EMDOWN','EMUP']):
+  t1 = range(0,totalDur,tstepPerAction)
+  t2 = range(tstepPerAction,totalDur+tstepPerAction,tstepPerAction)  
+  return {pop:generateActivityMap(t1, t2, dspkT[pop], dspkID[pop], dnumc[pop], dstartidx[pop]) for pop in lpop}
+  
+def loadsimdat (name=None,getactmap=True):
   # load simulation data
   global totalDur, tstepPerAction
   name = getsimname(name)
@@ -85,19 +93,15 @@ def loadsimdat (name=None):
   for pop in simConfig['net']['pops'].keys():
     dspkID[pop] = spkID[(spkID >= dstartidx[pop]) & (spkID <= dendidx[pop])]
     dspkT[pop] = spkT[(spkID >= dstartidx[pop]) & (spkID <= dendidx[pop])]
-  ###################################################################################################################
-  ## could separate this part into another function to get input images and activity maps
   InputImages = loadInputImages(dconf['sim']['name'])
   ldflow = loadMotionFields(dconf['sim']['name'])
   totalDur = int(dconf['sim']['duration'])
-  tstepPerAction = dconf['sim']['tstepPerAction'] # time step per action (in ms)
+  tstepPerAction = dconf['sim']['tstepPerAction'] # time step per action (in ms)  
+  dact = None
   lpop = ['ER', 'EV1', 'EV4', 'EMT', 'IR', 'IV1', 'IV4', 'IMT',\
           'EV1DW','EV1DNW', 'EV1DN', 'EV1DNE','EV1DE','EV1DSW', 'EV1DS', 'EV1DSE',\
-          'EMDOWN','EMUP']
-  t1 = range(0,totalDur,tstepPerAction)
-  t2 = range(tstepPerAction,totalDur+tstepPerAction,tstepPerAction)  
-  dact = {pop:generateActivityMap(t1, t2, dspkT[pop], dspkID[pop], dnumc[pop], dstartidx[pop]) for pop in lpop}
-  ###################################################################################################################
+          'EMDOWN','EMUP']  
+  if getactmap: dact = getdActMap(totalDur, tstepPerAction, lpop)
   return simConfig, pdf, actreward, dstartidx, dendidx, dnumc, dspkID, dspkT, InputImages, ldflow, dact
 
 #
@@ -382,23 +386,29 @@ def drawcellVm (simConfig):
   ax.legend(handles=lpatch,handlelength=1,loc='best')    
   
 #  
-def plotFollowBall (actreward, ax=None,msz=1):
+def plotFollowBall (actreward, ax=None,msz=1,cumulative=True,binsz=1e3,color='r'):
+  # plot probability of model racket following ball vs time
+  # when cumulative == True, plots cumulative probability; otherwise bins probabilities over binsz interval
+  global tstepPerAction
   if ax is None: ax = gca()
   action_times = np.array(actreward.time)
+  ax.plot([0,np.max(action_times)],[0.5,0.5],'--',color='gray')    
   actionvsproposed = np.array(actreward.action-actreward.proposed)
-  rewardingActions = np.cumsum(np.where(actionvsproposed==0,1,0)) #rewarding action
-  #punishing action i.e. when the action leads to move the racket away from the ball
-  punishingActions = np.cumsum(np.where((actionvsproposed>0) | (actionvsproposed<0),1,0)) 
-  cumActs = np.array(range(1,len(actionvsproposed)+1))
-  Hit_Missed = np.array(actreward.hit)
-  ax.plot(action_times,np.divide(rewardingActions,cumActs),'r.',markersize=msz)
-  #ax.plot(action_times,np.divide(punishingActions,cumActs),'b.',markersize=msz)# do not need to plot, just 1-p(follow ball)
+  rewardingActions = np.where(actionvsproposed==0,1,0) # rewarding actions (from following ball)  
+  if cumulative:
+    rewardingActions = np.cumsum(rewardingActions) # cumulative of rewarding action
+    cumActs = np.array(range(1,len(actionvsproposed)+1))
+    aout = np.divide(rewardingActions,cumActs)
+    ax.plot(action_times,aout,color+'.',markersize=msz)
+  else:
+    nbin = int(binsz / (action_times[1]-action_times[0]))
+    aout = avgfollow = [mean(rewardingActions[sidx:sidx+nbin]) for sidx in arange(0,len(rewardingActions),nbin)]
+    ax.plot(tstepPerAction*arange(0,len(rewardingActions),nbin), avgfollow, color,linewidth=msz)
   ax.set_xlim((0,np.max(action_times)))
   ax.set_ylim((0,1))
-  #ax.legend(('Follow Ball'),loc='best')
-  ax.plot([0,np.max(action_times)],[0.5,0.5],'--',color='gray')  
   ax.set_xlabel('Time (ms)'); ax.set_ylabel('p(Follow Ball)')
-
+  return aout
+  
 #  
 def plotHitMiss (actreward,ax=None,msz=1):
   if ax is None: ax = gca()
@@ -826,7 +836,7 @@ if __name__ == '__main__':
     except:
       pass
   print(stepNB)
-  simConfig, pdf, actreward, dstartidx, dendidx, dnumc, dspkID, dspkT, InputImages, ldflow, dact = loadsimdat()
+  simConfig, pdf, actreward, dstartidx, dendidx, dnumc, dspkID, dspkT, InputImages, ldflow, dact = loadsimdat(getactmap=False)
   print('loaded simulation data')
   #davgw = plotavgweights(pdf)
   #animSynWeights(pdf,'gif/'+dconf['sim']['name']+'weightmap.mp4', framerate=10) #plot/save images as movie
