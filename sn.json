@@ -6,15 +6,17 @@
     "movefctr": 1.0,
     "rewardcodes": {"scorePoint": 1, "losePoint": -0.1, "followBall": 0.1, "avoidBall": -0.01, "hitBall": 0.5},    
     "actionsPerPlay": 1,
+    "followOnlyTowards": 1,
     "DirectionDetectionAlgo":{"CentroidTracker":1,"OpticFlow":0,"FlowWidth":16,"UseFull":1},
     "verbose": 0,
     "simtype": {"ResumeSim":0,"ResumeSimFromFile":"data/20jun2_A3_falcor_synWeights_final.pkl"}, 
-    "sim": {"duration": 300000, "dt": 0.2, "verbose": 0, "recordStep":0.6,"recordWeightStepSize":500,"normalizeWeightStepSize":2000,"RLFakeUpRule": 0,"RLFakeDownRule": 0,"RLFakeStayRule": 0,"name":"20jun6_NoPreMRecurrCross_targetted_falcor_","doquit":1,"doplot":0,"saveCellSecs":0,"saveCellConns":0,"targettedRL":1,"tstepPerAction":20},
+    "sim": {"duration": 300000, "dt": 0.2, "verbose": 0, "recordStep":0.6,"recordWeightStepSize":25,"normalizeWeightStepSize":2000,"RLFakeUpRule": 0,"RLFakeDownRule": 0,"RLFakeStayRule": 0,"name":"20jun7_A0_falcor_","doquit":1,"doplot":0,"saveCellSecs":0,"saveCellConns":0,"targettedRL":0,"tstepPerAction":20},
     "architecturePreMtoM": {"useProbabilistic":1,"useTopological":0},
-    "net":{"scale":1,"ER":400,"IR":100,"EV1":400,"EV1DE":400,"EV1DNE":400,"EV1DN":400,"EV1DNW":400,"EV1DW":400,"EV1DSW":400,"EV1DS":400,"EV1DSE":400,"IV1":100,"EV4":100,"IV4":25,"EMT":25,"IMT":9,"EMDOWN":400,"EMUP":400,"IM":200,"AngRFSigma":22.5,"DirMinRate":0.0,"DirMaxRate":50.0,"EEMWghtAM":0.00008,"EEMWghtNM":0.0000025,"EEPreMWghtAM":0.00008,"EEPreMWghtNM":0.0000025,"EEMWghtThreshMin":0.00004,"EEMWghtThreshMax":0.00016,"EEMProb":0.3,"EEMRecProb":0.1,"EEPreMProb":0.0,"EEMPopNorm":0,"EEMRecProbCross":0},
+    "net":{"scale":1,"ER":400,"IR":100,"EV1":400,"EV1DE":400,"EV1DNE":400,"EV1DN":400,"EV1DNW":400,"EV1DW":400,"EV1DSW":400,"EV1DS":400,"EV1DSE":400,"IV1":100,"EV4":100,"IV4":25,"EMT":25,"IMT":9,"EMDOWN":400,"EMUP":400,"IM":200,"AngRFSigma":22.5,"DirMinRate":0.0,"DirMaxRate":50.0,"EEMWghtAM":0.00008,"EEMWghtNM":0.0000025,"EEPreMWghtAM":0.00008,"EEPreMWghtNM":0.0000025,"EEMWghtThreshMin":0.00004,"EEMWghtThreshMax":0.00016,"EEMProb":0.3,"EEMRecProb":0.1,"EEPreMProb":0.1,"EEMPopNorm":0,"EEMRecProbCross":0},
     "RL":{"AMPA":
-	  {"wbase":0.0000001,"wmax":0.00024,"RLon":1,"RLlenhebb":100,"RLlenanti":50,"useRLexp":1,"RLhebbwt":0.000004,"RLantiwt":-0.0,"hebbwt":0,"antiwt":0,"tauhebb":10,"RLwindhebb":50,"softthresh":0,"verbose":0},
+	  {"wbase":0.0000001,"wmax":0.00024,"RLon":1,"RLlenhebb":200,"RLlenanti":50,"useRLexp":1,"RLhebbwt":0.000004,"RLantiwt":-0.0,"hebbwt":0,"antiwt":0,"tauhebb":10,"RLwindhebb":50,"softthresh":0,"verbose":0},
 	  "NMDA":
 	  {"wbase":0.000001,"wmax":0.000075,"RLon":0,"RLlenhebb":800,"RLlenanti":100,"useRLexp":1,"RLhebbwt":0.000004,"RLantiwt":-0.0,"hebbwt":0,"antiwt":0,"tauhebb":10,"RLwindhebb":50,"softthresh":1,"verbose":0}
-	 }
+	 },
+    "Noise":{"I":{"Rate":100,"Weight":0.00001},"E":{"Rate":25,"Weight":0.00001}}
 }

@@ -7021,3 +7021,185 @@ worth checking in newer networks if targettedRL helps ...
 
 *** 20jun6_PreMRecurr_targetted_falcor_ 
 *** 20jun6_NoPreMRecurrCross_targetted_falcor_
+*20jun7
+** check output from 20jun6_PreMRecurr_targetted_falcor_ 
+
+python -i simdat.py backupcfg/20jun6_PreMRecurr_targetted_falcor_sim.json
+
+dstr = getdatestr(); simstr = dconf['sim']['name'] # date and sim string
+
+#
+plotFollowBall(actreward,ax=subplot(1,3,1),cumulative=True,msz=3,color='k'); ylim((0,.6))
+plotFollowBall(actreward,ax=subplot(1,3,1),cumulative=False,msz=3,color='r'); ylim((0,.6))
+plotHitMiss(actreward,ax=subplot(1,3,2),msz=3); ylim((0,120)); 
+plotRewards(actreward,ax=subplot(1,3,3),msz=3); 
+
+savefig('gif/'+dstr+simstr+'perf.png')
+
+is that doing etter than without targetted RL? might be a little better than 20jun6_20jun5_PreMRecurr_falcor_perf.png
+
+clf(); drawraster(dspkT,dspkID); xlim((290e3,300e3)); savefig('gif/'+dstr+simstr+'rast.png')
+clf(); drawcellVm(simConfig); xlim((290e3,300e3)); savefig('gif/'+dstr+simstr+'Vm.png')
+
+#
+clf(); dobjpos = loadObjPos()
+subplot(1,2,1); xlabel('Racket X position'); hist(dobjpos['racket'][:,0])
+subplot(1,2,2); xlabel('Racket Y position'); hist(dobjpos['racket'][:,1])
+savefig('gif/'+dstr+simstr+'poshist.png')
+
+less bias at down position ...
+
+clf(); DOWNwts,UPwts = plotMeanWeights(pdf, gca(), xl=(0,simConfig['simConfig']['duration'])); savefig('gif/'+dstr+simstr+'avg_weight.png')
+
+neither population dominates throughout; that's somewhat reassuring ... can continue ... see if improves ...
+
+pdfs = pdf[pdf.time==np.amax(pdf.time)]; D = pdf2weightsdict(pdfs); pickle.dump(D, open('data/'+simstr+'synWeights_final.pkl','wb')) 
+
+** check output from 20jun6_NoPreMRecurrCross_targetted_falcor_
+
+python -i simdat.py backupcfg/20jun6_NoPreMRecurrCross_targetted_falcor_sim.json
+
+dstr = getdatestr(); simstr = dconf['sim']['name'] # date and sim string
+
+#
+plotFollowBall(actreward,ax=subplot(1,3,1),cumulative=True,msz=3,color='k'); ylim((0,.6))
+plotFollowBall(actreward,ax=subplot(1,3,1),cumulative=False,msz=3,color='r'); ylim((0,.6))
+plotHitMiss(actreward,ax=subplot(1,3,2),msz=3); ylim((0,120)); 
+plotRewards(actreward,ax=subplot(1,3,3),msz=3); 
+
+savefig('gif/'+dstr+simstr+'perf.png')
+
+clf(); drawraster(dspkT,dspkID); xlim((290e3,300e3)); savefig('gif/'+dstr+simstr+'rast.png')
+clf(); drawcellVm(simConfig); xlim((290e3,300e3)); savefig('gif/'+dstr+simstr+'Vm.png')
+
+#
+clf(); dobjpos = loadObjPos()
+subplot(1,2,1); xlabel('Racket X position'); hist(dobjpos['racket'][:,0])
+subplot(1,2,2); xlabel('Racket Y position'); hist(dobjpos['racket'][:,1])
+savefig('gif/'+dstr+simstr+'poshist.png')
+
+clf(); DOWNwts,UPwts = plotMeanWeights(pdf, gca(), xl=(0,simConfig['simConfig']['duration'])); savefig('gif/'+dstr+simstr+'avg_weight.png')
+
+pdfs = pdf[pdf.time==np.amax(pdf.time)]; D = pdf2weightsdict(pdfs); pickle.dump(D, open('data/'+simstr+'synWeights_final.pkl','wb')) 
+
+** other problem with follow ball rule
+
+what if ball is flying away from racket? the distance between racket and ball might increase even if the racket is 'following' the ball
+e.g. ball moving up and to the left and racket moving up, but ball moving faster up than racket. so that might be a punishing action
+instead of rewarding. could instead consider that it's best action compared to staying still or moving down. alternatively, ignore situations
+when ball is moving away from the racket.
+
+there are some calculations for checking if ball moving towards racket in aigame.py:
+
+      observation, reward, done, info = self.env.step(caction)
+      #find position of ball after action
+      xpos_Ball2, ypos_Ball2 = self.findobj(observation, courtXRng, courtYRng)        
+      if xpos_Ball>0 and xpos_Ball2>0:
+        if xpos_Ball2-xpos_Ball>0:
+          ball_moves_towards_racket = 1 #use proposed action for reward only when the ball moves towards the racket
+          current_ball_dir = 1 
+        elif xpos_Ball2-xpos_Ball<0:
+          ball_moves_towards_racket = 0
+          current_ball_dir = -1
+        else:
+          ball_moves_towards_racket = 0
+          current_ball_dir = 0 #direction can't be determinted  prob. because the ball didn't move in x dir.
+      else:
+        ball_moves_towards_racket = 0
+        current_ball_dir = 0 #direction can't be determined because either current or last position of the ball is outside the court
+
+but ball_moves_towards_racket is not used anywhere ... 
+
+added option to set proposed_action to -1 if that value in sn.json == 1:
+    "followOnlyTowards": 1,
+
+note that similar problem can occur when ball moving towards racket. even if it's getting farther away in
+y direction, the model's action may have been best possible action selected and so should not be punished for it.
+so, should compare which action minimizes error, and reward model if it took that action, punish otherwise.
+will note to update aigame.py logic for that ... hmm, check more carefully if aigame.py implements that
+logic already ... 
+
+one other reason that follow ball rule seems not ideal is racket should move towards where ball will be when
+it hits x coord of racket, which is not always minimizing current y difference between ball and racket. this
+is especially true if ball bounces off top or bottom of court.
+
+ok, anyway, follow ball rule makes some sense, though should be improved to use
+movement towards/away from predicted y location where ball crosses racket x coordinate 
+
+** add some noise to EM populations (new option)
+
+that might desynchronize their activity ... how does it look with E and I noise to the EMUP,EMDOWN populations?
+
+here's how to specify in the json file:
+    "Noise":{"I":{"Rate":100,"Weight":0.00001},"E":{"Rate":50,"Weight":0.00001}}
+
+./myrun 16 sn.json
+
+python -i simdat.py backupcfg/20jun7_A0_falcor_sim.json
+
+dstr = getdatestr(); simstr = dconf['sim']['name'] # date and sim string
+
+#
+plotFollowBall(actreward,ax=subplot(1,3,1),cumulative=True,msz=3,color='k'); ylim((0,.6))
+plotFollowBall(actreward,ax=subplot(1,3,1),cumulative=False,msz=3,color='r'); ylim((0,.6))
+plotHitMiss(actreward,ax=subplot(1,3,2),msz=3); ylim((0,120)); 
+plotRewards(actreward,ax=subplot(1,3,3),msz=3); 
+savefig('gif/'+dstr+simstr+'perf.png')
+
+clf(); drawraster(dspkT,dspkID); savefig('gif/'+dstr+simstr+'rast.png')
+clf(); drawcellVm(simConfig); savefig('gif/'+dstr+simstr+'Vm.png')
+
+raster looks a bit too synched at times ... but other times noisy ... 
+
+#
+clf(); dobjpos = loadObjPos()
+subplot(1,2,1); xlabel('Racket X position'); hist(dobjpos['racket'][:,0])
+subplot(1,2,2); xlabel('Racket Y position'); hist(dobjpos['racket'][:,1])
+savefig('gif/'+dstr+simstr+'poshist.png')
+
+clf(); DOWNwts,UPwts = plotMeanWeights(pdf, gca(), xl=(0,simConfig['simConfig']['duration'])); savefig('gif/'+dstr+simstr+'avg_weight.png')
+first time saw average weights go up and then down ... ?? 
+
+note that this is also with     "followOnlyTowards" == 1
+could compare in both cases ... 
+
+try another noise test first, with E Rate of 25 ...
+
+python -i simdat.py backupcfg/20jun7_A0_falcor_sim.json
+
+dstr = getdatestr(); simstr = dconf['sim']['name'] # date and sim string
+
+#
+plotFollowBall(actreward,ax=subplot(1,3,1),cumulative=True,msz=3,color='k'); ylim((0,.6))
+plotFollowBall(actreward,ax=subplot(1,3,1),cumulative=False,msz=3,color='r'); ylim((0,.6))
+plotHitMiss(actreward,ax=subplot(1,3,2),msz=3); ylim((0,120)); 
+plotRewards(actreward,ax=subplot(1,3,3),msz=3); 
+savefig('gif/'+dstr+simstr+'perf_B.png')
+
+clf(); drawraster(dspkT,dspkID); savefig('gif/'+dstr+simstr+'rast_B.png')
+clf(); drawcellVm(simConfig); savefig('gif/'+dstr+simstr+'Vm_B.png')
+
+#
+clf(); dobjpos = loadObjPos()
+subplot(1,2,1); xlabel('Racket X position'); hist(dobjpos['racket'][:,0])
+subplot(1,2,2); xlabel('Racket Y position'); hist(dobjpos['racket'][:,1])
+savefig('gif/'+dstr+simstr+'poshist.png')
+
+clf(); DOWNwts,UPwts = plotMeanWeights(pdf, gca(), xl=(0,simConfig['simConfig']['duration'])); savefig('gif/'+dstr+simstr+'avg_weight_B.png')
+
+raster probably ok ... 
+
+** top/bottom edge move rule?
+
+if at top/bottom edge, prevent actuating further moves in that direction?
+
+** feedback plasticity?
+** longer run with noise to EMUP,EMDOWN and "followOnlyTowards" == 1
+
+could have longer RLlenhebb of 200 ... since less frequent feedback about success
+
+name: 20jun7_B0_falcor_
+    "Noise":{"I":{"Rate":100,"Weight":0.00001},"E":{"Rate":25,"Weight":0.00001}}
+    "followOnlyTowards": 1,
+
+./myrun 16 sn.json

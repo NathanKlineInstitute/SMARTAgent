@@ -239,20 +239,25 @@ class AIGame:
 
       observation, reward, done, info = self.env.step(caction)
       #find position of ball after action
-      xpos_Ball2, ypos_Ball2 = self.findobj(observation, courtXRng, courtYRng)        
+      xpos_Ball2, ypos_Ball2 = self.findobj(observation, courtXRng, courtYRng)
+      ball_moves_towards_racket = False
       if xpos_Ball>0 and xpos_Ball2>0:
         if xpos_Ball2-xpos_Ball>0:
-          ball_moves_towards_racket = 1 #use proposed action for reward only when the ball moves towards the racket
+          ball_moves_towards_racket = True # use proposed action for reward only when the ball moves towards the racket
           current_ball_dir = 1 
         elif xpos_Ball2-xpos_Ball<0:
-          ball_moves_towards_racket = 0
+          ball_moves_towards_racket = False
           current_ball_dir = -1
         else:
-          ball_moves_towards_racket = 0
+          ball_moves_towards_racket = False
           current_ball_dir = 0 #direction can't be determinted  prob. because the ball didn't move in x dir.
       else:
-        ball_moves_towards_racket = 0
+        ball_moves_towards_racket = False
         current_ball_dir = 0 #direction can't be determined because either current or last position of the ball is outside the court
+
+      if "followOnlyTowards" in dconf:
+        if dconf["followOnlyTowards"] and not ball_moves_towards_racket:
+          proposed_action = -1 # no proposed action if ball moving away from racket
 
       ball_hits_racket = 0
       # previously I assumed when current_ball_dir is 0 there is no way to find out if the ball hit the racket
