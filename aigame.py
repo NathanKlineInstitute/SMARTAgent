@@ -261,10 +261,8 @@ class AIGame:
 
       ball_hits_racket = 0
       # previously I assumed when current_ball_dir is 0 there is no way to find out if the ball hit the racket
-      if current_ball_dir-self.last_ball_dir<0 and reward==0 and xpos_Ball2>courtXRng[1]-courtXRng[0]-3:
+      if reward==0 and xpos_Ball2>courtXRng[1]-courtXRng[0]-3 and (current_ball_dir-self.last_ball_dir<0 or xpos_Ball==-1):
         ball_hits_racket = 1
-      elif xpos_Ball==-1 and reward==0 and xpos_Ball2>courtXRng[1]-courtXRng[0]-3:
-        ball_hits_racket = 1  
       print(ball_hits_racket)
       self.last_ball_dir = current_ball_dir
       total_hits.append(ball_hits_racket) # i dont think this can be more than a single hit in 5 moves. so check if sum is greater than 1, print error
