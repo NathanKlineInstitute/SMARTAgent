@@ -114,7 +114,13 @@ netParams.stimTargetParams['MRbkg->all'] = {'source': 'MRbkg', 'conds': {'cellTy
 netParams.stimSourceParams['bkg'] = {'type': 'NetStim', 'rate': 20, 'noise': 1.0}
 netParams.stimTargetParams['bkg->all'] = {'source': 'bkg', 'conds': {'cellType': ['IR','IV1','IV4','IMT']}, 'weight': 0.0, 'delay': 'max(1, normal(5,2))', 'synMech': 'AMPA'}
 """
-
+if "Noise" in dconf:
+  for ty,sy in zip(["E","I"],["AMPA","GABA"]):
+    Weight,Rate = dconf["Noise"][ty]["Weight"],dconf["Noise"][ty]["Rate"]
+    if Weight > 0.0 and Rate > 0.0:
+      netParams.stimSourceParams[ty+'Mbkg'] = {'type': 'NetStim', 'rate': Rate, 'noise': 1.0}
+      netParams.stimTargetParams[ty+'Mbkg->all'] = {'source': ty+'Mbkg', 'conds': {'cellType': EMotorPops}, 'weight': Weight, 'delay': 'max(1, normal(5,2))', 'synMech': sy}
+      
 ######################################################################################
 
 #####################################################################################
