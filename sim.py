@@ -552,7 +552,7 @@ if "EEMFeedbackProb" in dconf['net']: EEMFeedbackProb = dconf['net']['EEMFeedbac
 if EEMFeedbackProb > 0.0:
   for prety in EMotorPops:
     for poty in EPreMPops:
-        for strty,synmech,weight in zip(['','n'],['AMPA', 'NMDA'],[dconf['net']['EEMWghtAM']*cfg.EEGain, dconf['net']['EEMWghtNM']*cfg.EEGain]):
+        for strty,synmech,weight in zip(['','n'],['AMPA', 'NMDA'],[dconf['net']['EEMFeedbackWghtAM']*cfg.EEGain, dconf['net']['EEMFeedbackWghtNM']*cfg.EEGain]):
           k = strty+prety+'->'+strty+poty
           netParams.connParams[k] = {
             'preConds': {'pop': prety},
@@ -884,7 +884,7 @@ def trainAgent (t):
     F_DOWNs = vec.to_python()
     if sim.rank==0:
       if fid4 is None: fid4 = open(sim.MotorOutputsfilename,'w')
-      print('U,D firing rates: ', F_UPs, F_DOWNs)
+      print('t=',t,' U,D firing rates:', F_UPs, F_DOWNs)
       #print('Firing rates: ', F_R1, F_R2, F_R3, F_R4, F_R5, F_L1, F_L2, F_L3, F_L4, F_L5)
       fid4.write('%0.1f' % t)
       for ts in range(int(dconf['actionsPerPlay'])): fid4.write('\t%0.1f' % F_UPs[ts])
@@ -901,9 +901,8 @@ def trainAgent (t):
         else:
           actions.append(dconf['moves']['NOMOVE']) # No move        
   if sim.rank == 0:
-    print('Model actions:', actions)
     rewards, epCount, proposed_actions, total_hits = sim.AIGame.playGame(actions, epCount)
-    print('Proposed actions:', proposed_actions)
+    print('t=',t,'proposed actions:', proposed_actions,', model actions:', actions)
     if dconf['sim']['RLFakeUpRule']: # fake rule for testing reinforcing of up moves
       critic = np.sign(actions.count(dconf['moves']['UP']) - actions.count(dconf['moves']['DOWN']))          
       rewards = [critic for i in range(len(rewards))]
@@ -963,7 +962,7 @@ def trainAgent (t):
       if dconf['verbose']: print('APPLY RL to EMDOWN')
       for STDPmech in dSTDPmech['EMDOWN']: STDPmech.reward_punish(float(critic))
   if sim.rank==0:
-    print('Game rewards:', rewards) # only rank 0 has access to rewards      
+    print('t=',t,' game rewards:', rewards) # only rank 0 has access to rewards      
     for action in actions:
         sim.allActions.append(action)
     for pactions in proposed_actions: #also record proposed actions
