@@ -7203,3 +7203,46 @@ name: 20jun7_B0_falcor_
     "followOnlyTowards": 1,
 
 ./myrun 16 sn.json
+
+hmm, crashed at the very end with a memory error ... of course, recordWeightStepSize was 25!!
+anyway, from viewing activity, did not look like model performance was too great ... 
+
+*20jun8
+** right side rule for ball
+
+follow vs not should also only apply until ball passes model racket (on right side)
+
+** other run
+
+compare performance when no intermediate rewards from follow vs not follow given?
+since follow ball seems problematic ... watching videos shows that racket overshoots
+sometimes and does not have time to adjust ... 
+
+lower E noise ... looks less synched?
+
+    "Noise":{"I":{"Rate":100,"Weight":0.00001},"E":{"Rate":0,"Weight":0.00001}}
+
+./myrun 16 sn.json
+
+python -i simdat.py backupcfg/20jun8_A0_falcor_sim.json
+
+clf(); drawraster(dspkT,dspkID); savefig('gif/'+dstr+simstr+'rast.png')
+
+EM populations are less synchronized ... but the direction selective neurons fire too synchronously ... 
+
+try an intermediate run ... 
+
+seemed like when ball hit racket, there was no reward ... must have introduced a bug
+
+python -i simdat.py backupcfg/20jun8_A0_falcor_sim.json
+
+#
+plotFollowBall(actreward,ax=subplot(1,3,1),cumulative=True,msz=3,color='k'); ylim((0,.6))
+plotFollowBall(actreward,ax=subplot(1,3,1),cumulative=False,msz=3,color='r'); ylim((0,.6))
+plotHitMiss(actreward,ax=subplot(1,3,2),msz=3); ylim((0,120)); 
+plotRewards(actreward,ax=subplot(1,3,3),msz=3); 
+
+savefig('gif/'+dstr+simstr+'perf.png')
+
+clf(); drawraster(dspkT,dspkID); savefig('gif/'+dstr+simstr+'rast.png')
+xlim((19e3,20e3)); savefig('gif/'+dstr+simstr+'rastB.png')

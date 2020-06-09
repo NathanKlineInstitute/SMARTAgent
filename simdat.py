@@ -837,7 +837,8 @@ if __name__ == '__main__':
       pass
   print(stepNB)
   simConfig, pdf, actreward, dstartidx, dendidx, dnumc, dspkID, dspkT, InputImages, ldflow, dact = loadsimdat(getactmap=False)
-  print('loaded simulation data')
+  dstr = getdatestr(); simstr = dconf['sim']['name'] # date and sim string
+  print('loaded simulation data',simstr,'on',dstr)
   #davgw = plotavgweights(pdf)
   #animSynWeights(pdf,'gif/'+dconf['sim']['name']+'weightmap.mp4', framerate=10) #plot/save images as movie
   #wperPostID = plotavgweightsPerPostSynNeuron1(pdf)
