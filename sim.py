@@ -884,7 +884,7 @@ def trainAgent (t):
     F_DOWNs = vec.to_python()
     if sim.rank==0:
       if fid4 is None: fid4 = open(sim.MotorOutputsfilename,'w')
-      print('t=',t,' U,D firing rates:', F_UPs, F_DOWNs)
+      print('t=',round(t,2),' U,D firing rates:', F_UPs, F_DOWNs)
       #print('Firing rates: ', F_R1, F_R2, F_R3, F_R4, F_R5, F_L1, F_L2, F_L3, F_L4, F_L5)
       fid4.write('%0.1f' % t)
       for ts in range(int(dconf['actionsPerPlay'])): fid4.write('\t%0.1f' % F_UPs[ts])
@@ -902,7 +902,7 @@ def trainAgent (t):
           actions.append(dconf['moves']['NOMOVE']) # No move        
   if sim.rank == 0:
     rewards, epCount, proposed_actions, total_hits = sim.AIGame.playGame(actions, epCount)
-    print('t=',t,'proposed actions:', proposed_actions,', model actions:', actions)
+    print('t=',round(t,2),'proposed actions:', proposed_actions,', model actions:', actions)
     if dconf['sim']['RLFakeUpRule']: # fake rule for testing reinforcing of up moves
       critic = np.sign(actions.count(dconf['moves']['UP']) - actions.count(dconf['moves']['DOWN']))          
       rewards = [critic for i in range(len(rewards))]
@@ -951,7 +951,7 @@ def trainAgent (t):
     DOWNactions = vec3.to_python()[0]
     if dconf['verbose']: print('UPactions: ', UPactions,'DOWNactions: ', DOWNactions)
   if critic != 0: # if critic signal indicates punishment (-1) or reward (+1)
-    if sim.rank==0: print('t=',t,'- adjusting weights based on RL critic value:', critic)
+    if sim.rank==0: print('t=',round(t,2),'- adjusting weights based on RL critic value:', critic)
     if not dconf['sim']['targettedRL'] or UPactions==DOWNactions:
       if dconf['verbose']: print('APPLY RL to both EMUP and EMDOWN')
       for STDPmech in dSTDPmech['all']: STDPmech.reward_punish(float(critic))
@@ -962,7 +962,7 @@ def trainAgent (t):
       if dconf['verbose']: print('APPLY RL to EMDOWN')
       for STDPmech in dSTDPmech['EMDOWN']: STDPmech.reward_punish(float(critic))
   if sim.rank==0:
-    print('t=',t,' game rewards:', rewards) # only rank 0 has access to rewards      
+    print('t=',round(t,2),' game rewards:', rewards) # only rank 0 has access to rewards      
     for action in actions:
         sim.allActions.append(action)
     for pactions in proposed_actions: #also record proposed actions
@@ -1011,8 +1011,9 @@ if sim.rank == 0:  # sim rank 0 specific init and backup of config file
   # node 0 saves the json config file
   # this is just a precaution since simConfig pkl file has MOST of the info; ideally should adjust simConfig to contain
   # ALL of the required info
-  from utils import backupcfg
+  from utils import backupcfg, safemkdir
   backupcfg(dconf['sim']['name'])
+  safemkdir('data') # make sure data (output) directory exists
 
 sim.net.createPops()                      # instantiate network populations
 sim.net.createCells()                     # instantiate network cells based on defined populations
