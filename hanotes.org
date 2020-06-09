@@ -2735,3 +2735,254 @@ Option 1: Make topological connections between visual and motor cortices.
 
 ** Using topological architecture between preMotor and Motor areas. run 200 sec sim in "20june02_B_"
 
+run sim on ZN with "EEMRecProb":0.6 in file "20june02_ZN_B_"
+-- was not taking any action so i reduced weights again.
+-- was not taking any action, so i reverted weights back and change "EEMRecProb":0.4 and rerun.
+-- E and I Firing rates of M neurons are high. (23 Hz). 
+
+** play with convergence of E->I ------------- save in file "20june02_C_"
+
+netParams.connParams['EMDOWN->IM'] = {
+        'preConds': {'pop': 'EMDOWN'},
+        'postConds': {'pop': 'IM'},
+        #'probability': 0.125/2.,     
+        'convergence': prob2conv(0.125/4, dnumc['EMDOWN']),
+        'weight': 0.02 * cfg.EIGain,
+        'delay': 2,
+        'synMech': 'AMPA', 'sec':'soma', 'loc':0.5}
+netParams.connParams['EMUP->IM'] = {
+        'preConds': {'pop': 'EMUP'},
+        'postConds': {'pop': 'IM'},
+        #'probability': 0.125/2.,       
+        'convergence': prob2conv(0.125/4, dnumc['EMUP']),
+        'weight': 0.02 * cfg.EIGain,
+        'delay': 2,
+        'synMech': 'AMPA', 'sec':'soma', 'loc':0.5}
+
+-- Firing rate of E and I neurons in this sim is too high: 23Hz. (Raster saved as 'Raster_June2_2020_C.png')
+-- to see the connectivity, sam suggested: look at the inputmap functions in simdat.py
+
+
+TIPS FROM SAM:
+
+
+Use this to access the activity
+
+python -i simdat.py backupcfg/20jun1_B2_falcor_sim.json
+dstr = '20jun2_'; simstr = dconf['sim']['name'] # date and sim string
+#
+plotFollowBall(actreward,ax=subplot(1,3,1),msz=3); ylim((0,.6))
+plotHitMiss(actreward,ax=subplot(1,3,2),msz=3); ylim((0,120));
+plotRewards(actreward,ax=subplot(1,3,3),msz=3);
+subplot(1,3,1); plot([40e3,80e3,120e3,160e3,200e3,240e3,280e3,320e3,360e3,400e3],[.45,.45,.45,.45,.45,0.45,.45,.45,.45,.45],'bo',markersize=10) # times of weight norm
+savefig('gif/'+dstr+simstr+'perf.png')
+clf(); drawraster(dspkT,dspkID); xlim((390e3,400e3)); savefig('gif/'+dstr+simstr+'rast.png')
+clf(); drawcellVm(simConfig); xlim((390e3,400e3)); savefig('gif/'+dstr+simstr+'Vm.png')
+
+
+* 20june03
+
+** on june02, I ran sim on ZN with "EEMRecProb":0.4 in file "20june02_ZN_B_"
+-- with weights: 'EEMWghtAM': 0.0008, 'EEWeightNM': 0.00025, 'EEMWghtThreshMin': 0.0002, 'EEMWghtThreshMax':0.0008
+-- E and I Firing rates of M neurons were high. (23 Hz).
+
+** reduce weights to: 'EEMWghtAM': 0.0004, 'EEWeightNM': 0.000125 and run for 20 sec in file "20june03_ZN_B_"
+-- still very high firing rate (~21Hz).
+
+** reduce weights to: 'EEMWghtAM': 0.0002, 'EEWeightNM': 0.00006 and run for 20 sec in file "20june03_ZN_B2_"
+-- still very high firing rate (~18Hz).
+
+** reduce weights to: 'EEMWghtAM': 0.0001, 'EEWeightNM': 0.00003 and run for 300 sec in file "20june03_ZN_B3_"
+-- the other weight parameters are 'EEMWghtThreshMin':0.00002, 'EEMWghtThreshMax':0.0008
+-- 'EEMRecProb':0.4
+-- still very high firing rate (~16 Hz)
+
+** reduce weights to: 'EEMWghtAM': 0.00005, 'EEWeightNM': 0.000015 and run for 20 sec in file "20june04_ZN_B_"
+-- the other weight parameters are 'EEMWghtThreshMin':0.00001, 'EEMWghtThreshMax':0.0004
+-- 'EEMRecProb':0.4
+
+
+
+####################################################
+** on june02, I ran sim on falcor with reduced convergence of E->I ------------- saved in file "20june02_C_"
+-- had too high firing rate of E and I neurons in M.
+
+** reduce weights to: 'EEMWghtAM': 0.0004, 'EEWeightNM': 0.000125 and run for 20 sec in file "20june03_C_"
+-- the other weight parameters are: 'EEMWghtThreshMin': 0.0002, 'EEMWghtThreshMax':0.0008
+-- 'EEMRecProb':0.3
+-- still high firing rates (~20Hz).
+
+** reduce weights to: 'EEMWghtAM': 0.0002, 'EEWeightNM': 0.00006 and run for 20 sec in file "20june03_C2_"
+-- still high firing rates (~17Hz).
+
+** reduce weights to: 'EEMWghtAM': 0.0001, 'EEWeightNM': 0.00003 and run for 20 sec in file "20june03_C3_"
+-- the other weight parameters are 'EEMWghtThreshMin':0.00002, 'EEMWghtThreshMax':0.0008
+-- firing rate is in reasonable range.
+-- record actmap movie as well as weightmap movie. mv those movies to my computer.
+
+** run this simulatio for 200 sec in file "20june03_C4_"
+-- Firing rate is in reasonable range (~1Hz for E and ~3Hz for I)
+-- record actmap and weightmap movies..copied those movies to my computer
+
+** run this simulation for 400 sec in file "20june03_C5"
+-- Firing rate is in reasoanable range.
+-- record actmao and weight movies ... copied those movies to my computer.
+-- I DON'T SEE ANY LEARNING.
+
+** run a 20 sec sim with .... in file "20june05_C1_"and compare results with "20june03_C3_"
+-- 'EEMRecProb':0.4
+-- the firing rate increased to ~16Hz. i.e. too high.
+
+** reduce weights to: 'EEMWghtAM': 0.00005, 'EEWeightNM': 0.000015 and run for 20 sec in file "20june05_C2_"
+-- the other weight parameters are 'EEMWghtThreshMin':0.00001, 'EEMWghtThreshMax':0.0004
+-- The firing rate decreased to 0.17 Hz.
+
+** increase -- 'EEMRecProb' to 0.5 and run 20 sec in "20june05_C3_"
+-- firing rate of E neurons didnt change much. Firing rate of I neurons went a bit up.---didnt save raster.
+-- need to see connectivity maps.
+
+TRY THIS 
+
+drfmap = plotallinputmaps(pdf, pdf.time[0], dstartidx['EMUP'] + 0, 'EMUP', dnumc, dstartidx, dendidx, lprety)
+drfmap = plotallinputmaps(pdf, pdf.time[0], dstartidx['EMUP'] + 1, 'EMUP', dnumc, dstartidx, dendidx, lprety)
+
+
+** Learning depends on how well the reward is associated with the action. ---> This is somewhat straightforward to test.
+** similarly, learning also depends on how well the firing rate of M neural population represent the action generated. ---> This is more difficult to test.
+
+* 20june08
+** run 20 sec sim in file "20june08_A_" 
+-- 'EEMRecProb' to 0.5
+-- 'EEMWghtAM': 0.00005, 'EEWeightNM': 0.000015
+-- 'EEMWghtThreshMin':0.00001, 'EEMWghtThreshMax':0.0004
+-- no RL between preM and M.
+-- RL only between recurrent connections in M.
+
+.... very synchronized activity in M pops.
+.... very high firing rate (~15Hz)
+
+** run 20 sec sim in file "20june08_A2_"
+-- reduce to 'EEMWghtAM': 0.00001, 'EEWeightNM': 0.000003
+
+... E stopped firing.
+
+-- rerun sim with 'EEMWghtAM': 0.00003, 'EEWeightNM': 0.000009
+... very low firing rate. ~0.01 Hz
+-- rerun sim with 'EEMWghtAM': 0.00004, 'EEWeightNM': 0.000012
+... very low activity ~0.13 Hz. saved raster on falcor.
+...
+
+
+from aigame import AIGame
+AIGame = AIGame()
+epCount = []
+
+LOOK HERE: IT IS WORKING FINE.
+
+>>> rewards, epCount, proposed_actions, total_hits = AIGame.playGame([3], epCount)
+Current_ball_dir 1
+Last ball dir 1
+current X pos Ball 115.5
+last X pos Ball 112.5
+Court Range (20, 140)
+0
+>>> rewards, epCount, proposed_actions, total_hits = AIGame.playGame([3], epCount)
+Current_ball_dir 1
+Last ball dir 1
+current X pos Ball 118.5
+last X pos Ball 115.5
+Court Range (20, 140)
+0
+>>> rewards, epCount, proposed_actions, total_hits = AIGame.playGame([3], epCount)
+Current_ball_dir -1
+Last ball dir 1
+current X pos Ball 117.5
+last X pos Ball 118.5
+Court Range (20, 140)
+1
+
+
+HERE WAS THE Problem
+
+
+>>> rewards, epCount, proposed_actions, total_hits = AIGame.playGame([4], epCount)
+Current_ball_dir 0
+Last ball dir 1
+current X pos Ball -1 ---> the ball goes out of courtXRng
+last X pos Ball 118.5
+Court Range (20, 140)
+0
+>>> rewards, epCount, proposed_actions, total_hits = AIGame.playGame([4], epCount)
+Current_ball_dir 0
+Last ball dir 0
+current X pos Ball 115.5 --> comes back in the courtXRng
+last X pos Ball -1
+Court Range (20, 140)
+0
+
+condition 0:
+----If last X pos Ball was 116.5, current X pos Ball would be 119.5. 
+    and if its picked up by the racket, in next step last X Ball would be 119.5 and current X pos Ball would be 116.5
+condition 1:
+----If last X pos Ball was 117.5, current X pos Ball would be 120.5 that would be -1. 
+    and if its picked up by the racket, in next step last X Ball would be -1 and current X pos Ball would be 114.5
+condition 2:
+----If last X pos Ball was 118.5, current X pos Ball would be 121.5 that would be -1. 
+    and if its picked up by the racket, in next step last X Ball would be -1 and current X pos Ball would be 115.5
+condition 3:
+----If last X pos Ball was 119.5, current X pos Ball would be 122.5 that would be -1. 
+    and if its picked up by the racket, in next step last X Ball would be -1 and current X pos Ball would be 116.5
+
+
+if current_ball_dir-self.last_ball_dir<0 and reward==0 and xpos_Ball2>courtXRng[1]-courtXRng[0]-3:
+  ball_hits_racket = 1
+elif xpos_Ball==-1 and reward==0 and xpos_Ball2>courtXRng[1]-courtXRng[0]-6: # before i was using  xpos_Ball2>courtXRng[1]-courtXRng[0]-3
+  ball_hits_racket = 1
+
+>>> rewards, epCount, proposed_actions, total_hits = AIGame.playGame([3], epCount)
+Current_ball_dir -1
+Last ball dir 1
+current X pos Ball 117.5
+last X pos Ball 118.5
+Court Range (20, 140)
+1
+
+>>> rewards, epCount, proposed_actions, total_hits = AIGame.playGame([1], epCount)
+Current_ball_dir 0
+Last ball dir 1
+current X pos Ball 117.5
+last X pos Ball 117.5
+Court Range (20, 140)
+1
+
+IT MISSED AGAIN HERE:
+
+>>> rewards, epCount, proposed_actions, total_hits = AIGame.playGame([1], epCount)
+Current_ball_dir -1
+Last ball dir 1
+current X pos Ball 107.5
+last X pos Ball 116.5
+Court Range (20, 140)
+0
+
+FIX:
+
+if current_ball_dir-self.last_ball_dir<0 and reward==0 and xpos_Ball2>courtXRng[1]-courtXRng[0]-40:
+  ball_hits_racket = 1
+
+
+>>> rewards, epCount, proposed_actions, total_hits = AIGame.playGame([3], epCount)
+Current_ball_dir -1
+Last ball dir 1
+current X pos Ball 116.5
+last X pos Ball 119.0
+Court Range (20, 140)
+1
+
+>>> rewards, epCount, proposed_actions, total_hits = AIGame.playGame([1], epCount)
+Current_ball_dir -1
+Last ball dir 1
+current X pos Ball 113.5
+last X pos Ball 119.0
+Court Range (20, 140)
+1
