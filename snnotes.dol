@@ -7246,3 +7246,11 @@ savefig('gif/'+dstr+simstr+'perf.png')
 
 clf(); drawraster(dspkT,dspkID); savefig('gif/'+dstr+simstr+'rast.png')
 xlim((19e3,20e3)); savefig('gif/'+dstr+simstr+'rastB.png')
+
+*20jun9
+** ha fixed follow ball rule
+
+is working on updating it for calculating trajectory/intercept
+
+** other test following ha fix
+

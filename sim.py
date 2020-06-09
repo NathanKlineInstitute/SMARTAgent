@@ -50,6 +50,7 @@ allpops = ['ER','IR','EV1','EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','E
 #EDirPops = ['EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE']
 #IDirPops = ['IV1D']
 EMotorPops = ['EMDOWN', 'EMUP'] # excitatory neuron motor populations
+EPreMPops = ['EV1','EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE','EV4','EMT']
 dnumc = OrderedDict({ty:dconf['net'][ty]*scale for ty in allpops}) # number of neurons of a given type
 
 # Network parameters
@@ -409,66 +410,50 @@ netParams.connParams['EV4->IMT'] = {
         'synMech': 'AMPA','sec':'soma', 'loc':0.5}
 """
 
-"""
-#E to E feedbackward connections
-netParams.connParams['EV1->ER'] = {
-        'preConds': {'pop': 'EV1'},
-        'postConds': {'pop': 'ER'},
-        'connList': blistEV1toER,
-        #'convergence': 10,
-        'weight': 0.000 * cfg.EEGain, #0.0001
-        'delay': 2,
-        'synMech': 'AMPA','sec':'dend', 'loc':0.5}
-netParams.connParams['EV4->EV1'] = {    # <<-- that's E -> I ?? or E -> E ?? weight is 0 but something wrong here
-        'preConds': {'pop': 'EV4'},
-        'postConds': {'pop': 'EV1'},
-        'connList': blistEV4toEV1,
-        #'convergence': 10,
-        'weight': 0.000 * cfg.EEGain, #0.0001
-        'delay': 2,
-        'synMech': 'AMPA','sec':'dend', 'loc':0.5}
-netParams.connParams['EMT->EV4'] = {
-        'preConds': {'pop': 'EMT'},
-        'postConds': {'pop': 'EV4'},
-        'connList': blistEMTtoEV4,
-        #'convergence': 10,
-        'weight': 0.000 * cfg.EEGain, #0.0001
-        'delay': 2,
-        'synMech': 'AMPA','sec':'dend', 'loc':0.5}
-
-#I to E feedbackward connections
-netParams.connParams['IV1->ER'] = {
-        'preConds': {'pop': 'IV1'},
-        'postConds': {'pop': 'ER'},
-        'connList': blistIV1toER,
-        #'convergence': 10,
-        'weight': 0.00 * cfg.IEGain, #0.02
-        'delay': 2,
-        'synMech': 'GABA','sec':'soma', 'loc':0.5}
-netParams.connParams['IV4->EV1'] = {
-        'preConds': {'pop': 'IV4'},
-        'postConds': {'pop': 'EV1'},
-        'connList': blistIV4toEV1,
-        #'convergence': 10,
-        'weight': 0.00 * cfg.IEGain, #0.02
-        'delay': 2,
-        'synMech': 'GABA','sec':'soma', 'loc':0.5}
-netParams.connParams['IMT->EV4'] = {
-        'preConds': {'pop': 'IMT'},
-        'postConds': {'pop': 'EV4'},
-        'connList': blistIMTtoEV4,
-        #'convergence': 10,
-        'weight': 0.00 * cfg.IEGain, #0.02
-        'delay': 2,
-        'synMech': 'GABA','sec':'soma', 'loc':0.5}
-"""
+VisualFeedback = False
+if "VisualFeedback" in dconf['net']: VisualFeedback = dconf['net']['VisualFeedback']
+if VisualFeedback:
+  # visual area feedback connections
+  for prety,poty,connList in zip(['EV1','EV4','EMT'],['ER','EV1','EV4'],[blistEV1toER,blistEV4toEV1,blistEMTtoEV4]):
+    for strty,synmech,weight in zip(['','n'],['AMPA', 'NMDA'],[dconf['net']['EEMWghtAM']*cfg.EEGain, dconf['net']['EEMWghtNM']*cfg.EEGain]):
+        k = strty+prety+'->'+strty+poty
+        netParams.connParams[k] = {
+          'preConds': {'pop': 'EV1'},
+          'postConds': {'pop': 'ER'},
+          'connList': connList,
+          'weight': 0.0001 * cfg.EEGain, 
+          'delay': 2,
+          'synMech': 'AMPA','sec':'dend', 'loc':0.5}
+        if dSTDPparamsRL[synmech]['RLon']: # only turn on plasticity when specified to do so
+          netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL[synmech]}        
+  #I to E feedback connections
+  netParams.connParams['IV1->ER'] = {
+          'preConds': {'pop': 'IV1'},
+          'postConds': {'pop': 'ER'},
+          'connList': blistIV1toER,
+          'weight': 0.02 * cfg.IEGain, 
+          'delay': 2,
+          'synMech': 'GABA','sec':'soma', 'loc':0.5}
+  netParams.connParams['IV4->EV1'] = {
+          'preConds': {'pop': 'IV4'},
+          'postConds': {'pop': 'EV1'},
+          'connList': blistIV4toEV1,
+          'weight': 0.02 * cfg.IEGain, 
+          'delay': 2,
+          'synMech': 'GABA','sec':'soma', 'loc':0.5}
+  netParams.connParams['IMT->EV4'] = {
+          'preConds': {'pop': 'IMT'},
+          'postConds': {'pop': 'EV4'},
+          'connList': blistIMTtoEV4,
+          'weight': 0.02 * cfg.IEGain, 
+          'delay': 2,
+          'synMech': 'GABA','sec':'soma', 'loc':0.5}
 
 #I to I - between areas
 netParams.connParams['IV1->IV4'] = {
         'preConds': {'pop': 'IV1'},
         'postConds': {'pop': 'IV4'},
         'connList': blistIV1toIV4,
-        #'convergence': 10,
         'weight': 0.0075 * cfg.IIGain,
         'delay': 2,
         'synMech': 'GABA','sec':'soma', 'loc':0.5}
@@ -476,7 +461,6 @@ netParams.connParams['IV4->IMT'] = {
         'preConds': {'pop': 'IV4'},
         'postConds': {'pop': 'IMT'},
         'connList': blistIV4toIMT,
-        #'convergence': 10,
         'weight': 0.0075 * cfg.IIGain,
         'delay': 2,
         'synMech': 'GABA','sec':'soma', 'loc':0.5}
@@ -485,7 +469,7 @@ if dconf['architecturePreMtoM']['useTopological']:
   blistEV1toEM = connectLayerswithOverlap(NBpreN = dnumc['EV1'], NBpostN = dnumc['EMUP'], overlap_xdir = 3)
   blistEV4toEM = connectLayerswithOverlapDiv(NBpreN = dnumc['EV4'], NBpostN = dnumc['EMUP'], overlap_xdir = 3)
   blistEMTtoEM = connectLayerswithOverlapDiv(NBpreN = dnumc['EMT'], NBpostN = dnumc['EMUP'], overlap_xdir = 5)
-  for prety in ['EV1', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW','EV1DSW', 'EV1DS','EV1DSE','EV4','EMT']:
+  for prety in EPreMPops:
     for poty in EMotorPops:
       for strty,synmech,weight in zip(['','n'],['AMPA', 'NMDA'],[dconf['net']['EEMWghtAM']*cfg.EEGain, dconf['net']['EEMWghtNM']*cfg.EEGain]):
         k = strty+prety+'->'+strty+poty
@@ -523,7 +507,7 @@ if dconf['architecturePreMtoM']['useTopological']:
           netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL[synmech]}
 elif dconf['architecturePreMtoM']['useProbabilistic']:
   # Add connections from lower and higher visual areas to motor cortex and direct connections between premotor to motor areas
-  for prety in ['EV1', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW','EV1DSW', 'EV1DS','EV1DSE', 'EV4', 'EMT']:
+  for prety in EPreMPops:
     EEMProb = 0.1 # default - feedforward connectivity
     if "EEMProb" in dconf['net']: EEMProb = dconf['net']['EEMProb']
     for poty in EMotorPops:
@@ -561,7 +545,28 @@ if EEMRecProb > 0.0:
           }
           if dSTDPparamsRL[synmech]['RLon']: # only turn on plasticity when specified to do so
             netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL[synmech]}  
-        
+
+# add feedback plastic connectivity from EM populations to premotor/visual populations
+EEMFeedbackProb = 0.0 # default
+if "EEMFeedbackProb" in dconf['net']: EEMFeedbackProb = dconf['net']['EEMFeedbackProb']
+if EEMFeedbackProb > 0.0:
+  for prety in EMotorPops:
+    for poty in EPreMPops:
+        for strty,synmech,weight in zip(['','n'],['AMPA', 'NMDA'],[dconf['net']['EEMWghtAM']*cfg.EEGain, dconf['net']['EEMWghtNM']*cfg.EEGain]):
+          k = strty+prety+'->'+strty+poty
+          netParams.connParams[k] = {
+            'preConds': {'pop': prety},
+            'postConds': {'pop': poty},
+            'convergence': prob2conv(EEMFeedbackProb, dnumc[prety]),
+            'weight': weight,
+            'delay': 2,
+            'synMech': synmech,
+            'sec':'dend', 'loc':0.5
+          }
+          if dSTDPparamsRL[synmech]['RLon']: # only turn on plasticity when specified to do so
+            netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL[synmech]}  
+
+            
 ###################################################################################################################################
 
 sim.AIGame = None # placeholder
