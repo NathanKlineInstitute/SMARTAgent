@@ -2986,3 +2986,5 @@ current X pos Ball 113.5
 last X pos Ball 119.0
 Court Range (20, 140)
 1
+
+** adjust sim.json according to sn.json
