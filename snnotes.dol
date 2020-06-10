@@ -7252,7 +7252,7 @@ xlim((19e3,20e3)); savefig('gif/'+dstr+simstr+'rastB.png')
 
 is working on updating it for calculating trajectory/intercept
 
-** other test following ha fix
+** other test following ha fix -- paddle follows ball sometimes but over/under-shoots and gets stuck sometimes (20jun9_A0_falcor_)
 
 adding other options for architecture adjustments
 including "EEMFeedbackProb":0.05,"VisualFeedback":0
@@ -7284,4 +7284,102 @@ plotRewards(actreward,ax=subplot(1,3,3),msz=3);
 savefig('gif/'+dstr+simstr+'perf.png')
 
 try longer run . . . 
+
+similar pattern seen in much of the activity 
+sometimes takes a while for racket to move to the right place but when it does the
+ball has already changed location in vertical axis relative to paddle, so model
+does not have time to reverse its course 
+predicting intercept rule could avoid that problem
+alternatively, it's possible equal reward/punishment for follow/not-follow might
+allow model to respond faster ... ? or smaller weight chnages?
+
+similarly, seeing racket oscillate around the ball moving above and then below but
+often too late ... 
+
+** same params but with smaller weight increments (RLhebbwt of 0.000001) (20jun9_B0_falcor_)
+
+to see if avoids overshoots
+
+./myrun 16 sn.json
+
+*20jun10
+** check output from 20jun9_A0_falcor_ -->> continue as 20jun10_A1_falcor_
+
+python -i simdat.py backupcfg/20jun9_A0_falcor_sim.json
+
+#
+plotFollowBall(actreward,ax=subplot(1,3,1),cumulative=True,msz=3,color='k'); ylim((0,.6))
+plotFollowBall(actreward,ax=subplot(1,3,1),cumulative=False,msz=3,color='r'); ylim((0,.6))
+plotHitMiss(actreward,ax=subplot(1,3,2),msz=3); ylim((0,120)); 
+plotRewards(actreward,ax=subplot(1,3,3),msz=3); 
+
+savefig('gif/'+dstr+simstr+'perf.png')
+savefig('gif/'+dstr+simstr+'perfB.png')
+
+clf(); drawraster(dspkT,dspkID); 
+savefig('gif/'+dstr+simstr+'rast.png')
+xlim((290e3,300e3)); savefig('gif/'+dstr+simstr+'rastB.png')
+xlim((299e3,300e3)); savefig('gif/'+dstr+simstr+'rastC.png')
+
+clf(); drawcellVm(simConfig); 
+savefig('gif/'+dstr+simstr+'Vm.png')
+
+#
+clf(); dobjpos = loadObjPos()
+subplot(1,2,1); xlabel('Racket X position'); hist(dobjpos['racket'][:,0])
+subplot(1,2,2); xlabel('Racket Y position'); hist(dobjpos['racket'][:,1])
+savefig('gif/'+dstr+simstr+'poshist.png')
+
+clf(); DOWNwts,UPwts = plotMeanWeights(pdf, gca(), xl=(0,simConfig['simConfig']['duration'])); 
+savefig('gif/'+dstr+simstr+'avg_weight.png')
+
+pdfs = pdf[pdf.time==np.amax(pdf.time)]; D = pdf2weightsdict(pdfs); pickle.dump(D, open('data/'+simstr+'synWeights_final.pkl','wb')) 
+
+lpop = ['ER', 'EV1', 'EV4', 'EMT', 'IR', 'IV1', 'IV4', 'IMT','EV1DW','EV1DNW', 'EV1DN', 'EV1DNE','EV1DE','EV1DSW', 'EV1DS', 'EV1DSE','EMDOWN','EMUP']  
+dact = getdActMap(totalDur, tstepPerAction, lpop)
+
+fig, axs, plt = animActivityMaps() # gif/20jun9_A0_falcor_actmap.mp4
+
+continue as 20jun10_A1_falcor_
+
+./myrun 16 sn.json
+
+** check output from 20jun9_B0_falcor_ (lower weight increments) -->> not as good as 20jun9_A0_falcor_
+
+python -i simdat.py backupcfg/20jun9_B0_falcor_sim.json
+
+#
+plotFollowBall(actreward,ax=subplot(1,3,1),cumulative=True,msz=3,color='k'); ylim((0,.6))
+plotFollowBall(actreward,ax=subplot(1,3,1),cumulative=False,msz=3,color='r'); ylim((0,.6))
+plotHitMiss(actreward,ax=subplot(1,3,2),msz=3); ylim((0,120)); 
+plotRewards(actreward,ax=subplot(1,3,3),msz=3); 
+
+savefig('gif/'+dstr+simstr+'perf.png')
+savefig('gif/'+dstr+simstr+'perfB.png')
+
+this sim 20jun9_B0_falcor_ has not as many hits as 20jun9_A0_falcor_ and has lower follow ball probability
+
+clf(); drawraster(dspkT,dspkID); 
+savefig('gif/'+dstr+simstr+'rast.png')
+xlim((290e3,300e3)); savefig('gif/'+dstr+simstr+'rastB.png')
+xlim((299e3,300e3)); savefig('gif/'+dstr+simstr+'rastC.png')
+
+clf(); drawcellVm(simConfig); 
+savefig('gif/'+dstr+simstr+'Vm.png')
+
+#
+clf(); dobjpos = loadObjPos()
+subplot(1,2,1); xlabel('Racket X position'); hist(dobjpos['racket'][:,0])
+subplot(1,2,2); xlabel('Racket Y position'); hist(dobjpos['racket'][:,1])
+savefig('gif/'+dstr+simstr+'poshist.png')
+
+clf(); DOWNwts,UPwts = plotMeanWeights(pdf, gca(), xl=(0,simConfig['simConfig']['duration'])); savefig('gif/'+dstr+simstr+'avg_weight.png')
+
+will not continue this sim (20jun9_B0_falcor_) since not as good as 20jun9_A0_falcor_ ...
+
+
+
+** try sim with no follow ball rewards?
+
+and longer time constant for RL ... 
 
