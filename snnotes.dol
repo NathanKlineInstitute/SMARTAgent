@@ -7485,11 +7485,15 @@ continue as 20jun11_B1_falcor_
 
 ./myrun 16 sn.json
 
-** check performance for model w/o learning (RL off) (20jun11_C0_laptop_)
+** check performance for model w/o learning (RL off) (20jun11_C0_laptop_ , 20jun11_NORL_falcor_)
 
 ./myrun 12 sn.json
 
-python -i simdat.py backupcfg/20jun11_C0_laptop_sim.json
+too slow on laptop ... try on falcor ...
+
+./myrun 16 sn.json
+
+python -i simdat.py backupcfg/20jun11_NORL_falcor_sim.json
 
 #
 plotFollowBall(actreward,ax=subplot(1,3,1),cumulative=True,msz=3,color='k'); ylim((0,.6))
@@ -7580,3 +7584,6 @@ but with 1/2 the I noise rate, to see if improves faster ...
     "Noise":{"I":{"Rate":50,"Weight":0.00001},"E":{"Rate":0,"Weight":0.00001}}
 
 ./myrun 16 sn.json
+
+stopped this one for now ... since running too many jobs on falcor ... may restart it later ... 
+
