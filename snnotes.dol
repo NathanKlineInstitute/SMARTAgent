@@ -7393,7 +7393,7 @@ ok
 ./myrun 16 sn.json
 
 *20jun11
-** continue 20jun10_A1_falcor_ as 20jun11_A2_falcor_
+** check output of 20jun10_A1_falcor_ and continue as 20jun11_A2_falcor_
 
 python -i simdat.py backupcfg/20jun10_A1_falcor_sim.json
 
@@ -7510,3 +7510,73 @@ savefig('gif/'+dstr+simstr+'poshist.png')
 
 clf(); DOWNwts,UPwts = plotMeanWeights(pdf, gca(), xl=(0,simConfig['simConfig']['duration'])); savefig('gif/'+dstr+simstr+'avg_weight.png')
 
+
+** check output of 20jun11_A2_falcor_ and continue as 20jun11_A3_falcor_
+
+python -i simdat.py backupcfg/20jun11_A2_falcor_sim.json
+
+#
+plotFollowBall(actreward,ax=subplot(1,3,1),cumulative=True,msz=3,color='k'); ylim((0,.6))
+plotFollowBall(actreward,ax=subplot(1,3,1),cumulative=False,msz=3,color='r'); ylim((0,.6))
+plotHitMiss(actreward,ax=subplot(1,3,2),msz=3); ylim((0,120)); 
+plotRewards(actreward,ax=subplot(1,3,3),msz=3); 
+
+savefig('gif/'+dstr+simstr+'perf.png')
+savefig('gif/'+dstr+simstr+'perfB.png') # 
+
+a little better than last run ... 
+
+clf(); drawraster(dspkT,dspkID); 
+savefig('gif/'+dstr+simstr+'rast.png')
+xlim((290e3,300e3)); savefig('gif/'+dstr+simstr+'rastB.png')
+xlim((299e3,300e3)); savefig('gif/'+dstr+simstr+'rastC.png')
+
+#
+clf(); dobjpos = loadObjPos()
+xlabel('Racket Y position'); hist(dobjpos['racket'][:,1])
+savefig('gif/'+dstr+simstr+'poshist.png')
+
+clf(); DOWNwts,UPwts = plotMeanWeights(pdf, gca(), xl=(0,simConfig['simConfig']['duration'])); savefig('gif/'+dstr+simstr+'avg_weight.png')
+
+pdfs = pdf[pdf.time==np.amax(pdf.time)]; D = pdf2weightsdict(pdfs); pickle.dump(D, open('data/'+simstr+'synWeights_final.pkl','wb')) 
+
+#
+#lpop = ['ER', 'EV1', 'EV4', 'EMT', 'IR', 'IV1', 'IV4', 'IMT','EV1DW','EV1DNW', 'EV1DN', 'EV1DNE','EV1DE','EV1DSW', 'EV1DS', 'EV1DSE','EMDOWN','EMUP']  
+#dact = getdActMap(totalDur, tstepPerAction, lpop)
+#fig, axs, plt = animActivityMaps() # 
+#animSynWeights(pdf) # 
+
+check all activity from past few A series sims ... 
+
+#
+sim = '20jun9_A0_falcor_'
+pda = pd.DataFrame(np.loadtxt('data/'+sim+'ActionsRewards.txt'),columns=['time','action','reward','proposed','hit'])
+curt = 300e3
+for sim,maxdur in zip(['20jun10_A1_falcor_','20jun11_A2_falcor_'],[300e3,300e3]):
+  tmp = pd.DataFrame(np.loadtxt('data/'+sim+'ActionsRewards.txt'),columns=['time','action','reward','proposed','hit'])
+  tmp.time += curt
+  curt += maxdur
+  pda = pda.append(tmp)
+
+#
+clf()
+plotFollowBall(pda,ax=subplot(1,3,1),msz=3); ylim((0.1,.16))
+plotHitMiss(pda,ax=subplot(1,3,2),msz=3); 
+plotRewards(pda,ax=subplot(1,3,3),msz=3); 
+
+savefig('gif/'+dstr+simstr+'perf_tot.png')
+
+it's increasing slightly 
+
+could use a different metric based on positions - y-distance between ball and racket when ball
+in right half, over time ... probability that racket and ball are within a tolerance given that
+the ball is in right half of court, and see how that changes over time...
+
+clf(); plot(np.sqrt((dobjpos['ball'][:,1]-dobjpos['racket'][:,1])**2))
+
+continue as 20jun11_A3A_falcor_
+
+but with 1/2 the I noise rate, to see if improves faster ... 
+    "Noise":{"I":{"Rate":50,"Weight":0.00001},"E":{"Rate":0,"Weight":0.00001}}
+
+./myrun 16 sn.json
