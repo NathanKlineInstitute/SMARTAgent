@@ -408,9 +408,15 @@ def plotFollowBall (actreward, ax=None,msz=1,cumulative=True,binsz=1e3,color='r'
   ax.set_ylim((0,1))
   ax.set_xlabel('Time (ms)'); ax.set_ylabel('p(Follow Ball)')
   return aout
-  
+
+def getCumScore (actreward):
+  # get cumulative score - assumes score has max reward
+  ScoreLoss = np.array(actreward.reward)
+  allScore = np.where(ScoreLoss==np.amax(ScoreLoss),1,0) 
+  return np.cumsum(allScore) #cumulative score evolving with time.  
+
 #  
-def plotHitMiss (actreward,ax=None,msz=1):
+def plotHitMiss (actreward,ax=None,msz=3):
   if ax is None: ax = gca()
   action_times = np.array(actreward.time)
   Hit_Missed = np.array(actreward.hit)
@@ -418,12 +424,32 @@ def plotHitMiss (actreward,ax=None,msz=1):
   allMissed = np.where(Hit_Missed==-1,1,0)
   cumHits = np.cumsum(allHit) #cumulative hits evolving with time.
   cumMissed = np.cumsum(allMissed) #if a reward is -1, replace it with 1 else replace it with 0.
+  cumScore = getCumScore(actreward)
+  ax.plot(action_times,cumScore,'r-o',markersize=msz)
   ax.plot(action_times,cumHits,'g-o',markersize=msz)
-  ax.plot(action_times,cumMissed,'k-o',markersize=msz)
+  ax.plot(action_times,cumMissed,'b-o',markersize=msz)
   ax.set_xlim((0,np.max(action_times)))
   ax.set_ylim((0,np.max([cumHits[-1],cumMissed[-1]])))
-  ax.legend(('Hit Ball','Miss Ball'),loc='best')  
+  ax.legend(('Score ('+str(cumScore[-1])+')','Hit Ball ('+str(cumHits[-1])+')','Miss Ball ('+str(cumMissed[-1])+')'),loc='best')
+  return cumScore[-1],cumHits[-1],cumMissed[-1]
 
+#  
+def plotScoreLoss (actreward,ax=None,msz=3):
+  # plot cumulative score points and lose points; assumes score/lose point is max/min reward
+  if ax is None: ax = gca()
+  action_times = np.array(actreward.time)
+  ScoreLoss = np.array(actreward.reward)
+  allScore = np.where(ScoreLoss==np.amax(ScoreLoss),1,0) 
+  allLoss = np.where(ScoreLoss==np.amin(ScoreLoss),1,0)
+  cumScore = np.cumsum(allScore) #cumulative hits evolving with time.
+  cumLoss = np.cumsum(allLoss) #if a reward is -1, replace it with 1 else replace it with 0.
+  ax.plot(action_times,cumScore,'r-o',markersize=msz)
+  ax.plot(action_times,cumLoss,'b-o',markersize=msz)
+  ax.set_xlim((0,np.max(action_times)))
+  ax.set_ylim((0,np.max([cumScore[-1],cumLoss[-1]])))
+  ax.legend(('Score Point ('+str(cumScore[-1])+')','Lose Point ('+str(cumLoss[-1])+')'),loc='best')
+  return cumScore[-1],cumLoss[-1]
+  
 #
 def plotRewards (actreward,ax=None,msz=1,xl=None):
   if ax is None: ax = gca()  

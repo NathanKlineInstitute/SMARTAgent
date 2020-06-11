@@ -7432,3 +7432,55 @@ animSynWeights(pdf) #
 continue as 20jun11_A2_falcor_
 
 ./myrun 16 sn.json
+
+** check output from 20jun10_B0_falcor_ (sim with no follow ball rewards)
+
+python -i simdat.py backupcfg/20jun10_B0_falcor_sim.json
+
+#
+plotFollowBall(actreward,ax=subplot(1,3,1),cumulative=True,msz=3,color='k'); ylim((0,.6))
+plotFollowBall(actreward,ax=subplot(1,3,1),cumulative=False,msz=3,color='r'); ylim((0,.6))
+plotHitMiss(actreward,ax=subplot(1,3,2),msz=3); ylim((0,120)); 
+plotRewards(actreward,ax=subplot(1,3,3),msz=3); 
+
+savefig('gif/'+dstr+simstr+'perf.png')
+savefig('gif/'+dstr+simstr+'perfB.png') # 
+
+seems to be performing similar to the model with follow ball rule ... similar number of
+points, hits, and follow ball probability ... should draw cumulative of score/lose points too
+
+plotScoreLoss(actreward,msz=3)
+savefig('gif/'+dstr+simstr+'score.png') # 16 to 238
+
+should combine with the hit miss plot instead ... hit is greater than score
+since some hits are returned ... but miss ball is same as loss since any miss
+results in point for opponent
+
+plotHitMiss(actreward)
+savefig('gif/'+dstr+simstr+'scorehitmiss.png') # 16 55 238
+
+clf(); drawraster(dspkT,dspkID); 
+savefig('gif/'+dstr+simstr+'rast.png')
+xlim((290e3,300e3)); savefig('gif/'+dstr+simstr+'rastB.png')
+xlim((299e3,300e3)); savefig('gif/'+dstr+simstr+'rastC.png')
+
+clf(); drawcellVm(simConfig); savefig('gif/'+dstr+simstr+'Vm.png')
+
+#
+clf(); dobjpos = loadObjPos()
+xlabel('Racket Y position'); hist(dobjpos['racket'][:,1])
+savefig('gif/'+dstr+simstr+'poshist.png')
+
+clf(); DOWNwts,UPwts = plotMeanWeights(pdf, gca(), xl=(0,simConfig['simConfig']['duration'])); savefig('gif/'+dstr+simstr+'avg_weight.png')
+
+pdfs = pdf[pdf.time==np.amax(pdf.time)]; D = pdf2weightsdict(pdfs); pickle.dump(D, open('data/'+simstr+'synWeights_final.pkl','wb')) 
+
+#
+lpop = ['ER', 'EV1', 'EV4', 'EMT', 'IR', 'IV1', 'IV4', 'IMT','EV1DW','EV1DNW', 'EV1DN', 'EV1DNE','EV1DE','EV1DSW', 'EV1DS', 'EV1DSE','EMDOWN','EMUP']  
+dact = getdActMap(totalDur, tstepPerAction, lpop)
+fig, axs, plt = animActivityMaps() # 
+animSynWeights(pdf) # 
+
+continue as 20jun11_B1_falcor_
+
+./myrun 16 sn.json
