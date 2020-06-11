@@ -239,27 +239,35 @@ class AIGame:
 
       observation, reward, done, info = self.env.step(caction)
       #find position of ball after action
-      xpos_Ball2, ypos_Ball2 = self.findobj(observation, courtXRng, courtYRng)        
+      xpos_Ball2, ypos_Ball2 = self.findobj(observation, courtXRng, courtYRng)
+      ball_moves_towards_racket = False
       if xpos_Ball>0 and xpos_Ball2>0:
         if xpos_Ball2-xpos_Ball>0:
-          ball_moves_towards_racket = 1 #use proposed action for reward only when the ball moves towards the racket
+          ball_moves_towards_racket = True # use proposed action for reward only when the ball moves towards the racket
           current_ball_dir = 1 
         elif xpos_Ball2-xpos_Ball<0:
-          ball_moves_towards_racket = 0
+          ball_moves_towards_racket = False
           current_ball_dir = -1
         else:
-          ball_moves_towards_racket = 0
+          ball_moves_towards_racket = False
           current_ball_dir = 0 #direction can't be determinted  prob. because the ball didn't move in x dir.
       else:
-        ball_moves_towards_racket = 0
+        ball_moves_towards_racket = False
         current_ball_dir = 0 #direction can't be determined because either current or last position of the ball is outside the court
+
+      if "followOnlyTowards" in dconf:
+        if dconf["followOnlyTowards"] and not ball_moves_towards_racket:
+          proposed_action = -1 # no proposed action if ball moving away from racket
 
       ball_hits_racket = 0
       # previously I assumed when current_ball_dir is 0 there is no way to find out if the ball hit the racket
-      if current_ball_dir-self.last_ball_dir<0 and reward==0 and xpos_Ball2>courtXRng[1]-courtXRng[0]-3:
+      if current_ball_dir-self.last_ball_dir<0 and reward==0 and xpos_Ball2>courtXRng[1]-courtXRng[0]-40:
         ball_hits_racket = 1
-      elif xpos_Ball==-1 and reward==0 and xpos_Ball2>courtXRng[1]-courtXRng[0]-3:
-        ball_hits_racket = 1  
+      #print('Current_ball_dir', current_ball_dir)
+      #print('Last ball dir', self.last_ball_dir)
+      #print('current X pos Ball', xpos_Ball2)
+      #print('last X pos Ball', xpos_Ball)
+      #print('Court Range',courtXRng) 
       print(ball_hits_racket)
       self.last_ball_dir = current_ball_dir
       total_hits.append(ball_hits_racket) # i dont think this can be more than a single hit in 5 moves. so check if sum is greater than 1, print error

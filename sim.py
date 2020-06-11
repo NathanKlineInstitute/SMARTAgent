@@ -50,6 +50,7 @@ allpops = ['ER','IR','EV1','EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','E
 #EDirPops = ['EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE']
 #IDirPops = ['IV1D']
 EMotorPops = ['EMDOWN', 'EMUP'] # excitatory neuron motor populations
+EPreMPops = ['EV1','EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE','EV4','EMT']
 dnumc = OrderedDict({ty:dconf['net'][ty]*scale for ty in allpops}) # number of neurons of a given type
 
 # Network parameters
@@ -114,7 +115,13 @@ netParams.stimTargetParams['MRbkg->all'] = {'source': 'MRbkg', 'conds': {'cellTy
 netParams.stimSourceParams['bkg'] = {'type': 'NetStim', 'rate': 20, 'noise': 1.0}
 netParams.stimTargetParams['bkg->all'] = {'source': 'bkg', 'conds': {'cellType': ['IR','IV1','IV4','IMT']}, 'weight': 0.0, 'delay': 'max(1, normal(5,2))', 'synMech': 'AMPA'}
 """
-
+if "Noise" in dconf:
+  for ty,sy in zip(["E","I"],["AMPA","GABA"]):
+    Weight,Rate = dconf["Noise"][ty]["Weight"],dconf["Noise"][ty]["Rate"]
+    if Weight > 0.0 and Rate > 0.0:
+      netParams.stimSourceParams[ty+'Mbkg'] = {'type': 'NetStim', 'rate': Rate, 'noise': 1.0}
+      netParams.stimTargetParams[ty+'Mbkg->all'] = {'source': ty+'Mbkg', 'conds': {'cellType': EMotorPops}, 'weight': Weight, 'delay': 'max(1, normal(5,2))', 'synMech': sy}
+      
 ######################################################################################
 
 #####################################################################################
@@ -403,66 +410,50 @@ netParams.connParams['EV4->IMT'] = {
         'synMech': 'AMPA','sec':'soma', 'loc':0.5}
 """
 
-"""
-#E to E feedbackward connections
-netParams.connParams['EV1->ER'] = {
-        'preConds': {'pop': 'EV1'},
-        'postConds': {'pop': 'ER'},
-        'connList': blistEV1toER,
-        #'convergence': 10,
-        'weight': 0.000 * cfg.EEGain, #0.0001
-        'delay': 2,
-        'synMech': 'AMPA','sec':'dend', 'loc':0.5}
-netParams.connParams['EV4->EV1'] = {    # <<-- that's E -> I ?? or E -> E ?? weight is 0 but something wrong here
-        'preConds': {'pop': 'EV4'},
-        'postConds': {'pop': 'EV1'},
-        'connList': blistEV4toEV1,
-        #'convergence': 10,
-        'weight': 0.000 * cfg.EEGain, #0.0001
-        'delay': 2,
-        'synMech': 'AMPA','sec':'dend', 'loc':0.5}
-netParams.connParams['EMT->EV4'] = {
-        'preConds': {'pop': 'EMT'},
-        'postConds': {'pop': 'EV4'},
-        'connList': blistEMTtoEV4,
-        #'convergence': 10,
-        'weight': 0.000 * cfg.EEGain, #0.0001
-        'delay': 2,
-        'synMech': 'AMPA','sec':'dend', 'loc':0.5}
-
-#I to E feedbackward connections
-netParams.connParams['IV1->ER'] = {
-        'preConds': {'pop': 'IV1'},
-        'postConds': {'pop': 'ER'},
-        'connList': blistIV1toER,
-        #'convergence': 10,
-        'weight': 0.00 * cfg.IEGain, #0.02
-        'delay': 2,
-        'synMech': 'GABA','sec':'soma', 'loc':0.5}
-netParams.connParams['IV4->EV1'] = {
-        'preConds': {'pop': 'IV4'},
-        'postConds': {'pop': 'EV1'},
-        'connList': blistIV4toEV1,
-        #'convergence': 10,
-        'weight': 0.00 * cfg.IEGain, #0.02
-        'delay': 2,
-        'synMech': 'GABA','sec':'soma', 'loc':0.5}
-netParams.connParams['IMT->EV4'] = {
-        'preConds': {'pop': 'IMT'},
-        'postConds': {'pop': 'EV4'},
-        'connList': blistIMTtoEV4,
-        #'convergence': 10,
-        'weight': 0.00 * cfg.IEGain, #0.02
-        'delay': 2,
-        'synMech': 'GABA','sec':'soma', 'loc':0.5}
-"""
+VisualFeedback = False
+if "VisualFeedback" in dconf['net']: VisualFeedback = dconf['net']['VisualFeedback']
+if VisualFeedback:
+  # visual area feedback connections
+  for prety,poty,connList in zip(['EV1','EV4','EMT'],['ER','EV1','EV4'],[blistEV1toER,blistEV4toEV1,blistEMTtoEV4]):
+    for strty,synmech,weight in zip(['','n'],['AMPA', 'NMDA'],[dconf['net']['EEMWghtAM']*cfg.EEGain, dconf['net']['EEMWghtNM']*cfg.EEGain]):
+        k = strty+prety+'->'+strty+poty
+        netParams.connParams[k] = {
+          'preConds': {'pop': 'EV1'},
+          'postConds': {'pop': 'ER'},
+          'connList': connList,
+          'weight': 0.0001 * cfg.EEGain, 
+          'delay': 2,
+          'synMech': 'AMPA','sec':'dend', 'loc':0.5}
+        if dSTDPparamsRL[synmech]['RLon']: # only turn on plasticity when specified to do so
+          netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL[synmech]}        
+  #I to E feedback connections
+  netParams.connParams['IV1->ER'] = {
+          'preConds': {'pop': 'IV1'},
+          'postConds': {'pop': 'ER'},
+          'connList': blistIV1toER,
+          'weight': 0.02 * cfg.IEGain, 
+          'delay': 2,
+          'synMech': 'GABA','sec':'soma', 'loc':0.5}
+  netParams.connParams['IV4->EV1'] = {
+          'preConds': {'pop': 'IV4'},
+          'postConds': {'pop': 'EV1'},
+          'connList': blistIV4toEV1,
+          'weight': 0.02 * cfg.IEGain, 
+          'delay': 2,
+          'synMech': 'GABA','sec':'soma', 'loc':0.5}
+  netParams.connParams['IMT->EV4'] = {
+          'preConds': {'pop': 'IMT'},
+          'postConds': {'pop': 'EV4'},
+          'connList': blistIMTtoEV4,
+          'weight': 0.02 * cfg.IEGain, 
+          'delay': 2,
+          'synMech': 'GABA','sec':'soma', 'loc':0.5}
 
 #I to I - between areas
 netParams.connParams['IV1->IV4'] = {
         'preConds': {'pop': 'IV1'},
         'postConds': {'pop': 'IV4'},
         'connList': blistIV1toIV4,
-        #'convergence': 10,
         'weight': 0.0075 * cfg.IIGain,
         'delay': 2,
         'synMech': 'GABA','sec':'soma', 'loc':0.5}
@@ -470,7 +461,6 @@ netParams.connParams['IV4->IMT'] = {
         'preConds': {'pop': 'IV4'},
         'postConds': {'pop': 'IMT'},
         'connList': blistIV4toIMT,
-        #'convergence': 10,
         'weight': 0.0075 * cfg.IIGain,
         'delay': 2,
         'synMech': 'GABA','sec':'soma', 'loc':0.5}
@@ -479,7 +469,7 @@ if dconf['architecturePreMtoM']['useTopological']:
   blistEV1toEM = connectLayerswithOverlap(NBpreN = dnumc['EV1'], NBpostN = dnumc['EMUP'], overlap_xdir = 3)
   blistEV4toEM = connectLayerswithOverlapDiv(NBpreN = dnumc['EV4'], NBpostN = dnumc['EMUP'], overlap_xdir = 3)
   blistEMTtoEM = connectLayerswithOverlapDiv(NBpreN = dnumc['EMT'], NBpostN = dnumc['EMUP'], overlap_xdir = 5)
-  for prety in ['EV1', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW','EV1DSW', 'EV1DS','EV1DSE','EV4','EMT']:
+  for prety in EPreMPops:
     for poty in EMotorPops:
       for strty,synmech,weight in zip(['','n'],['AMPA', 'NMDA'],[dconf['net']['EEMWghtAM']*cfg.EEGain, dconf['net']['EEMWghtNM']*cfg.EEGain]):
         k = strty+prety+'->'+strty+poty
@@ -517,7 +507,7 @@ if dconf['architecturePreMtoM']['useTopological']:
           netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL[synmech]}
 elif dconf['architecturePreMtoM']['useProbabilistic']:
   # Add connections from lower and higher visual areas to motor cortex and direct connections between premotor to motor areas
-  for prety in ['EV1', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW','EV1DSW', 'EV1DS','EV1DSE', 'EV4', 'EMT']:
+  for prety in EPreMPops:
     EEMProb = 0.1 # default - feedforward connectivity
     if "EEMProb" in dconf['net']: EEMProb = dconf['net']['EEMProb']
     for poty in EMotorPops:
@@ -555,7 +545,28 @@ if EEMRecProb > 0.0:
           }
           if dSTDPparamsRL[synmech]['RLon']: # only turn on plasticity when specified to do so
             netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL[synmech]}  
-        
+
+# add feedback plastic connectivity from EM populations to premotor/visual populations
+EEMFeedbackProb = 0.0 # default
+if "EEMFeedbackProb" in dconf['net']: EEMFeedbackProb = dconf['net']['EEMFeedbackProb']
+if EEMFeedbackProb > 0.0:
+  for prety in EMotorPops:
+    for poty in EPreMPops:
+        for strty,synmech,weight in zip(['','n'],['AMPA', 'NMDA'],[dconf['net']['EEMFeedbackWghtAM']*cfg.EEGain, dconf['net']['EEMFeedbackWghtNM']*cfg.EEGain]):
+          k = strty+prety+'->'+strty+poty
+          netParams.connParams[k] = {
+            'preConds': {'pop': prety},
+            'postConds': {'pop': poty},
+            'convergence': prob2conv(EEMFeedbackProb, dnumc[prety]),
+            'weight': weight,
+            'delay': 2,
+            'synMech': synmech,
+            'sec':'dend', 'loc':0.5
+          }
+          if dSTDPparamsRL[synmech]['RLon']: # only turn on plasticity when specified to do so
+            netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL[synmech]}  
+
+            
 ###################################################################################################################################
 
 sim.AIGame = None # placeholder
@@ -873,7 +884,7 @@ def trainAgent (t):
     F_DOWNs = vec.to_python()
     if sim.rank==0:
       if fid4 is None: fid4 = open(sim.MotorOutputsfilename,'w')
-      print('U,D firing rates: ', F_UPs, F_DOWNs)
+      print('t=',round(t,2),' U,D firing rates:', F_UPs, F_DOWNs)
       #print('Firing rates: ', F_R1, F_R2, F_R3, F_R4, F_R5, F_L1, F_L2, F_L3, F_L4, F_L5)
       fid4.write('%0.1f' % t)
       for ts in range(int(dconf['actionsPerPlay'])): fid4.write('\t%0.1f' % F_UPs[ts])
@@ -890,9 +901,8 @@ def trainAgent (t):
         else:
           actions.append(dconf['moves']['NOMOVE']) # No move        
   if sim.rank == 0:
-    print('Model actions:', actions)
     rewards, epCount, proposed_actions, total_hits = sim.AIGame.playGame(actions, epCount)
-    print('Proposed actions:', proposed_actions)
+    print('t=',round(t,2),'proposed actions:', proposed_actions,', model actions:', actions)
     if dconf['sim']['RLFakeUpRule']: # fake rule for testing reinforcing of up moves
       critic = np.sign(actions.count(dconf['moves']['UP']) - actions.count(dconf['moves']['DOWN']))          
       rewards = [critic for i in range(len(rewards))]
@@ -941,7 +951,7 @@ def trainAgent (t):
     DOWNactions = vec3.to_python()[0]
     if dconf['verbose']: print('UPactions: ', UPactions,'DOWNactions: ', DOWNactions)
   if critic != 0: # if critic signal indicates punishment (-1) or reward (+1)
-    if sim.rank==0: print('t=',t,'- adjusting weights based on RL critic value:', critic)
+    if sim.rank==0: print('t=',round(t,2),'- adjusting weights based on RL critic value:', critic)
     if not dconf['sim']['targettedRL'] or UPactions==DOWNactions:
       if dconf['verbose']: print('APPLY RL to both EMUP and EMDOWN')
       for STDPmech in dSTDPmech['all']: STDPmech.reward_punish(float(critic))
@@ -952,7 +962,7 @@ def trainAgent (t):
       if dconf['verbose']: print('APPLY RL to EMDOWN')
       for STDPmech in dSTDPmech['EMDOWN']: STDPmech.reward_punish(float(critic))
   if sim.rank==0:
-    print('Game rewards:', rewards) # only rank 0 has access to rewards      
+    print('t=',round(t,2),' game rewards:', rewards) # only rank 0 has access to rewards      
     for action in actions:
         sim.allActions.append(action)
     for pactions in proposed_actions: #also record proposed actions
@@ -1001,8 +1011,9 @@ if sim.rank == 0:  # sim rank 0 specific init and backup of config file
   # node 0 saves the json config file
   # this is just a precaution since simConfig pkl file has MOST of the info; ideally should adjust simConfig to contain
   # ALL of the required info
-  from utils import backupcfg
+  from utils import backupcfg, safemkdir
   backupcfg(dconf['sim']['name'])
+  safemkdir('data') # make sure data (output) directory exists
 
 sim.net.createPops()                      # instantiate network populations
 sim.net.createCells()                     # instantiate network cells based on defined populations
