@@ -84,7 +84,9 @@ def loadsimdat (name=None,getactmap=True):
   simConfig = pickle.load(open('data/'+name+'simConfig.pkl','rb'))
   dstartidx = {p:simConfig['net']['pops'][p]['cellGids'][0] for p in simConfig['net']['pops'].keys()} # starting indices for each population
   dendidx = {p:simConfig['net']['pops'][p]['cellGids'][-1] for p in simConfig['net']['pops'].keys()} # ending indices for each population
-  pdf = readinweights(name)
+  pdf=None
+  try: pdf = readinweights(name) # if RL was off, no weights saved
+  except: pass
   actreward = pd.DataFrame(np.loadtxt('data/'+name+'ActionsRewards.txt'),columns=['time','action','reward','proposed','hit'])
   dnumc = {p:dendidx[p]-dstartidx[p]+1 for p in simConfig['net']['pops'].keys()}
   spkID= np.array(simConfig['simData']['spkid'])
@@ -93,6 +95,7 @@ def loadsimdat (name=None,getactmap=True):
   for pop in simConfig['net']['pops'].keys():
     dspkID[pop] = spkID[(spkID >= dstartidx[pop]) & (spkID <= dendidx[pop])]
     dspkT[pop] = spkT[(spkID >= dstartidx[pop]) & (spkID <= dendidx[pop])]
+  InputImages=ldflow=None
   InputImages = loadInputImages(dconf['sim']['name'])
   ldflow = loadMotionFields(dconf['sim']['name'])
   totalDur = int(dconf['sim']['duration'])
