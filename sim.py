@@ -1121,3 +1121,5 @@ if sim.rank == 0: # only rank 0 should save. otherwise all the other nodes could
   if sim.saveMotionFields: saveMotionFields(sim.AIGame.ldflow)
   if sim.saveObjPos: saveObjPos(sim.AIGame.dObjPos)
   if dconf['sim']['doquit']: quit()
+
+import pylab; pylab.show()

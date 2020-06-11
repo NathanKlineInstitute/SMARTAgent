@@ -7,8 +7,8 @@
     "actionsPerPlay": 1,
     "DirectionDetectionAlgo":{"CentroidTracker":1,"OpticFlow":0,"UseFull":1,"FlowWidth":16},
     "verbose": 0,
-    "simtype": {"ResumeSim":0,"ResumeSimFromFile":"20mar5_G0_simConfig.pkl"},        
-    "sim": {"duration": 200000, "dt": 0.2, "verbose": 0, "recordStep":0.6,"recordWeightStepSize":50,"normalizeWeightStepSize":50,"RLFakeUpRule": 0,"RLFakeDownRule": 0,"RLFakeStayRule": 0,"name":"20june02_B_","doquit":0,"doplot":1,"saveCellSecs":0,"saveCellConns":0,"targettedRL":0,"tstepPerAction":20},
+    "simtype": {"ResumeSim":1,"ResumeSimFromFile":"data/20june02_B_synWeights.pkl"},        
+    "sim": {"duration": 2000, "dt": 0.2, "verbose": 0, "recordStep":0.6,"recordWeightStepSize":50,"normalizeWeightStepSize":50,"RLFakeUpRule": 0,"RLFakeDownRule": 0,"RLFakeStayRule": 0,"name":"20june02_B_","doquit":0,"doplot":1,"saveCellSecs":0,"saveCellConns":0,"targettedRL":0,"tstepPerAction":20},
     "architecturePreMtoM": {"useProbabilistic":0,"useTopological":1},
     "net":{"scale":1,"ER":400,"IR":100,"EV1":400,"EV1DE":400,"EV1DNE":400,"EV1DN":400,"EV1DNW":400,"EV1DW":400,"EV1DSW":400,"EV1DS":400,"EV1DSE":400,"IV1":100,"EV4":100,"IV4":25,"EMT":25,"IMT":9,"EMDOWN":400,"EMUP":400,"IM":200,"AngRFSigma":22.5,"DirMinRate":0.0,"DirMaxRate":50.0,"EEMWghtAM":0.0008,"EEMWghtNM":0.00025,"EEMWghtThreshMin":0.0004,"EEMWghtThreshMax":0.0016,"EEMProb":0.3,"EEMRecProb":0.3,"EEMPopNorm":0,"EEMRecProbCross":0},
     "RL":{"AMPA":
