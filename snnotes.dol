@@ -7340,6 +7340,8 @@ dact = getdActMap(totalDur, tstepPerAction, lpop)
 
 fig, axs, plt = animActivityMaps() # gif/20jun9_A0_falcor_actmap.mp4
 
+animSynWeights(pdf) # gif/20jun9_A0_falcor_weightmap.mp4
+
 continue as 20jun10_A1_falcor_
 
 ./myrun 16 sn.json
@@ -7379,7 +7381,14 @@ will not continue this sim (20jun9_B0_falcor_) since not as good as 20jun9_A0_fa
 
 
 
-** try sim with no follow ball rewards?
+** try sim with no follow ball rewards? (20jun10_B0_falcor_)
 
 and longer time constant for RL ... 
+
+ok
+    "rewardcodes": {"scorePoint": 1, "losePoint": -0.1, "followBall": 0.0, "avoidBall": 0.0, "hitBall": 0.5},    
+
+"RLlenhebb":800
+
+./myrun 16 sn.json
 
