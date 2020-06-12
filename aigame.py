@@ -192,6 +192,28 @@ class AIGame:
       xpos = np.median(Obj_inds,0)[1] #x position of the center of mass of the object
     return xpos, ypos
 
+  def predictBallRacketYIntercept(self, xpos1, ypos1, xpos2, ypos2):
+    if ((xpos1==-1) or (xpos2==-1)):
+      predY = -1
+    else:
+      deltax = xpos2-xpos1
+      if deltax<=0:
+        predY = -1
+      else:
+        if ypos1<0:
+          predY = -1
+        else:
+          NB_intercept_steps = np.ceil((120.0 - xpos2)/deltax)
+          deltay = ypos2-ypos1
+          predY_nodeflection = ypos2 + (NB_intercept_steps*deltay)
+          if predY_nodeflection<0:
+            predY = -1*predY_nodeflection
+          elif predY_nodeflection>160:
+            predY = predY_nodeflection-160
+          else:
+            predY = predY_nodeflection
+    return predY
+
   def playGame (self, actions, epCount): #actions need to be generated from motor cortex
     # PLAY GAME
     rewards = []; proposed_actions =[]; total_hits = []; Images = []
@@ -258,6 +280,21 @@ class AIGame:
       if "followOnlyTowards" in dconf:
         if dconf["followOnlyTowards"] and not ball_moves_towards_racket:
           proposed_action = -1 # no proposed action if ball moving away from racket
+
+      if "useRacketPredictedPos" in dconf:
+        if dconf["useRacketPredictedPos"]:
+          xpos_Racket2, ypos_Racket2 = findobj (observation, racketXRng, courtYRng)
+          predY = self.predictBallRacketYIntercept(xpos_Ball,ypos_Ball,xpos_Ball2,ypos_Ball2)
+          if predY==-1:
+            proposed_action = -1
+          else:
+            targetY = ypos_Racket2 - predY
+          if targetY>8:
+            proposed_action = dconf['moves']['UP'] #move up
+          elif targetY<-8:
+            proposed_action = dconf['moves']['DOWN'] #move down
+          else:
+            proposed_action = dconf['moves']['NOMOVE'] #no move
 
       ball_hits_racket = 0
       # previously I assumed when current_ball_dir is 0 there is no way to find out if the ball hit the racket

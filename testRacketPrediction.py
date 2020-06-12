@@ -32,7 +32,8 @@ def findobj (img, xrng, yrng):
     xpos = np.median(Obj_inds,0)[1]
   return xpos, ypos
 
-env = gym.make('Pong-v0',frameskip=3)
+#env = gym.make('Pong-v0',frameskip=3)
+env = gym.make('PongNoFrameskip-v4')
 env.reset()
 
 def predictBallRacketYIntercept(xpos_Ball,ypos_Ball,xpos_Ball2,ypos_Ball2):
