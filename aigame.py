@@ -283,7 +283,7 @@ class AIGame:
 
       if "useRacketPredictedPos" in dconf:
         if dconf["useRacketPredictedPos"]:
-          xpos_Racket2, ypos_Racket2 = findobj (observation, racketXRng, courtYRng)
+          xpos_Racket2, ypos_Racket2 = self.findobj (observation, racketXRng, courtYRng)
           predY = self.predictBallRacketYIntercept(xpos_Ball,ypos_Ball,xpos_Ball2,ypos_Ball2)
           if predY==-1:
             proposed_action = -1
