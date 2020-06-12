@@ -7761,3 +7761,13 @@ clf(); drawraster(dspkT,dspkID); savefig('gif/'+dstr+simstr+'rast.png')
 savefig('gif/'+dstr+simstr+'rast.png')
 
 clf(); drawcellVm(simConfig); savefig('gif/'+dstr+simstr+'Vm.png')
+
+** ha added new target tracking rule
+
+instead of ball following rule
+
+new rewardcodes are followTarget and avoidTarget
+when     "useRacketPredictedPos": 1, uses the new rule, otherwise uses the old followball rule
+
+** still adjusting params 
+

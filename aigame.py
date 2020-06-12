@@ -280,11 +280,13 @@ class AIGame:
         ball_moves_towards_racket = False
         current_ball_dir = 0 #direction can't be determined because either current or last position of the ball is outside the court
 
+      skipPred = False # skip prediction of y intercept?
       if "followOnlyTowards" in dconf:
         if dconf["followOnlyTowards"] and not ball_moves_towards_racket:
           proposed_action = -1 # no proposed action if ball moving away from racket
-
-      if "useRacketPredictedPos" in dconf:
+          skipPred = True # skip prediction if ba
+      
+      if not skipPred and "useRacketPredictedPos" in dconf:
         if dconf["useRacketPredictedPos"]:
           xpos_Racket2, ypos_Racket2 = self.findobj (observation, racketXRng, courtYRng)
           predY = self.predictBallRacketYIntercept(xpos_Ball,ypos_Ball,xpos_Ball2,ypos_Ball2)
