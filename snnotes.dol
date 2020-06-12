@@ -7694,3 +7694,23 @@ xlim((290e3,300e3)); savefig('gif/'+dstr+simstr+'rastB.png')
 xlim((299e3,300e3)); savefig('gif/'+dstr+simstr+'rastC.png')
 
 clf(); drawcellVm(simConfig); savefig('gif/'+dstr+simstr+'Vm.png')
+
+** restarted NORL sim (control) (name=20jun12_NORL_falcor)
+
+python -i simdat.py backupcfg/20jun12_NORL_falcorsim.json
+
+#
+plotFollowBall(actreward,ax=subplot(1,3,1),cumulative=True,color='k'); ylim((0,.6))
+plotFollowBall(actreward,ax=subplot(1,3,1),cumulative=False,color='r'); ylim((0,.6))
+plotHitMiss(actreward,ax=subplot(1,3,2)); 
+plotRewards(actreward,ax=subplot(1,3,3)); 
+
+savefig('gif/'+dstr+simstr+'perf.png')
+
+subplot(1,3,1); ylim((0.1,0.16)); savefig('gif/'+dstr+simstr+'perfB.png') # 
+
+clf(); drawraster(dspkT,dspkID); savefig('gif/'+dstr+simstr+'rast.png')
+xlim((99e3,100e3)); savefig('gif/'+dstr+simstr+'rastB.png')
+
+ok, so the naive NORL sim performs similarly to the sim with RL ... 
+
