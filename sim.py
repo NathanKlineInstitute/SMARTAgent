@@ -30,6 +30,7 @@ sim.allNonRLWeights = [] # list to store weights --- should remove that
 #sim.NonRLweightsfilename = 'data/'+dconf['sim']['name']+'NonRLweights.txt'  # file to store weights
 sim.plotWeights = 0  # plot weights
 sim.saveWeights = 1  # save weights
+if 'saveWeights' in dconf['sim']: sim.saveWeights = dconf['sim']['saveWeights']
 sim.saveInputImages = 1 #save Input Images (5 game frames)
 sim.saveMotionFields = 1 # whether to save the motion fields
 sim.saveObjPos = 1 # save ball and paddle position to file
