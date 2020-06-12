@@ -4,7 +4,7 @@
     "moves": {"UP": 4,"DOWN":3, "NOMOVE":1},
     "movecodes": [1,3,4],
     "movefctr": 1.0,
-    "rewardcodes": {"scorePoint": 1, "losePoint": -0.1, "followBall": 0.1, "avoidBall": -0.01, "hitBall": 0.5},
+    "rewardcodes": {"scorePoint": 1, "losePoint": -0.1, "followTarget": 0.1, "avoidTarget": -0.01, "hitBall": 0.5},
     "actionsPerPlay": 1,
     "followOnlyTowards": 1,
     "useRacketPredictedPos": 1,

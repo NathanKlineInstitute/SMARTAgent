@@ -3167,3 +3167,5 @@ try this: env = gym.make('PongNoFrameskip-v4')
       }
 
 --- now i will use what sam uses.
+
+** change followBall and avoidBall to followTarget and avoidTarget respectively.

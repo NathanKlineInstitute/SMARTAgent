@@ -932,9 +932,9 @@ def trainAgent (t):
         if cproposed_action == -1: # invalid action since e.g. ball not visible
           continue
         elif caction - cproposed_action == 0: # model followed proposed action - gets a reward
-          critic_for_following_ball += dconf['rewardcodes']['followBall'] #follow the ball
+          critic_for_following_ball += dconf['rewardcodes']['followTarget'] #follow the ball
         else: # model did not follow proposed action - gets a punishment
-          critic_for_following_ball += dconf['rewardcodes']['avoidBall'] # didn't follow the ball
+          critic_for_following_ball += dconf['rewardcodes']['avoidTarget'] # didn't follow the ball
       #total rewards
       critic = critic + critic_for_avoidingloss + critic_for_following_ball
       rewards = [critic for i in range(len(rewards))]  # reset rewards to modified critic signal - should use more granular recording
