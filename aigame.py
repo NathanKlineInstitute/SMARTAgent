@@ -29,12 +29,12 @@ from centroidtracker import CentroidTracker
 # make the environment - env is global so that it only gets created on a single node (important when using MPI with > 1 node)
 try:
   from conf import dconf
-  env = gym.make(dconf['env']['name'],frameskip=dconf['env']['frameskip'])
+  env = gym.make(dconf['env']['name'],frameskip=dconf['env']['frameskip'],repeat_action_probability=0.)
   if dconf['env']['savemp4']: env = wrappers.Monitor(env, './videos/' + dconf['sim']['name'] + '/',force=True)
   env.reset()
 except:
   print('Exception in makeENV')
-  env = gym.make('Pong-v0',frameskip=3)
+  env = gym.make('Pong-v0',frameskip=3,repeat_action_probability=0.)
   env = wrappers.Monitor(env, './videos/' + str(time()) + '/',force=True)
   env.reset()
 
