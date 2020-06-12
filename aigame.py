@@ -289,12 +289,12 @@ class AIGame:
             proposed_action = -1
           else:
             targetY = ypos_Racket2 - predY
-          if targetY>8:
-            proposed_action = dconf['moves']['UP'] #move up
-          elif targetY<-8:
-            proposed_action = dconf['moves']['DOWN'] #move down
-          else:
-            proposed_action = dconf['moves']['NOMOVE'] #no move
+            if targetY>8:
+              proposed_action = dconf['moves']['UP'] #move up
+            elif targetY<-8:
+              proposed_action = dconf['moves']['DOWN'] #move down
+            else:
+              proposed_action = dconf['moves']['NOMOVE'] #no move
 
       ball_hits_racket = 0
       # previously I assumed when current_ball_dir is 0 there is no way to find out if the ball hit the racket
