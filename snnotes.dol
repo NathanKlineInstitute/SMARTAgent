@@ -7587,3 +7587,35 @@ but with 1/2 the I noise rate, to see if improves faster ...
 
 stopped this one for now ... since running too many jobs on falcor ... may restart it later ... 
 
+** check activity with somewhat lower I noise (20jun11_lowerI_laptop_)
+
+myrun 12 sn.json
+
+python -i simdat.py backupcfg/20jun11_lowerI_laptop_sim.json
+
+drawraster(dspkT,dspkID); savefig('gif/'+dstr+simstr+'rast.png') # 20jun11_20jun11_lowerI_laptop_rast.png
+
+seems like a bit too much synch ~1500 ms...
+
+try intermediate - 75 Hz I instead (just tried 50 Hz now ... )
+
+myrun 12 sn.json
+
+python -i simdat.py backupcfg/20jun11_lowerI_laptop_sim.json
+
+drawraster(dspkT,dspkID); savefig('gif/'+dstr+simstr+'rastB.png') # 20jun11_20jun11_lowerI_laptop_rastB.png
+
+looks decent ... no longer see hypersynch ~1500 ms (initial transient between 0-250 ms is ok)
+
+try longer ...
+
+./myrun 12 sn.json
+
+would noise in other E populations help too ... ???
+
+python -i simdat.py backupcfg/20jun11_lowerI_laptop_sim.json
+
+drawraster(dspkT,dspkID); savefig('gif/'+dstr+simstr+'rastC.png') # 20jun11_20jun11_lowerI_laptop_rastC.png
+
+looks decent overall ...
+
