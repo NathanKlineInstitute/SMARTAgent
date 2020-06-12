@@ -2988,3 +2988,182 @@ Court Range (20, 140)
 1
 
 ** adjust sim.json according to sn.json
+
+** run 200 sec sim on falcor with only plasticity in recurrent connections in motor pop.
+
+
+* 2020june10
+** running 400 sec sim on falcor using sn.json
+
+** working on algorithm to find the racket ball intercept.
+
+import random
+from matplotlib import pyplot as plt
+import numpy as np
+import gym
+courtXRng = (20, 140)
+courtYRng = (34, 194)
+racketXRng = (141, 144)
+def findobj (img, xrng, yrng):
+  subimg = img[yrng[0]:yrng[1],xrng[0]:xrng[1],:]
+  sIC = np.sum(subimg,2)
+  pixelVal = np.amax(sIC)
+  sIC[sIC<pixelVal]=0
+  Obj_inds = []
+  for i in range(sIC.shape[0]):
+    for j in range(sIC.shape[1]):
+      if sIC[i,j]>0:
+        Obj_inds.append([i,j])
+  if sIC.shape[0]*sIC.shape[1]==np.shape(Obj_inds)[0]:
+    ypos = -1
+    xpos = -1
+  else:
+    ypos = np.median(Obj_inds,0)[0]
+    xpos = np.median(Obj_inds,0)[1]
+  return xpos, ypos
+
+env = gym.make('Pong-v0',frameskip=3)
+env.reset()
+# ball appears on 20th action so
+ball_xpos = []
+ball_ypos = []
+for _ in range(200):
+  caction = random.randint(3,4)
+  observation, reward, done, info = env.step(caction)
+  env.render()
+  xpos, ypos = findobj (observation, courtXRng, courtYRng)
+  ball_xpos.append(xpos)
+  ball_ypos.append(ypos)
+
+# find delta_x, delta_y per step and then estimate x and y after N steps.
+predicted_y = [-1]
+predicted_x = [120]
+predicted_steps = [-1]
+NBsteps = 200
+for i in range(1,NBsteps):
+  predicted_x.append(120)
+  deltax = ball_xpos[i]-ball_xpos[i-1]
+  if deltax<=0:
+    predicted_y .append(-1)
+    predicted_steps.append(-1)
+  else:
+    if ball_ypos[i-1]<0:
+      predicted_y .append(-1)
+      predicted_steps.append(-1)
+    else:
+      NB_intercept_steps = np.ceil((120.0 - ball_xpos[i])/3.0)
+      deltay = ball_ypos[i]-ball_ypos[i-1]
+      predY_nodeflection = ball_ypos[i] + (NB_intercept_steps*deltay)
+      predicted_steps.append(NB_intercept_steps)
+      if predY_nodeflection<0:
+        predY = -1*predY_nodeflection
+      elif predY_nodeflection>160:
+        predY = predY_nodeflection-160
+      else:
+        predY = predY_nodeflection
+      predicted_y.append(predY)
+
+plt.plot(ball_xpos,ball_ypos,'bo')
+plt.plot(predicted_x,predicted_y,'ro')
+
+##############################################################################
+
+import random
+from matplotlib import pyplot as plt
+import numpy as np
+import gym
+courtXRng = (20, 140)
+courtYRng = (34, 194)
+racketXRng = (141, 144)
+
+xpos_Ball = -1 #previous location
+ypos_Ball = -1
+xpos_Ball2 = -1 #current location
+ypos_Ball2 = -1
+
+def findobj (img, xrng, yrng):
+  subimg = img[yrng[0]:yrng[1],xrng[0]:xrng[1],:]
+  sIC = np.sum(subimg,2)
+  pixelVal = np.amax(sIC)
+  sIC[sIC<pixelVal]=0
+  Obj_inds = []
+  for i in range(sIC.shape[0]):
+    for j in range(sIC.shape[1]):
+      if sIC[i,j]>0:
+        Obj_inds.append([i,j])
+  if sIC.shape[0]*sIC.shape[1]==np.shape(Obj_inds)[0]:
+    ypos = -1
+    xpos = -1
+  else:
+    ypos = np.median(Obj_inds,0)[0]
+    xpos = np.median(Obj_inds,0)[1]
+  return xpos, ypos
+
+env = gym.make('Pong-v0',frameskip=3)
+env.reset()
+
+def predictBallRacketYIntercept(xpos_Ball,ypos_Ball,xpos_Ball2,ypos_Ball2):
+  if ((xpos_Ball==-1) or (xpos_Ball2==-1)):
+    predY = -1
+  else:
+    deltax = xpos_Ball2-xpos_Ball
+    if deltax<=0:
+      predY = -1
+    else:
+      if ypos_Ball<0:
+        predY = -1
+      else:
+        NB_intercept_steps = np.ceil((120.0 - xpos_Ball2)/deltax)
+        deltay = ypos_Ball2-ypos_Ball
+        predY_nodeflection = ypos_Ball2 + (NB_intercept_steps*deltay)
+        if predY_nodeflection<0:
+          predY = -1*predY_nodeflection
+        elif predY_nodeflection>160:
+          predY = predY_nodeflection-160
+        else:
+          predY = predY_nodeflection
+  return predY
+
+  observation, reward, done, info = env.step(1)
+  xpos_Ball2, ypos_Ball2 = findobj (observation, courtXRng, courtYRng)
+  xpos_Racket2, ypos_Racket2 = findobj (observation, racketXRng, courtYRng)
+  predY = predictBallRacketYIntercept(xpos_Ball,ypos_Ball,xpos_Ball2,ypos_Ball2)
+  for _ in range(200):
+    if predY==-1:
+      caction = random.randint(3,4)
+    else:
+      targetY = ypos_Racket2 - predY
+      if targetY>8: # racket height is 16 pixels, so use 8 here
+        caction = 4
+      elif targetY<-8:
+        caction = 3
+      else:
+        caction = 1
+    observation, reward, done, info = env.step(caction)
+    env.render()
+    xpos_Ball = xpos_Ball2
+    ypos_Ball = ypos_Ball2
+    xpos_Ball2, ypos_Ball2 = findobj (observation, courtXRng, courtYRng)
+    xpos_Racket2, ypos_Racket2 = findobj (observation, racketXRng, courtYRng)
+    predY = predictBallRacketYIntercept(xpos_Ball,ypos_Ball,xpos_Ball2,ypos_Ball2)
+    if done==1:
+      env.reset()
+
+try this: env = gym.make('PongNoFrameskip-v4')
+-- improved performance
+-- when the racket on the top or bottom, it has tendency to miss the ball. probably because it still considers the ball is within 16 pixels around the median.
+
+** use "useRacketPredictedPos": 1 to use RacketPredictedPos for proposing actions.
+*** when "useRacketPredictedPos": 1, the it overrides the proposed actions from "followtheball" rule.
+** run 20 sec sim in "20june12_A_"
+
+--- previously i was using these parameters
+"architecturePreMtoM": {"useProbabilistic":0,"useTopological":1},
+    "net":{"scale":1,"ER":400,"IR":100,"EV1":400,"EV1DE":400,"EV1DNE":400,"EV1DN":400,"EV1DNW":400,"EV1DW":400,"EV1DSW":400,"EV1DS":400,"EV1DSE":400,"IV1":100,"EV4":100,"IV4":25,"EMT":25,"IMT":9,"EMDOWN":400,"EMUP":400,"IM":200,"AngRFSigma":22.5,"DirMinRate":0.0,"DirMaxRate":50.0,"EEMWghtAM":0.00003,"EEMWghtNM":0.000009,"EEMWghtThreshMin":0.00001,"EEMWghtThreshMax":0.0004,"EEMProb":0.3,"EEMRecProb":0.5,"EEMPopNorm":0,"EEMRecProbCross":0},
+    "RL":{"AMPA":
+        {"wbase":0.0000001,"wmax":0.00024,"RLon":1,"RLlenhebb":100,"RLlenanti":50,"useRLexp":1,"RLhebbwt":0.000004,"RLantiwt":-0.0,"hebbwt":0,"antiwt":0,"tauhebb":10,"RLwindhebb":50,"softthresh":0,"verbose":0},
+        "NMDA":
+        {"wbase":0.000001,"wmax":0.000075,"RLon":0,"RLlenhebb":800,"RLlenanti":100,"useRLexp":1,"RLhebbwt":0.000004,"RLantiwt":-0.0,"hebbwt":0,"antiwt":0,"tauhebb":10,"RLwindhebb":50,"softthresh":1,"verbose":0}
+      }
+
+--- now i will use what sam uses.
