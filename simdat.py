@@ -389,7 +389,7 @@ def drawcellVm (simConfig):
   ax.legend(handles=lpatch,handlelength=1,loc='best')    
   
 #  
-def plotFollowBall (actreward, ax=None,msz=1,cumulative=True,binsz=1e3,color='r'):
+def plotFollowBall (actreward, ax=None,msz=3,cumulative=True,binsz=1e3,color='r'):
   # plot probability of model racket following ball vs time
   # when cumulative == True, plots cumulative probability; otherwise bins probabilities over binsz interval
   global tstepPerAction
@@ -454,7 +454,7 @@ def plotScoreLoss (actreward,ax=None,msz=3):
   return cumScore[-1],cumLoss[-1]
   
 #
-def plotRewards (actreward,ax=None,msz=1,xl=None):
+def plotRewards (actreward,ax=None,msz=3,xl=None):
   if ax is None: ax = gca()  
   ax.plot(actreward.time,actreward.reward,'ko-',markersize=msz)
   if xl is not None: ax.set_xlim(xl)

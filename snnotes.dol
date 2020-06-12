@@ -7619,3 +7619,78 @@ drawraster(dspkT,dspkID); savefig('gif/'+dstr+simstr+'rastC.png') # 20jun11_20ju
 
 looks decent overall ...
 
+** check output from 20jun11_B1_falcor_ (no follow ball rule, only score/loss and hit racket) -->> did not improve in hits,score
+
+this one continued from 20jun10_B0_falcor_
+
+python -i simdat.py backupcfg/20jun11_B1_falcor_sim.json
+
+#
+plotFollowBall(actreward,ax=subplot(1,3,1),cumulative=True,color='k'); ylim((0,.6))
+plotFollowBall(actreward,ax=subplot(1,3,1),cumulative=False,color='r'); ylim((0,.6))
+plotHitMiss(actreward,ax=subplot(1,3,2)); 
+plotRewards(actreward,ax=subplot(1,3,3)); 
+
+(17, 56, 239) # score, hit, miss
+17 to 239 and 56 hits; last sim (20jun10_B0_falcor_) had total of 16 to 238 and 55 hits ... so it did not improve 
+but it does seem to be doing better than the one with intermediate rewards for follow/not-follow (20jun11_20jun11_A2_falcor_perf_tot.png)
+
+savefig('gif/'+dstr+simstr+'perf.png')
+
+subplot(1,3,1); ylim((0.1,0.16)); savefig('gif/'+dstr+simstr+'perfB.png') # 
+
+clf(); drawraster(dspkT,dspkID); 
+savefig('gif/'+dstr+simstr+'rast.png')
+xlim((290e3,300e3)); savefig('gif/'+dstr+simstr+'rastB.png')
+xlim((299e3,300e3)); savefig('gif/'+dstr+simstr+'rastC.png')
+
+clf(); drawcellVm(simConfig); savefig('gif/'+dstr+simstr+'Vm.png')
+
+#
+clf(); dobjpos = loadObjPos()
+xlabel('Racket Y position'); hist(dobjpos['racket'][:,1])
+savefig('gif/'+dstr+simstr+'poshist.png')
+
+clf(); DOWNwts,UPwts = plotMeanWeights(pdf, gca(), xl=(0,simConfig['simConfig']['duration'])); savefig('gif/'+dstr+simstr+'avg_weight.png')
+
+pdfs = pdf[pdf.time==np.amax(pdf.time)]; D = pdf2weightsdict(pdfs); pickle.dump(D, open('data/'+simstr+'synWeights_final.pkl','wb')) 
+
+#
+lpop = ['ER', 'EV1', 'EV4', 'EMT', 'IR', 'IV1', 'IV4', 'IMT','EV1DW','EV1DNW', 'EV1DN', 'EV1DNE','EV1DE','EV1DSW', 'EV1DS', 'EV1DSE','EMDOWN','EMUP']  
+dact = getdActMap(totalDur, tstepPerAction, lpop)
+fig, axs, plt = animActivityMaps() # 
+animSynWeights(pdf) # 
+quit()
+
+probably no point continuing with the current parameters ... 
+
+*20jun12
+** back to adjusting parameters
+
+try with: "EEMFeedbackProb":0.05,"EEMFeedbackWghtAM":0.00001,"EEMFeedbackWghtNM":0.000001,"VisualFeedback":0
+I Noise Rate of 75 (instead of previous 100)...
+    "rewardcodes": {"scorePoint": 1, "losePoint": -0.1, "followBall": 0.0, "avoidBall": 0.0, "hitBall": 0.5},    
+and longer RLlenhebb of 1600 ... 
+
+20jun12_A0_falcor_
+
+./myrun 16 sn.json
+
+python -i simdat.py backupcfg/20jun12_A0_falcor_sim.json
+
+#
+plotFollowBall(actreward,ax=subplot(1,3,1),cumulative=True,color='k'); ylim((0,.6))
+plotFollowBall(actreward,ax=subplot(1,3,1),cumulative=False,color='r'); ylim((0,.6))
+plotHitMiss(actreward,ax=subplot(1,3,2)); 
+plotRewards(actreward,ax=subplot(1,3,3)); 
+
+savefig('gif/'+dstr+simstr+'perf.png')
+
+subplot(1,3,1); ylim((0.1,0.16)); savefig('gif/'+dstr+simstr+'perfB.png') # 
+
+clf(); drawraster(dspkT,dspkID); 
+savefig('gif/'+dstr+simstr+'rast.png')
+xlim((290e3,300e3)); savefig('gif/'+dstr+simstr+'rastB.png')
+xlim((299e3,300e3)); savefig('gif/'+dstr+simstr+'rastC.png')
+
+clf(); drawcellVm(simConfig); savefig('gif/'+dstr+simstr+'Vm.png')
