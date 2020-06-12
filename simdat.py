@@ -415,7 +415,7 @@ def plotFollowBall (actreward, ax=None,msz=3,cumulative=True,binsz=1e3,color='r'
 def getCumScore (actreward):
   # get cumulative score - assumes score has max reward
   ScoreLoss = np.array(actreward.reward)
-  allScore = np.where(ScoreLoss==np.amax(ScoreLoss),1,0) 
+  allScore = np.where(ScoreLoss==dconf['rewardcodes']['scorePoint'],1,0) 
   return np.cumsum(allScore) #cumulative score evolving with time.  
 
 #  
