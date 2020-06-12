@@ -7665,7 +7665,7 @@ quit()
 probably no point continuing with the current parameters ... 
 
 *20jun12
-** back to adjusting parameters
+** back to adjusting parameters (20jun12_A0_falcor_)
 
 try with: "EEMFeedbackProb":0.05,"EEMFeedbackWghtAM":0.00001,"EEMFeedbackWghtNM":0.000001,"VisualFeedback":0
 I Noise Rate of 75 (instead of previous 100)...
@@ -7686,14 +7686,13 @@ plotRewards(actreward,ax=subplot(1,3,3));
 
 savefig('gif/'+dstr+simstr+'perf.png')
 
-subplot(1,3,1); ylim((0.1,0.16)); savefig('gif/'+dstr+simstr+'perfB.png') # 
+no better than naive ... 
 
-clf(); drawraster(dspkT,dspkID); 
-savefig('gif/'+dstr+simstr+'rast.png')
+clf(); drawraster(dspkT,dspkID); savefig('gif/'+dstr+simstr+'rast.png')
 xlim((290e3,300e3)); savefig('gif/'+dstr+simstr+'rastB.png')
 xlim((299e3,300e3)); savefig('gif/'+dstr+simstr+'rastC.png')
 
-clf(); drawcellVm(simConfig); savefig('gif/'+dstr+simstr+'Vm.png')
+activity (raster) looks ok
 
 ** restarted NORL sim (control) (name=20jun12_NORL_falcor)
 
