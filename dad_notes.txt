@@ -1,0 +1,125 @@
+########################################
+06-12-20
+########################################
+
+Paddle seems to have momentum in all pong versions
+Frameskip seems to make it harder to control paddle, as if we lose opportunity to move the paddle by skipping frames
+
+Opened issue on GitHub to ask momentum question: 
+https://github.com/openai/gym/issues/1954
+
+If all else fails, I can make our own environment for pong:
+https://github.com/openai/gym/blob/master/docs/creating-environments.md
+
+
+########################################
+##Different versions of pong
+########################################
+https://github.com/openai/gym/blob/master/gym/envs/__init__.py
+
+EnvSpec(Pong-v0), EnvSpec(Pong-v4) 
+EnvSpec(PongDeterministic-v0), EnvSpec(PongDeterministic-v4)
+EnvSpec(PongNoFrameskip-v0), EnvSpec(PongNoFrameskip-v4)
+EnvSpec(Pong-ram-v0), EnvSpec(Pong-ram-v4)
+EnvSpec(Pong-ramDeterministic-v0), EnvSpec(Pong-ramDeterministic-v4)
+EnvSpec(Pong-ramNoFrameskip-v0), EnvSpec(Pong-ramNoFrameskip-v4)
+
+register(
+            id='{}-v0'.format(name),
+            entry_point='gym.envs.atari:AtariEnv',
+            kwargs={'game': game, 'obs_type': obs_type, 'repeat_action_probability': 0.25},
+            max_episode_steps=10000,
+            nondeterministic=nondeterministic,
+        )
+        register(
+            id='{}-v4'.format(name),
+            entry_point='gym.envs.atari:AtariEnv',
+            kwargs={'game': game, 'obs_type': obs_type},
+            max_episode_steps=100000,
+            nondeterministic=nondeterministic,
+        )
+        # Standard Deterministic (as in the original DeepMind paper)
+        if game == 'space_invaders':
+            frameskip = 3
+        else:
+            frameskip = 4
+        # Use a deterministic frame skip.
+        register(
+            id='{}Deterministic-v0'.format(name),
+            entry_point='gym.envs.atari:AtariEnv',
+            kwargs={'game': game, 'obs_type': obs_type, 'frameskip': frameskip, 'repeat_action_probability': 0.25},
+            max_episode_steps=100000,
+            nondeterministic=nondeterministic,
+        )
+        register(
+            id='{}Deterministic-v4'.format(name),
+            entry_point='gym.envs.atari:AtariEnv',
+            kwargs={'game': game, 'obs_type': obs_type, 'frameskip': frameskip},
+            max_episode_steps=100000,
+            nondeterministic=nondeterministic,
+        )
+        register(
+            id='{}NoFrameskip-v0'.format(name),
+            entry_point='gym.envs.atari:AtariEnv',
+            kwargs={'game': game, 'obs_type': obs_type, 'frameskip': 1, 'repeat_action_probability': 0.25}, # A frameskip of 1 means we get every frame
+            max_episode_steps=frameskip * 100000,
+            nondeterministic=nondeterministic,
+        )
+        # No frameskip. (Atari has no entropy source, so these are
+        # deterministic environments.)
+        register(
+            id='{}NoFrameskip-v4'.format(name),
+            entry_point='gym.envs.atari:AtariEnv',
+            kwargs={'game': game, 'obs_type': obs_type, 'frameskip': 1}, # A frameskip of 1 means we get every frame
+            max_episode_steps=frameskip * 100000,
+            nondeterministic=nondeterministic,
+
+########################################
+##Running controlled pong
+########################################
+https://github.com/openai/gym/blob/7006c7a182a991b9409c206c56abc121eaffafb5/gym/envs/atari/atari_env.py
+
+
+import gym; env = gym.make('PongNoFrameskip-v4’); env.reset()
+##CHANGE caction to number 1, 3, 4 to move paddle, and repeat this command
+observation, reward, done, info = env.step(caction); env.render()
+
+
+ACTION_MEANING = {
+    0: "NOOP",
+    1: "FIRE",
+    2: "UP",
+    3: "RIGHT",
+    4: "LEFT",
+    5: "DOWN",
+    6: "UPRIGHT",
+    7: "UPLEFT",
+    8: "DOWNRIGHT",
+    9: "DOWNLEFT",
+    10: "UPFIRE",
+    11: "RIGHTFIRE",
+    12: "LEFTFIRE",
+    13: "DOWNFIRE",
+    14: "UPRIGHTFIRE",
+    15: "UPLEFTFIRE",
+    16: "DOWNRIGHTFIRE",
+    17: "DOWNLEFTFIRE",
+}
+
+########################################
+##PRIOR NOTES
+########################################
+
+TO RUN SIM (at 2 cores)
+./myrun 2 sim.json
+mpiexec -n 2 nrniv -python -mpi sim.py
+
+simdat.py is used to load output data from a simulation you ran. so to create that final weight output file you'd first run the simulation (which saves the data), then python -i simdat.py backupcfg/yoursimfilename.json to load the data. then this command pdfs = pdf[pdf.time==np.amax(pdf.time)]; D = pdf2weightsdict(pdfs); pickle.dump(D, open('data/'+simstr+'synWeights_final.pkl','wb'))  will save the final weights to a new output file. then you'd specify that new file in sim.json ... some of that could be automated
+
+and when you specify that new file, it will be for the ResumeSimFromFile field
+
+yeah, or can use multistepsim.py
+which does most of that for you
+python multistepSim.py sim.json 12 10 multirun
+so that will run sim.json with 12 cores 10X loading weights from last run into next run sequentially
+i don't always use it so i'd have a chance to look at output before starting next one...
