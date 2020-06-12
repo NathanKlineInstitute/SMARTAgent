@@ -53,6 +53,11 @@ allpops = ['ER','IR','EV1','EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','E
 EMotorPops = ['EMDOWN', 'EMUP'] # excitatory neuron motor populations
 EPreMPops = ['EV1','EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE','EV4','EMT']
 dnumc = OrderedDict({ty:dconf['net'][ty]*scale for ty in allpops}) # number of neurons of a given type
+lrecpop = ['EMUP', 'EMDOWN'] # which populations to record from
+if dconf['net']['EEPreMProb'] > 0.0 or dconf['net']['EEMFeedbackProb'] > 0.0 or dconf['net']['VisualFeedback']:
+  for pop in ['EV1','EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE','EV4','EMT']:
+    lrecpop.append(pop)
+  if dconf['net']['VisualFeedback']: lrecpop.append('ER')
 
 # Network parameters
 netParams = specs.NetParams() #object of class NetParams to store the network parameters
@@ -982,12 +987,12 @@ def trainAgent (t):
   if NBsteps % recordWeightStepSize == 0:
     if dconf['verbose'] > 0 and sim.rank==0:
       print('Weights Recording Time:', t, 'NBsteps:',NBsteps,'recordWeightStepSize:',recordWeightStepSize)
-    recordAdjustableWeights(sim, t) 
+    recordAdjustableWeights(sim, t, lpop = lrecpop) 
     #recordWeights(sim, t)
   if NBsteps % normalizeWeightStepSize == 0:
     if dconf['verbose'] > 0 and sim.rank==0:
       print('Weight Normalize Time:', t, 'NBsteps:',NBsteps,'normalizeWeightStepSize:',normalizeWeightStepSize)
-    normalizeAdjustableWeights(sim, t)     
+    normalizeAdjustableWeights(sim, t, lpop = lrecpop)     
 
 def getAllSTDPObjects (sim):
   # get all the STDP objects from the simulation's cells
