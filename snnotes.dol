@@ -7775,6 +7775,23 @@ when     "useRacketPredictedPos": 1, uses the new rule, otherwise uses the old f
 
 ./myrun 16 sn.json
 
+stopped in middle - cannot tell if U,D firing rates correctly controlling racket ... 
+some cases when racket was supposed to move one way based on U,D rates and get certain
+reward, looked like it moved in opposite direction ... 
+
+try simple test of only allowing up moves ... ok, worked ... hmm ... 
+adjust tau to 200, equal follow avoid reward (.25, -.25) ... 
+
+    "rewardcodes": {"scorePoint": 1.0, "losePoint": -1.0, "followTarget": 0.25, "avoidTarget": -0.25, "hitBall": 0.5},    
+
+and increased some of the connectivity ... 10 s sim had decent rates ... avg for EMUP,EMDOWN was ~1 Hz ...
+
+    "net":{"scale":1,"ER":400,"IR":100,"EV1":400,"EV1DE":400,"EV1DNE":400,"EV1DN":400,"EV1DNW":400,"EV1DW":400,"EV1DSW":400,"EV1DS":400,"EV1DSE":400,"IV1":100,"EV4":100,"IV4":25,"EMT":25,"IMT":9,"EMDOWN":400,"EMUP":400,"IM":200,"AngRFSigma":22.5,"DirMinRate":0.0,"DirMaxRate":50.0,"EEMWghtAM":0.00016,"EEMWghtNM":0.0000050,"EEPreMWghtAM":0.00008,"EEPreMWghtNM":0.0000025,"EEMWghtThreshMin":0.00004,"EEMWghtThreshMax":0.00032,"EEMProb":0.2,"EEMRecProb":0.125,"EEPreMProb":0.0625,"EEMPopNorm":0,"EEMRecProbCross":0,"EEMFeedbackProb":0.125,"EEMFeedbackWghtAM":0.000025,"EEMFeedbackWghtNM":0.0000025,"VisualFeedback":0},
+
+ok, try 300 s sim ... 
+
+./myrun 16 sn.json
+
 python -i simdat.py backupcfg/20jun12_E0_falcor_sim.json
 
 #
@@ -7789,3 +7806,11 @@ clf(); drawraster(dspkT,dspkID); savefig('gif/'+dstr+simstr+'rast.png')
 savefig('gif/'+dstr+simstr+'rast.png')
 
 clf(); drawcellVm(simConfig); savefig('gif/'+dstr+simstr+'Vm.png')
+
+** decaying integrated spike rates?
+
+to control moves more smoothly ... ?
+
+so integrate weights and have discounting factor, then compare totals to decide movement ...
+but that would make it difficult to hold still ... unless have difference margin 
+
