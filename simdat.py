@@ -389,28 +389,30 @@ def drawcellVm (simConfig):
   ax.legend(handles=lpatch,handlelength=1,loc='best')    
   
 #  
-def plotFollowBall (actreward, ax=None,msz=3,cumulative=True,binsz=1e3,color='r'):
-  # plot probability of model racket following ball vs time
+def plotFollowBall (actreward, ax=None,cumulative=True,msz=3,binsz=1e3,color='r'):
+  # plot probability of model racket following target(predicted ball y intercept) vs time
   # when cumulative == True, plots cumulative probability; otherwise bins probabilities over binsz interval
+  # not a good way to plot probabilities over time when uneven sampling - could resample to uniform intervals ...
+  # for now cumulative == False is not plotted at all ... 
   global tstepPerAction
   if ax is None: ax = gca()
-  action_times = np.array(actreward.time)
-  ax.plot([0,np.max(action_times)],[0.5,0.5],'--',color='gray')    
-  actionvsproposed = np.array(actreward.action-actreward.proposed)
-  rewardingActions = np.where(actionvsproposed==0,1,0) # rewarding actions (from following ball)  
-  if cumulative:
-    rewardingActions = np.cumsum(rewardingActions) # cumulative of rewarding action
-    cumActs = np.array(range(1,len(actionvsproposed)+1))
-    aout = np.divide(rewardingActions,cumActs)
-    ax.plot(action_times,aout,color+'.',markersize=msz)
-  else:
-    nbin = int(binsz / (action_times[1]-action_times[0]))
-    aout = avgfollow = [mean(rewardingActions[sidx:sidx+nbin]) for sidx in arange(0,len(rewardingActions),nbin)]
-    ax.plot(tstepPerAction*arange(0,len(rewardingActions),nbin), avgfollow, color,linewidth=msz)
-  ax.set_xlim((0,np.max(action_times)))
+  ax.plot([0,actreward.time[len(actreward)-1]],[0.5,0.5],'--',color='gray')    
+  allproposed = actreward[(actreward.proposed!=-1)] # only care about cases when can suggest a proposed action
+  rewardingActions = np.where(allproposed.proposed-allproposed.action==0,1,0)
+  #if cumulative:
+  rewardingActions = np.cumsum(rewardingActions) # cumulative of rewarding action
+  cumActs = np.array(range(1,len(allproposed)+1))
+  aout = np.divide(rewardingActions,cumActs)
+  ax.plot(allproposed.time,aout,color+'.',markersize=msz)
+  #else:
+  #  nbin = int(binsz / (actreward.time[1]-actreward.time[0]))
+  #  aout = avgfollow = [mean(rewardingActions[sidx:sidx+nbin]) for sidx in arange(0,len(rewardingActions),nbin)]
+  #  ax.plot(allproposed.time, avgfollow, color,linewidth=msz)
+  ax.set_xlim((0,actreward.time[len(actreward)-1]))
   ax.set_ylim((0,1))
-  ax.set_xlabel('Time (ms)'); ax.set_ylabel('p(Follow Ball)')
+  ax.set_xlabel('Time (ms)'); ax.set_ylabel('p(Follow Target)')
   return aout
+
 
 def getCumScore (actreward):
   # get cumulative score - assumes score has max reward

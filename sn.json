@@ -10,8 +10,8 @@
     "useRacketPredictedPos": 1,
     "DirectionDetectionAlgo":{"CentroidTracker":1,"OpticFlow":0,"FlowWidth":16,"UseFull":1},
     "verbose": 0,
-    "simtype": {"ResumeSim":0,"ResumeSimFromFile":"data/20jun10_B0_falcor_synWeights_final.pkl"}, 
-    "sim": {"duration": 300000, "dt": 0.2, "verbose": 0, "recordStep":0.6,"recordWeightStepSize":250,"normalizeWeightStepSize":20000,"RLFakeUpRule": 0,"RLFakeDownRule": 0,"RLFakeStayRule": 0,"name":"20jun12_E0_falcor_","doquit":1,"doplot":0,"saveCellSecs":0,"saveCellConns":0,"targettedRL":0,"tstepPerAction":20,"saveWeights":1},
+    "simtype": {"ResumeSim":1,"ResumeSimFromFile":"data/20jun12_E0_falcor_synWeights_final.pkl"}, 
+    "sim": {"duration": 300000, "dt": 0.2, "verbose": 0, "recordStep":0.6,"recordWeightStepSize":250,"normalizeWeightStepSize":20000,"RLFakeUpRule": 0,"RLFakeDownRule": 0,"RLFakeStayRule": 0,"name":"20jun13_E1_falcor_","doquit":1,"doplot":0,"saveCellSecs":0,"saveCellConns":0,"targettedRL":0,"tstepPerAction":20,"saveWeights":1},
     "architecturePreMtoM": {"useProbabilistic":1,"useTopological":0},
     "net":{"scale":1,"ER":400,"IR":100,"EV1":400,"EV1DE":400,"EV1DNE":400,"EV1DN":400,"EV1DNW":400,"EV1DW":400,"EV1DSW":400,"EV1DS":400,"EV1DSE":400,"IV1":100,"EV4":100,"IV4":25,"EMT":25,"IMT":9,"EMDOWN":400,"EMUP":400,"IM":200,"AngRFSigma":22.5,"DirMinRate":0.0,"DirMaxRate":50.0,"EEMWghtAM":0.00016,"EEMWghtNM":0.0000050,"EEPreMWghtAM":0.00008,"EEPreMWghtNM":0.0000025,"EEMWghtThreshMin":0.00004,"EEMWghtThreshMax":0.00032,"EEMProb":0.2,"EEMRecProb":0.125,"EEPreMProb":0.0625,"EEMPopNorm":0,"EEMRecProbCross":0,"EEMFeedbackProb":0.125,"EEMFeedbackWghtAM":0.000025,"EEMFeedbackWghtNM":0.0000025,"VisualFeedback":0},
     "RL":{"AMPA":

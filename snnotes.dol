@@ -7814,3 +7814,58 @@ to control moves more smoothly ... ?
 so integrate weights and have discounting factor, then compare totals to decide movement ...
 but that would make it difficult to hold still ... unless have difference margin 
 
+*20jun13
+** wrong normalization in plotFollowBall 
+
+noticed that had wrong normalization in plotFollowBall leading to incorrect probability
+estimate in plotFollowBall
+
+was dividing by all actions regardless of whether an action could be suggested/proposed (which leads
+to reward vs punishment); instead should only count correct actions normalized to the subset of
+validly suggested actions ... that means the plotFollowBall figures above were all incorrect ...
+shape could be correct but value was an underestimate of model accuracy, particularly since
+introduction of proposed actions only when ball on screen and when ball moving towards target
+
+** check output from 20jun12_E0_falcor_ -->> with fix for probabilities looks better but doesnt seem to improve over time
+
+python -i simdat.py backupcfg/20jun12_E0_falcor_sim.json
+
+
+#
+plotFollowBall(actreward,ax=subplot(1,3,1),cumulative=True,color='r'); ylim((0,.6))
+plotHitMiss(actreward,ax=subplot(1,3,2)); 
+plotRewards(actreward,ax=subplot(1,3,3)); 
+
+savefig('gif/'+dstr+simstr+'perf.png')
+
+still does not seem to improve ... 
+
+clf(); drawraster(dspkT,dspkID); savefig('gif/'+dstr+simstr+'rast.png')
+do rates differ from what started with?
+xlim((290e3,300e3)); savefig('gif/'+dstr+simstr+'rast.png')
+xlim((299e3,300e3)); savefig('gif/'+dstr+simstr+'rastC.png')
+xlim((9e3,10e3)); savefig('gif/'+dstr+simstr+'rastD.png')
+
+clf(); drawcellVm(simConfig); savefig('gif/'+dstr+simstr+'Vm.png')
+
+clf(); DOWNwts,UPwts = plotMeanWeights(pdf, gca(), xl=(0,simConfig['simConfig']['duration'])); savefig('gif/'+dstr+simstr+'avg_weight.png')
+
+average weights decreasing, haven't seen that trend before ... 
+
+pdfs = pdf[pdf.time==np.amax(pdf.time)]; D = pdf2weightsdict(pdfs); pickle.dump(D, open('data/'+simstr+'synWeights_final.pkl','wb')) 
+
+worth looking at the activity ... 
+
+#
+lpop = ['ER', 'EV1', 'EV4', 'EMT', 'IR', 'IV1', 'IV4', 'IMT','EV1DW','EV1DNW', 'EV1DN', 'EV1DNE','EV1DE','EV1DSW', 'EV1DS', 'EV1DSE','EMDOWN','EMUP']  
+dact = getdActMap(totalDur, tstepPerAction, lpop)
+fig, axs, plt = animActivityMaps() # 
+animSynWeights(pdf) # 
+quit()
+
+and maybe continuing the simulation ... 
+
+continue as ... 
+    "simtype": {"ResumeSim":1,"ResumeSimFromFile":"data/20jun12_E0_falcor_synWeights_final.pkl"}, 
+20jun13_E1_falcor_
+
