@@ -1,4 +1,50 @@
 ########################################
+06-16-20
+########################################
+
+To-Do:
+-Look into plotallinputmaps in simdat.py
+	:Gives connectivity plot of pre/post synaptic neurons
+	-Make similar function to plot recurrent connectivity maps with Haroon
+
+
+########################################
+06-15-20
+########################################
+Working on X2Go vpn connection
+
+Need to clone repository (https://github.com/NathanKlineInstitute/SMARTAgent.git) onto workspace
+Need to learn GitHub terminal commands to understand how to do this
+
+Motion of paddle seems to be after an average three null inputs after a motion input. Opposite motion input reverses direction faster. 
+
+If motion is total 100 pixels, it seems 25~30 pixels after input motions, then 45~50, 15, 10 pixels after null inputs.
+
+Sam wants to talk about motion with me and Haroon.
+	Is there a way for system to measure what each input does, through experimenting itself?
+	Will help transition network to other games.
+
+
+To-Do:
+-Get X2GO to run simulation
+	*DONE
+-Learn Github
+	*DONE. Here is cheatsheet: https://gist.github.com/cferdinandi/ef665330286fd5d7127d
+- Talk to Haroon about keeping paddle in middle
+	-Count up/down paddle actions
+	-Count ball actions to cross board
+		*Working on excel sheet to count these
+	**DONE. Ball_action_avg=36, Padd_action_avg=10
+	-Work on paddle momentum 
+		*Github post was responded to
+		**It seems every action (up/down) takes multiple frames to be completed. I did up/down action (2/5) followed by no action (0) to see how many frames each input takes, and it seems to be three additional inputs. So it takes four 0 inputs to stop motion.
+		**Completed on excel.
+-Look into plotallinputmaps in simdat.py
+	:Gives connectivity plot of pre/post synaptic neurons
+	-Make similar function to plot recurrent connectivity maps with Haroon
+
+
+########################################
 06-12-20
 ########################################
 
@@ -11,6 +57,7 @@ https://github.com/openai/gym/issues/1954
 If all else fails, I can make our own environment for pong:
 https://github.com/openai/gym/blob/master/docs/creating-environments.md
 
+On vpn "ssh davidd@10.76.253.155"
 
 ########################################
 ##Different versions of pong
@@ -111,7 +158,7 @@ ACTION_MEANING = {
 ########################################
 
 TO RUN SIM (at 2 cores)
-./myrun 2 sim.json
+./myrun 2 sim.jsons
 mpiexec -n 2 nrniv -python -mpi sim.py
 
 simdat.py is used to load output data from a simulation you ran. so to create that final weight output file you'd first run the simulation (which saves the data), then python -i simdat.py backupcfg/yoursimfilename.json to load the data. then this command pdfs = pdf[pdf.time==np.amax(pdf.time)]; D = pdf2weightsdict(pdfs); pickle.dump(D, open('data/'+simstr+'synWeights_final.pkl','wb'))  will save the final weights to a new output file. then you'd specify that new file in sim.json ... some of that could be automated
