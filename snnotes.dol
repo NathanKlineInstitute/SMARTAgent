@@ -7991,3 +7991,73 @@ ok, so the EM weights highest, others in V areas and preM lower; most of the ave
 
 for next sim could reduce feedback weights
 
+** adjust sim parameters (20jun15_A0_falcor_)
+
+reduce the feedback connectivity probability and weight...
+
+    "net":{"scale":1,"ER":400,"IR":100,"EV1":400,"EV1DE":400,"EV1DNE":400,"EV1DN":400,"EV1DNW":400,"EV1DW":400,"EV1DSW":400,"EV1DS":400,"EV1DSE":400,"IV1":100,"EV4":100,"IV4":25,"EMT":25,"IMT":9,"EMDOWN":400,"EMUP":400,"IM":200,"AngRFSigma":22.5,"DirMinRate":0.0,"DirMaxRate":50.0,"EEMWghtAM":0.00016,"EEMWghtNM":0.0000050,"EEPreMWghtAM":0.00008,"EEPreMWghtNM":0.0000025,"EEMWghtThreshMin":0.00000625,"EEMWghtThreshMax":0.00032,"EEMProb":0.15,"EEMRecProb":0.1,"EEPreMProb":0.05,"EEMPopNorm":0,"EEMRecProbCross":0,"EEMFeedbackProb":0.05,"EEMFeedbackWghtAM":0.0000125,"EEMFeedbackWghtNM":0.00000125,"VisualFeedback":0},
+
+adjust reward values:
+    "rewardcodes": {"scorePoint": 1.0, "losePoint": -0.1, "followTarget": 0.1, "avoidTarget": -0.01, "hitBall": 0.5},    
+
+first will run 50 s sim to make sure doesn't get epileptic ... 
+
+./myrun 16 sn.json
+
+python -i simdat.py backupcfg/20jun15_A0_falcor_sim.json
+
+#
+plotFollowBall(actreward,ax=subplot(1,3,1),cumulative=True,color='r'); ylim((0,.6))
+plotHitMiss(actreward,ax=subplot(1,3,2)); 
+plotRewards(actreward,ax=subplot(1,3,3)); 
+
+savefig('gif/'+dstr+simstr+'perf.png') # 
+
+so it's very different from the control sim, has slightly better performance and very different
+trajectory of follow target probabilities ... but may need to adjust params so don't get the dip 
+in performance
+
+clf(); drawraster(dspkT,dspkID); savefig('gif/'+dstr+simstr+'rast.png') # 
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=3,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP','EV1','EV4','EMT'],lclr=['r','b','g','c','m'])
+savefig('gif/'+dstr+simstr+'avg_weight.png')
+
+
+** control sim (20jun15_A0_control_falcor_)
+
+python -i simdat.py backupcfg/20jun15_A0_control_falcor_sim.json
+
+#
+plotFollowBall(actreward,ax=subplot(1,3,1),cumulative=True,color='r'); ylim((0,.6))
+plotHitMiss(actreward,ax=subplot(1,3,2)); 
+plotRewards(actreward,ax=subplot(1,3,3)); 
+
+savefig('gif/'+dstr+simstr+'perf.png') # 20jun15_20jun15_A0_control_falcor_perf.png
+
+clf(); drawraster(dspkT,dspkID); savefig('gif/'+dstr+simstr+'rast.png') # 20jun15_20jun15_A0_control_falcor_rast.png
+
+even without RL, there's a big spike ~10 s ... and the EMUP,EMDOWN rate is higher ... 
+
+compare perf against the model with learning ...
+
+actcontrol = pd.DataFrame(np.loadtxt('data/20jun15_A0_control_falcor_ActionsRewards.txt'),columns=['time','action','reward','proposed','hit'])
+actlearn = pd.DataFrame(np.loadtxt('data/20jun15_A0_falcor_ActionsRewards.txt'),columns=['time','action','reward','proposed','hit'])
+
+clf(); plotFollowBall(actlearn,ax=gca(),cumulative=True,color='r'); ylim((0.2,.4)); plotFollowBall(actcontrol,ax=gca(),cumulative=True,color='b'); ylim((0.2,.4));
+savefig('gif/20jun15_20jun15_A0_falcor_compare_learn_control_perf_a0.png')
+learn and control look pretty similar ... learn slightly higher prob of following target in period around 10 s ... 
+
+#
+clf()
+plotHitMiss(actlearn,ax=subplot(1,2,1)); ylim((0,14));
+plotHitMiss(actcontrol,ax=subplot(1,2,2)); ylim((0,14));
+savefig('gif/20jun15_20jun15_A0_falcor_compare_learn_control_hitmiss_a1.png')
+looks pretty similar too ... control might be a little 'better' in lower number of misses and higher number
+of hits , though learning model has higher score (could be random)... 
+
+** continue model (20jun15_A0_falcor_ as 20jun15_A1_falcor_) to see if improves at all
+
+python -i simdat.py backupcfg/20jun15_A0_falcor_sim.json 
+
+pdfs = pdf[pdf.time==np.amax(pdf.time)]; D = pdf2weightsdict(pdfs); pickle.dump(D, open('data/'+simstr+'synWeights_final.pkl','wb')) 
+
