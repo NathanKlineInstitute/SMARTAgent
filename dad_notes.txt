@@ -11,6 +11,7 @@ https://github.com/openai/gym/issues/1954
 If all else fails, I can make our own environment for pong:
 https://github.com/openai/gym/blob/master/docs/creating-environments.md
 
+On vpn "ssh davidd@10.76.253.155"
 
 ########################################
 ##Different versions of pong
