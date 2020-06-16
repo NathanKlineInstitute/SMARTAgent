@@ -8118,4 +8118,21 @@ ok ...
 
 since using high connectivity (100%) do not need many EM neurons (all receive same inputs)
 try 16 of each ... or even 1 of each (that produces error in run), so 16 for now ... fast to run ...
+can get down to 1 of each EM (and 1 IM) after fix to getfiringrateinterval checking for 0 cells of a type...
+also have to fixup simdat.py ... to check for 0 pop size ... 
+
+python -i simdat.py backupcfg/20jun16_B0_falcor_sim.json
+
+#
+plotFollowBall(actreward,ax=subplot(1,3,1),cumulative=True,color='r'); ylim((0,.6))
+plotHitMiss(actreward,ax=subplot(1,3,2)); 
+plotRewards(actreward,ax=subplot(1,3,3)); 
+
+savefig('gif/'+dstr+simstr+'perf.png') # 
+
+clf(); drawraster(dspkT,dspkID); 
+savefig('gif/'+dstr+simstr+'rast.png') # 
+
+clf(); drawcellVm(simConfig); 
+savefig('gif/'+dstr+simstr+'Vm.png')
 
