@@ -15,6 +15,7 @@ def prob2conv (prob, npre):
 def connectOnePreNtoOneMNeuron (NBNeurons,offset_pre,offset_post):
   #this method is used to generate list of connections between preSynNeurons and motor neurons.
   blist = []
+  if NBNeurons < 1: return blist
   for i in range(NBNeurons):
     preN = i+offset_pre
     postN = i+offset_post
@@ -22,7 +23,8 @@ def connectOnePreNtoOneMNeuron (NBNeurons,offset_pre,offset_post):
   return blist
   
 def connectLayerswithOverlap (NBpreN, NBpostN, overlap_xdir):
-    #NBpreN = 6400 	#number of presynaptic neurons
+    blist = []
+    if NBpreN < 1 or NBpostN < 1: return blist
     NBpreN_x = int(np.sqrt(NBpreN))
     NBpreN_y = int(np.sqrt(NBpreN))
     #NBpostN = 6400	#number of postsynaptic neurons
@@ -36,7 +38,6 @@ def connectLayerswithOverlap (NBpreN, NBpostN, overlap_xdir):
     overlap_ydir = overlap_xdir
     preNIndices = np.zeros((NBpreN_x,NBpreN_y))
     postNIndices = np.zeros((NBpostN_x,NBpostN_y))		#list created for indices from linear (1-6400) to square indexing (1-80,81-160,....) 
-    blist = []
     for i in range(NBpreN_x):
         for j in range(NBpreN_y):
             preNIndices[i,j]=j+(NBpreN_y*i)
@@ -78,6 +79,8 @@ def connectLayerswithOverlap (NBpreN, NBpostN, overlap_xdir):
     return blist
 
 def connectLayerswithOverlapDiv(NBpreN, NBpostN, overlap_xdir):
+    blist = []
+    if NBpreN < 1 or NBpostN < 1: return blist  
     NBpreN_x = int(np.sqrt(NBpreN))
     NBpreN_y = int(np.sqrt(NBpreN))
     NBpostN_x = int(np.sqrt(NBpostN))
@@ -88,7 +91,6 @@ def connectLayerswithOverlapDiv(NBpreN, NBpostN, overlap_xdir):
     overlap_ydir = overlap_xdir
     preNIndices = np.zeros((NBpreN_x,NBpreN_y))
     postNIndices = np.zeros((NBpostN_x,NBpostN_y))		#list created for indices from linear (1-6400) to square indexing (1-80,81-160,....) 
-    blist = []
     for i in range(NBpreN_x):
         for j in range(NBpreN_y):
             preNIndices[i,j]=j+(NBpreN_y*i)

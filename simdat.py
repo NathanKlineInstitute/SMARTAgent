@@ -68,9 +68,10 @@ def generateActivityMap(t1, t2, spkT, spkID, numc, startidx):
         Nact[t][i][j] = len(cbinSpikes)
   return Nact
 
-def getdActMap (totalDur, tstepPerAction, lpop = ['ER', 'EV1', 'EV4', 'EMT', 'IR', 'IV1', 'IV4', 'IMT',\
-                                                  'EV1DW','EV1DNW', 'EV1DN', 'EV1DNE','EV1DE','EV1DSW', 'EV1DS', 'EV1DSE',\
-                                                  'EMDOWN','EMUP']):
+def getdActMap (totalDur, tstepPerAction, dspkT, dspkID, dnumc, dstartidx,\
+                lpop = ['ER', 'EV1', 'EV4', 'EMT', 'IR', 'IV1', 'IV4', 'IMT',\
+                        'EV1DW','EV1DNW', 'EV1DN', 'EV1DNE','EV1DE','EV1DSW', 'EV1DS', 'EV1DSE',\
+                        'EMDOWN','EMUP']):
   t1 = range(0,totalDur,tstepPerAction)
   t2 = range(tstepPerAction,totalDur+tstepPerAction,tstepPerAction)  
   return {pop:generateActivityMap(t1, t2, dspkT[pop], dspkID[pop], dnumc[pop], dstartidx[pop]) for pop in lpop}
@@ -104,7 +105,7 @@ def loadsimdat (name=None,getactmap=True):
   lpop = ['ER', 'EV1', 'EV4', 'EMT', 'IR', 'IV1', 'IV4', 'IMT',\
           'EV1DW','EV1DNW', 'EV1DN', 'EV1DNE','EV1DE','EV1DSW', 'EV1DS', 'EV1DSE',\
           'EMDOWN','EMUP']  
-  if getactmap: dact = getdActMap(totalDur, tstepPerAction, lpop)
+  if getactmap: dact = getdActMap(totalDur, tstepPerAction, dspkT, dspkID, dnumc, dstartidx, lpop)
   return simConfig, pdf, actreward, dstartidx, dendidx, dnumc, dspkID, dspkT, InputImages, ldflow, dact
 
 #
@@ -463,21 +464,24 @@ def plotRewards (actreward,ax=None,msz=3,xl=None):
   ax.set_ylim((np.min(actreward.reward),np.max(actreward.reward)))
   ax.set_ylabel('Rewards'); #f_ax1.set_xlabel('Time (ms)')
 
-def plotMeanWeights (pdf,ax=None,msz=1,xl=None):
-  #plot mean weights of all connections onto EMDOWN and EMUP  
+def plotMeanWeights (pdf,ax=None,msz=1,xl=None,lpop=['EMDOWN','EMUP'],lclr=['r','b']):
+  #plot mean weights of all plastic synaptic weights onto lpop
   if ax is None: ax = gca()
   utimes = np.unique(pdf.time)
-  pdfsDOWN = pdf[(pdf.postid>=dstartidx['EMDOWN']) & (pdf.postid<=dendidx['EMDOWN'])]
-  pdfdsUP = pdf[(pdf.postid>=dstartidx['EMUP']) & (pdf.postid<=dendidx['EMUP'])]
-  DOWNwts = [np.mean(pdfsDOWN[(pdfsDOWN.time==t)].weight) for t in utimes] #wts of connections onto EMDOWN
-  UPwts = [np.mean(pdfdsUP[(pdfdsUP.time==t)].weight) for t in utimes] #wts of connections onto EMUP  
-  ax.plot(utimes,DOWNwts,'r-o',markersize=msz)
-  ax.plot(utimes,UPwts,'b-o',markersize=msz)
+  popwts = {}
+  mnw,mxw=1e9,-1e9
+  for pop,clr in zip(lpop,lclr):
+    #print(pop,clr)
+    pdfs = pdf[(pdf.postid>=dstartidx[pop]) & (pdf.postid<=dendidx[pop])]
+    popwts[pop] = [np.mean(pdfs[(pdfs.time==t)].weight) for t in utimes] #wts of connections onto pop
+    ax.plot(utimes,popwts[pop],clr+'-o',markersize=msz)
+    mnw=min(mnw, np.amin(popwts[pop]))
+    mxw=max(mxw, np.amax(popwts[pop]))
   if xl is not None: ax.set_xlim(xl)
-  ax.set_ylim((np.min([np.min(DOWNwts),np.min(UPwts)]),np.max([np.max(DOWNwts),np.max(UPwts)])))
-  ax.set_ylabel('Average weight'); #f_ax2.set_xlabel('Time (ms)')
-  ax.legend(('->EMDOWN','->EMUP'),loc='best')
-  return DOWNwts,UPwts
+  ax.set_ylim((mnw,mxw))
+  ax.set_ylabel('Average weight'); 
+  ax.legend(tuple(['->'+pop for pop in lpop]),loc='best')
+  return popwts
   
 #
 def animSynWeights (pdf, outpath='gif/'+dconf['sim']['name']+'weightmap.mp4', framerate=10, figsize=(14,8), cmap='jet'):  
@@ -505,7 +509,7 @@ def animSynWeights (pdf, outpath='gif/'+dconf['sim']['name']+'weightmap.mp4', fr
   f_ax4 = fig.add_subplot(gs[3,6:8])
   plotFollowBall(actreward,f_ax1)
   plotRewards(actreward,f_ax2,xl=(0,simConfig['simConfig']['duration']))
-  DOWNwts,UPwts = plotMeanWeights(pdf,f_ax3,xl=(0,simConfig['simConfig']['duration']))
+  popwts = plotMeanWeights(pdf,f_ax3,xl=(0,simConfig['simConfig']['duration']))
   plotHitMiss(actreward,f_ax4)
   lsrc = ['EV1', 'EV4', 'EMT','EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE']
   ltitle = []
@@ -526,7 +530,7 @@ def animSynWeights (pdf, outpath='gif/'+dconf['sim']['name']+'weightmap.mp4', fr
       lout.append(lwt)
     return lout[0], lout[1]    
   minR,maxR = np.min(actreward.reward),np.max(actreward.reward)
-  minW,maxW = np.min([np.min(DOWNwts),np.min(UPwts)]), np.max([np.max(DOWNwts),np.max(UPwts)])
+  minW,maxW = np.min([np.min(popwts['EMDOWN']),np.min(popwts['EMUP'])]), np.max([np.max(popwts['EMDOWN']),np.max(popwts['EMUP'])])
   t = utimes[0]
   dline[1], = f_ax1.plot([t,t],[minR,maxR],'r',linewidth=0.2); f_ax1.set_xticks([])
   dline[2], = f_ax2.plot([t,t],[minW,maxW],'r',linewidth=0.2); f_ax2.set_xticks([])  

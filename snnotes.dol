@@ -7869,3 +7869,248 @@ continue as ...
     "simtype": {"ResumeSim":1,"ResumeSimFromFile":"data/20jun12_E0_falcor_synWeights_final.pkl"}, 
 20jun13_E1_falcor_
 
+*20jun14
+** check output from 20jun13_E1_falcor_
+
+python -i simdat.py backupcfg/20jun13_E1_falcor_sim.json
+
+#
+plotFollowBall(actreward,ax=subplot(1,3,1),cumulative=True,color='r'); ylim((0,.6))
+plotHitMiss(actreward,ax=subplot(1,3,2)); 
+plotRewards(actreward,ax=subplot(1,3,3)); 
+
+savefig('gif/'+dstr+simstr+'perf.png') # 'gif/20jun14_20jun13_E1_falcor_perf.png' (4, 15, 81)
+
+looks like it's doing worse than last run: 20jun13_20jun12_E0_falcor_perf.png (6, 20, 74)
+
+clf(); drawraster(dspkT,dspkID); savefig('gif/'+dstr+simstr+'rast.png') # 'gif/20jun14_20jun13_E1_falcor_rast.png'
+now firing rates much lower than last run: 20jun13_20jun12_E0_falcor_rast.png ... so that means too much punishment ... ? 
+
+xlim((290e3,300e3)); savefig('gif/'+dstr+simstr+'rast.png')
+xlim((299e3,300e3)); savefig('gif/'+dstr+simstr+'rastC.png')
+
+clf(); DOWNwts,UPwts = plotMeanWeights(pdf, gca(), xl=(0,simConfig['simConfig']['duration'])); savefig('gif/'+dstr+simstr+'avg_weight.png')
+
+average weights continued decreasing
+
+pdfs = pdf[pdf.time==np.amax(pdf.time)]; D = pdf2weightsdict(pdfs); pickle.dump(D, open('data/'+simstr+'synWeights_final.pkl','wb')) 
+
+may as well start a different simulation ... with different reward scores ... less punishment ... 
+
+** sensitivity analysis
+
+is there incremental improvement in scores, following target when varying specific connectivity parameters? checking that would at least 
+provide ~simple test of performance and narrowing in on what might matter ... 
+
+** differnet simulation with same architecture as 20jun13_E1_falcor_ but lower punishment values/scores (20jun14_A0_falcor_)
+
+try these values:
+    "rewardcodes": {"scorePoint": 1.0, "losePoint": -0.1, "followTarget": 0.25, "avoidTarget": -0.01, "hitBall": 0.5},    
+
+    "followOnlyTowards": 1,
+    "useRacketPredictedPos": 1,
+
+can run for 150 s ... see if it's improving compared to previous sim at same times ... 
+
+./myrun 16 sn.json
+
+** control simulation for 20jun14_A0_falcor_ (20jun14_A0_control_falcor_)
+
+everything the same but saveweight==0 and RLon==0
+
+*20jun15
+** check output from 20jun14_A0_control_falcor_
+
+python -i simdat.py backupcfg/20jun14_A0_control_falcor_sim.json
+
+#
+plotFollowBall(actreward,ax=subplot(1,3,1),cumulative=True,color='r'); ylim((0,.6))
+plotHitMiss(actreward,ax=subplot(1,3,2)); 
+plotRewards(actreward,ax=subplot(1,3,3)); 
+
+over 150 s score, hit, miss: 1, 9, 42
+
+savefig('gif/'+dstr+simstr+'perf.png') # 20jun15_20jun14_A0_control_falcor_perf.png
+
+clf(); drawraster(dspkT,dspkID); savefig('gif/'+dstr+simstr+'rast.png') # 20jun15_20jun14_A0_control_falcor_rast.png
+
+xlim((140e3,150e3)); savefig('gif/'+dstr+simstr+'rastB.png')
+xlim((149e3,150e3)); savefig('gif/'+dstr+simstr+'rastC.png')
+xlim((9e3,10e3)); savefig('gif/'+dstr+simstr+'rastD.png')
+
+even without RL gets ~hypersynchronized with decent overall firing rates
+
+** check output from 20jun14_A0_falcor_
+
+python -i simdat.py backupcfg/20jun14_A0_falcor_sim.json
+
+#
+plotFollowBall(actreward,ax=subplot(1,3,1),cumulative=True,color='r'); ylim((0,.6))
+plotHitMiss(actreward,ax=subplot(1,3,2)); 
+plotRewards(actreward,ax=subplot(1,3,3)); 
+
+savefig('gif/'+dstr+simstr+'perf.png') # 20jun15_20jun14_A0_falcor_perf.png
+
+over 150 s score, hit, miss: 3, 9, 41
+
+so it's very different from the control sim, has slightly better performance and very different
+trajectory of follow target probabilities ... but may need to adjust params so don't get the dip 
+in performance
+
+clf(); drawraster(dspkT,dspkID); savefig('gif/'+dstr+simstr+'rast.png') # 20jun15_20jun14_A0_falcor_rast.png
+xlim((140e3,150e3)); savefig('gif/'+dstr+simstr+'rastB.png')
+xlim((149e3,150e3)); savefig('gif/'+dstr+simstr+'rastC.png')
+xlim((9e3,10e3)); savefig('gif/'+dstr+simstr+'rastD.png')
+xlim((29e3,30e3)); savefig('gif/'+dstr+simstr+'rastE.png')
+
+ok, might not be learning properly - could just be due to hypersynchrony and then recovery from hypersynchrony ... 
+
+clf(); DOWNwts,UPwts = plotMeanWeights(pdf, gca(), xl=(0,simConfig['simConfig']['duration'])); savefig('gif/'+dstr+simstr+'avg_weight.png')
+
+performance follows weights ... so if the weights increase too much, will probably lead to hypersynch again ... 
+
+and at least part of that is likely due to feedback plasticity ... 
+
+## pdfs = pdf[pdf.time==np.amax(pdf.time)]; D = pdf2weightsdict(pdfs); pickle.dump(D, open('data/'+simstr+'synWeights_final.pkl','wb')) 
+
+actcontrol = pd.DataFrame(np.loadtxt('data/20jun14_A0_control_falcor_ActionsRewards.txt'),columns=['time','action','reward','proposed','hit'])
+
+#
+clf()
+plotFollowBall(actreward,ax=gca(),cumulative=True,color='r'); ylim((0.1,.4)); plotFollowBall(actcontrol,ax=gca(),cumulative=True,color='b'); ylim((0.1,.4));
+
+savefig('gif/20jun15_20jun14_A0_falcor_compare_RLhypersynch_control_perf_a0.png')
+
+good to know that the control sim moves towards ~0.33 probability which makes sense given 3 actions and it's behaving randomly ...
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=3,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP','EV1','EV4','EMT'],lclr=['r','b','g','c','m'])
+
+savefig('gif/'+dstr+simstr+'avg_weightB.png')
+
+ok, so the EM weights highest, others in V areas and preM lower; most of the average weights follow same pattern of rise then decay then rise ...
+
+for next sim could reduce feedback weights
+
+** adjust sim parameters (20jun15_A0_falcor_)
+
+reduce the feedback connectivity probability and weight...
+
+    "net":{"scale":1,"ER":400,"IR":100,"EV1":400,"EV1DE":400,"EV1DNE":400,"EV1DN":400,"EV1DNW":400,"EV1DW":400,"EV1DSW":400,"EV1DS":400,"EV1DSE":400,"IV1":100,"EV4":100,"IV4":25,"EMT":25,"IMT":9,"EMDOWN":400,"EMUP":400,"IM":200,"AngRFSigma":22.5,"DirMinRate":0.0,"DirMaxRate":50.0,"EEMWghtAM":0.00016,"EEMWghtNM":0.0000050,"EEPreMWghtAM":0.00008,"EEPreMWghtNM":0.0000025,"EEMWghtThreshMin":0.00000625,"EEMWghtThreshMax":0.00032,"EEMProb":0.15,"EEMRecProb":0.1,"EEPreMProb":0.05,"EEMPopNorm":0,"EEMRecProbCross":0,"EEMFeedbackProb":0.05,"EEMFeedbackWghtAM":0.0000125,"EEMFeedbackWghtNM":0.00000125,"VisualFeedback":0},
+
+adjust reward values:
+    "rewardcodes": {"scorePoint": 1.0, "losePoint": -0.1, "followTarget": 0.1, "avoidTarget": -0.01, "hitBall": 0.5},    
+
+first will run 50 s sim to make sure doesn't get epileptic ... 
+
+./myrun 16 sn.json
+
+python -i simdat.py backupcfg/20jun15_A0_falcor_sim.json
+
+#
+plotFollowBall(actreward,ax=subplot(1,3,1),cumulative=True,color='r'); ylim((0,.6))
+plotHitMiss(actreward,ax=subplot(1,3,2)); 
+plotRewards(actreward,ax=subplot(1,3,3)); 
+
+savefig('gif/'+dstr+simstr+'perf.png') # 
+
+so it's very different from the control sim, has slightly better performance and very different
+trajectory of follow target probabilities ... but may need to adjust params so don't get the dip 
+in performance
+
+clf(); drawraster(dspkT,dspkID); savefig('gif/'+dstr+simstr+'rast.png') # 
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=3,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP','EV1','EV4','EMT'],lclr=['r','b','g','c','m'])
+savefig('gif/'+dstr+simstr+'avg_weight.png')
+
+
+** control sim (20jun15_A0_control_falcor_)
+
+python -i simdat.py backupcfg/20jun15_A0_control_falcor_sim.json
+
+#
+plotFollowBall(actreward,ax=subplot(1,3,1),cumulative=True,color='r'); ylim((0,.6))
+plotHitMiss(actreward,ax=subplot(1,3,2)); 
+plotRewards(actreward,ax=subplot(1,3,3)); 
+
+savefig('gif/'+dstr+simstr+'perf.png') # 20jun15_20jun15_A0_control_falcor_perf.png
+
+clf(); drawraster(dspkT,dspkID); savefig('gif/'+dstr+simstr+'rast.png') # 20jun15_20jun15_A0_control_falcor_rast.png
+
+even without RL, there's a big spike ~10 s ... and the EMUP,EMDOWN rate is higher ... 
+
+compare perf against the model with learning ...
+
+actcontrol = pd.DataFrame(np.loadtxt('data/20jun15_A0_control_falcor_ActionsRewards.txt'),columns=['time','action','reward','proposed','hit'])
+actlearn = pd.DataFrame(np.loadtxt('data/20jun15_A0_falcor_ActionsRewards.txt'),columns=['time','action','reward','proposed','hit'])
+
+clf(); plotFollowBall(actlearn,ax=gca(),cumulative=True,color='r'); ylim((0.2,.4)); plotFollowBall(actcontrol,ax=gca(),cumulative=True,color='b'); ylim((0.2,.4));
+savefig('gif/20jun15_20jun15_A0_falcor_compare_learn_control_perf_a0.png')
+learn and control look pretty similar ... learn slightly higher prob of following target in period around 10 s ... 
+
+#
+clf()
+plotHitMiss(actlearn,ax=subplot(1,2,1)); ylim((0,14));
+plotHitMiss(actcontrol,ax=subplot(1,2,2)); ylim((0,14));
+savefig('gif/20jun15_20jun15_A0_falcor_compare_learn_control_hitmiss_a1.png')
+looks pretty similar too ... control might be a little 'better' in lower number of misses and higher number
+of hits , though learning model has higher score (could be random)... 
+
+** continue model (20jun15_A0_falcor_ as 20jun15_A1_falcor_) to see if improves at all
+
+python -i simdat.py backupcfg/20jun15_A0_falcor_sim.json 
+
+pdfs = pdf[pdf.time==np.amax(pdf.time)]; D = pdf2weightsdict(pdfs); pickle.dump(D, open('data/'+simstr+'synWeights_final.pkl','wb')) 
+
+*20jun16
+** check output from 20jun15_A1_falcor_
+
+python -i simdat.py backupcfg/20jun15_A1_falcor_sim.json
+
+#
+plotFollowBall(actreward,ax=subplot(1,3,1),cumulative=True,color='r'); ylim((0,.6))
+plotHitMiss(actreward,ax=subplot(1,3,2)); 
+plotRewards(actreward,ax=subplot(1,3,3)); 
+
+savefig('gif/'+dstr+simstr+'perf.png') # 'gif/20jun16_20jun15_A1_falcor_perf.png'
+
+clf(); drawraster(dspkT,dspkID); savefig('gif/'+dstr+simstr+'rast.png') # 
+
+#
+actcontrol = pd.DataFrame(np.loadtxt('data/20jun15_A0_control_falcor_ActionsRewards.txt'),columns=['time','action','reward','proposed','hit'])
+actlearn0 = pd.DataFrame(np.loadtxt('data/20jun15_A0_falcor_ActionsRewards.txt'),columns=['time','action','reward','proposed','hit'])
+actlearn1 = pd.DataFrame(np.loadtxt('data/20jun15_A1_falcor_ActionsRewards.txt'),columns=['time','action','reward','proposed','hit'])
+actlearn1.time += 50e3
+pda = actlearn0; pda = pda.append(actlearn1)
+                                         
+clf(); plotFollowBall(pda,ax=gca(),cumulative=True,color='r'); ylim((0.2,.4)); plotFollowBall(actcontrol,ax=gca(),cumulative=True,color='b'); ylim((0.2,.4));
+xlim((0,250e3))
+savefig('gif/20jun16_compare_learn_control_perf_a0.png')
+
+looks mostly random ...
+
+#
+clf()
+plotHitMiss(pda,ax=subplot(1,2,1)); ylim((0,70));
+plotHitMiss(actcontrol,ax=subplot(1,2,2)); ylim((0,70));
+
+savefig('gif/20jun16_compare_learn_control_hitmiss_a1.png')
+
+ok, not doing too well
+
+** discussion with ha to make plan
+
+1. test reduced architecture (get rid of V4, MT)
+2. test increased connection to EMDOWN,EMUP (closer to full connectivity - to make sure motor neurons receiving right information)
+3. test specific image input sequences after learning - to test whether neurons learned properly
+4. is our stdp.mod testing sufficiently? could it be improved/adjusted?
+
+** option to get rid of V4, MT
+
+can just set number of those neurons to 0?
+
+    "net":{"scale":1,"ER":400,"IR":100,"EV1":400,"EV1DE":400,"EV1DNE":400,"EV1DN":400,"EV1DNW":400,"EV1DW":400,"EV1DSW":400,"EV1DS":400,"EV1DSE":400,"IV1":100,"EV4":100,"IV4":25,"EMT":25,"IMT":9,"EMDOWN":400,"EMUP":400,"IM":200,"AngRFSigma":22.5,"DirMinRate":0.0,"DirMaxRate":50.0,"EEMWghtAM":0.00016,"EEMWghtNM":0.0000050,"EEPreMWghtAM":0.00008,"EEPreMWghtNM":0.0000025,"EEMWghtThreshMin":0.00000625,"EEMWghtThreshMax":0.00032,"EEMProb":0.15,"EEMRecProb":0.1,"EEPreMProb":0.05,"EEMPopNorm":0,"EEMRecProbCross":0,"EEMFeedbackProb":0.05,"EEMFeedbackWghtAM":0.0000125,"EEMFeedbackWghtNM":0.00000125,"VisualFeedback":0},
+
+see if that works ... seems to work after fix to connUtils.py functions checking for 0 number of pre,post neurons
+
+ok ... 
+
