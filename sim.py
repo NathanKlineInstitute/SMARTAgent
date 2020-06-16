@@ -727,6 +727,7 @@ def saveGameBehavior(sim):
 
 def getFiringRatesWithInterval (trange = None, neuronal_pop = None):
   #sim.gatherData()
+  if len(neuronal_pop) < 1: return 0.0
   spkts = sim.simData['spkt']
   spkids = sim.simData['spkid']
   pop_spikes = 0
@@ -1097,7 +1098,7 @@ def saveSynWeights ():
         print('saveSynWeights: waiting for finish write of', fn)
         time.sleep(1)      
       lw = pickle.load(open(fn,'rb'))
-      print(fn,'len(lw)=',len(lw),type(lw),type(lw[0]),lw[0])
+      print(fn,'len(lw)=',len(lw),type(lw))
       os.unlink(fn) # remove the temporary file
       L = L + lw # concatenate to the list L
     #pickle.dump(L,open('data/'+dconf['sim']['name']+'synWeights.pkl', 'wb')) # this would save as a List

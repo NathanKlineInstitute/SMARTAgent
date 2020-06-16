@@ -73,8 +73,12 @@ def getdActMap (totalDur, tstepPerAction, dspkT, dspkID, dnumc, dstartidx,\
                         'EV1DW','EV1DNW', 'EV1DN', 'EV1DNE','EV1DE','EV1DSW', 'EV1DS', 'EV1DSE',\
                         'EMDOWN','EMUP']):
   t1 = range(0,totalDur,tstepPerAction)
-  t2 = range(tstepPerAction,totalDur+tstepPerAction,tstepPerAction)  
-  return {pop:generateActivityMap(t1, t2, dspkT[pop], dspkID[pop], dnumc[pop], dstartidx[pop]) for pop in lpop}
+  t2 = range(tstepPerAction,totalDur+tstepPerAction,tstepPerAction)
+  dact = {}
+  for pop in lpop:
+    if pop in dnumc and dnumc[pop] > 0:
+      dact[pop] = generateActivityMap(t1, t2, dspkT[pop], dspkID[pop], dnumc[pop], dstartidx[pop])
+  return dact
   
 def loadsimdat (name=None,getactmap=True):
   # load simulation data
@@ -83,19 +87,28 @@ def loadsimdat (name=None,getactmap=True):
   print('loading data from', name)
   conf.dconf = conf.readconf('backupcfg/'+name+'sim.json')
   simConfig = pickle.load(open('data/'+name+'simConfig.pkl','rb'))
-  dstartidx = {p:simConfig['net']['pops'][p]['cellGids'][0] for p in simConfig['net']['pops'].keys()} # starting indices for each population
-  dendidx = {p:simConfig['net']['pops'][p]['cellGids'][-1] for p in simConfig['net']['pops'].keys()} # ending indices for each population
+  dstartidx,dendidx={},{} # starting,ending indices for each population
+  for p in simConfig['net']['pops'].keys():
+    if simConfig['net']['pops'][p]['tags']['numCells'] > 0:
+      dstartidx[p] = simConfig['net']['pops'][p]['cellGids'][0]
+      dendidx[p] = simConfig['net']['pops'][p]['cellGids'][-1]
   pdf=None
   try: pdf = readinweights(name) # if RL was off, no weights saved
   except: pass
   actreward = pd.DataFrame(np.loadtxt('data/'+name+'ActionsRewards.txt'),columns=['time','action','reward','proposed','hit'])
-  dnumc = {p:dendidx[p]-dstartidx[p]+1 for p in simConfig['net']['pops'].keys()}
+  dnumc = {}
+  for p in simConfig['net']['pops'].keys():
+    if p in dstartidx:
+      dnumc[p] = dendidx[p]-dstartidx[p]+1
+    else:
+      dnumc[p] = 0
   spkID= np.array(simConfig['simData']['spkid'])
   spkT = np.array(simConfig['simData']['spkt'])
   dspkID,dspkT = {},{}
   for pop in simConfig['net']['pops'].keys():
-    dspkID[pop] = spkID[(spkID >= dstartidx[pop]) & (spkID <= dendidx[pop])]
-    dspkT[pop] = spkT[(spkID >= dstartidx[pop]) & (spkID <= dendidx[pop])]
+    if dnumc[pop] > 0:
+      dspkID[pop] = spkID[(spkID >= dstartidx[pop]) & (spkID <= dendidx[pop])]
+      dspkT[pop] = spkT[(spkID >= dstartidx[pop]) & (spkID <= dendidx[pop])]
   InputImages=ldflow=None
   InputImages = loadInputImages(dconf['sim']['name'])
   ldflow = loadMotionFields(dconf['sim']['name'])
@@ -397,7 +410,7 @@ def plotFollowBall (actreward, ax=None,cumulative=True,msz=3,binsz=1e3,color='r'
   # for now cumulative == False is not plotted at all ... 
   global tstepPerAction
   if ax is None: ax = gca()
-  ax.plot([0,actreward.time[len(actreward)-1]],[0.5,0.5],'--',color='gray')    
+  ax.plot([0,np.amax(actreward.time)],[0.5,0.5],'--',color='gray')    
   allproposed = actreward[(actreward.proposed!=-1)] # only care about cases when can suggest a proposed action
   rewardingActions = np.where(allproposed.proposed-allproposed.action==0,1,0)
   #if cumulative:
@@ -409,7 +422,7 @@ def plotFollowBall (actreward, ax=None,cumulative=True,msz=3,binsz=1e3,color='r'
   #  nbin = int(binsz / (actreward.time[1]-actreward.time[0]))
   #  aout = avgfollow = [mean(rewardingActions[sidx:sidx+nbin]) for sidx in arange(0,len(rewardingActions),nbin)]
   #  ax.plot(allproposed.time, avgfollow, color,linewidth=msz)
-  ax.set_xlim((0,actreward.time[len(actreward)-1]))
+  ax.set_xlim((0,np.amax(actreward.time)))
   ax.set_ylim((0,1))
   ax.set_xlabel('Time (ms)'); ax.set_ylabel('p(Follow Target)')
   return aout
