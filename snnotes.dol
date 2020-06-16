@@ -8114,3 +8114,8 @@ see if that works ... seems to work after fix to connUtils.py functions checking
 
 ok ... 
 
+** try higher connectivity to EM
+
+since using high connectivity (100%) do not need many EM neurons (all receive same inputs)
+try 16 of each ... or even 1 of each (that produces error in run), so 16 for now ... fast to run ...
+
