@@ -727,6 +727,7 @@ def saveGameBehavior(sim):
 
 def getFiringRatesWithInterval (trange = None, neuronal_pop = None):
   #sim.gatherData()
+  if len(neuronal_pop) < 1: return 0.0
   spkts = sim.simData['spkt']
   spkids = sim.simData['spkid']
   pop_spikes = 0
