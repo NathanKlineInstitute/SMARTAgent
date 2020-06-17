@@ -1,12 +1,124 @@
 ########################################
-06-16-20
+06-18-20
+########################################
+To-Do:
+-Understand inputs for recurrent connectivity maps
+	-Which groups are recurrent neurons?
+
+
+
+########################################
+06-17-20
 ########################################
 
 To-Do:
 -Look into plotallinputmaps in simdat.py
 	:Gives connectivity plot of pre/post synaptic neurons
 	-Make similar function to plot recurrent connectivity maps with Haroon
+-Understand inputs for recurrent connectivity maps
 
+Looking at plotallinputmaps on data:
+bash
+./myrun 8 sim.json (dur=2000)
+#Total runtime 7323.42 s
+>>> exit()
+(Still in bash)
+python -i simdat.py backupcfg/20june12_A_sim.json
+drfmap = plotallinputmaps(pdf, pdf.time[0], dstartidx['EMUP'] + 0, 'EMUP', dnumc, dstartidx, dendidx, asweight=True)
+savefig('gif/20june17_e1.png')
+##File did not save
+
+
+########################################
+06-16-20
+########################################
+
+To-Do:
+-Look into plotallinputmaps in simdat.py
+	:Gives connectivity plot of pre/post synaptic neurons
+	*DONE
+	-Make similar function to plot recurrent connectivity maps with Haroon
+-Look into sam's notes on his use of the function plotallinputmaps
+	May 28, 2020 - May 29, 2020
+	*DONE
+
+#####Code for plotallinputmaps#####
+
+
+def plotallinputmaps (pdf, t, postid, poty, dnumc, dstartidx, dendidx, lprety=['EV1DNW', 'EV1DN', 'EV1DNE', 'EV1DW', 'EV1','EV1DE','EV1DSW', 'EV1DS', 'EV1DSE'], asweight=False, cmap='jet',dmap=None):
+  if dmap is None:
+    drfmap = getallinputmaps(pdf, t, postid, poty, dnumc, dstartidx, dendidx, lprety, asweight=asweight)
+  else:
+    drfmap = dmap
+  vmin,vmax = 1e9,-1e9
+  for prety in lprety:
+    vmin = min(vmin, np.amin(drfmap[prety]))
+    vmax = max(vmax, np.amax(drfmap[prety]))    
+  for tdx,prety in enumerate(lprety):
+    subplot(3,3,tdx+1)
+    imshow(drfmap[prety],cmap=cmap,origin='upper',vmin=vmin,vmax=vmax);
+    title(prety+'->'+poty+str(postid));
+    colorbar()
+  return drfmap
+
+####Inputs####
+Function Inputs - Calling Input
+pdf - pdf
+t - pdf.time[0]
+postid - dstartidx['EMUP'] + 0
+poty - 'EMUP'
+dnumc -  dnumc
+dstartidx - dstartidx
+dendidx - dendidx
+lprety - lprety
+
+
+####Notes####
+drfmap = Output
+lprety is a list of "EV1" parts, what is this significance? I think its neural groups being plotted. Looks like 9x9 grid, with compass directions (EV1 center)
+	This makes prety (pre-ty?) the content of the list
+vmin, vmax = constant min, max of the array drfmap at each pre-ty (unless 1e9,-1e9 is better?)
+tdx = Counter for lprety list enumerated
+
+
+####Questions####
+√1. What is the point of the first if statement, dmap is set to None in the inputs?
+√1a. Also, what is dmap?
+	The if statement is used to avoid recomputation of dmap if it already exists. If it doesn't exist, it calls the function to compute it.
+
+√2. What does postid mean (in reference to getallinputmaps function)?
+	"  # gets all input maps onto postid "
+	See number 5.
+√3. Why 1e9,-1e9 for vmin,vmax?
+	Sets the range form imshow to show range of synapses
+
+√4. Does the tdx counter start at 1? (Internet says yes) If so, why start the subplot at 1+1?
+	Looping tdx starts at 0 (see explination of enumerate below), but subplot counter starts at 1 in upper left corner.
+√5. What are poty and postid? (title function)
+	Poty is a "tag" to pass other values
+		drfmap = plotallinputmaps(pdf, pdf.time[0], dstartidx[‘EMUP’] + 0, ‘EMUP’, dnumc, dstartidx, dendidx, lprety)
+	Above is how function plotallinputmaps is called, EMUP is passed as poty.
+	
+	Postid used throughout script, seems to be the id of the post synaptic neuron when observing topological inputs.
+		postid = dstartidx[‘EMUP’] + 0,
+	where dstartidx['EMUP'] is the starting id of the population neurons belonging to 'EMUP.' Many neurons make synases onto single postsynaptic neuron, we see how a single neuron receives input from all different populations of neurons.
+
+
+#######Explination of enumerate function#######
+my_list = ['apple', 'banana', 'grapes', 'pear']
+for c, value in enumerate(my_list, 1):
+    print(c, value)
+
+# Output:
+# 1 apple
+# 2 banana
+# 3 grapes
+# 4 pear
+
+#####Sam's notes#####
+Looks like sam is plotting and saving the files of e0 to e9 (data from 20may27_B1_falcor_sim.json). Does not explain much on how the function runs.
+
+drfmap = plotallinputmaps(pdf, pdf.time[0], dstartidx[‘EMUP’] + 0, ‘EMUP’, dnumc, dstartidx, dendidx, lprety)
 
 ########################################
 06-15-20
