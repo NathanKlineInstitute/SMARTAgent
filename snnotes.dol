@@ -8114,12 +8114,16 @@ see if that works ... seems to work after fix to connUtils.py functions checking
 
 ok ... 
 
-** try higher connectivity to EM
+** try higher connectivity to EM (100%) only 2 neurons, one per direction; 20jun16_B0_falcor_
 
 since using high connectivity (100%) do not need many EM neurons (all receive same inputs)
 try 16 of each ... or even 1 of each (that produces error in run), so 16 for now ... fast to run ...
 can get down to 1 of each EM (and 1 IM) after fix to getfiringrateinterval checking for 0 cells of a type...
 also have to fixup simdat.py ... to check for 0 pop size ... 
+
+after watching it for a while, seems to get stuck not being able to move up ... problem with
+1 neuron per direction is can't fire as rapidly or have as diverse output encoding ... only
+4 possibilities at each timestep with 2 total EM neurons ... 
 
 python -i simdat.py backupcfg/20jun16_B0_falcor_sim.json
 
@@ -8135,4 +8139,10 @@ savefig('gif/'+dstr+simstr+'rast.png') #
 
 clf(); drawcellVm(simConfig); 
 savefig('gif/'+dstr+simstr+'Vm.png')
+
+** high connectivity to EM (100%); 16 neurons per direction - some I noise; 20jun16_C0_falcor_
+
+some minor I noise may allow the 16 neurons to learn slightly differently ... 
+
+run for 200 s ...
 
