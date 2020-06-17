@@ -8146,3 +8146,198 @@ some minor I noise may allow the 16 neurons to learn slightly differently ...
 
 run for 200 s ...
 
+*20jun17
+** check output from 20jun16_C0_falcor_
+
+python -i simdat.py backupcfg/20jun16_C0_falcor_sim.json
+
+#
+plotFollowBall(actreward,ax=subplot(1,3,1),cumulative=True,color='r'); ylim((0,.6))
+plotHitMiss(actreward,ax=subplot(1,3,2)); 
+plotRewards(actreward,ax=subplot(1,3,3)); 
+
+savefig('gif/'+dstr+simstr+'perf.png') # 
+
+looks like probability jumps up around 25 s ... after that stays mostly flat
+
+clf(); drawraster(dspkT,dspkID); 
+savefig('gif/'+dstr+simstr+'rast.png') # 
+all M cells firing together...
+xlim((5e3,15e3))
+savefig('gif/'+dstr+simstr+'rastB.png') # 
+xlim((8e3,12e3))
+savefig('gif/'+dstr+simstr+'rastC.png') # 
+well, not exactly at same time...
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN']); 
+xlim((0,10e3))
+savefig('gif/'+dstr+simstr+'Vm.png')
+xlim((190e3,200e3))
+savefig('gif/'+dstr+simstr+'VmB.png')
+by end of simulation there's less correlation between those two cell spike times ... 
+that's a measure that we should track to make sure the populations differ ... 
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=3,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP'],lclr=['r','b','g','c','m'])
+savefig('gif/'+dstr+simstr+'avg_weight.png')
+
+EMDOWN winning by a lot, which is why racket stays at bottom ... worth comparing to the targetted RL rule ...
+
+np.amax
+
+#
+clf()
+for pdx,pop in enumerate(['EMDOWN','EMUP']):
+  subplot(2,1,pdx+1); title('->'+pop)
+  pdfs = pdf[(pdf.postid>=dstartidx[pop])&(pdf.postid<=dendidx[pop])]
+  ncol = np.unique(pdfs['time']).shape[0]
+  nrow = int(pdfs['weight'].shape[0] / ncol)
+  imshow(np.reshape(np.array(pdfs['weight']),(nrow,ncol)),extent=(0,200e3,0,nrow),interpolation='None',cmap='jet')
+  colorbar()
+
+savefig('gif/'+dstr+simstr+'_allwght.png')
+
+look somewhat similar overall, though difficult to tell ... 
+
+#
+clf()
+gdx=1
+for pdx,pop in enumerate(['EMDOWN','EMUP']):
+  for idx in range(dstartidx[pop],dendidx[pop]+1,1):
+    subplot(8,4,gdx); title('->'+pop)
+    pdfs = pdf[(pdf.postid>=idx)&(pdf.postid<=idx)]
+    ncol = np.unique(pdfs['time']).shape[0]
+    nrow = int(pdfs['weight'].shape[0] / ncol)
+    imshow(np.reshape(np.array(pdfs['weight']),(nrow,ncol)),extent=(0,200e3,0,nrow),interpolation='None',cmap='jet')
+    colorbar()
+    gdx+=1
+  
+#
+dw={}
+for pdx,pop in enumerate(['EMDOWN','EMUP']):
+  dw[pop]=[]
+  for idx in range(dstartidx[pop],dendidx[pop]+1,1):
+    pdfs = pdf[(pdf.postid>=idx)&(pdf.postid<=idx)]
+    ncol = np.unique(pdfs['time']).shape[0]
+    nrow = int(pdfs['weight'].shape[0] / ncol)
+    dw[pop].append(np.array(pdfs.weight))
+
+from scipy.stats import pearsonr
+
+#
+dR = {}
+for pop in ['EMDOWN','EMUP']:
+  dR[pop]=[]
+  for idx,idf in enumerate(dw[pop]):
+    for jdx,jdf in enumerate(dw[pop]):
+      if jdx>idx:
+        dR[pop].append(pearsonr(idf,jdf)[0])
+
+mean(dR['EMDOWN']) # 0.7449948387935842 
+mean(dR['EMUP']) # 0.6385154461653857
+
+so there's some variability in the weights ... 
+
+#
+for pop1 in ['EMDOWN']:
+  for pop2 in ['EMUP']:
+    dR[pop1+'->'+pop2]=[]
+    for idx,idf in enumerate(dw[pop1]):
+      for jdx,jdf in enumerate(dw[pop2]):
+        dR[pop1+'->'+pop2].append(pearsonr(idf,jdf)[0])
+
+mean(dR['EMDOWN->EMUP']) # 0.6902693693719086
+
+so that's pretty high similarity across the populations, compared to similarity within EMUP population
+
+would probably want the two populations to have some divergence in the information emphasized ... 
+
+does that highlight benefit of targetted rule?
+
+lpop = ['ER', 'EV1', 'EV4', 'EMT', 'IR', 'IV1', 'IV4', 'IMT','EV1DW','EV1DNW', 'EV1DN', 'EV1DNE','EV1DE','EV1DSW', 'EV1DS', 'EV1DSE','EMDOWN','EMUP']  
+dact = getdActMap(totalDur, tstepPerAction, dspkT, dspkID, dnumc, dstartidx, lpop)
+
+fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4')
+
+#fig, axs, plt = animActivityMaps() # 
+#animSynWeights(pdf) # 
+
+** compare last sim (20jun16_C0_falcor_) with targetted RL (20jun17_C0_targetted_falcor_)
+
+** check output from sim with 1 EM neuron of each type (20jun16_B0_falcor_sim.json)
+
+python -i simdat.py backupcfg/20jun16_B0_falcor_sim.json
+
+#
+plotFollowBall(actreward,ax=subplot(1,3,1),cumulative=True,color='r'); ylim((0,.6))
+plotHitMiss(actreward,ax=subplot(1,3,2)); 
+plotRewards(actreward,ax=subplot(1,3,3)); 
+
+(6, 17, 251)
+
+savefig('gif/'+dstr+simstr+'perf.png') # 
+
+looks like probability gradually increases up to t=200e3 ... after that stays mostly flat
+looks similar to other sim with 16 EM neurons of each type
+
+clf(); drawraster(dspkT,dspkID); 
+savefig('gif/'+dstr+simstr+'rast.png') # 
+xlim((5e3,15e3)); savefig('gif/'+dstr+simstr+'rastB.png') # 
+xlim((8e3,12e3)); savefig('gif/'+dstr+simstr+'rastC.png') # 
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN']); 
+xlim((0,10e3)); savefig('gif/'+dstr+simstr+'Vm.png')
+xlim((790e3,800e3)); savefig('gif/'+dstr+simstr+'VmB.png')
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=3,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP'],lclr=['r','b','g','c','m'])
+savefig('gif/'+dstr+simstr+'avg_weight.png')
+
+same pattern as other model ... early initial bias sets stage for rest of simulation ... 
+
+how do the weights correlate?
+
+#
+dw={}
+for pdx,pop in enumerate(['EMDOWN','EMUP']):
+  dw[pop]=[]
+  for idx in range(dstartidx[pop],dendidx[pop]+1,1):
+    pdfs = pdf[(pdf.postid>=idx)&(pdf.postid<=idx)]
+    ncol = np.unique(pdfs['time']).shape[0]
+    nrow = int(pdfs['weight'].shape[0] / ncol)
+    dw[pop].append(np.array(pdfs.weight))
+
+from scipy.stats import pearsonr
+
+dR = {}
+#
+for pop1 in ['EMDOWN']:
+  for pop2 in ['EMUP']:
+    dR[pop1+'->'+pop2]=[]
+    for idx,idf in enumerate(dw[pop1]):
+      for jdx,jdf in enumerate(dw[pop2]):
+        dR[pop1+'->'+pop2].append(pearsonr(idf,jdf)[0])
+
+mean(dR['EMDOWN->EMUP']) # {'EMDOWN->EMUP': [0.1665834150590529]}
+
+that's much different from other sim ... here there's a much different pattern of weights ...
+
+#
+clf()
+gdx=1
+for pdx,pop in enumerate(['EMDOWN','EMUP']):
+  for idx in range(dstartidx[pop],dendidx[pop]+1,1):
+    figure(); title('->'+pop)
+    pdfs = pdf[(pdf.postid>=idx)&(pdf.postid<=idx)]
+    ncol = np.unique(pdfs['time']).shape[0]
+    nrow = int(pdfs['weight'].shape[0] / ncol)
+    imshow(np.reshape(np.array(pdfs['weight']),(nrow,ncol)),extent=(0,800e3,0,nrow),interpolation='None',cmap='jet')
+    #colorbar()
+    gdx+=1
+
+fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4')
+
+** try single EM neuron of each pop but with targetted RL
+
+20jun17_B0_targetted_falcor_
+
+only run for 200 s ...
+

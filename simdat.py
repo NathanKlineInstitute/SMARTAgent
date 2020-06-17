@@ -138,9 +138,9 @@ def animActivityMaps (outpath='gif/'+dconf['sim']['name']+'actmap.mp4', framerat
   lpop = ['ER', 'EV1', 'EV4', 'EMT', 'IR', 'IV1', 'IV4', 'IMT',\
           'EV1DW','EV1DNW', 'EV1DN', 'EV1DNE','EV1DE','EV1DSW', 'EV1DS', 'EV1DSE',\
           'EMDOWN','EMUP']  
-  dmaxSpk = OrderedDict({pop:np.max(dact[pop]) for pop in lpop})
-  max_spks = np.max([dmaxSpk[p] for p in lpop])  
-  for pop in lpop:
+  dmaxSpk = OrderedDict({pop:np.max(dact[pop]) for pop in dact.keys()})
+  max_spks = np.max([dmaxSpk[p] for p in dact.keys()])  
+  for pop in dact.keys():
     lact.append(dact[pop])
     lvmax.append(max_spks)
   ddat = {}
@@ -390,15 +390,21 @@ def drawraster (dspkT,dspkID,tlim=None,msz=2):
   ax.legend(handles=lpatch,handlelength=1,loc='best')
 
 #
-def drawcellVm (simConfig):
+def drawcellVm (simConfig, ldrawpop=None):
   csm=cm.ScalarMappable(cmap=cm.prism); csm.set_clim(0,len(dspkT.keys()))
-  lclr = []; lpop = []
+  dclr = OrderedDict(); lpop = []
   for kdx,k in enumerate(list(simConfig['simData']['V_soma'].keys())):  
-    color = csm.to_rgba(kdx); lclr.append(color)
+    color = csm.to_rgba(kdx); 
+    cty = simConfig['net']['cells'][int(k.split('_')[1])]['tags']['cellType']
+    if ldrawpop is not None and cty not in ldrawpop: continue
+    dclr[kdx]=color
     lpop.append(simConfig['net']['cells'][int(k.split('_')[1])]['tags']['cellType'])
+  if ldrawpop is None: ldrawpop = lpop    
   for kdx,k in enumerate(list(simConfig['simData']['V_soma'].keys())):
-    plot(simConfig['simData']['t'],simConfig['simData']['V_soma'][k],color=lclr[kdx])
-  lpatch = [mpatches.Patch(color=c,label=s) for c,s in zip(lclr,lpop)]
+    cty = simConfig['net']['cells'][int(k.split('_')[1])]['tags']['cellType']
+    if ldrawpop is not None and cty not in ldrawpop: continue
+    plot(simConfig['simData']['t'],simConfig['simData']['V_soma'][k],color=dclr[kdx])
+  lpatch = [mpatches.Patch(color=c,label=s) for c,s in zip(dclr.values(),ldrawpop)]
   ax=gca()
   ax.legend(handles=lpatch,handlelength=1,loc='best')    
   
