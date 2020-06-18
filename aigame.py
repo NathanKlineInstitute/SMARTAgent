@@ -320,7 +320,8 @@ class AIGame:
       print(ball_hits_racket)
       self.last_ball_dir = current_ball_dir
       total_hits.append(ball_hits_racket) # i dont think this can be more than a single hit in 5 moves. so check if sum is greater than 1, print error
-      self.env.render()
+      if dconf['useSimulatedEnv']==0:
+        self.env.render()
       self.last_obs = observation # current observation will be used as last_obs for the next action
       if done:
         if dconf['useSimulatedEnv']==0:
