@@ -62,8 +62,8 @@ class AIGame:
   """ Interface to OpenAI gym game 
   """
   def __init__ (self,fcfg='sim.json'): # initialize variables
-    self.env = env
     if dconf['useSimulatedEnv']==1: self.pong = pong
+    else: self.env = env
     self.countAll = 0
     self.ldir = ['E','NE','N', 'NW','W','SW','S','SE']
     self.ldirpop = ['EV1D'+Dir for Dir in self.ldir]
