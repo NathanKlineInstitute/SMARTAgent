@@ -138,9 +138,9 @@ def animActivityMaps (outpath='gif/'+dconf['sim']['name']+'actmap.mp4', framerat
   lpop = ['ER', 'EV1', 'EV4', 'EMT', 'IR', 'IV1', 'IV4', 'IMT',\
           'EV1DW','EV1DNW', 'EV1DN', 'EV1DNE','EV1DE','EV1DSW', 'EV1DS', 'EV1DSE',\
           'EMDOWN','EMUP']  
-  dmaxSpk = OrderedDict({pop:np.max(dact[pop]) for pop in lpop})
-  max_spks = np.max([dmaxSpk[p] for p in lpop])  
-  for pop in lpop:
+  dmaxSpk = OrderedDict({pop:np.max(dact[pop]) for pop in dact.keys()})
+  max_spks = np.max([dmaxSpk[p] for p in dact.keys()])  
+  for pop in dact.keys():
     lact.append(dact[pop])
     lvmax.append(max_spks)
   ddat = {}
@@ -390,15 +390,21 @@ def drawraster (dspkT,dspkID,tlim=None,msz=2):
   ax.legend(handles=lpatch,handlelength=1,loc='best')
 
 #
-def drawcellVm (simConfig):
+def drawcellVm (simConfig, ldrawpop=None):
   csm=cm.ScalarMappable(cmap=cm.prism); csm.set_clim(0,len(dspkT.keys()))
-  lclr = []; lpop = []
+  dclr = OrderedDict(); lpop = []
   for kdx,k in enumerate(list(simConfig['simData']['V_soma'].keys())):  
-    color = csm.to_rgba(kdx); lclr.append(color)
+    color = csm.to_rgba(kdx); 
+    cty = simConfig['net']['cells'][int(k.split('_')[1])]['tags']['cellType']
+    if ldrawpop is not None and cty not in ldrawpop: continue
+    dclr[kdx]=color
     lpop.append(simConfig['net']['cells'][int(k.split('_')[1])]['tags']['cellType'])
+  if ldrawpop is None: ldrawpop = lpop    
   for kdx,k in enumerate(list(simConfig['simData']['V_soma'].keys())):
-    plot(simConfig['simData']['t'],simConfig['simData']['V_soma'][k],color=lclr[kdx])
-  lpatch = [mpatches.Patch(color=c,label=s) for c,s in zip(lclr,lpop)]
+    cty = simConfig['net']['cells'][int(k.split('_')[1])]['tags']['cellType']
+    if ldrawpop is not None and cty not in ldrawpop: continue
+    plot(simConfig['simData']['t'],simConfig['simData']['V_soma'][k],color=dclr[kdx])
+  lpatch = [mpatches.Patch(color=c,label=s) for c,s in zip(dclr.values(),ldrawpop)]
   ax=gca()
   ax.legend(handles=lpatch,handlelength=1,loc='best')    
   
@@ -477,7 +483,21 @@ def plotRewards (actreward,ax=None,msz=3,xl=None):
   ax.set_ylim((np.min(actreward.reward),np.max(actreward.reward)))
   ax.set_ylabel('Rewards'); #f_ax1.set_xlabel('Time (ms)')
 
-def plotMeanWeights (pdf,ax=None,msz=1,xl=None,lpop=['EMDOWN','EMUP'],lclr=['r','b']):
+def plotMeanNeuronWeight (pdf,postid,clr='k',ax=None,msz=1,xl=None):
+  if ax is None: ax = gca()
+  utimes = np.unique(pdf.time)
+  mnw,mxw=1e9,-1e9
+  pdfs = pdf[(pdf.postid==postid) & (pdf.postid==postid)]
+  wts = [np.mean(pdfs[(pdfs.time==t)].weight) for t in utimes] #wts of connections onto pop
+  ax.plot(utimes,wts,clr+'-o',markersize=msz)
+  mnw=min(mnw, min(wts))
+  mxw=max(mxw, max(wts))
+  if xl is not None: ax.set_xlim(xl)
+  ax.set_ylim((mnw,mxw))
+  ax.set_ylabel('Average weight'); 
+  return wts    
+  
+def plotMeanWeights (pdf,ax=None,msz=1,xl=None,lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=True):
   #plot mean weights of all plastic synaptic weights onto lpop
   if ax is None: ax = gca()
   utimes = np.unique(pdf.time)
@@ -485,17 +505,22 @@ def plotMeanWeights (pdf,ax=None,msz=1,xl=None,lpop=['EMDOWN','EMUP'],lclr=['r',
   mnw,mxw=1e9,-1e9
   for pop,clr in zip(lpop,lclr):
     #print(pop,clr)
+    if plotindiv:
+      for idx in range(dstartidx[pop],dendidx[pop]+1,1): # first plot average weight onto each individual neuron
+        lwt = plotMeanNeuronWeight(pdf,idx,clr=clr,msz=1)
+        mnw=min(mnw, min(lwt))
+        mxw=max(mxw, max(lwt))    
     pdfs = pdf[(pdf.postid>=dstartidx[pop]) & (pdf.postid<=dendidx[pop])]
     popwts[pop] = [np.mean(pdfs[(pdfs.time==t)].weight) for t in utimes] #wts of connections onto pop
     ax.plot(utimes,popwts[pop],clr+'-o',markersize=msz)
     mnw=min(mnw, np.amin(popwts[pop]))
-    mxw=max(mxw, np.amax(popwts[pop]))
+    mxw=max(mxw, np.amax(popwts[pop]))            
   if xl is not None: ax.set_xlim(xl)
   ax.set_ylim((mnw,mxw))
   ax.set_ylabel('Average weight'); 
-  ax.legend(tuple(['->'+pop for pop in lpop]),loc='best')
+  ax.legend(handles=[mpatches.Patch(color=c,label=s) for c,s in zip(lclr,lpop)],handlelength=1,loc='best')
   return popwts
-  
+
 #
 def animSynWeights (pdf, outpath='gif/'+dconf['sim']['name']+'weightmap.mp4', framerate=10, figsize=(14,8), cmap='jet'):  
   # animate the synaptic weights along with some stats on behavior

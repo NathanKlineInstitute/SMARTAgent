@@ -8114,12 +8114,16 @@ see if that works ... seems to work after fix to connUtils.py functions checking
 
 ok ... 
 
-** try higher connectivity to EM
+** try higher connectivity to EM (100%) only 2 neurons, one per direction; 20jun16_B0_falcor_
 
 since using high connectivity (100%) do not need many EM neurons (all receive same inputs)
 try 16 of each ... or even 1 of each (that produces error in run), so 16 for now ... fast to run ...
 can get down to 1 of each EM (and 1 IM) after fix to getfiringrateinterval checking for 0 cells of a type...
 also have to fixup simdat.py ... to check for 0 pop size ... 
+
+after watching it for a while, seems to get stuck not being able to move up ... problem with
+1 neuron per direction is can't fire as rapidly or have as diverse output encoding ... only
+4 possibilities at each timestep with 2 total EM neurons ... 
 
 python -i simdat.py backupcfg/20jun16_B0_falcor_sim.json
 
@@ -8135,4 +8139,490 @@ savefig('gif/'+dstr+simstr+'rast.png') #
 
 clf(); drawcellVm(simConfig); 
 savefig('gif/'+dstr+simstr+'Vm.png')
+
+** high connectivity to EM (100%); 16 neurons per direction - some I noise; 20jun16_C0_falcor_
+
+some minor I noise may allow the 16 neurons to learn slightly differently ... 
+
+run for 200 s ...
+
+*20jun17
+** check output from 20jun16_C0_falcor_
+
+python -i simdat.py backupcfg/20jun16_C0_falcor_sim.json
+
+#
+plotFollowBall(actreward,ax=subplot(1,3,1),cumulative=True,color='r'); ylim((0,.6))
+plotHitMiss(actreward,ax=subplot(1,3,2)); 
+plotRewards(actreward,ax=subplot(1,3,3)); 
+
+savefig('gif/'+dstr+simstr+'perf.png') # 
+
+looks like probability jumps up around 25 s ... after that stays mostly flat
+
+clf(); drawraster(dspkT,dspkID); 
+savefig('gif/'+dstr+simstr+'rast.png') # 
+all M cells firing together...
+xlim((5e3,15e3))
+savefig('gif/'+dstr+simstr+'rastB.png') # 
+xlim((8e3,12e3))
+savefig('gif/'+dstr+simstr+'rastC.png') # 
+well, not exactly at same time...
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN']); 
+xlim((0,10e3))
+savefig('gif/'+dstr+simstr+'Vm.png')
+xlim((190e3,200e3))
+savefig('gif/'+dstr+simstr+'VmB.png')
+by end of simulation there's less correlation between those two cell spike times ... 
+that's a measure that we should track to make sure the populations differ ... 
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=3,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP'],lclr=['r','b','g','c','m'])
+savefig('gif/'+dstr+simstr+'avg_weight.png')
+
+EMDOWN winning by a lot, which is why racket stays at bottom ... worth comparing to the targetted RL rule ...
+
+np.amax
+
+#
+clf()
+for pdx,pop in enumerate(['EMDOWN','EMUP']):
+  subplot(2,1,pdx+1); title('->'+pop)
+  pdfs = pdf[(pdf.postid>=dstartidx[pop])&(pdf.postid<=dendidx[pop])]
+  ncol = np.unique(pdfs['time']).shape[0]
+  nrow = int(pdfs['weight'].shape[0] / ncol)
+  imshow(np.reshape(np.array(pdfs['weight']),(nrow,ncol)),extent=(0,200e3,0,nrow),interpolation='None',cmap='jet')
+  colorbar()
+
+savefig('gif/'+dstr+simstr+'_allwght.png')
+
+look somewhat similar overall, though difficult to tell ... 
+
+#
+clf()
+gdx=1
+for pdx,pop in enumerate(['EMDOWN','EMUP']):
+  for idx in range(dstartidx[pop],dendidx[pop]+1,1):
+    subplot(8,4,gdx); title('->'+pop)
+    pdfs = pdf[(pdf.postid>=idx)&(pdf.postid<=idx)]
+    ncol = np.unique(pdfs['time']).shape[0]
+    nrow = int(pdfs['weight'].shape[0] / ncol)
+    imshow(np.reshape(np.array(pdfs['weight']),(nrow,ncol)),extent=(0,200e3,0,nrow),interpolation='None',cmap='jet')
+    colorbar()
+    gdx+=1
+  
+#
+dw={}
+for pdx,pop in enumerate(['EMDOWN','EMUP']):
+  dw[pop]=[]
+  for idx in range(dstartidx[pop],dendidx[pop]+1,1):
+    pdfs = pdf[(pdf.postid>=idx)&(pdf.postid<=idx)]
+    ncol = np.unique(pdfs['time']).shape[0]
+    nrow = int(pdfs['weight'].shape[0] / ncol)
+    dw[pop].append(np.array(pdfs.weight))
+
+from scipy.stats import pearsonr
+
+#
+dR = {}
+for pop in ['EMDOWN','EMUP']:
+  dR[pop]=[]
+  for idx,idf in enumerate(dw[pop]):
+    for jdx,jdf in enumerate(dw[pop]):
+      if jdx>idx:
+        dR[pop].append(pearsonr(idf,jdf)[0])
+
+mean(dR['EMDOWN']) # 0.7449948387935842 
+mean(dR['EMUP']) # 0.6385154461653857
+
+so there's some variability in the weights ... 
+
+#
+for pop1 in ['EMDOWN']:
+  for pop2 in ['EMUP']:
+    dR[pop1+'->'+pop2]=[]
+    for idx,idf in enumerate(dw[pop1]):
+      for jdx,jdf in enumerate(dw[pop2]):
+        dR[pop1+'->'+pop2].append(pearsonr(idf,jdf)[0])
+
+mean(dR['EMDOWN->EMUP']) # 0.6902693693719086
+
+so that's pretty high similarity across the populations, compared to similarity within EMUP population
+
+would probably want the two populations to have some divergence in the information emphasized ... 
+
+does that highlight benefit of targetted rule?
+
+lpop = ['ER', 'EV1', 'EV4', 'EMT', 'IR', 'IV1', 'IV4', 'IMT','EV1DW','EV1DNW', 'EV1DN', 'EV1DNE','EV1DE','EV1DSW', 'EV1DS', 'EV1DSE','EMDOWN','EMUP']  
+dact = getdActMap(totalDur, tstepPerAction, dspkT, dspkID, dnumc, dstartidx, lpop)
+
+fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4')
+
+#fig, axs, plt = animActivityMaps() # 
+#animSynWeights(pdf) # 
+
+** compare last sim (20jun16_C0_falcor_) with targetted RL (20jun17_C0_targetted_falcor_) , continue as 20jun17_C1_targetted_falcor
+
+python -i simdat.py backupcfg/20jun17_C0_targetted_falcor_sim.json
+
+#
+plotFollowBall(actreward,ax=subplot(1,3,1),cumulative=True,color='r'); ylim((0,.6))
+plotHitMiss(actreward,ax=subplot(1,3,2)); 
+plotRewards(actreward,ax=subplot(1,3,3)); 
+
+savefig('gif/'+dstr+simstr+'perf.png') # 
+
+(1, 4, 62)
+
+interesting ... that seems a lot better - rises in beginning, but then drops from 75 - 125 ... 
+
+clf(); drawraster(dspkT,dspkID); 
+savefig('gif/'+dstr+simstr+'rast.png') # 
+xlim((70e3,80e3))
+savefig('gif/'+dstr+simstr+'rastB.png') # 
+xlim((135e3,145e3))
+savefig('gif/'+dstr+simstr+'rastC.png') # 
+
+probably because weights went down, and neurons stopped firing ...
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN']); 
+savefig('gif/'+dstr+simstr+'Vm.png')
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=3,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP'],lclr=['r','b'])
+savefig('gif/'+dstr+simstr+'avg_weight.png')
+weights diverge even more ... probably too much?
+
+#
+clf()
+for pdx,pop in enumerate(['EMDOWN','EMUP']):
+  subplot(2,1,pdx+1); title('->'+pop)
+  pdfs = pdf[(pdf.postid>=dstartidx[pop])&(pdf.postid<=dendidx[pop])]
+  ncol = np.unique(pdfs['time']).shape[0]
+  nrow = int(pdfs['weight'].shape[0] / ncol)
+  imshow(np.reshape(np.array(pdfs['weight']),(nrow,ncol)),extent=(0,200e3,0,nrow),interpolation='None',cmap='jet')
+  colorbar()
+
+savefig('gif/'+dstr+simstr+'_allwght.png')
+
+  
+#
+dw={}
+for pdx,pop in enumerate(['EMDOWN','EMUP']):
+  dw[pop]=[]
+  for idx in range(dstartidx[pop],dendidx[pop]+1,1):
+    pdfs = pdf[(pdf.postid>=idx)&(pdf.postid<=idx)]
+    ncol = np.unique(pdfs['time']).shape[0]
+    nrow = int(pdfs['weight'].shape[0] / ncol)
+    dw[pop].append(np.array(pdfs.weight))
+
+from scipy.stats import pearsonr
+
+#
+dR = {}
+for pop in ['EMDOWN','EMUP']:
+  dR[pop]=[]
+  for idx,idf in enumerate(dw[pop]):
+    for jdx,jdf in enumerate(dw[pop]):
+      if jdx>idx:
+        dR[pop].append(pearsonr(idf,jdf)[0])
+
+mean(dR['EMDOWN']) # 0.8013999327206577
+mean(dR['EMUP']) # 0.6545299428996271
+
+#
+for pop1 in ['EMDOWN']:
+  for pop2 in ['EMUP']:
+    dR[pop1+'->'+pop2]=[]
+    for idx,idf in enumerate(dw[pop1]):
+      for jdx,jdf in enumerate(dw[pop2]):
+        dR[pop1+'->'+pop2].append(pearsonr(idf,jdf)[0])
+
+mean(dR['EMDOWN->EMUP']) # 0.10102358520733701
+
+much less similar now ... 
+
+fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4',showflow=False)
+
+pdfs = pdf[pdf.time==np.amax(pdf.time)]; D = pdf2weightsdict(pdfs); pickle.dump(D, open('data/'+simstr+'synWeights_final.pkl','wb')) 
+
+can continue ... as 20jun17_C1_targetted_falcor ... hmm, no point probably ... 
+
+** check output from sim with 1 EM neuron of each type (20jun16_B0_falcor_sim.json)
+
+python -i simdat.py backupcfg/20jun16_B0_falcor_sim.json
+
+#
+plotFollowBall(actreward,ax=subplot(1,3,1),cumulative=True,color='r'); ylim((0,.6))
+plotHitMiss(actreward,ax=subplot(1,3,2)); 
+plotRewards(actreward,ax=subplot(1,3,3)); 
+
+(6, 17, 251)
+
+savefig('gif/'+dstr+simstr+'perf.png') # 
+
+looks like probability gradually increases up to t=200e3 ... after that stays mostly flat
+looks similar to other sim with 16 EM neurons of each type
+
+clf(); drawraster(dspkT,dspkID); 
+savefig('gif/'+dstr+simstr+'rast.png') # 
+xlim((5e3,15e3)); savefig('gif/'+dstr+simstr+'rastB.png') # 
+xlim((8e3,12e3)); savefig('gif/'+dstr+simstr+'rastC.png') # 
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN']); 
+xlim((0,10e3)); savefig('gif/'+dstr+simstr+'Vm.png')
+xlim((790e3,800e3)); savefig('gif/'+dstr+simstr+'VmB.png')
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=3,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP'],lclr=['r','b','g','c','m'])
+savefig('gif/'+dstr+simstr+'avg_weight.png')
+
+same pattern as other model ... early initial bias sets stage for rest of simulation ... 
+
+how do the weights correlate?
+
+#
+dw={}
+for pdx,pop in enumerate(['EMDOWN','EMUP']):
+  dw[pop]=[]
+  for idx in range(dstartidx[pop],dendidx[pop]+1,1):
+    pdfs = pdf[(pdf.postid>=idx)&(pdf.postid<=idx)]
+    ncol = np.unique(pdfs['time']).shape[0]
+    nrow = int(pdfs['weight'].shape[0] / ncol)
+    dw[pop].append(np.array(pdfs.weight))
+
+from scipy.stats import pearsonr
+
+dR = {}
+#
+for pop1 in ['EMDOWN']:
+  for pop2 in ['EMUP']:
+    dR[pop1+'->'+pop2]=[]
+    for idx,idf in enumerate(dw[pop1]):
+      for jdx,jdf in enumerate(dw[pop2]):
+        dR[pop1+'->'+pop2].append(pearsonr(idf,jdf)[0])
+
+mean(dR['EMDOWN->EMUP']) # {'EMDOWN->EMUP': [0.1665834150590529]}
+
+that's much different from other sim ... here there's a much different pattern of weights ...
+
+#
+clf()
+gdx=1
+for pdx,pop in enumerate(['EMDOWN','EMUP']):
+  for idx in range(dstartidx[pop],dendidx[pop]+1,1):
+    figure(); title('->'+pop)
+    pdfs = pdf[(pdf.postid>=idx)&(pdf.postid<=idx)]
+    ncol = np.unique(pdfs['time']).shape[0]
+    nrow = int(pdfs['weight'].shape[0] / ncol)
+    imshow(np.reshape(np.array(pdfs['weight']),(nrow,ncol)),extent=(0,800e3,0,nrow),interpolation='None',cmap='jet')
+    #colorbar()
+    gdx+=1
+
+fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4')
+
+** try single EM neuron of each pop but with targetted RL
+
+20jun17_B0_targetted_falcor_
+
+only run for 200 s ...
+
+python -i simdat.py backupcfg/20jun17_B0_targetted_falcor_sim.json
+
+#
+plotFollowBall(actreward,ax=subplot(1,3,1),cumulative=True,color='r'); ylim((0,.6))
+plotHitMiss(actreward,ax=subplot(1,3,2)); 
+plotRewards(actreward,ax=subplot(1,3,3)); 
+
+(3, 5, 60)
+
+savefig('gif/'+dstr+simstr+'perf.png') # 
+
+similar to without targetted ... but worse than sim with 16 neurons ... 
+
+clf(); drawraster(dspkT,dspkID); 
+savefig('gif/'+dstr+simstr+'rast.png') # 
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN']); 
+savefig('gif/'+dstr+simstr+'Vm.png')
+
+follow target mostly seems random and just a question of firing rate ... 
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=3,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP'],lclr=['r','b','g','c','m'])
+savefig('gif/'+dstr+simstr+'avg_weight.png')
+
+fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4',showflow=False)
+
+** do 32 EM (X2) neurons perform better than 16?
+
+    "net":{"scale":1,"ER":400,"IR":100,"EV1":400,"EV1DE":400,"EV1DNE":400,"EV1DN":400,"EV1DNW":400,"EV1DW":400,"EV1DSW":400,"EV1DS":400,"EV1DSE":400,"IV1":100,"EV4":0,"IV4":0,"EMT":0,"IMT":0,"EMDOWN":32,"EMUP":32,"IM":16,"AngRFSigma":22.5,"DirMinRate":0.0,"DirMaxRate":50.0,"EEMWghtAM":0.0000075,"EEMWghtNM":0.000001,"EEPreMWghtAM":0.00008,"EEPreMWghtNM":0.0000025,"EEMWghtThreshMin":0.00000625,"EEMWghtThreshMax":0.00032,"EEMProb":1.0,"EEMRecProb":0.0,"EEPreMProb":0.0,"EEMPopNorm":0,"EEMRecProbCross":0,"EEMFeedbackProb":0.0,"EEMFeedbackWghtAM":0.0000125,"EEMFeedbackWghtNM":0.00000125,"VisualFeedback":0},
+
+well, so far no evidence that even the 16 can perform past chance/noise levels ... 
+
+*** targetted: 20jun17_D0_targetted_falcor_
+*** non-targetted: 20jun17_D0_falcor_
+** remove the I noise, introduce other minor variability (20jun17_E0_falcor_)
+
+can have < 100% connectivity - 75%, remove the I noise, and have some recurrent conn too (75%)...
+
+20jun17_E0_falcor_
+
+    "net":{"scale":1,"ER":400,"IR":100,"EV1":400,"EV1DE":400,"EV1DNE":400,"EV1DN":400,"EV1DNW":400,"EV1DW":400,"EV1DSW":400,"EV1DS":400,"EV1DSE":400,"IV1":100,"EV4":0,"IV4":0,"EMT":0,"IMT":0,"EMDOWN":16,"EMUP":16,"IM":8,"AngRFSigma":22.5,"DirMinRate":0.0,"DirMaxRate":50.0,"EEMWghtAM":0.000012,"EEMWghtNM":0.0000012,"EEPreMWghtAM":0.00008,"EEPreMWghtNM":0.0000025,"EEMWghtThreshMin":0.00000625,"EEMWghtThreshMax":0.00032,"EEMProb":0.75,"EEMRecProb":0.75,"EEPreMProb":0.0,"EEMPopNorm":0,"EEMRecProbCross":0,"EEMFeedbackProb":0.0,"EEMFeedbackWghtAM":0.0000125,"EEMFeedbackWghtNM":0.00000125,"VisualFeedback":0},
+
+python -i simdat.py backupcfg/20jun17_E0_falcor_sim.json
+
+#
+plotFollowBall(actreward,ax=subplot(1,3,1),cumulative=True,color='r'); ylim((0,.6))
+plotHitMiss(actreward,ax=subplot(1,3,2)); 
+plotRewards(actreward,ax=subplot(1,3,3)); 
+
+savefig('gif/'+dstr+simstr+'perf.png') # 
+
+clf(); drawraster(dspkT,dspkID); 
+savefig('gif/'+dstr+simstr+'rast.png') # 
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN']); 
+savefig('gif/'+dstr+simstr+'Vm.png')
+
+#
+clf(); dobjpos = loadObjPos()
+xlabel('Racket Y position'); hist(dobjpos['racket'][:,1])
+savefig('gif/'+dstr+simstr+'poshist.png')
+
+pdfs = pdf[pdf.time==np.amax(pdf.time)]; D = pdf2weightsdict(pdfs); pickle.dump(D, open('data/'+simstr+'synWeights_final.pkl','wb')) 
+
+fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4',showflow=False)
+
+** and same thing but targetted (20jun17_E0_targetted_falcor_)
+
+python -i simdat.py backupcfg/20jun17_E0_targetted_falcor_sim.json
+
+#
+plotFollowBall(actreward,ax=subplot(1,3,1),cumulative=True,color='r'); ylim((0,.6))
+plotHitMiss(actreward,ax=subplot(1,3,2)); 
+plotRewards(actreward,ax=subplot(1,3,3)); 
+
+savefig('gif/'+dstr+simstr+'perf.png') # 
+
+clf(); drawraster(dspkT,dspkID); 
+savefig('gif/'+dstr+simstr+'rast.png') # 
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN']); 
+savefig('gif/'+dstr+simstr+'Vm.png')
+
+#
+clf(); dobjpos = loadObjPos()
+xlabel('Racket Y position'); hist(dobjpos['racket'][:,1])
+savefig('gif/'+dstr+simstr+'poshist.png')
+
+pdfs = pdf[pdf.time==np.amax(pdf.time)]; D = pdf2weightsdict(pdfs); pickle.dump(D, open('data/'+simstr+'synWeights_final.pkl','wb')) 
+
+fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4',showflow=False)
+
+
+*20jun18
+** check output from 20jun17_E0_targetted_falcor_ (seems to be improcing; continue as 20jun18_E1_targetted_falcor_)
+
+python -i simdat.py backupcfg/20jun17_E0_targetted_falcor_sim.json
+
+#
+plotFollowBall(actreward,ax=subplot(1,3,1),cumulative=True,color='r'); ylim((0,.6))
+plotHitMiss(actreward,ax=subplot(1,3,2)); 
+plotRewards(actreward,ax=subplot(1,3,3)); 
+
+savefig('gif/'+dstr+simstr+'perf.png') # 
+
+looks like improving - but will it go beyond 0.33 chance if continues?
+
+score,hit,miss: (13, 36, 217)
+
+clf(); drawraster(dspkT,dspkID); 
+savefig('gif/'+dstr+simstr+'rast.png') # 
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN']); 
+savefig('gif/'+dstr+simstr+'Vm.png')
+
+drops in tracking appear when lower rates occur ... 
+
+#
+clf(); dobjpos = loadObjPos()
+xlabel('Racket Y position'); hist(dobjpos['racket'][:,1])
+savefig('gif/'+dstr+simstr+'poshist.png')
+
+less bias than have seen in other sims ... 
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=3,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP'],lclr=['r','b'])
+savefig('gif/'+dstr+simstr+'avg_weight.png')
+and there is divergence between the weights to the two EM populations ... 
+
+for pop,clr in zip(['EMUP','EMDOWN'],['b','r']):
+  for idx in range(dstartidx[pop],dendidx[pop]+1,1):
+    plotMeanNeuronWeight(pdf,idx,clr=clr)
+
+popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP'],lclr=['r','b'])
+xlabel('Time (ms)')
+some variability within and across populations ... overlap in average weights of individual neurons tends to occur more as time progresses
+there's also more spread between average weights, even within a population, as simulation progresses...
+
+savefig('gif/'+dstr+simstr+'all_avg_weight.png')
+
+will be interesting/useful to also look at full weight maps ... 
+
+pdfs = pdf[pdf.time==np.amax(pdf.time)]; D = pdf2weightsdict(pdfs); pickle.dump(D, open('data/'+simstr+'synWeights_final.pkl','wb')) 
+
+fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4',showflow=False)
+
+worth continuing this one ... 
+
+continue as 20jun18_E1_targetted_falcor_
+
+    "simtype": {"ResumeSim":1,"ResumeSimFromFile":"data/20jun17_E0_targetted_falcor_synWeights_final.pkl"}, 
+
+./myrun 16 sn.json
+
+started ~16:09 ... 
+
+** check output from 20jun17_E0_falcor_
+
+python -i simdat.py backupcfg/20jun17_E0_falcor_sim.json
+
+#
+plotFollowBall(actreward,ax=subplot(1,3,1),cumulative=True,color='r'); ylim((0,.6))
+plotHitMiss(actreward,ax=subplot(1,3,2)); 
+plotRewards(actreward,ax=subplot(1,3,3)); 
+
+savefig('gif/'+dstr+simstr+'perf.png') # 
+
+score, hit, miss: (1, 1, 272)
+not improving much, well a bit, but pretty slowly ... why so much worse than targetted (above)?
+
+clf(); drawraster(dspkT,dspkID); savefig('gif/'+dstr+simstr+'rast.png') # 
+well, firing rates of the two populations are very different - is it due to chance in the evolution
+of weights or specific to differences between targetted vs non-targetted RL?
+xlim((790e3,800e3))
+savefig('gif/'+dstr+simstr+'rastB.png') # 
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN']); 
+savefig('gif/'+dstr+simstr+'Vm.png')
+
+#
+clf(); dobjpos = loadObjPos()
+xlabel('Racket Y position'); hist(dobjpos['racket'][:,1])
+savefig('gif/'+dstr+simstr+'poshist.png')
+
+and of course, spent whole time in one spot ... 
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=True)
+xlabel('Time (ms)'); savefig('gif/'+dstr+simstr+'all_avg_weight.png')
+
+interesting how much closer the weights are together but even that small bias with UP having higher weights means paddle
+stays at top of screen for most of the simulation ... 
+
+probably no point continuing this simulation ... but seems problematic that it could enter such a bad state ... where no longer moves...
+
+## pdfs = pdf[pdf.time==np.amax(pdf.time)]; D = pdf2weightsdict(pdfs); pickle.dump(D, open('data/'+simstr+'synWeights_final.pkl','wb')) 
+
+fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4',showflow=False)
+
+** meanwhile, try a control sim (20jun18_E0_control_falcor_)
+
+started ~16:55 ... 
 
