@@ -3307,3 +3307,5 @@ plt.show()
 ** set 'useSimulatedEnv' =  1 in sim.json to use simulatedPong instead of aigame enviroment.
 
 ** test if simulatePong is working well.
+
+** add dconf['simulatedEnvParams']['yball'] and dconf['simulatedEnvParams']['yracket'] in sim.json to be used with simulatePong.py

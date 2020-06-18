@@ -1,4 +1,5 @@
 import numpy as np
+from conf import dconf
 
 class simulatePong:
   def __init__ (self):
@@ -9,10 +10,10 @@ class simulatePong:
     self.racket_width = 4
     self.racket_height = 16
     # start ball from the middle
-    self.ypos_ball = 80  # this corresponds to 0 index
+    self.ypos_ball = dconf['simulatedEnvParams']['yball']  # this corresponds to 0 index
     self.xpos_ball = 20  # this corresponds to 1 index
     self.xpos_racket = 140 # this is fixed
-    self.ypos_racket = 80 # this can change
+    self.ypos_racket = dconf['simulatedEnvParams']['yracket'] # this can change
     # create background
     self.obs = np.zeros(shape=(210,160,3))
     self.obs[self.court_top:self.court_bottom,:,0]=144
