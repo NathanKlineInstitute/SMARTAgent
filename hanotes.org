@@ -3192,6 +3192,7 @@ try this: env = gym.make('PongNoFrameskip-v4')
 -- ball color 236,236,236 (width = 2 , height = 4)
 -- racket color 92,186,92 (width = 4 ,height = 16 pixels)
 -- background color 144,72,17
+-- other racket: 213,130,74
 import gym
 import random
 env = gym.make('PongNoFrameskip-v4',repeat_action_probability=0)
@@ -3291,7 +3292,7 @@ import numpy as np
 from simulatePong import simulatePong
 pong = simulatePong()
 
-obs, reward = pong.step(1)
+obs, reward, done = pong.step(1)
 plt.imshow(obs.astype(np.uint8))
 plt.show()
 
@@ -3309,3 +3310,5 @@ plt.show()
 ** test if simulatePong is working well.
 
 ** add dconf['simulatedEnvParams']['yball'] and dconf['simulatedEnvParams']['yracket'] in sim.json to be used with simulatePong.py
+
+** randomly moving opponent racket added in simulatePong.py
