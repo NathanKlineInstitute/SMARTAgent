@@ -8517,3 +8517,110 @@ pdfs = pdf[pdf.time==np.amax(pdf.time)]; D = pdf2weightsdict(pdfs); pickle.dump(
 
 fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4',showflow=False)
 
+
+*20jun18
+** check output from 20jun17_E0_targetted_falcor_ (seems to be improcing; continue as 20jun18_E1_targetted_falcor_)
+
+python -i simdat.py backupcfg/20jun17_E0_targetted_falcor_sim.json
+
+#
+plotFollowBall(actreward,ax=subplot(1,3,1),cumulative=True,color='r'); ylim((0,.6))
+plotHitMiss(actreward,ax=subplot(1,3,2)); 
+plotRewards(actreward,ax=subplot(1,3,3)); 
+
+savefig('gif/'+dstr+simstr+'perf.png') # 
+
+looks like improving - but will it go beyond 0.33 chance if continues?
+
+score,hit,miss: (13, 36, 217)
+
+clf(); drawraster(dspkT,dspkID); 
+savefig('gif/'+dstr+simstr+'rast.png') # 
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN']); 
+savefig('gif/'+dstr+simstr+'Vm.png')
+
+drops in tracking appear when lower rates occur ... 
+
+#
+clf(); dobjpos = loadObjPos()
+xlabel('Racket Y position'); hist(dobjpos['racket'][:,1])
+savefig('gif/'+dstr+simstr+'poshist.png')
+
+less bias than have seen in other sims ... 
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=3,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP'],lclr=['r','b'])
+savefig('gif/'+dstr+simstr+'avg_weight.png')
+and there is divergence between the weights to the two EM populations ... 
+
+for pop,clr in zip(['EMUP','EMDOWN'],['b','r']):
+  for idx in range(dstartidx[pop],dendidx[pop]+1,1):
+    plotMeanNeuronWeight(pdf,idx,clr=clr)
+
+popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP'],lclr=['r','b'])
+xlabel('Time (ms)')
+some variability within and across populations ... overlap in average weights of individual neurons tends to occur more as time progresses
+there's also more spread between average weights, even within a population, as simulation progresses...
+
+savefig('gif/'+dstr+simstr+'all_avg_weight.png')
+
+will be interesting/useful to also look at full weight maps ... 
+
+pdfs = pdf[pdf.time==np.amax(pdf.time)]; D = pdf2weightsdict(pdfs); pickle.dump(D, open('data/'+simstr+'synWeights_final.pkl','wb')) 
+
+fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4',showflow=False)
+
+worth continuing this one ... 
+
+continue as 20jun18_E1_targetted_falcor_
+
+    "simtype": {"ResumeSim":1,"ResumeSimFromFile":"data/20jun17_E0_targetted_falcor_synWeights_final.pkl"}, 
+
+./myrun 16 sn.json
+
+started ~16:09 ... 
+
+** check output from 20jun17_E0_falcor_
+
+python -i simdat.py backupcfg/20jun17_E0_falcor_sim.json
+
+#
+plotFollowBall(actreward,ax=subplot(1,3,1),cumulative=True,color='r'); ylim((0,.6))
+plotHitMiss(actreward,ax=subplot(1,3,2)); 
+plotRewards(actreward,ax=subplot(1,3,3)); 
+
+savefig('gif/'+dstr+simstr+'perf.png') # 
+
+score, hit, miss: (1, 1, 272)
+not improving much, well a bit, but pretty slowly ... why so much worse than targetted (above)?
+
+clf(); drawraster(dspkT,dspkID); savefig('gif/'+dstr+simstr+'rast.png') # 
+well, firing rates of the two populations are very different - is it due to chance in the evolution
+of weights or specific to differences between targetted vs non-targetted RL?
+xlim((790e3,800e3))
+savefig('gif/'+dstr+simstr+'rastB.png') # 
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN']); 
+savefig('gif/'+dstr+simstr+'Vm.png')
+
+#
+clf(); dobjpos = loadObjPos()
+xlabel('Racket Y position'); hist(dobjpos['racket'][:,1])
+savefig('gif/'+dstr+simstr+'poshist.png')
+
+and of course, spent whole time in one spot ... 
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=True)
+xlabel('Time (ms)'); savefig('gif/'+dstr+simstr+'all_avg_weight.png')
+
+interesting how much closer the weights are together but even that small bias with UP having higher weights means paddle
+stays at top of screen for most of the simulation ... 
+
+probably no point continuing this simulation ... but seems problematic that it could enter such a bad state ... where no longer moves...
+
+## pdfs = pdf[pdf.time==np.amax(pdf.time)]; D = pdf2weightsdict(pdfs); pickle.dump(D, open('data/'+simstr+'synWeights_final.pkl','wb')) 
+
+fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4',showflow=False)
+
+** meanwhile, try a control sim
+
