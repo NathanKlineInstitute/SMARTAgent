@@ -8622,5 +8622,7 @@ probably no point continuing this simulation ... but seems problematic that it c
 
 fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4',showflow=False)
 
-** meanwhile, try a control sim
+** meanwhile, try a control sim (20jun18_E0_control_falcor_)
+
+started ~16:55 ... 
 
