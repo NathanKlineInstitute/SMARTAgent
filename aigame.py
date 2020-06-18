@@ -29,12 +29,16 @@ from centroidtracker import CentroidTracker
 # make the environment - env is global so that it only gets created on a single node (important when using MPI with > 1 node)
 try:
   from conf import dconf
-  if 'frameskip' in dconf['env']:
-    env = gym.make(dconf['env']['name'],frameskip=dconf['env']['frameskip'],repeat_action_probability=0.)
+  if dconf['useSimulatedEnv']==1:
+    from simulatePong import simulatePong
+    pong = simulatePong()
   else:
-    env = gym.make(dconf['env']['name'],repeat_action_probability=0.)    
-  if dconf['env']['savemp4']: env = wrappers.Monitor(env, './videos/' + dconf['sim']['name'] + '/',force=True)
-  env.reset()
+    if 'frameskip' in dconf['env']:
+      env = gym.make(dconf['env']['name'],frameskip=dconf['env']['frameskip'],repeat_action_probability=0.)
+    else:
+      env = gym.make(dconf['env']['name'],repeat_action_probability=0.)    
+    if dconf['env']['savemp4']: env = wrappers.Monitor(env, './videos/' + dconf['sim']['name'] + '/',force=True)
+    env.reset()
 except:
   print('Exception in makeENV')
   env = gym.make('PongNoFrameskip-v4',repeat_action_probability=0.)
@@ -59,6 +63,7 @@ class AIGame:
   """
   def __init__ (self,fcfg='sim.json'): # initialize variables
     self.env = env
+    if dconf['useSimulatedEnv']==1: self.pong = pong
     self.countAll = 0
     self.ldir = ['E','NE','N', 'NW','W','SW','S','SE']
     self.ldirpop = ['EV1D'+Dir for Dir in self.ldir]
@@ -261,8 +266,10 @@ class AIGame:
         proposed_action = -1 #if there is no last_obs
         ypos_Ball = -1 #if there is no last_obs, no position of ball
         xpos_Ball = -1 #if there is no last_obs, no position of ball
-
-      observation, reward, done, info = self.env.step(caction)
+      if dconf['useSimulatedEnv']==1:
+        observation, reward, done = self.pong.step(caction)
+      else:
+        observation, reward, done, info = self.env.step(caction)
       #find position of ball after action
       xpos_Ball2, ypos_Ball2 = self.findobj(observation, courtXRng, courtYRng)
       ball_moves_towards_racket = False
@@ -316,7 +323,8 @@ class AIGame:
       self.env.render()
       self.last_obs = observation # current observation will be used as last_obs for the next action
       if done:
-        self.env.reset()
+        if dconf['useSimulatedEnv']==0:
+          self.env.reset()
         self.last_obs = [] # when the game ends, and new game starts, there is no last observation
         self.last_ball_dir=0
         done = False
@@ -355,8 +363,9 @@ class AIGame:
 
     if done: # done means that 1 episode of the game finished, so the environment needs to be reset. 
       epCount.append(self.countAll)
-      self.env.reset()
-      self.env.frameskip = 3 
+      if dconf['useSimulatedEnv']==0:
+        self.env.reset()
+        self.env.frameskip = 3 
       self.countAll = 0 
     if np.sum(total_hits)>1:
       print('ERROR COMPUTING NUMBER OF HITS')
