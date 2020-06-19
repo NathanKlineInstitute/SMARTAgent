@@ -218,6 +218,21 @@ cfg.saveCellConns = bool(dconf['sim']['saveCellConns']) # if False removes all d
 #cfg.gatherOnlySimData = True # do not set to True, when True gathers from nodes only the output simulation data (not the network instance)
 ###
 
+# weight variance -- check if need to vary the initial weights (note, they're over-written if resumeSim==1)
+if 'weightVar' in dconf['sim']:
+  cfg.weightVar = dconf['sim']['weightVar']
+else:
+  cfg.weightVar = 0.
+
+def getInitWeight (weight):
+  """get initial weight for a connection
+     checks if weightVar is non-zero, if so will use a uniform distribution 
+     with range on interval: (1-var)*weight, (1+var)*weight
+  """
+  if cfg.weightVar == 0.0:
+    return weight
+  else:
+    return 'discunif(%f,%f)' % (weight*(1.0-cfg.weightVar),weight*(1.0+cfg.weightVar))
 
 #Local excitation
 #E to E recurrent connectivity in premotor areas
@@ -232,7 +247,7 @@ if EEPreMProb > 0.0:
         'preConds': {'pop': prety},
         'postConds': {'pop': poty},
         'convergence': prob2conv(EEPreMProb, dnumc[prety]),
-        'weight': weight,
+        'weight': getInitWeight(weight),
         'delay': 2,
         'synMech': synmech,
         'sec':'dend', 'loc':0.5
@@ -245,14 +260,14 @@ netParams.connParams['ER->IR'] = {
         'preConds': {'pop': 'ER'},
         'postConds': {'pop': 'IR'},
         'connList': blistERtoIR,
-        'weight': 0.02 * cfg.EIGain,
+        'weight': getInitWeight(0.02 * cfg.EIGain),
         'delay': 2,
         'synMech': 'AMPA', 'sec':'soma', 'loc':0.5}
 netParams.connParams['EV1->IV1'] = {
         'preConds': {'pop': 'EV1'},
         'postConds': {'pop': 'IV1'},
         'connList': blistEV1toIV1,
-        'weight': 0.02 * cfg.EIGain,
+        'weight': getInitWeight(0.02 * cfg.EIGain),
         'delay': 2,
         'synMech': 'AMPA', 'sec':'soma', 'loc':0.5}
 
@@ -263,7 +278,7 @@ for prety in EDirPops:
       'preConds': {'pop': prety},
       'postConds': {'pop': poty},
       'connList': blistEV1DtoIV1D,
-      'weight': 0.02 * cfg.EIGain,
+      'weight': getInitWeight(0.02 * cfg.EIGain),
       'delay': 2,
       'synMech': 'AMPA', 'sec':'soma', 'loc':0.5}
 """
@@ -272,14 +287,14 @@ netParams.connParams['EV4->IV4'] = {
         'preConds': {'pop': 'EV4'},
         'postConds': {'pop': 'IV4'},
         'connList': blistEV4toIV4,
-        'weight': 0.02 * cfg.EIGain,
+        'weight': getInitWeight(0.02 * cfg.EIGain),
         'delay': 2,
         'synMech': 'AMPA', 'sec':'soma', 'loc':0.5}
 netParams.connParams['EMT->IMT'] = {
         'preConds': {'pop': 'EMT'},
         'postConds': {'pop': 'IMT'},
         'connList': blistEMTtoIMT,
-        'weight': 0.02 * cfg.EIGain,
+        'weight': getInitWeight(0.02 * cfg.EIGain),
         'delay': 2,
         'synMech': 'AMPA', 'sec':'soma', 'loc':0.5}
 netParams.connParams['EMDOWN->IM'] = {
@@ -287,7 +302,7 @@ netParams.connParams['EMDOWN->IM'] = {
         'postConds': {'pop': 'IM'},
         #'probability': 0.125/2.,
         'convergence': prob2conv(0.125/2, dnumc['EMDOWN']),
-        'weight': 0.02 * cfg.EIGain,
+        'weight': getInitWeight(0.02 * cfg.EIGain),
         'delay': 2,
         'synMech': 'AMPA', 'sec':'soma', 'loc':0.5}
 netParams.connParams['EMUP->IM'] = {
@@ -295,7 +310,7 @@ netParams.connParams['EMUP->IM'] = {
         'postConds': {'pop': 'IM'},
         #'probability': 0.125/2.,
         'convergence': prob2conv(0.125/2, dnumc['EMUP']),
-        'weight': 0.02 * cfg.EIGain,
+        'weight': getInitWeight(0.02 * cfg.EIGain),
         'delay': 2,
         'synMech': 'AMPA', 'sec':'soma', 'loc':0.5}
 
@@ -305,7 +320,7 @@ netParams.connParams['IR->ER'] = {
         'preConds': {'pop': 'IR'},
         'postConds': {'pop': 'ER'},
         'connList': blistIRtoER,
-        'weight': 0.2 * cfg.IEGain,
+        'weight': getInitWeight(0.2 * cfg.IEGain),
         'delay': 2,
         'synMech': 'GABA', 'sec':'soma', 'loc':0.5}
 
@@ -313,7 +328,7 @@ netParams.connParams['IV1->EV1'] = {
         'preConds': {'pop': 'IV1'},
         'postConds': {'pop': 'EV1'},
         'connList': blistIV1toEV1,
-        'weight': 0.2 * cfg.IEGain,
+        'weight': getInitWeight(0.2 * cfg.IEGain),
         'delay': 2,
         'synMech': 'GABA', 'sec':'soma', 'loc':0.5}
 
@@ -324,7 +339,7 @@ for prety in IDirPops:
       'preConds': {'pop': prety},
       'postConds': {'pop': poty},
       'connList': blistIV1DtoEV1D,
-      'weight': 0.2 * cfg.IEGain,
+      'weight': getInitWeight(0.2 * cfg.IEGain),
       'delay': 2,
       'synMech': 'GABA', 'sec':'soma', 'loc':0.5}
 """
@@ -333,14 +348,14 @@ netParams.connParams['IV4->EV4'] = {
         'preConds': {'pop': 'IV4'},
         'postConds': {'pop': 'EV4'},
         'connList': blistIV4toEV4,
-        'weight': 0.2 * cfg.IEGain,
+        'weight': getInitWeight(0.2 * cfg.IEGain),
         'delay': 2,
         'synMech': 'GABA', 'sec':'soma', 'loc':0.5}
 netParams.connParams['IMT->EMT'] = {
         'preConds': {'pop': 'IMT'},
         'postConds': {'pop': 'EMT'},
         'connList': blistIMTtoEMT,
-        'weight': 0.2 * cfg.IEGain,
+        'weight': getInitWeight(0.2 * cfg.IEGain),
         'delay': 2,
         'synMech': 'GABA', 'sec':'soma', 'loc':0.5}
 
@@ -349,7 +364,7 @@ for poty in EMotorPops: # I -> E for motor populations
     'preConds': {'pop': 'IM'},
     'postConds': {'pop': poty},
     'convergence': prob2conv(0.125, dnumc['IM']),
-    'weight': 0.2 * cfg.IEGain,
+    'weight': getInitWeight(0.2 * cfg.IEGain),
     'delay': 2,
     'synMech': 'GABA', 'sec':'soma', 'loc':0.5}
 
@@ -359,7 +374,7 @@ for IType in ['IV1', 'IV4', 'IMT', 'IM']:
     'preConds': {'pop': IType},
     'postConds': {'pop': IType},
     'convergence': prob2conv(0.25, dnumc[IType]),
-    'weight': 0.05 * cfg.IIGain, 
+    'weight': getInitWeight(0.05 * cfg.IIGain), 
     'delay': 2,
     'synMech': 'GABA', 'sec':'soma', 'loc':0.5}  
 
@@ -368,14 +383,14 @@ netParams.connParams['ER->EV1'] = {
         'preConds': {'pop': 'ER'},
         'postConds': {'pop': 'EV1'},
         'connList': blistERtoEV1,
-        'weight': 0.015 * cfg.EEGain,
+        'weight': getInitWeight(0.015 * cfg.EEGain),
         'delay': 2,
         'synMech': 'AMPA','sec':'dend', 'loc':0.5}
 netParams.connParams['EV1->EV4'] = {
         'preConds': {'pop': 'EV1'},
         'postConds': {'pop': 'EV4'},
         'connList': blistEV1toEV4,
-        'weight': 0.0075 * cfg.EEGain,
+        'weight': getInitWeight(0.0075 * cfg.EEGain),
         'delay': 2,
         'synMech': 'AMPA','sec':'dend', 'loc':0.5}
 netParams.connParams['EV4->EMT'] = {
@@ -383,7 +398,7 @@ netParams.connParams['EV4->EMT'] = {
         'postConds': {'pop': 'EMT'},
         'connList': blistEV4toEMT,
         #'convergence': 10,
-        'weight': 0.0075 * cfg.EEGain,
+        'weight': getInitWeight(0.0075 * cfg.EEGain),
         'delay': 2,
         'synMech': 'AMPA','sec':'dend', 'loc':0.5}
 
@@ -395,7 +410,7 @@ netParams.connParams['ER->IV1'] = {
         'postConds': {'pop': 'IV1'},
         'connList': blistERtoIV1,
         #'convergence': 10,
-        'weight': 0.00 * cfg.EIGain, #0.002
+        'weight': getInitWeight(0.00 * cfg.EIGain), #0.002
         'delay': 2,
         'synMech': 'AMPA','sec':'soma', 'loc':0.5}
 netParams.connParams['EV1->IV4'] = {
@@ -403,7 +418,7 @@ netParams.connParams['EV1->IV4'] = {
         'postConds': {'pop': 'IV4'},
         'connList': blistEV1toIV4,
         #'convergence': 10,
-        'weight': 0.00 * cfg.EIGain, #0.002
+        'weight': getInitWeight(0.00 * cfg.EIGain), #0.002
         'delay': 2,
         'synMech': 'AMPA','sec':'soma', 'loc':0.5}
 netParams.connParams['EV4->IMT'] = {
@@ -411,7 +426,7 @@ netParams.connParams['EV4->IMT'] = {
         'postConds': {'pop': 'IMT'},
         'connList': blistEV4toIMT,
         #'convergence': 10,
-        'weight': 0.00 * cfg.EIGain, #0.002
+        'weight': getInitWeight(0.00 * cfg.EIGain), #0.002
         'delay': 2,
         'synMech': 'AMPA','sec':'soma', 'loc':0.5}
 """
@@ -427,7 +442,7 @@ if VisualFeedback:
           'preConds': {'pop': 'EV1'},
           'postConds': {'pop': 'ER'},
           'connList': connList,
-          'weight': 0.0001 * cfg.EEGain, 
+          'weight': getInitWeight(0.0001 * cfg.EEGain), 
           'delay': 2,
           'synMech': 'AMPA','sec':'dend', 'loc':0.5}
         if dSTDPparamsRL[synmech]['RLon']: # only turn on plasticity when specified to do so
@@ -437,21 +452,21 @@ if VisualFeedback:
           'preConds': {'pop': 'IV1'},
           'postConds': {'pop': 'ER'},
           'connList': blistIV1toER,
-          'weight': 0.02 * cfg.IEGain, 
+          'weight': getInitWeight(0.02 * cfg.IEGain), 
           'delay': 2,
           'synMech': 'GABA','sec':'soma', 'loc':0.5}
   netParams.connParams['IV4->EV1'] = {
           'preConds': {'pop': 'IV4'},
           'postConds': {'pop': 'EV1'},
           'connList': blistIV4toEV1,
-          'weight': 0.02 * cfg.IEGain, 
+          'weight': getInitWeight(0.02 * cfg.IEGain), 
           'delay': 2,
           'synMech': 'GABA','sec':'soma', 'loc':0.5}
   netParams.connParams['IMT->EV4'] = {
           'preConds': {'pop': 'IMT'},
           'postConds': {'pop': 'EV4'},
           'connList': blistIMTtoEV4,
-          'weight': 0.02 * cfg.IEGain, 
+          'weight': getInitWeight(0.02 * cfg.IEGain), 
           'delay': 2,
           'synMech': 'GABA','sec':'soma', 'loc':0.5}
 
@@ -460,14 +475,14 @@ netParams.connParams['IV1->IV4'] = {
         'preConds': {'pop': 'IV1'},
         'postConds': {'pop': 'IV4'},
         'connList': blistIV1toIV4,
-        'weight': 0.0075 * cfg.IIGain,
+        'weight': getInitWeight(0.0075 * cfg.IIGain),
         'delay': 2,
         'synMech': 'GABA','sec':'soma', 'loc':0.5}
 netParams.connParams['IV4->IMT'] = {
         'preConds': {'pop': 'IV4'},
         'postConds': {'pop': 'IMT'},
         'connList': blistIV4toIMT,
-        'weight': 0.0075 * cfg.IIGain,
+        'weight': getInitWeight(0.0075 * cfg.IIGain),
         'delay': 2,
         'synMech': 'GABA','sec':'soma', 'loc':0.5}
 
@@ -484,7 +499,7 @@ if dconf['architecturePreMtoM']['useTopological']:
             'preConds': {'pop': prety},
             'postConds': {'pop': poty},
             'connList': blistEV4toEM, 
-            'weight': weight,
+            'weight': getInitWeight(weight),
             'delay': 2,
             'synMech': synmech,
             'sec':'dend', 'loc':0.5
@@ -494,7 +509,7 @@ if dconf['architecturePreMtoM']['useTopological']:
             'preConds': {'pop': prety},
             'postConds': {'pop': poty},
             'connList': blistEMTtoEM, 
-            'weight': weight,
+            'weight': getInitWeight(weight),
             'delay': 2,
             'synMech': synmech,
             'sec':'dend', 'loc':0.5
@@ -504,7 +519,7 @@ if dconf['architecturePreMtoM']['useTopological']:
             'preConds': {'pop': prety},
             'postConds': {'pop': poty},
             'connList': blistEV1toEM, 
-            'weight': weight,
+            'weight': getInitWeight(weight),
             'delay': 2,
             'synMech': synmech,
             'sec':'dend', 'loc':0.5
@@ -523,7 +538,7 @@ elif dconf['architecturePreMtoM']['useProbabilistic']:
           'preConds': {'pop': prety},
           'postConds': {'pop': poty},
           'convergence': prob2conv(EEMProb, dnumc[prety]),
-          'weight': weight,
+          'weight': getInitWeight(weight),
           'delay': 2,
           'synMech': synmech,
           'sec':'dend', 'loc':0.5
@@ -544,7 +559,7 @@ if EEMRecProb > 0.0:
             'preConds': {'pop': prety},
             'postConds': {'pop': poty},
             'convergence': prob2conv(EEMRecProb, dnumc[prety]),
-            'weight': weight,
+            'weight': getInitWeight(weight),
             'delay': 2,
             'synMech': synmech,
             'sec':'dend', 'loc':0.5
@@ -564,7 +579,7 @@ if EEMFeedbackProb > 0.0:
             'preConds': {'pop': prety},
             'postConds': {'pop': poty},
             'convergence': prob2conv(EEMFeedbackProb, dnumc[prety]),
-            'weight': weight,
+            'weight': getInitWeight(weight),
             'delay': 2,
             'synMech': synmech,
             'sec':'dend', 'loc':0.5
