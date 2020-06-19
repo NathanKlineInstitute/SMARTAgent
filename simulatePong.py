@@ -3,8 +3,8 @@ from conf import dconf
 import random
 class simulatePong:
   def __init__ (self):
-    self.court_top = 36
-    self.court_bottom = 195
+    self.court_top = 34
+    self.court_bottom = 194
     self.ball_width = 2
     self.ball_height = 4
     self.racket_width = 4
@@ -130,4 +130,5 @@ class simulatePong:
       self.b1y = self.court_top+self.ypos_ball
       self.b2y = self.court_top+self.ypos_ball+self.ball_height
       self.done = 0
+    self.obs = self.obs.astype(np.uint8)
     return self.obs, self.reward, self.done

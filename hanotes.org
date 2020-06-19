@@ -3312,3 +3312,7 @@ plt.show()
 ** add dconf['simulatedEnvParams']['yball'] and dconf['simulatedEnvParams']['yracket'] in sim.json to be used with simulatePong.py
 
 ** randomly moving opponent racket added in simulatePong.py
+
+** fixed bugs
+-- set type of self.obs to uint8 in simulatePong.py
+-- fix the court range in simulatePong.py
