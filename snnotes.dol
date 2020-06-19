@@ -8626,3 +8626,75 @@ fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4',showflow=False)
 
 started ~16:55 ... 
 
+*20jun19
+** check output from next step of targetted RL sim (20jun18_E1_targetted_falcor_)
+
+python -i simdat.py backupcfg/20jun18_E1_targetted_falcor_sim.json
+
+#
+plotFollowBall(actreward,ax=subplot(1,3,1),cumulative=True,color='r'); ylim((0,.6))
+plotHitMiss(actreward,ax=subplot(1,3,2)); 
+plotRewards(actreward,ax=subplot(1,3,3)); 
+
+score, hit, miss: (17, 48, 209)
+
+so that improved from first step of the sim: score,hit,miss: (13, 36, 217)
+
+improved a lot for hits ...
+
+savefig('gif/'+dstr+simstr+'perf.png') # 
+
+clf(); drawraster(dspkT,dspkID); savefig('gif/'+dstr+simstr+'rast.png') # 
+xlim((790e3,800e3)); savefig('gif/'+dstr+simstr+'rastB.png') # 
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN']); savefig('gif/'+dstr+simstr+'Vm.png')
+
+#
+clf(); dobjpos = loadObjPos()
+xlabel('Racket Y position'); hist(dobjpos['racket'][:,1])
+savefig('gif/'+dstr+simstr+'poshist.png')
+still biased ... but overall seems to be improving in performance
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=True)
+xlabel('Time (ms)'); tl(); savefig('gif/'+dstr+simstr+'all_avg_weight.png')
+
+lot of overlap ... 
+
+pdfs = pdf[pdf.time==np.amax(pdf.time)]; D = pdf2weightsdict(pdfs); pickle.dump(D, open('data/'+simstr+'synWeights_final.pkl','wb'))
+ data/20jun18_E1_targetted_falcor_synWeights_final.pkl
+
+and should concat the performance to see how cumulative changes ... 
+
+#
+actlearn0 = pd.DataFrame(np.loadtxt('data/20jun17_E0_targetted_falcor_ActionsRewards.txt'),columns=['time','action','reward','proposed','hit'])
+actlearn1 = pd.DataFrame(np.loadtxt('data/20jun18_E1_targetted_falcor_ActionsRewards.txt'),columns=['time','action','reward','proposed','hit'])
+actlearn1.time += 800e3
+pda = actlearn0; pda = pda.append(actlearn1)
+
+#
+plotFollowBall(pda,ax=subplot(1,3,1),cumulative=True,color='r'); ylim((0,.6))
+plotHitMiss(pda,ax=subplot(1,3,2)); 
+plotRewards(pda,ax=subplot(1,3,3)); 
+
+score, hit, miss: (30, 84, 426)
+
+savefig('gif/'+dstr+simstr+'perf_step0_step1.png') # 
+
+yeah, looks like it's continuing to improve ... the restart may have caused slight downturn ... 
+
+fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4',showflow=False)
+
+continue as ... 20jun19_E2_targetted_falcor_
+
+    "simtype": {"ResumeSim":1,"ResumeSimFromFile":"data/20jun18_E1_targetted_falcor_synWeights_final.pkl"}, 
+
+started @ ~13:00 ... 
+
+** check control
+
+** other way to vary EM activity
+
+could have 100% connectivity to EM but randomize the starting weights to each EM neuron ... 
+that way would make sure each neuron receives all the information ... 
+but would allow each neuron to have a different representation and hopefully more robust response
+
