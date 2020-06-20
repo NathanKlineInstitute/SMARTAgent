@@ -8830,7 +8830,26 @@ note that cfg.seeds['conn'] is used seed for random number
 generator, and that handles RNG initialization, etc. so do
 not have to do anything additional to get same results each time
 
+*20jun20
 ** try sim with weight var
 
-20jun19_F0_targetted_zn_
+fixed weightvar to use uniform - had discunif before but that's only for discrete numbers!
+
+will have weightVar of 0.1, run for 800 s, with 100% connectivity onto EM (EEMProb of 1.0, and EEMRecProb of 0.0)
+
+the weight variance will apply to EMUP, EMDOWN on the inputs they receive...so they all get full sensory
+info but there will be variability in how it's weighted ... 
+
+"name":"20jun20_F0_targetted_tank_"
+
+    "rewardcodes": {"scorePoint": 1.0, "losePoint": -0.1, "followTarget": 0.1, "avoidTarget": -0.01, "hitBall": 0.5},    
+    "net":{"scale":1,"ER":400,"IR":100,"EV1":400,"EV1DE":400,"EV1DNE":400,"EV1DN":400,"EV1DNW":400,"EV1DW":400,"EV1DSW":400,"EV1DS":400,"EV1DSE":400,"IV1":100,"EV4":0,"IV4":0,"EMT":0,"IMT":0,"EMDOWN":16,"EMUP":16,"IM":8,"AngRFSigma":22.5,"DirMinRate":0.0,"DirMaxRate":50.0,"EEMWghtAM":0.000012,"EEMWghtNM":0.0000012,"EEPreMWghtAM":0.00008,"EEPreMWghtNM":0.0000025,"EEMWghtThreshMin":0.00000625,"EEMWghtThreshMax":0.00032,"EEMProb":1.0,"EEMRecProb":0.0,"EEPreMProb":0.0,"EEMPopNorm":0,"EEMRecProbCross":0,"EEMFeedbackProb":0.0,"EEMFeedbackWghtAM":0.0000125,"EEMFeedbackWghtNM":0.00000125,"VisualFeedback":0,"weightVar":0.1},
+    "RL":{"AMPA":
+	  {"wbase":0.0000001,"wmax":0.00048,"RLon":1,"RLlenhebb":200,"RLlenanti":50,"useRLexp":1,"RLhebbwt":0.0000002,"RLantiwt":-0.0,"hebbwt":0,"antiwt":0,"tauhebb":10,"RLwindhebb":50,"softthresh":0,"verbose":0},
+
+otherwise, same params as recent sims on falcor ... 
+
+20jun20_F0_targetted_tank_
+
+started ~00:15 ...
 

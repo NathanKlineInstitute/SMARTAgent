@@ -232,7 +232,8 @@ def getInitWeight (weight):
   if cfg.weightVar == 0.0:
     return weight
   else:
-    return 'discunif(%f,%f)' % (weight*(1.0-cfg.weightVar),weight*(1.0+cfg.weightVar))
+    print('uniform(%g,%g)' % (weight*(1.0-cfg.weightVar),weight*(1.0+cfg.weightVar)))
+    return 'uniform(%g,%g)' % (weight*(1.0-cfg.weightVar),weight*(1.0+cfg.weightVar))
 
 #Local excitation
 #E to E recurrent connectivity in premotor areas
