@@ -8690,7 +8690,7 @@ continue as ... 20jun19_E2_targetted_falcor_
 
 started @ ~13:00 ... 
 
-** check control (20jun18_E0_control_falcor_)
+** check control (20jun18_E0_control_falcor_) -->> did not move for most of simulation, even w/o learning (some initial bias there, why?)
 
 python -i simdat.py backupcfg/20jun18_E0_control_falcor_sim.json
 
@@ -8718,7 +8718,7 @@ savefig('gif/'+dstr+simstr+'poshist.png')
 must be some bias in the wiring leading to EMUP population dominating, even without learning. the learning
 model also has to overcome that bias ...
 
-** other control via randomized learned weights
+** other control via randomized learned weights (20jun19_E2_targetted_control_falcor_)
 
 take learned weights, shuffle their final values, then use them to resume a control sim ... will it work
 if control sim has no RL weights? could just set rl learning weight to 0 ... so weights stay fixed (check that it works)
@@ -8852,4 +8852,72 @@ otherwise, same params as recent sims on falcor ...
 20jun20_F0_targetted_tank_
 
 started ~00:15 ...
+
+** check output from 20jun19_E2_targetted_falcor_
+
+(took ~11 hours to run, while falcor was already pretty heavily in use)
+
+python -i simdat.py backupcfg/20jun19_E2_targetted_falcor_sim.json
+
+from previous step sim: ## score, hit, miss: (17, 48, 209)
+
+#
+plotFollowBall(actreward,ax=subplot(1,3,1),cumulative=True,color='r'); ylim((0,.6))
+plotHitMiss(actreward,ax=subplot(1,3,2)); 
+plotRewards(actreward,ax=subplot(1,3,3)); 
+
+from this sim score, hit, miss: (13, 36, 229)
+hmm, fewer scores and hits...
+but follow target probability seems better overall ?
+savefig('gif/'+dstr+simstr+'perf.png') # 
+
+clf(); drawraster(dspkT,dspkID); savefig('gif/'+dstr+simstr+'rast.png') # 
+xlim((790e3,800e3)); savefig('gif/'+dstr+simstr+'rastB.png') # 
+
+are the EMUP,EMDOWN rates getting too high?
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN']); savefig('gif/'+dstr+simstr+'Vm.png')
+
+#
+clf(); dobjpos = loadObjPos() ## hmm, did not save objpos?? got error ... 
+##xlabel('Racket Y position'); hist(dobjpos['racket'][:,1])
+##savefig('gif/'+dstr+simstr+'poshist.png')
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=True)
+xlabel('Time (ms)'); tl(); savefig('gif/'+dstr+simstr+'all_avg_weight.png')
+very big spread in weights - suppose that's good, if it allows selectivity ... 
+
+#
+actlearn0 = pd.DataFrame(np.loadtxt('data/20jun17_E0_targetted_falcor_ActionsRewards.txt'),columns=['time','action','reward','proposed','hit'])
+actlearn1 = pd.DataFrame(np.loadtxt('data/20jun18_E1_targetted_falcor_ActionsRewards.txt'),columns=['time','action','reward','proposed','hit'])
+actlearn1.time += 800e3
+actlearn2 = pd.DataFrame(np.loadtxt('data/20jun19_E2_targetted_falcor_ActionsRewards.txt'),columns=['time','action','reward','proposed','hit'])
+actlearn2.time += 1600e3
+pda = actlearn0; pda = pda.append(actlearn1); pda = pda.append(actlearn2)
+
+#
+plotFollowBall(pda,ax=subplot(1,3,1),cumulative=True,color='r'); ylim((0,.6))
+plotHitMiss(pda,ax=subplot(1,3,2)); 
+plotRewards(pda,ax=subplot(1,3,3)); 
+
+score, hit, miss: (43, 120, 655)
+
+savefig('gif/'+dstr+simstr+'perf_step0_step1_step2.png') # 
+
+seems to have improved further? at least in target following ... 
+
+pdfs = pdf[pdf.time==np.amax(pdf.time)]; D = pdf2weightsdict(pdfs); pickle.dump(D, open('data/'+simstr+'synWeights_final.pkl','wb'))
+# data/20jun19_E2_targetted_falcor_synWeights_final.pkl
+
+continue as ... 20jun20_E3_targetted_falcor_
+
+continue it for 1600 s ... 
+
+meanwhile, animate the activity . . . 
+
+fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4',showflow=False)
+
+./myrun 16 sn.json
+
+started ~00:41 ...
 
