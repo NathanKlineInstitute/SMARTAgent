@@ -2,12 +2,12 @@ import random
 from matplotlib import pyplot as plt
 import numpy as np
 import gym
-
+#from pylab import *
 nbsteps = 20000
 
 courtXRng = (20, 140)
 courtYRng = (34, 194)
-racketXRng = (141, 144)
+racketXRng = (141,144) # (140, 143) #(141, 144) <<-- is that off by 1? does it matter?
 
 xpos_Ball = -1 #previous location
 ypos_Ball = -1
@@ -62,9 +62,12 @@ observation, reward, done, info = env.step(1)
 xpos_Ball2, ypos_Ball2 = findobj (observation, courtXRng, courtYRng)
 xpos_Racket2, ypos_Racket2 = findobj (observation, racketXRng, courtYRng)
 predY = predictBallRacketYIntercept(xpos_Ball,ypos_Ball,xpos_Ball2,ypos_Ball2)
+
+#ion()
+
 for _ in range(nbsteps):
   if predY==-1:
-    caction = random.randint(3,4)
+    caction = np.random.randint(3,4)
   else:
     targetY = ypos_Racket2 - predY
     if targetY>8:
@@ -80,5 +83,6 @@ for _ in range(nbsteps):
   xpos_Ball2, ypos_Ball2 = findobj (observation, courtXRng, courtYRng)
   xpos_Racket2, ypos_Racket2 = findobj (observation, racketXRng, courtYRng)
   predY = predictBallRacketYIntercept(xpos_Ball,ypos_Ball,xpos_Ball2,ypos_Ball2)
+  #imshow(observation,origin='upper'); plot([xpos_Racket2+courtXRng[0]],[predY+courtYRng[0]],'ro')
   if done==1:
     env.reset()

@@ -8626,3 +8626,298 @@ fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4',showflow=False)
 
 started ~16:55 ... 
 
+*20jun19
+** check output from next step of targetted RL sim (20jun18_E1_targetted_falcor_)
+
+python -i simdat.py backupcfg/20jun18_E1_targetted_falcor_sim.json
+
+#
+plotFollowBall(actreward,ax=subplot(1,3,1),cumulative=True,color='r'); ylim((0,.6))
+plotHitMiss(actreward,ax=subplot(1,3,2)); 
+plotRewards(actreward,ax=subplot(1,3,3)); 
+
+score, hit, miss: (17, 48, 209)
+
+so that improved from first step of the sim: score,hit,miss: (13, 36, 217)
+
+improved a lot for hits ...
+
+savefig('gif/'+dstr+simstr+'perf.png') # 
+
+clf(); drawraster(dspkT,dspkID); savefig('gif/'+dstr+simstr+'rast.png') # 
+xlim((790e3,800e3)); savefig('gif/'+dstr+simstr+'rastB.png') # 
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN']); savefig('gif/'+dstr+simstr+'Vm.png')
+
+#
+clf(); dobjpos = loadObjPos()
+xlabel('Racket Y position'); hist(dobjpos['racket'][:,1])
+savefig('gif/'+dstr+simstr+'poshist.png')
+still biased ... but overall seems to be improving in performance
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=True)
+xlabel('Time (ms)'); tl(); savefig('gif/'+dstr+simstr+'all_avg_weight.png')
+
+lot of overlap ... 
+
+pdfs = pdf[pdf.time==np.amax(pdf.time)]; D = pdf2weightsdict(pdfs); pickle.dump(D, open('data/'+simstr+'synWeights_final.pkl','wb'))
+ data/20jun18_E1_targetted_falcor_synWeights_final.pkl
+
+and should concat the performance to see how cumulative changes ... 
+
+#
+actlearn0 = pd.DataFrame(np.loadtxt('data/20jun17_E0_targetted_falcor_ActionsRewards.txt'),columns=['time','action','reward','proposed','hit'])
+actlearn1 = pd.DataFrame(np.loadtxt('data/20jun18_E1_targetted_falcor_ActionsRewards.txt'),columns=['time','action','reward','proposed','hit'])
+actlearn1.time += 800e3
+pda = actlearn0; pda = pda.append(actlearn1)
+
+#
+plotFollowBall(pda,ax=subplot(1,3,1),cumulative=True,color='r'); ylim((0,.6))
+plotHitMiss(pda,ax=subplot(1,3,2)); 
+plotRewards(pda,ax=subplot(1,3,3)); 
+
+score, hit, miss: (30, 84, 426)
+
+savefig('gif/'+dstr+simstr+'perf_step0_step1.png') # 
+
+yeah, looks like it's continuing to improve ... the restart may have caused slight downturn ... 
+
+fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4',showflow=False)
+
+continue as ... 20jun19_E2_targetted_falcor_
+
+    "simtype": {"ResumeSim":1,"ResumeSimFromFile":"data/20jun18_E1_targetted_falcor_synWeights_final.pkl"}, 
+
+started @ ~13:00 ... 
+
+** check control (20jun18_E0_control_falcor_) -->> did not move for most of simulation, even w/o learning (some initial bias there, why?)
+
+python -i simdat.py backupcfg/20jun18_E0_control_falcor_sim.json
+
+#
+plotFollowBall(actreward,ax=subplot(1,3,1),cumulative=True,color='r'); ylim((0,.6))
+plotHitMiss(actreward,ax=subplot(1,3,2)); 
+plotRewards(actreward,ax=subplot(1,3,3)); ylim((-0.1,1))
+
+score, hit, miss: (0, 0, 274)
+
+savefig('gif/'+dstr+simstr+'perf.png') # 
+
+0 score, 0 hit, ...
+
+clf(); drawraster(dspkT,dspkID); savefig('gif/'+dstr+simstr+'rast.png') # 
+xlim((790e3,800e3)); savefig('gif/'+dstr+simstr+'rastB.png') # 
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN']); savefig('gif/'+dstr+simstr+'Vm.png')
+
+#
+clf(); dobjpos = loadObjPos()
+xlabel('Racket Y position'); hist(dobjpos['racket'][:,1])
+savefig('gif/'+dstr+simstr+'poshist.png')
+
+must be some bias in the wiring leading to EMUP population dominating, even without learning. the learning
+model also has to overcome that bias ...
+
+** other control via randomized learned weights (20jun19_E2_targetted_control_falcor_)
+
+take learned weights, shuffle their final values, then use them to resume a control sim ... will it work
+if control sim has no RL weights? could just set rl learning weight to 0 ... so weights stay fixed (check that it works)
+
+python -i simdat.py backupcfg/20jun18_E1_targetted_falcor_sim.json
+
+https://stackoverflow.com/questions/15772009/shuffling-permutating-a-dataframe-in-pandas
+
+pdfs = pdf[pdf.time==np.amax(pdf.time)]; 
+
+np.mean(pdfs.weight)
+np.mean(pdfs.weight) # 1.828570798265547e-05
+
+pdfs.index[0] # 159
+pdfs.loc[159]
+time      799999.999886
+preid        512.000000
+postid      4224.000000
+weight         0.000012
+
+pdfshuf = pdfs.reindex(np.random.permutation(pdfs.index))
+
+pdfshuf.index[0] # 11384479
+pdfshuf.loc[11384479]
+time      799999.999886
+preid       2018.000000
+postid      4201.000000
+weight         0.000022
+
+D = pdf2weightsdict(pdfshuf); 
+pickle.dump(D, open('data/'+simstr+'synWeights_final_shuffled.pkl','wb'))
+
+data/20jun18_E1_targetted_falcor_synWeights_final_shuffled.pkl
+
+ok, use that weight in a control sim ... have RLon but set the weight increment to 0
+
+    "simtype": {"ResumeSim":1,"ResumeSimFromFile":"data/20jun18_E1_targetted_falcor_synWeights_final_shuffled.pkl"}, 
+	  {"wbase":0.0000001,"wmax":0.00048,"RLon":1,"RLlenhebb":200,"RLlenanti":50,"useRLexp":1,"RLhebbwt":0.0,"RLantiwt":-0.0,"hebbwt":0,"antiwt":0,"tauhebb":10,"RLwindhebb":50,"softthresh":0,"verbose":0},
+
+20jun19_E2_targetted_control_falcor_
+
+first try 10 s and make sure weights stay same as initially loaded
+
+./myrun 16 sn.json
+
+python -i simdat.py backupcfg/20jun19_E2_targetted_control_falcor_sim.json
+
+popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=True)
+xlabel('Time (ms)'); tl(); savefig('gif/'+dstr+simstr+'all_avg_weight_test.png')
+ok, weights are flat ... but running this simulation will likely show bias too ... 
+
+can check for 100 s ... 
+
+./myrun 16 sn.json
+
+python -i simdat.py backupcfg/20jun19_E2_targetted_control_falcor_sim.json
+
+#
+plotFollowBall(actreward,ax=subplot(1,3,1),cumulative=True,color='r'); ylim((0,.6))
+plotHitMiss(actreward,ax=subplot(1,3,2)); 
+plotRewards(actreward,ax=subplot(1,3,3)); ylim((-0.1,1))
+
+
+** are there initial biases in the connectivity?
+
+and that's why control model has paddle stuck at top?
+
+had thought biases would not occur since using convergence to wire the network
+
+** other way to vary EM activity
+
+could have 100% connectivity to EM but randomize the starting weights to each EM neuron ... 
+that way would make sure each neuron receives all the information ... 
+but would allow each neuron to have a different representation and hopefully more robust response
+
+http://www.netpyne.org/reference.html#function-string
+
+weight = '%f * normal(%f,%f)' % (mean,stdev)
+
+try discunif instead ...
+
+for example:
+weight = 'discunif(%f,%f)' % (mean*.9,mean*1.1)
+
+default weightvar will be 0 ... that way can have it shut off by default ... 
+
+have this now in sim.py :
+# weight variance -- check if need to vary the initial weights (note, they're over-written if resumeSim==1)
+if 'weightVar' in dconf['sim']:
+  cfg.weightVar = dconf['sim']['weightVar']
+else:
+  cfg.weightVar = 0.
+
+def getInitWeight (weight)
+  """get initial weight for a connection
+     checks if weightVar is non-zero, if so will use a uniform distribution 
+     with range on interval: (1-var)*weight, (1+var)*weight
+  """
+  if cfg.weightVar == 0.0:
+    return weight
+  else:
+    return 'discunif(%f,%f)' % (weight*(1.0-cfg.weightVar),weight*(1.0+cfg.weightVar))
+
+and everywhere weight is specified for a connection using
+getInitWeight(weight)
+where weight is the original weight used 
+
+note that cfg.seeds['conn'] is used seed for random number
+generator, and that handles RNG initialization, etc. so do
+not have to do anything additional to get same results each time
+
+*20jun20
+** try sim with weight var
+
+fixed weightvar to use uniform - had discunif before but that's only for discrete numbers!
+
+will have weightVar of 0.1, run for 800 s, with 100% connectivity onto EM (EEMProb of 1.0, and EEMRecProb of 0.0)
+
+the weight variance will apply to EMUP, EMDOWN on the inputs they receive...so they all get full sensory
+info but there will be variability in how it's weighted ... 
+
+"name":"20jun20_F0_targetted_tank_"
+
+    "rewardcodes": {"scorePoint": 1.0, "losePoint": -0.1, "followTarget": 0.1, "avoidTarget": -0.01, "hitBall": 0.5},    
+    "net":{"scale":1,"ER":400,"IR":100,"EV1":400,"EV1DE":400,"EV1DNE":400,"EV1DN":400,"EV1DNW":400,"EV1DW":400,"EV1DSW":400,"EV1DS":400,"EV1DSE":400,"IV1":100,"EV4":0,"IV4":0,"EMT":0,"IMT":0,"EMDOWN":16,"EMUP":16,"IM":8,"AngRFSigma":22.5,"DirMinRate":0.0,"DirMaxRate":50.0,"EEMWghtAM":0.000012,"EEMWghtNM":0.0000012,"EEPreMWghtAM":0.00008,"EEPreMWghtNM":0.0000025,"EEMWghtThreshMin":0.00000625,"EEMWghtThreshMax":0.00032,"EEMProb":1.0,"EEMRecProb":0.0,"EEPreMProb":0.0,"EEMPopNorm":0,"EEMRecProbCross":0,"EEMFeedbackProb":0.0,"EEMFeedbackWghtAM":0.0000125,"EEMFeedbackWghtNM":0.00000125,"VisualFeedback":0,"weightVar":0.1},
+    "RL":{"AMPA":
+	  {"wbase":0.0000001,"wmax":0.00048,"RLon":1,"RLlenhebb":200,"RLlenanti":50,"useRLexp":1,"RLhebbwt":0.0000002,"RLantiwt":-0.0,"hebbwt":0,"antiwt":0,"tauhebb":10,"RLwindhebb":50,"softthresh":0,"verbose":0},
+
+otherwise, same params as recent sims on falcor ... 
+
+20jun20_F0_targetted_tank_
+
+started ~00:15 ...
+
+** check output from 20jun19_E2_targetted_falcor_
+
+(took ~11 hours to run, while falcor was already pretty heavily in use)
+
+python -i simdat.py backupcfg/20jun19_E2_targetted_falcor_sim.json
+
+from previous step sim: ## score, hit, miss: (17, 48, 209)
+
+#
+plotFollowBall(actreward,ax=subplot(1,3,1),cumulative=True,color='r'); ylim((0,.6))
+plotHitMiss(actreward,ax=subplot(1,3,2)); 
+plotRewards(actreward,ax=subplot(1,3,3)); 
+
+from this sim score, hit, miss: (13, 36, 229)
+hmm, fewer scores and hits...
+but follow target probability seems better overall ?
+savefig('gif/'+dstr+simstr+'perf.png') # 
+
+clf(); drawraster(dspkT,dspkID); savefig('gif/'+dstr+simstr+'rast.png') # 
+xlim((790e3,800e3)); savefig('gif/'+dstr+simstr+'rastB.png') # 
+
+are the EMUP,EMDOWN rates getting too high?
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN']); savefig('gif/'+dstr+simstr+'Vm.png')
+
+#
+clf(); dobjpos = loadObjPos() ## hmm, did not save objpos?? got error ... 
+##xlabel('Racket Y position'); hist(dobjpos['racket'][:,1])
+##savefig('gif/'+dstr+simstr+'poshist.png')
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=True)
+xlabel('Time (ms)'); tl(); savefig('gif/'+dstr+simstr+'all_avg_weight.png')
+very big spread in weights - suppose that's good, if it allows selectivity ... 
+
+#
+actlearn0 = pd.DataFrame(np.loadtxt('data/20jun17_E0_targetted_falcor_ActionsRewards.txt'),columns=['time','action','reward','proposed','hit'])
+actlearn1 = pd.DataFrame(np.loadtxt('data/20jun18_E1_targetted_falcor_ActionsRewards.txt'),columns=['time','action','reward','proposed','hit'])
+actlearn1.time += 800e3
+actlearn2 = pd.DataFrame(np.loadtxt('data/20jun19_E2_targetted_falcor_ActionsRewards.txt'),columns=['time','action','reward','proposed','hit'])
+actlearn2.time += 1600e3
+pda = actlearn0; pda = pda.append(actlearn1); pda = pda.append(actlearn2)
+
+#
+plotFollowBall(pda,ax=subplot(1,3,1),cumulative=True,color='r'); ylim((0,.6))
+plotHitMiss(pda,ax=subplot(1,3,2)); 
+plotRewards(pda,ax=subplot(1,3,3)); 
+
+score, hit, miss: (43, 120, 655)
+
+savefig('gif/'+dstr+simstr+'perf_step0_step1_step2.png') # 
+
+seems to have improved further? at least in target following ... 
+
+pdfs = pdf[pdf.time==np.amax(pdf.time)]; D = pdf2weightsdict(pdfs); pickle.dump(D, open('data/'+simstr+'synWeights_final.pkl','wb'))
+# data/20jun19_E2_targetted_falcor_synWeights_final.pkl
+
+continue as ... 20jun20_E3_targetted_falcor_
+
+continue it for 1600 s ... 
+
+meanwhile, animate the activity . . . 
+
+fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4',showflow=False)
+
+./myrun 16 sn.json
+
+started ~00:41 ...
+

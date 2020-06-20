@@ -218,6 +218,22 @@ cfg.saveCellConns = bool(dconf['sim']['saveCellConns']) # if False removes all d
 #cfg.gatherOnlySimData = True # do not set to True, when True gathers from nodes only the output simulation data (not the network instance)
 ###
 
+# weight variance -- check if need to vary the initial weights (note, they're over-written if resumeSim==1)
+if 'weightVar' in dconf['net']:
+  cfg.weightVar = dconf['net']['weightVar']
+else:
+  cfg.weightVar = 0.
+
+def getInitWeight (weight):
+  """get initial weight for a connection
+     checks if weightVar is non-zero, if so will use a uniform distribution 
+     with range on interval: (1-var)*weight, (1+var)*weight
+  """
+  if cfg.weightVar == 0.0:
+    return weight
+  else:
+    print('uniform(%g,%g)' % (weight*(1.0-cfg.weightVar),weight*(1.0+cfg.weightVar)))
+    return 'uniform(%g,%g)' % (weight*(1.0-cfg.weightVar),weight*(1.0+cfg.weightVar))
 
 #Local excitation
 #E to E recurrent connectivity in premotor areas
@@ -263,7 +279,7 @@ for prety in EDirPops:
       'preConds': {'pop': prety},
       'postConds': {'pop': poty},
       'connList': blistEV1DtoIV1D,
-      'weight': 0.02 * cfg.EIGain,
+      'weight': getInitWeight(0.02 * cfg.EIGain),
       'delay': 2,
       'synMech': 'AMPA', 'sec':'soma', 'loc':0.5}
 """
@@ -285,7 +301,6 @@ netParams.connParams['EMT->IMT'] = {
 netParams.connParams['EMDOWN->IM'] = {
         'preConds': {'pop': 'EMDOWN'},
         'postConds': {'pop': 'IM'},
-        #'probability': 0.125/2.,
         'convergence': prob2conv(0.125/2, dnumc['EMDOWN']),
         'weight': 0.02 * cfg.EIGain,
         'delay': 2,
@@ -293,7 +308,6 @@ netParams.connParams['EMDOWN->IM'] = {
 netParams.connParams['EMUP->IM'] = {
         'preConds': {'pop': 'EMUP'},
         'postConds': {'pop': 'IM'},
-        #'probability': 0.125/2.,
         'convergence': prob2conv(0.125/2, dnumc['EMUP']),
         'weight': 0.02 * cfg.EIGain,
         'delay': 2,
@@ -484,7 +498,7 @@ if dconf['architecturePreMtoM']['useTopological']:
             'preConds': {'pop': prety},
             'postConds': {'pop': poty},
             'connList': blistEV4toEM, 
-            'weight': weight,
+            'weight': getInitWeight(weight),
             'delay': 2,
             'synMech': synmech,
             'sec':'dend', 'loc':0.5
@@ -494,7 +508,7 @@ if dconf['architecturePreMtoM']['useTopological']:
             'preConds': {'pop': prety},
             'postConds': {'pop': poty},
             'connList': blistEMTtoEM, 
-            'weight': weight,
+            'weight': getInitWeight(weight),
             'delay': 2,
             'synMech': synmech,
             'sec':'dend', 'loc':0.5
@@ -504,7 +518,7 @@ if dconf['architecturePreMtoM']['useTopological']:
             'preConds': {'pop': prety},
             'postConds': {'pop': poty},
             'connList': blistEV1toEM, 
-            'weight': weight,
+            'weight': getInitWeight(weight),
             'delay': 2,
             'synMech': synmech,
             'sec':'dend', 'loc':0.5
@@ -523,7 +537,7 @@ elif dconf['architecturePreMtoM']['useProbabilistic']:
           'preConds': {'pop': prety},
           'postConds': {'pop': poty},
           'convergence': prob2conv(EEMProb, dnumc[prety]),
-          'weight': weight,
+          'weight': getInitWeight(weight),
           'delay': 2,
           'synMech': synmech,
           'sec':'dend', 'loc':0.5
@@ -544,7 +558,7 @@ if EEMRecProb > 0.0:
             'preConds': {'pop': prety},
             'postConds': {'pop': poty},
             'convergence': prob2conv(EEMRecProb, dnumc[prety]),
-            'weight': weight,
+            'weight': getInitWeight(weight),
             'delay': 2,
             'synMech': synmech,
             'sec':'dend', 'loc':0.5
