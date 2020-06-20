@@ -8830,3 +8830,7 @@ note that cfg.seeds['conn'] is used seed for random number
 generator, and that handles RNG initialization, etc. so do
 not have to do anything additional to get same results each time
 
+** try sim with weight var
+
+20jun19_F0_targetted_zn_
+
