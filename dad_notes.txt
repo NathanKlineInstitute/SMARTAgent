@@ -3,10 +3,36 @@
 ########################################
 To-Do:
 -Start creating own function
+	*DONE
+-Test functions
 	
-def plotallrecurrentmaps (pdf, t, postid, dnumc, dstartidx, dendidx, lnety = ['EV1DNW', 'EV1DN', 'EV1DNE', 'EV1DW', 'EV1','EV1DE','EV1DSW', 'EV1DS', 'EV1DSE'], asweight=False, cmap='jet',dmap=None):
+To update git repository, do "git pull"
+
+######Testing Function######
+drfmap = plotallrecurrentmaps(pdf, pdf.time[0], #Just realized postid needs to be automted
+
+##Input to old function
+drfmap = plotallinputmaps(pdf, pdf.time[0], dstartidx['EMUP'] + 0, 'EMUP', dnumc, dstartidx, dendidx, asweight=True)
+
+
+####Inputs####
+Function Inputs - Calling Input
+pdf - pdf
+t - pdf.time[0]
+postid - dstartidx['EMUP'] + 0
+poty - 'EMUP'
+dnumc -  dnumc
+dstartidx - dstartidx
+dendidx - dendidx
+lprety - lprety
+
+def plotallinputmaps (pdf, t, postid, poty, dnumc, dstartidx, dendidx, lprety=['EV1DNW', 'EV1DN', 'EV1DNE', 'EV1DW', 'EV1','EV1DE','EV1DSW', 'EV1DS', 'EV1DSE'], asweight=False, cmap='jet',dmap=None):
+
+######Creating Function######
+	
+def plotallrecurrentmaps (pdf, t, dnumc, dstartidx, dendidx, lnety = ['EV1DNW', 'EV1DN', 'EV1DNE', 'EV1DW', 'EV1','EV1DE','EV1DSW', 'EV1DS', 'EV1DSE'], asweight=False, cmap='jet',dmap=None):
   if dmap is None:
-    drfmap = getallrecurrentmaps(pdf, t, postid, dnumc, dstartidx, dendidx, lnety, asweight=asweight)
+    drfmap = getallrecurrentmaps(pdf, t, dnumc, dstartidx, dendidx, lnety, asweight=asweight)
   else:
     drfmap = dmap
   vmin,vmax = 1e9,-1e9
@@ -14,6 +40,7 @@ def plotallrecurrentmaps (pdf, t, postid, dnumc, dstartidx, dendidx, lnety = ['E
     vmin = min(vmin, np.amin(drfmap[nety]))
     vmax = max(vmax, np.amax(drfmap[nety]))    
   for tdx,nety in enumerate(lnety):
+    postid = dstartidx[nety] + 0
     subplot(3,3,tdx+1)
     imshow(drfmap[nety],cmap=cmap,origin='upper',vmin=vmin,vmax=vmax);
     title(nety+'->'+nety+str(postid));
@@ -22,15 +49,17 @@ def plotallrecurrentmaps (pdf, t, postid, dnumc, dstartidx, dendidx, lnety = ['E
 
 ####Changes####
 #-Removed poty from input variables, prety is nety (and lprety is lnety)
+#-Automated postid for each nety
 
-def getallrecurrentmaps (pdf, t, postid, dnumc, dstartidx, dendidx, lnety = ['EV1DNW', 'EV1DN', 'EV1DNE', 'EV1DW', 'EV1','EV1DE','EV1DSW', 'EV1DS', 'EV1DSE'], asweight=False):
+def getallrecurrentmaps (pdf, t, dnumc, dstartidx, dendidx, lnety = ['EV1DNW', 'EV1DN', 'EV1DNE', 'EV1DW', 'EV1','EV1DE','EV1DSW', 'EV1DS', 'EV1DSE'], asweight=False):
   # gets all recurrent maps in lnety
-  return {nety:getrecurrentmap(pdf, t, nety, postid, dnumc, dstartidx, dendidx, asweight=asweight) for nety in lnety}
+  return {nety:getrecurrentmap(pdf, t, nety, dnumc, dstartidx, dendidx, asweight=asweight) for nety in lnety}
 
 ####Changes####
 #-Removed poty from getrecurrentmap input variables, prety is nety (and lprety is lnety)
 
-def getrecurrentmap(pdf, t, nety, postid, dnumc, dstartidx, dendidx, asweight=False):
+def getrecurrentmap(pdf, t, nety, dnumc, dstartidx, dendidx, asweight=False):
+  postid = dstartidx[nety] + 0
   nrow = ncol = int(np.sqrt(dnumc[nety])) 
   rfmap = np.zeros((nrow,ncol))
   pdfs = pdf[(pdf.postid==postid) & (pdf.preid>dstartidx[nety]) & (pdf.preid<=dendidx[nety]) & (pdf.time==t)]
@@ -59,7 +88,7 @@ def getrecurrentmap(pdf, t, nety, postid, dnumc, dstartidx, dendidx, asweight=Fa
 
 ####Changes made####
 #-All reference to prety, poty are now merged to nety (neuron type)
-
+#-Defines postid in function for each nety
 
 ########################################
 06-19-20
@@ -262,7 +291,6 @@ To-Do:
 	*DONE
 
 #####Code for plotallinputmaps#####
-
 
 def plotallinputmaps (pdf, t, postid, poty, dnumc, dstartidx, dendidx, lprety=['EV1DNW', 'EV1DN', 'EV1DNE', 'EV1DW', 'EV1','EV1DE','EV1DSW', 'EV1DS', 'EV1DSE'], asweight=False, cmap='jet',dmap=None):
   if dmap is None:
