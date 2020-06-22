@@ -1,12 +1,231 @@
 ########################################
+06-22-20
+########################################
+To-Do:
+-Start creating own function
+	
+def plotallrecurrentmaps (pdf, t, postid, dnumc, dstartidx, dendidx, lnety = ['EV1DNW', 'EV1DN', 'EV1DNE', 'EV1DW', 'EV1','EV1DE','EV1DSW', 'EV1DS', 'EV1DSE'], asweight=False, cmap='jet',dmap=None):
+  if dmap is None:
+    drfmap = getallrecurrentmaps(pdf, t, postid, dnumc, dstartidx, dendidx, lnety, asweight=asweight)
+  else:
+    drfmap = dmap
+  vmin,vmax = 1e9,-1e9
+  for nety in lnety:
+    vmin = min(vmin, np.amin(drfmap[nety]))
+    vmax = max(vmax, np.amax(drfmap[nety]))    
+  for tdx,nety in enumerate(lnety):
+    subplot(3,3,tdx+1)
+    imshow(drfmap[nety],cmap=cmap,origin='upper',vmin=vmin,vmax=vmax);
+    title(nety+'->'+nety+str(postid));
+    colorbar()
+  return drfmap
+
+####Changes####
+#-Removed poty from input variables, prety is nety (and lprety is lnety)
+
+def getallrecurrentmaps (pdf, t, postid, dnumc, dstartidx, dendidx, lnety = ['EV1DNW', 'EV1DN', 'EV1DNE', 'EV1DW', 'EV1','EV1DE','EV1DSW', 'EV1DS', 'EV1DSE'], asweight=False):
+  # gets all recurrent maps in lnety
+  return {nety:getrecurrentmap(pdf, t, nety, postid, dnumc, dstartidx, dendidx, asweight=asweight) for nety in lnety}
+
+####Changes####
+#-Removed poty from getrecurrentmap input variables, prety is nety (and lprety is lnety)
+
+def getrecurrentmap(pdf, t, nety, postid, dnumc, dstartidx, dendidx, asweight=False):
+  nrow = ncol = int(np.sqrt(dnumc[nety])) 
+  rfmap = np.zeros((nrow,ncol))
+  pdfs = pdf[(pdf.postid==postid) & (pdf.preid>dstartidx[nety]) & (pdf.preid<=dendidx[nety]) & (pdf.time==t)]
+  if len(pdfs) < 1: return rfmap
+  if not asweight:
+    for idx in pdfs.index:
+      preid = int(pdfs.at[idx,'preid'])
+      x,y = gid2pos(dnumc[nety], dstartidx[nety], preid)
+      rfmap[y,x] += 1
+  else:
+    rfcnt = np.zeros((nrow,ncol))    
+    for idx in pdfs.index:
+      preid = int(pdfs.at[idx,'preid'])
+      x,y = gid2pos(dnumc[nety], dstartidx[nety], preid)
+      rfcnt[y,x] += 1
+      rfmap[y,x] += pdfs.at[idx,'weight']
+    for y in range(nrow):
+      for x in range(ncol):
+        if rfcnt[y,x]>0: rfmap[y,x]/=rfcnt[y,x]		#rfmap integrates weight, take the average
+  return rfmap
+ 
+####Questions####
+#-preid is the numbers within a range, should I worry about postid == preid
+#-Theres no check for if postid is in range of dstartidx[nety] and dendidx[nety]
+#-Instead of postid being input like postid - dstartidx['EMUP'] + 0, could automate this to just read in poty, but would remove user accessability and options
+
+####Changes made####
+#-All reference to prety, poty are now merged to nety (neuron type)
+
+
+########################################
+06-19-20
+########################################
+To-Do:
+-Understand all functions called by plotallinputmaps
+	-Can I scrap any of them?
+
+####Inputs####
+Function Inputs - Calling Input
+pdf - pdf
+t - pdf.time[0]
+postid - dstartidx['EMUP'] + 0
+poty - 'EMUP'
+dnumc -  dnumc
+dstartidx - dstartidx
+dendidx - dendidx
+lprety - lprety
+cmap - colormap for the imshow function
+
+#
+def plotallinputmaps (pdf, t, postid, poty, dnumc, dstartidx, dendidx, lprety=['EV1DNW', 'EV1DN', 'EV1DNE', 'EV1DW', 'EV1','EV1DE','EV1DSW', 'EV1DS', 'EV1DSE'], asweight=False, cmap='jet',dmap=None):
+  if dmap is None:
+    drfmap = getallinputmaps(pdf, t, postid, poty, dnumc, dstartidx, dendidx, lprety, asweight=asweight)
+  else:
+    drfmap = dmap
+  vmin,vmax = 1e9,-1e9
+  for prety in lprety:
+    vmin = min(vmin, np.amin(drfmap[prety]))
+    vmax = max(vmax, np.amax(drfmap[prety]))    
+  for tdx,prety in enumerate(lprety):
+    subplot(3,3,tdx+1)
+    imshow(drfmap[prety],cmap=cmap,origin='upper',vmin=vmin,vmax=vmax);
+    title(prety+'->'+poty+str(postid));
+    colorbar()
+  return drfmap
+##Image data stored in drfmap from getallinputmaps, this is the meat of it.
+##lprety these types coded since they have the sensory info, want to see how this info conveyed to the motor neurons
+##dmap is get all input maps
+##asweight draws the color picture draws the count or weight
+
+
+#
+def getallinputmaps (pdf, t, postid, poty, dnumc, dstartidx, dendidx, lprety = ['EV1DNW', 'EV1DN', 'EV1DNE', 'EV1DW', 'EV1','EV1DE','EV1DSW', 'EV1DS', 'EV1DSE'], asweight=False):
+  # gets all input maps onto postid
+  return {prety:getinputmap(pdf, t, prety, postid, poty, dnumc, dstartidx, dendidx, asweight=asweight) for prety in lprety}
+##Returns to a dictionary, key is prety in lprety and value is output from getinputmap
+##This is basically a compiler for getinputmaps
+
+
+
+####Inputs####
+Function Inputs - Calling Input
+pdf - pdf
+t - pdf.time[0]
+prety - from lprety
+postid - dstartidx['EMUP'] + 0
+poty - 'EMUP'
+dnumc -  dnumc
+dstartidx - dstartidx
+dendidx - dendidx
+
+
+#
+def getinputmap (pdf, t, prety, postid, poty, dnumc, dstartidx, dendidx, asweight=False):
+  nrow = ncol = int(np.sqrt(dnumc[poty]))
+  rfmap = np.zeros((nrow,ncol))
+  pdfs = pdf[(pdf.postid==postid) & (pdf.preid>dstartidx[prety]) & (pdf.preid<=dendidx[prety]) & (pdf.time==t)]
+  if len(pdfs) < 1: return rfmap
+  if not asweight:
+    for idx in pdfs.index:
+      preid = int(pdfs.at[idx,'preid'])
+      x,y = gid2pos(dnumc[prety], dstartidx[prety], preid)
+      rfmap[y,x] += 1
+  else:
+    rfcnt = np.zeros((nrow,ncol))    
+    for idx in pdfs.index:
+      preid = int(pdfs.at[idx,'preid'])
+      x,y = gid2pos(dnumc[prety], dstartidx[prety], preid)
+      rfcnt[y,x] += 1
+      rfmap[y,x] += pdfs.at[idx,'weight']
+    for y in range(nrow):
+      for x in range(ncol):
+        if rfcnt[y,x]>0: rfmap[y,x]/=rfcnt[y,x]		#rfmap integrates weight, take the average
+  return rfmap
+
+#####Notes#####
+-dnumc is a directory
+-
+#####Variables#####
+-nrow, ncol
+	Equal value?
+-rfmap
+	Image data, 2D matrix
+-pdfs
+	Confused by this?
+	Seems to be raw data
+-asweight
+	If true, looks at weights of connections, not just count
+
+#####Sam Notes#####
+
+dnumc is a dictionary that holds the number of cells of a type
+
+nrow,ncol gets the number of rows,columns -- assumes they're arranged in a square
+
+rfmap is the receptive field map output
+
+pdfs is the pandas dataframe of the synaptic weights
+
+the selection gets all pretype (prety) inputs onto the postsynaptic (postid) neuron at the time t
+
+and then it puts the values into rfmap, either as a weight value (if asweight==True) or as a count, based on the x,y position of the neurons
+
+one problem is that it's difficult to decipher the position of the neurons from the code (since it's an implicit mapping)
+
+sorry for lack of commenting in the code
+
+dstartidx, dendidx are the start and end indices of a neuron
+
+by type
+
+(population)
+
+this line is a selection on a dataframe (basically a table of values): pdfs = pdf[(pdf.postid==postid) & (pdf.preid>dstartidx[prety]) & (pdf.preid<=dendidx[prety]) & (pdf.time==t)]
+
+pdf.columns
+
+that will give you the column names
+
+##lprety these types coded since they have the sensory info, want to see how this info conveyed to the motor neurons
+##dmap is get all input maps
+##asweight draws the color picture draws the count or weight
+
+
+
+########################################
 06-18-20
 ########################################
 To-Do:
 -Understand inputs for recurrent connectivity maps
+	*DONE
 	-Which groups are recurrent neurons?
+		*See notes below (internal pop connections)
+-Talk on momentum & number actions to adjust the control output
+	*DONE
+	*Haroon said finish plotallinputmaps first
 
+####Notes from talk with Haroon####
+#Goal
+Take one neuron id and plot all recurrent inputs from that neuron id (like how plotallinputmaps did with EMUP)
 
+#Connectivity patterns
 
+Feed forward: Neurons connections to a higher population #higher/lower in the flow of info
+Feed backward: Neurons connections to a lower population
+recurrent connectivity: neurons in a population making connections to that same population
+
+#Flow of information
+R > V1 > M
+
+#Specific Pops
+Each pop has neurons for each location in field of view
+Below pops are direction selection (V1?), when an object moves in particular direction
+'EV1DNW', 'EV1DN', 'EV1DNE', 'EV1DW', 'EV1','EV1DE','EV1DSW', 'EV1DS', 'EV1DSE'
+Pops EMUP and EMDOWN are for moving paddle in a 1D direction.
 ########################################
 06-17-20
 ########################################
@@ -71,6 +290,7 @@ dnumc -  dnumc
 dstartidx - dstartidx
 dendidx - dendidx
 lprety - lprety
+cmap - colormap for the imshow function
 
 
 ####Notes####
@@ -239,7 +459,7 @@ register(
 https://github.com/openai/gym/blob/7006c7a182a991b9409c206c56abc121eaffafb5/gym/envs/atari/atari_env.py
 
 
-import gym; env = gym.make('PongNoFrameskip-v4’); env.reset()
+import gym; env = gym.make('PongNoFrameskip-v4'); env.reset()
 ##CHANGE caction to number 1, 3, 4 to move paddle, and repeat this command
 observation, reward, done, info = env.step(caction); env.render()
 
