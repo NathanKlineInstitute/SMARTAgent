@@ -9001,3 +9001,38 @@ name:
 
 will just run this for 100 s ... no point wasting 800 s of sim time if this is a real control ... 
 
+*20jun21
+** check control 20jun20_20jun19_E2_targetted_control_falcor_
+
+python -i simdat.py backupcfg/20jun20_20jun19_E2_targetted_control_falcor_sim.json
+
+#
+plotFollowBall(actreward,ax=subplot(1,3,1),cumulative=True,color='r'); ylim((0,.6))
+plotHitMiss(actreward,ax=subplot(1,3,2)); 
+plotRewards(actreward,ax=subplot(1,3,3)); ylim((-0.1,1))
+
+score, hit, miss: (0, 0, 34)
+
+savefig('gif/'+dstr+simstr+'perf.png') # 
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=True)
+xlabel('Time (ms)'); tl(); savefig('gif/'+dstr+simstr+'all_avg_weight.png')
+
+#
+clf(); dobjpos = loadObjPos() ## hmm, did not save objpos?? got error ... 
+xlabel('Racket Y position'); hist(dobjpos['racket'][:,1])
+savefig('gif/'+dstr+simstr+'poshist.png')
+
+ok, so stuck at top whole time again ... 
+
+having difficulty getting these control simulations to do anything remotely similar to learning model ... 
+
+as control could instead just generate arbitrary/random moves ... and see what kind of performance
+that produces ...
+
+** try control with ranodom moves (20jun21_randmove_control_falcor_)
+
+to turn on random move generation just have 'randmove' = 1 set in the json file
+
+simulation itself isn't useful here - just generation of moves
+
