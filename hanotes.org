@@ -3316,3 +3316,17 @@ plt.show()
 ** fixed bugs
 -- set type of self.obs to uint8 in simulatePong.py
 -- fix the court range in simulatePong.py
+
+* 20june19
+
+** ran '20june18_C_' for 1000 sec.
+-- something seems off.
+-- learning does not improve follow the ball.
+-- hit was awarded a score 1. so its different than regular game, where hit was awarded score for being hit.
+-- looking the act video to find what went wrong.
+
+* 20june22
+
+** ran '20june22_A_' for 100 sec using reduced architecture (parameters copied from sn.json).
+
+** when using simulatedPong, use scorePoint=0.5 instead of scorePoint=1.0
