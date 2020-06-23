@@ -913,14 +913,20 @@ def trainAgent (t):
       fid4.write('\n')
       actions = []
       movefctr=1.0
+      randmove = 0
       if 'movefctr' in dconf: movefctr=dconf['movefctr']
-      for ts in range(int(dconf['actionsPerPlay'])):
-        if F_UPs[ts]>F_DOWNs[ts] * movefctr:
-          actions.append(dconf['moves']['UP'])
-        elif F_DOWNs[ts]>F_UPs[ts] * movefctr:
-          actions.append(dconf['moves']['DOWN'])
-        else:
-          actions.append(dconf['moves']['NOMOVE']) # No move        
+      if 'randmove' in dconf: randmove=dconf['randmove']
+      if randmove:
+        lmoves = list(dconf['moves'].values())
+        for ts in range(int(dconf['actionsPerPlay'])): actions.append(lmoves[np.random.randint(0,len(lmoves))])
+      else:
+        for ts in range(int(dconf['actionsPerPlay'])):
+          if F_UPs[ts]>F_DOWNs[ts] * movefctr:
+            actions.append(dconf['moves']['UP'])
+          elif F_DOWNs[ts]>F_UPs[ts] * movefctr:
+            actions.append(dconf['moves']['DOWN'])
+          else:
+            actions.append(dconf['moves']['NOMOVE']) # No move        
   if sim.rank == 0:
     rewards, epCount, proposed_actions, total_hits = sim.AIGame.playGame(actions, epCount)
     print('t=',round(t,2),'proposed actions:', proposed_actions,', model actions:', actions)
