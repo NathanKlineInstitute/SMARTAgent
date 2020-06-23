@@ -9212,3 +9212,4 @@ is it depolarization blockade of the EMDOWN neurons??
 is the firing threshold of 0 for pyr cells problematic? should it be even lower?
 
 fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4',showflow=False) # 
+
