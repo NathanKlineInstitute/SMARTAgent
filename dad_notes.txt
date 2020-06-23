@@ -1,4 +1,556 @@
 ########################################
+06-23-20
+########################################
+To-Do:
+-Talk to Haroon about my next project
+	*DONE
+	-If momentum problem solved, what should I do next?
+		*Work on momentum
+-Commit plotallrecurrentmaps today!
+-Work on aigame.py (see plan below)
+-Understand Question 3/Motion of paddle
+	- How is value of decisions changing with dynamics?
+
+Questions:
+1. What's output encoding?
+	*Yes, specifically how output command are encoded in firing rates of different pops of neuronsw
+2. Source of bias? - Is this referring to the paddle bias of up over down?
+	*Refers to all bias: momentum, paddle bias, etc.
+3. Does "hold" pop equate to EMDown and EMUp, where its action is 0 (no motion)?
+	3a. Can't the network already do 0 as an action? 
+	*See below
+
+##Notes from Haroon##
+Still work on momentum, his sim env (which solves momentum) is just for testing
+	we can set ‘useSimulatedEnv’ to 0 and use the actual game (aigame.py / func playGame)
+	
+System reads the next state/position of object/ associated reward/ associated reward after every action input (up/down/null), we should try to read after every 2 inputs (up/down/null + null) (sim.py / func playGame)
+
+####Plan####
+1. Understand variables and functions in aigame.py
+	1a. Comment on every line of code to explain it
+2. Make a list of potential things affected by using multiple steps for one calling of playGame
+3. Implement
+
+##Harron ideas on Question 3##
+right now we are comparing firing rates of EMDown population and EMUp population
+
+#Haroon
+when EMUP firing rate is equal to EMDown firing rate we say ‘DONT MOVE’
+when EMUP firing rate is higher than EMDown firing rate, we say ‘MOVE UP’
+and when EMDown firing rate is higher than EMUP firing rate, we say  ‘MOVE DOWN’
+now we have had debate many times where i believe this setup is not sustainable and will fail by design
+because the firing rates are changing dynamically
+and value of decisions is evolving with the dynamics of networks
+this is a scary concept
+problem is i have not yet come up with an alternative idea to test
+and Sam still believes that this will work
+ideally we want to try different actions for all possible pairs of positions and directions
+and only make the connection strong when an action for ball and racket at a particular location moving in a particular direction produce a reward
+theoretically simple to describe….. very hard to imagine how to implement it in biological network
+right now we are trying one action for a pair of configuration and then change the network
+so next time we take another action that is associable to previous network state
+so although things are evolving and learning….. next time the model faces exactly same situation and it already forgot what it was supposed to do
+#Me
+So why has the system already forget what it was supposed to do?
+Just not enough reward/reinforcement?
+#Haroon
+no….. next time the same synapse strengthened for another condition
+so multiple conditions are encoded in single synapses or overlapping synapses
+#Me
+And 'conditions' is object position and direction?
+#Haroon
+and reward
+#Me
+So if reward is always changing based on the prior gameplay,  is the network still recognizing situations its already been in?
+#Haroon
+thats what it is supposed to do
+not sure if it is doing so
+because thats the only way the network will choose correct action
+its like if the car is coming in front of you, and if you dont move aside it will hit you
+so to make that decision you need to recognize your location, the fornt car’s location
+it direction of motion
+and someone should have told you that its going to hit you if its coming from front
+only then you will move on side
+all these 4 things have to be associated
+position+direction+action+reward/punishment
+
+
+
+########################################
+06-22-20
+########################################
+To-Do:
+-Start creating own function
+	*DONE
+-Test functions
+	*DONE
+-Notes on momentum
+	*Check excel sheet for prior experiments
+
+####Notes from sam & haroon on mom*
+#difficult to get any kind of stability with output encoding used
+	#What's output encoding?
+#Haroon made controlled environment to eliminate the momentum
+#Source of bias? - Is this the paddle bias of up over down?
+#They are looking into adding a hold pop. Is this a pop that would cause 0 motion? I thought the system was already capable of this.
+#Sam had idea to inhibit opposite motion populations if there is a lot of activity from one particular pop.
+
+########################################
+FINAL PRODUCT FOR plotallrecurrentmaps
+
+def plotallrecurrentmaps (pdf, t, dnumc, dstartidx, dendidx, lnety = ['EV1DNW', 'EV1DN', 'EV1DNE', 'EV1DW', 'EV1','EV1DE','EV1DSW', 'EV1DS', 'EV1DSE'], asweight=False, cmap='jet',dmap=None):
+  if dmap is None:
+    drfmap = getallrecurrentmaps(pdf, t, dnumc, dstartidx, dendidx, lnety, asweight=asweight)
+  else:
+    drfmap = dmap
+  vmin,vmax = 1e9,-1e9
+  for nety in lnety:
+    vmin = min(vmin, np.amin(drfmap[nety]))
+    vmax = max(vmax, np.amax(drfmap[nety]))    
+  for tdx,nety in enumerate(lnety):
+    postid = dstartidx[nety] + 0
+    subplot(3,3,tdx+1)
+    imshow(drfmap[nety],cmap=cmap,origin='upper',vmin=vmin,vmax=vmax);
+    title(nety+'->'+nety+str(postid));
+    colorbar()
+  return drfmap
+
+def getallrecurrentmaps (pdf, t, dnumc, dstartidx, dendidx, lnety = ['EV1DNW', 'EV1DN', 'EV1DNE', 'EV1DW', 'EV1','EV1DE','EV1DSW', 'EV1DS', 'EV1DSE'], asweight=False):
+  # gets all recurrent maps in lnety
+  return {nety:getrecurrentmap(pdf, t, nety, dnumc, dstartidx, dendidx, asweight=asweight) for nety in lnety}
+
+def getrecurrentmap(pdf, t, nety, dnumc, dstartidx, dendidx, asweight=False):
+  postid = dstartidx[nety] + 0
+  nrow = ncol = int(np.sqrt(dnumc[nety])) 
+  rfmap = np.zeros((nrow,ncol))
+  pdfs = pdf[(pdf.postid==postid) & (pdf.preid>dstartidx[nety]) & (pdf.preid<=dendidx[nety]) & (pdf.time==t)]
+  if len(pdfs) < 1: return rfmap
+  if not asweight:
+    for idx in pdfs.index:
+      preid = int(pdfs.at[idx,'preid'])
+      x,y = gid2pos(dnumc[nety], dstartidx[nety], preid)
+      rfmap[y,x] += 1
+  else:
+    rfcnt = np.zeros((nrow,ncol))    
+    for idx in pdfs.index:
+      preid = int(pdfs.at[idx,'preid'])
+      x,y = gid2pos(dnumc[nety], dstartidx[nety], preid)
+      rfcnt[y,x] += 1
+      rfmap[y,x] += pdfs.at[idx,'weight']
+    for y in range(nrow):
+      for x in range(ncol):
+        if rfcnt[y,x]>0: rfmap[y,x]/=rfcnt[y,x]		#rfmap integrates weight, take the average
+  return rfmap
+
+########################################
+
+
+
+To update git repository, do "git pull"
+
+######Testing Function######
+drfmap = plotallrecurrentmaps(pdf, pdf.time[0], #Just realized postid needs to be automted
+DONE, postid changes made
+
+drfmap = plotallrecurrentmaps(pdf, pdf.time[0], dnumc, dstartidx, dendidx, asweight = False)
+
+def plotallrecurrentmaps (pdf, t, dnumc, dstartidx, dendidx, lnety = ['EV1DNW', 'EV1DN', 'EV1DNE', 'EV1DW', 'EV1','EV1DE','EV1DSW', 'EV1DS', 'EV1DSE'], asweight=False, cmap='jet',dmap=None):
+
+##Input to old function
+drfmap = plotallinputmaps(pdf, pdf.time[0], dstartidx['EMUP'] + 0, 'EMUP', dnumc, dstartidx, dendidx, asweight=True)
+
+
+####Inputs####
+Function Inputs - Calling Input
+pdf - pdf
+t - pdf.time[0]
+postid - dstartidx['EMUP'] + 0
+poty - 'EMUP'
+dnumc -  dnumc
+dstartidx - dstartidx
+dendidx - dendidx
+lprety - lprety
+
+def plotallinputmaps (pdf, t, postid, poty, dnumc, dstartidx, dendidx, lprety=['EV1DNW', 'EV1DN', 'EV1DNE', 'EV1DW', 'EV1','EV1DE','EV1DSW', 'EV1DS', 'EV1DSE'], asweight=False, cmap='jet',dmap=None):
+
+######Creating Function######
+	
+def plotallrecurrentmaps (pdf, t, dnumc, dstartidx, dendidx, lnety = ['EV1DNW', 'EV1DN', 'EV1DNE', 'EV1DW', 'EV1','EV1DE','EV1DSW', 'EV1DS', 'EV1DSE'], asweight=False, cmap='jet',dmap=None):
+  if dmap is None:
+    drfmap = getallrecurrentmaps(pdf, t, dnumc, dstartidx, dendidx, lnety, asweight=asweight)
+  else:
+    drfmap = dmap
+  vmin,vmax = 1e9,-1e9
+  for nety in lnety:
+    vmin = min(vmin, np.amin(drfmap[nety]))
+    vmax = max(vmax, np.amax(drfmap[nety]))    
+  for tdx,nety in enumerate(lnety):
+    postid = dstartidx[nety] + 0
+    subplot(3,3,tdx+1)
+    imshow(drfmap[nety],cmap=cmap,origin='upper',vmin=vmin,vmax=vmax);
+    title(nety+'->'+nety+str(postid));
+    colorbar()
+  return drfmap
+
+####Changes####
+#-Removed poty from input variables, prety is nety (and lprety is lnety)
+#-Automated postid for each nety
+
+def getallrecurrentmaps (pdf, t, dnumc, dstartidx, dendidx, lnety = ['EV1DNW', 'EV1DN', 'EV1DNE', 'EV1DW', 'EV1','EV1DE','EV1DSW', 'EV1DS', 'EV1DSE'], asweight=False):
+  # gets all recurrent maps in lnety
+  return {nety:getrecurrentmap(pdf, t, nety, dnumc, dstartidx, dendidx, asweight=asweight) for nety in lnety}
+
+####Changes####
+#-Removed poty from getrecurrentmap input variables, prety is nety (and lprety is lnety)
+
+def getrecurrentmap(pdf, t, nety, dnumc, dstartidx, dendidx, asweight=False):
+  postid = dstartidx[nety] + 0
+  nrow = ncol = int(np.sqrt(dnumc[nety])) 
+  rfmap = np.zeros((nrow,ncol))
+  pdfs = pdf[(pdf.postid==postid) & (pdf.preid>dstartidx[nety]) & (pdf.preid<=dendidx[nety]) & (pdf.time==t)]
+  if len(pdfs) < 1: return rfmap
+  if not asweight:
+    for idx in pdfs.index:
+      preid = int(pdfs.at[idx,'preid'])
+      x,y = gid2pos(dnumc[nety], dstartidx[nety], preid)
+      rfmap[y,x] += 1
+  else:
+    rfcnt = np.zeros((nrow,ncol))    
+    for idx in pdfs.index:
+      preid = int(pdfs.at[idx,'preid'])
+      x,y = gid2pos(dnumc[nety], dstartidx[nety], preid)
+      rfcnt[y,x] += 1
+      rfmap[y,x] += pdfs.at[idx,'weight']
+    for y in range(nrow):
+      for x in range(ncol):
+        if rfcnt[y,x]>0: rfmap[y,x]/=rfcnt[y,x]		#rfmap integrates weight, take the average
+  return rfmap
+ 
+####Questions####
+#-preid is the numbers within a range, should I worry about postid == preid
+#-Theres no check for if postid is in range of dstartidx[nety] and dendidx[nety]
+#-Instead of postid being input like postid - dstartidx['EMUP'] + 0, could automate this to just read in poty, but would remove user accessability and options
+
+####Changes made####
+#-All reference to prety, poty are now merged to nety (neuron type)
+#-Defines postid in function for each nety
+
+########################################
+06-19-20
+########################################
+To-Do:
+-Understand all functions called by plotallinputmaps
+	-Can I scrap any of them?
+
+####Inputs####
+Function Inputs - Calling Input
+pdf - pdf
+t - pdf.time[0]
+postid - dstartidx['EMUP'] + 0
+poty - 'EMUP'
+dnumc -  dnumc
+dstartidx - dstartidx
+dendidx - dendidx
+lprety - lprety
+cmap - colormap for the imshow function
+
+#
+def plotallinputmaps (pdf, t, postid, poty, dnumc, dstartidx, dendidx, lprety=['EV1DNW', 'EV1DN', 'EV1DNE', 'EV1DW', 'EV1','EV1DE','EV1DSW', 'EV1DS', 'EV1DSE'], asweight=False, cmap='jet',dmap=None):
+  if dmap is None:
+    drfmap = getallinputmaps(pdf, t, postid, poty, dnumc, dstartidx, dendidx, lprety, asweight=asweight)
+  else:
+    drfmap = dmap
+  vmin,vmax = 1e9,-1e9
+  for prety in lprety:
+    vmin = min(vmin, np.amin(drfmap[prety]))
+    vmax = max(vmax, np.amax(drfmap[prety]))    
+  for tdx,prety in enumerate(lprety):
+    subplot(3,3,tdx+1)
+    imshow(drfmap[prety],cmap=cmap,origin='upper',vmin=vmin,vmax=vmax);
+    title(prety+'->'+poty+str(postid));
+    colorbar()
+  return drfmap
+##Image data stored in drfmap from getallinputmaps, this is the meat of it.
+##lprety these types coded since they have the sensory info, want to see how this info conveyed to the motor neurons
+##dmap is get all input maps
+##asweight draws the color picture draws the count or weight
+
+
+#
+def getallinputmaps (pdf, t, postid, poty, dnumc, dstartidx, dendidx, lprety = ['EV1DNW', 'EV1DN', 'EV1DNE', 'EV1DW', 'EV1','EV1DE','EV1DSW', 'EV1DS', 'EV1DSE'], asweight=False):
+  # gets all input maps onto postid
+  return {prety:getinputmap(pdf, t, prety, postid, poty, dnumc, dstartidx, dendidx, asweight=asweight) for prety in lprety}
+##Returns to a dictionary, key is prety in lprety and value is output from getinputmap
+##This is basically a compiler for getinputmaps
+
+
+
+####Inputs####
+Function Inputs - Calling Input
+pdf - pdf
+t - pdf.time[0]
+prety - from lprety
+postid - dstartidx['EMUP'] + 0
+poty - 'EMUP'
+dnumc -  dnumc
+dstartidx - dstartidx
+dendidx - dendidx
+
+
+#
+def getinputmap (pdf, t, prety, postid, poty, dnumc, dstartidx, dendidx, asweight=False):
+  nrow = ncol = int(np.sqrt(dnumc[poty]))
+  rfmap = np.zeros((nrow,ncol))
+  pdfs = pdf[(pdf.postid==postid) & (pdf.preid>dstartidx[prety]) & (pdf.preid<=dendidx[prety]) & (pdf.time==t)]
+  if len(pdfs) < 1: return rfmap
+  if not asweight:
+    for idx in pdfs.index:
+      preid = int(pdfs.at[idx,'preid'])
+      x,y = gid2pos(dnumc[prety], dstartidx[prety], preid)
+      rfmap[y,x] += 1
+  else:
+    rfcnt = np.zeros((nrow,ncol))    
+    for idx in pdfs.index:
+      preid = int(pdfs.at[idx,'preid'])
+      x,y = gid2pos(dnumc[prety], dstartidx[prety], preid)
+      rfcnt[y,x] += 1
+      rfmap[y,x] += pdfs.at[idx,'weight']
+    for y in range(nrow):
+      for x in range(ncol):
+        if rfcnt[y,x]>0: rfmap[y,x]/=rfcnt[y,x]		#rfmap integrates weight, take the average
+  return rfmap
+
+#####Notes#####
+-dnumc is a directory
+-
+#####Variables#####
+-nrow, ncol
+	Equal value?
+-rfmap
+	Image data, 2D matrix
+-pdfs
+	Confused by this?
+	Seems to be raw data
+-asweight
+	If true, looks at weights of connections, not just count
+
+#####Sam Notes#####
+
+dnumc is a dictionary that holds the number of cells of a type
+
+nrow,ncol gets the number of rows,columns -- assumes they're arranged in a square
+
+rfmap is the receptive field map output
+
+pdfs is the pandas dataframe of the synaptic weights
+
+the selection gets all pretype (prety) inputs onto the postsynaptic (postid) neuron at the time t
+
+and then it puts the values into rfmap, either as a weight value (if asweight==True) or as a count, based on the x,y position of the neurons
+
+one problem is that it's difficult to decipher the position of the neurons from the code (since it's an implicit mapping)
+
+sorry for lack of commenting in the code
+
+dstartidx, dendidx are the start and end indices of a neuron
+
+by type
+
+(population)
+
+this line is a selection on a dataframe (basically a table of values): pdfs = pdf[(pdf.postid==postid) & (pdf.preid>dstartidx[prety]) & (pdf.preid<=dendidx[prety]) & (pdf.time==t)]
+
+pdf.columns
+
+that will give you the column names
+
+##lprety these types coded since they have the sensory info, want to see how this info conveyed to the motor neurons
+##dmap is get all input maps
+##asweight draws the color picture draws the count or weight
+
+
+
+########################################
+06-18-20
+########################################
+To-Do:
+-Understand inputs for recurrent connectivity maps
+	*DONE
+	-Which groups are recurrent neurons?
+		*See notes below (internal pop connections)
+-Talk on momentum & number actions to adjust the control output
+	*DONE
+	*Haroon said finish plotallinputmaps first
+
+####Notes from talk with Haroon####
+#Goal
+Take one neuron id and plot all recurrent inputs from that neuron id (like how plotallinputmaps did with EMUP)
+
+#Connectivity patterns
+
+Feed forward: Neurons connections to a higher population #higher/lower in the flow of info
+Feed backward: Neurons connections to a lower population
+recurrent connectivity: neurons in a population making connections to that same population
+
+#Flow of information
+R > V1 > M
+
+#Specific Pops
+Each pop has neurons for each location in field of view
+Below pops are direction selection (V1?), when an object moves in particular direction
+'EV1DNW', 'EV1DN', 'EV1DNE', 'EV1DW', 'EV1','EV1DE','EV1DSW', 'EV1DS', 'EV1DSE'
+Pops EMUP and EMDOWN are for moving paddle in a 1D direction.
+########################################
+06-17-20
+########################################
+
+To-Do:
+-Look into plotallinputmaps in simdat.py
+	:Gives connectivity plot of pre/post synaptic neurons
+	-Make similar function to plot recurrent connectivity maps with Haroon
+-Understand inputs for recurrent connectivity maps
+
+Looking at plotallinputmaps on data:
+bash
+./myrun 8 sim.json (dur=2000)
+#Total runtime 7323.42 s
+>>> exit()
+(Still in bash)
+python -i simdat.py backupcfg/20june12_A_sim.json
+drfmap = plotallinputmaps(pdf, pdf.time[0], dstartidx['EMUP'] + 0, 'EMUP', dnumc, dstartidx, dendidx, asweight=True)
+savefig('gif/20june17_e1.png')
+##File did not save
+
+
+########################################
+06-16-20
+########################################
+
+To-Do:
+-Look into plotallinputmaps in simdat.py
+	:Gives connectivity plot of pre/post synaptic neurons
+	*DONE
+	-Make similar function to plot recurrent connectivity maps with Haroon
+-Look into sam's notes on his use of the function plotallinputmaps
+	May 28, 2020 - May 29, 2020
+	*DONE
+
+#####Code for plotallinputmaps#####
+
+def plotallinputmaps (pdf, t, postid, poty, dnumc, dstartidx, dendidx, lprety=['EV1DNW', 'EV1DN', 'EV1DNE', 'EV1DW', 'EV1','EV1DE','EV1DSW', 'EV1DS', 'EV1DSE'], asweight=False, cmap='jet',dmap=None):
+  if dmap is None:
+    drfmap = getallinputmaps(pdf, t, postid, poty, dnumc, dstartidx, dendidx, lprety, asweight=asweight)
+  else:
+    drfmap = dmap
+  vmin,vmax = 1e9,-1e9
+  for prety in lprety:
+    vmin = min(vmin, np.amin(drfmap[prety]))
+    vmax = max(vmax, np.amax(drfmap[prety]))    
+  for tdx,prety in enumerate(lprety):
+    subplot(3,3,tdx+1)
+    imshow(drfmap[prety],cmap=cmap,origin='upper',vmin=vmin,vmax=vmax);
+    title(prety+'->'+poty+str(postid));
+    colorbar()
+  return drfmap
+
+####Inputs####
+Function Inputs - Calling Input
+pdf - pdf
+t - pdf.time[0]
+postid - dstartidx['EMUP'] + 0
+poty - 'EMUP'
+dnumc -  dnumc
+dstartidx - dstartidx
+dendidx - dendidx
+lprety - lprety
+cmap - colormap for the imshow function
+
+
+####Notes####
+drfmap = Output
+lprety is a list of "EV1" parts, what is this significance? I think its neural groups being plotted. Looks like 9x9 grid, with compass directions (EV1 center)
+	This makes prety (pre-ty?) the content of the list
+vmin, vmax = constant min, max of the array drfmap at each pre-ty (unless 1e9,-1e9 is better?)
+tdx = Counter for lprety list enumerated
+
+
+####Questions####
+√1. What is the point of the first if statement, dmap is set to None in the inputs?
+√1a. Also, what is dmap?
+	The if statement is used to avoid recomputation of dmap if it already exists. If it doesn't exist, it calls the function to compute it.
+
+√2. What does postid mean (in reference to getallinputmaps function)?
+	"  # gets all input maps onto postid "
+	See number 5.
+√3. Why 1e9,-1e9 for vmin,vmax?
+	Sets the range form imshow to show range of synapses
+
+√4. Does the tdx counter start at 1? (Internet says yes) If so, why start the subplot at 1+1?
+	Looping tdx starts at 0 (see explination of enumerate below), but subplot counter starts at 1 in upper left corner.
+√5. What are poty and postid? (title function)
+	Poty is a "tag" to pass other values
+		drfmap = plotallinputmaps(pdf, pdf.time[0], dstartidx[‘EMUP’] + 0, ‘EMUP’, dnumc, dstartidx, dendidx, lprety)
+	Above is how function plotallinputmaps is called, EMUP is passed as poty.
+	
+	Postid used throughout script, seems to be the id of the post synaptic neuron when observing topological inputs.
+		postid = dstartidx[‘EMUP’] + 0,
+	where dstartidx['EMUP'] is the starting id of the population neurons belonging to 'EMUP.' Many neurons make synases onto single postsynaptic neuron, we see how a single neuron receives input from all different populations of neurons.
+
+
+#######Explination of enumerate function#######
+my_list = ['apple', 'banana', 'grapes', 'pear']
+for c, value in enumerate(my_list, 1):
+    print(c, value)
+
+# Output:
+# 1 apple
+# 2 banana
+# 3 grapes
+# 4 pear
+
+#####Sam's notes#####
+Looks like sam is plotting and saving the files of e0 to e9 (data from 20may27_B1_falcor_sim.json). Does not explain much on how the function runs.
+
+drfmap = plotallinputmaps(pdf, pdf.time[0], dstartidx[‘EMUP’] + 0, ‘EMUP’, dnumc, dstartidx, dendidx, lprety)
+
+########################################
+06-15-20
+########################################
+Working on X2Go vpn connection
+
+Need to clone repository (https://github.com/NathanKlineInstitute/SMARTAgent.git) onto workspace
+Need to learn GitHub terminal commands to understand how to do this
+
+Motion of paddle seems to be after an average three null inputs after a motion input. Opposite motion input reverses direction faster. 
+
+If motion is total 100 pixels, it seems 25~30 pixels after input motions, then 45~50, 15, 10 pixels after null inputs.
+
+Sam wants to talk about motion with me and Haroon.
+	Is there a way for system to measure what each input does, through experimenting itself?
+	Will help transition network to other games.
+
+
+To-Do:
+-Get X2GO to run simulation
+	*DONE
+-Learn Github
+	*DONE. Here is git cheat sheet: https://gist.github.com/cferdinandi/ef665330286fd5d7127d
+- Talk to Haroon about keeping paddle in middle
+	-Count up/down paddle actions
+	-Count ball actions to cross board
+		*Working on excel sheet to count these
+	**DONE. Ball_action_avg=36, Padd_action_avg=10
+	-Work on paddle momentum 
+		*Github post was responded to
+		**It seems every action (up/down) takes multiple frames to be completed. I did up/down action (2/5) followed by no action (0) to see how many frames each input takes, and it seems to be three additional inputs. So it takes four 0 inputs to stop motion.
+		**Completed on excel.
+-Look into plotallinputmaps in simdat.py
+	:Gives connectivity plot of pre/post synaptic neurons
+	-Make similar function to plot recurrent connectivity maps with Haroon
+
+
+########################################
 06-12-20
 ########################################
 
@@ -81,7 +633,7 @@ register(
 https://github.com/openai/gym/blob/7006c7a182a991b9409c206c56abc121eaffafb5/gym/envs/atari/atari_env.py
 
 
-import gym; env = gym.make('PongNoFrameskip-v4’); env.reset()
+import gym; env = gym.make('PongNoFrameskip-v4'); env.reset()
 ##CHANGE caction to number 1, 3, 4 to move paddle, and repeat this command
 observation, reward, done, info = env.step(caction); env.render()
 
@@ -112,7 +664,7 @@ ACTION_MEANING = {
 ########################################
 
 TO RUN SIM (at 2 cores)
-./myrun 2 sim.json
+./myrun 2 sim.jsons
 mpiexec -n 2 nrniv -python -mpi sim.py
 
 simdat.py is used to load output data from a simulation you ran. so to create that final weight output file you'd first run the simulation (which saves the data), then python -i simdat.py backupcfg/yoursimfilename.json to load the data. then this command pdfs = pdf[pdf.time==np.amax(pdf.time)]; D = pdf2weightsdict(pdfs); pickle.dump(D, open('data/'+simstr+'synWeights_final.pkl','wb'))  will save the final weights to a new output file. then you'd specify that new file in sim.json ... some of that could be automated
