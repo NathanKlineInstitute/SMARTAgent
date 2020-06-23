@@ -8915,9 +8915,251 @@ continue it for 1600 s ...
 
 meanwhile, animate the activity . . . 
 
-fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4',showflow=False)
+fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4',showflow=False) # 20jun19_20jun19_E2_targetted_falcor__input.mp4
+(in that movie model is moving in right direction a lot but most of the time it misses points is when opponent hits ball to
+bottom right or top right corner and model stays all the way at bottom or top , so overshoots . . .so that's another clear
+sign that learning is taking place, just needs some tweaking ... 
 
 ./myrun 16 sn.json
 
 started ~00:41 ...
 
+** check output from control sim (20jun19_E2_targetted_control_falcor_)
+
+python -i simdat.py backupcfg/20jun19_E2_targetted_control_falcor_sim.json
+
+#
+plotFollowBall(actreward,ax=subplot(1,3,1),cumulative=True,color='r'); ylim((0,.6))
+plotHitMiss(actreward,ax=subplot(1,3,2)); 
+plotRewards(actreward,ax=subplot(1,3,3)); ylim((-0.1,1))
+
+score, hit, miss: (9, 32, 226)
+
+so, not as good as the simulation with correct learning in terms of score, hit -
+follow target probability is random but higher than sim with learning ... is learning
+sim not following due to mixed rewards (hit, score, loss, target follow vs not?)  or
+some systematic bias ... 
+
+savefig('gif/'+dstr+simstr+'perf.png') # 
+
+should check weights for the control sim ... see how balanced they are ... 
+assuming the target is ~fixed on each hit towards the paddle, random
+and balanced weights would produce moves ~50% towards vs away from target
+but with learning, there are some biases in weights created, so may not
+expect ~50% towards/away from target even with better performance overall?
+
+pdf.columns # Index(['time', 'preid', 'postid', 'weight'], dtype='object')
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=True)
+xlabel('Time (ms)'); tl(); savefig('gif/'+dstr+simstr+'all_avg_weight.png')
+
+hmm, the up and down are pretty different, would not expect that from the shuffle procedure ... is it really shuffled??
+
+via pdfshuf = pdfs.reindex(np.random.permutation(pdfs.index))
+perhaps the order of the index was changed but the contents were the same?
+
+pdfshuf = pdf.reindex(np.random.permutation(pdf.index))
+
+clf(); popwts = plotMeanWeights(pdfshuf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=True)
+xlabel('Time (ms)'); tl(); savefig('gif/'+dstr+simstr+'all_avg_weight_shuffle_test_A.png')
+
+that looks like same values as finished from 20jun19_20jun18_E1_targetted_falcor_all_avg_weight.png
+so that means it wasn't a good control simulation either - it was using the learned weights
+and keeping them fixed from when learning ended ... 
+
+that's a useful demonstration that learning took place and remained in place ... but still need a control
+
+len(pdf['weight'])
+
+pdfs = pdf[pdf.time==np.amax(pdf.time)]; 
+
+npwt = np.array(pdfs.weight)
+len(npwt) # 86784
+
+npwt[0],npwt[-1], mean(npwt) # (1.2421595668381792e-05, 4.670336697494599e-05, 1.828570798265547e-05)
+
+np.random.shuffle(npwt)
+
+npwt[0],npwt[-1], mean(npwt) # (1.2665998463950697e-05, 1.339615989324337e-05, 1.828570798265547e-05)
+len(npwt) # 86784
+
+
+A = np.array([pdfs.time,pdfs.preid,pdfs.postid,npwt]).T
+pdfshuf = pd.DataFrame(A,columns=['time','preid','postid','weight'])
+
+clf(); popwts = plotMeanWeights(pdfshuf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=True)
+
+xlabel('Time (ms)'); tl(); savefig('gif/'+dstr+simstr+'all_avg_weight_shuffle_test_B.png')
+
+ok, now values more close together ... should be properly shuffled ... now can rerun the control test ... 
+
+D = pdf2weightsdict(pdfshuf); 
+pickle.dump(D, open('data/20jun20_20jun18_E1_targetted_falcor_synWeights_final_shuffled.pkl','wb'))
+
+name:
+20jun20_20jun19_E2_targetted_control_falcor_
+
+will just run this for 100 s ... no point wasting 800 s of sim time if this is a real control ... 
+
+*20jun21
+** check control 20jun20_20jun19_E2_targetted_control_falcor_
+
+python -i simdat.py backupcfg/20jun20_20jun19_E2_targetted_control_falcor_sim.json
+
+#
+plotFollowBall(actreward,ax=subplot(1,3,1),cumulative=True,color='r'); ylim((0,.6))
+plotHitMiss(actreward,ax=subplot(1,3,2)); 
+plotRewards(actreward,ax=subplot(1,3,3)); ylim((-0.1,1))
+
+score, hit, miss: (0, 0, 34)
+
+savefig('gif/'+dstr+simstr+'perf.png') # 
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=True)
+xlabel('Time (ms)'); tl(); savefig('gif/'+dstr+simstr+'all_avg_weight.png')
+
+#
+clf(); dobjpos = loadObjPos() ## hmm, did not save objpos?? got error ... 
+xlabel('Racket Y position'); hist(dobjpos['racket'][:,1])
+savefig('gif/'+dstr+simstr+'poshist.png')
+
+ok, so stuck at top whole time again ... 
+
+having difficulty getting these control simulations to do anything remotely similar to learning model ... 
+
+as control could instead just generate arbitrary/random moves ... and see what kind of performance
+that produces ...
+
+** try control with ranodom moves (20jun21_randmove_control_falcor_)
+
+to turn on random move generation just have 'randmove' = 1 set in the json file
+
+simulation itself isn't useful here - just generation of moves
+
+** other simulation - only use target tracking rewards
+
+let everything else come about through that intermediate learning rule ... 
+
+20jun21_A0_targetted_only_track_falcor_
+
+*20jun22
+** check new control with random moves (20jun21_randmove_control_falcor_)
+
+python -i simdat.py backupcfg/20jun21_randmove_control_falcor_sim.json
+
+#
+plotFollowBall(actreward,ax=subplot(1,3,1),cumulative=True,color='r'); ylim((0,.6))
+plotHitMiss(actreward,ax=subplot(1,3,2)); 
+plotRewards(actreward,ax=subplot(1,3,3)); ylim((-0.1,1))
+
+score, hit, miss: (0, 4, 63)
+
+savefig('gif/'+dstr+simstr+'perf.png') # 20jun22_20jun21_randmove_control_falcor_perf.png
+
+ok, so that's ~0.33 for target follow and 0 score, only 4 hits in 200 s (so ~16 in 800 s ... )
+
+fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4',showflow=False) # 20jun22_20jun21_randmove_control_falcor__input.mp4
+ 
+** check output from the 1600 s continuation sim 
+
+python -i simdat.py backupcfg/20jun20_E3_targetted_falcor_sim.json
+
+#
+plotFollowBall(actreward,ax=subplot(1,3,1),cumulative=True,color='r'); ylim((0,.6))
+plotHitMiss(actreward,ax=subplot(1,3,2)); 
+plotRewards(actreward,ax=subplot(1,3,3)); 
+
+from this sim score, hit, miss: (41, 140, 362)
+
+savefig('gif/'+dstr+simstr+'perf.png') # 20jun22_20jun20_E3_targetted_falcor_perf.png
+
+up until ~400 s the follow target probability was increasing, but then started to decrease slightly
+when watching activity, looked like it was doing worse at the end ... systematically - going in opposite
+direction for many moves right when ball was about to hit the racket
+
+clf(); drawraster(dspkT,dspkID); savefig('gif/'+dstr+simstr+'rast.png') # 
+firing rates are probably too high now ... so probably should have normalized the weights ... ? 
+xlim((390e3,400e3)); savefig('gif/'+dstr+simstr+'rastB.png') # 
+xlim((1590e3,1600e3)); savefig('gif/'+dstr+simstr+'rastC.png') # 
+
+rcParams['agg.path.chunksize'] = 100000000000
+
+clf(); 
+drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN']); 
+savefig('gif/'+dstr+simstr+'Vm.png')
+
+was getting this error on draw:
+OverflowError: Exceeded cell block limit (set 'agg.path.chunksize' rcparam)
+so had to call this rcParams['agg.path.chunksize'] = 100000000000
+
+xlim((390e3,400e3)); savefig('gif/'+dstr+simstr+'VmB.png')
+xlim((1590e3,1600e3)); savefig('gif/'+dstr+simstr+'VmC.png')
+
+apart from those gian hyperpolarizations dont see much unusual ... how does IM look?
+
+drawcellVm(simConfig,ldrawpop=['IM']); 
+savefig('gif/'+dstr+simstr+'VmD.png')
+
+xlim((300e3,400e3));
+savefig('gif/'+dstr+simstr+'VmE.png')
+do not see anything unusual about the IM neuron displayed... 
+
+#
+clf(); dobjpos = loadObjPos() ## hmm, did not save objpos?? got error ... 
+xlabel('Racket Y position'); hist(dobjpos['racket'][:,1])
+savefig('gif/'+dstr+simstr+'poshist.png')
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=True)
+xlabel('Time (ms)'); tl(); savefig('gif/'+dstr+simstr+'all_avg_weight.png')
+
+#
+actlearn0 = pd.DataFrame(np.loadtxt('data/20jun17_E0_targetted_falcor_ActionsRewards.txt'),columns=['time','action','reward','proposed','hit'])
+actlearn1 = pd.DataFrame(np.loadtxt('data/20jun18_E1_targetted_falcor_ActionsRewards.txt'),columns=['time','action','reward','proposed','hit'])
+actlearn1.time += 800e3
+actlearn2 = pd.DataFrame(np.loadtxt('data/20jun19_E2_targetted_falcor_ActionsRewards.txt'),columns=['time','action','reward','proposed','hit'])
+actlearn2.time += 1600e3
+actlearn3 = pd.DataFrame(np.loadtxt('data/20jun20_E3_targetted_falcor_ActionsRewards.txt'),columns=['time','action','reward','proposed','hit'])
+actlearn3.time += 2400e3
+pda = actlearn0; pda = pda.append(actlearn1); pda = pda.append(actlearn2); pda = pda.append(actlearn3)
+
+#
+clf()
+plotFollowBall(pda,ax=subplot(1,3,1),cumulative=True,color='r'); ylim((0,.6))
+plotHitMiss(pda,ax=subplot(1,3,2)); 
+plotRewards(pda,ax=subplot(1,3,3)); 
+
+score, hit, miss: (84, 260, 1017)
+
+savefig('gif/'+dstr+simstr+'perf_step0_step1_step2_step3.png') # 
+
+looks like follow target prob decreasing slightly in last sim's period ... 1600 s ... 
+
+fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4',showflow=False) # 
+
+not sure worth continuing this one
+
+** discuss with ha
+
+re stability, add population of hold EM neurons since although looks like average position
+to target is decreasing over time the paddle is hovering up/down and has difficulty holding still
+
+** check output from 20jun21_A0_targetted_only_track_falcor_
+
+python -i simdat.py backupcfg/20jun21_A0_targetted_only_track_falcor_sim.json
+
+#
+plotFollowBall(actreward,ax=subplot(1,3,1),cumulative=True,color='r'); ylim((0,.6))
+plotHitMiss(actreward,ax=subplot(1,3,2)); 
+plotRewards(actreward,ax=subplot(1,3,3)); 
+
+wrong score count: (5718, 4, 64)
+but right hit (4) count and miss (64) count ... 
+
+savefig('gif/'+dstr+simstr+'perf.png')
+
+clf(); drawraster(dspkT,dspkID); savefig('gif/'+dstr+simstr+'rast.png') # 
+
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN']); savefig('gif/'+dstr+simstr+'Vm.png')
+
+fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4',showflow=False) # 
