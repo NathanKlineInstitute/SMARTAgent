@@ -9213,3 +9213,19 @@ is the firing threshold of 0 for pyr cells problematic? should it be even lower?
 
 fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4',showflow=False) # 
 
+** continue 20jun20_E3_targetted_falcor_ as 20jun23_E4_targetted_falcor_
+
+this movie: gif/20jun22_20jun20_E3_targetted_falcor__input.mp4
+makes clear that it is learning, but still has a lot of screwups; one problem is it's hard
+for stability to emerge when have two competing directions of movement and no explicit representation
+of staying still; since have to move very quickly to get to an exact target location there's some
+benefit to moving quickly, which is a tradeoff with precision of movement? 
+
+first make the final weights ...
+
+python -i simdat.py backupcfg/20jun20_E3_targetted_falcor_sim.json
+
+pdfs = pdf[pdf.time==np.amax(pdf.time)]; D = pdf2weightsdict(pdfs); pickle.dump(D, open('data/'+simstr+'synWeights_final.pkl','wb'))
+
+started @ 17:28 ...
+
