@@ -53,6 +53,11 @@ allpops = ['ER','IR','EV1','EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','E
 EMotorPops = ['EMDOWN', 'EMUP'] # excitatory neuron motor populations
 EPreMPops = ['EV1','EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE','EV4','EMT']
 dnumc = OrderedDict({ty:dconf['net'][ty]*scale for ty in allpops}) # number of neurons of a given type
+lrecpop = ['EMUP', 'EMDOWN'] # which populations to record from
+if dconf['net']['EEPreMProb'] > 0.0 or dconf['net']['EEMFeedbackProb'] > 0.0 or dconf['net']['VisualFeedback']:
+  for pop in ['EV1','EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE','EV4','EMT']:
+    lrecpop.append(pop)
+  if dconf['net']['VisualFeedback']: lrecpop.append('ER')
 
 # Network parameters
 netParams = specs.NetParams() #object of class NetParams to store the network parameters
@@ -213,6 +218,22 @@ cfg.saveCellConns = bool(dconf['sim']['saveCellConns']) # if False removes all d
 #cfg.gatherOnlySimData = True # do not set to True, when True gathers from nodes only the output simulation data (not the network instance)
 ###
 
+# weight variance -- check if need to vary the initial weights (note, they're over-written if resumeSim==1)
+if 'weightVar' in dconf['net']:
+  cfg.weightVar = dconf['net']['weightVar']
+else:
+  cfg.weightVar = 0.
+
+def getInitWeight (weight):
+  """get initial weight for a connection
+     checks if weightVar is non-zero, if so will use a uniform distribution 
+     with range on interval: (1-var)*weight, (1+var)*weight
+  """
+  if cfg.weightVar == 0.0:
+    return weight
+  else:
+    print('uniform(%g,%g)' % (weight*(1.0-cfg.weightVar),weight*(1.0+cfg.weightVar)))
+    return 'uniform(%g,%g)' % (weight*(1.0-cfg.weightVar),weight*(1.0+cfg.weightVar))
 
 #Local excitation
 #E to E recurrent connectivity in premotor areas
@@ -258,7 +279,7 @@ for prety in EDirPops:
       'preConds': {'pop': prety},
       'postConds': {'pop': poty},
       'connList': blistEV1DtoIV1D,
-      'weight': 0.02 * cfg.EIGain,
+      'weight': getInitWeight(0.02 * cfg.EIGain),
       'delay': 2,
       'synMech': 'AMPA', 'sec':'soma', 'loc':0.5}
 """
@@ -280,7 +301,6 @@ netParams.connParams['EMT->IMT'] = {
 netParams.connParams['EMDOWN->IM'] = {
         'preConds': {'pop': 'EMDOWN'},
         'postConds': {'pop': 'IM'},
-        #'probability': 0.125/2.,
         'convergence': prob2conv(0.125/2, dnumc['EMDOWN']),
         'weight': 0.02 * cfg.EIGain,
         'delay': 2,
@@ -288,7 +308,6 @@ netParams.connParams['EMDOWN->IM'] = {
 netParams.connParams['EMUP->IM'] = {
         'preConds': {'pop': 'EMUP'},
         'postConds': {'pop': 'IM'},
-        #'probability': 0.125/2.,
         'convergence': prob2conv(0.125/2, dnumc['EMUP']),
         'weight': 0.02 * cfg.EIGain,
         'delay': 2,
@@ -479,7 +498,7 @@ if dconf['architecturePreMtoM']['useTopological']:
             'preConds': {'pop': prety},
             'postConds': {'pop': poty},
             'connList': blistEV4toEM, 
-            'weight': weight,
+            'weight': getInitWeight(weight),
             'delay': 2,
             'synMech': synmech,
             'sec':'dend', 'loc':0.5
@@ -489,7 +508,7 @@ if dconf['architecturePreMtoM']['useTopological']:
             'preConds': {'pop': prety},
             'postConds': {'pop': poty},
             'connList': blistEMTtoEM, 
-            'weight': weight,
+            'weight': getInitWeight(weight),
             'delay': 2,
             'synMech': synmech,
             'sec':'dend', 'loc':0.5
@@ -499,7 +518,7 @@ if dconf['architecturePreMtoM']['useTopological']:
             'preConds': {'pop': prety},
             'postConds': {'pop': poty},
             'connList': blistEV1toEM, 
-            'weight': weight,
+            'weight': getInitWeight(weight),
             'delay': 2,
             'synMech': synmech,
             'sec':'dend', 'loc':0.5
@@ -518,7 +537,7 @@ elif dconf['architecturePreMtoM']['useProbabilistic']:
           'preConds': {'pop': prety},
           'postConds': {'pop': poty},
           'convergence': prob2conv(EEMProb, dnumc[prety]),
-          'weight': weight,
+          'weight': getInitWeight(weight),
           'delay': 2,
           'synMech': synmech,
           'sec':'dend', 'loc':0.5
@@ -539,7 +558,7 @@ if EEMRecProb > 0.0:
             'preConds': {'pop': prety},
             'postConds': {'pop': poty},
             'convergence': prob2conv(EEMRecProb, dnumc[prety]),
-            'weight': weight,
+            'weight': getInitWeight(weight),
             'delay': 2,
             'synMech': synmech,
             'sec':'dend', 'loc':0.5
@@ -722,6 +741,7 @@ def saveGameBehavior(sim):
 
 def getFiringRatesWithInterval (trange = None, neuronal_pop = None):
   #sim.gatherData()
+  if len(neuronal_pop) < 1: return 0.0
   spkts = sim.simData['spkt']
   spkids = sim.simData['spkid']
   pop_spikes = 0
@@ -893,14 +913,20 @@ def trainAgent (t):
       fid4.write('\n')
       actions = []
       movefctr=1.0
+      randmove = 0
       if 'movefctr' in dconf: movefctr=dconf['movefctr']
-      for ts in range(int(dconf['actionsPerPlay'])):
-        if F_UPs[ts]>F_DOWNs[ts] * movefctr:
-          actions.append(dconf['moves']['UP'])
-        elif F_DOWNs[ts]>F_UPs[ts] * movefctr:
-          actions.append(dconf['moves']['DOWN'])
-        else:
-          actions.append(dconf['moves']['NOMOVE']) # No move        
+      if 'randmove' in dconf: randmove=dconf['randmove']
+      if randmove:
+        lmoves = list(dconf['moves'].values())
+        for ts in range(int(dconf['actionsPerPlay'])): actions.append(lmoves[np.random.randint(0,len(lmoves))])
+      else:
+        for ts in range(int(dconf['actionsPerPlay'])):
+          if F_UPs[ts]>F_DOWNs[ts] * movefctr:
+            actions.append(dconf['moves']['UP'])
+          elif F_DOWNs[ts]>F_UPs[ts] * movefctr:
+            actions.append(dconf['moves']['DOWN'])
+          else:
+            actions.append(dconf['moves']['NOMOVE']) # No move        
   if sim.rank == 0:
     rewards, epCount, proposed_actions, total_hits = sim.AIGame.playGame(actions, epCount)
     print('t=',round(t,2),'proposed actions:', proposed_actions,', model actions:', actions)
@@ -932,9 +958,9 @@ def trainAgent (t):
         if cproposed_action == -1: # invalid action since e.g. ball not visible
           continue
         elif caction - cproposed_action == 0: # model followed proposed action - gets a reward
-          critic_for_following_ball += dconf['rewardcodes']['followBall'] #follow the ball
+          critic_for_following_ball += dconf['rewardcodes']['followTarget'] #follow the ball
         else: # model did not follow proposed action - gets a punishment
-          critic_for_following_ball += dconf['rewardcodes']['avoidBall'] # didn't follow the ball
+          critic_for_following_ball += dconf['rewardcodes']['avoidTarget'] # didn't follow the ball
       #total rewards
       critic = critic + critic_for_avoidingloss + critic_for_following_ball
       rewards = [critic for i in range(len(rewards))]  # reset rewards to modified critic signal - should use more granular recording
@@ -982,12 +1008,12 @@ def trainAgent (t):
   if NBsteps % recordWeightStepSize == 0:
     if dconf['verbose'] > 0 and sim.rank==0:
       print('Weights Recording Time:', t, 'NBsteps:',NBsteps,'recordWeightStepSize:',recordWeightStepSize)
-    recordAdjustableWeights(sim, t) 
+    recordAdjustableWeights(sim, t, lpop = lrecpop) 
     #recordWeights(sim, t)
   if NBsteps % normalizeWeightStepSize == 0:
     if dconf['verbose'] > 0 and sim.rank==0:
       print('Weight Normalize Time:', t, 'NBsteps:',NBsteps,'normalizeWeightStepSize:',normalizeWeightStepSize)
-    normalizeAdjustableWeights(sim, t)     
+    normalizeAdjustableWeights(sim, t, lpop = lrecpop)     
 
 def getAllSTDPObjects (sim):
   # get all the STDP objects from the simulation's cells
@@ -1092,7 +1118,7 @@ def saveSynWeights ():
         print('saveSynWeights: waiting for finish write of', fn)
         time.sleep(1)      
       lw = pickle.load(open(fn,'rb'))
-      print(fn,'len(lw)=',len(lw),type(lw),type(lw[0]),lw[0])
+      print(fn,'len(lw)=',len(lw),type(lw))
       os.unlink(fn) # remove the temporary file
       L = L + lw # concatenate to the list L
     #pickle.dump(L,open('data/'+dconf['sim']['name']+'synWeights.pkl', 'wb')) # this would save as a List

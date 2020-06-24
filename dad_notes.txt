@@ -163,7 +163,6 @@ def getrecurrentmap(pdf, t, nety, dnumc, dstartidx, dendidx, asweight=False):
 ########################################
 
 
-
 To update git repository, do "git pull"
 
 ######Testing Function######
@@ -552,7 +551,7 @@ To-Do:
 -Get X2GO to run simulation
 	*DONE
 -Learn Github
-	*DONE. Here is git cheat sheet: https://gist.github.com/cferdinandi/ef665330286fd5d7127d
+	*DONE. Here is cheatsheet: https://gist.github.com/cferdinandi/ef665330286fd5d7127d
 - Talk to Haroon about keeping paddle in middle
 	-Count up/down paddle actions
 	-Count ball actions to cross board

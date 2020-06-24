@@ -29,12 +29,19 @@ from centroidtracker import CentroidTracker
 # make the environment - env is global so that it only gets created on a single node (important when using MPI with > 1 node)
 try:
   from conf import dconf
-  env = gym.make(dconf['env']['name'],frameskip=dconf['env']['frameskip'])
-  if dconf['env']['savemp4']: env = wrappers.Monitor(env, './videos/' + dconf['sim']['name'] + '/',force=True)
-  env.reset()
+  if dconf['useSimulatedEnv']==1:
+    from simulatePong import simulatePong
+    pong = simulatePong()
+  else:
+    if 'frameskip' in dconf['env']:
+      env = gym.make(dconf['env']['name'],frameskip=dconf['env']['frameskip'],repeat_action_probability=0.)
+    else:
+      env = gym.make(dconf['env']['name'],repeat_action_probability=0.)    
+    if dconf['env']['savemp4']: env = wrappers.Monitor(env, './videos/' + dconf['sim']['name'] + '/',force=True)
+    env.reset()
 except:
   print('Exception in makeENV')
-  env = gym.make('Pong-v0',frameskip=3)
+  env = gym.make('PongNoFrameskip-v4',repeat_action_probability=0.)
   env = wrappers.Monitor(env, './videos/' + str(time()) + '/',force=True)
   env.reset()
 
@@ -55,7 +62,8 @@ class AIGame:
   """ Interface to OpenAI gym game 
   """
   def __init__ (self,fcfg='sim.json'): # initialize variables
-    self.env = env
+    if dconf['useSimulatedEnv']==1: self.pong = pong
+    else: self.env = env
     self.countAll = 0
     self.ldir = ['E','NE','N', 'NW','W','SW','S','SE']
     self.ldirpop = ['EV1D'+Dir for Dir in self.ldir]
@@ -258,8 +266,10 @@ class AIGame:
         proposed_action = -1 #if there is no last_obs
         ypos_Ball = -1 #if there is no last_obs, no position of ball
         xpos_Ball = -1 #if there is no last_obs, no position of ball
-
-      observation, reward, done, info = self.env.step(caction)
+      if dconf['useSimulatedEnv']==1:
+        observation, reward, done = self.pong.step(caction)
+      else:
+        observation, reward, done, info = self.env.step(caction)
       #find position of ball after action
       xpos_Ball2, ypos_Ball2 = self.findobj(observation, courtXRng, courtYRng)
       ball_moves_towards_racket = False
@@ -277,11 +287,13 @@ class AIGame:
         ball_moves_towards_racket = False
         current_ball_dir = 0 #direction can't be determined because either current or last position of the ball is outside the court
 
+      skipPred = False # skip prediction of y intercept?
       if "followOnlyTowards" in dconf:
         if dconf["followOnlyTowards"] and not ball_moves_towards_racket:
           proposed_action = -1 # no proposed action if ball moving away from racket
-
-      if "useRacketPredictedPos" in dconf:
+          skipPred = True # skip prediction if ba
+      
+      if not skipPred and "useRacketPredictedPos" in dconf:
         if dconf["useRacketPredictedPos"]:
           xpos_Racket2, ypos_Racket2 = self.findobj (observation, racketXRng, courtYRng)
           predY = self.predictBallRacketYIntercept(xpos_Ball,ypos_Ball,xpos_Ball2,ypos_Ball2)
@@ -308,10 +320,12 @@ class AIGame:
       print(ball_hits_racket)
       self.last_ball_dir = current_ball_dir
       total_hits.append(ball_hits_racket) # i dont think this can be more than a single hit in 5 moves. so check if sum is greater than 1, print error
-      self.env.render()
+      if dconf['useSimulatedEnv']==0:
+        self.env.render()
       self.last_obs = observation # current observation will be used as last_obs for the next action
       if done:
-        self.env.reset()
+        if dconf['useSimulatedEnv']==0:
+          self.env.reset()
         self.last_obs = [] # when the game ends, and new game starts, there is no last observation
         self.last_ball_dir=0
         done = False
@@ -350,8 +364,9 @@ class AIGame:
 
     if done: # done means that 1 episode of the game finished, so the environment needs to be reset. 
       epCount.append(self.countAll)
-      self.env.reset()
-      self.env.frameskip = 3 
+      if dconf['useSimulatedEnv']==0:
+        self.env.reset()
+        self.env.frameskip = 3 
       self.countAll = 0 
     if np.sum(total_hits)>1:
       print('ERROR COMPUTING NUMBER OF HITS')

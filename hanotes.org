@@ -3167,3 +3167,166 @@ try this: env = gym.make('PongNoFrameskip-v4')
       }
 
 --- now i will use what sam uses.
+
+** change followBall and avoidBall to followTarget and avoidTarget respectively.
+
+** ran 400 sec of sim in "20june12_B_"
+
+** running 100 sec of sim in "20june12_C_" with RLon = 0
+-- something went wrong.... could not use simdat.py
+--re run sim for 10 sec to check if everything is running or not.
+
+** running 10 sec of sim in "20june16_A1_falcor" using sn.json (cp sn.json sim.json)
+-- simdat.py running fine.
+- run sim with RLon = 0.... for 10 sec to check if everything is running or not.
+
+** running 10 sec of sim in "20june16_A2_falcor" using sn.json (cp sn.json sim.json)
+
+** Had discussion with Sam
+-- reduce network by removing V4 and MT layers.
+-- push the connectivity prob between pre and post motor neurons to maximum
+-- create a simulation of pong game with simple scenerios.
+
+
+
+-- ball color 236,236,236 (width = 2 , height = 4)
+-- racket color 92,186,92 (width = 4 ,height = 16 pixels)
+-- background color 144,72,17
+-- other racket: 213,130,74
+import gym
+import random
+env = gym.make('PongNoFrameskip-v4',repeat_action_probability=0)
+env.reset()
+for _ in range(20):
+  caction = random.randint(3,4)
+  observation, reward, done, info = env.step(caction)
+
+
+
+
+######################################
+import numpy as np
+
+class simulatePong:
+  def __init__ (self):
+    self.court_top = 36
+    self.court_bottom = 195
+    self.ball_width = 2
+    self.ball_height = 4
+    self.racket_width = 4
+    self.racket_height = 16
+    # start ball from the middle
+    self.ypos_ball = 80  # this corresponds to 0 index
+    self.xpos_ball = 20  # this corresponds to 1 index
+    self.xpos_racket = 140 # this is fixed
+    self.ypos_racket = 80 # this can change
+    # create background
+    self.obs = np.zeros(shape=(210,160,3))
+    self.obs[self.court_top:self.court_bottom,:,0]=144
+    self.obs[self.court_top:self.court_bottom,:,1]=72
+    self.obs[self.court_top:self.court_bottom,:,2]=17
+    # create ball
+    self.b1x = self.xpos_ball
+    self.b2x = self.xpos_ball+self.ball_width
+    self.b1y = self.court_top+self.ypos_ball
+    self.b2y = self.court_top+self.ypos_ball+self.ball_height  
+    self.obs[self.b1y:self.b2y,self.b1x:self.b2x,0]=236
+    self.obs[self.b1y:self.b2y,self.b1x:self.b2x,1]=236
+    self.obs[self.b1y:self.b2y,self.b1x:self.b2x,2]=236
+    # create racket
+    self.r1x = self.xpos_racket
+    self.r2x = self.xpos_racket+self.racket_width
+    self.r1y = self.court_top+self.ypos_racket
+    self.r2y = self.court_top+self.ypos_racket+self.racket_height
+    self.obs[self.r1y:self.r2y,self.r1x:self.r2x,0]= 92
+    self.obs[self.r1y:self.r2y,self.r1x:self.r2x,1]= 186
+    self.obs[self.r1y:self.r2y,self.r1x:self.r2x,0]= 92
+
+  def createnewframe(self):
+    self.obs = np.zeros(shape=(210,160,3))
+    self.obs[self.court_top:self.court_bottom,:,0]=144
+    self.obs[self.court_top:self.court_bottom,:,1]=72
+    self.obs[self.court_top:self.court_bottom,:,2]=17
+
+  def moveball(self,xshift_ball,yshift_ball):
+    self.b1x = self.b1x+xshift_ball
+    self.b2x = self.b2x+xshift_ball
+    self.b1y = self.b1y+yshift_ball
+    self.b2y = self.b2y+yshift_ball
+    self.obs[self.b1y:self.b2y,self.b1x:self.b2x,0]=236
+    self.obs[self.b1y:self.b2y,self.b1x:self.b2x,1]=236
+    self.obs[self.b1y:self.b2y,self.b1x:self.b2x,2]=236
+
+  def moveracket(self,yshift_racket):
+    self.r1y = self.r1y+yshift_ball
+    self.r2y = self.r2y+yshift_ball
+    self.obs[self.r1y:self.r2y,self.r1x:self.r2x,0]= 92
+    self.obs[self.r1y:self.r2y,self.r1x:self.r2x,1]= 186
+    self.obs[self.r1y:self.r2y,self.r1x:self.r2x,0]= 92
+
+  def step(self,action):
+    if action==3:
+      yshift_racket=10
+    elif action==4:
+      yshift_racket=-10
+    else:
+      yshift_racket=0
+    self.createnewframe()
+    self.moveracket(yshift_racket)
+    self.moveball(xshift_ball=3, yshift_ball=0)
+    if self.b2x>=self.r1x:
+      if ((self.b1y>self.r1y) and (self.b1y<self.r2y)) or ((self.b2y>self.r1y) and (self.b2y<self.r2y)): # if upper or lower edge of the ball is within the range of the racket 
+        reward = 1
+      else:
+        reward = -1
+    else:
+      reward = 0
+    if self.b2x>self.r2x+4:
+      self.ypos_ball = 80
+      self.xpos_ball = 20
+  return self.obs, reward
+
+
+from matplotlib import pyplot as plt
+import numpy as np
+from simulatePong import simulatePong
+pong = simulatePong()
+
+obs, reward, done = pong.step(1)
+plt.imshow(obs.astype(np.uint8))
+plt.show()
+
+
+* 20june18
+
+** integrated simulatePong in the game
+-- simple ball movement from left side of the court to right side of the screen implemented.
+-- racket can be controled by Motor Cortex model.
+-- when the ball is hit by the racket (reward = 1 is generated and done = 1 is set), the ball is reset to the initial position i.e. on the left side of the court
+-- when the ball is missed by the racket (reward = -1 is generated and done = 1), the ball is reset to the initial position i.e. on the left side of the ciurt.
+
+** set 'useSimulatedEnv' =  1 in sim.json to use simulatedPong instead of aigame enviroment.
+
+** test if simulatePong is working well.
+
+** add dconf['simulatedEnvParams']['yball'] and dconf['simulatedEnvParams']['yracket'] in sim.json to be used with simulatePong.py
+
+** randomly moving opponent racket added in simulatePong.py
+
+** fixed bugs
+-- set type of self.obs to uint8 in simulatePong.py
+-- fix the court range in simulatePong.py
+
+* 20june19
+
+** ran '20june18_C_' for 1000 sec.
+-- something seems off.
+-- learning does not improve follow the ball.
+-- hit was awarded a score 1. so its different than regular game, where hit was awarded score for being hit.
+-- looking the act video to find what went wrong.
+
+* 20june22
+
+** ran '20june22_A_' for 100 sec using reduced architecture (parameters copied from sn.json).
+
+** when using simulatedPong, use scorePoint=0.5 instead of scorePoint=1.0
