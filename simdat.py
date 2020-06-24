@@ -899,7 +899,52 @@ def plotallinputmaps (pdf, t, postid, poty, dnumc, dstartidx, dendidx, lprety=['
     colorbar()
   return drfmap
   
-  
+ #
+def getrecurrentmap(pdf, t, nety, dnumc, dstartidx, dendidx, asweight=False): #Individual map for pop
+  postid = dstartidx[nety] + 0  #checks reccurrent connectivity to postid neuron, which is first neuron in pop
+  nrow = ncol = int(np.sqrt(dnumc[nety]))
+  rfmap = np.zeros((nrow,ncol))
+  pdfs = pdf[(pdf.postid==postid) & (pdf.preid>dstartidx[nety]) & (pdf.preid<=dendidx[nety]) & (pdf.time==t)]
+  if len(pdfs) < 1: return rfmap
+  if not asweight:
+    for idx in pdfs.index:
+      preid = int(pdfs.at[idx,'preid'])
+      x,y = gid2pos(dnumc[nety], dstartidx[nety], preid)
+      rfmap[y,x] += 1
+  else:
+    rfcnt = np.zeros((nrow,ncol))
+    for idx in pdfs.index:
+      preid = int(pdfs.at[idx,'preid'])
+      x,y = gid2pos(dnumc[nety], dstartidx[nety], preid)
+      rfcnt[y,x] += 1
+      rfmap[y,x] += pdfs.at[idx,'weight']
+    for y in range(nrow):
+      for x in range(ncol):
+        if rfcnt[y,x]>0: rfmap[y,x]/=rfcnt[y,x]         #rfmap integrates weight, take the average
+  return rfmap
+
+ #
+def getallrecurrentmaps (pdf, t, dnumc, dstartidx, dendidx, lnety = ['EV1DNW', 'EV1DN', 'EV1DNE', 'EV1DW', 'EV1','EV1DE','EV1DSW', 'EV1DS', 'EV1DSE'], asweight=False):
+  # gets all recurrent maps in lnety
+  return {nety:getrecurrentmap(pdf, t, nety, dnumc, dstartidx, dendidx, asweight=asweight) for nety in lnety}
+
+ #
+def plotallrecurrentmaps (pdf, t, dnumc, dstartidx, dendidx, lnety = ['EV1DNW', 'EV1DN', 'EV1DNE', 'EV1DW', 'EV1','EV1DE','EV1DSW', 'EV1DS', 'EV1DSE'], asweight=False, cmap='jet',dmap=None):
+  if dmap is None:
+    drfmap = getallrecurrentmaps(pdf, t, dnumc, dstartidx, dendidx, lnety, asweight=asweight)
+  else:
+    drfmap = dmap
+  vmin,vmax = 1e9,-1e9
+  for nety in lnety:
+    vmin = min(vmin, np.amin(drfmap[nety]))
+    vmax = max(vmax, np.amax(drfmap[nety]))
+  for tdx,nety in enumerate(lnety):
+    postid = dstartidx[nety] + 0        #recalculate postid, same as in getrecurrentmap
+    subplot(3,3,tdx+1)                  #3x3 plot, max9 subplots. Can be changed
+    imshow(drfmap[nety],cmap=cmap,origin='upper',vmin=vmin,vmax=vmax);
+    title(nety+'->'+nety+str(postid));
+    colorbar()
+  return drfmap
       
 if __name__ == '__main__':
   stepNB = -1

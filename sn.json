@@ -1,6 +1,8 @@
 
 {
-    "env":  {"name": "PongNoFrameskip-v4", "savemp4":0},    
+    "env":  {"name": "PongNoFrameskip-v4", "savemp4":0},
+    "useSimulatedEnv": 0,
+    "simulatedEnvParams": {"yball":80,"yracket":40},    
     "moves": {"UP": 4,"DOWN":3, "NOMOVE":1},
     "movecodes": [1,3,4],
     "movefctr": 1.0,
