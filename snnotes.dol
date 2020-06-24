@@ -9219,6 +9219,9 @@ use
 20jun20_F0_targetted_tank_synWeights_final.pkl
 to continue on falcor as 20jun23_F1_targetted_tank_
 
+./myrun 16 sn.json
+
+started @ ~22:23 ...
 
 ** continue 20jun20_E3_targetted_falcor_ as 20jun23_E4_targetted_falcor_
 
