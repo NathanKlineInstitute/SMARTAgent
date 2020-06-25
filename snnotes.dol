@@ -9241,7 +9241,7 @@ started @ 17:28 ...
 
 
 *20jun24
-** check output from 20jun23_F1_targetted_tank_
+** check output from 20jun23_F1_targetted_tank_ continue as 20jun24_F2_targetted_tank_
 
 backupcfg/20jun20_F0_targetted_tank_sim.json
 
@@ -9286,8 +9286,32 @@ pdfsDOWN = pdfs[(pdfs.postid>=dstartidx['EMDOWN'])&(pdfs.postid<=dendidx['EMDOWN
 np.mean(pdfsUP.weight),np.mean(pdfsDOWN.weight) # (1.6342212432719612e-05, 1.8452168483336483e-05)
 
 also strange that EMDOWN has a slightly higher average firing rate (14.98 Hz) than EMUP average firing rate (14.88 Hz)
+if EMDOWN is firing more would expect bias on the other side (bottom)
 
 pdfs = pdf[pdf.time==np.amax(pdf.time)]; D = pdf2weightsdict(pdfs); pickle.dump(D, open('data/'+simstr+'synWeights_final.pkl','wb'))
+# data/20jun23_F1_targetted_tank_synWeights_final.pkl
 
 fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4',showflow=False) #
+# gif/20jun24_20jun23_F1_targetted_tank__input.mp4
+does look like it's learning ... has the usual screwups ... worth continuing ... 
+
+#
+actlearn0 = pd.DataFrame(np.loadtxt('data/20jun20_F0_targetted_tank_ActionsRewards.txt'),columns=['time','action','reward','proposed','hit'])
+actlearn1 = pd.DataFrame(np.loadtxt('data/20jun23_F1_targetted_tank_ActionsRewards.txt'),columns=['time','action','reward','proposed','hit'])
+actlearn1.time += 800e3
+pda = actlearn0; pda = pda.append(actlearn1); 
+
+#
+clf()
+plotFollowBall(pda,ax=subplot(1,3,1),cumulative=True,color='r'); ylim((0,.6))
+plotHitMiss(pda,ax=subplot(1,3,2)); 
+plotRewards(pda,ax=subplot(1,3,3)); 
+
+score, hit, miss: (27, 89, 426)
+
+savefig('gif/'+dstr+simstr+'perf_step0_step1.png') # 
+
+./myrun 16 sn.json
+
+started ~21:47 ...
 
