@@ -3324,9 +3324,137 @@ plt.show()
 -- learning does not improve follow the ball.
 -- hit was awarded a score 1. so its different than regular game, where hit was awarded score for being hit.
 -- looking the act video to find what went wrong.
+-- looks like between 30 and 31 minutes in the actmap.mp4, many populations become epileptic... that is when the learning/performance starts going down.
+   -- may be the parameters are not good to produce stable activity.
 
 * 20june22
 
 ** ran '20june22_A_' for 100 sec using reduced architecture (parameters copied from sn.json).
 
 ** when using simulatedPong, use scorePoint=0.5 instead of scorePoint=1.0
+
+** ran 400 sec simulation in '20june22_B' with reduced architecture (parameters copied from sn.json), simulated Pong and scorePoint of 0.5.
+-- results dont seem to improve. see saved plots.
+
+** rerun with lower weights in '20june22_C'.
+-- reduce all weights to half.
+-- too weak .... increase it so that its 3/4 of original---> DO that after '20june22_D'
+
+** rerun with parameters same as in '20june22_B' but with targeted RL on.
+-- results are saved in '20june22_D'
+-- run for 500 sec.
+
+** DISCUSSION:
+-- I think part of problem is that it's difficult to get any kind of stability with the output encoding used and there seems to be some bias to moving up from the get-go
+-- it seems different from totally random movement in the beginning
+-- so one question is if the RL is just spending all its time overcoming the bias then it won't be able to learn effectively...
+-- could look into source of bias, improving the output encoding, and maybe the related momentum issue
+-- but I think the movie shows that there is some learning taking place, it's just difficult to measure at each timestep
+-- biases seem easier to fix
+-- if there's any lack of symmetry in inputs could cause the bias, so could check for those...for output encoding had a param that controls diff btwn rates of two populations to allow a middle ground; 
+
+** SUGGESTIONS:
+-- also had some suggestion about population that produces a "hold" output
+-- or could have some EMDown -> inhib -> EMUp? when EMDown fires a lot suppresses other pop and vice versa?
+
+
+
+** TO RESUME SIMULATION:
+
+so if i want to continue run from previous sim, i just change ResumeSim to 1 and ResumeSimFromFIle name in sim.json?
+samn  2:01 PM
+yeah
+i'd suggest that you just save the final weights to a file first
+pdfs = pdf[pdf.time==np.amax(pdf.time)]; D = pdf2weightsdict(pdfs); pickle.dump(D, open('data/'+simstr+'synWeights_final.pkl','wb'))
+for example, and use that output filename
+(that's after loading simdat.py)
+
+Haroon Anwar  2:02 PM
+use that output filename for what?
+
+samn  2:02 PM
+for the resumesimfromfile name
+since it's smaller file
+otherwise could run out of memory if 16 processes load a huge file
+
+
+** new machine at nki
+ssh hanwar@10.76.252.198
+haroonnki20
+bash
+
+
+** i had resumed simulation '20june22_D' in '20june22_D2' using '20june22_D_synWeights_final.pkl'
+-- it looks like the simulation was started from the initial values.
+-- to confirm this, i will rerun sim in '20june22_D3' for only 10 sec using '20june22_D_synWeights.pkl'
+-- looks like the problem was that if i am not using multistepSim, then i need to specify synWeights file name as 'data/20june22_D_synWeights.pkl'
+-- running now after fixing path.
+
+** repeat '20june22_D2_' sim. 500 sec
+
+** repeat '20june22_D3_' sim. 1000 sec.
+
+** add 'EMSTAY' population in the simulation
+
+** Rule change:
+-- if firing rate of UP neurons is higher than firing rates of DOWN neurons and STAY neurons, then move UP.
+-- if firing rate of DOWN neurons is higher than firing rates of UP neurons and STAY neurons, then move DOWN.
+-- if firing rate of STAY neurons is higher than firing rates of UP neurons and DOWN neurons, then NO MOVE.
+-- if firing rate of UP neurons and STAY neurons is same and also higher than the firing rate of DOWN neurons, then choose randomly either to move UP or NO MOVE.
+-- if firing rate of DOWN neurons and STAY neurons is same and also higher than the firing rate of UP neurons, then choose randomly either to move DOWN or NO MOVE.
+-- if firing rate of UP neurons and DOWN neurons is same and also higher than the firing rate of STAY neurons, then choose randomly either to move UP or DOWN.
+-- if none of the above mentioned conditions hold true then choose a random action from UP, DOWN or NO MOVE. 
+
+      if 'movefctr' in dconf: movefctr=dconf['movefctr']
+      if 'randmove' in dconf: randmove=dconf['randmove']
+      if randmove:
+        lmoves = list(dconf['moves'].values())
+        for ts in range(int(dconf['actionsPerPlay'])): actions.append(lmoves[np.random.randint(0,len(lmoves))])
+      else:
+        for ts in range(int(dconf['actionsPerPlay'])):
+          if (F_UPs[ts]>F_DOWNs[ts] * movefctr) and (F_UPs[ts]>F_STAYs[ts] * movefctr):
+            actions.append(dconf['moves']['UP'])
+          elif (F_DOWNs[ts]>F_UPs[ts] * movefctr) and (F_DOWNs[ts]>F_STAYs[ts] * movefctr):
+            actions.append(dconf['moves']['DOWN'])
+          elif (F_STAYs[ts]>F_UPs[ts] * movefctr) and (F_STAYs[ts]>F_DOWNs[ts] * movefctr):
+            actions.append(dconf['moves']['NOMOVE']) # No move
+          elif (F_UPs[ts]>F_DOWNs[ts] * movefctr) and (F_UPs[ts]==F_STAYs[ts]):
+            actions.append(np.random.randint(dconf['moves']['UP'],dconf['moves']['NOMOVE']))
+          elif (F_DOWNs[ts]>F_UPs[ts] * movefctr) and (F_DOWNs[ts]==F_STAYs[ts]):
+            actions.append(np.random.randint(dconf['moves']['DOWN'],dconf['moves']['NOMOVE']))
+          elif (F_DOWNs[ts]>F_STAYs[ts] * movefctr) and (F_DOWNs[ts]==F_UPs[ts]):
+            actions.append(np.random.randint(dconf['moves']['DOWN'],dconf['moves']['UP']))
+          else:
+            lmoves = list(dconf['moves'].values())
+            actions.append(lmoves[np.random.randint(0,len(lmoves))])
+            #actions.append(dconf['moves']['NOMOVE']) # No move       
+
+** RULE CHANGE for targeted RL:
+
+    if not dconf['sim']['targettedRL']:
+      if dconf['verbose']: print('APPLY RL to EMUP, EMDOWN and EMSTAY')
+      for STDPmech in dSTDPmech['all']: STDPmech.reward_punish(float(critic))
+    elif UPactions>DOWNactions and UPactions>STAYactions:
+      if dconf['verbose']: print('APPLY RL to EMUP')
+      for STDPmech in dSTDPmech['EMUP']: STDPmech.reward_punish(float(critic))
+    elif DOWNactions>UPactions and DOWNactions>STAYactions:
+      if dconf['verbose']: print('APPLY RL to EMDOWN')
+      for STDPmech in dSTDPmech['EMDOWN']: STDPmech.reward_punish(float(critic))
+    elif STAYactions>UPactions and STAYactions>DOWNactions:
+      if dconf['verbose']: print('APPLY RL to EMSTAY')
+      for STDPmech in dSTDPmech['EMSTAY']: STDPmech.reward_punish(float(critic))
+    elif UPactions==DOWNactions and UPactions>STAYactions:
+      if dconf['verbose']: print('APPLY RL to EMUP and EMDOWN')
+      for STDPmech in dSTDPmech['EMUP']: STDPmech.reward_punish(float(critic))
+      for STDPmech in dSTDPmech['EMDOWN']: STDPmech.reward_punish(float(critic))
+    elif UPactions==STAYactions and UPactions>DOWNactions:
+      if dconf['verbose']: print('APPLY RL to EMUP and EMSTAY')
+      for STDPmech in dSTDPmech['EMUP']: STDPmech.reward_punish(float(critic))
+      for STDPmech in dSTDPmech['EMSTAY']: STDPmech.reward_punish(float(critic))
+    elif DOWNactions==STAYactions and DOWNactions>UPactions:
+      if dconf['verbose']: print('APPLY RL to EMDOWN and EMSTAY')
+      for STDPmech in dSTDPmech['EMDOWN']: STDPmech.reward_punish(float(critic))
+      for STDPmech in dSTDPmech['EMSTAY']: STDPmech.reward_punish(float(critic))
+    elif DOWNactions==STAYactions and UPactions==STAYactions:
+      if dconf['verbose']: print('APPLY RL to EMUP, EMDOWN and EMSTAY')
+      for STDPmech in dSTDPmech['all']: STDPmech.reward_punish(float(critic))
