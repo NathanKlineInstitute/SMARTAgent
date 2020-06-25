@@ -943,11 +943,11 @@ def trainAgent (t):
           elif (F_STAYs[ts]>F_UPs[ts] * movefctr) and (F_STAYs[ts]>F_DOWNs[ts] * movefctr):
             actions.append(dconf['moves']['NOMOVE']) # No move
           elif (F_UPs[ts]>F_DOWNs[ts] * movefctr) and (F_UPs[ts]==F_STAYs[ts]):
-            actions.append(np.random.randint(dconf['moves']['UP'],dconf['moves']['NOMOVE']))
+            actions.append(np.random.choice([dconf['moves']['UP'],dconf['moves']['NOMOVE']]))
           elif (F_DOWNs[ts]>F_UPs[ts] * movefctr) and (F_DOWNs[ts]==F_STAYs[ts]):
-            actions.append(np.random.randint(dconf['moves']['DOWN'],dconf['moves']['NOMOVE']))
+            actions.append(np.random.choice([dconf['moves']['DOWN'],dconf['moves']['NOMOVE']]))
           elif (F_DOWNs[ts]>F_STAYs[ts] * movefctr) and (F_DOWNs[ts]==F_UPs[ts]):
-            actions.append(np.random.randint(dconf['moves']['DOWN'],dconf['moves']['UP']))
+            actions.append(np.random.choice([dconf['moves']['DOWN'],dconf['moves']['UP']]))
           else:
             lmoves = list(dconf['moves'].values())
             actions.append(lmoves[np.random.randint(0,len(lmoves))])
