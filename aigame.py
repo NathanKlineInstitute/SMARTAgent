@@ -25,11 +25,13 @@ from imgutils import getoptflow
 from imgutils import getObjectsBoundingBoxes, getObjectMotionDirection
 import cv2
 from centroidtracker import CentroidTracker
+from conf import dconf
 
 # make the environment - env is global so that it only gets created on a single node (important when using MPI with > 1 node)
 try:
-  from conf import dconf
-  if dconf['useSimulatedEnv']==1:
+  useSimulatedEnv = False
+  if 'useSimulatedEnv' in dconf: useSimulatedEnv = dconf['useSimulatedEnv']
+  if useSimulatedEnv:
     from simulatePong import simulatePong
     pong = simulatePong()
   else:
