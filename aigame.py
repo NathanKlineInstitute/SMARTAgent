@@ -28,8 +28,8 @@ from centroidtracker import CentroidTracker
 from conf import dconf
 
 # make the environment - env is global so that it only gets created on a single node (important when using MPI with > 1 node)
+useSimulatedEnv = False
 try:
-  useSimulatedEnv = False
   if 'useSimulatedEnv' in dconf: useSimulatedEnv = dconf['useSimulatedEnv']
   if useSimulatedEnv:
     from simulatePong import simulatePong
@@ -64,7 +64,7 @@ class AIGame:
   """ Interface to OpenAI gym game 
   """
   def __init__ (self,fcfg='sim.json'): # initialize variables
-    if dconf['useSimulatedEnv']==1: self.pong = pong
+    if useSimulatedEnv: self.pong = pong
     else: self.env = env
     self.countAll = 0
     self.ldir = ['E','NE','N', 'NW','W','SW','S','SE']
@@ -268,7 +268,7 @@ class AIGame:
         proposed_action = -1 #if there is no last_obs
         ypos_Ball = -1 #if there is no last_obs, no position of ball
         xpos_Ball = -1 #if there is no last_obs, no position of ball
-      if dconf['useSimulatedEnv']==1:
+      if useSimulatedEnv:
         observation, reward, done = self.pong.step(caction)
       else:
         observation, reward, done, info = self.env.step(caction)
@@ -322,12 +322,11 @@ class AIGame:
       print(ball_hits_racket)
       self.last_ball_dir = current_ball_dir
       total_hits.append(ball_hits_racket) # i dont think this can be more than a single hit in 5 moves. so check if sum is greater than 1, print error
-      if dconf['useSimulatedEnv']==0:
+      if not useSimulatedEnv:
         self.env.render()
       self.last_obs = observation # current observation will be used as last_obs for the next action
       if done:
-        if dconf['useSimulatedEnv']==0:
-          self.env.reset()
+        if not useSimulatedEnv: self.env.reset()
         self.last_obs = [] # when the game ends, and new game starts, there is no last observation
         self.last_ball_dir=0
         done = False
@@ -366,9 +365,9 @@ class AIGame:
 
     if done: # done means that 1 episode of the game finished, so the environment needs to be reset. 
       epCount.append(self.countAll)
-      if dconf['useSimulatedEnv']==0:
+      if not useSimulatedEnv:
         self.env.reset()
-        self.env.frameskip = 3 
+        #self.env.frameskip = 3 # why is frameskip set to 3??
       self.countAll = 0 
     if np.sum(total_hits)>1:
       print('ERROR COMPUTING NUMBER OF HITS')
