@@ -202,7 +202,7 @@ def animActivityMaps (outpath='gif/'+dconf['sim']['name']+'actmap.mp4', framerat
   return fig, axs, plt
 
 #
-def animInput (InputImages, outpath, framerate=10, figsize=None, showflow=True, ldflow=None, dobjpos=None):
+def animInput (InputImages, outpath, framerate=10, figsize=None, showflow=False, ldflow=None, dobjpos=None):
   # animate the input images; showflow specifies whether to calculate/animate optical flow
   ioff()
   # plot input images and optionally optical flow
