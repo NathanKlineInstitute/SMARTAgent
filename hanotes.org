@@ -3498,3 +3498,138 @@ on falcor
 
 
 ** use random.choice with list of actions instead of random.randint
+
+** Some ideas discussed with Sam
+
+Haroon Anwar
+so i was thinking-----
+if we didnt have to follow this stupid RL rule of pre-post spiking
+
+samn  2:50 PM
+pre->post, well, it worked in the past but there's also hebbian rule
+
+Haroon Anwar  2:50 PM
+i would have ran random actions and based on actions, make connections stronger or weaker
+i am not criticizing that
+
+samn  2:50 PM
+random actions produced by model?
+
+Haroon Anwar  2:51 PM
+just trying to be creative
+
+samn  2:51 PM
+you can criticize
+how else to make it beter
+
+Haroon Anwar  2:51 PM
+thats training phase i am talking about during training
+make random actions
+but make connections stronger or weaker between pre and postM
+once training is done, then let M decide
+coz now we will have only synapses which are relevant
+
+samn  2:52 PM
+so random actions - and which synapses are strengthened/weakened?
+
+Haroon Anwar  2:52 PM
+that would be topological neurons in M
+
+samn  2:52 PM
+the ones that contribute to action? so all of the ones that contribute?
+
+Haroon Anwar  2:52 PM
+with targeted
+
+samn  2:53 PM
+how do you know if they contributed?
+if they were silent recently should they be strengthened?
+
+Haroon Anwar  2:53 PM
+no contribution
+i know the neuron representing a space in visual field
+
+samn  2:53 PM
+so if pre and postsynaptic neuron fired recently, then strengthen synapse if it contributed to the right action
+and weaken it if it contributed to the wrong action
+
+Haroon Anwar  2:54 PM
+no post synaptic neurons are not involved in anything here
+
+samn  2:54 PM
+post synaptic is the M neurons that contribute to an action
+
+Haroon Anwar  2:54 PM
+but during training they dont
+
+samn  2:55 PM
+since it's random action - so i'm unclear about which synapses to strengthen and weaken then
+you mean to strengthen all synapses projecting to a EM population?
+
+Haroon Anwar  2:55 PM
+spatially associated postsynaptic M neuron and presynaptic neurons
+no not all
+we dont use all to all connectivity
+we do topological connectivity
+in M too
+
+samn  2:56 PM
+i was using all or close to all to EM recently
+without topology in M
+probabalistic
+if you have different rule, can try it too
+just want one that will work and is bio plausible
+
+Haroon Anwar  2:56 PM
+I am proposing this --> we dont use all to all connectivity
+we do topological connectivity in M too
+not saying we did that
+
+samn  2:57 PM
+ic
+so spatially associated postsynaptic M neuron synapses are strengthened in which condition?
+when they receive synaptic inputs that cause the right action?
+
+Haroon Anwar  2:58 PM
+when UP is good , UP neuron for that location
+when DOWN is good, DOWN neuron for that location
+
+samn  2:58 PM
+that sg to try
+
+Haroon Anwar  2:58 PM
+this way only those neurons will get selectivity excited
+
+samn  2:58 PM
+yes, that seems like an interesting algorithm
+take note of it and can try it if have time
+
+
+** sim with 'EMSTAY' in '20june25_D_' gives weird results.
+-- racket get stuck on upper corner or lower corner.
+-- RLhebbwt was 0.0000002
+
+** sim with 'EMSTAY' in '20june25_E_' still gives weird results.
+
+** run sim with 0 pop size of 'EMSTAY' in '2ojune25_F_'
+
+** pass lpop to the following functions in simdat.py otherwise by default allpossible_pops will be passed.
+-- use the following code to see which of the pops are defined for the simulation network. 
+  allpossible_pops = ['ER','IR','EV1','EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE','IV1','EV4','IV4','EMT','IMT','EMDOWN','EMUP','EMSTAY','IM']
+  lpop = []
+  for pop_ind in range(len(allpossible_pops)):
+    cpop = allpossible_pops[pop_ind]
+    if cpop in dconf:
+      if dconf['net'][cpop]>0:
+        lpop.append(cpop)
+  print('lpop: ', lpop)
+  simConfig, pdf, actreward, dstartidx, dendidx, dnumc, dspkID, dspkT, InputImages, ldflow, dact = loadsimdat(getactmap=False,lpop)
+
+-- dact = getdActMap (totalDur, tstepPerAction, dspkT, dspkID, dnumc, dstartidx,\
+                lpop = allpossible_pops)
+-- loadsimdat (name=None,getactmap=True,lpop = allpossible_pops): # load simulation data
+-- animActivityMaps (outpath='gif/'+dconf['sim']['name']+'actmap.mp4', framerate=10, figsize=(18,10), dobjpos=None,\
+  lpop = allpossible_pops): # plot activity in different layers as a function of input images
+
+
+** test simdat.py.....
