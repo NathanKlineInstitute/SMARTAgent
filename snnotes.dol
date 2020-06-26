@@ -9578,3 +9578,8 @@ lpop = ['ER', 'EV1', 'EV4', 'EMT', 'IR', 'IV1', 'IV4', 'IMT','EV1DW','EV1DNW', '
 dact = getdActMap(totalDur, tstepPerAction, dspkT, dspkID, dnumc, dstartidx, lpop)
 fig, axs, plt = animActivityMaps() # 
 
+** actmap movie labels need to be adjusted for reduced architecture (no V4, MT)
+
+should also potentially include rewards(hit,miss,score) and weights in the movie
+so can see full (moving) picture ... 
+
