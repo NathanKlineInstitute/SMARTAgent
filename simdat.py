@@ -22,7 +22,7 @@ rcParams['font.size'] = 12
 tl=tight_layout
 stepNB = -1
 totalDur = int(dconf['sim']['duration']) # total simulation duration
-
+allpossible_pops = ['ER','IR','EV1','EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE','IV1','EV4','IV4','EMT','IMT','EMDOWN','EMUP','EMSTAY','IM']
 def pdf2weightsdict (pdf):
   # convert the pandas dataframe with synaptic weights into a dictionary
   D = {}
@@ -967,7 +967,7 @@ if __name__ == '__main__':
     except:
       pass
   print(stepNB)
-  allpossible_pops = ['ER','IR','EV1','EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE','IV1','EV4','IV4','EMT','IMT','EMDOWN','EMUP','EMSTAY','IM']
+  #allpossible_pops = ['ER','IR','EV1','EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE','IV1','EV4','IV4','EMT','IMT','EMDOWN','EMUP','EMSTAY','IM']
   lpop = []
   for pop_ind in range(len(allpossible_pops)):
     cpop = allpossible_pops[pop_ind]
@@ -975,7 +975,7 @@ if __name__ == '__main__':
       if dconf['net'][cpop]>0:
         lpop.append(cpop)
   print('lpop: ', lpop)
-  simConfig, pdf, actreward, dstartidx, dendidx, dnumc, dspkID, dspkT, InputImages, ldflow, dact = loadsimdat(getactmap=False,lpop)
+  simConfig, pdf, actreward, dstartidx, dendidx, dnumc, dspkID, dspkT, InputImages, ldflow, dact = loadsimdat(getactmap=False,lpop=lpop)
   dstr = getdatestr(); simstr = dconf['sim']['name'] # date and sim string
   print('loaded simulation data',simstr,'on',dstr)
   #davgw = plotavgweights(pdf)
