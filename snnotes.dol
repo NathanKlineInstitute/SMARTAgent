@@ -9583,3 +9583,6 @@ fig, axs, plt = animActivityMaps() #
 should also potentially include rewards(hit,miss,score) and weights in the movie
 so can see full (moving) picture ... 
 
+*20jun26
+** setting up on cycle
+

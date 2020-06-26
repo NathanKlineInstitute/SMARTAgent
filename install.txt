@@ -1,3 +1,44 @@
+=============================================================
+condensed commands:
+ if using miniconda:
+  bash ~/Downloads/Miniconda3-latest-Linux-x86_64.sh
+ if using anaconda:
+  bash ~/Downloads/Anaconda3-2020.02-Linux-x86_64.sh
+
+conda install numpy scipy matplotlib pandas scikit-image
+pip install 'gym[atari]'
+conda install imageio-ffmpeg -c conda-forge
+conda install gcc_linux-64 openmpi mpi4py cython
+conda install gxx_linux-64
+pip install neuron-nightly
+pip install netpyne --upgrade
+cd ~/SMARTAgent
+nrnivmodl mod
+
+=============================================================
+on cycle (server at nki)
+as root installed full anaconda in /opt/anaconda3
+using
+bash ~/Downloads/Anaconda3-2020.02-Linux-x86_64.sh
+then created lab group and set group for /opt/anaconda3 to lab
+and owner to samn
+make sure to export LD_LIBRARY_PATH=/opt/anaconda3/lib
+also have to use pipz instead of pip on nki machines
+pipz alias is alias pipz='pip --trusted-host files.pythonhosted.org --trusted-host pypi.org --trusted-host pypi.python.org'
+and make sure those aliases and exports in .bashrc
+
+conda install numpy scipy matplotlib pandas scikit-image
+pipz install 'gym[atari]'
+conda install imageio-ffmpeg -c conda-forge
+conda install gcc_linux-64 openmpi mpi4py cython
+conda install gxx_linux-64
+pipz install neuron-nightly
+pipz install netpyne --upgrade
+cd ~/SMARTAgent
+nrnivmodl mod
+
+=============================================================
+some of the commands with explanations
 
 first need to install anaconda or miniconda (to save space)
 
@@ -25,16 +66,3 @@ pip install netpyne --upgrade
 then from terminal in the SMARTAgent folder:
 nrnivmodl mod
 to compile the NEURON mod files
-
-condensed commands:
-bash ~/Downloads/Miniconda3-latest-Linux-x86_64.sh
-conda install numpy scipy matplotlib pandas scikit-image
-pip install 'gym[atari]'
-conda install imageio-ffmpeg -c conda-forge
-conda install gcc_linux-64 openmpi mpi4py cython
-conda install gxx_linux-64
-pip install neuron-nightly
-pip install netpyne --upgrade
-cd ~/SMARTAgent
-nrnivmodl mod
-
