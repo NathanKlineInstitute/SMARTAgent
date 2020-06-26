@@ -129,8 +129,8 @@ def animActivityMaps (outpath='gif/'+dconf['sim']['name']+'actmap.mp4', framerat
   for popind in range(len(possible_pops)):
     if possible_pops[popind] in lpop:
       ltitle.append(possible_titles[popind]) 
-    
-  if figsize is not None: fig, axs = plt.subplots(4, 5, figsize=figsize);
+  print('titles:', ltitle)  
+  if figsize is not None: fig, axs = plt.subplots(4, 6, figsize=figsize);
   else: fig, axs = plt.subplots(4, 6);
   lax = axs.ravel()
   cbaxes = fig.add_axes([0.95, 0.4, 0.01, 0.2])
