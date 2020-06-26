@@ -122,16 +122,16 @@ def animActivityMaps (outpath='gif/'+dconf['sim']['name']+'actmap.mp4', framerat
   lpop = allpossible_pops): # plot activity in different layers as a function of input images  
   ioff()
   possible_pops = ['ER','EV1','EV4','EMT','IR','IV1','IV4','IMT','EV1DW','EV1DNW','EV1DN'\
-    ,'EV1DNE','EV1DE','EV1DSW','EV1DS', 'EV1DSE','EMDOWN','EMUP','EMSTAY']
+    ,'EV1DNE','EV1DE','EV1DSW','EV1DS', 'EV1DSE','EMDOWN','EMUP','EMSTAY','IM']
   possible_titles = ['Excit R', 'Excit V1', 'Excit V4', 'Excit MT', 'Inhib R', 'Inhib V1', 'Inhib V4', 'Inhib MT',\
-    'W','NW','N','NE','E','SW','S','SE','Excit M DOWN', 'Excit M UP', 'Excit M STAY']
+    'W','NW','N','NE','E','SW','S','SE','Excit M DOWN', 'Excit M UP', 'Excit M STAY','Inhib M']
   ltitle = ['Input Images']
   for popind in range(len(possible_pops)):
     if possible_pops[popind] in lpop:
       ltitle.append(possible_titles[popind]) 
     
   if figsize is not None: fig, axs = plt.subplots(4, 5, figsize=figsize);
-  else: fig, axs = plt.subplots(4, 5);
+  else: fig, axs = plt.subplots(4, 6);
   lax = axs.ravel()
   cbaxes = fig.add_axes([0.95, 0.4, 0.01, 0.2])
   
@@ -164,7 +164,7 @@ def animActivityMaps (outpath='gif/'+dconf['sim']['name']+'actmap.mp4', framerat
       offidx=1
     else:
       offidx=0
-    if ldx==5:
+    if ldx==6:
       X, Y = np.meshgrid(np.arange(0, InputImages[0].shape[1], 1), np.arange(0,InputImages[0].shape[0],1))
       ddat[ldx] = ax.quiver(X,Y,ldflow[0]['thflow'][:,:,0],-ldflow[0]['thflow'][:,:,1], pivot='mid', units='inches',width=0.022,scale=1/0.15)
       ax.set_xlim((0,InputImages[0].shape[1])); ax.set_ylim((0,InputImages[0].shape[0]))
@@ -190,7 +190,7 @@ def animActivityMaps (outpath='gif/'+dconf['sim']['name']+'actmap.mp4', framerat
         offidx=-1
       else:
         offidx=0
-      if ldx == 5:
+      if ldx == 6:
         ddat[ldx].set_UVC(ldflow[t+offidx]['thflow'][:,:,0],-ldflow[t]['thflow'][:,:,1])        
       else:
         ddat[ldx].set_data(lact[idx][t+offidx,:,:])
