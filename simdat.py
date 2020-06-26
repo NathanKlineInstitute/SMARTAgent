@@ -967,13 +967,14 @@ if __name__ == '__main__':
     except:
       pass
   print(stepNB)
-  #allpossible_pops = ['ER','IR','EV1','EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE','IV1','EV4','IV4','EMT','IMT','EMDOWN','EMUP','EMSTAY','IM']
+  allpossible_pops = ['ER','IR','EV1','EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE','IV1','EV4','IV4','EMT','IMT','EMDOWN','EMUP','EMSTAY','IM']
   lpop = []
   for pop_ind in range(len(allpossible_pops)):
     cpop = allpossible_pops[pop_ind]
-    if cpop in dconf:
-      if dconf['net'][cpop]>0:
-        lpop.append(cpop)
+    print('cpop',cpop)
+    #if cpop in dconf:
+    if dconf['net'][cpop]>0:
+      lpop.append(cpop)
   print('lpop: ', lpop)
   simConfig, pdf, actreward, dstartidx, dendidx, dnumc, dspkID, dspkT, InputImages, ldflow, dact = loadsimdat(getactmap=False,lpop=lpop)
   dstr = getdatestr(); simstr = dconf['sim']['name'] # date and sim string
