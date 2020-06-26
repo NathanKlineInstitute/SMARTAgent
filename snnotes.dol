@@ -9398,3 +9398,188 @@ started ~22:18 ...
 could prevent paddle from moving so far to bottom or top of screen that only part of paddle is vislbe
 that would cnvert many of the misses into hits ... but ideally model should figure out never to do that...
 
+hmm, one reason racket might move up or down all the way when ball flying to top right or bottom right
+is that the model does not know the position of the racket as well as it knows the movement of the ball?
+so usually moving up when ball flying to top right will minimize chance of error ... 
+hmm, but model still hits ball when it's at intermediate position , so must have some
+accurate info about position of racket ... 
+
+*20jun25
+** use actmap to check if net looks epileptic -- this does still happen
+
+discussed with ha need for using normalization; still have to test that weight normalization
+does not interfere with function
+
+** check output from 20jun24_F2_targetted_tank_
+
+python -i simdat.py backupcfg/20jun24_F2_targetted_tank_sim.json
+
+#
+plotFollowBall(actreward,ax=subplot(1,3,1),cumulative=True,color='r'); ylim((0,.6))
+plotHitMiss(actreward,ax=subplot(1,3,2)); 
+plotRewards(actreward,ax=subplot(1,3,3)); ylim((-0.1,1))
+
+score,hit,miss (12, 40, 219) <<-- previous previous step
+score,hit,miss (15, 49, 207) <<-- previous step
+score,hit,miss (18, 62, 189) <<-- this step, increased performance
+
+savefig('gif/'+dstr+simstr+'perf.png') # 
+savefig('gif/'+dstr+simstr+'perfB.png') # 
+
+follow target probability rises early and then decays
+hit greater than miss early on when probability of following target highest ... 
+
+clf(); drawraster(dspkT,dspkID); savefig('gif/'+dstr+simstr+'rast.png') # 
+xlim((65e3,75e3)); savefig('gif/'+dstr+simstr+'rastB.png') # 
+xlim((790e3,800e3)); savefig('gif/'+dstr+simstr+'rastB.png') # 
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN']); savefig('gif/'+dstr+simstr+'Vm.png')
+
+#
+clf(); dobjpos = loadObjPos() ## hmm, did not save objpos?? got error ... 
+xlabel('Racket Y position'); hist(dobjpos['racket'][:,1])
+savefig('gif/'+dstr+simstr+'poshist.png')
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=True)
+xlabel('Time (ms)'); tl(); savefig('gif/'+dstr+simstr+'all_avg_weight.png')
+
+initial EEMWghtAM was 0.000012 now it's risen by > 50% ... 
+could multiply all weights by 0.75 before continuing, since that might be issue with further improvement ... 
+
+pdfs = pdf[pdf.time==np.amax(pdf.time)]; D = pdf2weightsdict(pdfs); pickle.dump(D, open('data/'+simstr+'synWeights_final.pkl','wb'))
+# data/20jun24_F2_targetted_tank_synWeights_final.pkl
+
+np.amax(pdf.weight) # 0.00010486205304156363
+
+0.00010486205304156363 / 0.000012 # 8.738504420130303
+
+pdf.weight *= 0.75
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=True)
+xlabel('Time (ms)'); tl(); savefig('gif/'+dstr+simstr+'all_avg_weight_reduced.png')
+
+np.mean(pdfs.weight) # 2.0353749694156496e-05
+avgfinalw = np.mean(pdfs.weight)
+initw = 0.000012 # initial weight
+avgfinalw / initw # 1.6961458078463747
+fctr = initw / avgfinalw # 0.5895719550607015
+
+pdf.weight *= fctr
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=True)
+xlabel('Time (ms)'); tl(); savefig('gif/'+dstr+simstr+'all_avg_weight_reduced.png')
+
+pdfs = pdf[pdf.time==np.amax(pdf.time)]; D = pdf2weightsdict(pdfs); pickle.dump(D, open('data/'+simstr+'synWeights_final_reduced.pkl','wb'))
+# data/20jun24_F2_targetted_tank_synWeights_final_reduced.pkl
+np.min(pdfs.weight) # 2.0263158815486595e-06
+can try using these normalized/reduced weights for continuation ... but will have to reduce "EEMWghtThreshMin":0.00000625
+try 0.000001
+and for "EEMWghtThreshMax":use 0.00016 instead of 0.00032
+will continue that way as 20jun25_F3_targetted_reduced_tank_ , and a comparison without the reduction
+
+#
+actlearn0 = pd.DataFrame(np.loadtxt('data/20jun20_F0_targetted_tank_ActionsRewards.txt'),columns=['time','action','reward','proposed','hit'])
+actlearn1 = pd.DataFrame(np.loadtxt('data/20jun23_F1_targetted_tank_ActionsRewards.txt'),columns=['time','action','reward','proposed','hit'])
+actlearn1.time += 800e3
+actlearn2 = pd.DataFrame(np.loadtxt('data/20jun24_F2_targetted_tank_ActionsRewards.txt'),columns=['time','action','reward','proposed','hit'])
+actlearn2.time += 1600e3
+pda = actlearn0; pda = pda.append(actlearn1); pda = pda.append(actlearn2); 
+
+#
+clf()
+plotFollowBall(pda,ax=subplot(1,3,1),cumulative=True,color='r'); ylim((0,.6))
+plotHitMiss(pda,ax=subplot(1,3,2)); 
+plotRewards(pda,ax=subplot(1,3,3)); 
+
+score, hit, miss: (27, 89, 426)
+score, hit, miss: (45, 151, 615) <<-- slightly improved ratio of hit/miss and score/miss
+(45-27.)/(615-426.) # 0.09523809523809523
+27/426. # 0.06338028169014084
+
+savefig('gif/'+dstr+simstr+'perf_step0_step1_step2.png') # 
+
+lpop = ['ER', 'EV1', 'EV4', 'EMT', 'IR', 'IV1', 'IV4', 'IMT','EV1DW','EV1DNW', 'EV1DN', 'EV1DNE','EV1DE','EV1DSW', 'EV1DS', 'EV1DSE','EMDOWN','EMUP']  
+dact = getdActMap(totalDur, tstepPerAction, dspkT, dspkID, dnumc, dstartidx, lpop)
+fig, axs, plt = animActivityMaps() # 
+
+./myrun 16 sn.json
+started @ 16:45 ... (20jun25_F3_targetted_reduced_tank_)
+
+and the other one without weight reduction using 
+data/20jun24_F2_targetted_tank_synWeights_final.pkl
+as 20jun25_F3_targetted_tank_
+./myrun 16 sn.json
+started @ 16:49 ... 
+
+** check output from 20jun24_E5_targetted_falcor_ -->> need to look more closely
+
+python -i simdat.py backupcfg/20jun24_E5_targetted_falcor_sim.json
+
+#
+plotFollowBall(actreward,ax=subplot(1,3,1),cumulative=True,color='r'); ylim((0,.6))
+plotHitMiss(actreward,ax=subplot(1,3,2)); 
+plotRewards(actreward,ax=subplot(1,3,3)); 
+
+from the last last sim score, hit, miss: (41, 140, 362)
+from the last sim score, hit, miss: (17, 58, 466)
+from this sim score, hit, miss: (10, 39, 224)
+
+10/224. # 0.044642857142857144
+39/224. # 0.17410714285714285
+
+savefig('gif/'+dstr+simstr+'perf.png') # 20jun25_20jun24_E5_targetted_falcor_perf.png
+
+maybe improving but not as good as sim with weightvar and two steps ago
+had much better performance (140/362 compared to 39/224, though the other sim ran for 2X duration) - 
+
+ax=subplot(1,3,2); cla(); plotHitMiss(actreward,ax=subplot(1,3,2),asratio=True); ax.set_ylim((0,0.2))
+score/miss, hit/miss = (0.044642857142857144, 0.17410714285714285)
+
+savefig('gif/'+dstr+simstr+'perfB.png') # 20jun25_20jun24_E5_targetted_falcor_perfB.png
+hit/miss ratio looks like slowly improving...
+
+clf(); drawraster(dspkT,dspkID); savefig('gif/'+dstr+simstr+'rast.png') # 
+xlim((790e3,800e3)); savefig('gif/'+dstr+simstr+'rastC.png') # 
+
+rcParams['agg.path.chunksize'] = 100000000000
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','IM']); xlim((790e3,800e3)); savefig('gif/'+dstr+simstr+'Vm.png'); 
+
+#
+clf(); dobjpos = loadObjPos() ## hmm, did not save objpos?? got error ... 
+xlabel('Racket Y position'); hist(dobjpos['racket'][:,1])
+savefig('gif/'+dstr+simstr+'poshist.png')
+don't see bias at extrema...
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=True)
+xlabel('Time (ms)'); tl(); savefig('gif/'+dstr+simstr+'all_avg_weight.png')
+
+lfn = ['20jun17_E0_targetted_falcor_ActionsRewards.txt','20jun18_E1_targetted_falcor_ActionsRewards.txt','20jun19_E2_targetted_falcor_ActionsRewards.txt','20jun20_E3_targetted_falcor_ActionsRewards.txt','20jun23_E4_targetted_falcor_ActionsRewards.txt','20jun24_E5_targetted_falcor_ActionsRewards.txt']
+lfn = ['data/'+x for x in lfn]
+pda = getconcatactionreward(lfn)
+
+#
+clf()
+plotFollowBall(pda,ax=subplot(1,3,1),cumulative=True,color='r'); ylim((0,.6))
+plotHitMiss(pda,ax=subplot(1,3,2),asratio=True); 
+plotRewards(pda,ax=subplot(1,3,3)); 
+
+final score/miss, hit/miss ratio: (0.06502636203866433, 0.20913884007029876)
+
+savefig('gif/'+dstr+simstr+'perf_step0_step1_step2_step3_step4_step5.png') # 
+
+so the performance increases, decreases, etc. . . in general may be increasing in terms
+of hits and score to miss ratios ... 
+
+pdfs = pdf[pdf.time==np.amax(pdf.time)]; D = pdf2weightsdict(pdfs); pickle.dump(D, open('data/'+simstr+'synWeights_final.pkl','wb'))
+# data/20jun24_E5_targetted_falcor_synWeights_final.pkl
+
+in case want to continue with reduced weights ... can do that if activity looks epileptic ... and should do within sim itself ... 
+via EEMPopNorm set to True/1 so that would normalize both populations' synapses by same amount ...
+
+lpop = ['ER', 'EV1', 'EV4', 'EMT', 'IR', 'IV1', 'IV4', 'IMT','EV1DW','EV1DNW', 'EV1DN', 'EV1DNE','EV1DE','EV1DSW', 'EV1DS', 'EV1DSE','EMDOWN','EMUP']  
+dact = getdActMap(totalDur, tstepPerAction, dspkT, dspkID, dnumc, dstartidx, lpop)
+fig, axs, plt = animActivityMaps() # 
+
+** actmap movie labels need to be adjusted for reduced architecture (no V4, MT)
+
+should also potentially include rewards(hit,miss,score) and weights in the movie
+so can see full (moving) picture ... 
+

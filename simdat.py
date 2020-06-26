@@ -446,7 +446,7 @@ def getCumScore (actreward):
   return np.cumsum(allScore) #cumulative score evolving with time.  
 
 #  
-def plotHitMiss (actreward,ax=None,msz=3):
+def plotHitMiss (actreward,ax=None,msz=3,asratio=False):
   if ax is None: ax = gca()
   action_times = np.array(actreward.time)
   Hit_Missed = np.array(actreward.hit)
@@ -455,13 +455,21 @@ def plotHitMiss (actreward,ax=None,msz=3):
   cumHits = np.cumsum(allHit) #cumulative hits evolving with time.
   cumMissed = np.cumsum(allMissed) #if a reward is -1, replace it with 1 else replace it with 0.
   cumScore = getCumScore(actreward)
-  ax.plot(action_times,cumScore,'r-o',markersize=msz)
-  ax.plot(action_times,cumHits,'g-o',markersize=msz)
-  ax.plot(action_times,cumMissed,'b-o',markersize=msz)
-  ax.set_xlim((0,np.max(action_times)))
-  ax.set_ylim((0,np.max([cumHits[-1],cumMissed[-1]])))
-  ax.legend(('Score ('+str(cumScore[-1])+')','Hit Ball ('+str(cumHits[-1])+')','Miss Ball ('+str(cumMissed[-1])+')'),loc='best')
-  return cumScore[-1],cumHits[-1],cumMissed[-1]
+  if asratio:
+    ax.plot(action_times,cumScore/cumMissed,'r-o',markersize=msz)
+    ax.plot(action_times,cumHits/cumMissed,'g-o',markersize=msz)
+    ax.set_xlim((0,np.max(action_times)))
+    #ax.set_ylim((0,np.max([cumHits[-1],cumMissed[-1]])))
+    ax.legend(('Score/Miss ('+str(round(cumScore[-1]/cumMissed[-1],2))+')','Hit/Miss ('+str(round(cumHits[-1]/cumMissed[-1],2))+')'),loc='best')
+    return cumScore[-1]/cumMissed[-1],cumHits[-1]/cumMissed[-1]
+  else:
+    ax.plot(action_times,cumScore,'r-o',markersize=msz)
+    ax.plot(action_times,cumHits,'g-o',markersize=msz)
+    ax.plot(action_times,cumMissed,'b-o',markersize=msz)
+    ax.set_xlim((0,np.max(action_times)))
+    ax.set_ylim((0,np.max([cumHits[-1],cumMissed[-1]])))    
+    ax.legend(('Score ('+str(cumScore[-1])+')','Hit Ball ('+str(cumHits[-1])+')','Miss Ball ('+str(cumMissed[-1])+')'),loc='best')
+    return cumScore[-1],cumHits[-1],cumMissed[-1]
 
 #  
 def plotScoreLoss (actreward,ax=None,msz=3):
@@ -488,6 +496,19 @@ def plotRewards (actreward,ax=None,msz=3,xl=None):
   ax.set_ylim((np.min(actreward.reward),np.max(actreward.reward)))
   ax.set_ylabel('Rewards'); #f_ax1.set_xlabel('Time (ms)')
 
+def getconcatactionreward (lfn):
+  # concatenate the actionreward data frames together so can look at cumulative rewards,actions,etc.
+  # lfn is a list of actionrewards filenames from the simulation
+  pda = None
+  for fn in lfn:
+    acl = pd.DataFrame(np.loadtxt(fn),columns=['time','action','reward','proposed','hit'])
+    if pda is None:
+      pda = acl
+    else:
+      acl.time += np.amax(pda.time)
+      pda = pda.append(acl)
+  return pda
+  
 def plotMeanNeuronWeight (pdf,postid,clr='k',ax=None,msz=1,xl=None):
   if ax is None: ax = gca()
   utimes = np.unique(pdf.time)
