@@ -9723,3 +9723,64 @@ since 20 ms per step
 and set EEMWghtThreshMax to 0.000012
 so that goes back to mean initial weight ... 
 
+** test on cycle -- more EMUP,EMDOWN,IM neurons -->> better performance?
+
+can scale up network and see if improves performance
+
+20jun26_G0_cycle_
+
+double number of EMDOWN, EMUP, IM to 32, 32, 16
+
+can try run of 3200 s ... 
+
+apparently have to configure to allow > 48 cores (64 complained)
+
+./myrun 64 sn.json
+
+Either request fewer slots for your application, or make more slots
+available for use.
+
+A "slot" is the Open MPI term for an allocatable unit where we can
+launch a process.  The number of slots available are defined by the
+environment in which Open MPI processes are run:
+
+  1. Hostfile, via "slots=N" clauses (N defaults to number of
+     processor cores if not provided)
+  2. The --host command line parameter, via a ":N" suffix on the
+     hostname (N defaults to 1 if not provided)
+  3. Resource manager (e.g., SLURM, PBS/Torque, LSF, etc.)
+  4. If none of a hostfile, the --host command line parameter, or an
+     RM is present, Open MPI defaults to the number of processor cores
+
+In all the above cases, if you want Open MPI to default to the number
+of hardware threads instead of the number of processor cores, use the
+--use-hwthread-cpus option.
+
+Alternatively, you can use the --oversubscribe option to ignore the
+number of available slots when deciding the number of processes to
+launch.
+
+./myrun 32 sn.json
+
+hmm, much faster than falcor...even with the larger network 
+
+also with 48 cores? yes, fast, but sensors indicating getting hot (close to 90C, high is 94C
+crit is 104C) ... can stick with 32 for first tests ...
+to make sure system does not overheat ... 
+
+ok, will run for 3200 s ... with 32 cores ... not using weight norm for now ... 
+
+./myrun 32 sn.json
+
+python -i simdat.py backupcfg/20jun26_G0_cycle_sim.json
+
+#
+plotFollowBall(actreward,ax=subplot(1,3,1),cumulative=True,color='r'); ylim((0,.6))
+plotHitMiss(actreward,ax=subplot(1,3,2),asratio=False); 
+plotRewards(actreward,ax=subplot(1,3,3)); 
+
+clf(); drawraster(dspkT,dspkID); 
+savefig('gif/'+dstr+simstr+'rast.png') 
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','IM']); 
+savefig('gif/'+dstr+simstr+'Vm.png'); 
