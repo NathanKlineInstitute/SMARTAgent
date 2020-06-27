@@ -9653,7 +9653,7 @@ for 1600 s ...
     "simtype": {"ResumeSim":1,"ResumeSimFromFile":"data/20jun25_F3_targetted_tank_synWeights_final.pkl"}, 
 20jun26_F4_targetted_tank_
 
-*** with reduced weights (20jun25_F3_targetted_reduced_tank_) -->> seems much better than above
+*** with reduced weights (20jun25_F3_targetted_reduced_tank_) -->> seems much better than above (well, a little better at end)
 
 python -i simdat.py backupcfg/20jun25_F3_targetted_reduced_tank_sim.json
 
@@ -9710,4 +9710,16 @@ lpop = ['ER', 'EV1', 'EV4', 'EMT', 'IR', 'IV1', 'IV4', 'IMT','EV1DW','EV1DNW', '
 dact = getdActMap(totalDur, tstepPerAction, dspkT, dspkID, dnumc, dstartidx, lpop)
 lpop = ['ER', 'EV1DNW', 'EV1DN', 'EV1DNE','EV1', 'IR', 'EV1DW','EV1DE','IV1','EMUP','EV1DSW', 'EV1DS', 'EV1DSE','IM','EMDOWN']  
 fig, axs, plt = animActivityMaps(lpop=lpop) # 
+
+continuing as 20jun26_F4_targetted_reduced_tank_
+for 1600 s ... 
+    "simtype": {"ResumeSim":1,"ResumeSimFromFile":"data/20jun25_F3_targetted_reduced_tank_synWeights_final.pkl"}, 
+20jun26_F4_targetted_reduced_tank_
+
+"EEMPopNorm":1
+can normalize/reduce the weights every 400 s ? 
+that's "normalizeWeightStepSize":20000
+since 20 ms per step
+and set EEMWghtThreshMax to 0.000012
+so that goes back to mean initial weight ... 
 
