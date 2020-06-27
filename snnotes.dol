@@ -9585,4 +9585,129 @@ so can see full (moving) picture ...
 
 *20jun26
 ** setting up on cycle
+** compare output from two runs on falcor - similar though reduced weights drops then increases in performance to slightly higher level
+*** without reduced weights (20jun25_F3_targetted_tank_)
+
+python -i simdat.py backupcfg/20jun25_F3_targetted_tank_sim.json
+
+#
+plotFollowBall(actreward,ax=subplot(1,3,1),cumulative=True,color='r'); ylim((0,.6))
+plotHitMiss(actreward,ax=subplot(1,3,2),asratio=True); 
+plotRewards(actreward,ax=subplot(1,3,3)); 
+
+score/miss, hit/miss = (0.044642857142857144, 0.17410714285714285) <<-- previous step
+score/miss, hit/miss = (0.0663265306122449, 0.30612244897959184) <<-- this sim
+
+savefig('gif/'+dstr+simstr+'perf.png') # 20jun26_20jun25_F3_targetted_tank_perf.png
+
+so that's better on average ... though lots of variability in the performance ... 
+
+clf(); drawraster(dspkT,dspkID); savefig('gif/'+dstr+simstr+'rast.png') # 
+xlim((790e3,800e3)); savefig('gif/'+dstr+simstr+'rastC.png') # 
+
+rcParams['agg.path.chunksize'] = 100000000000
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','IM']); xlim((790e3,800e3)); savefig('gif/'+dstr+simstr+'Vm.png'); 
+xlim((790e3,792e3)); savefig('gif/'+dstr+simstr+'VmB.png'); 
+might be recording artifact but seems like the EMDOWN are firing below the 0 mV threshold ... may want to lower it 
+and see if improves performance -- since higher weights could have pushed AP lower ...  due to dep blockade emerging?
+if that's case, would expect weight normalization to improve performance 
+
+#
+clf(); dobjpos = loadObjPos() ## hmm, did not save objpos?? got error ... 
+xlabel('Racket Y position'); hist(dobjpos['racket'][:,1])
+savefig('gif/'+dstr+simstr+'poshist.png')
+bias towards top (EMUP moves)
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=True)
+xlabel('Time (ms)'); tl(); savefig('gif/'+dstr+simstr+'all_avg_weight.png')
+well, most of the EMDOWN weights are lower but average EMDOWN weights are higher (?)
+
+lfn = ['20jun20_F0_targetted_tank_ActionsRewards.txt','20jun23_F1_targetted_tank_ActionsRewards.txt','20jun24_F2_targetted_tank_ActionsRewards.txt','20jun25_F3_targetted_tank_ActionsRewards.txt']
+lfn = ['data/'+x for x in lfn]
+pda = getconcatactionreward(lfn)
+
+#
+clf()
+plotFollowBall(pda,ax=subplot(1,3,1),cumulative=True,color='r'); ylim((0,.6))
+plotHitMiss(pda,ax=subplot(1,3,2),asratio=True); 
+plotRewards(pda,ax=subplot(1,3,3)); 
+
+final score/miss, hit/miss ratio: (0.07151664611590629, 0.2601726263871763)
+
+savefig('gif/'+dstr+simstr+'perf_step0_step1_step2_step3.png') # 
+
+generally increasing for hit/miss and score/miss, and p(follow) slightly...
+
+pdfs = pdf[pdf.time==np.amax(pdf.time)]; D = pdf2weightsdict(pdfs); pickle.dump(D, open('data/'+simstr+'synWeights_final.pkl','wb'))
+# data/20jun25_F3_targetted_tank_synWeights_final.pkl
+
+can continue, depending on how compares with sim below ... 
+
+lpop = ['ER', 'EV1', 'EV4', 'EMT', 'IR', 'IV1', 'IV4', 'IMT','EV1DW','EV1DNW', 'EV1DN', 'EV1DNE','EV1DE','EV1DSW', 'EV1DS', 'EV1DSE','EMDOWN','EMUP','IM']  
+dact = getdActMap(totalDur, tstepPerAction, dspkT, dspkID, dnumc, dstartidx, lpop)
+lpop = ['ER', 'EV1DNW', 'EV1DN', 'EV1DNE','EV1', 'IR', 'EV1DW','EV1DE','IV1','EMUP','EV1DSW', 'EV1DS', 'EV1DSE','IM','EMDOWN']  
+fig, axs, plt = animActivityMaps(lpop=lpop) # 
+
+continuing as 20jun26_F4_targetted_tank_
+for 1600 s ... 
+    "simtype": {"ResumeSim":1,"ResumeSimFromFile":"data/20jun25_F3_targetted_tank_synWeights_final.pkl"}, 
+20jun26_F4_targetted_tank_
+
+*** with reduced weights (20jun25_F3_targetted_reduced_tank_) -->> seems much better than above
+
+python -i simdat.py backupcfg/20jun25_F3_targetted_reduced_tank_sim.json
+
+#
+plotFollowBall(actreward,ax=subplot(1,3,1),cumulative=True,color='r'); ylim((0,.6))
+plotHitMiss(actreward,ax=subplot(1,3,2),asratio=True); 
+plotRewards(actreward,ax=subplot(1,3,3)); 
+
+score/miss, hit/miss = (0.044642857142857144, 0.17410714285714285) <<-- previous step
+score/miss, hit/miss = (0.09090909090909091, 0.3689839572192513) <<-- this sim (better final values than without weight reduction above)
+however, this sim starts with low performance and gradually increases; low performance could be due to the normalization procedure...the
+other sim stays around same level ... would periodic normalization help??
+
+savefig('gif/'+dstr+simstr+'perf.png') # 20jun26_20jun25_F3_targetted_reduced_tank_perf.png
+
+clf(); drawraster(dspkT,dspkID); savefig('gif/'+dstr+simstr+'rast.png') # rates lower than sim above, as expected
+xlim((790e3,800e3)); savefig('gif/'+dstr+simstr+'rastC.png') # 
+
+rcParams['agg.path.chunksize'] = 100000000000
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','IM']); xlim((790e3,800e3)); savefig('gif/'+dstr+simstr+'Vm.png'); 
+xlim((790e3,792e3)); savefig('gif/'+dstr+simstr+'VmB.png'); 
+
+#
+clf(); dobjpos = loadObjPos() ## hmm, did not save objpos?? got error ... 
+xlabel('Racket Y position'); hist(dobjpos['racket'][:,1])
+savefig('gif/'+dstr+simstr+'poshist.png')
+still has bias towards top (EMUP moves)
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=True)
+xlabel('Time (ms)'); tl(); savefig('gif/'+dstr+simstr+'all_avg_weight.png') # 20jun26_20jun25_F3_targetted_reduced_tank_all_avg_weight.png
+
+lfn = ['20jun20_F0_targetted_tank_ActionsRewards.txt','20jun23_F1_targetted_tank_ActionsRewards.txt','20jun24_F2_targetted_tank_ActionsRewards.txt','20jun25_F3_targetted_reduced_tank_ActionsRewards.txt']
+lfn = ['data/'+x for x in lfn]
+pda = getconcatactionreward(lfn)
+
+#
+clf()
+plotFollowBall(pda,ax=subplot(1,3,1),cumulative=True,color='r'); ylim((0,.6))
+plotHitMiss(pda,ax=subplot(1,3,2),asratio=True); 
+plotRewards(pda,ax=subplot(1,3,3)); 
+
+final score/miss, hit/miss ratio without weight reduction: (0.07151664611590629, 0.2601726263871763)
+THIS final score/miss, hit/miss ratio WITH weight reduction: (0.0773067331670823, 0.2743142144638404)
+so with weight reduction final performance is slightly higher than without weight reduction ... 
+
+savefig('gif/'+dstr+simstr+'perf_step0_step1_step2_step3.png') # 20jun26_20jun25_F3_targetted_reduced_tank_perf_step0_step1_step2_step3.png
+
+generally increasing for hit/miss and score/miss, and p(follow) slightly...
+
+pdfs = pdf[pdf.time==np.amax(pdf.time)]; D = pdf2weightsdict(pdfs); pickle.dump(D, open('data/'+simstr+'synWeights_final.pkl','wb'))
+# data/20jun25_F3_targetted_reduced_tank_synWeights_final.pkl
+
+lpop = ['ER', 'EV1', 'EV4', 'EMT', 'IR', 'IV1', 'IV4', 'IMT','EV1DW','EV1DNW', 'EV1DN', 'EV1DNE','EV1DE','EV1DSW', 'EV1DS', 'EV1DSE','EMDOWN','EMUP','IM']  
+dact = getdActMap(totalDur, tstepPerAction, dspkT, dspkID, dnumc, dstartidx, lpop)
+lpop = ['ER', 'EV1DNW', 'EV1DN', 'EV1DNE','EV1', 'IR', 'EV1DW','EV1DE','IV1','EMUP','EV1DSW', 'EV1DS', 'EV1DSE','IM','EMDOWN']  
+fig, axs, plt = animActivityMaps(lpop=lpop) # 
 

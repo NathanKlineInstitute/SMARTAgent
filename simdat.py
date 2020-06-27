@@ -119,52 +119,46 @@ def loadsimdat (name=None,getactmap=True,lpop = allpossible_pops): # load simula
 
 #
 def animActivityMaps (outpath='gif/'+dconf['sim']['name']+'actmap.mp4', framerate=10, figsize=(18,10), dobjpos=None,\
-  lpop = allpossible_pops): # plot activity in different layers as a function of input images  
+                      lpop=allpossible_pops):
+  # plot activity in different layers as a function of input images  
   ioff()
   possible_pops = ['ER','EV1','EV4','EMT','IR','IV1','IV4','IMT','EV1DW','EV1DNW','EV1DN'\
-    ,'EV1DNE','EV1DE','EV1DSW','EV1DS', 'EV1DSE','EMDOWN','EMUP','EMSTAY']
+                   ,'EV1DNE','EV1DE','EV1DSW','EV1DS', 'EV1DSE','EMDOWN','EMUP','EMSTAY','IM']
   possible_titles = ['Excit R', 'Excit V1', 'Excit V4', 'Excit MT', 'Inhib R', 'Inhib V1', 'Inhib V4', 'Inhib MT',\
-    'W','NW','N','NE','E','SW','S','SE','Excit M DOWN', 'Excit M UP', 'Excit M STAY']
+                     'W','NW','N','NE','E','SW','S','SE','Excit M DOWN', 'Excit M UP', 'Excit M STAY', 'Inhib M']
+  dtitle = {p:t for p,t in zip(possible_pops,possible_titles)}
   ltitle = ['Input Images']
-  for popind in range(len(possible_pops)):
-    if possible_pops[popind] in lpop:
-      ltitle.append(possible_titles[popind]) 
-    
+  lact = [InputImages]; lvmax = [255];
+  dmaxSpk = OrderedDict({pop:np.max(dact[pop]) for pop in dact.keys()})
+  max_spks = np.max([dmaxSpk[p] for p in dact.keys()])
+  for pop in lpop:
+    ltitle.append(dtitle[pop])
+    lact.append(dact[pop])
+    lvmax.append(max_spks)
   if figsize is not None: fig, axs = plt.subplots(4, 5, figsize=figsize);
   else: fig, axs = plt.subplots(4, 5);
   lax = axs.ravel()
-  cbaxes = fig.add_axes([0.95, 0.4, 0.01, 0.2])
-  
+  cbaxes = fig.add_axes([0.95, 0.4, 0.01, 0.2])  
   ddir = OrderedDict({'EV1DW':'W','EV1DNW':'NW', 'EV1DN':'N','EV1DNE':'NE','EV1DE':'E','EV1DSW':'SW','EV1DS':'S','EV1DSE':'SE'})
-  #for p in ddir.keys(): ltitle.append(ddir[p])
-  #for p in ['Excit M DOWN', 'Excit M UP']: ltitle.append(p)
-  lact = [InputImages]; lvmax = [255];
   lfnimage = []
-  #lpop = ['ER', 'EV1', 'EV4', 'EMT', 'IR', 'IV1', 'IV4', 'IMT',\
-  #        'EV1DW','EV1DNW', 'EV1DN', 'EV1DNE','EV1DE','EV1DSW', 'EV1DS', 'EV1DSE',\
-  #        'EMDOWN','EMUP']  
-  dmaxSpk = OrderedDict({pop:np.max(dact[pop]) for pop in dact.keys()})
-  max_spks = np.max([dmaxSpk[p] for p in dact.keys()])  
-  for pop in dact.keys():
-    lact.append(dact[pop])
-    lvmax.append(max_spks)
   ddat = {}
   fig.suptitle('Time = ' + str(0*tstepPerAction) + ' ms')
   idx = 0
   objfctr = 1.0
   if 'UseFull' in dconf['DirectionDetectionAlgo']:
-    if dconf['DirectionDetectionAlgo']['UseFull']: objfctr=1/8.  
+    if dconf['DirectionDetectionAlgo']['UseFull']: objfctr=1/8.
+  flowdx = 8 # 5
   for ldx,ax in enumerate(lax):
     if idx > len(dact.keys()):
       ax.axis('off')
       continue
     if ldx==0:
       offidx=-1
-    elif ldx==5:
+    elif ldx==flowdx:
       offidx=1
     else:
       offidx=0
-    if ldx==5:
+    if ldx==flowdx:
       X, Y = np.meshgrid(np.arange(0, InputImages[0].shape[1], 1), np.arange(0,InputImages[0].shape[0],1))
       ddat[ldx] = ax.quiver(X,Y,ldflow[0]['thflow'][:,:,0],-ldflow[0]['thflow'][:,:,1], pivot='mid', units='inches',width=0.022,scale=1/0.15)
       ax.set_xlim((0,InputImages[0].shape[1])); ax.set_ylim((0,InputImages[0].shape[0]))
@@ -186,11 +180,11 @@ def animActivityMaps (outpath='gif/'+dconf['sim']['name']+'actmap.mp4', framerat
     idx = 0
     for ldx,ax in enumerate(lax):
       if idx > len(dact.keys()): continue
-      if ldx==0 or ldx==5:
+      if ldx==0 or ldx==flowdx:
         offidx=-1
       else:
         offidx=0
-      if ldx == 5:
+      if ldx == flowdx:
         ddat[ldx].set_UVC(ldflow[t+offidx]['thflow'][:,:,0],-ldflow[t]['thflow'][:,:,1])        
       else:
         ddat[ldx].set_data(lact[idx][t+offidx,:,:])
