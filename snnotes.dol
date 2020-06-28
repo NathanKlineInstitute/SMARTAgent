@@ -9822,7 +9822,33 @@ pdfs = pdf[pdf.time==np.amax(pdf.time)]; D = pdf2weightsdict(pdfs); pickle.dump(
 lpop = ['ER', 'EV1', 'EV4', 'EMT', 'IR', 'IV1', 'IV4', 'IMT','EV1DW','EV1DNW', 'EV1DN', 'EV1DNE','EV1DE','EV1DSW', 'EV1DS', 'EV1DSE','EMDOWN','EMUP','IM']  
 dact = getdActMap(totalDur, tstepPerAction, dspkT, dspkID, dnumc, dstartidx, lpop)
 lpop = ['ER', 'EV1DNW', 'EV1DN', 'EV1DNE','EV1', 'IR', 'EV1DW','EV1DE','IV1','EMUP','EV1DSW', 'EV1DS', 'EV1DSE','IM','EMDOWN']  
-fig, axs, plt = animActivityMaps(lpop=lpop) # 
+fig, axs, plt = animActivityMaps(lpop=lpop) # <<-- getting error on cycle
+  File "<stdin>", line 1, in <module>
+  File "simdat.py", line 199, in animActivityMaps
+    ani.save(outpath, writer=writer); print('saved animation to', outpath)
+  File "/opt/anaconda3/lib/python3.7/site-packages/matplotlib/animation.py", line 1200, in save
+    writer.grab_frame(**savefig_kwargs)
+  File "/opt/anaconda3/lib/python3.7/contextlib.py", line 130, in __exit__
+    self.gen.throw(type, value, traceback)
+  File "/opt/anaconda3/lib/python3.7/site-packages/matplotlib/animation.py", line 241, in saving
+    self.finish()
+  File "/opt/anaconda3/lib/python3.7/site-packages/matplotlib/animation.py", line 367, in finish
+    self.cleanup()
+  File "/opt/anaconda3/lib/python3.7/site-packages/matplotlib/animation.py", line 405, in cleanup
+    out, err = self._proc.communicate()
+  File "/opt/anaconda3/lib/python3.7/subprocess.py", line 964, in communicate
+    stdout, stderr = self._communicate(input, endtime, timeout)
+  File "/opt/anaconda3/lib/python3.7/subprocess.py", line 1701, in _communicate
+    selector.register(self.stdout, selectors.EVENT_READ)
+  File "/opt/anaconda3/lib/python3.7/selectors.py", line 352, in register
+    key = super().register(fileobj, events, data)
+  File "/opt/anaconda3/lib/python3.7/selectors.py", line 238, in register
+    key = SelectorKey(fileobj, self._fileobj_lookup(fileobj), events, data)
+  File "/opt/anaconda3/lib/python3.7/selectors.py", line 225, in _fileobj_lookup
+    return _fileobj_to_fd(fileobj)
+  File "/opt/anaconda3/lib/python3.7/selectors.py", line 40, in _fileobj_to_fd
+    "{!r}".format(fileobj)) from None
+ValueError: Invalid file object: <_io.BufferedReader name=12>
 
 will check activity ... meanwhile, can either continue ... or run larger population of EM neurons and see if
 its performance improves further
