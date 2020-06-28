@@ -9772,15 +9772,67 @@ ok, will run for 3200 s ... with 32 cores ... not using weight norm for now ...
 
 ./myrun 32 sn.json
 
+*20jun27
+** check run from cycle (20jun26_G0_cycle_sim.json) -- better performance -- continue as 20jun27_G1_cycle_
+
+this sim has 32 neurons of each M pop and ran for 3200 s ... took < 24 hrs with 32 cores running on cycle
+
+Gathering data...
+  Done; gather time = 68.48 s.
+Analyzing...
+  Cells: 4280
+  Connections: 0 (0.00 per cell)
+  Spikes: 24956526 (1.82 Hz)
+  Simulated time: 3200.0 s; 32 workers
+  Run time: 78963.26 s
+
 python -i simdat.py backupcfg/20jun26_G0_cycle_sim.json
 
 #
 plotFollowBall(actreward,ax=subplot(1,3,1),cumulative=True,color='r'); ylim((0,.6))
-plotHitMiss(actreward,ax=subplot(1,3,2),asratio=False); 
+plotHitMiss(actreward,ax=subplot(1,3,2),asratio=True); 
 plotRewards(actreward,ax=subplot(1,3,3)); 
 
-clf(); drawraster(dspkT,dspkID); 
-savefig('gif/'+dstr+simstr+'rast.png') 
+score/miss, hit/miss ratio: (0.09251700680272108, 0.36054421768707484)
+looks good - improving, and follow target prob is increasing up to ~0.43
 
-clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','IM']); 
-savefig('gif/'+dstr+simstr+'Vm.png'); 
+savefig('gif/'+dstr+simstr+'perf.png') # 20jun27_20jun26_G0_cycle_perf.png
+
+clf(); drawraster(dspkT,dspkID); xlim((3190e3,3200e3)); savefig('gif/'+dstr+simstr+'rastB.png') # 
+overall rates are ok
+
+rcParams['agg.path.chunksize'] = 100000000000
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','IM']); xlim((3190e3,3200e3)); savefig('gif/'+dstr+simstr+'Vm.png'); 
+looks ok, those IM neurons firing very fast with giant bursts...
+
+#
+clf(); dobjpos = loadObjPos() ## hmm, did not save objpos?? got error ... 
+xlabel('Racket Y position'); hist(dobjpos['racket'][:,1])
+savefig('gif/'+dstr+simstr+'poshist.png')
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=True)
+xlabel('Time (ms)'); tl(); savefig('gif/'+dstr+simstr+'all_avg_weight.png') # 
+same pattern as other recent sims - EMDOWN has higher weights, EMUP has lower; though bias
+towards UP positions is higher ... still seems like a bug somewhere, or is it just due to initial
+moves leading to the difference??
+
+pdfs = pdf[pdf.time==np.amax(pdf.time)]; D = pdf2weightsdict(pdfs); pickle.dump(D, open('data/'+simstr+'synWeights_final.pkl','wb'))
+# data/20jun26_G0_cycle_synWeights_final.pkl
+
+lpop = ['ER', 'EV1', 'EV4', 'EMT', 'IR', 'IV1', 'IV4', 'IMT','EV1DW','EV1DNW', 'EV1DN', 'EV1DNE','EV1DE','EV1DSW', 'EV1DS', 'EV1DSE','EMDOWN','EMUP','IM']  
+dact = getdActMap(totalDur, tstepPerAction, dspkT, dspkID, dnumc, dstartidx, lpop)
+lpop = ['ER', 'EV1DNW', 'EV1DN', 'EV1DNE','EV1', 'IR', 'EV1DW','EV1DE','IV1','EMUP','EV1DSW', 'EV1DS', 'EV1DSE','IM','EMDOWN']  
+fig, axs, plt = animActivityMaps(lpop=lpop) # 
+
+will check activity ... meanwhile, can either continue ... or run larger population of EM neurons and see if
+its performance improves further
+
+may as well continue first and if doesn't improve substantially can increase pop size ... 
+
+continue as 20jun27_G1_cycle_
+    "simtype": {"ResumeSim":1,"ResumeSimFromFile":"data/20jun26_G0_cycle_synWeights_final.pkl"}, 
+
+./myrun 32 sn.json
+
+started 23:02 ...
+
