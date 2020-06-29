@@ -555,13 +555,20 @@ def animSynWeights (pdf, outpath='gif/'+dconf['sim']['name']+'weightmap.mp4', fr
   plotRewards(actreward,f_ax2,xl=(0,simConfig['simConfig']['duration']))
   popwts = plotMeanWeights(pdf,f_ax3,xl=(0,simConfig['simConfig']['duration']))
   plotHitMiss(actreward,f_ax4)
-  lsrc = ['EV1', 'EV4', 'EMT','EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE']
+  possible_src = ['EV1', 'EV4', 'EMT','EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE']
+  lsrc = []
+  for c_src in possible_src:
+    if c_src in dstartidx:
+      lsrc.append(c_src)
+  print('Source Pops: ', lsrc)
+  possible_targs = ['EMDOWN', 'EMUP','EMSTAY']
+  ltarg = []
+  for c_targ in possible_targs:
+    if c_targ in dstartidx:
+      ltarg.append(c_targ)  
   ltitle = []
   for src in lsrc:
-    if 'EMSTAY' in dstartidx:
-      for trg in ['EMDOWN', 'EMUP','EMSTAY']: ltitle.append(src+'->'+trg)
-    else:
-      for trg in ['EMDOWN', 'EMUP']: ltitle.append(src+'->'+trg)
+    for trg in ltarg: ltitle.append(src+'->'+trg)
   dimg = {}; dline = {}; 
   def getwts (tdx, src):
     t = utimes[tdx]
@@ -628,11 +635,18 @@ def plotavgweights (pdf):
   xlim((0,simConfig['simConfig']['duration']))
   ylim((-1.1,1.1))
   gdx = 2
-  if 'EMSTAY' in dstartidx:
-    ltrg = ['EMDOWN', 'EMUP','EMSTAY']
-  else:
-    ltrg = ['EMDOWN', 'EMUP']
-  for src in ['EV1','EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE', 'EV4', 'EMT']:
+  possible_src = ['EV1', 'EV4', 'EMT','EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE']
+  lsrc = []
+  for c_src in possible_src:
+    if c_src in dstartidx:
+      lsrc.append(c_src)
+  print('Source Pops: ', lsrc)
+  possible_targs = ['EMDOWN', 'EMUP','EMSTAY']
+  ltrg = []
+  for c_targ in possible_targs:
+    if c_targ in dstartidx:
+      ltrg.append(c_targ)
+  for src in lsrc:
       for trg in ltrg:
           davgw[src+'->'+trg] = arr = []        
           for t in utimes:
