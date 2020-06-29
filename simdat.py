@@ -510,16 +510,17 @@ def plotMeanWeights (pdf,ax=None,msz=1,xl=None,lpop=['EMDOWN','EMUP','EMSTAY'],l
   mnw,mxw=1e9,-1e9
   for pop,clr in zip(lpop,lclr):
     #print(pop,clr)
-    if plotindiv:
-      for idx in range(dstartidx[pop],dendidx[pop]+1,1): # first plot average weight onto each individual neuron
-        lwt = plotMeanNeuronWeight(pdf,idx,clr=clr,msz=1)
-        mnw=min(mnw, min(lwt))
-        mxw=max(mxw, max(lwt))    
-    pdfs = pdf[(pdf.postid>=dstartidx[pop]) & (pdf.postid<=dendidx[pop])]
-    popwts[pop] = [np.mean(pdfs[(pdfs.time==t)].weight) for t in utimes] #wts of connections onto pop
-    ax.plot(utimes,popwts[pop],clr+'-o',markersize=msz)
-    mnw=min(mnw, np.amin(popwts[pop]))
-    mxw=max(mxw, np.amax(popwts[pop]))            
+    if pop in dstartidx:
+      if plotindiv:
+        for idx in range(dstartidx[pop],dendidx[pop]+1,1): # first plot average weight onto each individual neuron
+          lwt = plotMeanNeuronWeight(pdf,idx,clr=clr,msz=1)
+          mnw=min(mnw, min(lwt))
+          mxw=max(mxw, max(lwt))    
+      pdfs = pdf[(pdf.postid>=dstartidx[pop]) & (pdf.postid<=dendidx[pop])]
+      popwts[pop] = [np.mean(pdfs[(pdfs.time==t)].weight) for t in utimes] #wts of connections onto pop
+      ax.plot(utimes,popwts[pop],clr+'-o',markersize=msz)
+      mnw=min(mnw, np.amin(popwts[pop]))
+      mxw=max(mxw, np.amax(popwts[pop]))            
   if xl is not None: ax.set_xlim(xl)
   ax.set_ylim((mnw,mxw))
   ax.set_ylabel('Average weight'); 

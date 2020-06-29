@@ -3646,3 +3646,10 @@ take note of it and can try it if have time
 -- tried fixing it .... test again.
 -- seems working --- fix labeling
 
+
+-- dact = getdActMap (totalDur, tstepPerAction, dspkT, dspkID, dnumc, dstartidx, lpop)
+-- animActivityMaps (outpath='gif/'+dconf['sim']['name']+'actmap.mp4', framerate=10, figsize=(18,10), dobjpos=None,\
+  lpop = lpop)
+
+** debug animSynWeights
+-- plot only if pop exists.
