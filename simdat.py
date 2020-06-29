@@ -440,7 +440,7 @@ def getCumScore (actreward):
   return np.cumsum(allScore) #cumulative score evolving with time.  
 
 #  
-def plotHitMiss (actreward,ax=None,msz=3,asratio=False):
+def plotHitMiss (actreward,ax=None,msz=3,asratio=False,lclr=['r','g','b']):
   if ax is None: ax = gca()
   action_times = np.array(actreward.time)
   Hit_Missed = np.array(actreward.hit)
@@ -448,22 +448,38 @@ def plotHitMiss (actreward,ax=None,msz=3,asratio=False):
   allMissed = np.where(Hit_Missed==-1,1,0)
   cumHits = np.cumsum(allHit) #cumulative hits evolving with time.
   cumMissed = np.cumsum(allMissed) #if a reward is -1, replace it with 1 else replace it with 0.
-  cumScore = getCumScore(actreward)
   if asratio:
-    ax.plot(action_times,cumScore/cumMissed,'r-o',markersize=msz)
-    ax.plot(action_times,cumHits/cumMissed,'g-o',markersize=msz)
+    ax.plot(action_times,cumHits/cumMissed,lclr[0]+'-o',markersize=msz)
     ax.set_xlim((0,np.max(action_times)))
-    #ax.set_ylim((0,np.max([cumHits[-1],cumMissed[-1]])))
-    ax.legend(('Score/Miss ('+str(round(cumScore[-1]/cumMissed[-1],2))+')','Hit/Miss ('+str(round(cumHits[-1]/cumMissed[-1],2))+')'),loc='best')
-    return cumScore[-1]/cumMissed[-1],cumHits[-1]/cumMissed[-1]
+    ax.set_ylabel('Hit/Miss ('+str(round(cumHits[-1]/cumMissed[-1],2))+')')
+    return cumHits[-1]/cumMissed[-1]
   else:
-    ax.plot(action_times,cumScore,'r-o',markersize=msz)
-    ax.plot(action_times,cumHits,'g-o',markersize=msz)
-    ax.plot(action_times,cumMissed,'b-o',markersize=msz)
+    ax.plot(action_times,cumHits,lclr[0]+'-o',markersize=msz)
+    ax.plot(action_times,cumMissed,lclr[1]+'-o',markersize=msz)
     ax.set_xlim((0,np.max(action_times)))
     ax.set_ylim((0,np.max([cumHits[-1],cumMissed[-1]])))    
-    ax.legend(('Score ('+str(cumScore[-1])+')','Hit Ball ('+str(cumHits[-1])+')','Miss Ball ('+str(cumMissed[-1])+')'),loc='best')
-    return cumScore[-1],cumHits[-1],cumMissed[-1]
+    ax.set_ylabel('Hit Ball ('+str(cumHits[-1])+')','Miss Ball ('+str(cumMissed[-1])+')')
+    return cumHits[-1],cumMissed[-1]
+
+#  
+def plotScoreMiss (actreward,ax=None,msz=3,asratio=False,clr='r'):
+  if ax is None: ax = gca()
+  action_times = np.array(actreward.time)
+  Hit_Missed = np.array(actreward.hit)
+  allMissed = np.where(Hit_Missed==-1,1,0)
+  cumMissed = np.cumsum(allMissed) #if a reward is -1, replace it with 1 else replace it with 0.
+  cumScore = getCumScore(actreward)
+  if asratio:
+    ax.plot(action_times,cumScore/cumMissed,clr+'-o',markersize=msz)
+    ax.set_xlim((0,np.max(action_times)))
+    ax.set_ylabel('Score/Miss ('+str(round(cumScore[-1]/cumMissed[-1],2))+')')
+    return cumScore[-1]/cumMissed[-1]
+  else:
+    ax.plot(action_times,cumScore,clr+'-o',markersize=msz)
+    ax.set_xlim((0,np.max(action_times)))
+    ax.set_ylim((0,cumMissed[-1]))
+    ax.set_ylabel('Score ('+str(cumScore[-1])+')')
+    return cumScore[-1]
 
 #  
 def plotScoreLoss (actreward,ax=None,msz=3):
@@ -502,7 +518,12 @@ def getconcatactionreward (lfn):
       acl.time += np.amax(pda.time)
       pda = pda.append(acl)
   return pda
-  
+
+def getindivactionreward (lfn):
+  # get the individual actionreward data frames separately so can compare cumulative rewards,actions,etc.
+  # lfn is a list of actionrewards filenames from the simulation
+  return [pd.DataFrame(np.loadtxt(fn),columns=['time','action','reward','proposed','hit']) for fn in lfn]
+
 def plotMeanNeuronWeight (pdf,postid,clr='k',ax=None,msz=1,xl=None):
   if ax is None: ax = gca()
   utimes = np.unique(pdf.time)

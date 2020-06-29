@@ -9930,5 +9930,133 @@ will run same sim but for 1600 s instead of 3200 s ... hopefully will not have a
 
 ./myrun 32 sn.json 
 
-started ~22:35 ...
+started ~22:35 ... finished ~10 hours later (including save)
+
+t= 1599999.8  game rewards: [0]
+  Done; run time = 33818.91 s; real-time ratio: 0.05.
+
+Gathering data...
+  Done; gather time = 34.85 s.
+
+Analyzing...
+  Cells: 4280
+  Connections: 0 (0.00 per cell)
+  Spikes: 13510421 (1.97 Hz)
+  Simulated time: 1600.0 s; 32 workers
+  Run time: 33818.91 s
+fatal: not a git repository (or any of the parent directories): .git
+Saving output as data/20jun27_G1_cycle_simConfig.pkl ... 
+Finished saving!
+  Done; saving time = 26.95 s.
+
+*20jun29
+** check output from 20jun27_G1_cycle_
+
+python -i simdat.py backupcfg/20jun27_G1_cycle_sim.json
+
+#
+plotFollowBall(actreward,ax=subplot(1,3,1),cumulative=True,color='r'); ylim((0,.6))
+plotHitMiss(actreward,ax=subplot(1,3,2),asratio=True); 
+plotRewards(actreward,ax=subplot(1,3,3)); 
+
+score/miss, hit/miss ratio: (0.09251700680272108, 0.36054421768707484) <<-- last sim (follow target prob is increasing up to ~0.43)
+score/miss, hit/miss ratio: (0.08238636363636363, 0.4375)
+score/miss goes up and down a little but hit/miss has risen substantially
+follow target has increased a bit too (ends near 0.46)
+
+savefig('gif/'+dstr+simstr+'perf.png') # 20jun29_20jun27_G1_cycle_perf.png
+
+clf(); drawraster(dspkT,dspkID); xlim((1590e3,1600e3)); savefig('gif/'+dstr+simstr+'rastB.png') # 
+rates getting higher ... 
+
+rcParams['agg.path.chunksize'] = 100000000000
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','IM']); xlim((1590e3,1600e3)); savefig('gif/'+dstr+simstr+'Vm.png'); 
+
+#
+clf(); dobjpos = loadObjPos() ## hmm, did not save objpos?? got error ... 
+xlabel('Racket Y position'); hist(dobjpos['racket'][:,1])
+savefig('gif/'+dstr+simstr+'poshist.png')
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=True)
+xlabel('Time (ms)'); tl(); savefig('gif/'+dstr+simstr+'all_avg_weight.png') # 
+
+pdfs = pdf[pdf.time==np.amax(pdf.time)]; D = pdf2weightsdict(pdfs); pickle.dump(D, open('data/'+simstr+'synWeights_final.pkl','wb'))
+# data/20jun27_G1_cycle_synWeights_final.pkl
+
+lfn = ['20jun26_G0_cycle_ActionsRewards.txt','20jun27_G1_cycle_ActionsRewards.txt']
+lfn = ['data/'+x for x in lfn]
+pda = getconcatactionreward(lfn)
+
+#
+clf()
+plotFollowBall(pda,ax=subplot(1,3,1),cumulative=True,color='r'); ylim((0,.6))
+plotHitMiss(pda,ax=subplot(1,3,2),asratio=True); 
+plotRewards(pda,ax=subplot(1,3,3)); 
+
+final score/miss, hit/miss ratios: (0.08923643054277829, 0.38546458141674333)
+
+savefig('gif/'+dstr+simstr+'perf_step0_step1.png') # 20jun29_20jun27_G1_cycle_perf_step0_step1.png
+
+lpda = getindivactionreward(lfn)
+
+#
+clf()
+plotFollowBall(lpda[0],ax=subplot(1,2,1),cumulative=True,color='g'); ylim((0,.6))
+plotFollowBall(lpda[1],ax=subplot(1,2,1),cumulative=True,color='r'); ylim((0,.6))
+plotHitMiss(lpda[0],ax=subplot(1,2,2),asratio=True,lclr=['c','m']); 
+plotHitMiss(lpda[1],ax=subplot(1,2,2),asratio=True,lclr=['r','g']); 
+
+#
+clf()
+plotFollowBall(lpda[0],ax=subplot(1,3,1),cumulative=True,color='b'); ylim((0,.6)); xlim((0,3200e3));
+plotFollowBall(lpda[1],ax=subplot(1,3,1),cumulative=True,color='r'); ylim((0,.6)); xlim((0,3200e3));
+plotHitMiss(lpda[0],ax=subplot(1,3,2),lclr=['b'],asratio=True); ylim((0,.6)); xlim((0,3200e3));
+plotHitMiss(lpda[1],ax=subplot(1,3,2),lclr=['r'],asratio=True); ylim((0,.6)); xlim((0,3200e3));
+plotScoreMiss(lpda[0],ax=subplot(1,3,3),clr='b',asratio=True); ylim((0,.6)); xlim((0,3200e3));
+plotScoreMiss(lpda[1],ax=subplot(1,3,3),clr='r',asratio=True); ylim((0,.6)); xlim((0,3200e3));
+
+savefig('gif/'+dstr+simstr+'perf_compare_step0_step1.png') # 20jun29_20jun27_G1_cycle_perf_compare_step0_step1.png
+
+so overlay shows that second step is an improvement over first ... but score/miss ratio does not improve much
+and follow target prob seems to be decreasing in second step ... 
+
+and how does it compare to the smaller population of EM neurons?
+
+lfn = ['20jun20_F0_targetted_tank_ActionsRewards.txt','20jun26_G0_cycle_ActionsRewards.txt']
+lfn = ['data/'+x for x in lfn]
+lpda = getindivactionreward(lfn)
+
+#
+clf()
+plotFollowBall(lpda[0],ax=subplot(1,3,1),cumulative=True,color='b'); ylim((0,.6)); xlim((0,800e3));
+plotFollowBall(lpda[1],ax=subplot(1,3,1),cumulative=True,color='r'); ylim((0,.6)); xlim((0,800e3));
+plotHitMiss(lpda[0],ax=subplot(1,3,2),lclr=['b'],asratio=True); ylim((0,.6)); xlim((0,800e3));
+plotHitMiss(lpda[1],ax=subplot(1,3,2),lclr=['r'],asratio=True); ylim((0,.6)); xlim((0,800e3));
+plotScoreMiss(lpda[0],ax=subplot(1,3,3),clr='b',asratio=True); ylim((0,.6)); xlim((0,800e3));
+plotScoreMiss(lpda[1],ax=subplot(1,3,3),clr='r',asratio=True); ylim((0,.6)); xlim((0,800e3));
+
+savefig('gif/'+dstr+simstr+'perf_compare_16x16_32x32.png') # 20jun29_20jun27_G1_cycle_perf_compare_16x16_32x32.png
+
+so larger population of EM seems to help only for follow target probability, otherwise over same
+interval, everything else looks ~same
+
+so may want a larger network ... though won't fix everything ... 
+
+still have to fix movie generation on cycle... 
+
+lpop = ['ER', 'EV1DNW', 'EV1DN', 'EV1DNE','EV1', 'IR', 'EV1DW','EV1DE','IV1','EMUP','EV1DSW', 'EV1DS', 'EV1DSE','IM','EMDOWN']  
+dact = getdActMap(totalDur, tstepPerAction, dspkT, dspkID, dnumc, dstartidx, lpop)
+fig, axs, plt = animActivityMaps(lpop=lpop) # <<-- getting error on cycle
+
+** try larger EM population (EMDOWN, EMUP, IM: 64,64,32) ; name = 20jun29_64_H0_cycle_
+
+    "net":{"scale":1,"ER":400,"IR":100,"EV1":400,"EV1DE":400,"EV1DNE":400,"EV1DN":400,"EV1DNW":400,"EV1DW":400,"EV1DSW":400,"EV1DS":400,"EV1DSE":400,"IV1":100,"EV4":0,"IV4":0,"EMT":0,"IMT":0,"EMDOWN":64,"EMUP":64,"IM":32,"AngRFSigma":22.5,"DirMinRate":0.0,"DirMaxRate":50.0,"EEMWghtAM":0.000012,"EEMWghtNM":0.0000012,"EEPreMWghtAM":0.00008,"EEPreMWghtNM":0.0000025,"EEMWghtThreshMin":0.00000625,"EEMWghtThreshMax":0.00032,"EEMProb":1.0,"EEMRecProb":0.0,"EEPreMProb":0.0,"EEMPopNorm":0,"EEMRecProbCross":0,"EEMFeedbackProb":0.0,"EEMFeedbackWghtAM":0.0000125,"EEMFeedbackWghtNM":0.00000125,"VisualFeedback":0,"weightVar":0.1},
+
+20jun29_64_H0_cycle_
+
+run for 1600 s ... 
+
+./myrun 32 sn.json
+
+started ~noon
 
