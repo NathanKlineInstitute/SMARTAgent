@@ -9862,3 +9862,59 @@ continue as 20jun27_G1_cycle_
 
 started 23:02 ...
 
+*20jun28
+** continue on cycle -- sim finished but gatherdata produced a memory error -->> rerun for 1/2 duration (1600 s)
+
+  Done; run time = 73606.97 s; real-time ratio: 0.04.
+
+Gathering data...
+terminate called after throwing an instance of 'std::bad_alloc'
+  what():  std::bad_alloc
+[cycle:678494] Process received signal
+[cycle:678494] Signal: Aborted (6)
+[cycle:678494] Signal code:  (-6)
+[cycle:678494] [ 0] /lib/x86_64-linux-gnu/libpthread.so.0(+0x153c0)[0x7f3012d463c0]
+[cycle:678494] [ 1] /lib/x86_64-linux-gnu/libc.so.6(gsignal+0xcb)[0x7f3012b8518b]
+[cycle:678494] [ 2] /lib/x86_64-linux-gnu/libc.so.6(abort+0x12b)[0x7f3012b64859]
+[cycle:678494] [ 3] /opt/anaconda3/lib/libstdc++.so.6(_ZN9__gnu_cxx27__verbose_terminate_handlerEv+0xbc)[0x7f3012f6684a]
+[cycle:678494] [ 4] /opt/anaconda3/lib/libstdc++.so.6(+0xabf47)[0x7f3012f64f47]
+[cycle:678494] [ 5] /opt/anaconda3/lib/libstdc++.so.6(+0xabf7d)[0x7f3012f64f7d]
+[cycle:678494] [ 6] /opt/anaconda3/lib/libstdc++.so.6(__cxa_rethrow+0x0)[0x7f3012f6515a]
+[cycle:678494] [ 7] /opt/anaconda3/lib/libstdc++.so.6(_Znwm+0x52)[0x7f3012f65522]
+[cycle:678494] [ 8] /opt/anaconda3/lib/python3.7/site-packages/neuron/.data/share/nrn/../../lib/libnrnpython3.so(+0x1d751)[0x7f2fffdc5751]
+[cycle:678494] [ 9] /opt/anaconda3/lib/python3.7/site-packages/neuron/.data/bin/../lib/libnrniv.so(+0x273405)[0x7f30132bb405]
+[cycle:678494] [10] /opt/anaconda3/lib/python3.7/site-packages/neuron/.data/bin/../lib/libnrniv.so(hoc_call_ob_proc+0x2ab)[0x7f30132f5d3b]
+[cycle:678494] [11] /opt/anaconda3/lib/python3.7/site-packages/neuron/.data/bin/../lib/libnrniv.so(hoc_object_component+0x5c7)[0x7f30132f6a47]
+[cycle:678494] [12] /opt/anaconda3/lib/python3.7/site-packages/neuron/.data/share/nrn/../../lib/libnrnpython3.so(+0xf93b)[0x7f2fffdb793b]
+[cycle:678494] [13] /opt/anaconda3/lib/python3.7/site-packages/neuron/.data/share/nrn/../../lib/libnrnpython3.so(+0x12b74)[0x7f2fffdbab74]
+[cycle:678494] [14] /opt/anaconda3/lib/python3.7/site-packages/neuron/.data/bin/../lib/libnrniv.so(_ZN10OcJumpImpl7fpycallEPFPvS0_S0_ES0_S0_+0x3e)[0x7f30132c133e]
+[cycle:678494] [15] /opt/anaconda3/lib/python3.7/site-packages/neuron/.data/share/nrn/../../lib/libnrnpython3.so(+0x12fce)[0x7f2fffdbafce]
+[cycle:678494] [16] /opt/anaconda3/lib/./libpython3.7m.so.1.0(_PyObject_FastCallKeywords+0xc5)[0x7f30081ce945]
+[cycle:678494] [17] /opt/anaconda3/lib/./libpython3.7m.so.1.0(+0x6f091)[0x7f30080f7091]
+[cycle:678494] [18] /opt/anaconda3/lib/./libpython3.7m.so.1.0(_PyEval_EvalFrameDefault+0x710a)[0x7f30080f510a]
+[cycle:678494] [19] /opt/anaconda3/lib/./libpython3.7m.so.1.0(_PyEval_EvalCodeWithName+0xade)[0x7f30082a7fae]
+[cycle:678494] [20] /opt/anaconda3/lib/./libpython3.7m.so.1.0(_PyFunction_FastCallKeywords+0x90)[0x7f30081cdfc0]
+[cycle:678494] [21] /opt/anaconda3/lib/./libpython3.7m.so.1.0(+0x6f116)[0x7f30080f7116]
+[cycle:678494] [22] /opt/anaconda3/lib/./libpython3.7m.so.1.0(_PyEval_EvalFrameDefault+0x710a)[0x7f30080f510a]
+[cycle:678494] [23] /opt/anaconda3/lib/./libpython3.7m.so.1.0(_PyEval_EvalCodeWithName+0xade)[0x7f30082a7fae]
+[cycle:678494] [24] /opt/anaconda3/lib/./libpython3.7m.so.1.0(PyEval_EvalCodeEx+0x3f)[0x7f30082a809f]
+[cycle:678494] [25] /opt/anaconda3/lib/./libpython3.7m.so.1.0(PyEval_EvalCode+0x1c)[0x7f30081970cc]
+[cycle:678494] [26] /opt/anaconda3/lib/./libpython3.7m.so.1.0(PyRun_FileExFlags+0xb7)[0x7f30081867d7]
+[cycle:678494] [27] /opt/anaconda3/lib/./libpython3.7m.so.1.0(PyRun_SimpleFileExFlags+0xf4)[0x7f30081fcd64]
+[cycle:678494] [28] /opt/anaconda3/lib/python3.7/site-packages/neuron/.data/share/nrn/../../lib/libnrnpython3.so(nrnpy_pyrun+0x2c)[0x7f2fffdb70ac]
+[cycle:678494] [29] /opt/anaconda3/lib/python3.7/site-packages/neuron/.data/share/nrn/../../lib/libnrnpython3.so(nrnpython_start+0x278)[0x7f2fffdb7638]
+[cycle:678494]  End of error message 
+--------------------------------------------------------------------------
+Primary job  terminated normally, but 1 process returned
+a non-zero exit code. Per user-direction, the job has been aborted.
+--------------------------------------------------------------------------
+--------------------------------------------------------------------------
+mpiexec noticed that process rank 0 with PID 0 on node cycle exited on signal 6 (Aborted).
+--------------------------------------------------------------------------
+
+will run same sim but for 1600 s instead of 3200 s ... hopefully will not have a memory error in gatherdata ... 
+
+./myrun 32 sn.json 
+
+started ~22:35 ...
+
