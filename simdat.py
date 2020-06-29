@@ -538,19 +538,19 @@ def animSynWeights (pdf, outpath='gif/'+dconf['sim']['name']+'weightmap.mp4', fr
   print('minwt:',minwt,'maxwt:',maxwt)
   if figsize is not None: fig = plt.figure(figsize=figsize)
   else: fig = plt.figure()
-  gs = gridspec.GridSpec(4,8)
+  gs = gridspec.GridSpec(5,9)
   f_ax = []
   ax_count = 0
-  for rows in range(3):
-    for cols in range(8): 
-      if ax_count<22: 
+  for rows in range(4):
+    for cols in range(9): 
+      if ax_count<33: 
         f_ax.append(fig.add_subplot(gs[rows,cols]))
       ax_count += 1
   cbaxes = fig.add_axes([0.92, 0.4, 0.01, 0.2])
-  f_ax1 = fig.add_subplot(gs[2,6:8])
-  f_ax2 = fig.add_subplot(gs[3,0:2])
-  f_ax3 = fig.add_subplot(gs[3,3:5])
-  f_ax4 = fig.add_subplot(gs[3,6:8])
+  f_ax1 = fig.add_subplot(gs[3,6:8])
+  f_ax2 = fig.add_subplot(gs[4,0:2])
+  f_ax3 = fig.add_subplot(gs[4,3:5])
+  f_ax4 = fig.add_subplot(gs[4,6:8])
   plotFollowBall(actreward,f_ax1)
   plotRewards(actreward,f_ax2,xl=(0,simConfig['simConfig']['duration']))
   popwts = plotMeanWeights(pdf,f_ax3,xl=(0,simConfig['simConfig']['duration']))
@@ -558,7 +558,10 @@ def animSynWeights (pdf, outpath='gif/'+dconf['sim']['name']+'weightmap.mp4', fr
   lsrc = ['EV1', 'EV4', 'EMT','EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE']
   ltitle = []
   for src in lsrc:
-    for trg in ['EMDOWN', 'EMUP','EMSTAY']: ltitle.append(src+'->'+trg)
+    if 'EMSTAY' in dstartidx:
+      for trg in ['EMDOWN', 'EMUP','EMSTAY']: ltitle.append(src+'->'+trg)
+    else:
+      for trg in ['EMDOWN', 'EMUP']: ltitle.append(src+'->'+trg)
   dimg = {}; dline = {}; 
   def getwts (tdx, src):
     t = utimes[tdx]
@@ -574,7 +577,10 @@ def animSynWeights (pdf, outpath='gif/'+dconf['sim']['name']+'weightmap.mp4', fr
       lout.append(lwt)
     return lout[0], lout[1]    
   minR,maxR = np.min(actreward.reward),np.max(actreward.reward)
-  minW,maxW = np.min([np.min(popwts['EMDOWN']),np.min(popwts['EMUP']),np.min(popwts['EMSTAY'])]), np.max([np.max(popwts['EMDOWN']),np.max(popwts['EMUP']),np.max(popwts['EMSTAY'])])
+  if 'EMSTAY' in dstartidx:
+    minW,maxW = np.min([np.min(popwts['EMDOWN']),np.min(popwts['EMUP']),np.min(popwts['EMSTAY'])]), np.max([np.max(popwts['EMDOWN']),np.max(popwts['EMUP']),np.max(popwts['EMSTAY'])])
+  else:
+    minW,maxW = np.min([np.min(popwts['EMDOWN']),np.min(popwts['EMUP'])]), np.max([np.max(popwts['EMDOWN']),np.max(popwts['EMUP'])])
   t = utimes[0]
   dline[1], = f_ax1.plot([t,t],[minR,maxR],'r',linewidth=0.2); f_ax1.set_xticks([])
   dline[2], = f_ax2.plot([t,t],[minW,maxW],'r',linewidth=0.2); f_ax2.set_xticks([])  
