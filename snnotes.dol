@@ -10046,6 +10046,28 @@ still have to fix movie generation on cycle...
 
 lpop = ['ER', 'EV1DNW', 'EV1DN', 'EV1DNE','EV1', 'IR', 'EV1DW','EV1DE','IV1','EMUP','EV1DSW', 'EV1DS', 'EV1DSE','IM','EMDOWN']  
 dact = getdActMap(totalDur, tstepPerAction, dspkT, dspkID, dnumc, dstartidx, lpop)
+
+import logging
+logger = logging.getLogger('matplotlib')
+logger.setLevel(logging.INFO)
+print(animation._log.getEffectiveLevel() > logging.DEBUG) # prints True
+
+hmm, does not help
+
+ffmpeg from terminal reports missing openh264 library
+
+conda remove imageio-ffmpeg
+sudo apt-get install ffmpeg
+
+this: export LD_LIBRARY_PATH="/opt/anaconda3/lib"
+in .bashrc seems to be causing the problem; getting rid
+of it seems to fix the problem with missing libtinfo...but still have a ffmpeg problem...
+
+did conda upgrade ffmpeg
+and seems to work now ... 
+
+#plt.rcParams['animation.ffmpeg_path'] = '/opt/anaconda3/bin/ffmpeg' # Add the path of ffmpeg here!!
+#plt.rcParams['animation.ffmpeg_path'] = '/usr/bin/ffmpeg' # Add the path of ffmpeg here!!
 fig, axs, plt = animActivityMaps(lpop=lpop) # <<-- getting error on cycle
 
 ** try larger EM population (EMDOWN, EMUP, IM: 64,64,32) ; name = 20jun29_64_H0_cycle_

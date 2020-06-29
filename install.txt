@@ -8,6 +8,7 @@ condensed commands:
 conda install numpy scipy matplotlib pandas scikit-image
 pip install 'gym[atari]'
 conda install imageio-ffmpeg -c conda-forge
+conda upgrade ffmpeg
 conda install gcc_linux-64 openmpi mpi4py cython
 conda install gxx_linux-64
 pip install neuron-nightly
@@ -30,6 +31,7 @@ and make sure those aliases and exports in .bashrc
 conda install numpy scipy matplotlib pandas scikit-image
 pipz install 'gym[atari]'
 conda install imageio-ffmpeg -c conda-forge
+conda upgrade ffmpeg
 conda install gcc_linux-64 openmpi mpi4py cython
 conda install gxx_linux-64
 pipz install neuron-nightly
@@ -50,6 +52,7 @@ then some python packages via conda and pip
 conda install numpy scipy matplotlib pandas scikit-image
 pip install 'gym[atari]'
 conda install imageio-ffmpeg -c conda-forge
+conda upgrade ffmpeg
 
 this is easier way to install openmpi and other requirements too:
 conda install gcc_linux-64 openmpi mpi4py cython

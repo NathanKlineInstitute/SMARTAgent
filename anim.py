@@ -31,13 +31,13 @@ def getwriter (outpath, framerate):
       writer = animation.writers['avconv']
     writer = writer(fps=framerate)
     return writer
-    ani.save(outpath, writer=writer)
+    #ani.save(outpath, writer=writer)
   elif outpath.endswith('gif'):
     try:
       writer = animation.writers['imagemagick'] # need to have imagemagick installed
       writer = writer(fps=framerate)
       return writer
-      ani.save(outpath, writer=writer)
+      #ani.save(outpath, writer=writer)
     except:
       print('imagemagick not available')
   return None
