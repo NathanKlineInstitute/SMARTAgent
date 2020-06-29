@@ -127,7 +127,7 @@ def animActivityMaps (outpath='gif/'+dconf['sim']['name']+'actmap.mp4', framerat
     'W','NW','N','NE','E','SW','S','SE','Excit M DOWN', 'Excit M UP', 'Excit M STAY','Inhib M']
   ltitle = ['Input Images']
   for popind in range(len(possible_pops)):
-    if possible_pops[popind] in lpop:
+    if possible_pops[popind] in lpop and possible_pops[popind] in dnumc:
       ltitle.append(possible_titles[popind]) 
   print('titles:', ltitle)  
   if figsize is not None: fig, axs = plt.subplots(4, 6, figsize=figsize);
