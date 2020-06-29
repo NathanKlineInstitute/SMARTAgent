@@ -9850,6 +9850,20 @@ fig, axs, plt = animActivityMaps(lpop=lpop) # <<-- getting error on cycle
     "{!r}".format(fileobj)) from None
 ValueError: Invalid file object: <_io.BufferedReader name=12>
 
+this help for animation problem?
+https://stackoverflow.com/questions/53198609/trying-to-save-an-animated-of-graph-with-matplotlib-in-python-invalid-file-ob/54263809#54263809
+
+which ffmpeg
+/opt/anaconda3/bin/ffmpeg
+
+plt.rcParams['animation.ffmpeg_path'] # 'ffmpeg'
+
+plt.rcParams['animation.ffmpeg_path'] = '/opt/anaconda3/bin/ffmpeg' # Add the path of ffmpeg here!!
+
+fig, axs, plt = animActivityMaps(lpop=lpop) # <<-- still getting error on cycle
+
+https://github.com/matplotlib/matplotlib/issues/12769
+
 will check activity ... meanwhile, can either continue ... or run larger population of EM neurons and see if
 its performance improves further
 
