@@ -565,7 +565,10 @@ def animSynWeights (pdf, outpath='gif/'+dconf['sim']['name']+'weightmap.mp4', fr
   dimg = {}; dline = {}; 
   def getwts (tdx, src):
     t = utimes[tdx]
-    ltarg = ['EMDOWN', 'EMUP','EMSTAY']
+    if 'EMSTAY' in dstartidx:
+      ltarg = ['EMDOWN', 'EMUP','EMSTAY']
+    else:
+      ltarg = ['EMDOWN', 'EMUP']
     lout = []
     for targ in ltarg:
       cpdf = pdf[(pdf.time==t) & (pdf.postid>=dstartidx[targ]) & (pdf.postid<=dendidx[targ]) & (pdf.preid>=dstartidx[src]) & (pdf.preid<=dendidx[src])]
@@ -625,8 +628,12 @@ def plotavgweights (pdf):
   xlim((0,simConfig['simConfig']['duration']))
   ylim((-1.1,1.1))
   gdx = 2
+  if 'EMSTAY' in dstartidx:
+    ltrg = ['EMDOWN', 'EMUP','EMSTAY']
+  else:
+    ltrg = ['EMDOWN', 'EMUP']
   for src in ['EV1','EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE', 'EV4', 'EMT']:
-      for trg in ['EMDOWN', 'EMUP','EMSTAY']:
+      for trg in ltrg:
           davgw[src+'->'+trg] = arr = []        
           for t in utimes:
               pdfs = pdf[(pdf.time==t) & (pdf.postid>=dstartidx[trg]) & (pdf.postid<=dendidx[trg]) & (pdf.preid>=dstartidx[src]) & (pdf.preid<=dendidx[src])]
@@ -634,11 +641,15 @@ def plotavgweights (pdf):
       subplot(12,1,gdx)
       plot(utimes,davgw[src+'->EMDOWN'],'r-',linewidth=3);
       plot(utimes,davgw[src+'->EMUP'],'b-',linewidth=3);
-      plot(utimes,davgw[src+'->EMSTAY'],'g-',linewidth=3);
-      legend((src+'->EMDOWN',src+'->EMUP',src+'->EMSTAY'),loc='upper left')
+      if 'EMSTAY' in dstartidx:
+        plot(utimes,davgw[src+'->EMSTAY'],'g-',linewidth=3);
+        legend((src+'->EMDOWN',src+'->EMUP',src+'->EMSTAY'),loc='upper left')
+      else:
+        legend((src+'->EMDOWN',src+'->EMUP'),loc='upper left')
       plot(utimes,davgw[src+'->EMDOWN'],'ro',markersize=10);
       plot(utimes,davgw[src+'->EMUP'],'bo',markersize=10);
-      plot(utimes,davgw[src+'->EMSTAY'],'go',markersize=10);       
+      if 'EMSTAY' in dstartidx:
+        plot(utimes,davgw[src+'->EMSTAY'],'go',markersize=10);       
       xlim((0,simConfig['simConfig']['duration']))
       ylabel('RL weights') 
       gdx += 1
