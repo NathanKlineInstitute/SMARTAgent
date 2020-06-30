@@ -709,19 +709,20 @@ def normalizeAdjustableWeights (sim, t, lpop = ['EMUP', 'EMDOWN']):
   davg = getAverageAdjustableWeights(sim, lpop)
   try:
     dfctr = {}
-    for k in lpop:
-      if davg[k] < dconf['net']['EEMWghtThreshMin']:
-        dfctr[k] = dconf['net']['EEMWghtThreshMin'] / davg[k]
-      elif davg[k] > dconf['net']['EEMWghtThreshMax']:
-        dfctr[k] = dconf['net']['EEMWghtThreshMax'] / davg[k]
-      else:
-        dfctr[k] = 1.0
     # normalize weights across populations to avoid bias
+    initw = dconf['net']['EEMWghtAM'] # initial average weight
     if dconf['net']['EEMPopNorm']:
-      mxw = np.amax([davg[k] for k in lpop])
+      curravgw = np.mean([davg[k] for k in lpop]) # current average weight
+      if curravgw <= 0.0: curravgw = initw
+      for k in lpop: dfctr[k] = initw / curravgw
+    else:
       for k in lpop:
-        if davg[k]>0.0:
-          dfctr[k] *= mxw / davg[k]        
+        if davg[k] < dconf['net']['EEMWghtThreshMin']:
+          dfctr[k] = dconf['net']['EEMWghtThreshMin'] / davg[k]
+        elif davg[k] > dconf['net']['EEMWghtThreshMax']:
+          dfctr[k] = dconf['net']['EEMWghtThreshMax'] / davg[k]
+        else:
+          dfctr[k] = 1.0
     if sim.rank==0: print('sim.rank=',sim.rank,'davg:',davg,'dfctr:',dfctr)
     mulAdjustableWeights(sim,dfctr)
   except:
