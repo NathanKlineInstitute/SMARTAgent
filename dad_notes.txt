@@ -1,8 +1,74 @@
 ########################################
+06-30-20
+########################################
+Cloned repo onto new server
+Need to add key to github so can clone onto server
+	1. ssh-keygen
+	2. cat ~/davidd/.ssh/id_rsa.pub
+	3. https://github.com/settings/keys
+
+########################################
+06-29-20
+########################################
+To-Do:
+-Work on aigame.py (see plan below)
+	
+####Plan####
+1. Understand variables and functions in aigame.py
+	# Where is the playGame func called?
+	# variable actionsPerPlay(1) & tstepPerAction (20) 
+	*DONE*
+	1a. Comment on every line of code to explain it
+		*Not done*
+2. Make a list of potential things affected by using multiple steps for one calling of playGame
+	Reward system
+	ball_hits_racket
+3. Implement
+	*TRYING*
+
+Call with Haroon 
+Don't use actionsPerPlay, would change the algorithm too much
+	Just include implicit stay action
+	Paramount that motion is nullified before next motion
+	Find where done is being used
+	Find where reward is being used, might need to sum it up
+	Reward system should be integrated
+	Computation for ball_hits_racket possible error
+########################################
+06-26-20
+########################################
+New account on server (davidd@10.76.252.198)
+	Updated password ($ passwd)
+
+########################################
+06-25-20
+########################################
+To-Do:
+-Work on aigame.py (see plan below)
+	*ALMOST DONE WITH STEP 1*
+-Understand Question 3/Motion of paddle
+	- How is value of decisions changing with dynamics?
+	*DONE*
+
+####Plan####
+1. Understand variables and functions in aigame.py
+	# Where is the playGame func called?
+	# variable actionsPerPlay(1) & tstepPerAction (20) 
+	1a. Comment on every line of code to explain it
+
+2. Make a list of potential things affected by using multiple steps for one calling of playGame
+ 
+3. Implement
+
+Haven't finished reading entire code, but looking into actionsPerPlay, aka intaction
+
+
+########################################
 06-24-20
 ########################################
 To-Do:
 -Commit on github
+	*DONE (took me a bit :p )
 -Work on aigame.py (see plan below)
 -Understand Question 3/Motion of paddle
 	- How is value of decisions changing with dynamics?
@@ -10,6 +76,7 @@ To-Do:
 ####Plan####
 1. Understand variables and functions in aigame.py
 	1a. Comment on every line of code to explain it
+	*STARTED
 2. Make a list of potential things affected by using multiple steps for one calling of playGame
 3. Implement
 
