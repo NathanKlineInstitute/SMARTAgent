@@ -43,17 +43,29 @@ tstepPerAction = dconf['sim']['tstepPerAction'] # time step per action (in ms)
 fid4=None # only used by rank 0
 
 scale = dconf['net']['scale']
-ETypes = ['ER','EV1','EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE','EV4','EMT', 'EMDOWN', 'EMUP']
+if 'EMSTAY' in dconf['net']:
+  ETypes = ['ER','EV1','EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE','EV4','EMT', 'EMDOWN', 'EMUP','EMSTAY']
+else:
+  ETypes = ['ER','EV1','EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE','EV4','EMT', 'EMDOWN', 'EMUP']
 #ITypes = ['IR','IV1','IV1D','IV4','IMT','IM'] #
 ITypes = ['IR','IV1','IV4','IMT','IM'] # 
 #allpops = ['ER','IR','EV1','EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE','IV1','IV1D','EV4','IV4','EMT','IMT','EMDOWN','EMUP','IM']
-allpops = ['ER','IR','EV1','EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE','IV1','EV4','IV4','EMT','IMT','EMDOWN','EMUP','IM']
+if 'EMSTAY' in dconf['net']:
+  allpops = ['ER','IR','EV1','EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE','IV1','EV4','IV4','EMT','IMT','EMDOWN','EMUP','EMSTAY','IM']
+else:
+  allpops = ['ER','IR','EV1','EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE','IV1','EV4','IV4','EMT','IMT','EMDOWN','EMUP','IM']
 #EDirPops = ['EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE']
 #IDirPops = ['IV1D']
-EMotorPops = ['EMDOWN', 'EMUP'] # excitatory neuron motor populations
+if 'EMSTAY' in dconf['net']:
+  EMotorPops = ['EMDOWN', 'EMUP','EMSTAY'] # excitatory neuron motor populations
+else:
+  EMotorPops = ['EMDOWN', 'EMUP'] # excitatory neuron motor populations
 EPreMPops = ['EV1','EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE','EV4','EMT']
 dnumc = OrderedDict({ty:dconf['net'][ty]*scale for ty in allpops}) # number of neurons of a given type
-lrecpop = ['EMUP', 'EMDOWN'] # which populations to record from
+if 'EMSTAY' in dconf['net']:
+  lrecpop = ['EMUP', 'EMDOWN','EMSTAY'] # which populations to record from
+else:
+  lrecpop = ['EMUP', 'EMDOWN'] # which populations to record from
 if dconf['net']['EEPreMProb'] > 0.0 or dconf['net']['EEMFeedbackProb'] > 0.0 or dconf['net']['VisualFeedback']:
   for pop in ['EV1','EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE','EV4','EMT']:
     lrecpop.append(pop)
@@ -197,7 +209,10 @@ simConfig.saveFolder = 'data'
 # ['ER','IR','EV1','EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE','IV1','EV4','IV4','EMT','IMT','EMDOWN','EMUP','IM']
 #simConfig.analysis['plotTraces'] = {'include': [(pop, 0) for pop in allpops]}
 #simConfig.analysis['plotTraces'] = {'include': [(pop, 0) for pop in ['ER','IR','EV1','EV1DE','IV1','EV4','IV4','EMT','IMT','EMDOWN','IM']]}
-simConfig.analysis['plotTraces'] = {'include': [(pop, 0) for pop in ['ER','IR','EV1','EV1DE','IV1','EMDOWN','EMUP','IM']]}
+if 'EMSTAY' in dconf['net']:
+  simConfig.analysis['plotTraces'] = {'include': [(pop, 0) for pop in ['ER','IR','EV1','EV1DE','IV1','EMDOWN','EMUP','EMSTAY','IM']]}
+else:
+  simConfig.analysis['plotTraces'] = {'include': [(pop, 0) for pop in ['ER','IR','EV1','EV1DE','IV1','EMDOWN','EMUP','IM']]}
 
 #simConfig.analysis['plotRaster'] = {'timeRange': [500,1000],'popRates':'overlay','saveData':'data/RasterData.pkl','showFig':True}
 #simConfig.analysis['plotRaster'] = {'popRates':'overlay','saveData':'data/'+dconf['sim']['name']+'RasterData.pkl','showFig':dconf['sim']['doplot']}
@@ -312,7 +327,14 @@ netParams.connParams['EMUP->IM'] = {
         'weight': 0.02 * cfg.EIGain,
         'delay': 2,
         'synMech': 'AMPA', 'sec':'soma', 'loc':0.5}
-
+if 'EMSTAY' in dconf['net']:
+  netParams.connParams['EMSTAY->IM'] = {
+        'preConds': {'pop': 'EMSTAY'},
+        'postConds': {'pop': 'IM'},
+        'convergence': prob2conv(0.125/2, dnumc['EMSTAY']),
+        'weight': 0.02 * cfg.EIGain,
+        'delay': 2,
+        'synMech': 'AMPA', 'sec':'soma', 'loc':0.5}
 #Local inhibition
 #I to E within area
 netParams.connParams['IR->ER'] = {
@@ -613,7 +635,7 @@ def recordAdjustableWeightsPop (sim, t, popname):
         lsynweights.append([t,conn.preGid,cell.gid,float(conn['hObj'].weight[0])])
   return len(lcell)
                     
-def recordAdjustableWeights (sim, t, lpop = ['EMUP', 'EMDOWN']):
+def recordAdjustableWeights (sim, t, lpop = EMotorPops):
   """ record the STDP weights during the simulation - called in trainAgent
   """
   for pop in lpop: recordAdjustableWeightsPop(sim, t, pop)
@@ -672,7 +694,7 @@ def plotWeights():
   colorbar()
   show()
 
-def getAverageAdjustableWeights (sim, lpop = ['EMUP', 'EMDOWN']):
+def getAverageAdjustableWeights (sim, lpop = EMotorPops):
   # get average adjustable weights on a target population
   davg = {pop:0.0 for pop in lpop}
   for pop in lpop:
@@ -704,7 +726,7 @@ def mulAdjustableWeights (sim, dfctr):
         if 'hSTDP' in conn:    
           conn['hObj'].weight[0] *= dfctr[pop] 
 
-def normalizeAdjustableWeights (sim, t, lpop = ['EMUP', 'EMDOWN']):
+def normalizeAdjustableWeights (sim, t, lpop = EMotorPops):
   # normalize the STDP/RL weights during the simulation - called in trainAgent
   davg = getAverageAdjustableWeights(sim, lpop)
   try:

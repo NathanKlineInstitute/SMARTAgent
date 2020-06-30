@@ -3666,3 +3666,14 @@ take note of it and can try it if have time
 ** Found out that the code in sim.py was messed up.... no idea when did it happen... probably pushed the code without savind and then pulled which override the unsaved changes.
 
 ** anyway tried fixing all the error --- test now.
+
+** sim without 'EMSTAY' in '20june30_A' looks fine. 
+-- actmap looks ok.
+-- MissScore plot looks ok
+-- weights plot looks ok
+-- follow the ball plot looks ok.
+-- animSynWeights crashed--- didnt look into the reason why... since its not very useful anyway.
+
+** now run sim with 'EMSTAY' in '20june30_B'...
+-- code was completely messed up.... 'EMSTAY' was not set up at all.
+-- made changes and now will test....
