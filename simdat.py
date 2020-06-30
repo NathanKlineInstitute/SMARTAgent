@@ -119,52 +119,46 @@ def loadsimdat (name=None,getactmap=True,lpop = allpossible_pops): # load simula
 
 #
 def animActivityMaps (outpath='gif/'+dconf['sim']['name']+'actmap.mp4', framerate=10, figsize=(18,10), dobjpos=None,\
-  lpop = allpossible_pops): # plot activity in different layers as a function of input images  
+                      lpop=allpossible_pops):
+  # plot activity in different layers as a function of input images  
   ioff()
   possible_pops = ['ER','EV1','EV4','EMT','IR','IV1','IV4','IMT','EV1DW','EV1DNW','EV1DN'\
-    ,'EV1DNE','EV1DE','EV1DSW','EV1DS', 'EV1DSE','EMDOWN','EMUP','EMSTAY','IM']
+                   ,'EV1DNE','EV1DE','EV1DSW','EV1DS', 'EV1DSE','EMDOWN','EMUP','EMSTAY','IM']
   possible_titles = ['Excit R', 'Excit V1', 'Excit V4', 'Excit MT', 'Inhib R', 'Inhib V1', 'Inhib V4', 'Inhib MT',\
-    'W','NW','N','NE','E','SW','S','SE','Excit M DOWN', 'Excit M UP', 'Excit M STAY','Inhib M']
+                     'W','NW','N','NE','E','SW','S','SE','Excit M DOWN', 'Excit M UP', 'Excit M STAY', 'Inhib M']
+  dtitle = {p:t for p,t in zip(possible_pops,possible_titles)}
   ltitle = ['Input Images']
-  for popind in range(len(possible_pops)):
-    if possible_pops[popind] in lpop and possible_pops[popind] in dnumc:
-      ltitle.append(possible_titles[popind]) 
-  print('titles:', ltitle)  
-  if figsize is not None: fig, axs = plt.subplots(4, 6, figsize=figsize);
-  else: fig, axs = plt.subplots(4, 6);
-  lax = axs.ravel()
-  cbaxes = fig.add_axes([0.95, 0.4, 0.01, 0.2])
-  
-  ddir = OrderedDict({'EV1DW':'W','EV1DNW':'NW', 'EV1DN':'N','EV1DNE':'NE','EV1DE':'E','EV1DSW':'SW','EV1DS':'S','EV1DSE':'SE'})
-  #for p in ddir.keys(): ltitle.append(ddir[p])
-  #for p in ['Excit M DOWN', 'Excit M UP']: ltitle.append(p)
   lact = [InputImages]; lvmax = [255];
-  lfnimage = []
-  #lpop = ['ER', 'EV1', 'EV4', 'EMT', 'IR', 'IV1', 'IV4', 'IMT',\
-  #        'EV1DW','EV1DNW', 'EV1DN', 'EV1DNE','EV1DE','EV1DSW', 'EV1DS', 'EV1DSE',\
-  #        'EMDOWN','EMUP']  
   dmaxSpk = OrderedDict({pop:np.max(dact[pop]) for pop in dact.keys()})
-  max_spks = np.max([dmaxSpk[p] for p in dact.keys()])  
-  for pop in dact.keys():
+  max_spks = np.max([dmaxSpk[p] for p in dact.keys()])
+  for pop in lpop:
+    ltitle.append(dtitle[pop])
     lact.append(dact[pop])
     lvmax.append(max_spks)
+  if figsize is not None: fig, axs = plt.subplots(4, 5, figsize=figsize);
+  else: fig, axs = plt.subplots(4, 5);
+  lax = axs.ravel()
+  cbaxes = fig.add_axes([0.95, 0.4, 0.01, 0.2])  
+  ddir = OrderedDict({'EV1DW':'W','EV1DNW':'NW', 'EV1DN':'N','EV1DNE':'NE','EV1DE':'E','EV1DSW':'SW','EV1DS':'S','EV1DSE':'SE'})
+  lfnimage = []
   ddat = {}
   fig.suptitle('Time = ' + str(0*tstepPerAction) + ' ms')
   idx = 0
   objfctr = 1.0
   if 'UseFull' in dconf['DirectionDetectionAlgo']:
-    if dconf['DirectionDetectionAlgo']['UseFull']: objfctr=1/8.  
+    if dconf['DirectionDetectionAlgo']['UseFull']: objfctr=1/8.
+  flowdx = 8 # 5
   for ldx,ax in enumerate(lax):
     if idx > len(dact.keys()):
       ax.axis('off')
       continue
     if ldx==0:
       offidx=-1
-    elif ldx==5:
+    elif ldx==flowdx:
       offidx=1
     else:
       offidx=0
-    if ldx==6:
+    if ldx==flowdx:
       X, Y = np.meshgrid(np.arange(0, InputImages[0].shape[1], 1), np.arange(0,InputImages[0].shape[0],1))
       ddat[ldx] = ax.quiver(X,Y,ldflow[0]['thflow'][:,:,0],-ldflow[0]['thflow'][:,:,1], pivot='mid', units='inches',width=0.022,scale=1/0.15)
       ax.set_xlim((0,InputImages[0].shape[1])); ax.set_ylim((0,InputImages[0].shape[0]))
@@ -186,11 +180,11 @@ def animActivityMaps (outpath='gif/'+dconf['sim']['name']+'actmap.mp4', framerat
     idx = 0
     for ldx,ax in enumerate(lax):
       if idx > len(dact.keys()): continue
-      if ldx==0 or ldx==5:
+      if ldx==0 or ldx==flowdx:
         offidx=-1
       else:
         offidx=0
-      if ldx == 6:
+      if ldx == flowdx:
         ddat[ldx].set_UVC(ldflow[t+offidx]['thflow'][:,:,0],-ldflow[t]['thflow'][:,:,1])        
       else:
         ddat[ldx].set_data(lact[idx][t+offidx,:,:])
@@ -446,7 +440,7 @@ def getCumScore (actreward):
   return np.cumsum(allScore) #cumulative score evolving with time.  
 
 #  
-def plotHitMiss (actreward,ax=None,msz=3):
+def plotHitMiss (actreward,ax=None,msz=3,asratio=False,lclr=['r','g','b']):
   if ax is None: ax = gca()
   action_times = np.array(actreward.time)
   Hit_Missed = np.array(actreward.hit)
@@ -454,14 +448,38 @@ def plotHitMiss (actreward,ax=None,msz=3):
   allMissed = np.where(Hit_Missed==-1,1,0)
   cumHits = np.cumsum(allHit) #cumulative hits evolving with time.
   cumMissed = np.cumsum(allMissed) #if a reward is -1, replace it with 1 else replace it with 0.
+  if asratio:
+    ax.plot(action_times,cumHits/cumMissed,lclr[0]+'-o',markersize=msz)
+    ax.set_xlim((0,np.max(action_times)))
+    ax.set_ylabel('Hit/Miss ('+str(round(cumHits[-1]/cumMissed[-1],2))+')')
+    return cumHits[-1]/cumMissed[-1]
+  else:
+    ax.plot(action_times,cumHits,lclr[0]+'-o',markersize=msz)
+    ax.plot(action_times,cumMissed,lclr[1]+'-o',markersize=msz)
+    ax.set_xlim((0,np.max(action_times)))
+    ax.set_ylim((0,np.max([cumHits[-1],cumMissed[-1]])))    
+    ax.set_ylabel('Hit Ball ('+str(cumHits[-1])+')','Miss Ball ('+str(cumMissed[-1])+')')
+    return cumHits[-1],cumMissed[-1]
+
+#  
+def plotScoreMiss (actreward,ax=None,msz=3,asratio=False,clr='r'):
+  if ax is None: ax = gca()
+  action_times = np.array(actreward.time)
+  Hit_Missed = np.array(actreward.hit)
+  allMissed = np.where(Hit_Missed==-1,1,0)
+  cumMissed = np.cumsum(allMissed) #if a reward is -1, replace it with 1 else replace it with 0.
   cumScore = getCumScore(actreward)
-  ax.plot(action_times,cumScore,'r-o',markersize=msz)
-  ax.plot(action_times,cumHits,'g-o',markersize=msz)
-  ax.plot(action_times,cumMissed,'b-o',markersize=msz)
-  ax.set_xlim((0,np.max(action_times)))
-  ax.set_ylim((0,np.max([cumHits[-1],cumMissed[-1]])))
-  ax.legend(('Score ('+str(cumScore[-1])+')','Hit Ball ('+str(cumHits[-1])+')','Miss Ball ('+str(cumMissed[-1])+')'),loc='best')
-  return cumScore[-1],cumHits[-1],cumMissed[-1]
+  if asratio:
+    ax.plot(action_times,cumScore/cumMissed,clr+'-o',markersize=msz)
+    ax.set_xlim((0,np.max(action_times)))
+    ax.set_ylabel('Score/Miss ('+str(round(cumScore[-1]/cumMissed[-1],2))+')')
+    return cumScore[-1]/cumMissed[-1]
+  else:
+    ax.plot(action_times,cumScore,clr+'-o',markersize=msz)
+    ax.set_xlim((0,np.max(action_times)))
+    ax.set_ylim((0,cumMissed[-1]))
+    ax.set_ylabel('Score ('+str(cumScore[-1])+')')
+    return cumScore[-1]
 
 #  
 def plotScoreLoss (actreward,ax=None,msz=3):
@@ -487,6 +505,24 @@ def plotRewards (actreward,ax=None,msz=3,xl=None):
   if xl is not None: ax.set_xlim(xl)
   ax.set_ylim((np.min(actreward.reward),np.max(actreward.reward)))
   ax.set_ylabel('Rewards'); #f_ax1.set_xlabel('Time (ms)')
+
+def getconcatactionreward (lfn):
+  # concatenate the actionreward data frames together so can look at cumulative rewards,actions,etc.
+  # lfn is a list of actionrewards filenames from the simulation
+  pda = None
+  for fn in lfn:
+    acl = pd.DataFrame(np.loadtxt(fn),columns=['time','action','reward','proposed','hit'])
+    if pda is None:
+      pda = acl
+    else:
+      acl.time += np.amax(pda.time)
+      pda = pda.append(acl)
+  return pda
+
+def getindivactionreward (lfn):
+  # get the individual actionreward data frames separately so can compare cumulative rewards,actions,etc.
+  # lfn is a list of actionrewards filenames from the simulation
+  return [pd.DataFrame(np.loadtxt(fn),columns=['time','action','reward','proposed','hit']) for fn in lfn]
 
 def plotMeanNeuronWeight (pdf,postid,clr='k',ax=None,msz=1,xl=None):
   if ax is None: ax = gca()
