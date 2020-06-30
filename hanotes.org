@@ -3662,3 +3662,7 @@ take note of it and can try it if have time
 ** test sim.py without 'EMSTAY' in '20june30_A_' -- 100 sec sim.
 
 ** copy '20june29_A_' on my computer to work on plotting firing rate statistics.
+
+** Found out that the code in sim.py was messed up.... no idea when did it happen... probably pushed the code without savind and then pulled which override the unsaved changes.
+
+** anyway tried fixing all the error --- test now.

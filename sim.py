@@ -887,6 +887,7 @@ def trainAgent (t):
   vec = h.Vector()
   vec2 = h.Vector()
   vec3 = h.Vector()
+  vec4 = h.Vector()
   if t<(tstepPerAction*dconf['actionsPerPlay']): # for the first time interval use randomly selected actions
     actions =[]
     for _ in range(int(dconf['actionsPerPlay'])):
@@ -901,18 +902,27 @@ def trainAgent (t):
       ts_end = t-tstepPerAction*(dconf['actionsPerPlay']-ts)
       F_UPs.append(getFiringRatesWithInterval([ts_end,ts_beg], sim.net.pops['EMUP'].cellGids))
       F_DOWNs.append(getFiringRatesWithInterval([ts_end,ts_beg], sim.net.pops['EMDOWN'].cellGids))
-      F_STAYs.append(getFiringRatesWithInterval([ts_end,ts_beg], sim.net.pops['EMSTAY'].cellGids))
+      if 'EMSTAY' in dconf['net']:
+        F_STAYs.append(getFiringRatesWithInterval([ts_end,ts_beg], sim.net.pops['EMSTAY'].cellGids))
     sim.pc.allreduce(vec.from_python(F_UPs),1) #sum
     F_UPs = vec.to_python()
     sim.pc.allreduce(vec.from_python(F_DOWNs),1) #sum
     F_DOWNs = vec.to_python()
+    if 'EMSTAY' in dconf['net']:
+      sim.pc.allreduce(vec.from_python(F_STAYs),1) #sum
+      F_STAYs = vec.to_python()
     if sim.rank==0:
       if fid4 is None: fid4 = open(sim.MotorOutputsfilename,'w')
-      print('t=',round(t,2),' U,D firing rates:', F_UPs, F_DOWNs)
+      if 'EMSTAY' in dconf['net']:
+        print('t=',round(t,2),' U,D,S firing rates:', F_UPs, F_DOWNs, F_STAYs)
+      else:
+        print('t=',round(t,2),' U,D firing rates:', F_UPs, F_DOWNs)
       #print('Firing rates: ', F_R1, F_R2, F_R3, F_R4, F_R5, F_L1, F_L2, F_L3, F_L4, F_L5)
       fid4.write('%0.1f' % t)
       for ts in range(int(dconf['actionsPerPlay'])): fid4.write('\t%0.1f' % F_UPs[ts])
       for ts in range(int(dconf['actionsPerPlay'])): fid4.write('\t%0.1f' % F_DOWNs[ts])
+      if 'EMSTAY' in dconf['net']:
+        for ts in range(int(dconf['actionsPerPlay'])): fid4.write('\t%0.1f' % F_STAYs[ts])
       fid4.write('\n')
       actions = []
       movefctr=1.0
@@ -990,6 +1000,9 @@ def trainAgent (t):
     DOWNactions = np.sum(np.where(np.array(actions)==dconf['moves']['DOWN'],1,0))
     sim.pc.broadcast(vec2.from_python([UPactions]),0)
     sim.pc.broadcast(vec3.from_python([DOWNactions]),0)
+    if 'EMSTAY' in dconf['net']:
+      STAYactions = np.sum(np.where(np.array(actions)==dconf['moves']['NOMOVE'],1,0))
+      sim.pc.broadcast(vec4.from_python([STAYactions]),0)
   else: # other workers
     sim.pc.broadcast(vec, 0) # receive critic value from master node
     critic = vec.to_python()[0] # critic is first element of the array
@@ -997,7 +1010,12 @@ def trainAgent (t):
     UPactions = vec2.to_python()[0]
     sim.pc.broadcast(vec3, 0)
     DOWNactions = vec3.to_python()[0]
-    if dconf['verbose']: print('UPactions: ', UPactions,'DOWNactions: ', DOWNactions)
+    if 'EMSTAY' in dconf['net']:
+      sim.pc.broadcast(vec4, 0)
+      STAYactions = vec4.to_python()[0]
+    if dconf['verbose']:
+      if 'EMSTAY' in dconf['net']: print('UPactions: ', UPactions,'DOWNactions: ', DOWNactions, 'STAYactions: ', STAYactions)
+      else: print('UPactions: ', UPactions,'DOWNactions: ', DOWNactions)
   if critic != 0: # if critic signal indicates punishment (-1) or reward (+1)
     if sim.rank==0: print('t=',round(t,2),'- adjusting weights based on RL critic value:', critic)
     if 'EMSTAY' in dconf['net']:
@@ -1029,8 +1047,8 @@ def trainAgent (t):
         if dconf['verbose']: print('APPLY RL to EMUP, EMDOWN and EMSTAY')
         for STDPmech in dSTDPmech['all']: STDPmech.reward_punish(float(critic))
     else:
-      if not dconf['sim']['targettedRL']:
-        if dconf['verbose']: print('APPLY RL to EMUP, EMDOWN and EMSTAY')
+      if not dconf['sim']['targettedRL'] or UPactions==DOWNactions:
+        if dconf['verbose']: print('APPLY RL to both EMUP and EMDOWN')
         for STDPmech in dSTDPmech['all']: STDPmech.reward_punish(float(critic))
       elif UPactions>DOWNactions:
         if dconf['verbose']: print('APPLY RL to EMUP')
