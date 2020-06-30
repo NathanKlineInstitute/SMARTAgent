@@ -18,11 +18,11 @@ if __name__ == '__main__':
     d['sim']['doplot'] = 0
     if i > 0:
       d['simtype']['ResumeSim'] = 1
-      d['simtype']['ResumeSimFromFile'] = 'data/' + simstr + '_step_' + str(i-1) + '_synWeights.pkl'
+      d['simtype']['ResumeSimFromFile'] = 'data/' + simstr + '_step_' + str(i-1) + '_synWeights_final.pkl'
     fnjson = d['sim']['name'] + '.json'
-    fpout.writelines('myrun ' + str(ncore) + ' ' + fnjson + '\n')
+    fpout.writelines('./myrun ' + str(ncore) + ' ' + fnjson + '\n')
     json.dump(d, open(fnjson,'w'))
   fpout.close()
   os.chmod(outf,0o775)
   print('running ', outf)
-  os.system(outf)
+  os.system('./'+outf)

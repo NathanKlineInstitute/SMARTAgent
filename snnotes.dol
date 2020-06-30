@@ -10251,3 +10251,108 @@ started ~22:45 ...
 
 started ~23:45 ...
 
+finished @ 9:39 next morning ...
+
+*20jun30
+** check output from last sim on cycle (20jun29_G2_cycle_) has (EMDOWN,EMUP,IM: 32,32,16)
+
+python -i simdat.py backupcfg/20jun29_G2_cycle_sim.json
+
+lfn = ['20jun26_G0_cycle_ActionsRewards.txt','20jun27_G1_cycle_ActionsRewards.txt','20jun29_G2_cycle_ActionsRewards.txt']
+lfn = ['data/'+x for x in lfn]
+lpda = getindivactionreward(lfn)
+
+#
+for pda,clr in zip(lpda,['b','g','r']):
+  plotFollowBall(pda,ax=subplot(1,3,1),cumulative=True,color=clr);  
+  plotHitMiss(pda,ax=subplot(1,3,2),lclr=[clr],asratio=True); 
+  plotScoreMiss(pda,ax=subplot(1,3,3),clr=clr,asratio=True); 
+
+savefig('gif/'+dstr+simstr+'perf_compare_steps.png') # 20jun30_20jun29_G2_cycle_perf_compare_steps.png
+
+looks like some improvement but mostly stuck for the last step
+interesting that there's a large spike in performance at beginning of step 3 (red) but then after 200 s
+it drops to step 2 performance levels (green). is that just an accident of which location the ball was hit to?
+will have to check in movie ... 
+
+pdac = getconcatactionreward(lfn)
+plotFollowBall(pdac,ax=subplot(1,3,1),cumulative=True,color='k');  
+plotHitMiss(pdac,ax=subplot(1,3,2),lclr=['k'],asratio=True); 
+plotScoreMiss(pdac,ax=subplot(1,3,3),clr='k',asratio=True); 
+
+final hit/miss ratio 0.38392857142857145
+final score/miss ratio 0.08585164835164835
+
+savefig('gif/'+dstr+simstr+'perf_compare_steps_and_cumulative.png')
+
+clf(); drawraster(dspkT,dspkID); 
+xlim((0e3,10e3)); savefig('gif/'+dstr+simstr+'rastA.png') # 
+xlim((10e3,20e3)); savefig('gif/'+dstr+simstr+'rastB.png') # 
+xlim((190e3,200e3)); savefig('gif/'+dstr+simstr+'rastC.png') # 
+xlim((200e3,210e3)); savefig('gif/'+dstr+simstr+'rastD.png') # 
+
+drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','IM'],tlim=(0,10e3)); tl(); savefig('gif/'+dstr+simstr+'Vm.png'); 
+drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','IM'],tlim=(10e3,20e3)); tl(); savefig('gif/'+dstr+simstr+'VmB.png'); 
+drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','IM'],tlim=(190e3,200e3)); tl(); savefig('gif/'+dstr+simstr+'VmC.png'); 
+drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','IM'],tlim=(200e3,210e3)); tl(); savefig('gif/'+dstr+simstr+'VmD.png'); 
+
+20jun30_20jun29_G2_cycle_Vm.png
+20jun30_20jun29_G2_cycle_VmB.png
+20jun30_20jun29_G2_cycle_VmC.png
+20jun30_20jun29_G2_cycle_VmD.png
+
+activity looks ok in general ... do not see anything strange around when performance drops
+
+#
+clf(); dobjpos = loadObjPos() ## 
+xlabel('Racket Y position'); hist(dobjpos['racket'][:,1])
+savefig('gif/'+dstr+simstr+'poshist.png') # 20jun30_20jun29_G2_cycle_poshist.png
+
+some bias ... not terrible ...
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=True)
+xlabel('Time (ms)'); tl(); savefig('gif/'+dstr+simstr+'all_avg_weight.png') # 
+
+pdfs = pdf[pdf.time==np.amax(pdf.time)]; D = pdf2weightsdict(pdfs); pickle.dump(D, open('data/'+simstr+'synWeights_final.pkl','wb'))
+# data/20jun29_G2_cycle_synWeights_final.pkl
+can continue or run a multistep sim ... maybe more benefit to that so do not have to keep restarting manually ... 
+
+lpop = ['ER', 'EV1DNW', 'EV1DN', 'EV1DNE','EV1', 'IR', 'EV1DW','EV1DE','IV1','EMUP','EV1DSW', 'EV1DS', 'EV1DSE','IM','EMDOWN']  
+dact = getdActMap(totalDur, tstepPerAction, dspkT, dspkID, dnumc, dstartidx, lpop)
+fig, axs, plt = animActivityMaps(lpop=lpop)
+
+may as well continue as a multistep sim ... see if improves further with longer runs;
+easier than restarting each time ...
+
+first setup the base sn.json ... 
+
+hmm, problem with multistep sim is that it does not use the final weights, uses full weights, so that
+will likely lead to a memory error if 32 cores all using large amount of RAM ... well, 2 GB x 32 = 64 GB,
+within system limits ... 
+
+could have multistep auto-create final weights ... sim.py can do that too ... 
+
+ok, sim.py will do that ... that way won't have to create each time 
+
+try it out ...
+20jun30_G3_cycle_
+    "simtype": {"ResumeSim":1,"ResumeSimFromFile":"data/20jun29_G2_cycle_synWeights_final.pkl"}, 
+
+run for 10 s ... 
+
+seems to have worked ...
+
+now try multistepSim.py ... will make it for 2 10 s steps and make sure works
+
+python multistepSim.py sn.json 32 2 multirun
+
+ok, seemed to work ... will run 10 1600 s sims ... 
+
+will take a couple of days ... 
+
+python multistepSim.py sn.json 32 10 multirun
+
+base name is 20jun30_G3_cycle_
+
+started ~12:33 ... 
+

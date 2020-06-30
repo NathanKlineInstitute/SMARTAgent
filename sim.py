@@ -1151,13 +1151,20 @@ sim.saveData() # save data to disk
 def LSynWeightToD (L):
   # convert list of synaptic weights to dictionary to save disk space
   print('converting synaptic weight list to dictionary...')
-  dout = {}
+  dout = {}; doutfinal = {}
   for row in L:
     t,preID,poID,w = row
-    if preID not in dout: dout[preID] = {}
-    if poID not in dout[preID]: dout[preID][poID] = []
+    if preID not in dout:
+      dout[preID] = {}
+      doutfinal[preID] = {}
+    if poID not in dout[preID]:
+      dout[preID][poID] = []
+      doutfinal[preID][poID] = []
     dout[preID][poID].append([t,w])
-  return dout
+  for preID in doutfinal.keys():
+    for poID in doutfinal[preID].keys():
+      doutfinal[preID][poID].append(dout[preID][poID][-1])
+  return dout, doutfinal
 
 def saveSynWeights ():
   # save synaptic weights 
@@ -1178,7 +1185,9 @@ def saveSynWeights ():
       L = L + lw # concatenate to the list L
     #pickle.dump(L,open('data/'+dconf['sim']['name']+'synWeights.pkl', 'wb')) # this would save as a List
     # now convert the list to a dictionary to save space, and save it to disk
-    pickle.dump(LSynWeightToD(L),open('data/'+dconf['sim']['name']+'synWeights.pkl', 'wb'))    
+    dout, doutfinal = LSynWeightToD(L)
+    pickle.dump(dout,open('data/'+dconf['sim']['name']+'synWeights.pkl', 'wb'))
+    pickle.dump(doutfinal,open('data/'+dconf['sim']['name']+'synWeights_final.pkl', 'wb'))        
 
 if sim.saveWeights: saveSynWeights()
 
