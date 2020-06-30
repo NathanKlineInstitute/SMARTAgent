@@ -10128,8 +10128,11 @@ plenty of the initial bias ...
 
 clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=True)
 xlabel('Time (ms)'); tl(); savefig('gif/'+dstr+simstr+'all_avg_weight.png') # 
+20jun29_20jun29_64_H0_cycle_all_avg_weight.png
+much more diversity in weights ... probably worth continuing this one later on ... 
 
 pdfs = pdf[pdf.time==np.amax(pdf.time)]; D = pdf2weightsdict(pdfs); pickle.dump(D, open('data/'+simstr+'synWeights_final.pkl','wb'))
+data/20jun29_64_H0_cycle_synWeights_final.pkl
 
 ** compare and check output/performance from 20jun26_F4_targetted_reduced_tank_ and 20jun26_F4_targetted_tank_
 
