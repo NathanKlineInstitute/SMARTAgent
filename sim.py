@@ -910,8 +910,7 @@ def trainAgent (t):
       ts_end = t-tstepPerAction*(dconf['actionsPerPlay']-ts)
       F_UPs.append(getFiringRatesWithInterval([ts_end,ts_beg], sim.net.pops['EMUP'].cellGids))
       F_DOWNs.append(getFiringRatesWithInterval([ts_end,ts_beg], sim.net.pops['EMDOWN'].cellGids))
-      if 'EMSTAY' in dconf['net']:
-        F_STAYs.append(getFiringRatesWithInterval([ts_end,ts_beg], sim.net.pops['EMSTAY'].cellGids))
+      F_STAYs.append(getFiringRatesWithInterval([ts_end,ts_beg], sim.net.pops['EMSTAY'].cellGids))
     sim.pc.allreduce(vec.from_python(F_UPs),1) #sum
     F_UPs = vec.to_python()
     sim.pc.allreduce(vec.from_python(F_DOWNs),1) #sum
