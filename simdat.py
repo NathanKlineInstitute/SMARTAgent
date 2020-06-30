@@ -15,7 +15,7 @@ from collections import OrderedDict
 from imgutils import getoptflow, getoptflowframes
 from connUtils import gid2pos
 from utils import getdatestr
-
+rcParams['agg.path.chunksize'] = 100000000000 # for plots of long activity 
 ion()
 
 rcParams['font.size'] = 12
