@@ -10082,6 +10082,55 @@ run for 1600 s ...
 
 started ~noon
 
+finished ~23:05
+
+check output ...
+
+python -i simdat.py backupcfg/20jun29_64_H0_cycle_sim.json
+
+lfn = ['20jun20_F0_targetted_tank_ActionsRewards.txt','20jun26_G0_cycle_ActionsRewards.txt','20jun29_64_H0_cycle_ActionsRewards.txt']
+lfn = ['data/'+x for x in lfn]
+lpda = getindivactionreward(lfn)
+
+#
+plotFollowBall(lpda[0],ax=subplot(1,3,1),cumulative=True,color='b'); ylim((0,.6)); 
+plotFollowBall(lpda[1],ax=subplot(1,3,1),cumulative=True,color='r'); ylim((0,.6)); 
+plotFollowBall(lpda[2],ax=subplot(1,3,1),cumulative=True,color='g'); ylim((0,.6)); xlim((0,1600e3));
+plotHitMiss(lpda[0],ax=subplot(1,3,2),lclr=['b'],asratio=True); ylim((0,.6)); 
+plotHitMiss(lpda[1],ax=subplot(1,3,2),lclr=['r'],asratio=True); ylim((0,.6)); 
+plotHitMiss(lpda[2],ax=subplot(1,3,2),lclr=['g'],asratio=True); ylim((0,.6)); xlim((0,1600e3));
+plotScoreMiss(lpda[0],ax=subplot(1,3,3),clr='b',asratio=True); ylim((0,.6)); 
+plotScoreMiss(lpda[1],ax=subplot(1,3,3),clr='r',asratio=True); ylim((0,.6)); 
+plotScoreMiss(lpda[2],ax=subplot(1,3,3),clr='g',asratio=True); ylim((0,.6)); xlim((0,1600e3))
+
+savefig('gif/'+dstr+simstr+'perf_compare_16_32_64.png') # 
+
+based on that it looks like the network with 32 EMDOWN, 32 EMUP, 16 IM has the best performance
+(green) 64,64,32 seems to perform slightly worse...perhaps higher weightvar would help the
+64,64,32?
+
+clf(); drawraster(dspkT,dspkID); xlim((1590e3,1600e3)); savefig('gif/'+dstr+simstr+'rastB.png') # 
+# 20jun29_20jun29_64_H0_cycle_rastB.png
+xlim((1590e3,1592e3)); savefig('gif/'+dstr+simstr+'rastC.png') # 
+20jun29_20jun29_64_H0_cycle_rastC.png
+
+performance could be degraded due to hypersynch and/or low rates of EMUP, EMDOWN ... may need
+more time to develop ... 
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','IM']); xlim((1590e3,1600e3)); savefig('gif/'+dstr+simstr+'Vm.png'); 
+20jun29_20jun29_64_H0_cycle_Vm.png
+
+#
+clf(); dobjpos = loadObjPos() #
+xlabel('Racket Y position'); hist(dobjpos['racket'][:,1])
+savefig('gif/'+dstr+simstr+'poshist.png')
+plenty of the initial bias ... 
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=True)
+xlabel('Time (ms)'); tl(); savefig('gif/'+dstr+simstr+'all_avg_weight.png') # 
+
+pdfs = pdf[pdf.time==np.amax(pdf.time)]; D = pdf2weightsdict(pdfs); pickle.dump(D, open('data/'+simstr+'synWeights_final.pkl','wb'))
+
 ** compare and check output/performance from 20jun26_F4_targetted_reduced_tank_ and 20jun26_F4_targetted_tank_
 
 reduced has the weight norm every 400 s ... 
@@ -10190,4 +10239,12 @@ and "EEMPopNorm":1 <<-- that means use average weight to rescale both population
 ./myrun 16 sn.json
 
 started ~22:45 ...
+
+** continue 20jun27_G1_cycle_ (EMDOWN,EMUP,IM: 32,32,16) as 20jun29_G2_cycle_
+
+    "simtype": {"ResumeSim":1,"ResumeSimFromFile":"data/20jun27_G1_cycle_synWeights_final.pkl"}, 
+
+./myrun 32 sn.json
+
+started ~23:45 ...
 

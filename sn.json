@@ -10,10 +10,10 @@
     "useRacketPredictedPos": 1,
     "DirectionDetectionAlgo":{"CentroidTracker":1,"OpticFlow":0,"FlowWidth":16,"UseFull":1},
     "verbose": 0,
-    "simtype": {"ResumeSim":1,"ResumeSimFromFile":"data/20jun26_F4_targetted_tank_synWeights_final.pkl"}, 
-    "sim": {"duration": 1600000, "dt": 0.2, "verbose": 0, "recordStep":0.6,"recordWeightStepSize":250,"normalizeWeightStepSize":20000,"RLFakeUpRule": 0,"RLFakeDownRule": 0,"RLFakeStayRule": 0,"name":"20jun29_F5_targetted_norm_tank_","doquit":1,"doplot":0,"saveCellSecs":0,"saveCellConns":0,"targettedRL":1,"tstepPerAction":20,"saveWeights":1},
+    "simtype": {"ResumeSim":1,"ResumeSimFromFile":"data/20jun27_G1_cycle_synWeights_final.pkl"}, 
+    "sim": {"duration": 1600000, "dt": 0.2, "verbose": 0, "recordStep":0.6,"recordWeightStepSize":250,"normalizeWeightStepSize":900000,"RLFakeUpRule": 0,"RLFakeDownRule": 0,"RLFakeStayRule": 0,"name":"20jun29_G2_cycle_","doquit":1,"doplot":0,"saveCellSecs":0,"saveCellConns":0,"targettedRL":1,"tstepPerAction":20,"saveWeights":1},
     "architecturePreMtoM": {"useProbabilistic":1,"useTopological":0},
-    "net":{"scale":1,"ER":400,"IR":100,"EV1":400,"EV1DE":400,"EV1DNE":400,"EV1DN":400,"EV1DNW":400,"EV1DW":400,"EV1DSW":400,"EV1DS":400,"EV1DSE":400,"IV1":100,"EV4":0,"IV4":0,"EMT":0,"IMT":0,"EMDOWN":16,"EMUP":16,"IM":8,"AngRFSigma":22.5,"DirMinRate":0.0,"DirMaxRate":50.0,"EEMWghtAM":0.000012,"EEMWghtNM":0.0000012,"EEPreMWghtAM":0.00008,"EEPreMWghtNM":0.0000025,"EEMWghtThreshMin":0.00000625,"EEMWghtThreshMax":0.00032,"EEMProb":1.0,"EEMRecProb":0.0,"EEPreMProb":0.0,"EEMPopNorm":1,"EEMRecProbCross":0,"EEMFeedbackProb":0.0,"EEMFeedbackWghtAM":0.0000125,"EEMFeedbackWghtNM":0.00000125,"VisualFeedback":0,"weightVar":0.1},
+    "net":{"scale":1,"ER":400,"IR":100,"EV1":400,"EV1DE":400,"EV1DNE":400,"EV1DN":400,"EV1DNW":400,"EV1DW":400,"EV1DSW":400,"EV1DS":400,"EV1DSE":400,"IV1":100,"EV4":0,"IV4":0,"EMT":0,"IMT":0,"EMDOWN":32,"EMUP":32,"IM":16,"AngRFSigma":22.5,"DirMinRate":0.0,"DirMaxRate":50.0,"EEMWghtAM":0.000012,"EEMWghtNM":0.0000012,"EEPreMWghtAM":0.00008,"EEPreMWghtNM":0.0000025,"EEMWghtThreshMin":0.00000625,"EEMWghtThreshMax":0.00032,"EEMProb":1.0,"EEMRecProb":0.0,"EEPreMProb":0.0,"EEMPopNorm":0,"EEMRecProbCross":0,"EEMFeedbackProb":0.0,"EEMFeedbackWghtAM":0.0000125,"EEMFeedbackWghtNM":0.00000125,"VisualFeedback":0,"weightVar":0.1},
     "RL":{"AMPA":
 	  {"wbase":0.0000001,"wmax":0.00048,"RLon":1,"RLlenhebb":200,"RLlenanti":50,"useRLexp":1,"RLhebbwt":0.0000002,"RLantiwt":-0.0,"hebbwt":0,"antiwt":0,"tauhebb":10,"RLwindhebb":50,"softthresh":0,"verbose":0},
 	  "NMDA":
