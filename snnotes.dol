@@ -10173,7 +10173,7 @@ fig, axs, plt = animActivityMaps(lpop=lpop)
 
 started ~22:24 ... 
 
-*** second with new weight norm in sim
+*** second with new weight norm in sim (20jun29_F5_targetted_norm_tank_)
 
     # normalize weights across populations to avoid bias 
     if dconf['net']['EEMPopNorm']:
@@ -10183,4 +10183,11 @@ started ~22:24 ...
 this way also do not have to deal with min and max thresh for the normalization and
 use the same norm for both populations maintaining the relative weights (which are biased, but
 that's not a problem, is it? since based on learning appropriate responses) 
+
+all params same as 20jun29_F5_targetted_tank_ except that has "normalizeWeightStepSize":20000  <<-- that means weight norm every 400 ms ... 
+and "EEMPopNorm":1 <<-- that means use average weight to rescale both populations' weights to initial weight, but preserving relative values
+
+./myrun 16 sn.json
+
+started ~22:45 ...
 
