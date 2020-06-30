@@ -3657,3 +3657,8 @@ take note of it and can try it if have time
 -- testing .... expecting some more bugs to fix.
 -- more fixing...
 -- more fixing...
+
+
+** test sim.py without 'EMSTAY' in '20june30_A_' -- 100 sec sim.
+
+** copy '20june29_A_' on my computer to work on plotting firing rate statistics.
