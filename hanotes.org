@@ -3633,3 +3633,27 @@ take note of it and can try it if have time
 
 
 ** test simdat.py.....
+
+-- just use: dact = getdActMap (totalDur, tstepPerAction, dspkT, dspkID, dnumc, dstartidx,lpop)
+-- juset use: animActivityMaps (outpath='gif/'+dconf['sim']['name']+'actmap.mp4', framerate=10, lpop = lpop)
+
+** debugging simdat.py
+-- lpop OK
+-- dact loading fine.
+-- animAcitivytMaps has problems since now we should have capacity to plot more than 20 subplots.
+-- tried fixing it.... test again.
+-- still problem...
+-- tried fixing it .... test again.
+-- seems working --- fix labeling
+
+
+-- dact = getdActMap (totalDur, tstepPerAction, dspkT, dspkID, dnumc, dstartidx, lpop)
+-- animActivityMaps (outpath='gif/'+dconf['sim']['name']+'actmap.mp4', framerate=10, figsize=(18,10), dobjpos=None,\
+  lpop = lpop)
+
+** debug animSynWeights
+-- plot only if pop exists.
+-- make more panels to fit in 11 more pre-post pairs.
+-- testing .... expecting some more bugs to fix.
+-- more fixing...
+-- more fixing...

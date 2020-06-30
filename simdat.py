@@ -546,16 +546,17 @@ def plotMeanWeights (pdf,ax=None,msz=1,xl=None,lpop=['EMDOWN','EMUP','EMSTAY'],l
   mnw,mxw=1e9,-1e9
   for pop,clr in zip(lpop,lclr):
     #print(pop,clr)
-    if plotindiv:
-      for idx in range(dstartidx[pop],dendidx[pop]+1,1): # first plot average weight onto each individual neuron
-        lwt = plotMeanNeuronWeight(pdf,idx,clr=clr,msz=1)
-        mnw=min(mnw, min(lwt))
-        mxw=max(mxw, max(lwt))    
-    pdfs = pdf[(pdf.postid>=dstartidx[pop]) & (pdf.postid<=dendidx[pop])]
-    popwts[pop] = [np.mean(pdfs[(pdfs.time==t)].weight) for t in utimes] #wts of connections onto pop
-    ax.plot(utimes,popwts[pop],clr+'-o',markersize=msz)
-    mnw=min(mnw, np.amin(popwts[pop]))
-    mxw=max(mxw, np.amax(popwts[pop]))            
+    if pop in dstartidx:
+      if plotindiv:
+        for idx in range(dstartidx[pop],dendidx[pop]+1,1): # first plot average weight onto each individual neuron
+          lwt = plotMeanNeuronWeight(pdf,idx,clr=clr,msz=1)
+          mnw=min(mnw, min(lwt))
+          mxw=max(mxw, max(lwt))    
+      pdfs = pdf[(pdf.postid>=dstartidx[pop]) & (pdf.postid<=dendidx[pop])]
+      popwts[pop] = [np.mean(pdfs[(pdfs.time==t)].weight) for t in utimes] #wts of connections onto pop
+      ax.plot(utimes,popwts[pop],clr+'-o',markersize=msz)
+      mnw=min(mnw, np.amin(popwts[pop]))
+      mxw=max(mxw, np.amax(popwts[pop]))            
   if xl is not None: ax.set_xlim(xl)
   ax.set_ylim((mnw,mxw))
   ax.set_ylabel('Average weight'); 
@@ -573,31 +574,44 @@ def animSynWeights (pdf, outpath='gif/'+dconf['sim']['name']+'weightmap.mp4', fr
   print('minwt:',minwt,'maxwt:',maxwt)
   if figsize is not None: fig = plt.figure(figsize=figsize)
   else: fig = plt.figure()
-  gs = gridspec.GridSpec(4,8)
+  gs = gridspec.GridSpec(5,9)
   f_ax = []
   ax_count = 0
-  for rows in range(3):
-    for cols in range(8): 
-      if ax_count<22: 
+  for rows in range(4):
+    for cols in range(9): 
+      if ax_count<33: 
         f_ax.append(fig.add_subplot(gs[rows,cols]))
       ax_count += 1
   cbaxes = fig.add_axes([0.92, 0.4, 0.01, 0.2])
-  f_ax1 = fig.add_subplot(gs[2,6:8])
-  f_ax2 = fig.add_subplot(gs[3,0:2])
-  f_ax3 = fig.add_subplot(gs[3,3:5])
-  f_ax4 = fig.add_subplot(gs[3,6:8])
+  f_ax1 = fig.add_subplot(gs[3,6:8])
+  f_ax2 = fig.add_subplot(gs[4,0:2])
+  f_ax3 = fig.add_subplot(gs[4,3:5])
+  f_ax4 = fig.add_subplot(gs[4,6:8])
   plotFollowBall(actreward,f_ax1)
   plotRewards(actreward,f_ax2,xl=(0,simConfig['simConfig']['duration']))
   popwts = plotMeanWeights(pdf,f_ax3,xl=(0,simConfig['simConfig']['duration']))
   plotHitMiss(actreward,f_ax4)
-  lsrc = ['EV1', 'EV4', 'EMT','EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE']
+  possible_src = ['EV1', 'EV4', 'EMT','EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE']
+  lsrc = []
+  for c_src in possible_src:
+    if c_src in dstartidx:
+      lsrc.append(c_src)
+  print('Source Pops: ', lsrc)
+  possible_targs = ['EMDOWN', 'EMUP','EMSTAY']
+  ltarg = []
+  for c_targ in possible_targs:
+    if c_targ in dstartidx:
+      ltarg.append(c_targ)  
   ltitle = []
   for src in lsrc:
-    for trg in ['EMDOWN', 'EMUP','EMSTAY']: ltitle.append(src+'->'+trg)
+    for trg in ltarg: ltitle.append(src+'->'+trg)
   dimg = {}; dline = {}; 
   def getwts (tdx, src):
     t = utimes[tdx]
-    ltarg = ['EMDOWN', 'EMUP','EMSTAY']
+    if 'EMSTAY' in dstartidx:
+      ltarg = ['EMDOWN', 'EMUP','EMSTAY']
+    else:
+      ltarg = ['EMDOWN', 'EMUP']
     lout = []
     for targ in ltarg:
       cpdf = pdf[(pdf.time==t) & (pdf.postid>=dstartidx[targ]) & (pdf.postid<=dendidx[targ]) & (pdf.preid>=dstartidx[src]) & (pdf.preid<=dendidx[src])]
@@ -609,7 +623,10 @@ def animSynWeights (pdf, outpath='gif/'+dconf['sim']['name']+'weightmap.mp4', fr
       lout.append(lwt)
     return lout[0], lout[1]    
   minR,maxR = np.min(actreward.reward),np.max(actreward.reward)
-  minW,maxW = np.min([np.min(popwts['EMDOWN']),np.min(popwts['EMUP']),np.min(popwts['EMSTAY'])]), np.max([np.max(popwts['EMDOWN']),np.max(popwts['EMUP']),np.max(popwts['EMSTAY'])])
+  if 'EMSTAY' in dstartidx:
+    minW,maxW = np.min([np.min(popwts['EMDOWN']),np.min(popwts['EMUP']),np.min(popwts['EMSTAY'])]), np.max([np.max(popwts['EMDOWN']),np.max(popwts['EMUP']),np.max(popwts['EMSTAY'])])
+  else:
+    minW,maxW = np.min([np.min(popwts['EMDOWN']),np.min(popwts['EMUP'])]), np.max([np.max(popwts['EMDOWN']),np.max(popwts['EMUP'])])
   t = utimes[0]
   dline[1], = f_ax1.plot([t,t],[minR,maxR],'r',linewidth=0.2); f_ax1.set_xticks([])
   dline[2], = f_ax2.plot([t,t],[minW,maxW],'r',linewidth=0.2); f_ax2.set_xticks([])  
@@ -654,8 +671,19 @@ def plotavgweights (pdf):
   xlim((0,simConfig['simConfig']['duration']))
   ylim((-1.1,1.1))
   gdx = 2
-  for src in ['EV1','EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE', 'EV4', 'EMT']:
-      for trg in ['EMDOWN', 'EMUP','EMSTAY']:
+  possible_src = ['EV1', 'EV4', 'EMT','EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE']
+  lsrc = []
+  for c_src in possible_src:
+    if c_src in dstartidx:
+      lsrc.append(c_src)
+  print('Source Pops: ', lsrc)
+  possible_targs = ['EMDOWN', 'EMUP','EMSTAY']
+  ltrg = []
+  for c_targ in possible_targs:
+    if c_targ in dstartidx:
+      ltrg.append(c_targ)
+  for src in lsrc:
+      for trg in ltrg:
           davgw[src+'->'+trg] = arr = []        
           for t in utimes:
               pdfs = pdf[(pdf.time==t) & (pdf.postid>=dstartidx[trg]) & (pdf.postid<=dendidx[trg]) & (pdf.preid>=dstartidx[src]) & (pdf.preid<=dendidx[src])]
@@ -663,11 +691,15 @@ def plotavgweights (pdf):
       subplot(12,1,gdx)
       plot(utimes,davgw[src+'->EMDOWN'],'r-',linewidth=3);
       plot(utimes,davgw[src+'->EMUP'],'b-',linewidth=3);
-      plot(utimes,davgw[src+'->EMSTAY'],'g-',linewidth=3);
-      legend((src+'->EMDOWN',src+'->EMUP',src+'->EMSTAY'),loc='upper left')
+      if 'EMSTAY' in dstartidx:
+        plot(utimes,davgw[src+'->EMSTAY'],'g-',linewidth=3);
+        legend((src+'->EMDOWN',src+'->EMUP',src+'->EMSTAY'),loc='upper left')
+      else:
+        legend((src+'->EMDOWN',src+'->EMUP'),loc='upper left')
       plot(utimes,davgw[src+'->EMDOWN'],'ro',markersize=10);
       plot(utimes,davgw[src+'->EMUP'],'bo',markersize=10);
-      plot(utimes,davgw[src+'->EMSTAY'],'go',markersize=10);       
+      if 'EMSTAY' in dstartidx:
+        plot(utimes,davgw[src+'->EMSTAY'],'go',markersize=10);       
       xlim((0,simConfig['simConfig']['duration']))
       ylabel('RL weights') 
       gdx += 1
