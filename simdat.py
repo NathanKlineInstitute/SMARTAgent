@@ -23,6 +23,7 @@ tl=tight_layout
 stepNB = -1
 totalDur = int(dconf['sim']['duration']) # total simulation duration
 allpossible_pops = ['ER','IR','EV1','EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE','IV1','EV4','IV4','EMT','IMT','EMDOWN','EMUP','EMSTAY','IM']
+
 def pdf2weightsdict (pdf):
   # convert the pandas dataframe with synaptic weights into a dictionary
   D = {}
@@ -49,6 +50,12 @@ def readweightsfile2pdf (fn):
 def readinweights (name):
   # read the synaptic plasticity weights associated with sim name into a pandas dataframe
   return readweightsfile2pdf('data/'+name+'synWeights.pkl')
+
+def savefinalweights (pdf, simstr):
+  # save final weights to a (small) file
+  pdfs = pdf[pdf.time==np.amax(pdf.time)]
+  D = pdf2weightsdict(pdfs)
+  pickle.dump(D, open('data/'+simstr+'synWeights_final.pkl','wb'))  
 
 def getsimname (name=None):
   if name is None:
@@ -389,8 +396,11 @@ def drawraster (dspkT,dspkID,tlim=None,msz=2):
   ax.legend(handles=lpatch,handlelength=1,loc='best')
 
 #
-def drawcellVm (simConfig, ldrawpop=None):
+def drawcellVm (simConfig, ldrawpop=None,tlim=None):
   csm=cm.ScalarMappable(cmap=cm.prism); csm.set_clim(0,len(dspkT.keys()))
+  if tlim is not None:
+    dt = simConfig['simData']['t'][1]-simConfig['simData']['t'][0]    
+    sidx,eidx = int(0.5+tlim[0]/dt),int(0.5+tlim[1]/dt)
   dclr = OrderedDict(); lpop = []
   for kdx,k in enumerate(list(simConfig['simData']['V_soma'].keys())):  
     color = csm.to_rgba(kdx); 
@@ -402,10 +412,14 @@ def drawcellVm (simConfig, ldrawpop=None):
   for kdx,k in enumerate(list(simConfig['simData']['V_soma'].keys())):
     cty = simConfig['net']['cells'][int(k.split('_')[1])]['tags']['cellType']
     if ldrawpop is not None and cty not in ldrawpop: continue
-    plot(simConfig['simData']['t'],simConfig['simData']['V_soma'][k],color=dclr[kdx])
+    if tlim is not None:
+      plot(simConfig['simData']['t'][sidx:eidx],simConfig['simData']['V_soma'][k][sidx:eidx],color=dclr[kdx])
+    else:
+      plot(simConfig['simData']['t'],simConfig['simData']['V_soma'][k],color=dclr[kdx])      
   lpatch = [mpatches.Patch(color=c,label=s) for c,s in zip(dclr.values(),ldrawpop)]
   ax=gca()
-  ax.legend(handles=lpatch,handlelength=1,loc='best')    
+  ax.legend(handles=lpatch,handlelength=1,loc='best')
+  if tlim is not None: ax.set_xlim(tlim)
   
 #  
 def plotFollowBall (actreward, ax=None,cumulative=True,msz=3,binsz=1e3,color='r'):
