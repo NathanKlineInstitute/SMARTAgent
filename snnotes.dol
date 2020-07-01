@@ -10379,3 +10379,50 @@ not exactly a fair comparison against dqn ...
 
 initialized weights from data/20jun29_G2_cycle_synWeights_final.pkl
 
+*20jul1
+** check output from 20jun30_H0_cycle_
+
+python -i simdat.py backupcfg/20jun30_H0_cycle_sim.json
+
+#
+plotFollowBall(actreward,ax=subplot(1,3,1),cumulative=True,color='k');  
+plotHitMiss(actreward,ax=subplot(1,3,2),lclr=['k'],asratio=True); 
+plotScoreMiss(actreward,ax=subplot(1,3,3),clr='k',asratio=True);
+
+hit/miss and score/miss ratios: 0.7241379310344828, 0.13793103448275862
+pretty high ratios - surprising...
+
+savefig('gif/'+dstr+simstr+'perf.png') # 20jul1_20jun30_H0_cycle_perf.png
+
+clf(); drawraster(dspkT,dspkID); xlim((790e3,800e3));
+savefig('gif/'+dstr+simstr+'rast.png') # 20jul1_20jun30_H0_cycle_rast.png
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','IM'],tlim=(790e3,800e3)); 
+savefig('gif/'+dstr+simstr+'Vm.png'); # 20jul1_20jun30_H0_cycle_Vm.png
+
+#
+clf(); dobjpos = loadObjPos() ## 
+xlabel('Racket Y position'); hist(dobjpos['racket'][:,1])
+savefig('gif/'+dstr+simstr+'poshist.png') # 20jul1_20jun30_H0_cycle_poshist.png
+not much bias
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=True)
+xlabel('Time (ms)'); tl(); savefig('gif/'+dstr+simstr+'all_avg_weight.png') #
+hmm, looks like weights did not change ... did not intend that ... 
+
+pdfs = pdf[pdf.time==np.amax(pdf.time)]; D = pdf2weightsdict(pdfs); pickle.dump(D, open('data/'+simstr+'synWeights_final.pkl','wb'))
+#
+
+fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4',showflow=False)
+gif/20jul1_20jun30_H0_cycle__input.mp4
+
+looked like paddle was trying to stay still when ball coming head on but had difficulty since
+no explicit stay population was used ... 
+
+** adjust EMstay rule
+
+right now if two populations are tied, it picks randomly between them for action -- can make it default to stay
+to help with momentum issue, later can make random ... or keep random - either could help
+if no populations fire it still picks randomly -->> that should be adjusted to do nothing (stay/nomove)
+but in targetted rl if two populations/actions are tied it should not reward/punish either one of them
+
