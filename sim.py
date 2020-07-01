@@ -962,30 +962,13 @@ def trainAgent (t):
               actions.append(dconf['moves']['DOWN'])
             elif (F_STAYs[ts]>F_UPs[ts]) and (F_STAYs[ts]>F_DOWNs[ts]): # STAY WINS vs ALL
               actions.append(dconf['moves']['NOMOVE']) # No move
-            elif (F_UPs[ts]>F_DOWNs[ts]) and (F_UPs[ts]==F_STAYs[ts]): # # UP and STAY tied
-              actions.append(dconf['moves']['NOMOVE'])
-              noWinner = True
-              #actions.append(np.random.choice([dconf['moves']['UP'],dconf['moves']['NOMOVE']]))# may want later
-            elif (F_DOWNs[ts]>F_UPs[ts]) and (F_DOWNs[ts]==F_STAYs[ts]): # DOWN and STAY tied
-              actions.append(dconf['moves']['NOMOVE'])
-              noWinner = True # there was a TIE, so no clear winner             
-              #actions.append(np.random.choice([dconf['moves']['DOWN'],dconf['moves']['NOMOVE']]))# may want later
-            elif (F_DOWNs[ts]>F_STAYs[ts]) and (F_DOWNs[ts]==F_UPs[ts]): # DOWN and UP tied
-              actions.append(dconf['moves']['NOMOVE']) # may want later
-              noWinner = True # there was a TIE, so no clear winner             
-              #actions.append(np.random.choice([dconf['moves']['DOWN'],dconf['moves']['UP']]))
-            elif F_DOWNs[ts]==0. and F_UPs[ts]==0. and F_STAYs[ts]==0.:
-              actions.append(dconf['moves']['NOMOVE'])
-              noWinner = True # nothing happened so don't apply RL when targetted==True
-            else: # does this condition ever happen?
-              lmoves = list(dconf['moves'].values())
-              actions.append(lmoves[np.random.randint(0,len(lmoves))])
-              #actions.append(dconf['moves']['NOMOVE']) # No move
+            else: 
+              actions.append(dconf['moves']['NOMOVE']) # No move but also no clear winner
               noWinner = True
           else:
-            if F_UPs[ts]>F_DOWNs[ts]:
+            if F_UPs[ts]>F_DOWNs[ts]: # UP WINS
               actions.append(dconf['moves']['UP'])
-            elif F_DOWNs[ts]>F_UPs[ts]:
+            elif F_DOWNs[ts]>F_UPs[ts]: # DOWN WINS
               actions.append(dconf['moves']['DOWN'])
             else:
               actions.append(dconf['moves']['NOMOVE']) # No move
