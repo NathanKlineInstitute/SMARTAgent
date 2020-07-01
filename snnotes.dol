@@ -10439,3 +10439,38 @@ IM -->> 24
 run for 100 s ... see how looks, 20 ms window for actions
 
 ./myrun 32 sn.json
+
+python -i simdat.py backupcfg/20jun30_S0_cycle_sim.json
+
+#
+plotFollowBall(actreward,ax=subplot(1,3,1),cumulative=True,color='k');  
+plotHitMiss(actreward,ax=subplot(1,3,2),lclr=['k'],asratio=True); 
+plotScoreMiss(actreward,ax=subplot(1,3,3),clr='k',asratio=True);
+
+savefig('gif/'+dstr+simstr+'perf.png') 
+
+clf(); drawraster(dspkT,dspkID); xlim((90e3,100e3));
+savefig('gif/'+dstr+simstr+'rast.png') 
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','EMSTAY','IM'],tlim=(90e3,100e3)); 
+savefig('gif/'+dstr+simstr+'Vm.png'); # 
+
+#
+clf(); dobjpos = loadObjPos() ## 
+xlabel('Racket Y position'); hist(dobjpos['racket'][:,1])
+savefig('gif/'+dstr+simstr+'poshist.png') # 20jul1_20jun30_H0_cycle_poshist.png
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP','EMSTAY'],lclr=['r','b','g'],plotindiv=True)
+xlabel('Time (ms)'); tl(); savefig('gif/'+dstr+simstr+'all_avg_weight.png') #
+more complicated pattern ... 
+
+pdfs = pdf[pdf.time==np.amax(pdf.time)]; D = pdf2weightsdict(pdfs); pickle.dump(D, open('data/'+simstr+'synWeights_final.pkl','wb'))
+# data/20jun30_S0_cycle_synWeights_final.pkl
+
+fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4',showflow=False)
+
+sits a lot more still than the other models ... can continue run longer to see if improves ...
+
+    "simtype": {"ResumeSim":1,"ResumeSimFromFile":"data/20jun30_S0_cycle_synWeights_final.pkl"}, 
+20jun30_S1_cycle_
+
