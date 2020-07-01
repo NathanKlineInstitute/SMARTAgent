@@ -10375,3 +10375,7 @@ also would be better if model did not use object detection
 and flow calculations ... nor intermediate rewards ... otherwise,
 not exactly a fair comparison against dqn ...
 
+** quick test of tstepPerAction":100 (20jun30_H0_cycle_)
+
+initialized weights from data/20jun29_G2_cycle_synWeights_final.pkl
+
