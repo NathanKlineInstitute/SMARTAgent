@@ -10356,3 +10356,22 @@ base name is 20jun30_G3_cycle_
 
 started ~12:33 ... 
 
+check how it's doing ... 
+
+** the dqn models
+
+https://github.com/ykteh93/Deep_Reinforcement_Learning-Atari
+https://github.com/araina2/Deep-Reinforcement-Learning
+https://github.com/brendanator/atari-rl
+https://github.com/kuz/DeepMind-Atari-Deep-Q-Learner
+https://github.com/Nasdin/ReinforcementLearning-AtariGame
+
+some of these stack 4 frames together to get motion
+information and use the 4 frames to decide a single action
+
+would that help with momentum issue?
+
+also would be better if model did not use object detection
+and flow calculations ... nor intermediate rewards ... otherwise,
+not exactly a fair comparison against dqn ...
+
