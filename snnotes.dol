@@ -10594,10 +10594,18 @@ name:
 
 started
 
-** also start simpler test
+** also start simpler test (20jul2_T0_cycle_), no score/loss, shorter RL tau
 
 same architecture but only reward for follow / not follow target and hit
 and shorten RL tau ...
 
+20jul2_T0_cycle_
 
+    "rewardcodes": {"scorePoint": 0.0, "losePoint": 0.0, "followTarget": 0.1, "avoidTarget": -0.01, "hitBall": 0.5},
+
+"RLlenhebb":40
+
+./myrun 32 sn.json
+
+started ~15:02 ...
 
