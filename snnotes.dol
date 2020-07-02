@@ -10541,3 +10541,63 @@ looks pretty flat ... though follow target slowly decaying? can let multistep ru
 
 savefig('gif/'+dstr+simstr+'perf_multistep.png') # 'gif/20jul1_20jun30_G3_cycle__step_2_perf_multistep.png'
 
+*20jul2
+** check next output from multistep sim
+
+python -i simdat.py backupcfg/20jun30_G3_cycle__step_3_sim.json
+
+lfn = ['20jun26_G0_cycle_ActionsRewards.txt','20jun27_G1_cycle_ActionsRewards.txt','20jun29_G2_cycle_ActionsRewards.txt','20jun30_G3_cycle__step_0_ActionsRewards.txt','20jun30_G3_cycle__step_1_ActionsRewards.txt','20jun30_G3_cycle__step_2_ActionsRewards.txt','20jun30_G3_cycle__step_3_ActionsRewards.txt']
+lfn = ['data/'+x for x in lfn]
+pdac = getconcatactionreward(lfn)
+
+plotFollowBall(pdac,ax=subplot(1,3,1),cumulative=True,color='k');  ylim((0,.5))
+plotHitMiss(pdac,ax=subplot(1,3,2),lclr=['k'],asratio=True); ylim((0,.5))
+plotScoreMiss(pdac,ax=subplot(1,3,3),clr='k',asratio=True); ylim((0,.5))
+
+last hit/miss and score/miss ratios: 0.39151130503768344, 0.09401031336771122
+this hit/miss and score/miss ratios: 0.38453572661373836, 0.09423541594753193
+
+savefig('gif/'+dstr+simstr+'perf_multistepB.png') # gif/20jul2_20jun30_G3_cycle__step_3_perf_multistepB.png
+
+#
+clf()
+aout = plotFollowBall(pdac,ax=gca(),binsz=5e3,cumulative=False,color='r');  ylim((0,.65))
+plotFollowBall(pdac,ax=gca(),cumulative=True,color='k');  ylim((0,.65))
+
+savefig('gif/'+dstr+simstr+'perf_multistep_pfollow_C.png') # gif/20jul2_20jun30_G3_cycle__step_3_perf_multistep_pfollow_C.png
+
+looks like probability of follow target decreasing gradually ... should probably stop
+this multistep sim ... ok stopped it ... 
+
+** check output from 20jun30_S2_cycle_
+
+python -i simdat.py backupcfg/20jun30_S2_cycle_sim.json
+
+plotFollowBall(actreward,ax=subplot(1,3,1),cumulative=True,color='k');  ylim((0,.5))
+plotHitMiss(actreward,ax=subplot(1,3,2),lclr=['k'],asratio=True); ylim((0,.5))
+plotScoreMiss(actreward,ax=subplot(1,3,3),clr='k',asratio=True); ylim((0,.5))
+
+0.26683291770573564, 0.0798004987531172
+
+clear improvement ...
+
+savefig('gif/'+dstr+simstr+'perf.png') # gif/20jul2_20jun30_S2_cycle_perf.png
+
+should continue ...
+
+fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4',showflow=False)
+
+name:
+20jul2_S3_cycle_
+    "simtype": {"ResumeSim":1,"ResumeSimFromFile":"data/20jun30_S2_cycle_synWeights_final.pkl"},
+
+
+started
+
+** also start simpler test
+
+same architecture but only reward for follow / not follow target and hit
+and shorten RL tau ...
+
+
+
