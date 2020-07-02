@@ -10510,7 +10510,7 @@ more complicated pattern ... but clear the EMSTAY weights are decreasing ... whi
 hmm, since each neuron of a pop gets same inputs, all the synapses go in same direction at same time ... that
 seems too redundant, even though weights start with some variability ...  
 
-fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4',showflow=False)
+fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4',showflow=False) # gif/20jul1_20jun30_S1_cycle__input.mp4
 
 since values still increasing can run another continuation ...
 
@@ -10522,4 +10522,22 @@ will run longer ... (1600 s)
 ./myrun 32 sn.json
 
 started ~21:42 ...
+
+** meanwhile check output from multistep sim
+
+python -i simdat.py backupcfg/20jun30_G3_cycle__step_2_sim.json
+
+lfn = ['20jun26_G0_cycle_ActionsRewards.txt','20jun27_G1_cycle_ActionsRewards.txt','20jun29_G2_cycle_ActionsRewards.txt','20jun30_G3_cycle__step_0_ActionsRewards.txt','20jun30_G3_cycle__step_1_ActionsRewards.txt','20jun30_G3_cycle__step_2_ActionsRewards.txt']
+lfn = ['data/'+x for x in lfn]
+pdac = getconcatactionreward(lfn)
+
+plotFollowBall(pdac,ax=subplot(1,3,1),cumulative=True,color='k');  ylim((0,.5))
+plotHitMiss(pdac,ax=subplot(1,3,2),lclr=['k'],asratio=True); ylim((0,.5))
+plotScoreMiss(pdac,ax=subplot(1,3,3),clr='k',asratio=True); ylim((0,.5))
+
+hit/miss and score/miss ratios: 0.39151130503768344, 0.09401031336771122
+
+looks pretty flat ... though follow target slowly decaying? can let multistep run continue but might be pointless ... 
+
+savefig('gif/'+dstr+simstr+'perf_multistep.png') # 'gif/20jul1_20jun30_G3_cycle__step_2_perf_multistep.png'
 
