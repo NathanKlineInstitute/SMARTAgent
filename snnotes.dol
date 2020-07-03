@@ -10646,5 +10646,63 @@ fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4',showflow=False)
 
 started ~11:10 ...
 
-** check output from
+** check output from 20jul2_S3_cycle_
+
+python -i simdat.py backupcfg/20jul2_S3_cycle_sim.json
+
+plotFollowBall(actreward,ax=subplot(1,3,1),cumulative=True,color='k');  ylim((0,.5))
+plotHitMiss(actreward,ax=subplot(1,3,2),lclr=['k'],asratio=True); ylim((0,.5))
+plotScoreMiss(actreward,ax=subplot(1,3,3),clr='k',asratio=True); ylim((0,.5))
+
+0.26683291770573564, 0.0798004987531172 <<-- last time
+0.4746268656716418, 0.13432835820895522 <<-- this time
+
+clear improvement ...
+
+savefig('gif/'+dstr+simstr+'perf.png') # gif/20jul3_20jul2_S3_cycle_perf.png
+
+lfn = ['20jun30_S0_cycle_', '20jun30_S1_cycle_', '20jun30_S2_cycle_', '20jul2_S3_cycle_']
+lfn = ['data/'+x+'ActionsRewards.txt' for x in lfn]
+pdac = getconcatactionreward(lfn)
+
+plotFollowBall(pdac,ax=subplot(1,3,1),cumulative=True,color='k');  ylim((0,.5))
+plotHitMiss(pdac,ax=subplot(1,3,2),lclr=['k'],asratio=True); ylim((0,.5))
+plotScoreMiss(pdac,ax=subplot(1,3,3),clr='k',asratio=True); ylim((0,.5))
+
+savefig('gif/'+dstr+simstr+'perf_tot.png') # 20jul3_20jul2_S3_cycle_perf_tot.png
+
+seems like improving ... so worth continuing ... 
+
+
+clf(); drawraster(dspkT,dspkID); xlim((1590e3,1600e3));
+savefig('gif/'+dstr+simstr+'rast.png') # gif/20jul3_20jul2_S3_cycle_rast.png
+interesting, EMSTAY is firing much less than EMUP and EMDOWN
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','EMSTAY','IM'],tlim=(1590e3,1600e3)); 
+savefig('gif/'+dstr+simstr+'Vm.png'); # gif/20jul3_20jul2_S3_cycle_Vm.png
+
+#
+clf(); dobjpos = loadObjPos() ## 
+xlabel('Racket Y position'); hist(dobjpos['racket'][:,1])
+savefig('gif/'+dstr+simstr+'poshist.png') # gif/20jul3_20jul2_S3_cycle_poshist.png
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP','EMSTAY'],lclr=['r','b','g'],plotindiv=True)
+xlabel('Time (ms)'); tl(); savefig('gif/'+dstr+simstr+'all_avg_weight.png') # 20jul3_20jul2_S3_cycle_all_avg_weight.png
+
+EMSTAY input weights are much lower than input weights to EMDOWN and EMUP
+though EMSTAY input weights still rising slowly now ...
+savefig('gif/'+dstr+simstr+'all_avg_weightB.png') # 20jul3_20jul2_S3_cycle_all_avg_weightB.png
+
+fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4',showflow=False)
+
+meanwhile, setup for continue - could use multistep ...
+
+    "simtype": {"ResumeSim":1,"ResumeSimFromFile":"data/20jul2_S3_cycle_synWeights_final.pkl"},
+20jul3_S4_cycle_
+
+will run ~4 steps to start ... to see how it progresses ...
+
+python multistepSim.py sn.json 32 4 multirun
+
+started ~12:02 ...
 
