@@ -10677,7 +10677,15 @@ for pda,clr in zip(lpda,['b','r','g']):
 
 probably need to run longer ...
 
-will continue the 200 ms tau sim ... to leave that out as a factor ... 
+will continue the 200 ms tau sim ... to leave that out as a factor ...
+
+20jul3_T1_cycle_
+    "simtype": {"ResumeSim":1,"ResumeSimFromFile":"data/20jul3_T0_cycle_synWeights_final.pkl"}, 
+each step will run for 800 s ... use 16 cores to save 16 others if needed ...
+
+python multistepSim.py sn.json 16 4 multirunT
+
+started ~15:51 ... 
 
 ** check output from 20jul2_S3_cycle_ -->> looked to be improving; continue as multistep
 
