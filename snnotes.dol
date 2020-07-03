@@ -10747,3 +10747,15 @@ python multistepSim.py sn.json 32 4 multirun
 
 started ~12:02 ...
 
+** sim with only score/loss and longer RL tau? (20jul3_NO_INTERMR_cycle_)
+
+to avoid any intermediate rewards ... see if it improves at all ... 
+
+"name":"20jul3_NO_INTERMR_cycle_"
+"RLlenhebb":2000
+    "rewardcodes": {"scorePoint": 1.0, "losePoint": -0.1, "followTarget": 0.0, "avoidTarget": 0.0, "hitBall": 0.0},
+
+duration of 800 s ...
+
+python multistepSim.py sn.json 16 4 multirunNOINTERM
+
