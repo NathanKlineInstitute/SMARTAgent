@@ -10609,3 +10609,42 @@ and shorten RL tau ...
 
 started ~15:02 ...
 
+*20jul3
+** check output from simpler test (20jul2_T0_cycle_) -->> not as good perf
+
+python -i simdat.py backupcfg/20jul2_T0_cycle_sim.json
+
+plotFollowBall(actreward,ax=subplot(1,2,1),cumulative=True,color='k');  ylim((0,.5))
+plotHitMiss(actreward,ax=subplot(1,2,2),lclr=['k'],asratio=True); ylim((0,.5))
+
+savefig('gif/'+dstr+simstr+'perf.png') # gif/20jul3_20jul2_T0_cycle_perf.png
+
+seems mostly flat...not as good as other sim so far ... not sure if it's to
+do with the shorter time constant or the rewards ... could run a comparison
+with a longer time constant ... (200 ms), with rewards same
+
+clf(); drawraster(dspkT,dspkID); xlim((1590e3,1600e3));
+savefig('gif/'+dstr+simstr+'rast.png') # 
+
+#
+clf(); dobjpos = loadObjPos() ## 
+xlabel('Racket Y position'); hist(dobjpos['racket'][:,1])
+savefig('gif/'+dstr+simstr+'poshist.png') # 
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP','EMSTAY'],lclr=['r','b','g'],plotindiv=True)
+xlabel('Time (ms)'); tl(); savefig('gif/'+dstr+simstr+'all_avg_weight.png') #
+
+fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4',showflow=False)
+
+** run simpler test (20jul3_T0_cycle), reward only move to target and hit, but with longer RL tau
+
+"RLlenhebb":200
+"name":"20jul3_T0_cycle_"
+"duration": 500000
+
+./myrun 32 sn.json
+
+started ~11:10 ...
+
+** check output from
+
