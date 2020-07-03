@@ -10646,7 +10646,40 @@ fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4',showflow=False)
 
 started ~11:10 ...
 
-** check output from 20jul2_S3_cycle_
+finished ~ 15:13
+
+python -i simdat.py backupcfg/20jul3_T0_cycle_sim.json
+
+plotFollowBall(actreward,ax=subplot(1,2,1),cumulative=True,color='k');  ylim((0,.5))
+plotHitMiss(actreward,ax=subplot(1,2,2),lclr=['k'],asratio=True); ylim((0,.5))
+
+savefig('gif/'+dstr+simstr+'perf.png') # gif/20jul3_20jul3_T0_cycle_perf.png
+
+lfn = ['20jul2_T0_cycle_','20jul3_T0_cycle_']
+lfn = ['data/'+x+'ActionsRewards.txt' for x in lfn]
+lpda = getindivactionreward(lfn)
+
+#
+for pda,clr in zip(lpda,['b','r']):
+  plotFollowBall(pda,ax=subplot(1,2,1),cumulative=True,color=clr);  
+  plotHitMiss(pda,ax=subplot(1,2,2),lclr=[clr],asratio=True); 
+
+savefig('gif/'+dstr+simstr+'perf_compare_tau.png') # gif/20jul3_20jul3_T0_cycle_perf_compare_tau.png
+
+lfn = ['20jul2_T0_cycle_','20jul3_T0_cycle_', '20jun30_S1_cycle_']
+lfn = ['data/'+x+'ActionsRewards.txt' for x in lfn]
+lpda = getindivactionreward(lfn)
+
+#
+for pda,clr in zip(lpda,['b','r','g']):
+  plotFollowBall(pda,ax=subplot(1,2,1),cumulative=True,color=clr);  xlim((0,500e3));
+  plotHitMiss(pda,ax=subplot(1,2,2),lclr=[clr],asratio=True); xlim((0,500e3))
+
+probably need to run longer ...
+
+will continue the 200 ms tau sim ... to leave that out as a factor ... 
+
+** check output from 20jul2_S3_cycle_ -->> looked to be improving; continue as multistep
 
 python -i simdat.py backupcfg/20jul2_S3_cycle_sim.json
 
