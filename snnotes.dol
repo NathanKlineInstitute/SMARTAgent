@@ -10759,3 +10759,46 @@ duration of 800 s ...
 
 python multistepSim.py sn.json 16 4 multirunNOINTERM
 
+*20jul4
+** check 20jul3_NO_INTERMR_cycle__step_1_
+
+this is the sim with no intermediate rewards, and the long RL time constants ... 
+
+python -i simdat.py backupcfg/20jul3_NO_INTERMR_cycle__step_1_sim.json
+
+plotFollowBall(actreward,ax=subplot(1,3,1),cumulative=True,color='k');  ylim((0,.5))
+plotHitMiss(actreward,ax=subplot(1,3,2),lclr=['k'],asratio=True); ylim((0,.5))
+plotScoreMiss(actreward,ax=subplot(1,3,3),clr='k',asratio=True); ylim((0,.5))
+
+savefig('gif/'+dstr+simstr+'perf.png') # gif/20jul4_20jul3_NO_INTERMR_cycle__step_1_perf.png
+
+lower values than other recent sims on cycle, but does seem to be improving somewhat ... 
+
+lfn = ['20jul3_NO_INTERMR_cycle__step_0_','20jul3_NO_INTERMR_cycle__step_1_']
+lfn = ['data/'+x+'ActionsRewards.txt' for x in lfn]
+pdac = getconcatactionreward(lfn)
+
+plotFollowBall(pdac,ax=subplot(1,3,1),cumulative=True,color='k');  ylim((0,.5))
+plotHitMiss(pdac,ax=subplot(1,3,2),lclr=['k'],asratio=True); ylim((0,.5))
+plotScoreMiss(pdac,ax=subplot(1,3,3),clr='k',asratio=True); ylim((0,.5))
+
+savefig('gif/'+dstr+simstr+'perf_step0_step1.png') # 
+
+or maybe not improving much ...
+
+clf(); drawraster(dspkT,dspkID); xlim((790e3,800e3));
+savefig('gif/'+dstr+simstr+'rast.png') # gif/20jul4_20jul3_NO_INTERMR_cycle__step_1_rast.png
+as usual, EMSTAY rates lower than EMUP,EMDOWN
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','EMSTAY','IM'],tlim=(790e3,800e3)); 
+savefig('gif/'+dstr+simstr+'Vm.png'); # gif/20jul4_20jul3_NO_INTERMR_cycle__step_1_Vm.png
+
+#
+clf(); dobjpos = loadObjPos() ## 
+xlabel('Racket Y position'); hist(dobjpos['racket'][:,1])
+savefig('gif/'+dstr+simstr+'poshist.png') # gif/20jul4_20jul3_NO_INTERMR_cycle__step_1_poshist.png
+plenty of bias in position...(towards top)
+
+fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4',showflow=False)
+gif/20jul4_20jul3_NO_INTERMR_cycle__step_1__input.mp4
+
