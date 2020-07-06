@@ -438,9 +438,9 @@ def plotFollowBall (actreward, ax=None,cumulative=True,msz=3,binsz=1e3,color='r'
     aout = np.divide(rewardingActions,cumActs)
     ax.plot(allproposed.time,aout,color+'.',markersize=msz)
   else:
-    nbin = int(binsz / (actreward.time[1]-actreward.time[0]))
+    nbin = int(binsz / (np.array(actreward.time)[1]-np.array(actreward.time)[0]))
     aout = avgfollow = [mean(rewardingActions[sidx:sidx+nbin]) for sidx in arange(0,len(rewardingActions),nbin)]
-    ax.plot(allproposed.time, avgfollow, color,linewidth=msz)
+    ax.plot(np.linspace(0,np.amax(actreward.time),len(avgfollow)), avgfollow, color,linewidth=msz)
   ax.set_xlim((0,np.amax(actreward.time)))
   ax.set_ylim((0,1))
   ax.set_xlabel('Time (ms)'); ax.set_ylabel('p(Follow Target)')
