@@ -10964,3 +10964,43 @@ this is the main code for fix in aigame.py :
             #print(stay_step)
           env.render() # Renders the game after the stay steps
 
+** try momentum fix
+
+"name": "20jul6_A0_cycle_"
+100 s sim ...
+
+./myrun 32 sn.json
+
+python -i simdat.py backupcfg/20jul6_A0_cycle_sim.json
+
+plotFollowBall(actreward,ax=subplot(1,3,1),cumulative=True,color='k');  ylim((0,.5))
+plotHitMiss(actreward,ax=subplot(1,3,2),lclr=['k'],asratio=True); ylim((0,.5))
+plotScoreMiss(actreward,ax=subplot(1,3,3),clr='k',asratio=True); ylim((0,.5))
+
+savefig('gif/'+dstr+simstr+'perf.png') # gif/20jul6_20jul6_A0_cycle_perf.png
+
+clf(); drawraster(dspkT,dspkID); xlim((90e3,100e3)); #
+savefig('gif/'+dstr+simstr+'rast.png') # gif/20jul6_20jul6_A0_cycle_rast.png
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','EMSTAY','IM'],tlim=(90e3,100e3)); 
+savefig('gif/'+dstr+simstr+'Vm.png'); # gif/20jul6_20jul6_A0_cycle_Vm.png
+
+#
+clf(); dobjpos = loadObjPos() ## 
+xlabel('Racket Y position'); hist(dobjpos['racket'][:,1])
+savefig('gif/'+dstr+simstr+'poshist.png') # 
+not much bias...
+
+fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4',showflow=False)
+gif/20jul6_20jul6_A0_cycle__input.mp4
+
+looks like improving and less bias ... will continue with multistep to see
+how it fares with longer durations ... but seems like ball is moving too fast ...
+
+"simtype": {"ResumeSim": 1, "ResumeSimFromFile": "data/20jul6_A0_cycle_synWeights_final.pkl"},
+"name": "20jul6_A1_cycle_"
+
+python multistepSim.py sn.json 32 4 20jul6_MultiTestA
+
+started 16:39 ...
+
