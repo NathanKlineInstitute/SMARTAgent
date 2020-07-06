@@ -273,18 +273,19 @@ class AIGame:
         observation, reward, done = self.pong.step(caction)
       else:
         observation, reward, done, info = self.env.step(caction) # Re-Initializes reward before if statement
-# To eliminate momentum
+        # To eliminate momentum
         # print('Here is caction: ' , caction)
-        if caction == 3 or caction == 4 or caction == 1: # Follow down(3)/up(4)/stay(1) with stay(1)
+        if caction in [dconf['moves']['DOWN'], dconf['moves']['UP'], dconf['moves']['NOMOVE']]:
+          # Follow down/up/stay with stay to prevent momentum problem (Pong-specific)
           stay_step = 0 # initialize
           while not done and stay_step < 6:
-# Takes 6 stays instead of 3 because it seems every other input is ignored (check dad notes for details)
-            observation, interreward, done, info = env.step(1) # Stay motion
+            # Takes 6 stays instead of 3 because it seems every other input is ignored (check dad_notes.txt for details)
+            observation, interreward, done, info = env.step(dconf['moves']['NOMOVE']) # Stay motion
             reward = reward + interreward  # Uses summation so no reinforcement/punishment is missed
             stay_step += 1
             #print(stay_step)
-            env.render() # Renders the game after the stay steps
-#find position of ball after action
+          env.render() # Renders the game after the stay steps
+      #find position of ball after action
       xpos_Ball2, ypos_Ball2 = self.findobj(observation, courtXRng, courtYRng)
       ball_moves_towards_racket = False
       if xpos_Ball>0 and xpos_Ball2>0:
