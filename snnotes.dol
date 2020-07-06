@@ -11004,3 +11004,15 @@ python multistepSim.py sn.json 32 4 20jul6_MultiTestA
 
 started 16:39 ...
 
+** other test with only follow,hit target
+
+for 800 s
+ "rewardcodes": {"scorePoint": 0.0, "losePoint": 0.0, "followTarget": 0.1, "avoidTarget": -0.01, "hitBall": 0.5},
+ "name": "20jul6_TM0_cycle_"
+
+python multistepSim.py sn.json 16 4 20jul6_MultiTestTM
+
+started 16:42 ...
+
+** other test with no intermediate rewards
+
