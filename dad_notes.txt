@@ -8,6 +8,8 @@ To-Do:
 	*DONE, both manual and sim ran script fine
 -Update team and commit changes
 	*DONE
+-Look into Breakout
+	*DONE
 
 Current system to update reward:
 observation, reward, done, info = env.step(1);
@@ -47,6 +49,72 @@ IN aigame.py
 working to commit these changes to github now.
 # from samn
 git add, then git commit. then push to branch and pull request.
+
+Tutorial for pull request
+1. git add <filename>
+2. git commit -m "message"
+3. git push
+4. Go to github site to submit pull request
+
+
+## List of breakout versions ##
+EnvSpec(Breakout-v0)
+EnvSpec(Breakout-v4)
+EnvSpec(BreakoutDeterministic-v0)
+EnvSpec(BreakoutDeterministic-v4)
+EnvSpec(BreakoutNoFrameskip-v0)
+EnvSpec(BreakoutNoFrameskip-v4)
+EnvSpec(Breakout-ram-v0)
+EnvSpec(Breakout-ram-v4)
+EnvSpec(Breakout-ramDeterministic-v0)
+EnvSpec(Breakout-ramDeterministic-v4)
+EnvSpec(Breakout-ramNoFrameskip-v0)
+EnvSpec(Breakout-ramNoFrameskip-v4)
+
+
+import gym; env = gym.make('BreakoutNoFrameskip-v4'); env.reset()
+##CHANGE caction to number 1, 3, 4 to move paddle, and repeat this command
+observation, reward, done, info = env.step(caction); env.render()
+
+# Same to pong, motion has momentum
+ACTION_MEANING = {
+    0: "NOOP",	# No
+    1: "FIRE",	# No
+    2: "UP",	# Right
+    3: "RIGHT", # Left
+    4: "LEFT",	# IndexError
+    5: "DOWN",	# IndexError
+	}
+# Motion checks
+Input:	2 1 1 1 1 1	# Motion really small, lot of time to respond
+Motion:	N Y Y Y N N	# Maybe ball speeds up??
+Input:	2 1 1 1 1 1
+Motion:	N Y Y Y N N
+Input:	3 1 1 1 1 1
+Motion:	N Y Y Y Y N
+Input:	3 1 1 1 1 1
+Motion:	N Y Y Y N N
+Input:	3 1 1 1 1 1
+Motion:	N Y Y Y N N
+Input:	3 3 1 1 1 1 1 1 # Takes 4 null inputs instead of typical 3
+Motion:	N Y Y Y Y Y N N
+Input:	3 3 1 1 1 1 1 1
+Motion:	N Y Y Y Y Y N N
+Input:	2 2 1 1 1 1 1 1
+Motion:	N Y Y Y Y Y N N
+Input:	2 2 1 1 1 1 1 1
+Motion:	N Y Y Y Y Y N N
+Input:	2 2 2 1 1 1 1 1 1 # 4 null inputs
+Motion:	N Y Y Y Y Y Y N N
+Input:	3 2 1 1 1 1
+Motion:	N L R R N N
+
+# Board motion
+# Starting from left side
+How many 2 inputs to reach other side? 26
+# Starting from right side
+How many 3 inputs to reach other side? 26
+# Right side of env goes a bit off the board
 ########################################
 07-03-20
 ########################################
