@@ -11014,5 +11014,13 @@ python multistepSim.py sn.json 16 4 20jul6_MultiTestTM
 
 started 16:42 ...
 
-** other test with no intermediate rewards
+** other test with no intermediate rewards 
+
+for 800 s
+ "rewardcodes": {"scorePoint": 1.0, "losePoint": -0.1, "followTarget": 0.0, "avoidTarget": 0.0, "hitBall": 0.0},
+"name": "20jul6_NOINTERM0_cycle_"
+
+python multistepSim.py sn.json 16 4 20jul6_MultiTestNoIntermM
+
+started 16:47 ...
 
