@@ -275,7 +275,7 @@ class AIGame:
         observation, reward, done, info = self.env.step(caction) # Re-Initializes reward before if statement
 # To eliminate momentum
         # print('Here is caction: ' , caction)
-        if caction == 3 or caction == 4: # Follow up(4)/down(3) with stay(1)
+        if caction == 3 or caction == 4 or caction == 1: # Follow down(3)/up(4)/stay(1) with stay(1)
           stay_step = 0 # initialize
           while not done and stay_step < 6:
 # Takes 6 stays instead of 3 because it seems every other input is ignored (check dad notes for details)
