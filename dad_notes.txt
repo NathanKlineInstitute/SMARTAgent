@@ -1,4 +1,163 @@
 ########################################
+07-06-20
+########################################
+To-Do:
+-Work on reward
+	*DONE
+-Test new code
+	*DONE, both manual and sim ran script fine
+-Update team and commit changes
+	*DONE
+
+Current system to update reward:
+observation, reward, done, info = env.step(1);
+
+Idea for new:
+#interreward is intermediate reward
+observation, interreward, done, info = env.step(1);
+reward = reward + interreward 
+#With new logic, must start reward at 0 at start of every new loop
+#First caction line (observation, reward, done, info = self.env.step(caction)) already initalized reward before if statement every time
+
+Turning code into while loop, with done as the dependent variable
+stay_step = 0
+while not done and stay_step < 6:
+#used or statement, caused issues. fix with and statement.
+
+
+#testing *works
+from aigame import AIGame; AIGame = AIGame()
+rewards, epCount, proposed_actions, total_hits  = AIGame.playGame(actions=[1], epCount = 0)
+########################################
+FINAL PRODUCT FOR MOMENTUM
+IN aigame.py
+# To eliminate momentum
+        # print('Here is caction: ' , caction)
+        if caction == 3 or caction == 4: # Follow up(4)/down(3) with stay(1)
+          stay_step = 0 # initialize
+          while not done and stay_step < 6:
+# Takes 6 stays instead of 3 because it seems every other input is ignored (check dad notes for details)
+            observation, interreward, done, info = env.step(1) # Stay motion
+            reward = reward + interreward  # Uses summation so no reinforcement/punishment is missed
+            stay_step += 1
+            #print(stay_step)
+            env.render() # Renders the game after the stay steps
+########################################
+
+working to commit these changes to github now.
+# from samn
+git add, then git commit. then push to branch and pull request.
+########################################
+07-03-20
+########################################
+To-Do:
+-Test code to see if we can completely eliminate momentum
+	*DONE
+
+ if caction == 3 or caction == 4:
+          env.step(1);
+          env.step(1);
+          env.step(1);
+          env.step(1); env.render()
+
+from aigame import AIGame; AIGame = AIGame()
+Input: 3 1 1 1 1 1
+Motion: Y Y N N N N
+
+ if caction == 3 or caction == 4:
+          env.step(1);
+          env.step(1);
+          env.step(1);
+          env.step(1);
+          env.step(1); env.render()
+from aigame import AIGame; AIGame = AIGame()
+Input: 3 1 1 1 1 1
+Motion:Y N N N N N
+Input: 3 1 1 1 1 1
+Motion:Y Y N N N N
+Input: 4 1 1 1 1 1
+Motion:Y N N N N N
+Input: 4 1 3 1 1 1
+Motion:Y N Y Y N N
+Input: 4 1 1 1 1 1
+Motion:Y Y N N N N
+Seems to randomly have both 1 step or 2 steps
+##THIS WORLDS BELOW vVvVv
+        if caction == 3 or caction == 4:
+          env.step(1);
+          env.step(1);
+          env.step(1);
+          env.step(1);
+          env.step(1);
+          env.step(1); env.render()
+#If every even index input is discluded, then 6 nulls are needed
+Input: 4 1 1 1 1 1
+Motion:Y N N N N N
+Input: 3 1 1 1 1 1
+Motion:Y N N N N N
+Input: 4 3 1 1 1 1
+Motion:Y Y N N N N
+Input: 3 3 1 1 1 1
+Motion:Y Y N N N N
+Input: 3 4 1 1 1 1
+Motion:Y Y N N N N
+Input: 4 4 1 1 1 1
+Motion:Y N N N N N 
+
+If goes up/down it goes 6 frames per input, versus 1 frame for stay
+Time goes slower for null, look into middle strategy again
+
+########################################
+07-02-20
+########################################
+Trying new if statement
+# Code in aigame.py:
+        if caction == 3 or caction == 4:
+	  env.step(1);
+	  env.step(1);
+          env.step(1); env.render()
+Test Inputs: 3 1 1 1
+There is a small jump after the second null imput 
+Without my if loop, there seems to be a binary loop of motion
+	input: 4 1 1 1 1 1 1 
+	Only motion on odd index of input (motion on inputs 1 3 5 7)
+	Still needs 3 null inputs to stop motion
+
+Talk with Haroon
+Possisble error: not sure if we can get reward(+/- 1) from env.step
+Should we read at every step?
+	observation, reward, done, info = env.step(caction)
+For observation, could work with only last step, maybe not for reward though
+	dont want to miss any reward/punishment!
+########################################
+07-01-20
+########################################
+To control environment with integrated aigame.py
+
+# look at code in testCentroidTracking.py
+from aigame import AIGame
+AIGame = AIGame()
+
+# to initialize the class and then
+rewards, epCount, proposed_actions, total_hits, Racket_pos, Ball_pos = AIGame.playGame(actions=[3], epCount = 0)
+
+What is epCount?
+In some of Haroon's notes, he doesn't set epcount = 0, but in testCentroidTracking.py
+Need =0, if not:
+	SyntaxError: positional argument follows keyword argument
+*epCount, or episode count, means how many times the game resets the environment (aka points scored i think)
+Regardless, getting ValueError from input:
+	sValueError: not enough values to unpack (expected 6, got 4)
+	Which 2 values are not going through?
+		#from playGame in aigame.py		
+		return rewards, epCount, proposed_actions, total_hits
+"moves": {"UP": 4,"DOWN":3, "NOMOVE":1}
+# Code in aigame.py:
+        if caction == 3 or caction == 4:
+          dconf['moves']['NOMOVE']
+          dconf['moves']['NOMOVE']
+          dconf['moves']['NOMOVE']
+########################################
 06-30-20
 ########################################
 Cloned repo onto new server
@@ -7,12 +166,20 @@ Need to add key to github so can clone onto server
 	2. cat ~/davidd/.ssh/id_rsa.pub
 	3. https://github.com/settings/keys
 
+if statement for no move after move
+if caction == 3 or 4:
+	dconf['moves']['NOMOVE']
+elif caction == 1:
+	nothing
+
+Can't get controlled environment right
+
 ########################################
 06-29-20
 ########################################
 To-Do:
 -Work on aigame.py (see plan below)
-	
+
 ####Plan####
 1. Understand variables and functions in aigame.py
 	# Where is the playGame func called?

@@ -4,6 +4,7 @@ Adapted from arm.py
 Original Version: 2015jan28 by salvadordura@gmail.com
 Modified Version: 2019oct1 by haroon.anwar@gmail.com
 Modified 2019-2020 samn
+Modified 2020 davidd
 """
 
 from neuron import h
@@ -271,8 +272,19 @@ class AIGame:
       if useSimulatedEnv:
         observation, reward, done = self.pong.step(caction)
       else:
-        observation, reward, done, info = self.env.step(caction)
-      #find position of ball after action
+        observation, reward, done, info = self.env.step(caction) # Re-Initializes reward before if statement
+# To eliminate momentum
+        # print('Here is caction: ' , caction)
+        if caction == 3 or caction == 4: # Follow up(4)/down(3) with stay(1)
+          stay_step = 0 # initialize
+          while not done and stay_step < 6:
+# Takes 6 stays instead of 3 because it seems every other input is ignored (check dad notes for details)
+            observation, interreward, done, info = env.step(1) # Stay motion
+            reward = reward + interreward  # Uses summation so no reinforcement/punishment is missed
+            stay_step += 1
+            #print(stay_step)
+            env.render() # Renders the game after the stay steps
+#find position of ball after action
       xpos_Ball2, ypos_Ball2 = self.findobj(observation, courtXRng, courtYRng)
       ball_moves_towards_racket = False
       if xpos_Ball>0 and xpos_Ball2>0:

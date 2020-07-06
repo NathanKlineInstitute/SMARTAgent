@@ -18,3 +18,8 @@ x86_64/.libs/mod_func.o
 x86_64/.libs/nsloc.o
 x86_64/.libs/stdp.o
 weights.txt
+x86_64/
+__pycache__/
+cells/
+data/
+backupcfg/
