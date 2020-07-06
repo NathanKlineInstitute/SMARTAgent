@@ -10897,3 +10897,52 @@ python multistepSim.py sn.json 16 8 multirunNOINTERM2
 
 ** check output from sims with only target follow rewards
 
+python -i simdat.py backupcfg/20jul3_T1_cycle__step_3_sim.json
+
+plotFollowBall(actreward,ax=subplot(1,2,1),cumulative=True,color='k');  ylim((0,.5))
+plotHitMiss(actreward,ax=subplot(1,2,2),lclr=['k'],asratio=True); ylim((0,.5))
+
+savefig('gif/'+dstr+simstr+'perf.png') # gif/20jul6_20jul3_T1_cycle__step_3_perf.png
+
+follow target ~0.4 inc then decaying a bit; hit/miss increasing slightly...
+
+lfn = ['20jul3_T0_cycle_', '20jul3_T1_cycle__step_0_', '20jul3_T1_cycle__step_1_', '20jul3_T1_cycle__step_2_', '20jul3_T1_cycle__step_3_']
+lfn = ['data/'+x+'ActionsRewards.txt' for x in lfn]
+pdac = getconcatactionreward(lfn)
+
+plotFollowBall(pdac,ax=subplot(1,2,1),cumulative=True,color='k');  ylim((0,.5))
+plotHitMiss(pdac,ax=subplot(1,2,2),lclr=['k'],asratio=True); ylim((0,.5))
+
+savefig('gif/'+dstr+simstr+'perf_step0_step1_step2_step3.png') # gif/20jul6_20jul3_T1_cycle__step_3_perf_step0_step1_step2_step3.png
+follow target rising, same with hit/miss; worth continuing too. . .
+
+clf(); drawraster(dspkT,dspkID); xlim((790e3,800e3)); #
+savefig('gif/'+dstr+simstr+'rast.png') # gif/20jul6_20jul3_T1_cycle__step_3_rast.png
+just as in other sim, EMSTAY rate much lower
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','EMSTAY','IM'],tlim=(790e3,800e3)); 
+savefig('gif/'+dstr+simstr+'Vm.png'); # gif/20jul6_20jul3_T1_cycle__step_3_Vm.png
+
+#
+clf(); dobjpos = loadObjPos() ## 
+xlabel('Racket Y position'); hist(dobjpos['racket'][:,1])
+savefig('gif/'+dstr+simstr+'poshist.png') # gif/20jul6_20jul3_T1_cycle__step_3_poshist.png
+some bias at top/bottom
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP','EMSTAY'],lclr=['r','b','g'],plotindiv=True)
+xlabel('Time (ms)'); tl(); savefig('gif/'+dstr+simstr+'all_avg_weight.png') # gif/20jul6_20jul3_T1_cycle__step_3_all_avg_weight.png
+
+similar pattern with EMSTAY lower - in future, could start their weights lower to begin with
+
+fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4',showflow=False)
+
+can continue this set too ... 
+
+ "simtype": {"ResumeSim": 1, "ResumeSimFromFile": "data/20jul3_T1_cycle__step_3_synWeights_final.pkl"},
+ "name": "20jul6_T1_cycle_"
+  "rewardcodes": {"scorePoint": 0.0, "losePoint": 0.0, "followTarget": 0.1, "avoidTarget": -0.01, "hitBall": 0.5},
+
+python multistepSim.py sn.json 16 8 multirunT2
+
+started ~10:36 ...
+
