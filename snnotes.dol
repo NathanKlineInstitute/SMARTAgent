@@ -10802,3 +10802,98 @@ plenty of bias in position...(towards top)
 fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4',showflow=False)
 gif/20jul4_20jul3_NO_INTERMR_cycle__step_1__input.mp4
 
+*20jul5
+** check 20jul3_NO_INTERMR_cycle__step_2_
+
+this is the sim with no intermediate rewards, and the long RL time constants ... 
+
+python -i simdat.py backupcfg/20jul3_NO_INTERMR_cycle__step_2_sim.json
+
+plotFollowBall(actreward,ax=subplot(1,3,1),cumulative=True,color='k');  ylim((0,.5))
+plotHitMiss(actreward,ax=subplot(1,3,2),lclr=['k'],asratio=True); ylim((0,.5))
+plotScoreMiss(actreward,ax=subplot(1,3,3),clr='k',asratio=True); ylim((0,.5))
+
+savefig('gif/'+dstr+simstr+'perf.png') # if/20jul5_20jul3_NO_INTERMR_cycle__step_2_perf.png
+is it better than last step? seems a little better ... 
+
+lfn = ['20jul3_NO_INTERMR_cycle__step_0_','20jul3_NO_INTERMR_cycle__step_1_','20jul3_NO_INTERMR_cycle__step_2_']
+lfn = ['data/'+x+'ActionsRewards.txt' for x in lfn]
+pdac = getconcatactionreward(lfn)
+
+plotFollowBall(pdac,ax=subplot(1,3,1),cumulative=True,color='k');  ylim((0,.5))
+plotHitMiss(pdac,ax=subplot(1,3,2),lclr=['k'],asratio=True); ylim((0,.5))
+plotScoreMiss(pdac,ax=subplot(1,3,3),clr='k',asratio=True); ylim((0,.5))
+
+savefig('gif/'+dstr+simstr+'perf_step0_step1_step2.png') # gif/20jul5_20jul3_NO_INTERMR_cycle__step_2_perf_step0_step1_step2.png
+
+clf(); drawraster(dspkT,dspkID); xlim((790e3,800e3));
+savefig('gif/'+dstr+simstr+'rast.png') # gif/20jul5_20jul3_NO_INTERMR_cycle__step_2_rast.png
+just slight increase to EMDOWN,EMUP rates from last one ... 
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','EMSTAY','IM'],tlim=(790e3,800e3)); 
+savefig('gif/'+dstr+simstr+'Vm.png'); # gif/20jul5_20jul3_NO_INTERMR_cycle__step_2_Vm.png
+
+#
+clf(); dobjpos = loadObjPos() ## 
+xlabel('Racket Y position'); hist(dobjpos['racket'][:,1])
+savefig('gif/'+dstr+simstr+'poshist.png') # gif/20jul5_20jul3_NO_INTERMR_cycle__step_2_poshist.png
+still lot of bias
+
+fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4',showflow=False)
+gif/20jul5_20jul3_NO_INTERMR_cycle__step_2__input.mp4
+
+*20jul6
+** check 20jul3_NO_INTERMR_cycle__step_3_
+
+this is the sim with no intermediate rewards, and the long RL time constants ... 
+
+python -i simdat.py backupcfg/20jul3_NO_INTERMR_cycle__step_3_sim.json
+
+plotFollowBall(actreward,ax=subplot(1,3,1),cumulative=True,color='k');  ylim((0,.5))
+plotHitMiss(actreward,ax=subplot(1,3,2),lclr=['k'],asratio=True); ylim((0,.5))
+plotScoreMiss(actreward,ax=subplot(1,3,3),clr='k',asratio=True); ylim((0,.5))
+
+savefig('gif/'+dstr+simstr+'perf.png') # if/20jul5_20jul3_NO_INTERMR_cycle__step_3_perf.png
+
+lfn = ['20jul3_NO_INTERMR_cycle__step_0_','20jul3_NO_INTERMR_cycle__step_1_','20jul3_NO_INTERMR_cycle__step_2_','20jul3_NO_INTERMR_cycle__step_3_']
+lfn = ['data/'+x+'ActionsRewards.txt' for x in lfn]
+pdac = getconcatactionreward(lfn)
+
+plotFollowBall(pdac,ax=subplot(1,3,1),cumulative=True,color='k');  ylim((0,.25))
+plotHitMiss(pdac,ax=subplot(1,3,2),lclr=['k'],asratio=True); ylim((0,.25))
+plotScoreMiss(pdac,ax=subplot(1,3,3),clr='k',asratio=True); ylim((0,.25))
+
+savefig('gif/'+dstr+simstr+'perf_step0_step1_step2_step3.png') # gif/20jul6_20jul3_NO_INTERMR_cycle__step_3_perf_step0_step1_step2_step3.png
+
+follow target rising slowly . . . seems worth continuing ... 
+
+clf(); drawraster(dspkT,dspkID); xlim((790e3,800e3)); # emstay rates went down a lot
+savefig('gif/'+dstr+simstr+'rast.png') # gif/20jul6_20jul3_NO_INTERMR_cycle__step_3_rast.png
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','EMSTAY','IM'],tlim=(790e3,800e3)); 
+savefig('gif/'+dstr+simstr+'Vm.png'); # gif/20jul6_20jul3_NO_INTERMR_cycle__step_3_Vm.png
+
+#
+clf(); dobjpos = loadObjPos() ## 
+xlabel('Racket Y position'); hist(dobjpos['racket'][:,1])
+savefig('gif/'+dstr+simstr+'poshist.png') # gif/20jul6_20jul3_NO_INTERMR_cycle__step_3_poshist.png
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP','EMSTAY'],lclr=['r','b','g'],plotindiv=True)
+xlabel('Time (ms)'); tl(); savefig('gif/'+dstr+simstr+'all_avg_weight.png') # gif/20jul6_20jul3_NO_INTERMR_cycle__step_3_all_avg_weight.png'
+all the weights are decreasing but EMSTAY weights are lower and decreasing faster
+
+fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4',showflow=False)
+gif/20jul5_20jul3_NO_INTERMR_cycle__step_3_input.mp4
+
+continue? may as well . . .
+
+20jul6_NO_INTERMR_cycle_
+    "simtype": {"ResumeSim": 1, "ResumeSimFromFile": "data/20jul3_NO_INTERMR_cycle__step_3_synWeights_final.pkl"},
+    "rewardcodes": {"scorePoint": 1.0, "losePoint": -0.1, "followTarget": 0.0, "avoidTarget": 0.0, "hitBall": 0.0},
+
+will continue with multistep ...
+
+python multistepSim.py sn.json 16 8 multirunNOINTERM2
+
+** check output from sims with only target follow rewards
+
