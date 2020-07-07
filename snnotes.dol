@@ -11061,3 +11061,46 @@ savefig('gif/'+dstr+simstr+'poshist.png') # gif/20jul6_20jul3_S4_cycle__step_3_p
 
 fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4',showflow=False)
 
+*20jul7
+** stopped all sims on cycle, since seems like there's a bug in command encoding
+
+here's main code for rate calculation:
+
+    F_UPs = []
+    F_DOWNs = []
+    F_STAYs = []
+    for ts in range(int(dconf['actionsPerPlay'])):
+      ts_beg = t-tstepPerAction*(dconf['actionsPerPlay']-ts-1) 
+      ts_end = t-tstepPerAction*(dconf['actionsPerPlay']-ts)
+      F_UPs.append(getFiringRatesWithInterval([ts_end,ts_beg], sim.net.pops['EMUP'].cellGids))
+      F_DOWNs.append(getFiringRatesWithInterval([ts_end,ts_beg], sim.net.pops['EMDOWN'].cellGids))
+      if 'EMSTAY' in dconf['net']:
+        F_STAYs.append(getFiringRatesWithInterval([ts_end,ts_beg], sim.net.pops['EMSTAY'].cellGids))
+    sim.pc.allreduce(vec.from_python(F_UPs),1) #sum
+    F_UPs = vec.to_python()
+    sim.pc.allreduce(vec.from_python(F_DOWNs),1) #sum
+    F_DOWNs = vec.to_python()
+    if 'EMSTAY' in dconf['net']:
+      sim.pc.allreduce(vec.from_python(F_STAYs),1) #sum
+      F_STAYs = vec.to_python()
+
+and code for broadcast of actions:
+    sim.pc.broadcast(vec.from_python([critic]), 0) # convert python list to hoc vector to broadcast critic value to other nodes
+    UPactions = np.sum(np.where(np.array(actions)==dconf['moves']['UP'],1,0))
+    DOWNactions = np.sum(np.where(np.array(actions)==dconf['moves']['DOWN'],1,0))
+    sim.pc.broadcast(vec2.from_python([UPactions]),0)
+    sim.pc.broadcast(vec3.from_python([DOWNactions]),0)
+    if 'EMSTAY' in dconf['net']:
+      STAYactions = np.sum(np.where(np.array(actions)==dconf['moves']['NOMOVE'],1,0))
+      sim.pc.broadcast(vec4.from_python([STAYactions]),0)
+  else: # other workers
+    sim.pc.broadcast(vec, 0) # receive critic value from master node
+    critic = vec.to_python()[0] # critic is first element of the array
+    sim.pc.broadcast(vec2, 0)
+    UPactions = vec2.to_python()[0]
+    sim.pc.broadcast(vec3, 0)
+    DOWNactions = vec3.to_python()[0]
+    if 'EMSTAY' in dconf['net']:
+      sim.pc.broadcast(vec4, 0)
+      STAYactions = vec4.to_python()[0]
+
