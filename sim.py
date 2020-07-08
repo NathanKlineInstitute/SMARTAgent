@@ -762,8 +762,7 @@ def saveGameBehavior(sim):
 
 ######################################################################################
 
-def getFiringRatesWithInterval (trange = None, neuronal_pop = None):
-  #sim.gatherData()
+def getSpikesWithInterval (trange = None, neuronal_pop = None):
   if len(neuronal_pop) < 1: return 0.0
   spkts = sim.simData['spkt']
   spkids = sim.simData['spkid']
@@ -771,14 +770,8 @@ def getFiringRatesWithInterval (trange = None, neuronal_pop = None):
   if len(spkts)>0:
     for i in range(len(spkids)):
       if trange[0] <= spkts[i] <= trange[1] and spkids[i] in neuronal_pop:
-        pop_spikes = pop_spikes+1
-    tsecs = float((trange[1]-trange[0]))/1000.0
-    numCells = float(len(neuronal_pop))
-    avgRates = pop_spikes/numCells/tsecs
-  else:
-    avgRates = 0.0
-  #print('Firing rate : %.3f Hz'%(avgRates))
-  return avgRates
+        pop_spikes += 1
+  return pop_spikes
 
 NBsteps = 0 # this is a counter for recording the plastic weights
 epCount = []
@@ -923,10 +916,10 @@ def trainAgent (t):
     for ts in range(int(dconf['actionsPerPlay'])):
       ts_beg = t-tstepPerAction*(dconf['actionsPerPlay']-ts-1) 
       ts_end = t-tstepPerAction*(dconf['actionsPerPlay']-ts)
-      F_UPs.append(getFiringRatesWithInterval([ts_end,ts_beg], sim.net.pops['EMUP'].cellGids))
-      F_DOWNs.append(getFiringRatesWithInterval([ts_end,ts_beg], sim.net.pops['EMDOWN'].cellGids))
+      F_UPs.append(getSpikesWithInterval([ts_end,ts_beg], sim.net.pops['EMUP'].cellGids))
+      F_DOWNs.append(getSpikesWithInterval([ts_end,ts_beg], sim.net.pops['EMDOWN'].cellGids))
       if 'EMSTAY' in dconf['net']:
-        F_STAYs.append(getFiringRatesWithInterval([ts_end,ts_beg], sim.net.pops['EMSTAY'].cellGids))
+        F_STAYs.append(getSpikesWithInterval([ts_end,ts_beg], sim.net.pops['EMSTAY'].cellGids))
     sim.pc.allreduce(vec.from_python(F_UPs),1) #sum
     F_UPs = vec.to_python()
     sim.pc.allreduce(vec.from_python(F_DOWNs),1) #sum
@@ -937,10 +930,9 @@ def trainAgent (t):
     if sim.rank==0:
       if fid4 is None: fid4 = open(sim.MotorOutputsfilename,'w')
       if 'EMSTAY' in dconf['net']:
-        print('t=',round(t,2),' U,D,S firing rates:', F_UPs, F_DOWNs, F_STAYs)
+        print('t=',round(t,2),' U,D,S spikes:', F_UPs, F_DOWNs, F_STAYs)
       else:
-        print('t=',round(t,2),' U,D firing rates:', F_UPs, F_DOWNs)
-      #print('Firing rates: ', F_R1, F_R2, F_R3, F_R4, F_R5, F_L1, F_L2, F_L3, F_L4, F_L5)
+        print('t=',round(t,2),' U,D spikes:', F_UPs, F_DOWNs)
       fid4.write('%0.1f' % t)
       for ts in range(int(dconf['actionsPerPlay'])): fid4.write('\t%0.1f' % F_UPs[ts])
       for ts in range(int(dconf['actionsPerPlay'])): fid4.write('\t%0.1f' % F_DOWNs[ts])
@@ -1107,15 +1099,13 @@ def trainAgent (t):
 
 def getAllSTDPObjects (sim):
   # get all the STDP objects from the simulation's cells
-  if 'EMSTAY' in dconf['net']:
-    dSTDPmech = {'all':[], 'EMUP':[], 'EMDOWN':[], 'EMSTAY':[]} # dictionary of STDP objects keyed by type (all, for EMUP, EMDOWN populations)
-    Mpops = ['EMUP', 'EMDOWN', 'EMSTAY']
-  else:
-    dSTDPmech = {'all':[], 'EMUP':[], 'EMDOWN':[]} # dictionary of STDP objects keyed by type (all, for EMUP, EMDOWN populations)
-    Mpops = ['EMUP', 'EMDOWN']
+  Mpops = ['EMUP', 'EMDOWN']  
+  if 'EMSTAY' in dconf['net']: Mpops.append('EMSTAY')
+  dSTDPmech = {'all':[]} # dictionary of STDP objects keyed by type (all, for EMUP, EMDOWN populations)
+  for pop in Mpops: dSTDPmech[pop] = []
   for cell in sim.net.cells:
     for conn in cell.conns:
-      STDPmech = conn.get('hSTDP')  # check if has STDP mechanism
+      STDPmech = conn.get('hSTDP')  # check if the connection has a NEURON STDP mechanism object
       if STDPmech:
         dSTDPmech['all'].append(STDPmech)
         for pop in Mpops:

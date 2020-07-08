@@ -98,6 +98,11 @@ class AIGame:
       self.ct = CentroidTracker()
       self.objects = OrderedDict() # objects detected in current frame
       self.last_objects = OrderedDict() # objects detected in previous frame
+    if "stayStepLim" in dconf:
+      self.stayStepLim = dconf['stayStepLim']
+    else:
+      self.stayStepLim = 6 # number of steps to hold still after every move (to reduce momentum)
+      # Takes 6 stays instead of 3 because it seems every other input is ignored (check dad_notes.txt for details)
 
   def updateInputRates (self, dsum_Images):
     # update input rates to retinal neurons
@@ -278,12 +283,10 @@ class AIGame:
         if caction in [dconf['moves']['DOWN'], dconf['moves']['UP'], dconf['moves']['NOMOVE']]:
           # Follow down/up/stay with stay to prevent momentum problem (Pong-specific)
           stay_step = 0 # initialize
-          while not done and stay_step < 6:
-            # Takes 6 stays instead of 3 because it seems every other input is ignored (check dad_notes.txt for details)
+          while not done and stay_step < self.stayStepLim:
             observation, interreward, done, info = env.step(dconf['moves']['NOMOVE']) # Stay motion
-            reward = reward + interreward  # Uses summation so no reinforcement/punishment is missed
+            reward += interreward  # Uses summation so no reinforcement/punishment is missed
             stay_step += 1
-            #print(stay_step)
           env.render() # Renders the game after the stay steps
       #find position of ball after action
       xpos_Ball2, ypos_Ball2 = self.findobj(observation, courtXRng, courtYRng)

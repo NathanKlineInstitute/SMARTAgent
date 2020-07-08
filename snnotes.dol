@@ -10964,3 +10964,210 @@ this is the main code for fix in aigame.py :
             #print(stay_step)
           env.render() # Renders the game after the stay steps
 
+** try momentum fix
+
+"name": "20jul6_A0_cycle_"
+100 s sim ...
+
+./myrun 32 sn.json
+
+python -i simdat.py backupcfg/20jul6_A0_cycle_sim.json
+
+plotFollowBall(actreward,ax=subplot(1,3,1),cumulative=True,color='k');  ylim((0,.5))
+plotHitMiss(actreward,ax=subplot(1,3,2),lclr=['k'],asratio=True); ylim((0,.5))
+plotScoreMiss(actreward,ax=subplot(1,3,3),clr='k',asratio=True); ylim((0,.5))
+
+savefig('gif/'+dstr+simstr+'perf.png') # gif/20jul6_20jul6_A0_cycle_perf.png
+
+clf(); drawraster(dspkT,dspkID); xlim((90e3,100e3)); #
+savefig('gif/'+dstr+simstr+'rast.png') # gif/20jul6_20jul6_A0_cycle_rast.png
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','EMSTAY','IM'],tlim=(90e3,100e3)); 
+savefig('gif/'+dstr+simstr+'Vm.png'); # gif/20jul6_20jul6_A0_cycle_Vm.png
+
+#
+clf(); dobjpos = loadObjPos() ## 
+xlabel('Racket Y position'); hist(dobjpos['racket'][:,1])
+savefig('gif/'+dstr+simstr+'poshist.png') # 
+not much bias...
+
+fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4',showflow=False)
+gif/20jul6_20jul6_A0_cycle__input.mp4
+
+looks like improving and less bias ... will continue with multistep to see
+how it fares with longer durations ... but seems like ball is moving too fast ...
+
+"simtype": {"ResumeSim": 1, "ResumeSimFromFile": "data/20jul6_A0_cycle_synWeights_final.pkl"},
+"name": "20jul6_A1_cycle_"
+
+python multistepSim.py sn.json 32 4 20jul6_MultiTestA
+
+started 16:39 ...
+
+** other test with only follow,hit target
+
+for 800 s
+ "rewardcodes": {"scorePoint": 0.0, "losePoint": 0.0, "followTarget": 0.1, "avoidTarget": -0.01, "hitBall": 0.5},
+ "name": "20jul6_TM0_cycle_"
+
+python multistepSim.py sn.json 16 4 20jul6_MultiTestTM
+
+started 16:42 ...
+
+** other test with no intermediate rewards 
+
+for 800 s
+ "rewardcodes": {"scorePoint": 1.0, "losePoint": -0.1, "followTarget": 0.0, "avoidTarget": 0.0, "hitBall": 0.0},
+"name": "20jul6_NOINTERM0_cycle_"
+
+python multistepSim.py sn.json 16 4 20jul6_MultiTestNoIntermM
+
+started 16:47 ...
+
+** check output from 20jul3_S4_cycle__step_3_
+
+python -i simdat.py backupcfg/20jul3_S4_cycle__step_3_sim.json
+
+plotFollowBall(actreward,ax=subplot(1,3,1),cumulative=True,color='k');  ylim((0,.75))
+plotHitMiss(actreward,ax=subplot(1,3,2),lclr=['k'],asratio=True); ylim((0,.75))
+plotScoreMiss(actreward,ax=subplot(1,3,3),clr='k',asratio=True); ylim((0,.75))
+
+savefig('gif/'+dstr+simstr+'perf.png') # gif/20jul6_20jul3_S4_cycle__step_3_perf.png
+
+pretty good values except for score/miss
+
+lfn = ['20jun30_S0_cycle_', '20jun30_S1_cycle_', '20jun30_S2_cycle_', '20jul2_S3_cycle_', '20jul3_S4_cycle__step_0_','20jul3_S4_cycle__step_1_','20jul3_S4_cycle__step_2_','20jul3_S4_cycle__step_3_']
+lfn = ['data/'+x+'ActionsRewards.txt' for x in lfn]
+pdac = getconcatactionreward(lfn)
+
+plotFollowBall(pdac,ax=subplot(1,3,1),cumulative=True,color='k');  ylim((0,.5))
+plotHitMiss(pdac,ax=subplot(1,3,2),lclr=['k'],asratio=True); ylim((0,.5))
+plotScoreMiss(pdac,ax=subplot(1,3,3),clr='k',asratio=True); ylim((0,.5))
+
+savefig('gif/'+dstr+simstr+'perf_all_steps_so_far.png') # gif/20jul6_20jul3_S4_cycle__step_3_perf_all_steps_so_far.png
+
+clf(); drawraster(dspkT,dspkID); xlim((1590e3,1600e3)); #
+savefig('gif/'+dstr+simstr+'rast.png') # gif/20jul6_20jul3_S4_cycle__step_3_rast.png
+
+EMSTAY rates (~3 Hz) much lower than EMUP, EMDOWN (~17 Hz)
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','EMSTAY','IM'],tlim=(1590e3,1600e3)); 
+savefig('gif/'+dstr+simstr+'Vm.png'); # gif/20jul6_20jul3_S4_cycle__step_3_Vm.png
+
+#
+clf(); dobjpos = loadObjPos() ## 
+xlabel('Racket Y position'); hist(dobjpos['racket'][:,1])
+savefig('gif/'+dstr+simstr+'poshist.png') # gif/20jul6_20jul3_S4_cycle__step_3_poshist.png
+
+fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4',showflow=False)
+
+*20jul7
+** stopped all sims on cycle, since seems like there's a bug in command encoding
+
+here's main code for rate calculation:
+
+    F_UPs = []
+    F_DOWNs = []
+    F_STAYs = []
+    for ts in range(int(dconf['actionsPerPlay'])):
+      ts_beg = t-tstepPerAction*(dconf['actionsPerPlay']-ts-1) 
+      ts_end = t-tstepPerAction*(dconf['actionsPerPlay']-ts)
+      F_UPs.append(getFiringRatesWithInterval([ts_end,ts_beg], sim.net.pops['EMUP'].cellGids))
+      F_DOWNs.append(getFiringRatesWithInterval([ts_end,ts_beg], sim.net.pops['EMDOWN'].cellGids))
+      if 'EMSTAY' in dconf['net']:
+        F_STAYs.append(getFiringRatesWithInterval([ts_end,ts_beg], sim.net.pops['EMSTAY'].cellGids))
+    sim.pc.allreduce(vec.from_python(F_UPs),1) #sum
+    F_UPs = vec.to_python()
+    sim.pc.allreduce(vec.from_python(F_DOWNs),1) #sum
+    F_DOWNs = vec.to_python()
+    if 'EMSTAY' in dconf['net']:
+      sim.pc.allreduce(vec.from_python(F_STAYs),1) #sum
+      F_STAYs = vec.to_python()
+
+and code for broadcast of actions:
+    sim.pc.broadcast(vec.from_python([critic]), 0) # convert python list to hoc vector to broadcast critic value to other nodes
+    UPactions = np.sum(np.where(np.array(actions)==dconf['moves']['UP'],1,0))
+    DOWNactions = np.sum(np.where(np.array(actions)==dconf['moves']['DOWN'],1,0))
+    sim.pc.broadcast(vec2.from_python([UPactions]),0)
+    sim.pc.broadcast(vec3.from_python([DOWNactions]),0)
+    if 'EMSTAY' in dconf['net']:
+      STAYactions = np.sum(np.where(np.array(actions)==dconf['moves']['NOMOVE'],1,0))
+      sim.pc.broadcast(vec4.from_python([STAYactions]),0)
+  else: # other workers
+    sim.pc.broadcast(vec, 0) # receive critic value from master node
+    critic = vec.to_python()[0] # critic is first element of the array
+    sim.pc.broadcast(vec2, 0)
+    UPactions = vec2.to_python()[0]
+    sim.pc.broadcast(vec3, 0)
+    DOWNactions = vec3.to_python()[0]
+    if 'EMSTAY' in dconf['net']:
+      sim.pc.broadcast(vec4, 0)
+      STAYactions = vec4.to_python()[0]
+
+not sure if there's a bug; HA checking
+
+** where were the sims?
+
+python -i simdat.py backupcfg/20jul6_TM0_cycle__step_0_sim.json
+
+plotFollowBall(actreward,ax=subplot(1,3,1),cumulative=True,color='k');  ylim((0,.75))
+plotHitMiss(actreward,ax=subplot(1,3,2),lclr=['k'],asratio=True); ylim((0,.75))
+plotScoreMiss(actreward,ax=subplot(1,3,3),clr='k',asratio=True); ylim((0,.75))
+
+savefig('gif/'+dstr+simstr+'perf.png') # gif/20jul7_20jul6_TM0_cycle__step_0_perf.png
+probabilities increasing slowly ...
+
+fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4',showflow=False)
+gif/20jul7_20jul6_TM0_cycle__step_0__input.mp4
+
+looks like improving but paddle moves too slowly compared to the ball ...
+
+** HA found that higher weightVar (0.4 compared to 0.1) performed better
+** other test
+
+"name": "20jul7_B0_cycle_"
+
+./myrun 32 sn.json
+
+python -i simdat.py backupcfg/20jul7_B0_cycle_sim.json
+
+plotFollowBall(actreward,ax=subplot(1,3,1),cumulative=True,color='k');  ylim((0,.75))
+plotHitMiss(actreward,ax=subplot(1,3,2),lclr=['k'],asratio=True); ylim((0,.75))
+plotScoreMiss(actreward,ax=subplot(1,3,3),clr='k',asratio=True); ylim((0,.75))
+
+savefig('gif/'+dstr+simstr+'noEMSTAY_noTARGETTED_stayStepLim6_perf.png')
+savefig('gif/'+dstr+simstr+'noEMSTAY_yesTARGETTED_stayStepLim6_perf.png') # <- slightly better
+
+tried a few options - to compare targetted vs not (targetted did a little better in 100 s)
+had EMSTAY off since seemed to slow movement down, now will try with it on for longer run overnight...
+
+*20jul8
+** added option to control how many stay steps in between moves
+
+ "stayStepLim": 6,
+ default is 6 (value DD determined for removing momentum)
+ but if ball moves too fast, may want to reduce the value (tradeoff between momentum problem and
+ speed of game play)
+
+** continue test from above
+
+now put EMSTAY back will run overnihgt ... can use 64 cores on cycle if use this
+flag with mpiexec : --use-hwthread-cpus
+put that into myrun
+96 cores is slower than 64 on cycle ... 
+
+20jul8_A0_cycle_ ... 
+
+./myrun 64 sn.json
+
+python -i simdat.py backupcfg/20jul8_A0_cycle_sim.json
+
+plotFollowBall(actreward,ax=subplot(1,3,1),cumulative=True,color='k');  ylim((0,.75))
+plotHitMiss(actreward,ax=subplot(1,3,2),lclr=['k'],asratio=True); ylim((0,.75))
+plotScoreMiss(actreward,ax=subplot(1,3,3),clr='k',asratio=True); ylim((0,.75))
+
+
+clf(); drawraster(dspkT,dspkID)
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP','EMSTAY'],lclr=['r','b','g'],plotindiv=True)
+xlabel('Time (ms)'); tl();
