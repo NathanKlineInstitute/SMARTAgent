@@ -11104,3 +11104,70 @@ and code for broadcast of actions:
       sim.pc.broadcast(vec4, 0)
       STAYactions = vec4.to_python()[0]
 
+not sure if there's a bug; HA checking
+
+** where were the sims?
+
+python -i simdat.py backupcfg/20jul6_TM0_cycle__step_0_sim.json
+
+plotFollowBall(actreward,ax=subplot(1,3,1),cumulative=True,color='k');  ylim((0,.75))
+plotHitMiss(actreward,ax=subplot(1,3,2),lclr=['k'],asratio=True); ylim((0,.75))
+plotScoreMiss(actreward,ax=subplot(1,3,3),clr='k',asratio=True); ylim((0,.75))
+
+savefig('gif/'+dstr+simstr+'perf.png') # gif/20jul7_20jul6_TM0_cycle__step_0_perf.png
+probabilities increasing slowly ...
+
+fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4',showflow=False)
+gif/20jul7_20jul6_TM0_cycle__step_0__input.mp4
+
+looks like improving but paddle moves too slowly compared to the ball ...
+
+** HA found that higher weightVar (0.4 compared to 0.1) performed better
+** other test
+
+"name": "20jul7_B0_cycle_"
+
+./myrun 32 sn.json
+
+python -i simdat.py backupcfg/20jul7_B0_cycle_sim.json
+
+plotFollowBall(actreward,ax=subplot(1,3,1),cumulative=True,color='k');  ylim((0,.75))
+plotHitMiss(actreward,ax=subplot(1,3,2),lclr=['k'],asratio=True); ylim((0,.75))
+plotScoreMiss(actreward,ax=subplot(1,3,3),clr='k',asratio=True); ylim((0,.75))
+
+savefig('gif/'+dstr+simstr+'noEMSTAY_noTARGETTED_stayStepLim6_perf.png')
+savefig('gif/'+dstr+simstr+'noEMSTAY_yesTARGETTED_stayStepLim6_perf.png') # <- slightly better
+
+tried a few options - to compare targetted vs not (targetted did a little better in 100 s)
+had EMSTAY off since seemed to slow movement down, now will try with it on for longer run overnight...
+
+*20jul8
+** added option to control how many stay steps in between moves
+
+ "stayStepLim": 6,
+ default is 6 (value DD determined for removing momentum)
+ but if ball moves too fast, may want to reduce the value (tradeoff between momentum problem and
+ speed of game play)
+
+** continue test from above
+
+now put EMSTAY back will run overnihgt ... can use 64 cores on cycle if use this
+flag with mpiexec : --use-hwthread-cpus
+put that into myrun
+96 cores is slower than 64 on cycle ... 
+
+20jul8_A0_cycle_ ... 
+
+./myrun 64 sn.json
+
+python -i simdat.py backupcfg/20jul8_A0_cycle_sim.json
+
+plotFollowBall(actreward,ax=subplot(1,3,1),cumulative=True,color='k');  ylim((0,.75))
+plotHitMiss(actreward,ax=subplot(1,3,2),lclr=['k'],asratio=True); ylim((0,.75))
+plotScoreMiss(actreward,ax=subplot(1,3,3),clr='k',asratio=True); ylim((0,.75))
+
+
+clf(); drawraster(dspkT,dspkID)
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP','EMSTAY'],lclr=['r','b','g'],plotindiv=True)
+xlabel('Time (ms)'); tl();

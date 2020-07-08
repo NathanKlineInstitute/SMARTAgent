@@ -1,1 +1,1 @@
-mpiexec -n $1 nrniv -python -mpi sim.py $2
+mpiexec -n $1 --use-hwthread-cpus nrniv -python -mpi sim.py $2
