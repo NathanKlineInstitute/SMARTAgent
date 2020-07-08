@@ -11166,8 +11166,40 @@ plotFollowBall(actreward,ax=subplot(1,3,1),cumulative=True,color='k');  ylim((0,
 plotHitMiss(actreward,ax=subplot(1,3,2),lclr=['k'],asratio=True); ylim((0,.75))
 plotScoreMiss(actreward,ax=subplot(1,3,3),clr='k',asratio=True); ylim((0,.75))
 
+savefig('gif/'+dstr+simstr+'perf.png') # gif/20jul8_20jul8_A0_cycle_perf.png
+hit/miss low, score low, follow target probability increasing ... 
 
 clf(); drawraster(dspkT,dspkID)
+xlim((1590e3,1600e3))
+savefig('gif/'+dstr+simstr+'rast.png') # gif/20jul8_20jul8_A0_cycle_rast.png
+emstay rates lower, emup rates lower than emdown rates
 
 clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP','EMSTAY'],lclr=['r','b','g'],plotindiv=True)
 xlabel('Time (ms)'); tl();
+savefig('gif/'+dstr+simstr+'all_avg_weight.png') # gif/20jul8_20jul8_A0_cycle_all_avg_weight.png
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','EMSTAY','IM'],tlim=(1590e3,1600e3)); 
+savefig('gif/'+dstr+simstr+'Vm.png') # gif/20jul8_20jul8_A0_cycle_Vm.png
+
+fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4',showflow=False)
+gif/20jul8_20jul8_A0_cycle__input.mp4
+
+looks like paddle movement speeding up near end ... 
+
+can continue for shorter duration ...
+
+20jul8_A1_cycle_
+ "simtype": {"ResumeSim": 1, "ResumeSimFromFile": "data/20jul8_A0_cycle_synWeights_final.pkl"},
+
+./myrun 64 sn.json
+
+hmm, ball seems to move too fast ... will stop this one
+
+** other motor command encoding
+
+could have move to y coordinate
+then a set of motor neurons each which represent a single y coordinate
+winner is where paddle should move to
+might allow smoother movement since higher level command
+but would not generalize to all games
+
