@@ -10,6 +10,7 @@
     "actionsPerPlay": 1,
     "followOnlyTowards": 1,
     "useRacketPredictedPos": 1,
+    "stayStepLim": 6,
     "DirectionDetectionAlgo":{"CentroidTracker":1,"OpticFlow":0,"UseFull":1,"FlowWidth":16},
     "verbose": 0,
     "simtype": {"ResumeSim":0,"ResumeSimFromFile":"data/20june22_D_synWeights.pkl"},        

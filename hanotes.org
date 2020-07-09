@@ -3674,6 +3674,201 @@ take note of it and can try it if have time
 -- follow the ball plot looks ok.
 -- animSynWeights crashed--- didnt look into the reason why... since its not very useful anyway.
 
-** now run sim with 'EMSTAY' in '20june30_B'...
+** now run sim with 'EMSTAY'=16 in '20june30_B'...
 -- code was completely messed up.... 'EMSTAY' was not set up at all.
 -- made changes and now will test....
+-- looks OK --- not performance wise..
+
+** now run sim with 'EMSTAY'=0 in '20june30_C'...
+-- looks OK --- not performance wise..
+
+** repeat sim without 'EMSTAY' in '20june30_A2'.
+
+** repeat sim for 2000 sec without 'EMSTAY' in '20june30_A3'.
+
+-- HISTOGRAM
+
+hist, bin_edges = np.histogram(d)
+
+* 2020july1
+
+** Need to undestand how many leels of firing rates exist in individual neurons as well as pop of M neurons.
+-- looking at file from sam.... 20jun26_F4_targetted_tank_sim.json
+-- very similar single neuron dynamics:
+      --hist, bins = np.histogram(dact['EMUP'])
+        hist = 708285 (0), 449672 (1), 122009 (2), 34 (3)
+      --hist, bins = np.histogram(dact['EMDOWN'])
+        hist = 715238 (0), 426331 (1), 138200 (2), 231 (3)  
+
+
+-- looking at pop firing rates:
+FR_UP = []
+FR_DOWN = []
+for t in range(np.shape(dact['EMUP'])[0]):
+  FR_UP.append(np.sum(dact['EMUP'][t]))
+  FR_DOWN.append(np.sum(dact['EMDOWN'][t]))
+Decisive_FR = np.subtract(FR_UP,FR_DOWN)
+plt.hist(Decisive_FR, bins = 200)
+plt.hist(FR_UP, bins = 200)
+plt.hist(FR_DOWN, bins = 200)
+
+-- too many times FR_UP == FR_DOWN
+-- not that many times, FR_UP or FR_DOWN equal 0.
+If a neuron can have 0, 1, 2 or 3 spikes, how many possible firing patterns will be there?
+
+-- unique FR_DOWN: 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,32
+-- unique FR_UP: 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,24,27
+
+inds = np.where(np.array(FR_UP)==1.)
+FR_UP_1s = dact['EMUP'][inds] --- 801 inds
+np.sum(FR_1s,0)
+--- [[75,103,42,132],
+      [236,0,0,0],
+      [0,1,0,0],
+      [59,66,87,0]
+
+
+inds = np.where(np.array(FR_UP)==2.)
+FR_UP_2s = dact['EMUP'][inds] --- 977 inds
+np.sum(FR_2s,0)
+--- [[89,617,85,627],
+      [172,1,0,0],
+      [0,0,1,0],
+      [102,108,151,1]]
+
+inds = np.where(np.array(FR_UP)==3.) --- 708 inds
+FR_UP_3s = dact['EMUP'][inds]
+np.sum(FR_3s,0)
+--- [[213,342,221,346],
+      [297,1,6,6],
+      [2,2,1,5],
+      [207,232,241,2]]
+
+inds = np.where(np.array(FR_UP)==4.) ---  816 inds
+FR_UP_4s = dact['EMUP'][inds]
+np.sum(FR_4s,0)
+--- [[418,374,414,369],
+      [418,0,4,3],
+      [2,2,0,4],
+      [424,418,413,1]]
+
+inds = np.where(np.array(FR_UP)==5.) ---  1603 inds
+FR_UP_5s = dact['EMUP'][inds]
+np.sum(FR_5s,0)
+--- [1343,437,1326,433],
+    [569,2,1,1],
+    [1,1,2,1],
+    [1317,1333,1247,1]
+
+inds = np.where(np.array(FR_UP)==6.) ---  4619 inds
+FR_UP_6s = dact['EMUP'][inds]
+np.sum(FR_6s,0)
+--- [4413,759,4407,747],
+    [4240,2,1,2],
+    [3,3,2,1],
+    [4415,4433,4283,3]
+
+inds = np.where(np.array(FR_UP)==7.) --- 2713 inds
+FR_UP_7s = dact['EMUP'][inds]
+np.sum(FR_7s,0)
+--- [2594,2172,2579,2071],
+    [1977,0,2,2],
+    [2,2,0,2],
+    [2537,2538,2511,2]
+
+inds = np.where(np.array(FR_UP)==8.) ---  35419 inds --- on time axis, when is this happening??
+FR_UP_8s = dact['EMUP'][inds]
+np.sum(FR_8s,0)
+--- [35431,35368,35427,35366],
+    [35403,3,13,13],
+    [8,8,3,12],
+    [35439,35427,35423,8]
+
+ninds = np.where(FR_UP_8s[:,1,1]>0)
+3933, 12190, 30613 -- single spikes.
+
+
+* 20july02
+** run 100 sec sim in '20july02_A_'
+--'EMSTAY':16
+--tstepPerAction:20
+--EEMProb:1.0
+--EEMRecProb:0
+--weightVar:0.1
+--RLlenhebb:20
+--RLlenanti:20
+
+** run 100 sec sim in '20july02_B_'
+...reduce weights
+-- EEMWghtAM:0.00001
+-- EEMWghtNM:0.000001
+-- EEPreMWghtAM:0.00006  - Not relevant
+-- EEPreMWghtNM:0.000002  - Not relevant
+-- EEMWghtThreshMin: 0.000006
+-- EEMWghtThreshMax: 0.0003
+-- EEMFeedbackWghtAM: 0.00001 - Not relevant
+-- EEMFeedbackWghtNM: 0.000001 - Not relevant
+
+** run 1000 sec sim in '20july02_B2_'
+-- use same parameters as above.
+
+** some ideas
+-- may be adding EMSTAY has caused higher inhibition. so try reducing the strength of I to E in M.
+
+** run 100 sec sim on cycle using same parameters as in '20july02_A_' but lower EMDOWN to IM and EMUP to IM and EMSTAY to IM.
+-- reduce to 0.15 from 0.2
+
+** run 1000 sec sim in '20july03_B_'
+-- use same parameters as in '20july02_B_'
+-- use RLhebbwt=0.0000001
+
+** run 1000 sec sim in '20july03_B2_'
+-- weightVar: 0.4
+
+** run 1000 sec sim in '20july03_B3_' ----> not yet sumbitted
+-- tstepPerAction:100ms
+-- RLwindhebb: 100
+-- RLlenhebb: 100
+-- RLlenanti: 100
+
+
+** SAM SUGGESTED:
+-- look at normalizeAdjustableWeights to see options - EEMPopNorm might be useful - not sure
+
+** start 1000 sec sim in '20july03_B2_R1_' and '20july03_B_R1_'
+
+** run 200 sec sim on cycle in file "20july06_B_cycle_"
+-- set rewards for 'followTarget' = 0 and 'avoidTarget' = 0
+-- weightVar: 0.4
+--use RLhebbwt=0.0000002
+
+
+
+** run 1000 sec sim in "20july07_A_" ----> This got terminated.
+-- weightVar: 0
+
+** we saw that Hits performance increases while followtheball performance pleateus and starts slowly decaying.
+-- Could this be because of the difference in score values used?
+-- Check what happens if you keep both types of reward values same.
+
+** run 1000 sec sim in "20july07_B_"
+-- weightVar: 0
+-- scorePoint: 0.25, losePoint: -0.25
+
+** SOME IDEAS:
+
+-- Lets say M neurons are under constant inhibition all the time.
+-- When neurons in Visual Cortex get activated, it release the spatially associated M neurons from inhibition, and only those neurons can go under RL based plasticity.
+
+
+
+comparing actions between '20jul8_A0_withMPI' (blue) and '20jul8_A0_noMPI' (red)
+-- first difference is observed at time step # 74. withMPI had caction = 4 whereas noMPI had caction = 1
+-- We can see that effect in input images. so that was clearly the effect of firing rates. so look at the raster plots.
+-- save raster plot from 1380-1500 ms. all cells, input cells and output cells.
+
+
+** Try original game vs current game
+
+from aigame import AIGame
+AIGame = AIGame()
