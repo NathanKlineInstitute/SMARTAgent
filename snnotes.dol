@@ -11203,3 +11203,76 @@ winner is where paddle should move to
 might allow smoother movement since higher level command
 but would not generalize to all games
 
+** compare diff levels of stayStepLim -->> no clear diff in short sims
+
+100 s ... 
+20jul8_B0_cycle_
+ "stayStepLim": 3,
+
+20jul8_B1_cycle_
+ "stayStepLim": 2,
+
+20jul8_B2_cycle_
+ "stayStepLim": 1,
+
+20jul8_B3_cycle_
+ "stayStepLim": 0,
+
+20jul8_B4_cycle_
+ "stayStepLim": 4,
+
+./myrun 64 sn.json
+
+python -i simdat.py
+
+lfn = ['20jul8_B3_cycle_', '20jul8_B2_cycle_', '20jul8_B1_cycle_', '20jul8_B0_cycle_']
+lfn = ['data/'+x+'ActionsRewards.txt' for x in lfn]
+lpda = getindivactionreward(lfn)
+
+#
+for pda,clr in zip(lpda,['b','r','g','c']):
+  plotFollowBall(pda,ax=subplot(1,3,1),cumulative=True,color=clr); ylim((0,0.5))
+  plotHitMiss(pda,ax=subplot(1,3,2),lclr=[clr],asratio=True); ylim((0,0.5))
+  plotScoreMiss(pda,ax=subplot(1,3,3),clr=clr,asratio=True); ylim((0,0.5))
+
+lpatch = [mpatches.Patch(color=c,label=s) for c,s in zip(['b','r','g','c'],['Stay0','Stay1','Stay2','Stay3'])]
+ax=gca()
+ax.legend(handles=lpatch,handlelength=1)
+
+savefig('gif/20jul8_B_cycle_perf_compare_stay0_1_2_3.png')
+
+do not see much difference ... maybe stay0 doing best??
+
+** fewer EMSTAY & other EM neurons?
+
+./myrun 48 sn.json
+
+python -i simdat.py backupcfg/20jul8_C0_cycle_sim.json
+
+plotFollowBall(actreward,ax=subplot(1,3,1),cumulative=True,color='k');  ylim((0,.75))
+plotHitMiss(actreward,ax=subplot(1,3,2),lclr=['k'],asratio=True); ylim((0,.75))
+plotScoreMiss(actreward,ax=subplot(1,3,3),clr='k',asratio=True); ylim((0,.75))
+
+clf(); drawraster(dspkT,dspkID)
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','EMSTAY','IM'])
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP','EMSTAY'],lclr=['r','b','g'],plotindiv=True)
+
+clf(); dobjpos = loadObjPos() ## 
+xlabel('Racket Y position'); hist(dobjpos['racket'][:,1])
+
+** 24 cores for 16x16x16x12 (EMUP,EMDWON,EMDSTAY,IM) was faster than 16 & 48 cores but same as 32 cores
+** longer sim with stayStepLim of 0 (20jul8_D0_stayStepLim0_cycle_)
+
+"duration": 2000000
+
+./myrun 24 sn.json
+
+** and comparison with stayStepLim of 1 (20jul8_D0_stayStepLim1_cycle_)
+
+./myrun 24 sn.json
+
+** and comparison with stayStepLim of 2 (20jul8_D0_stayStepLim2_cycle_)
+
+./myrun 24 sn.json
