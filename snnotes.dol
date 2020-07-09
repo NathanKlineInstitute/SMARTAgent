@@ -11276,3 +11276,8 @@ xlabel('Racket Y position'); hist(dobjpos['racket'][:,1])
 ** and comparison with stayStepLim of 2 (20jul8_D0_stayStepLim2_cycle_)
 
 ./myrun 24 sn.json
+
+*20jul9
+** and comparison with stayStepLim of 3 (20jul9_D0_stayStepLim3_falcor_)
+
+./myrun 24 sn.json
