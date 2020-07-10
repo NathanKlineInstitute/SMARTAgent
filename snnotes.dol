@@ -11281,3 +11281,14 @@ xlabel('Racket Y position'); hist(dobjpos['racket'][:,1])
 ** and comparison with stayStepLim of 3 (20jul9_D0_stayStepLim3_falcor_)
 
 ./myrun 24 sn.json
+
+** one neuron of each EM type??
+
+20jul9_E0_1111_falcor_
+
+tried that before...
+
+./myrun 16 sn.json
+
+python -i simdat.py backupcfg/20jul9_E0_1111_falcor_sim.json
+
