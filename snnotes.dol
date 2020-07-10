@@ -11292,3 +11292,67 @@ tried that before...
 
 python -i simdat.py backupcfg/20jul9_E0_1111_falcor_sim.json
 
+*20jul10
+** compare outputs for different number of stayStepLim
+
+python -i simdat.py
+
+lfn = ['20jul8_D0_stayStepLim0_cycle_', '20jul8_D0_stayStepLim1_cycle_', '20jul8_D0_stayStepLim2_cycle_']
+lfn = ['data/'+x+'ActionsRewards.txt' for x in lfn]
+lpda = getindivactionreward(lfn)
+
+#
+for pda,clr in zip(lpda,['b','r','g']):
+  plotFollowBall(pda,ax=subplot(1,3,1),cumulative=True,color=clr); ylim((0,0.5))
+  plotHitMiss(pda,ax=subplot(1,3,2),lclr=[clr],asratio=True); ylim((0,0.5))
+  plotScoreMiss(pda,ax=subplot(1,3,3),clr=clr,asratio=True); ylim((0,0.5))
+
+lpatch = [mpatches.Patch(color=c,label=s) for c,s in zip(['b','r','g'],['Stay0','Stay1','Stay2','Stay3'])]
+ax=gca()
+ax.legend(handles=lpatch,handlelength=1)
+
+savefig('gif/20jul10_compare_stay0_stay1_stay2_a0.png')
+
+stay of 2 follows target a little better but stay of 0,1 hit ball more often
+
+** HA discussion
+
+Pong-v0 performs better than PongNoFrameskip-v4
+
+so will use it by default
+
+** discuss with HA re RLwindhebb
+
+and only change in RL parameters would be:
+12:22
+--change “RLlenhebb”: 200 to “RLlenhebb”: 50
+(Length of the eligibility Hebbian and anti-Hebbian eligibility traces, or the decay time constants if the traces are decaying exponentials.)
+-- change “RLwindhebb”: 50 to “RLwindhebb”: 20
+(Maximum interval between pre- and post-synaptic events for an starting an eligibility trace.)
+12:23
+samn 50 ms for latter - didn't realize it was that high
+12:23
+Haroon Anwar yes
+12:23
+samn that's what sal used?
+12:24
+Haroon Anwar dont remember, i think so…. but could check
+12:24
+samn ic, np
+12:24
+even 10 seems reasonable for that
+12:24
+but def 20 sg
+
+** so now have to test stayStepLim 0,1,2 in Pong-v0
+
+ "stayStepLim": 0,
+"name": "20jul10_A0_stay0_cycle_"
+
+./myrun 32 sn.json
+
+started ~13:07 ...
+
+ "stayStepLim": 1,
+"name": "20jul10_A0_stay1_cycle_"
+
