@@ -3937,3 +3937,10 @@ middle ground
 
 
 WE DECIDED TO USE staysteplim of 1 for now.
+
+** run 100 sec sim in "20jul10_A0_falcor_"
+--change "RLlenhebb": 200 to "RLlenhebb": 50
+-- change "RLlenanti": 200 to "RLlenanti": 50
+(Length of the eligibility Hebbian and anti-Hebbian eligibility traces, or the decay time constants if the traces are decaying exponentials.)
+-- change "RLwindhebb": 50 to "RLwindhebb": 20
+(Maximum interval between pre- and post-synaptic events for an starting an eligibility trace.) 
