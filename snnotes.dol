@@ -11356,3 +11356,12 @@ started ~13:07 ...
  "stayStepLim": 1,
 "name": "20jul10_A0_stay1_cycle_"
 
+./myrun 32 sn.json
+
+started ~13:10 ...
+
+using 32, 32, 32, 24 for EM and IM populations
+
+weightVar of 0.3 ...
+some recurrent and feedback connectivity and RLwindhebb of 20
+
