@@ -44,7 +44,7 @@ try:
     env.reset()
 except:
   print('Exception in makeENV')
-  env = gym.make('PongNoFrameskip-v4',repeat_action_probability=0.)
+  env = gym.make('Pong-v0',framepskip=2,repeat_action_probability=0.)
   env = wrappers.Monitor(env, './videos/' + str(time()) + '/',force=True)
   env.reset()
 

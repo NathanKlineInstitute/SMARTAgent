@@ -1,5 +1,5 @@
 {"env":
- {"name": "PongNoFrameskip-v4", "savemp4": 0},
+ {"name": "Pong-v0", "frameskip":2, "savemp4": 0},
  "moves": {"UP": 4, "DOWN": 3, "NOMOVE": 1},
  "movecodes": [1, 3, 4],
  "movefctr": 1.0,
@@ -7,7 +7,7 @@
  "actionsPerPlay": 1,
  "followOnlyTowards": 1,
  "useRacketPredictedPos": 1,
- "stayStepLim": 6,
+ "stayStepLim": 1,
  "DirectionDetectionAlgo": {"CentroidTracker": 1, "OpticFlow": 0, "FlowWidth": 16, "UseFull": 1},
  "verbose": 0,
  "simtype": {"ResumeSim": 0, "ResumeSimFromFile": "data/20jul6_A0_cycle_synWeights_final.pkl"},

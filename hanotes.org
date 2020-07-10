@@ -3868,7 +3868,72 @@ comparing actions between '20jul8_A0_withMPI' (blue) and '20jul8_A0_noMPI' (red)
 -- save raster plot from 1380-1500 ms. all cells, input cells and output cells.
 
 
+** some material to read:
+
+https://medium.com/gradientcrescent/fundamentals-of-reinforcement-learning-automating-pong-in-using-a-policy-model-an-implementation-b71f64c158ff
+https://arxiv.org/pdf/1807.08452.pdf
+
+
 ** Try original game vs current game
 
+epCount = []
 from aigame import AIGame
 AIGame = AIGame()
+rewards, epCount, proposed_actions, total_hits = AIGame.playGame([4], epCount)
+
+
+for pong environments:
+https://github.com/openai/gym/blob/master/gym/envs/__init__.py
+
+
+--- LOOKS LIKE repeat_action_probability=0. not working properly.... see the discussion below.
+https://github.com/openai/gym/issues/349
+
+also check: 
+PongNoFrameskip-v4
+PongDeterministic-v0
+PongDeterministic-v4
+
+
+--- may be should use register(
+            id='{}NoFrameskip-v0'.format(name),
+            entry_point='gym.envs.atari:AtariEnv',
+            kwargs={'game': game, 'obs_type': obs_type, 'frameskip': 1, 'repeat_action_probability': 0.25}, # A frameskip of 1 means we get every frame
+            max_episode_steps=frameskip * 100000,
+            nondeterministic=nondeterministic,
+        )
+
+        because i can assign rpeat_action_probabilyt:0
+
+
+didnt work... seems like both NoFrameskip-v0 and NoFrameskip-v4 giving me same behavior.
+
+
+* 20july10
+
+** change to "env":  {"name": "Pong-v0", "frameskip":2, "savemp4":0} from  "env":  {"name": "PongNoFrameskip-v4", "savemp4":0}
+
+** now decide how many STAYs needed to have no momentum.
+-- "stayStepLim": 0,
+-- "stayStepLim": 1,
+-- "stayStepLim": 2,
+
+** How many MODEL steps needed by racket to move from top to bottom?
+-- "stayStepLim": 3 --- 14 MODEL Steps
+
+so we can either use “stayStepLim”: 1 or “stayStepLim”: 2… there will be a compromise for  both 
+for both transition from 3 to 4 and 4 to 3 is immediate (without momentum)
+same when transition from 1 to 3 and 1 to 4
+difference is only when we transition from 3 to 1 and 4 to 1
+when we use stayStepLim:1, it takes 2 MODEL steps to overcome the momentum from 3 or 4 which ever it was
+when we use stayStepLim:2, it takes 1 MODEL step to overcome the momentum from 3 or 4 which ever it was
+staysteplim of 0 will have momentums in all transitions
+so i could overcome momentum using staysteplim of 3 but then it would be difficult for racket to catch the ball
+so in my opinion we could use a trick:
+when action is 3 or 4, we take 1 STAY
+if action is 1, we take 3 STAYs
+or use staysteplim of 2
+middle ground
+
+
+WE DECIDED TO USE staysteplim of 1 for now.
