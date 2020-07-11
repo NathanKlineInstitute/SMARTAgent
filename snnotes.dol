@@ -11439,3 +11439,15 @@ python multistepSim.py sn.json 32 10 20jul10_MultiTestNoIntermRewards_
 
 started ~22:54 ...
 
+** and another with stayStepLim==1, intermediate rewards, but RLantiwt too
+
+running on falcor...
+
+20jul10_C0_stay1_RLantitoo_falcor_
+
+ "RL": {"AMPA": {"wbase": 1e-08, "wmax": 0.00048, "RLon": 1, "RLlenhebb": 2000, "RLlenanti": 2000, "useRLexp": 1, "RLhebbwt": 2e-07, "RLantiwt": -2e-07, "hebbwt": 0, "antiwt": 0, "tauhebb": 10, "RLwindhebb": 20, "softthresh": 0, "verbose": 0},
+
+./myrun 16 sn.json
+
+started ~22:58 ...
+
