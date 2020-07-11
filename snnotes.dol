@@ -11428,3 +11428,14 @@ started ~22:10 ...
 
 ** and another with stayStepLim==1 and no intermediate rewards
 
+also did not use RLantiwt ... probably should so allows adjusting weights when post fires before pre ...
+should compare sim with/without that separately ... 
+
+"name": "20jul10_B0_stay1_NOINTERMR_cycle_"
+"RLlenhebb": 2000
+"duration": 800000
+
+python multistepSim.py sn.json 32 10 20jul10_MultiTestNoIntermRewards_
+
+started ~22:54 ...
+
