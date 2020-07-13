@@ -11480,3 +11480,105 @@ fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4',showflow=False) # gif/
 
 ok, will compare to data on cycle ...
 
+scp samn@falcor://home/samn/SMARTAgent/backupcfg/20jul10_C0_stay1_RLantitoo_falcor_sim.json ./backupcfg
+scp samn@falcor://home/samn/SMARTAgent/data/20jul10_C0_stay1_RLantitoo_falcor*.txt ./data
+scp samn@falcor://home/samn/SMARTAgent/gif/*20jul10_C0_stay1_RLantitoo_falcor*png ./gif/
+
+ok, compare these two:
+
+python -i simdat.py backupcfg/20jul10_A0_stay1_cycle_sim.json
+
+lfn = ['20jul10_A0_stay1_cycle_', '20jul10_C0_stay1_RLantitoo_falcor_']
+lfn = ['data/'+x+'ActionsRewards.txt' for x in lfn]
+lpda = getindivactionreward(lfn)
+
+#
+for pda,clr in zip(lpda,['b','r']):
+  plotFollowBall(pda,ax=subplot(1,3,1),cumulative=True,color=clr); ylim((0,0.35))
+  plotHitMiss(pda,ax=subplot(1,3,2),lclr=[clr],asratio=True); ylim((0,0.35))
+  plotScoreMiss(pda,ax=subplot(1,3,3),clr=clr,asratio=True); ylim((0,0.35))
+
+lpatch = [mpatches.Patch(color=c,label=s) for c,s in zip(['b','r'],['Stay1 No Anti','Stay1 Yes Anti'])]
+ax=gca()
+ax.legend(handles=lpatch,handlelength=1)
+
+savefig('gif/20jul13_compare_no_anti_yes_anti_a0.png')
+
+pretty similar performance ... for target follow, no antiRL does a little better
+for hit/miss and score/miss with antiRL does a litlte better, except for at the end ...
+would need a longer comparison ...
+
+** check output from multistep sims -- with intermediate reward/punishment
+
+python -i simdat.py backupcfg/20jul10_A1_stay1_cycle__step_4_sim.json
+
+lfn = ['20jul10_A0_stay1_cycle_', '20jul10_A1_stay1_cycle__step_0_', '20jul10_A1_stay1_cycle__step_1_','20jul10_A1_stay1_cycle__step_2_','20jul10_A1_stay1_cycle__step_3_','20jul10_A1_stay1_cycle__step_4_']
+lfn = ['data/'+x+'ActionsRewards.txt' for x in lfn]
+pdac = getconcatactionreward(lfn)
+
+plotFollowBall(pdac,ax=subplot(1,3,1),cumulative=True,color='k');  ylim((0,.5))
+plotHitMiss(pdac,ax=subplot(1,3,2),lclr=['k'],asratio=True); ylim((0,.5))
+plotScoreMiss(pdac,ax=subplot(1,3,3),clr='k',asratio=True); ylim((0,.5))
+
+savefig('gif/'+dstr+simstr+'perf_all_steps_so_far.png') # gif/20jul13_20jul10_A1_stay1_cycle__step_4_perf_all_steps_so_far.png
+
+hmm, not doing as well as previous sims ... many reasons/differences (EMSTAY, stayStepLim==1, recurrent conn, feedback
+conn, Pong-v0 vs v4 ...)
+
+clf(); drawraster(dspkT,dspkID); xlim((790e3,800e3)); #
+savefig('gif/'+dstr+simstr+'rast.png') # gif/20jul13_20jul10_A1_stay1_cycle__step_4_rast.png
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','EMSTAY','IM'],tlim=(790e3,800e3)); 
+savefig('gif/'+dstr+simstr+'Vm.png'); # gif/20jul13_20jul10_A1_stay1_cycle__step_4_Vm.png
+
+#
+clf(); dobjpos = loadObjPos() ## 
+xlabel('Racket Y position'); hist(dobjpos['racket'][:,1])
+savefig('gif/'+dstr+simstr+'poshist.png') # gif/20jul13_20jul10_A1_stay1_cycle__step_4_poshist.png
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP','EMSTAY'],lclr=['r','b','g'],plotindiv=True)
+xlabel('Time (ms)'); tl();
+savefig('gif/'+dstr+simstr+'all_avg_weight.png') # gif/20jul13_20jul10_A1_stay1_cycle__step_4_all_avg_weight.png
+
+fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4',showflow=False)
+gif/20jul13_20jul10_A1_stay1_cycle__step_4__input.mp4
+
+** check output from multistep sims -- without intermediate reward/punishment
+
+python -i simdat.py backupcfg/20jul10_B0_stay1_NOINTERMR_cycle__step_4_sim.json
+
+lfn = ['20jul10_B0_stay1_NOINTERMR_cycle__step_0_','20jul10_B0_stay1_NOINTERMR_cycle__step_1_','20jul10_B0_stay1_NOINTERMR_cycle__step_2_','20jul10_B0_stay1_NOINTERMR_cycle__step_3_','20jul10_B0_stay1_NOINTERMR_cycle__step_4_']
+lfn = ['data/'+x+'ActionsRewards.txt' for x in lfn]
+pdac = getconcatactionreward(lfn)
+
+plotFollowBall(pdac,ax=subplot(1,3,1),cumulative=True,color='k');  ylim((0,.5))
+plotHitMiss(pdac,ax=subplot(1,3,2),lclr=['k'],asratio=True); ylim((0,.5))
+plotScoreMiss(pdac,ax=subplot(1,3,3),clr='k',asratio=True); ylim((0,.5))
+
+savefig('gif/'+dstr+simstr+'perf_all_steps_so_far.png') # gif/20jul13_20jul10_B0_stay1_NOINTERMR_cycle__step_4_perf_all_steps_so_far.png
+
+a lot worse performance than sim with intermediate score/punishment, as expected ...
+though follow target probability may be increasing slowly ...
+
+clf(); drawraster(dspkT,dspkID); xlim((790e3,800e3)); #
+savefig('gif/'+dstr+simstr+'rast.png') # gif/20jul13_20jul10_B0_stay1_NOINTERMR_cycle__step_4_rast.png
+
+EMSTAY rate lower than EMUP,EMDOWN ...
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','EMSTAY','IM'],tlim=(790e3,800e3)); 
+savefig('gif/'+dstr+simstr+'Vm.png'); # gif/20jul13_20jul10_B0_stay1_NOINTERMR_cycle__step_4_Vm.png
+
+#
+clf(); dobjpos = loadObjPos() ## 
+xlabel('Racket Y position'); hist(dobjpos['racket'][:,1])
+savefig('gif/'+dstr+simstr+'poshist.png') # gif/20jul13_20jul10_B0_stay1_NOINTERMR_cycle__step_4_poshist.png
+
+much more bias than sim with intermediate rewards
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP','EMSTAY'],lclr=['r','b','g'],plotindiv=True)
+xlabel('Time (ms)'); tl();
+savefig('gif/'+dstr+simstr+'all_avg_weight.png') # gif/20jul13_20jul10_B0_stay1_NOINTERMR_cycle__step_4_all_avg_weight.png
+
+fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4',showflow=False)
+gif/20jul13_20jul10_B0_stay1_NOINTERMR_cycle__step_4__input.mp4
+
