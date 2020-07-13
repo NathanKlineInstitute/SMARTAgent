@@ -11451,3 +11451,32 @@ running on falcor...
 
 started ~22:58 ...
 
+*20jul13
+** check output from run on falcor
+
+python -i simdat.py backupcfg/20jul10_C0_stay1_RLantitoo_falcor_sim.json
+
+plotFollowBall(actreward,ax=subplot(1,3,1),cumulative=True,color='k');  ylim((0,.75))
+plotHitMiss(actreward,ax=subplot(1,3,2),lclr=['k'],asratio=True); ylim((0,.75))
+plotScoreMiss(actreward,ax=subplot(1,3,3),clr='k',asratio=True); ylim((0,.75))
+savefig('gif/'+dstr+simstr+'perf.png') # gif/20jul13_20jul10_C0_stay1_RLantitoo_falcor_perf.png
+not improving much...but should compare to same sim without the antihebbRL ...
+
+
+clf(); drawraster(dspkT,dspkID)
+xlim((790e3,800e3))
+savefig('gif/'+dstr+simstr+'rast.png') # gif/20jul13_20jul10_C0_stay1_RLantitoo_falcor_rast.png
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','EMSTAY','IM'],tlim=(790e3,800e3))
+savefig('gif/'+dstr+simstr+'Vm.png') # gif/20jul13_20jul10_C0_stay1_RLantitoo_falcor_Vm.png
+
+#clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP','EMSTAY'],lclr=['r','b','g'],plotindiv=True)
+
+clf(); dobjpos = loadObjPos() ## 
+xlabel('Racket Y position'); hist(dobjpos['racket'][:,1])
+savefig('gif/'+dstr+simstr+'poshist.png') # gif/20jul13_20jul10_C0_stay1_RLantitoo_falcor_poshist.png
+
+fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4',showflow=False) # gif/20jul13_20jul10_C0_stay1_RLantitoo_falcor__input.mp4
+
+ok, will compare to data on cycle ...
+
