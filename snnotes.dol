@@ -11582,3 +11582,4 @@ savefig('gif/'+dstr+simstr+'all_avg_weight.png') # gif/20jul13_20jul10_B0_stay1_
 fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4',showflow=False)
 gif/20jul13_20jul10_B0_stay1_NOINTERMR_cycle__step_4__input.mp4
 
+** stopped sims since performance seems worse than earlier versions
