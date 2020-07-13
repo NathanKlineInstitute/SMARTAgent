@@ -1,23 +1,20 @@
-
-{
-    "env":  {"name": "PongNoFrameskip-v4", "savemp4":0},    
-    "moves": {"UP": 4,"DOWN":3, "NOMOVE":1},
-    "movecodes": [1,3,4],
-    "movefctr": 1.0,
-    "rewardcodes": {"scorePoint": 1.0, "losePoint": -0.1, "followTarget": 0.1, "avoidTarget": -0.01, "hitBall": 0.5},    
-    "actionsPerPlay": 1,
-    "followOnlyTowards": 1,
-    "useRacketPredictedPos": 1,
-    "DirectionDetectionAlgo":{"CentroidTracker":1,"OpticFlow":0,"FlowWidth":16,"UseFull":1},
-    "verbose": 0,
-    "simtype": {"ResumeSim":1,"ResumeSimFromFile":"data/20jun29_G2_cycle_synWeights_final.pkl"}, 
-    "sim": {"duration": 800000, "dt": 0.2, "verbose": 0, "recordStep":0.6,"recordWeightStepSize":250,"normalizeWeightStepSize":900000,"RLFakeUpRule": 0,"RLFakeDownRule": 0,"RLFakeStayRule": 0,"name":"20jun30_H0_cycle_","doquit":1,"doplot":0,"saveCellSecs":0,"saveCellConns":0,"targettedRL":1,"tstepPerAction":100,"saveWeights":1},
-    "architecturePreMtoM": {"useProbabilistic":1,"useTopological":0},
-    "net":{"scale":1,"ER":400,"IR":100,"EV1":400,"EV1DE":400,"EV1DNE":400,"EV1DN":400,"EV1DNW":400,"EV1DW":400,"EV1DSW":400,"EV1DS":400,"EV1DSE":400,"IV1":100,"EV4":0,"IV4":0,"EMT":0,"IMT":0,"EMDOWN":32,"EMUP":32,"IM":16,"AngRFSigma":22.5,"DirMinRate":0.0,"DirMaxRate":50.0,"EEMWghtAM":0.000012,"EEMWghtNM":0.0000012,"EEPreMWghtAM":0.00008,"EEPreMWghtNM":0.0000025,"EEMWghtThreshMin":0.00000625,"EEMWghtThreshMax":0.00032,"EEMProb":1.0,"EEMRecProb":0.0,"EEPreMProb":0.0,"EEMPopNorm":0,"EEMRecProbCross":0,"EEMFeedbackProb":0.0,"EEMFeedbackWghtAM":0.0000125,"EEMFeedbackWghtNM":0.00000125,"VisualFeedback":0,"weightVar":0.1},
-    "RL":{"AMPA":
-	  {"wbase":0.0000001,"wmax":0.00048,"RLon":1,"RLlenhebb":200,"RLlenanti":50,"useRLexp":1,"RLhebbwt":0.0000002,"RLantiwt":-0.0,"hebbwt":0,"antiwt":0,"tauhebb":10,"RLwindhebb":50,"softthresh":0,"verbose":0},
-	  "NMDA":
-	  {"wbase":0.000001,"wmax":0.000075,"RLon":0,"RLlenhebb":800,"RLlenanti":100,"useRLexp":1,"RLhebbwt":0.000004,"RLantiwt":-0.0,"hebbwt":0,"antiwt":0,"tauhebb":10,"RLwindhebb":50,"softthresh":1,"verbose":0}
-	 },
-    "Noise":{"I":{"Rate":0,"Weight":0.00001},"E":{"Rate":0,"Weight":0.00001}}
+{"env":
+ {"name": "Pong-v0", "frameskip":2, "savemp4": 0},
+ "moves": {"UP": 4, "DOWN": 3, "NOMOVE": 1},
+ "movecodes": [1, 3, 4],
+ "movefctr": 1.0,
+ "rewardcodes": {"scorePoint": 1.0, "losePoint": -0.1, "followTarget": 0.1, "avoidTarget": -0.01, "hitBall": 0.5},
+ "actionsPerPlay": 1,
+ "followOnlyTowards": 1,
+ "useRacketPredictedPos": 1,
+ "stayStepLim": 1,
+ "DirectionDetectionAlgo": {"CentroidTracker": 1, "OpticFlow": 0, "FlowWidth": 16, "UseFull": 1},
+ "verbose": 0,
+ "simtype": {"ResumeSim": 0, "ResumeSimFromFile": "data/20jul6_A0_cycle_synWeights_final.pkl"},
+ "sim": {"duration": 1600000, "dt": 0.2, "verbose": 0, "recordStep": 0.6, "recordWeightStepSize": 250, "normalizeWeightStepSize": 900000, "RLFakeUpRule": 0, "RLFakeDownRule": 0, "RLFakeStayRule": 0, "name": "20jul8_A0_cycle_", "doquit": 1, "doplot": 0, "saveCellSecs": 0, "saveCellConns": 0, "targettedRL": 1, "tstepPerAction": 20, "saveWeights": 1},
+ "architecturePreMtoM": {"useProbabilistic": 1, "useTopological": 0},
+ "net": {"scale": 1, "ER": 400, "IR": 100, "EV1": 400, "EV1DE": 400, "EV1DNE": 400, "EV1DN": 400, "EV1DNW": 400, "EV1DW": 400, "EV1DSW": 400, "EV1DS": 400, "EV1DSE": 400, "IV1": 100, "EV4": 0, "IV4": 0, "EMT": 0, "IMT": 0, "EMDOWN": 32, "EMUP": 32, "EMSTAY": 32, "IM": 24, "AngRFSigma": 22.5, "DirMinRate": 0.0, "DirMaxRate": 50.0, "EEMWghtAM": 1.2e-05, "EEMWghtNM": 1.2e-06, "EEPreMWghtAM": 8e-05, "EEPreMWghtNM": 2.5e-06, "EEMWghtThreshMin": 6.25e-06, "EEMWghtThreshMax": 0.00032, "EEMProb": 1.0, "EEMRecProb": 0.07, "EEPreMProb": 0.0, "EEMPopNorm": 0, "EEMRecProbCross": 1, "EEMFeedbackProb": 0.05, "EEMFeedbackWghtAM": 1.2e-05, "EEMFeedbackWghtNM": 1.2e-06, "VisualFeedback": 0, "weightVar": 0.4},
+ "RL": {"AMPA": {"wbase": 1e-08, "wmax": 0.00048, "RLon": 1, "RLlenhebb": 200, "RLlenanti": 200, "useRLexp": 1, "RLhebbwt": 2e-07, "RLantiwt": -0.0, "hebbwt": 0, "antiwt": 0, "tauhebb": 10, "RLwindhebb": 50, "softthresh": 0, "verbose": 0},
+	"NMDA": {"wbase": 1e-06, "wmax": 7.5e-05, "RLon": 0, "RLlenhebb": 800, "RLlenanti": 100, "useRLexp": 1, "RLhebbwt": 4e-06, "RLantiwt": -0.0, "hebbwt": 0, "antiwt": 0, "tauhebb": 10, "RLwindhebb": 50, "softthresh": 1, "verbose": 0}},
+ "Noise": {"I": {"Rate": 0, "Weight": 1e-05}, "E": {"Rate": 0, "Weight": 1e-05}}
 }
