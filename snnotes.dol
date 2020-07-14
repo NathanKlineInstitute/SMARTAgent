@@ -11692,3 +11692,14 @@ python multistepSim.py sn.json 32 10 20jul14_MultiTestS4Continue
 
 started ~16:21 ...
 
+** comparison with weight norm
+
+"name": "20jul14_cont_with_norm_20jul3_S4_cycle__step_3_"
+
+"normalizeWeightStepSize":20000  <<-- that means weight norm every 400 s ... 
+and "EEMPopNorm":1 <<-- that means use average weight to rescale both populations' weights to initial weight, but preserving relative values
+
+python multistepSim.py sn.json 32 10 20jul14_MultiTestS4ContinueNorm
+
+started ~16:29 ...
+
