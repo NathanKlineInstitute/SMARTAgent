@@ -11583,13 +11583,49 @@ fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4',showflow=False)
 gif/20jul13_20jul10_B0_stay1_NOINTERMR_cycle__step_4__input.mp4
 
 ** stopped sims since performance seems worse than earlier versions
-** better w/o EMSTAY??
+** better w/o EMSTAY?? (20jul13_N0_cycle_)
 
-20jul13_N0_cycle_
 also try longer step size for moves and RLantiwt too ...
 
-python -i simdat.py backupcfg/20jul13_cycle_sim.json
+*20jul14
+** check output from 20jul13_N0_cycle_
+
+python -i simdat.py backupcfg/20jul13_N0_cycle_sim.json
 
 plotFollowBall(actreward,ax=subplot(1,3,1),cumulative=True,color='k');  ylim((0,.75))
 plotHitMiss(actreward,ax=subplot(1,3,2),lclr=['k'],asratio=True); ylim((0,.75))
 plotScoreMiss(actreward,ax=subplot(1,3,3),clr='k',asratio=True); ylim((0,.75))
+
+savefig('gif/'+dstr+simstr+'perf.png') # gif/20jul14_20jul13_N0_cycle_perf.png
+
+decent for follow prob - others pretty low (hit, score)
+
+clf(); drawraster(dspkT,dspkID); xlim((790e3,800e3)); #
+savefig('gif/'+dstr+simstr+'rast.png') # gif/20jul14_20jul13_N0_cycle_rast.png
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','IM'],tlim=(790e3,800e3)); 
+savefig('gif/'+dstr+simstr+'Vm.png'); # gif/20jul14_20jul13_N0_cycle_Vm.png
+
+#
+clf(); dobjpos = loadObjPos() ## 
+xlabel('Racket Y position'); hist(dobjpos['racket'][:,1])
+savefig('gif/'+dstr+simstr+'poshist.png') # 
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP','EMSTAY'],lclr=['r','b','g'],plotindiv=True)
+xlabel('Time (ms)'); tl();
+savefig('gif/'+dstr+simstr+'all_avg_weight.png') # gif/20jul13_20jul10_B0_stay1_NOINTERMR_cycle__step_4_all_avg_weight.png
+
+fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4',showflow=False)
+gif/20jul14_20jul13_N0_cycle__input.mp4
+
+stuck a lot ... 
+
+can continue ...
+
+"name": "20jul14_N1_cycle_"
+ "simtype": {"ResumeSim": 1, "ResumeSimFromFile": "data/20jul13_N0_cycle_synWeights_final.pkl"},
+
+./myrun 32 sn.json
+
+started ~10:27 ...
+
