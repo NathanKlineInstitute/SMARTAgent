@@ -11583,3 +11583,13 @@ fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4',showflow=False)
 gif/20jul13_20jul10_B0_stay1_NOINTERMR_cycle__step_4__input.mp4
 
 ** stopped sims since performance seems worse than earlier versions
+** better w/o EMSTAY??
+
+20jul13_N0_cycle_
+also try longer step size for moves and RLantiwt too ...
+
+python -i simdat.py backupcfg/20jul13_cycle_sim.json
+
+plotFollowBall(actreward,ax=subplot(1,3,1),cumulative=True,color='k');  ylim((0,.75))
+plotHitMiss(actreward,ax=subplot(1,3,2),lclr=['k'],asratio=True); ylim((0,.75))
+plotScoreMiss(actreward,ax=subplot(1,3,3),clr='k',asratio=True); ylim((0,.75))
