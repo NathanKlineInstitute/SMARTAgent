@@ -11686,7 +11686,9 @@ could continue that one too ...
 
 20jul3_S4_cycle__step_3_sim.json
 
+"name": "20jul14_cont_20jul3_S4_cycle__step_3_"
+
 python multistepSim.py sn.json 32 10 20jul14_MultiTestS4Continue
 
-started ~16:18 ...
+started ~16:21 ...
 
