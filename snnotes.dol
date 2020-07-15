@@ -11780,5 +11780,58 @@ try a quick test ...
 
 ./myrun 60 sn.json
 
+  Simulated time: 2.0 s; 60 workers
+  Run time: 35.17 s
+
 seemed to work ... pretty fast ...
+
+is it faster with fewer cores?
+
+./myrun 32 sn.json
+
+  Simulated time: 2.0 s; 32 workers
+  Run time: 35.72 s
+
+was the same duration ...
+
+and with 16 cores?
+
+./myrun 16 sn.json
+
+  Simulated time: 2.0 s; 16 workers
+  Run time: 37.38 s
+
+so just slightly slower with 16 cores ... not really noticeable difference ...
+
+so at current scale could run ~4 simulations each with 16 cores ... or could run larger
+simulation ... see if that improves performance ...
+
+python -i simdat.py backupcfg/20jul14_testG0_gcp_sim.json
+
+try with 4X larger EMDOWN, EMUP, EMSTAY, IM ... (128, 128, 128, 96)
+
+./myrun 60 sn.json
+
+  Simulated time: 2.0 s; 60 workers
+  Run time: 102.29 s
+
+same speed with 32 cores?
+
+./myrun 32 sn.json
+
+  Simulated time: 2.0 s; 32 workers
+  Run time: 113.94 s
+
+yeah, similar duration ... slightly slower ...
+
+would take ~25 hours to run 1600 s sim ... could compare weight norm to without weight norm on
+the larger output pop size ... well, can run for 800 s ... to avoid overusing on a prelim test
+
+will need higher weightvar ... 0.5?
+
+ok ...
+
+"name": "20jul14_testG0_nonorm_gcp_"
+
+./myrun 30 sn.json
 
