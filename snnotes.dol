@@ -11583,3 +11583,165 @@ fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4',showflow=False)
 gif/20jul13_20jul10_B0_stay1_NOINTERMR_cycle__step_4__input.mp4
 
 ** stopped sims since performance seems worse than earlier versions
+** better w/o EMSTAY?? (20jul13_N0_cycle_)
+
+also try longer step size for moves and RLantiwt too ...
+
+*20jul14
+** check output from 20jul13_N0_cycle_
+
+python -i simdat.py backupcfg/20jul13_N0_cycle_sim.json
+
+plotFollowBall(actreward,ax=subplot(1,3,1),cumulative=True,color='k');  ylim((0,.75))
+plotHitMiss(actreward,ax=subplot(1,3,2),lclr=['k'],asratio=True); ylim((0,.75))
+plotScoreMiss(actreward,ax=subplot(1,3,3),clr='k',asratio=True); ylim((0,.75))
+
+savefig('gif/'+dstr+simstr+'perf.png') # gif/20jul14_20jul13_N0_cycle_perf.png
+
+decent for follow prob - others pretty low (hit, score)
+
+clf(); drawraster(dspkT,dspkID); xlim((790e3,800e3)); #
+savefig('gif/'+dstr+simstr+'rast.png') # gif/20jul14_20jul13_N0_cycle_rast.png
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','IM'],tlim=(790e3,800e3)); 
+savefig('gif/'+dstr+simstr+'Vm.png'); # gif/20jul14_20jul13_N0_cycle_Vm.png
+
+#
+clf(); dobjpos = loadObjPos() ## 
+xlabel('Racket Y position'); hist(dobjpos['racket'][:,1])
+savefig('gif/'+dstr+simstr+'poshist.png') # 
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP','EMSTAY'],lclr=['r','b','g'],plotindiv=True)
+xlabel('Time (ms)'); tl();
+savefig('gif/'+dstr+simstr+'all_avg_weight.png') # gif/20jul13_20jul10_B0_stay1_NOINTERMR_cycle__step_4_all_avg_weight.png
+
+fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4',showflow=False)
+gif/20jul14_20jul13_N0_cycle__input.mp4
+
+stuck a lot ... 
+
+can continue ...
+
+"name": "20jul14_N1_cycle_"
+ "simtype": {"ResumeSim": 1, "ResumeSimFromFile": "data/20jul13_N0_cycle_synWeights_final.pkl"},
+
+./myrun 32 sn.json
+
+started ~10:27 ...
+
+finished ~15:30 ...
+
+python -i simdat.py backupcfg/20jul14_N1_cycle_sim.json
+
+plotFollowBall(actreward,ax=subplot(1,3,1),cumulative=True,color='k');  ylim((0,.75))
+plotHitMiss(actreward,ax=subplot(1,3,2),lclr=['k'],asratio=True); ylim((0,.75))
+plotScoreMiss(actreward,ax=subplot(1,3,3),clr='k',asratio=True); ylim((0,.75))
+
+savefig('gif/'+dstr+simstr+'perf.png') # gif/20jul14_20jul14_N1_cycle_perf.png
+
+clf(); drawraster(dspkT,dspkID); xlim((790e3,800e3)); #
+savefig('gif/'+dstr+simstr+'rast.png') # gif/20jul14_20jul14_N1_cycle_rast.png
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','IM'],tlim=(790e3,800e3)); 
+savefig('gif/'+dstr+simstr+'Vm.png'); # gif/20jul14_20jul14_N1_cycle_Vm.png
+
+#
+clf(); dobjpos = loadObjPos() ## 
+xlabel('Racket Y position'); hist(dobjpos['racket'][:,1])
+savefig('gif/'+dstr+simstr+'poshist.png') # gif/20jul14_20jul14_N1_cycle_poshist.png
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP','EMSTAY'],lclr=['r','b','g'],plotindiv=True)
+xlabel('Time (ms)'); tl();
+savefig('gif/'+dstr+simstr+'all_avg_weight.png') # gif/20jul14_20jul14_N1_cycle_all_avg_weight.png
+
+lfn = ['20jul13_N0_cycle_', '20jul14_N1_cycle_']
+lfn = ['data/'+x+'ActionsRewards.txt' for x in lfn]
+pdac = getconcatactionreward(lfn)
+
+plotFollowBall(pdac,ax=subplot(1,3,1),cumulative=True,color='k');  ylim((0,.75))
+plotHitMiss(pdac,ax=subplot(1,3,2),lclr=['k'],asratio=True); ylim((0,.75))
+plotScoreMiss(pdac,ax=subplot(1,3,3),clr='k',asratio=True); ylim((0,.75))
+
+savefig('gif/'+dstr+simstr+'perf_all_steps_so_far.png') # gif/20jul14_20jul14_N1_cycle_perf_all_steps_so_far.png
+
+does not look terribly good ... previous versions were better ...
+
+fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4',showflow=False)
+
+** continue previous sim that was doing better?
+
+  -rw-rw-r-- 1 samn samn    111122 Jun 29 10:41 20jun29_20jun27_G1_cycle_perf_compare_step0_step1.png
+  -rw-rw-r-- 1 samn samn     99241 Jun 29 10:11 20jun29_20jun27_G1_cycle_perf_step0_step1.png
+  20jun29_20jun27_G1_cycle_perf.png
+20jun29_20jun27_G1_cycle_rastB.png
+
+problem was that rates seemed to get too high ... and never finished testing the weight norm
+
+hmm, this one was good too:
+ 20jul6_20jul3_S4_cycle__step_3_perf.png
+
+had stopped it since thought there was a bug in command encoding ...
+
+could continue that one too ...
+
+20jul3_S4_cycle__step_3_sim.json
+
+"name": "20jul14_cont_20jul3_S4_cycle__step_3_"
+
+python multistepSim.py sn.json 32 10 20jul14_MultiTestS4Continue
+
+started ~16:21 ...
+
+** comparison with weight norm
+
+"name": "20jul14_cont_with_norm_20jul3_S4_cycle__step_3_"
+
+"normalizeWeightStepSize":20000  <<-- that means weight norm every 400 s ... 
+and "EEMPopNorm":1 <<-- that means use average weight to rescale both populations' weights to initial weight, but preserving relative values
+
+python multistepSim.py sn.json 32 10 20jul14_MultiTestS4ContinueNorm
+
+started ~16:29 ...
+
+** setting up on gcp
+
+created an ubuntu (20 LTS) c2 instance with 60 cores
+
+trying to get chrome remote desktop :
+https://cloud.google.com/solutions/chrome-desktop-remote-on-compute-engine
+
+first ssh into the VM ... 
+
+sudo apt update
+sudo apt-get install --assume-yes wget
+
+mkdir Downloads
+cd Downloads
+wget https://dl.google.com/linux/direct/chrome-remote-desktop_current_amd64.deb
+
+sudo dpkg --install chrome-remote-desktop_current_amd64.deb
+sudo apt install --assume-yes --fix-broken
+
+sudo DEBIAN_FRONTEND=noninteractive \
+    apt install --assume-yes xfce4 desktop-base
+
+sudo bash -c 'echo "exec /etc/X11/Xsession /usr/bin/xfce4-session" > /etc/chrome-remote-desktop-session'
+
+sudo apt install --assume-yes xscreensaver
+
+sudo systemctl disable lightdm.service
+
+wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+
+sudo dpkg --install google-chrome-stable_current_amd64.deb
+sudo apt install --assume-yes --fix-broken
+
+sudo usermod -a -G chrome-remote-desktop $USER
+logout
+
+then after copying auth code to shell can login here:
+
+https://remotedesktop.google.com/
+
+seems to work !
+
