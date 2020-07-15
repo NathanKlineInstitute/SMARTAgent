@@ -11835,3 +11835,15 @@ ok ...
 
 ./myrun 30 sn.json
 
+started ~22:38 ...
+
+and another with weight norm every 400 s
+
+"name": "20jul14_testG0_yesnorm_gcp_"
+"normalizeWeightStepSize": 20000
+"EEMPopNorm": 1
+
+./myrun 30 sn.json
+
+started ~22:44 ...
+
