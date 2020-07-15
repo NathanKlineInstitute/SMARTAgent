@@ -11745,3 +11745,40 @@ https://remotedesktop.google.com/
 
 seems to work !
 
+ok, now that on gcp ...
+
+setup ssh keys and added to github profile
+
+cloned the repo
+
+git clone git@github.com:NathanKlineInstitute/SMARTAgent.git
+git branch development
+git checkout development
+git pull origin development
+
+https://medium.com/google-cloud/set-up-anaconda-under-google-cloud-vm-on-windows-f71fc1064bd7
+
+cd ~/Downloads
+wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
+bash Miniconda3-latest-Linux-x86_64.sh
+rm Miniconda3-latest-Linux-x86_64.sh
+source ~/.bashrc
+
+then onward with the install.txt instructions (should be same as for cycle)
+
+also had to do this:
+sudo apt-get install build-essential
+to compile with nrnivmodl ...
+
+and make sure to set LD_LIBRARY_PATH in .bashrc
+
+export LD_LIBRARY_PATH="/home/ext_samnemo_gmail_com/miniconda3/lib"
+
+try a quick test ...
+
+"name": "20jul14_testG0_gcp_"
+
+./myrun 60 sn.json
+
+seemed to work ... pretty fast ...
+
