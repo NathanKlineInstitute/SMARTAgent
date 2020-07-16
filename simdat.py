@@ -135,7 +135,7 @@ def loadsimdat (name=None,getactmap=True,lpop = allpossible_pops): # load simula
 
 #
 def animActivityMaps (outpath='gif/'+dconf['sim']['name']+'actmap.mp4', framerate=10, figsize=(18,10), dobjpos=None,\
-                      lpop=allpossible_pops):
+                      lpop=allpossible_pops, nframe=None):
   # plot activity in different layers as a function of input images  
   ioff()
   possible_pops = ['ER','EV1','EV4','EMT','IR','IV1','IV4','IMT','EV1DW','EV1DNW','EV1DN'\
@@ -210,7 +210,8 @@ def animActivityMaps (outpath='gif/'+dconf['sim']['name']+'actmap.mp4', framerat
         idx += 1
     return fig
   t1 = range(0,totalDur,tstepPerAction)
-  ani = animation.FuncAnimation(fig, updatefig, interval=1, frames=len(t1)-1)
+  if nframe is None: nframe = len(t1) - 1
+  ani = animation.FuncAnimation(fig, updatefig, interval=1, frames=nframe)
   writer = anim.getwriter(outpath, framerate=framerate)
   ani.save(outpath, writer=writer); print('saved animation to', outpath)
   ion()

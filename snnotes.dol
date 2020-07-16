@@ -11985,3 +11985,158 @@ and 43 vs 67 hits ... so can stop this one ...
 ok - stopped 20jul15_testH0_gcp_ since it's not doing as well and seems to be slowing down
 the other sim...
 
+*20jul16
+** check output on cycle
+
+python -i simdat.py backupcfg/20jul14_cont_20jul3_S4_cycle__step_3__step_0_sim.json
+
+plotFollowBall(actreward,ax=subplot(1,3,1),cumulative=True,color='k');  ylim((0,1.))
+plotHitMiss(actreward,ax=subplot(1,3,2),lclr=['k'],asratio=True); ylim((0,1.))
+plotScoreMiss(actreward,ax=subplot(1,3,3),clr='k',asratio=True); ylim((0,1.))
+
+savefig('gif/'+dstr+simstr+'perf.png') # gif/20jul16_20jul14_cont_20jul3_S4_cycle__step_3__step_0_perf.png
+
+looks pretty good for most measures except for score/miss ... others seem at ~highest levels seen
+
+and how does it compare to the one with weight normalization?
+
+actN = pd.DataFrame(np.loadtxt('data/20jul14_cont_with_norm_20jul3_S4_cycle__step_3__step_0_ActionsRewards.txt'),columns=['time','action','reward','proposed','hit'])
+
+clf()
+plotFollowBall(actreward,ax=subplot(1,3,1),cumulative=True,color='b');  ylim((0,1.))
+plotHitMiss(actreward,ax=subplot(1,3,2),lclr=['b'],asratio=True); ylim((0,1.))
+plotScoreMiss(actreward,ax=subplot(1,3,3),clr='b',asratio=True); ylim((0,1.))
+plotFollowBall(actN,ax=subplot(1,3,1),cumulative=True,color='r');  ylim((0,1.))
+plotHitMiss(actN,ax=subplot(1,3,2),lclr=['r'],asratio=True); ylim((0,1.))
+plotScoreMiss(actN,ax=subplot(1,3,3),clr='r',asratio=True); ylim((0,1.))
+
+savefig('gif/'+dstr+simstr+'perf_compare_norm_no_norm.png') # gif/20jul16_20jul14_cont_20jul3_S4_cycle__step_3__step_0_perf_compare_norm_no_norm.png
+
+so weight norm might help a little for hit/miss and score/miss but only briefly ...
+
+and the full durations concatenated?
+
+lfn = ['20jun30_S0_cycle_', '20jun30_S1_cycle_', '20jun30_S2_cycle_', '20jul2_S3_cycle_', '20jul3_S4_cycle__step_0_','20jul3_S4_cycle__step_1_','20jul3_S4_cycle__step_2_','20jul3_S4_cycle__step_3_','20jul14_cont_20jul3_S4_cycle__step_3__step_0_']
+lfn = ['data/'+x+'ActionsRewards.txt' for x in lfn]
+pdac = getconcatactionreward(lfn)
+
+plotFollowBall(pdac,ax=subplot(1,1,1),cumulative=True,color='b');  ylim((0,.45))
+plotHitMiss(pdac,ax=subplot(1,1,1),lclr=['g'],asratio=True); ylim((0,.45))
+plotScoreMiss(pdac,ax=subplot(1,1,1),clr='r',asratio=True); ylim((0,.45))
+
+savefig('gif/'+dstr+simstr+'perf_all_steps_so_far.png') # gif/20jul16_20jul14_cont_20jul3_S4_cycle__step_3__step_0_perf_all_steps_so_far.png
+
+clf(); drawraster(dspkT,dspkID); xlim((1590e3,1600e3)); ylim((0,sum(list(dnumc.values())))); #
+savefig('gif/'+dstr+simstr+'rast.png') # gif/20jul16_20jul14_cont_20jul3_S4_cycle__step_3__step_0_rast.png
+
+xlim((1599e3,1600e3))
+savefig('gif/'+dstr+simstr+'rastB.png')
+gif/20jul16_20jul14_cont_20jul3_S4_cycle__step_3__step_0_rastB.png
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','EMSTAY','IM'],tlim=(1590e3,1600e3)); 
+savefig('gif/'+dstr+simstr+'Vm.png'); # gif/20jul16_20jul14_cont_20jul3_S4_cycle__step_3__step_0_Vm.png
+xlim((1599e3,1600e3))
+savefig('gif/'+dstr+simstr+'VmB.png')
+gif/20jul16_20jul14_cont_20jul3_S4_cycle__step_3__step_0_VmB.png
+
+#
+clf(); dobjpos = loadObjPos() ## 
+xlabel('Racket Y position'); hist(dobjpos['racket'][:,1])
+savefig('gif/'+dstr+simstr+'poshist.png') # 'gif/'+dstr+simstr+'poshist.png'
+gif/20jul16_20jul14_cont_20jul3_S4_cycle__step_3__step_0_poshist.png
+
+fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4',showflow=False)
+gif/20jul16_20jul14_cont_20jul3_S4_cycle__step_3__step_0__input.mp4
+performs pretty well on some of the volleys ... but still makes the usual mistakes ... 
+
+lpop = ['ER', 'EV1DNW', 'EV1DN', 'EV1DNE','EV1', 'IR', 'EV1DW','EV1DE','IV1','EMUP','EV1DSW', 'EV1DS', 'EV1DSE','IM','EMDOWN', 'EMSTAY']  
+dact = getdActMap(totalDur, tstepPerAction, dspkT, dspkID, dnumc, dstartidx, lpop)
+fig, axs, plt = animActivityMaps(lpop=lpop)
+gif/20jul14_cont_20jul3_S4_cycle__step_3__step_0_actmap.mp4
+
+** setup google cloud sdk
+
+so can more easily download/uploads files, etc.
+
+https://cloud.google.com/sdk/docs#deb
+
+echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
+
+sudo apt-get install apt-transport-https ca-certificates gnupg
+
+curl --insecure https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key --keyring /usr/share/keyrings/cloud.google.gpg add -
+
+(--insecure on cycle/NKI machines since they use zscaler)
+
+sudo apt-get update && sudo apt-get install google-cloud-sdk
+
+gcloud init
+
+gcloud config set accessibility/screen_reader true
+
+hmm, not working properly on nki machine ... will try install from source instead ...
+
+downloaded
+https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-301.0.0-linux-x86_64.tar.gz
+to ~/Downloads
+cd ~/Downloads
+tar -xvf google-cloud-sdk-301.0.0-linux-x86_64.tar.gz
+sudo mv ~/Downloads/google-cloud-sdk /opt/
+cd /opt
+./google-cloud-sdk/install.sh
+
+./google-cloud-sdk/install.sh
+Welcome to the Google Cloud SDK!
+
+To help improve the quality of this product, we collect anonymized usage data
+and anonymized stacktraces when crashes are encountered; additional information
+is available at <https://cloud.google.com/sdk/usage-statistics>. This data is
+handled in accordance with our privacy policy
+<https://policies.google.com/privacy>. You may choose to opt in this
+collection now (by choosing 'Y' at the below prompt), or at any time in the
+future by running the following command:
+
+    gcloud config set disable_usage_reporting false
+
+Do you want to help improve the Google Cloud SDK (y/N)?  no
+
+ERROR: (gcloud.components.list) Failed to fetch component listing from server. Check your network settings and try again.
+
+hmm...problem ...
+
+/opt/google-cloud-sdk/bin/gcloud init
+
+/opt/google-cloud-sdk/bin/gcloud init
+Welcome! This command will take you through the configuration of gcloud.
+
+Your current configuration has been set to: [default]
+
+You can skip diagnostics next time by using the following flag:
+  gcloud init --skip-diagnostics
+
+Network diagnostic detects and fixes local network connection issues.
+Checking network connection...done.
+ERROR: Reachability Check failed.
+    Cannot reach https://www.google.com (SSLCertVerificationError)
+    Cannot reach https://accounts.google.com (SSLCertVerificationError)
+    Cannot reach https://cloudresourcemanager.googleapis.com/v1beta1/projects (SSLCertVerificationError)
+    Cannot reach https://www.googleapis.com/auth/cloud-platform (SSLCertVerificationError)
+    Cannot reach https://dl.google.com/dl/cloudsdk/channels/rapid/components-2.json (SSLCertVerificationError)
+Network connection problems may be due to proxy or firewall settings.
+
+
+Do you have a network proxy you would like to set in gcloud (Y/n)?  n
+
+ERROR: Network diagnostic failed (0/1 checks passed).
+
+Network errors detected.
+
+Would you like to continue anyway (y/N)?  n
+
+You can re-run diagnostics with the following command:
+  gcloud info --run-diagnostics
+
+looks like will be a problem installing/running on NKI machines
+
+will install on laptop instead, can then scp files as needed ...
+
