@@ -47,9 +47,13 @@ def readweightsfile2pdf (fn):
   return pd.DataFrame(A,columns=['time','preid','postid','weight'])
 
 #
-def readinweights (name):
+def readinweights (name,final=False):
   # read the synaptic plasticity weights associated with sim name into a pandas dataframe
-  return readweightsfile2pdf('data/'+name+'synWeights.pkl')
+  if final:
+    fn = 'data/'+name+'synWeights_final.pkl'
+  else:
+    fn = 'data/'+name+'synWeights.pkl'
+  return readweightsfile2pdf(fn)
 
 def savefinalweights (pdf, simstr):
   # save final weights to a (small) file
@@ -96,8 +100,13 @@ def loadsimdat (name=None,getactmap=True,lpop = allpossible_pops): # load simula
       dstartidx[p] = simConfig['net']['pops'][p]['cellGids'][0]
       dendidx[p] = simConfig['net']['pops'][p]['cellGids'][-1]
   pdf=None
-  try: pdf = readinweights(name) # if RL was off, no weights saved
-  except: pass
+  try:
+    pdf = readinweights(name) # if RL was off, no weights saved
+  except:
+    try:
+      pdf = readinweights(name,final=True)
+    except:
+      pass
   actreward = pd.DataFrame(np.loadtxt('data/'+name+'ActionsRewards.txt'),columns=['time','action','reward','proposed','hit'])
   dnumc = {}
   for p in simConfig['net']['pops'].keys():

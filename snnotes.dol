@@ -11847,3 +11847,63 @@ and another with weight norm every 400 s
 
 started ~22:44 ...
 
+*20jul15
+** runs on gcp finished ~21:48
+
+was not enough room on the disk image to save everything (only 20 GB in /, can probably increase
+space if needed); the synweights files were each ~5.7 GB ... 
+
+python -i simdat.py backupcfg/20jul14_testG0_nonorm_gcp_sim.json
+
+lfn = ['20jul14_testG0_nonorm_gcp_', '20jul14_testG0_yesnorm_gcp_']
+lfn = ['data/'+x+'ActionsRewards.txt' for x in lfn]
+lpda = getindivactionreward(lfn)
+
+#
+for pda,clr in zip(lpda,['b','r']):
+  plotFollowBall(pda,ax=subplot(1,3,1),cumulative=True,color=clr); ylim((0,0.35))
+  plotHitMiss(pda,ax=subplot(1,3,2),lclr=[clr],asratio=True); ylim((0,0.35))
+  plotScoreMiss(pda,ax=subplot(1,3,3),clr=clr,asratio=True); ylim((0,0.35))
+
+lpatch = [mpatches.Patch(color=c,label=s) for c,s in zip(['b','r'],['No norm @ 400 s','Norm @ 400 s'])]
+ax=gca()
+ax.legend(handles=lpatch,handlelength=1)
+
+savefig('gif/'+dstr+simstr+'perf_compare_yes_no_norm_a0.png') # gif/20jul16_20jul14_testG0_nonorm_gcp_perf_compare_yes_no_norm_a0.png
+
+so weight norm at 400 s may have helped a little...but performance is not better than smaller output layer
+
+clf(); drawraster(dspkT,dspkID); xlim((790e3,800e3)); #
+savefig('gif/'+dstr+simstr+'rast.png') # gif/20jul16_20jul14_testG0_nonorm_gcp_rast.png
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','EMSTAY','IM'],tlim=(790e3,800e3)); 
+savefig('gif/'+dstr+simstr+'Vm.png'); # gif/20jul16_20jul14_testG0_nonorm_gcp_Vm.png
+
+#
+clf(); dobjpos = loadObjPos() ## 
+xlabel('Racket Y position'); hist(dobjpos['racket'][:,1])
+savefig('gif/'+dstr+simstr+'poshist.png') # gif/20jul16_20jul14_testG0_nonorm_gcp_poshist.png
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP','EMSTAY'],lclr=['r','b','g'],plotindiv=True); xlabel('Time (ms)'); tl(); xlim((790e3,810e3)); savefig('gif/'+dstr+simstr+'all_avg_weight.png') # gif/20jul16_20jul14_testG0_nonorm_gcp_all_avg_weight.png
+
+name # 20jul14_testG0_nonorm_gcp_
+
+name = '20jul14_testG0_yesnorm_gcp_'
+
+simConfig, pdf, actreward, dstartidx, dendidx, dnumc, dspkID, dspkT, InputImages, ldflow, dact = loadsimdat(name,getactmap=False,lpop=lpop)
+
+simstr = '20jul14_testG0_yesnorm_gcp_'
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP','EMSTAY'],lclr=['r','b','g'],plotindiv=True)
+xlabel('Time (ms)'); tl(); xlim((790e3,810e3))
+savefig('gif/'+dstr+simstr+'all_avg_weight.png') # gif/20jul16_20jul14_testG0_yesnorm_gcp_all_avg_weight.png
+
+average weights look ~same as no norm, probably since dfctr was just a bit below 1 ...
+
+clf(); drawraster(dspkT,dspkID); xlim((790e3,800e3)); #
+savefig('gif/'+dstr+simstr+'rast.png') # gif/20jul16_20jul14_testG0_yesnorm_gcp_rast.png
+
+so, no point having a large output layer with full conn, since performance did not improve ...
+
+** try large output layer but not 100% conn?
+
