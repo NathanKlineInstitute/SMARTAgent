@@ -12199,4 +12199,76 @@ well, may as well continue ...
 ./myrun 30 sn.json
 
 started ~16:59 ...
+finished ~9:20 next day
+
+  Spikes: 14948607 (1.63 Hz)
+  Simulated time: 2000.0 s; 30 workers
+  Run time: 43836.70 s
+
+*20jul17
+** check output from 20jul16_testG1_gcp_
+
+python -i simdat.py backupcfg/20jul16_testG1_gcp_sim.json
+
+plotFollowBall(actreward,ax=subplot(1,1,1),cumulative=True,color='b');  ylim((0,.65))
+plotHitMiss(actreward,ax=subplot(1,1,1),lclr=['g'],asratio=True); ylim((0,.65))
+plotScoreMiss(actreward,ax=subplot(1,1,1),clr='r',asratio=True); ylim((0,.65))
+ylabel('Performance')
+lpatch = [mpatches.Patch(color=c,label=s) for c,s in zip(['b','g','r'],['Follow','Hit/Miss','Score/Miss'])]
+ax=gca()
+ax.legend(handles=lpatch,handlelength=1)
+savefig('gif/'+dstr+simstr+'perf.png') # gif/20jul17_20jul16_testG1_gcp_perf.png
+
+seems better ... yeah, improved a bit...
+
+lfn = ['20jul15_testG0_gcp_','20jul16_testG1_gcp_']
+lfn = ['data/'+x+'ActionsRewards.txt' for x in lfn]
+pdac = getconcatactionreward(lfn)
+
+plotFollowBall(pdac,ax=subplot(1,1,1),cumulative=True,color='b');  ylim((0,.35))
+plotHitMiss(pdac,ax=subplot(1,1,1),lclr=['g'],asratio=True); ylim((0,.35))
+plotScoreMiss(pdac,ax=subplot(1,1,1),clr='r',asratio=True); ylim((0,.35))
+lpatch = [mpatches.Patch(color=c,label=s) for c,s in zip(['b','g','r'],['Follow','Hit/Miss','Score/Miss'])]
+ax=gca()
+ax.legend(handles=lpatch,handlelength=1)
+
+savefig('gif/'+dstr+simstr+'perf_all_steps_so_far.png') # gif/20jul17_20jul16_testG1_gcp_perf_all_steps_so_far.png
+
+clf(); drawraster(dspkT,dspkID); xlim((1990e3,2000e3)); ylim((0,sum(list(dnumc.values())))); #
+savefig('gif/'+dstr+simstr+'rast.png') # gif/20jul17_20jul16_testG1_gcp_rast.png
+
+rates for EMUP,EMDOWN have increased, EMSTAY decreased
+
+xlim((1999e3,2000e3))
+savefig('gif/'+dstr+simstr+'rastB.png') # gif/20jul17_20jul16_testG1_gcp_rastB.png
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','EMSTAY','IM'],tlim=(1990e3,2000e3)); 
+savefig('gif/'+dstr+simstr+'Vm.png'); # gif/20jul17_20jul16_testG1_gcp_Vm.png
+
+#
+clf(); dobjpos = loadObjPos() ## 
+xlabel('Racket Y position'); hist(dobjpos['racket'][:,1])
+savefig('gif/'+dstr+simstr+'poshist.png') # gif/20jul17_20jul16_testG1_gcp_poshist.png
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP','EMSTAY'],lclr=['r','b','g'],plotindiv=True)
+xlabel('Time (ms)'); tl(); 
+savefig('gif/'+dstr+simstr+'all_avg_weight.png') # gif/20jul17_20jul16_testG1_gcp_all_avg_weight.png
+weights for EMDOWN,EMUP still rising, EMSTAY lower but rising slowly
+savefig('gif/'+dstr+simstr+'all_avg_weightB.png') # gif/20jul17_20jul16_testG1_gcp_all_avg_weightB.png
+
+fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4',showflow=False)
+gif/20jul17_20jul16_testG1_gcp__input.mp4
+
+#lpop = ['ER', 'EV1DNW', 'EV1DN', 'EV1DNE','EV1', 'IR', 'EV1DW','EV1DE','IV1','EMUP','EV1DSW', 'EV1DS', 'EV1DSE','IM','EMDOWN', 'EMSTAY']  
+#dact = getdActMap(totalDur, tstepPerAction, dspkT, dspkID, dnumc, dstartidx, lpop)
+#fig, axs, plt = animActivityMaps(lpop=lpop)
+
+ok, since it's been gradually improving, may as well continue this sim as multistep sim ...
+
+    "simtype": {"ResumeSim": 1, "ResumeSimFromFile": "data/20jul16_testG1_gcp_synWeights_final.pkl"},
+    "name": "20jul17_testG2_gcp_"
+
+python multistepSim.py sn.json 30 10 20jul17_testG2_gcp_multistep_
+
+started ~10:31 ...
 
