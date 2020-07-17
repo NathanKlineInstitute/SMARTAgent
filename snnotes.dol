@@ -12272,3 +12272,27 @@ python multistepSim.py sn.json 30 10 20jul17_testG2_gcp_multistep_
 
 started ~10:31 ...
 
+** setup gcloud sdk on laptop
+
+echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
+
+sudo apt-get install apt-transport-https ca-certificates gnupg
+
+curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key --keyring /usr/share/keyrings/cloud.google.gpg add -
+
+sudo apt-get update && sudo apt-get install google-cloud-sdk
+
+gcloud init
+
+gcloud config set accessibility/screen_reader true
+
+authenticated with gmail address via browser
+
+ Commands that require authentication will use samnemo@gmail.com by default
+ Commands will reference project `ecas-2019` by default
+ Compute Engine commands will use region `us-central1` by default
+ Compute Engine commands will use zone `us-central1-c` by default
+
+so now will more easily be able to transfer files ...
+
+gsutil -m cp -r gs://samn_data/SMARTAgent/gif/* ./gif/
