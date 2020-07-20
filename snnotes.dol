@@ -12591,7 +12591,19 @@ gif/20jul20_20jul14_cont_20jul3_S4_cycle__step_3__step_4_perf_all_steps_so_far.p
 
 ** use last weight norm sim on cycle to continue sim with less frequent weight norm
 
+cp backupcfg/20jul14_cont_with_norm_20jul3_S4_cycle__step_3__step_5_sim.json sn.json
 
+    "simtype": {"ResumeSim": 1, "ResumeSimFromFile": "data/20jul14_cont_with_norm_20jul3_S4_cycle__step_3__step_4_synWeights_final.pkl"},
+
+"name": "20jul20_cont_S_with_less_freq_norm_cycle_"
+"normalizeWeightStepSize": 75000
+that's norm every 1500 s
+also cutting down recording weight step size to 1/2 as frequent...:
+"recordWeightStepSize": 500
+
+python multistepSim.py sn.json 32 10 20jul20_MultiTestSContinueNormLessFreq
+
+started 15:43 ...
 
 ** use last weight norm sim on cycle to continue sim with no intermediate rewards
 
@@ -12602,4 +12614,3 @@ data/20jul14_cont_with_norm_20jul3_S4_cycle__step_3__step_4_synWeights_final.pkl
 
 will have to use longer time constant for RL ...
 
-other option would be to have less frequent weight norm and with same rewards ... should do that as well ... 
