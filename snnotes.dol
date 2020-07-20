@@ -12560,7 +12560,6 @@ savefig('gif/'+dstr+simstr+'Vm.png'); # gif/20jul20_20jul14_cont_20jul3_S4_cycle
 #
 clf(); dobjpos = loadObjPos() ## 
 xlabel('Racket Y position'); hist(dobjpos['racket'][:,1])
-<<<<<<< HEAD
 savefig('gif/'+dstr+simstr+'poshist.png') # gif/20jul20_20jul14_cont_20jul3_S4_cycle__step_3__step_4_poshist.png
 
 lfn = ['20jun30_S0_cycle_', '20jun30_S1_cycle_', '20jun30_S2_cycle_', '20jul2_S3_cycle_', '20jul3_S4_cycle__step_0_','20jul3_S4_cycle__step_1_','20jul3_S4_cycle__step_2_','20jul3_S4_cycle__step_3_','20jul14_cont_20jul3_S4_cycle__step_3__step_0_','20jul14_cont_20jul3_S4_cycle__step_3__step_1_','20jul14_cont_20jul3_S4_cycle__step_3__step_2_','20jul14_cont_20jul3_S4_cycle__step_3__step_3_','20jul14_cont_20jul3_S4_cycle__step_3__step_4_']
