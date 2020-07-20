@@ -12608,9 +12608,24 @@ started 15:43 ...
 ** use last weight norm sim on cycle to continue sim with no intermediate rewards
 
 see if using the final weights that had intermediate rewards can be used
-to bootstrap improved learning for hit/miss and score ...
+to bootstrap improved learning for hit/miss and score ... so there's partial
+intermediate reward (hit ball will still get a reward)
 
 data/20jul14_cont_with_norm_20jul3_S4_cycle__step_3__step_4_synWeights_final.pkl
 
-will have to use longer time constant for RL ...
+will have to use longer time constant for RL ... 
+
+    "simtype": {"ResumeSim": 1, "ResumeSimFromFile": "data/20jul14_cont_with_norm_20jul3_S4_cycle__step_3__step_4_synWeights_final.pkl"},
+"name": "20jul20_cont_S_with_less_freq_norm_lessintermr_cycle_"
+"normalizeWeightStepSize": 75000
+that's norm every 1500 s
+also cutting down recording weight step size to 1/2 as frequent...:
+"recordWeightStepSize": 500
+longer RL tau:
+"RLlenhebb": 1000 (instead of 200)
+    "rewardcodes": {"scorePoint": 1.0, "losePoint": -0.1, "followTarget": 0.0, "avoidTarget": 0.00, "hitBall": 0.5},
+    
+python multistepSim.py sn.json 32 10 20jul20_MultiTestSContinueNormLessFreqLessIntermR
+
+started ~16:00 ...
 
