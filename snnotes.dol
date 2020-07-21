@@ -12699,3 +12699,60 @@ python multistepSim.py sn.json 30 10 20jul20_MultiTestGCPContinueLessFreqLessInt
 
 started ~16:46 ...
 
+*20jul21
+** check continued output on GCP
+
+python -i simdat.py backupcfg/20jul20_testG3_gcp_lessintermR__step_0_sim.json
+
+plotFollowBall(actreward,ax=subplot(1,1,1),cumulative=True,color='b');  ylim((0,1.))
+plotHitMiss(actreward,ax=subplot(1,1,1),lclr=['g'],asratio=True); ylim((0,1.))
+plotScoreMiss(actreward,ax=subplot(1,1,1),clr='r',asratio=True); ylim((0,1.))
+ylabel('Performance')
+lpatch = [mpatches.Patch(color=c,label=s) for c,s in zip(['b','g','r'],['Follow','Hit/Miss','Score/Miss'])]
+ax=gca()
+ax.legend(handles=lpatch,handlelength=1)
+
+savefig('gif/'+dstr+simstr+'perf.png') # gif/20jul21_20jul20_testG3_gcp_lessintermR__step_0_perf.png
+performance looks ~same as before ... so changing reward values did not have a negative impact ...
+was hoping for positive impact ... well, hit/miss ratio is a little higher than before so that's
+possible evidence of improvement ... will have to run longer
+
+lfn = ['20jul15_testG0_gcp_','20jul16_testG1_gcp_', '20jul17_testG2_gcp__step_0_','20jul17_testG2_gcp__step_1_','20jul17_testG2_gcp__step_2_','20jul17_testG2_gcp__step_3_','20jul17_testG2_gcp__step_4_','20jul17_testG2_gcp__step_5_','20jul20_testG3_gcp_lessintermR__step_0_']
+lfn = ['data/'+x+'ActionsRewards.txt' for x in lfn]
+pdac = getconcatactionreward(lfn)
+
+np.amax(pdac.time) / (1e3*60*60) # 4.999999500000001
+so ~5 hours of training so far ... 
+
+plotFollowBall(pdac,ax=subplot(1,1,1),cumulative=True,color='b');  ylim((0,.45))
+plotHitMiss(pdac,ax=subplot(1,1,1),lclr=['g'],asratio=True); ylim((0,.45))
+plotScoreMiss(pdac,ax=subplot(1,1,1),clr='r',asratio=True); ylim((0,.45))
+lpatch = [mpatches.Patch(color=c,label=s) for c,s in zip(['b','g','r'],['Follow','Hit/Miss','Score/Miss'])]
+ax=gca()
+ax.legend(handles=lpatch,handlelength=1)
+ylabel('Performance')
+plot([np.amax(pdac.time)-2000e3,np.amax(pdac.time)-2000e3],[0,0.45],'--',color='gray')
+savefig('gif/'+dstr+simstr+'perf_all_steps_so_far.png') #
+gif/20jul21_20jul20_testG3_gcp_lessintermR__step_0_perf_all_steps_so_far.png
+
+clf(); drawraster(dspkT,dspkID); xlim((1990e3,2000e3)); ylim((0,sum(list(dnumc.values())))); #
+savefig('gif/'+dstr+simstr+'rast.png') # gif/20jul21_20jul20_testG3_gcp_lessintermR__step_0_rast.png
+
+xlim((1999e3,2000e3))
+savefig('gif/'+dstr+simstr+'rastB.png') # gif/20jul21_20jul20_testG3_gcp_lessintermR__step_0_rastB.png
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','EMSTAY','IM'],tlim=(1990e3,2000e3)); 
+savefig('gif/'+dstr+simstr+'Vm.png'); # gif/20jul21_20jul20_testG3_gcp_lessintermR__step_0_Vm.png
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP','EMSTAY'],lclr=['r','b','g'],plotindiv=True)
+xlabel('Time (ms)'); tl(); 
+savefig('gif/'+dstr+simstr+'all_avg_weight.png') #
+gif/20jul21_20jul20_testG3_gcp_lessintermR__step_0_all_avg_weight.png
+weights are changing but much more slowly ...
+savefig('gif/'+dstr+simstr+'all_avg_weightB.png') #
+gif/20jul21_20jul20_testG3_gcp_lessintermR__step_0_all_avg_weightB.png
+savefig('gif/'+dstr+simstr+'all_avg_weightC.png') #
+gif/20jul21_20jul20_testG3_gcp_lessintermR__step_0_all_avg_weightC.png
+
+fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4',showflow=False)
+
