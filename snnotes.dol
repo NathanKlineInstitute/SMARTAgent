@@ -12756,3 +12756,131 @@ gif/20jul21_20jul20_testG3_gcp_lessintermR__step_0_all_avg_weightC.png
 
 fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4',showflow=False)
 
+*20jul21
+** check output on cycle (less frequent weight norm)
+
+python -i simdat.py backupcfg/20jul20_cont_S_with_less_freq_norm_cycle__step_0_sim.json
+
+plotFollowBall(actreward,ax=subplot(1,1,1),cumulative=True,color='b');  ylim((0,1.))
+plotHitMiss(actreward,ax=subplot(1,1,1),lclr=['g'],asratio=True); ylim((0,1.))
+plotScoreMiss(actreward,ax=subplot(1,1,1),clr='r',asratio=True); ylim((0,1.))
+ylabel('Performance')
+lpatch = [mpatches.Patch(color=c,label=s) for c,s in zip(['b','g','r'],['Follow','Hit/Miss','Score/Miss'])]
+ax=gca()
+ax.legend(handles=lpatch,handlelength=1)
+
+savefig('gif/'+dstr+simstr+'perf.png') # gif/20jul21_20jul20_cont_S_with_less_freq_norm_cycle__step_0_perf.png
+does not seem better than the more frequent weight norm ... seems a bit worse ...
+
+clf(); drawraster(dspkT,dspkID); xlim((1590e3,1600e3)); ylim((0,sum(list(dnumc.values())))); #
+savefig('gif/'+dstr+simstr+'rast.png') # gif/20jul21_20jul20_cont_S_with_less_freq_norm_cycle__step_0_rast.png
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','EMSTAY','IM'],tlim=(1590e3,1600e3)); 
+savefig('gif/'+dstr+simstr+'Vm.png'); # gif/20jul21_20jul20_cont_S_with_less_freq_norm_cycle__step_0_Vm.png
+
+#
+clf(); dobjpos = loadObjPos() ## 
+xlabel('Racket Y position'); hist(dobjpos['racket'][:,1])
+savefig('gif/'+dstr+simstr+'poshist.png') # gif/20jul21_20jul20_cont_S_with_less_freq_norm_cycle__step_0_poshist.png
+
+lfn = ['20jun30_S0_cycle_', '20jun30_S1_cycle_', '20jun30_S2_cycle_', '20jul2_S3_cycle_', '20jul3_S4_cycle__step_0_','20jul3_S4_cycle__step_1_','20jul3_S4_cycle__step_2_','20jul3_S4_cycle__step_3_','20jul14_cont_20jul3_S4_cycle__step_3__step_0_','20jul14_cont_20jul3_S4_cycle__step_3__step_1_','20jul14_cont_20jul3_S4_cycle__step_3__step_2_','20jul14_cont_20jul3_S4_cycle__step_3__step_3_','20jul14_cont_20jul3_S4_cycle__step_3__step_4_','20jul20_cont_S_with_less_freq_norm_cycle__step_0_']
+lfn = ['data/'+x+'ActionsRewards.txt' for x in lfn]
+pdac = getconcatactionreward(lfn)
+
+plotFollowBall(pdac,ax=subplot(1,1,1),cumulative=True,color='b');  ylim((0,.45))
+plotHitMiss(pdac,ax=subplot(1,1,1),lclr=['g'],asratio=True); ylim((0,.45))
+plotScoreMiss(pdac,ax=subplot(1,1,1),clr='r',asratio=True); ylim((0,.45))
+plot([np.amax(pdac.time)-50e3,np.amax(pdac.time)-50e3],[0,0.45],'--',color='gray') # when weight norm applied last
+plot([np.amax(pdac.time)-1600e3,np.amax(pdac.time)-1600e3],[0,0.45],'--',color='black') # last step start
+ylabel('Performance',fontsize=30);
+xlabel('Time (ms)',fontsize=30)
+lpatch = [mpatches.Patch(color=c,label=s) for c,s in zip(['b','g','r'],['Follow','Hit/Miss','Score/Miss'])]
+ax=gca()
+ax.legend(handles=lpatch,handlelength=1,fontsize=30)
+tl()
+
+savefig('gif/'+dstr+simstr+'perf_all_steps_so_far.png') # gif/20jul21_20jul20_cont_S_with_less_freq_norm_cycle__step_0_perf_all_steps_so_far.png
+
+there might be a slight deflection upward in performance in last step of sim for follow
+target, but need more time to see if improves substantially...
+
+#clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP','EMSTAY'],lclr=['r','b','g'],plotindiv=True)
+#xlabel('Time (ms)',fontsize=30); ylabel('Average weight',fontsize=30); tl(); 
+#savefig('gif/'+dstr+simstr+'all_avg_weight.png') #
+
+#fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4',showflow=False) # 
+#lpop = ['ER', 'EV1DNW', 'EV1DN', 'EV1DNE','EV1', 'IR', 'EV1DW','EV1DE','IV1','EMUP','EV1DSW', 'EV1DS', 'EV1DSE','IM','EMDOWN', 'EMSTAY']  
+#dact = getdActMap(totalDur, tstepPerAction, dspkT, dspkID, dnumc, dstartidx, lpop)
+#fig, axs, plt = animActivityMaps(lpop=lpop)
+
+** check output on cycle (less intermediate reward)
+
+python -i simdat.py backupcfg/20jul20_cont_S_with_less_freq_norm_lessintermr_cycle__step_0_sim.json
+
+plotFollowBall(actreward,ax=subplot(1,1,1),cumulative=True,color='b');  ylim((0,1.))
+plotHitMiss(actreward,ax=subplot(1,1,1),lclr=['g'],asratio=True); ylim((0,1.))
+plotScoreMiss(actreward,ax=subplot(1,1,1),clr='r',asratio=True); ylim((0,1.))
+ylabel('Performance')
+lpatch = [mpatches.Patch(color=c,label=s) for c,s in zip(['b','g','r'],['Follow','Hit/Miss','Score/Miss'])]
+ax=gca()
+ax.legend(handles=lpatch,handlelength=1)
+savefig('gif/'+dstr+simstr+'perf.png') # gif/20jul21_20jul20_cont_S_with_less_freq_norm_lessintermr_cycle__step_0_perf.png
+
+clf(); drawraster(dspkT,dspkID); xlim((1590e3,1600e3)); ylim((0,sum(list(dnumc.values())))); #
+savefig('gif/'+dstr+simstr+'rast.png') # gif/20jul21_20jul20_cont_S_with_less_freq_norm_lessintermr_cycle__step_0_rast.png
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','EMSTAY','IM'],tlim=(1590e3,1600e3)); 
+savefig('gif/'+dstr+simstr+'Vm.png'); # gif/20jul21_20jul20_cont_S_with_less_freq_norm_lessintermr_cycle__step_0_Vm.png
+
+#
+clf(); dobjpos = loadObjPos() ## 
+xlabel('Racket Y position'); hist(dobjpos['racket'][:,1])
+savefig('gif/'+dstr+simstr+'poshist.png') # gif/20jul21_20jul20_cont_S_with_less_freq_norm_lessintermr_cycle__step_0_poshist.png
+
+lfn = ['20jun30_S0_cycle_', '20jun30_S1_cycle_', '20jun30_S2_cycle_', '20jul2_S3_cycle_', '20jul3_S4_cycle__step_0_','20jul3_S4_cycle__step_1_','20jul3_S4_cycle__step_2_','20jul3_S4_cycle__step_3_','20jul14_cont_20jul3_S4_cycle__step_3__step_0_','20jul14_cont_20jul3_S4_cycle__step_3__step_1_','20jul14_cont_20jul3_S4_cycle__step_3__step_2_','20jul14_cont_20jul3_S4_cycle__step_3__step_3_','20jul14_cont_20jul3_S4_cycle__step_3__step_4_','20jul20_cont_S_with_less_freq_norm_lessintermr_cycle__step_0_']
+lfn = ['data/'+x+'ActionsRewards.txt' for x in lfn]
+pdac = getconcatactionreward(lfn)
+
+plotFollowBall(pdac,ax=subplot(1,1,1),cumulative=True,color='b');  ylim((0,.45))
+plotHitMiss(pdac,ax=subplot(1,1,1),lclr=['g'],asratio=True); ylim((0,.45))
+plotScoreMiss(pdac,ax=subplot(1,1,1),clr='r',asratio=True); ylim((0,.45))
+plot([np.amax(pdac.time)-50e3,np.amax(pdac.time)-50e3],[0,0.45],'--',color='gray') # when weight norm applied last
+plot([np.amax(pdac.time)-1600e3,np.amax(pdac.time)-1600e3],[0,0.45],'--',color='black') # last step start
+ylabel('Performance',fontsize=30);
+xlabel('Time (ms)',fontsize=30)
+lpatch = [mpatches.Patch(color=c,label=s) for c,s in zip(['b','g','r'],['Follow','Hit/Miss','Score/Miss'])]
+ax=gca()
+ax.legend(handles=lpatch,handlelength=1,fontsize=30)
+tl()
+
+savefig('gif/'+dstr+simstr+'perf_all_steps_so_far.png') # gif/20jul21_20jul20_cont_S_with_less_freq_norm_lessintermr_cycle__step_0_perf_all_steps_so_far.png
+
+hmm, can not tell diff from other sim above ... overlay ...
+
+lfn = ['20jul20_cont_S_with_less_freq_norm_cycle__step_0_','20jul20_cont_S_with_less_freq_norm_lessintermr_cycle__step_0_']
+lfn = ['data/'+x+'ActionsRewards.txt' for x in lfn]
+lpda = getindivactionreward(lfn)
+
+#
+for pda,clr in zip(lpda,['b','r']):
+  plotFollowBall(pda,ax=subplot(1,3,1),cumulative=True,color=clr); ylim((0,1.))
+  plotHitMiss(pda,ax=subplot(1,3,2),lclr=[clr],asratio=True); ylim((0,1.))
+  plotScoreMiss(pda,ax=subplot(1,3,3),clr=clr,asratio=True); ylim((0,1.))
+
+lpatch = [mpatches.Patch(color=c,label=s) for c,s in zip(['b','r'],['All Interm Reward','Less Interm Reward'])]
+ax=gca()
+ax.legend(handles=lpatch,handlelength=1)
+
+savefig('gif/'+dstr+simstr+'perf_compare_less_interm_reward.png')
+gif/20jul21_20jul20_cont_S_with_less_freq_norm_lessintermr_cycle__step_0_perf_compare_less_interm_reward.png
+the one with no follow target reward seems to be doing better overall ... in terms of hit/miss and score
+
+#clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP','EMSTAY'],lclr=['r','b','g'],plotindiv=True)
+#xlabel('Time (ms)',fontsize=30); ylabel('Average weight',fontsize=30); tl(); 
+#savefig('gif/'+dstr+simstr+'all_avg_weight.png') #
+
+fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4',showflow=False) # 
+#lpop = ['ER', 'EV1DNW', 'EV1DN', 'EV1DNE','EV1', 'IR', 'EV1DW','EV1DE','IV1','EMUP','EV1DSW', 'EV1DS', 'EV1DSE','IM','EMDOWN', 'EMSTAY']  
+#dact = getdActMap(totalDur, tstepPerAction, dspkT, dspkID, dnumc, dstartidx, lpop)
+#fig, axs, plt = animActivityMaps(lpop=lpop)
+
