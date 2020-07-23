@@ -47,9 +47,13 @@ def readweightsfile2pdf (fn):
   return pd.DataFrame(A,columns=['time','preid','postid','weight'])
 
 #
-def readinweights (name):
+def readinweights (name,final=False):
   # read the synaptic plasticity weights associated with sim name into a pandas dataframe
-  return readweightsfile2pdf('data/'+name+'synWeights.pkl')
+  if final:
+    fn = 'data/'+name+'synWeights_final.pkl'
+  else:
+    fn = 'data/'+name+'synWeights.pkl'
+  return readweightsfile2pdf(fn)
 
 def savefinalweights (pdf, simstr):
   # save final weights to a (small) file
@@ -96,8 +100,13 @@ def loadsimdat (name=None,getactmap=True,lpop = allpossible_pops): # load simula
       dstartidx[p] = simConfig['net']['pops'][p]['cellGids'][0]
       dendidx[p] = simConfig['net']['pops'][p]['cellGids'][-1]
   pdf=None
-  try: pdf = readinweights(name) # if RL was off, no weights saved
-  except: pass
+  try:
+    pdf = readinweights(name) # if RL was off, no weights saved
+  except:
+    try:
+      pdf = readinweights(name,final=True)
+    except:
+      pass
   actreward = pd.DataFrame(np.loadtxt('data/'+name+'ActionsRewards.txt'),columns=['time','action','reward','proposed','hit'])
   dnumc = {}
   for p in simConfig['net']['pops'].keys():
@@ -126,7 +135,7 @@ def loadsimdat (name=None,getactmap=True,lpop = allpossible_pops): # load simula
 
 #
 def animActivityMaps (outpath='gif/'+dconf['sim']['name']+'actmap.mp4', framerate=10, figsize=(18,10), dobjpos=None,\
-                      lpop=allpossible_pops):
+                      lpop=allpossible_pops, nframe=None):
   # plot activity in different layers as a function of input images  
   ioff()
   possible_pops = ['ER','EV1','EV4','EMT','IR','IV1','IV4','IMT','EV1DW','EV1DNW','EV1DN'\
@@ -201,7 +210,8 @@ def animActivityMaps (outpath='gif/'+dconf['sim']['name']+'actmap.mp4', framerat
         idx += 1
     return fig
   t1 = range(0,totalDur,tstepPerAction)
-  ani = animation.FuncAnimation(fig, updatefig, interval=1, frames=len(t1)-1)
+  if nframe is None: nframe = len(t1) - 1
+  ani = animation.FuncAnimation(fig, updatefig, interval=1, frames=nframe)
   writer = anim.getwriter(outpath, framerate=framerate)
   ani.save(outpath, writer=writer); print('saved animation to', outpath)
   ion()

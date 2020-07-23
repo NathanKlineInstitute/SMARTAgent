@@ -11583,3 +11583,1463 @@ fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4',showflow=False)
 gif/20jul13_20jul10_B0_stay1_NOINTERMR_cycle__step_4__input.mp4
 
 ** stopped sims since performance seems worse than earlier versions
+** better w/o EMSTAY?? (20jul13_N0_cycle_)
+
+also try longer step size for moves and RLantiwt too ...
+
+*20jul14
+** check output from 20jul13_N0_cycle_
+
+python -i simdat.py backupcfg/20jul13_N0_cycle_sim.json
+
+plotFollowBall(actreward,ax=subplot(1,3,1),cumulative=True,color='k');  ylim((0,.75))
+plotHitMiss(actreward,ax=subplot(1,3,2),lclr=['k'],asratio=True); ylim((0,.75))
+plotScoreMiss(actreward,ax=subplot(1,3,3),clr='k',asratio=True); ylim((0,.75))
+
+savefig('gif/'+dstr+simstr+'perf.png') # gif/20jul14_20jul13_N0_cycle_perf.png
+
+decent for follow prob - others pretty low (hit, score)
+
+clf(); drawraster(dspkT,dspkID); xlim((790e3,800e3)); #
+savefig('gif/'+dstr+simstr+'rast.png') # gif/20jul14_20jul13_N0_cycle_rast.png
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','IM'],tlim=(790e3,800e3)); 
+savefig('gif/'+dstr+simstr+'Vm.png'); # gif/20jul14_20jul13_N0_cycle_Vm.png
+
+#
+clf(); dobjpos = loadObjPos() ## 
+xlabel('Racket Y position'); hist(dobjpos['racket'][:,1])
+savefig('gif/'+dstr+simstr+'poshist.png') # 
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP','EMSTAY'],lclr=['r','b','g'],plotindiv=True)
+xlabel('Time (ms)'); tl();
+savefig('gif/'+dstr+simstr+'all_avg_weight.png') # gif/20jul13_20jul10_B0_stay1_NOINTERMR_cycle__step_4_all_avg_weight.png
+
+fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4',showflow=False)
+gif/20jul14_20jul13_N0_cycle__input.mp4
+
+stuck a lot ... 
+
+can continue ...
+
+"name": "20jul14_N1_cycle_"
+ "simtype": {"ResumeSim": 1, "ResumeSimFromFile": "data/20jul13_N0_cycle_synWeights_final.pkl"},
+
+./myrun 32 sn.json
+
+started ~10:27 ...
+
+finished ~15:30 ...
+
+python -i simdat.py backupcfg/20jul14_N1_cycle_sim.json
+
+plotFollowBall(actreward,ax=subplot(1,3,1),cumulative=True,color='k');  ylim((0,.75))
+plotHitMiss(actreward,ax=subplot(1,3,2),lclr=['k'],asratio=True); ylim((0,.75))
+plotScoreMiss(actreward,ax=subplot(1,3,3),clr='k',asratio=True); ylim((0,.75))
+
+savefig('gif/'+dstr+simstr+'perf.png') # gif/20jul14_20jul14_N1_cycle_perf.png
+
+clf(); drawraster(dspkT,dspkID); xlim((790e3,800e3)); #
+savefig('gif/'+dstr+simstr+'rast.png') # gif/20jul14_20jul14_N1_cycle_rast.png
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','IM'],tlim=(790e3,800e3)); 
+savefig('gif/'+dstr+simstr+'Vm.png'); # gif/20jul14_20jul14_N1_cycle_Vm.png
+
+#
+clf(); dobjpos = loadObjPos() ## 
+xlabel('Racket Y position'); hist(dobjpos['racket'][:,1])
+savefig('gif/'+dstr+simstr+'poshist.png') # gif/20jul14_20jul14_N1_cycle_poshist.png
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP','EMSTAY'],lclr=['r','b','g'],plotindiv=True)
+xlabel('Time (ms)'); tl();
+savefig('gif/'+dstr+simstr+'all_avg_weight.png') # gif/20jul14_20jul14_N1_cycle_all_avg_weight.png
+
+lfn = ['20jul13_N0_cycle_', '20jul14_N1_cycle_']
+lfn = ['data/'+x+'ActionsRewards.txt' for x in lfn]
+pdac = getconcatactionreward(lfn)
+
+plotFollowBall(pdac,ax=subplot(1,3,1),cumulative=True,color='k');  ylim((0,.75))
+plotHitMiss(pdac,ax=subplot(1,3,2),lclr=['k'],asratio=True); ylim((0,.75))
+plotScoreMiss(pdac,ax=subplot(1,3,3),clr='k',asratio=True); ylim((0,.75))
+
+savefig('gif/'+dstr+simstr+'perf_all_steps_so_far.png') # gif/20jul14_20jul14_N1_cycle_perf_all_steps_so_far.png
+
+does not look terribly good ... previous versions were better ...
+
+fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4',showflow=False)
+
+** continue previous sim that was doing better?
+
+  -rw-rw-r-- 1 samn samn    111122 Jun 29 10:41 20jun29_20jun27_G1_cycle_perf_compare_step0_step1.png
+  -rw-rw-r-- 1 samn samn     99241 Jun 29 10:11 20jun29_20jun27_G1_cycle_perf_step0_step1.png
+  20jun29_20jun27_G1_cycle_perf.png
+20jun29_20jun27_G1_cycle_rastB.png
+
+problem was that rates seemed to get too high ... and never finished testing the weight norm
+
+hmm, this one was good too:
+ 20jul6_20jul3_S4_cycle__step_3_perf.png
+
+had stopped it since thought there was a bug in command encoding ...
+
+could continue that one too ...
+
+20jul3_S4_cycle__step_3_sim.json
+
+"name": "20jul14_cont_20jul3_S4_cycle__step_3_"
+
+python multistepSim.py sn.json 32 10 20jul14_MultiTestS4Continue
+
+started ~16:21 ...
+
+** comparison with weight norm
+
+"name": "20jul14_cont_with_norm_20jul3_S4_cycle__step_3_"
+
+"normalizeWeightStepSize":20000  <<-- that means weight norm every 400 s ... 
+and "EEMPopNorm":1 <<-- that means use average weight to rescale both populations' weights to initial weight, but preserving relative values
+
+python multistepSim.py sn.json 32 10 20jul14_MultiTestS4ContinueNorm
+
+started ~16:29 ...
+
+** setting up on gcp
+
+created an ubuntu (20 LTS) c2 instance with 60 cores
+
+trying to get chrome remote desktop :
+https://cloud.google.com/solutions/chrome-desktop-remote-on-compute-engine
+
+first ssh into the VM ... 
+
+sudo apt update
+sudo apt-get install --assume-yes wget
+
+mkdir Downloads
+cd Downloads
+wget https://dl.google.com/linux/direct/chrome-remote-desktop_current_amd64.deb
+
+sudo dpkg --install chrome-remote-desktop_current_amd64.deb
+sudo apt install --assume-yes --fix-broken
+
+sudo DEBIAN_FRONTEND=noninteractive \
+    apt install --assume-yes xfce4 desktop-base
+
+sudo bash -c 'echo "exec /etc/X11/Xsession /usr/bin/xfce4-session" > /etc/chrome-remote-desktop-session'
+
+sudo apt install --assume-yes xscreensaver
+
+sudo systemctl disable lightdm.service
+
+wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+
+sudo dpkg --install google-chrome-stable_current_amd64.deb
+sudo apt install --assume-yes --fix-broken
+
+sudo usermod -a -G chrome-remote-desktop $USER
+logout
+
+then after copying auth code to shell can login here:
+
+https://remotedesktop.google.com/
+
+seems to work !
+
+ok, now that on gcp ...
+
+setup ssh keys and added to github profile
+
+cloned the repo
+
+git clone git@github.com:NathanKlineInstitute/SMARTAgent.git
+git branch development
+git checkout development
+git pull origin development
+
+https://medium.com/google-cloud/set-up-anaconda-under-google-cloud-vm-on-windows-f71fc1064bd7
+
+cd ~/Downloads
+wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
+bash Miniconda3-latest-Linux-x86_64.sh
+rm Miniconda3-latest-Linux-x86_64.sh
+source ~/.bashrc
+
+then onward with the install.txt instructions (should be same as for cycle)
+
+also had to do this:
+sudo apt-get install build-essential
+to compile with nrnivmodl ...
+
+and make sure to set LD_LIBRARY_PATH in .bashrc
+
+export LD_LIBRARY_PATH="/home/ext_samnemo_gmail_com/miniconda3/lib"
+
+try a quick test ...
+
+"name": "20jul14_testG0_gcp_"
+
+./myrun 60 sn.json
+
+  Simulated time: 2.0 s; 60 workers
+  Run time: 35.17 s
+
+seemed to work ... pretty fast ...
+
+is it faster with fewer cores?
+
+./myrun 32 sn.json
+
+  Simulated time: 2.0 s; 32 workers
+  Run time: 35.72 s
+
+was the same duration ...
+
+and with 16 cores?
+
+./myrun 16 sn.json
+
+  Simulated time: 2.0 s; 16 workers
+  Run time: 37.38 s
+
+so just slightly slower with 16 cores ... not really noticeable difference ...
+
+so at current scale could run ~4 simulations each with 16 cores ... or could run larger
+simulation ... see if that improves performance ...
+
+python -i simdat.py backupcfg/20jul14_testG0_gcp_sim.json
+
+try with 4X larger EMDOWN, EMUP, EMSTAY, IM ... (128, 128, 128, 96)
+
+./myrun 60 sn.json
+
+  Simulated time: 2.0 s; 60 workers
+  Run time: 102.29 s
+
+same speed with 32 cores?
+
+./myrun 32 sn.json
+
+  Simulated time: 2.0 s; 32 workers
+  Run time: 113.94 s
+
+yeah, similar duration ... slightly slower ...
+
+would take ~25 hours to run 1600 s sim ... could compare weight norm to without weight norm on
+the larger output pop size ... well, can run for 800 s ... to avoid overusing on a prelim test
+
+will need higher weightvar ... 0.5?
+
+ok ...
+
+"name": "20jul14_testG0_nonorm_gcp_"
+
+./myrun 30 sn.json
+
+started ~22:38 ...
+
+and another with weight norm every 400 s
+
+"name": "20jul14_testG0_yesnorm_gcp_"
+"normalizeWeightStepSize": 20000
+"EEMPopNorm": 1
+
+./myrun 30 sn.json
+
+started ~22:44 ...
+
+*20jul15
+** runs on gcp finished ~21:48
+
+was not enough room on the disk image to save everything (only 20 GB in /, can probably increase
+space if needed); the synweights files were each ~5.7 GB ... 
+
+python -i simdat.py backupcfg/20jul14_testG0_nonorm_gcp_sim.json
+
+lfn = ['20jul14_testG0_nonorm_gcp_', '20jul14_testG0_yesnorm_gcp_']
+lfn = ['data/'+x+'ActionsRewards.txt' for x in lfn]
+lpda = getindivactionreward(lfn)
+
+#
+for pda,clr in zip(lpda,['b','r']):
+  plotFollowBall(pda,ax=subplot(1,3,1),cumulative=True,color=clr); ylim((0,0.35))
+  plotHitMiss(pda,ax=subplot(1,3,2),lclr=[clr],asratio=True); ylim((0,0.35))
+  plotScoreMiss(pda,ax=subplot(1,3,3),clr=clr,asratio=True); ylim((0,0.35))
+
+lpatch = [mpatches.Patch(color=c,label=s) for c,s in zip(['b','r'],['No norm @ 400 s','Norm @ 400 s'])]
+ax=gca()
+ax.legend(handles=lpatch,handlelength=1)
+
+savefig('gif/'+dstr+simstr+'perf_compare_yes_no_norm_a0.png') # gif/20jul16_20jul14_testG0_nonorm_gcp_perf_compare_yes_no_norm_a0.png
+
+so weight norm at 400 s may have helped a little...but performance is not better than smaller output layer
+
+clf(); drawraster(dspkT,dspkID); xlim((790e3,800e3)); #
+savefig('gif/'+dstr+simstr+'rast.png') # gif/20jul16_20jul14_testG0_nonorm_gcp_rast.png
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','EMSTAY','IM'],tlim=(790e3,800e3)); 
+savefig('gif/'+dstr+simstr+'Vm.png'); # gif/20jul16_20jul14_testG0_nonorm_gcp_Vm.png
+
+#
+clf(); dobjpos = loadObjPos() ## 
+xlabel('Racket Y position'); hist(dobjpos['racket'][:,1])
+savefig('gif/'+dstr+simstr+'poshist.png') # gif/20jul16_20jul14_testG0_nonorm_gcp_poshist.png
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP','EMSTAY'],lclr=['r','b','g'],plotindiv=True); xlabel('Time (ms)'); tl(); xlim((790e3,810e3)); savefig('gif/'+dstr+simstr+'all_avg_weight.png') # gif/20jul16_20jul14_testG0_nonorm_gcp_all_avg_weight.png
+
+name # 20jul14_testG0_nonorm_gcp_
+
+name = '20jul14_testG0_yesnorm_gcp_'
+
+simConfig, pdf, actreward, dstartidx, dendidx, dnumc, dspkID, dspkT, InputImages, ldflow, dact = loadsimdat(name,getactmap=False,lpop=lpop)
+
+simstr = '20jul14_testG0_yesnorm_gcp_'
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP','EMSTAY'],lclr=['r','b','g'],plotindiv=True)
+xlabel('Time (ms)'); tl(); xlim((790e3,810e3))
+savefig('gif/'+dstr+simstr+'all_avg_weight.png') # gif/20jul16_20jul14_testG0_yesnorm_gcp_all_avg_weight.png
+
+average weights look ~same as no norm, probably since dfctr was just a bit below 1 ...
+
+clf(); drawraster(dspkT,dspkID); xlim((790e3,800e3)); #
+savefig('gif/'+dstr+simstr+'rast.png') # gif/20jul16_20jul14_testG0_yesnorm_gcp_rast.png
+
+so, no point having a large output layer with full conn, since performance did not improve ...
+
+** try large output layer but not 100% conn? (20jul15_testG0_gcp_)
+
+ok, 100 of each EM, 75 IM
+EEMProb of 0.3, EEMRecProb of 0.3
+
+"name": "20jul15_testG0_gcp_"
+
+and have to scale
+"EEMWghtAM": 1.2e-05, "EEMWghtNM": 1.2e-06
+and "RLhebbwt": 2e-07
+by ~1/.3 (since most of inputs were from preM)
+"EEMWghtAM": 3.6e-05, "EEMWghtNM": 3.6e-06
+"RLhebbwt": 6e-07
+
+./myrun 30 sn.json
+
+  Simulated time: 10.0 s; 30 workers
+  Run time: 166.28 s
+
+well, it was faster to run ... due to fewer RL synapses ...
+
+with 2 s sim took:
+  Simulated time: 2.0 s; 30 workers
+  Run time: 28.81 s
+
+what's speed with 16 workers?
+./myrun 16 sn.json
+  Simulated time: 2.0 s; 16 workers
+  Run time: 38.83 s
+a lot longer, so may as well use 30 workers ...
+
+and speed with 60 workers?
+./myrun 60 sn.json
+  Simulated time: 2.0 s; 60 workers
+  Run time: 35.94 s
+slower than with 30 workers ... so use 30 workers...
+
+try 100 s before longer sim ...
+./myrun 30 sn.json
+
+  Spikes: 732174 (1.60 Hz)
+  Simulated time: 100.0 s; 30 workers
+  Run time: 1847.54 s
+  so took ~30 minutes to run 100 s
+and main output file was ~176 MB with 5 s increments for weight saves ...   
+  -rw-r--r--  1 ext_samnemo_gmail_com 3015339689 176865149 Jul 16 03:27 20jul15_testG0_gcp_synWeights.pkl  
+
+so can run for ~2000 s in ~10 hours ... but reduce frequency of weight saving ...
+
+"recordWeightStepSize": 500
+
+note that weightVar is 0.5 ...
+
+./myrun 30 sn.json
+
+started ~23:36 ... 
+
+python -i simdat.py backupcfg/20jul15_testG0_gcp_sim.json
+
+drawraster(dspkT,dspkID);
+drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','EMSTAY','IM'])
+
+plotFollowBall(actreward,ax=subplot(1,3,1),cumulative=True,color='k');  ylim((0,.75))
+plotHitMiss(actreward,ax=subplot(1,3,2),lclr=['k'],asratio=True); ylim((0,.75))
+plotScoreMiss(actreward,ax=subplot(1,3,3),clr='k',asratio=True); ylim((0,.75))
+
+
+** and another one with same params but lower weightVar (0.25); 20jul15_testH0_gcp_
+
+./myrun 30 sn.json
+
+started ~23:38 ...
+
+both are around 1/2 way done ~9:30 AM ... so instead of 10 hours, closer to 20 hours to complete ...
+this one not doing as well as 20jul15_testG0_gcp_ in terms of score (9 points compared to 14 points)
+and 43 vs 67 hits ... so can stop this one ...
+
+ok - stopped 20jul15_testH0_gcp_ since it's not doing as well and seems to be slowing down
+the other sim...
+
+*20jul16
+** check output on cycle
+
+python -i simdat.py backupcfg/20jul14_cont_20jul3_S4_cycle__step_3__step_0_sim.json
+
+plotFollowBall(actreward,ax=subplot(1,3,1),cumulative=True,color='k');  ylim((0,1.))
+plotHitMiss(actreward,ax=subplot(1,3,2),lclr=['k'],asratio=True); ylim((0,1.))
+plotScoreMiss(actreward,ax=subplot(1,3,3),clr='k',asratio=True); ylim((0,1.))
+
+savefig('gif/'+dstr+simstr+'perf.png') # gif/20jul16_20jul14_cont_20jul3_S4_cycle__step_3__step_0_perf.png
+
+looks pretty good for most measures except for score/miss ... others seem at ~highest levels seen
+
+and how does it compare to the one with weight normalization?
+
+actN = pd.DataFrame(np.loadtxt('data/20jul14_cont_with_norm_20jul3_S4_cycle__step_3__step_0_ActionsRewards.txt'),columns=['time','action','reward','proposed','hit'])
+
+clf()
+plotFollowBall(actreward,ax=subplot(1,3,1),cumulative=True,color='b');  ylim((0,1.))
+plotHitMiss(actreward,ax=subplot(1,3,2),lclr=['b'],asratio=True); ylim((0,1.))
+plotScoreMiss(actreward,ax=subplot(1,3,3),clr='b',asratio=True); ylim((0,1.))
+plotFollowBall(actN,ax=subplot(1,3,1),cumulative=True,color='r');  ylim((0,1.))
+plotHitMiss(actN,ax=subplot(1,3,2),lclr=['r'],asratio=True); ylim((0,1.))
+plotScoreMiss(actN,ax=subplot(1,3,3),clr='r',asratio=True); ylim((0,1.))
+
+savefig('gif/'+dstr+simstr+'perf_compare_norm_no_norm.png') # gif/20jul16_20jul14_cont_20jul3_S4_cycle__step_3__step_0_perf_compare_norm_no_norm.png
+
+so weight norm might help a little for hit/miss and score/miss but only briefly ...
+
+and the full durations concatenated?
+
+lfn = ['20jun30_S0_cycle_', '20jun30_S1_cycle_', '20jun30_S2_cycle_', '20jul2_S3_cycle_', '20jul3_S4_cycle__step_0_','20jul3_S4_cycle__step_1_','20jul3_S4_cycle__step_2_','20jul3_S4_cycle__step_3_','20jul14_cont_20jul3_S4_cycle__step_3__step_0_']
+lfn = ['data/'+x+'ActionsRewards.txt' for x in lfn]
+pdac = getconcatactionreward(lfn)
+
+plotFollowBall(pdac,ax=subplot(1,1,1),cumulative=True,color='b');  ylim((0,.45))
+plotHitMiss(pdac,ax=subplot(1,1,1),lclr=['g'],asratio=True); ylim((0,.45))
+plotScoreMiss(pdac,ax=subplot(1,1,1),clr='r',asratio=True); ylim((0,.45))
+
+savefig('gif/'+dstr+simstr+'perf_all_steps_so_far.png') # gif/20jul16_20jul14_cont_20jul3_S4_cycle__step_3__step_0_perf_all_steps_so_far.png
+
+clf(); drawraster(dspkT,dspkID); xlim((1590e3,1600e3)); ylim((0,sum(list(dnumc.values())))); #
+savefig('gif/'+dstr+simstr+'rast.png') # gif/20jul16_20jul14_cont_20jul3_S4_cycle__step_3__step_0_rast.png
+
+xlim((1599e3,1600e3))
+savefig('gif/'+dstr+simstr+'rastB.png')
+gif/20jul16_20jul14_cont_20jul3_S4_cycle__step_3__step_0_rastB.png
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','EMSTAY','IM'],tlim=(1590e3,1600e3)); 
+savefig('gif/'+dstr+simstr+'Vm.png'); # gif/20jul16_20jul14_cont_20jul3_S4_cycle__step_3__step_0_Vm.png
+xlim((1599e3,1600e3))
+savefig('gif/'+dstr+simstr+'VmB.png')
+gif/20jul16_20jul14_cont_20jul3_S4_cycle__step_3__step_0_VmB.png
+
+#
+clf(); dobjpos = loadObjPos() ## 
+xlabel('Racket Y position'); hist(dobjpos['racket'][:,1])
+savefig('gif/'+dstr+simstr+'poshist.png') # 'gif/'+dstr+simstr+'poshist.png'
+gif/20jul16_20jul14_cont_20jul3_S4_cycle__step_3__step_0_poshist.png
+
+fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4',showflow=False)
+gif/20jul16_20jul14_cont_20jul3_S4_cycle__step_3__step_0__input.mp4
+performs pretty well on some of the volleys ... but still makes the usual mistakes ... 
+
+lpop = ['ER', 'EV1DNW', 'EV1DN', 'EV1DNE','EV1', 'IR', 'EV1DW','EV1DE','IV1','EMUP','EV1DSW', 'EV1DS', 'EV1DSE','IM','EMDOWN', 'EMSTAY']  
+dact = getdActMap(totalDur, tstepPerAction, dspkT, dspkID, dnumc, dstartidx, lpop)
+fig, axs, plt = animActivityMaps(lpop=lpop)
+gif/20jul14_cont_20jul3_S4_cycle__step_3__step_0_actmap.mp4
+
+** setup google cloud sdk
+
+so can more easily download/uploads files, etc.
+
+https://cloud.google.com/sdk/docs#deb
+
+echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
+
+sudo apt-get install apt-transport-https ca-certificates gnupg
+
+curl --insecure https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key --keyring /usr/share/keyrings/cloud.google.gpg add -
+
+(--insecure on cycle/NKI machines since they use zscaler)
+
+sudo apt-get update && sudo apt-get install google-cloud-sdk
+
+gcloud init
+
+gcloud config set accessibility/screen_reader true
+
+hmm, not working properly on nki machine ... will try install from source instead ...
+
+downloaded
+https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-301.0.0-linux-x86_64.tar.gz
+to ~/Downloads
+cd ~/Downloads
+tar -xvf google-cloud-sdk-301.0.0-linux-x86_64.tar.gz
+sudo mv ~/Downloads/google-cloud-sdk /opt/
+cd /opt
+./google-cloud-sdk/install.sh
+
+./google-cloud-sdk/install.sh
+Welcome to the Google Cloud SDK!
+
+To help improve the quality of this product, we collect anonymized usage data
+and anonymized stacktraces when crashes are encountered; additional information
+is available at <https://cloud.google.com/sdk/usage-statistics>. This data is
+handled in accordance with our privacy policy
+<https://policies.google.com/privacy>. You may choose to opt in this
+collection now (by choosing 'Y' at the below prompt), or at any time in the
+future by running the following command:
+
+    gcloud config set disable_usage_reporting false
+
+Do you want to help improve the Google Cloud SDK (y/N)?  no
+
+ERROR: (gcloud.components.list) Failed to fetch component listing from server. Check your network settings and try again.
+
+hmm...problem ...
+
+/opt/google-cloud-sdk/bin/gcloud init
+
+/opt/google-cloud-sdk/bin/gcloud init
+Welcome! This command will take you through the configuration of gcloud.
+
+Your current configuration has been set to: [default]
+
+You can skip diagnostics next time by using the following flag:
+  gcloud init --skip-diagnostics
+
+Network diagnostic detects and fixes local network connection issues.
+Checking network connection...done.
+ERROR: Reachability Check failed.
+    Cannot reach https://www.google.com (SSLCertVerificationError)
+    Cannot reach https://accounts.google.com (SSLCertVerificationError)
+    Cannot reach https://cloudresourcemanager.googleapis.com/v1beta1/projects (SSLCertVerificationError)
+    Cannot reach https://www.googleapis.com/auth/cloud-platform (SSLCertVerificationError)
+    Cannot reach https://dl.google.com/dl/cloudsdk/channels/rapid/components-2.json (SSLCertVerificationError)
+Network connection problems may be due to proxy or firewall settings.
+
+
+Do you have a network proxy you would like to set in gcloud (Y/n)?  n
+
+ERROR: Network diagnostic failed (0/1 checks passed).
+
+Network errors detected.
+
+Would you like to continue anyway (y/N)?  n
+
+You can re-run diagnostics with the following command:
+  gcloud info --run-diagnostics
+
+looks like will be a problem installing/running on NKI machines
+
+will install on laptop instead, can then scp files as needed ...
+
+** check output from gcp run (20jul15_testG0_gcp_)
+
+started ~23:38 night before
+finished around 16:06 ...
+
+  Spikes: 14349215 (1.57 Hz)
+  Simulated time: 2000.0 s; 30 workers
+  Run time: 58766.61 s
+
+python -i simdat.py backupcfg/20jul15_testG0_gcp_sim.json
+
+plotFollowBall(actreward,ax=subplot(1,1,1),cumulative=True,color='b');  ylim((0,.35))
+plotHitMiss(actreward,ax=subplot(1,1,1),lclr=['g'],asratio=True); ylim((0,.35))
+plotScoreMiss(actreward,ax=subplot(1,1,1),clr='r',asratio=True); ylim((0,.35))
+ylabel('Performance')
+lpatch = [mpatches.Patch(color=c,label=s) for c,s in zip(['b','g','r'],['Follow','Hit/Miss','Score/Miss'])]
+ax=gca()
+ax.legend(handles=lpatch,handlelength=1)
+savefig('gif/'+dstr+simstr+'perf.png') # gif/20jul16_20jul15_testG0_gcp_perf.png
+
+looks ok, but not as good as other recent sims on cycle ...
+
+clf(); drawraster(dspkT,dspkID); xlim((1990e3,2000e3)); ylim((0,sum(list(dnumc.values())))); #
+savefig('gif/'+dstr+simstr+'rast.png') # gif/20jul16_20jul15_testG0_gcp_rast.png
+
+xlim((1999e3,2000e3))
+savefig('gif/'+dstr+simstr+'rastB.png') # gif/20jul16_20jul15_testG0_gcp_rastB.png
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','EMSTAY','IM'],tlim=(1990e3,2000e3)); 
+savefig('gif/'+dstr+simstr+'Vm.png'); # gif/20jul16_20jul15_testG0_gcp_Vm.png
+
+#
+clf(); dobjpos = loadObjPos() ## 
+xlabel('Racket Y position'); hist(dobjpos['racket'][:,1])
+savefig('gif/'+dstr+simstr+'poshist.png') # gif/20jul16_20jul15_testG0_gcp_poshist.png
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP','EMSTAY'],lclr=['r','b','g'],plotindiv=True)
+xlabel('Time (ms)'); tl(); 
+savefig('gif/'+dstr+simstr+'all_avg_weight.png') # gif/20jul16_20jul15_testG0_gcp_all_avg_weight.png
+
+the weights are still fairly quickly ... rates very similar to start of simulation ...
+
+can continue the simulation ... see if it improves ...
+
+fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4',showflow=False)
+20jul16_20jul15_testG0_gcp__input.mp4
+
+#lpop = ['ER', 'EV1DNW', 'EV1DN', 'EV1DNE','EV1', 'IR', 'EV1DW','EV1DE','IV1','EMUP','EV1DSW', 'EV1DS', 'EV1DSE','IM','EMDOWN', 'EMSTAY']  
+#dact = getdActMap(totalDur, tstepPerAction, dspkT, dspkID, dnumc, dstartidx, lpop)
+#fig, axs, plt = animActivityMaps(lpop=lpop)
+
+well, may as well continue ...
+
+"name": "20jul16_testG1_gcp_"
+    "simtype": {"ResumeSim": 1, "ResumeSimFromFile": "data/20jul15_testG0_gcp_synWeights_final.pkl"},
+
+./myrun 30 sn.json
+
+started ~16:59 ...
+finished ~9:20 next day
+
+  Spikes: 14948607 (1.63 Hz)
+  Simulated time: 2000.0 s; 30 workers
+  Run time: 43836.70 s
+
+*20jul17
+** check output from 20jul16_testG1_gcp_
+
+python -i simdat.py backupcfg/20jul16_testG1_gcp_sim.json
+
+plotFollowBall(actreward,ax=subplot(1,1,1),cumulative=True,color='b');  ylim((0,.65))
+plotHitMiss(actreward,ax=subplot(1,1,1),lclr=['g'],asratio=True); ylim((0,.65))
+plotScoreMiss(actreward,ax=subplot(1,1,1),clr='r',asratio=True); ylim((0,.65))
+ylabel('Performance')
+lpatch = [mpatches.Patch(color=c,label=s) for c,s in zip(['b','g','r'],['Follow','Hit/Miss','Score/Miss'])]
+ax=gca()
+ax.legend(handles=lpatch,handlelength=1)
+savefig('gif/'+dstr+simstr+'perf.png') # gif/20jul17_20jul16_testG1_gcp_perf.png
+
+seems better ... yeah, improved a bit...
+
+lfn = ['20jul15_testG0_gcp_','20jul16_testG1_gcp_']
+lfn = ['data/'+x+'ActionsRewards.txt' for x in lfn]
+pdac = getconcatactionreward(lfn)
+
+plotFollowBall(pdac,ax=subplot(1,1,1),cumulative=True,color='b');  ylim((0,.35))
+plotHitMiss(pdac,ax=subplot(1,1,1),lclr=['g'],asratio=True); ylim((0,.35))
+plotScoreMiss(pdac,ax=subplot(1,1,1),clr='r',asratio=True); ylim((0,.35))
+lpatch = [mpatches.Patch(color=c,label=s) for c,s in zip(['b','g','r'],['Follow','Hit/Miss','Score/Miss'])]
+ax=gca()
+ax.legend(handles=lpatch,handlelength=1)
+
+savefig('gif/'+dstr+simstr+'perf_all_steps_so_far.png') # gif/20jul17_20jul16_testG1_gcp_perf_all_steps_so_far.png
+
+clf(); drawraster(dspkT,dspkID); xlim((1990e3,2000e3)); ylim((0,sum(list(dnumc.values())))); #
+savefig('gif/'+dstr+simstr+'rast.png') # gif/20jul17_20jul16_testG1_gcp_rast.png
+
+rates for EMUP,EMDOWN have increased, EMSTAY decreased
+
+xlim((1999e3,2000e3))
+savefig('gif/'+dstr+simstr+'rastB.png') # gif/20jul17_20jul16_testG1_gcp_rastB.png
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','EMSTAY','IM'],tlim=(1990e3,2000e3)); 
+savefig('gif/'+dstr+simstr+'Vm.png'); # gif/20jul17_20jul16_testG1_gcp_Vm.png
+
+#
+clf(); dobjpos = loadObjPos() ## 
+xlabel('Racket Y position'); hist(dobjpos['racket'][:,1])
+savefig('gif/'+dstr+simstr+'poshist.png') # gif/20jul17_20jul16_testG1_gcp_poshist.png
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP','EMSTAY'],lclr=['r','b','g'],plotindiv=True)
+xlabel('Time (ms)'); tl(); 
+savefig('gif/'+dstr+simstr+'all_avg_weight.png') # gif/20jul17_20jul16_testG1_gcp_all_avg_weight.png
+weights for EMDOWN,EMUP still rising, EMSTAY lower but rising slowly
+savefig('gif/'+dstr+simstr+'all_avg_weightB.png') # gif/20jul17_20jul16_testG1_gcp_all_avg_weightB.png
+
+fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4',showflow=False)
+gif/20jul17_20jul16_testG1_gcp__input.mp4
+
+#lpop = ['ER', 'EV1DNW', 'EV1DN', 'EV1DNE','EV1', 'IR', 'EV1DW','EV1DE','IV1','EMUP','EV1DSW', 'EV1DS', 'EV1DSE','IM','EMDOWN', 'EMSTAY']  
+#dact = getdActMap(totalDur, tstepPerAction, dspkT, dspkID, dnumc, dstartidx, lpop)
+#fig, axs, plt = animActivityMaps(lpop=lpop)
+
+ok, since it's been gradually improving, may as well continue this sim as multistep sim ...
+
+    "simtype": {"ResumeSim": 1, "ResumeSimFromFile": "data/20jul16_testG1_gcp_synWeights_final.pkl"},
+    "name": "20jul17_testG2_gcp_"
+
+python multistepSim.py sn.json 30 10 20jul17_testG2_gcp_multistep_
+
+started ~10:31 ...
+
+** setup gcloud sdk on laptop
+
+echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
+
+sudo apt-get install apt-transport-https ca-certificates gnupg
+
+curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key --keyring /usr/share/keyrings/cloud.google.gpg add -
+
+sudo apt-get update && sudo apt-get install google-cloud-sdk
+
+gcloud init
+
+gcloud config set accessibility/screen_reader true
+
+authenticated with gmail address via browser
+
+ Commands that require authentication will use samnemo@gmail.com by default
+ Commands will reference project `ecas-2019` by default
+ Compute Engine commands will use region `us-central1` by default
+ Compute Engine commands will use zone `us-central1-c` by default
+
+so now will more easily be able to transfer files ...
+
+gsutil -m cp -r gs://samn_data/SMARTAgent/gif/* ./gif/
+
+** check output from runs on cycle
+
+python -i simdat.py backupcfg/20jul14_cont_20jul3_S4_cycle__step_3__step_1_sim.json
+
+plotFollowBall(actreward,ax=subplot(1,1,1),cumulative=True,color='b');  ylim((0,1.))
+plotHitMiss(actreward,ax=subplot(1,1,1),lclr=['g'],asratio=True); ylim((0,1.))
+plotScoreMiss(actreward,ax=subplot(1,1,1),clr='r',asratio=True); ylim((0,1.))
+ylabel('Performance')
+lpatch = [mpatches.Patch(color=c,label=s) for c,s in zip(['b','g','r'],['Follow','Hit/Miss','Score/Miss'])]
+ax=gca()
+ax.legend(handles=lpatch,handlelength=1)
+
+savefig('gif/'+dstr+simstr+'perf.png')
+gif/20jul17_20jul14_cont_20jul3_S4_cycle__step_3__step_1_perf.png
+that looks good - much higher scores than have seen before . . .
+
+compare against the one with weight norm ..
+lfn = ['20jul14_cont_20jul3_S4_cycle__step_3__step_1_', '20jul14_cont_with_norm_20jul3_S4_cycle__step_3__step_1_']
+lfn = ['data/'+x+'ActionsRewards.txt' for x in lfn]
+lpda = getindivactionreward(lfn)
+
+#
+for pda,clr in zip(lpda,['b','r']):
+  plotFollowBall(pda,ax=subplot(1,3,1),cumulative=True,color=clr); ylim((0,1.))
+  plotHitMiss(pda,ax=subplot(1,3,2),lclr=[clr],asratio=True); ylim((0,1.))
+  plotScoreMiss(pda,ax=subplot(1,3,3),clr=clr,asratio=True); ylim((0,1.))
+
+lpatch = [mpatches.Patch(color=c,label=s) for c,s in zip(['b','r'],['No Normalization every 400 s','Normalization every 400 s'])]
+ax=gca()
+ax.legend(handles=lpatch,handlelength=1)
+
+savefig('gif/'+dstr+simstr+'perf_nonorm_norm_compare.png')
+gif/20jul17_20jul14_cont_20jul3_S4_cycle__step_3__step_1_perf_nonorm_norm_compare.png
+
+norm seems to help sometimes
+
+lfn = ['20jun30_S0_cycle_', '20jun30_S1_cycle_', '20jun30_S2_cycle_', '20jul2_S3_cycle_', '20jul3_S4_cycle__step_0_','20jul3_S4_cycle__step_1_','20jul3_S4_cycle__step_2_','20jul3_S4_cycle__step_3_','20jul14_cont_20jul3_S4_cycle__step_3__step_0_','20jul14_cont_20jul3_S4_cycle__step_3__step_1_']
+lfn = ['data/'+x+'ActionsRewards.txt' for x in lfn]
+pdac = getconcatactionreward(lfn)
+
+plotFollowBall(pdac,ax=subplot(1,1,1),cumulative=True,color='b');  ylim((0,.45))
+plotHitMiss(pdac,ax=subplot(1,1,1),lclr=['g'],asratio=True); ylim((0,.45))
+plotScoreMiss(pdac,ax=subplot(1,1,1),clr='r',asratio=True); ylim((0,.45))
+
+ylabel('Performance')
+lpatch = [mpatches.Patch(color=c,label=s) for c,s in zip(['b','g','r'],['Follow','Hit/Miss','Score/Miss'])]
+ax=gca()
+ax.legend(handles=lpatch,handlelength=1)
+
+savefig('gif/'+dstr+simstr+'perf_all_steps_so_far.png')
+gif/20jul17_20jul14_cont_20jul3_S4_cycle__step_3__step_1_perf_all_steps_so_far.png
+
+clf(); drawraster(dspkT,dspkID); xlim((1590e3,1600e3)); ylim((0,sum(list(dnumc.values())))); #
+savefig('gif/'+dstr+simstr+'rast.png') # gif/20jul17_20jul14_cont_20jul3_S4_cycle__step_3__step_1_rast.png
+
+xlim((1599e3,1600e3))
+savefig('gif/'+dstr+simstr+'rastB.png') # gif/20jul17_20jul14_cont_20jul3_S4_cycle__step_3__step_1_rastB.png
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','EMSTAY','IM'],tlim=(1590e3,1600e3)); 
+savefig('gif/'+dstr+simstr+'Vm.png'); # gif/20jul17_20jul14_cont_20jul3_S4_cycle__step_3__step_1_Vm.png
+
+#
+clf(); dobjpos = loadObjPos() ## 
+xlabel('Racket Y position'); hist(dobjpos['racket'][:,1])
+savefig('gif/'+dstr+simstr+'poshist.png') # gif/20jul17_20jul14_cont_20jul3_S4_cycle__step_3__step_1_poshist.png
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP','EMSTAY'],lclr=['r','b','g'],plotindiv=True)
+xlabel('Time (ms)'); tl(); 
+savefig('gif/'+dstr+simstr+'all_avg_weight.png') # gif/20jul17_20jul14_cont_20jul3_S4_cycle__step_3__step_1_all_avg_weight.png
+
+fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4',showflow=False) # gif/20jul17_20jul14_cont_20jul3_S4_cycle__step_3__step_1__input.mp4
+lpop = ['ER', 'EV1DNW', 'EV1DN', 'EV1DNE','EV1', 'IR', 'EV1DW','EV1DE','IV1','EMUP','EV1DSW', 'EV1DS', 'EV1DSE','IM','EMDOWN', 'EMSTAY']  
+dact = getdActMap(totalDur, tstepPerAction, dspkT, dspkID, dnumc, dstartidx, lpop)
+fig, axs, plt = animActivityMaps(lpop=lpop)
+gif/20jul17_20jul14_cont_20jul3_S4_cycle__step_3__step_1_actmap.mp4
+
+** check raster/activity/movies for weight normalized version too (on cycle)
+
+python -i simdat.py backupcfg/20jul14_cont_with_norm_20jul3_S4_cycle__step_3__step_1_sim.json
+
+plotFollowBall(actreward,ax=subplot(1,1,1),cumulative=True,color='b');  ylim((0,1.))
+plotHitMiss(actreward,ax=subplot(1,1,1),lclr=['g'],asratio=True); ylim((0,1.))
+plotScoreMiss(actreward,ax=subplot(1,1,1),clr='r',asratio=True); ylim((0,1.))
+ylabel('Performance')
+lpatch = [mpatches.Patch(color=c,label=s) for c,s in zip(['b','g','r'],['Follow','Hit/Miss','Score/Miss'])]
+ax=gca()
+ax.legend(handles=lpatch,handlelength=1)
+
+savefig('gif/'+dstr+simstr+'perf.png') #
+gif/20jul17_20jul14_cont_with_norm_20jul3_S4_cycle__step_3__step_1_perf.png
+yeah, looks better than w/o weight norm ...
+though still have a question of optimal frequency of weight norm
+
+clf(); drawraster(dspkT,dspkID); xlim((1590e3,1600e3)); ylim((0,sum(list(dnumc.values())))); #
+savefig('gif/'+dstr+simstr+'rast.png') # gif/20jul17_20jul14_cont_with_norm_20jul3_S4_cycle__step_3__step_1_rast.png
+firing rates much better (~10 Hz instead of ~20 Hz for non-normalized weights version)
+
+xlim((1599e3,1600e3))
+savefig('gif/'+dstr+simstr+'rastB.png') # gif/20jul17_20jul14_cont_with_norm_20jul3_S4_cycle__step_3__step_1_rastB.png
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','EMSTAY','IM'],tlim=(1590e3,1600e3)); 
+savefig('gif/'+dstr+simstr+'Vm.png'); # gif/20jul17_20jul14_cont_with_norm_20jul3_S4_cycle__step_3__step_1_Vm.png
+
+#
+clf(); dobjpos = loadObjPos() ## 
+xlabel('Racket Y position'); hist(dobjpos['racket'][:,1])
+savefig('gif/'+dstr+simstr+'poshist.png') # gif/20jul17_20jul14_cont_with_norm_20jul3_S4_cycle__step_3__step_1_poshist.png
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP','EMSTAY'],lclr=['r','b','g'],plotindiv=True)
+xlabel('Time (ms)'); tl(); 
+savefig('gif/'+dstr+simstr+'all_avg_weight.png') #
+gif/20jul17_20jul14_cont_with_norm_20jul3_S4_cycle__step_3__step_1_all_avg_weight.png
+
+fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4',showflow=False) # gif/20jul17_20jul14_cont_with_norm_20jul3_S4_cycle__step_3__step_1__input.mp4
+lpop = ['ER', 'EV1DNW', 'EV1DN', 'EV1DNE','EV1', 'IR', 'EV1DW','EV1DE','IV1','EMUP','EV1DSW', 'EV1DS', 'EV1DSE','IM','EMDOWN', 'EMSTAY']  
+dact = getdActMap(totalDur, tstepPerAction, dspkT, dspkID, dnumc, dstartidx, lpop)
+fig, axs, plt = animActivityMaps(lpop=lpop)
+gif/20jul17_20jul14_cont_with_norm_20jul3_S4_cycle__step_3__step_1_actmap.mp4
+
+*20jul18
+** check next step output from gcp
+
+python -i simdat.py backupcfg/20jul17_testG2_gcp__step_0_sim.json
+
+plotFollowBall(actreward,ax=subplot(1,1,1),cumulative=True,color='b');  ylim((0,1.))
+plotHitMiss(actreward,ax=subplot(1,1,1),lclr=['g'],asratio=True); ylim((0,1.))
+plotScoreMiss(actreward,ax=subplot(1,1,1),clr='r',asratio=True); ylim((0,1.))
+ylabel('Performance')
+lpatch = [mpatches.Patch(color=c,label=s) for c,s in zip(['b','g','r'],['Follow','Hit/Miss','Score/Miss'])]
+ax=gca()
+ax.legend(handles=lpatch,handlelength=1)
+
+savefig('gif/'+dstr+simstr+'perf.png') # gif/20jul18_20jul17_testG2_gcp__step_0_perf.png
+doing noticeably better than last step ...
+
+lfn = ['20jul15_testG0_gcp_','20jul16_testG1_gcp_', '20jul17_testG2_gcp__step_0_']
+lfn = ['data/'+x+'ActionsRewards.txt' for x in lfn]
+pdac = getconcatactionreward(lfn)
+
+plotFollowBall(pdac,ax=subplot(1,1,1),cumulative=True,color='b');  ylim((0,.38))
+plotHitMiss(pdac,ax=subplot(1,1,1),lclr=['g'],asratio=True); ylim((0,.38))
+plotScoreMiss(pdac,ax=subplot(1,1,1),clr='r',asratio=True); ylim((0,.38))
+lpatch = [mpatches.Patch(color=c,label=s) for c,s in zip(['b','g','r'],['Follow','Hit/Miss','Score/Miss'])]
+ax=gca()
+ax.legend(handles=lpatch,handlelength=1)
+ylabel('Performance')
+savefig('gif/'+dstr+simstr+'perf_all_steps_so_far.png') # gif/20jul18_20jul17_testG2_gcp__step_0_perf_all_steps_so_far.png
+
+looks like all performance measures increasing ... 
+
+clf(); drawraster(dspkT,dspkID); xlim((1990e3,2000e3)); ylim((0,sum(list(dnumc.values())))); #
+savefig('gif/'+dstr+simstr+'rast.png') # gif/20jul18_20jul17_testG2_gcp__step_0_rast.png
+and the rates are still low/good
+
+xlim((1999e3,2000e3))
+savefig('gif/'+dstr+simstr+'rastB.png') # gif/20jul18_20jul17_testG2_gcp__step_0_rastB.png
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','EMSTAY','IM'],tlim=(1990e3,2000e3)); 
+savefig('gif/'+dstr+simstr+'Vm.png'); # gif/20jul18_20jul17_testG2_gcp__step_0_Vm.png
+
+#
+clf(); dobjpos = loadObjPos() ## 
+xlabel('Racket Y position'); hist(dobjpos['racket'][:,1])
+savefig('gif/'+dstr+simstr+'poshist.png') # gif/20jul18_20jul17_testG2_gcp__step_0_poshist.png
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP','EMSTAY'],lclr=['r','b','g'],plotindiv=True)
+xlabel('Time (ms)'); tl(); 
+savefig('gif/'+dstr+simstr+'all_avg_weight.png') # gif/20jul18_20jul17_testG2_gcp__step_0_all_avg_weight.png
+
+fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4',showflow=False)
+gif/20jul18_20jul17_testG2_gcp__step_0__input.mp4
+
+#lpop = ['ER', 'EV1DNW', 'EV1DN', 'EV1DNE','EV1', 'IR', 'EV1DW','EV1DE','IV1','EMUP','EV1DSW', 'EV1DS', 'EV1DSE','IM','EMDOWN', 'EMSTAY']  
+#dact = getdActMap(totalDur, tstepPerAction, dspkT, dspkID, dnumc, dstartidx, lpop)
+#fig, axs, plt = animActivityMaps(lpop=lpop)
+
+*20jul20
+** check raster/activity/movies for weight normalized version (on cycle)
+
+python -i simdat.py backupcfg/20jul14_cont_with_norm_20jul3_S4_cycle__step_3__step_4_sim.json
+
+savefig('gif/'+dstr+simstr+'perf.png') # gif/20jul20_20jul14_cont_with_norm_20jul3_S4_cycle__step_3__step_4_perf.png
+
+not clear it's better than a few steps ago ... 
+
+clf(); drawraster(dspkT,dspkID); xlim((1590e3,1600e3)); ylim((0,sum(list(dnumc.values())))); #
+savefig('gif/'+dstr+simstr+'rast.png') # gif/20jul20_20jul14_cont_with_norm_20jul3_S4_cycle__step_3__step_4_rast.png
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','EMSTAY','IM'],tlim=(1590e3,1600e3)); 
+savefig('gif/'+dstr+simstr+'Vm.png'); # gif/20jul20_20jul14_cont_with_norm_20jul3_S4_cycle__step_3__step_4_Vm.png
+
+#
+clf(); dobjpos = loadObjPos() ## 
+xlabel('Racket Y position'); hist(dobjpos['racket'][:,1])
+savefig('gif/'+dstr+simstr+'poshist.png') # gif/20jul20_20jul14_cont_with_norm_20jul3_S4_cycle__step_3__step_4_poshist.png
+
+the one without weight norm is still running same step so will wait to compare until it finishes (without norm takes
+longer since higher firing rates)
+
+lfn = ['20jun30_S0_cycle_', '20jun30_S1_cycle_', '20jun30_S2_cycle_', '20jul2_S3_cycle_', '20jul3_S4_cycle__step_0_','20jul3_S4_cycle__step_1_','20jul3_S4_cycle__step_2_','20jul3_S4_cycle__step_3_','20jul14_cont_with_norm_20jul3_S4_cycle__step_3__step_0_','20jul14_cont_with_norm_20jul3_S4_cycle__step_3__step_1_','20jul14_cont_with_norm_20jul3_S4_cycle__step_3__step_2_','20jul14_cont_with_norm_20jul3_S4_cycle__step_3__step_3_','20jul14_cont_with_norm_20jul3_S4_cycle__step_3__step_4_']
+lfn = ['data/'+x+'ActionsRewards.txt' for x in lfn]
+pdac = getconcatactionreward(lfn)
+
+plotFollowBall(pdac,ax=subplot(1,1,1),cumulative=True,color='b');  ylim((0,.45))
+plotHitMiss(pdac,ax=subplot(1,1,1),lclr=['g'],asratio=True); ylim((0,.45))
+plotScoreMiss(pdac,ax=subplot(1,1,1),clr='r',asratio=True); ylim((0,.45))
+
+ylabel('Performance',fontsize=30);
+xlabel('Time (ms)',fontsize=30)
+lpatch = [mpatches.Patch(color=c,label=s) for c,s in zip(['b','g','r'],['Follow','Hit/Miss','Score/Miss'])]
+ax=gca()
+ax.legend(handles=lpatch,handlelength=1,fontsize=30)
+tl()
+
+savefig('gif/'+dstr+simstr+'perf_all_steps_so_far.png')
+gif/20jul20_20jul14_cont_with_norm_20jul3_S4_cycle__step_3__step_4_perf_all_steps_so_far.png
+
+lfn = ['20jun30_S0_cycle_', '20jun30_S1_cycle_', '20jun30_S2_cycle_', '20jul2_S3_cycle_', '20jul3_S4_cycle__step_0_','20jul3_S4_cycle__step_1_','20jul3_S4_cycle__step_2_','20jul3_S4_cycle__step_3_','20jul14_cont_20jul3_S4_cycle__step_3__step_0_','20jul14_cont_20jul3_S4_cycle__step_3__step_1_','20jul14_cont_20jul3_S4_cycle__step_3__step_2_','20jul14_cont_20jul3_S4_cycle__step_3__step_3_','20jul14_cont_20jul3_S4_cycle__step_3__step_4_']
+lfn = ['data/'+x+'ActionsRewards.txt' for x in lfn]
+pdac = getconcatactionreward(lfn)
+plotFollowBall(pdac,ax=subplot(1,1,1),cumulative=True,color='c');  ylim((0,.45))
+plotHitMiss(pdac,ax=subplot(1,1,1),lclr=['m'],asratio=True); ylim((0,.45))
+plotScoreMiss(pdac,ax=subplot(1,1,1),clr='y',asratio=True); ylim((0,.45))
+savefig('gif/'+dstr+simstr+'perf_compare_all_steps_so_far_norm_no_norm.png')
+gif/20jul20_20jul14_cont_with_norm_20jul3_S4_cycle__step_3__step_4_perf_compare_all_steps_so_far_norm_no_norm.png
+so norm is helping slightly for follow, but not for score/miss
+(c,m,y are the no-norm simulations)
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP','EMSTAY'],lclr=['r','b','g'],plotindiv=True)
+xlabel('Time (ms)',fontsize=30); ylabel('Average weight',fontsize=30); tl(); 
+savefig('gif/'+dstr+simstr+'all_avg_weight.png') #
+gif/20jul20_20jul14_cont_with_norm_20jul3_S4_cycle__step_3__step_4_all_avg_weight.png
+
+fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4',showflow=False) # 
+lpop = ['ER', 'EV1DNW', 'EV1DN', 'EV1DNE','EV1', 'IR', 'EV1DW','EV1DE','IV1','EMUP','EV1DSW', 'EV1DS', 'EV1DSE','IM','EMDOWN', 'EMSTAY']  
+dact = getdActMap(totalDur, tstepPerAction, dspkT, dspkID, dnumc, dstartidx, lpop)
+fig, axs, plt = animActivityMaps(lpop=lpop)
+
+** check raster/activity/movies for NO weight normalized version (on cycle)
+
+python -i simdat.py backupcfg/20jul14_cont_20jul3_S4_cycle__step_3__step_4_sim.json
+
+plotFollowBall(actreward,ax=subplot(1,1,1),cumulative=True,color='b');  ylim((0,1.))
+plotHitMiss(actreward,ax=subplot(1,1,1),lclr=['g'],asratio=True); ylim((0,1.))
+plotScoreMiss(actreward,ax=subplot(1,1,1),clr='r',asratio=True); ylim((0,1.))
+ylabel('Performance')
+lpatch = [mpatches.Patch(color=c,label=s) for c,s in zip(['b','g','r'],['Follow','Hit/Miss','Score/Miss'])]
+ax=gca()
+ax.legend(handles=lpatch,handlelength=1)
+
+savefig('gif/'+dstr+simstr+'perf.png') # gif/20jul20_20jul14_cont_20jul3_S4_cycle__step_3__step_4_perf.png
+that's much worse than the one with weight norm; so should probably discontinue the one without weight norm
+(could restart from final weight norm weights and just use score/loss rewards to see if it improves at all...)
+
+clf(); drawraster(dspkT,dspkID); xlim((1590e3,1600e3)); ylim((0,sum(list(dnumc.values())))); #
+savefig('gif/'+dstr+simstr+'rast.png') # gif/20jul20_20jul14_cont_20jul3_S4_cycle__step_3__step_4_rast.png
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','EMSTAY','IM'],tlim=(1590e3,1600e3)); 
+savefig('gif/'+dstr+simstr+'Vm.png'); # gif/20jul20_20jul14_cont_20jul3_S4_cycle__step_3__step_4_Vm.png
+
+#
+clf(); dobjpos = loadObjPos() ## 
+xlabel('Racket Y position'); hist(dobjpos['racket'][:,1])
+savefig('gif/'+dstr+simstr+'poshist.png') # gif/20jul20_20jul14_cont_20jul3_S4_cycle__step_3__step_4_poshist.png
+
+lfn = ['20jun30_S0_cycle_', '20jun30_S1_cycle_', '20jun30_S2_cycle_', '20jul2_S3_cycle_', '20jul3_S4_cycle__step_0_','20jul3_S4_cycle__step_1_','20jul3_S4_cycle__step_2_','20jul3_S4_cycle__step_3_','20jul14_cont_20jul3_S4_cycle__step_3__step_0_','20jul14_cont_20jul3_S4_cycle__step_3__step_1_','20jul14_cont_20jul3_S4_cycle__step_3__step_2_','20jul14_cont_20jul3_S4_cycle__step_3__step_3_','20jul14_cont_20jul3_S4_cycle__step_3__step_4_']
+lfn = ['data/'+x+'ActionsRewards.txt' for x in lfn]
+pdac = getconcatactionreward(lfn)
+
+plotFollowBall(pdac,ax=subplot(1,1,1),cumulative=True,color='b');  ylim((0,.45))
+plotHitMiss(pdac,ax=subplot(1,1,1),lclr=['g'],asratio=True); ylim((0,.45))
+plotScoreMiss(pdac,ax=subplot(1,1,1),clr='r',asratio=True); ylim((0,.45))
+
+ylabel('Performance',fontsize=30);
+xlabel('Time (ms)',fontsize=30)
+lpatch = [mpatches.Patch(color=c,label=s) for c,s in zip(['b','g','r'],['Follow','Hit/Miss','Score/Miss'])]
+ax=gca()
+ax.legend(handles=lpatch,handlelength=1,fontsize=30)
+tl()
+
+savefig('gif/'+dstr+simstr+'perf_all_steps_so_far.png')
+gif/20jul20_20jul14_cont_20jul3_S4_cycle__step_3__step_4_perf_all_steps_so_far.png
+
+#clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP','EMSTAY'],lclr=['r','b','g'],plotindiv=True)
+#xlabel('Time (ms)',fontsize=30); ylabel('Average weight',fontsize=30); tl(); 
+#savefig('gif/'+dstr+simstr+'all_avg_weight.png') #
+
+#fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4',showflow=False) # 
+#lpop = ['ER', 'EV1DNW', 'EV1DN', 'EV1DNE','EV1', 'IR', 'EV1DW','EV1DE','IV1','EMUP','EV1DSW', 'EV1DS', 'EV1DSE','IM','EMDOWN', 'EMSTAY']  
+#dact = getdActMap(totalDur, tstepPerAction, dspkT, dspkID, dnumc, dstartidx, lpop)
+#fig, axs, plt = animActivityMaps(lpop=lpop)
+
+** use last weight norm sim on cycle to continue sim with less frequent weight norm
+
+cp backupcfg/20jul14_cont_with_norm_20jul3_S4_cycle__step_3__step_5_sim.json sn.json
+
+    "simtype": {"ResumeSim": 1, "ResumeSimFromFile": "data/20jul14_cont_with_norm_20jul3_S4_cycle__step_3__step_4_synWeights_final.pkl"},
+
+"name": "20jul20_cont_S_with_less_freq_norm_cycle_"
+"normalizeWeightStepSize": 75000
+that's norm every 1500 s
+also cutting down recording weight step size to 1/2 as frequent...:
+"recordWeightStepSize": 500
+
+python multistepSim.py sn.json 32 10 20jul20_MultiTestSContinueNormLessFreq
+
+started 15:43 ...
+
+** use last weight norm sim on cycle to continue sim with no intermediate rewards
+
+see if using the final weights that had intermediate rewards can be used
+to bootstrap improved learning for hit/miss and score ... so there's partial
+intermediate reward (hit ball will still get a reward)
+
+data/20jul14_cont_with_norm_20jul3_S4_cycle__step_3__step_4_synWeights_final.pkl
+
+will have to use longer time constant for RL ... 
+
+    "simtype": {"ResumeSim": 1, "ResumeSimFromFile": "data/20jul14_cont_with_norm_20jul3_S4_cycle__step_3__step_4_synWeights_final.pkl"},
+"name": "20jul20_cont_S_with_less_freq_norm_lessintermr_cycle_"
+"normalizeWeightStepSize": 75000
+that's norm every 1500 s
+also cutting down recording weight step size to 1/2 as frequent...:
+"recordWeightStepSize": 500
+longer RL tau:
+"RLlenhebb": 1000 (instead of 200)
+    "rewardcodes": {"scorePoint": 1.0, "losePoint": -0.1, "followTarget": 0.0, "avoidTarget": 0.00, "hitBall": 0.5},
+    
+python multistepSim.py sn.json 32 10 20jul20_MultiTestSContinueNormLessFreqLessIntermR
+
+started ~16:00 ...
+
+** check GCP sim progress -->> looked good; interrupt and reload weights, restart with adjusted rewards/taus (similar to cycle sims above)
+
+python -i simdat.py backupcfg/20jul17_testG2_gcp__step_5_sim.json
+
+plotFollowBall(actreward,ax=subplot(1,1,1),cumulative=True,color='b');  ylim((0,1.))
+plotHitMiss(actreward,ax=subplot(1,1,1),lclr=['g'],asratio=True); ylim((0,1.))
+plotScoreMiss(actreward,ax=subplot(1,1,1),clr='r',asratio=True); ylim((0,1.))
+ylabel('Performance')
+lpatch = [mpatches.Patch(color=c,label=s) for c,s in zip(['b','g','r'],['Follow','Hit/Miss','Score/Miss'])]
+ax=gca()
+ax.legend(handles=lpatch,handlelength=1)
+
+savefig('gif/'+dstr+simstr+'perf.png') # gif/20jul20_20jul17_testG2_gcp__step_5_perf.png
+
+similar perf to before ... not really improved further?
+
+lfn = ['20jul15_testG0_gcp_','20jul16_testG1_gcp_', '20jul17_testG2_gcp__step_0_','20jul17_testG2_gcp__step_1_','20jul17_testG2_gcp__step_2_','20jul17_testG2_gcp__step_3_','20jul17_testG2_gcp__step_4_','20jul17_testG2_gcp__step_5_']
+lfn = ['data/'+x+'ActionsRewards.txt' for x in lfn]
+pdac = getconcatactionreward(lfn)
+
+plotFollowBall(pdac,ax=subplot(1,1,1),cumulative=True,color='b');  ylim((0,.45))
+plotHitMiss(pdac,ax=subplot(1,1,1),lclr=['g'],asratio=True); ylim((0,.45))
+plotScoreMiss(pdac,ax=subplot(1,1,1),clr='r',asratio=True); ylim((0,.45))
+lpatch = [mpatches.Patch(color=c,label=s) for c,s in zip(['b','g','r'],['Follow','Hit/Miss','Score/Miss'])]
+ax=gca()
+ax.legend(handles=lpatch,handlelength=1)
+ylabel('Performance')
+savefig('gif/'+dstr+simstr+'perf_all_steps_so_far.png') #
+gif/20jul20_20jul17_testG2_gcp__step_5_perf_all_steps_so_far.png
+has similar performance to network with full connectivity to output ... but not as good ...
+question is how to improve performance further ... 
+
+clf(); drawraster(dspkT,dspkID); xlim((1990e3,2000e3)); ylim((0,sum(list(dnumc.values())))); #
+savefig('gif/'+dstr+simstr+'rast.png') # gif/20jul20_20jul17_testG2_gcp__step_5_rast.png
+firing rates are still ok/low
+
+xlim((1999e3,2000e3))
+savefig('gif/'+dstr+simstr+'rastB.png') # gif/20jul20_20jul17_testG2_gcp__step_5_rastB.png
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','EMSTAY','IM'],tlim=(1990e3,2000e3)); 
+savefig('gif/'+dstr+simstr+'Vm.png'); # gif/20jul20_20jul17_testG2_gcp__step_5_Vm.png
+
+#clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP','EMSTAY'],lclr=['r','b','g'],plotindiv=True)
+#xlabel('Time (ms)'); tl(); 
+#savefig('gif/'+dstr+simstr+'all_avg_weight.png') # 
+
+#fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4',showflow=False)
+
+lpop = ['ER', 'EV1DNW', 'EV1DN', 'EV1DNE','EV1', 'IR', 'EV1DW','EV1DE','IV1','EMUP','EV1DSW', 'EV1DS', 'EV1DSE','IM','EMDOWN', 'EMSTAY']  
+dact = getdActMap(totalDur, tstepPerAction, dspkT, dspkID, dnumc, dstartidx, lpop)
+fig, axs, plt = animActivityMaps(lpop=lpop)
+
+will make that movie ... question is whether to continue this sim as is or adjust settings
+as did on cycle ...
+
+will try the new strategy that tried on cycle - get rid of follow target reward, increase
+RL tau, and use the learned weights as starting point ... this is because current sim seems
+to have stabilized follow probability ... 
+
+cp backupcfg/20jul17_testG2_gcp__step_6_sim.json sn.json
+
+"name": "20jul20_testG3_gcp_lessintermR_"
+    "simtype": {"ResumeSim": 1, "ResumeSimFromFile": "data/20jul17_testG2_gcp__step_5_synWeights_final.pkl"},
+    "rewardcodes": {"scorePoint": 1.0, "losePoint": -0.1, "followTarget": 0.0, "avoidTarget": 0.0, "hitBall": 0.5},    
+    "RLlenhebb": 1000
+
+python multistepSim.py sn.json 30 10 20jul20_MultiTestGCPContinueLessFreqLessIntermR
+
+started ~16:46 ...
+
+*20jul21
+** check continued output on GCP
+
+python -i simdat.py backupcfg/20jul20_testG3_gcp_lessintermR__step_0_sim.json
+
+plotFollowBall(actreward,ax=subplot(1,1,1),cumulative=True,color='b');  ylim((0,1.))
+plotHitMiss(actreward,ax=subplot(1,1,1),lclr=['g'],asratio=True); ylim((0,1.))
+plotScoreMiss(actreward,ax=subplot(1,1,1),clr='r',asratio=True); ylim((0,1.))
+ylabel('Performance')
+lpatch = [mpatches.Patch(color=c,label=s) for c,s in zip(['b','g','r'],['Follow','Hit/Miss','Score/Miss'])]
+ax=gca()
+ax.legend(handles=lpatch,handlelength=1)
+
+savefig('gif/'+dstr+simstr+'perf.png') # gif/20jul21_20jul20_testG3_gcp_lessintermR__step_0_perf.png
+performance looks ~same as before ... so changing reward values did not have a negative impact ...
+was hoping for positive impact ... well, hit/miss ratio is a little higher than before so that's
+possible evidence of improvement ... will have to run longer
+
+lfn = ['20jul15_testG0_gcp_','20jul16_testG1_gcp_', '20jul17_testG2_gcp__step_0_','20jul17_testG2_gcp__step_1_','20jul17_testG2_gcp__step_2_','20jul17_testG2_gcp__step_3_','20jul17_testG2_gcp__step_4_','20jul17_testG2_gcp__step_5_','20jul20_testG3_gcp_lessintermR__step_0_']
+lfn = ['data/'+x+'ActionsRewards.txt' for x in lfn]
+pdac = getconcatactionreward(lfn)
+
+np.amax(pdac.time) / (1e3*60*60) # 4.999999500000001
+so ~5 hours of training so far ... 
+
+plotFollowBall(pdac,ax=subplot(1,1,1),cumulative=True,color='b');  ylim((0,.45))
+plotHitMiss(pdac,ax=subplot(1,1,1),lclr=['g'],asratio=True); ylim((0,.45))
+plotScoreMiss(pdac,ax=subplot(1,1,1),clr='r',asratio=True); ylim((0,.45))
+lpatch = [mpatches.Patch(color=c,label=s) for c,s in zip(['b','g','r'],['Follow','Hit/Miss','Score/Miss'])]
+ax=gca()
+ax.legend(handles=lpatch,handlelength=1)
+ylabel('Performance')
+plot([np.amax(pdac.time)-2000e3,np.amax(pdac.time)-2000e3],[0,0.45],'--',color='gray')
+savefig('gif/'+dstr+simstr+'perf_all_steps_so_far.png') #
+gif/20jul21_20jul20_testG3_gcp_lessintermR__step_0_perf_all_steps_so_far.png
+
+clf(); drawraster(dspkT,dspkID); xlim((1990e3,2000e3)); ylim((0,sum(list(dnumc.values())))); #
+savefig('gif/'+dstr+simstr+'rast.png') # gif/20jul21_20jul20_testG3_gcp_lessintermR__step_0_rast.png
+
+xlim((1999e3,2000e3))
+savefig('gif/'+dstr+simstr+'rastB.png') # gif/20jul21_20jul20_testG3_gcp_lessintermR__step_0_rastB.png
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','EMSTAY','IM'],tlim=(1990e3,2000e3)); 
+savefig('gif/'+dstr+simstr+'Vm.png'); # gif/20jul21_20jul20_testG3_gcp_lessintermR__step_0_Vm.png
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP','EMSTAY'],lclr=['r','b','g'],plotindiv=True)
+xlabel('Time (ms)'); tl(); 
+savefig('gif/'+dstr+simstr+'all_avg_weight.png') #
+gif/20jul21_20jul20_testG3_gcp_lessintermR__step_0_all_avg_weight.png
+weights are changing but much more slowly ...
+savefig('gif/'+dstr+simstr+'all_avg_weightB.png') #
+gif/20jul21_20jul20_testG3_gcp_lessintermR__step_0_all_avg_weightB.png
+savefig('gif/'+dstr+simstr+'all_avg_weightC.png') #
+gif/20jul21_20jul20_testG3_gcp_lessintermR__step_0_all_avg_weightC.png
+
+fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4',showflow=False)
+
+*20jul21
+** check output on cycle (less frequent weight norm)
+
+python -i simdat.py backupcfg/20jul20_cont_S_with_less_freq_norm_cycle__step_0_sim.json
+
+plotFollowBall(actreward,ax=subplot(1,1,1),cumulative=True,color='b');  ylim((0,1.))
+plotHitMiss(actreward,ax=subplot(1,1,1),lclr=['g'],asratio=True); ylim((0,1.))
+plotScoreMiss(actreward,ax=subplot(1,1,1),clr='r',asratio=True); ylim((0,1.))
+ylabel('Performance')
+lpatch = [mpatches.Patch(color=c,label=s) for c,s in zip(['b','g','r'],['Follow','Hit/Miss','Score/Miss'])]
+ax=gca()
+ax.legend(handles=lpatch,handlelength=1)
+
+savefig('gif/'+dstr+simstr+'perf.png') # gif/20jul21_20jul20_cont_S_with_less_freq_norm_cycle__step_0_perf.png
+does not seem better than the more frequent weight norm ... seems a bit worse ...
+
+clf(); drawraster(dspkT,dspkID); xlim((1590e3,1600e3)); ylim((0,sum(list(dnumc.values())))); #
+savefig('gif/'+dstr+simstr+'rast.png') # gif/20jul21_20jul20_cont_S_with_less_freq_norm_cycle__step_0_rast.png
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','EMSTAY','IM'],tlim=(1590e3,1600e3)); 
+savefig('gif/'+dstr+simstr+'Vm.png'); # gif/20jul21_20jul20_cont_S_with_less_freq_norm_cycle__step_0_Vm.png
+
+#
+clf(); dobjpos = loadObjPos() ## 
+xlabel('Racket Y position'); hist(dobjpos['racket'][:,1])
+savefig('gif/'+dstr+simstr+'poshist.png') # gif/20jul21_20jul20_cont_S_with_less_freq_norm_cycle__step_0_poshist.png
+
+lfn = ['20jun30_S0_cycle_', '20jun30_S1_cycle_', '20jun30_S2_cycle_', '20jul2_S3_cycle_', '20jul3_S4_cycle__step_0_','20jul3_S4_cycle__step_1_','20jul3_S4_cycle__step_2_','20jul3_S4_cycle__step_3_','20jul14_cont_20jul3_S4_cycle__step_3__step_0_','20jul14_cont_20jul3_S4_cycle__step_3__step_1_','20jul14_cont_20jul3_S4_cycle__step_3__step_2_','20jul14_cont_20jul3_S4_cycle__step_3__step_3_','20jul14_cont_20jul3_S4_cycle__step_3__step_4_','20jul20_cont_S_with_less_freq_norm_cycle__step_0_']
+lfn = ['data/'+x+'ActionsRewards.txt' for x in lfn]
+pdac = getconcatactionreward(lfn)
+
+plotFollowBall(pdac,ax=subplot(1,1,1),cumulative=True,color='b');  ylim((0,.45))
+plotHitMiss(pdac,ax=subplot(1,1,1),lclr=['g'],asratio=True); ylim((0,.45))
+plotScoreMiss(pdac,ax=subplot(1,1,1),clr='r',asratio=True); ylim((0,.45))
+plot([np.amax(pdac.time)-50e3,np.amax(pdac.time)-50e3],[0,0.45],'--',color='gray') # when weight norm applied last
+plot([np.amax(pdac.time)-1600e3,np.amax(pdac.time)-1600e3],[0,0.45],'--',color='black') # last step start
+ylabel('Performance',fontsize=30);
+xlabel('Time (ms)',fontsize=30)
+lpatch = [mpatches.Patch(color=c,label=s) for c,s in zip(['b','g','r'],['Follow','Hit/Miss','Score/Miss'])]
+ax=gca()
+ax.legend(handles=lpatch,handlelength=1,fontsize=30)
+tl()
+
+savefig('gif/'+dstr+simstr+'perf_all_steps_so_far.png') # gif/20jul21_20jul20_cont_S_with_less_freq_norm_cycle__step_0_perf_all_steps_so_far.png
+
+there might be a slight deflection upward in performance in last step of sim for follow
+target, but need more time to see if improves substantially...
+
+#clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP','EMSTAY'],lclr=['r','b','g'],plotindiv=True)
+#xlabel('Time (ms)',fontsize=30); ylabel('Average weight',fontsize=30); tl(); 
+#savefig('gif/'+dstr+simstr+'all_avg_weight.png') #
+
+#fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4',showflow=False) # 
+#lpop = ['ER', 'EV1DNW', 'EV1DN', 'EV1DNE','EV1', 'IR', 'EV1DW','EV1DE','IV1','EMUP','EV1DSW', 'EV1DS', 'EV1DSE','IM','EMDOWN', 'EMSTAY']  
+#dact = getdActMap(totalDur, tstepPerAction, dspkT, dspkID, dnumc, dstartidx, lpop)
+#fig, axs, plt = animActivityMaps(lpop=lpop)
+
+** check output on cycle (less intermediate reward)
+
+python -i simdat.py backupcfg/20jul20_cont_S_with_less_freq_norm_lessintermr_cycle__step_0_sim.json
+
+plotFollowBall(actreward,ax=subplot(1,1,1),cumulative=True,color='b');  ylim((0,1.))
+plotHitMiss(actreward,ax=subplot(1,1,1),lclr=['g'],asratio=True); ylim((0,1.))
+plotScoreMiss(actreward,ax=subplot(1,1,1),clr='r',asratio=True); ylim((0,1.))
+ylabel('Performance')
+lpatch = [mpatches.Patch(color=c,label=s) for c,s in zip(['b','g','r'],['Follow','Hit/Miss','Score/Miss'])]
+ax=gca()
+ax.legend(handles=lpatch,handlelength=1)
+savefig('gif/'+dstr+simstr+'perf.png') # gif/20jul21_20jul20_cont_S_with_less_freq_norm_lessintermr_cycle__step_0_perf.png
+
+clf(); drawraster(dspkT,dspkID); xlim((1590e3,1600e3)); ylim((0,sum(list(dnumc.values())))); #
+savefig('gif/'+dstr+simstr+'rast.png') # gif/20jul21_20jul20_cont_S_with_less_freq_norm_lessintermr_cycle__step_0_rast.png
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','EMSTAY','IM'],tlim=(1590e3,1600e3)); 
+savefig('gif/'+dstr+simstr+'Vm.png'); # gif/20jul21_20jul20_cont_S_with_less_freq_norm_lessintermr_cycle__step_0_Vm.png
+
+#
+clf(); dobjpos = loadObjPos() ## 
+xlabel('Racket Y position'); hist(dobjpos['racket'][:,1])
+savefig('gif/'+dstr+simstr+'poshist.png') # gif/20jul21_20jul20_cont_S_with_less_freq_norm_lessintermr_cycle__step_0_poshist.png
+
+lfn = ['20jun30_S0_cycle_', '20jun30_S1_cycle_', '20jun30_S2_cycle_', '20jul2_S3_cycle_', '20jul3_S4_cycle__step_0_','20jul3_S4_cycle__step_1_','20jul3_S4_cycle__step_2_','20jul3_S4_cycle__step_3_','20jul14_cont_20jul3_S4_cycle__step_3__step_0_','20jul14_cont_20jul3_S4_cycle__step_3__step_1_','20jul14_cont_20jul3_S4_cycle__step_3__step_2_','20jul14_cont_20jul3_S4_cycle__step_3__step_3_','20jul14_cont_20jul3_S4_cycle__step_3__step_4_','20jul20_cont_S_with_less_freq_norm_lessintermr_cycle__step_0_']
+lfn = ['data/'+x+'ActionsRewards.txt' for x in lfn]
+pdac = getconcatactionreward(lfn)
+
+plotFollowBall(pdac,ax=subplot(1,1,1),cumulative=True,color='b');  ylim((0,.45))
+plotHitMiss(pdac,ax=subplot(1,1,1),lclr=['g'],asratio=True); ylim((0,.45))
+plotScoreMiss(pdac,ax=subplot(1,1,1),clr='r',asratio=True); ylim((0,.45))
+plot([np.amax(pdac.time)-50e3,np.amax(pdac.time)-50e3],[0,0.45],'--',color='gray') # when weight norm applied last
+plot([np.amax(pdac.time)-1600e3,np.amax(pdac.time)-1600e3],[0,0.45],'--',color='black') # last step start
+ylabel('Performance',fontsize=30);
+xlabel('Time (ms)',fontsize=30)
+lpatch = [mpatches.Patch(color=c,label=s) for c,s in zip(['b','g','r'],['Follow','Hit/Miss','Score/Miss'])]
+ax=gca()
+ax.legend(handles=lpatch,handlelength=1,fontsize=30)
+tl()
+
+savefig('gif/'+dstr+simstr+'perf_all_steps_so_far.png') # gif/20jul21_20jul20_cont_S_with_less_freq_norm_lessintermr_cycle__step_0_perf_all_steps_so_far.png
+
+hmm, can not tell diff from other sim above ... overlay ...
+
+lfn = ['20jul20_cont_S_with_less_freq_norm_cycle__step_0_','20jul20_cont_S_with_less_freq_norm_lessintermr_cycle__step_0_']
+lfn = ['data/'+x+'ActionsRewards.txt' for x in lfn]
+lpda = getindivactionreward(lfn)
+
+#
+for pda,clr in zip(lpda,['b','r']):
+  plotFollowBall(pda,ax=subplot(1,3,1),cumulative=True,color=clr); ylim((0,1.))
+  plotHitMiss(pda,ax=subplot(1,3,2),lclr=[clr],asratio=True); ylim((0,1.))
+  plotScoreMiss(pda,ax=subplot(1,3,3),clr=clr,asratio=True); ylim((0,1.))
+
+lpatch = [mpatches.Patch(color=c,label=s) for c,s in zip(['b','r'],['All Interm Reward','Less Interm Reward'])]
+ax=gca()
+ax.legend(handles=lpatch,handlelength=1)
+
+savefig('gif/'+dstr+simstr+'perf_compare_less_interm_reward.png')
+gif/20jul21_20jul20_cont_S_with_less_freq_norm_lessintermr_cycle__step_0_perf_compare_less_interm_reward.png
+the one with no follow target reward seems to be doing better overall ... in terms of hit/miss and score
+
+#clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP','EMSTAY'],lclr=['r','b','g'],plotindiv=True)
+#xlabel('Time (ms)',fontsize=30); ylabel('Average weight',fontsize=30); tl(); 
+#savefig('gif/'+dstr+simstr+'all_avg_weight.png') #
+
+fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4',showflow=False) # 
+#lpop = ['ER', 'EV1DNW', 'EV1DN', 'EV1DNE','EV1', 'IR', 'EV1DW','EV1DE','IV1','EMUP','EV1DSW', 'EV1DS', 'EV1DSE','IM','EMDOWN', 'EMSTAY']  
+#dact = getdActMap(totalDur, tstepPerAction, dspkT, dspkID, dnumc, dstartidx, lpop)
+#fig, axs, plt = animActivityMaps(lpop=lpop)
+
+*20jul22
+** check gcp (step 1)
+
+python -i simdat.py backupcfg/20jul20_testG3_gcp_lessintermR__step_1_sim.json
+
+plotFollowBall(actreward,ax=subplot(1,1,1),cumulative=True,color='b');  ylim((0,1.))
+plotHitMiss(actreward,ax=subplot(1,1,1),lclr=['g'],asratio=True); ylim((0,1.))
+plotScoreMiss(actreward,ax=subplot(1,1,1),clr='r',asratio=True); ylim((0,1.))
+ylabel('Performance')
+lpatch = [mpatches.Patch(color=c,label=s) for c,s in zip(['b','g','r'],['Follow','Hit/Miss','Score/Miss'])]
+ax=gca()
+ax.legend(handles=lpatch,handlelength=1)
+
+savefig('gif/'+dstr+simstr+'perf.png') # gif/20jul22_20jul20_testG3_gcp_lessintermR__step_1_perf.png
+
+lfn = ['20jul15_testG0_gcp_','20jul16_testG1_gcp_', '20jul17_testG2_gcp__step_0_','20jul17_testG2_gcp__step_1_','20jul17_testG2_gcp__step_2_','20jul17_testG2_gcp__step_3_','20jul17_testG2_gcp__step_4_','20jul17_testG2_gcp__step_5_','20jul20_testG3_gcp_lessintermR__step_0_','20jul20_testG3_gcp_lessintermR__step_1_']
+lfn = ['data/'+x+'ActionsRewards.txt' for x in lfn]
+pdac = getconcatactionreward(lfn)
+
+np.amax(pdac.time) / (1e3*60*60) # 5.555555000000001
+
+plotFollowBall(pdac,ax=subplot(1,1,1),cumulative=True,color='b');  ylim((0,.45))
+plotHitMiss(pdac,ax=subplot(1,1,1),lclr=['g'],asratio=True); ylim((0,.45))
+plotScoreMiss(pdac,ax=subplot(1,1,1),clr='r',asratio=True); ylim((0,.45))
+lpatch = [mpatches.Patch(color=c,label=s) for c,s in zip(['b','g','r'],['Follow','Hit/Miss','Score/Miss'])]
+ax=gca()
+ax.legend(handles=lpatch,handlelength=1)
+ylabel('Performance')
+plot([np.amax(pdac.time)-4000e3,np.amax(pdac.time)-4000e3],[0,0.45],'--',color='gray')
+savefig('gif/'+dstr+simstr+'perf_all_steps_so_far.png') # gif/20jul22_20jul20_testG3_gcp_lessintermR__step_1_perf_all_steps_so_far.png
+
+doesnt look like improving ... 
+
+clf(); drawraster(dspkT,dspkID); xlim((1990e3,2000e3)); ylim((0,sum(list(dnumc.values())))); #
+savefig('gif/'+dstr+simstr+'rast.png') # gif/20jul22_20jul20_testG3_gcp_lessintermR__step_1_rast.png
+even though rates are fairly low...due to normalization
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','EMSTAY','IM'],tlim=(1990e3,2000e3)); 
+savefig('gif/'+dstr+simstr+'Vm.png'); # gif/20jul22_20jul20_testG3_gcp_lessintermR__step_1_Vm.png
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP','EMSTAY'],lclr=['r','b','g'],plotindiv=True)
+xlabel('Time (ms)'); tl(); 
+savefig('gif/'+dstr+simstr+'all_avg_weight.png') # gif/20jul22_20jul20_testG3_gcp_lessintermR__step_1_all_avg_weight.png
+
+fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4',showflow=False)
+
+** check gcp (step 2)
+
+python -i simdat.py backupcfg/20jul20_testG3_gcp_lessintermR__step_2_sim.json
+
+plotFollowBall(actreward,ax=subplot(1,1,1),cumulative=True,color='b');  ylim((0,1.))
+plotHitMiss(actreward,ax=subplot(1,1,1),lclr=['g'],asratio=True); ylim((0,1.))
+plotScoreMiss(actreward,ax=subplot(1,1,1),clr='r',asratio=True); ylim((0,1.))
+ylabel('Performance')
+lpatch = [mpatches.Patch(color=c,label=s) for c,s in zip(['b','g','r'],['Follow','Hit/Miss','Score/Miss'])]
+ax=gca()
+ax.legend(handles=lpatch,handlelength=1)
+
+savefig('gif/'+dstr+simstr+'perf.png') # gif/20jul22_20jul20_testG3_gcp_lessintermR__step_2_perf.png
+does not look like it's changing much...
+
+lfn = ['20jul15_testG0_gcp_','20jul16_testG1_gcp_', '20jul17_testG2_gcp__step_0_','20jul17_testG2_gcp__step_1_','20jul17_testG2_gcp__step_2_','20jul17_testG2_gcp__step_3_','20jul17_testG2_gcp__step_4_','20jul17_testG2_gcp__step_5_','20jul20_testG3_gcp_lessintermR__step_0_','20jul20_testG3_gcp_lessintermR__step_1_','20jul20_testG3_gcp_lessintermR__step_2_']
+lfn = ['data/'+x+'ActionsRewards.txt' for x in lfn]
+pdac = getconcatactionreward(lfn)
+
+np.amax(pdac.time) / (1e3*60*60) # 6.1111105000000014
+
+plotFollowBall(pdac,ax=subplot(1,1,1),cumulative=True,color='b');  ylim((0,.45))
+plotHitMiss(pdac,ax=subplot(1,1,1),lclr=['g'],asratio=True); ylim((0,.45))
+plotScoreMiss(pdac,ax=subplot(1,1,1),clr='r',asratio=True); ylim((0,.45))
+lpatch = [mpatches.Patch(color=c,label=s) for c,s in zip(['b','g','r'],['Follow','Hit/Miss','Score/Miss'])]
+ax=gca()
+ax.legend(handles=lpatch,handlelength=1)
+ylabel('Performance')
+plot([np.amax(pdac.time)-6000e3,np.amax(pdac.time)-6000e3],[0,0.45],'--',color='gray')
+savefig('gif/'+dstr+simstr+'perf_all_steps_so_far.png') # gif/20jul22_20jul20_testG3_gcp_lessintermR__step_2_perf_all_steps_so_far.png
+
+doesnt look like improving ... 
+
+clf(); drawraster(dspkT,dspkID); xlim((1990e3,2000e3)); ylim((0,sum(list(dnumc.values())))); #
+savefig('gif/'+dstr+simstr+'rast.png') # gif/20jul22_20jul20_testG3_gcp_lessintermR__step_2_rast.png
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','EMSTAY','IM'],tlim=(1990e3,2000e3)); 
+savefig('gif/'+dstr+simstr+'Vm.png'); # gif/20jul22_20jul20_testG3_gcp_lessintermR__step_2_Vm.png
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP','EMSTAY'],lclr=['r','b','g'],plotindiv=True)
+xlabel('Time (ms)'); tl(); 
+savefig('gif/'+dstr+simstr+'all_avg_weight.png') # gif/20jul22_20jul20_testG3_gcp_lessintermR__step_2_all_avg_weight.png
+
+weights are changing much more slowly since less frequent reward/punishment ... could increase weight increments and see if helps ... 
+
+# fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4',showflow=False)
+
+*20jul23
+** check gcp (step 3)
+
+python -i simdat.py backupcfg/20jul20_testG3_gcp_lessintermR__step_3_sim.json
+
+plotFollowBall(actreward,ax=subplot(1,1,1),cumulative=True,color='b');  ylim((0,1.))
+plotHitMiss(actreward,ax=subplot(1,1,1),lclr=['g'],asratio=True); ylim((0,1.))
+plotScoreMiss(actreward,ax=subplot(1,1,1),clr='r',asratio=True); ylim((0,1.))
+ylabel('Performance')
+lpatch = [mpatches.Patch(color=c,label=s) for c,s in zip(['b','g','r'],['Follow','Hit/Miss','Score/Miss'])]
+ax=gca()
+ax.legend(handles=lpatch,handlelength=1)
+
+savefig('gif/'+dstr+simstr+'perf.png') # gif/20jul23_20jul20_testG3_gcp_lessintermR__step_3_perf.png
+now performance is getting worse...
+
+lfn = ['20jul15_testG0_gcp_','20jul16_testG1_gcp_', '20jul17_testG2_gcp__step_0_','20jul17_testG2_gcp__step_1_','20jul17_testG2_gcp__step_2_','20jul17_testG2_gcp__step_3_','20jul17_testG2_gcp__step_4_','20jul17_testG2_gcp__step_5_','20jul20_testG3_gcp_lessintermR__step_0_','20jul20_testG3_gcp_lessintermR__step_1_','20jul20_testG3_gcp_lessintermR__step_2_','20jul20_testG3_gcp_lessintermR__step_3_']
+lfn = ['data/'+x+'ActionsRewards.txt' for x in lfn]
+pdac = getconcatactionreward(lfn)
+
+np.amax(pdac.time) / (1e3*60*60) # 6.666666000000001
+
+plotFollowBall(pdac,ax=subplot(1,1,1),cumulative=True,color='b');  ylim((0,.45))
+plotHitMiss(pdac,ax=subplot(1,1,1),lclr=['g'],asratio=True); ylim((0,.45))
+plotScoreMiss(pdac,ax=subplot(1,1,1),clr='r',asratio=True); ylim((0,.45))
+lpatch = [mpatches.Patch(color=c,label=s) for c,s in zip(['b','g','r'],['Follow','Hit/Miss','Score/Miss'])]
+ax=gca()
+ax.legend(handles=lpatch,handlelength=1)
+ylabel('Performance')
+plot([np.amax(pdac.time)-8000e3,np.amax(pdac.time)-8000e3],[0,0.45],'--',color='gray')
+savefig('gif/'+dstr+simstr+'perf_all_steps_so_far.png') # gif/20jul23_20jul20_testG3_gcp_lessintermR__step_3_perf_all_steps_so_far.png
+
+performance getting worse...
+
+clf(); drawraster(dspkT,dspkID); xlim((1990e3,2000e3)); ylim((0,sum(list(dnumc.values())))); #
+savefig('gif/'+dstr+simstr+'rast.png') # gif/20jul23_20jul20_testG3_gcp_lessintermR__step_3_rast.png
+
+but the firing rates are ok...since still using weight normalization every 1500 s... no, was not
+using weight normalization, but the rates were still fairly low already ... 
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','EMSTAY','IM'],tlim=(1990e3,2000e3)); 
+savefig('gif/'+dstr+simstr+'Vm.png'); # gif/20jul23_20jul20_testG3_gcp_lessintermR__step_3_Vm.png
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP','EMSTAY'],lclr=['r','b','g'],plotindiv=True)
+xlabel('Time (ms)'); tl(); 
+savefig('gif/'+dstr+simstr+'all_avg_weight.png') # gif/20jul23_20jul20_testG3_gcp_lessintermR__step_3_all_avg_weight.png
+zoom-in shows weights changing, but much too slowly ... should adjust scores and try again ...
+
+# fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4',showflow=False)
+
+** restart multistep on gcp but use larger scores
+
+    "simtype": {"ResumeSim": 1, "ResumeSimFromFile": "data/20jul17_testG2_gcp__step_5_synWeights_final.pkl"},
+
+can multiply RLhebbwt by by 10 - see if that makes a difference...
+from 6e-07 to 6e-06
+
+also increase the RL tau ... 1 s may not be long enough ...
+"RLlenhebb": 2000
+
+"name": "20jul23_testG4_gcp_lessintermR_"
+
+python multistepSim.py sn.json 30 10 20jul23_MultiTestGCPContinue
+
+started ~12:04 ...
+
