@@ -3,7 +3,7 @@ from matplotlib import pyplot as plt
 import numpy as np
 import gym
 #from pylab import *
-nbsteps = 20000
+nbsteps = 400
 
 courtXRng = (20, 140)
 courtYRng = (34, 194)
@@ -32,8 +32,8 @@ def findobj (img, xrng, yrng):
     xpos = np.median(Obj_inds,0)[1]
   return xpos, ypos
 
-#env = gym.make('Pong-v0',frameskip=3)
-env = gym.make('PongNoFrameskip-v4')
+env = gym.make('Pong-v0',frameskip=2)
+#env = gym.make('PongNoFrameskip-v4')
 env.reset()
 
 def predictBallRacketYIntercept(xpos_Ball,ypos_Ball,xpos_Ball2,ypos_Ball2):
@@ -65,7 +65,8 @@ predY = predictBallRacketYIntercept(xpos_Ball,ypos_Ball,xpos_Ball2,ypos_Ball2)
 
 #ion()
 
-for _ in range(nbsteps):
+maxtstr = len(str(nbsteps))
+for step in range(nbsteps):
   if predY==-1:
     caction = np.random.randint(3,4)
   else:
@@ -77,12 +78,34 @@ for _ in range(nbsteps):
     else:
       caction = 1
   observation, reward, done, info = env.step(caction)
-  env.render()
+  #env.render()
   xpos_Ball = xpos_Ball2
   ypos_Ball = ypos_Ball2
   xpos_Ball2, ypos_Ball2 = findobj (observation, courtXRng, courtYRng)
   xpos_Racket2, ypos_Racket2 = findobj (observation, racketXRng, courtYRng)
   predY = predictBallRacketYIntercept(xpos_Ball,ypos_Ball,xpos_Ball2,ypos_Ball2)
-  #imshow(observation,origin='upper'); plot([xpos_Racket2+courtXRng[0]],[predY+courtYRng[0]],'ro')
+  plt.imshow(observation[courtYRng[0]:courtYRng[1],:,:],origin='upper')
+  print(predY)
+  #if predY>0 and predY<160:
+    #plt.plot(xpos_Racket2+courtXRng[1],predY,'ro')
+    #plt.plot([xpos_Racket2+courtXRng[1]],[predY+courtYRng[0]],'ro')
+  #if step==0:
+  #  im0 = plt.imshow(observation,origin='upper')
+  #  if predY>0: 
+  #    plt.plot([xpos_Racket2+courtXRng[1]],[predY+courtYRng[0]],'ro')
+  #else:
+  #  im0.set_data(observation)
+  #  if predY>0: 
+  #    plt.plot([xpos_Racket2+courtXRng[1]],[predY+courtYRng[0]],'ro')
+  plt.pause(1)
+  ctstrl = len(str(step))
+  tpre = ''
+  for ttt in range(maxtstr-ctstrl):
+    tpre = tpre+'0'
+  fn = tpre+str(step)+'.png'
+  fnimg = 'HitMissImages/'+fn
+  #fnimg = 'RacketPredictionImages/'+fn
+  plt.savefig(fnimg)
+  plt.close()
   if done==1:
     env.reset()
