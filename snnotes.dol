@@ -13043,3 +13043,113 @@ python multistepSim.py sn.json 30 10 20jul23_MultiTestGCPContinue
 
 started ~12:04 ...
 
+** check status/output on cycle
+
+python -i simdat.py backupcfg/20jul20_cont_S_with_less_freq_norm_lessintermr_cycle__step_1_sim.json
+
+plotFollowBall(actreward,ax=subplot(1,1,1),cumulative=True,color='b');  ylim((0,1.))
+plotHitMiss(actreward,ax=subplot(1,1,1),lclr=['g'],asratio=True); ylim((0,1.))
+plotScoreMiss(actreward,ax=subplot(1,1,1),clr='r',asratio=True); ylim((0,1.))
+ylabel('Performance')
+lpatch = [mpatches.Patch(color=c,label=s) for c,s in zip(['b','g','r'],['Follow','Hit/Miss','Score/Miss'])]
+ax=gca()
+ax.legend(handles=lpatch,handlelength=1)
+savefig('gif/'+dstr+simstr+'perf.png') # gif/20jul23_20jul20_cont_S_with_less_freq_norm_lessintermr_cycle__step_1_perf.png
+doing reasonably well (compared to prior sims), though not consistently improving ...
+performance probably depends on where ball hit to ... so should not expect uniform performance
+
+clf(); drawraster(dspkT,dspkID); xlim((1590e3,1600e3)); ylim((0,sum(list(dnumc.values())))); #
+savefig('gif/'+dstr+simstr+'rast.png') # gif/20jul23_20jul20_cont_S_with_less_freq_norm_lessintermr_cycle__step_1_rast.png
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','EMSTAY','IM'],tlim=(1590e3,1600e3)); 
+savefig('gif/'+dstr+simstr+'Vm.png'); # gif/20jul23_20jul20_cont_S_with_less_freq_norm_lessintermr_cycle__step_1_Vm.png
+
+#
+clf(); dobjpos = loadObjPos() ## 
+xlabel('Racket Y position'); hist(dobjpos['racket'][:,1])
+savefig('gif/'+dstr+simstr+'poshist.png') # gif/20jul23_20jul20_cont_S_with_less_freq_norm_lessintermr_cycle__step_1_poshist.png
+
+lfn = ['20jun30_S0_cycle_', '20jun30_S1_cycle_', '20jun30_S2_cycle_', '20jul2_S3_cycle_', '20jul3_S4_cycle__step_0_','20jul3_S4_cycle__step_1_','20jul3_S4_cycle__step_2_','20jul3_S4_cycle__step_3_','20jul14_cont_20jul3_S4_cycle__step_3__step_0_','20jul14_cont_20jul3_S4_cycle__step_3__step_1_','20jul14_cont_20jul3_S4_cycle__step_3__step_2_','20jul14_cont_20jul3_S4_cycle__step_3__step_3_','20jul14_cont_20jul3_S4_cycle__step_3__step_4_','20jul20_cont_S_with_less_freq_norm_lessintermr_cycle__step_0_','20jul20_cont_S_with_less_freq_norm_lessintermr_cycle__step_1_']
+lfn = ['data/'+x+'ActionsRewards.txt' for x in lfn]
+pdac = getconcatactionreward(lfn)
+
+plotFollowBall(pdac,ax=subplot(1,1,1),cumulative=True,color='b');  ylim((0,.45))
+plotHitMiss(pdac,ax=subplot(1,1,1),lclr=['g'],asratio=True); ylim((0,.45))
+plotScoreMiss(pdac,ax=subplot(1,1,1),clr='r',asratio=True); ylim((0,.45))
+plot([np.amax(pdac.time)-50e3,np.amax(pdac.time)-50e3],[0,0.45],'--',color='gray') # when weight norm applied last
+plot([np.amax(pdac.time)-3200e3,np.amax(pdac.time)-3200e3],[0,0.45],'--',color='black') # last step start
+ylabel('Performance',fontsize=30);
+xlabel('Time (ms)',fontsize=30)
+lpatch = [mpatches.Patch(color=c,label=s) for c,s in zip(['b','g','r'],['Follow','Hit/Miss','Score/Miss'])]
+ax=gca()
+ax.legend(handles=lpatch,handlelength=1,fontsize=30)
+tl()
+
+savefig('gif/'+dstr+simstr+'perf_all_steps_so_far.png')
+gif/20jul23_20jul20_cont_S_with_less_freq_norm_lessintermr_cycle__step_1_perf_all_steps_so_far.png
+
+savefig('gif/'+dstr+simstr+'perf_all_steps_so_farA.png') # gif/20jul23_20jul20_cont_S_with_less_freq_norm_lessintermr_cycle__step_1_perf_all_steps_so_farA.png
+looks like follow score going up even though no longer explicitly reinforced...
+
+everything else pretty flat ...
+
+note that this sim has less frequent weight norm and no follow target reward ...
+
+how does it compare to the one with only less frequent weight norm?
+
+lfn = ['20jul20_cont_S_with_less_freq_norm_cycle__step_1_','20jul20_cont_S_with_less_freq_norm_lessintermr_cycle__step_1_']
+lfn = ['data/'+x+'ActionsRewards.txt' for x in lfn]
+lpda = getindivactionreward(lfn)
+
+#
+for pda,clr in zip(lpda,['b','r']):
+  plotFollowBall(pda,ax=subplot(1,3,1),cumulative=True,color=clr); ylim((0,1.))
+  plotHitMiss(pda,ax=subplot(1,3,2),lclr=[clr],asratio=True); ylim((0,1.))
+  plotScoreMiss(pda,ax=subplot(1,3,3),clr=clr,asratio=True); ylim((0,1.))
+
+lpatch = [mpatches.Patch(color=c,label=s) for c,s in zip(['b','r'],['All Interm Reward','Less Interm Reward'])]
+ax=gca()
+ax.legend(handles=lpatch,handlelength=1)
+
+savefig('gif/'+dstr+simstr+'perf_compare_less_interm_reward.png')
+gif/20jul23_20jul20_cont_S_with_less_freq_norm_lessintermr_cycle__step_1_perf_compare_less_interm_reward.png
+
+less interm reward may be doing better on scoring, though there's still a lot of overlap
+... should compare both steps so have more to compare ...
+
+llfn = [['20jul20_cont_S_with_less_freq_norm_cycle__step_0_','20jul20_cont_S_with_less_freq_norm_cycle__step_1_'],
+        ['20jul20_cont_S_with_less_freq_norm_lessintermr_cycle__step_0_','20jul20_cont_S_with_less_freq_norm_lessintermr_cycle__step_1_']]
+lpda = [getconcatactionreward(lfn) for lfn in llfn]
+
+#
+for pda,clr in zip(lpda,['b','r']):
+  plotFollowBall(pda,ax=subplot(1,3,1),cumulative=True,color=clr); ylim((0,1.))
+  plotHitMiss(pda,ax=subplot(1,3,2),lclr=[clr],asratio=True); ylim((0,1.))
+  plotScoreMiss(pda,ax=subplot(1,3,3),clr=clr,asratio=True); ylim((0,1.))
+
+lpatch = [mpatches.Patch(color=c,label=s) for c,s in zip(['b','r'],['All Interm Reward','Less Interm Reward'])]
+ax=gca()
+ax.legend(handles=lpatch,handlelength=1)
+
+savefig('gif/'+dstr+simstr+'perf_compare_less_interm_reward.png')
+
+gif/20jul23_20jul20_cont_S_with_less_freq_norm_lessintermr_cycle__step_1_perf_compare_less_interm_reward.png
+
+seems like less intermediate reward sim doing better overall - definitely in terms of score ... 
+
+so may want to stop the sim with the follow target rewards ... 
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP','EMSTAY'],lclr=['r','b','g'],plotindiv=True)
+xlabel('Time (ms)',fontsize=30); ylabel('Average weight',fontsize=30); tl(); 
+savefig('gif/'+dstr+simstr+'all_avg_weight.png') #
+gif/20jul23_20jul20_cont_S_with_less_freq_norm_lessintermr_cycle__step_1_all_avg_weight.png
+weights changing at a somewhat slow but perhaps reasonable pace...
+
+fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4',showflow=False) # 
+#lpop = ['ER', 'EV1DNW', 'EV1DN', 'EV1DNE','EV1', 'IR', 'EV1DW','EV1DE','IV1','EMUP','EV1DSW', 'EV1DS', 'EV1DSE','IM','EMDOWN', 'EMSTAY']  
+#dact = getdActMap(totalDur, tstepPerAction, dspkT, dspkID, dnumc, dstartidx, lpop)
+#fig, axs, plt = animActivityMaps(lpop=lpop)
+
+stopped this one (python multistepSim.py sn.json 32 10 20jul20_MultiTestSContinueNormLessFreq)
+so, only the one with no follow target reward is running now ...
+
