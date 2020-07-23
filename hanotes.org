@@ -3944,3 +3944,122 @@ WE DECIDED TO USE staysteplim of 1 for now.
 (Length of the eligibility Hebbian and anti-Hebbian eligibility traces, or the decay time constants if the traces are decaying exponentials.)
 -- change "RLwindhebb": 50 to "RLwindhebb": 20
 (Maximum interval between pre- and post-synaptic events for an starting an eligibility trace.) 
+
+
+** run 100 sec sim in "20jul10_B0_falcor"
+-- all parameters are same as for "20jul10_B0_falcor"
+-- change "FlowWidth":8 (default was 16)
+
+** run 100 sec sim in "20jul10_C0_falcor"
+-- all parameters are same as for "20jul10_B0_falcor"
+-- change "FlowWidth":4 (default was 16)
+
+** run 100 sec sim in "20jul10_A1_falcor_"
+-- same parameters as in "20jul10_A0_falcor_"
+-- use "tstepPerAction": 100 instead of "tstepPerAction": 20
+
+** run 100 sec sim in "20jul10_B1_falcor"
+-- same parameters as in "20jul10_B0_falcor_"
+-- use "tstepPerAction": 100 instead of "tstepPerAction": 20
+
+** run 1000 sec sim in "20jul10_C1_falcor"
+-- all parameters are same as for "20jul10_C0_falcor"
+-- use "tstepPerAction": 100 instead of "tstepPerAction": 20
+
+** run 1000 sec sim in "20jul10_B2_falcor"
+--resume from "20jul10_B1_falcor" 
+--same parameters as in "20jul10_B1_falcor_"
+
+
+** run 1000 sec sim in "20jul10_A2_falcor"
+--resume from "20jul10_A1_falcor" 
+--same parameters as in "20jul10_A1_falcor_"
+
+
+* 20july13
+
+** pull the latest version of code at 5:48 pm.
+
+** run sim 100 sec "20jul13_A0_cycle_"
+-- set "useRacketPredictedPos":0
+-- "FLowWidth":16 (default)
+-- remove "EMSTAY" from sim
+-- Looks promising so run in "20jul13_A1_cycle_" for 1000 sec.
+
+** run sim 100 sec "20jul13_B0_cycle_"
+-- same as "20jul13_A0_cycle_"
+-- "FLowWidth":8
+-- Looks promising so run in "20jul13_B1_cycle_" for 1000 sec.
+
+** run sim 100 sec "20jul13_C0_cycle_"
+-- same as "20jul13_A0_cycle_"
+-- "FLowWidth":4
+-- Doesnt look very good. so drop this sim.json
+
+** run sim 1000 sec "20jul13_A1_cycle_"
+-- same as "20jul13_A0_cycle_"
+
+** run sim 1000 sec "20jul13_B1_cycle_"
+-- same as "20jul13_B0_cycle_"
+
+** run sim 1000 sec "20jul13_B1lstep_cycle_"
+-- same as "20jul13_B0_cycle_"
+-- tstep = 100 ms
+
+** run sim 1000 sec "20jul13_D1lstep_cycle_"
+-- same as "20jul13_B1lstep_cycle_"
+-- tstep = 100 ms
+-- useRacketPredictedPos: 1
+-- "FLowWidth":8
+-- LOOKS improving
+
+** resume sim 1000 sec "20jul13_D1lstep_cycle_" and save as "20jul13_D1lstep2_cycle_"
+** resume sim 1000 sec "20jul13_D1lstep_cycle_" and save as "20jul13_E1lstep3_cycle_" ---->FILENAME MISTAKE. BE careful
+
+
+** run sim 1000 sec "20jul13_D1_cycle_"
+-- same as "20jul13_D1lstep_cycle_"
+-- tstep = 20 ms
+-- useRacketPredictedPos: 1
+-- "FLowWidth":8
+
+** run sim 1000 sec "20jul13_E1_cycle_"
+-- same as "20jul13_D1_cycle_"
+-- tstep = 20 ms
+-- useRacketPredictedPos: 1
+-- "FLowWidth":16
+
+** run sim 1000 sec "20jul13_E1lstep_cycle_"
+-- same as "20jul13_E1_cycle_"
+-- tstep = 100 ms
+-- useRacketPredictedPos: 1
+-- "FLowWidth":16
+
+** resume sim 1000 sec "20jul13_E1lstep_cycle_" and save as "20jul13_E1lstep2_cycle_"
+
+For saving movies using png files.
+
+import anim
+anim.savemp4(inpath='CentroidTrackingImages/*.png',outpath='CentroidTracking.mp4',framerate=10)
+
+
+plotting tips:
+
+
+plotFollowBall(actreward,ax=subplot(1,3,1),cumulative=True,color='k');  ylim((0,.75))
+plotHitMiss(actreward,ax=subplot(1,3,2),lclr=['k'],asratio=True); ylim((0,.75))
+plotScoreMiss(actreward,ax=subplot(1,3,3),clr='k',asratio=True); ylim((0,.75))
+2:44
+plotHitMiss and have asratio=True
+
+
+more plotting tips
+
+lfn = ['20jun30_S0_cycle_', '20jun30_S1_cycle_', '20jun30_S2_cycle_', '20jul2_S3_cycle_', '20jul3_S4_cycle__step_0_','20jul3_S4_cycle__step_1_','20jul3_S4_cycle__step_2_','20jul3_S4_cycle__step_3_','20jul14_cont_20jul3_S4_cycle__step_3__step_0_']
+lfn = ['data/'+x+'ActionsRewards.txt' for x in lfn]
+pdac = getconcatactionreward(lfn)
+plotFollowBall(pdac,ax=subplot(1,1,1),cumulative=True,color='b');  ylim((0,.45))
+plotHitMiss(pdac,ax=subplot(1,1,1),lclr=['g'],asratio=True); ylim((0,.45))
+plotScoreMiss(pdac,ax=subplot(1,1,1),clr='r',asratio=True); ylim((0,.45))
+11:30
+that's example, where lfn has the simulation names

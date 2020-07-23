@@ -14,8 +14,8 @@ import copy
 from skimage.transform import downscale_local_mean, rescale, resize
 
 AIGame = AIGame()
-#for _ in range(20):
-rewards, epCount, proposed_actions, total_hits, Racket_pos, Ball_pos = AIGame.playGame(actions=[3], epCount = 0)
+for _ in range(20):
+  rewards, epCount, proposed_actions, total_hits = AIGame.playGame(actions=[3], epCount = 0)
 
 def getObjectsBoundingBoxes(frame):
   mask = frame > np.min(frame)
@@ -89,19 +89,21 @@ def getObjectMotionDirection(objects, last_objects, rects, dims,FlowWidth):
 
 # initialize our centroid tracker and frame dimensions
 ct = CentroidTracker()
-NB_steps = 100
+NB_steps = 200
 steps = 0
-fig = plt.figure()
+fig = plt.figure(figsize=(6,2.8))
 gs = gridspec.GridSpec(1,2)
 f_ax = []
 f_ax.append(fig.add_subplot(gs[0,0]))
 f_ax.append(fig.add_subplot(gs[0,1]))
 objects = OrderedDict()
 last_objects = OrderedDict()
+maxtstr = len(str(NB_steps))
 while steps<NB_steps:
   caction = random.randint(3,4)
   # read the next frame from the AIGame
-  rewards, epCount, proposed_actions, total_hits, Racket_pos, Ball_pos = AIGame.playGame(actions=[caction], epCount = 0)
+  #rewards, epCount, proposed_actions, total_hits, Racket_pos, Ball_pos = AIGame.playGame(actions=[caction], epCount = 0)
+  rewards, epCount, proposed_actions, total_hits = AIGame.playGame(actions=[caction], epCount = 0)
   frame = AIGame.FullImages[-1]
   #frame  = downscale_local_mean(frame,(8,8))
   # Detect the objects, and initialize the list of bounding box rectangles
@@ -142,5 +144,13 @@ while steps<NB_steps:
     plt.draw()
     plt.pause(1)
   last_object = objects
+  ctstrl = len(str(steps))
+  tpre = ''
+  for ttt in range(maxtstr-ctstrl):
+    tpre = tpre+'0'
+  fn = tpre+str(steps)+'.png'
+  fnimg = 'CentroidTrackingImages/'+fn
+  plt.savefig(fnimg)
   steps = steps+1
+
 
