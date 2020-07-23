@@ -4063,3 +4063,16 @@ plotHitMiss(pdac,ax=subplot(1,1,1),lclr=['g'],asratio=True); ylim((0,.45))
 plotScoreMiss(pdac,ax=subplot(1,1,1),clr='r',asratio=True); ylim((0,.45))
 11:30
 that's example, where lfn has the simulation names
+
+
+
+*20july23
+
+** I will start the parameters in file "/home/samn/SMARTAgent/backupcfg/20jul14_cont_with_norm_20jul3_S4_cycle__step_3__step_5_sim.json" as reference to start exploring further
+** Additions: 
+-- "env":  {"name": "Pong-v0", "frameskip":2, "savemp4":0},
+-- "EEMFeedbackProb": 0.05
+-- "EEMRecProb": 0.07
+-- "weightVar": 0.4
+
+** run 1000 sec sim in "20jul23_A0_cycle_"
