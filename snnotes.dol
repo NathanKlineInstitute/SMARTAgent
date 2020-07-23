@@ -13022,6 +13022,7 @@ savefig('gif/'+dstr+simstr+'Vm.png'); # gif/20jul23_20jul20_testG3_gcp_lessinter
 clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP','EMSTAY'],lclr=['r','b','g'],plotindiv=True)
 xlabel('Time (ms)'); tl(); 
 savefig('gif/'+dstr+simstr+'all_avg_weight.png') # gif/20jul23_20jul20_testG3_gcp_lessintermR__step_3_all_avg_weight.png
+zoom-in shows weights changing, but much too slowly ... should adjust scores and try again ...
 
 # fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4',showflow=False)
 
