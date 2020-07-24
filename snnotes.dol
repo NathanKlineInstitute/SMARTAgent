@@ -13285,3 +13285,26 @@ python multistepSim.py sn.json 30 10 20jul24_MultiTestGCPContinue
 
 started @ ~12:32 ...
 
+** restart continuation run on cycle
+
+above had this: 
+cp backupcfg/20jul14_cont_with_norm_20jul3_S4_cycle__step_3__step_5_sim.json sn.json
+
+will adjust parameters since did not look like improving here
+20jul24_20jul20_cont_S_with_less_freq_norm_lessintermr_cycle__step_2_perf_all_steps_so_far.png
+
+will use those final weights below but will also increase RL tau (RLlenhebb)and increase RLhebbwt 
+
+    "simtype": {"ResumeSim": 1, "ResumeSimFromFile": "data/20jul14_cont_with_norm_20jul3_S4_cycle__step_3__step_4_synWeights_final.pkl"},
+"name": "20jul24_cont_S_with_less_freq_norm_lessintermr_cycle_"
+"normalizeWeightStepSize": 75000
+longer RL tau:
+"RLlenhebb": 2000
+"RLhebbwt": 2e-06
+will adjust scores too:
+"rewardcodes": {"scorePoint": 1.0, "losePoint": -1.0, "followTarget": 0.0, "avoidTarget": 0.00, "hitBall": 0.5},
+
+python multistepSim.py sn.json 32 10 20jul24_MultiTestSContinueNormLessFreqLessIntermR
+
+started ~13:56 ...
+
