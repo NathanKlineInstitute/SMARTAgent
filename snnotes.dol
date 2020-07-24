@@ -13272,3 +13272,16 @@ stopped this sim for now...need to look more carefully at pattern of weights (st
 and see what else could increase network capacity to improve performance ...
 
 ** stopped gcp run on cycle since do have some more gcp credits -- will restart it on gcp
+** restart gcp run on gcp
+
+cp backupcfg/20jul23_testG4_gcp_lessintermR__step_0_sim.json sn.json
+
+then adjust in sn.json
+
+    "simtype": {"ResumeSim": 1, "ResumeSimFromFile": "data/20jul17_testG2_gcp__step_5_synWeights_final.pkl"},
+"name": "20jul24_testG4_gcp_lessintermR_"
+
+python multistepSim.py sn.json 30 10 20jul24_MultiTestGCPContinue
+
+started @ ~12:32 ...
+
