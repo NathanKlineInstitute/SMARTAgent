@@ -529,7 +529,19 @@ def plotScoreLoss (actreward,ax=None,msz=3):
   ax.set_ylim((0,np.max([cumScore[-1],cumLoss[-1]])))
   ax.legend(('Score Point ('+str(cumScore[-1])+')','Lose Point ('+str(cumLoss[-1])+')'),loc='best')
   return cumScore[-1],cumLoss[-1]
-  
+
+def plotPerf (actreward,yl=(0,1)):
+  # plot performance
+  plotFollowBall(actreward,ax=subplot(1,1,1),cumulative=True,color='b');  
+  plotHitMiss(actreward,ax=subplot(1,1,1),lclr=['g'],asratio=True); 
+  plotScoreMiss(actreward,ax=subplot(1,1,1),clr='r',asratio=True);
+  ylim(yl)
+  ylabel('Performance')
+  lpatch = [mpatches.Patch(color=c,label=s) for c,s in zip(['b','g','r'],['Follow','Hit/Miss','Score/Miss'])]
+  ax=gca()
+  ax.legend(handles=lpatch,handlelength=1)
+  return ax
+
 #
 def plotRewards (actreward,ax=None,msz=3,xl=None):
   if ax is None: ax = gca()  
