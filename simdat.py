@@ -464,7 +464,7 @@ def getCumScore (actreward):
   return np.cumsum(allScore) #cumulative score evolving with time.  
 
 #  
-def plotHitMiss (actreward,ax=None,msz=3,asratio=False,lclr=['r','g','b']):
+def plotHitMiss (actreward,ax=None,msz=3,asratio=False,asbin=False,binsz=10e3,lclr=['r','g','b']):
   if ax is None: ax = gca()
   action_times = np.array(actreward.time)
   Hit_Missed = np.array(actreward.hit)
@@ -472,7 +472,15 @@ def plotHitMiss (actreward,ax=None,msz=3,asratio=False,lclr=['r','g','b']):
   allMissed = np.where(Hit_Missed==-1,1,0)
   cumHits = np.cumsum(allHit) #cumulative hits evolving with time.
   cumMissed = np.cumsum(allMissed) #if a reward is -1, replace it with 1 else replace it with 0.
-  if asratio:
+  if asbin:
+    nbin = int(binsz / (np.array(actreward.time)[1]-np.array(actreward.time)[0]))
+    avgHit = np.array([sum(allHit[sidx:sidx+nbin]) for sidx in arange(0,len(allHit),nbin)])
+    avgMiss = np.array([sum(allMissed[sidx:sidx+nbin]) for sidx in arange(0,len(allMissed),nbin)])
+    score = avgHit / (avgHit + avgMiss)
+    ax.plot(np.linspace(0,np.amax(actreward.time),len(score)), score, color=lclr[0],linewidth=msz)
+    ax.set_ylabel('Hit/(Hit+Miss) ('+str(round(score[-1],2))+')')    
+    return score
+  elif asratio:
     ax.plot(action_times,cumHits/cumMissed,lclr[0]+'-o',markersize=msz)
     ax.set_xlim((0,np.max(action_times)))
     ax.set_ylabel('Hit/Miss ('+str(round(cumHits[-1]/cumMissed[-1],2))+')')
@@ -535,6 +543,7 @@ def getconcatactionreward (lfn):
   # lfn is a list of actionrewards filenames from the simulation
   pda = None
   for fn in lfn:
+    if not fn.endswith('ActionsRewards.txt'): fn = 'data/'+fn+'ActionsRewards.txt'
     acl = pd.DataFrame(np.loadtxt(fn),columns=['time','action','reward','proposed','hit'])
     if pda is None:
       pda = acl
@@ -545,8 +554,11 @@ def getconcatactionreward (lfn):
 
 def getindivactionreward (lfn):
   # get the individual actionreward data frames separately so can compare cumulative rewards,actions,etc.
-  # lfn is a list of actionrewards filenames from the simulation
-  return [pd.DataFrame(np.loadtxt(fn),columns=['time','action','reward','proposed','hit']) for fn in lfn]
+  # lfn is a list of actionrewards filenames from the simulation or list of simulation names
+  if lfn[0].endswith('ActionsRewards.txt'): 
+    return [pd.DataFrame(np.loadtxt(fn),columns=['time','action','reward','proposed','hit']) for fn in lfn]
+  else:
+    return [pd.DataFrame(np.loadtxt('data/'+fn+'ActionsRewards.txt'),columns=['time','action','reward','proposed','hit']) for fn in lfn]    
 
 def plotMeanNeuronWeight (pdf,postid,clr='k',ax=None,msz=1,xl=None):
   if ax is None: ax = gca()
