@@ -13308,3 +13308,35 @@ python multistepSim.py sn.json 32 10 20jul24_MultiTestSContinueNormLessFreqLessI
 
 started ~13:56 ...
 
+** other test on gcp -- more EM neurons, sparser connectivity, more recurrent conn
+
+    "rewardcodes": {"scorePoint": 1.0, "losePoint": -1.0, "followTarget": 0.0, "avoidTarget": 0.0, "hitBall": 0.0},
+"name": "20jul24_testH0_gcp_"
+    "RL": {"AMPA": {"wbase": 1e-07, "wmax": 0.00096, "RLon": 1, "RLlenhebb": 2000, "RLlenanti": 50, "useRLexp": 1, "RLhebbwt": 12e-06, "RLantiwt": -0.0, "hebbwt": 0, "antiwt": 0, "tauhebb": 10, "RLwindhebb": 50, "softthresh": 0, "verbose": 0},
+
+
+    "net": {"scale": 1, "ER": 400, "IR": 100, "EV1": 400, "EV1DE": 400, "EV1DNE": 400, "EV1DN": 400, "EV1DNW": 400, "EV1DW": 400, "EV1DSW": 400, "EV1DS": 400, "EV1DSE": 400, "IV1": 100, "EV4": 0, "IV4": 0, "EMT": 0, "IMT": 0, "EMDOWN": 200, "EMUP": 200, "EMSTAY": 200, "IM": 75, "AngRFSigma": 22.5, "DirMinRate": 0.0, "DirMaxRate": 50.0, "EEMWghtAM": 7.2e-05, "EEMWghtNM": 7.2e-06, "EEPreMWghtAM": 8e-05, "EEPreMWghtNM": 2.5e-06, "EEMWghtThreshMin": 6.25e-06, "EEMWghtThreshMax": 0.00032, "EEMProb": 0.15, "EEMRecProb": 0.15, "EEPreMProb": 0.0, "EEMPopNorm": 1, "EEMRecProbCross": 0, "EEMFeedbackProb": 0.0, "EEMFeedbackWghtAM": 1.25e-05, "EEMFeedbackWghtNM": 1.25e-06, "VisualFeedback": 0, "weightVar": 0.5},
+
+have more EM neurons, and lower feedforward and recurrent connectivity ... 
+
+./myrun 24 sn.json
+
+python -i simdat.py backupcfg/20jul24_testH0_gcp_sim.json
+
+ax=plotPerf(actreward,yl=(0,.55))
+savefig('gif/'+dstr+simstr+'perf.png') # gif/20jul24_20jul24_testH0_gcp_perf.png
+already got 2 points ... so there's a chance learning can work without intermediate rewards
+
+drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); #
+savefig('gif/'+dstr+simstr+'rast.png') # gif/20jul24_20jul24_testH0_gcp_rast.png
+rates are good - ~0.7-.8 Hz for EM, 6.3 for IM
+
+drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','EMSTAY','IM'],tlim=(95e3,100e3))
+savefig('gif/'+dstr+simstr+'Vm.png') # gif/20jul24_20jul24_testH0_gcp_Vm.png
+
+fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4',showflow=False) #
+
+can run this longer ...
+
+may as well use the saved weights and start next ... using multistep
+
