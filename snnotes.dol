@@ -13340,3 +13340,10 @@ can run this longer ...
 
 may as well use the saved weights and start next ... using multistep
 
+    "simtype": {"ResumeSim": 1, "ResumeSimFromFile": "data/20jul24_testH0_gcp_synWeights_final.pkl"},    
+    "name": "20jul24_testH1_gcp_"
+
+python multistepSim.py sn.json 24 10 20jul24_MultiTestGCP_H1
+
+started ~16:06 ...
+
