@@ -13347,3 +13347,31 @@ python multistepSim.py sn.json 24 10 20jul24_MultiTestGCP_H1
 
 started ~16:06 ...
 
+will stop this sim - not clear targetted RL makes sense here (see below)
+
+** targettedRL -- should it be used when no intermediate rewards?
+
+probably not? since when scoring a point, the actions taken to score it were a long
+time ago...so no sense in rewarding only 1 action that contributed to the final outcome
+
+for loss of points, it's more likely to be 1 move that contributed, but even there
+often many moves contribute to the mistake
+
+** restart last one on GCP -- adjust params
+
+no targetted RL ... restore size of network to have 100 EMDOWN, EMUP, EMSTAY ...
+
+20jul24_testI0_gcp_
+
+will also bootstrap with previous weights
+
+    "simtype": {"ResumeSim": 1, "ResumeSimFromFile": "data/20jul17_testG2_gcp__step_5_synWeights_final.pkl"},
+
+RLlenhebb of 5000
+
+EEMProb EEMRecProb back to 0.3 ... EEMWghtAM 3.6e-5, EEMWghtNM 3.6e-6
+
+python multistepSim.py sn.json 30 10 20jul24_MultiTestGCP_I
+
+started ~23:24 ...
+
