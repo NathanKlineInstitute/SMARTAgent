@@ -13405,10 +13405,19 @@ mistakenly had the follow/avoid reward codes ... and larger lose point punish va
 these are the codes had intended:
     "rewardcodes": {"scorePoint": 1.0, "losePoint": -0.1, "followTarget": 0.0, "avoidTarget": 0.0, "hitBall": 0.5},
     "name": "20jul25_cont_S_lessintermr_cycle_"
+    "simtype": {"ResumeSim": 1, "ResumeSimFromFile": "data/20jul14_cont_with_norm_20jul3_S4_cycle__step_3__step_4_synWeights_final.pkl"},
 
 ok, restart ...
 
 python multistepSim.py sn.json 32 10 20jul25_MultiTestSContinueNormLessFreqLessIntermR
 
 started ~23:17 ...
+
+** and another on cycle with no intermediate reward (but bootstrapping same as other above)
+
+    "simtype": {"ResumeSim": 1, "ResumeSimFromFile": "data/20jul14_cont_with_norm_20jul3_S4_cycle__step_3__step_4_synWeights_final.pkl"},
+    "rewardcodes": {"scorePoint": 1.0, "losePoint": -0.1, "followTarget": 0.0, "avoidTarget": 0.0, "hitBall": 0.5},
+    "name": "20jul25_cont_S_nointermr_cycle_"
+
+python multistepSim.py sn.json 32 10 20jul25_MultiTestSContinueNormLessFreqNoIntermR
 
