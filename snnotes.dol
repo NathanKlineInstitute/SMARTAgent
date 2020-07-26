@@ -13395,3 +13395,20 @@ python multistepSim.py sn.json 30 10 20jul25_MultiTestGCP_J
 
 started ~22:54 ...
 
+** continuation run on cycle was incorrect too -->> adjust, restart
+
+this one:
+(python multistepSim.py sn.json 32 10 20jul24_MultiTestSContinueNormLessFreqLessIntermR)
+
+mistakenly had the follow/avoid reward codes ... and larger lose point punish value ...
+
+these are the codes had intended:
+    "rewardcodes": {"scorePoint": 1.0, "losePoint": -0.1, "followTarget": 0.0, "avoidTarget": 0.0, "hitBall": 0.5},
+    "name": "20jul25_cont_S_lessintermr_cycle_"
+
+ok, restart ...
+
+python multistepSim.py sn.json 32 10 20jul25_MultiTestSContinueNormLessFreqLessIntermR
+
+started ~23:17 ...
+
