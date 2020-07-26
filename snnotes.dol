@@ -13375,3 +13375,23 @@ python multistepSim.py sn.json 30 10 20jul24_MultiTestGCP_I
 
 started ~23:24 ...
 
+*20jul25
+** almost no firing from I0 on gcp -->> adjust params, restart as 20jul25_testJ0_gcp_
+
+after end of first step ... so there was probably too much punishment
+from losing points ...
+
+can make less drastic changes from other sim - have only score and lose point for reward
+but 0.1 for losePoint ... and keep targetted ... since it was working before for the more
+frequent reward cases ...
+
+    "rewardcodes": {"scorePoint": 1.0, "losePoint": -0.1, "followTarget": 0.0, "avoidTarget": 0.0, "hitBall": 0.0},
+    "simtype": {"ResumeSim": 1, "ResumeSimFromFile": "data/20jul17_testG2_gcp__step_5_synWeights_final.pkl"},    
+20jul25_testJ0_gcp_
+
+also put RLlenhebb down to 2e3 ...
+
+python multistepSim.py sn.json 30 10 20jul25_MultiTestGCP_J
+
+started ~22:54 ...
+
