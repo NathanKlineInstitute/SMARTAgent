@@ -13421,3 +13421,81 @@ started ~23:17 ...
 
 python multistepSim.py sn.json 32 10 20jul25_MultiTestSContinueNormLessFreqNoIntermR
 
+*20jul27
+** check output from GCP -- 20jul24_testG4_gcp_lessintermR__step_2_ (this has score,loss and hit rewards)
+
+python -i simdat.py backupcfg/20jul24_testG4_gcp_lessintermR__step_2_sim.json
+
+ax=plotPerf(actreward,yl=(0,.55))
+savefig('gif/'+dstr+simstr+'perf.png') # gif/20jul27_20jul24_testG4_gcp_lessintermR__step_2_perf.png
+
+follow is ~0.5, others much lower ...
+
+drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); #
+xlim((1990e3,2000e3))
+savefig('gif/'+dstr+simstr+'rast.png') # gif/20jul27_20jul24_testG4_gcp_lessintermR__step_2_rast.png
+
+drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','EMSTAY','IM'],tlim=(1990e3,2000e3))
+savefig('gif/'+dstr+simstr+'Vm.png') # gif/20jul27_20jul24_testG4_gcp_lessintermR__step_2_Vm.png
+
+lfn = ['20jul15_testG0_gcp_','20jul16_testG1_gcp_', '20jul17_testG2_gcp__step_0_','20jul17_testG2_gcp__step_1_','20jul17_testG2_gcp__step_2_','20jul17_testG2_gcp__step_3_','20jul17_testG2_gcp__step_4_','20jul17_testG2_gcp__step_5_','20jul20_testG3_gcp_lessintermR__step_0_','20jul20_testG3_gcp_lessintermR__step_1_','20jul20_testG3_gcp_lessintermR__step_2_','20jul20_testG3_gcp_lessintermR__step_3_','20jul24_testG4_gcp_lessintermR__step_0_','20jul24_testG4_gcp_lessintermR__step_1_','20jul24_testG4_gcp_lessintermR__step_2_']
+lfn = ['data/'+x+'ActionsRewards.txt' for x in lfn]
+pdac = getconcatactionreward(lfn)
+
+ax=plotPerf(pdac,yl=(0,.55))
+plot([np.amax(pdac.time)-6000e3,np.amax(pdac.time)-6000e3],[0,.55],'--',color='black') # change in rewards
+savefig('gif/'+dstr+simstr+'perf_all_steps_so_far.png')
+gif/20jul27_20jul24_testG4_gcp_lessintermR__step_2_perf_all_steps_so_far.png
+
+follow increasing, but hit/miss and score/miss are decreasing ... in this sim using score,loss and hit reward
+but no follow target reward ... not clear why hit/miss score/miss performance would decrease
+could be lower activity levels ... 
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP','EMSTAY'],lclr=['r','b','g'],plotindiv=True)
+xlabel('Time (ms)',fontsize=30); ylabel('Average weight',fontsize=30); tl(); 
+savefig('gif/'+dstr+simstr+'all_avg_weight.png') #
+weights look like mostly decreasing ... though near end they start to increase,
+from this hits,scores at end of sim ...
+savefig('gif/'+dstr+simstr+'all_avg_weightB.png') # gif/20jul27_20jul24_testG4_gcp_lessintermR__step_2_all_avg_weightB.png
+
+fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4',showflow=False) #
+gif/20jul27_20jul24_testG4_gcp_lessintermR__step_2__input.mp4
+
+** check output from GCP -- 20jul25_testJ0_gcp__step_1_ (this has only score,loss reward/punish)
+
+python -i simdat.py backupcfg/20jul25_testJ0_gcp__step_0_sim.json
+
+ax=plotPerf(actreward,yl=(0,.55))
+savefig('gif/'+dstr+simstr+'perf.png') # gif/20jul27_20jul25_testJ0_gcp__step_0_perf.png
+this one doing better than sim above ... hit/miss, score/miss slowly increasing in 2nd half of simulation...
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((1990e3,2000e3))
+savefig('gif/'+dstr+simstr+'rast.png') # gif/20jul27_20jul25_testJ0_gcp__step_0_rast.png
+similar firing rates to sim above ... 
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','EMSTAY','IM'],tlim=(1990e3,2000e3))
+savefig('gif/'+dstr+simstr+'Vm.png') # gif/20jul27_20jul25_testJ0_gcp__step_0_Vm.png
+
+lfn = ['20jul15_testG0_gcp_','20jul16_testG1_gcp_', '20jul17_testG2_gcp__step_0_','20jul17_testG2_gcp__step_1_','20jul17_testG2_gcp__step_2_','20jul17_testG2_gcp__step_3_','20jul17_testG2_gcp__step_4_','20jul17_testG2_gcp__step_5_','20jul20_testG3_gcp_lessintermR__step_0_','20jul20_testG3_gcp_lessintermR__step_1_','20jul20_testG3_gcp_lessintermR__step_2_','20jul20_testG3_gcp_lessintermR__step_3_','20jul25_testJ0_gcp__step_0_']
+lfn = ['data/'+x+'ActionsRewards.txt' for x in lfn]
+pdac = getconcatactionreward(lfn)
+
+ax=plotPerf(pdac,yl=(0,.55))
+plot([np.amax(pdac.time)-2000e3,np.amax(pdac.time)-2000e3],[0,.55],'--',color='black') # change in rewards
+savefig('gif/'+dstr+simstr+'perf_all_steps_so_far.png')
+gif/20jul27_20jul25_testJ0_gcp__step_0_perf_all_steps_so_far.png
+savefig('gif/'+dstr+simstr+'perf_all_steps_so_farB.png')
+gif/20jul27_20jul25_testJ0_gcp__step_0_perf_all_steps_so_farB.png
+score/miss increasing slightly at end, but not to a peak in cumulative; so that
+either reflects slow cumulative measure or slightly worse performance
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP','EMSTAY'],lclr=['r','b','g'],plotindiv=True)
+xlabel('Time (ms)',fontsize=30); ylabel('Average weight',fontsize=30); tl(); 
+savefig('gif/'+dstr+simstr+'all_avg_weight.png') #
+gif/20jul27_20jul25_testJ0_gcp__step_0_all_avg_weight.png
+in this one (compared to other above with less reward), the weights are increasing more...
+so there's more stability...may need to adjust weight scores for the other simulation
+
+fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4',showflow=False) #
+gif/20jul27_20jul25_testJ0_gcp__step_0__input.mp4
+
