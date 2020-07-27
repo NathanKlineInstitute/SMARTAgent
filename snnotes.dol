@@ -13556,3 +13556,90 @@ started ~14:08 ...
 
 without the bootstrapping ... will try that later ...
 
+** check sims on cycle -- first, compare less intermediate reward with no intermediate reward
+
+python -i simdat.py backupcfg/20jul25_cont_S_nointermr_cycle__step_0_sim.json
+
+lfn = ['20jul25_cont_S_lessintermr_cycle__step_0_', '20jul25_cont_S_nointermr_cycle__step_0_']
+lpda = getindivactionreward(lfn)
+
+#
+for pda,clr in zip(lpda,['b','r']):
+  plotFollowBall(pda,ax=subplot(1,3,1),cumulative=True,color=clr); ylim((0,.55))
+  plotHitMiss(pda,ax=subplot(1,3,2),lclr=[clr],asratio=True); ylim((0,.55))
+  plotScoreMiss(pda,ax=subplot(1,3,3),clr=clr,asratio=True); ylim((0,.55))
+
+lpatch = [mpatches.Patch(color=c,label=s) for c,s in zip(['b','r'],['Score/Loss/Hit Reward','Score/Loss Reward'])]
+ax=gca()
+ax.legend(handles=lpatch,handlelength=1)
+
+savefig('gif/20jul27_compare_lessintermr_nointermr_cycle_gcp_perf.png')
+gif/20jul27_compare_lessintermr_nointermr_cycle_gcp_perf.png
+
+here too, the sim without hit reward is doing better ... but both of their hit/miss ratios
+seem to be decreasing after initial spike ...
+
+compare cumulative ... 
+
+lfn = ['20jun30_S0_cycle_', '20jun30_S1_cycle_', '20jun30_S2_cycle_', '20jul2_S3_cycle_', '20jul3_S4_cycle__step_0_','20jul3_S4_cycle__step_1_','20jul3_S4_cycle__step_2_','20jul3_S4_cycle__step_3_','20jul14_cont_20jul3_S4_cycle__step_3__step_0_','20jul14_cont_20jul3_S4_cycle__step_3__step_1_','20jul14_cont_20jul3_S4_cycle__step_3__step_2_','20jul14_cont_20jul3_S4_cycle__step_3__step_3_','20jul14_cont_20jul3_S4_cycle__step_3__step_4_','20jul25_cont_S_nointermr_cycle__step_0_']
+pdac = getconcatactionreward(lfn)
+
+ax=plotPerf(pdac,yl=(0,.55))
+plot([np.amax(pdac.time)-1600e3,np.amax(pdac.time)-1600e3],[0,.55],'--',color='black') # change in rewards
+
+savefig('gif/'+dstr+simstr+'perf_all_steps_so_far.png')
+gif/20jul27_20jul25_cont_S_nointermr_cycle__step_0_perf_all_steps_so_far.png
+
+overall, not doing better with the adjusted rewards ... may run another step ... 
+but will stop the sim with the hit reward, since not doing as well as this one
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((1590e3,1600e3))
+savefig('gif/'+dstr+simstr+'rast.png') # gif/20jul27_20jul25_cont_S_nointermr_cycle__step_0_rast.png
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','EMSTAY','IM'],tlim=(1590e3,1600e3))
+savefig('gif/'+dstr+simstr+'Vm.png') # gif/20jul27_20jul25_cont_S_nointermr_cycle__step_0_Vm.png
+
+clf(); dobjpos = loadObjPos() ## 
+xlabel('Racket Y position'); hist(dobjpos['racket'][:,1])
+savefig('gif/'+dstr+simstr+'poshist.png') # gif/20jul27_20jul25_cont_S_nointermr_cycle__step_0_poshist.png
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP','EMSTAY'],lclr=['r','b','g'],plotindiv=True)
+xlabel('Time (ms)',fontsize=30); ylabel('Average weight',fontsize=30); tl(); 
+savefig('gif/'+dstr+simstr+'all_avg_weight.png') # gif/20jul27_20jul25_cont_S_nointermr_cycle__step_0_all_avg_weight.png
+
+fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4',showflow=False) #
+gif/20jul27_20jul25_cont_S_nointermr_cycle__step_0__input.mp4
+
+** try larger EM layer on cycle 
+
+using params from gcp ... and adjusted to larger size
+
+"name": "20jul27_T0_cycle_"
+
+./myrun 32 sn.json
+
+python -i simdat.py backupcfg/20jul27_T0_cycle_sim.json
+
+drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); 
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','EMSTAY','IM'])
+
+ax=plotPerf(actreward,yl=(0,.55))
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP','EMSTAY','IM'],lclr=['r','b','g','c'],plotindiv=True)
+xlabel('Time (ms)',fontsize=30); ylabel('Average weight',fontsize=30); tl();
+
+ok, try a multistep here ...
+
+python multistepSim.py sn.json 32 10 20jul25_MultiTestCycle_T
+
+** EIPlast?
+
+could have plasticity from each motor pop to other interneuron pop to allow competition
+between the output commands ...
+
+would that help the type of rebound in action seen ... where moving down or up for a few steps
+leads to moves in opposite direction immediately after ...
+
+even fixed weight activation of other interneurons that suppress other output actions could help with that...
+
