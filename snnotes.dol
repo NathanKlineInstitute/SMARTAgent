@@ -13633,6 +13633,8 @@ ok, try a multistep here ...
 
 python multistepSim.py sn.json 32 10 20jul25_MultiTestCycle_T
 
+started ~16:53 ...
+
 ** EIPlast?
 
 could have plasticity from each motor pop to other interneuron pop to allow competition
