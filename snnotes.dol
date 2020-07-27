@@ -13524,3 +13524,35 @@ savefig('gif/20jul27_compare_scorelosshit_scoreloss_gcp_perf.png')
 hmm, so even on first step, the one with the hit reward is doing much worse in getting hits
 and in getting points... surprising ...
 
+** stop 20jul24_testG4_gcp_lessintermR_ sim on gcp
+
+this is the sim with score/loss and hit rewards that was continued from the weights of sim which also
+had follow target reward; since this sim is doing worse than the sim with only score/loss reward (20jul25_testJ0_gcp__step_0_),
+will stop this sim
+
+### python multistepSim.py sn.json 30 10 20jul24_MultiTestGCPContinue ###
+
+** other sim on gcp (20jul27_testK0_gcp_), bootstrap weights, only score/loss, longer RLlenhebb, smaller RLhebbwt
+
+try same as J but with longer RL time constant and smaller RLhebbwt?
+
+to see if learns better ...
+
+cp backupcfg/20jul25_testJ0_gcp__step_0_.json sn.json
+
+then adjust ...
+
+    "RL": {"AMPA": {"wbase": 1e-07, "wmax": 0.00048, "RLon": 1, "RLlenhebb": 4000, "RLlenanti": 50, "useRLexp": 1, "RLhebbwt": 3e-06, "RLantiwt": -0.0, "hebbwt": 0, "antiwt": 0, "tauhebb": 10, "RLwindhebb": 50, "softthresh": 0, "verbose": 0},
+
+(increased RLlenhebb to 4000 from 2000; and decreased RLhebbwt from 6e-06 to 3e-06)
+
+"name": "20jul27_testK0_gcp_"
+
+python multistepSim.py sn.json 30 10 20jul25_MultiTestGCP_K
+
+started ~14:08 ...
+
+** or try larger output layer
+
+without the bootstrapping ... will try that later ...
+
