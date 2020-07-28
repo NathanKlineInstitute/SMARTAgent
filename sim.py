@@ -66,6 +66,9 @@ if dconf['net']['EEPreMProb'] > 0.0 or dconf['net']['EEMFeedbackProb'] > 0.0 or 
   for pop in ['EV1','EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE','EV4','EMT']:
     lrecpop.append(pop)
   if dconf['net']['VisualFeedback']: lrecpop.append('ER')
+if 'EIPlast' in dconf['net']:
+  if dconf['net']['EIPlast']:
+    lrecpop.append('IM')
 
 # Network parameters
 netParams = specs.NetParams() #object of class NetParams to store the network parameters
@@ -96,6 +99,7 @@ STDPparams = {'hebbwt': 0.0001, 'antiwt':-0.00001, 'wbase': 0.0012, 'wmax': 50, 
 
 dSTDPparamsRL = {} # STDP-RL parameters for AMPA,NMDA synapses; generally uses shorter/longer eligibility traces
 for sy in ['AMPA', 'NMDA']: dSTDPparamsRL[sy] = dconf['RL'][sy]
+if 'AMPAI' in dconf['RL']: dSTDPparamsRL['AMPAI'] = dconf['RL']['AMPAI']
 
 # these are the image-based inputs provided to the R (retinal) cells
 netParams.stimSourceParams['stimMod'] = {'type': 'NetStim', 'rate': 'variable', 'noise': 0}
@@ -302,28 +306,21 @@ netParams.connParams['EMT->IMT'] = {
         'weight': 0.02 * cfg.EIGain,
         'delay': 2,
         'synMech': 'AMPA', 'sec':'soma', 'loc':0.5}
-netParams.connParams['EMDOWN->IM'] = {
-        'preConds': {'pop': 'EMDOWN'},
-        'postConds': {'pop': 'IM'},
-        'convergence': prob2conv(0.125/2, dnumc['EMDOWN']),
-        'weight': 0.02 * cfg.EIGain,
-        'delay': 2,
-        'synMech': 'AMPA', 'sec':'soma', 'loc':0.5}
-netParams.connParams['EMUP->IM'] = {
-        'preConds': {'pop': 'EMUP'},
-        'postConds': {'pop': 'IM'},
-        'convergence': prob2conv(0.125/2, dnumc['EMUP']),
-        'weight': 0.02 * cfg.EIGain,
-        'delay': 2,
-        'synMech': 'AMPA', 'sec':'soma', 'loc':0.5}
-if 'EMSTAY' in dconf['net']:
-  netParams.connParams['EMSTAY->IM'] = {
-        'preConds': {'pop': 'EMSTAY'},
-        'postConds': {'pop': 'IM'},
-        'convergence': prob2conv(0.125/2, dnumc['EMSTAY']),
-        'weight': 0.02 * cfg.EIGain,
-        'delay': 2,
-        'synMech': 'AMPA', 'sec':'soma', 'loc':0.5}
+
+for prety in EMotorPops:
+  k = prety+'->IM'
+  netParams.connParams[k] = {
+    'preConds': {'pop': prety},
+    'postConds': {'pop': 'IM'},
+    'convergence': prob2conv(0.125/2, dnumc[prety]),
+    'weight': 0.02 * cfg.EIGain,
+    'delay': 2,
+    'synMech': 'AMPA', 'sec':'soma', 'loc':0.5}
+  if 'EIPlast' in dconf['net']:
+    if dconf['net']['EIPlast']:
+      if dSTDPparamsRL['AMPAI']['RLon']: # only turn on plasticity when specified to do so
+        netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL['AMPAI']}
+  
 #Local inhibition
 #I to E within area
 netParams.connParams['IR->ER'] = {

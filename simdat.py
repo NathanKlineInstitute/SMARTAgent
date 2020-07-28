@@ -464,7 +464,7 @@ def getCumScore (actreward):
   return np.cumsum(allScore) #cumulative score evolving with time.  
 
 #  
-def plotHitMiss (actreward,ax=None,msz=3,asratio=False,lclr=['r','g','b']):
+def plotHitMiss (actreward,ax=None,msz=3,asratio=False,asbin=False,binsz=10e3,lclr=['r','g','b']):
   if ax is None: ax = gca()
   action_times = np.array(actreward.time)
   Hit_Missed = np.array(actreward.hit)
@@ -472,7 +472,15 @@ def plotHitMiss (actreward,ax=None,msz=3,asratio=False,lclr=['r','g','b']):
   allMissed = np.where(Hit_Missed==-1,1,0)
   cumHits = np.cumsum(allHit) #cumulative hits evolving with time.
   cumMissed = np.cumsum(allMissed) #if a reward is -1, replace it with 1 else replace it with 0.
-  if asratio:
+  if asbin:
+    nbin = int(binsz / (np.array(actreward.time)[1]-np.array(actreward.time)[0]))
+    avgHit = np.array([sum(allHit[sidx:sidx+nbin]) for sidx in arange(0,len(allHit),nbin)])
+    avgMiss = np.array([sum(allMissed[sidx:sidx+nbin]) for sidx in arange(0,len(allMissed),nbin)])
+    score = avgHit / (avgHit + avgMiss)
+    ax.plot(np.linspace(0,np.amax(actreward.time),len(score)), score, color=lclr[0],linewidth=msz)
+    ax.set_ylabel('Hit/(Hit+Miss) ('+str(round(score[-1],2))+')')    
+    return score
+  elif asratio:
     ax.plot(action_times,cumHits/cumMissed,lclr[0]+'-o',markersize=msz)
     ax.set_xlim((0,np.max(action_times)))
     ax.set_ylabel('Hit/Miss ('+str(round(cumHits[-1]/cumMissed[-1],2))+')')
@@ -521,7 +529,33 @@ def plotScoreLoss (actreward,ax=None,msz=3):
   ax.set_ylim((0,np.max([cumScore[-1],cumLoss[-1]])))
   ax.legend(('Score Point ('+str(cumScore[-1])+')','Lose Point ('+str(cumLoss[-1])+')'),loc='best')
   return cumScore[-1],cumLoss[-1]
+
+def plotPerf (actreward,yl=(0,1)):
+  # plot performance
+  plotFollowBall(actreward,ax=subplot(1,1,1),cumulative=True,color='b');  
+  plotHitMiss(actreward,ax=subplot(1,1,1),lclr=['g'],asratio=True); 
+  plotScoreMiss(actreward,ax=subplot(1,1,1),clr='r',asratio=True);
+  ylim(yl)
+  ylabel('Performance')
+  lpatch = [mpatches.Patch(color=c,label=s) for c,s in zip(['b','g','r'],['Follow','Hit/Miss','Score/Miss'])]
+  ax=gca()
+  ax.legend(handles=lpatch,handlelength=1)
+  return ax
+
+def plotComparePerf (lpda, lclr, yl=(0,.55), lleg=None):
+  # plot comparison of performance of list of action rewards dataframes in lpda
+  # lclr is color to plot
+  # lleg is optional legend
+  for pda,clr in zip(lpda,lclr):
+    plotFollowBall(pda,ax=subplot(1,3,1),cumulative=True,color=clr); ylim(yl)
+    plotHitMiss(pda,ax=subplot(1,3,2),lclr=[clr],asratio=True); ylim(yl)
+    plotScoreMiss(pda,ax=subplot(1,3,3),clr=clr,asratio=True); ylim(yl)
+  if lleg is not None:
+    lpatch = [mpatches.Patch(color=c,label=s) for c,s in zip(lclr,lleg)]
+    ax=gca()
+    ax.legend(handles=lpatch,handlelength=1)
   
+
 #
 def plotRewards (actreward,ax=None,msz=3,xl=None):
   if ax is None: ax = gca()  
@@ -535,6 +569,7 @@ def getconcatactionreward (lfn):
   # lfn is a list of actionrewards filenames from the simulation
   pda = None
   for fn in lfn:
+    if not fn.endswith('ActionsRewards.txt'): fn = 'data/'+fn+'ActionsRewards.txt'
     acl = pd.DataFrame(np.loadtxt(fn),columns=['time','action','reward','proposed','hit'])
     if pda is None:
       pda = acl
@@ -545,8 +580,11 @@ def getconcatactionreward (lfn):
 
 def getindivactionreward (lfn):
   # get the individual actionreward data frames separately so can compare cumulative rewards,actions,etc.
-  # lfn is a list of actionrewards filenames from the simulation
-  return [pd.DataFrame(np.loadtxt(fn),columns=['time','action','reward','proposed','hit']) for fn in lfn]
+  # lfn is a list of actionrewards filenames from the simulation or list of simulation names
+  if lfn[0].endswith('ActionsRewards.txt'): 
+    return [pd.DataFrame(np.loadtxt(fn),columns=['time','action','reward','proposed','hit']) for fn in lfn]
+  else:
+    return [pd.DataFrame(np.loadtxt('data/'+fn+'ActionsRewards.txt'),columns=['time','action','reward','proposed','hit']) for fn in lfn]    
 
 def plotMeanNeuronWeight (pdf,postid,clr='k',ax=None,msz=1,xl=None):
   if ax is None: ax = gca()
@@ -961,7 +999,7 @@ def plotSynWeightsPostNeuronID(pdf,postNeuronID):
 
 #
 def getinputmap (pdf, t, prety, postid, poty, dnumc, dstartidx, dendidx, asweight=False):
-  nrow = ncol = int(np.sqrt(dnumc[poty]))
+  nrow = ncol = int(np.sqrt(dnumc[prety]))
   rfmap = np.zeros((nrow,ncol))
   pdfs = pdf[(pdf.postid==postid) & (pdf.preid>dstartidx[prety]) & (pdf.preid<=dendidx[prety]) & (pdf.time==t)]
   if len(pdfs) < 1: return rfmap
@@ -1050,7 +1088,24 @@ def plotallrecurrentmaps (pdf, t, dnumc, dstartidx, dendidx, lnety = ['EV1DNW', 
     title(nety+'->'+nety+str(postid));
     colorbar()
   return drfmap
-      
+
+def getpopinputmap (pdf, t, dnumc, dstartidx, dendidx, poty, asweight=True):
+  # get integrated RF for a population
+  pdfs = pdf[(pdf.time==t) & (pdf.postid>=dstartidx[poty]) & (pdf.postid<=dendidx[poty])]
+  ddrfmap = {}
+  for idx in range(dstartidx[poty],dendidx[poty]+1,1):
+    print(idx)
+    ddrfmap[idx] = getallinputmaps(pdfs, np.amax(pdfs.time), idx, poty, dnumc, dstartidx, dendidx, asweight=asweight)
+  dout = {}
+  for idx in range(dstartidx[poty],dendidx[poty]+1,1):
+    drfmap = ddrfmap[idx]
+    for k in drfmap.keys():
+      if k not in dout:
+        dout[k] = drfmap[k]
+      else:
+        dout[k] += drfmap[k]
+  return dout  
+
 if __name__ == '__main__':
   stepNB = -1
   if len(sys.argv) > 1:
