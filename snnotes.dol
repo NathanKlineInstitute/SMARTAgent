@@ -13645,3 +13645,41 @@ leads to moves in opposite direction immediately after ...
 
 even fixed weight activation of other interneurons that suppress other output actions could help with that...
 
+** check next step on gcp (20jul25_testJ0_gcp__step_1_)
+
+python -i simdat.py backupcfg/20jul25_testJ0_gcp__step_1_sim.json
+
+ax=plotPerf(actreward,yl=(0,.55))
+savefig('gif/'+dstr+simstr+'perf.png') # gif/20jul28_20jul25_testJ0_gcp__step_1_perf.png
+does not look better from last step...
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((1990e3,2000e3))
+savefig('gif/'+dstr+simstr+'rast.png') # gif/20jul28_20jul25_testJ0_gcp__step_1_rast.png
+rates look ok ... some synch between EMUP,EMDOWN ...
+savefig('gif/'+dstr+simstr+'rastB.png') # gif/20jul28_20jul25_testJ0_gcp__step_1_rastB.png
+
+suggests would be useful to plot rates or raster in actmap movies ... to help diagnose when
+dynamics/behavior failing
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','EMSTAY','IM'],tlim=(1990e3,2000e3))
+savefig('gif/'+dstr+simstr+'Vm.png') # gif/20jul28_20jul25_testJ0_gcp__step_1_Vm.png
+
+lfn = ['20jul15_testG0_gcp_','20jul16_testG1_gcp_', '20jul17_testG2_gcp__step_0_','20jul17_testG2_gcp__step_1_','20jul17_testG2_gcp__step_2_','20jul17_testG2_gcp__step_3_','20jul17_testG2_gcp__step_4_','20jul17_testG2_gcp__step_5_','20jul25_testJ0_gcp__step_0_','20jul25_testJ0_gcp__step_1_']
+lfn = ['data/'+x+'ActionsRewards.txt' for x in lfn]
+pdac = getconcatactionreward(lfn)
+
+ax=plotPerf(pdac,yl=(0,.55))
+plot([np.amax(pdac.time)-4000e3,np.amax(pdac.time)-4000e3],[0,.55],'--',color='black') # change in rewards
+savefig('gif/'+dstr+simstr+'perf_all_steps_so_far.png')
+gif/20jul27_20jul25_testJ0_gcp__step_1_perf_all_steps_so_far.png
+seems like decreasing in hit/miss ratio ... 
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP','EMSTAY'],lclr=['r','b','g'],plotindiv=True)
+xlabel('Time (ms)',fontsize=30); ylabel('Average weight',fontsize=30); tl(); 
+savefig('gif/'+dstr+simstr+'all_avg_weight.png') #
+gif/20jul27_20jul25_testJ0_gcp__step_1_all_avg_weight.png
+weights go up/down in parallel with the performance ... 
+
+fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4',showflow=False) #
+gif/20jul27_20jul25_testJ0_gcp__step_1__input.mp4
+
