@@ -13683,3 +13683,33 @@ weights go up/down in parallel with the performance ...
 fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4',showflow=False) #
 gif/20jul27_20jul25_testJ0_gcp__step_1__input.mp4
 
+*20jul28
+** check network with smaller RLhebbwt, and longer Rllenhebb (20jul27_testK0_gcp__step_0_)
+
+python -i simdat.py backupcfg/20jul27_testK0_gcp__step_0_sim.json
+
+ax=plotPerf(actreward,yl=(0,.55))
+savefig('gif/'+dstr+simstr+'perf.png') # gif/20jul28_20jul27_testK0_gcp__step_0_perf.png
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((1990e3,2000e3))
+savefig('gif/'+dstr+simstr+'rast.png') # gif/20jul28_20jul27_testK0_gcp__step_0_rast.png
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','EMSTAY','IM'],tlim=(1990e3,2000e3))
+savefig('gif/'+dstr+simstr+'Vm.png') # gif/20jul28_20jul27_testK0_gcp__step_0_Vm.png
+
+how does performance compare to the other model which had bigger weights?
+
+lfn = ['20jul25_testJ0_gcp__step_0_', '20jul27_testK0_gcp__step_0_']
+lpda = getindivactionreward(lfn)
+
+plotComparePerf(lpda,['b','r'],yl=(0,.55),lleg=lfn)
+savefig('gif/'+dstr+simstr+'compare_perf.png') # gif/20jul28_20jul27_testK0_gcp__step_0_compare_perf.png
+not clear which better, if any, need more time to compare performance...
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP','EMSTAY'],lclr=['r','b','g'],plotindiv=True)
+xlabel('Time (ms)',fontsize=30); ylabel('Average weight',fontsize=30); tl(); 
+savefig('gif/'+dstr+simstr+'all_avg_weight.png') # gif/20jul28_20jul27_testK0_gcp__step_0_all_avg_weight.png
+
+fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4',showflow=False) #
+gif/20jul28_20jul27_testK0_gcp__step_0__input.mp4
+
