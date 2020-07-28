@@ -13713,3 +13713,90 @@ savefig('gif/'+dstr+simstr+'all_avg_weight.png') # gif/20jul28_20jul27_testK0_gc
 fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4',showflow=False) #
 gif/20jul28_20jul27_testK0_gcp__step_0__input.mp4
 
+** check next J0 step on gcp
+
+python -i simdat.py backupcfg/20jul25_testJ0_gcp__step_2_sim.json
+
+ax=plotPerf(actreward,yl=(0,.55))
+savefig('gif/'+dstr+simstr+'perf.png') # gif/20jul28_20jul25_testJ0_gcp__step_2_perf.png
+does not look better...just the opposite
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((1990e3,2000e3))
+savefig('gif/'+dstr+simstr+'rast.png') # gif/20jul28_20jul25_testJ0_gcp__step_2_rast.png
+EMSTAY is almost entirely off ... so might be better off without them??
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','EMSTAY','IM'],tlim=(1990e3,2000e3))
+savefig('gif/'+dstr+simstr+'Vm.png') # gif/20jul28_20jul25_testJ0_gcp__step_2_Vm.png
+
+lfn = ['20jul15_testG0_gcp_','20jul16_testG1_gcp_', '20jul17_testG2_gcp__step_0_','20jul17_testG2_gcp__step_1_','20jul17_testG2_gcp__step_2_','20jul17_testG2_gcp__step_3_','20jul17_testG2_gcp__step_4_','20jul17_testG2_gcp__step_5_','20jul25_testJ0_gcp__step_0_','20jul25_testJ0_gcp__step_1_','20jul25_testJ0_gcp__step_2_']
+lfn = ['data/'+x+'ActionsRewards.txt' for x in lfn]
+pdac = getconcatactionreward(lfn)
+
+ax=plotPerf(pdac,yl=(0,.55))
+plot([np.amax(pdac.time)-6000e3,np.amax(pdac.time)-6000e3],[0,.55],'--',color='black') # change in rewards
+savefig('gif/'+dstr+simstr+'perf_all_steps_so_far.png')
+gif/20jul27_20jul25_testJ0_gcp__step_2_perf_all_steps_so_far.png
+performance values dropping ... so, this strategy may not work ... 
+
+pdfs = pdf[(pdf.preid>=dstartidx['EV1']) & (pdf.preid<=dendidx['EV1']) & (pdf.postid==dstartidx['EMDOWN'])]
+len(pdfs) # 24000
+plot(pdfs.time,pdfs.weight,'ko',markersize=3)
+savefig('gif/'+dstr+simstr+'wght1.png')
+so some weights go up and then down, and do not seem stable...
+
+seems useful to know which x,y coordinates correspond to higher vs lower weights ... (similar
+to RFs)
+
+plotallinputmaps ...
+
+drfmap = plotallinputmaps(pdf, np.amin(pdf.time), dstartidx['EMDOWN'] + 0, 'EMDOWN', dnumc, dstartidx, dendidx, asweight=True,cmap='jet')
+
+savefig('gif/'+dstr+simstr+'map1.png')
+gif/20jul28_20jul25_testJ0_gcp__step_2_map1.png
+more representation at the left/right sides ... makes sense given that
+it's where most of the reward/punishment occurs
+
+#
+lmap = [drfmap[x] for x in drfmap.keys()]
+lmap = np.array(lmap)
+nps = np.sum(lmap,axis=0)
+clf(); imshow(nps,cmap='jet',origin='upper'); colorbar()
+savefig('gif/'+dstr+simstr+'map2.png') # gif/20jul28_20jul25_testJ0_gcp__step_2_map2.png
+
+#
+drfmap = plotallinputmaps(pdf, np.amax(pdf.time), dstartidx['EMSTAY'] + 0, 'EMSTAY', dnumc, dstartidx, dendidx, asweight=True,cmap='jet')
+lmap = [drfmap[x] for x in drfmap.keys()]
+lmap = np.array(lmap)
+nps = np.sum(lmap,axis=0)
+clf(); imshow(nps,cmap='jet',origin='upper'); colorbar()
+savefig('gif/'+dstr+simstr+'map3.png') # gif/20jul28_20jul25_testJ0_gcp__step_2_map3.png
+but EMSTAY does not have that pattern...(EMUP does)
+
+tt = np.unique(pdf.time)
+
+dout = getpopinputmap(pdf, tt[-1], dnumc, dstartidx, dendidx, 'EMDOWN')
+plotallinputmaps(pdfs,tt[-1],dstartidx['EMDOWN'],'EMDOWN',dnumc,dstartidx,dendidx,asweight=True,dmap=dout)
+
+savefig('gif/'+dstr+simstr+'EMDOWN_map4.png') # gif/20jul28_20jul25_testJ0_gcp__step_2_EMDOWN_map4.png
+that's at EMDOWN population level ... seems interesting ...
+
+dout = getpopinputmap(pdf, tt[-1], dnumc, dstartidx, dendidx, 'EMUP')
+clf(); plotallinputmaps(pdfs,tt[-1],dstartidx['EMUP'],'EMUP',dnumc,dstartidx,dendidx,asweight=True,dmap=dout)
+savefig('gif/'+dstr+simstr+'EMUP_map4.png') # gif/20jul28_20jul25_testJ0_gcp__step_2_EMUP_map4.png
+
+dout = getpopinputmap(pdf, tt[-1], dnumc, dstartidx, dendidx, 'EMSTAY')
+clf(); plotallinputmaps(pdfs,tt[-1],dstartidx['EMSTAY'],'EMSTAY',dnumc,dstartidx,dendidx,asweight=True,dmap=dout)
+savefig('gif/'+dstr+simstr+'EMSTAY_map4.png') # gif/20jul28_20jul25_testJ0_gcp__step_2_EMSTAY_map4.png
+
+EMSTAY much more noisy ...
+
+so next, can see if the RFs change over time, and how ... 
+
+#clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP','EMSTAY'],lclr=['r','b','g'],plotindiv=True)
+#xlabel('Time (ms)',fontsize=30); ylabel('Average weight',fontsize=30); tl(); 
+#savefig('gif/'+dstr+simstr+'all_avg_weight.png') #
+#gif/20jul27_20jul25_testJ0_gcp__step_2_all_avg_weight.png
+
+#fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4',showflow=False) #
+#gif/20jul27_20jul25_testJ0_gcp__step_2__input.mp4
+

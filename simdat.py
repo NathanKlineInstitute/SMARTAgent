@@ -999,7 +999,7 @@ def plotSynWeightsPostNeuronID(pdf,postNeuronID):
 
 #
 def getinputmap (pdf, t, prety, postid, poty, dnumc, dstartidx, dendidx, asweight=False):
-  nrow = ncol = int(np.sqrt(dnumc[poty]))
+  nrow = ncol = int(np.sqrt(dnumc[prety]))
   rfmap = np.zeros((nrow,ncol))
   pdfs = pdf[(pdf.postid==postid) & (pdf.preid>dstartidx[prety]) & (pdf.preid<=dendidx[prety]) & (pdf.time==t)]
   if len(pdfs) < 1: return rfmap
@@ -1088,7 +1088,24 @@ def plotallrecurrentmaps (pdf, t, dnumc, dstartidx, dendidx, lnety = ['EV1DNW', 
     title(nety+'->'+nety+str(postid));
     colorbar()
   return drfmap
-      
+
+def getpopinputmap (pdf, t, dnumc, dstartidx, dendidx, poty, asweight=True):
+  # get integrated RF for a population
+  pdfs = pdf[(pdf.time==t) & (pdf.postid>=dstartidx[poty]) & (pdf.postid<=dendidx[poty])]
+  ddrfmap = {}
+  for idx in range(dstartidx[poty],dendidx[poty]+1,1):
+    print(idx)
+    ddrfmap[idx] = getallinputmaps(pdfs, np.amax(pdfs.time), idx, poty, dnumc, dstartidx, dendidx, asweight=asweight)
+  dout = {}
+  for idx in range(dstartidx[poty],dendidx[poty]+1,1):
+    drfmap = ddrfmap[idx]
+    for k in drfmap.keys():
+      if k not in dout:
+        dout[k] = drfmap[k]
+      else:
+        dout[k] += drfmap[k]
+  return dout  
+
 if __name__ == '__main__':
   stepNB = -1
   if len(sys.argv) > 1:
