@@ -13934,3 +13934,83 @@ ax=plotPerf(actreward,yl=(0,.55))
 savefig('gif/'+dstr+simstr+'perf.png')
 
 clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((90e3,100e3))
+
+*20jul29
+** check 20jul27_testK0_gcp__step_1_ (smaller RLhebbwt, and longer Rllenhebb)
+
+python -i simdat.py backupcfg/20jul27_testK0_gcp__step_1_sim.json
+
+ax=plotPerf(actreward,yl=(0,.55))
+savefig('gif/'+dstr+simstr+'perf.png') # gif/20jul28_20jul27_testK0_gcp__step_1_perf.png
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((1990e3,2000e3))
+savefig('gif/'+dstr+simstr+'rast.png') # gif/20jul28_20jul27_testK0_gcp__step_1_rast.png
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','EMSTAY','IM'],tlim=(1990e3,2000e3))
+savefig('gif/'+dstr+simstr+'Vm.png') # gif/20jul28_20jul27_testK0_gcp__step_1_Vm.png
+
+lfn = ['20jul25_testJ0_gcp__step_1_', '20jul27_testK0_gcp__step_1_']
+lpda = getindivactionreward(lfn)
+
+plotComparePerf(lpda,['b','r'],yl=(0,.55),lleg=lfn)
+savefig('gif/'+dstr+simstr+'compare_perf.png') # gif/20jul28_20jul27_testK0_gcp__step_1_compare_perf.png
+smaller step size looks better ... so may as well shut off J sims ...
+
+lfn = ['20jul15_testG0_gcp_','20jul16_testG1_gcp_', '20jul17_testG2_gcp__step_0_','20jul17_testG2_gcp__step_1_','20jul17_testG2_gcp__step_2_','20jul17_testG2_gcp__step_3_','20jul17_testG2_gcp__step_4_','20jul17_testG2_gcp__step_5_','20jul27_testK0_gcp__step_0_','20jul27_testK0_gcp__step_1_']
+lfn = ['data/'+x+'ActionsRewards.txt' for x in lfn]
+pdac = getconcatactionreward(lfn)
+ax=plotPerf(pdac,yl=(0,.55))
+plot([np.amax(pdac.time)-4000e3,np.amax(pdac.time)-4000e3],[0,.55],'--',color='black') # change in rewards
+savefig('gif/'+dstr+simstr+'perf_all_steps_so_far.png') # gif/20jul29_20jul27_testK0_gcp__step_1_perf_all_steps_so_far.png
+
+performance not falling as fast as J series ... 
+
+could reduce RLhebbwt even more and see if helps ... since there is a lot more frequent punishmnet
+for losing points ... 
+
+** check (20jul25_testJ0_gcp__step_3_) sim with higher RLhebbwt
+
+python -i simdat.py backupcfg/20jul25_testJ0_gcp__step_3_sim.json
+
+ax=plotPerf(actreward,yl=(0,.55))
+savefig('gif/'+dstr+simstr+'perf.png') # gif/20jul28_20jul25_testJ0_gcp__step_3_perf.png
+seems even worse than before
+
+lfn = ['20jul15_testG0_gcp_','20jul16_testG1_gcp_', '20jul17_testG2_gcp__step_0_','20jul17_testG2_gcp__step_1_','20jul17_testG2_gcp__step_2_','20jul17_testG2_gcp__step_3_','20jul17_testG2_gcp__step_4_','20jul17_testG2_gcp__step_5_','20jul25_testJ0_gcp__step_0_','20jul25_testJ0_gcp__step_1_','20jul25_testJ0_gcp__step_2_','20jul25_testJ0_gcp__step_3_']
+lfn = ['data/'+x+'ActionsRewards.txt' for x in lfn]
+pdac = getconcatactionreward(lfn)
+
+ax=plotPerf(pdac,yl=(0,.55))
+plot([np.amax(pdac.time)-8000e3,np.amax(pdac.time)-8000e3],[0,.55],'--',color='black') # change in rewards
+savefig('gif/'+dstr+simstr+'perf_all_steps_so_far.png')
+gif/20jul27_20jul25_testJ0_gcp__step_3_perf_all_steps_so_far.png
+performance still dropping, will stop this sim
+
+** next for gcp
+
+stop J sims ...
+start L sim with smaller weight inc (RLhebbwt)
+
+cp backupcfg/20jul27_testK0_gcp__step_0_sim.json sn.json
+
+then modify ...
+
+        "name": "20jul29_testL0_gcp_",
+            "RLlenhebb": 8000,
+            "RLhebbwt": 1.5e-06,
+    "simtype": {
+        "ResumeSim": 1,
+        "ResumeSimFromFile": "data/20jul17_testG2_gcp__step_5_synWeights_final.pkl"
+    },
+    "rewardcodes": {
+        "scorePoint": 1.0,
+        "losePoint": -0.1,
+        "followTarget": 0.0,
+        "avoidTarget": 0.0,
+        "hitBall": 0.0
+    },
+    
+python multistepSim.py sn.json 30 10 20jul29_MultiTestGCP_L
+
+started ~14:21 ...
+
