@@ -13837,7 +13837,8 @@ but not as clear ...
 clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP','EMSTAY'],lclr=['r','b','g'],plotindiv=True)
 xlabel('Time (ms)',fontsize=30); ylabel('Average weight',fontsize=30); tl(); 
 savefig('gif/'+dstr+simstr+'all_avg_weight.png') # gif/20jul28_20jul27_T0_cycle__step_0_all_avg_weight.png
-weights may be decreasing too quickly, so could reduce lose point value ... 
+weights may be decreasing too quickly, so could reduce lose point value ...
+stopped this sim ... 
 
 ** forced weight stabilization through sequential training?
 
@@ -13912,4 +13913,24 @@ gid2pos(dnumc['EMDOWN'],dstartidx['EMDOWN'], dstartidx['EMDOWN']) # (0, 0)
 gid2pos(dnumc['EMDOWN'],dstartidx['EMDOWN'], dstartidx['EMDOWN']+1) # (1, 0)
 those are x,y positions ... so coordinate 0,0 must not receive any input ... ??
 no, there is a bug in getinputmap - had left off the first input in map creation ...
+fixed now ...
 
+** other sim with better resolution for motion detection
+
+could put in the intermediate rewards again to check ...
+
+"name": "20jul28_U0_cycle_"
+    "rewardcodes": {"scorePoint": 1.0, "losePoint": -0.1, "followTarget": 0.1, "avoidTarget": -0.01, "hitBall": 0.5},
+    "DirectionDetectionAlgo": {"CentroidTracker": 1, "OpticFlow": 0, "FlowWidth": 1, "UseFull": 1},
+
+./myrun 32 sn.json
+
+python -i simdat.py backupcfg/20jul28_U0_cycle_sim.json
+
+ldflow = loadMotionFields(dconf['sim']['name'])
+fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4',showflow=True,ldflow=ldflow) #
+
+ax=plotPerf(actreward,yl=(0,.55))
+savefig('gif/'+dstr+simstr+'perf.png')
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((90e3,100e3))
