@@ -14014,3 +14014,111 @@ python multistepSim.py sn.json 30 10 20jul29_MultiTestGCP_L
 
 started ~14:21 ...
 
+** check output on cycle (20jul25_cont_S_nointermr_cycle__step_2_)
+
+python -i simdat.py backupcfg/20jul25_cont_S_nointermr_cycle__step_2_sim.json
+
+ax=plotPerf(actreward,yl=(0,.55))
+savefig('gif/'+dstr+simstr+'perf.png') # gif/20jul28_20jul25_cont_S_nointermr_cycle__step_2_perf.png
+that looks like a turnaround for hit/miss ratio ... seems to be rising ... same with score/miss ...
+or maybe not, since last step had higher values ... 
+
+lfn = ['20jun30_S0_cycle_', '20jun30_S1_cycle_', '20jun30_S2_cycle_', '20jul2_S3_cycle_', '20jul3_S4_cycle__step_0_','20jul3_S4_cycle__step_1_','20jul3_S4_cycle__step_2_','20jul3_S4_cycle__step_3_','20jul14_cont_20jul3_S4_cycle__step_3__step_0_','20jul14_cont_20jul3_S4_cycle__step_3__step_1_','20jul14_cont_20jul3_S4_cycle__step_3__step_2_','20jul14_cont_20jul3_S4_cycle__step_3__step_3_','20jul14_cont_20jul3_S4_cycle__step_3__step_4_','20jul25_cont_S_nointermr_cycle__step_0_','20jul25_cont_S_nointermr_cycle__step_1_','20jul25_cont_S_nointermr_cycle__step_2_']
+pdac = getconcatactionreward(lfn)
+
+ax=plotPerf(pdac,yl=(0,.55))
+plot([np.amax(pdac.time)-4800e3,np.amax(pdac.time)-4800e3],[0,.55],'--',color='black') # change in rewards
+savefig('gif/'+dstr+simstr+'perf_all_steps_so_far.png')
+gif/20jul28_20jul25_cont_S_nointermr_cycle__step_2_perf_all_steps_so_far.png
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((1590e3,1600e3))
+savefig('gif/'+dstr+simstr+'rast.png') # gif/20jul28_20jul25_cont_S_nointermr_cycle__step_2_rast.png
+
+clf(); dobjpos = loadObjPos() ## 
+subplot(2,1,1); xlabel('Racket Y position'); hist(dobjpos['racket'][:,1])
+subplot(2,1,2); xlabel('Ball Y position'); hist(dobjpos['ball'][:,1])
+savefig('gif/'+dstr+simstr+'poshist.png') # gif/20jul28_20jul25_cont_S_nointermr_cycle__step_2_poshist.png
+
+plot(dobjpos['ball'][:,1],'b')
+plot(dobjpos['racket'][:,1],'r')
+savefig('gif/'+dstr+simstr+'ball_racket_pos.png') # gif/20jul29_20jul25_cont_S_nointermr_cycle__step_2_ball_racket_pos.png
+
+from scipy.stats import pearsonr
+pearsonr(dobjpos['ball'][:,1],dobjpos['racket'][:,1]) # (0.41416891327846045, 0.0)
+that could be another performance measure ...
+
+should also overlay the firing rates of each EM population to see if can figure out where/why
+performance degrades...
+
+binsz=20; tmax=totalDur
+tt = np.arange(0,tmax,binsz)
+spkT = dspkT['EMDOWN']
+nspk = [len(spkT[(spkT>=tstart) & (spkT<tstart+binsz)]) for tstart in tt]
+#tt,nspk = getspikehist(dspkT['EMDOWN'],dnumc,binsz,tmax)
+
+dhist = {pop:getspikehist(dspkT[pop],dnumc,binsz,totalDur) for pop in ['EMDOWN','EMUP','EMSTAY','IM']}
+
+#
+clf()
+subplot(2,1,1)
+tt = np.linspace(0,totalDur,len(dobjpos['ball'][:,1]))
+plot(tt,dobjpos['ball'][:,1],'b')
+plot(tt,dobjpos['racket'][:,1],'r')
+xlim((0,totalDur))
+subplot(2,1,2)
+tt = dhist['EMDOWN'][0]
+plot(tt,dhist['EMDOWN'][1],'r')
+plot(tt,dhist['EMUP'][1],'b')
+plot(tt,dhist['EMSTAY'][1],'g')
+xlim((0,totalDur))
+
+lpatch = [mpatches.Patch(color=c,label=s) for c,s in zip(['r','b','g'],['EMDOWN','EMUP','EMSTAY'])]
+ax=subplot(2,1,2)
+ax.legend(handles=lpatch,handlelength=1)
+
+savefig('gif/'+dstr+simstr+'_ball_racket_rates.png')
+gif/20jul29_20jul25_cont_S_nointermr_cycle__step_2__ball_racket_rates.png
+
+hmm, but do not know exact times from obj pos ...
+
+subplot(2,1,1); xlim((11e3,16e3))
+subplot(2,1,2); xlim((11e3,16e3))
+savefig('gif/'+dstr+simstr+'_ball_racket_ratesB.png')
+
+could competition between ensembles result in wrong moves after many right moves?
+e.g. move up fast then up population goes into refractoriness and then down takes over ...
+also note that EMSTAY rates are almost always lower than EMDOWN,EMUP so EMSTAY almost never
+has an impact on behavior
+
+pearsonr(dhist['EMDOWN'][1],dhist['EMUP'][1]) # (0.4815442693187105, 0.0)
+pearsonr(dhist['EMDOWN'][1],dhist['IM'][1]) # (0.6387126328081073, 0.0)
+
+#clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP','EMSTAY'],lclr=['r','b','g'],plotindiv=True)
+#xlabel('Time (ms)',fontsize=30); ylabel('Average weight',fontsize=30); tl(); 
+#savefig('gif/'+dstr+simstr+'all_avg_weight.png') # 
+
+#fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4',showflow=False) #
+
+tt = np.unique(pdf.time)
+
+dout = getpopinputmap(pdf, tt[0], dnumc, dstartidx, dendidx, 'EMDOWN')
+plotallinputmaps(pdf,tt[0],dstartidx['EMDOWN'],'EMDOWN',dnumc,dstartidx,dendidx,asweight=True,dmap=dout)
+savefig('gif/'+dstr+simstr+'EMDOWN_inputmap_first.png') # gif/20jul28_20jul25_cont_S_nointermr_cycle__step_2_EMDOWN_inputmap_first.png
+dout = getpopinputmap(pdf, tt[-1], dnumc, dstartidx, dendidx, 'EMDOWN')
+clf(); plotallinputmaps(pdf,tt[-1],dstartidx['EMDOWN'],'EMDOWN',dnumc,dstartidx,dendidx,asweight=True,dmap=dout)
+savefig('gif/'+dstr+simstr+'EMDOWN_inputmap_last.png') # gif/20jul28_20jul25_cont_S_nointermr_cycle__step_2_EMDOWN_inputmap_last.png
+
+dout = getpopinputmap(pdf, tt[0], dnumc, dstartidx, dendidx, 'EMUP')
+clf(); plotallinputmaps(pdf,tt[0],dstartidx['EMUP'],'EMUP',dnumc,dstartidx,dendidx,asweight=True,dmap=dout)
+savefig('gif/'+dstr+simstr+'EMUP_inputmap_first.png') # gif/20jul28_20jul25_cont_S_nointermr_cycle__step_2_EMUP_inputmap_first.png
+dout = getpopinputmap(pdf, tt[-1], dnumc, dstartidx, dendidx, 'EMUP')
+clf(); plotallinputmaps(pdf,tt[-1],dstartidx['EMUP'],'EMUP',dnumc,dstartidx,dendidx,asweight=True,dmap=dout)
+savefig('gif/'+dstr+simstr+'EMUP_inputmap_last.png') # gif/20jul28_20jul25_cont_S_nointermr_cycle__step_2_EMUP_inputmap_last.png
+
+dout = getpopinputmap(pdf, tt[0], dnumc, dstartidx, dendidx, 'EMSTAY')
+clf(); plotallinputmaps(pdf,tt[0],dstartidx['EMSTAY'],'EMSTAY',dnumc,dstartidx,dendidx,asweight=True,dmap=dout)
+savefig('gif/'+dstr+simstr+'EMSTAY_inputmap_first.png') # gif/20jul28_20jul25_cont_S_nointermr_cycle__step_2_EMSTAY_inputmap_first.png
+dout = getpopinputmap(pdf, tt[-1], dnumc, dstartidx, dendidx, 'EMSTAY')
+clf(); plotallinputmaps(pdf,tt[-1],dstartidx['EMSTAY'],'EMSTAY',dnumc,dstartidx,dendidx,asweight=True,dmap=dout)
+savefig('gif/'+dstr+simstr+'EMSTAY_inputmap_last.png') # gif/20jul28_20jul25_cont_S_nointermr_cycle__step_2_EMSTAY_inputmap_last.png
+

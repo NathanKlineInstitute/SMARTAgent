@@ -375,6 +375,11 @@ def loadMotionFields (name=None): return pickle.load(open('data/'+getsimname(nam
 
 def loadObjPos (name=None): return pickle.load(open('data/'+getsimname(name)+'objpos.pkl','rb'))
 
+def getspikehist (spkT, dnumc, binsz, tmax):
+  tt = np.arange(0,tmax,binsz)
+  nspk = [len(spkT[(spkT>=tstart) & (spkT<tstart+binsz)]) for tstart in tt]
+  return tt,nspk
+
 #
 def getrate (dspkT,dspkID, pop, dnumc):
   # get average firing rate for the population, over entire simulation
