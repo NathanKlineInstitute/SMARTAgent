@@ -13800,3 +13800,116 @@ so next, can see if the RFs change over time, and how ...
 #fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4',showflow=False) #
 #gif/20jul27_20jul25_testJ0_gcp__step_2__input.mp4
 
+** check output from larger-output layer sim on cycle (20jul27_T0_cycle__step_0_)
+
+python -i simdat.py backupcfg/20jul27_T0_cycle__step_0_sim.json
+
+ax=plotPerf(actreward,yl=(0,.55))
+savefig('gif/'+dstr+simstr+'perf.png') # gif/20jul28_20jul27_T0_cycle__step_0_perf.png
+pretty bad so far - only ~7 hits and 1 point ...
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((790e3,800e3))
+savefig('gif/'+dstr+simstr+'rast.png') # gif/20jul28_20jul27_T0_cycle__step_0_rast.png
+very low firing rates ... 
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','EMSTAY','IM'],tlim=(790e3,800e3))
+savefig('gif/'+dstr+simstr+'Vm.png') # gif/20jul28_20jul27_T0_cycle__step_0_Vm.png
+
+tt = np.unique(pdf.time)
+
+dout = getpopinputmap(pdf, tt[-1], dnumc, dstartidx, dendidx, 'EMDOWN')
+plotallinputmaps(pdf,tt[-1],dstartidx['EMDOWN'],'EMDOWN',dnumc,dstartidx,dendidx,asweight=True,dmap=dout)
+savefig('gif/'+dstr+simstr+'EMDOWN_inputmap.png') # gif/20jul28_20jul27_T0_cycle__step_0_EMDOWN_inputmap.png
+looks like noise ... 
+
+dout = getpopinputmap(pdf, tt[-1], dnumc, dstartidx, dendidx, 'EMUP')
+clf(); plotallinputmaps(pdf,tt[-1],dstartidx['EMUP'],'EMUP',dnumc,dstartidx,dendidx,asweight=True,dmap=dout)
+savefig('gif/'+dstr+simstr+'EMUP_inputmap.png') # gif/20jul28_20jul27_T0_cycle__step_0_EMUP_inputmap.png
+
+dout = getpopinputmap(pdf, tt[-1], dnumc, dstartidx, dendidx, 'EMSTAY')
+clf(); plotallinputmaps(pdf,tt[-1],dstartidx['EMSTAY'],'EMSTAY',dnumc,dstartidx,dendidx,asweight=True,dmap=dout)
+savefig('gif/'+dstr+simstr+'EMSTAY_inputmap.png') # gif/20jul28_20jul27_T0_cycle__step_0_EMSTAY_inputmap.png
+these EMSTAY patterns look less noisy than EMDOWN,EMUP ... but EV1DSE->EMSTAY has lower weights in bottom right
+corner; would expect opposite - higher EMSTAY weights there ... maybe lower values in lower right and upper right
+because that's where most of the lost points occur ... can see some of that for EMUP and EMDOWN weights
+but not as clear ...
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP','EMSTAY'],lclr=['r','b','g'],plotindiv=True)
+xlabel('Time (ms)',fontsize=30); ylabel('Average weight',fontsize=30); tl(); 
+savefig('gif/'+dstr+simstr+'all_avg_weight.png') # gif/20jul28_20jul27_T0_cycle__step_0_all_avg_weight.png
+weights may be decreasing too quickly, so could reduce lose point value ... 
+
+** forced weight stabilization through sequential training?
+
+could hold some weights from initial intermediate training fixed,
+then apply the training with no intermediate rewards
+
+** check 20jul25_cont_S_nointermr_cycle__step_1_
+
+python -i simdat.py backupcfg/20jul25_cont_S_nointermr_cycle__step_1_sim.json
+
+ax=plotPerf(actreward,yl=(0,.55))
+savefig('gif/'+dstr+simstr+'perf.png') # gif/20jul28_20jul25_cont_S_nointermr_cycle__step_1_perf.png
+nothing consistent ... ? 
+
+lfn = ['20jun30_S0_cycle_', '20jun30_S1_cycle_', '20jun30_S2_cycle_', '20jul2_S3_cycle_', '20jul3_S4_cycle__step_0_','20jul3_S4_cycle__step_1_','20jul3_S4_cycle__step_2_','20jul3_S4_cycle__step_3_','20jul14_cont_20jul3_S4_cycle__step_3__step_0_','20jul14_cont_20jul3_S4_cycle__step_3__step_1_','20jul14_cont_20jul3_S4_cycle__step_3__step_2_','20jul14_cont_20jul3_S4_cycle__step_3__step_3_','20jul14_cont_20jul3_S4_cycle__step_3__step_4_','20jul25_cont_S_nointermr_cycle__step_0_','20jul25_cont_S_nointermr_cycle__step_1_']
+pdac = getconcatactionreward(lfn)
+
+ax=plotPerf(pdac,yl=(0,.55))
+plot([np.amax(pdac.time)-3200e3,np.amax(pdac.time)-3200e3],[0,.55],'--',color='black') # change in rewards
+savefig('gif/'+dstr+simstr+'perf_all_steps_so_far.png')
+gif/20jul28_20jul25_cont_S_nointermr_cycle__step_1_perf_all_steps_so_far.png
+performance decreasing for hit/miss, score/miss ... seems problematic ... 
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((1590e3,1600e3))
+savefig('gif/'+dstr+simstr+'rast.png') # gif/20jul28_20jul25_cont_S_nointermr_cycle__step_1_rast.png
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','EMSTAY','IM'],tlim=(1590e3,1600e3))
+savefig('gif/'+dstr+simstr+'Vm.png') # gif/20jul28_20jul25_cont_S_nointermr_cycle__step_1_Vm.png
+
+clf(); dobjpos = loadObjPos() ## 
+subplot(2,1,1); xlabel('Racket Y position'); hist(dobjpos['racket'][:,1])
+subplot(2,1,2); xlabel('Ball Y position'); hist(dobjpos['ball'][:,1])
+savefig('gif/'+dstr+simstr+'poshist.png') # gif/20jul28_20jul25_cont_S_nointermr_cycle__step_1_poshist.png
+ball y position and racket y position closely aligned in histogram ... so may not make sense to consider
+it a bias in the model ... however, paddle does get stuck at top too far from where it can hit ball ... and
+that accounts for many misses. is it due to too large flow width? or some bug at the edges of image?
+
+#clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP','EMSTAY'],lclr=['r','b','g'],plotindiv=True)
+#xlabel('Time (ms)',fontsize=30); ylabel('Average weight',fontsize=30); tl(); 
+#savefig('gif/'+dstr+simstr+'all_avg_weight.png') # 
+
+#fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4',showflow=False) #
+
+tt = np.unique(pdf.time)
+
+dout = getpopinputmap(pdf, tt[0], dnumc, dstartidx, dendidx, 'EMDOWN')
+plotallinputmaps(pdf,tt[0],dstartidx['EMDOWN'],'EMDOWN',dnumc,dstartidx,dendidx,asweight=True,dmap=dout)
+savefig('gif/'+dstr+simstr+'EMDOWN_inputmap_first.png') # gif/20jul28_20jul25_cont_S_nointermr_cycle__step_1_EMDOWN_inputmap_first.png
+dout = getpopinputmap(pdf, tt[-1], dnumc, dstartidx, dendidx, 'EMDOWN')
+clf(); plotallinputmaps(pdf,tt[-1],dstartidx['EMDOWN'],'EMDOWN',dnumc,dstartidx,dendidx,asweight=True,dmap=dout)
+savefig('gif/'+dstr+simstr+'EMDOWN_inputmap_last.png') # gif/20jul28_20jul25_cont_S_nointermr_cycle__step_1_EMDOWN_inputmap_last.png
+those two maps look qualitatively similar ... 
+
+dout = getpopinputmap(pdf, tt[0], dnumc, dstartidx, dendidx, 'EMUP')
+clf(); plotallinputmaps(pdf,tt[0],dstartidx['EMUP'],'EMUP',dnumc,dstartidx,dendidx,asweight=True,dmap=dout)
+savefig('gif/'+dstr+simstr+'EMUP_inputmap_first.png') # gif/20jul28_20jul25_cont_S_nointermr_cycle__step_1_EMUP_inputmap_first.png
+dout = getpopinputmap(pdf, tt[-1], dnumc, dstartidx, dendidx, 'EMUP')
+clf(); plotallinputmaps(pdf,tt[-1],dstartidx['EMUP'],'EMUP',dnumc,dstartidx,dendidx,asweight=True,dmap=dout)
+savefig('gif/'+dstr+simstr+'EMUP_inputmap_last.png') # gif/20jul28_20jul25_cont_S_nointermr_cycle__step_1_EMUP_inputmap_last.png
+
+dout = getpopinputmap(pdf, tt[0], dnumc, dstartidx, dendidx, 'EMSTAY')
+clf(); plotallinputmaps(pdf,tt[0],dstartidx['EMSTAY'],'EMSTAY',dnumc,dstartidx,dendidx,asweight=True,dmap=dout)
+savefig('gif/'+dstr+simstr+'EMSTAY_inputmap_first.png') # gif/20jul28_20jul25_cont_S_nointermr_cycle__step_1_EMSTAY_inputmap_first.png
+dout = getpopinputmap(pdf, tt[-1], dnumc, dstartidx, dendidx, 'EMSTAY')
+clf(); plotallinputmaps(pdf,tt[-1],dstartidx['EMSTAY'],'EMSTAY',dnumc,dstartidx,dendidx,asweight=True,dmap=dout)
+savefig('gif/'+dstr+simstr+'EMSTAY_inputmap_last.png') # gif/20jul28_20jul25_cont_S_nointermr_cycle__step_1_EMSTAY_inputmap_last.png
+here EMSTAY maps are not random and change more from first to last time step, ... more difficult to decipher
+
+also, why is top left corner blank in all of these input maps?
+
+gid2pos(dnumc['EMDOWN'],dstartidx['EMDOWN'], dstartidx['EMDOWN']) # (0, 0)
+gid2pos(dnumc['EMDOWN'],dstartidx['EMDOWN'], dstartidx['EMDOWN']+1) # (1, 0)
+those are x,y positions ... so coordinate 0,0 must not receive any input ... ??
+no, there is a bug in getinputmap - had left off the first input in map creation ...
+

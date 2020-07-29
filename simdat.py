@@ -1001,7 +1001,7 @@ def plotSynWeightsPostNeuronID(pdf,postNeuronID):
 def getinputmap (pdf, t, prety, postid, poty, dnumc, dstartidx, dendidx, asweight=False):
   nrow = ncol = int(np.sqrt(dnumc[prety]))
   rfmap = np.zeros((nrow,ncol))
-  pdfs = pdf[(pdf.postid==postid) & (pdf.preid>dstartidx[prety]) & (pdf.preid<=dendidx[prety]) & (pdf.time==t)]
+  pdfs = pdf[(pdf.postid==postid) & (pdf.preid>=dstartidx[prety]) & (pdf.preid<=dendidx[prety]) & (pdf.time==t)]
   if len(pdfs) < 1: return rfmap
   if not asweight:
     for idx in pdfs.index:
