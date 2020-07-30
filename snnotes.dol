@@ -14206,3 +14206,118 @@ but only 1% of the NOMOVE commands ... that means there are many situations
 when EMUP and EMDOWN have the same firing rate, which means EMSTAY may not
 be needed to provide extra stability ... 
 
+** check output from low flowwidth (==1, high precision in move direction locations); 20jul28_U0_cycle_
+
+python -i simdat.py backupcfg/20jul28_U0_cycle_sim.json
+
+this sim had all the intermediate rewards ... 
+
+ax=plotPerf(actreward,yl=(0,.55))
+savefig('gif/'+dstr+simstr+'perf.png') # gif/20jul30_20jul28_U0_cycle_perf.png
+performance moving up  - gets close to highest values ... and that's with flowwidth of 1
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((1590e3,1600e3))
+savefig('gif/'+dstr+simstr+'rast.png') # gif/20jul30_20jul28_U0_cycle_rast.png
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','EMSTAY','IM'],tlim=(1590e3,1600e3))
+savefig('gif/'+dstr+simstr+'Vm.png') # gif/20jul30_20jul28_U0_cycle_Vm.png
+
+at this earlier stage of training, how often are the stay moves from EMSTAY firing most?
+
+binsz=20
+dhist = {pop:getspikehist(dspkT[pop],dnumc,binsz,totalDur) for pop in ['EMDOWN','EMUP','EMSTAY']}
+
+actsel = getactsel(dhist, actreward)
+actsel.count(dconf['moves']['NOMOVE']) # 16079
+
+actsel = []
+for i in range(len(dhist['EMDOWN'][1])):
+  dspk, uspk, sspk = dhist['EMDOWN'][1][i], dhist['EMUP'][1][i], dhist['EMSTAY'][1][i]
+  if dspk > uspk and dspk > sspk:
+    actsel.append(dconf['moves']['DOWN'])
+  elif uspk > dspk and uspk > sspk:
+    actsel.append(dconf['moves']['UP'])
+  elif sspk > uspk and sspk > dspk:
+    actsel.append(dconf['moves']['NOMOVE'])
+
+actsel.count(dconf['moves']['NOMOVE']) # 3464
+
+3464 / 16079. # 0.21543628335095466
+
+so at the earlier stage of training, ~21% of the NOMOVE commands
+are from EMSTAY neurons having higher firing rates than EMUP, EMDOWN neurons ...
+as EMSTAY rate decreases, expect that ratio to decrease further
+
+tt = np.unique(pdf.time)
+
+dout = getpopinputmap(pdf, tt[0], dnumc, dstartidx, dendidx, 'EMDOWN')
+plotallinputmaps(pdf,tt[0],dstartidx['EMDOWN'],'EMDOWN',dnumc,dstartidx,dendidx,asweight=True,dmap=dout)
+savefig('gif/'+dstr+simstr+'EMDOWN_inputmap_first.png') # gif/20jul30_20jul28_U0_cycle_EMDOWN_inputmap_first.png
+dout = getpopinputmap(pdf, tt[-1], dnumc, dstartidx, dendidx, 'EMDOWN')
+clf(); plotallinputmaps(pdf,tt[-1],dstartidx['EMDOWN'],'EMDOWN',dnumc,dstartidx,dendidx,asweight=True,dmap=dout)
+savefig('gif/'+dstr+simstr+'EMDOWN_inputmap_last.png') # gif/20jul30_20jul28_U0_cycle_EMDOWN_inputmap_last.png
+
+dout = getpopinputmap(pdf, tt[0], dnumc, dstartidx, dendidx, 'EMUP')
+clf(); plotallinputmaps(pdf,tt[0],dstartidx['EMUP'],'EMUP',dnumc,dstartidx,dendidx,asweight=True,dmap=dout)
+savefig('gif/'+dstr+simstr+'EMUP_inputmap_first.png') # gif/20jul30_20jul28_U0_cycle_EMUP_inputmap_first.png
+dout = getpopinputmap(pdf, tt[-1], dnumc, dstartidx, dendidx, 'EMUP')
+clf(); plotallinputmaps(pdf,tt[-1],dstartidx['EMUP'],'EMUP',dnumc,dstartidx,dendidx,asweight=True,dmap=dout)
+savefig('gif/'+dstr+simstr+'EMUP_inputmap_last.png') # gif/20jul30_20jul28_U0_cycle_EMUP_inputmap_last.png
+
+dout = getpopinputmap(pdf, tt[0], dnumc, dstartidx, dendidx, 'EMSTAY')
+clf(); plotallinputmaps(pdf,tt[0],dstartidx['EMSTAY'],'EMSTAY',dnumc,dstartidx,dendidx,asweight=True,dmap=dout)
+savefig('gif/'+dstr+simstr+'EMSTAY_inputmap_first.png') # gif/20jul30_20jul28_U0_cycle_EMSTAY_inputmap_first.png
+dout = getpopinputmap(pdf, tt[-1], dnumc, dstartidx, dendidx, 'EMSTAY')
+clf(); plotallinputmaps(pdf,tt[-1],dstartidx['EMSTAY'],'EMSTAY',dnumc,dstartidx,dendidx,asweight=True,dmap=dout)
+savefig('gif/'+dstr+simstr+'EMSTAY_inputmap_last.png') # gif/20jul30_20jul28_U0_cycle_EMSTAY_inputmap_last.png
+
+ldoutEMDOWN = []
+for t in tt:
+  print(t)
+  dout = getpopinputmap(pdf, t, dnumc, dstartidx, dendidx, 'EMDOWN')
+  ldoutEMDOWN.append(dout)
+
+len(ldoutEMDOWN) # 320
+
+from scipy.stats import pearsonr
+
+cmat = np.zeros((320,320))
+for Adx,doutA in enumerate(ldoutEMDOWN):
+  mA = np.reshape(doutA['EV1DSE'],(400,))
+  for Bdx,doutB in enumerate(ldoutEMDOWN):
+    mB = np.reshape(doutB['EV1DSE'],(400,))
+    cmat[Adx,Bdx] = cmat[Bdx,Adx] = pearsonr(mA,mB)[0]
+
+clf(); imshow(cmat,origin='lower',cmap='jet',interpolation='None',extent=(0,1600,0,1600),vmin=.9,vmax=1); colorbar()
+xlabel('Time (s)'); ylabel('Time (s)'); title('EV1DSE inputmap correlation')
+savefig('gif/'+dstr+simstr+'EMDOWN_inputmap_EV1DSE_corr.png')
+gif/20jul30_20jul28_U0_cycle_EMDOWN_inputmap_EV1DSE_corr.png
+so correlations are pretty high, even near beginning, showing map ~stabilized
+but magnitude of map can change and individual synapses can still change ...
+so there's still room for improvement
+
+figure(); plot(np.linspace(0,1600,320),mean(cmat,axis=1))
+xlabel('Time (s)'); ylabel('Average Correlation')
+savefig('gif/'+dstr+simstr+'EMDOWN_inputmap_EV1DSE_corr_average.png')
+gif/20jul30_20jul28_U0_cycle_EMDOWN_inputmap_EV1DSE_corr_average.png
+
+fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4',showflow=True,ldflow=ldflow)
+
+** check output on cycle (20jul25_cont_S_nointermr_cycle__step_3_) -->> getting worse, stopped
+
+python -i simdat.py backupcfg/20jul25_cont_S_nointermr_cycle__step_3_sim.json
+
+ax=plotPerf(actreward,yl=(0,.55))
+savefig('gif/'+dstr+simstr+'perf.png') # gif/20jul30_20jul25_cont_S_nointermr_cycle__step_3_perf.png
+performance dropping too much...
+
+lfn = ['20jun30_S0_cycle_', '20jun30_S1_cycle_', '20jun30_S2_cycle_', '20jul2_S3_cycle_', '20jul3_S4_cycle__step_0_','20jul3_S4_cycle__step_1_','20jul3_S4_cycle__step_2_','20jul3_S4_cycle__step_3_','20jul14_cont_20jul3_S4_cycle__step_3__step_0_','20jul14_cont_20jul3_S4_cycle__step_3__step_1_','20jul14_cont_20jul3_S4_cycle__step_3__step_2_','20jul14_cont_20jul3_S4_cycle__step_3__step_3_','20jul14_cont_20jul3_S4_cycle__step_3__step_4_','20jul25_cont_S_nointermr_cycle__step_0_','20jul25_cont_S_nointermr_cycle__step_1_','20jul25_cont_S_nointermr_cycle__step_2_','20jul25_cont_S_nointermr_cycle__step_3_']
+pdac = getconcatactionreward(lfn)
+
+ax=plotPerf(pdac,yl=(0,.55))
+plot([np.amax(pdac.time)-6400e3,np.amax(pdac.time)-6400e3],[0,.55],'--',color='black') # change in rewards
+savefig('gif/'+dstr+simstr+'perf_all_steps_so_far.png')
+gif/20jul30_20jul25_cont_S_nointermr_cycle__step_3_perf_all_steps_so_far.png
+
+will stop this sim ...
+

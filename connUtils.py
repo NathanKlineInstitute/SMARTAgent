@@ -90,7 +90,7 @@ def connectLayerswithOverlapDiv(NBpreN, NBpostN, overlap_xdir):
     divergence_factor_y = np.ceil(np.sqrt(divergence_factor))
     overlap_ydir = overlap_xdir
     preNIndices = np.zeros((NBpreN_x,NBpreN_y))
-    postNIndices = np.zeros((NBpostN_x,NBpostN_y))		#list created for indices from linear (1-6400) to square indexing (1-80,81-160,....) 
+    postNIndices = np.zeros((NBpostN_x,NBpostN_y)) #list created for indices from linear (1-6400) to square indexing (1-80,81-160,..) 
     for i in range(NBpreN_x):
         for j in range(NBpreN_y):
             preNIndices[i,j]=j+(NBpreN_y*i)
