@@ -14378,6 +14378,12 @@ python -i simdat.py backupcfg/20jul30_IzhiTest0_cycle_sim.json
 
 drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','EMSTAY','IM'])
 
+works - though have to adjust weight gains
+
+not much faster than the 2-comp mainen and 1-comp basket cells ... since izhi2007b require a section
+could try the izhi2007a, which sal mentioned are a little faster since point processes ...
+also have different versions of intf cells ... though probably won't work with the RL stdp.mod ... 
+
 ** other sim on gcp - start learning from scratch - without EMSTAY, and with flowwidth=1
 
 params based on 20jul29_testL0_gcp__step_1_sim.json but then adjusted
