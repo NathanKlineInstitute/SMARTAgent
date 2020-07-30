@@ -74,18 +74,50 @@ if 'EIPlast' in dconf['net']:
 netParams = specs.NetParams() #object of class NetParams to store the network parameters
 netParams.defaultThreshold = 0.0 # spike threshold, 10 mV is NetCon default, lower it for all cells
 
+ECellModel = 'Mainen'
+if 'ECellModel' in dconf['net']: ECellModel = dconf['net']['ECellModel']
+ICellModel = 'FS_BasketCell'
+if 'ICellModel' in dconf['net']: ICellModel = dconf['net']['ICellModel']
+
 #Population parameters
 for ty in allpops:
   if ty in ETypes:
-    netParams.popParams[ty] = {'cellType':ty, 'numCells': dnumc[ty], 'cellModel': 'Mainen'}
+    netParams.popParams[ty] = {'cellType':ty, 'numCells': dnumc[ty], 'cellModel': ECellModel}
   else:
-    netParams.popParams[ty] = {'cellType':ty, 'numCells': dnumc[ty], 'cellModel': 'FS_BasketCell'}
-    
-netParams.importCellParams(label='PYR_Mainen_rule', conds={'cellType': ETypes}, fileName='cells/mainen.py', cellName='PYR2')
-netParams.importCellParams(label='FS_BasketCell_rule', conds={'cellType': ITypes}, fileName='cells/FS_BasketCell.py', cellName='Bas')
+    netParams.popParams[ty] = {'cellType':ty, 'numCells': dnumc[ty], 'cellModel': ICellModel}
 
-netParams.cellParams['PYR_Mainen_rule']['secs']['soma']['threshold'] = 0.0
-netParams.cellParams['FS_BasketCell_rule']['secs']['soma']['threshold'] = -10.0
+izhiParams = {} # Izhi cell params (used in cell properties)
+    
+if ECellModel == 'Mainen':    
+  netParams.importCellParams(label='PYR_Mainen_rule', conds={'cellType': ETypes}, fileName='cells/mainen.py', cellName='PYR2')
+  netParams.cellParams['PYR_Mainen_rule']['secs']['soma']['threshold'] = 0.0
+  EExcitSec = 'dend' # section where excitatory synapses placed
+elif ECellModel == 'IzhiRS': 
+  #netParams.importCellParams(label='PYR_Izhi07b_rule', conds={'cellType': ETypes, 'cellModel':'Izhi2007b'},\
+  #                           fileName='cells/izhi2007Wrapper.py', cellName='IzhiCell',  cellArgs={'type':'RS'}) # regular spiking
+  EExcitSec = 'soma' # section where excitatory synapses placed
+  izhiParams['RS'] = {'mod':'Izhi2007b', 'C':1, 'k':0.7, 'vr':-60, 'vt':-40, 'vpeak':35, 'a':0.03, 'b':-2, 'c':-50, 'd':100, 'celltype':1}
+  ## RS Izhi cell params
+  RScellRule = {'conds': {'cellType': ETypes, 'cellModel': 'Izhi'}, 'secs': {}}
+  RScellRule['secs']['soma'] = {'geom': {}, 'pointps':{}}  #  soma
+  RScellRule['secs']['soma']['geom'] = {'diam': 10, 'L': 10, 'cm': 31.831}
+  RScellRule['secs']['soma']['pointps']['Izhi'] = izhiParams['RS'] 
+  netParams.cellParams['RS_Izhi'] = RScellRule  # add dict to list of cell properties
+      
+if ICellModel == 'FS_BasketCell':  
+  netParams.importCellParams(label='FS_BasketCell_rule', conds={'cellType': ITypes}, fileName='cells/FS_BasketCell.py', cellName='Bas')
+  netParams.cellParams['FS_BasketCell_rule']['secs']['soma']['threshold'] = -10.0
+elif ICellModel == 'IzhiFS': # defaults to Izhi cell otherwise
+  #netParams.importCellParams(label='PYR_Izhi07b_rule', conds={'cellType': ITypes, 'cellModel':'Izhi2007b'},\
+  #                           fileName='cells/izhi2007Wrapper.py', cellName='IzhiCell',  cellArgs={'type':'FS'}) # fast spiking
+  izhiParams['FS'] = {'mod':'Izhi2007b', 'C':0.2, 'k':1.0, 'vr':-55, 'vt':-40, 'vpeak':25, 'a':0.2, 'b':-2, 'c':-45, 'd':-55, 'celltype':5}  
+  ## FS Izhi cell params
+  FScellRule = {'conds': {'cellType': ITypes, 'cellModel': 'Izhi'}, 'secs': {}}
+  FScellRule['secs']['soma'] = {'geom': {}, 'pointps':{}}  #  soma
+  FScellRule['secs']['soma']['geom'] = {'diam': 10, 'L': 10, 'cm': 31.831}
+  FScellRule['secs']['soma']['pointps']['Izhi'] = izhiParams['FS'] 
+  netParams.cellParams['FS_Izhi'] = FScellRule  # add dict to list of cell properties
+  
 
 ## Synaptic mechanism parameters
 netParams.synMechParams['AMPA'] = {'mod': 'Exp2Syn', 'tau1': 0.05, 'tau2': 5.3, 'e': 0}  # excitatory synaptic mechanism
@@ -205,6 +237,9 @@ simConfig.saveMat = False
 simConfig.saveFolder = 'data'
 # simConfig.backupCfg = ['sim.json', 'backupcfg/'+dconf['sim']['name']+'sim.json']
 
+#simConfig.createNEURONObj = True  # create HOC objects when instantiating network
+#simConfig.createPyStruct = True  # create Python structure (simulator-independent) when instantiating network
+
 if 'EMSTAY' in dconf['net']:
   simConfig.analysis['plotTraces'] = {'include': [(pop, 0) for pop in ['ER','IR','EV1','EV1DE','IV1','EMDOWN','EMUP','EMSTAY','IM']]}
 else:
@@ -259,7 +294,7 @@ if EEPreMProb > 0.0:
         'weight': weight,
         'delay': 2,
         'synMech': synmech,
-        'sec':'dend', 'loc':0.5
+        'sec':EExcitSec, 'loc':0.5
       }
       if dSTDPparamsRL[synmech]['RLon']: # only turn on plasticity when specified to do so
         netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL[synmech]}
@@ -392,14 +427,14 @@ netParams.connParams['ER->EV1'] = {
         'connList': blistERtoEV1,
         'weight': 0.015 * cfg.EEGain,
         'delay': 2,
-        'synMech': 'AMPA','sec':'dend', 'loc':0.5}
+        'synMech': 'AMPA','sec':EExcitSec, 'loc':0.5}
 netParams.connParams['EV1->EV4'] = {
         'preConds': {'pop': 'EV1'},
         'postConds': {'pop': 'EV4'},
         'connList': blistEV1toEV4,
         'weight': 0.0075 * cfg.EEGain,
         'delay': 2,
-        'synMech': 'AMPA','sec':'dend', 'loc':0.5}
+        'synMech': 'AMPA','sec':EExcitSec, 'loc':0.5}
 netParams.connParams['EV4->EMT'] = {
         'preConds': {'pop': 'EV4'},
         'postConds': {'pop': 'EMT'},
@@ -407,7 +442,7 @@ netParams.connParams['EV4->EMT'] = {
         #'convergence': 10,
         'weight': 0.0075 * cfg.EEGain,
         'delay': 2,
-        'synMech': 'AMPA','sec':'dend', 'loc':0.5}
+        'synMech': 'AMPA','sec':EExcitSec, 'loc':0.5}
 
 """
 # these all have 0 weight, dont set them up
@@ -451,7 +486,7 @@ if VisualFeedback:
           'connList': connList,
           'weight': 0.0001 * cfg.EEGain, 
           'delay': 2,
-          'synMech': 'AMPA','sec':'dend', 'loc':0.5}
+          'synMech': 'AMPA','sec':EExcitSec, 'loc':0.5}
         if dSTDPparamsRL[synmech]['RLon']: # only turn on plasticity when specified to do so
           netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL[synmech]}        
   #I to E feedback connections
@@ -509,7 +544,7 @@ if dconf['architecturePreMtoM']['useTopological']:
             'weight': getInitWeight(weight),
             'delay': 2,
             'synMech': synmech,
-            'sec':'dend', 'loc':0.5
+            'sec':EExcitSec, 'loc':0.5
           }
         elif prety=='EMT':
           netParams.connParams[k] = {
@@ -519,7 +554,7 @@ if dconf['architecturePreMtoM']['useTopological']:
             'weight': getInitWeight(weight),
             'delay': 2,
             'synMech': synmech,
-            'sec':'dend', 'loc':0.5
+            'sec':EExcitSec, 'loc':0.5
           }
         else:
           netParams.connParams[k] = {
@@ -529,7 +564,7 @@ if dconf['architecturePreMtoM']['useTopological']:
             'weight': getInitWeight(weight),
             'delay': 2,
             'synMech': synmech,
-            'sec':'dend', 'loc':0.5
+            'sec':EExcitSec, 'loc':0.5
           }
         if dSTDPparamsRL[synmech]['RLon']: # only turn on plasticity when specified to do so
           netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL[synmech]}
@@ -548,7 +583,7 @@ elif dconf['architecturePreMtoM']['useProbabilistic']:
           'weight': getInitWeight(weight),
           'delay': 2,
           'synMech': synmech,
-          'sec':'dend', 'loc':0.5
+          'sec':EExcitSec, 'loc':0.5
         }
         if dSTDPparamsRL[synmech]['RLon']: # only turn on plasticity when specified to do so
           netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL[synmech]}
@@ -569,7 +604,7 @@ if EEMRecProb > 0.0:
             'weight': getInitWeight(weight),
             'delay': 2,
             'synMech': synmech,
-            'sec':'dend', 'loc':0.5
+            'sec':EExcitSec, 'loc':0.5
           }
           if dSTDPparamsRL[synmech]['RLon']: # only turn on plasticity when specified to do so
             netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL[synmech]}  
@@ -589,7 +624,7 @@ if EEMFeedbackProb > 0.0:
             'weight': weight,
             'delay': 2,
             'synMech': synmech,
-            'sec':'dend', 'loc':0.5
+            'sec':EExcitSec, 'loc':0.5
           }
           if dSTDPparamsRL[synmech]['RLon']: # only turn on plasticity when specified to do so
             netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL[synmech]}  

@@ -14370,6 +14370,10 @@ http://www.netpyne.org/advanced.html?highlight=izhi#import-izhi07b
 netParams.importCellParams(label='PYR_Izhi07b_rule', conds={'cellType': 'PYR', 'cellModel':'Izhi2007b'},
         fileName='izhi2007Wrapper.py', cellName='IzhiCell',  cellArgs={'type':'RS'})
 
+try out on cycle ...
+
+
+
 ** other sim on gcp - start learning from scratch - without EMSTAY, and with flowwidth=1
 
 params based on 20jul29_testL0_gcp__step_1_sim.json but then adjusted
