@@ -14321,3 +14321,50 @@ gif/20jul30_20jul25_cont_S_nointermr_cycle__step_3_perf_all_steps_so_far.png
 
 will stop this sim ...
 
+** check output from 20jul29_testL0_gcp__step_0_
+
+python -i simdat.py backupcfg/20jul29_testL0_gcp__step_0_sim.json
+
+ax=plotPerf(actreward,yl=(0,.55))
+savefig('gif/'+dstr+simstr+'perf.png') # gif/20jul30_20jul29_testL0_gcp__step_0_perf.png
+doing pretty well ... better than other recent ones on gcp ... 
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((1990e3,2000e3))
+savefig('gif/'+dstr+simstr+'rast.png') # gif/20jul30_20jul29_testL0_gcp__step_0_rast.png
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','EMSTAY','IM'],tlim=(1990e3,2000e3))
+savefig('gif/'+dstr+simstr+'Vm.png') # gif/20jul30_20jul29_testL0_gcp__step_0_Vm.png
+
+lfn = ['20jul25_testJ0_gcp__step_0_', '20jul27_testK0_gcp__step_0_', '20jul29_testL0_gcp__step_0_']
+lpda = getindivactionreward(lfn)
+
+plotComparePerf(lpda,['b','g', 'r'],yl=(0,.55),lleg=lfn)
+savefig('gif/'+dstr+simstr+'compare_perf.png') # gif/20jul30_20jul29_testL0_gcp__step_0_compare_perf.png
+so L series is much better than the others ... should stop K series
+
+lfn = ['20jul15_testG0_gcp_','20jul16_testG1_gcp_', '20jul17_testG2_gcp__step_0_','20jul17_testG2_gcp__step_1_','20jul17_testG2_gcp__step_2_','20jul17_testG2_gcp__step_3_','20jul17_testG2_gcp__step_4_','20jul17_testG2_gcp__step_5_','20jul29_testL0_gcp__step_0_']
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0,.55))
+plot([np.amax(pdac.time)-2000e3,np.amax(pdac.time)-2000e3],[0,.55],'--',color='black') # change in rewards
+savefig('gif/'+dstr+simstr+'perf_all_steps_so_far.png') # gif/20jul30_20jul29_testL0_gcp__step_0_perf_all_steps_so_far.png
+seems to be improving slowly ... ? need more steps to see if performance falls off later similar to the J, K sims ...
+
+savefig('gif/'+dstr+simstr+'perf_all_steps_so_farB.png') # gif/20jul30_20jul29_testL0_gcp__step_0_perf_all_steps_so_farB.png
+savefig('gif/'+dstr+simstr+'perf_all_steps_so_farC.png') # gif/20jul30_20jul29_testL0_gcp__step_0_perf_all_steps_so_farC.png
+
+weights changing?
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP','EMSTAY'],lclr=['r','b','g'],plotindiv=True)
+xlabel('Time (ms)',fontsize=30); ylabel('Average weight',fontsize=30); tl(); 
+savefig('gif/'+dstr+simstr+'all_avg_weight.png') # 
+
+#binsz=20
+#dhist = {pop:getspikehist(dspkT[pop],dnumc,binsz,totalDur) for pop in ['EMDOWN','EMUP','EMSTAY']}
+
+** setup model to use izhi neurons?
+
+http://www.netpyne.org/advanced.html?highlight=izhi#import-izhi07b
+
+netParams.importCellParams(label='PYR_Izhi07b_rule', conds={'cellType': 'PYR', 'cellModel':'Izhi2007b'},
+        fileName='izhi2007Wrapper.py', cellName='IzhiCell',  cellArgs={'type':'RS'})
+
