@@ -14356,7 +14356,9 @@ weights changing?
 
 clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP','EMSTAY'],lclr=['r','b','g'],plotindiv=True)
 xlabel('Time (ms)',fontsize=30); ylabel('Average weight',fontsize=30); tl(); 
-savefig('gif/'+dstr+simstr+'all_avg_weight.png') # 
+savefig('gif/'+dstr+simstr+'all_avg_weight.png') # gif/20jul30_20jul29_testL0_gcp__step_0_all_avg_weight.png
+savefig('gif/'+dstr+simstr+'all_avg_weightB.png') # gif/20jul30_20jul29_testL0_gcp__step_0_all_avg_weightB.png
+some increases seen ... so will let it run some more to see if improves 
 
 #binsz=20
 #dhist = {pop:getspikehist(dspkT[pop],dnumc,binsz,totalDur) for pop in ['EMDOWN','EMUP','EMSTAY']}
@@ -14367,4 +14369,30 @@ http://www.netpyne.org/advanced.html?highlight=izhi#import-izhi07b
 
 netParams.importCellParams(label='PYR_Izhi07b_rule', conds={'cellType': 'PYR', 'cellModel':'Izhi2007b'},
         fileName='izhi2007Wrapper.py', cellName='IzhiCell',  cellArgs={'type':'RS'})
+
+** other sim on gcp - start learning from scratch - without EMSTAY, and with flowwidth=1
+
+params based on 20jul29_testL0_gcp__step_1_sim.json but then adjusted
+flowwidth to 1, EMSTAY to 0, IM to 50 , RLlenhebb to 200 ... ResumeSim to 0
+
+"name": "20jul30_U0_gcp_"
+
+    "rewardcodes": {
+        "scorePoint": 1.0,
+        "losePoint": -0.1,
+        "followTarget": 0.1,
+        "avoidTarget": -0.01,
+        "hitBall": 0.5
+    },
+
+./myrun 30 sn.json
+
+python -i simdat.py backupcfg/20jul30_U0_gcp_sim.json
+
+ax=plotPerf(actreward,yl=(0,.55))
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((1990e3,2000e3))
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','EMSTAY','IM'],tlim=(1990e3,2000e3))
+
+python multistepSim.py sn.json 30 10 20jul30_MultiTestGCP_U
 
