@@ -569,6 +569,21 @@ def plotRewards (actreward,ax=None,msz=3,xl=None):
   ax.set_ylim((np.min(actreward.reward),np.max(actreward.reward)))
   ax.set_ylabel('Rewards'); #f_ax1.set_xlabel('Time (ms)')
 
+def getactsel (dhist, actreward):
+  # get action selected based on firing rates in dhist (no check for consistency with sim.py)
+  actsel = []
+  for i in range(len(dhist['EMDOWN'][1])):
+    dspk, uspk, sspk = dhist['EMDOWN'][1][i], dhist['EMUP'][1][i], dhist['EMSTAY'][1][i]
+    if dspk > uspk and dspk > sspk:
+      actsel.append(dconf['moves']['DOWN'])
+    elif uspk > dspk and uspk > sspk:
+      actsel.append(dconf['moves']['UP'])
+    elif sspk > uspk and sspk > dspk:
+      actsel.append(dconf['moves']['NOMOVE'])
+    else: # dspk == uspk:
+      actsel.append(dconf['moves']['NOMOVE'])
+  return actsel  
+  
 def getconcatactionreward (lfn):
   # concatenate the actionreward data frames together so can look at cumulative rewards,actions,etc.
   # lfn is a list of actionrewards filenames from the simulation

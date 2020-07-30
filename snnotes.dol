@@ -14122,3 +14122,87 @@ dout = getpopinputmap(pdf, tt[-1], dnumc, dstartidx, dendidx, 'EMSTAY')
 clf(); plotallinputmaps(pdf,tt[-1],dstartidx['EMSTAY'],'EMSTAY',dnumc,dstartidx,dendidx,asweight=True,dmap=dout)
 savefig('gif/'+dstr+simstr+'EMSTAY_inputmap_last.png') # gif/20jul28_20jul25_cont_S_nointermr_cycle__step_2_EMSTAY_inputmap_last.png
 
+*20jul30
+** check 20jul27_testK0_gcp__step_2_ (smaller RLhebbwt, and longer Rllenhebb than testJ0_gcp)
+
+python -i simdat.py backupcfg/20jul27_testK0_gcp__step_2_sim.json
+
+ax=plotPerf(actreward,yl=(0,.55))
+savefig('gif/'+dstr+simstr+'perf.png') # gif/20jul28_20jul27_testK0_gcp__step_2_perf.png
+mostly flat ...
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((1990e3,2000e3))
+savefig('gif/'+dstr+simstr+'rast.png') # gif/20jul28_20jul27_testK0_gcp__step_2_rast.png
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','EMSTAY','IM'],tlim=(1990e3,2000e3))
+savefig('gif/'+dstr+simstr+'Vm.png') # gif/20jul28_20jul27_testK0_gcp__step_2_Vm.png
+
+lfn = ['20jul25_testJ0_gcp__step_2_', '20jul27_testK0_gcp__step_2_']
+lpda = getindivactionreward(lfn)
+
+plotComparePerf(lpda,['b','r'],yl=(0,.55),lleg=lfn)
+savefig('gif/'+dstr+simstr+'compare_perf.png') # gif/20jul28_20jul27_testK0_gcp__step_2_compare_perf.png
+again, smaller step size better at same step ... (already stopped off J series)
+
+lfn = ['20jul15_testG0_gcp_','20jul16_testG1_gcp_', '20jul17_testG2_gcp__step_0_','20jul17_testG2_gcp__step_1_','20jul17_testG2_gcp__step_2_','20jul17_testG2_gcp__step_3_','20jul17_testG2_gcp__step_4_','20jul17_testG2_gcp__step_5_','20jul27_testK0_gcp__step_0_','20jul27_testK0_gcp__step_1_','20jul27_testK0_gcp__step_2_']
+pdac = getconcatactionreward(lfn)
+ax=plotPerf(pdac,yl=(0,.55))
+plot([np.amax(pdac.time)-6000e3,np.amax(pdac.time)-6000e3],[0,.55],'--',color='black') # change in rewards
+savefig('gif/'+dstr+simstr+'perf_all_steps_so_far.png') # gif/20jul29_20jul27_testK0_gcp__step_2_perf_all_steps_so_far.png
+hit/miss ratio still decreasing slowly (but more slowly than with J sims), so that's still a problem...
+
+binsz=20
+dhist = {pop:getspikehist(dspkT[pop],dnumc,binsz,totalDur) for pop in ['EMDOWN','EMUP','EMSTAY']}
+
+#
+clf()
+subplot(2,1,1)
+tt = np.linspace(0,totalDur,len(dobjpos['ball'][:,1]))
+plot(tt,dobjpos['ball'][:,1],'b')
+plot(tt,dobjpos['racket'][:,1],'r')
+xlim((0,totalDur))
+subplot(2,1,2)
+tt = dhist['EMDOWN'][0]
+plot(tt,dhist['EMDOWN'][1],'r')
+plot(tt,dhist['EMUP'][1],'b')
+plot(tt,dhist['EMSTAY'][1],'g')
+xlim((0,totalDur))
+
+actsel = []
+for i in range(len(dhist['EMDOWN'][1])):
+  dspk, uspk, sspk = dhist['EMDOWN'][1][i], dhist['EMUP'][1][i], dhist['EMSTAY'][1][i]
+  if dspk > uspk and dspk > sspk:
+    actsel.append(dconf['moves']['DOWN'])
+  elif uspk > dspk and uspk > sspk:
+    actsel.append(dconf['moves']['UP'])
+  elif sspk > uspk and sspk > dspk:
+    actsel.append(dconf['moves']['NOMOVE'])
+  else: # dspk == uspk:
+    actsel.append(dconf['moves']['NOMOVE'])
+    
+hist(actsel) # looks right
+savefig('gif/'+dstr+simstr+'actsel_hist.png') #
+
+actsel.count(dconf['moves']['NOMOVE']) # 14490
+
+and how many of the NOMOVE commands are from when EMSTAY has higher rate?
+
+actsel = []
+for i in range(len(dhist['EMDOWN'][1])):
+  dspk, uspk, sspk = dhist['EMDOWN'][1][i], dhist['EMUP'][1][i], dhist['EMSTAY'][1][i]
+  if dspk > uspk and dspk > sspk:
+    actsel.append(dconf['moves']['DOWN'])
+  elif uspk > dspk and uspk > sspk:
+    actsel.append(dconf['moves']['UP'])
+  elif sspk > uspk and sspk > dspk:
+    actsel.append(dconf['moves']['NOMOVE'])
+
+actsel.count(dconf['moves']['NOMOVE']) # 175
+
+so there were a very few times when EMSTAY had higher rates than EMUP,EMDOWN ...
+
+175 / 14490. # 0.012077294685990338
+but only 1% of the NOMOVE commands ... that means there are many situations
+when EMUP and EMDOWN have the same firing rate, which means EMSTAY may not
+be needed to provide extra stability ... 
+
