@@ -14410,3 +14410,75 @@ clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','EMSTAY','IM'],tlim=(1990e
 
 python multistepSim.py sn.json 30 10 20jul30_MultiTestGCP_U
 
+** continue the flowwidth==1 sim on cycle?
+** or test higher resolution impact on perf
+
+        "name": "20jul30_HRTest0_cycle_",
+
+from these numbers:
+        "ER": 400,
+        "IR": 100,
+        "EV1": 400,
+        "EV1DE": 400,
+        "EV1DNE": 400,
+        "EV1DN": 400,
+        "EV1DNW": 400,
+        "EV1DW": 400,
+        "EV1DSW": 400,
+        "EV1DS": 400,
+        "EV1DSE": 400,
+        "IV1": 100,
+        "EV4": 0,
+        "IV4": 0,
+        "EMT": 0,
+        "IMT": 0,
+        "EMDOWN": 100,
+        "EMUP": 100,
+        "EMSTAY": 0,
+        "IM": 50,
+
+to:
+
+        "ER": 1600,
+        "IR": 400,
+        "EV1": 1600,
+        "EV1DE": 1600,
+        "EV1DNE": 1600,
+        "EV1DN": 1600,
+        "EV1DNW": 1600,
+        "EV1DW": 1600,
+        "EV1DSW": 1600,
+        "EV1DS": 1600,
+        "EV1DSE": 1600,
+        "IV1": 400,
+        "EV4": 0,
+        "IV4": 0,
+        "EMT": 0,
+        "IMT": 0,
+        "EMDOWN": 100,
+        "EMUP": 100,
+        "EMSTAY": 0,
+        "IM": 50,
+	
+./myrun 48 sn.json
+
+python -i simdat.py backupcfg/20jul30_HRTest0_cycle_sim.json
+
+fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4',showflow=True,ldflow=ldflow)
+
+10 s took ~490 s with 48 cores (64 cores same, and 32 cores 520 s) ...
+
+python -i simdat.py backupcfg/20jul30_HRTest0_cycle_sim.json
+
+ax=plotPerf(actreward,yl=(0,.55))
+
+drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); 
+drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','IM'])
+
+so around 800 minutes for 1000 s ...
+
+will use longer interval between weight recordings, since more neurons ...
+        "recordWeightStepSize": 1000,
+
+./myrun 48 sn.json
+
