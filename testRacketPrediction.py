@@ -3,11 +3,14 @@ from matplotlib import pyplot as plt
 import numpy as np
 import gym
 #from pylab import *
-nbsteps = 20000
+nbsteps = 200000
 
-courtXRng = (20, 140)
-courtYRng = (34, 194)
-racketXRng = (141,144) # (140, 143) #(141, 144) <<-- is that off by 1? does it matter?
+#breakout-specfici 
+# courtXRng = (9, 159)
+courtXRng = (9,149)
+# courtYRng = (32, 189)
+courtYRng = (93, 188)
+racketYRng = (189,192) 
 
 xpos_Ball = -1 #previous location
 ypos_Ball = -1
@@ -24,18 +27,22 @@ def findobj (img, xrng, yrng):
     for j in range(sIC.shape[1]):
       if sIC[i,j]>0:
         Obj_inds.append([i,j])
-  if sIC.shape[0]*sIC.shape[1]==np.shape(Obj_inds)[0]:
+  if sIC.shape[0]*sIC.shape[1]==np.shape(Obj_inds)[0] or len(Obj_inds)==0: # if number of elements is equal, no sig obj is found
     ypos = -1
     xpos = -1
   else:
+    Obj = np.median(Obj_inds,0)
+    # print(yrng, type(Obj), type(Obj_inds))
+    # print(np.median(Obj_inds,0))
     ypos = np.median(Obj_inds,0)[0]
     xpos = np.median(Obj_inds,0)[1]
   return xpos, ypos
 
-#env = gym.make('Pong-v0',frameskip=3)
-env = gym.make('PongNoFrameskip-v4')
+# env = gym.make('Pong-v0',frameskip=3)
+env = gym.make('Breakout-v0', frameskip=3)
 env.reset()
 
+#For pong (horizontal game)
 def predictBallRacketYIntercept(xpos_Ball,ypos_Ball,xpos_Ball2,ypos_Ball2):
   if ((xpos_Ball==-1) or (xpos_Ball2==-1)):
     predY = -1
@@ -58,31 +65,67 @@ def predictBallRacketYIntercept(xpos_Ball,ypos_Ball,xpos_Ball2,ypos_Ball2):
           predY = predY_nodeflection
   return predY
 
+#For breakout (vertical game)
+def predictBallRacketXIntercept(xpos1, ypos1, xpos2, ypos2):  
+  courtHeight = courtYRng[1] - courtYRng[0]
+  courtWidth = courtXRng[1] - courtXRng[0]
+  if ((ypos1==-1) or (ypos2==-1)):
+    predX = -1
+    # print ('Error 1')
+  else:
+    deltay = ypos2-ypos1
+    if deltay<=0:
+      predX = -1
+      print( deltay, ypos2, ypos1, predX)
+      # print ('Error 2')
+    else:
+      if xpos1<0:
+        predX = -1
+        # print ('Error 3')
+      else:
+        NB_intercept_steps = np.ceil((courtHeight - ypos2)/deltay)
+        deltax = xpos2-xpos1
+        predX_nodeflection = xpos2 + (NB_intercept_steps*deltax)
+        if predX_nodeflection<0:
+          predX = -1*predX_nodeflection
+          # print ('Error 4')
+        elif predX_nodeflection>courtWidth:
+          predX = predX_nodeflection-courtWidth
+          # print ('Error 5')
+        else:
+          predX = predX_nodeflection
+  return predX
 observation, reward, done, info = env.step(1)
 xpos_Ball2, ypos_Ball2 = findobj (observation, courtXRng, courtYRng)
-xpos_Racket2, ypos_Racket2 = findobj (observation, racketXRng, courtYRng)
-predY = predictBallRacketYIntercept(xpos_Ball,ypos_Ball,xpos_Ball2,ypos_Ball2)
+xpos_Racket2, ypos_Racket2 = findobj (observation, courtXRng, racketYRng)
+
+#breakout-specific
+predX = predictBallRacketXIntercept(xpos_Ball,ypos_Ball,xpos_Ball2,ypos_Ball2)
 
 #ion()
 
 for _ in range(nbsteps):
-  if predY==-1:
-    caction = np.random.randint(3,4)
+  if predX==-1:
+    caction = np.random.randint(2,4) 	# 4 is not included, really pick of 2 and 3
+    # print('Random')
   else:
-    targetY = ypos_Racket2 - predY
-    if targetY>8:
-      caction = 4
-    elif targetY<-8:
-      caction = 3
+    targetX = xpos_Racket2 - predX
+    if targetX>8:
+      caction = 3 #left
+      # print('Target left')
+    elif targetX<-8:
+      caction = 2 #right
+      # print('Target right')
     else:
-      caction = 1
+      caction = 1 #stay
+      # print('Target stay')
   observation, reward, done, info = env.step(caction)
   env.render()
   xpos_Ball = xpos_Ball2
   ypos_Ball = ypos_Ball2
   xpos_Ball2, ypos_Ball2 = findobj (observation, courtXRng, courtYRng)
-  xpos_Racket2, ypos_Racket2 = findobj (observation, racketXRng, courtYRng)
-  predY = predictBallRacketYIntercept(xpos_Ball,ypos_Ball,xpos_Ball2,ypos_Ball2)
+  xpos_Racket2, ypos_Racket2 = findobj (observation, courtXRng, racketYRng)
+  predX = predictBallRacketXIntercept(xpos_Ball,ypos_Ball,xpos_Ball2,ypos_Ball2)
   #imshow(observation,origin='upper'); plot([xpos_Racket2+courtXRng[0]],[predY+courtYRng[0]],'ro')
   if done==1:
     env.reset()
