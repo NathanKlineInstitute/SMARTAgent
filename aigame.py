@@ -103,6 +103,9 @@ class AIGame:
     else:
       self.stayStepLim = 6 # number of steps to hold still after every move (to reduce momentum)
       # Takes 6 stays instead of 3 because it seems every other input is ignored (check dad_notes.txt for details)
+    self.downsampshape = (8,8)
+    if dconf['net']['ER'] == 1600:
+      self.downsampshape = (4,4)
 
   def updateInputRates (self, dsum_Images):
     # update input rates to retinal neurons
@@ -111,7 +114,7 @@ class AIGame:
     fr_Images = 40/(1+np.exp((np.multiply(-1,dsum_Images)+123)/25))
     fr_Images = np.subtract(fr_Images,np.min(fr_Images)) #baseline firing rate subtraction. Instead all excitatory neurons are firing at 5Hz.
     #print(np.amax(fr_Images))
-    self.dFiringRates['ER'] = np.reshape(fr_Images,400) #400 for 20*20
+    self.dFiringRates['ER'] = np.reshape(fr_Images,dconf['net']['ER']) #400 for 20*20, 900 for 30*30, etc.
 
   def computeMotionFields (self, UseFull=False):
     # compute and store the motion fields and associated data
@@ -246,7 +249,7 @@ class AIGame:
       lobs_gimage_ds = []
     else:
       lobs_gimage = 255.0*rgb2gray(self.last_obs[courtYRng[0]:courtYRng[1],:,:]) 
-      lobs_gimage_ds = downscale_local_mean(lobs_gimage,(8,8))
+      lobs_gimage_ds = downscale_local_mean(lobs_gimage,self.downsampshape)
       lobs_gimage_ds = np.where(lobs_gimage_ds>np.min(lobs_gimage_ds)+1,255,lobs_gimage_ds)
       lobs_gimage_ds = 0.5*lobs_gimage_ds #use this image for motion computation only
       
@@ -349,7 +352,7 @@ class AIGame:
       rewards.append(reward)
       proposed_actions.append(proposed_action)    
       gray_Image = 255.0*rgb2gray(observation[courtYRng[0]:courtYRng[1],:,:]) # convert to grayscale; rgb2gray has 0-1 range so mul by 255
-      gray_ds = downscale_local_mean(gray_Image,(8,8)) # then downsample
+      gray_ds = downscale_local_mean(gray_Image,self.downsampshape) # then downsample
       gray_ds = np.where(gray_ds>np.min(gray_ds)+1,255,gray_ds) # Different thresholding
       gray_ns = np.where(gray_Image>np.min(gray_Image)+1,255,gray_Image)
       lgimage_ns.append(lgwght[adx]*gray_ns)
