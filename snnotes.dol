@@ -14482,3 +14482,88 @@ will use longer interval between weight recordings, since more neurons ...
 
 ./myrun 48 sn.json
 
+*20jul31
+** check 20jul30_U0_gcp__step_0_
+
+python -i simdat.py backupcfg/20jul30_U0_gcp__step_0_sim.json
+
+ax=plotPerf(actreward,yl=(0,.55))
+savefig('gif/'+dstr+simstr+'perf.png') # gif/20jul31_20jul30_U0_gcp__step_0_perf.png
+improving steadily...which makes sense, given that the intermediate rewards are turned on and
+this is the early stage of learning...also note here that flowwidth==1 and not using EMSTAY
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((1990e3,2000e3))
+savefig('gif/'+dstr+simstr+'rast.png') # gif/20jul31_20jul30_U0_gcp__step_0_rast.png
+rates look good so far ...
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','IM'],tlim=(1990e3,2000e3))
+savefig('gif/'+dstr+simstr+'Vm.png') # gif/20jul31_20jul30_U0_gcp__step_0_Vm.png
+
+how does perf compare to the first step in previous sims that had EMSTAY and larger flowwidth?
+
+lfn = ['20jul15_testG0_gcp_', '20jul30_U0_gcp__step_0_']
+lpda = getindivactionreward(lfn)
+
+clf(); plotComparePerf(lpda,['b','r'],yl=(0,.55),lleg=lfn)
+savefig('gif/'+dstr+simstr+'compare_perf.png') # gif/20jul31_20jul30_U0_gcp__step_0_compare_perf.png
+new version looks a lot better ... improving more clearly
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=True); xlabel('Time (ms)',fontsize=30); ylabel('Average weight',fontsize=30); tl(); 
+savefig('gif/'+dstr+simstr+'all_avg_weight.png') # gif/20jul31_20jul30_U0_gcp__step_0_all_avg_weight.png
+weights going up, and pretty fast...
+
+fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4',showflow=True,ldflow=ldflow)
+gif/20jul31_20jul30_U0_gcp__step_0__input.mp4
+
+also worth checking/animating the input maps ... to see how they vary over time, along with
+the performance ... and get an indication of when/why performance saturates
+
+** check 20jul29_testL0_gcp__step_1_
+
+python -i simdat.py backupcfg/20jul29_testL0_gcp__step_1_sim.json
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig('gif/'+dstr+simstr+'perf.png') # gif/20jul31_20jul29_testL0_gcp__step_1_perf.png
+doing very well in beginning, then some decrease - may be due to different locations ball sent to...
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((1990e3,2000e3))
+savefig('gif/'+dstr+simstr+'rast.png') # gif/20jul31_20jul29_testL0_gcp__step_1_rast.png
+rates are ok
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','EMSTAY','IM'],tlim=(1990e3,2000e3))
+savefig('gif/'+dstr+simstr+'Vm.png') # gif/20jul31_20jul29_testL0_gcp__step_1_Vm.png
+
+lfn = ['20jul25_testJ0_gcp__step_1_', '20jul27_testK0_gcp__step_1_', '20jul29_testL0_gcp__step_1_']
+lpda = getindivactionreward(lfn)
+
+clf(); plotComparePerf(lpda,['b','g','r'],yl=(0,.55),lleg=lfn)
+savefig('gif/'+dstr+simstr+'compare_perf.png') # gif/20jul31_20jul29_testL0_gcp__step_1_compare_perf.png
+seems a lot better than the others - at the given time
+
+lfn = ['20jul15_testG0_gcp_','20jul16_testG1_gcp_', '20jul17_testG2_gcp__step_0_','20jul17_testG2_gcp__step_1_','20jul17_testG2_gcp__step_2_','20jul17_testG2_gcp__step_3_','20jul17_testG2_gcp__step_4_','20jul17_testG2_gcp__step_5_','20jul29_testL0_gcp__step_0_','20jul29_testL0_gcp__step_1_']
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0,.55))
+plot([np.amax(pdac.time)-4000e3,np.amax(pdac.time)-4000e3],[0,.55],'--',color='black') # change in rewards
+savefig('gif/'+dstr+simstr+'perf_all_steps_so_far.png') # gif/20jul31_20jul29_testL0_gcp__step_1_perf_all_steps_so_far.png
+cumulative not decreasing, but also does not appear to increase
+is this just due to small weight incs (RLhebbwt)?
+savefig('gif/'+dstr+simstr+'perf_all_steps_so_farB.png') # gif/20jul31_20jul29_testL0_gcp__step_1_perf_all_steps_so_farB.png
+savefig('gif/'+dstr+simstr+'perf_all_steps_so_farC.png') # gif/20jul31_20jul29_testL0_gcp__step_1_perf_all_steps_so_farC.png
+
+weights changing?
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP','EMSTAY'],lclr=['r','b','g'],plotindiv=True)
+xlabel('Time (ms)',fontsize=30); ylabel('Average weight',fontsize=30); tl(); 
+savefig('gif/'+dstr+simstr+'all_avg_weight.png') # gif/20jul31_20jul29_testL0_gcp__step_1_all_avg_weight.png
+savefig('gif/'+dstr+simstr+'all_avg_weightB.png') # gif/20jul31_20jul29_testL0_gcp__step_1_all_avg_weightB.png
+many weights trending up slowly - so worth seeing if it improves ...
+even if EMSTAY does not contribute to motor commands, it does influence IM and feedback inhib onto EMDOWN
+and EMUP, so could influence commands indirectly; but might not be worth the extra computational cost
+
+fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4')
+gif/20jul31_20jul29_testL0_gcp__step_1__input.mp4
+
+** other sim on gcp?
+
+to test recurrent conn between EMUP,EMDOWN impact on perf
+
