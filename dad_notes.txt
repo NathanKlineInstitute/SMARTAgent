@@ -1,4 +1,342 @@
 ########################################
+7-31-20
+########################################
+To-Do:
+-Test prediction for longer, see when ball goes above bricks
+	-Test with v0, add frameskip # both will => compute faster * Change aigame.py to frameskip
+	# env = gym.make('Breakout-v0', frameskip=3)
+	* Updated time to 200,000. Ball still does not come back after first miss. 
+-Upload notes to github
+-Update staymoves (momentum) loop
+-Combine aigame.py & aigame2.py
+-sim.py motor populations w/ help
+	-Haroon says to add to aigame.py which moves to use?
+-Update computer vision for racket predictions
+	-Currently limited coordinated to not include bricks for simplicity in object detections
+	-Check notes on 7/27
+
+Tutorial for pull request
+1. git add <filename>
+2. git commit -m "message"
+3. git push
+4. Go to github site to submit pull request
+
+########################################
+7-30-20
+########################################
+Worked with Lakshay, walked him through the code
+np.median(a=, axis=) # a is array, axis is along which you calculate
+np.amax # total max in the array
+See yesterday for notes on continued testRacketPredictions
+########################################
+7-29-20
+########################################
+To-Do:
+-Finish testRacketPredictions
+*DONE
+-Test prediction for longer, see when ball goes above bricks
+-Add frameskip
+-Upload notes to github
+-Update staymoves (momentum) loop
+-Combine aigame.py & aigame2.py
+-sim.py motor populations w/ help
+	-Haroon says to add to aigame.py which moves to use?
+-Update computer vision for racket predictions
+	-Currently limited coordinated to not include bricks for simplicity in object detections
+	-Check notes on 7/27
+
+
+testRacketPrediction:
+## Updated the court coordinates
+  File "testRacketPrediction.py", line 83, in predictBallRacketXIntercept
+    NB_intercept_steps = np.ceil((CourtHeight - ypos2)/deltay)
+NameError: name 'CourtHeight' is not defined
+## Not sure why, changed variable to hard-coded number (against my preference)
+	* Fixed that proble
+	* Not getting type 2 error, that's good
+Traceback (most recent call last):
+  File "testRacketPrediction.py", line 124, in <module>
+    xpos_Ball2, ypos_Ball2 = findobj (observation, courtXRng, courtYRng)
+  File "testRacketPrediction.py", line 34, in findobj
+    ypos = np.median(Obj_inds,0)[0]
+IndexError: invalid index to scalar variable.
+## New error, unsure what it's problem is
+# Happens when you try to index a numpy scalar variable (google)
+Haroon says to change this:
+if sIC.shape[0]*sIC.shape[1]==np.shape(Obj_inds)[0] or len(Obj_inds)==0: # if number of elements is equal, no sig obj is found
+* NOW WORKS
+
+########################################
+7-27-20
+########################################
+To-Do:
+-Add frameskip
+-Upload notes to github
+-Update staymoves (momentum) loop
+-Combine aigame.py & aigame2.py
+-sim.py motor populations w/ help
+	-Haroon says to add to aigame.py which moves to use?
+
+###  testRacketPredictions  ###
+Adapted code from aigame.py
+Paddle only goes to one side, will need to explore.
+Only goes right
+
+Not based on targetX
+	Switched 2 with another input, paddle still went right
+Sam & Haroon to rescue
+Adding print text to track the code
+  Gets stuck at predX = -1, so defaults to np.random.randint(2,3)
+    Is 3 included as the top limit?
+      No, should be randint(2,4)
+    Why is it stuck?
+      Error 2:     "if deltay<=0: predX = -1"
+      ypos2 <= ypos 1
+      ypos is kept 78.0, never updated
+New task:
+Store objects found and iterate through to find ball based on size (xdim, ydim) and possibly color
+find all color other than black
+Check opencv (open source library for computer vision)
+	check getObjectsBoundingBoxes in imgutils.py (for object detection)
+
+########################################
+7-24-20
+########################################
+To-Do:
+-Add frameskip
+-Upload notes to github
+-Test testRacketPredi  ctions.py
+	*DONE
+-Combine aigame.py & aigame2.py
+-sim.py motor populations w/ help
+	-Haroon says to add to aigame.py which moves to use?
+
+###  testRacketPredictions  ###
+Adapted code from aigame.py
+Paddle only goes to one side, will need to explore.
+########################################
+7-23-20
+########################################
+To-Do:
+-Add frameskip
+-Upload notes to github
+-Fix momentum
+	-Will try 4 based on prior testing
+	* DONE
+-Test testRacketPredictions.py
+	*STARTED
+-Combine aigame.py & aigame2.py
+-sim.py motor populations w/ help
+	-Haroon says to add to aigame.py which moves to use?
+
+testRacketPredictions is Pong-specific, 
+making changes
+########################################
+7-22-20
+########################################
+Watched workshops
+Organization of Computational Neuroscience (CNS)
+
+########################################
+07-21-20
+########################################
+To-Do:
+-Haroon says add to aigame.py which moves to use?
+-Sam wants to combine aigame.py & aigame2.py
+-Test testRacketPrediction.py to see things work properly
+-Fix momentum
+-Upload to github
+-Why won't picture update?
+	*FIXED, removed frameskip from sim.json since env is v4
+
+Talk with sam and haroon:
+frameskip in sim.json unneccessary for v4
+frameskip allows less processing for model, if game runs slow is usefull
+Adapt sim.py for motor populations
+	Sam and Haroon will help
+########################################
+07-20-20
+########################################
+To-Do:
+-Haroon says add to aigame.py which moves to use?
+-Sam wants to combine aigame.py & aigame2.py
+-Update racketXRng/racketYRng variables
+	*DONE, no more mention of racketXRng
+-Test testRacketPrediction.py to see things work properly
+
+Possible Error:
+#What does this do?
+Additional calcuations allow for accurate coordinate of X axis (since only area between paddles is usually found)
+        #self.FullImages.append(np.sum(self.last_obs[courtYRng[0]:courtYRng[1],:,:],2))
+        self.dObjPos['ball'].append([courtXRng[0]-1+xpos_Ball,ypos_Ball])
+        self.dObjPos['racket'].append([racketXRng[0]-1+xpos_Racket,ypos_Racket])
+* Switched additional calculations to Y coordinates, since game switches to vertical instead of horizontal. Hope that works. 
+        self.dObjPos['ball'].append([xpos_Ball,courtYRng[0]-1+ypos_Ball])
+        self.dObjPos['racket'].append([xpos_Racket,racketYRng[0]-1+ypos_Racket])
+# Momentum
+	# I dont have the updated loop, and unsure on # of stay steps needed
+
+
+Changed sim.json, ran test simulation
+Updated: moves, movecodes, env.
+
+$ from aigame2 import AIGame; AIGame = AIGame()
+bash: syntax error near unexpected token `(' # Forgot to be in python
+$ from aigame2 import AIGame; AIGame = AIGame()
+$ rewards, epCount, proposed_actions, total_hits  = AIGame.playGame(actions=[1], epCount = 0)
+
+  File "/home/davidd/workspace/SMARTAgent/aigame2.py", line 268, in playGame
+    self.dObjPos['racket'].append([racketXRng[0]-1+xpos_Racket,ypos_Racket])
+NameError: name 'racketXRng' is not defined
+
+$ from aigame2 import AIGame; AIGame = AIGame()
+$ rewards, epCount, proposed_actions, total_hits  = AIGame.playGame(actions=[1], epCount = 0)
+$ rewards, epCount, proposed_actions, total_hits  = AIGame.playGame(actions=[3], epCount = 0)
+$ rewards, epCount, proposed_actions, total_hits  = AIGame.playGame(actions=[2], epCount = 0)
+$ rewards, epCount, proposed_actions, total_hits  = AIGame.playGame(actions=[3], epCount = 0)
+# No updated image of board? Paddle not moving and ball not spawning
+########################################
+07-17-20
+########################################
+To-Do:
+-Haroon says add to aigame.py which moves to use
+-Update racketXRng/racketYRng variables
+	*Started
+-Find ball after action
+	*Now uses y pos
+	*DONE
+-Test testRacketPrediction.py to see things work properly
+
+Possible Error:
+#What does this do?
+Additional calcuations allow for accurate coordinate of X axis (since only area between paddles is usually found)
+        #self.FullImages.append(np.sum(self.last_obs[courtYRng[0]:courtYRng[1],:,:],2))
+        self.dObjPos['ball'].append([courtXRng[0]-1+xpos_Ball,ypos_Ball])
+        self.dObjPos['racket'].append([racketXRng[0]-1+xpos_Racket,ypos_Racket])
+# Momentum
+	# I dont have the updated loop, and unsure on # of stay steps needed
+For ball_hits_racket, what is the last condition?
+      if current_ball_dir-self.last_ball_dir<0 and reward==0 and xpos_Ball2>courtXRng[1]-courtXRng[0]-40:
+# Ensures the ball is on the right side of court (pong) aka side of model. Used 20 for breakout. Can change later.
+########################################
+07-16-20
+########################################
+To-Do:
+-Haroon says add to aigame.py which moves to use
+-Update racketXRng/racketYRng variables
+	*Started
+-Look into proposed actions, action input
+	*Done
+-Update findObj inputs and function
+	*Done
+	*Left function alone, just updated racket position function:
+        # xpos_Racket, ypos_Racket = self.findobj(self.last_obs, racketXRng, courtYRng) # get x,y positions of racket
+	# TO
+        # xpos_Racket, ypos_Racket = self.findobj(self.last_obs, courtXRng, racketYRng) # get x,y positions of racket
+
+going to assume dconf['moves'] are 'LEFT'(3) 'RIGHT'(2) and 'NOMOVE'(1)
+
+Possible Error:
+#What does this do?
+        #self.FullImages.append(np.sum(self.last_obs[courtYRng[0]:courtYRng[1],:,:],2))
+        self.dObjPos['ball'].append([courtXRng[0]-1+xpos_Ball,ypos_Ball])
+        self.dObjPos['racket'].append([racketXRng[0]-1+xpos_Racket,ypos_Racket])
+# Momentum
+	# I dont have the updated loop, and unsure on # of stay steps needed
+########################################
+07-15-20
+########################################
+To-Do:
+-Update racketXRng/racketYRng variables
+	*Started
+-Update predictBallRacketYIntercept
+	*DONE
+-Look into proposed actions, action input
+-Update findObj inputs and function
+
+All variable ranges are in a tuple, can be called by index (starting at 0)
+########################################
+07-14-20
+########################################
+Looking through playGame for where to switch X,Y
+########################################
+07-13-20
+########################################
+pull request from master to dad_develop; merged
+git pull
+#need to stash sim.json before merge
+#did not git pull yet.
+git stash #Will probably clear, no cares about sim.json
+git pull
+
+git add dad_notes.txt; git commit -m "notes on breakout"; git push
+
+To-Do:
+-Update court size
+	*DONE
+-look into turning racketXRng to racketYRng
+	*need to update all racket stuff
+-ask about predictBallRacketYIntercept
+	*Seems like changes necessary, unsure what the hardcoded numbers represent (ie 160)
+	*Will need to be switched to XIntercept
+	*Asking Haroon
+	*DONE: 160 (height) and 120 (width) are court sizes.
+########################################
+07-12-20
+########################################
+Ranges for pong:
+    self.courtYRng = (34, 194) # court y range
+    self.courtXRng = (20, 140) # court x range
+    self.racketXRng = (141, 144) # racket x range
+# Will look into turning racketXRng to racketYRng
+Ranges for breakout:
+	#Rounded to middle
+courtYRng = (31.5, 192.5) #31.5 is guess, didn't see how high ball goes - 
+# courtXRng = ( 7.5 , 143.5 + (136.5 - 120.5)) #Paddle goes off the view
+courtXRng = (7.5, 159.5)
+racketYRng = (188.5, 192.5)
+# racketXRng = 136.5 - 120.5 = 16.0
+ 
+########################################
+07-10-20
+########################################
+How to map coordinates of breakout game?
+Guess/Check or is there way to plot pixels? 
+
+
+import gym; env = gym.make('BreakoutNoFrameskip-v4'); env.reset()
+## CHANGE caction to number 1, 3, 4 to move paddle, and repeat this command
+# observation, reward, done, info = env.step(caction); env.render()
+
+obs, reward, done, info = env.step(1); env.render()
+import matplotlib.pyplot as plt
+plt.imshow(obs); plt.show()
+
+
+Unchaged/Left Alone:
+-updateInputRates
+-computeMotionFields
+-computeAllObjectsMotionDirections
+-updateDirSensitiveRates
+-findobj
+-predictBallRacketYIntercept
+	*Seems like changes necessary, unsure what the hardcoded numbers represent (ie 160)
+########################################
+07-08-20
+########################################
+Continuing to go through aigame2.py
+
+Going to keep useSimulatedEnv for simplicity and to allow the option in case it's desired.
+
+
+########################################
+07-07-20
+########################################
+To-Do:
+-Make aigame.py for Breakout
+
+Script: aigame2.py
+########################################
 07-06-20
 ########################################
 To-Do:
@@ -7,6 +345,8 @@ To-Do:
 -Test new code
 	*DONE, both manual and sim ran script fine
 -Update team and commit changes
+	*DONE
+-Look into Breakout
 	*DONE
 
 Current system to update reward:
@@ -47,6 +387,72 @@ IN aigame.py
 working to commit these changes to github now.
 # from samn
 git add, then git commit. then push to branch and pull request.
+
+Tutorial for pull request
+1. git add <filename>
+2. git commit -m "message"
+3. git push
+4. Go to github site to submit pull request
+
+
+## List of breakout versions ##
+EnvSpec(Breakout-v0)
+EnvSpec(Breakout-v4)
+EnvSpec(BreakoutDeterministic-v0)
+EnvSpec(BreakoutDeterministic-v4)
+EnvSpec(BreakoutNoFrameskip-v0)
+EnvSpec(BreakoutNoFrameskip-v4)
+EnvSpec(Breakout-ram-v0)
+EnvSpec(Breakout-ram-v4)
+EnvSpec(Breakout-ramDeterministic-v0)
+EnvSpec(Breakout-ramDeterministic-v4)
+EnvSpec(Breakout-ramNoFrameskip-v0)
+EnvSpec(Breakout-ramNoFrameskip-v4)
+
+
+import gym; env = gym.make('BreakoutNoFrameskip-v4'); env.reset()
+##CHANGE caction to number 1, 3, 4 to move paddle, and repeat this command
+observation, reward, done, info = env.step(caction); env.render()
+
+# Same to pong, motion has momentum
+ACTION_MEANING = {
+    0: "NOOP",	# No
+    1: "FIRE",	# No
+    2: "UP",	# Right
+    3: "RIGHT", # Left
+    4: "LEFT",	# IndexError
+    5: "DOWN",	# IndexError
+	}
+# Motion checks
+Input:	2 1 1 1 1 1	# Motion really small, lot of time to respond
+Motion:	N Y Y Y N N	# Maybe ball speeds up??
+Input:	2 1 1 1 1 1
+Motion:	N Y Y Y N N
+Input:	3 1 1 1 1 1
+Motion:	N Y Y Y Y N
+Input:	3 1 1 1 1 1
+Motion:	N Y Y Y N N
+Input:	3 1 1 1 1 1
+Motion:	N Y Y Y N N
+Input:	3 3 1 1 1 1 1 1 # Takes 4 null inputs instead of typical 3
+Motion:	N Y Y Y Y Y N N
+Input:	3 3 1 1 1 1 1 1
+Motion:	N Y Y Y Y Y N N
+Input:	2 2 1 1 1 1 1 1
+Motion:	N Y Y Y Y Y N N
+Input:	2 2 1 1 1 1 1 1
+Motion:	N Y Y Y Y Y N N
+Input:	2 2 2 1 1 1 1 1 1 # 4 null inputs
+Motion:	N Y Y Y Y Y Y N N
+Input:	3 2 1 1 1 1
+Motion:	N L R R N N
+
+# Board motion
+# Starting from left side
+How many 2 inputs to reach other side? 26
+# Starting from right side
+How many 3 inputs to reach other side? 26
+# Right side of env goes a bit off the board
 ########################################
 07-03-20
 ########################################
