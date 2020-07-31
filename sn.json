@@ -33,11 +33,11 @@
     "verbose": 0,
     "stayStepLim": 0,
     "simtype": {
-        "ResumeSim": 0,
-        "ResumeSimFromFile": "data/20jul29_testL0_gcp__step_0_synWeights_final.pkl"
+        "ResumeSim": 1,
+        "ResumeSimFromFile": "data/20jul30_HRTest0_cycle_synWeights_final.pkl"
     },
     "sim": {
-        "duration": 100,
+        "duration": 1000000,
         "dt": 0.2,
         "verbose": 0,
         "recordStep": 0.6,
@@ -46,9 +46,9 @@
         "RLFakeUpRule": 0,
         "RLFakeDownRule": 0,
         "RLFakeStayRule": 0,
-        "name": "20jul31_TestIntf0_cycle_",
-        "doquit": 0,
-        "doplot": 1,
+        "name": "20jul31_HRTest1_cycle_",
+        "doquit": 1,
+        "doplot": 0,
         "saveCellSecs": 0,
         "saveCellConns": 0,
         "targettedRL": 1,
@@ -60,8 +60,8 @@
         "useTopological": 0
     },
     "net": {
-	"ECellModel": "INTF",
-	"ICellModel": "INTF",
+	"ECellModel": "Mainen",
+	"ICellModel": "FS_BasketCell",
 	"EEGain": 1.0,
 	"EIGain": 1.0,
 	"IEGain": 1.0,

@@ -14593,3 +14593,18 @@ for izhi2007a have these additional changes to let cell model use its own V:
 cellRule['secs']['soma']['pointps']['Izhi2007a_0']['vref'] = 'V' # specify that uses its own voltage V
 cellRule['secs']['soma']['pointps']['Izhi2007a_0']['synList'] = ['AMPA', 'NMDA', 'GABAA', 'GABAB']  # specify its own synapses
 
+** continue HR sim
+
+cp backupcfg/20jul30_HRTest0_cycle_sim.json sn.json
+
+and adjust ... 
+
+        "name": "20jul31_HRTest1_cycle_",
+    "simtype": {
+        "ResumeSim": 1,
+        "ResumeSimFromFile": "data/20jul30_HRTest0_cycle_synWeights_final.pkl"
+    },
+
+still have to check output from previous one ...
+
+./myrun 48 sn.json
