@@ -14567,3 +14567,29 @@ gif/20jul31_20jul29_testL0_gcp__step_1__input.mp4
 
 to test recurrent conn between EMUP,EMDOWN impact on perf
 
+** try INTF4?
+
+https://www.neuron.yale.edu/neuron/static/py_doc/modelspec/programmatic/mechanisms/mech.html?highlight=intf#IntFire4
+
+h.IntFire4
+
+c = h.IntFire4()
+c.taue --- ms excitatory input time constant
+c.taui1 --- ms inhibitory input rise time constant
+c.taui2 --- ms inhibitory input fall time constant
+c.taum --- membrane time constant
+c.m --- membrane state variable
+c.M --- analytic value of membrane state at current time, t
+c.e --- excitatory current state variable
+c.E --- analytic value of excitation current
+c.i1 c.i2 -- inhibitory current state variables
+c.I --- analytic value of inhibitory current.
+
+it's an event-based neuron ... that's what INTF6 was based on ...
+
+http://www.netpyne.org/netpyne.cell.pointCell.html?highlight=intf
+
+for izhi2007a have these additional changes to let cell model use its own V:
+cellRule['secs']['soma']['pointps']['Izhi2007a_0']['vref'] = 'V' # specify that uses its own voltage V
+cellRule['secs']['soma']['pointps']['Izhi2007a_0']['synList'] = ['AMPA', 'NMDA', 'GABAA', 'GABAB']  # specify its own synapses
+
