@@ -14676,7 +14676,31 @@ hmm, input images are getting saved incorrectly ... !
 hmm if court x and y range not same, input images will not be square after downsampling by same amount
 in each direction ... problem? seems like there would be more loss of information in one dimension than
 another after downsampling ... and/or distortion when projecting onto square ... better to allow neurons
-to have rectangular grid ... 
+to have rectangular grid ...
+
+samndp7730% python
+Python 3.6.10 |Anaconda, Inc.| (default, Jan  7 2020, 21:14:29) 
+[GCC 7.3.0] on linux
+Type "help", "copyright", "credits" or "license" for more information.
+>>> from skimage.transform import downscale_local_mean, resize
+>>> downsampshape = (8,8)
+>>> courtYRng = (34, 194)
+>>> courtXRng = (20, 140)
+>>> lobs_gimage = np.zeros((courtYRng[1]-courtYRng[0]+1,courtXRng[1]-courtXRng[0]+1))
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+NameError: name 'np' is not defined
+>>> import numpy as np
+>>> lobs_gimage = np.zeros((courtYRng[1]-courtYRng[0]+1,courtXRng[1]-courtXRng[0]+1))
+>>> lobs_gimage.shape
+(161, 121)
+>>> lobs_gimage = np.zeros((courtYRng[1]-courtYRng[0],courtXRng[1]-courtXRng[0]))
+>>> lobs_gimage.shape
+(160, 120)
+>>> lobs_gimage_ds = downscale_local_mean(lobs_gimage,downsampshape)
+>>> lobs_gimage_ds.shape
+(20, 15) <<-- that's wrong size if used for motion computation and projection to a square ... 
+>>> 
 
 ** is motion in all directions represented with equal firing rates?
 
