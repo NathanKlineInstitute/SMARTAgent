@@ -14712,3 +14712,10 @@ will have fall-off in rate ... that seems problematic ...
 instead, should give each direction sensitive neuron a location (x,y), direction, and sigma ...
 was planning to do that before ...
 
+*20aug1
+** have to check those issues mentioned above (about images, representations, etc.)
+** continue HR
+
+        "name": "20aug1_HRTest2_cycle_",
+	        "ResumeSimFromFile": "data/20jul31_HRTest1_cycle_synWeights_final.pkl"
+
