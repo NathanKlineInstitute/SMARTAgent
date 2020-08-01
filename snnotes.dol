@@ -14608,3 +14608,83 @@ and adjust ...
 still have to check output from previous one ...
 
 ./myrun 48 sn.json
+
+** check output from first 20jul30_HRTest0_cycle_
+
+python -i simdat.py backupcfg/20jul30_HRTest0_cycle_sim.json
+
+ax=plotPerf(actreward,yl=(0,.55))
+savefig('gif/'+dstr+simstr+'perf.png') # gif/20jul31_20jul30_HRTest0_cycle_perf.png
+looks pretty good...comparable to other recent simulations
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((990e3,1000e3))
+savefig('gif/'+dstr+simstr+'rast.png') # gif/20jul31_20jul30_HRTest0_cycle_rast.png
+good (low) firing rates
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','IM'],tlim=(990e3,1000e3))
+savefig('gif/'+dstr+simstr+'Vm.png') # gif/20jul31_20jul30_HRTest0_cycle_Vm.png
+looks ok
+
+tt = np.unique(pdf.time)
+
+dout = getpopinputmap(pdf, tt[0], dnumc, dstartidx, dendidx, 'EMDOWN')
+plotallinputmaps(pdf,tt[0],dstartidx['EMDOWN'],'EMDOWN',dnumc,dstartidx,dendidx,asweight=True,dmap=dout)
+savefig('gif/'+dstr+simstr+'EMDOWN_inputmap_first.png') # gif/20jul31_20jul30_HRTest0_cycle_EMDOWN_inputmap_first.png
+dout = getpopinputmap(pdf, tt[-1], dnumc, dstartidx, dendidx, 'EMDOWN')
+clf(); plotallinputmaps(pdf,tt[-1],dstartidx['EMDOWN'],'EMDOWN',dnumc,dstartidx,dendidx,asweight=True,dmap=dout)
+savefig('gif/'+dstr+simstr+'EMDOWN_inputmap_last.png') # gif/20jul31_20jul30_HRTest0_cycle_EMDOWN_inputmap_last.png
+
+dout = getpopinputmap(pdf, tt[0], dnumc, dstartidx, dendidx, 'EMUP')
+clf(); plotallinputmaps(pdf,tt[0],dstartidx['EMUP'],'EMUP',dnumc,dstartidx,dendidx,asweight=True,dmap=dout)
+savefig('gif/'+dstr+simstr+'EMUP_inputmap_first.png') # gif/20jul31_20jul30_HRTest0_cycle_EMUP_inputmap_first.png
+dout = getpopinputmap(pdf, tt[-1], dnumc, dstartidx, dendidx, 'EMUP')
+clf(); plotallinputmaps(pdf,tt[-1],dstartidx['EMUP'],'EMUP',dnumc,dstartidx,dendidx,asweight=True,dmap=dout)
+savefig('gif/'+dstr+simstr+'EMUP_inputmap_last.png') # gif/20jul31_20jul30_HRTest0_cycle_EMUP_inputmap_last.png
+
+ldoutEMDOWN = []
+for t in tt:
+  print(t)
+  dout = getpopinputmap(pdf, t, dnumc, dstartidx, dendidx, 'EMDOWN')
+  ldoutEMDOWN.append(dout)
+
+len(ldoutEMDOWN) # 50
+
+from scipy.stats import pearsonr
+
+cmat = np.zeros((len(ldoutEMDOWN),len(ldoutEMDOWN)))
+for Adx,doutA in enumerate(ldoutEMDOWN):
+  mA = np.reshape(doutA['EV1DSE'],(dconf['net']['EV1DSE'],))
+  for Bdx,doutB in enumerate(ldoutEMDOWN):
+    mB = np.reshape(doutB['EV1DSE'],(dconf['net']['EV1DSE'],))
+    cmat[Adx,Bdx] = cmat[Bdx,Adx] = pearsonr(mA,mB)[0]
+
+clf(); imshow(cmat,origin='lower',cmap='jet',interpolation='None',extent=(0,1000,0,1000),vmin=0,vmax=1); colorbar()
+xlabel('Time (s)'); ylabel('Time (s)'); title('EV1DSE inputmap correlation')
+savefig('gif/'+dstr+simstr+'EMDOWN_inputmap_EV1DSE_corr.png') # gif/20jul31_20jul30_HRTest0_cycle_EMDOWN_inputmap_EV1DSE_corr.png
+
+figure(); plot(np.linspace(0,1000,50),mean(cmat,axis=1))
+xlabel('Time (s)'); ylabel('Average Correlation')
+savefig('gif/'+dstr+simstr+'EMDOWN_inputmap_EV1DSE_corr_average.png')
+gif/20jul31_20jul30_HRTest0_cycle_EMDOWN_inputmap_EV1DSE_corr_average.png
+
+InputImages.shape # (50000, 20, 40)
+hmm, input images are getting saved incorrectly ... !
+
+    self.courtYRng = (34, 194) # court y range
+    self.courtXRng = (20, 140) # court x range
+
+hmm if court x and y range not same, input images will not be square after downsampling by same amount
+in each direction ... problem? seems like there would be more loss of information in one dimension than
+another after downsampling ... and/or distortion when projecting onto square ... better to allow neurons
+to have rectangular grid ... 
+
+** is motion in all directions represented with equal firing rates?
+
+could this be a problem - for representation of direction info?
+        "AngRFSigma": 22.5,
+
+some directions will have lower firing rates ... anything off one of the 8 major directions
+will have fall-off in rate ... that seems problematic ...
+instead, should give each direction sensitive neuron a location (x,y), direction, and sigma ...
+was planning to do that before ...
+
