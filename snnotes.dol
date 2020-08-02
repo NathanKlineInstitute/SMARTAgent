@@ -14719,3 +14719,67 @@ was planning to do that before ...
         "name": "20aug1_HRTest2_cycle_",
 	        "ResumeSimFromFile": "data/20jul31_HRTest1_cycle_synWeights_final.pkl"
 
+** check output from 20jul31_HRTest1_cycle_
+
+python -i simdat.py backupcfg/20jul31_HRTest1_cycle_sim.json
+
+ax=plotPerf(actreward,yl=(0,.55))
+savefig('gif/'+dstr+simstr+'perf.png') # gif/20aug1_20jul31_HRTest1_cycle_perf.png
+doing pretty well...
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((990e3,1000e3))
+savefig('gif/'+dstr+simstr+'rast.png') # gif/20aug1_20jul31_HRTest1_cycle_rast.png
+rates still good (low)
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','IM'],tlim=(990e3,1000e3))
+savefig('gif/'+dstr+simstr+'Vm.png') # gif/20aug1_20jul31_HRTest1_cycle_Vm.png
+
+lfn = ['20jul30_HRTest0_cycle_', '20jul31_HRTest1_cycle_']
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0,.55))
+savefig('gif/'+dstr+simstr+'perf_all_steps_so_far.png') # gif/20aug1_20jul31_HRTest1_cycle_perf_all_steps_so_far.png
+still improving ... (continued run above too -- in 20aug1_HRTest2_cycle_)
+
+InputImages.shape # (50000, 20, 40)
+(note to fix that)
+
+** check image representations
+
+so have this code in aigame.py:
+
+courtYRng = (34, 194)
+courtXRng = (20, 140)
+
+      gray_Image = 255.0*rgb2gray(observation[courtYRng[0]:courtYRng[1],:,:]) # convert to grayscale; rgb2gray has 0-1 range so mul by 255
+
+that uses courtYRng which is 160 pixels and full x range, which is also 160 pixels ... (the atari games had 160x160 pixel display)
+
+so based on that most of the operations below, including downscaling seem ok ... should produce a square ... 
+
+      gray_ds = downscale_local_mean(gray_Image,self.downsampshape) # then downsample
+      gray_ds = np.where(gray_ds>np.min(gray_ds)+1,255,gray_ds) # Different thresholding
+      gray_ns = np.where(gray_Image>np.min(gray_Image)+1,255,gray_Image)
+      lgimage_ns.append(lgwght[adx]*gray_ns)
+      lgimage.append(lgwght[adx]*gray_ds) # save weighted grayscale image from current frame
+
+but then why are input images for HRTest (above) not correct size?
+
+downsampshape = (8,8)
+courtYRng = (34, 194)
+courtXRng = (20, 140)
+lobs_gimage = np.zeros((courtYRng[1]-courtYRng[0],160))
+lobs_gimage.shape # (160, 160)
+from skimage.transform import downscale_local_mean, resize
+lobs_gimage_ds = downscale_local_mean(lobs_gimage,downsampshape)
+lobs_gimage_ds.shape # (20, 20)
+
+downsampshape = (4,4)
+lobs_gimage_ds = downscale_local_mean(lobs_gimage,downsampshape)
+lobs_gimage_ds.shape # (40, 40)
+
+try the HR Test for a few timesteps to see why InputImages saved with incorrect size ...
+
+
+
+** can NE get confused with SE (with current RFs, sigmas) ?
+
