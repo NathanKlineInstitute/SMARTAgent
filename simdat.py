@@ -368,7 +368,7 @@ def loadInputImages (name=None):
   for x in range(NB_Images):
     fp = x*Input_Images.shape[1]
     # 20 is sqrt of 400 (20x20 pixels). what is 400? number of ER neurons? or getting rid of counter @ top of screen?
-    New_InputImages.append(Input_Images[fp:fp+20,:])
+    New_InputImages.append(Input_Images[fp:fp+Input_Images.shape[1],:])
   return np.array(New_InputImages)
 
 def loadMotionFields (name=None): return pickle.load(open('data/'+getsimname(name)+'MotionFields.pkl','rb'))

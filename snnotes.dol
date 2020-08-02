@@ -14779,7 +14779,36 @@ lobs_gimage_ds.shape # (40, 40)
 
 try the HR Test for a few timesteps to see why InputImages saved with incorrect size ...
 
+./myrun 16 sn.json
 
+sim.AIGame.ReducedImages[0].shape # (40, 40)
+so that's correct shape ...
+len(sim.AIGame.ReducedImages) # 5, ran for 100 ms, image every 20 ms
+
+head data/20jul31_HRTest1_cycle_InputImages.txt
+# Array shape: (50000, 40, 40)
+
+hmm, so must have fixed the problem already ... ?? no, the problem was not in the save
+
+head data/20jul30_HRTest0_cycle_InputImages.txt
+# Array shape: (50000, 40, 40)
+
+so must be in the read in simdat.py ...
+
+yeah, loadInputImages assumes 20x20:
+    New_InputImages.append(Input_Images[fp:fp+20,:])
+
+ok, fix that up ...
+
+IM = np.loadtxt('data/20jul30_HRTest0_cycle_InputImages.txt')
+IM.shape # (2000000, 40)
+hmm, text file not great way to save the images ...
+NB_Images = int(IM.shape[0]/IM.shape[1]) # 50000
+
+IM = loadInputImages(name='20aug1_Debug_cycle_')
+IM.shape # (5, 40, 40)
+
+ok, fixed ... 
 
 ** can NE get confused with SE (with current RFs, sigmas) ?
 
