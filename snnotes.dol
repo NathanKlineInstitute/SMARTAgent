@@ -14482,3 +14482,515 @@ will use longer interval between weight recordings, since more neurons ...
 
 ./myrun 48 sn.json
 
+*20jul31
+** check 20jul30_U0_gcp__step_0_
+
+python -i simdat.py backupcfg/20jul30_U0_gcp__step_0_sim.json
+
+ax=plotPerf(actreward,yl=(0,.55))
+savefig('gif/'+dstr+simstr+'perf.png') # gif/20jul31_20jul30_U0_gcp__step_0_perf.png
+improving steadily...which makes sense, given that the intermediate rewards are turned on and
+this is the early stage of learning...also note here that flowwidth==1 and not using EMSTAY
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((1990e3,2000e3))
+savefig('gif/'+dstr+simstr+'rast.png') # gif/20jul31_20jul30_U0_gcp__step_0_rast.png
+rates look good so far ...
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','IM'],tlim=(1990e3,2000e3))
+savefig('gif/'+dstr+simstr+'Vm.png') # gif/20jul31_20jul30_U0_gcp__step_0_Vm.png
+
+how does perf compare to the first step in previous sims that had EMSTAY and larger flowwidth?
+
+lfn = ['20jul15_testG0_gcp_', '20jul30_U0_gcp__step_0_']
+lpda = getindivactionreward(lfn)
+
+clf(); plotComparePerf(lpda,['b','r'],yl=(0,.55),lleg=lfn)
+savefig('gif/'+dstr+simstr+'compare_perf.png') # gif/20jul31_20jul30_U0_gcp__step_0_compare_perf.png
+new version looks a lot better ... improving more clearly
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=True); xlabel('Time (ms)',fontsize=30); ylabel('Average weight',fontsize=30); tl(); 
+savefig('gif/'+dstr+simstr+'all_avg_weight.png') # gif/20jul31_20jul30_U0_gcp__step_0_all_avg_weight.png
+weights going up, and pretty fast...
+
+fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4',showflow=True,ldflow=ldflow)
+gif/20jul31_20jul30_U0_gcp__step_0__input.mp4
+
+also worth checking/animating the input maps ... to see how they vary over time, along with
+the performance ... and get an indication of when/why performance saturates
+
+** check 20jul29_testL0_gcp__step_1_
+
+python -i simdat.py backupcfg/20jul29_testL0_gcp__step_1_sim.json
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig('gif/'+dstr+simstr+'perf.png') # gif/20jul31_20jul29_testL0_gcp__step_1_perf.png
+doing very well in beginning, then some decrease - may be due to different locations ball sent to...
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((1990e3,2000e3))
+savefig('gif/'+dstr+simstr+'rast.png') # gif/20jul31_20jul29_testL0_gcp__step_1_rast.png
+rates are ok
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','EMSTAY','IM'],tlim=(1990e3,2000e3))
+savefig('gif/'+dstr+simstr+'Vm.png') # gif/20jul31_20jul29_testL0_gcp__step_1_Vm.png
+
+lfn = ['20jul25_testJ0_gcp__step_1_', '20jul27_testK0_gcp__step_1_', '20jul29_testL0_gcp__step_1_']
+lpda = getindivactionreward(lfn)
+
+clf(); plotComparePerf(lpda,['b','g','r'],yl=(0,.55),lleg=lfn)
+savefig('gif/'+dstr+simstr+'compare_perf.png') # gif/20jul31_20jul29_testL0_gcp__step_1_compare_perf.png
+seems a lot better than the others - at the given time
+
+lfn = ['20jul15_testG0_gcp_','20jul16_testG1_gcp_', '20jul17_testG2_gcp__step_0_','20jul17_testG2_gcp__step_1_','20jul17_testG2_gcp__step_2_','20jul17_testG2_gcp__step_3_','20jul17_testG2_gcp__step_4_','20jul17_testG2_gcp__step_5_','20jul29_testL0_gcp__step_0_','20jul29_testL0_gcp__step_1_']
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0,.55))
+plot([np.amax(pdac.time)-4000e3,np.amax(pdac.time)-4000e3],[0,.55],'--',color='black') # change in rewards
+savefig('gif/'+dstr+simstr+'perf_all_steps_so_far.png') # gif/20jul31_20jul29_testL0_gcp__step_1_perf_all_steps_so_far.png
+cumulative not decreasing, but also does not appear to increase
+is this just due to small weight incs (RLhebbwt)?
+savefig('gif/'+dstr+simstr+'perf_all_steps_so_farB.png') # gif/20jul31_20jul29_testL0_gcp__step_1_perf_all_steps_so_farB.png
+savefig('gif/'+dstr+simstr+'perf_all_steps_so_farC.png') # gif/20jul31_20jul29_testL0_gcp__step_1_perf_all_steps_so_farC.png
+
+weights changing?
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP','EMSTAY'],lclr=['r','b','g'],plotindiv=True)
+xlabel('Time (ms)',fontsize=30); ylabel('Average weight',fontsize=30); tl(); 
+savefig('gif/'+dstr+simstr+'all_avg_weight.png') # gif/20jul31_20jul29_testL0_gcp__step_1_all_avg_weight.png
+savefig('gif/'+dstr+simstr+'all_avg_weightB.png') # gif/20jul31_20jul29_testL0_gcp__step_1_all_avg_weightB.png
+many weights trending up slowly - so worth seeing if it improves ...
+even if EMSTAY does not contribute to motor commands, it does influence IM and feedback inhib onto EMDOWN
+and EMUP, so could influence commands indirectly; but might not be worth the extra computational cost
+
+fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4')
+gif/20jul31_20jul29_testL0_gcp__step_1__input.mp4
+
+** other sim on gcp?
+
+to test recurrent conn between EMUP,EMDOWN impact on perf
+
+** try INTF4?
+
+https://www.neuron.yale.edu/neuron/static/py_doc/modelspec/programmatic/mechanisms/mech.html?highlight=intf#IntFire4
+
+h.IntFire4
+
+c = h.IntFire4()
+c.taue --- ms excitatory input time constant
+c.taui1 --- ms inhibitory input rise time constant
+c.taui2 --- ms inhibitory input fall time constant
+c.taum --- membrane time constant
+c.m --- membrane state variable
+c.M --- analytic value of membrane state at current time, t
+c.e --- excitatory current state variable
+c.E --- analytic value of excitation current
+c.i1 c.i2 -- inhibitory current state variables
+c.I --- analytic value of inhibitory current.
+
+it's an event-based neuron ... that's what INTF6 was based on ...
+
+http://www.netpyne.org/netpyne.cell.pointCell.html?highlight=intf
+
+for izhi2007a have these additional changes to let cell model use its own V:
+cellRule['secs']['soma']['pointps']['Izhi2007a_0']['vref'] = 'V' # specify that uses its own voltage V
+cellRule['secs']['soma']['pointps']['Izhi2007a_0']['synList'] = ['AMPA', 'NMDA', 'GABAA', 'GABAB']  # specify its own synapses
+
+** continue HR sim
+
+cp backupcfg/20jul30_HRTest0_cycle_sim.json sn.json
+
+and adjust ... 
+
+        "name": "20jul31_HRTest1_cycle_",
+    "simtype": {
+        "ResumeSim": 1,
+        "ResumeSimFromFile": "data/20jul30_HRTest0_cycle_synWeights_final.pkl"
+    },
+
+still have to check output from previous one ...
+
+./myrun 48 sn.json
+
+** check output from first 20jul30_HRTest0_cycle_
+
+python -i simdat.py backupcfg/20jul30_HRTest0_cycle_sim.json
+
+ax=plotPerf(actreward,yl=(0,.55))
+savefig('gif/'+dstr+simstr+'perf.png') # gif/20jul31_20jul30_HRTest0_cycle_perf.png
+looks pretty good...comparable to other recent simulations
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((990e3,1000e3))
+savefig('gif/'+dstr+simstr+'rast.png') # gif/20jul31_20jul30_HRTest0_cycle_rast.png
+good (low) firing rates
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','IM'],tlim=(990e3,1000e3))
+savefig('gif/'+dstr+simstr+'Vm.png') # gif/20jul31_20jul30_HRTest0_cycle_Vm.png
+looks ok
+
+tt = np.unique(pdf.time)
+
+dout = getpopinputmap(pdf, tt[0], dnumc, dstartidx, dendidx, 'EMDOWN')
+plotallinputmaps(pdf,tt[0],dstartidx['EMDOWN'],'EMDOWN',dnumc,dstartidx,dendidx,asweight=True,dmap=dout)
+savefig('gif/'+dstr+simstr+'EMDOWN_inputmap_first.png') # gif/20jul31_20jul30_HRTest0_cycle_EMDOWN_inputmap_first.png
+dout = getpopinputmap(pdf, tt[-1], dnumc, dstartidx, dendidx, 'EMDOWN')
+clf(); plotallinputmaps(pdf,tt[-1],dstartidx['EMDOWN'],'EMDOWN',dnumc,dstartidx,dendidx,asweight=True,dmap=dout)
+savefig('gif/'+dstr+simstr+'EMDOWN_inputmap_last.png') # gif/20jul31_20jul30_HRTest0_cycle_EMDOWN_inputmap_last.png
+
+dout = getpopinputmap(pdf, tt[0], dnumc, dstartidx, dendidx, 'EMUP')
+clf(); plotallinputmaps(pdf,tt[0],dstartidx['EMUP'],'EMUP',dnumc,dstartidx,dendidx,asweight=True,dmap=dout)
+savefig('gif/'+dstr+simstr+'EMUP_inputmap_first.png') # gif/20jul31_20jul30_HRTest0_cycle_EMUP_inputmap_first.png
+dout = getpopinputmap(pdf, tt[-1], dnumc, dstartidx, dendidx, 'EMUP')
+clf(); plotallinputmaps(pdf,tt[-1],dstartidx['EMUP'],'EMUP',dnumc,dstartidx,dendidx,asweight=True,dmap=dout)
+savefig('gif/'+dstr+simstr+'EMUP_inputmap_last.png') # gif/20jul31_20jul30_HRTest0_cycle_EMUP_inputmap_last.png
+
+ldoutEMDOWN = []
+for t in tt:
+  print(t)
+  dout = getpopinputmap(pdf, t, dnumc, dstartidx, dendidx, 'EMDOWN')
+  ldoutEMDOWN.append(dout)
+
+len(ldoutEMDOWN) # 50
+
+from scipy.stats import pearsonr
+
+cmat = np.zeros((len(ldoutEMDOWN),len(ldoutEMDOWN)))
+for Adx,doutA in enumerate(ldoutEMDOWN):
+  mA = np.reshape(doutA['EV1DSE'],(dconf['net']['EV1DSE'],))
+  for Bdx,doutB in enumerate(ldoutEMDOWN):
+    mB = np.reshape(doutB['EV1DSE'],(dconf['net']['EV1DSE'],))
+    cmat[Adx,Bdx] = cmat[Bdx,Adx] = pearsonr(mA,mB)[0]
+
+clf(); imshow(cmat,origin='lower',cmap='jet',interpolation='None',extent=(0,1000,0,1000),vmin=0,vmax=1); colorbar()
+xlabel('Time (s)'); ylabel('Time (s)'); title('EV1DSE inputmap correlation')
+savefig('gif/'+dstr+simstr+'EMDOWN_inputmap_EV1DSE_corr.png') # gif/20jul31_20jul30_HRTest0_cycle_EMDOWN_inputmap_EV1DSE_corr.png
+
+figure(); plot(np.linspace(0,1000,50),mean(cmat,axis=1))
+xlabel('Time (s)'); ylabel('Average Correlation')
+savefig('gif/'+dstr+simstr+'EMDOWN_inputmap_EV1DSE_corr_average.png')
+gif/20jul31_20jul30_HRTest0_cycle_EMDOWN_inputmap_EV1DSE_corr_average.png
+
+InputImages.shape # (50000, 20, 40)
+hmm, input images are getting saved incorrectly ... !
+
+    self.courtYRng = (34, 194) # court y range
+    self.courtXRng = (20, 140) # court x range
+
+hmm if court x and y range not same, input images will not be square after downsampling by same amount
+in each direction ... problem? seems like there would be more loss of information in one dimension than
+another after downsampling ... and/or distortion when projecting onto square ... better to allow neurons
+to have rectangular grid ...
+
+samndp7730% python
+Python 3.6.10 |Anaconda, Inc.| (default, Jan  7 2020, 21:14:29) 
+[GCC 7.3.0] on linux
+Type "help", "copyright", "credits" or "license" for more information.
+>>> from skimage.transform import downscale_local_mean, resize
+>>> downsampshape = (8,8)
+>>> courtYRng = (34, 194)
+>>> courtXRng = (20, 140)
+>>> lobs_gimage = np.zeros((courtYRng[1]-courtYRng[0]+1,courtXRng[1]-courtXRng[0]+1))
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+NameError: name 'np' is not defined
+>>> import numpy as np
+>>> lobs_gimage = np.zeros((courtYRng[1]-courtYRng[0]+1,courtXRng[1]-courtXRng[0]+1))
+>>> lobs_gimage.shape
+(161, 121)
+>>> lobs_gimage = np.zeros((courtYRng[1]-courtYRng[0],courtXRng[1]-courtXRng[0]))
+>>> lobs_gimage.shape
+(160, 120)
+>>> lobs_gimage_ds = downscale_local_mean(lobs_gimage,downsampshape)
+>>> lobs_gimage_ds.shape
+(20, 15) <<-- that's wrong size if used for motion computation and projection to a square ... 
+>>> 
+
+** is motion in all directions represented with equal firing rates?
+
+could this be a problem - for representation of direction info?
+        "AngRFSigma": 22.5,
+
+some directions will have lower firing rates ... anything off one of the 8 major directions
+will have fall-off in rate ... that seems problematic ...
+instead, should give each direction sensitive neuron a location (x,y), direction, and sigma ...
+was planning to do that before ...
+
+*20aug1
+** have to check those issues mentioned above (about images, representations, etc.)
+** continue HR
+
+        "name": "20aug1_HRTest2_cycle_",
+	        "ResumeSimFromFile": "data/20jul31_HRTest1_cycle_synWeights_final.pkl"
+
+** check output from 20jul31_HRTest1_cycle_
+
+python -i simdat.py backupcfg/20jul31_HRTest1_cycle_sim.json
+
+ax=plotPerf(actreward,yl=(0,.55))
+savefig('gif/'+dstr+simstr+'perf.png') # gif/20aug1_20jul31_HRTest1_cycle_perf.png
+doing pretty well...
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((990e3,1000e3))
+savefig('gif/'+dstr+simstr+'rast.png') # gif/20aug1_20jul31_HRTest1_cycle_rast.png
+rates still good (low)
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','IM'],tlim=(990e3,1000e3))
+savefig('gif/'+dstr+simstr+'Vm.png') # gif/20aug1_20jul31_HRTest1_cycle_Vm.png
+
+lfn = ['20jul30_HRTest0_cycle_', '20jul31_HRTest1_cycle_']
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0,.55))
+savefig('gif/'+dstr+simstr+'perf_all_steps_so_far.png') # gif/20aug1_20jul31_HRTest1_cycle_perf_all_steps_so_far.png
+still improving ... (continued run above too -- in 20aug1_HRTest2_cycle_)
+
+InputImages.shape # (50000, 20, 40)
+(note to fix that)
+
+** check image representations
+
+so have this code in aigame.py:
+
+courtYRng = (34, 194)
+courtXRng = (20, 140)
+
+      gray_Image = 255.0*rgb2gray(observation[courtYRng[0]:courtYRng[1],:,:]) # convert to grayscale; rgb2gray has 0-1 range so mul by 255
+
+that uses courtYRng which is 160 pixels and full x range, which is also 160 pixels ... (the atari games had 160x160 pixel display)
+
+so based on that most of the operations below, including downscaling seem ok ... should produce a square ... 
+
+      gray_ds = downscale_local_mean(gray_Image,self.downsampshape) # then downsample
+      gray_ds = np.where(gray_ds>np.min(gray_ds)+1,255,gray_ds) # Different thresholding
+      gray_ns = np.where(gray_Image>np.min(gray_Image)+1,255,gray_Image)
+      lgimage_ns.append(lgwght[adx]*gray_ns)
+      lgimage.append(lgwght[adx]*gray_ds) # save weighted grayscale image from current frame
+
+but then why are input images for HRTest (above) not correct size?
+
+downsampshape = (8,8)
+courtYRng = (34, 194)
+courtXRng = (20, 140)
+lobs_gimage = np.zeros((courtYRng[1]-courtYRng[0],160))
+lobs_gimage.shape # (160, 160)
+from skimage.transform import downscale_local_mean, resize
+lobs_gimage_ds = downscale_local_mean(lobs_gimage,downsampshape)
+lobs_gimage_ds.shape # (20, 20)
+
+downsampshape = (4,4)
+lobs_gimage_ds = downscale_local_mean(lobs_gimage,downsampshape)
+lobs_gimage_ds.shape # (40, 40)
+
+try the HR Test for a few timesteps to see why InputImages saved with incorrect size ...
+
+./myrun 16 sn.json
+
+sim.AIGame.ReducedImages[0].shape # (40, 40)
+so that's correct shape ...
+len(sim.AIGame.ReducedImages) # 5, ran for 100 ms, image every 20 ms
+
+head data/20jul31_HRTest1_cycle_InputImages.txt
+# Array shape: (50000, 40, 40)
+
+hmm, so must have fixed the problem already ... ?? no, the problem was not in the save
+
+head data/20jul30_HRTest0_cycle_InputImages.txt
+# Array shape: (50000, 40, 40)
+
+so must be in the read in simdat.py ...
+
+yeah, loadInputImages assumes 20x20:
+    New_InputImages.append(Input_Images[fp:fp+20,:])
+
+ok, fix that up ...
+
+IM = np.loadtxt('data/20jul30_HRTest0_cycle_InputImages.txt')
+IM.shape # (2000000, 40)
+hmm, text file not great way to save the images ...
+NB_Images = int(IM.shape[0]/IM.shape[1]) # 50000
+
+IM = loadInputImages(name='20aug1_Debug_cycle_')
+IM.shape # (5, 40, 40)
+
+ok, fixed ... 
+
+** can NE get confused with SE (with current RFs, sigmas) ?
+*20aug2
+** check 20aug1_HRTest2_cycle_
+
+python -i simdat.py backupcfg/20aug1_HRTest2_cycle_sim.json
+
+ax=plotPerf(actreward,yl=(0,1.))
+savefig('gif/'+dstr+simstr+'perf.png') # gif/20aug2_20aug1_HRTest2_cycle_perf.png
+at times good, at times not ... 
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((990e3,1000e3))
+savefig('gif/'+dstr+simstr+'rast.png') # gif/20aug2_20aug1_HRTest2_cycle_rast.png
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','IM'],tlim=(990e3,1000e3))
+savefig('gif/'+dstr+simstr+'Vm.png') # gif/20aug2_20aug1_HRTest2_cycle_Vm.png
+
+lfn = ['20jul30_HRTest0_cycle_', '20jul31_HRTest1_cycle_','20aug1_HRTest2_cycle_']
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0,.55))
+savefig('gif/'+dstr+simstr+'perf_all_steps_so_far.png') # gif/20aug2_20aug1_HRTest2_cycle_perf_all_steps_so_far.png
+some improvements, difficult to tell if consistent and/or still increasing...
+
+InputImages.shape # (50000, 40, 40)
+
+fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4') # gif/20aug2_20aug1_HRTest2_cycle__input.mp4
+
+continue this run ...
+
+        "name": "20aug2_HRTest3_cycle_",
+    "simtype": {
+        "ResumeSim": 1,
+        "ResumeSimFromFile": "data/20aug1_HRTest2_cycle_synWeights_final.pkl"
+    },
+
+python multistepSim.py sn.json 48 10 20aug2_HRTest3_cycle_MultiTest
+
+started @ ~21:35 ...
+
+** check ang rep
+
+fctr = np.exp(-1.0*(getangdiff(motiondir[y][x],dAngPeak[pop])**2)/AngRFSigma2)
+
+have been using AngRFSigma of 22.5, so AngRFSigma2 == 22.5**2
+
+# get smallest angle difference
+def getangdiff (ang1, ang2):
+  if ang1 > 180.0:
+    ang1 -= 360.0
+  if ang2 > 180.0:
+    ang2 -= 360.0
+  angdiff = ang1 - ang2
+  if angdiff > 180.0:
+    angdiff-=360.0
+  elif angdiff < -180.0:
+    angdiff+=360.0
+  return angdiff
+
+assume motiondir angle == 0 (east)
+
+python
+
+import numpy as np
+
+AngRFSigma = 22.5
+AngRFSigma2 = AngRFSigma**2
+
+motiondir = 0.0
+ang2 = 45
+
+getangdiff(motiondir,ang2)**2/AngRFSigma2 # 4.0
+np.exp(-1.0*getangdiff(motiondir,ang2)**2/AngRFSigma2) # 0.01831563888873418
+
+so at 45 degree difference, that's a pretty big fall-off
+
+ang2 = 22.5
+getangdiff(motiondir,ang2)**2/AngRFSigma2 # 1.0
+np.exp(-1.0*getangdiff(motiondir,ang2)**2/AngRFSigma2) # 0.36787944117144233
+
+but at 22.5 degree diff, it's ~0.37 ...
+
+lang = np.linspace(-180,180,361)
+lfctr = [np.exp(-1.0*getangdiff(motiondir,ang2)**2/AngRFSigma2) for ang2 in lang]
+
+from pylab import *
+
+plot(lang, lfctr, 'ko')
+xlabel('Ang Diff'); ylabel('Factor')
+savefig('gif/20aug2_angrf_a0.png')
+
+having only 8 primary directions means certain movement directions will always
+have less representation in terms of number of spikes they produce ... so, that
+means certain information is not propagating as effectively throughout the network,
+and that the model is less likely to make an optimal decision ... 
+
+so, then worth having all 360 deg of representation with ~equal weighting ...
+but that means a lot more neurons ...
+
+some inhib between these dir selective neurons could help promote correct answer ...
+
+what if neurons at each coordinate had a more complex RF, that responded
+in all directions, but not all directions equally (some bias in particular
+directions?) - is that better than a dominant direction with fall-off in
+other directions? 
+
+AngRFSigma2 = 45.0**2
+lfctr = [np.exp(-1.0*getangdiff(motiondir,ang2)**2/AngRFSigma2) for ang2 in lang]
+plot(lang, lfctr, 'bo')
+
+lang[225] # 45.0
+lfctr[225] # 0.36787944117144233
+
+savefig('gif/20aug2_angrf_a1.png')
+that wider rep is too wide, since >90 deg apart (which has component of opposite
+directions, still has positive value ~1.7%):
+lang[271],lfctr[271] # (91.0, 0.016749569608612666)
+
+AngRFSigma2 = 22.5**2
+lfctr = [np.exp(-1.0*getangdiff(motiondir,ang2)**2/AngRFSigma2) for ang2 in lang]
+whereas with sigma used now, many orders of magnitude smaller:
+lang[271],lfctr[271] # (91.0, 7.870722635526579e-08)
+
+but still, could be usefull to have the full set of directions
+with equal rep ...
+
+** how many neurons for 1/2 rep (80x80) ?
+
+6400 for ER, EV1, and each of the dir selective neurons
+
+        "name": "20aug2_HalfTest0_cycle_",
+
+./myrun 48 sn.json
+
+  Simulated time: 1.0 s; 48 workers
+  Run time: 347.35 s
+
+python -i simdat.py backupcfg/20aug2_HalfTest0_cycle_sim.json
+
+sum(list(dnumc.values())) # 67450
+
+ax=plotPerf(actreward,yl=(0,1.))
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); 
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','IM'])
+
+100 s would take ~10 hours on 48 cores ... of course, already using 48 cores on cycle ...
+
+worth a try ...
+
+had these as number of neurons:
+        "ER": 6400,
+        "IR": 1600,
+        "EV1": 6400,
+        "EV1DE": 6400,
+        "EV1DNE": 6400,
+        "EV1DN": 6400,
+        "EV1DNW": 6400,
+        "EV1DW": 6400,
+        "EV1DSW": 6400,
+        "EV1DS": 6400,
+        "EV1DSE": 6400,
+        "IV1": 1600,
+        "EV4": 0,
+        "IV4": 0,
+        "EMT": 0,
+        "IMT": 0,
+        "EMDOWN": 100,
+        "EMUP": 100,
+        "EMSTAY": 0,
+        "IM": 50,
+
+        "EEMWghtAM": 1.25e-05,
+        "EEMWghtNM": 1.25e-06,
+
+            "RLhebbwt": 6.25e-07,
+
+        "recordWeightStepSize": 4500,
+	
+and other params same as HR test above ...
+
+./myrun 48 sn.json
+
+started ~23:16 ...
+

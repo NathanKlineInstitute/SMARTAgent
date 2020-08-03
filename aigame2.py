@@ -1,12 +1,9 @@
 """
-AIGame: connects OpenAI gym game to the model (V1-M1-RL)
-Adapted from arm.py
-Original Version: 2015jan28 by salvadordura@gmail.com
-Modified Version: 2019oct1 by haroon.anwar@gmail.com
-Modified 2019-2020 samn
-Modified 2020 davidd
+AIGame2: connects OpenAI gym game to the model (V1-M1-RL) for Breakout environment
+Adapted from AIGame.py
+Original Version: 2020jul7 by davidd
 """
-
+#Original iimports from aigame.py
 from neuron import h
 from pylab import concatenate, figure, show, ion, ioff, pause,xlabel, ylabel, plot, Circle, sqrt, arctan, arctan2, close
 from copy import copy, deepcopy
@@ -29,12 +26,13 @@ from centroidtracker import CentroidTracker
 from conf import dconf
 
 # make the environment - env is global so that it only gets created on a single node (important when using MPI with > 1 node)
+#Allows option for simulatedBreakout
 useSimulatedEnv = False
 try:
-  if 'useSimulatedEnv' in dconf: useSimulatedEnv = dconf['useSimulatedEnv']
+  if 'useSimulatedEnv' in dconf: useSimulatedEnv = dconf['useSimulatedEnv']	
   if useSimulatedEnv:
-    from simulatePong import simulatePong
-    pong = simulatePong()
+    from simulateBreakout import simulateBreakout	#simulatedBreakout doesn't exist yet, but in case it becomes necessary
+    breakout = simulateBreakout()
   else:
     if 'frameskip' in dconf['env']:
       env = gym.make(dconf['env']['name'],frameskip=dconf['env']['frameskip'],repeat_action_probability=0.)
@@ -44,7 +42,7 @@ try:
     env.reset()
 except:
   print('Exception in makeENV')
-  env = gym.make('Pong-v0',framepskip=1,repeat_action_probability=0.)
+  env = gym.make('BreakoutNoFrameskip-v4',repeat_action_probability=0.)
   env = wrappers.Monitor(env, './videos/' + str(time()) + '/',force=True)
   env.reset()
 
@@ -65,7 +63,7 @@ class AIGame:
   """ Interface to OpenAI gym game 
   """
   def __init__ (self,fcfg='sim.json'): # initialize variables
-    if useSimulatedEnv: self.pong = pong
+    if useSimulatedEnv: self.breakout = breakout
     else: self.env = env
     self.countAll = 0
     self.ldir = ['E','NE','N', 'NW','W','SW','S','SE']
@@ -80,14 +78,14 @@ class AIGame:
                                 'EV1DS': 270.0,'EV1DSE': 315.0})
     self.AngRFSigma2 = dconf['net']['AngRFSigma']**2 # angular receptive field (RF) sigma squared used for dir selective neuron RFs
     if self.AngRFSigma2 <= 0.0: self.AngRFSigma2=1.0
-    self.input_dim = int(np.sqrt(dconf['net']['ER'])) # input image XY plane width,height -- not used anywhere
+    self.input_dim = int(np.sqrt(dconf['net']['ER'])) # input image XY plane width,height
     self.dirSensitiveNeuronDim = int(np.sqrt(dconf['net']['EV1DE'])) # direction sensitive neuron XY plane width,height
     self.dirSensitiveNeuronRate = (dconf['net']['DirMinRate'], dconf['net']['DirMaxRate']) # min, max firing rate (Hz) for dir sensitive neurons
     self.intaction = int(dconf['actionsPerPlay']) # integrate this many actions together before returning reward information to model
-    # these are Pong-specific coordinate ranges; should later move out of this function into Pong-specific functions
-    self.courtYRng = (34, 194) # court y range
-    self.courtXRng = (20, 140) # court x range
-    self.racketXRng = (141, 144) # racket x range
+    # these are Breakout-specific coordinate ranges
+    self.courtYRng = (32, 192) # court y range
+    self.courtXRng = (8, 159) # court x range
+    self.racketYRng = (189, 192) # racket y range 
     self.dObjPos = {'racket':[], 'ball':[]}
     self.last_obs = [] # previous observation
     self.last_ball_dir = 0 # last ball direction
@@ -98,18 +96,6 @@ class AIGame:
       self.ct = CentroidTracker()
       self.objects = OrderedDict() # objects detected in current frame
       self.last_objects = OrderedDict() # objects detected in previous frame
-    if "stayStepLim" in dconf:
-      self.stayStepLim = dconf['stayStepLim']
-    else:
-      self.stayStepLim = 6 # number of steps to hold still after every move (to reduce momentum)
-      # Takes 6 stays instead of 3 because it seems every other input is ignored (check dad_notes.txt for details)
-    self.downsampshape = (8,8) # default is 20x20 (20 = 1/8 of 160)
-    if dconf['net']['ER'] == 1600: # this is for 40x40 (40 = 1/4 of 160)
-      self.downsampshape = (4,4)
-    elif dconf['net']['ER'] == 6400: # this is for 80x80 (1/2 resolution)
-      self.downsampshape = (2,2)
-    elif dconf['net']['ER'] == 25600: # this is for 160x160 (full resolution)
-      self.downsampshape = (1,1)
 
   def updateInputRates (self, dsum_Images):
     # update input rates to retinal neurons
@@ -118,7 +104,7 @@ class AIGame:
     fr_Images = 40/(1+np.exp((np.multiply(-1,dsum_Images)+123)/25))
     fr_Images = np.subtract(fr_Images,np.min(fr_Images)) #baseline firing rate subtraction. Instead all excitatory neurons are firing at 5Hz.
     #print(np.amax(fr_Images))
-    self.dFiringRates['ER'] = np.reshape(fr_Images,dconf['net']['ER']) #400 for 20*20, 900 for 30*30, etc.
+    self.dFiringRates['ER'] = np.reshape(fr_Images,400) #400 for 20*20
 
   def computeMotionFields (self, UseFull=False):
     # compute and store the motion fields and associated data
@@ -133,6 +119,7 @@ class AIGame:
       ang[mag == 0] = -100
       goodInds = np.zeros(shape=(limage[-1].shape[0],limage[-1].shape[1]))
       self.ldflow.append({'flow':flow,'mag':mag,'ang':ang,'goodInds':goodInds,'thang':ang,'thflow':flow})
+      #return
     else:
       self.ldflow.append(getoptflow(limage[-2],limage[-1]))
 
@@ -214,34 +201,37 @@ class AIGame:
       xpos = np.median(Obj_inds,0)[1] #x position of the center of mass of the object
     return xpos, ypos
 
-  def predictBallRacketYIntercept(self, xpos1, ypos1, xpos2, ypos2):
-    if ((xpos1==-1) or (xpos2==-1)):
-      predY = -1
+  def predictBallRacketXIntercept(self, xpos1, ypos1, xpos2, ypos2):
+    courtYRng, courtXRng = self.courtYRng, self.courtXRng # coordinate ranges for different objects (Breakout-specific)    
+    courtHeight = courtYRng[1] - courtYRng[0]
+    courtWidth = courtXRng[1] - courtXRng[0]
+    if ((ypos1==-1) or (ypos2==-1)):
+      predX = -1
     else:
-      deltax = xpos2-xpos1
-      if deltax<=0:
-        predY = -1
+      deltay = ypos2-ypos1
+      if deltay<=0:
+        predX = -1
       else:
-        if ypos1<0:
-          predY = -1
+        if xpos1<0:
+          predX = -1
         else:
-          NB_intercept_steps = np.ceil((120.0 - xpos2)/deltax)
-          deltay = ypos2-ypos1
-          predY_nodeflection = ypos2 + (NB_intercept_steps*deltay)
-          if predY_nodeflection<0:
-            predY = -1*predY_nodeflection
-          elif predY_nodeflection>160:
-            predY = predY_nodeflection-160
+          NB_intercept_steps = np.ceil((CourtHeight - ypos2)/deltay)
+          deltax = xpos2-xpos1
+          predX_nodeflection = xpos2 + (NB_intercept_steps*deltax)
+          if predX_nodeflection<0:
+            predX = -1*predX_nodeflection
+          elif predX_nodeflection>courtWidth:
+            predX = predX_nodeflection-courtWidth
           else:
-            predY = predY_nodeflection
-    return predY
+            predX = predX_nodeflection
+    return predX
 
   def playGame (self, actions, epCount): #actions need to be generated from motor cortex
     # PLAY GAME
     rewards = []; proposed_actions =[]; total_hits = []; Images = []
     input_dim = self.input_dim
     done = False
-    courtYRng, courtXRng, racketXRng = self.courtYRng, self.courtXRng, self.racketXRng # coordinate ranges for different objects (PONG-specific)    
+    courtYRng, courtXRng, racketYRng = self.courtYRng, self.courtXRng, self.racketYRng # coordinate ranges for different objects (Breakout-specific)    
     if self.intaction==1:
       lgwght = [1.0]
     else:
@@ -252,7 +242,7 @@ class AIGame:
       lobs_gimage_ds = []
     else:
       lobs_gimage = 255.0*rgb2gray(self.last_obs[courtYRng[0]:courtYRng[1],:,:]) 
-      lobs_gimage_ds = downscale_local_mean(lobs_gimage,self.downsampshape)
+      lobs_gimage_ds = downscale_local_mean(lobs_gimage,(8,8))
       lobs_gimage_ds = np.where(lobs_gimage_ds>np.min(lobs_gimage_ds)+1,255,lobs_gimage_ds)
       lobs_gimage_ds = 0.5*lobs_gimage_ds #use this image for motion computation only
       
@@ -262,20 +252,20 @@ class AIGame:
 
       if np.shape(self.last_obs)[0]>0: #if last_obs is not empty              
         xpos_Ball, ypos_Ball = self.findobj(self.last_obs, courtXRng, courtYRng) # get x,y positions of ball
-        xpos_Racket, ypos_Racket = self.findobj(self.last_obs, racketXRng, courtYRng) # get x,y positions of racket          
+        xpos_Racket, ypos_Racket = self.findobj(self.last_obs, courtXRng, racketYRng) # get x,y positions of racket          
         #Now we know the position of racket relative to the ball. We can suggest the action for the racket so that it doesn't miss the ball.
         #For the time being, I am implementing a simple rule i.e. based on only the ypos of racket relative to the ball
         if ypos_Ball==-1: #guess about proposed move can't be made because ball was not visible in the court
           proposed_action = -1 #no valid action guessed        
-        elif ypos_Racket>ypos_Ball: #if the racket is lower than the ball the suggestion is to move up
-          proposed_action = dconf['moves']['UP'] #move up
-        elif ypos_Racket<ypos_Ball: #if the racket is higher than the ball the suggestion is to move down
-          proposed_action = dconf['moves']['DOWN'] #move down
-        elif ypos_Racket==ypos_Ball:
+        elif xpos_Racket>xpos_Ball: #if the racket is right to the ball the suggestion is to move left
+          proposed_action = dconf['moves']['LEFT'] #move left
+        elif xpos_Racket<xpos_Ball: #if the racket is left to the ball the suggestion is to move right
+          proposed_action = dconf['moves']['RIGHT'] #move right
+        elif xpos_Racket==xpos_Ball:
           proposed_action = dconf['moves']['NOMOVE'] #no move
         #self.FullImages.append(np.sum(self.last_obs[courtYRng[0]:courtYRng[1],:,:],2))
-        self.dObjPos['ball'].append([courtXRng[0]-1+xpos_Ball,ypos_Ball])
-        self.dObjPos['racket'].append([racketXRng[0]-1+xpos_Racket,ypos_Racket])
+        self.dObjPos['ball'].append([xpos_Ball,courtYRng[0]-1+ypos_Ball])
+        self.dObjPos['racket'].append([xpos_Racket,racketYRng[0]-1+ypos_Racket])
       else:
         proposed_action = -1 #if there is no last_obs
         ypos_Ball = -1 #if there is no last_obs, no position of ball
@@ -284,24 +274,25 @@ class AIGame:
         observation, reward, done = self.pong.step(caction)
       else:
         observation, reward, done, info = self.env.step(caction) # Re-Initializes reward before if statement
-        # To eliminate momentum
+# To eliminate momentum
         # print('Here is caction: ' , caction)
-        if caction in [dconf['moves']['DOWN'], dconf['moves']['UP'], dconf['moves']['NOMOVE']]:
-          # Follow down/up/stay with stay to prevent momentum problem (Pong-specific)
+        if caction == 3 or caction == 2 or caction == 1: # Follow left(3)/right(4)/stay(2) with stay(1)
           stay_step = 0 # initialize
-          while not done and stay_step < self.stayStepLim:
-            observation, interreward, done, info = env.step(dconf['moves']['NOMOVE']) # Stay motion
-            reward += interreward  # Uses summation so no reinforcement/punishment is missed
+          while not done and stay_step < 4:
+# Takes 6 stays instead of 3 because it seems every other input is ignored (check dad notes for details)
+            observation, interreward, done, info = env.step(1) # Stay motion
+            reward = reward + interreward  # Uses summation so no reinforcement/punishment is missed
             stay_step += 1
-          env.render() # Renders the game after the stay steps
-      #find position of ball after action
+            #print(stay_step)
+            env.render() # Renders the game after the stay steps
+#find position of ball after action
       xpos_Ball2, ypos_Ball2 = self.findobj(observation, courtXRng, courtYRng)
       ball_moves_towards_racket = False
-      if xpos_Ball>0 and xpos_Ball2>0:
-        if xpos_Ball2-xpos_Ball>0:
+      if ypos_Ball>0 and ypos_Ball2>0:
+        if ypos_Ball2 - ypos_Ball>0:
           ball_moves_towards_racket = True # use proposed action for reward only when the ball moves towards the racket
           current_ball_dir = 1 
-        elif xpos_Ball2-xpos_Ball<0:
+        elif ypos_Ball2 - ypos_Ball<0:
           ball_moves_towards_racket = False
           current_ball_dir = -1
         else:
@@ -311,7 +302,7 @@ class AIGame:
         ball_moves_towards_racket = False
         current_ball_dir = 0 #direction can't be determined because either current or last position of the ball is outside the court
 
-      skipPred = False # skip prediction of y intercept?
+      skipPred = False # skip prediction of x intercept?
       if "followOnlyTowards" in dconf:
         if dconf["followOnlyTowards"] and not ball_moves_towards_racket:
           proposed_action = -1 # no proposed action if ball moving away from racket
@@ -319,22 +310,22 @@ class AIGame:
       
       if not skipPred and "useRacketPredictedPos" in dconf:
         if dconf["useRacketPredictedPos"]:
-          xpos_Racket2, ypos_Racket2 = self.findobj (observation, racketXRng, courtYRng)
-          predY = self.predictBallRacketYIntercept(xpos_Ball,ypos_Ball,xpos_Ball2,ypos_Ball2)
-          if predY==-1:
+          xpos_Racket2, ypos_Racket2 = self.findobj (observation, courtXRng, racketYRng)
+          predX = self.predictBallRacketXIntercept(xpos_Ball,ypos_Ball,xpos_Ball2,ypos_Ball2)
+          if predX==-1:
             proposed_action = -1
           else:
-            targetY = ypos_Racket2 - predY
-            if targetY>8:
-              proposed_action = dconf['moves']['UP'] #move up
-            elif targetY<-8:
-              proposed_action = dconf['moves']['DOWN'] #move down
+            targetX = xpos_Racket2 - predX # 8 is half the racket length (16 pixels total)
+            if targetX>8:	 # racket is to right of predX
+              proposed_action = dconf['moves']['LEFT'] #move left
+            elif targetX<-8:	# racket is to left of predX
+              proposed_action = dconf['moves']['RIGHT'] #move right
             else:
               proposed_action = dconf['moves']['NOMOVE'] #no move
 
       ball_hits_racket = 0
       # previously I assumed when current_ball_dir is 0 there is no way to find out if the ball hit the racket
-      if current_ball_dir-self.last_ball_dir<0 and reward==0 and xpos_Ball2>courtXRng[1]-courtXRng[0]-40:
+      if current_ball_dir-self.last_ball_dir<0 and reward==0 and ypos_Ball2>courtYRng[1]-courtYRng[0]-20:	#Last 20 pixels of court
         ball_hits_racket = 1
       #print('Current_ball_dir', current_ball_dir)
       #print('Last ball dir', self.last_ball_dir)
@@ -355,7 +346,7 @@ class AIGame:
       rewards.append(reward)
       proposed_actions.append(proposed_action)    
       gray_Image = 255.0*rgb2gray(observation[courtYRng[0]:courtYRng[1],:,:]) # convert to grayscale; rgb2gray has 0-1 range so mul by 255
-      gray_ds = downscale_local_mean(gray_Image,self.downsampshape) # then downsample
+      gray_ds = downscale_local_mean(gray_Image,(8,8)) # then downsample
       gray_ds = np.where(gray_ds>np.min(gray_ds)+1,255,gray_ds) # Different thresholding
       gray_ns = np.where(gray_Image>np.min(gray_Image)+1,255,gray_Image)
       lgimage_ns.append(lgwght[adx]*gray_ns)

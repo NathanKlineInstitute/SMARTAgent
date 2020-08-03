@@ -85,6 +85,8 @@ for ty in allpops:
     netParams.popParams[ty] = {'cellType':ty, 'numCells': dnumc[ty], 'cellModel': ECellModel}
   else:
     netParams.popParams[ty] = {'cellType':ty, 'numCells': dnumc[ty], 'cellModel': ICellModel}
+
+EExcitSec = 'dend' # section where excitatory synapses placed
     
 if ECellModel == 'Mainen':    
   netParams.importCellParams(label='PYR_Mainen_rule', conds={'cellType': ETypes}, fileName='cells/mainen.py', cellName='PYR2')
@@ -97,6 +99,14 @@ elif ECellModel == 'IzhiRS':   ## RS Izhi cell params
   RScellRule['secs']['soma']['geom'] = {'diam': 10, 'L': 10, 'cm': 31.831}
   RScellRule['secs']['soma']['pointps']['Izhi'] = {'mod':'Izhi2007b', 'C':1, 'k':0.7, 'vr':-60, 'vt':-40, 'vpeak':35, 'a':0.03, 'b':-2, 'c':-50, 'd':100, 'celltype':1}
   netParams.cellParams['IzhiRS'] = RScellRule  # add dict to list of cell properties
+elif ECellModel == 'INTF':
+  RScellRule = {'conds': {'cellType': ETypes, 'cellModel': 'IntFire4'}, 'secs': {}}
+  RScellRule['secs']['soma'] = {'geom': {}, 'pointps':{}}  #  soma
+  #RScellRule['secs']['soma']['geom'] = {'diam': 10, 'L': 10, 'cm': 31.831}
+  RScellRule['secs']['soma']['pointps']['INTF'] = {'mod':'h.IntFire4'}#, 'C':0.2, 'k':1.0, 'vr':-55, 'vt':-40, 'vpeak':25, 'a':0.2, 'b':-2, 'c':-45, 'd':-55, 'celltype':5}
+  RScellRule['secs']['soma']['pointps']['INTF']['vref'] = 'm' # specify that uses its own voltage V
+  #cellRule['secs']['soma']['pointps']['Izhi2007a_0']['synList'] = ['AMPA', 'NMDA', 'GABAA', 'GABAB']  # specify its own synapses  
+  netParams.cellParams['IntFire4RS'] = RScellRule  # add dict to list of cell properties    
       
 if ICellModel == 'FS_BasketCell':    ## FS Izhi cell params
   netParams.importCellParams(label='FS_BasketCell_rule', conds={'cellType': ITypes}, fileName='cells/FS_BasketCell.py', cellName='Bas')
@@ -105,8 +115,18 @@ elif ICellModel == 'IzhiFS': # defaults to Izhi cell otherwise
   FScellRule = {'conds': {'cellType': ITypes, 'cellModel': 'IzhiFS'}, 'secs': {}}
   FScellRule['secs']['soma'] = {'geom': {}, 'pointps':{}}  #  soma
   FScellRule['secs']['soma']['geom'] = {'diam': 10, 'L': 10, 'cm': 31.831}
-  FScellRule['secs']['soma']['pointps']['Izhi'] = {'mod':'Izhi2007b', 'C':0.2, 'k':1.0, 'vr':-55, 'vt':-40, 'vpeak':25, 'a':0.2, 'b':-2, 'c':-45, 'd':-55, 'celltype':5}  
+  FScellRule['secs']['soma']['pointps']['Izhi'] = {'mod':'Izhi2007b', 'C':0.2, 'k':1.0, 'vr':-55, 'vt':-40, 'vpeak':25, 'a':0.2, 'b':-2, 'c':-45, 'd':-55, 'celltype':5}
+  RFScellRule['secs']['soma']['pointps']['INTF']['vref'] = 'm' # specify that uses its own voltage V  
   netParams.cellParams['IzhiFS'] = FScellRule  # add dict to list of cell properties
+elif ICellModel == 'INTF':
+  FScellRule = netParams.importCellParams(label='INTFFS_rule', conds={'cellType': ITypes, 'cellModel':'IntFire4'},
+                                          fileName='cells/IntFirewrapper.py',cellName='IntFire4Cell',  cellArgs={'host':'dummy'})  
+  #FScellRule = {'conds': {'cellType': ITypes, 'cellModel': 'IntFire4'}, 'secs': {}}
+  #FScellRule['secs']['soma'] = {'geom': {}, 'pointps':{}}  #  soma
+  #FScellRule['secs']['soma']['geom'] = {'diam': 10, 'L': 10, 'cm': 31.831}
+  #FScellRule['secs']['soma']['pointps']['INTF'] = {'mod':'IntFire4'}#, 'C':0.2, 'k':1.0, 'vr':-55, 'vt':-40, 'vpeak':25, 'a':0.2, 'b':-2, 'c':-45, 'd':-55, 'celltype':5}
+  FScellRule['secs']['soma']['pointps']['INTF']['vref'] = 'm' # specify that uses its own voltage V  
+  netParams.cellParams['IntFire4FS'] = FScellRule  # add dict to list of cell properties  
 
 ## Synaptic mechanism parameters
 netParams.synMechParams['AMPA'] = {'mod': 'Exp2Syn', 'tau1': 0.05, 'tau2': 5.3, 'e': 0}  # excitatory synaptic mechanism
@@ -792,89 +812,6 @@ epCount = []
 proposed_actions = [] 
 total_hits = [] #numbertimes ball is hit by racket as ball changes its direction and player doesn't lose a score (assign 1). if player loses
 dSTDPmech = {} # dictionary of list of STDP mechanisms
-cumRewardActions = []
-cumPunishingActions = []
-current_time_stepNB = 0
-f_ax = []
-fig = []
-
-def updateBehaviorPlot (sim,InputImages,Images,dirSensitiveNeurons,Racket_pos,Ball_pos, current_time_stepNB,f_ax,fig):
-  # update 
-  global cumRewardActions, cumPunishingActions
-  maxtstr = len(str(100000))
-  if current_time_stepNB==0:
-    fig = plt.figure(figsize=(12,8))
-    gs = fig.add_gridspec(4,4)
-    f_ax = []
-    f_ax.append(fig.add_subplot(gs[0:2,0])) #for 5-image input - 0
-    f_ax.append(fig.add_subplot(gs[0:2,1])) #for single image  - 1
-    f_ax.append(fig.add_subplot(gs[0:2,2])) #for direction selectivity - 2
-    f_ax.append(fig.add_subplot(gs[2,0:2])) #display executed/proposed actions - 3
-    f_ax.append(fig.add_subplot(gs[2,2:4])) #display - 4 
-    f_ax.append(fig.add_subplot(gs[3,0:2])) #- 5
-    f_ax.append(fig.add_subplot(gs[3,2:4])) #- 6
-  cbaxes = fig.add_axes([0.75, 0.62, 0.01, 0.24])
-  f_ax[0].cla()
-  f_ax[0].imshow(InputImages[-1])
-  f_ax[0].set_title('Input Images [t-5,t]')
-  f_ax[2].cla()
-  fa = f_ax[2].imshow(dirSensitiveNeurons,origin='upper',vmin=0, vmax=359, cmap='Dark2')
-  f_ax[2].set_xlim((-0.5,9.5))
-  f_ax[2].set_ylim((9.5,-0.5))
-  f_ax[2].set_xticks(ticks=[0,2,4,6,8])
-  f_ax[2].set_title('direction angles [t-5,t]')
-  c1 = plt.colorbar(fa,cax = cbaxes)
-  c1.set_ticks([22,67,112,157,202,247,292,337])
-  c1.set_ticklabels(['E','NE','N','NW','W','SW','S','SE'])
-  Hit_Missed = np.array(sim.allHits)
-  allHit = np.where(Hit_Missed==1,1,0) 
-  allMissed = np.where(Hit_Missed==-1,1,0)
-  cumHits = np.cumsum(allHit) #cummulative hits evolving with time.
-  cumMissHits = np.cumsum(allMissed) #if a reward is -1, replace it with 1 else replace it with 0.
-  Diff_Actions_Proposed = np.subtract(sim.allActions,sim.allProposedActions)
-  t0 = int(dconf['actionsPerPlay'])
-  tpnts = range(t0,len(Diff_Actions_Proposed)+t0,t0)
-  rewardingActions = np.sum(np.where(Diff_Actions_Proposed==0,1,0))
-  punishingActions = np.sum(np.where((Diff_Actions_Proposed>0) | (Diff_Actions_Proposed<0),1,0))
-  totalActs = rewardingActions + punishingActions
-  cumRewardActions.append(rewardingActions/totalActs)
-  cumPunishingActions.append(punishingActions/totalActs)
-  f_ax[3].plot(sim.allActions,LineStyle="None",Marker=2,MarkerSize=6,MarkerFaceColor="None",MarkerEdgeColor='r')
-  f_ax[3].plot(sim.allProposedActions,LineStyle="None",Marker=3,MarkerSize=6,MarkerFaceColor="None",MarkerEdgeColor='b')
-  f_ax[3].set_yticks(ticks=[1,3,4])
-  f_ax[3].set_yticklabels(labels=['No action','Down','Up'])
-  f_ax[3].set_ylim((0.5,4.5))
-  f_ax[3].legend(('Executed','Proposed'),loc='upper left')
-  f_ax[4].cla()
-  f_ax[4].plot(tpnts,np.array(cumRewardActions),'o-',MarkerSize=5,MarkerFaceColor='r',MarkerEdgeColor='r')
-  f_ax[4].plot(tpnts,np.array(cumPunishingActions),'s-',MarkerSize=5,MarkerFaceColor='b',MarkerEdgeColor='b')
-  f_ax[4].legend(('Rewarding actions','Punishing Actions'),loc='upper left')
-  f_ax[5].cla()
-  f_ax[5].plot(sim.allRewards,'o-',MarkerFaceColor="None",MarkerEdgeColor='g')
-  f_ax[5].legend('Rewards')
-  f_ax[6].cla()
-  f_ax[6].plot(cumHits,Marker='o',MarkerSize=5,MarkerFaceColor='r',MarkerEdgeColor='r')
-  f_ax[6].plot(cumMissHits,Marker='s',MarkerSize=3,MarkerFaceColor='k',MarkerEdgeColor='k')
-  f_ax[6].legend(('Cumm. Hits','Cumm. Miss'),loc='upper left')
-  f_ax[1].cla()
-  for nbi in range(np.shape(Racket_pos)[0]):
-    f_ax[1].imshow(Images[nbi])
-    if Ball_pos[nbi][0]>18: #to account for offset for the court
-      f_ax[1].plot(Racket_pos[nbi][0],Racket_pos[nbi][1],'o',MarkerSize=5, MarkerFaceColor="None",MarkerEdgeColor='r')
-      f_ax[1].plot(Ball_pos[nbi][0],Ball_pos[nbi][1],'o',MarkerSize=5, MarkerFaceColor="None",MarkeredgeColor='b')
-    f_ax[1].set_title('last obs')
-    #plt.pause(0.1)
-    ctstrl = len(str(current_time_stepNB))
-    tpre = ''
-    for ttt in range(maxtstr-ctstrl):
-      tpre = tpre+'0'
-    fn = tpre+str(current_time_stepNB)+'.png'
-    fnimg = '/tmp/'+fn
-    plt.savefig(fnimg)
-    #plt.close() 
-    #lfnimage.append(fnimg)
-    current_time_stepNB = current_time_stepNB+1
-  return current_time_stepNB, f_ax, fig
 
 def updateInputRates ():
   # update the source firing rates for the ER neuron population, based on image contents
@@ -910,7 +847,7 @@ def updateInputRates ():
 def trainAgent (t):
   """ training interface between simulation and game environment
   """
-  global NBsteps, epCount, proposed_actions, total_hits, current_time_stepNB, fid4
+  global NBsteps, epCount, proposed_actions, total_hits, fid4
   global f_ax, fig
   global tstepPerAction
   vec = h.Vector()
@@ -1097,8 +1034,6 @@ def trainAgent (t):
     tvec_actions = []
     for ts in range(len(actions)): tvec_actions.append(t-tstepPerAction*(len(actions)-ts-1))
     for ltpnt in tvec_actions: sim.allTimes.append(ltpnt)
-    #current_time_stepNB, f_ax, fig = updateBehaviorPlot (sim,sim.AIGame.ReducedImages,sim.AIGame.FullImages,dirSensitiveNeurons,Racket_pos,Ball_pos,current_time_stepNB, f_ax, fig)
-    #current_time_stepNB = current_time_stepNB + 1
   updateInputRates() # update firing rate of inputs to R population (based on image content)                
   NBsteps += 1
   if NBsteps % recordWeightStepSize == 0:
