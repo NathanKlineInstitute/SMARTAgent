@@ -14848,3 +14848,89 @@ python multistepSim.py sn.json 48 10 20aug2_HRTest3_cycle_MultiTest
 
 started @ ~21:35 ...
 
+** check ang rep
+
+fctr = np.exp(-1.0*(getangdiff(motiondir[y][x],dAngPeak[pop])**2)/AngRFSigma2)
+
+have been using AngRFSigma of 22.5, so AngRFSigma2 == 22.5**2
+
+# get smallest angle difference
+def getangdiff (ang1, ang2):
+  if ang1 > 180.0:
+    ang1 -= 360.0
+  if ang2 > 180.0:
+    ang2 -= 360.0
+  angdiff = ang1 - ang2
+  if angdiff > 180.0:
+    angdiff-=360.0
+  elif angdiff < -180.0:
+    angdiff+=360.0
+  return angdiff
+
+assume motiondir angle == 0 (east)
+
+python
+
+import numpy as np
+
+AngRFSigma = 22.5
+AngRFSigma2 = AngRFSigma**2
+
+motiondir = 0.0
+ang2 = 45
+
+getangdiff(motiondir,ang2)**2/AngRFSigma2 # 4.0
+np.exp(-1.0*getangdiff(motiondir,ang2)**2/AngRFSigma2) # 0.01831563888873418
+
+so at 45 degree difference, that's a pretty big fall-off
+
+ang2 = 22.5
+getangdiff(motiondir,ang2)**2/AngRFSigma2 # 1.0
+np.exp(-1.0*getangdiff(motiondir,ang2)**2/AngRFSigma2) # 0.36787944117144233
+
+but at 22.5 degree diff, it's ~0.37 ...
+
+lang = np.linspace(-180,180,361)
+lfctr = [np.exp(-1.0*getangdiff(motiondir,ang2)**2/AngRFSigma2) for ang2 in lang]
+
+from pylab import *
+
+plot(lang, lfctr, 'ko')
+xlabel('Ang Diff'); ylabel('Factor')
+savefig('gif/20aug2_angrf_a0.png')
+
+having only 8 primary directions means certain movement directions will always
+have less representation in terms of number of spikes they produce ... so, that
+means certain information is not propagating as effectively throughout the network,
+and that the model is less likely to make an optimal decision ... 
+
+so, then worth having all 360 deg of representation with ~equal weighting ...
+but that means a lot more neurons ...
+
+some inhib between these dir selective neurons could help promote correct answer ...
+
+what if neurons at each coordinate had a more complex RF, that responded
+in all directions, but not all directions equally (some bias in particular
+directions?) - is that better than a dominant direction with fall-off in
+other directions? 
+
+AngRFSigma2 = 45.0**2
+lfctr = [np.exp(-1.0*getangdiff(motiondir,ang2)**2/AngRFSigma2) for ang2 in lang]
+plot(lang, lfctr, 'bo')
+
+lang[225] # 45.0
+lfctr[225] # 0.36787944117144233
+
+savefig('gif/20aug2_angrf_a1.png')
+that wider rep is too wide, since >90 deg apart (which has component of opposite
+directions, still has positive value ~1.7%):
+lang[271],lfctr[271] # (91.0, 0.016749569608612666)
+
+AngRFSigma2 = 22.5**2
+lfctr = [np.exp(-1.0*getangdiff(motiondir,ang2)**2/AngRFSigma2) for ang2 in lang]
+whereas with sigma used now, many orders of magnitude smaller:
+lang[271],lfctr[271] # (91.0, 7.870722635526579e-08)
+
+but still, could be usefull to have the full set of directions
+with equal rep ...
+
