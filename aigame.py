@@ -80,7 +80,7 @@ class AIGame:
                                 'EV1DS': 270.0,'EV1DSE': 315.0})
     self.AngRFSigma2 = dconf['net']['AngRFSigma']**2 # angular receptive field (RF) sigma squared used for dir selective neuron RFs
     if self.AngRFSigma2 <= 0.0: self.AngRFSigma2=1.0
-    self.input_dim = int(np.sqrt(dconf['net']['ER'])) # input image XY plane width,height
+    self.input_dim = int(np.sqrt(dconf['net']['ER'])) # input image XY plane width,height -- not used anywhere
     self.dirSensitiveNeuronDim = int(np.sqrt(dconf['net']['EV1DE'])) # direction sensitive neuron XY plane width,height
     self.dirSensitiveNeuronRate = (dconf['net']['DirMinRate'], dconf['net']['DirMaxRate']) # min, max firing rate (Hz) for dir sensitive neurons
     self.intaction = int(dconf['actionsPerPlay']) # integrate this many actions together before returning reward information to model
@@ -103,9 +103,13 @@ class AIGame:
     else:
       self.stayStepLim = 6 # number of steps to hold still after every move (to reduce momentum)
       # Takes 6 stays instead of 3 because it seems every other input is ignored (check dad_notes.txt for details)
-    self.downsampshape = (8,8)
-    if dconf['net']['ER'] == 1600:
+    self.downsampshape = (8,8) # default is 20x20 (20 = 1/8 of 160)
+    if dconf['net']['ER'] == 1600: # this is for 40x40 (40 = 1/4 of 160)
       self.downsampshape = (4,4)
+    elif dconf['net']['ER'] == 6400: # this is for 80x80 (1/2 resolution)
+      self.downsampshape = (2,2)
+    elif dconf['net']['ER'] == 25600: # this is for 160x160 (full resolution)
+      self.downsampshape = (1,1)
 
   def updateInputRates (self, dsum_Images):
     # update input rates to retinal neurons
@@ -129,7 +133,6 @@ class AIGame:
       ang[mag == 0] = -100
       goodInds = np.zeros(shape=(limage[-1].shape[0],limage[-1].shape[1]))
       self.ldflow.append({'flow':flow,'mag':mag,'ang':ang,'goodInds':goodInds,'thang':ang,'thflow':flow})
-      #return
     else:
       self.ldflow.append(getoptflow(limage[-2],limage[-1]))
 

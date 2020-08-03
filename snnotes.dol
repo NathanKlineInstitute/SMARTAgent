@@ -14934,3 +14934,61 @@ lang[271],lfctr[271] # (91.0, 7.870722635526579e-08)
 but still, could be usefull to have the full set of directions
 with equal rep ...
 
+** how many neurons for 1/2 rep (80x80) ?
+
+6400 for ER, EV1, and each of the dir selective neurons
+
+        "name": "20aug2_HalfTest0_cycle_",
+
+./myrun 48 sn.json
+
+  Simulated time: 1.0 s; 48 workers
+  Run time: 347.35 s
+
+python -i simdat.py backupcfg/20aug2_HalfTest0_cycle_sim.json
+
+sum(list(dnumc.values())) # 67450
+
+ax=plotPerf(actreward,yl=(0,1.))
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); 
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','IM'])
+
+100 s would take ~10 hours on 48 cores ... of course, already using 48 cores on cycle ...
+
+worth a try ...
+
+had these as number of neurons:
+        "ER": 6400,
+        "IR": 1600,
+        "EV1": 6400,
+        "EV1DE": 6400,
+        "EV1DNE": 6400,
+        "EV1DN": 6400,
+        "EV1DNW": 6400,
+        "EV1DW": 6400,
+        "EV1DSW": 6400,
+        "EV1DS": 6400,
+        "EV1DSE": 6400,
+        "IV1": 1600,
+        "EV4": 0,
+        "IV4": 0,
+        "EMT": 0,
+        "IMT": 0,
+        "EMDOWN": 100,
+        "EMUP": 100,
+        "EMSTAY": 0,
+        "IM": 50,
+
+        "EEMWghtAM": 1.25e-05,
+        "EEMWghtNM": 1.25e-06,
+
+            "RLhebbwt": 6.25e-07,
+
+        "recordWeightStepSize": 4500,
+	
+and other params same as HR test above ...
+
+./myrun 48 sn.json
+
