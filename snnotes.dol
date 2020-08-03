@@ -15203,3 +15203,30 @@ savefig('gif/'+dstr+simstr+'rast.png') # gif/20aug3_20jul30_U0_gcp__step_5_rast.
 clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','IM'],tlim=(1990e3,2000e3))
 savefig('gif/'+dstr+simstr+'Vm.png') # gif/20aug3_20jul30_U0_gcp__step_5_Vm.png
 
+** simple change to AngRF
+
+allow all directions within AngRFSigma of one of the 8 primary directions to have MaxRate
+
+option specified with EXPDir (default is 1, not needed to be in the json file)
+
+cp backupcfg/20jul30_U0_gcp_sim.json sn.json
+
+then adjust ...
+
+        "name": "20aug3_U0_noEXPDir_gcp_",
+	"EXPDir": 0,
+
+./myrun 30 sn.json
+
+python -i simdat.py backupcfg/20aug3_U0_noEXPDir_gcp_sim.json
+
+ax=plotPerf(actreward,yl=(0,.55))
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values()))))
+
+lpop = ['ER', 'EV1DNW', 'EV1DN', 'EV1DNE','EV1', 'IR', 'EV1DW','EV1DE','IV1','EMUP','EV1DSW', 'EV1DS', 'EV1DSE','IM','EMDOWN', ]  
+dact = getdActMap(totalDur, tstepPerAction, dspkT, dspkID, dnumc, dstartidx, lpop)
+fig, axs, plt = animActivityMaps(lpop=lpop)
+
+looked ok in short run ... try 2000 s run to compare against 20jul30_U0_gcp_
+
+./myrun 30 sn.json
