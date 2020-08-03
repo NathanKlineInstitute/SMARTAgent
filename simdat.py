@@ -267,7 +267,7 @@ def animInput (InputImages, outpath, framerate=10, figsize=None, showflow=False,
   t1 = range(0,totalDur,tstepPerAction)
   nframe = len(t1)
   if showflow: nframe-=1
-  ani = animation.FuncAnimation(fig, updatefig, interval=1, frames=20)#nframe)
+  ani = animation.FuncAnimation(fig, updatefig, interval=1, frames=nframe)
   writer = anim.getwriter(outpath, framerate=framerate)
   ani.save(outpath, writer=writer); print('saved animation to', outpath)
   ion()

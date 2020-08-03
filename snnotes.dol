@@ -14811,4 +14811,40 @@ IM.shape # (5, 40, 40)
 ok, fixed ... 
 
 ** can NE get confused with SE (with current RFs, sigmas) ?
+*20aug2
+** check 20aug1_HRTest2_cycle_
+
+python -i simdat.py backupcfg/20aug1_HRTest2_cycle_sim.json
+
+ax=plotPerf(actreward,yl=(0,1.))
+savefig('gif/'+dstr+simstr+'perf.png') # gif/20aug2_20aug1_HRTest2_cycle_perf.png
+at times good, at times not ... 
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((990e3,1000e3))
+savefig('gif/'+dstr+simstr+'rast.png') # gif/20aug2_20aug1_HRTest2_cycle_rast.png
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','IM'],tlim=(990e3,1000e3))
+savefig('gif/'+dstr+simstr+'Vm.png') # gif/20aug2_20aug1_HRTest2_cycle_Vm.png
+
+lfn = ['20jul30_HRTest0_cycle_', '20jul31_HRTest1_cycle_','20aug1_HRTest2_cycle_']
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0,.55))
+savefig('gif/'+dstr+simstr+'perf_all_steps_so_far.png') # gif/20aug2_20aug1_HRTest2_cycle_perf_all_steps_so_far.png
+some improvements, difficult to tell if consistent and/or still increasing...
+
+InputImages.shape # (50000, 40, 40)
+
+fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4') # gif/20aug2_20aug1_HRTest2_cycle__input.mp4
+
+continue this run ...
+
+        "name": "20aug2_HRTest3_cycle_",
+    "simtype": {
+        "ResumeSim": 1,
+        "ResumeSimFromFile": "data/20aug1_HRTest2_cycle_synWeights_final.pkl"
+    },
+
+python multistepSim.py sn.json 48 10 20aug2_HRTest3_cycle_MultiTest
+
+started @ ~21:35 ...
 
