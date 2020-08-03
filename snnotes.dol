@@ -14992,5 +14992,159 @@ and other params same as HR test above ...
 
 ./myrun 48 sn.json
 
-started ~23:16 ...
+started ~23:16 ... hmm, that was accidentally only 1 s sim ... 
+
+*20aug3
+** discuss representations with ha
+
+09:55
+samn:meal: was looking at direction selective representations - to see if influencing outcomes
+09:55
+right now - certain directions have lower rates than / information than others
+09:56
+not sure if it's the main or even contributing problem - but think arbitrary direction RFs would be better
+09:56
+Haroon Anwar diagonals have higher rates
+09:56
+samn:meal: right, if in one of the 8 primary directions
+09:57
+if off a direction falls off
+09:57
+Haroon Anwar by arbitrary direction RFs what do you mean?
+09:57
+samn:meal: any of 360 directions with some sigma
+09:58
+Haroon Anwar you mean we could have a sigmoid where each angle could evoke different firing rates
+09:58
+?
+09:58
+samn:meal: i mean a dominant direction, and fall-off around it
+09:58
+Haroon Anwar and how many dominant directions?
+09:58
+samn:meal: for each neuron. and the dominant direction can be in any direction
+09:59
+Haroon Anwar and you want it to be random? without topology?
+09:59
+samn:meal: there can still be topology
+10:00
+Haroon Anwar i dont understand…. i think what you are suggesting would make more sense without toplogy
+10:00
+so position is already encoded by V1
+10:00
+and direction selective neurons just encode angle
+10:01
+samn:meal: each neuron would only be sensitive to motion at a particular location
+10:01
+and a direction with some fall-off
+10:01
+Haroon Anwar then we will need to have atleast 8 neurons for each location no? or how many you think would be enough
+10:02
+samn:meal: yeah, maybe so..that's a problem
+10:02
+Haroon Anwar its similar to what we have now…. i think if we dont worry about location
+10:03
+and just encode direction that should be fine too
+10:03
+why do same thing twice?
+10:03
+samn:meal: but one object can move up and another down
+10:03
+in different locations
+10:03
+shouldn't the neurons encode that information more accurately?
+10:04
+Haroon Anwar well then some neurons will encode one direction, others will encode another direction
+10:04
+and location will be in V1
+10:04
+and everything will be integrated in later stage
+10:04
+samn:meal: i agree it's possible to separate them - but will it help to reduce the info that dir selective neurons have?
+10:05
+Haroon Anwar not sure
+10:05
+so whats the problem with the other idea
+10:06
+— use a sigmoid to represent 0-360 for each location
+10:06
+samn:meal: sigmoid represents 0-360 at each location?
+10:06
+Haroon Anwar we will need to make sure that we have 8 firing rates per neuron
+10:06
+samn:meal: not sure what you mean
+10:07
+rate of the neuron represents the direction?
+10:07
+Haroon Anwar yes
+10:07
+samn:meal: that seems more difficult to decode downstream
+10:07
+Haroon Anwar yes you are right
+10:08
+i feel we have too many neurons encoding direction
+10:09
+also not sure what R is doing? other than converging input space
+10:10
+could drive V1 directly using poisson processes
+10:10
+as we are doing for direction selective neurons
+10:10
+samn:meal: i agree about both
+10:10
+Haroon Anwar its just relaying infor
+10:11
+i think goal is to speedup things while retaining max info
+10:11
+samn:meal: i thought R was used just to allow use of variable rate based on location
+10:11
+ER
+10:11
+but no point having two pops that have same info
+10:12
+Haroon Anwar i think they have same info
+10:12
+can double check
+10:15
+samn:meal: ok sg
+10:15
+for dir selective - still unclear what's best
+10:16
+Haroon Anwar yes
+10:16
+ok if same info, i will use an option for R and IR neurons
+10:17
+atleast it will reduce 500 neurons
+10:17
+samn:meal: yeah, seems worthwhile
+
+** discuss corner cases with ha
+
+main problem in losing points is the corners - for some reason model doesn't perform well when ball goes to top or bottom corner
+10:23
+any insight into why?
+10:24
+also, before you make changes to ER/IR, i'll merge dev code into main so we can work from same code
+10:24
+Haroon Anwar ok
+10:24
+you mean top/bottom corners?
+10:24
+samn:meal: yeah, top right, bottom right
+10:25
+Haroon Anwar probably should look at firing rates for those instances and compare it to rest
+10:25
+samn:meal: yeah, some of that analysis code sounded useful for it
+10:25
+Haroon Anwar may be it has something to do with less input drive
+10:26
+samn:meal: is it pushed/useful/etc.?
+10:26
+Haroon Anwar not pushed… i have it in script form. let me add as a function in simdat.py
+10:27
+samn:meal: ok, and can check some of those cases ... should push more regularly, otherwise code will diverge more and more
+10:27
+Haroon Anwar k
+10:28
+i will check those cases
 
