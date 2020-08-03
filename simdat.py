@@ -1201,7 +1201,7 @@ def analyzeRepeatedInputSequences(dact, InputImages, targetPixel=(10,10),nbseq=1
   lax[i+10].legend(['Actions','Proposed'],loc='best')
 
 
-def analyzeRepeatedInputForSingleEvent(dact, InputImages, targetPixel=(10,10),targetCorr=0.9):
+def analyzeRepeatedInputForSingleEvent(dact, InputImages, targetPixel=(10,10)):
   midInds = np.where(InputImages[:,targetPixel[0],targetPixel[1]]>250)
   # for each midInd, find 14 (13 could be enough but i am not sure) consecutive Images to see the trajectory. 
   seqInputs = np.zeros((int(len(midInds[0])/2),20,20),dtype=float)

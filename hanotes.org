@@ -4384,3 +4384,4 @@ lax[2].legend(['Actions','Proposed'],loc='best')
 
 
 --- Not sure how the above analysis would help figure out the problem with the circuit.
+-- No need for targetCorr in function: analyzeRepeatedInputForSingleEvent(dact, InputImages, targetPixel=(10,10)) 
