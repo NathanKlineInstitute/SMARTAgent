@@ -15170,7 +15170,7 @@ probably no point continuing this run ... until figure out what's leading to per
 what if model only received rewards, instead of rewards + punishments? would the weights stay close to
 starting values and then learn further?
 
-** check perf of 20jul30_U0_gcp__step_4_
+** check perf of 20jul30_U0_gcp__step_4_ and 20jul30_U0_gcp__step_5_
 
 python -i simdat.py backupcfg/20jul30_U0_gcp__step_4_sim.json
 
@@ -15185,4 +15185,21 @@ savefig('gif/'+dstr+simstr+'perf_all_steps_so_far.png') # gif/20aug3_20jul30_U0_
 
 seems to have reached a plateau ... and probably will not pass it ... 
 will let next step (almost done) finish, to check...
+
+python -i simdat.py backupcfg/20jul30_U0_gcp__step_5_sim.json
+
+ax=plotPerf(actreward,yl=(0,.55))
+savefig('gif/'+dstr+simstr+'perf.png') # gif/20aug3_20jul30_U0_gcp__step_5_perf.png
+
+lfn = ['20jul30_U0_gcp__step_0_','20jul30_U0_gcp__step_1_','20jul30_U0_gcp__step_2_','20jul30_U0_gcp__step_3_','20jul30_U0_gcp__step_4_','20jul30_U0_gcp__step_5_']
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0,.55))
+
+savefig('gif/'+dstr+simstr+'perf_all_steps_so_far.png') # gif/20aug3_20jul30_U0_gcp__step_5_perf_all_steps_so_far.png
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((1990e3,2000e3))
+savefig('gif/'+dstr+simstr+'rast.png') # gif/20aug3_20jul30_U0_gcp__step_5_rast.png
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','IM'],tlim=(1990e3,2000e3))
+savefig('gif/'+dstr+simstr+'Vm.png') # gif/20aug3_20jul30_U0_gcp__step_5_Vm.png
 
