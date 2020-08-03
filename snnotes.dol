@@ -15148,3 +15148,41 @@ Haroon Anwar k
 10:28
 i will check those cases
 
+** check perf from 20jul29_testL0_gcp__step_4_
+
+python -i simdat.py backupcfg/20jul29_testL0_gcp__step_4_sim.json
+
+lfn = ['20jul15_testG0_gcp_','20jul16_testG1_gcp_', '20jul17_testG2_gcp__step_0_','20jul17_testG2_gcp__step_1_','20jul17_testG2_gcp__step_2_','20jul17_testG2_gcp__step_3_','20jul17_testG2_gcp__step_4_','20jul17_testG2_gcp__step_5_','20jul29_testL0_gcp__step_0_','20jul29_testL0_gcp__step_1_','20jul29_testL0_gcp__step_2_','20jul29_testL0_gcp__step_3_','20jul29_testL0_gcp__step_4_']
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0,.55))
+plot([np.amax(pdac.time)-10000e3,np.amax(pdac.time)-10000e3],[0,.55],'--',color='black') # change in rewards
+savefig('gif/'+dstr+simstr+'perf_all_steps_so_far.png') # gif/20aug3_20jul29_testL0_gcp__step_4_perf_all_steps_so_far.png
+
+performance falling off ...
+
+lpda = getindivactionreward(lfn)
+ax=plotPerf(lpda[-1],yl=(0,.55))
+savefig('gif/'+dstr+simstr+'perf.png') # gif/20aug3_20jul29_testL0_gcp__step_4_perf.png
+perf lower than before ...
+
+probably no point continuing this run ... until figure out what's leading to perf decay...
+
+what if model only received rewards, instead of rewards + punishments? would the weights stay close to
+starting values and then learn further?
+
+** check perf of 20jul30_U0_gcp__step_4_
+
+python -i simdat.py backupcfg/20jul30_U0_gcp__step_4_sim.json
+
+ax=plotPerf(actreward,yl=(0,.55))
+savefig('gif/'+dstr+simstr+'perf.png') # gif/20aug3_20jul30_U0_gcp__step_4_perf.png
+
+lfn = ['20jul30_U0_gcp__step_0_','20jul30_U0_gcp__step_1_','20jul30_U0_gcp__step_2_','20jul30_U0_gcp__step_3_','20jul30_U0_gcp__step_4_']
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0,.55))
+
+savefig('gif/'+dstr+simstr+'perf_all_steps_so_far.png') # gif/20aug3_20jul30_U0_gcp__step_4_perf_all_steps_so_far.png
+
+seems to have reached a plateau ... and probably will not pass it ... 
+will let next step (almost done) finish, to check...
+
