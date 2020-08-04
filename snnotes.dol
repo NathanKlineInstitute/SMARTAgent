@@ -15329,3 +15329,5 @@ savefig('gif/'+dstr+simstr+'Vm.png') # gif/20aug4_20aug3_HalfTest0_cycle_Vm.png
 
 so the weights were too low . . .
 
+** stopped HRTest multistep -- well restart after other changes to net
+
