@@ -315,13 +315,14 @@ if EEPreMProb > 0.0:
         netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL[synmech]}
                
 #E to I within area
-netParams.connParams['ER->IR'] = { # empty rules that do not apply are OK
-        'preConds': {'pop': 'ER'},
-        'postConds': {'pop': 'IR'},
-        'connList': blistERtoIR,
-        'weight': 0.02 * cfg.EIGain,
-        'delay': 2,
-        'synMech': 'AMPA', 'sec':'soma', 'loc':0.5}
+if dnumc['ER']>0:
+  netParams.connParams['ER->IR'] = {
+          'preConds': {'pop': 'ER'},
+          'postConds': {'pop': 'IR'},
+          'connList': blistERtoIR,
+          'weight': 0.02 * cfg.EIGain,
+          'delay': 2,
+          'synMech': 'AMPA', 'sec':'soma', 'loc':0.5}
 netParams.connParams['EV1->IV1'] = {
         'preConds': {'pop': 'EV1'},
         'postConds': {'pop': 'IV1'},
@@ -373,14 +374,14 @@ for prety in EMotorPops:
   
 #Local inhibition
 #I to E within area
-netParams.connParams['IR->ER'] = {
-        'preConds': {'pop': 'IR'},
-        'postConds': {'pop': 'ER'},
-        'connList': blistIRtoER,
-        'weight': 0.2 * cfg.IEGain,
-        'delay': 2,
-        'synMech': 'GABA', 'sec':'soma', 'loc':0.5}
-
+if dnumc['ER']>0:
+  netParams.connParams['IR->ER'] = {
+          'preConds': {'pop': 'IR'},
+          'postConds': {'pop': 'ER'},
+          'connList': blistIRtoER,
+          'weight': 0.2 * cfg.IEGain,
+          'delay': 2,
+          'synMech': 'GABA', 'sec':'soma', 'loc':0.5}
 netParams.connParams['IV1->EV1'] = {
         'preConds': {'pop': 'IV1'},
         'postConds': {'pop': 'EV1'},
@@ -436,13 +437,14 @@ for IType in ['IV1', 'IV4', 'IMT', 'IM']:
     'synMech': 'GABA', 'sec':'soma', 'loc':0.5}  
 
 #E to E feedforward connections - AMPA
-netParams.connParams['ER->EV1'] = {
-        'preConds': {'pop': 'ER'},
-        'postConds': {'pop': 'EV1'},
-        'connList': blistERtoEV1,
-        'weight': 0.015 * cfg.EEGain,
-        'delay': 2,
-        'synMech': 'AMPA','sec':EExcitSec, 'loc':0.5}
+if dnumc['ER']>0:
+  netParams.connParams['ER->EV1'] = {
+          'preConds': {'pop': 'ER'},
+          'postConds': {'pop': 'EV1'},
+          'connList': blistERtoEV1,
+          'weight': 0.015 * cfg.EEGain,
+          'delay': 2,
+          'synMech': 'AMPA','sec':EExcitSec, 'loc':0.5}
 netParams.connParams['EV1->EV4'] = {
         'preConds': {'pop': 'EV1'},
         'postConds': {'pop': 'EV4'},

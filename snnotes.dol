@@ -15375,3 +15375,23 @@ the ER/EV1 population and not for the direction selective neurons?
 since sim.AIGame.lratepop only consists of ER,EV1? or does it contain dir selective pops too??
 ah, it does contain the dir selective neurons too... so that's not a problem ...
 
+./myrun 30 sn.json
+
+python -i simdat.py backupcfg/20aug4_A0_cycle_sim.json
+
+ax=plotPerf(actreward,yl=(0,1.))
+savefig('gif/'+dstr+simstr+'_100s_perf.png') # gif/20aug4_20aug4_A0_cycle__100s_perf.png
+gets to ~0.4 follow prob quickly...
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((90e3,100e3))
+savefig('gif/'+dstr+simstr+'_100s_rast.png') # gif/20aug4_20aug4_A0_cycle__100s_rast.png
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','IM'],tlim=((90e3,100e3))
+savefig('gif/'+dstr+simstr+'_100s_Vm.png') # gif/20aug4_20aug4_A0_cycle__100s_Vm.png
+
+ok, run longer ... 2000 s ... 
+
+./myrun 30 sn.json
+
+started ~16:20 ...
+
