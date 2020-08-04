@@ -15,6 +15,8 @@ from collections import OrderedDict
 from imgutils import getoptflow, getoptflowframes
 from connUtils import gid2pos
 from utils import getdatestr
+from scipy.stats import pearsonr
+
 rcParams['agg.path.chunksize'] = 100000000000 # for plots of long activity 
 ion()
 
@@ -1125,6 +1127,143 @@ def getpopinputmap (pdf, t, dnumc, dstartidx, dendidx, poty, asweight=True):
       else:
         dout[k] += drfmap[k]
   return dout  
+
+def analyzeRepeatedInputSequences(dact, InputImages, targetPixel=(10,10),nbseq=14,targetCorr=0.9):
+  midInds = np.where(InputImages[:,targetPixel[0],targetPixel[1]]>250)
+  # for each midInd, find 14 (13 could be enough but i am not sure) consecutive Images to see the trajectory. 
+  seqInputs = np.zeros((int(len(midInds[0])/2),nbseq,20,20),dtype=float)
+  seqActions = np.zeros((int(len(midInds[0])/2),nbseq),dtype=float)
+  seqPropActions = np.zeros((int(len(midInds[0])/2),nbseq),dtype=float)
+  seqRewards = np.zeros((int(len(midInds[0])/2),nbseq),dtype=float)
+  seqHitMiss = np.zeros((int(len(midInds[0])/2),nbseq),dtype=float)
+  seqOutputsUP = np.zeros((int(len(midInds[0])/2),nbseq,5,5),dtype=float)
+  seqOutputsDOWN = np.zeros((int(len(midInds[0])/2),nbseq,5,5),dtype=float)
+  seqOutputsSTAY = np.zeros((int(len(midInds[0])/2),nbseq,5,5),dtype=float)
+  count = 0
+  for i in range(0,len(midInds[0]),2):
+    cmidInd = midInds[0][i]
+    for j in range(nbseq):
+      seqInputs[count,j,:,:] = InputImages[cmidInd+j,:,:]
+      seqActions[count,j] = actreward['action'][cmidInd+j]
+      seqRewards[count,j] = actreward['reward'][cmidInd+j]
+      seqPropActions[count,j] = actreward['proposed'][cmidInd+j]
+      seqHitMiss[count,j] = actreward['hit'][cmidInd+j]
+      seqOutputsUP[count,j,:,:] = dact['EMUP'][cmidInd+j,:,:]
+      seqOutputsDOWN[count,j,:,:] = dact['EMDOWN'][cmidInd+j,:,:]
+      seqOutputsSTAY[count,j,:,:] = dact['EMSTAY'][cmidInd+j,:,:]
+    count = count + 1
+  # now i have all inputs, outputs, actions and proposed etc for all inputs where the ball starts in the middle of the screen.
+  # But i need to pick up the sequences which are exactly like one another.  
+  x = np.sum(seqInputs,axis=1)[1,:,:] #3:17
+  goodInds = []
+  for j in range(seqInputs.shape[0]):
+    y = np.sum(seqInputs,axis=1)[j,:,:]
+    corr, p_value = pearsonr(x.flat, y.flat)
+    if corr>targetCorr:
+      goodInds.append(j)
+  # for comparison only use correlated sequences...
+  seqInputs4comp = seqInputs[goodInds,:,:,:]
+  seqActions4comp = seqActions[goodInds,:]
+  seqRewards4comp = seqRewards[goodInds,:]
+  seqPropActions4comp = seqPropActions[goodInds,:]
+  seqHitMiss4comp = seqHitMiss[goodInds,:]
+  seqOutputsUP4comp = seqOutputsUP[goodInds,:,:,:]
+  seqOutputsDOWN4comp = seqOutputsDOWN[goodInds,:,:,:]
+  seqOutputsSTAY4comp = seqOutputsSTAY[goodInds,:,:,:]
+  lSeqNBs4comp = [0,1,2,3,4,5,6,7,8,9,10]
+
+  fig, axs = plt.subplots(6, 5, figsize=(10,8));
+  lax = axs.ravel()
+  for i in range(5):
+    cSeq = lSeqNBs4comp[i]
+    lax[i].imshow(np.sum(seqInputs4comp,axis=1)[cSeq])
+    lax[i].axis('off')
+    lax[i+5].plot(np.sum(np.sum(seqOutputsUP4comp,axis=2),axis=2)[cSeq],'b-o',markersize=3)
+    lax[i+5].plot(np.sum(np.sum(seqOutputsDOWN4comp,axis=2),axis=2)[cSeq],'r-o',markersize=3)
+    lax[i+5].plot(np.sum(np.sum(seqOutputsSTAY4comp,axis=2),axis=2)[cSeq],'g-o',markersize=3)
+    if i==0: lax[i+5].set_ylabel('# of pop spikes')
+    lax[i+10].plot(seqActions4comp[cSeq,:],'-o',color=(0,0,0,1),markersize=3)
+    lax[i+10].plot(seqPropActions[cSeq,:],'-o',color=(0.5,0.5,0.5,1),markersize=3)
+    lax[i+10].set_yticks([1,3,4])
+    if i==0: lax[i+10].set_yticklabels(['STAY','DOWN','UP'])
+    cSeq = lSeqNBs4comp[i+5]
+    lax[i+15].imshow(np.sum(seqInputs4comp,axis=1)[cSeq])
+    lax[i+15].axis('off')
+    lax[i+20].plot(np.sum(np.sum(seqOutputsUP4comp,axis=2),axis=2)[cSeq],'b-o',markersize=3)
+    lax[i+20].plot(np.sum(np.sum(seqOutputsDOWN4comp,axis=2),axis=2)[cSeq],'r-o',markersize=3)
+    lax[i+20].plot(np.sum(np.sum(seqOutputsSTAY4comp,axis=2),axis=2)[cSeq],'g-o',markersize=3)
+    if i==0: lax[i+20].set_ylabel('# of pop spikes')
+    lax[i+25].plot(seqActions4comp[cSeq,:],'-o',color=(0,0,0,1),markersize=3)
+    lax[i+25].plot(seqPropActions[cSeq,:],'-o',color=(0.5,0.5,0.5,1),markersize=3)
+    lax[i+25].set_yticks([1,3,4])
+    if i==0: lax[i+25].set_yticklabels(['STAY','DOWN','UP'])
+  lax[i+5].legend(['UP','DOWN','STAY'],loc='best')
+  lax[i+10].legend(['Actions','Proposed'],loc='best')
+
+
+def analyzeRepeatedInputForSingleEvent(dact, InputImages, targetPixel=(10,10)):
+  midInds = np.where(InputImages[:,targetPixel[0],targetPixel[1]]>250)
+  # for each midInd, find 14 (13 could be enough but i am not sure) consecutive Images to see the trajectory. 
+  seqInputs = np.zeros((int(len(midInds[0])/2),20,20),dtype=float)
+  seqActions = np.zeros((int(len(midInds[0])/2)),dtype=float)
+  seqPropActions = np.zeros((int(len(midInds[0])/2)),dtype=float)
+  seqRewards = np.zeros((int(len(midInds[0])/2)),dtype=float)
+  seqHitMiss = np.zeros((int(len(midInds[0])/2)),dtype=float)
+  seqOutputsUP = np.zeros((int(len(midInds[0])/2),5,5),dtype=float)
+  seqOutputsDOWN = np.zeros((int(len(midInds[0])/2),5,5),dtype=float)
+  seqOutputsSTAY = np.zeros((int(len(midInds[0])/2),5,5),dtype=float)
+  count = 0
+  for i in range(0,len(midInds[0]),2):
+    cmidInd = midInds[0][i]
+    seqInputs[count,:,:] = InputImages[cmidInd,:,:]
+    seqActions[count] = actreward['action'][cmidInd]
+    seqRewards[count] = actreward['reward'][cmidInd]
+    seqPropActions[count] = actreward['proposed'][cmidInd]
+    seqHitMiss[count] = actreward['hit'][cmidInd]
+    seqOutputsUP[count,:,:] = dact['EMUP'][cmidInd,:,:]
+    seqOutputsDOWN[count,:,:] = dact['EMDOWN'][cmidInd,:,:]
+    seqOutputsSTAY[count,:,:] = dact['EMSTAY'][cmidInd,:,:]
+    count = count + 1
+  FR_UP = np.sum(np.sum(seqOutputsUP,axis=1),axis=1)
+  FR_DOWN = np.sum(np.sum(seqOutputsDOWN,axis=1),axis=1)
+  FR_STAY = np.sum(np.sum(seqOutputsSTAY,axis=1),axis=1)
+  fig, axs = plt.subplots(2, 3, figsize=(12,7));
+  lax = axs.ravel()
+  lax[0].imshow(np.sum(seqInputs,axis=0))
+  lax[0].axis('off')
+  lax[1].hist(seqActions,bins=[-1.5,-0.5,0.5,1.5,2.5,3.5,4.5])
+  lax[1].set_xlabel('Actions')
+  lax[1].set_xticks([1,3,4])
+  lax[1].set_xticklabels(['STAY','DOWN','UP'])
+  lax[2].hist(seqPropActions,bins=[-1.5,-0.5,0.5,1.5,2.5,3.5,4.5])
+  lax[2].set_xlabel('Proposed Actions')
+  lax[2].set_xticks([1,3,4])
+  lax[2].set_xticklabels(['STAY','DOWN','UP'])
+  lax[3].hist(FR_UP)
+  lax[3].set_xlabel('# of EMUP spikes')
+  lax[4].hist(FR_DOWN)
+  lax[4].set_xlabel('# of EMDOWN spikes')
+  lax[5].hist(FR_STAY)
+  lax[5].set_xlabel('# of EMSTAY spikes')
+  #
+  fig, axs = plt.subplots(4, 1, figsize=(10,8));
+  lax = axs.ravel()
+  lax[0].imshow(np.sum(seqInputs,axis=0))
+  lax[0].axis('off')
+  lax[1].plot(np.sum(np.sum(seqOutputsUP,axis=1),axis=1),'b-o',markersize=3)
+  lax[1].plot(np.sum(np.sum(seqOutputsDOWN,axis=1),axis=1),'r-o',markersize=3)
+  lax[1].plot(np.sum(np.sum(seqOutputsSTAY,axis=1),axis=1),'g-o',markersize=3)
+  lax[1].set_ylabel('# of pop spikes')
+  lax[2].plot(seqActions,'-o',color=(0,0,0,1),markersize=3)
+  lax[2].plot(seqPropActions,'-o',color=(0.5,0.5,0.5,1),markersize=3)
+  lax[2].set_yticks([1,3,4])
+  lax[2].set_yticklabels(['STAY','DOWN','UP'])
+  lax[3].plot(seqRewards ,'-o',color=(0,0,0,1),markersize=3)
+  lax[3].plot(seqHitMiss,'-o',color=(0.5,0.5,0.5,1),markersize=3)
+  lax[3].set_yticks([-1,0,1])
+  lax[3].legend(['Rewards','Hit/Moss'])
+  lax[1].legend(['UP','DOWN','STAY'],loc='best')
+  lax[2].legend(['Actions','Proposed'],loc='best')
 
 """
 current_time_stepNB = 0

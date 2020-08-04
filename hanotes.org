@@ -4076,3 +4076,331 @@ that's example, where lfn has the simulation names
 -- "weightVar": 0.4
 
 ** run 1000 sec sim in "20jul23_A0_cycle_"
+
+** run 1000 sec sim in "20jul23_A0_falcor_" with timestep = 100 ms 
+-- p(FollowBall) = 0.29
+-- avg. Hit/Miss = 0.15
+-- avg. Score/Miss = 0.03
+-- Firing rates:  2.61 Hz (EMSTAY), 2.71 Hz (EMUP), 2.77 Hz (EMDOWN), 9.27 Hz (IM)
+
+
+** run 1000 sec sim in "20jul23_A1_cycle_"
+-- -- "EEMRecProb": 0.14
+
+** run 1000 sec sim in "20jul23_A1_falcor_" with timestep = 100 ms
+-- p(FollowBall) = 0.2867
+-- avg. Hit/Miss = 0.16
+-- avg. Score/Miss = 0.04
+-- Firing rates: 2.71 Hz (EMSTAY), 2.82 Hz (EMUP), 2.84 Hz (EMDOWN), 9,45 Hz (IM)
+
+** run 1000 sec sim in "20jul23_A2_cycle_"
+-- "EEMRecProb": 0.21
+
+** run 1000 sec sim in "20jul23_A2_falcor_" with timestep = 100 ms
+-- p(FollowBall) ~ 0.28 (did not note down exact value, so should not compare)
+-- avg. Hit/Miss = 0.16
+-- avg. Score/Miss = 0.03
+-- Firing rates: 2.76 Hz (EMSTAY), 2.86 Hz (EMUP), 2.89 Hz (EMDOWN), 9.59 (IM)
+
+** run 100 sec sim in "20jul28_A0_falcor_"
+-- EEMFeedbackProb = 0.1
+-- EEMRecProb = 0.07
+
+** run 100 sec sim in "20jul28_A1_falcor_"
+-- EEMFeedbackProb = 0.15
+-- EEMRecProb = 0.07
+
+** run 100 sec sim in "20jul28_A2_falcor_"
+-- EEMFeedbackProb = 0.2
+-- EEMRecProb = 0.07
+
+
+
+----------
+
+SOME IDEAS TO WORK ON:
+
+
+For Architecture:
+
+Haroon: 
+coz eventually sensory areas learn how to drive motor neurons based on these PFC-sensory connections
+sensory cortex encodes sensory information as well as associations between what actions to execute based on the associations
+so VC also needs learning
+
+samn:meal:
+i agree VC learning could help
+
+Haroon Anwar:
+i dont know just thinking how to make it more learnable
+
+samn:
+since no reason to assume our initial  wiring is optimal
+but not sure i understand the PFC role yet ...
+could develop that idea further
+
+Haroon Anwar  11:35 AM
+question is how to keep topological connectivity while making connections learnable
+could be possibly different types of neurons
+
+samn:meal: 
+could use the V4, IT areas we had before to learn additional info on top of topology
+
+Haroon Anwar:
+with within area connectivity
+good idea
+
+samn:meal:
+yeah, other types sg too
+from serre's talk - he mentioned deep network with > 150 layers
+
+Haroon Anwar:
+so some neurons encode toplogy (FF) but then some neurons encode associations (via feedback and recurrent pathways)
+topology means visual scene in topological manner
+
+samn:
+maybe we can't compete with a smaller network without those additional features
+associations via feedback/recurrent - that sg
+
+Haroon Anwar:
+ok good
+feeling excited about “associations via feedback/recurrent”
+
+samn:
+yeah, sounds interesting
+either with RL or not - maybe interesting to compare
+
+Haroon Anwar  11:39 AM
+feedback with RL
+recurrent with/without
+feedback should be with RL
+if not strongly FF driven
+anyway
+something interesting to move forward
+
+
+http://www.neurosimlab.com/pdfs/jnm275_1.pdf
+
+samn: suppose simpler to start just by looking at how weight matrix changes over time
+either full matrix or subset of the weights
+
+sam: in the old videos, looked like some locations were going up a lot and others not changing much
+if that's right, it's a clue...what is special about the weights that increase a lot
+
+samn: and would have to track it back to the neurons involved
+
+Haroon Anwar: i think this is important question “what is special about the weights that increase a lot”
+
+samn: ok good, so have a direction to explore
+
+Haroon Anwar: and also otherway
+
+samn: agree
+
+Haroon Anwar: and also how does that increase influence the action
+
+
+
+
+----------
+
+*20jul29
+
+** continue for 1000 sec sim in "20jul29_A0_falcor_" from "20jul28_A0_falcor"
+-- EEMFeedbackProb = 0.1
+-- EEMRecProb = 0.07
+
+** continue for 1000 sec sim in "20jul29_A1_falcor_" from "20jul28_A1_falcor"
+-- EEMFeedbackProb = 0.15
+-- EEMRecProb = 0.07
+
+** continue 1000 sec sim in "20jul29_A2_falcor_" from "20jul28_A2_falcor"
+-- EEMFeedbackProb = 0.2
+-- EEMRecProb = 0.07
+
+** Run from start 1000 sec sim in "20jul29_A3_falcor_"
+-- EEMFeedbackProb = 0.4
+-- EEMRecProb = 0.07
+
+** create a prob map of racket and ball locations (roughly) during the game.
+
+sInputImages = np.zeros((20,20),dtype=float)
+for i in range(10000):
+  sInputImages = np.add(sInputImages,InputImages[i,:,:])
+
+midInds = np.where(InputImages[:,10,10]>250)
+
+# for each midInd, find 14 (13 could be enough but i am not sure) consecutive Images to see the trajectory. 
+seqInputs = np.zeros((int(len(midInds[0])/2),14,20,20),dtype=float)
+seqActions = np.zeros((int(len(midInds[0])/2),14),dtype=float)
+seqPropActions = np.zeros((int(len(midInds[0])/2),14),dtype=float)
+seqRewards = np.zeros((int(len(midInds[0])/2),14),dtype=float)
+seqHitMiss = np.zeros((int(len(midInds[0])/2),14),dtype=float)
+seqOutputsUP = np.zeros((int(len(midInds[0])/2),14,5,5),dtype=float)
+seqOutputsDOWN = np.zeros((int(len(midInds[0])/2),14,5,5),dtype=float)
+seqOutputsSTAY = np.zeros((int(len(midInds[0])/2),14,5,5),dtype=float)
+
+dact = getdActMap (totalDur, tstepPerAction, dspkT, dspkID, dnumc, dstartidx,lpop =lpop)
+
+count = 0
+for i in range(0,len(midInds[0]),2):
+  cmidInd = midInds[0][i]
+  for j in range(14):
+    seqInputs[count,j,:,:] = InputImages[cmidInd+j,:,:]
+    seqActions[count,j] = actreward['action'][cmidInd+j]
+    seqRewards[count,j] = actreward['reward'][cmidInd+j]
+    seqPropActions[count,j] = actreward['proposed'][cmidInd+j]
+    seqHitMiss[count,j] = actreward['hit'][cmidInd+j]
+    seqOutputsUP[count,j,:,:] = dact['EMUP'][cmidInd+j,:,:]
+    seqOutputsDOWN[count,j,:,:] = dact['EMDOWN'][cmidInd+j,:,:]
+    seqOutputsSTAY[count,j,:,:] = dact['EMSTAY'][cmidInd+j,:,:]
+  count = count + 1
+
+# now i have all inputs, outputs, actions and proposed etc for all inputs where the ball starts in the middle of the screen.
+# But i need to pick up the sequences which are exactly like one another.
+
+from scipy.stats import pearsonr
+x = np.sum(seqInputs,axis=1)[1,:,:] #3:17
+goodInds = []
+for j in range(seqInputs.shape[0]):
+  y = np.sum(seqInputs,axis=1)[j,:,:]
+  corr, p_value = pearsonr(x.flat, y.flat)
+  if corr>0.9:
+    goodInds.append(j)
+
+# for comparison only use correlated sequences...
+seqInputs4comp = seqInputs[goodInds,:,:,:]
+seqActions4comp = seqActions[goodInds,:]
+seqRewards4comp = seqRewards[goodInds,:]
+seqPropActions4comp = seqPropActions[goodInds,:]
+seqHitMiss4comp = seqHitMiss[goodInds,:]
+seqOutputsUP4comp = seqOutputsUP[goodInds,:,:,:]
+seqOutputsDOWN4comp = seqOutputsDOWN[goodInds,:,:,:]
+seqOutputsSTAY4comp = seqOutputsSTAY[goodInds,:,:,:]
+
+lSeqNBs4comp = [0,1,2,3,4,5,6,7,8,9,10]
+
+fig, axs = plt.subplots(6, 5, figsize=(10,8));
+lax = axs.ravel()
+for i in range(5):
+  cSeq = lSeqNBs4comp[i]
+  lax[i].imshow(np.sum(seqInputs4comp,axis=1)[cSeq])
+  lax[i].axis('off')
+
+for i in range(5):
+  cSeq = lSeqNBs4comp[i+5]
+  lax[i+15].imshow(np.sum(seqInputs4comp,axis=1)[cSeq])
+  lax[i+15].axis('off')
+
+for i in range(5):
+  cSeq = lSeqNBs4comp[i]
+  lax[i+5].plot(np.sum(np.sum(seqOutputsUP4comp,axis=2),axis=2)[cSeq],'b-o',markersize=3)
+  lax[i+5].plot(np.sum(np.sum(seqOutputsDOWN4comp,axis=2),axis=2)[cSeq],'r-o',markersize=3)
+  lax[i+5].plot(np.sum(np.sum(seqOutputsSTAY4comp,axis=2),axis=2)[cSeq],'g-o',markersize=3)
+  if i==0: lax[i+5].set_ylabel('# of pop spikes')
+
+lax[i+5].legend(['UP','DOWN','STAY'],loc='best')
+
+for i in range(5):
+  cSeq = lSeqNBs4comp[i+5]
+  lax[i+20].plot(np.sum(np.sum(seqOutputsUP4comp,axis=2),axis=2)[cSeq],'b-o',markersize=3)
+  lax[i+20].plot(np.sum(np.sum(seqOutputsDOWN4comp,axis=2),axis=2)[cSeq],'r-o',markersize=3)
+  lax[i+20].plot(np.sum(np.sum(seqOutputsSTAY4comp,axis=2),axis=2)[cSeq],'g-o',markersize=3)
+  if i==0: lax[i+20].set_ylabel('# of pop spikes')
+
+for i in range(5):
+  cSeq = lSeqNBs4comp[i]
+  lax[i+10].plot(seqActions4comp[cSeq,:],'-o',color=(0,0,0,1),markersize=3)
+  lax[i+10].plot(seqPropActions[cSeq,:],'-o',color=(0.5,0.5,0.5,1),markersize=3)
+  lax[i+10].set_yticks([1,3,4])
+  if i==0: lax[i+10].set_yticklabels(['STAY','DOWN','UP'])
+
+lax[i+10].legend(['Actions','Proposed'],loc='best')
+
+for i in range(5):
+  cSeq = lSeqNBs4comp[i+5]
+  lax[i+25].plot(seqActions4comp[cSeq,:],'-o',color=(0,0,0,1),markersize=3)
+  lax[i+25].plot(seqPropActions[cSeq,:],'-o',color=(0.5,0.5,0.5,1),markersize=3)
+  lax[i+25].set_yticks([1,3,4])
+  if i==0: lax[i+25].set_yticklabels(['STAY','DOWN','UP'])
+
+
+for i in range(0,len(midInds[0]),2):
+  cmidInd = midInds[0][i]
+  seqInputs[count,:,:] = InputImages[cmidInd,:,:]
+  seqActions[count] = actreward['action'][cmidInd]
+  seqRewards[count] = actreward['reward'][cmidInd]
+  seqPropActions[count] = actreward['proposed'][cmidInd]
+  seqHitMiss[count] = actreward['hit'][cmidInd]
+  seqOutputsUP[count,:,:] = dact['EMUP'][cmidInd,:,:]
+  seqOutputsDOWN[count,:,:] = dact['EMDOWN'][cmidInd,:,:]
+  seqOutputsSTAY[count,:,:] = dact['EMSTAY'][cmidInd,:,:]
+  count = count + 1
+
+FR_UP = np.sum(np.sum(seqOutputsUP,axis=1),axis=1)
+FR_DOWN = np.sum(np.sum(seqOutputsDOWN,axis=1),axis=1)
+FR_STAY = np.sum(np.sum(seqOutputsSTAY,axis=1),axis=1)
+
+fig, axs = plt.subplots(2, 3, figsize=(12,7));
+lax = axs.ravel()
+lax[0].imshow(np.sum(seqInputs,axis=0))
+lax[0].axis('off')
+
+lax[3].hist(FR_UP)
+lax[3].set_xlabel('# of EMUP spikes')
+lax[4].hist(FR_DOWN)
+lax[4].set_xlabel('# of EMDOWN spikes')
+lax[5].hist(FR_STAY)
+lax[5].set_xlabel('# of EMSTAY spikes')
+
+lax[1].hist(seqActions,bins=[-1.5,-0.5,0.5,1.5,2.5,3.5,4.5])
+lax[1].set_xlabel('Actions')
+lax[1].set_xticks([1,3,4])
+lax[1].set_xticklabels(['STAY','DOWN','UP'])
+
+lax[2].hist(seqPropActions,bins=[-1.5,-0.5,0.5,1.5,2.5,3.5,4.5])
+lax[2].set_xlabel('Proposed Actions')
+lax[2].set_xticks([1,3,4])
+lax[2].set_xticklabels(['STAY','DOWN','UP'])
+
+fig, axs = plt.subplots(4, 1, figsize=(10,8));
+lax = axs.ravel()
+lax[0].imshow(np.sum(seqInputs,axis=0))
+lax[0].axis('off')
+lax[1].plot(np.sum(np.sum(seqOutputsUP,axis=1),axis=1),'b-o',markersize=3)
+lax[1].plot(np.sum(np.sum(seqOutputsDOWN,axis=1),axis=1),'r-o',markersize=3)
+lax[1].plot(np.sum(np.sum(seqOutputsSTAY,axis=1),axis=1),'g-o',markersize=3)
+lax[1].set_ylabel('# of pop spikes')
+lax[2].plot(seqActions,'-o',color=(0,0,0,1),markersize=3)
+lax[2].plot(seqPropActions,'-o',color=(0.5,0.5,0.5,1),markersize=3)
+lax[2].set_yticks([1,3,4])
+lax[2].set_yticklabels(['STAY','DOWN','UP'])
+lax[3].plot(seqRewards ,'-o',color=(0,0,0,1),markersize=3)
+lax[3].plot(seqHitMiss,'-o',color=(0.5,0.5,0.5,1),markersize=3)
+lax[3].set_yticks([-1,0,1])
+lax[3].legend(['Rewards','Hit/Moss'])
+lax[1].legend(['UP','DOWN','STAY'],loc='best')
+lax[2].legend(['Actions','Proposed'],loc='best')
+
+
+--- Not sure how the above analysis would help figure out the problem with the circuit.
+-- No need for targetCorr in function: analyzeRepeatedInputForSingleEvent(dact, InputImages, targetPixel=(10,10)) 
+
+----------
+
+*20aug04
+
+def setdminID (sim, lpop):
+  # setup min ID for each population in lpop
+  alltags = sim._gatherAllCellTags() #gather cell tags; see https://github.com/Neurosim-lab/netpyne/blob/development/netpyne/sim/gather.py
+  dGIDs = {pop:[] for pop in lpop}
+  for tinds in range(len(alltags)):
+    if alltags[tinds]['pop'] in lpop:
+      dGIDs[alltags[tinds]['pop']].append(tinds)
+  sim.simData['dminID'] = {pop:np.amin(dGIDs[pop]) for pop in lpop}
+
+
+  -- why only setdminID(sim, ['ER', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW', 'EV1DSW', 'EV1DS', 'EV1DSE'])?
+
+  -- added capability in script to remove 'ER' and 'IR' from simulation so that V1 is directly driven by the stimMod.
+  -- simdat.py needs adjustment accordingly. 
