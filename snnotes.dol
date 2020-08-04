@@ -15230,3 +15230,33 @@ fig, axs, plt = animActivityMaps(lpop=lpop)
 looked ok in short run ... try 2000 s run to compare against 20jul30_U0_gcp_
 
 ./myrun 30 sn.json
+
+** check 20aug2_HRTest3_cycle__step_0_
+
+python -i simdat.py backupcfg/20aug2_HRTest3_cycle__step_0_sim.json
+
+ax=plotPerf(actreward,yl=(0,1.))
+savefig('gif/'+dstr+simstr+'perf.png') # gif/20aug3_20aug2_HRTest3_cycle__step_0_perf.png
+
+no clear improvement overall, highly variable ... so that probably just reflects where the ball
+is getting hit to by opponent ... 
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((990e3,1000e3))
+savefig('gif/'+dstr+simstr+'rast.png') # gif/20aug3_20aug2_HRTest3_cycle__step_0_rast.png
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','IM'],tlim=(990e3,1000e3))
+savefig('gif/'+dstr+simstr+'Vm.png') # gif/20aug3_20aug2_HRTest3_cycle__step_0_Vm.png
+
+lfn = ['20jul30_HRTest0_cycle_', '20jul31_HRTest1_cycle_','20aug1_HRTest2_cycle_','20aug2_HRTest3_cycle__step_0_']
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0,.55))
+savefig('gif/'+dstr+simstr+'perf_all_steps_so_far.png') # gif/20aug3_20aug2_HRTest3_cycle__step_0_perf_all_steps_so_far.png
+
+InputImages.shape # (50000, 40, 40)
+
+fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4') # gif/20aug3_20aug2_HRTest3_cycle__step_0__input.mp4
+
+** rerun halftest (100 s; "name": "20aug3_HalfTest0_cycle_")
+
+./myrun 48 sn.json
+
