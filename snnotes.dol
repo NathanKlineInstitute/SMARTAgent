@@ -15260,3 +15260,31 @@ fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4') # gif/20aug3_20aug2_H
 
 ./myrun 48 sn.json
 
+*20aug4
+** check 20aug3_U0_noEXPDir_gcp_
+
+python -i simdat.py backupcfg/20aug3_U0_noEXPDir_gcp_sim.json
+
+ax=plotPerf(actreward,yl=(0,1.))
+savefig('gif/'+dstr+simstr+'perf.png') # gif/20aug4_20aug3_U0_noEXPDir_gcp_perf.png
+looks about as good as the others ... 
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((1990e3,2000e3))
+savefig('gif/'+dstr+simstr+'rast.png') # gif/20aug4_20aug3_U0_noEXPDir_gcp_rast.png
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','IM'],tlim=(1990e3,2000e3))
+savefig('gif/'+dstr+simstr+'Vm.png') # gif/20aug4_20aug3_U0_noEXPDir_gcp_Vm.png
+
+and how does performance compare to the sim with exp fall-off for angrf?
+
+lfn = ['20jul30_U0_gcp__step_0_', '20aug3_U0_noEXPDir_gcp_']
+lpda = getindivactionreward(lfn)
+clf(); plotComparePerf(lpda,['b','r'],yl=(0,.55),lleg=lfn)
+savefig('gif/'+dstr+simstr+'compare_perf.png') # gif/20aug4_20aug3_U0_noEXPDir_gcp_compare_perf.png
+
+hmm, identical - had a mistake in aigame.py was not reading the value ... will have to rerun ...
+
+        "name": "20aug4_U0_noEXPDir_gcp_",
+
+./myrun 30 sn.json
+

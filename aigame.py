@@ -82,7 +82,7 @@ class AIGame:
     self.AngRFSigma2 = dconf['net']['AngRFSigma']**2 # angular receptive field (RF) sigma squared used for dir selective neuron RFs
     if self.AngRFSigma2 <= 0.0: self.AngRFSigma2=1.0
     self.EXPDir = True
-    if 'EXPDir' in dconf: self.EXPDir = dconf['EXPDir']
+    if 'EXPDir' in dconf['net']: self.EXPDir = dconf['net']['EXPDir']
     self.input_dim = int(np.sqrt(dconf['net']['ER'])) # input image XY plane width,height -- not used anywhere
     self.dirSensitiveNeuronDim = int(np.sqrt(dconf['net']['EV1DE'])) # direction sensitive neuron XY plane width,height
     self.dirSensitiveNeuronRate = (dconf['net']['DirMinRate'], dconf['net']['DirMaxRate']) # min, max firing rate (Hz) for dir sensitive neurons
@@ -198,7 +198,7 @@ class AIGame:
         for x in range(motiondir.shape[1]):
           if motiondir[y,x] >= 0.0: # make sure it's a valid angle
             for pop in self.ldirpop:
-              if abs(getangdiff(motiondir[y][x],dAngPeak[pop])) <= AngRFSigma:
+              if abs(getangdiff(motiondir[y][x],dAngPeak[pop])) <= self.AngRFSigma:
                 self.dFiringRates[pop][y,x] = MaxRate
               #print('updateDirRates',pop,x,y,fctr,dAngPeak[pop],motiondir[y][x])
     #print('motiondir',motiondir)
