@@ -4385,3 +4385,22 @@ lax[2].legend(['Actions','Proposed'],loc='best')
 
 --- Not sure how the above analysis would help figure out the problem with the circuit.
 -- No need for targetCorr in function: analyzeRepeatedInputForSingleEvent(dact, InputImages, targetPixel=(10,10)) 
+
+----------
+
+*20aug04
+
+def setdminID (sim, lpop):
+  # setup min ID for each population in lpop
+  alltags = sim._gatherAllCellTags() #gather cell tags; see https://github.com/Neurosim-lab/netpyne/blob/development/netpyne/sim/gather.py
+  dGIDs = {pop:[] for pop in lpop}
+  for tinds in range(len(alltags)):
+    if alltags[tinds]['pop'] in lpop:
+      dGIDs[alltags[tinds]['pop']].append(tinds)
+  sim.simData['dminID'] = {pop:np.amin(dGIDs[pop]) for pop in lpop}
+
+
+  -- why only setdminID(sim, ['ER', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW', 'EV1DSW', 'EV1DS', 'EV1DSE'])?
+
+  -- added capability in script to remove 'ER' and 'IR' from simulation so that V1 is directly driven by the stimMod.
+  -- simdat.py needs adjustment accordingly. 

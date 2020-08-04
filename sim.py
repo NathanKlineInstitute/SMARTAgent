@@ -43,15 +43,26 @@ tstepPerAction = dconf['sim']['tstepPerAction'] # time step per action (in ms)
 fid4=None # only used by rank 0
 
 scale = dconf['net']['scale']
-if 'EMSTAY' in dconf['net']:
+if 'EMSTAY' in dconf['net'] and 'ER' in dconf['net']:
   ETypes = ['ER','EV1','EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE','EV4','EMT', 'EMDOWN', 'EMUP','EMSTAY']
-else:
+elif 'EMSTAY' in dconf['net'] and 'ER' not in dconf['net']:
+  ETypes = ['EV1','EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE','EV4','EMT', 'EMDOWN', 'EMUP','EMSTAY']
+elif 'EMSTAY' not in dconf['net'] and 'ER' in dconf['net']:
   ETypes = ['ER','EV1','EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE','EV4','EMT', 'EMDOWN', 'EMUP']
-ITypes = ['IR','IV1','IV4','IMT','IM'] # 
-if 'EMSTAY' in dconf['net']:
-  allpops = ['ER','IR','EV1','EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE','IV1','EV4','IV4','EMT','IMT','EMDOWN','EMUP','EMSTAY','IM']
 else:
+  ETypes = ['EV1','EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE','EV4','EMT', 'EMDOWN', 'EMUP']
+if 'IR' in dconf['net']:
+  ITypes = ['IR','IV1','IV4','IMT','IM'] #
+else:
+  ITypes = ['IV1','IV4','IMT','IM'] # 
+if 'EMSTAY' in dconf['net'] and 'ER' in dconf['net']:
+  allpops = ['ER','IR','EV1','EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE','IV1','EV4','IV4','EMT','IMT','EMDOWN','EMUP','EMSTAY','IM']
+elif 'EMSTAY' in dconf['net'] and 'ER' not in dconf['net'] and 'IR' not in dconf['net']:
+  allpops = ['EV1','EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE','IV1','EV4','IV4','EMT','IMT','EMDOWN','EMUP','EMSTAY','IM']
+elif 'EMSTAY' not in dconf['net'] and 'ER' in dconf['net'] and 'IR' in dconf['net']:
   allpops = ['ER','IR','EV1','EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE','IV1','EV4','IV4','EMT','IMT','EMDOWN','EMUP','IM']
+else:
+  allpops = ['EV1','EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE','IV1','EV4','IV4','EMT','IMT','EMDOWN','EMUP','IM']
 if 'EMSTAY' in dconf['net']:
   EMotorPops = ['EMDOWN', 'EMUP','EMSTAY'] # excitatory neuron motor populations
 else:
@@ -65,7 +76,7 @@ else:
 if dconf['net']['EEPreMProb'] > 0.0 or dconf['net']['EEMFeedbackProb'] > 0.0 or dconf['net']['VisualFeedback']:
   for pop in ['EV1','EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE','EV4','EMT']:
     lrecpop.append(pop)
-  if dconf['net']['VisualFeedback']: lrecpop.append('ER')
+  if dconf['net']['VisualFeedback'] and 'ER' in dconf['net']: lrecpop.append('ER')
 if 'EIPlast' in dconf['net']:
   if dconf['net']['EIPlast']:
     lrecpop.append('IM')
@@ -144,12 +155,20 @@ if 'AMPAI' in dconf['RL']: dSTDPparamsRL['AMPAI'] = dconf['RL']['AMPAI']
 
 # these are the image-based inputs provided to the R (retinal) cells
 netParams.stimSourceParams['stimMod'] = {'type': 'NetStim', 'rate': 'variable', 'noise': 0}
-netParams.stimTargetParams['stimMod->R'] = {'source': 'stimMod',
-        'conds': {'pop': 'ER'},
-        'convergence': 1,
-        'weight': 0.05,
-        'delay': 1,
-        'synMech': 'AMPA'}
+if 'ER' in dconf['net']:
+  netParams.stimTargetParams['stimMod->R'] = {'source': 'stimMod',
+          'conds': {'pop': 'ER'},
+          'convergence': 1,
+          'weight': 0.05,
+          'delay': 1,
+          'synMech': 'AMPA'}
+else:
+  netParams.stimTargetParams['stimMod->V1'] = {'source': 'stimMod',
+          'conds': {'pop': 'EV1'},
+          'convergence': 1,
+          'weight': 0.05,
+          'delay': 1,
+          'synMech': 'AMPA'}
 netParams.stimTargetParams['stimMod->DirSelInput'] = {'source': 'stimMod',
         'conds': {'pop': ['EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE']},
         'convergence': 1,
@@ -186,7 +205,8 @@ if "Noise" in dconf:
 #####################################################################################
 #Feedforward excitation
 #E to E - Feedforward connections
-blistERtoEV1 = connectLayerswithOverlap(NBpreN = dnumc['ER'], NBpostN = dnumc['EV1'], overlap_xdir = 3)
+if 'ER' in dconf['net']:
+  blistERtoEV1 = connectLayerswithOverlap(NBpreN = dnumc['ER'], NBpostN = dnumc['EV1'], overlap_xdir = 3)
 blistEV1toEV4 = connectLayerswithOverlap(NBpreN = dnumc['EV1'], NBpostN = dnumc['EV4'], overlap_xdir = 3)
 blistEV4toEMT = connectLayerswithOverlap(NBpreN = dnumc['EV4'], NBpostN = dnumc['EMT'], overlap_xdir = 3) #was 15
 #blistITtoMI = connectLayerswithOverlap(NBpreN = NB_ITneurons, NBpostN = NB_MIneurons, overlap_xdir = 3) #Not sure if this is a good strategy instead of all to all
@@ -199,14 +219,16 @@ blistEV4toEMT = connectLayerswithOverlap(NBpreN = dnumc['EV4'], NBpostN = dnumc[
 #blistEV4toIMT = connectLayerswithOverlap(NBpreN = dnumc['EV4'], NBpostN = dnumc['IMT'], overlap_xdir = 3) 
 
 #E to I - WithinLayer connections
-blistERtoIR = connectLayerswithOverlap(NBpreN = dnumc['ER'], NBpostN = dnumc['IR'], overlap_xdir = 3)
+if 'ER' in  dconf['net']:
+  blistERtoIR = connectLayerswithOverlap(NBpreN = dnumc['ER'], NBpostN = dnumc['IR'], overlap_xdir = 3)
 blistEV1toIV1 = connectLayerswithOverlap(NBpreN = dnumc['EV1'], NBpostN = dnumc['IV1'], overlap_xdir = 3)
 #blistEV1DtoIV1D = connectLayerswithOverlap(NBpreN = dnumc['EV1DE'], NBpostN = dnumc['IV1D'], overlap_xdir = 3) # for dir selective E -> I
 blistEV4toIV4 = connectLayerswithOverlap(NBpreN = dnumc['EV4'], NBpostN = dnumc['IV4'], overlap_xdir = 3)
 blistEMTtoIMT = connectLayerswithOverlap(NBpreN = dnumc['EMT'], NBpostN = dnumc['IMT'], overlap_xdir = 3)
 
 #I to E - WithinLayer Inhibition
-blistIRtoER = connectLayerswithOverlapDiv(NBpreN = dnumc['IR'], NBpostN = dnumc['ER'], overlap_xdir = 5)
+if 'IR' in dconf['net']:
+  blistIRtoER = connectLayerswithOverlapDiv(NBpreN = dnumc['IR'], NBpostN = dnumc['ER'], overlap_xdir = 5)
 blistIV1toEV1 = connectLayerswithOverlapDiv(NBpreN = dnumc['IV1'], NBpostN = dnumc['EV1'], overlap_xdir = 5)
 #blistIV1DtoEV1D = connectLayerswithOverlapDiv(NBpreN = dnumc['IV1D'], NBpostN = dnumc['EV1DE'], overlap_xdir = 5) # for dir selective I -> E
 blistIV4toEV4 = connectLayerswithOverlapDiv(NBpreN = dnumc['IV4'], NBpostN = dnumc['EV4'], overlap_xdir = 5)
@@ -214,7 +236,8 @@ blistIMTtoEMT = connectLayerswithOverlapDiv(NBpreN = dnumc['IMT'], NBpostN = dnu
 
 #Feedbackward excitation
 #E to E  
-blistEV1toER = connectLayerswithOverlapDiv(NBpreN = dnumc['EV1'], NBpostN = dnumc['ER'], overlap_xdir = 3)
+if 'ER' in dconf['net']:
+  blistEV1toER = connectLayerswithOverlapDiv(NBpreN = dnumc['EV1'], NBpostN = dnumc['ER'], overlap_xdir = 3)
 blistEV4toEV1 = connectLayerswithOverlapDiv(NBpreN = dnumc['EV4'], NBpostN = dnumc['EV1'], overlap_xdir = 3)
 blistEMTtoEV4 = connectLayerswithOverlapDiv(NBpreN = dnumc['EMT'], NBpostN = dnumc['EV4'], overlap_xdir = 3)
 
@@ -225,7 +248,8 @@ blistIV4toIMT = connectLayerswithOverlap(NBpreN = dnumc['IV4'], NBpostN = dnumc[
 
 #Feedbackward inhibition
 #I to E 
-blistIV1toER = connectLayerswithOverlapDiv(NBpreN = dnumc['IV1'], NBpostN = dnumc['ER'], overlap_xdir = 5)
+if 'IR' in dconf['net']:
+  blistIV1toER = connectLayerswithOverlapDiv(NBpreN = dnumc['IV1'], NBpostN = dnumc['ER'], overlap_xdir = 5)
 blistIV4toEV1 = connectLayerswithOverlapDiv(NBpreN = dnumc['IV4'], NBpostN = dnumc['EV1'], overlap_xdir = 5)
 blistIMTtoEV4 = connectLayerswithOverlapDiv(NBpreN = dnumc['IMT'], NBpostN = dnumc['EV4'], overlap_xdir = 5)
 
@@ -249,11 +273,14 @@ simConfig.saveFolder = 'data'
 #simConfig.createNEURONObj = True  # create HOC objects when instantiating network
 #simConfig.createPyStruct = True  # create Python structure (simulator-independent) when instantiating network
 
-if 'EMSTAY' in dconf['net']:
+if 'EMSTAY' in dconf['net'] and 'ER' in dconf['net']:
   simConfig.analysis['plotTraces'] = {'include': [(pop, 0) for pop in ['ER','IR','EV1','EV1DE','IV1','EMDOWN','EMUP','EMSTAY','IM']]}
-else:
+elif 'EMSTAY' in dconf['net'] and 'ER' not in dconf['net'] and 'IR' not in dconf['net']:
+  simConfig.analysis['plotTraces'] = {'include': [(pop, 0) for pop in ['EV1','EV1DE','IV1','EMDOWN','EMUP','EMSTAY','IM']]}
+elif 'EMSTAY' not in dconf['net'] and 'ER' in dconf['net'] and 'IR' in dconf['net']:
   simConfig.analysis['plotTraces'] = {'include': [(pop, 0) for pop in ['ER','IR','EV1','EV1DE','IV1','EMDOWN','EMUP','IM']]}
-
+else:
+  simConfig.analysis['plotTraces'] = {'include': [(pop, 0) for pop in ['EV1','EV1DE','IV1','EMDOWN','EMUP','IM']]}
 simConfig.analysis['plotRaster'] = {'popRates':'overlay','showFig':dconf['sim']['doplot']}
 #simConfig.analysis['plot2Dnet'] = True 
 #simConfig.analysis['plotConn'] = True           # plot connectivity matrix
@@ -294,9 +321,13 @@ def getInitWeight (weight):
 #Local excitation
 #E to E recurrent connectivity in premotor areas
 EEPreMProb = 0.0 # default - 0
+if 'ER' in dconf['net']:
+  EpopForRConns = ['ER', 'EV1', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW', 'EV1DSW', 'EV1DS','EV1DSE','EV4','EMT']
+else:
+  EpopForRConns = ['EV1', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW', 'EV1DSW', 'EV1DS','EV1DSE','EV4','EMT'] 
 if "EEPreMProb" in dconf['net']: EEPreMProb = dconf['net']['EEPreMProb']
 if EEPreMProb > 0.0:
-  for epop in ['ER', 'EV1', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW', 'EV1DSW', 'EV1DS','EV1DSE','EV4','EMT']:
+  for epop in EpopForRConns:
     prety = poty = epop
     for strty,synmech,weight in zip(['','n'],['AMPA', 'NMDA'],[dconf['net']['EEPreMWghtAM']*cfg.EEGain, dconf['net']['EEPreMWghtNM']*cfg.EEGain]):
       k = strty+prety+'->'+strty+poty
@@ -313,13 +344,14 @@ if EEPreMProb > 0.0:
         netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL[synmech]}
                
 #E to I within area
-netParams.connParams['ER->IR'] = {
-        'preConds': {'pop': 'ER'},
-        'postConds': {'pop': 'IR'},
-        'connList': blistERtoIR,
-        'weight': 0.02 * cfg.EIGain,
-        'delay': 2,
-        'synMech': 'AMPA', 'sec':'soma', 'loc':0.5}
+if 'ER' in dconf['net']:
+  netParams.connParams['ER->IR'] = {
+          'preConds': {'pop': 'ER'},
+          'postConds': {'pop': 'IR'},
+          'connList': blistERtoIR,
+          'weight': 0.02 * cfg.EIGain,
+          'delay': 2,
+          'synMech': 'AMPA', 'sec':'soma', 'loc':0.5}
 netParams.connParams['EV1->IV1'] = {
         'preConds': {'pop': 'EV1'},
         'postConds': {'pop': 'IV1'},
@@ -371,13 +403,14 @@ for prety in EMotorPops:
   
 #Local inhibition
 #I to E within area
-netParams.connParams['IR->ER'] = {
-        'preConds': {'pop': 'IR'},
-        'postConds': {'pop': 'ER'},
-        'connList': blistIRtoER,
-        'weight': 0.2 * cfg.IEGain,
-        'delay': 2,
-        'synMech': 'GABA', 'sec':'soma', 'loc':0.5}
+if 'ER' in dconf['net']:
+  netParams.connParams['IR->ER'] = {
+          'preConds': {'pop': 'IR'},
+          'postConds': {'pop': 'ER'},
+          'connList': blistIRtoER,
+          'weight': 0.2 * cfg.IEGain,
+          'delay': 2,
+          'synMech': 'GABA', 'sec':'soma', 'loc':0.5}
 
 netParams.connParams['IV1->EV1'] = {
         'preConds': {'pop': 'IV1'},
@@ -434,13 +467,14 @@ for IType in ['IV1', 'IV4', 'IMT', 'IM']:
     'synMech': 'GABA', 'sec':'soma', 'loc':0.5}  
 
 #E to E feedforward connections - AMPA
-netParams.connParams['ER->EV1'] = {
-        'preConds': {'pop': 'ER'},
-        'postConds': {'pop': 'EV1'},
-        'connList': blistERtoEV1,
-        'weight': 0.015 * cfg.EEGain,
-        'delay': 2,
-        'synMech': 'AMPA','sec':EExcitSec, 'loc':0.5}
+if 'ER' in dconf['net']:
+  netParams.connParams['ER->EV1'] = {
+          'preConds': {'pop': 'ER'},
+          'postConds': {'pop': 'EV1'},
+          'connList': blistERtoEV1,
+          'weight': 0.015 * cfg.EEGain,
+          'delay': 2,
+          'synMech': 'AMPA','sec':EExcitSec, 'loc':0.5}
 netParams.connParams['EV1->EV4'] = {
         'preConds': {'pop': 'EV1'},
         'postConds': {'pop': 'EV4'},
@@ -490,20 +524,29 @@ VisualFeedback = False
 if "VisualFeedback" in dconf['net']: VisualFeedback = dconf['net']['VisualFeedback']
 if VisualFeedback:
   # visual area feedback connections
-  for prety,poty,connList in zip(['EV1','EV4','EMT'],['ER','EV1','EV4'],[blistEV1toER,blistEV4toEV1,blistEMTtoEV4]):
-    for strty,synmech,weight in zip(['','n'],['AMPA', 'NMDA'],[dconf['net']['EEMWghtAM']*cfg.EEGain, dconf['net']['EEMWghtNM']*cfg.EEGain]):
+  if 'ER' in dconf['net']:
+    pretyList = ['EV1','EV4','EMT']
+    potyList = ['ER','EV1','EV4']
+    allconnList = [blistEV1toER,blistEV4toEV1,blistEMTtoEV4]
+  else:
+    pretyList = ['EV4','EMT']
+    potyList = ['EV1','EV4']
+    allconnList = [blistEV4toEV1,blistEMTtoEV4]
+  for prety,poty,connList in zip(pretyList,potyList,allconnList):
+    for strty,synmech,synweight in zip(['','n'],['AMPA', 'NMDA'],[dconf['net']['EEMWghtAM']*cfg.EEGain, dconf['net']['EEMWghtNM']*cfg.EEGain]):
         k = strty+prety+'->'+strty+poty
         netParams.connParams[k] = {
-          'preConds': {'pop': 'EV1'},
-          'postConds': {'pop': 'ER'},
+          'preConds': {'pop': prety},
+          'postConds': {'pop': poty},
           'connList': connList,
-          'weight': 0.0001 * cfg.EEGain, 
+          'weight': synweight * cfg.EEGain, 
           'delay': 2,
-          'synMech': 'AMPA','sec':EExcitSec, 'loc':0.5}
+          'synMech': 'AMPA','sec':EExcitSec, 'loc':0.5} # 'weight' should be fixed
         if dSTDPparamsRL[synmech]['RLon']: # only turn on plasticity when specified to do so
           netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL[synmech]}        
   #I to E feedback connections
-  netParams.connParams['IV1->ER'] = {
+  if 'ER' in dconf['net']:
+    netParams.connParams['IV1->ER'] = {
           'preConds': {'pop': 'IV1'},
           'postConds': {'pop': 'ER'},
           'connList': blistIV1toER,
@@ -816,7 +859,10 @@ dSTDPmech = {} # dictionary of list of STDP mechanisms
 def updateInputRates ():
   # update the source firing rates for the ER neuron population, based on image contents
   # also update the firing rates for the direction sensitive neurons based on image contents
-  lratepop = ['ER', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW', 'EV1DSW', 'EV1DS', 'EV1DSE']  
+  if 'ER' in dconf['net']:
+    lratepop = ['ER', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW', 'EV1DSW', 'EV1DS', 'EV1DSE']
+  else:
+    lratepop = ['EV1', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW', 'EV1DSW', 'EV1DS', 'EV1DSE']  
   if sim.rank == 0:
     dFiringRates = sim.AIGame.dFiringRates    
     for k in sim.AIGame.lratepop:
@@ -1119,8 +1165,10 @@ def setdminID (sim, lpop):
       dGIDs[alltags[tinds]['pop']].append(tinds)
   sim.simData['dminID'] = {pop:np.amin(dGIDs[pop]) for pop in lpop}
 
-setdminID(sim, ['ER', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW', 'EV1DSW', 'EV1DS', 'EV1DSE'])
-
+if 'ER' in dconf['net']:
+  setdminID(sim, ['ER', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW', 'EV1DSW', 'EV1DS', 'EV1DSE'])
+else:
+  setdminID(sim, ['EV1', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW', 'EV1DSW', 'EV1DS', 'EV1DSE'])
 tPerPlay = tstepPerAction*dconf['actionsPerPlay']
 sim.runSimWithIntervalFunc(tPerPlay,trainAgent) # has periodic callback to adjust STDP weights based on RL signal
 if sim.rank==0 and fid4 is not None: fid4.close()
