@@ -15312,3 +15312,20 @@ savefig('gif/'+dstr+simstr+'Vm.png') # gif/20aug4_20jul30_U0_gcp__step_6_Vm.png
 
 will probably stop this one since planning some adjustments to network with HA that should improve perf...
 
+** check 20aug3_HalfTest0_cycle_
+
+python -i simdat.py backupcfg/20aug3_HalfTest0_cycle_sim.json
+
+ax=plotPerf(actreward,yl=(0,1.))
+savefig('gif/'+dstr+simstr+'perf.png') # gif/20aug4_20aug3_HalfTest0_cycle_perf.png
+
+hmm, neurons did not fire??
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((90e3,100e3))
+savefig('gif/'+dstr+simstr+'rast.png') # gif/20aug4_20aug3_HalfTest0_cycle_rast.png
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','IM'],tlim=((90e3,100e3))
+savefig('gif/'+dstr+simstr+'Vm.png') # gif/20aug4_20aug3_HalfTest0_cycle_Vm.png
+
+so the weights were too low . . .
+
