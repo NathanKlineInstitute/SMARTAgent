@@ -15330,4 +15330,68 @@ savefig('gif/'+dstr+simstr+'Vm.png') # gif/20aug4_20aug3_HalfTest0_cycle_Vm.png
 so the weights were too low . . .
 
 ** stopped HRTest multistep -- well restart after other changes to net
+** Haroon added option to leave out ER,IR
+
+to use it, set ER==0 in the json file
+
+this should add precision to the spatial location of inputs
+
+trying it out ... adjusting specification so easier to read code; lot
+of the population info can go into the json file, including ETypes, ITypes,
+and their counts; so then will check if dnumc[type] > 0 instead of if 'ER' in dconf['net'], etc.
+
+for example, here's part of what's in the net section of json file:
+
+    "net": {
+        "scale": 1,
+	"allpops": {
+	    "ER":400,
+	    "IR":100,
+	    "EV1":400,
+	    "EV1DE":400,
+	    "EV1DNE":400,
+	    "EV1DN":400,
+	    "EV1DNW":400,
+	    "EV1DW":400,
+	    "EV1DSW":400,
+	    "EV1DS":400,
+	    "EV1DSE":400,
+	    "IV1":100,
+	    "EV4":0,
+	    "IV4":0,
+	    "EMT":0,
+	    "IMT":0,
+	    "EMDOWN":100,
+	    "EMUP":100,
+	    "EMSTAY":100,
+	    "IM":50},	
+	"ETypes": ["ER","EV1","EV1DE","EV1DNE","EV1DN","EV1DNW","EV1DW","EV1DSW","EV1DS","EV1DSE","EV4","EMT","EMDOWN","EMUP","EMSTAY"],
+	"ITypes": ["IR","IV1","IV4","IMT","IM"],
+	"EMotorPops": ["EMDOWN", "EMUP", "EMSTAY"],
+	"EPreMPops": ["EV1","EV1DE","EV1DNE","EV1DN","EV1DNW","EV1DW","EV1DSW","EV1DS","EV1DSE","EV4","EMT"],
+
+is there a problem in updateInputRates? that sim.rank==0 is only updating the rate of
+the ER/EV1 population and not for the direction selective neurons?
+since sim.AIGame.lratepop only consists of ER,EV1? or does it contain dir selective pops too??
+ah, it does contain the dir selective neurons too... so that's not a problem ...
+
+./myrun 30 sn.json
+
+python -i simdat.py backupcfg/20aug4_A0_cycle_sim.json
+
+ax=plotPerf(actreward,yl=(0,1.))
+savefig('gif/'+dstr+simstr+'_100s_perf.png') # gif/20aug4_20aug4_A0_cycle__100s_perf.png
+gets to ~0.4 follow prob quickly...
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((90e3,100e3))
+savefig('gif/'+dstr+simstr+'_100s_rast.png') # gif/20aug4_20aug4_A0_cycle__100s_rast.png
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','IM'],tlim=((90e3,100e3))
+savefig('gif/'+dstr+simstr+'_100s_Vm.png') # gif/20aug4_20aug4_A0_cycle__100s_Vm.png
+
+ok, run longer ... 2000 s ... 
+
+./myrun 30 sn.json
+
+started ~16:20 ...
 

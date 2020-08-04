@@ -70,13 +70,12 @@ class AIGame:
     self.countAll = 0
     self.ldir = ['E','NE','N', 'NW','W','SW','S','SE']
     self.ldirpop = ['EV1D'+Dir for Dir in self.ldir]
-    if 'ER' in dconf['net']:
-      self.lratepop = ['ER'] # populations that we calculate rates for
-    else:
-      self.lratepop = ['EV1']
+    if dconf['net']['allpops']['ER']>0: self.InputPop = 'ER'
+    else: self.InputPop = 'EV1'    
+    self.lratepop = [self.InputPop] # populations that we calculate rates for
     for d in self.ldir: self.lratepop.append('EV1D'+d)
     self.dFVec = OrderedDict({pop:h.Vector() for pop in self.lratepop}) # NEURON Vectors for firing rate calculations
-    self.dFiringRates = OrderedDict({pop:np.zeros(dconf['net'][pop]) for pop in self.lratepop}) # python objects for firing rate calculations
+    self.dFiringRates = OrderedDict({pop:np.zeros(dconf['net']['allpops'][pop]) for pop in self.lratepop}) # python objects for firing rate calculations
     self.dAngPeak = OrderedDict({'EV1DE': 0.0,'EV1DNE': 45.0, # receptive field peak angles for the direction selective populations
                                 'EV1DN': 90.0,'EV1DNW': 135.0,
                                 'EV1DW': 180.0,'EV1DSW': 235.0,
@@ -86,11 +85,8 @@ class AIGame:
     if self.AngRFSigma2 <= 0.0: self.AngRFSigma2=1.0
     self.EXPDir = True
     if 'EXPDir' in dconf['net']: self.EXPDir = dconf['net']['EXPDir']
-    if 'ER' in dconf['net']:
-      self.input_dim = int(np.sqrt(dconf['net']['ER'])) # input image XY plane width,height -- not used anywhere
-    else:
-      self.input_dim = int(np.sqrt(dconf['net']['EV1']))
-    self.dirSensitiveNeuronDim = int(np.sqrt(dconf['net']['EV1DE'])) # direction sensitive neuron XY plane width,height
+    self.input_dim = int(np.sqrt(dconf['net']['allpops'][self.InputPop])) # input image XY plane width,height -- not used anywhere    
+    self.dirSensitiveNeuronDim = int(np.sqrt(dconf['net']['allpops']['EV1DE'])) # direction sensitive neuron XY plane width,height
     self.dirSensitiveNeuronRate = (dconf['net']['DirMinRate'], dconf['net']['DirMaxRate']) # min, max firing rate (Hz) for dir sensitive neurons
     self.intaction = int(dconf['actionsPerPlay']) # integrate this many actions together before returning reward information to model
     # these are Pong-specific coordinate ranges; should later move out of this function into Pong-specific functions
@@ -113,15 +109,11 @@ class AIGame:
       self.stayStepLim = 6 # number of steps to hold still after every move (to reduce momentum)
       # Takes 6 stays instead of 3 because it seems every other input is ignored (check dad_notes.txt for details)
     self.downsampshape = (8,8) # default is 20x20 (20 = 1/8 of 160)
-    if 'ER' in dconf['net']:
-      InputPopName = 'ER'
-    else:
-      InputPopName = 'EV1'
-    if dconf['net'][InputPopName] == 1600: # this is for 40x40 (40 = 1/4 of 160)
+    if dconf['net']['allpops'][self.InputPop] == 1600: # this is for 40x40 (40 = 1/4 of 160)
       self.downsampshape = (4,4)
-    elif dconf['net'][InputPopName] == 6400: # this is for 80x80 (1/2 resolution)
+    elif dconf['net']['allpops'][self.InputPop] == 6400: # this is for 80x80 (1/2 resolution)
       self.downsampshape = (2,2)
-    elif dconf['net'][InputPopName] == 25600: # this is for 160x160 (full resolution)
+    elif dconf['net']['allpops'][self.InputPop] == 25600: # this is for 160x160 (full resolution)
       self.downsampshape = (1,1)
 
   def updateInputRates (self, dsum_Images):
@@ -131,10 +123,7 @@ class AIGame:
     fr_Images = 40/(1+np.exp((np.multiply(-1,dsum_Images)+123)/25))
     fr_Images = np.subtract(fr_Images,np.min(fr_Images)) #baseline firing rate subtraction. Instead all excitatory neurons are firing at 5Hz.
     #print(np.amax(fr_Images))
-    if 'ER' in dconf['net']:
-      self.dFiringRates['ER'] = np.reshape(fr_Images,dconf['net']['ER']) #400 for 20*20, 900 for 30*30, etc.
-    else:
-      self.dFiringRates['EV1'] = np.reshape(fr_Images,dconf['net']['EV1']) #400 for 20*20, 900 for 30*30, etc.
+    self.dFiringRates[self.InputPop] = np.reshape(fr_Images,dconf['net']['allpops'][self.InputPop]) #400 for 20*20, 900 for 30*30, etc.
 
   def computeMotionFields (self, UseFull=False):
     # compute and store the motion fields and associated data
