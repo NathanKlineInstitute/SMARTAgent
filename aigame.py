@@ -81,8 +81,11 @@ class AIGame:
                                 'EV1DN': 90.0,'EV1DNW': 135.0,
                                 'EV1DW': 180.0,'EV1DSW': 235.0,
                                 'EV1DS': 270.0,'EV1DSE': 315.0})
+    self.AngRFSigma = dconf['net']['AngRFSigma']
     self.AngRFSigma2 = dconf['net']['AngRFSigma']**2 # angular receptive field (RF) sigma squared used for dir selective neuron RFs
     if self.AngRFSigma2 <= 0.0: self.AngRFSigma2=1.0
+    self.EXPDir = True
+    if 'EXPDir' in dconf['net']: self.EXPDir = dconf['net']['EXPDir']
     if 'ER' in dconf['net']:
       self.input_dim = int(np.sqrt(dconf['net']['ER'])) # input image XY plane width,height -- not used anywhere
     else:
@@ -195,13 +198,22 @@ class AIGame:
     AngRFSigma2 = self.AngRFSigma2
     MaxRate = self.dirSensitiveNeuronRate[1]
     for pop in self.ldirpop: self.dFiringRates[pop] = self.dirSensitiveNeuronRate[0] * np.ones(shape=(dirSensitiveNeuronDim,dirSensitiveNeuronDim))
-    for y in range(motiondir.shape[0]):
-      for x in range(motiondir.shape[1]):
-        if motiondir[y,x] >= 0.0: # make sure it's a valid angle
-          for pop in self.ldirpop:
-            fctr = np.exp(-1.0*(getangdiff(motiondir[y][x],dAngPeak[pop])**2)/AngRFSigma2)
-            #print('updateDirRates',pop,x,y,fctr,dAngPeak[pop],motiondir[y][x])
-            self.dFiringRates[pop][y,x] += MaxRate * fctr
+    if self.EXPDir:
+      for y in range(motiondir.shape[0]):
+        for x in range(motiondir.shape[1]):
+          if motiondir[y,x] >= 0.0: # make sure it's a valid angle
+            for pop in self.ldirpop:
+              fctr = np.exp(-1.0*(getangdiff(motiondir[y][x],dAngPeak[pop])**2)/AngRFSigma2)
+              #print('updateDirRates',pop,x,y,fctr,dAngPeak[pop],motiondir[y][x])
+              self.dFiringRates[pop][y,x] += MaxRate * fctr
+    else:
+      for y in range(motiondir.shape[0]):
+        for x in range(motiondir.shape[1]):
+          if motiondir[y,x] >= 0.0: # make sure it's a valid angle
+            for pop in self.ldirpop:
+              if abs(getangdiff(motiondir[y][x],dAngPeak[pop])) <= self.AngRFSigma:
+                self.dFiringRates[pop][y,x] = MaxRate
+              #print('updateDirRates',pop,x,y,fctr,dAngPeak[pop],motiondir[y][x])
     #print('motiondir',motiondir)
     for pop in self.ldirpop:
       self.dFiringRates[pop]=np.reshape(self.dFiringRates[pop],dirSensitiveNeuronDim**2)

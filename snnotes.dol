@@ -14992,5 +14992,342 @@ and other params same as HR test above ...
 
 ./myrun 48 sn.json
 
-started ~23:16 ...
+started ~23:16 ... hmm, that was accidentally only 1 s sim ... 
+
+*20aug3
+** discuss representations with ha
+
+09:55
+samn:meal: was looking at direction selective representations - to see if influencing outcomes
+09:55
+right now - certain directions have lower rates than / information than others
+09:56
+not sure if it's the main or even contributing problem - but think arbitrary direction RFs would be better
+09:56
+Haroon Anwar diagonals have higher rates
+09:56
+samn:meal: right, if in one of the 8 primary directions
+09:57
+if off a direction falls off
+09:57
+Haroon Anwar by arbitrary direction RFs what do you mean?
+09:57
+samn:meal: any of 360 directions with some sigma
+09:58
+Haroon Anwar you mean we could have a sigmoid where each angle could evoke different firing rates
+09:58
+?
+09:58
+samn:meal: i mean a dominant direction, and fall-off around it
+09:58
+Haroon Anwar and how many dominant directions?
+09:58
+samn:meal: for each neuron. and the dominant direction can be in any direction
+09:59
+Haroon Anwar and you want it to be random? without topology?
+09:59
+samn:meal: there can still be topology
+10:00
+Haroon Anwar i dont understand…. i think what you are suggesting would make more sense without toplogy
+10:00
+so position is already encoded by V1
+10:00
+and direction selective neurons just encode angle
+10:01
+samn:meal: each neuron would only be sensitive to motion at a particular location
+10:01
+and a direction with some fall-off
+10:01
+Haroon Anwar then we will need to have atleast 8 neurons for each location no? or how many you think would be enough
+10:02
+samn:meal: yeah, maybe so..that's a problem
+10:02
+Haroon Anwar its similar to what we have now…. i think if we dont worry about location
+10:03
+and just encode direction that should be fine too
+10:03
+why do same thing twice?
+10:03
+samn:meal: but one object can move up and another down
+10:03
+in different locations
+10:03
+shouldn't the neurons encode that information more accurately?
+10:04
+Haroon Anwar well then some neurons will encode one direction, others will encode another direction
+10:04
+and location will be in V1
+10:04
+and everything will be integrated in later stage
+10:04
+samn:meal: i agree it's possible to separate them - but will it help to reduce the info that dir selective neurons have?
+10:05
+Haroon Anwar not sure
+10:05
+so whats the problem with the other idea
+10:06
+— use a sigmoid to represent 0-360 for each location
+10:06
+samn:meal: sigmoid represents 0-360 at each location?
+10:06
+Haroon Anwar we will need to make sure that we have 8 firing rates per neuron
+10:06
+samn:meal: not sure what you mean
+10:07
+rate of the neuron represents the direction?
+10:07
+Haroon Anwar yes
+10:07
+samn:meal: that seems more difficult to decode downstream
+10:07
+Haroon Anwar yes you are right
+10:08
+i feel we have too many neurons encoding direction
+10:09
+also not sure what R is doing? other than converging input space
+10:10
+could drive V1 directly using poisson processes
+10:10
+as we are doing for direction selective neurons
+10:10
+samn:meal: i agree about both
+10:10
+Haroon Anwar its just relaying infor
+10:11
+i think goal is to speedup things while retaining max info
+10:11
+samn:meal: i thought R was used just to allow use of variable rate based on location
+10:11
+ER
+10:11
+but no point having two pops that have same info
+10:12
+Haroon Anwar i think they have same info
+10:12
+can double check
+10:15
+samn:meal: ok sg
+10:15
+for dir selective - still unclear what's best
+10:16
+Haroon Anwar yes
+10:16
+ok if same info, i will use an option for R and IR neurons
+10:17
+atleast it will reduce 500 neurons
+10:17
+samn:meal: yeah, seems worthwhile
+
+** discuss corner cases with ha
+
+main problem in losing points is the corners - for some reason model doesn't perform well when ball goes to top or bottom corner
+10:23
+any insight into why?
+10:24
+also, before you make changes to ER/IR, i'll merge dev code into main so we can work from same code
+10:24
+Haroon Anwar ok
+10:24
+you mean top/bottom corners?
+10:24
+samn:meal: yeah, top right, bottom right
+10:25
+Haroon Anwar probably should look at firing rates for those instances and compare it to rest
+10:25
+samn:meal: yeah, some of that analysis code sounded useful for it
+10:25
+Haroon Anwar may be it has something to do with less input drive
+10:26
+samn:meal: is it pushed/useful/etc.?
+10:26
+Haroon Anwar not pushed… i have it in script form. let me add as a function in simdat.py
+10:27
+samn:meal: ok, and can check some of those cases ... should push more regularly, otherwise code will diverge more and more
+10:27
+Haroon Anwar k
+10:28
+i will check those cases
+
+** check perf from 20jul29_testL0_gcp__step_4_
+
+python -i simdat.py backupcfg/20jul29_testL0_gcp__step_4_sim.json
+
+lfn = ['20jul15_testG0_gcp_','20jul16_testG1_gcp_', '20jul17_testG2_gcp__step_0_','20jul17_testG2_gcp__step_1_','20jul17_testG2_gcp__step_2_','20jul17_testG2_gcp__step_3_','20jul17_testG2_gcp__step_4_','20jul17_testG2_gcp__step_5_','20jul29_testL0_gcp__step_0_','20jul29_testL0_gcp__step_1_','20jul29_testL0_gcp__step_2_','20jul29_testL0_gcp__step_3_','20jul29_testL0_gcp__step_4_']
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0,.55))
+plot([np.amax(pdac.time)-10000e3,np.amax(pdac.time)-10000e3],[0,.55],'--',color='black') # change in rewards
+savefig('gif/'+dstr+simstr+'perf_all_steps_so_far.png') # gif/20aug3_20jul29_testL0_gcp__step_4_perf_all_steps_so_far.png
+
+performance falling off ...
+
+lpda = getindivactionreward(lfn)
+ax=plotPerf(lpda[-1],yl=(0,.55))
+savefig('gif/'+dstr+simstr+'perf.png') # gif/20aug3_20jul29_testL0_gcp__step_4_perf.png
+perf lower than before ...
+
+probably no point continuing this run ... until figure out what's leading to perf decay...
+
+what if model only received rewards, instead of rewards + punishments? would the weights stay close to
+starting values and then learn further?
+
+** check perf of 20jul30_U0_gcp__step_4_ and 20jul30_U0_gcp__step_5_
+
+python -i simdat.py backupcfg/20jul30_U0_gcp__step_4_sim.json
+
+ax=plotPerf(actreward,yl=(0,.55))
+savefig('gif/'+dstr+simstr+'perf.png') # gif/20aug3_20jul30_U0_gcp__step_4_perf.png
+
+lfn = ['20jul30_U0_gcp__step_0_','20jul30_U0_gcp__step_1_','20jul30_U0_gcp__step_2_','20jul30_U0_gcp__step_3_','20jul30_U0_gcp__step_4_']
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0,.55))
+
+savefig('gif/'+dstr+simstr+'perf_all_steps_so_far.png') # gif/20aug3_20jul30_U0_gcp__step_4_perf_all_steps_so_far.png
+
+seems to have reached a plateau ... and probably will not pass it ... 
+will let next step (almost done) finish, to check...
+
+python -i simdat.py backupcfg/20jul30_U0_gcp__step_5_sim.json
+
+ax=plotPerf(actreward,yl=(0,.55))
+savefig('gif/'+dstr+simstr+'perf.png') # gif/20aug3_20jul30_U0_gcp__step_5_perf.png
+
+lfn = ['20jul30_U0_gcp__step_0_','20jul30_U0_gcp__step_1_','20jul30_U0_gcp__step_2_','20jul30_U0_gcp__step_3_','20jul30_U0_gcp__step_4_','20jul30_U0_gcp__step_5_']
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0,.55))
+
+savefig('gif/'+dstr+simstr+'perf_all_steps_so_far.png') # gif/20aug3_20jul30_U0_gcp__step_5_perf_all_steps_so_far.png
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((1990e3,2000e3))
+savefig('gif/'+dstr+simstr+'rast.png') # gif/20aug3_20jul30_U0_gcp__step_5_rast.png
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','IM'],tlim=(1990e3,2000e3))
+savefig('gif/'+dstr+simstr+'Vm.png') # gif/20aug3_20jul30_U0_gcp__step_5_Vm.png
+
+** simple change to AngRF
+
+allow all directions within AngRFSigma of one of the 8 primary directions to have MaxRate
+
+option specified with EXPDir (default is 1, not needed to be in the json file)
+
+cp backupcfg/20jul30_U0_gcp_sim.json sn.json
+
+then adjust ...
+
+        "name": "20aug3_U0_noEXPDir_gcp_",
+	"EXPDir": 0,
+
+./myrun 30 sn.json
+
+python -i simdat.py backupcfg/20aug3_U0_noEXPDir_gcp_sim.json
+
+ax=plotPerf(actreward,yl=(0,.55))
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values()))))
+
+lpop = ['ER', 'EV1DNW', 'EV1DN', 'EV1DNE','EV1', 'IR', 'EV1DW','EV1DE','IV1','EMUP','EV1DSW', 'EV1DS', 'EV1DSE','IM','EMDOWN', ]  
+dact = getdActMap(totalDur, tstepPerAction, dspkT, dspkID, dnumc, dstartidx, lpop)
+fig, axs, plt = animActivityMaps(lpop=lpop)
+
+looked ok in short run ... try 2000 s run to compare against 20jul30_U0_gcp_
+
+./myrun 30 sn.json
+
+** check 20aug2_HRTest3_cycle__step_0_
+
+python -i simdat.py backupcfg/20aug2_HRTest3_cycle__step_0_sim.json
+
+ax=plotPerf(actreward,yl=(0,1.))
+savefig('gif/'+dstr+simstr+'perf.png') # gif/20aug3_20aug2_HRTest3_cycle__step_0_perf.png
+
+no clear improvement overall, highly variable ... so that probably just reflects where the ball
+is getting hit to by opponent ... 
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((990e3,1000e3))
+savefig('gif/'+dstr+simstr+'rast.png') # gif/20aug3_20aug2_HRTest3_cycle__step_0_rast.png
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','IM'],tlim=(990e3,1000e3))
+savefig('gif/'+dstr+simstr+'Vm.png') # gif/20aug3_20aug2_HRTest3_cycle__step_0_Vm.png
+
+lfn = ['20jul30_HRTest0_cycle_', '20jul31_HRTest1_cycle_','20aug1_HRTest2_cycle_','20aug2_HRTest3_cycle__step_0_']
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0,.55))
+savefig('gif/'+dstr+simstr+'perf_all_steps_so_far.png') # gif/20aug3_20aug2_HRTest3_cycle__step_0_perf_all_steps_so_far.png
+
+InputImages.shape # (50000, 40, 40)
+
+fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4') # gif/20aug3_20aug2_HRTest3_cycle__step_0__input.mp4
+
+** rerun halftest (100 s; "name": "20aug3_HalfTest0_cycle_")
+
+./myrun 48 sn.json
+
+*20aug4
+** check 20aug3_U0_noEXPDir_gcp_
+
+python -i simdat.py backupcfg/20aug3_U0_noEXPDir_gcp_sim.json
+
+ax=plotPerf(actreward,yl=(0,1.))
+savefig('gif/'+dstr+simstr+'perf.png') # gif/20aug4_20aug3_U0_noEXPDir_gcp_perf.png
+looks about as good as the others ... 
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((1990e3,2000e3))
+savefig('gif/'+dstr+simstr+'rast.png') # gif/20aug4_20aug3_U0_noEXPDir_gcp_rast.png
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','IM'],tlim=(1990e3,2000e3))
+savefig('gif/'+dstr+simstr+'Vm.png') # gif/20aug4_20aug3_U0_noEXPDir_gcp_Vm.png
+
+and how does performance compare to the sim with exp fall-off for angrf?
+
+lfn = ['20jul30_U0_gcp__step_0_', '20aug3_U0_noEXPDir_gcp_']
+lpda = getindivactionreward(lfn)
+clf(); plotComparePerf(lpda,['b','r'],yl=(0,.55),lleg=lfn)
+savefig('gif/'+dstr+simstr+'compare_perf.png') # gif/20aug4_20aug3_U0_noEXPDir_gcp_compare_perf.png
+
+hmm, identical - had a mistake in aigame.py was not reading the value ... will have to rerun ...
+
+        "name": "20aug4_U0_noEXPDir_gcp_",
+
+./myrun 30 sn.json
+
+stopped firing, so will stop this one ... 
+
+** check output from 20jul30_U0_gcp__step_6_
+
+python -i simdat.py backupcfg/20jul30_U0_gcp__step_6_sim.json
+
+ax=plotPerf(actreward,yl=(0,.55))
+savefig('gif/'+dstr+simstr+'perf.png') # gif/20aug4_20jul30_U0_gcp__step_6_perf.png
+similar to before - nonuniform, but mostly flat
+
+lfn = ['20jul30_U0_gcp__step_0_','20jul30_U0_gcp__step_1_','20jul30_U0_gcp__step_2_','20jul30_U0_gcp__step_3_','20jul30_U0_gcp__step_4_','20jul30_U0_gcp__step_5_','20jul30_U0_gcp__step_6_']
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0,.55))
+
+savefig('gif/'+dstr+simstr+'perf_all_steps_so_far.png') # gif/20aug4_20jul30_U0_gcp__step_6_perf_all_steps_so_far.png
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((1990e3,2000e3))
+savefig('gif/'+dstr+simstr+'rast.png') # gif/20aug4_20jul30_U0_gcp__step_6_rast.png
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','IM'],tlim=(1990e3,2000e3))
+savefig('gif/'+dstr+simstr+'Vm.png') # gif/20aug4_20jul30_U0_gcp__step_6_Vm.png
+
+will probably stop this one since planning some adjustments to network with HA that should improve perf...
+
+** check 20aug3_HalfTest0_cycle_
+
+python -i simdat.py backupcfg/20aug3_HalfTest0_cycle_sim.json
+
+ax=plotPerf(actreward,yl=(0,1.))
+savefig('gif/'+dstr+simstr+'perf.png') # gif/20aug4_20aug3_HalfTest0_cycle_perf.png
+
+hmm, neurons did not fire??
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((90e3,100e3))
+savefig('gif/'+dstr+simstr+'rast.png') # gif/20aug4_20aug3_HalfTest0_cycle_rast.png
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','IM'],tlim=((90e3,100e3))
+savefig('gif/'+dstr+simstr+'Vm.png') # gif/20aug4_20aug3_HalfTest0_cycle_Vm.png
+
+so the weights were too low . . .
+
+** stopped HRTest multistep -- well restart after other changes to net
 
