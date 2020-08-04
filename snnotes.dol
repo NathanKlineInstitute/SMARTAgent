@@ -15288,3 +15288,27 @@ hmm, identical - had a mistake in aigame.py was not reading the value ... will h
 
 ./myrun 30 sn.json
 
+stopped firing, so will stop this one ... 
+
+** check output from 20jul30_U0_gcp__step_6_
+
+python -i simdat.py backupcfg/20jul30_U0_gcp__step_6_sim.json
+
+ax=plotPerf(actreward,yl=(0,.55))
+savefig('gif/'+dstr+simstr+'perf.png') # gif/20aug4_20jul30_U0_gcp__step_6_perf.png
+similar to before - nonuniform, but mostly flat
+
+lfn = ['20jul30_U0_gcp__step_0_','20jul30_U0_gcp__step_1_','20jul30_U0_gcp__step_2_','20jul30_U0_gcp__step_3_','20jul30_U0_gcp__step_4_','20jul30_U0_gcp__step_5_','20jul30_U0_gcp__step_6_']
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0,.55))
+
+savefig('gif/'+dstr+simstr+'perf_all_steps_so_far.png') # gif/20aug4_20jul30_U0_gcp__step_6_perf_all_steps_so_far.png
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((1990e3,2000e3))
+savefig('gif/'+dstr+simstr+'rast.png') # gif/20aug4_20jul30_U0_gcp__step_6_rast.png
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','IM'],tlim=(1990e3,2000e3))
+savefig('gif/'+dstr+simstr+'Vm.png') # gif/20aug4_20jul30_U0_gcp__step_6_Vm.png
+
+will probably stop this one since planning some adjustments to network with HA that should improve perf...
+
