@@ -15395,3 +15395,13 @@ ok, run longer ... 2000 s ...
 
 started ~16:20 ...
 
+** also compare with cross prob (between EMDOWN,EMUP);         "name": "20aug4_B0_cycle_",
+
+        "EEMRecProbCross": 1,
+
+everything else same as 20aug4_A0_cycle_
+
+./myrun 30 sn.json
+
+started ~16:25 ...
+
