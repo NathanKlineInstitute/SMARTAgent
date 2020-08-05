@@ -37,7 +37,7 @@
         "ResumeSimFromFile": "data/20jul29_testL0_gcp__step_0_synWeights_final.pkl"
     },
     "sim": {
-        "duration": 2000000,
+        "duration": 250,
         "dt": 0.2,
         "verbose": 0,
         "recordStep": 0.6,
@@ -46,7 +46,7 @@
         "RLFakeUpRule": 0,
         "RLFakeDownRule": 0,
         "RLFakeStayRule": 0,
-        "name": "20aug4_B0_cycle_",
+        "name": "20aug5_I0_lp_",
         "doquit": 0,
         "doplot": 1,
         "saveCellSecs": 0,

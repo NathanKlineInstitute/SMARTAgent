@@ -15405,3 +15405,8 @@ everything else same as 20aug4_A0_cycle_
 
 started ~16:25 ...
 
+*20aug5
+** fixup INTF for use in net
+
+        "name": "20aug5_I0_lp_",
+
