@@ -37,7 +37,7 @@
         "ResumeSimFromFile": "data/20jul29_testL0_gcp__step_0_synWeights_final.pkl"
     },
     "sim": {
-        "duration": 250,
+        "duration": 1000,
         "dt": 0.2,
         "verbose": 0,
         "recordStep": 0.6,
@@ -60,6 +60,14 @@
         "useTopological": 0
     },
     "net": {
+	"stimModInputW": 0.5,
+	"stimModDirW": 0.1,
+	"EEGain": 50.0,
+	"EIGain": 50.0,
+	"IEGain": 1.0,
+	"IIGain": 1.0,
+	"ECellModel": "Friesen",
+	"ICellModel": "Friesen",
         "scale": 1,
 	"allpops": {
 	    "ER":0,

@@ -5,7 +5,7 @@
 from neuron import h
 
 class FCELL:
-  def __init__ (self,ID,ty,col=0,poflag=0):
+  def __init__ (self,ID,ty,col=0,poflag=False):
     self.ID=ID
     self.ty=ty
     self.col=col

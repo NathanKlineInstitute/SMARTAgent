@@ -156,27 +156,34 @@ if 'AMPAI' in dconf['RL']: dSTDPparamsRL['AMPAI'] = dconf['RL']['AMPAI']
 
 # these are the image-based inputs provided to the R (retinal) cells
 netParams.stimSourceParams['stimMod'] = {'type': 'NetStim', 'rate': 'variable', 'noise': 0}
+
+stimModInputW = 0.05
+if 'stimModInputW' in dconf['net']: stimModInputW = dconf['net']['stimModInputW']
+stimModDirW = 0.01
+if 'stimModDirW' in dconf['net']: stimModDirW = dconf['net']['stimModDirW']
+
 if dnumc['ER']>0:
   netParams.stimTargetParams['stimMod->R'] = {'source': 'stimMod',
           'conds': {'pop': 'ER'},
           'convergence': 1,
-          'weight': 0.05,
+          'weight': stimModInputW,
           'delay': 1,
           'synMech': 'AMPA'}
 else:
   netParams.stimTargetParams['stimMod->V1'] = {'source': 'stimMod',
           'conds': {'pop': 'EV1'},
           'convergence': 1,
-          'weight': 0.05,
+          'weight': stimModInputW,
           'delay': 1,
           'synMech': 'AMPA'}
   
 netParams.stimTargetParams['stimMod->DirSelInput'] = {'source': 'stimMod',
         'conds': {'pop': ['EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE']},
         'convergence': 1,
-        'weight': 0.01,
+        'weight': stimModDirW,
         'delay': 1,
         'synMech': 'AMPA'}
+
 #background input to inhibitory neurons to increase their firing rate
 
 # Stimulation parameters
