@@ -4437,4 +4437,33 @@ def setdminID (sim, lpop):
     if critic != 0: 
     .......... # previous code
 
--- run 10 sec sim using anticipatedRL in "20aug06_A0_falcor_ARL_"... still using probabilistic connections.
+-- run 10 sec sim using anticipatedRL in "20aug04_A0_cycle_" on falcor... still using probabilistic connections.
+
+-- run 1000 sec sim using anticipatedRL in "20aug06_A0_falcor_" on falcor... still using probabilistic connections.
+
+-- tuning parameters to run with topological connectivity in "20aug06_B0_falcor_"
+
+        "EEMWghtAM": 5e-05, --> premotor to motor connection strengths. --->
+        "EEMWghtNM": 5e-06,
+        "EEPreMWghtAM": 8e-05,
+        "EEPreMWghtNM": 2.5e-06,
+        "EEMWghtThreshMin": 6.25e-06,
+        "EEMWghtThreshMax": 0.00032,
+        "EEMProb": 0.3,
+        "EEMRecProb": 0.3,
+        "EEPreMProb": 0.0,
+        "EEMPopNorm": 1,
+        "EEMRecProbCross": 0,
+        "EEMFeedbackProb": 0.0,
+        "EEMFeedbackWghtAM": 1.25e-05,
+        "EEMFeedbackWghtNM": 1.25e-06,
+        "VisualFeedback": 0,
+        "weightVar": 0.5
+
+-- run 100 sec sim in "20aug06_B1_falcor_" with topological connectivity and "EEMWghtAM": 5e-3, EMDOWN=400 and EMUP = 400
+
+-- analysis functions modified... should work with any number of neurons in M.
+
+analyzeRepeatedInputSequences(dact,dnumc,InputImages, targetPixel=(10,10),nbseq=14,targetCorr=0.9)
+-- plotting fix number of sequences 1-10.... should be able to plot any 10. will modify later.
+analyzeRepeatedInputForSingleEvent(dact, dnumc, InputImages, targetPixel=(10,10))

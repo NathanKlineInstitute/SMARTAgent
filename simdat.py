@@ -1128,17 +1128,18 @@ def getpopinputmap (pdf, t, dnumc, dstartidx, dendidx, poty, asweight=True):
         dout[k] += drfmap[k]
   return dout  
 
-def analyzeRepeatedInputSequences(dact, InputImages, targetPixel=(10,10),nbseq=14,targetCorr=0.9):
+def analyzeRepeatedInputSequences(dact,dnumc,InputImages, targetPixel=(10,10),nbseq=14,targetCorr=0.9):
   midInds = np.where(InputImages[:,targetPixel[0],targetPixel[1]]>250)
   # for each midInd, find 14 (13 could be enough but i am not sure) consecutive Images to see the trajectory. 
-  seqInputs = np.zeros((int(len(midInds[0])/2),nbseq,20,20),dtype=float)
+  seqInputs = np.zeros((int(len(midInds[0])/2),nbseq,InputImages.shape[0],InputImages.shape[1]),dtype=float)
   seqActions = np.zeros((int(len(midInds[0])/2),nbseq),dtype=float)
   seqPropActions = np.zeros((int(len(midInds[0])/2),nbseq),dtype=float)
   seqRewards = np.zeros((int(len(midInds[0])/2),nbseq),dtype=float)
   seqHitMiss = np.zeros((int(len(midInds[0])/2),nbseq),dtype=float)
-  seqOutputsUP = np.zeros((int(len(midInds[0])/2),nbseq,5,5),dtype=float)
-  seqOutputsDOWN = np.zeros((int(len(midInds[0])/2),nbseq,5,5),dtype=float)
-  seqOutputsSTAY = np.zeros((int(len(midInds[0])/2),nbseq,5,5),dtype=float)
+  seqOutputsUP = np.zeros((int(len(midInds[0])/2),nbseq,dact['EMUP'].shape[1],dact['EMUP'].shape[2]),dtype=float)
+  seqOutputsDOWN = np.zeros((int(len(midInds[0])/2),nbseq,dact['EMDOWN'].shape[1],dact['EMDOWN'].shape[2]),dtype=float)
+  if dnumc['EMSTAY']>0:
+    seqOutputsSTAY = np.zeros((int(len(midInds[0])/2),nbseq,dact['EMSTAY'].shape[1],dact['EMSTAY'].shape[2]),dtype=float)
   count = 0
   for i in range(0,len(midInds[0]),2):
     cmidInd = midInds[0][i]
@@ -1150,7 +1151,8 @@ def analyzeRepeatedInputSequences(dact, InputImages, targetPixel=(10,10),nbseq=1
       seqHitMiss[count,j] = actreward['hit'][cmidInd+j]
       seqOutputsUP[count,j,:,:] = dact['EMUP'][cmidInd+j,:,:]
       seqOutputsDOWN[count,j,:,:] = dact['EMDOWN'][cmidInd+j,:,:]
-      seqOutputsSTAY[count,j,:,:] = dact['EMSTAY'][cmidInd+j,:,:]
+      if dnumc['EMSTAY']>0:
+        seqOutputsSTAY[count,j,:,:] = dact['EMSTAY'][cmidInd+j,:,:]
     count = count + 1
   # now i have all inputs, outputs, actions and proposed etc for all inputs where the ball starts in the middle of the screen.
   # But i need to pick up the sequences which are exactly like one another.  
@@ -1169,9 +1171,9 @@ def analyzeRepeatedInputSequences(dact, InputImages, targetPixel=(10,10),nbseq=1
   seqHitMiss4comp = seqHitMiss[goodInds,:]
   seqOutputsUP4comp = seqOutputsUP[goodInds,:,:,:]
   seqOutputsDOWN4comp = seqOutputsDOWN[goodInds,:,:,:]
-  seqOutputsSTAY4comp = seqOutputsSTAY[goodInds,:,:,:]
+  if dnumc['EMSTAY']>0:
+    seqOutputsSTAY4comp = seqOutputsSTAY[goodInds,:,:,:]
   lSeqNBs4comp = [0,1,2,3,4,5,6,7,8,9,10]
-
   fig, axs = plt.subplots(6, 5, figsize=(10,8));
   lax = axs.ravel()
   for i in range(5):
@@ -1180,7 +1182,8 @@ def analyzeRepeatedInputSequences(dact, InputImages, targetPixel=(10,10),nbseq=1
     lax[i].axis('off')
     lax[i+5].plot(np.sum(np.sum(seqOutputsUP4comp,axis=2),axis=2)[cSeq],'b-o',markersize=3)
     lax[i+5].plot(np.sum(np.sum(seqOutputsDOWN4comp,axis=2),axis=2)[cSeq],'r-o',markersize=3)
-    lax[i+5].plot(np.sum(np.sum(seqOutputsSTAY4comp,axis=2),axis=2)[cSeq],'g-o',markersize=3)
+    if dnumc['EMSTAY']>0:
+      lax[i+5].plot(np.sum(np.sum(seqOutputsSTAY4comp,axis=2),axis=2)[cSeq],'g-o',markersize=3)
     if i==0: lax[i+5].set_ylabel('# of pop spikes')
     lax[i+10].plot(seqActions4comp[cSeq,:],'-o',color=(0,0,0,1),markersize=3)
     lax[i+10].plot(seqPropActions[cSeq,:],'-o',color=(0.5,0.5,0.5,1),markersize=3)
@@ -1191,17 +1194,21 @@ def analyzeRepeatedInputSequences(dact, InputImages, targetPixel=(10,10),nbseq=1
     lax[i+15].axis('off')
     lax[i+20].plot(np.sum(np.sum(seqOutputsUP4comp,axis=2),axis=2)[cSeq],'b-o',markersize=3)
     lax[i+20].plot(np.sum(np.sum(seqOutputsDOWN4comp,axis=2),axis=2)[cSeq],'r-o',markersize=3)
-    lax[i+20].plot(np.sum(np.sum(seqOutputsSTAY4comp,axis=2),axis=2)[cSeq],'g-o',markersize=3)
+    if dnumc['EMSTAY']>0:
+      lax[i+20].plot(np.sum(np.sum(seqOutputsSTAY4comp,axis=2),axis=2)[cSeq],'g-o',markersize=3)
     if i==0: lax[i+20].set_ylabel('# of pop spikes')
     lax[i+25].plot(seqActions4comp[cSeq,:],'-o',color=(0,0,0,1),markersize=3)
     lax[i+25].plot(seqPropActions[cSeq,:],'-o',color=(0.5,0.5,0.5,1),markersize=3)
     lax[i+25].set_yticks([1,3,4])
     if i==0: lax[i+25].set_yticklabels(['STAY','DOWN','UP'])
-  lax[i+5].legend(['UP','DOWN','STAY'],loc='best')
+  if dnumc['EMSTAY']>0:
+    lax[i+5].legend(['UP','DOWN','STAY'],loc='best')
+  else:
+    lax[i+5].legend(['UP','DOWN'],loc='best')
   lax[i+10].legend(['Actions','Proposed'],loc='best')
 
 
-def analyzeRepeatedInputForSingleEvent(dact, InputImages, targetPixel=(10,10)):
+def analyzeRepeatedInputForSingleEvent(dact, dnumc, InputImages, targetPixel=(10,10)):
   midInds = np.where(InputImages[:,targetPixel[0],targetPixel[1]]>250)
   # for each midInd, find 14 (13 could be enough but i am not sure) consecutive Images to see the trajectory. 
   seqInputs = np.zeros((int(len(midInds[0])/2),20,20),dtype=float)
@@ -1209,9 +1216,10 @@ def analyzeRepeatedInputForSingleEvent(dact, InputImages, targetPixel=(10,10)):
   seqPropActions = np.zeros((int(len(midInds[0])/2)),dtype=float)
   seqRewards = np.zeros((int(len(midInds[0])/2)),dtype=float)
   seqHitMiss = np.zeros((int(len(midInds[0])/2)),dtype=float)
-  seqOutputsUP = np.zeros((int(len(midInds[0])/2),5,5),dtype=float)
-  seqOutputsDOWN = np.zeros((int(len(midInds[0])/2),5,5),dtype=float)
-  seqOutputsSTAY = np.zeros((int(len(midInds[0])/2),5,5),dtype=float)
+  seqOutputsUP = np.zeros((int(len(midInds[0])/2),dact['EMUP'].shape[1],dact['EMUP'].shape[2]),dtype=float)
+  seqOutputsDOWN = np.zeros((int(len(midInds[0])/2),dact['EMDOWN'].shape[1],dact['EMDOWN'].shape[2]),dtype=float)
+  if dnumc['EMSTAY']>0:
+    seqOutputsSTAY = np.zeros((int(len(midInds[0])/2),dact['EMSTAY'].shape[1],dact['EMSTAY'].shape[2]),dtype=float)
   count = 0
   for i in range(0,len(midInds[0]),2):
     cmidInd = midInds[0][i]
@@ -1222,11 +1230,13 @@ def analyzeRepeatedInputForSingleEvent(dact, InputImages, targetPixel=(10,10)):
     seqHitMiss[count] = actreward['hit'][cmidInd]
     seqOutputsUP[count,:,:] = dact['EMUP'][cmidInd,:,:]
     seqOutputsDOWN[count,:,:] = dact['EMDOWN'][cmidInd,:,:]
-    seqOutputsSTAY[count,:,:] = dact['EMSTAY'][cmidInd,:,:]
+    if dnumc['EMSTAY']>0:
+      seqOutputsSTAY[count,:,:] = dact['EMSTAY'][cmidInd,:,:]
     count = count + 1
   FR_UP = np.sum(np.sum(seqOutputsUP,axis=1),axis=1)
   FR_DOWN = np.sum(np.sum(seqOutputsDOWN,axis=1),axis=1)
-  FR_STAY = np.sum(np.sum(seqOutputsSTAY,axis=1),axis=1)
+  if dnumc['EMSTAY']>0:
+    FR_STAY = np.sum(np.sum(seqOutputsSTAY,axis=1),axis=1)
   fig, axs = plt.subplots(2, 3, figsize=(12,7));
   lax = axs.ravel()
   lax[0].imshow(np.sum(seqInputs,axis=0))
@@ -1243,8 +1253,9 @@ def analyzeRepeatedInputForSingleEvent(dact, InputImages, targetPixel=(10,10)):
   lax[3].set_xlabel('# of EMUP spikes')
   lax[4].hist(FR_DOWN)
   lax[4].set_xlabel('# of EMDOWN spikes')
-  lax[5].hist(FR_STAY)
-  lax[5].set_xlabel('# of EMSTAY spikes')
+  if dnumc['EMSTAY']>0:
+    lax[5].hist(FR_STAY)
+    lax[5].set_xlabel('# of EMSTAY spikes')
   #
   fig, axs = plt.subplots(4, 1, figsize=(10,8));
   lax = axs.ravel()
@@ -1252,7 +1263,8 @@ def analyzeRepeatedInputForSingleEvent(dact, InputImages, targetPixel=(10,10)):
   lax[0].axis('off')
   lax[1].plot(np.sum(np.sum(seqOutputsUP,axis=1),axis=1),'b-o',markersize=3)
   lax[1].plot(np.sum(np.sum(seqOutputsDOWN,axis=1),axis=1),'r-o',markersize=3)
-  lax[1].plot(np.sum(np.sum(seqOutputsSTAY,axis=1),axis=1),'g-o',markersize=3)
+  if dnumc['EMSTAY']>0:
+    lax[1].plot(np.sum(np.sum(seqOutputsSTAY,axis=1),axis=1),'g-o',markersize=3)
   lax[1].set_ylabel('# of pop spikes')
   lax[2].plot(seqActions,'-o',color=(0,0,0,1),markersize=3)
   lax[2].plot(seqPropActions,'-o',color=(0.5,0.5,0.5,1),markersize=3)
@@ -1262,7 +1274,10 @@ def analyzeRepeatedInputForSingleEvent(dact, InputImages, targetPixel=(10,10)):
   lax[3].plot(seqHitMiss,'-o',color=(0.5,0.5,0.5,1),markersize=3)
   lax[3].set_yticks([-1,0,1])
   lax[3].legend(['Rewards','Hit/Moss'])
-  lax[1].legend(['UP','DOWN','STAY'],loc='best')
+  if dnumc['EMSTAY']>0:
+    lax[1].legend(['UP','DOWN','STAY'],loc='best')
+  else:
+    lax[1].legend(['UP','DOWN'],loc='best')
   lax[2].legend(['Actions','Proposed'],loc='best')
 
 """
