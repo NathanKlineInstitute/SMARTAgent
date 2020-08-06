@@ -15395,3 +15395,46 @@ ok, run longer ... 2000 s ...
 
 started ~16:20 ...
 
+** also compare with cross prob (between EMDOWN,EMUP);         "name": "20aug4_B0_cycle_",
+
+        "EEMRecProbCross": 1,
+
+everything else same as 20aug4_A0_cycle_
+
+./myrun 30 sn.json
+
+started ~16:25 ...
+
+*20aug5
+** fixup INTF for use in net -->> did not work yet
+** try friesen cell
+
+        "name": "20aug5_F0_gcp_",
+
+python -i simdat.py backupcfg/20aug5_F0_gcp_sim.json
+
+ax=plotPerf(actreward,yl=(0,1.))
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); 
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','IM'])
+
+got somewhat decent rates after adjusting gains ... and adding friesen FS cell
+to cells/friesen.py ... note that these cells have explicit refrac period ...
+
+not sure if they'll be faster than mainen cells, but interesting to compare
+across the cell types to see if results ~consistent ...
+
+try it out ...
+
+./myrun 30 sn.json
+
+started ~22:50 ...
+
+** another friesen sim with cross EM connect (to compare to sims run on cycle recently)
+
+        "name": "20aug5_F0_cross_gcp_",
+	"EEMRecProbCross": 1,
+
+./myrun 30 sn.json
+
