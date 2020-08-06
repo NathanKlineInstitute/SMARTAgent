@@ -288,10 +288,10 @@ cfg.EEGain = 1.0  # E to E scaling factor
 cfg.EIGain = 1.0 # E to I scaling factor
 cfg.IEGain = 1.0 # I to E scaling factor
 cfg.IIGain = 1.0  # I to I scaling factor
-if 'EEGain' in dconf['net']: EEGain = dconf['net']['EEGain']
-if 'EIGain' in dconf['net']: EIGain = dconf['net']['EIGain']
-if 'IEGain' in dconf['net']: IEGain = dconf['net']['IEGain']
-if 'IIGain' in dconf['net']: IIGain = dconf['net']['IIGain']
+if 'EEGain' in dconf['net']: cfg.EEGain = dconf['net']['EEGain']
+if 'EIGain' in dconf['net']: cfg.EIGain = dconf['net']['EIGain']
+if 'IEGain' in dconf['net']: cfg.IEGain = dconf['net']['IEGain']
+if 'IIGain' in dconf['net']: cfg.IIGain = dconf['net']['IIGain']
 
 ### from https://www.neuron.yale.edu/phpBB/viewtopic.php?f=45&t=3770&p=16227&hilit=memory#p16122
 cfg.saveCellSecs = bool(dconf['sim']['saveCellSecs']) # if False removes all data on cell sections prior to gathering from nodes
