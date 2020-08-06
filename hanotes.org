@@ -4404,3 +4404,35 @@ def setdminID (sim, lpop):
 
   -- added capability in script to remove 'ER' and 'IR' from simulation so that V1 is directly driven by the stimMod.
   -- simdat.py needs adjustment accordingly. 
+
+  -- running 1000 sec sim in "20aug05_B0_cycle" with 100 ms step and no ER and no IR.
+  -- changed parameters in sim.json based on sn.json
+
+  -- Why do we apply RL to the pop which produced action and why not apply RL to the pop which is expected to produce CORRECT action.
+  -- Is the reason for above choice is because applying reward/punishment to the pop which is expected to produce CORRECT action because its nonbiological?
+
+
+
+  -- add "anticipatedRL": 0 in "sim"
+  
+  * 20aug06
+
+  -- added rule for "anticipatedRL" as shown below
+
+  if dconf['sim']['anticipatedRL']==1:
+    for cpaction in proposed_actions:
+      anticipated_reward = dconf['rewardcoded']['followTarget']
+      if cpaction==dconf['moves']['UP']:
+        if dconf['verbose']: print('APPLY RL to EMUP')
+        for STDPmech in dSTDPmech['EMUP']: STDPmech.reward_punish(float(anticipated_reward))
+      elif cpaction==dconf['moves']['DOWN']:
+        if dconf['verbose']: print('APPLY RL to EMDOWN')
+        for STDPmech in dSTDPmech['EMDOWN']: STDPmech.reward_punish(float(anticipated_reward))
+      elif cpaction==dconf['moves']['STAY'] and dnumc['EMSTAY']>0:
+        if dconf['verbose']: print('APPLY RL to EMSTAY')
+        for STDPmech in dSTDPmech['EMSTAY']: STDPmech.reward_punish(float(anticipated_reward))
+      else:
+        print('No anticipated action for the input!!!')
+  else:
+    if critic != 0: 
+    .......... # previous code
