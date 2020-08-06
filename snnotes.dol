@@ -15504,6 +15504,25 @@ continue as B1 ...
 
 started ~10:41 ...
 
+** friesen sims on gcp - not much firing
+
+the starting weights would need to be adjusted to produce anything meaningful
+stopped the sims
+
+** other sims on gcp
+***  20aug6_A0_gcp_
+
+same as 20aug4_A0_cycle_ but without targetted RL
+
+./myrun 32 sn.json
+
+*** same as 20aug4_B0_cycle_ but without targetted RL
+
+same as 20aug4_B0_cycle_ but without targetted RL
+
+./myrun 32 sn.json
+
+
 ** better performance metrics
 
 could look at performance over time, given similar inputs
