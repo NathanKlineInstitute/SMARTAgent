@@ -4467,3 +4467,7 @@ def setdminID (sim, lpop):
 analyzeRepeatedInputSequences(dact,dnumc,InputImages, targetPixel=(10,10),nbseq=14,targetCorr=0.9)
 -- plotting fix number of sequences 1-10.... should be able to plot any 10. will modify later.
 analyzeRepeatedInputForSingleEvent(dact, dnumc, InputImages, targetPixel=(10,10))
+
+-- debugged and using dictionaries now.
+analyzeRepeatedInputSequences(dact, InputImages, targetPixel=(10,10),nbseq=14,targetCorr=0.9)
+analyzeRepeatedInputForSingleEvent(dact, InputImages, targetPixel=(10,10))
