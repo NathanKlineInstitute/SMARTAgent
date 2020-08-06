@@ -37,7 +37,7 @@
         "ResumeSimFromFile": "data/20jul29_testL0_gcp__step_0_synWeights_final.pkl"
     },
     "sim": {
-        "duration": 1000,
+        "duration": 10000,
         "dt": 0.2,
         "verbose": 0,
         "recordStep": 0.6,
@@ -98,8 +98,8 @@
 	"EXPDir": 1,
         "DirMinRate": 0.0,
         "DirMaxRate": 50.0,
-        "EEMWghtAM": 5e-05,
-        "EEMWghtNM": 5e-06,
+        "EEMWghtAM": 10e-05,
+        "EEMWghtNM": 10e-06,
         "EEPreMWghtAM": 8e-05,
         "EEPreMWghtNM": 2.5e-06,
         "EEMWghtThreshMin": 6.25e-06,
@@ -123,7 +123,7 @@
             "RLlenhebb": 200,
             "RLlenanti": 50,
             "useRLexp": 1,
-            "RLhebbwt": 2.5e-06,
+            "RLhebbwt": 5e-06,
             "RLantiwt": -0.0,
             "hebbwt": 0,
             "antiwt": 0,

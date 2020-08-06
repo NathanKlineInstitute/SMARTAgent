@@ -15410,3 +15410,10 @@ started ~16:25 ...
 
         "name": "20aug5_I0_lp_",
 
+python -i simdat.py backupcfg/20aug5_I0_lp_sim.json
+
+ax=plotPerf(actreward,yl=(0,1.))
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); 
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','IM'])
