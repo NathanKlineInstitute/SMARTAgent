@@ -15492,4 +15492,15 @@ savefig('gif/'+dstr+simstr+'Vm.png') # gif/20aug6_20aug4_B0_cycle_Vm.png
 
 fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4') # gif/20aug6_20aug4_B0_cycle__input.mp4
 
-continue as B1 ... 
+continue as B1 ...
+
+        "name": "20aug6_B1_cycle_",
+    "simtype": {
+        "ResumeSim": 1,
+        "ResumeSimFromFile": "data/20aug4_B0_cycle_synWeights_final.pkl"	
+    },
+
+./myrun 30 sn.json
+
+started ~10:41 ...
+
