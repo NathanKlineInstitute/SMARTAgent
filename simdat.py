@@ -1363,8 +1363,8 @@ if __name__ == '__main__':
   for pop_ind in range(len(allpossible_pops)):
     cpop = allpossible_pops[pop_ind]
     #print('cpop',cpop)
-    if cpop in dconf['net']:
-      if dconf['net'][cpop]>0:
+    if cpop in list(dconf['net']['allpops'].keys()):
+      if dconf['net']['allpops'][cpop]>0:
         lpop.append(cpop)
   print('lpop: ', lpop)
   simConfig, pdf, actreward, dstartidx, dendidx, dnumc, dspkID, dspkT, InputImages, ldflow, dact = loadsimdat(getactmap=False,lpop=lpop)

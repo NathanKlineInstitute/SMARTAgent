@@ -82,48 +82,64 @@ for ty in allpops:
   else:
     netParams.popParams[ty] = {'cellType':ty, 'numCells': dnumc[ty], 'cellModel': ICellModel}
 
-EExcitSec = 'dend' # section where excitatory synapses placed
-    
-if ECellModel == 'Mainen':    
-  netParams.importCellParams(label='PYR_Mainen_rule', conds={'cellType': ETypes}, fileName='cells/mainen.py', cellName='PYR2')
-  netParams.cellParams['PYR_Mainen_rule']['secs']['soma']['threshold'] = 0.0
-  EExcitSec = 'dend' # section where excitatory synapses placed
-elif ECellModel == 'IzhiRS':   ## RS Izhi cell params
-  EExcitSec = 'soma' # section where excitatory synapses placed
-  RScellRule = {'conds': {'cellType': ETypes, 'cellModel': 'IzhiRS'}, 'secs': {}}
-  RScellRule['secs']['soma'] = {'geom': {}, 'pointps':{}}  #  soma
-  RScellRule['secs']['soma']['geom'] = {'diam': 10, 'L': 10, 'cm': 31.831}
-  RScellRule['secs']['soma']['pointps']['Izhi'] = {'mod':'Izhi2007b', 'C':1, 'k':0.7, 'vr':-60, 'vt':-40, 'vpeak':35, 'a':0.03, 'b':-2, 'c':-50, 'd':100, 'celltype':1}
-  netParams.cellParams['IzhiRS'] = RScellRule  # add dict to list of cell properties
-elif ECellModel == 'INTF':
-  RScellRule = {'conds': {'cellType': ETypes, 'cellModel': 'IntFire4'}, 'secs': {}}
-  RScellRule['secs']['soma'] = {'geom': {}, 'pointps':{}}  #  soma
-  #RScellRule['secs']['soma']['geom'] = {'diam': 10, 'L': 10, 'cm': 31.831}
-  RScellRule['secs']['soma']['pointps']['INTF'] = {'mod':'h.IntFire4'}#, 'C':0.2, 'k':1.0, 'vr':-55, 'vt':-40, 'vpeak':25, 'a':0.2, 'b':-2, 'c':-45, 'd':-55, 'celltype':5}
-  RScellRule['secs']['soma']['pointps']['INTF']['vref'] = 'm' # specify that uses its own voltage V
-  #cellRule['secs']['soma']['pointps']['Izhi2007a_0']['synList'] = ['AMPA', 'NMDA', 'GABAA', 'GABAB']  # specify its own synapses  
-  netParams.cellParams['IntFire4RS'] = RScellRule  # add dict to list of cell properties    
-      
-if ICellModel == 'FS_BasketCell':    ## FS Izhi cell params
-  netParams.importCellParams(label='FS_BasketCell_rule', conds={'cellType': ITypes}, fileName='cells/FS_BasketCell.py', cellName='Bas')
-  netParams.cellParams['FS_BasketCell_rule']['secs']['soma']['threshold'] = -10.0
-elif ICellModel == 'IzhiFS': # defaults to Izhi cell otherwise
-  FScellRule = {'conds': {'cellType': ITypes, 'cellModel': 'IzhiFS'}, 'secs': {}}
-  FScellRule['secs']['soma'] = {'geom': {}, 'pointps':{}}  #  soma
-  FScellRule['secs']['soma']['geom'] = {'diam': 10, 'L': 10, 'cm': 31.831}
-  FScellRule['secs']['soma']['pointps']['Izhi'] = {'mod':'Izhi2007b', 'C':0.2, 'k':1.0, 'vr':-55, 'vt':-40, 'vpeak':25, 'a':0.2, 'b':-2, 'c':-45, 'd':-55, 'celltype':5}
-  RFScellRule['secs']['soma']['pointps']['INTF']['vref'] = 'm' # specify that uses its own voltage V  
-  netParams.cellParams['IzhiFS'] = FScellRule  # add dict to list of cell properties
-elif ICellModel == 'INTF':
-  FScellRule = netParams.importCellParams(label='INTFFS_rule', conds={'cellType': ITypes, 'cellModel':'IntFire4'},
-                                          fileName='cells/IntFirewrapper.py',cellName='IntFire4Cell',  cellArgs={'host':'dummy'})  
-  #FScellRule = {'conds': {'cellType': ITypes, 'cellModel': 'IntFire4'}, 'secs': {}}
-  #FScellRule['secs']['soma'] = {'geom': {}, 'pointps':{}}  #  soma
-  #FScellRule['secs']['soma']['geom'] = {'diam': 10, 'L': 10, 'cm': 31.831}
-  #FScellRule['secs']['soma']['pointps']['INTF'] = {'mod':'IntFire4'}#, 'C':0.2, 'k':1.0, 'vr':-55, 'vt':-40, 'vpeak':25, 'a':0.2, 'b':-2, 'c':-45, 'd':-55, 'celltype':5}
-  FScellRule['secs']['soma']['pointps']['INTF']['vref'] = 'm' # specify that uses its own voltage V  
-  netParams.cellParams['IntFire4FS'] = FScellRule  # add dict to list of cell properties  
+def makeECellModel (ECellModel):
+  # create rules for excitatory neuron models
+  EExcitSec = 'dend' # section where excitatory synapses placed  
+  if ECellModel == 'Mainen':    
+    netParams.importCellParams(label='PYR_Mainen_rule', conds={'cellType': ETypes}, fileName='cells/mainen.py', cellName='PYR2')
+    netParams.cellParams['PYR_Mainen_rule']['secs']['soma']['threshold'] = 0.0
+    EExcitSec = 'dend' # section where excitatory synapses placed
+  elif ECellModel == 'IzhiRS':   ## RS Izhi cell params
+    EExcitSec = 'soma' # section where excitatory synapses placed
+    RScellRule = {'conds': {'cellType': ETypes, 'cellModel': 'IzhiRS'}, 'secs': {}}
+    RScellRule['secs']['soma'] = {'geom': {}, 'pointps':{}}  #  soma
+    RScellRule['secs']['soma']['geom'] = {'diam': 10, 'L': 10, 'cm': 31.831}
+    RScellRule['secs']['soma']['pointps']['Izhi'] = {'mod':'Izhi2007b', 'C':1, 'k':0.7, 'vr':-60, 'vt':-40, 'vpeak':35, 'a':0.03, 'b':-2, 'c':-50, 'd':100, 'celltype':1}
+    netParams.cellParams['IzhiRS'] = RScellRule  # add dict to list of cell properties
+  elif ECellModel == 'INTF':
+    RScellRule = {'conds': {'cellType': ETypes, 'cellModel': 'IntFire4RS'}, 'secs': {}}
+    RScellRule['secs']['soma'] = {'geom': {}, 'pointps':{}}  #  soma
+    #RScellRule['secs']['soma']['geom'] = {'diam': 10, 'L': 10, 'cm': 31.831}
+    RScellRule['secs']['soma']['pointps']['INTF'] = {'mod':'intfire4'}
+    RScellRule['secs']['soma']['pointps']['INTF']['vref'] = 'm' # specify that uses its own voltage V
+    netParams.cellParams['IntFire4RS'] = RScellRule  # add dict to list of cell properties
+    EExcitSec = 'soma' # section where excitatory synapses placed
+  elif ECellModel == 'Friesen':
+    cellRule = netParams.importCellParams(label='PYR_Friesen_rule', conds={'cellType': ETypes, 'cellModel': 'Friesen'},
+                fileName='cells/friesen.py', cellName='MakeRSFCELL')
+    cellRule['secs']['axon']['spikeGenLoc'] = 0.5  # spike generator location.
+    EExcitSec = 'dend' # section where excitatory synapses placed
+  return EExcitSec
 
+def makeICellModel (ICellModel):
+  # create rules for inhibitory neuron models
+  if ICellModel == 'FS_BasketCell':    ## FS Izhi cell params
+    netParams.importCellParams(label='FS_BasketCell_rule', conds={'cellType': ITypes}, fileName='cells/FS_BasketCell.py', cellName='Bas')
+    netParams.cellParams['FS_BasketCell_rule']['secs']['soma']['threshold'] = -10.0
+  elif ICellModel == 'IzhiFS': # defaults to Izhi cell otherwise
+    FScellRule = {'conds': {'cellType': ITypes, 'cellModel': 'IzhiFS'}, 'secs': {}}
+    FScellRule['secs']['soma'] = {'geom': {}, 'pointps':{}}  #  soma
+    FScellRule['secs']['soma']['geom'] = {'diam': 10, 'L': 10, 'cm': 31.831}
+    FScellRule['secs']['soma']['pointps']['Izhi'] = {'mod':'Izhi2007b', 'C':0.2, 'k':1.0, 'vr':-55, 'vt':-40, 'vpeak':25, 'a':0.2, 'b':-2, 'c':-45, 'd':-55, 'celltype':5}
+    RFScellRule['secs']['soma']['pointps']['INTF']['vref'] = 'm' # specify that uses its own voltage V  
+    netParams.cellParams['IzhiFS'] = FScellRule  # add dict to list of cell properties
+  elif ICellModel == 'INTF':
+    #FScellRule = netParams.importCellParams(label='INTFFS_rule', conds={'cellType': ITypes, 'cellModel':'IntFire4'},
+    #                                        fileName='cells/IntFirewrapper.py',cellName='IntFire4Cell',  cellArgs={'host':'dummy'})  
+    FScellRule = {'conds': {'cellType': ITypes, 'cellModel': 'IntFire4'}, 'secs': {}}
+    FScellRule['secs']['soma'] = {'geom': {}, 'pointps':{}}  #  soma
+    #FScellRule['secs']['soma']['geom'] = {'diam': 10, 'L': 10, 'cm': 31.831}
+    FScellRule['secs']['soma']['pointps']['INTF'] = {'mod':'intfire4'}
+    FScellRule['secs']['soma']['pointps']['INTF']['vref'] = 'm' # specify that uses its own voltage V  
+    netParams.cellParams['IntFire4FS'] = FScellRule  # add dict to list of cell properties  
+  elif ICellModel == 'Friesen':
+    cellRule = netParams.importCellParams(label='Bas_Friesen_rule', conds={'cellType': ITypes, 'cellModel': 'Friesen'},
+                fileName='cells/friesen.py', cellName='MakeFSFCELL')
+    cellRule['secs']['axon']['spikeGenLoc'] = 0.5  # spike generator location.  
+      
+EExcitSec = makeECellModel(ECellModel)
+makeICellModel(ICellModel)
+  
 ## Synaptic mechanism parameters
 netParams.synMechParams['AMPA'] = {'mod': 'Exp2Syn', 'tau1': 0.05, 'tau2': 5.3, 'e': 0}  # excitatory synaptic mechanism
 netParams.synMechParams['NMDA'] = {'mod': 'Exp2Syn', 'tau1': 0.15, 'tau2': 166.0, 'e': 0} # NMDA
@@ -140,27 +156,34 @@ if 'AMPAI' in dconf['RL']: dSTDPparamsRL['AMPAI'] = dconf['RL']['AMPAI']
 
 # these are the image-based inputs provided to the R (retinal) cells
 netParams.stimSourceParams['stimMod'] = {'type': 'NetStim', 'rate': 'variable', 'noise': 0}
+
+stimModInputW = 0.05
+if 'stimModInputW' in dconf['net']: stimModInputW = dconf['net']['stimModInputW']
+stimModDirW = 0.01
+if 'stimModDirW' in dconf['net']: stimModDirW = dconf['net']['stimModDirW']
+
 if dnumc['ER']>0:
   netParams.stimTargetParams['stimMod->R'] = {'source': 'stimMod',
           'conds': {'pop': 'ER'},
           'convergence': 1,
-          'weight': 0.05,
+          'weight': stimModInputW,
           'delay': 1,
           'synMech': 'AMPA'}
 else:
   netParams.stimTargetParams['stimMod->V1'] = {'source': 'stimMod',
           'conds': {'pop': 'EV1'},
           'convergence': 1,
-          'weight': 0.05,
+          'weight': stimModInputW,
           'delay': 1,
           'synMech': 'AMPA'}
   
 netParams.stimTargetParams['stimMod->DirSelInput'] = {'source': 'stimMod',
         'conds': {'pop': ['EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE']},
         'convergence': 1,
-        'weight': 0.01,
+        'weight': stimModDirW,
         'delay': 1,
         'synMech': 'AMPA'}
+
 #background input to inhibitory neurons to increase their firing rate
 
 # Stimulation parameters
@@ -265,10 +288,10 @@ cfg.EEGain = 1.0  # E to E scaling factor
 cfg.EIGain = 1.0 # E to I scaling factor
 cfg.IEGain = 1.0 # I to E scaling factor
 cfg.IIGain = 1.0  # I to I scaling factor
-if 'EEGain' in dconf['net']: EEGain = dconf['net']['EEGain']
-if 'EIGain' in dconf['net']: EIGain = dconf['net']['EIGain']
-if 'IEGain' in dconf['net']: IEGain = dconf['net']['IEGain']
-if 'IIGain' in dconf['net']: IIGain = dconf['net']['IIGain']
+if 'EEGain' in dconf['net']: cfg.EEGain = dconf['net']['EEGain']
+if 'EIGain' in dconf['net']: cfg.EIGain = dconf['net']['EIGain']
+if 'IEGain' in dconf['net']: cfg.IEGain = dconf['net']['IEGain']
+if 'IIGain' in dconf['net']: cfg.IIGain = dconf['net']['IIGain']
 
 ### from https://www.neuron.yale.edu/phpBB/viewtopic.php?f=45&t=3770&p=16227&hilit=memory#p16122
 cfg.saveCellSecs = bool(dconf['sim']['saveCellSecs']) # if False removes all data on cell sections prior to gathering from nodes
