@@ -1010,6 +1010,7 @@ def trainAgent (t):
       sim.pc.broadcast(vec4, 0)
       STAYactions = vec4.to_python()[0]
     if dconf['sim']['anticipatedRL']==1:
+      sim.pc.broadcast(vec5, 0)
       proposed_actions = vec5.to_python()[0] # this([0]) will just pick up the first element of the list.
     if dconf['verbose']:
       if dnumc['EMSTAY']>0: print('UPactions: ', UPactions,'DOWNactions: ', DOWNactions, 'STAYactions: ', STAYactions)
