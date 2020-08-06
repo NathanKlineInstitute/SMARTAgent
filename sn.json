@@ -33,7 +33,7 @@
     "verbose": 0,
     "stayStepLim": 0,
     "simtype": {
-        "ResumeSim": 1,
+        "ResumeSim": 0,
         "ResumeSimFromFile": "data/20aug4_B0_cycle_synWeights_final.pkl"	
     },
     "sim": {
@@ -46,7 +46,7 @@
         "RLFakeUpRule": 0,
         "RLFakeDownRule": 0,
         "RLFakeStayRule": 0,
-        "name": "20aug6_A0_gcp_",
+        "name": "20aug6_B0_gcp_",
         "doquit": 0,
         "doplot": 1,
         "saveCellSecs": 0,
@@ -100,7 +100,7 @@
         "EEMRecProb": 0.3,
         "EEPreMProb": 0.0,
         "EEMPopNorm": 1,
-        "EEMRecProbCross": 0,
+        "EEMRecProbCross": 1,
         "EEMFeedbackProb": 0.0,
         "EEMFeedbackWghtAM": 1.25e-05,
         "EEMFeedbackWghtNM": 1.25e-06,

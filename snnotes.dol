@@ -15516,12 +15516,13 @@ same as 20aug4_A0_cycle_ but without targetted RL
 
 ./myrun 32 sn.json
 
-*** same as 20aug4_B0_cycle_ but without targetted RL
+*** 20aug6_B0_gcp_
 
 same as 20aug4_B0_cycle_ but without targetted RL
 
 ./myrun 32 sn.json
 
+started ~11:44 ... 
 
 ** better performance metrics
 
