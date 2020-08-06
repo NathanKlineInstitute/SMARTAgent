@@ -33,8 +33,8 @@
     "verbose": 0,
     "stayStepLim": 0,
     "simtype": {
-        "ResumeSim": 0,
-        "ResumeSimFromFile": "data/20jul29_testL0_gcp__step_0_synWeights_final.pkl"
+        "ResumeSim": 1,
+        "ResumeSimFromFile": "data/20aug4_A0_cycle_synWeights_final.pkl"
     },
     "sim": {
         "duration": 2000000,
@@ -46,9 +46,9 @@
         "RLFakeUpRule": 0,
         "RLFakeDownRule": 0,
         "RLFakeStayRule": 0,
-        "name": "20aug5_F0_cross_gcp_",
-        "doquit": 0,
-        "doplot": 1,
+        "name": "20aug6_A1_cycle_",
+        "doquit": 1,
+        "doplot": 0,
         "saveCellSecs": 0,
         "saveCellConns": 0,
         "targettedRL": 1,
@@ -60,14 +60,6 @@
         "useTopological": 0
     },
     "net": {
-	"stimModInputW": 0.5,
-	"stimModDirW": 0.1,
-	"EEGain": 1.0,
-	"EIGain": 20.0,
-	"IEGain": 1.0,
-	"IIGain": 1.0,
-	"ECellModel": "Friesen",
-	"ICellModel": "Friesen",
         "scale": 1,
 	"allpops": {
 	    "ER":0,
@@ -98,8 +90,8 @@
 	"EXPDir": 1,
         "DirMinRate": 0.0,
         "DirMaxRate": 50.0,
-        "EEMWghtAM": 0.001,
-        "EEMWghtNM": 0.0001,
+        "EEMWghtAM": 5e-05,
+        "EEMWghtNM": 5e-06,
         "EEPreMWghtAM": 8e-05,
         "EEPreMWghtNM": 2.5e-06,
         "EEMWghtThreshMin": 6.25e-06,
@@ -123,7 +115,7 @@
             "RLlenhebb": 200,
             "RLlenanti": 50,
             "useRLexp": 1,
-            "RLhebbwt": 5e-05,
+            "RLhebbwt": 2.5e-06,
             "RLantiwt": -0.0,
             "hebbwt": 0,
             "antiwt": 0,

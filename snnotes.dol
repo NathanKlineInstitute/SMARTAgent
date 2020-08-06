@@ -15438,3 +15438,58 @@ started ~22:50 ...
 
 ./myrun 30 sn.json
 
+*20aug6
+** check output from 20aug4_A0_cycle_
+
+python -i simdat.py backupcfg/20aug4_A0_cycle_sim.json
+
+ax=plotPerf(actreward,yl=(0,.55))
+savefig('gif/'+dstr+simstr+'perf.png') # gif/20aug6_20aug4_A0_cycle_perf.png
+performance going up - for hits too ... but follow flattens quickly
+
+lfn = ['20aug4_A0_cycle_','20aug4_B0_cycle_']
+lpda = getindivactionreward(lfn)
+clf(); plotComparePerf(lpda,['b','r'],yl=(0,.55),lleg=lfn)
+savefig('gif/'+dstr+simstr+'compare_perf.png') # gif/20aug6_20aug4_A0_cycle_compare_perf.png
+comparable performance
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((1990e3,2000e3))
+savefig('gif/'+dstr+simstr+'rast.png') # gif/20aug6_20aug4_A0_cycle_rast.png
+rates ok, ... 
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','IM'],tlim=((1990e3,2000e3)))
+savefig('gif/'+dstr+simstr+'Vm.png') # gif/20aug6_20aug4_A0_cycle_Vm.png
+
+fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4') # gif/20aug6_20aug4_A0_cycle__input.mp4
+
+continue as A1 ...
+
+        "name": "20aug6_A1_cycle_",
+
+    "simtype": {
+        "ResumeSim": 1,
+        "ResumeSimFromFile": "data/20aug4_A0_cycle_synWeights_final.pkl"
+    },
+
+./myrun 30 sn.json
+
+started ~10:29 ... 
+
+** check output from 20aug4_B0_cycle_
+
+python -i simdat.py backupcfg/20aug4_B0_cycle_sim.json
+
+ax=plotPerf(actreward,yl=(0,.55))
+savefig('gif/'+dstr+simstr+'perf.png') # gif/20aug6_20aug4_B0_cycle_perf.png
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((1990e3,2000e3))
+savefig('gif/'+dstr+simstr+'rast.png') # gif/20aug6_20aug4_B0_cycle_rast.png
+rates ok, ... slightly faster than for 20aug4_A0_cycle_ since there's recurrent connectivity
+between the two motor populations here ... 
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','IM'],tlim=((1990e3,2000e3)))
+savefig('gif/'+dstr+simstr+'Vm.png') # gif/20aug6_20aug4_B0_cycle_Vm.png
+
+fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4') # gif/20aug6_20aug4_B0_cycle__input.mp4
+
+continue as B1 ... 
