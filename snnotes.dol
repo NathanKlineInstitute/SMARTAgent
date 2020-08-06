@@ -15504,6 +15504,18 @@ continue as B1 ...
 
 started ~10:41 ...
 
+meanwhile, try analyzeRepeatedInputSequences
+
+
+lpop = ['EMUP','EMDOWN']  
+dact = getdActMap(totalDur, tstepPerAction, dspkT, dspkID, dnumc, dstartidx, lpop)
+analyzeRepeatedInputSequences(dact,InputImages, targetPixel=(10,10),nbseq=14,targetCorr=0.9)
+
+have to debug ... getting index out of bounds ...
+
+targetPixel = (10,10)
+midInds = np.where(InputImages[:,targetPixel[0],targetPixel[1]]>250)
+
 ** friesen sims on gcp - not much firing
 
 the starting weights would need to be adjusted to produce anything meaningful
