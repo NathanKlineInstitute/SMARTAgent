@@ -24,7 +24,7 @@ rcParams['font.size'] = 12
 tl=tight_layout
 stepNB = -1
 totalDur = int(dconf['sim']['duration']) # total simulation duration
-allpossible_pops = ['ER','IR','EV1','EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE','IV1','EV4','IV4','EMT','IMT','EMDOWN','EMUP','EMSTAY','IM']
+allpossible_pops = list(dconf['net']['allpops'].keys())
 
 def pdf2weightsdict (pdf):
   # convert the pandas dataframe with synaptic weights into a dictionary
