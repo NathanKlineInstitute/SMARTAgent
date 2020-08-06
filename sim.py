@@ -997,6 +997,7 @@ def trainAgent (t):
       STAYactions = np.sum(np.where(np.array(actions)==dconf['moves']['NOMOVE'],1,0))
       sim.pc.broadcast(vec4.from_python([STAYactions]),0)
     if dconf['sim']['anticipatedRL']==1:
+      print(proposed_actions)
       sim.pc.broadcast(vec5.from_python(proposed_actions),0) # used proposed actions to target/potentiate the pop representing anticipated action.
   else: # other workers
     sim.pc.broadcast(vec, 0) # receive critic value from master node
@@ -1009,24 +1010,24 @@ def trainAgent (t):
       sim.pc.broadcast(vec4, 0)
       STAYactions = vec4.to_python()[0]
     if dconf['sim']['anticipatedRL']==1:
-      proposed_actions = vec5.to_python()[0]
+      proposed_actions = vec5.to_python()[0] # this([0]) will just pick up the first element of the list.
     if dconf['verbose']:
       if dnumc['EMSTAY']>0: print('UPactions: ', UPactions,'DOWNactions: ', DOWNactions, 'STAYactions: ', STAYactions)
       else: print('UPactions: ', UPactions,'DOWNactions: ', DOWNactions)
   if dconf['sim']['anticipatedRL']==1:
-    for cpaction in proposed_actions:
-      anticipated_reward = dconf['rewardcoded']['followTarget']
-      if cpaction==dconf['moves']['UP']:
-        if dconf['verbose']: print('APPLY RL to EMUP')
-        for STDPmech in dSTDPmech['EMUP']: STDPmech.reward_punish(float(anticipated_reward))
-      elif cpaction==dconf['moves']['DOWN']:
-        if dconf['verbose']: print('APPLY RL to EMDOWN')
-        for STDPmech in dSTDPmech['EMDOWN']: STDPmech.reward_punish(float(anticipated_reward))
-      elif cpaction==dconf['moves']['STAY'] and dnumc['EMSTAY']>0:
-        if dconf['verbose']: print('APPLY RL to EMSTAY')
-        for STDPmech in dSTDPmech['EMSTAY']: STDPmech.reward_punish(float(anticipated_reward))
-      else:
-        print('No anticipated action for the input!!!')
+    cpaction = proposed_actions 
+    anticipated_reward = dconf['rewardcodes']['followTarget']
+    if cpaction==dconf['moves']['UP']:
+      if dconf['verbose']: print('APPLY RL to EMUP')
+      for STDPmech in dSTDPmech['EMUP']: STDPmech.reward_punish(float(anticipated_reward))
+    elif cpaction==dconf['moves']['DOWN']:
+      if dconf['verbose']: print('APPLY RL to EMDOWN')
+      for STDPmech in dSTDPmech['EMDOWN']: STDPmech.reward_punish(float(anticipated_reward))
+    elif cpaction==dconf['moves']['NOMOVE'] and dnumc['EMSTAY']>0:
+      if dconf['verbose']: print('APPLY RL to EMSTAY')
+      for STDPmech in dSTDPmech['EMSTAY']: STDPmech.reward_punish(float(anticipated_reward))
+    else:
+      print('No anticipated action for the input!!!')
   else:
     if critic != 0: # if critic signal indicates punishment (-1) or reward (+1)
       if sim.rank==0: print('t=',round(t,2),'- adjusting weights based on RL critic value:', critic)

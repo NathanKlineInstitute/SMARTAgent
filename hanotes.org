@@ -4436,3 +4436,5 @@ def setdminID (sim, lpop):
   else:
     if critic != 0: 
     .......... # previous code
+
+-- run 10 sec sim using anticipatedRL in "20aug06_A0_falcor_ARL_"... still using probabilistic connections.
