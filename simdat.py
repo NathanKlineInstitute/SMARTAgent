@@ -1236,7 +1236,6 @@ def analyzeRepeatedInputForSingleEvent(dact, InputImages, targetPixel=(10,10)):
     seqHitMiss[i] = actreward['hit'][cInputInd]
     for pop in dseqOutputs.keys():
         dseqOutputs[pop][i,:,:]=dact[pop][cInputInd,:,:]
-    count = count + 1
   dFR = {pop:np.sum(np.sum(dseqOutputs[pop],axis=1),axis=1) for pop in lmotorpop}
   fig, axs = plt.subplots(2, 3, figsize=(12,7));
   lax = axs.ravel()
