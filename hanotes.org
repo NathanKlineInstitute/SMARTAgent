@@ -4471,3 +4471,19 @@ analyzeRepeatedInputForSingleEvent(dact, dnumc, InputImages, targetPixel=(10,10)
 -- debugged and using dictionaries now.
 analyzeRepeatedInputSequences(dact, InputImages, targetPixel=(10,10),nbseq=14,targetCorr=0.9)
 analyzeRepeatedInputForSingleEvent(dact, InputImages, targetPixel=(10,10))
+
+Debugging function in simdat.py--- analyzeRepeatedInputSequences(dact, InputImages, targetPixel=(10,10),nbseq=14,targetCorr=0.9):
+
+-- instead of choosing alternative indices, i am looking for seqStartIndices with no repetitive sequences.
+
+  midInds = np.where(InputImages[:,targetPixel[0],targetPixel[1]]>250)
+  repSeqInds = []
+  for i in range(len(midInds[0])-1):
+    if midInds[0][i+1]-midInds[0][i]<5:
+      repSeqInds.append(i+1)
+  uniqueSeqStartInds = []
+  for i in range(len(midInds[0])):
+    if i not in repSeqInds:
+      uniqueSeqStartInds.append(midInds[0][i])
+
+-- still need to test it.

@@ -1130,30 +1130,36 @@ def getpopinputmap (pdf, t, dnumc, dstartidx, dendidx, poty, asweight=True):
 
 def analyzeRepeatedInputSequences(dact, InputImages, targetPixel=(10,10),nbseq=14,targetCorr=0.9):
   midInds = np.where(InputImages[:,targetPixel[0],targetPixel[1]]>250)
+  repSeqInds = []
+  for i in range(len(midInds[0])-1):
+    if midInds[0][i+1]-midInds[0][i]<5:
+      repSeqInds.append(i+1)
+  uniqueSeqStartInds = []
+  for i in range(len(midInds[0])):
+    if i not in repSeqInds:
+      uniqueSeqStartInds.append(midInds[0][i])
   # for each midInd, find 14 (13 could be enough but i am not sure) consecutive Images to see the trajectory.
   ImgH, ImgW = InputImages.shape[1],InputImages.shape[2]
   lmotorpop = [pop for pop in dconf['net']['EMotorPops'] if dconf['net']['allpops'][pop]>0] 
-  seqInputs = np.zeros((int(len(midInds[0])/2),nbseq,ImgH,ImgW),dtype=float)
-  seqActions = np.zeros((int(len(midInds[0])/2),nbseq),dtype=float)
-  seqPropActions = np.zeros((int(len(midInds[0])/2),nbseq),dtype=float)
-  seqRewards = np.zeros((int(len(midInds[0])/2),nbseq),dtype=float)
-  seqHitMiss = np.zeros((int(len(midInds[0])/2),nbseq),dtype=float)
-  dseqOutputs = {pop:np.zeros((int(len(midInds[0])/2),nbseq,dact[pop].shape[1],dact[pop].shape[2]),dtype=float) for pop in lmotorpop}
-  count = 0
-  for i in range(0,len(midInds[0]),2):
-    cmidInd = midInds[0][i]
+  seqInputs = np.zeros((len(uniqueSeqStartInds),nbseq,ImgH,ImgW),dtype=float)
+  seqActions = np.zeros((len(uniqueSeqStartInds),nbseq),dtype=float)
+  seqPropActions = np.zeros((len(uniqueSeqStartInds),nbseq),dtype=float)
+  seqRewards = np.zeros((len(uniqueSeqStartInds),nbseq),dtype=float)
+  seqHitMiss = np.zeros((len(uniqueSeqStartInds),nbseq),dtype=float)
+  dseqOutputs = {pop:np.zeros((len(uniqueSeqStartInds),nbseq,dact[pop].shape[1],dact[pop].shape[2]),dtype=float) for pop in lmotorpop}
+  for i in range(len(uniqueSeqStartInds)):
+    cSeqStartInd = uniqueSeqStartInds[i]
     for j in range(nbseq):
-      seqInputs[count,j,:,:] = InputImages[cmidInd+j,:,:]
-      seqActions[count,j] = actreward['action'][cmidInd+j]
-      seqRewards[count,j] = actreward['reward'][cmidInd+j]
-      seqPropActions[count,j] = actreward['proposed'][cmidInd+j]
-      seqHitMiss[count,j] = actreward['hit'][cmidInd+j]
+      seqInputs[i,j,:,:] = InputImages[cSeqStartInd+j,:,:]
+      seqActions[i,j] = actreward['action'][cSeqStartInd+j]
+      seqRewards[i,j] = actreward['reward'][cSeqStartInd+j]
+      seqPropActions[i,j] = actreward['proposed'][cSeqStartInd+j]
+      seqHitMiss[i,j] = actreward['hit'][cSeqStartInd+j]
       for pop in dseqOutputs.keys():
-        dseqOutputs[pop][count,j,:,:]=dact[pop][cmidInd+j,:,:]
-    count = count + 1
+        dseqOutputs[pop][i,j,:,:]=dact[pop][cSeqStartInd+j,:,:]
   # now i have all inputs, outputs, actions and proposed etc for all inputs where the ball starts in the middle of the screen.
   # But i need to pick up the sequences which are exactly like one another.  
-  x = np.sum(seqInputs,axis=1)[1,:,:] #3:17
+  x = np.sum(seqInputs,axis=1)[0,:,:] #3:17
   goodInds = []
   for j in range(seqInputs.shape[0]):
     y = np.sum(seqInputs,axis=1)[j,:,:]
