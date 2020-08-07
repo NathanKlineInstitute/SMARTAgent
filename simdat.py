@@ -1173,32 +1173,39 @@ def analyzeRepeatedInputSequences(dact, InputImages, targetPixel=(10,10),nbseq=1
   seqPropActions4comp = seqPropActions[goodInds,:]
   seqHitMiss4comp = seqHitMiss[goodInds,:]
   dseqOutputs4comp = {pop:dseqOutputs[pop][goodInds,:,:,:] for pop in dseqOutputs.keys()}
+  summedInputSequences = np.sum(seqInputs4comp,axis=1)
+  dsummedOutputs = {pop:np.zeros((len(goodInds),nbseq),dtype=float) for pop in lmotorpop}
+  for pop in lmotorpop:
+    dsummedOutputs[pop] = np.sum(np.sum(dseqOutputs4comp[pop],axis=2),axis=2)
   lSeqNBs4comp = [0,1,2,3,4,5,6,7,8,9,10]
   fig, axs = plt.subplots(6, 5, figsize=(10,8));
   lax = axs.ravel()
   for i in range(5):
     cSeq = lSeqNBs4comp[i]
-    lax[i].imshow(np.sum(seqInputs4comp,axis=1)[cSeq])
-    lax[i].axis('off')
-    for pop,clr in zip(lmotorpop,['b','r','g']):
-      lax[i+5].plot(np.sum(np.sum(dseqOutputs4comp[pop],axis=2),axis=2)[cSeq],clr+'-o',markersize=3)
-    if i==0: lax[i+5].set_ylabel('# of pop spikes')
-    lax[i+10].plot(seqActions4comp[cSeq,:],'-o',color=(0,0,0,1),markersize=3)
-    lax[i+10].plot(seqPropActions[cSeq,:],'-o',color=(0.5,0.5,0.5,1),markersize=3)
-    lax[i+10].set_yticks([1,3,4])
-    if i==0: lax[i+10].set_yticklabels(['STAY','DOWN','UP'])
+    if i<len(goodInds):
+      lax[i].imshow(summedInputSequences[cSeq,:])
+      lax[i].axis('off')
+      for pop,clr in zip(lmotorpop,['b','r','g']):
+        lax[i+5].plot(dsummedOutputs[pop][cSeq,:],clr+'-o',markersize=3)
+      if i==0: lax[i+5].set_ylabel('# of pop spikes')
+      lax[i+10].plot(seqActions4comp[cSeq,:],'-o',color=(0,0,0,1),markersize=3)
+      lax[i+10].plot(seqPropActions[cSeq,:],'-o',color=(0.5,0.5,0.5,1),markersize=3)
+      lax[i+10].set_yticks([1,3,4])
+      if i==0: lax[i+10].set_yticklabels(['STAY','DOWN','UP'])
     cSeq = lSeqNBs4comp[i+5]
-    lax[i+15].imshow(np.sum(seqInputs4comp,axis=1)[cSeq])
-    lax[i+15].axis('off')
-    for pop,clr in zip(lmotorpop,['b','r','g']):
-      lax[i+20].plot(np.sum(np.sum(dseqOutputs4comp,axis=2),axis=2)[cSeq],clr+'-o',markersize=3)
-    if i==0: lax[i+20].set_ylabel('# of pop spikes')
-    lax[i+25].plot(seqActions4comp[cSeq,:],'-o',color=(0,0,0,1),markersize=3)
-    lax[i+25].plot(seqPropActions[cSeq,:],'-o',color=(0.5,0.5,0.5,1),markersize=3)
-    lax[i+25].set_yticks([1,3,4])
-    if i==0: lax[i+25].set_yticklabels(['STAY','DOWN','UP'])
-  lax[i+5].legend(lmotorpop,loc='best')
-  lax[i+10].legend(['Actions','Proposed'],loc='best')
+    if (i+5)<len(goodInds):
+      lax[i+15].imshow(summedInputSequences[cSeq,:])
+      lax[i+15].axis('off')
+      for pop,clr in zip(lmotorpop,['b','r','g']):
+        lax[i+20].plot(dsummedOutputs[pop][cSeq,:],clr+'-o',markersize=3)
+      if i==0: lax[i+20].set_ylabel('# of pop spikes')
+      lax[i+25].plot(seqActions4comp[cSeq,:],'-o',color=(0,0,0,1),markersize=3)
+      lax[i+25].plot(seqPropActions[cSeq,:],'-o',color=(0.5,0.5,0.5,1),markersize=3)
+      lax[i+25].set_yticks([1,3,4])
+      if i==0: lax[i+25].set_yticklabels(['STAY','DOWN','UP'])
+  if i==0:
+    lax[i].legend(lmotorpop,loc='best')
+    lax[i+5].legend(['Actions','Proposed'],loc='best')
 
 
 def analyzeRepeatedInputForSingleEvent(dact, InputImages, targetPixel=(10,10)):

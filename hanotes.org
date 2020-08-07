@@ -4487,3 +4487,5 @@ Debugging function in simdat.py--- analyzeRepeatedInputSequences(dact, InputImag
       uniqueSeqStartInds.append(midInds[0][i])
 
 -- still need to test it.
+
+-- if the number of sequences is less than 10, then dont generate an error. checking.....
