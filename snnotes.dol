@@ -15605,3 +15605,13 @@ python multistepSim.py sn.json 30 10 20aug7_B2_cycle_Multi
 
 started ~10:31 ...
 
+** try same as 20aug4_B0_cycle_ but with longer time window for action (20aug7_C0_cycle_)
+
+        tstepPerAction == 40, instead of 20
+        "ResumeSim": 0,
+        "name": "20aug7_C0_cycle_",
+
+./myrun 30 sn.json
+
+started ~10:45 ...
+
