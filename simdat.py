@@ -1183,7 +1183,7 @@ def analyzeRepeatedInputSequences(dact, InputImages, targetPixel=(10,10),nbseq=1
   for i in range(5):
     cSeq = lSeqNBs4comp[i]
     if i<len(goodInds):
-      lax[i].imshow(summedInputSequences[cSeq,:])
+      lax[i].imshow(summedInputSequences[cSeq,:,:])
       lax[i].axis('off')
       for pop,clr in zip(lmotorpop,['b','r','g']):
         lax[i+5].plot(dsummedOutputs[pop][cSeq,:],clr+'-o',markersize=3)
@@ -1194,7 +1194,7 @@ def analyzeRepeatedInputSequences(dact, InputImages, targetPixel=(10,10),nbseq=1
       if i==0: lax[i+10].set_yticklabels(['STAY','DOWN','UP'])
     cSeq = lSeqNBs4comp[i+5]
     if (i+5)<len(goodInds):
-      lax[i+15].imshow(summedInputSequences[cSeq,:])
+      lax[i+15].imshow(summedInputSequences[cSeq,:,:])
       lax[i+15].axis('off')
       for pop,clr in zip(lmotorpop,['b','r','g']):
         lax[i+20].plot(dsummedOutputs[pop][cSeq,:],clr+'-o',markersize=3)
@@ -1203,9 +1203,9 @@ def analyzeRepeatedInputSequences(dact, InputImages, targetPixel=(10,10),nbseq=1
       lax[i+25].plot(seqPropActions[cSeq,:],'-o',color=(0.5,0.5,0.5,1),markersize=3)
       lax[i+25].set_yticks([1,3,4])
       if i==0: lax[i+25].set_yticklabels(['STAY','DOWN','UP'])
-  if i==0:
-    lax[i].legend(lmotorpop,loc='best')
-    lax[i+5].legend(['Actions','Proposed'],loc='best')
+    if i==0:
+      lax[i+5].legend(lmotorpop,loc='best')
+      lax[i+10].legend(['Actions','Proposed'],loc='best')
 
 
 def analyzeRepeatedInputForSingleEvent(dact, InputImages, targetPixel=(10,10)):
