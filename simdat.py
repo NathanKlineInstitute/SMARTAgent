@@ -1210,25 +1210,32 @@ def analyzeRepeatedInputSequences(dact, InputImages, targetPixel=(10,10),nbseq=1
 
 def analyzeRepeatedInputForSingleEvent(dact, InputImages, targetPixel=(10,10)):
   midInds = np.where(InputImages[:,targetPixel[0],targetPixel[1]]>250)
-  # for each midInd, find 14 (13 could be enough but i am not sure) consecutive Images to see the trajectory. 
+  repSeqInds = []
+  for i in range(len(midInds[0])-1):
+    if midInds[0][i+1]-midInds[0][i]<5:
+      repSeqInds.append(i+1)
+  uniqueSeqStartInds = []
+  for i in range(len(midInds[0])):
+    if i not in repSeqInds:
+      uniqueSeqStartInds.append(midInds[0][i])
+  # for each midInd, find 14 (13 could be enough but i am not sure) consecutive Images to see the trajectory.
   ImgH, ImgW = InputImages.shape[1],InputImages.shape[2]
-  lmotorpop = [pop for pop in dconf['net']['EMotorPops'] if dconf['net']['allpops'][pop]>0]
-  seqInputs = np.zeros((int(len(midInds[0])/2),ImgH,ImgW),dtype=float)
-  seqActions = np.zeros((int(len(midInds[0])/2)),dtype=float)
-  seqPropActions = np.zeros((int(len(midInds[0])/2)),dtype=float)
-  seqRewards = np.zeros((int(len(midInds[0])/2)),dtype=float)
-  seqHitMiss = np.zeros((int(len(midInds[0])/2)),dtype=float)
-  dseqOutputs = {pop:np.zeros((int(len(midInds[0])/2),dact[pop].shape[1],dact[pop].shape[2]),dtype=float) for pop in lmotorpop}
-  count = 0
-  for i in range(0,len(midInds[0]),2):
-    cmidInd = midInds[0][i]
-    seqInputs[count,:,:] = InputImages[cmidInd,:,:]
-    seqActions[count] = actreward['action'][cmidInd]
-    seqRewards[count] = actreward['reward'][cmidInd]
-    seqPropActions[count] = actreward['proposed'][cmidInd]
-    seqHitMiss[count] = actreward['hit'][cmidInd]
+  lmotorpop = [pop for pop in dconf['net']['EMotorPops'] if dconf['net']['allpops'][pop]>0] 
+  seqInputs = np.zeros((len(uniqueSeqStartInds),ImgH,ImgW),dtype=float)
+  seqActions = np.zeros((len(uniqueSeqStartInds),1),dtype=float)
+  seqPropActions = np.zeros((len(uniqueSeqStartInds),1),dtype=float)
+  seqRewards = np.zeros((len(uniqueSeqStartInds),1),dtype=float)
+  seqHitMiss = np.zeros((len(uniqueSeqStartInds),1),dtype=float)
+  dseqOutputs = {pop:np.zeros((len(uniqueSeqStartInds),dact[pop].shape[1],dact[pop].shape[2]),dtype=float) for pop in lmotorpop}
+  for i in range(len(uniqueSeqStartInds)):
+    cInputInd = uniqueSeqStartInds[i]
+    seqInputs[i,:,:] = InputImages[cInputInd,:,:]
+    seqActions[i] = actreward['action'][cInputInd]
+    seqRewards[i] = actreward['reward'][cInputInd]
+    seqPropActions[i] = actreward['proposed'][cInputInd]
+    seqHitMiss[i] = actreward['hit'][cInputInd]
     for pop in dseqOutputs.keys():
-        dseqOutputs[pop][count,:,:]=dact[pop][cmidInd,:,:]
+        dseqOutputs[pop][i,:,:]=dact[pop][cInputInd,:,:]
     count = count + 1
   dFR = {pop:np.sum(np.sum(dseqOutputs[pop],axis=1),axis=1) for pop in lmotorpop}
   fig, axs = plt.subplots(2, 3, figsize=(12,7));
