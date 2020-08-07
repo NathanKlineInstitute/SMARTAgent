@@ -33,8 +33,8 @@
     "verbose": 0,
     "stayStepLim": 0,
     "simtype": {
-        "ResumeSim": 0,
-        "ResumeSimFromFile": "data/20aug4_B0_cycle_synWeights_final.pkl"	
+        "ResumeSim": 1,
+        "ResumeSimFromFile": "data/20aug6_B1_cycle_synWeights_final.pkl"	
     },
     "sim": {
         "duration": 2000000,
@@ -46,12 +46,12 @@
         "RLFakeUpRule": 0,
         "RLFakeDownRule": 0,
         "RLFakeStayRule": 0,
-        "name": "20aug6_B0_gcp_",
-        "doquit": 0,
-        "doplot": 1,
+        "name": "20aug7_B2_cycle_",
+        "doquit": 1,
+        "doplot": 0,
         "saveCellSecs": 0,
         "saveCellConns": 0,
-        "targettedRL": 0,
+        "targettedRL": 1,
         "tstepPerAction": 20,
         "saveWeights": 1
     },

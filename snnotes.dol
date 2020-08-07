@@ -15540,3 +15540,68 @@ started ~11:44 ...
 
 could look at performance over time, given similar inputs
 
+*20aug7
+** check output
+*** 20aug6_A1_cycle_
+
+python -i simdat.py backupcfg/20aug6_A1_cycle_sim.json
+
+ax=plotPerf(actreward,yl=(0,.55))
+savefig('gif/'+dstr+simstr+'perf.png') # gif/20aug7_20aug6_A1_cycle_perf.png
+
+lfn = ['20aug6_A1_cycle_','20aug6_B1_cycle_']
+lpda = getindivactionreward(lfn)
+clf(); plotComparePerf(lpda,['b','r'],yl=(0,.55),lleg=lfn)
+savefig('gif/'+dstr+simstr+'compare_perf.png') # gif/20aug7_20aug6_A1_cycle_compare_perf.png
+comparable performance, overall 20aug6_B1_cycle_ is a little better in terms of score/follow
+
+lfn = ['20aug4_A0_cycle_','20aug6_A1_cycle_']
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0,.55))
+savefig('gif/'+dstr+simstr+'perf_all_steps_so_far.png') # gif/20aug7_20aug6_A1_cycle_perf_all_steps_so_far.png
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((1990e3,2000e3))
+savefig('gif/'+dstr+simstr+'rast.png') # gif/20aug7_20aug6_A1_cycle_rast.png
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','IM'],tlim=((1990e3,2000e3)))
+savefig('gif/'+dstr+simstr+'Vm.png') # gif/20aug7_20aug6_A1_cycle_Vm.png
+
+fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4') # gif/20aug7_20aug6_A1_cycle__input.mp4
+
+*** 20aug6_B1_cycle_
+
+python -i simdat.py backupcfg/20aug6_B1_cycle_sim.json
+
+ax=plotPerf(actreward,yl=(0,.55))
+savefig('gif/'+dstr+simstr+'perf.png') # gif/20aug7_20aug6_B1_cycle_perf.png
+
+lfn = ['20aug4_B0_cycle_','20aug6_B1_cycle_']
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0,.55))
+savefig('gif/'+dstr+simstr+'perf_all_steps_so_far.png') # gif/20aug7_20aug6_B1_cycle_perf_all_steps_so_far.png
+seems to be improving...
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((1990e3,2000e3))
+savefig('gif/'+dstr+simstr+'rast.png') # gif/20aug7_20aug6_B1_cycle_rast.png
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','IM'],tlim=((1990e3,2000e3)))
+savefig('gif/'+dstr+simstr+'Vm.png') # gif/20aug7_20aug6_B1_cycle_Vm.png
+
+fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4') # gif/20aug7_20aug6_B1_cycle__input.mp4
+
+continue this one (20aug6_B1_cycle_) in multistep ... (but will not continue 20aug6_A1_cycle_ for now)
+
+cp backupcfg/20aug6_B1_cycle_sim.json sn.json
+
+then adjust ...
+
+    "simtype": {
+        "ResumeSim": 1,
+        "ResumeSimFromFile": "data/20aug6_B1_cycle_synWeights_final.pkl"	
+    },
+            "name": "20aug7_B2_cycle_",
+
+python multistepSim.py sn.json 30 10 20aug7_B2_cycle_Multi
+
+started ~10:31 ...
+
