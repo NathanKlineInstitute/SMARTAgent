@@ -1197,33 +1197,37 @@ def analyzeRepeatedInputSequences(dact, InputImages, targetPixel=(10,10),nbseq=1
 """
 
 def analyzeRepeatedInputSequences(dact, InputImages, targetPixel=(10,10),nbseq=14,targetCorr=0.9):
-  midInds, = np.where(InputImages[:,targetPixel[0],targetPixel[1]]>250)
-  print('midInds.shape',midInds.shape)
+  midInds = np.where(InputImages[:,targetPixel[0],targetPixel[1]]>250)
+  repSeqInds = []
+  for i in range(len(midInds[0])-1):
+    if midInds[0][i+1]-midInds[0][i]<5:
+      repSeqInds.append(i+1)
+  uniqueSeqStartInds = []
+  for i in range(len(midInds[0])):
+    if i not in repSeqInds:
+      uniqueSeqStartInds.append(midInds[0][i])
   # for each midInd, find 14 (13 could be enough but i am not sure) consecutive Images to see the trajectory.
-  Nimg, ImgH, ImgW = InputImages.shape[0], InputImages.shape[1],InputImages.shape[2]
+  ImgH, ImgW = InputImages.shape[1],InputImages.shape[2]
   lmotorpop = [pop for pop in dconf['net']['EMotorPops'] if dconf['net']['allpops'][pop]>0] 
-  seqInputs = np.zeros((len(midInds),nbseq,ImgH,ImgW),dtype=float)
-  seqActions = np.zeros((len(midInds),nbseq),dtype=float)
-  seqPropActions = np.zeros((len(midInds),nbseq),dtype=float)
-  seqRewards = np.zeros((len(midInds),nbseq),dtype=float)
-  seqHitMiss = np.zeros((len(midInds),nbseq),dtype=float)
-  dseqOutputs = {pop:np.zeros((int(len(midInds)/2),nbseq,dact[pop].shape[1],dact[pop].shape[2]),dtype=float) for pop in lmotorpop}
-  count = 0
-  print(len(midInds))
-  for cmidInd in midInds:
+  seqInputs = np.zeros((len(uniqueSeqStartInds),nbseq,ImgH,ImgW),dtype=float)
+  seqActions = np.zeros((len(uniqueSeqStartInds),nbseq),dtype=float)
+  seqPropActions = np.zeros((len(uniqueSeqStartInds),nbseq),dtype=float)
+  seqRewards = np.zeros((len(uniqueSeqStartInds),nbseq),dtype=float)
+  seqHitMiss = np.zeros((len(uniqueSeqStartInds),nbseq),dtype=float)
+  dseqOutputs = {pop:np.zeros((len(uniqueSeqStartInds),nbseq,dact[pop].shape[1],dact[pop].shape[2]),dtype=float) for pop in lmotorpop}
+  for i in range(len(uniqueSeqStartInds)):
+    cSeqStartInd = uniqueSeqStartInds[i]
     for j in range(nbseq):
-      if j + cmidInd >= Nimg: break
-      seqInputs[count,j,:,:] = InputImages[cmidInd+j,:,:]
-      seqActions[count,j] = actreward['action'][cmidInd+j]
-      seqRewards[count,j] = actreward['reward'][cmidInd+j]
-      seqPropActions[count,j] = actreward['proposed'][cmidInd+j]
-      seqHitMiss[count,j] = actreward['hit'][cmidInd+j]
+      seqInputs[i,j,:,:] = InputImages[cSeqStartInd+j,:,:]
+      seqActions[i,j] = actreward['action'][cSeqStartInd+j]
+      seqRewards[i,j] = actreward['reward'][cSeqStartInd+j]
+      seqPropActions[i,j] = actreward['proposed'][cSeqStartInd+j]
+      seqHitMiss[i,j] = actreward['hit'][cSeqStartInd+j]
       for pop in dseqOutputs.keys():
-        dseqOutputs[pop][count,j,:,:]=dact[pop][cmidInd+j,:,:]
-    count = count + 1
+        dseqOutputs[pop][i,j,:,:]=dact[pop][cSeqStartInd+j,:,:]
   # now i have all inputs, outputs, actions and proposed etc for all inputs where the ball starts in the middle of the screen.
   # But i need to pick up the sequences which are exactly like one another.  
-  x = np.sum(seqInputs,axis=1)[1,:,:] #3:17
+  x = np.sum(seqInputs,axis=1)[0,:,:] #3:17
   goodInds = []
   for j in range(seqInputs.shape[0]):
     y = np.sum(seqInputs,axis=1)[j,:,:]
@@ -1237,59 +1241,69 @@ def analyzeRepeatedInputSequences(dact, InputImages, targetPixel=(10,10),nbseq=1
   seqPropActions4comp = seqPropActions[goodInds,:]
   seqHitMiss4comp = seqHitMiss[goodInds,:]
   dseqOutputs4comp = {pop:dseqOutputs[pop][goodInds,:,:,:] for pop in dseqOutputs.keys()}
+  summedInputSequences = np.sum(seqInputs4comp,axis=1)
+  dsummedOutputs = {pop:np.zeros((len(goodInds),nbseq),dtype=float) for pop in lmotorpop}
+  for pop in lmotorpop:
+    dsummedOutputs[pop] = np.sum(np.sum(dseqOutputs4comp[pop],axis=2),axis=2)
   lSeqNBs4comp = [0,1,2,3,4,5,6,7,8,9,10]
   fig, axs = plt.subplots(6, 5, figsize=(10,8));
   lax = axs.ravel()
   for i in range(5):
     cSeq = lSeqNBs4comp[i]
-    lax[i].imshow(np.sum(seqInputs4comp,axis=1)[cSeq])
-    lax[i].axis('off')
-    for pop,clr in zip(lmotorpop,['b','r','g']):
-      lax[i+5].plot(np.sum(np.sum(dseqOutputs4comp[pop],axis=2),axis=2)[cSeq],clr+'-o',markersize=3)
-    if i==0: lax[i+5].set_ylabel('# of pop spikes')
-    lax[i+10].plot(seqActions4comp[cSeq,:],'-o',color=(0,0,0,1),markersize=3)
-    lax[i+10].plot(seqPropActions[cSeq,:],'-o',color=(0.5,0.5,0.5,1),markersize=3)
-    lax[i+10].set_yticks([1,3,4])
-    if i==0: lax[i+10].set_yticklabels(['STAY','DOWN','UP'])
+    if i<len(goodInds):
+      lax[i].imshow(summedInputSequences[cSeq,:,:])
+      lax[i].axis('off')
+      for pop,clr in zip(lmotorpop,['b','r','g']):
+        lax[i+5].plot(dsummedOutputs[pop][cSeq,:],clr+'-o',markersize=3)
+      if i==0: lax[i+5].set_ylabel('# of pop spikes')
+      lax[i+10].plot(seqActions4comp[cSeq,:],'-o',color=(0,0,0,1),markersize=3)
+      lax[i+10].plot(seqPropActions[cSeq,:],'-o',color=(0.5,0.5,0.5,1),markersize=3)
+      lax[i+10].set_yticks([1,3,4])
+      if i==0: lax[i+10].set_yticklabels(['STAY','DOWN','UP'])
     cSeq = lSeqNBs4comp[i+5]
-    lax[i+15].imshow(np.sum(seqInputs4comp,axis=1)[cSeq])
-    lax[i+15].axis('off')
-    for pop,clr in zip(lmotorpop,['b','r','g']):
-      lax[i+20].plot(np.sum(np.sum(dseqOutputs4comp,axis=2),axis=2)[cSeq],clr+'-o',markersize=3)
-    if i==0: lax[i+20].set_ylabel('# of pop spikes')
-    lax[i+25].plot(seqActions4comp[cSeq,:],'-o',color=(0,0,0,1),markersize=3)
-    lax[i+25].plot(seqPropActions[cSeq,:],'-o',color=(0.5,0.5,0.5,1),markersize=3)
-    lax[i+25].set_yticks([1,3,4])
-    if i==0: lax[i+25].set_yticklabels(['STAY','DOWN','UP'])
-  lax[i+5].legend(lmotorpop,loc='best')
-  lax[i+10].legend(['Actions','Proposed'],loc='best')
+    if (i+5)<len(goodInds):
+      lax[i+15].imshow(summedInputSequences[cSeq,:,:])
+      lax[i+15].axis('off')
+      for pop,clr in zip(lmotorpop,['b','r','g']):
+        lax[i+20].plot(dsummedOutputs[pop][cSeq,:],clr+'-o',markersize=3)
+      if i==0: lax[i+20].set_ylabel('# of pop spikes')
+      lax[i+25].plot(seqActions4comp[cSeq,:],'-o',color=(0,0,0,1),markersize=3)
+      lax[i+25].plot(seqPropActions[cSeq,:],'-o',color=(0.5,0.5,0.5,1),markersize=3)
+      lax[i+25].set_yticks([1,3,4])
+      if i==0: lax[i+25].set_yticklabels(['STAY','DOWN','UP'])
+    if i==0:
+      lax[i+5].legend(lmotorpop,loc='best')
+      lax[i+10].legend(['Actions','Proposed'],loc='best')
 
-def analyzeRepeatedInputForSingleEvent (dact, InputImages, targetPixel=(10,10)):
+def analyzeRepeatedInputForSingleEvent(dact, InputImages, targetPixel=(10,10)):
   midInds = np.where(InputImages[:,targetPixel[0],targetPixel[1]]>250)
-  # for each midInd, find 14 (13 could be enough but i am not sure) consecutive Images to see the trajectory. 
-  seqInputs = np.zeros((int(len(midInds[0])/2),20,20),dtype=float)
-  seqActions = np.zeros((int(len(midInds[0])/2)),dtype=float)
-  seqPropActions = np.zeros((int(len(midInds[0])/2)),dtype=float)
-  seqRewards = np.zeros((int(len(midInds[0])/2)),dtype=float)
-  seqHitMiss = np.zeros((int(len(midInds[0])/2)),dtype=float)
-  seqOutputsUP = np.zeros((int(len(midInds[0])/2),5,5),dtype=float)
-  seqOutputsDOWN = np.zeros((int(len(midInds[0])/2),5,5),dtype=float)
-  seqOutputsSTAY = np.zeros((int(len(midInds[0])/2),5,5),dtype=float)
-  count = 0
-  for i in range(0,len(midInds[0]),2):
-    cmidInd = midInds[0][i]
-    seqInputs[count,:,:] = InputImages[cmidInd,:,:]
-    seqActions[count] = actreward['action'][cmidInd]
-    seqRewards[count] = actreward['reward'][cmidInd]
-    seqPropActions[count] = actreward['proposed'][cmidInd]
-    seqHitMiss[count] = actreward['hit'][cmidInd]
-    seqOutputsUP[count,:,:] = dact['EMUP'][cmidInd,:,:]
-    seqOutputsDOWN[count,:,:] = dact['EMDOWN'][cmidInd,:,:]
-    seqOutputsSTAY[count,:,:] = dact['EMSTAY'][cmidInd,:,:]
-    count = count + 1
-  FR_UP = np.sum(np.sum(seqOutputsUP,axis=1),axis=1)
-  FR_DOWN = np.sum(np.sum(seqOutputsDOWN,axis=1),axis=1)
-  FR_STAY = np.sum(np.sum(seqOutputsSTAY,axis=1),axis=1)
+  repSeqInds = []
+  for i in range(len(midInds[0])-1):
+    if midInds[0][i+1]-midInds[0][i]<5:
+      repSeqInds.append(i+1)
+  uniqueSeqStartInds = []
+  for i in range(len(midInds[0])):
+    if i not in repSeqInds:
+      uniqueSeqStartInds.append(midInds[0][i])
+  # for each midInd, find 14 (13 could be enough but i am not sure) consecutive Images to see the trajectory.
+  ImgH, ImgW = InputImages.shape[1],InputImages.shape[2]
+  lmotorpop = [pop for pop in dconf['net']['EMotorPops'] if dconf['net']['allpops'][pop]>0] 
+  seqInputs = np.zeros((len(uniqueSeqStartInds),ImgH,ImgW),dtype=float)
+  seqActions = np.zeros((len(uniqueSeqStartInds),1),dtype=float)
+  seqPropActions = np.zeros((len(uniqueSeqStartInds),1),dtype=float)
+  seqRewards = np.zeros((len(uniqueSeqStartInds),1),dtype=float)
+  seqHitMiss = np.zeros((len(uniqueSeqStartInds),1),dtype=float)
+  dseqOutputs = {pop:np.zeros((len(uniqueSeqStartInds),dact[pop].shape[1],dact[pop].shape[2]),dtype=float) for pop in lmotorpop}
+  for i in range(len(uniqueSeqStartInds)):
+    cInputInd = uniqueSeqStartInds[i]
+    seqInputs[i,:,:] = InputImages[cInputInd,:,:]
+    seqActions[i] = actreward['action'][cInputInd]
+    seqRewards[i] = actreward['reward'][cInputInd]
+    seqPropActions[i] = actreward['proposed'][cInputInd]
+    seqHitMiss[i] = actreward['hit'][cInputInd]
+    for pop in dseqOutputs.keys():
+        dseqOutputs[pop][i,:,:]=dact[pop][cInputInd,:,:]
+  dFR = {pop:np.sum(np.sum(dseqOutputs[pop],axis=1),axis=1) for pop in lmotorpop}
   fig, axs = plt.subplots(2, 3, figsize=(12,7));
   lax = axs.ravel()
   lax[0].imshow(np.sum(seqInputs,axis=0))
@@ -1302,20 +1316,17 @@ def analyzeRepeatedInputForSingleEvent (dact, InputImages, targetPixel=(10,10)):
   lax[2].set_xlabel('Proposed Actions')
   lax[2].set_xticks([1,3,4])
   lax[2].set_xticklabels(['STAY','DOWN','UP'])
-  lax[3].hist(FR_UP)
-  lax[3].set_xlabel('# of EMUP spikes')
-  lax[4].hist(FR_DOWN)
-  lax[4].set_xlabel('# of EMDOWN spikes')
-  lax[5].hist(FR_STAY)
-  lax[5].set_xlabel('# of EMSTAY spikes')
-  #
+  pop_ind = 1
+  for pop in lmotorpop:
+    lax[pop_ind+2].hist(dFR[pop])
+    lax[pop_ind+2].set_xlabel('# of EMUP spikes')
+    pop_ind = pop_ind+1
   fig, axs = plt.subplots(4, 1, figsize=(10,8));
   lax = axs.ravel()
   lax[0].imshow(np.sum(seqInputs,axis=0))
   lax[0].axis('off')
-  lax[1].plot(np.sum(np.sum(seqOutputsUP,axis=1),axis=1),'b-o',markersize=3)
-  lax[1].plot(np.sum(np.sum(seqOutputsDOWN,axis=1),axis=1),'r-o',markersize=3)
-  lax[1].plot(np.sum(np.sum(seqOutputsSTAY,axis=1),axis=1),'g-o',markersize=3)
+  for pop,clr in zip(lmotorpop,['b','r','g']):
+    lax[1].plot(np.sum(np.sum(dseqOutputs[pop],axis=1),axis=1),clr+'-o',markersize=3)
   lax[1].set_ylabel('# of pop spikes')
   lax[2].plot(seqActions,'-o',color=(0,0,0,1),markersize=3)
   lax[2].plot(seqPropActions,'-o',color=(0.5,0.5,0.5,1),markersize=3)
@@ -1325,8 +1336,9 @@ def analyzeRepeatedInputForSingleEvent (dact, InputImages, targetPixel=(10,10)):
   lax[3].plot(seqHitMiss,'-o',color=(0.5,0.5,0.5,1),markersize=3)
   lax[3].set_yticks([-1,0,1])
   lax[3].legend(['Rewards','Hit/Moss'])
-  lax[1].legend(['UP','DOWN','STAY'],loc='best')
-  lax[2].legend(['Actions','Proposed'],loc='best')
+  lax[1].legend(lmotorpop,loc='best')
+  lax[2].legend(['Actions','Proposed'],loc='best')      
+
 
 """
 current_time_stepNB = 0

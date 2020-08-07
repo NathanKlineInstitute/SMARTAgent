@@ -15589,6 +15589,31 @@ savefig('gif/'+dstr+simstr+'Vm.png') # gif/20aug7_20aug6_B1_cycle_Vm.png
 
 fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4') # gif/20aug7_20aug6_B1_cycle__input.mp4
 
+lpop = ['EMUP','EMDOWN']  
+dact = getdActMap(totalDur, tstepPerAction, dspkT, dspkID, dnumc, dstartidx, lpop)
+analyzeRepeatedInputSequences(dact,InputImages, targetPixel=(10,10),nbseq=14,targetCorr=0.9)
+
+analyzeRepeatedInputForSingleEvent(dact, InputImages, targetPixel=(10,10))
+figure(); analyzeRepeatedInputForSingleEvent(dact, InputImages, targetPixel=(19,17))
+
+savefig('gif/'+dstr+simstr+'seq0.png') # gif/20aug7_20aug6_B1_cycle_seq0.png
+
+tt = np.unique(pdf.time)
+
+dout = getpopinputmap(pdf, tt[0], dnumc, dstartidx, dendidx, 'EMDOWN')
+plotallinputmaps(pdf,tt[0],dstartidx['EMDOWN'],'EMDOWN',dnumc,dstartidx,dendidx,asweight=True,dmap=dout)
+savefig('gif/'+dstr+simstr+'EMDOWN_inputmap_first.png') # gif/20aug7_20aug6_B1_cycle_EMDOWN_inputmap_first.png
+dout = getpopinputmap(pdf, tt[-1], dnumc, dstartidx, dendidx, 'EMDOWN')
+clf(); plotallinputmaps(pdf,tt[-1],dstartidx['EMDOWN'],'EMDOWN',dnumc,dstartidx,dendidx,asweight=True,dmap=dout)
+savefig('gif/'+dstr+simstr+'EMDOWN_inputmap_last.png') # gif/20aug7_20aug6_B1_cycle_EMDOWN_inputmap_last.png
+
+dout = getpopinputmap(pdf, tt[0], dnumc, dstartidx, dendidx, 'EMUP')
+clf(); plotallinputmaps(pdf,tt[0],dstartidx['EMUP'],'EMUP',dnumc,dstartidx,dendidx,asweight=True,dmap=dout)
+savefig('gif/'+dstr+simstr+'EMUP_inputmap_first.png') # gif/20aug7_20aug6_B1_cycle_EMUP_inputmap_first.png
+dout = getpopinputmap(pdf, tt[-1], dnumc, dstartidx, dendidx, 'EMUP')
+clf(); plotallinputmaps(pdf,tt[-1],dstartidx['EMUP'],'EMUP',dnumc,dstartidx,dendidx,asweight=True,dmap=dout)
+savefig('gif/'+dstr+simstr+'EMUP_inputmap_last.png') # gif/20aug7_20aug6_B1_cycle_EMUP_inputmap_last.png
+
 continue this one (20aug6_B1_cycle_) in multistep ... (but will not continue 20aug6_A1_cycle_ for now)
 
 cp backupcfg/20aug6_B1_cycle_sim.json sn.json
@@ -15614,4 +15639,132 @@ started ~10:31 ...
 ./myrun 30 sn.json
 
 started ~10:45 ...
+
+** border issue
+
+EV1 neurons at border project to fewer IV1 neurons
+IV1 neurons at border project to fewer EV1 neurons
+
+could this lead to problem at corners?
+
+could pad neurons
+
+should store x,y,padded vs not
+
+*** discussion on this
+
+15:05
+samn do EV1 corners provide less activation of IV1 interneurons?
+15:05
+and receive less interneuron input?
+15:05
+since they're at the boundaries
+15:06
+Haroon Anwar yes
+15:06
+samn that's a problem?
+15:06
+and might explain some biases/problems at corners
+15:07
+Haroon Anwar i dont know how to compensate for that
+15:07
+yes thats possible
+15:07
+samn padding
+15:07
+add an extra two rows and columns of interneurons around the border
+15:07
+Haroon Anwar problem is feedforward
+15:08
+less drive is provided to the inhibitory neurons on the border
+15:08
+and corners are even less
+15:08
+corners receive input from 9 neurons
+15:08
+other border neurons receive 15
+15:09
+and nonborder receive 25
+15:09
+samn that should be a problem
+15:09
+Haroon Anwar hmm
+15:09
+good catch
+15:10
+samn suppose so, that may be why kept seeing issues at the corners
+15:10
+and if it's systematic issue with circuit wiring
+15:11
+Haroon Anwar it is systematic
+15:11
+samn paddle on top right isn't right at the corner, but close...
+15:11
+maybe in 20x20 it is close to a border
+15:11
+Haroon Anwar yes at least its receiving 15 inputs vs 25
+15:12
+samn so how to fix?
+15:14
+Haroon Anwar easy fix would be do padding of neurons in all layers
+15:15
+so that the border effect is pushed to padded neurons
+15:15
+samn any problem with that other than extra cost?
+15:15
+Haroon Anwar cant think of any problem at the moment
+15:16
+samn so the problem is in the EV1 edges, receiving less IV1 input
+15:16
+Haroon Anwar both ways
+15:16
+samn but also for IV1 borders receiving  less
+15:16
+Haroon Anwar IV1 receiving less input from EV1 edges
+15:17
+and in return EV1 edge neurons receiving even lesser inhibition
+15:17
+so its added effect
+15:18
+samn ok, probably should fix with padding...but if padded neurons used for behavior, won't they also have problems?
+15:18
+Haroon Anwar right
+15:18
+so for projects onto motor neurons, will have to exclude padded neurons
+15:18
+projections from premotor to motor
+15:19
+samn then need to carefully have set of properties of each neuron stored ... x, y, padded vs not padded
+15:19
+Haroon Anwar will need a function to get list of neurons for projections
+15:19
+samn otherwise, difficult to ensure correct
+15:20
+Haroon Anwar yes
+15:20
+samn and so can get all inputs/outputs to/from a type, based on neuron ID
+15:20
+to make sure right...
+15:21
+Haroon Anwar yes
+15:21
+samn could that be your priority?
+15:21
+seems important if systematic issue
+15:22
+alternative is to have random wiring
+15:22
+with fixed convergence
+15:22
+between EV1, IV1
+15:22
+Haroon Anwar yes this will be my priority…. but will have to wait for Monday for this…. quite busy on weekend
+15:22
+samn ok sg
+15:22
+Haroon Anwar random wiring--- that would be last resort…. i dont prefer that
+15:24
+samn makes sense
+:+1:
+1
 
