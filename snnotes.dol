@@ -15844,3 +15844,25 @@ savefig('gif/'+dstr+simstr+'compare_perf.png') # gif/20aug10_20aug7_C0_cycle_com
 the one with 20 ms tstepPerAction (blue) looks better, though it has 2X as much game-time
 compared to the one with 40 ms tstepPerAction ...
 
+** check output from gcp
+
+these are two sims without targetted RL
+
+20aug6_A0_gcp_ : same as 20aug4_A0_cycle_ but without targetted RL
+20aug6_B0_gcp_ : same as 20aug4_B0_cycle_ but without targetted RL, has
+RL plastic connectivity between EM populations
+
+python -i simdat.py backupcfg/20aug6_A0_gcp_sim.json
+
+ax=plotPerf(actreward,yl=(0,.55))
+savefig('gif/'+dstr+simstr+'perf.png') # gif/20aug10_20aug6_A0_gcp_perf.png
+hit/miss and score/miss somewhat worse than with targetted RL but the follow
+probability is surprisingly similar to with targetted RL
+
+lfn = ['20aug6_A0_gcp_', '20aug6_B0_gcp_']
+lpda = getindivactionreward(lfn)
+clf(); plotComparePerf(lpda,['b','r'],yl=(0,.55),lleg=lfn)
+savefig('gif/'+dstr+simstr+'compare_perf.png') # gif/20aug10_20aug6_A0_gcp_compare_perf.png
+in this case, the cross EM population recurrent connectivity (20aug6_B0_gcp_) sim
+does worse in follow and hit/miss compared to the sim without (20aug6_A0_gcp_)
+
