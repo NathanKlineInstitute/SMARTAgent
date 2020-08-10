@@ -15768,3 +15768,79 @@ samn makes sense
 :+1:
 1
 
+*20aug10
+** check output on cycle (20aug7_B2_cycle__step_3_)
+
+python -i simdat.py backupcfg/20aug7_B2_cycle__step_3_sim.json
+
+ax=plotPerf(actreward,yl=(0,.55))
+savefig('gif/'+dstr+simstr+'perf.png') # gif/20aug10_20aug7_B2_cycle__step_3_perf.png
+
+lfn = ['20aug4_B0_cycle_','20aug6_B1_cycle_','20aug7_B2_cycle__step_0_','20aug7_B2_cycle__step_1_','20aug7_B2_cycle__step_2_','20aug7_B2_cycle__step_3_']
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0,.55))
+savefig('gif/'+dstr+simstr+'perf_all_steps_so_far.png') # gif/20aug10_20aug7_B2_cycle__step_3_perf_all_steps_so_far.png
+increasing for a while, then decreasing - due to overly high firing rates?
+
+looked like performance starting decaying around 0.4*1e7 ms
+0.4*1e7 # 4000 000.0 ... 4000 s ... stopped the sim ... 
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((1990e3,2000e3))
+savefig('gif/'+dstr+simstr+'rast.png') # gif/20aug10_20aug7_B2_cycle__step_3_rast.png
+xlim((1999e3,2000e3))
+savefig('gif/'+dstr+simstr+'rastB.png') # gif/20aug10_20aug7_B2_cycle__step_3_rastB.png
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','IM'],tlim=((1990e3,2000e3)))
+savefig('gif/'+dstr+simstr+'Vm.png') # gif/20aug10_20aug7_B2_cycle__step_3_Vm.png
+
+## fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4') #
+
+can restart the sim from where it was at 4000 s but first normalize the weights and then normalize weights every additional
+4000 s ... see if that helps ...
+
+so the first 4000 s were from these two 2000 s sims:
+20aug4_B0_cycle_sim.json and 20aug6_B1_cycle_sim.json
+so take weights from 20aug6_B1_cycle_synWeights_final.pkl and normalize them
+and use that to continue sim ...
+
+python -i simdat.py backupcfg/20aug6_B1_cycle_sim.json
+
+can make a flag to normalize weights at start ...
+
+and it will only be used when resumeSim:
+    if 'normalizeWeightsAtStart' in dconf['sim']:
+      if dconf['sim']['normalizeWeightsAtStart']:
+        print('normalizing adjustable weights at start')
+        normalizeAdjustableWeights(sim, 0, lpop = lrecpop)
+
+
+...
+        "name": "20aug10_B2_cycle_",
+    "simtype": {
+        "ResumeSim": 1,
+        "ResumeSimFromFile": "data/20aug6_B1_cycle_synWeights_final.pkl"
+    },
+	"normalizeWeightsAtStart": 1,
+
+./myrun 30 sn.json
+
+started @ 16:17 ...
+
+normalizing adjustable weights at start
+sim.rank= 0 davg: {'EMUP': 0.00015330298049694589, 'EMDOWN': 0.00014458421066697647} dfctr: {'EMUP': 0.3356975491603856, 'EMDOWN': 0.3356975491603856}
+
+** check 20aug7_C0_cycle_ (same as 20aug4_B0_cycle_ but with tstepPerAction==40)
+
+python -i simdat.py backupcfg/20aug7_C0_cycle_sim.json
+
+ax=plotPerf(actreward,yl=(0,.55))
+savefig('gif/'+dstr+simstr+'perf.png') # gif/20aug10_20aug7_C0_cycle_perf.png
+
+lfn = ['20aug4_B0_cycle_','20aug7_C0_cycle_']
+lpda = getindivactionreward(lfn)
+clf(); plotComparePerf(lpda,['b','r'],yl=(0,.55),lleg=lfn)
+savefig('gif/'+dstr+simstr+'compare_perf.png') # gif/20aug10_20aug7_C0_cycle_compare_perf.png
+
+the one with 20 ms tstepPerAction (blue) looks better, though it has 2X as much game-time
+compared to the one with 40 ms tstepPerAction ...
+

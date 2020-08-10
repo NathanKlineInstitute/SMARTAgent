@@ -33,7 +33,7 @@
     "verbose": 0,
     "stayStepLim": 0,
     "simtype": {
-        "ResumeSim": 0,
+        "ResumeSim": 1,
         "ResumeSimFromFile": "data/20aug6_B1_cycle_synWeights_final.pkl"	
     },
     "sim": {
@@ -43,16 +43,17 @@
         "recordStep": 0.6,
         "recordWeightStepSize": 500,
         "normalizeWeightStepSize": 9000000000,
+	"normalizeWeightsAtStart": 1,
         "RLFakeUpRule": 0,
         "RLFakeDownRule": 0,
         "RLFakeStayRule": 0,
-        "name": "20aug7_C0_cycle_",
+        "name": "20aug10_B2_cycle_",
         "doquit": 1,
         "doplot": 0,
         "saveCellSecs": 0,
         "saveCellConns": 0,
         "targettedRL": 1,
-        "tstepPerAction": 40,
+        "tstepPerAction": 20,
         "saveWeights": 1
     },
     "architecturePreMtoM": {

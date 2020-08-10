@@ -1141,6 +1141,10 @@ if dconf['simtype']['ResumeSim']:
     A = readweightsfile2pdf(dconf['simtype']['ResumeSimFromFile'])
     updateSTDPWeights(sim, A[A.time == max(A.time)]) # take the latest weights saved
     if sim.rank==0: print('Updated STDP weights')
+    if 'normalizeWeightsAtStart' in dconf['sim']:
+      if dconf['sim']['normalizeWeightsAtStart']:
+        print('normalizing adjustable weights at start')
+        normalizeAdjustableWeights(sim, 0, lpop = lrecpop)
   except:
     print('Could not restore STDP weights from file.')
 
