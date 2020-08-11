@@ -4489,3 +4489,164 @@ Debugging function in simdat.py--- analyzeRepeatedInputSequences(dact, InputImag
 -- still need to test it.
 
 -- if the number of sequences is less than 10, then dont generate an error. checking.....
+
+
+* 20aug10
+
+-- TASK: ADD PADDING NEURONS TO AVOID BOUNDARY EFFECTS IN THE NETWORK.
+
+-- Features:
+1. should be automatic
+2. Number of padding neurons will depend on Size of Pop and Connections generated from the pop.
+    e.g. if we have 10x10 neurons in a population and 3x3 neurons are projecting from this population to other population
+    then we need to add a single layer of neurons around 10x10 neurons which will be 44 additional neurons.
+    if we have 10x10 neurons in a population and 5x5 neurons are projecting from this population to other population 
+    then we need to add double layer of neurons around 10x10 neurons which be 44 additional neurons in first layer and 52
+    additional neurons in 2nd layer. 
+
+-- to automate, add topological connectivity parameters in the sim.json file as follows.
+
+        "alltopolcons":{
+            "ER":{"IR":3,"EV1":3},
+            "IR":{"ER":5},
+            "EV1":{"IV1":3,"EV4":3,"ER":3},
+            "IV1":{"EV1":5,"IV4":5,"ER":5},
+            "EV4":{"IV4":3,"EMT":3,"EV1":3},
+            "IV4":{"EV4":5,"IMT":5,"EV1":5},
+            "EMT":{"IMT":3,"EV4":3},
+            "IMT":{"EMT":5,"EV4":5}
+        },
+        "useNeuronPad": 1,
+
+-- update number of neurons by including padding neurons, if useNeuronPad = 1	
+
+dnumc_padx = OrderedDict({ty:dconf['net']['allpops'][ty]*0 for ty in allpops}) # a dictionary with zeros to keep number of padded neurons in one dimension
+
+dtopolcons = dconf['net']['alltopolcons']
+allpops_withtopology = list(dtopolcons.keys())
+# below is the code for updating neuronal pop size to include padding. 
+if useNeuronPad:
+  for pop in allpops_withtopology:
+    max_receptive_field = np.amax(list(dtopolcons[pop].values()))
+    if dnumc[pop]>0 and max_receptive_field>0:
+      dnumc[pop] = int((np.sqrt(dnumc[pop])+max_receptive_field-1)**2)
+      dnumc_padx[pop] = max_receptive_field-1
+
+-- take care of padded neurons while making connection list using:
+
+def connectLayerswithOverlap (NBpreN, NBpostN, overlap_xdir,padded_preneurons_xdir,padded_postneurons_xdir):
+
+could be used as 
+
+connectLayerswithOverlap(NBpreN = dnumc['EV1'], NBpostN = dnumc['EV4'], overlap_xdir = dtopolcons['EV1']['EV4'], padded_preneurons_xdir = dnumc_padx['EV1'], padded_postneurons_xdir = dnumc_padx['EV4'])
+
+
+    targetOffset_x = int(padded_postneurons_xdir/2)
+    targetOffset_y = int(padded_postneurons_xdir/2) # assuming we have pops in square format. so anything x dimension would be same as in y dimension
+    sourceOffset_x = int(padded_preneurons_xdir/2)
+    sourceOffset_y = int(padded_preneurons_xdir/2) # assuming we have pops in square format. so anything x dimension would be same as in y dimension
+    target_postNIndices = list(range(targetOffset_x,NBpostN_x-targetOffset_x,1))
+    source_preNIndices = list(range(sourceOffset_x,NBpreN_x-sourceOffset_x,int(convergence_factor_x)))
+    for i in range(len(target_postNIndices)):				#parse the non
+        for j in range(len(target_postNIndices)):
+            postN = int(postNIndices[target_postNIndices[i],target_postNIndices[j]])
+            preN = int(preNIndices[source_preNIndices[i],source_preNIndices[j]]) 
+            preNIndices[int(i*convergence_factor_y),int(j*convergence_factor_x)]
+
+
+-- similar modifications in:
+def connectLayerswithOverlapDiv(NBpreN, NBpostN, overlap_xdir,padded_preneurons_xdir,padded_postneurons_xdir):
+
+except now:
+
+    target_postNIndices = list(range(targetOffset_x,NBpostN_x-targetOffset_x,int(divergence_factor_x)))
+    source_preNIndices = list(range(sourceOffset_x,NBpreN_x-sourceOffset_x,1))
+
+
+-- looked GOOD
+
+-- now the problem is that I have extra neurons which are not used in network. These neurons were generated because I used receptive field size for both convergent and divergent connections.
+-- We dont need to consider adding neurons (padding) for divergent connections. so i changes sim.json to
+
+
+        "alltopoldivcons":{
+            "IR":{"ER":5},
+            "EV1":{"ER":3},
+            "IV1":{"EV1":5,"ER":5},
+            "EV4":{"EV1":3},
+            "IV4":{"EV4":5,"EV1":5},
+            "EMT":{"EV4":3},
+            "IMT":{"EMT":5,"EV4":5}
+        },
+        "alltopolconvcons":{
+            "ER":{"IR":3,"EV1":3},
+            "EV1":{"IV1":3,"EV4":3},
+            "IV1":{"IV4":5},
+            "EV4":{"IV4":3,"EMT":3},
+            "IV4":{"IMT":5},
+            "EMT":{"IMT":3}
+        },
+
+and 
+
+
+dtopoldivcons = dconf['net']['alltopoldivcons']
+dtopolconvcons = dconf['net']['alltopolconvcons']
+allpops_withconvtopology = list(dtopolconvcons.keys())
+# below is the code for updating neuronal pop size to include padding. 
+if dconf['net']['useNeuronPad']==1:
+  for pop in allpops_withconvtopology:
+    receptive_fields = []
+    for postpop in list(dtopolconvcons[pop].keys()):
+      if dnumc[postpop]>0:
+        receptive_fields.append(dtopolconvcons[pop][postpop])
+    if len(receptive_fields)>0:
+      max_receptive_field = np.amax(receptive_fields)
+    else:
+      max_receptive_field = 0
+    if dnumc[pop]>0 and max_receptive_field>0:
+      dnumc[pop] = int((np.sqrt(dnumc[pop])+max_receptive_field-1)**2)
+      dnumc_padx[pop] = max_receptive_field-1
+
+
+
+
+Changes In aigame.py
+
+-- initialization:
+.... finding receptive field size to use for padding
+    self.dReceptiveField = OrderedDict({pop:np.amax(list(dconf['net']['alltopolconvcons'][pop].values())) for pop in self.lratepop})
+.... dictionary of pop size after padding.
+    self.dInputs = OrderedDict({pop:int((np.sqrt(dconf['net']['allpops'][pop])+self.dReceptiveField[pop]-1)**2) for pop in self.lratepop})
+.... if use neuron padding, then create dictionary with different size.
+    if dconf['net']['useNeuronPad']==1:
+      self.dFiringRates = OrderedDict({pop:np.zeros(dInputs[pop]) for pop in self.lratepop}) # python objects for firing rate calculations
+    else:
+      self.dFiringRates = OrderedDict({pop:np.zeros(dconf['net']['allpops'][pop]) for pop in self.lratepop}) # python objects for firing rate calculations
+.... if use neuron padding, compute input_dims accordingly:
+    if dconf['net']['useNeuronPad']==1:
+      self.input_dim = int(np.sqrt(self.dInputs[self.InputPop]))
+    else:  
+      self.input_dim = int(np.sqrt(dconf['net']['allpops'][self.InputPop])) # input image XY plane width,height -- not used anywhere
+
+-- function to update firing rates of neurons when using padded neurons.
+
+  def updateInputRatesWithPadding (self, dsum_Images):
+    # update input rates to retinal neurons
+    padded_Image = np.zeros(shape=(self.input_dim,self.input_dim))
+    offset = int((self.dReceptiveField[self.InputPop]-1)/2)
+    padded_Image[offset:offset+dsum_Images.shape[0],offset:offset+dsum_Images.shape[1]]=dsum_Images
+    fr_Images = 40/(1+np.exp((np.multiply(-1,padded_Image)+123)/25))
+    fr_Images = np.subtract(fr_Images,np.min(fr_Images)) #baseline firing rate subtraction. Instead all excitatory neurons are firing at 5Hz.
+    print(np.amin(fr_Images),np.amax(fr_Images))
+    self.dFiringRates[self.InputPop] = np.reshape(fr_Images,self.dInputs[self.InputPop]) #400 for 20*20, 900 for 30*30, etc.
+
+-- updating firing rates of input neurons.
+
+    if dconf['net']['useNeuronPad']==1:
+      self.updateInputRatesWithPadding(dsum_Images)
+    else:
+      self.updateInputRates(dsum_Images) # update input rates to retinal neurons
+
+
+-- tested a little bit--- seems that the padding is working without any problem.
