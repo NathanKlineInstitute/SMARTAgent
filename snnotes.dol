@@ -15946,3 +15946,16 @@ but will keep intermediate rewards turned on ...
 
 ./myrun 30 sn.json
 
+** sal response to netpyne forum INTF question
+
+You can just use: netParams.popParams['S'] = {'cellType': 'PYR', 'numCells': 1, 'cellModel': 'IntFire4'}
+
+As described in the docs, for point neurons you don't need to define cellParams, you can just
+include the name of the point neuron (ARTIFICIAL_CELL in mod file) as the cellModel :
+http://www.netpyne.org/reference.html#population-parameters
+
+You can also record any variables of the point neuron, e.g.: simConfig.recordTraces =
+{'intfire4_i1': {'var': 'i1'}}
+
+** fixing up INTF based on sal recc
+

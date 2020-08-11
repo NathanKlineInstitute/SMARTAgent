@@ -76,6 +76,28 @@ if 'EIPlast' in dconf['net']:
 netParams = specs.NetParams() #object of class NetParams to store the network parameters
 netParams.defaultThreshold = 0.0 # spike threshold, 10 mV is NetCon default, lower it for all cells
 
+simConfig = specs.SimConfig()           # object of class SimConfig to store simulation configuration
+#Simulation options
+simConfig.duration = dconf['sim']['duration'] # 100e3 # 0.1e5                      # Duration of the simulation, in ms
+simConfig.dt = dconf['sim']['dt']                            # Internal integration timestep to use
+simConfig.hParams['celsius'] = 37 # make sure temperature is set. otherwise we're at squid temperature
+simConfig.verbose = dconf['sim']['verbose']                       # Show detailed messages
+simConfig.recordTraces = {'V_soma':{'sec':'soma','loc':0.5,'var':'v'}}  # Dict with traces to record
+simConfig.recordCellsSpikes = [-1]
+simConfig.recordStep = dconf['sim']['recordStep'] # Step size in ms to save data (e.g. V traces, LFP, etc)
+simConfig.filename = 'data/'+dconf['sim']['name']+'simConfig'  # Set file output name
+simConfig.saveJson = False
+simConfig.savePickle = True            # Save params, network and sim output to pickle file
+simConfig.saveMat = False
+simConfig.saveFolder = 'data'
+# simConfig.backupCfg = ['sim.json', 'backupcfg/'+dconf['sim']['name']+'sim.json']
+#simConfig.createNEURONObj = True  # create HOC objects when instantiating network
+#simConfig.createPyStruct = True  # create Python structure (simulator-independent) when instantiating network
+simConfig.analysis['plotTraces'] = {'include': [(pop, 0) for pop in ['ER','IR','EV1','EV1DE','ID','IV1','EV4','IV4','EMT','IMT','EMDOWN','EMUP','IM']]}
+simConfig.analysis['plotRaster'] = {'popRates':'overlay','showFig':dconf['sim']['doplot']}
+#simConfig.analysis['plot2Dnet'] = True 
+#simConfig.analysis['plotConn'] = True           # plot connectivity matrix
+
 ECellModel = 'Mainen'
 if 'ECellModel' in dconf['net']: ECellModel = dconf['net']['ECellModel']
 ICellModel = 'FS_BasketCell'
@@ -102,14 +124,11 @@ def makeECellModel (ECellModel):
     RScellRule['secs']['soma']['geom'] = {'diam': 10, 'L': 10, 'cm': 31.831}
     RScellRule['secs']['soma']['pointps']['Izhi'] = {'mod':'Izhi2007b', 'C':1, 'k':0.7, 'vr':-60, 'vt':-40, 'vpeak':35, 'a':0.03, 'b':-2, 'c':-50, 'd':100, 'celltype':1}
     netParams.cellParams['IzhiRS'] = RScellRule  # add dict to list of cell properties
-  elif ECellModel == 'INTF':
-    RScellRule = {'conds': {'cellType': ETypes, 'cellModel': 'IntFire4RS'}, 'secs': {}}
-    RScellRule['secs']['soma'] = {'geom': {}, 'pointps':{}}  #  soma
-    #RScellRule['secs']['soma']['geom'] = {'diam': 10, 'L': 10, 'cm': 31.831}
-    RScellRule['secs']['soma']['pointps']['INTF'] = {'mod':'intfire4'}
-    RScellRule['secs']['soma']['pointps']['INTF']['vref'] = 'm' # specify that uses its own voltage V
-    netParams.cellParams['IntFire4RS'] = RScellRule  # add dict to list of cell properties
+  elif ECellModel == 'IntFire4':
     EExcitSec = 'soma' # section where excitatory synapses placed
+    simConfig.recordTraces = {'V_soma':{'var':'m'}}  # Dict with traces to record
+    for ty in ETypes:
+      netParams.popParams[ty] = {'cellType':ty, 'numCells': dnumc[ty], 'cellModel': ECellModel}#, 'params':{'taue':5.35,'taui1':9.1,'taui2':0.07,'taum':20}}    
   elif ECellModel == 'Friesen':
     cellRule = netParams.importCellParams(label='PYR_Friesen_rule', conds={'cellType': ETypes, 'cellModel': 'Friesen'},
                 fileName='cells/friesen.py', cellName='MakeRSFCELL')
@@ -127,17 +146,11 @@ def makeICellModel (ICellModel):
     FScellRule['secs']['soma'] = {'geom': {}, 'pointps':{}}  #  soma
     FScellRule['secs']['soma']['geom'] = {'diam': 10, 'L': 10, 'cm': 31.831}
     FScellRule['secs']['soma']['pointps']['Izhi'] = {'mod':'Izhi2007b', 'C':0.2, 'k':1.0, 'vr':-55, 'vt':-40, 'vpeak':25, 'a':0.2, 'b':-2, 'c':-45, 'd':-55, 'celltype':5}
-    RFScellRule['secs']['soma']['pointps']['INTF']['vref'] = 'm' # specify that uses its own voltage V  
     netParams.cellParams['IzhiFS'] = FScellRule  # add dict to list of cell properties
-  elif ICellModel == 'INTF':
-    #FScellRule = netParams.importCellParams(label='INTFFS_rule', conds={'cellType': ITypes, 'cellModel':'IntFire4'},
-    #                                        fileName='cells/IntFirewrapper.py',cellName='IntFire4Cell',  cellArgs={'host':'dummy'})  
-    FScellRule = {'conds': {'cellType': ITypes, 'cellModel': 'IntFire4'}, 'secs': {}}
-    FScellRule['secs']['soma'] = {'geom': {}, 'pointps':{}}  #  soma
-    #FScellRule['secs']['soma']['geom'] = {'diam': 10, 'L': 10, 'cm': 31.831}
-    FScellRule['secs']['soma']['pointps']['INTF'] = {'mod':'intfire4'}
-    FScellRule['secs']['soma']['pointps']['INTF']['vref'] = 'm' # specify that uses its own voltage V  
-    netParams.cellParams['IntFire4FS'] = FScellRule  # add dict to list of cell properties  
+  elif ICellModel == 'IntFire4':
+    simConfig.recordTraces = {'V_soma':{'var':'m'}}  # Dict with traces to record
+    for ty in ITypes:
+      netParams.popParams[ty] = {'cellType':ty, 'numCells': dnumc[ty], 'cellModel': ICellModel}#, 'params':{'taue':5.35,'taui1':9.1,'taui2':0.07,'taum':20}}        
   elif ICellModel == 'Friesen':
     cellRule = netParams.importCellParams(label='Bas_Friesen_rule', conds={'cellType': ITypes, 'cellModel': 'Friesen'},
                 fileName='cells/friesen.py', cellName='MakeFSFCELL')
@@ -262,31 +275,6 @@ blistIV4toIMT = connectLayerswithOverlap(NBpreN = dnumc['IV4'], NBpostN = dnumc[
 if dnumc['IR']>0: blistIV1toER = connectLayerswithOverlapDiv(NBpreN = dnumc['IV1'], NBpostN = dnumc['ER'], overlap_xdir = 5)
 blistIV4toEV1 = connectLayerswithOverlapDiv(NBpreN = dnumc['IV4'], NBpostN = dnumc['EV1'], overlap_xdir = 5)
 blistIMTtoEV4 = connectLayerswithOverlapDiv(NBpreN = dnumc['IMT'], NBpostN = dnumc['EV4'], overlap_xdir = 5)
-
-#Simulation options
-simConfig = specs.SimConfig()           # object of class SimConfig to store simulation configuration
-
-simConfig.duration = dconf['sim']['duration'] # 100e3 # 0.1e5                      # Duration of the simulation, in ms
-simConfig.dt = dconf['sim']['dt']                            # Internal integration timestep to use
-simConfig.hParams['celsius'] = 37 # make sure temperature is set. otherwise we're at squid temperature
-simConfig.verbose = dconf['sim']['verbose']                       # Show detailed messages
-simConfig.recordTraces = {'V_soma':{'sec':'soma','loc':0.5,'var':'v'}}  # Dict with traces to record
-simConfig.recordCellsSpikes = [-1]
-simConfig.recordStep = dconf['sim']['recordStep'] # Step size in ms to save data (e.g. V traces, LFP, etc)
-simConfig.filename = 'data/'+dconf['sim']['name']+'simConfig'  # Set file output name
-simConfig.saveJson = False
-simConfig.savePickle = True            # Save params, network and sim output to pickle file
-simConfig.saveMat = False
-simConfig.saveFolder = 'data'
-# simConfig.backupCfg = ['sim.json', 'backupcfg/'+dconf['sim']['name']+'sim.json']
-
-#simConfig.createNEURONObj = True  # create HOC objects when instantiating network
-#simConfig.createPyStruct = True  # create Python structure (simulator-independent) when instantiating network
-
-simConfig.analysis['plotTraces'] = {'include': [(pop, 0) for pop in ['ER','IR','EV1','EV1DE','ID','IV1','EV4','IV4','EMT','IMT','EMDOWN','EMUP','IM']]}
-simConfig.analysis['plotRaster'] = {'popRates':'overlay','showFig':dconf['sim']['doplot']}
-#simConfig.analysis['plot2Dnet'] = True 
-#simConfig.analysis['plotConn'] = True           # plot connectivity matrix
 
 # synaptic weight gain (based on E, I types)
 cfg = simConfig
