@@ -336,23 +336,34 @@ if EEPreMProb > 0.0:
       }
       if dSTDPparamsRL[synmech]['RLon']: # only turn on plasticity when specified to do so
         netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL[synmech]}
-               
+
+VTopoI = True # whether interneurons have topological arrangement
+if "VTopoI" in dconf['net']: VTopoI = dconf['net']['VTopoI']
+        
 #E to I within area
 if dnumc['ER']>0:
   netParams.connParams['ER->IR'] = {
           'preConds': {'pop': 'ER'},
           'postConds': {'pop': 'IR'},
-          'connList': blistERtoIR,
           'weight': 0.02 * cfg.EIGain,
           'delay': 2,
           'synMech': 'AMPA', 'sec':'soma', 'loc':0.5}
+  if VTopoI:
+    netParams.connParams['ER->IR']['connList'] = blistERtoIR
+  else:
+    netParams.connParams['ER->IR']['convergence'] = 9
+  
 netParams.connParams['EV1->IV1'] = {
         'preConds': {'pop': 'EV1'},
         'postConds': {'pop': 'IV1'},
-        'connList': blistEV1toIV1,
         'weight': 0.02 * cfg.EIGain,
         'delay': 2,
         'synMech': 'AMPA', 'sec':'soma', 'loc':0.5}
+if VTopoI:
+  netParams.connParams['EV1->IV1']['connList'] = blistEV1toIV1
+else:
+  netParams.connParams['EV1->IV1']['convergence'] = 9
+
 
 """
 for prety in EDirPops:
@@ -369,17 +380,22 @@ for prety in EDirPops:
 netParams.connParams['EV4->IV4'] = {
         'preConds': {'pop': 'EV4'},
         'postConds': {'pop': 'IV4'},
-        'connList': blistEV4toIV4,
         'weight': 0.02 * cfg.EIGain,
         'delay': 2,
         'synMech': 'AMPA', 'sec':'soma', 'loc':0.5}
+if VTopoI: netParams.connParams['EV4->IV4']['connList'] = blistEV4toIV4
+else: netParams.connParams['EV4->IV4']['convergence'] = 9
+
+
 netParams.connParams['EMT->IMT'] = {
         'preConds': {'pop': 'EMT'},
         'postConds': {'pop': 'IMT'},
-        'connList': blistEMTtoIMT,
         'weight': 0.02 * cfg.EIGain,
         'delay': 2,
         'synMech': 'AMPA', 'sec':'soma', 'loc':0.5}
+if VTopoI: netParams.connParams['EMT->IMT']['connList'] = blistEMTtoIMT
+else: netParams.connParams['EMT->IMT']['convergence'] = 9
+
 
 for prety in EMotorPops:
   k = prety+'->IM'
@@ -401,17 +417,20 @@ if dnumc['ER']>0:
   netParams.connParams['IR->ER'] = {
           'preConds': {'pop': 'IR'},
           'postConds': {'pop': 'ER'},
-          'connList': blistIRtoER,
           'weight': 0.2 * cfg.IEGain,
           'delay': 2,
           'synMech': 'GABA', 'sec':'soma', 'loc':0.5}
+  if VTopoI: netParams.connParams['IR->ER']['connList'] = blistIRtoER
+  else: netParams.connParams['IR->ER']['convergence'] = 25
+  
 netParams.connParams['IV1->EV1'] = {
-        'preConds': {'pop': 'IV1'},
-        'postConds': {'pop': 'EV1'},
-        'connList': blistIV1toEV1,
-        'weight': 0.2 * cfg.IEGain,
-        'delay': 2,
-        'synMech': 'GABA', 'sec':'soma', 'loc':0.5}
+  'preConds': {'pop': 'IV1'},
+  'postConds': {'pop': 'EV1'},
+  'weight': 0.2 * cfg.IEGain,
+  'delay': 2,
+  'synMech': 'GABA', 'sec':'soma', 'loc':0.5}
+if VTopoI: netParams.connParams['IV1->EV1']['connList'] = blistIV1toEV1
+else: netParams.connParams['IV1->EV1']['convergence'] = 25  
 
 """
 for prety in IDirPops:
@@ -428,10 +447,12 @@ for prety in IDirPops:
 netParams.connParams['IV4->EV4'] = {
         'preConds': {'pop': 'IV4'},
         'postConds': {'pop': 'EV4'},
-        'connList': blistIV4toEV4,
         'weight': 0.2 * cfg.IEGain,
         'delay': 2,
         'synMech': 'GABA', 'sec':'soma', 'loc':0.5}
+if VTopoI: netParams.connParams['IV4->EV4']['connList'] = blistIV4toEV4
+else: netParams.connParams['IV4->EV4']['convergence'] = 25
+
 netParams.connParams['IMT->EMT'] = {
         'preConds': {'pop': 'IMT'},
         'postConds': {'pop': 'EMT'},
@@ -439,6 +460,8 @@ netParams.connParams['IMT->EMT'] = {
         'weight': 0.2 * cfg.IEGain,
         'delay': 2,
         'synMech': 'GABA', 'sec':'soma', 'loc':0.5}
+if VTopoI: netParams.connParams['IMT->EMT']['connList'] = blistIMTtoEMT
+else: netParams.connParams['IMT->EMT']['convergence'] = 25
 
 for poty in EMotorPops: # I -> E for motor populations
   netParams.connParams['IM->'+poty] = {

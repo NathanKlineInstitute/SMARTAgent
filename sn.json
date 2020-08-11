@@ -33,7 +33,7 @@
     "verbose": 0,
     "stayStepLim": 0,
     "simtype": {
-        "ResumeSim": 1,
+        "ResumeSim": 0,
         "ResumeSimFromFile": "data/20aug6_B1_cycle_synWeights_final.pkl"	
     },
     "sim": {
@@ -47,7 +47,7 @@
         "RLFakeUpRule": 0,
         "RLFakeDownRule": 0,
         "RLFakeStayRule": 0,
-        "name": "20aug10_B2_cycle_",
+        "name": "20aug10_VTopoI0_cycle_",
         "doquit": 1,
         "doplot": 0,
         "saveCellSecs": 0,
@@ -61,6 +61,8 @@
         "useTopological": 0
     },
     "net": {
+	"EIPlast": 0,
+	"VTopoI": 0,
         "scale": 1,
 	"allpops": {
 	    "ER":0,
@@ -109,6 +111,22 @@
         "weightVar": 0.5
     },
     "RL": {
+	"AMPAI": {
+            "wbase": 1e-07,
+            "wmax": 0.00048,
+            "RLon": 1,
+            "RLlenhebb": 200,
+            "RLlenanti": 50,
+            "useRLexp": 1,
+            "RLhebbwt": 2.5e-06,
+            "RLantiwt": -0.0,
+            "hebbwt": 0,
+            "antiwt": 0,
+            "tauhebb": 10,
+            "RLwindhebb": 50,
+            "softthresh": 0,
+            "verbose": 0
+        },
         "AMPA": {
             "wbase": 1e-07,
             "wmax": 0.00048,
