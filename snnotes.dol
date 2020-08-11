@@ -15910,3 +15910,39 @@ else: netParams.connParams['IV1->EV1']['convergence'] = 25
 
 to breakup some of the hypersynch
 
+ok, started that run on gcp -         "name": "20aug10_VTopoI0_ID800_gcp_",
+with 800 ID neurons (project back to the EDir neurons)
+to use them have to specify
+	"EDirPops": ["EV1DE","EV1DNE","EV1DN","EV1DNW","EV1DW","EV1DSW","EV1DS","EV1DSE"],
+	"IDirPops": ["ID"],
+in json file
+and their number in allpops 
+
+*20aug11
+** ha finishing up padding and scaling
+
+scaling = same number of inputs for each neuron - is that different
+from fixed convergence? should be somewhat different since preserves
+topology
+
+** V4, MT?         "name": "20aug11_VTopoI0_ID800_V4MT_gcp_",
+
+more layers? more RL plasticity?
+
+will try with EV1->EV4 and EV4->EMT using RL plasticity
+and probabilistic connectivity with fixed convergence, rather than topographic ...
+
+EV4,EMT then project to EM populations with RL plasticity ...
+
+	    "EV4":100,
+	    "IV4":25,
+	    "EMT":100,
+	    "IMT":25,
+
+also have a new VisualRL flag that controls whether to use RL from EV1->EV4, EV4->EMT
+
+will leave targettedRL off since EV4,EMT do not produce motor commands directly ...
+but will keep intermediate rewards turned on ... 
+
+./myrun 30 sn.json
+

@@ -60,7 +60,13 @@ else:
 if dconf['net']['EEPreMProb'] > 0.0 or dconf['net']['EEMFeedbackProb'] > 0.0 or dconf['net']['VisualFeedback']:
   for pop in ['EV1','EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE','EV4','EMT']:
     lrecpop.append(pop)
-  if dconf['net']['VisualFeedback'] and 'ER' in dconf['net']: lrecpop.append('ER')
+  if dconf['net']['VisualFeedback'] and dnumc['ER']>0: lrecpop.append('ER')
+
+VisualRL = False
+if 'VIsualRL' in dconf['net']: VisualRL = dconf['net']['VisualRL']
+if VisualRL:
+  if lrecpop.count('EV4')==0: lrecpop.append('EV4')
+  if lrecpop.count('EMT')==0: lrecpop.append('EMT')
   
 if 'EIPlast' in dconf['net']:
   if dconf['net']['EIPlast']:
@@ -243,8 +249,8 @@ blistIMTtoEMT = connectLayerswithOverlapDiv(NBpreN = dnumc['IMT'], NBpostN = dnu
 #Feedbackward excitation
 #E to E  
 if dnumc['ER']>0: blistEV1toER = connectLayerswithOverlapDiv(NBpreN = dnumc['EV1'], NBpostN = dnumc['ER'], overlap_xdir = 3)
-blistEV4toEV1 = connectLayerswithOverlapDiv(NBpreN = dnumc['EV4'], NBpostN = dnumc['EV1'], overlap_xdir = 3)
-blistEMTtoEV4 = connectLayerswithOverlapDiv(NBpreN = dnumc['EMT'], NBpostN = dnumc['EV4'], overlap_xdir = 3)
+#blistEV4toEV1 = connectLayerswithOverlapDiv(NBpreN = dnumc['EV4'], NBpostN = dnumc['EV1'], overlap_xdir = 3)
+#blistEMTtoEV4 = connectLayerswithOverlapDiv(NBpreN = dnumc['EMT'], NBpostN = dnumc['EV4'], overlap_xdir = 3)
 
 #Feedforward inhibition
 #I to I
@@ -277,7 +283,7 @@ simConfig.saveFolder = 'data'
 #simConfig.createNEURONObj = True  # create HOC objects when instantiating network
 #simConfig.createPyStruct = True  # create Python structure (simulator-independent) when instantiating network
 
-simConfig.analysis['plotTraces'] = {'include': [(pop, 0) for pop in ['ER','IR','EV1','EV1DE','IV1','EMDOWN','EMUP','EMSTAY','IM']]}
+simConfig.analysis['plotTraces'] = {'include': [(pop, 0) for pop in ['ER','IR','EV1','EV1DE','ID','IV1','EV4','IV4','EMT','IMT','EMDOWN','EMUP','IM']]}
 simConfig.analysis['plotRaster'] = {'popRates':'overlay','showFig':dconf['sim']['doplot']}
 #simConfig.analysis['plot2Dnet'] = True 
 #simConfig.analysis['plotConn'] = True           # plot connectivity matrix
@@ -489,31 +495,30 @@ for IType in ['IV1', 'IV4', 'IMT', 'IM', 'ID']:
     'delay': 2,
     'synMech': 'GABA', 'sec':'soma', 'loc':0.5}  
 
-#E to E feedforward connections - AMPA
+#E to E feedforward connections - AMPA,NMDA
+lprety,lpoty,lblist = [],[],[]
 if dnumc['ER']>0:
-  netParams.connParams['ER->EV1'] = {
-          'preConds': {'pop': 'ER'},
-          'postConds': {'pop': 'EV1'},
-          'connList': blistERtoEV1,
-          'weight': 0.015 * cfg.EEGain,
-          'delay': 2,
-          'synMech': 'AMPA','sec':EExcitSec, 'loc':0.5}
-netParams.connParams['EV1->EV4'] = {
-        'preConds': {'pop': 'EV1'},
-        'postConds': {'pop': 'EV4'},
-        'connList': blistEV1toEV4,
-        'weight': 0.0075 * cfg.EEGain,
-        'delay': 2,
-        'synMech': 'AMPA','sec':EExcitSec, 'loc':0.5}
-netParams.connParams['EV4->EMT'] = {
-        'preConds': {'pop': 'EV4'},
-        'postConds': {'pop': 'EMT'},
-        'connList': blistEV4toEMT,
-        #'convergence': 10,
-        'weight': 0.0075 * cfg.EEGain,
-        'delay': 2,
-        'synMech': 'AMPA','sec':EExcitSec, 'loc':0.5}
-
+  lprety.append('ER')
+  lpoty.append('EV1')
+  lblist.append(blistERtoEV1)
+lprety.append('EV1'); lpoty.append('EV4'); lblist.append(blistEV1toEV4)
+lprety.append('EV4'); lpoty.append('EMT'); lblist.append(blistEV4toEMT)
+for prety,poty,blist in zip(lprety,lpoty,lblist):
+  for strty,synmech,weight in zip(['','n'],['AMPA', 'NMDA'],[dconf['net']['EEMWghtAM']*cfg.EEGain, dconf['net']['EEMWghtNM']*cfg.EEGain]):
+    if synmech=='NMDA': continue
+    k = strty+prety+'->'+strty+poty
+    netParams.connParams[k] = {
+            'preConds': {'pop': prety},
+            'postConds': {'pop': poty},
+            'weight': weight * 40,
+            'delay': 2,
+            'synMech': synmech,'sec':EExcitSec, 'loc':0.5}
+    if VTopoI: netParams.connParams[k]['connList'] = blist
+    else: netParams.connParams[k]['convergence'] = prob2conv(0.1,dnumc[prety])
+    if VisualRL and dSTDPparamsRL[synmech]['RLon']: # only turn on plasticity when specified to do so
+      netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL[synmech]}
+      netParams.connParams[k]['plast']['params']['RLhebbwt'] *= 40
+    
 """
 # these all have 0 weight, dont set them up - though no harm in setting them up
 #E to I feedforward connections
@@ -560,7 +565,7 @@ if VisualFeedback:
           'connList': connList,
           'weight': synweight * cfg.EEGain, 
           'delay': 2,
-          'synMech': 'AMPA','sec':EExcitSec, 'loc':0.5} # 'weight' should be fixed
+          'synMech': synmech,'sec':EExcitSec, 'loc':0.5} # 'weight' should be fixed
         if dSTDPparamsRL[synmech]['RLon']: # only turn on plasticity when specified to do so
           netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL[synmech]}        
   #I to E feedback connections
