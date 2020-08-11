@@ -364,18 +364,20 @@ if VTopoI:
 else:
   netParams.connParams['EV1->IV1']['convergence'] = 9
 
-
-"""
-for prety in EDirPops:
-  for poty in IDirPops:
-    netParams.connParams[prety+'->'+poty] = {
-      'preConds': {'pop': prety},
-      'postConds': {'pop': poty},
-      'connList': blistEV1DtoIV1D,
-      'weight': getInitWeight(0.02 * cfg.EIGain),
-      'delay': 2,
-      'synMech': 'AMPA', 'sec':'soma', 'loc':0.5}
-"""
+if 'EDirPops' in dconf['net'] and 'IDirPops' in dconf['net']:
+  if 'ID' in dconf['net']['allpops']:
+    if dnumc['ID']>0:
+      EDirPops = dconf['net']['EDirPops']
+      IDirPops = dconf['net']['IDirPops']
+      for prety in EDirPops:
+        for poty in IDirPops:
+          netParams.connParams[prety+'->'+poty] = {
+            'preConds': {'pop': prety},
+            'postConds': {'pop': poty},
+            'convergence': 9,
+            'weight': 0.02 * cfg.EIGain,
+            'delay': 2,
+            'synMech': 'AMPA', 'sec':'soma', 'loc':0.5}
 
 netParams.connParams['EV4->IV4'] = {
         'preConds': {'pop': 'EV4'},
@@ -432,17 +434,20 @@ netParams.connParams['IV1->EV1'] = {
 if VTopoI: netParams.connParams['IV1->EV1']['connList'] = blistIV1toEV1
 else: netParams.connParams['IV1->EV1']['convergence'] = 25  
 
-"""
-for prety in IDirPops:
-  for poty in EDirPOps:
-    netParams.connParams[prety+'->'+poty] = {
-      'preConds': {'pop': prety},
-      'postConds': {'pop': poty},
-      'connList': blistIV1DtoEV1D,
-      'weight': 0.2 * cfg.IEGain,
-      'delay': 2,
-      'synMech': 'GABA', 'sec':'soma', 'loc':0.5}
-"""
+if 'EDirPops' in dconf['net'] and 'IDirPops' in dconf['net']:
+  if 'ID' in dconf['net']['allpops']:
+    if dnumc['ID']>0:
+      EDirPops = dconf['net']['EDirPops']
+      IDirPops = dconf['net']['IDirPops']
+      for prety in IDirPops:
+        for poty in EDirPops:
+          netParams.connParams[prety+'->'+poty] = {
+            'preConds': {'pop': prety},
+            'postConds': {'pop': poty},
+            'convergence': 25,
+            'weight': 0.2 * cfg.IEGain,
+            'delay': 2,
+            'synMech': 'GABA', 'sec':'soma', 'loc':0.5}
 
 netParams.connParams['IV4->EV4'] = {
         'preConds': {'pop': 'IV4'},
@@ -473,7 +478,9 @@ for poty in EMotorPops: # I -> E for motor populations
     'synMech': 'GABA', 'sec':'soma', 'loc':0.5}
 
 #I to I
-for IType in ['IV1', 'IV4', 'IMT', 'IM']:
+for IType in ['IV1', 'IV4', 'IMT', 'IM', 'ID']:
+  if IType not in dnumc: continue
+  if dnumc[IType] <= 0: continue
   netParams.connParams[IType+'->'+IType] = {
     'preConds': {'pop': IType},
     'postConds': {'pop': IType},

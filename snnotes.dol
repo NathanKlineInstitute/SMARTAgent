@@ -15906,3 +15906,7 @@ else: netParams.connParams['IV1->EV1']['convergence'] = 25
 
 ./myrun 30 sn.json
 
+** add interneurons to dir selective pop?
+
+to breakup some of the hypersynch
+
