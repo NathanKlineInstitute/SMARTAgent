@@ -4650,3 +4650,5 @@ Changes In aigame.py
 
 
 -- tested a little bit--- seems that the padding is working without any problem.
+
+-- running 500 sec sim on falcor with paddings "20aug11_A0_falcor_"
