@@ -15996,3 +15996,35 @@ adjust...
 
 ./myrun 30 sn.json
 
+** check output from 20aug10_B2_cycle_
+
+python -i simdat.py backupcfg/20aug10_B2_cycle_sim.json
+
+ax=plotPerf(actreward,yl=(0,.55))
+savefig('gif/'+dstr+simstr+'perf.png') # gif/20aug11_20aug10_B2_cycle_perf.png
+
+lfn = ['20aug4_B0_cycle_','20aug6_B1_cycle_','20aug10_B2_cycle_']
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0,.55))
+savefig('gif/'+dstr+simstr+'perf_all_steps_so_far.png') # gif/20aug11_20aug10_B2_cycle_perf_all_steps_so_far.png
+looks good in that performance not decaying but not really getting past the highest performance level achieved...
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((1990e3,2000e3))
+savefig('gif/'+dstr+simstr+'rast.png') # gif/20aug11_20aug10_B2_cycle_rast.png
+xlim((1999e3,2000e3))
+savefig('gif/'+dstr+simstr+'rastB.png') # gif/20aug11_20aug10_B2_cycle_rastB.png
+
+may continue later ... or now ... 
+
+        "name": "20aug11_B3_cycle_",
+
+    "simtype": {
+        "ResumeSim": 1,
+        "ResumeSimFromFile": "data/20aug10_B2_cycle_synWeights_final.pkl"	
+    },
+
+this time
+	"normalizeWeightsAtStart": 0,
+
+./myrun 30 sn.json
+
