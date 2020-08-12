@@ -16179,3 +16179,24 @@ dconf['net']['VisualRL'] # 1
 
 fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4') # gif/20aug12_20aug11_VTopoI0_ID800_V4MT_gcp__input.mp4
 
+** check output from 20aug11_B3_cycle_
+
+python -i simdat.py backupcfg/20aug11_B3_cycle_sim.json
+
+ax=plotPerf(actreward,yl=(0,.55))
+savefig('gif/'+dstr+simstr+'perf.png') # gif/20aug12_20aug11_B3_cycle_perf.png
+better in beginning, then a little worse?
+
+lfn = ['20aug4_B0_cycle_','20aug6_B1_cycle_','20aug10_B2_cycle_', '20aug11_B3_cycle_']
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0,.55))
+savefig('gif/'+dstr+simstr+'perf_all_steps_so_far.png') # gif/20aug12_20aug11_B3_cycle_perf_all_steps_so_far.png
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((1990e3,2000e3))
+savefig('gif/'+dstr+simstr+'rast.png') # gif/20aug12_20aug11_B3_cycle_rast.png
+strange - westward moving activity for a stretch, but has some eastward activity too ...
+seems unlikely/impossible since only ball can move directly west or east -->> bug? poor representation?
+
+check video and flow ... 
+fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4',showflow=True,ldflow=ldflow) # gif/20aug12_20aug11_B3_cycle__input.mp4
+
