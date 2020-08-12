@@ -385,7 +385,7 @@ def ObjPos2pd (dobjpos):
     time = dobjpos['time']
   else:
     time = np.linspace(0,totalDur,len(dobjpos['ball']))
-  pdpos = pd.DataFrame(np.array([tt, ballX, ballY, racketX, racketY]).T,columns=['time','ballX','ballY','racketX','racketY'])
+  pdpos = pd.DataFrame(np.array([time, ballX, ballY, racketX, racketY]).T,columns=['time','ballX','ballY','racketX','racketY'])
   return pdpos
 
 def getdistvstimecorr (pdpos, ballxmin=137, ballxmax=141, pval=0.1):
