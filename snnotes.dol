@@ -16200,3 +16200,74 @@ seems unlikely/impossible since only ball can move directly west or east -->> bu
 check video and flow ... 
 fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4',showflow=True,ldflow=ldflow) # gif/20aug12_20aug11_B3_cycle__input.mp4
 
+** check output from sim with ID800 (20aug11_VTopoI0_ID800_B_gcp_)
+
+python -i simdat.py backupcfg/20aug11_VTopoI0_ID800_B_gcp_sim.json
+
+ax=plotPerf(actreward,yl=(0,.55))
+savefig('gif/'+dstr+simstr+'perf.png') # gif/20aug12_20aug11_VTopoI0_ID800_B_gcp_perf.png
+seems decent...some of the score values getting higher briefly...
+ylim((0,1)); savefig('gif/'+dstr+simstr+'perfB.png')
+gif/20aug12_20aug11_VTopoI0_ID800_B_gcp_perfB.png
+
+lfn = ['20aug10_VTopoI0_ID800_gcp_','20aug11_VTopoI0_ID800_B_gcp_']
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0,.55))
+savefig('gif/'+dstr+simstr+'perf_all_steps_so_far.png') # gif/20aug12_20aug11_VTopoI0_ID800_B_gcp_perf_all_steps_so_far.png
+
+lpda = getindivactionreward(lfn)
+clf(); plotComparePerf(lpda,['b','r'],yl=(0,1),lleg=lfn)
+savefig('gif/'+dstr+simstr+'perf_compare_all_steps_so_far.png')
+gif/20aug12_20aug11_VTopoI0_ID800_B_gcp_perf_compare_all_steps_so_far.png
+comparing individual steps seems more robust ... integrating cumulative over long
+periods of time seems to obscure the shorter-term performance ... which seems to
+clearly increase across steps here ... 
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((1990e3,2000e3))
+savefig('gif/'+dstr+simstr+'rast.png') # gif/20aug12_20aug11_VTopoI0_ID800_B_gcp_rast.png
+rates are low, note that there was weight normalization at start - so when continue this one
+should have that again ...
+
+clf(); dobjpos = loadObjPos() ## 
+subplot(2,1,1); xlabel('Racket Y position'); hist(dobjpos['racket'][:,1])
+subplot(2,1,2); xlabel('Ball Y position'); hist(dobjpos['ball'][:,1])
+savefig('gif/'+dstr+simstr+'poshist.png') # gif/20aug12_20aug11_VTopoI0_ID800_B_gcp_poshist.png
+
+pdpos = ObjPos2pd(dobjpos)
+dout = getdistvstimecorr(pdpos,pval=1)
+plot(dout['lN'],dout['lr'],'ko',markersize=15)
+xlabel('Number examples'); ylabel('Correlation between paddle/ball distance and time')
+savefig('gif/'+dstr+simstr+'num_examples_and_racket_ball_Y_dist_vs_time_corr.png')
+gif/20aug12_20aug11_VTopoI0_ID800_B_gcp_num_examples_and_racket_ball_Y_dist_vs_time_corr.png
+
+many of the values are positive ... though some for few examples ...
+top right corner is doing bad too ...
+
+plot(dout['lbally'], dout['lr'], 'ko', markersize=15)
+plot(dout['lbally'], dout['lr'], 'k', linewidth=3)
+xlabel('Y position'); ylabel('Correlation between paddle/ball distance and time')
+savefig('gif/'+dstr+simstr+'racket_ball_Y_dist_vs_time_corr.png')
+gif/20aug12_20aug11_VTopoI0_ID800_B_gcp_racket_ball_Y_dist_vs_time_corr.png
+
+some are down and some are up ...
+
+better to look at distance (between ball and paddle) over time at each y position ...
+
+cp backupcfg/20aug11_VTopoI0_ID800_B_gcp_sim.json sn.json
+then adjust ...
+
+        "name": "20aug12_VTopoI0_ID800_C_gcp_",
+	this one will have weight norm at beginning
+    "simtype": {
+        "ResumeSim": 1,
+        "ResumeSimFromFile": "data/20aug11_VTopoI0_ID800_B_gcp_synWeights_final.pkl"
+    },
+
+./myrun 30 sn.json
+
+started ~16:36 ...
+
+next one will have an additional weight norm halfway ...
+
+        "name": "20aug12_VTopoI0_ID800_D_gcp_",
+
