@@ -16270,4 +16270,9 @@ started ~16:36 ...
 next one will have an additional weight norm halfway ...
 
         "name": "20aug12_VTopoI0_ID800_D_gcp_",
+        "normalizeWeightStepSize": 50000,
+
+./myrun 30 sn.json
+
+started ~16:40 ...
 
