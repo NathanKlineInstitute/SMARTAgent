@@ -723,7 +723,7 @@ def recordAdjustableWeightsPop (sim, t, popname):
         lsynweights.append([t,conn.preGid,cell.gid,float(conn['hObj'].weight[0])])
   return len(lcell)
                     
-def recordAdjustableWeights (sim, t, lpop = EMotorPops):
+def recordAdjustableWeights (sim, t, lpop):
   """ record the STDP weights during the simulation - called in trainAgent
   """
   for pop in lpop: recordAdjustableWeightsPop(sim, t, pop)
@@ -814,7 +814,7 @@ def mulAdjustableWeights (sim, dfctr):
         if 'hSTDP' in conn:    
           conn['hObj'].weight[0] *= dfctr[pop] 
 
-def normalizeAdjustableWeights (sim, t, lpop = EMotorPops):
+def normalizeAdjustableWeights (sim, t, lpop):
   # normalize the STDP/RL weights during the simulation - called in trainAgent
   davg = getAverageAdjustableWeights(sim, lpop)
   try:
@@ -1096,12 +1096,12 @@ def trainAgent (t):
   if NBsteps % recordWeightStepSize == 0:
     if dconf['verbose'] > 0 and sim.rank==0:
       print('Weights Recording Time:', t, 'NBsteps:',NBsteps,'recordWeightStepSize:',recordWeightStepSize)
-    recordAdjustableWeights(sim, t, lpop = lrecpop) 
+    recordAdjustableWeights(sim, t, lrecpop) 
     #recordWeights(sim, t)
   if NBsteps % normalizeWeightStepSize == 0:
     if dconf['verbose'] > 0 and sim.rank==0:
       print('Weight Normalize Time:', t, 'NBsteps:',NBsteps,'normalizeWeightStepSize:',normalizeWeightStepSize)
-    normalizeAdjustableWeights(sim, t, lpop = lrecpop)     
+    normalizeAdjustableWeights(sim, t, lrecpop)
 
 def getAllSTDPObjects (sim):
   # get all the STDP objects from the simulation's cells
@@ -1167,7 +1167,7 @@ if dconf['simtype']['ResumeSim']:
     if 'normalizeWeightsAtStart' in dconf['sim']:
       if dconf['sim']['normalizeWeightsAtStart']:
         print('normalizing adjustable weights at start')
-        normalizeAdjustableWeights(sim, 0, lpop = lrecpop)
+        normalizeAdjustableWeights(sim, 0, lrecpop)
   except:
     print('Could not restore STDP weights from file.')
 

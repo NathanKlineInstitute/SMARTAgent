@@ -16150,3 +16150,32 @@ so there's not always a correlation between number of examples and the performan
 ~600 examples going to upper right, and only weak learning ... some bug? or because racket
 partially off-screen at top-right?
 
+** check output from sim with VisualRL and V4,MT
+
+note that this one had no targettedRL
+
+python -i simdat.py backupcfg/20aug11_VTopoI0_ID800_V4MT_gcp_sim.json
+
+ax=plotPerf(actreward,yl=(0,.55))
+savefig('gif/'+dstr+simstr+'perf.png') # gif/20aug12_20aug11_VTopoI0_ID800_V4MT_gcp_perf.png
+
+well, improving but not as good as with targetted ...
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((1990e3,2000e3))
+savefig('gif/'+dstr+simstr+'rast.png') # gif/20aug12_20aug11_VTopoI0_ID800_V4MT_gcp_rast.png
+EV4,EMT barely firing ... 
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP','EV4','EMT'],lclr=['r','b','g','c'],plotindiv=True)
+xlabel('Time (ms)',fontsize=30); ylabel('Average weight',fontsize=30); tl(); 
+savefig('gif/'+dstr+simstr+'all_avg_weight.png') # gif/20aug12_20aug11_VTopoI0_ID800_V4MT_gcp_all_avg_weight.png
+
+pdfs = pdf[(pdf.postid>=dstartidx['EV4'])&(pdf.postid<=dendidx['EV4'])]
+len(pdfs) # 0
+
+hmm, so did not record the EV4, EMT weights? so can't continue this simulation
+
+lrecpop should have been updated to include EV4, EMT ... since VisualRL was turned on
+dconf['net']['VisualRL'] # 1
+
+fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4') # gif/20aug12_20aug11_VTopoI0_ID800_V4MT_gcp__input.mp4
+
