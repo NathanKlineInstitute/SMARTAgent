@@ -16200,6 +16200,24 @@ seems unlikely/impossible since only ball can move directly west or east -->> bu
 check video and flow ... 
 fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4',showflow=True,ldflow=ldflow) # gif/20aug12_20aug11_B3_cycle__input.mp4
 
+lfn = ['20aug4_B0_cycle_','20aug6_B1_cycle_','20aug10_B2_cycle_', '20aug11_B3_cycle_']
+lpda = getindivactionreward(lfn)
+clf(); plotComparePerf(lpda,['c','g','b','r'],yl=(0,1),lleg=lfn)
+savefig('gif/'+dstr+simstr+'perf_compare_all_steps_so_far.png')
+gif/20aug12_20aug11_B3_cycle_perf_compare_all_steps_so_far.png
+look pretty similar ...later steps a bit better ... could continue or adjust architecture ...
+
+will continue but have weight norm at start ...
+
+cp backupcfg/20aug11_B3_cycle_sim.json sn.json
+    "simtype": {
+        "ResumeSim": 1,
+        "ResumeSimFromFile": "data/20aug11_B3_cycle_synWeights_final.pkl"
+    },
+        "name": "20aug12_B4_cycle_",
+
+started ~16:52 ...
+
 ** check output from sim with ID800 (20aug11_VTopoI0_ID800_B_gcp_)
 
 python -i simdat.py backupcfg/20aug11_VTopoI0_ID800_B_gcp_sim.json
