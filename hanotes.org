@@ -4652,3 +4652,123 @@ Changes In aigame.py
 -- tested a little bit--- seems that the padding is working without any problem.
 
 -- running 500 sec sim on falcor with paddings "20aug11_A0_falcor_"
+
+
+* 20aug12
+
+-- Things to do:
+
+1. background should be 0 firing rate and binary firing rates.
+2. try with edges instead of full objects
+3. better measure of performance
+
+-------------------------------------------------------------------
+Solving 1. background should be 0 firing rate and binary firing rates.
+
+-- find the range of firing rates:
+
+from netpyne import specs, sim
+from neuron import h
+import numpy as np
+import random
+from conf import dconf # configuration dictionary
+import pandas as pd
+import pickle
+from collections import OrderedDict
+from connUtils import *
+from matplotlib import pyplot as plt
+import os
+import anim
+from matplotlib import animation
+from aigame import AIGame
+sim.AIGame = AIGame()
+rewards, epCount, proposed_actions, total_hits = sim.AIGame.playGame(actions= [3], epCount = 0)
+
+>>> np.unique(sim.AIGame.dFiringRates['EV1'])
+array([ 0.        , 33.00293599])
+
+-- for nonpadded case, we got 2 firing rates.
+-- with padded case, we get more than 2 firing rates (probably 3 because we subtract 0 from the firing rates instead of subtracting min value).
+---> See fix below:
+
+>>> np.unique(sim.AIGame.dFiringRates['EV1DS'])
+array([ 0., 50.])
+
+-- for converting image to binary use
+
+from skimage.filters import threshold_otsu
+thresh = threshold_otsu(image)
+binary = image > thresh
+
+
+
+-- before was using 0 value for padded input pixels.
+now using min value for padded input pixels: 
+
+def updateInputRatesWithPadding (self, dsum_Images):
+  padded_Image = np.amin(dsum_Images)*np.ones(shape=(self.input_dim,self.input_dim))
+  offset = int((self.dReceptiveField[self.InputPop]-1)/2)
+  padded_Image[offset:offset+dsum_Images.shape[0],offset:offset+dsum_Images.shape[1]]=dsum_Images
+  if dconf['net']['useBinaryImage']==1:
+    thresh = threshold_otsu(padded_Image)
+    binary_Image = padded_Image > thresh
+    fr_Images = 50.0*binary_Image
+  else:
+    padded_Image = padded_Image - np.amin(padded_Image)
+    fr_Images = 40/(1+np.exp((np.multiply(-1,padded_Image)+123)/25))
+    fr_Images = np.subtract(fr_Images,np.min(fr_Images))
+  self.dFiringRates[self.InputPop] = np.reshape(fr_Images,self.dInputs[self.InputPop])
+
+
+similarly:
+
+def updateInputRates (self, dsum_Images):
+  if dconf['net']['useBinaryImage']==1:
+    thresh = threshold_otsu(dsum_Images)
+    binary_Image = dsum_Images > thresh
+    fr_Images = 50.0*binary_Image
+  else:
+    fr_Images = 40/(1+np.exp((np.multiply(-1,dsum_Images)+123)/25))
+    fr_Images = np.subtract(fr_Images,np.min(fr_Images)) 
+  self.dFiringRates[self.InputPop] = np.reshape(fr_Images,dconf['net']['allpops'][self.InputPop])
+
+
+-- PROBLEM: max firing rates of EV1 (~33 Hz) and EV1D(50Hz) were different. 
+
+
+
+using fr_Images = 50/(1+np.exp((np.multiply(-1,dsum_Images)+123)/25))
+
+np.unique(sim.AIGame.dFiringRates['EV1'])
+array([ 0.36231198, 43.75388096])
+
+
+using fr_Images = 50/(1+np.exp((np.multiply(-1,dsum_Images)+123)/10))
+
+-- SOLUTION:
+
+padded_Image = padded_Image - np.amin(padded_Image)
+padded_Image = (255.0/np.amax(padded_Image))*padded_Image # this will make sure that padded_Image spans 0-255
+fr_Images = 50/(1+np.exp((np.multiply(-1,padded_Image)+123)/10))
+
+
+and 
+
+dsum_Images = dsum_Images - np.amin(dsum_Images)
+dsum_Images = (255.0/np.amax(dsum_Images))*dsum_Images
+fr_Images = 50/(1+np.exp((np.multiply(-1,dsum_Images)+123)/10))
+
+
+-- now firing rates are close enough....when using nonbinary image.
+
+>>> np.unique(sim.AIGame.dFiringRates['EV1'])[1]
+49.99990747011135
+>>> np.unique(sim.AIGame.dFiringRates['EV1'])[0]
+0.00022758618723999394
+
+
+
+-- run 1000 sec sim on cycle "20aug12_A0_cycle_" with padding and binary inputs.
+
+        "useNeuronPad": 1,
+        "useBinaryImage": 1,
