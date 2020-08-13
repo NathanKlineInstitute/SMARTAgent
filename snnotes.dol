@@ -16297,3 +16297,12 @@ started ~16:40 ...
 *20aug13
 ** try new padding? bin images?
 
+pulled/merged development with master
+
+** add default param value setup to conf.py
+
+ensureDefaults
+
+did not put all of them in yet ... but for new ones, easier to add there
+than to enforce checking for presence of the params in the rest of the code
+

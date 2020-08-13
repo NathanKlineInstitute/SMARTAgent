@@ -1040,7 +1040,7 @@ def trainAgent (t):
     if dnumc['EMSTAY']>0:
       STAYactions = np.sum(np.where(np.array(actions)==dconf['moves']['NOMOVE'],1,0))
       sim.pc.broadcast(vec4.from_python([STAYactions]),0)
-    if dconf['sim']['anticipatedRL']==1:
+    if dconf['sim']['anticipatedRL']:
       print(proposed_actions)
       sim.pc.broadcast(vec5.from_python(proposed_actions),0) # used proposed actions to target/potentiate the pop representing anticipated action.
   else: # other workers
@@ -1053,13 +1053,13 @@ def trainAgent (t):
     if 'EMSTAY' in dconf['net']:
       sim.pc.broadcast(vec4, 0)
       STAYactions = vec4.to_python()[0]
-    if dconf['sim']['anticipatedRL']==1:
+    if dconf['sim']['anticipatedRL']:
       sim.pc.broadcast(vec5, 0)
       proposed_actions = vec5.to_python()[0] # this([0]) will just pick up the first element of the list.
     if dconf['verbose']:
       if dnumc['EMSTAY']>0: print('UPactions: ', UPactions,'DOWNactions: ', DOWNactions, 'STAYactions: ', STAYactions)
       else: print('UPactions: ', UPactions,'DOWNactions: ', DOWNactions)
-  if dconf['sim']['anticipatedRL']==1:
+  if dconf['sim']['anticipatedRL']:
     cpaction = proposed_actions 
     anticipated_reward = dconf['rewardcodes']['followTarget']
     if cpaction==dconf['moves']['UP']:
