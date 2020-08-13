@@ -16456,3 +16456,13 @@ started ~17:33 ...
 
 yes...seems to run ok
 
+python -i simdat.py backupcfg/20aug13_A0_cycle_sim.json
+
+ax=plotPerf(actreward,yl=(0,1))
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values()))));
+
+        "name": "20aug13_A0_cycle_",
+
+./myrun 32 sn.json
+
