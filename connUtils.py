@@ -22,7 +22,7 @@ def connectOnePreNtoOneMNeuron (NBNeurons,offset_pre,offset_post):
     blist.append([preN,postN])
   return blist
   
-def connectLayerswithOverlap (NBpreN, NBpostN, overlap_xdir):
+def connectLayerswithOverlap (NBpreN, NBpostN, overlap_xdir,padded_preneurons_xdir,padded_postneurons_xdir):
     blist = []
     if NBpreN < 1 or NBpostN < 1: return blist
     NBpreN_x = int(np.sqrt(NBpreN))
@@ -31,8 +31,8 @@ def connectLayerswithOverlap (NBpreN, NBpostN, overlap_xdir):
     NBpostN_x = int(np.sqrt(NBpostN))
     NBpostN_y = int(np.sqrt(NBpostN))
     convergence_factor = NBpreN/NBpostN
-    convergence_factor_x = np.ceil(np.sqrt(convergence_factor))
-    convergence_factor_y = np.ceil(np.sqrt(convergence_factor))
+    convergence_factor_x = int(np.sqrt(convergence_factor))
+    convergence_factor_y = int(np.sqrt(convergence_factor))
     #overlap_xdir = 5	#number of rows in a window for overlapping connectivity
     #overlap_ydir = 5	#number of columns in a window for overlapping connectivity
     overlap_ydir = overlap_xdir
@@ -44,14 +44,17 @@ def connectLayerswithOverlap (NBpreN, NBpostN, overlap_xdir):
     for i in range(NBpostN_x):
         for j in range(NBpostN_y):
             postNIndices[i,j]=j+(NBpostN_y*i)
-    for i in range(NBpostN_x):				#boundary conditions are implemented here
-        for j in range(NBpostN_y):
-            postN = int(postNIndices[i,j])
-            if convergence_factor_x>1:
-                preN = preNIndices[int(i*convergence_factor_y),int(j*convergence_factor_x)]
-                #preN = int(convergence_factor_x*convergence_factor_y*NBpostN_y*i) + int(convergence_factor_y*j)
-            else:
-                preN = int(postN)
+    targetOffset_x = int(padded_postneurons_xdir/2)
+    targetOffset_y = int(padded_postneurons_xdir/2) # assuming we have pops in square format. so anything x dimension would be same as in y dimension
+    sourceOffset_x = int(padded_preneurons_xdir/2)
+    sourceOffset_y = int(padded_preneurons_xdir/2) # assuming we have pops in square format. so anything x dimension would be same as in y dimension
+    target_postNIndices = list(range(targetOffset_x,NBpostN_x-targetOffset_x,1))
+    source_preNIndices = list(range(sourceOffset_x,NBpreN_x-sourceOffset_x,int(convergence_factor_x)))
+    for i in range(len(target_postNIndices)):				#parse the non
+        for j in range(len(target_postNIndices)):
+            postN = int(postNIndices[target_postNIndices[i],target_postNIndices[j]])
+            preN = int(preNIndices[source_preNIndices[i],source_preNIndices[j]]) 
+            preNIndices[int(i*convergence_factor_y),int(j*convergence_factor_x)]
             preN_ind = np.where(preNIndices==preN)
             #print(preN_ind)
             x0 = preN_ind[0][0] - int(overlap_xdir/2)
@@ -78,7 +81,7 @@ def connectLayerswithOverlap (NBpreN, NBpostN, overlap_xdir):
                     blist.append([preN,postN]) 			#list of [presynaptic_neuron, postsynaptic_neuron] 
     return blist
 
-def connectLayerswithOverlapDiv(NBpreN, NBpostN, overlap_xdir):
+def connectLayerswithOverlapDiv(NBpreN, NBpostN, overlap_xdir,padded_preneurons_xdir,padded_postneurons_xdir):
     blist = []
     if NBpreN < 1 or NBpostN < 1: return blist  
     NBpreN_x = int(np.sqrt(NBpreN))
@@ -86,24 +89,27 @@ def connectLayerswithOverlapDiv(NBpreN, NBpostN, overlap_xdir):
     NBpostN_x = int(np.sqrt(NBpostN))
     NBpostN_y = int(np.sqrt(NBpostN))
     divergence_factor = NBpostN/NBpreN
-    divergence_factor_x = np.ceil(np.sqrt(divergence_factor))
-    divergence_factor_y = np.ceil(np.sqrt(divergence_factor))
+    divergence_factor_x = int(np.sqrt(divergence_factor))
+    divergence_factor_y = int(np.sqrt(divergence_factor))
     overlap_ydir = overlap_xdir
     preNIndices = np.zeros((NBpreN_x,NBpreN_y))
     postNIndices = np.zeros((NBpostN_x,NBpostN_y)) #list created for indices from linear (1-6400) to square indexing (1-80,81-160,..) 
+    targetOffset_x = int(padded_postneurons_xdir/2)
+    targetOffset_y = int(padded_postneurons_xdir/2) # assuming we have pops in square format. so anything x dimension would be same as in y dimension
+    sourceOffset_x = int(padded_preneurons_xdir/2)
+    sourceOffset_y = int(padded_preneurons_xdir/2) # assuming we have pops in square format. so anything x dimension would be same as in y dimension
+    target_postNIndices = list(range(targetOffset_x,NBpostN_x-targetOffset_x,int(divergence_factor_x)))
+    source_preNIndices = list(range(sourceOffset_x,NBpreN_x-sourceOffset_x,1))
     for i in range(NBpreN_x):
         for j in range(NBpreN_y):
             preNIndices[i,j]=j+(NBpreN_y*i)
     for i in range(NBpostN_x):
         for j in range(NBpostN_y):
             postNIndices[i,j]=j+(NBpostN_y*i)
-    for i in range(NBpreN_x):				#boundary conditions are implemented here
-        for j in range(NBpreN_y):
-            preN = int(preNIndices[i,j])
-            if divergence_factor_x>1:
-                postN = postNIndices[int(i*divergence_factor_y),int(j*divergence_factor_x)]
-            else:
-                postN = int(preN)
+    for i in range(len(source_preNIndices)):				#boundary conditions are implemented here
+        for j in range(len(source_preNIndices)):
+            preN = int(preNIndices[source_preNIndices[i],source_preNIndices[j]])
+            postN = int(postNIndices[target_postNIndices[i],target_postNIndices[j]])
             postN_ind = np.where(postNIndices==postN)
             x0 = postN_ind[0][0] - int(overlap_xdir/2)
             if x0<0:

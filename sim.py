@@ -42,6 +42,8 @@ tstepPerAction = dconf['sim']['tstepPerAction'] # time step per action (in ms)
 
 fid4=None # only used by rank 0
 
+useNeuronPad = 1 # should be specified in sim.json.
+
 scale = dconf['net']['scale'] # scales the size of the network (only number of neurons)
 
 ETypes = dconf['net']['ETypes'] # excitatory neuron types
@@ -51,6 +53,25 @@ EMotorPops = dconf['net']['EMotorPops'] # excitatory neuron motor populations
 EPreMPops = dconf['net']['EPreMPops'] # excitatory premotor populations
 
 dnumc = OrderedDict({ty:dconf['net']['allpops'][ty]*scale for ty in allpops}) # number of neurons of a given type
+
+dnumc_padx = OrderedDict({ty:dconf['net']['allpops'][ty]*0 for ty in allpops}) # a dictionary with zeros to keep number of padded neurons in one dimension
+dtopoldivcons = dconf['net']['alltopoldivcons']
+dtopolconvcons = dconf['net']['alltopolconvcons']
+allpops_withconvtopology = list(dtopolconvcons.keys())
+# below is the code for updating neuronal pop size to include padding. 
+if dconf['net']['useNeuronPad']==1:
+  for pop in allpops_withconvtopology:
+    receptive_fields = []
+    for postpop in list(dtopolconvcons[pop].keys()):
+      if dnumc[postpop]>0:
+        receptive_fields.append(dtopolconvcons[pop][postpop])
+    if len(receptive_fields)>0:
+      max_receptive_field = np.amax(receptive_fields)
+    else:
+      max_receptive_field = 0
+    if dnumc[pop]>0 and max_receptive_field>0:
+      dnumc[pop] = int((np.sqrt(dnumc[pop])+max_receptive_field-1)**2)
+      dnumc_padx[pop] = max_receptive_field-1
 
 if dnumc['EMSTAY']>0:
   lrecpop = ['EMUP', 'EMDOWN','EMSTAY'] # which populations to record from
@@ -233,9 +254,9 @@ if "Noise" in dconf:
 #####################################################################################
 #Feedforward excitation
 #E to E - Feedforward connections
-if dnumc['ER']>0: blistERtoEV1 = connectLayerswithOverlap(NBpreN = dnumc['ER'], NBpostN = dnumc['EV1'], overlap_xdir = 3)
-blistEV1toEV4 = connectLayerswithOverlap(NBpreN = dnumc['EV1'], NBpostN = dnumc['EV4'], overlap_xdir = 3)
-blistEV4toEMT = connectLayerswithOverlap(NBpreN = dnumc['EV4'], NBpostN = dnumc['EMT'], overlap_xdir = 3) #was 15
+if dnumc['ER']>0: blistERtoEV1 = connectLayerswithOverlap(NBpreN = dnumc['ER'], NBpostN = dnumc['EV1'], overlap_xdir = dtopolconvcons['ER']['EV1'], padded_preneurons_xdir = dnumc_padx['ER'], padded_postneurons_xdir = dnumc_padx['EV1'])
+blistEV1toEV4 = connectLayerswithOverlap(NBpreN = dnumc['EV1'], NBpostN = dnumc['EV4'], overlap_xdir = dtopolconvcons['EV1']['EV4'], padded_preneurons_xdir = dnumc_padx['EV1'], padded_postneurons_xdir = dnumc_padx['EV4'])
+blistEV4toEMT = connectLayerswithOverlap(NBpreN = dnumc['EV4'], NBpostN = dnumc['EMT'], overlap_xdir = dtopolconvcons['EV4']['EMT'], padded_preneurons_xdir = dnumc_padx['EV4'], padded_postneurons_xdir = dnumc_padx['EMT']) #was 15
 #blistITtoMI = connectLayerswithOverlap(NBpreN = NB_ITneurons, NBpostN = NB_MIneurons, overlap_xdir = 3) #Not sure if this is a good strategy instead of all to all
 #blistMItoMO = connectLayerswithOverlap(NBpreN = NB_MIneurons, NBpostN = NB_MOneurons, overlap_xdir = 3) #was 19
 #blistMItoMO: Feedforward for MI to MO is all to all and can be specified in the connection statement iteself
@@ -246,35 +267,35 @@ blistEV4toEMT = connectLayerswithOverlap(NBpreN = dnumc['EV4'], NBpostN = dnumc[
 #blistEV4toIMT = connectLayerswithOverlap(NBpreN = dnumc['EV4'], NBpostN = dnumc['IMT'], overlap_xdir = 3) 
 
 #E to I - WithinLayer connections
-if dnumc['ER']>0: blistERtoIR = connectLayerswithOverlap(NBpreN = dnumc['ER'], NBpostN = dnumc['IR'], overlap_xdir = 3)
-blistEV1toIV1 = connectLayerswithOverlap(NBpreN = dnumc['EV1'], NBpostN = dnumc['IV1'], overlap_xdir = 3)
+if dnumc['ER']>0: blistERtoIR = connectLayerswithOverlap(NBpreN = dnumc['ER'], NBpostN = dnumc['IR'], overlap_xdir = dtopolconvcons['ER']['IR'], padded_preneurons_xdir = dnumc_padx['ER'], padded_postneurons_xdir = dnumc_padx['IR'])
+blistEV1toIV1 = connectLayerswithOverlap(NBpreN = dnumc['EV1'], NBpostN = dnumc['IV1'], overlap_xdir = dtopolconvcons['EV1']['IV1'], padded_preneurons_xdir = dnumc_padx['EV1'], padded_postneurons_xdir = dnumc_padx['IV1'])
 #blistEV1DtoIV1D = connectLayerswithOverlap(NBpreN = dnumc['EV1DE'], NBpostN = dnumc['IV1D'], overlap_xdir = 3) # for dir selective E -> I
-blistEV4toIV4 = connectLayerswithOverlap(NBpreN = dnumc['EV4'], NBpostN = dnumc['IV4'], overlap_xdir = 3)
-blistEMTtoIMT = connectLayerswithOverlap(NBpreN = dnumc['EMT'], NBpostN = dnumc['IMT'], overlap_xdir = 3)
+blistEV4toIV4 = connectLayerswithOverlap(NBpreN = dnumc['EV4'], NBpostN = dnumc['IV4'], overlap_xdir = dtopolconvcons['EV4']['IV4'], padded_preneurons_xdir = dnumc_padx['EV4'], padded_postneurons_xdir = dnumc_padx['IV4'])
+blistEMTtoIMT = connectLayerswithOverlap(NBpreN = dnumc['EMT'], NBpostN = dnumc['IMT'], overlap_xdir = dtopolconvcons['EMT']['IMT'], padded_preneurons_xdir = dnumc_padx['EMT'], padded_postneurons_xdir = dnumc_padx['IMT'])
 
 #I to E - WithinLayer Inhibition
-if dnumc['IR']>0: blistIRtoER = connectLayerswithOverlapDiv(NBpreN = dnumc['IR'], NBpostN = dnumc['ER'], overlap_xdir = 5)
-blistIV1toEV1 = connectLayerswithOverlapDiv(NBpreN = dnumc['IV1'], NBpostN = dnumc['EV1'], overlap_xdir = 5)
+if dnumc['IR']>0: blistIRtoER = connectLayerswithOverlapDiv(NBpreN = dnumc['IR'], NBpostN = dnumc['ER'], overlap_xdir = dtopoldivcons['IR']['ER'], padded_preneurons_xdir = dnumc_padx['IR'], padded_postneurons_xdir = dnumc_padx['ER'])
+blistIV1toEV1 = connectLayerswithOverlapDiv(NBpreN = dnumc['IV1'], NBpostN = dnumc['EV1'], overlap_xdir = dtopoldivcons['IV1']['EV1'], padded_preneurons_xdir = dnumc_padx['IV1'], padded_postneurons_xdir = dnumc_padx['EV1'])
 #blistIV1DtoEV1D = connectLayerswithOverlapDiv(NBpreN = dnumc['IV1D'], NBpostN = dnumc['EV1DE'], overlap_xdir = 5) # for dir selective I -> E
-blistIV4toEV4 = connectLayerswithOverlapDiv(NBpreN = dnumc['IV4'], NBpostN = dnumc['EV4'], overlap_xdir = 5)
-blistIMTtoEMT = connectLayerswithOverlapDiv(NBpreN = dnumc['IMT'], NBpostN = dnumc['EMT'], overlap_xdir = 5)
+blistIV4toEV4 = connectLayerswithOverlapDiv(NBpreN = dnumc['IV4'], NBpostN = dnumc['EV4'], overlap_xdir = dtopoldivcons['IV4']['EV4'], padded_preneurons_xdir = dnumc_padx['IV4'], padded_postneurons_xdir = dnumc_padx['EV4'])
+blistIMTtoEMT = connectLayerswithOverlapDiv(NBpreN = dnumc['IMT'], NBpostN = dnumc['EMT'], overlap_xdir = dtopoldivcons['IMT']['EMT'], padded_preneurons_xdir = dnumc_padx['IMT'], padded_postneurons_xdir = dnumc_padx['EMT'])
 
 #Feedbackward excitation
 #E to E  
-if dnumc['ER']>0: blistEV1toER = connectLayerswithOverlapDiv(NBpreN = dnumc['EV1'], NBpostN = dnumc['ER'], overlap_xdir = 3)
-#blistEV4toEV1 = connectLayerswithOverlapDiv(NBpreN = dnumc['EV4'], NBpostN = dnumc['EV1'], overlap_xdir = 3)
-#blistEMTtoEV4 = connectLayerswithOverlapDiv(NBpreN = dnumc['EMT'], NBpostN = dnumc['EV4'], overlap_xdir = 3)
+if dnumc['ER']>0: blistEV1toER = connectLayerswithOverlapDiv(NBpreN = dnumc['EV1'], NBpostN = dnumc['ER'], overlap_xdir = dtopoldivcons['EV1']['ER'], padded_preneurons_xdir = dnumc_padx['EV1'], padded_postneurons_xdir = dnumc_padx['ER'])
+blistEV4toEV1 = connectLayerswithOverlapDiv(NBpreN = dnumc['EV4'], NBpostN = dnumc['EV1'], overlap_xdir = dtopoldivcons['EV4']['EV1'], padded_preneurons_xdir = dnumc_padx['EV4'], padded_postneurons_xdir = dnumc_padx['EV1'])
+blistEMTtoEV4 = connectLayerswithOverlapDiv(NBpreN = dnumc['EMT'], NBpostN = dnumc['EV4'], overlap_xdir = dtopoldivcons['EMT']['EV4'], padded_preneurons_xdir = dnumc_padx['EMT'], padded_postneurons_xdir = dnumc_padx['EV4'])
 
 #Feedforward inhibition
 #I to I
-blistIV1toIV4 = connectLayerswithOverlap(NBpreN = dnumc['IV1'], NBpostN = dnumc['IV4'], overlap_xdir = 5)
-blistIV4toIMT = connectLayerswithOverlap(NBpreN = dnumc['IV4'], NBpostN = dnumc['IMT'], overlap_xdir = 5)
+blistIV1toIV4 = connectLayerswithOverlap(NBpreN = dnumc['IV1'], NBpostN = dnumc['IV4'], overlap_xdir = dtopolconvcons['IV1']['IV4'], padded_preneurons_xdir = dnumc_padx['IV1'], padded_postneurons_xdir = dnumc_padx['IV4'])
+blistIV4toIMT = connectLayerswithOverlap(NBpreN = dnumc['IV4'], NBpostN = dnumc['IMT'], overlap_xdir = dtopolconvcons['IV4']['IMT'], padded_preneurons_xdir = dnumc_padx['IV4'], padded_postneurons_xdir = dnumc_padx['IMT'])
 
 #Feedbackward inhibition
 #I to E 
-if dnumc['IR']>0: blistIV1toER = connectLayerswithOverlapDiv(NBpreN = dnumc['IV1'], NBpostN = dnumc['ER'], overlap_xdir = 5)
-blistIV4toEV1 = connectLayerswithOverlapDiv(NBpreN = dnumc['IV4'], NBpostN = dnumc['EV1'], overlap_xdir = 5)
-blistIMTtoEV4 = connectLayerswithOverlapDiv(NBpreN = dnumc['IMT'], NBpostN = dnumc['EV4'], overlap_xdir = 5)
+if dnumc['IR']>0: blistIV1toER = connectLayerswithOverlapDiv(NBpreN = dnumc['IV1'], NBpostN = dnumc['ER'], overlap_xdir = dtopoldivcons['IV1']['ER'], padded_preneurons_xdir = dnumc_padx['IV1'], padded_postneurons_xdir = dnumc_padx['ER'])
+blistIV4toEV1 = connectLayerswithOverlapDiv(NBpreN = dnumc['IV4'], NBpostN = dnumc['EV1'], overlap_xdir = dtopoldivcons['IV4']['EV1'], padded_preneurons_xdir = dnumc_padx['IV4'], padded_postneurons_xdir = dnumc_padx['EV1'])
+blistIMTtoEV4 = connectLayerswithOverlapDiv(NBpreN = dnumc['IMT'], NBpostN = dnumc['EV4'], overlap_xdir = dtopoldivcons['IMT']['EV4'], padded_preneurons_xdir = dnumc_padx['IMT'], padded_postneurons_xdir = dnumc_padx['EV4'])
 
 # synaptic weight gain (based on E, I types)
 cfg = simConfig
@@ -911,6 +932,7 @@ def trainAgent (t):
   vec2 = h.Vector()
   vec3 = h.Vector()
   vec4 = h.Vector()
+  vec5 = h.Vector()
   noWinner = False # no clear winner for the population firing rates (used below)
   if t<(tstepPerAction*dconf['actionsPerPlay']): # for the first time interval use randomly selected actions
     actions =[]
@@ -1018,6 +1040,9 @@ def trainAgent (t):
     if dnumc['EMSTAY']>0:
       STAYactions = np.sum(np.where(np.array(actions)==dconf['moves']['NOMOVE'],1,0))
       sim.pc.broadcast(vec4.from_python([STAYactions]),0)
+    if dconf['sim']['anticipatedRL']==1:
+      print(proposed_actions)
+      sim.pc.broadcast(vec5.from_python(proposed_actions),0) # used proposed actions to target/potentiate the pop representing anticipated action.
   else: # other workers
     sim.pc.broadcast(vec, 0) # receive critic value from master node
     critic = vec.to_python()[0] # critic is first element of the array
@@ -1028,56 +1053,74 @@ def trainAgent (t):
     if 'EMSTAY' in dconf['net']:
       sim.pc.broadcast(vec4, 0)
       STAYactions = vec4.to_python()[0]
+    if dconf['sim']['anticipatedRL']==1:
+      sim.pc.broadcast(vec5, 0)
+      proposed_actions = vec5.to_python()[0] # this([0]) will just pick up the first element of the list.
     if dconf['verbose']:
       if dnumc['EMSTAY']>0: print('UPactions: ', UPactions,'DOWNactions: ', DOWNactions, 'STAYactions: ', STAYactions)
       else: print('UPactions: ', UPactions,'DOWNactions: ', DOWNactions)
-  if critic != 0: # if critic signal indicates punishment (-1) or reward (+1)
-    if sim.rank==0: print('t=',round(t,2),'- adjusting weights based on RL critic value:', critic)
-    if dnumc['EMSTAY']>0:
-      if dconf['sim']['targettedRL']:
-        if not noWinner: # if there's a clear winner in terms of firing rates
-          if UPactions>DOWNactions and UPactions>STAYactions: # UP WINS vs ALL
-            if dconf['verbose']: print('APPLY RL to EMUP')
-            for STDPmech in dSTDPmech['EMUP']: STDPmech.reward_punish(float(critic))
-          elif DOWNactions>UPactions and DOWNactions>STAYactions: # DOWN WINS vs ALL
-            if dconf['verbose']: print('APPLY RL to EMDOWN')
-            for STDPmech in dSTDPmech['EMDOWN']: STDPmech.reward_punish(float(critic))
-          elif STAYactions>UPactions and STAYactions>DOWNactions: # STAY WINS vs ALL
-            if dconf['verbose']: print('APPLY RL to EMSTAY')
-            for STDPmech in dSTDPmech['EMSTAY']: STDPmech.reward_punish(float(critic))
-          elif UPactions==DOWNactions and UPactions>STAYactions: # UP and DOWN TIED
-            if dconf['verbose']: print('APPLY RL to EMUP and EMDOWN')
-            for STDPmech in dSTDPmech['EMUP']: STDPmech.reward_punish(float(critic))
-            for STDPmech in dSTDPmech['EMDOWN']: STDPmech.reward_punish(float(critic))
-          elif UPactions==STAYactions and UPactions>DOWNactions: # UP and STAY TIED
-            if dconf['verbose']: print('APPLY RL to EMUP and EMSTAY')
-            for STDPmech in dSTDPmech['EMUP']: STDPmech.reward_punish(float(critic))
-            for STDPmech in dSTDPmech['EMSTAY']: STDPmech.reward_punish(float(critic))
-          elif DOWNactions==STAYactions and DOWNactions>UPactions: # DOWN and STAY TIED
-            if dconf['verbose']: print('APPLY RL to EMDOWN and EMSTAY')
-            for STDPmech in dSTDPmech['EMDOWN']: STDPmech.reward_punish(float(critic))
-            for STDPmech in dSTDPmech['EMSTAY']: STDPmech.reward_punish(float(critic))
-          elif DOWNactions==STAYactions and UPactions==STAYactions: # ALL actions TIED
-            if dconf['verbose']: print('APPLY RL to EMUP, EMDOWN and EMSTAY')
-            for STDPmech in dSTDPmech['all']: STDPmech.reward_punish(float(critic))      
-      else:
-        if dconf['verbose']: print('APPLY RL to EMUP, EMDOWN and EMSTAY')
-        for STDPmech in dSTDPmech['all']: STDPmech.reward_punish(float(critic))
+  if dconf['sim']['anticipatedRL']==1:
+    cpaction = proposed_actions 
+    anticipated_reward = dconf['rewardcodes']['followTarget']
+    if cpaction==dconf['moves']['UP']:
+      if dconf['verbose']: print('APPLY RL to EMUP')
+      for STDPmech in dSTDPmech['EMUP']: STDPmech.reward_punish(float(anticipated_reward))
+    elif cpaction==dconf['moves']['DOWN']:
+      if dconf['verbose']: print('APPLY RL to EMDOWN')
+      for STDPmech in dSTDPmech['EMDOWN']: STDPmech.reward_punish(float(anticipated_reward))
+    elif cpaction==dconf['moves']['NOMOVE'] and dnumc['EMSTAY']>0:
+      if dconf['verbose']: print('APPLY RL to EMSTAY')
+      for STDPmech in dSTDPmech['EMSTAY']: STDPmech.reward_punish(float(anticipated_reward))
     else:
-      if dconf['sim']['targettedRL']:
-        if not noWinner: # if there's a clear winner in terms of firing rates
-          if UPactions==DOWNactions:
-            if dconf['verbose']: print('APPLY RL to both EMUP and EMDOWN')
-            for STDPmech in dSTDPmech['all']: STDPmech.reward_punish(float(critic))          
-          elif UPactions>DOWNactions: # UP WINS vs DOWN
-            if dconf['verbose']: print('APPLY RL to EMUP')
-            for STDPmech in dSTDPmech['EMUP']: STDPmech.reward_punish(float(critic))
-          elif DOWNactions>UPactions: # DOWN WINS vs UP
-            if dconf['verbose']: print('APPLY RL to EMDOWN')
-            for STDPmech in dSTDPmech['EMDOWN']: STDPmech.reward_punish(float(critic))        
+      print('No anticipated action for the input!!!')
+  else:
+    if critic != 0: # if critic signal indicates punishment (-1) or reward (+1)
+      if sim.rank==0: print('t=',round(t,2),'- adjusting weights based on RL critic value:', critic)
+      if dnumc['EMSTAY']>0:
+        if dconf['sim']['targettedRL']:
+          if not noWinner: # if there's a clear winner in terms of firing rates
+            if UPactions>DOWNactions and UPactions>STAYactions: # UP WINS vs ALL
+              if dconf['verbose']: print('APPLY RL to EMUP')
+              for STDPmech in dSTDPmech['EMUP']: STDPmech.reward_punish(float(critic))
+            elif DOWNactions>UPactions and DOWNactions>STAYactions: # DOWN WINS vs ALL
+              if dconf['verbose']: print('APPLY RL to EMDOWN')
+              for STDPmech in dSTDPmech['EMDOWN']: STDPmech.reward_punish(float(critic))
+            elif STAYactions>UPactions and STAYactions>DOWNactions: # STAY WINS vs ALL
+              if dconf['verbose']: print('APPLY RL to EMSTAY')
+              for STDPmech in dSTDPmech['EMSTAY']: STDPmech.reward_punish(float(critic))
+            elif UPactions==DOWNactions and UPactions>STAYactions: # UP and DOWN TIED
+              if dconf['verbose']: print('APPLY RL to EMUP and EMDOWN')
+              for STDPmech in dSTDPmech['EMUP']: STDPmech.reward_punish(float(critic))
+              for STDPmech in dSTDPmech['EMDOWN']: STDPmech.reward_punish(float(critic))
+            elif UPactions==STAYactions and UPactions>DOWNactions: # UP and STAY TIED
+              if dconf['verbose']: print('APPLY RL to EMUP and EMSTAY')
+              for STDPmech in dSTDPmech['EMUP']: STDPmech.reward_punish(float(critic))
+              for STDPmech in dSTDPmech['EMSTAY']: STDPmech.reward_punish(float(critic))
+            elif DOWNactions==STAYactions and DOWNactions>UPactions: # DOWN and STAY TIED
+              if dconf['verbose']: print('APPLY RL to EMDOWN and EMSTAY')
+              for STDPmech in dSTDPmech['EMDOWN']: STDPmech.reward_punish(float(critic))
+              for STDPmech in dSTDPmech['EMSTAY']: STDPmech.reward_punish(float(critic))
+            elif DOWNactions==STAYactions and UPactions==STAYactions: # ALL actions TIED
+              if dconf['verbose']: print('APPLY RL to EMUP, EMDOWN and EMSTAY')
+              for STDPmech in dSTDPmech['all']: STDPmech.reward_punish(float(critic))      
+        else:
+          if dconf['verbose']: print('APPLY RL to EMUP, EMDOWN and EMSTAY')
+          for STDPmech in dSTDPmech['all']: STDPmech.reward_punish(float(critic))
       else:
-        if dconf['verbose']: print('APPLY RL to both EMUP and EMDOWN')
-        for STDPmech in dSTDPmech['all']: STDPmech.reward_punish(float(critic))
+        if dconf['sim']['targettedRL']:
+          if not noWinner: # if there's a clear winner in terms of firing rates
+            if UPactions==DOWNactions:
+              if dconf['verbose']: print('APPLY RL to both EMUP and EMDOWN')
+              for STDPmech in dSTDPmech['all']: STDPmech.reward_punish(float(critic))          
+            elif UPactions>DOWNactions: # UP WINS vs DOWN
+              if dconf['verbose']: print('APPLY RL to EMUP')
+              for STDPmech in dSTDPmech['EMUP']: STDPmech.reward_punish(float(critic))
+            elif DOWNactions>UPactions: # DOWN WINS vs UP
+              if dconf['verbose']: print('APPLY RL to EMDOWN')
+              for STDPmech in dSTDPmech['EMDOWN']: STDPmech.reward_punish(float(critic))        
+        else:
+          if dconf['verbose']: print('APPLY RL to both EMUP and EMDOWN')
+          for STDPmech in dSTDPmech['all']: STDPmech.reward_punish(float(critic))
   if sim.rank==0:
     print('t=',round(t,2),' game rewards:', rewards) # only rank 0 has access to rewards      
     for action in actions:

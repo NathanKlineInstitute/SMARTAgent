@@ -4404,3 +4404,371 @@ def setdminID (sim, lpop):
 
   -- added capability in script to remove 'ER' and 'IR' from simulation so that V1 is directly driven by the stimMod.
   -- simdat.py needs adjustment accordingly. 
+
+  -- running 1000 sec sim in "20aug05_B0_cycle" with 100 ms step and no ER and no IR.
+  -- changed parameters in sim.json based on sn.json
+
+  -- Why do we apply RL to the pop which produced action and why not apply RL to the pop which is expected to produce CORRECT action.
+  -- Is the reason for above choice is because applying reward/punishment to the pop which is expected to produce CORRECT action because its nonbiological?
+
+
+
+  -- add "anticipatedRL": 0 in "sim"
+  
+  * 20aug06
+
+  -- added rule for "anticipatedRL" as shown below
+
+  if dconf['sim']['anticipatedRL']==1:
+    for cpaction in proposed_actions:
+      anticipated_reward = dconf['rewardcoded']['followTarget']
+      if cpaction==dconf['moves']['UP']:
+        if dconf['verbose']: print('APPLY RL to EMUP')
+        for STDPmech in dSTDPmech['EMUP']: STDPmech.reward_punish(float(anticipated_reward))
+      elif cpaction==dconf['moves']['DOWN']:
+        if dconf['verbose']: print('APPLY RL to EMDOWN')
+        for STDPmech in dSTDPmech['EMDOWN']: STDPmech.reward_punish(float(anticipated_reward))
+      elif cpaction==dconf['moves']['STAY'] and dnumc['EMSTAY']>0:
+        if dconf['verbose']: print('APPLY RL to EMSTAY')
+        for STDPmech in dSTDPmech['EMSTAY']: STDPmech.reward_punish(float(anticipated_reward))
+      else:
+        print('No anticipated action for the input!!!')
+  else:
+    if critic != 0: 
+    .......... # previous code
+
+-- run 10 sec sim using anticipatedRL in "20aug04_A0_cycle_" on falcor... still using probabilistic connections.
+
+-- run 1000 sec sim using anticipatedRL in "20aug06_A0_falcor_" on falcor... still using probabilistic connections.
+
+-- tuning parameters to run with topological connectivity in "20aug06_B0_falcor_"
+
+        "EEMWghtAM": 5e-05, --> premotor to motor connection strengths. --->
+        "EEMWghtNM": 5e-06,
+        "EEPreMWghtAM": 8e-05,
+        "EEPreMWghtNM": 2.5e-06,
+        "EEMWghtThreshMin": 6.25e-06,
+        "EEMWghtThreshMax": 0.00032,
+        "EEMProb": 0.3,
+        "EEMRecProb": 0.3,
+        "EEPreMProb": 0.0,
+        "EEMPopNorm": 1,
+        "EEMRecProbCross": 0,
+        "EEMFeedbackProb": 0.0,
+        "EEMFeedbackWghtAM": 1.25e-05,
+        "EEMFeedbackWghtNM": 1.25e-06,
+        "VisualFeedback": 0,
+        "weightVar": 0.5
+
+-- run 100 sec sim in "20aug06_B1_falcor_" with topological connectivity and "EEMWghtAM": 5e-3, EMDOWN=400 and EMUP = 400
+
+-- analysis functions modified... should work with any number of neurons in M.
+
+analyzeRepeatedInputSequences(dact,dnumc,InputImages, targetPixel=(10,10),nbseq=14,targetCorr=0.9)
+-- plotting fix number of sequences 1-10.... should be able to plot any 10. will modify later.
+analyzeRepeatedInputForSingleEvent(dact, dnumc, InputImages, targetPixel=(10,10))
+
+-- debugged and using dictionaries now.
+analyzeRepeatedInputSequences(dact, InputImages, targetPixel=(10,10),nbseq=14,targetCorr=0.9)
+analyzeRepeatedInputForSingleEvent(dact, InputImages, targetPixel=(10,10))
+
+Debugging function in simdat.py--- analyzeRepeatedInputSequences(dact, InputImages, targetPixel=(10,10),nbseq=14,targetCorr=0.9):
+
+-- instead of choosing alternative indices, i am looking for seqStartIndices with no repetitive sequences.
+
+  midInds = np.where(InputImages[:,targetPixel[0],targetPixel[1]]>250)
+  repSeqInds = []
+  for i in range(len(midInds[0])-1):
+    if midInds[0][i+1]-midInds[0][i]<5:
+      repSeqInds.append(i+1)
+  uniqueSeqStartInds = []
+  for i in range(len(midInds[0])):
+    if i not in repSeqInds:
+      uniqueSeqStartInds.append(midInds[0][i])
+
+-- still need to test it.
+
+-- if the number of sequences is less than 10, then dont generate an error. checking.....
+
+
+* 20aug10
+
+-- TASK: ADD PADDING NEURONS TO AVOID BOUNDARY EFFECTS IN THE NETWORK.
+
+-- Features:
+1. should be automatic
+2. Number of padding neurons will depend on Size of Pop and Connections generated from the pop.
+    e.g. if we have 10x10 neurons in a population and 3x3 neurons are projecting from this population to other population
+    then we need to add a single layer of neurons around 10x10 neurons which will be 44 additional neurons.
+    if we have 10x10 neurons in a population and 5x5 neurons are projecting from this population to other population 
+    then we need to add double layer of neurons around 10x10 neurons which be 44 additional neurons in first layer and 52
+    additional neurons in 2nd layer. 
+
+-- to automate, add topological connectivity parameters in the sim.json file as follows.
+
+        "alltopolcons":{
+            "ER":{"IR":3,"EV1":3},
+            "IR":{"ER":5},
+            "EV1":{"IV1":3,"EV4":3,"ER":3},
+            "IV1":{"EV1":5,"IV4":5,"ER":5},
+            "EV4":{"IV4":3,"EMT":3,"EV1":3},
+            "IV4":{"EV4":5,"IMT":5,"EV1":5},
+            "EMT":{"IMT":3,"EV4":3},
+            "IMT":{"EMT":5,"EV4":5}
+        },
+        "useNeuronPad": 1,
+
+-- update number of neurons by including padding neurons, if useNeuronPad = 1	
+
+dnumc_padx = OrderedDict({ty:dconf['net']['allpops'][ty]*0 for ty in allpops}) # a dictionary with zeros to keep number of padded neurons in one dimension
+
+dtopolcons = dconf['net']['alltopolcons']
+allpops_withtopology = list(dtopolcons.keys())
+# below is the code for updating neuronal pop size to include padding. 
+if useNeuronPad:
+  for pop in allpops_withtopology:
+    max_receptive_field = np.amax(list(dtopolcons[pop].values()))
+    if dnumc[pop]>0 and max_receptive_field>0:
+      dnumc[pop] = int((np.sqrt(dnumc[pop])+max_receptive_field-1)**2)
+      dnumc_padx[pop] = max_receptive_field-1
+
+-- take care of padded neurons while making connection list using:
+
+def connectLayerswithOverlap (NBpreN, NBpostN, overlap_xdir,padded_preneurons_xdir,padded_postneurons_xdir):
+
+could be used as 
+
+connectLayerswithOverlap(NBpreN = dnumc['EV1'], NBpostN = dnumc['EV4'], overlap_xdir = dtopolcons['EV1']['EV4'], padded_preneurons_xdir = dnumc_padx['EV1'], padded_postneurons_xdir = dnumc_padx['EV4'])
+
+
+    targetOffset_x = int(padded_postneurons_xdir/2)
+    targetOffset_y = int(padded_postneurons_xdir/2) # assuming we have pops in square format. so anything x dimension would be same as in y dimension
+    sourceOffset_x = int(padded_preneurons_xdir/2)
+    sourceOffset_y = int(padded_preneurons_xdir/2) # assuming we have pops in square format. so anything x dimension would be same as in y dimension
+    target_postNIndices = list(range(targetOffset_x,NBpostN_x-targetOffset_x,1))
+    source_preNIndices = list(range(sourceOffset_x,NBpreN_x-sourceOffset_x,int(convergence_factor_x)))
+    for i in range(len(target_postNIndices)):				#parse the non
+        for j in range(len(target_postNIndices)):
+            postN = int(postNIndices[target_postNIndices[i],target_postNIndices[j]])
+            preN = int(preNIndices[source_preNIndices[i],source_preNIndices[j]]) 
+            preNIndices[int(i*convergence_factor_y),int(j*convergence_factor_x)]
+
+
+-- similar modifications in:
+def connectLayerswithOverlapDiv(NBpreN, NBpostN, overlap_xdir,padded_preneurons_xdir,padded_postneurons_xdir):
+
+except now:
+
+    target_postNIndices = list(range(targetOffset_x,NBpostN_x-targetOffset_x,int(divergence_factor_x)))
+    source_preNIndices = list(range(sourceOffset_x,NBpreN_x-sourceOffset_x,1))
+
+
+-- looked GOOD
+
+-- now the problem is that I have extra neurons which are not used in network. These neurons were generated because I used receptive field size for both convergent and divergent connections.
+-- We dont need to consider adding neurons (padding) for divergent connections. so i changes sim.json to
+
+
+        "alltopoldivcons":{
+            "IR":{"ER":5},
+            "EV1":{"ER":3},
+            "IV1":{"EV1":5,"ER":5},
+            "EV4":{"EV1":3},
+            "IV4":{"EV4":5,"EV1":5},
+            "EMT":{"EV4":3},
+            "IMT":{"EMT":5,"EV4":5}
+        },
+        "alltopolconvcons":{
+            "ER":{"IR":3,"EV1":3},
+            "EV1":{"IV1":3,"EV4":3},
+            "IV1":{"IV4":5},
+            "EV4":{"IV4":3,"EMT":3},
+            "IV4":{"IMT":5},
+            "EMT":{"IMT":3}
+        },
+
+and 
+
+
+dtopoldivcons = dconf['net']['alltopoldivcons']
+dtopolconvcons = dconf['net']['alltopolconvcons']
+allpops_withconvtopology = list(dtopolconvcons.keys())
+# below is the code for updating neuronal pop size to include padding. 
+if dconf['net']['useNeuronPad']==1:
+  for pop in allpops_withconvtopology:
+    receptive_fields = []
+    for postpop in list(dtopolconvcons[pop].keys()):
+      if dnumc[postpop]>0:
+        receptive_fields.append(dtopolconvcons[pop][postpop])
+    if len(receptive_fields)>0:
+      max_receptive_field = np.amax(receptive_fields)
+    else:
+      max_receptive_field = 0
+    if dnumc[pop]>0 and max_receptive_field>0:
+      dnumc[pop] = int((np.sqrt(dnumc[pop])+max_receptive_field-1)**2)
+      dnumc_padx[pop] = max_receptive_field-1
+
+
+
+
+Changes In aigame.py
+
+-- initialization:
+.... finding receptive field size to use for padding
+    self.dReceptiveField = OrderedDict({pop:np.amax(list(dconf['net']['alltopolconvcons'][pop].values())) for pop in self.lratepop})
+.... dictionary of pop size after padding.
+    self.dInputs = OrderedDict({pop:int((np.sqrt(dconf['net']['allpops'][pop])+self.dReceptiveField[pop]-1)**2) for pop in self.lratepop})
+.... if use neuron padding, then create dictionary with different size.
+    if dconf['net']['useNeuronPad']==1:
+      self.dFiringRates = OrderedDict({pop:np.zeros(dInputs[pop]) for pop in self.lratepop}) # python objects for firing rate calculations
+    else:
+      self.dFiringRates = OrderedDict({pop:np.zeros(dconf['net']['allpops'][pop]) for pop in self.lratepop}) # python objects for firing rate calculations
+.... if use neuron padding, compute input_dims accordingly:
+    if dconf['net']['useNeuronPad']==1:
+      self.input_dim = int(np.sqrt(self.dInputs[self.InputPop]))
+    else:  
+      self.input_dim = int(np.sqrt(dconf['net']['allpops'][self.InputPop])) # input image XY plane width,height -- not used anywhere
+
+-- function to update firing rates of neurons when using padded neurons.
+
+  def updateInputRatesWithPadding (self, dsum_Images):
+    # update input rates to retinal neurons
+    padded_Image = np.zeros(shape=(self.input_dim,self.input_dim))
+    offset = int((self.dReceptiveField[self.InputPop]-1)/2)
+    padded_Image[offset:offset+dsum_Images.shape[0],offset:offset+dsum_Images.shape[1]]=dsum_Images
+    fr_Images = 40/(1+np.exp((np.multiply(-1,padded_Image)+123)/25))
+    fr_Images = np.subtract(fr_Images,np.min(fr_Images)) #baseline firing rate subtraction. Instead all excitatory neurons are firing at 5Hz.
+    print(np.amin(fr_Images),np.amax(fr_Images))
+    self.dFiringRates[self.InputPop] = np.reshape(fr_Images,self.dInputs[self.InputPop]) #400 for 20*20, 900 for 30*30, etc.
+
+-- updating firing rates of input neurons.
+
+    if dconf['net']['useNeuronPad']==1:
+      self.updateInputRatesWithPadding(dsum_Images)
+    else:
+      self.updateInputRates(dsum_Images) # update input rates to retinal neurons
+
+
+-- tested a little bit--- seems that the padding is working without any problem.
+
+-- running 500 sec sim on falcor with paddings "20aug11_A0_falcor_"
+
+
+* 20aug12
+
+-- Things to do:
+
+1. background should be 0 firing rate and binary firing rates.
+2. try with edges instead of full objects
+3. better measure of performance
+
+-------------------------------------------------------------------
+Solving 1. background should be 0 firing rate and binary firing rates.
+
+-- find the range of firing rates:
+
+from netpyne import specs, sim
+from neuron import h
+import numpy as np
+import random
+from conf import dconf # configuration dictionary
+import pandas as pd
+import pickle
+from collections import OrderedDict
+from connUtils import *
+from matplotlib import pyplot as plt
+import os
+import anim
+from matplotlib import animation
+from aigame import AIGame
+sim.AIGame = AIGame()
+rewards, epCount, proposed_actions, total_hits = sim.AIGame.playGame(actions= [3], epCount = 0)
+
+>>> np.unique(sim.AIGame.dFiringRates['EV1'])
+array([ 0.        , 33.00293599])
+
+-- for nonpadded case, we got 2 firing rates.
+-- with padded case, we get more than 2 firing rates (probably 3 because we subtract 0 from the firing rates instead of subtracting min value).
+---> See fix below:
+
+>>> np.unique(sim.AIGame.dFiringRates['EV1DS'])
+array([ 0., 50.])
+
+-- for converting image to binary use
+
+from skimage.filters import threshold_otsu
+thresh = threshold_otsu(image)
+binary = image > thresh
+
+
+
+-- before was using 0 value for padded input pixels.
+now using min value for padded input pixels: 
+
+def updateInputRatesWithPadding (self, dsum_Images):
+  padded_Image = np.amin(dsum_Images)*np.ones(shape=(self.input_dim,self.input_dim))
+  offset = int((self.dReceptiveField[self.InputPop]-1)/2)
+  padded_Image[offset:offset+dsum_Images.shape[0],offset:offset+dsum_Images.shape[1]]=dsum_Images
+  if dconf['net']['useBinaryImage']==1:
+    thresh = threshold_otsu(padded_Image)
+    binary_Image = padded_Image > thresh
+    fr_Images = 50.0*binary_Image
+  else:
+    padded_Image = padded_Image - np.amin(padded_Image)
+    fr_Images = 40/(1+np.exp((np.multiply(-1,padded_Image)+123)/25))
+    fr_Images = np.subtract(fr_Images,np.min(fr_Images))
+  self.dFiringRates[self.InputPop] = np.reshape(fr_Images,self.dInputs[self.InputPop])
+
+
+similarly:
+
+def updateInputRates (self, dsum_Images):
+  if dconf['net']['useBinaryImage']==1:
+    thresh = threshold_otsu(dsum_Images)
+    binary_Image = dsum_Images > thresh
+    fr_Images = 50.0*binary_Image
+  else:
+    fr_Images = 40/(1+np.exp((np.multiply(-1,dsum_Images)+123)/25))
+    fr_Images = np.subtract(fr_Images,np.min(fr_Images)) 
+  self.dFiringRates[self.InputPop] = np.reshape(fr_Images,dconf['net']['allpops'][self.InputPop])
+
+
+-- PROBLEM: max firing rates of EV1 (~33 Hz) and EV1D(50Hz) were different. 
+
+
+
+using fr_Images = 50/(1+np.exp((np.multiply(-1,dsum_Images)+123)/25))
+
+np.unique(sim.AIGame.dFiringRates['EV1'])
+array([ 0.36231198, 43.75388096])
+
+
+using fr_Images = 50/(1+np.exp((np.multiply(-1,dsum_Images)+123)/10))
+
+-- SOLUTION:
+
+padded_Image = padded_Image - np.amin(padded_Image)
+padded_Image = (255.0/np.amax(padded_Image))*padded_Image # this will make sure that padded_Image spans 0-255
+fr_Images = 50/(1+np.exp((np.multiply(-1,padded_Image)+123)/10))
+
+
+and 
+
+dsum_Images = dsum_Images - np.amin(dsum_Images)
+dsum_Images = (255.0/np.amax(dsum_Images))*dsum_Images
+fr_Images = 50/(1+np.exp((np.multiply(-1,dsum_Images)+123)/10))
+
+
+-- now firing rates are close enough....when using nonbinary image.
+
+>>> np.unique(sim.AIGame.dFiringRates['EV1'])[1]
+49.99990747011135
+>>> np.unique(sim.AIGame.dFiringRates['EV1'])[0]
+0.00022758618723999394
+
+
+
+-- run 1000 sec sim on cycle "20aug12_A0_cycle_" with padding and binary inputs.
+
+        "useNeuronPad": 1,
+        "useBinaryImage": 1,

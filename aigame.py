@@ -16,6 +16,7 @@ import random
 import numpy as np
 from skimage.transform import downscale_local_mean, resize
 from skimage.color import rgb2gray
+from skimage.filters import threshold_otsu
 import json
 import gym
 import sys
@@ -73,9 +74,16 @@ class AIGame:
     if dconf['net']['allpops']['ER']>0: self.InputPop = 'ER'
     else: self.InputPop = 'EV1'    
     self.lratepop = [self.InputPop] # populations that we calculate rates for
+    self.dReceptiveField = OrderedDict({pop:np.amax(list(dconf['net']['alltopolconvcons'][pop].values())) for pop in self.lratepop})
+    self.dInputs = OrderedDict({pop:int((np.sqrt(dconf['net']['allpops'][pop])+self.dReceptiveField[pop]-1)**2) for pop in self.lratepop})
     for d in self.ldir: self.lratepop.append('EV1D'+d)
     self.dFVec = OrderedDict({pop:h.Vector() for pop in self.lratepop}) # NEURON Vectors for firing rate calculations
+    #if dconf['net']['useNeuronPad']==1:
+    #  self.dFiringRates = OrderedDict({pop:np.zeros(self.dInputs[pop]) for pop in self.lratepop}) # python objects for firing rate calculations
+    #else:
     self.dFiringRates = OrderedDict({pop:np.zeros(dconf['net']['allpops'][pop]) for pop in self.lratepop}) # python objects for firing rate calculations
+    if dconf['net']['useNeuronPad']==1:
+      self.dFiringRates[self.InputPop] = np.zeros(self.dInputs[self.InputPop])
     self.dAngPeak = OrderedDict({'EV1DE': 0.0,'EV1DNE': 45.0, # receptive field peak angles for the direction selective populations
                                 'EV1DN': 90.0,'EV1DNW': 135.0,
                                 'EV1DW': 180.0,'EV1DSW': 235.0,
@@ -85,7 +93,10 @@ class AIGame:
     if self.AngRFSigma2 <= 0.0: self.AngRFSigma2=1.0
     self.EXPDir = True
     if 'EXPDir' in dconf['net']: self.EXPDir = dconf['net']['EXPDir']
-    self.input_dim = int(np.sqrt(dconf['net']['allpops'][self.InputPop])) # input image XY plane width,height -- not used anywhere    
+    if dconf['net']['useNeuronPad']==1:
+      self.input_dim = int(np.sqrt(self.dInputs[self.InputPop]))
+    else:  
+      self.input_dim = int(np.sqrt(dconf['net']['allpops'][self.InputPop])) # input image XY plane width,height -- not used anywhere    
     self.dirSensitiveNeuronDim = int(np.sqrt(dconf['net']['allpops']['EV1DE'])) # direction sensitive neuron XY plane width,height
     self.dirSensitiveNeuronRate = (dconf['net']['DirMinRate'], dconf['net']['DirMaxRate']) # min, max firing rate (Hz) for dir sensitive neurons
     self.intaction = int(dconf['actionsPerPlay']) # integrate this many actions together before returning reward information to model
@@ -116,13 +127,37 @@ class AIGame:
     elif dconf['net']['allpops'][self.InputPop] == 25600: # this is for 160x160 (full resolution)
       self.downsampshape = (1,1)
 
+  def updateInputRatesWithPadding (self, dsum_Images):
+    # update input rates to retinal neurons
+    padded_Image = np.amin(dsum_Images)*np.ones(shape=(self.input_dim,self.input_dim))
+    offset = int((self.dReceptiveField[self.InputPop]-1)/2)
+    padded_Image[offset:offset+dsum_Images.shape[0],offset:offset+dsum_Images.shape[1]]=dsum_Images
+    if dconf['net']['useBinaryImage']==1:
+      thresh = threshold_otsu(padded_Image)
+      binary_Image = padded_Image > thresh
+      fr_Images = 50.0*binary_Image
+    else:
+      padded_Image = padded_Image - np.amin(padded_Image)
+      padded_Image = (255.0/np.amax(padded_Image))*padded_Image # this will make sure that padded_Image spans 0-255
+      fr_Images = 50/(1+np.exp((np.multiply(-1,padded_Image)+123)/10))
+      #fr_Images = np.subtract(fr_Images,np.min(fr_Images)) #baseline firing rate subtraction. Instead all excitatory neurons are firing at 5Hz.
+      #print(np.amin(fr_Images),np.amax(fr_Images))
+    self.dFiringRates[self.InputPop] = np.reshape(fr_Images,self.dInputs[self.InputPop]) #400 for 20*20, 900 for 30*30, etc.
+
   def updateInputRates (self, dsum_Images):
     # update input rates to retinal neurons
     #fr_Images = np.where(dsum_Images>1.0,100,dsum_Images) #Using this to check what number would work for firing rate
     #fr_Images = np.where(dsum_Images<10.0,0,dsum_Images)
-    fr_Images = 40/(1+np.exp((np.multiply(-1,dsum_Images)+123)/25))
-    fr_Images = np.subtract(fr_Images,np.min(fr_Images)) #baseline firing rate subtraction. Instead all excitatory neurons are firing at 5Hz.
-    #print(np.amax(fr_Images))
+    if dconf['net']['useBinaryImage']==1:
+      thresh = threshold_otsu(dsum_Images)
+      binary_Image = dsum_Images > thresh
+      fr_Images = 50.0*binary_Image
+    else:
+      dsum_Images = dsum_Images - np.amin(dsum_Images)
+      dsum_Images = (255.0/np.amax(dsum_Images))*dsum_Images
+      fr_Images = 50/(1+np.exp((np.multiply(-1,dsum_Images)+123)/10))
+      #fr_Images = np.subtract(fr_Images,np.min(fr_Images)) #baseline firing rate subtraction. Instead all excitatory neurons are firing at 5Hz.
+      #print(np.amax(fr_Images))
     self.dFiringRates[self.InputPop] = np.reshape(fr_Images,dconf['net']['allpops'][self.InputPop]) #400 for 20*20, 900 for 30*30, etc.
 
   def computeMotionFields (self, UseFull=False):
@@ -389,8 +424,10 @@ class AIGame:
       nsum_Images = lgimage_ns[0]
     self.FullImages.append(nsum_Images) # save full images ----> THIS IS JUST USED FOR DIRECTIONS (for accuracy)
     self.ReducedImages.append(dsum_Images) # save the input image
-
-    self.updateInputRates(dsum_Images) # update input rates to retinal neurons
+    if dconf['net']['useNeuronPad']==1:
+      self.updateInputRatesWithPadding(dsum_Images)
+    else:
+      self.updateInputRates(dsum_Images) # update input rates to retinal neurons
     if self.intaction==1: #if only one frame used per play, then add the downsampled and scaled image from last_obs for direction computation 
       if len(lobs_gimage_ds)>0:
         dsum_Images = np.maximum(dsum_Images,lobs_gimage_ds)
