@@ -82,7 +82,7 @@ class AIGame:
     #  self.dFiringRates = OrderedDict({pop:np.zeros(self.dInputs[pop]) for pop in self.lratepop}) # python objects for firing rate calculations
     #else:
     self.dFiringRates = OrderedDict({pop:np.zeros(dconf['net']['allpops'][pop]) for pop in self.lratepop}) # python objects for firing rate calculations
-    if dconf['net']['useNeuronPad']==1:
+    if dconf['net']['useNeuronPad']:
       self.dFiringRates[self.InputPop] = np.zeros(self.dInputs[self.InputPop])
     self.dAngPeak = OrderedDict({'EV1DE': 0.0,'EV1DNE': 45.0, # receptive field peak angles for the direction selective populations
                                 'EV1DN': 90.0,'EV1DNW': 135.0,
@@ -92,8 +92,8 @@ class AIGame:
     self.AngRFSigma2 = dconf['net']['AngRFSigma']**2 # angular receptive field (RF) sigma squared used for dir selective neuron RFs
     if self.AngRFSigma2 <= 0.0: self.AngRFSigma2=1.0
     self.EXPDir = True
-    if 'EXPDir' in dconf['net']: self.EXPDir = dconf['net']['EXPDir']
-    if dconf['net']['useNeuronPad']==1:
+    self.EXPDir = dconf['net']['EXPDir']
+    if dconf['net']['useNeuronPad']:
       self.input_dim = int(np.sqrt(self.dInputs[self.InputPop]))
     else:  
       self.input_dim = int(np.sqrt(dconf['net']['allpops'][self.InputPop])) # input image XY plane width,height -- not used anywhere    
@@ -132,7 +132,7 @@ class AIGame:
     padded_Image = np.amin(dsum_Images)*np.ones(shape=(self.input_dim,self.input_dim))
     offset = int((self.dReceptiveField[self.InputPop]-1)/2)
     padded_Image[offset:offset+dsum_Images.shape[0],offset:offset+dsum_Images.shape[1]]=dsum_Images
-    if dconf['net']['useBinaryImage']==1:
+    if dconf['net']['useBinaryImage']:
       thresh = threshold_otsu(padded_Image)
       binary_Image = padded_Image > thresh
       fr_Images = 50.0*binary_Image
@@ -148,7 +148,7 @@ class AIGame:
     # update input rates to retinal neurons
     #fr_Images = np.where(dsum_Images>1.0,100,dsum_Images) #Using this to check what number would work for firing rate
     #fr_Images = np.where(dsum_Images<10.0,0,dsum_Images)
-    if dconf['net']['useBinaryImage']==1:
+    if dconf['net']['useBinaryImage']:
       thresh = threshold_otsu(dsum_Images)
       binary_Image = dsum_Images > thresh
       fr_Images = 50.0*binary_Image
