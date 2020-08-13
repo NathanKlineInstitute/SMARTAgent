@@ -16433,6 +16433,25 @@ looks like the weight normalization 1/2-way through did help a little ...
 
 python -i simdat.py backupcfg/20aug12_VTopoI0_ID800_D_gcp_sim.json
 
+may as well run one more continuation on gcp ...
+
+cp backupcfg/20aug12_VTopoI0_ID800_D_gcp_sim.json sn.json
+but make sure to turn off new padding so can use the last weights saved
+
+        "name": "20aug13_VTopoI0_ID800_E_gcp_",
+        "useNeuronPad": 0,
+        "useBinaryImage": 0,
+    "simtype": {
+        "ResumeSim": 1,
+        "ResumeSimFromFile": "data/20aug12_VTopoI0_ID800_D_gcp_synWeights_final.pkl"
+    },
+	"normalizeWeightsAtStart": 1,
+        "normalizeWeightStepSize": 50000,
+
+./myrun 30 sn.json
+
+started ~17:33 ...
+
 ** new version works?
 
 yes...seems to run ok
