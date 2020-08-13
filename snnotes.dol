@@ -16394,3 +16394,42 @@ plot([ypos,ypos],[0,7],'k--',linewidth=3)
 savefig('gif/'+dstr+simstr+'ball_Y_'+str(ypos)+'_position_hist.png') # gif/20aug13_20aug12_B4_cycle_ball_Y_93.5_position_hist.png
 peak does not look as clear, but there are fewer examples ...
 
+** check output from 20aug12_VTopoI0_ID800_C_gcp_
+and 20aug12_VTopoI0_ID800_D_gcp_
+
+python -i simdat.py backupcfg/20aug12_VTopoI0_ID800_C_gcp_sim.json
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig('gif/'+dstr+simstr+'perf.png') # gif/20aug13_20aug12_VTopoI0_ID800_C_gcp_perf.png
+does not look bad ... gets to pretty high levels overall, though expect to see the usual problems at
+the top-right and bottom-right corners...
+
+lfn = ['20aug10_VTopoI0_ID800_gcp_','20aug11_VTopoI0_ID800_B_gcp_','20aug12_VTopoI0_ID800_C_gcp_']
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0,.55))
+savefig('gif/'+dstr+simstr+'perf_all_steps_so_far.png') # gif/20aug13_20aug12_VTopoI0_ID800_C_gcp_perf_all_steps_so_far.png
+
+lpda = getindivactionreward(lfn)
+clf(); plotComparePerf(lpda,['b','g','r'],yl=(0,1),lleg=lfn)
+savefig('gif/'+dstr+simstr+'perf_compare_all_steps_so_far.png')
+gif/20aug13_20aug12_VTopoI0_ID800_C_gcp_perf_compare_all_steps_so_far.png
+some evidence that improving overall, though not as clear as first two steps
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((1990e3,2000e3))
+savefig('gif/'+dstr+simstr+'rast.png') # gif/20aug13_20aug12_VTopoI0_ID800_C_gcp_rast.png
+again see east/west activity at same time; do not think that should occur
+xlim((1992000,1993000))
+savefig('gif/'+dstr+simstr+'rastB.png') # gif/20aug13_20aug12_VTopoI0_ID800_C_gcp_rastB.png
+could see if ball goes back and forth, seems unlikely...
+
+compare to the sim with the weight normalization in the middle ...
+
+lfn = ['20aug12_VTopoI0_ID800_C_gcp_', '20aug12_VTopoI0_ID800_D_gcp_']
+lpda = getindivactionreward(lfn)
+clf(); plotComparePerf(lpda,['b','r'],yl=(0,1),lleg=lfn)
+savefig('gif/'+dstr+simstr+'perf_compare_against_more_norm.png')
+gif/20aug13_20aug12_VTopoI0_ID800_C_gcp_perf_compare_against_more_norm.png
+looks like the weight normalization 1/2-way through did help a little ... 
+
+python -i simdat.py backupcfg/20aug12_VTopoI0_ID800_D_gcp_sim.json
+
