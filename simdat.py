@@ -388,7 +388,7 @@ def ObjPos2pd (dobjpos):
   pdpos = pd.DataFrame(np.array([time, ballX, ballY, racketX, racketY]).T,columns=['time','ballX','ballY','racketX','racketY'])
   return pdpos
 
-def getdistvstimecorr (pdpos, ballxmin=137, ballxmax=141, pval=0.1):
+def getdistvstimecorr (pdpos, ballxmin=137, ballxmax=141, minN=2):
   # get distance vs time
   pdposs = pdpos[(pdpos.ballY>-1.0) & (pdpos.ballX>ballxmin) & (pdpos.ballX<ballxmax)]
   lbally = np.unique(pdposs.ballY)
@@ -402,13 +402,13 @@ def getdistvstimecorr (pdpos, ballxmin=137, ballxmax=141, pval=0.1):
     dout[y]['time'] = pdposss.time
     dout[y]['dist'] = dist
     dout[y]['rackety'] = pdposss.racketY
-    if len(pdposss.time) > 1:
-      r,p = pearsonr(pdposss.time, dist)
-      if p < pval:
-        lpval.append(p)
-        lr.append(r)
-        ly.append(y)
-        lN.append(len(dist))
+    r,p=0,0
+    if len(pdposss.time) > 1: r,p = pearsonr(pdposss.time, dist)
+    if len(dist) >= minN:
+      lpval.append(p)
+      lr.append(r)
+      ly.append(y)
+      lN.append(len(dist))
   dout['lbally'] = ly
   dout['lr'] = lr
   dout['lpval'] = lpval

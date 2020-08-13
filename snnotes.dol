@@ -16306,3 +16306,91 @@ ensureDefaults
 did not put all of them in yet ... but for new ones, easier to add there
 than to enforce checking for presence of the params in the rest of the code
 
+** check output from 20aug12_B4_cycle_
+
+note that there was a weight norm at start ... 
+
+python -i simdat.py backupcfg/20aug12_B4_cycle_sim.json
+
+ax=plotPerf(actreward,yl=(0,.55))
+savefig('gif/'+dstr+simstr+'perf.png') # gif/20aug13_20aug12_B4_cycle_perf.png
+
+lfn = ['20aug4_B0_cycle_','20aug6_B1_cycle_','20aug10_B2_cycle_', '20aug11_B3_cycle_', '20aug12_B4_cycle_']
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0,.55))
+savefig('gif/'+dstr+simstr+'perf_all_steps_so_far.png') # gif/20aug13_20aug12_B4_cycle_perf_all_steps_so_far.png
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((1990e3,2000e3))
+savefig('gif/'+dstr+simstr+'rast.png') # gif/20aug13_20aug12_B4_cycle_rast.png
+
+lpda = getindivactionreward(lfn)
+clf(); plotComparePerf(lpda,['c','g','b','m','r'],yl=(0,1),lleg=lfn)
+savefig('gif/'+dstr+simstr+'perf_compare_all_steps_so_far.png') # gif/20aug13_20aug12_B4_cycle_perf_compare_all_steps_so_far.png
+
+apart from the first and others, the rest look pretty similar overall ... 
+
+clf(); dobjpos = loadObjPos() ## 
+pdpos = ObjPos2pd(dobjpos)
+dout = getdistvstimecorr(pdpos,minN=2)
+plot(dout['lN'],dout['lr'],'ro',markersize=25)
+xlabel('Number examples'); ylabel('Correlation between paddle/ball distance and time')
+savefig('gif/'+dstr+simstr+'num_examples_and_racket_ball_Y_dist_vs_time_corr.png')
+
+plot(dout['lbally'], dout['lr'], 'ko', markersize=15)
+plot(dout['lbally'], dout['lr'], 'k', linewidth=3)
+xlabel('Y position'); ylabel('Correlation between paddle/ball distance and time')
+savefig('gif/'+dstr+simstr+'racket_ball_Y_dist_vs_time_corr.png')
+
+should look at full distribution of distances (on right side) based on number
+of examples
+
+plot(dout[1.5]['time'],dout[1.5]['dist'],'ko',markersize=25)
+plot(dout[15.5]['time'],dout[15.5]['dist'],'ro',markersize=25)
+
+plot(dout['lbally'],dout['lN'],'ko',markersize=25)
+xlabel('Y intercept',fontsize=20); ylabel('Count',fontsize=20)
+savefig('gif/'+dstr+simstr+'ball_Y_intercept_count.png') # 'gif/'+dstr+simstr+'ball_Y_intercept_count.png'
+so again can see most of the locations do not have many examples, most of the time the
+ball goes to top right corner, followed by bottom right corner
+
+len(dout[21.5]['time']) # 503
+plot(dout[21.5]['time'],dout[21.5]['dist'])
+plot(dout[21.5]['time'],dout[21.5]['dist'],'ko',markersize=10)
+xlabel('time'); ylabel('distance')
+savefig('gif/'+dstr+simstr+'ball_Y_21.5_distance_time.png') # gif/20aug13_20aug12_B4_cycle_ball_Y_21.5_distance_time.png'
+that does not look like improvement...distance all over the place...should see paddle location at each time that
+ball crosses right side.
+
+hist(dout[21.5]['dist'])
+hist(dout[21.5]['dist'],bins=160)
+xlabel('Distance')
+ylabel('Count')
+savefig('gif/'+dstr+simstr+'ball_Y_21.5_distance_hist.png') # 'gif/'+dstr+simstr+'ball_Y_21.5_distance_hist.png'
+so distances are biased towards correct - though there's a wide distribution 
+that's somewhat reassuring ... but strange that there's a peak at distance of 20 
+
+hist(dout[21.5]['rackety'])
+hist(dout[21.5]['rackety'],bins=160)
+plot([21.5,21.5],[0,140],'k--',linewidth=3)
+savefig('gif/'+dstr+simstr+'ball_Y_21.5_position_hist.png') # 'gif/'+dstr+simstr+'ball_Y_21.5_position_hist.png'
+so as observed in videos, the racket is all the way up top instead of at correct location (21.5)
+
+will likely see same at other end (bottom of screen)
+
+clf()
+hist(dout[141.5]['rackety'])
+hist(dout[141.5]['rackety'],bins=40)
+plot([141.5,141.5],[0,90],'k--',linewidth=3)
+savefig('gif/'+dstr+simstr+'ball_Y_141.5_position_hist.png') # gif/20aug13_20aug12_B4_cycle_ball_Y_141.5_position_hist.png
+
+dout['lbally']
+len(dout[81.5]['time'])
+
+clf()
+ypos = 93.5
+hist(dout[ypos]['rackety'])
+hist(dout[ypos]['rackety'],bins=20)
+plot([ypos,ypos],[0,7],'k--',linewidth=3)
+savefig('gif/'+dstr+simstr+'ball_Y_'+str(ypos)+'_position_hist.png') # gif/20aug13_20aug12_B4_cycle_ball_Y_93.5_position_hist.png
+peak does not look as clear, but there are fewer examples ...
+
