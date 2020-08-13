@@ -15438,3 +15438,862 @@ started ~22:50 ...
 
 ./myrun 30 sn.json
 
+*20aug6
+** check output from 20aug4_A0_cycle_
+
+python -i simdat.py backupcfg/20aug4_A0_cycle_sim.json
+
+ax=plotPerf(actreward,yl=(0,.55))
+savefig('gif/'+dstr+simstr+'perf.png') # gif/20aug6_20aug4_A0_cycle_perf.png
+performance going up - for hits too ... but follow flattens quickly
+
+lfn = ['20aug4_A0_cycle_','20aug4_B0_cycle_']
+lpda = getindivactionreward(lfn)
+clf(); plotComparePerf(lpda,['b','r'],yl=(0,.55),lleg=lfn)
+savefig('gif/'+dstr+simstr+'compare_perf.png') # gif/20aug6_20aug4_A0_cycle_compare_perf.png
+comparable performance
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((1990e3,2000e3))
+savefig('gif/'+dstr+simstr+'rast.png') # gif/20aug6_20aug4_A0_cycle_rast.png
+rates ok, ... 
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','IM'],tlim=((1990e3,2000e3)))
+savefig('gif/'+dstr+simstr+'Vm.png') # gif/20aug6_20aug4_A0_cycle_Vm.png
+
+fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4') # gif/20aug6_20aug4_A0_cycle__input.mp4
+
+continue as A1 ...
+
+        "name": "20aug6_A1_cycle_",
+
+    "simtype": {
+        "ResumeSim": 1,
+        "ResumeSimFromFile": "data/20aug4_A0_cycle_synWeights_final.pkl"
+    },
+
+./myrun 30 sn.json
+
+started ~10:29 ... 
+
+** check output from 20aug4_B0_cycle_
+
+python -i simdat.py backupcfg/20aug4_B0_cycle_sim.json
+
+ax=plotPerf(actreward,yl=(0,.55))
+savefig('gif/'+dstr+simstr+'perf.png') # gif/20aug6_20aug4_B0_cycle_perf.png
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((1990e3,2000e3))
+savefig('gif/'+dstr+simstr+'rast.png') # gif/20aug6_20aug4_B0_cycle_rast.png
+rates ok, ... slightly faster than for 20aug4_A0_cycle_ since there's recurrent connectivity
+between the two motor populations here ... 
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','IM'],tlim=((1990e3,2000e3)))
+savefig('gif/'+dstr+simstr+'Vm.png') # gif/20aug6_20aug4_B0_cycle_Vm.png
+
+fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4') # gif/20aug6_20aug4_B0_cycle__input.mp4
+
+continue as B1 ...
+
+        "name": "20aug6_B1_cycle_",
+    "simtype": {
+        "ResumeSim": 1,
+        "ResumeSimFromFile": "data/20aug4_B0_cycle_synWeights_final.pkl"	
+    },
+
+./myrun 30 sn.json
+
+started ~10:41 ...
+
+meanwhile, try analyzeRepeatedInputSequences
+
+
+lpop = ['EMUP','EMDOWN']  
+dact = getdActMap(totalDur, tstepPerAction, dspkT, dspkID, dnumc, dstartidx, lpop)
+analyzeRepeatedInputSequences(dact,InputImages, targetPixel=(10,10),nbseq=14,targetCorr=0.9)
+
+have to debug ... getting index out of bounds ...
+
+targetPixel = (10,10)
+midInds = np.where(InputImages[:,targetPixel[0],targetPixel[1]]>250)
+
+** friesen sims on gcp - not much firing
+
+the starting weights would need to be adjusted to produce anything meaningful
+stopped the sims
+
+** other sims on gcp
+***  20aug6_A0_gcp_
+
+same as 20aug4_A0_cycle_ but without targetted RL
+
+./myrun 32 sn.json
+
+*** 20aug6_B0_gcp_
+
+same as 20aug4_B0_cycle_ but without targetted RL
+
+./myrun 32 sn.json
+
+started ~11:44 ... 
+
+** better performance metrics
+
+could look at performance over time, given similar inputs
+
+*20aug7
+** check output
+*** 20aug6_A1_cycle_
+
+python -i simdat.py backupcfg/20aug6_A1_cycle_sim.json
+
+ax=plotPerf(actreward,yl=(0,.55))
+savefig('gif/'+dstr+simstr+'perf.png') # gif/20aug7_20aug6_A1_cycle_perf.png
+
+lfn = ['20aug6_A1_cycle_','20aug6_B1_cycle_']
+lpda = getindivactionreward(lfn)
+clf(); plotComparePerf(lpda,['b','r'],yl=(0,.55),lleg=lfn)
+savefig('gif/'+dstr+simstr+'compare_perf.png') # gif/20aug7_20aug6_A1_cycle_compare_perf.png
+comparable performance, overall 20aug6_B1_cycle_ is a little better in terms of score/follow
+
+lfn = ['20aug4_A0_cycle_','20aug6_A1_cycle_']
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0,.55))
+savefig('gif/'+dstr+simstr+'perf_all_steps_so_far.png') # gif/20aug7_20aug6_A1_cycle_perf_all_steps_so_far.png
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((1990e3,2000e3))
+savefig('gif/'+dstr+simstr+'rast.png') # gif/20aug7_20aug6_A1_cycle_rast.png
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','IM'],tlim=((1990e3,2000e3)))
+savefig('gif/'+dstr+simstr+'Vm.png') # gif/20aug7_20aug6_A1_cycle_Vm.png
+
+fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4') # gif/20aug7_20aug6_A1_cycle__input.mp4
+
+*** 20aug6_B1_cycle_
+
+python -i simdat.py backupcfg/20aug6_B1_cycle_sim.json
+
+ax=plotPerf(actreward,yl=(0,.55))
+savefig('gif/'+dstr+simstr+'perf.png') # gif/20aug7_20aug6_B1_cycle_perf.png
+
+lfn = ['20aug4_B0_cycle_','20aug6_B1_cycle_']
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0,.55))
+savefig('gif/'+dstr+simstr+'perf_all_steps_so_far.png') # gif/20aug7_20aug6_B1_cycle_perf_all_steps_so_far.png
+seems to be improving...
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((1990e3,2000e3))
+savefig('gif/'+dstr+simstr+'rast.png') # gif/20aug7_20aug6_B1_cycle_rast.png
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','IM'],tlim=((1990e3,2000e3)))
+savefig('gif/'+dstr+simstr+'Vm.png') # gif/20aug7_20aug6_B1_cycle_Vm.png
+
+fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4') # gif/20aug7_20aug6_B1_cycle__input.mp4
+
+lpop = ['EMUP','EMDOWN']  
+dact = getdActMap(totalDur, tstepPerAction, dspkT, dspkID, dnumc, dstartidx, lpop)
+analyzeRepeatedInputSequences(dact,InputImages, targetPixel=(10,10),nbseq=14,targetCorr=0.9)
+
+analyzeRepeatedInputForSingleEvent(dact, InputImages, targetPixel=(10,10))
+figure(); analyzeRepeatedInputForSingleEvent(dact, InputImages, targetPixel=(19,17))
+
+savefig('gif/'+dstr+simstr+'seq0.png') # gif/20aug7_20aug6_B1_cycle_seq0.png
+
+tt = np.unique(pdf.time)
+
+dout = getpopinputmap(pdf, tt[0], dnumc, dstartidx, dendidx, 'EMDOWN')
+plotallinputmaps(pdf,tt[0],dstartidx['EMDOWN'],'EMDOWN',dnumc,dstartidx,dendidx,asweight=True,dmap=dout)
+savefig('gif/'+dstr+simstr+'EMDOWN_inputmap_first.png') # gif/20aug7_20aug6_B1_cycle_EMDOWN_inputmap_first.png
+dout = getpopinputmap(pdf, tt[-1], dnumc, dstartidx, dendidx, 'EMDOWN')
+clf(); plotallinputmaps(pdf,tt[-1],dstartidx['EMDOWN'],'EMDOWN',dnumc,dstartidx,dendidx,asweight=True,dmap=dout)
+savefig('gif/'+dstr+simstr+'EMDOWN_inputmap_last.png') # gif/20aug7_20aug6_B1_cycle_EMDOWN_inputmap_last.png
+
+dout = getpopinputmap(pdf, tt[0], dnumc, dstartidx, dendidx, 'EMUP')
+clf(); plotallinputmaps(pdf,tt[0],dstartidx['EMUP'],'EMUP',dnumc,dstartidx,dendidx,asweight=True,dmap=dout)
+savefig('gif/'+dstr+simstr+'EMUP_inputmap_first.png') # gif/20aug7_20aug6_B1_cycle_EMUP_inputmap_first.png
+dout = getpopinputmap(pdf, tt[-1], dnumc, dstartidx, dendidx, 'EMUP')
+clf(); plotallinputmaps(pdf,tt[-1],dstartidx['EMUP'],'EMUP',dnumc,dstartidx,dendidx,asweight=True,dmap=dout)
+savefig('gif/'+dstr+simstr+'EMUP_inputmap_last.png') # gif/20aug7_20aug6_B1_cycle_EMUP_inputmap_last.png
+
+continue this one (20aug6_B1_cycle_) in multistep ... (but will not continue 20aug6_A1_cycle_ for now)
+
+cp backupcfg/20aug6_B1_cycle_sim.json sn.json
+
+then adjust ...
+
+    "simtype": {
+        "ResumeSim": 1,
+        "ResumeSimFromFile": "data/20aug6_B1_cycle_synWeights_final.pkl"	
+    },
+            "name": "20aug7_B2_cycle_",
+
+python multistepSim.py sn.json 30 10 20aug7_B2_cycle_Multi
+
+started ~10:31 ...
+
+** try same as 20aug4_B0_cycle_ but with longer time window for action (20aug7_C0_cycle_)
+
+        tstepPerAction == 40, instead of 20
+        "ResumeSim": 0,
+        "name": "20aug7_C0_cycle_",
+
+./myrun 30 sn.json
+
+started ~10:45 ...
+
+** border issue
+
+EV1 neurons at border project to fewer IV1 neurons
+IV1 neurons at border project to fewer EV1 neurons
+
+could this lead to problem at corners?
+
+could pad neurons
+
+should store x,y,padded vs not
+
+*** discussion on this
+
+15:05
+samn do EV1 corners provide less activation of IV1 interneurons?
+15:05
+and receive less interneuron input?
+15:05
+since they're at the boundaries
+15:06
+Haroon Anwar yes
+15:06
+samn that's a problem?
+15:06
+and might explain some biases/problems at corners
+15:07
+Haroon Anwar i dont know how to compensate for that
+15:07
+yes thats possible
+15:07
+samn padding
+15:07
+add an extra two rows and columns of interneurons around the border
+15:07
+Haroon Anwar problem is feedforward
+15:08
+less drive is provided to the inhibitory neurons on the border
+15:08
+and corners are even less
+15:08
+corners receive input from 9 neurons
+15:08
+other border neurons receive 15
+15:09
+and nonborder receive 25
+15:09
+samn that should be a problem
+15:09
+Haroon Anwar hmm
+15:09
+good catch
+15:10
+samn suppose so, that may be why kept seeing issues at the corners
+15:10
+and if it's systematic issue with circuit wiring
+15:11
+Haroon Anwar it is systematic
+15:11
+samn paddle on top right isn't right at the corner, but close...
+15:11
+maybe in 20x20 it is close to a border
+15:11
+Haroon Anwar yes at least its receiving 15 inputs vs 25
+15:12
+samn so how to fix?
+15:14
+Haroon Anwar easy fix would be do padding of neurons in all layers
+15:15
+so that the border effect is pushed to padded neurons
+15:15
+samn any problem with that other than extra cost?
+15:15
+Haroon Anwar cant think of any problem at the moment
+15:16
+samn so the problem is in the EV1 edges, receiving less IV1 input
+15:16
+Haroon Anwar both ways
+15:16
+samn but also for IV1 borders receiving  less
+15:16
+Haroon Anwar IV1 receiving less input from EV1 edges
+15:17
+and in return EV1 edge neurons receiving even lesser inhibition
+15:17
+so its added effect
+15:18
+samn ok, probably should fix with padding...but if padded neurons used for behavior, won't they also have problems?
+15:18
+Haroon Anwar right
+15:18
+so for projects onto motor neurons, will have to exclude padded neurons
+15:18
+projections from premotor to motor
+15:19
+samn then need to carefully have set of properties of each neuron stored ... x, y, padded vs not padded
+15:19
+Haroon Anwar will need a function to get list of neurons for projections
+15:19
+samn otherwise, difficult to ensure correct
+15:20
+Haroon Anwar yes
+15:20
+samn and so can get all inputs/outputs to/from a type, based on neuron ID
+15:20
+to make sure right...
+15:21
+Haroon Anwar yes
+15:21
+samn could that be your priority?
+15:21
+seems important if systematic issue
+15:22
+alternative is to have random wiring
+15:22
+with fixed convergence
+15:22
+between EV1, IV1
+15:22
+Haroon Anwar yes this will be my priority…. but will have to wait for Monday for this…. quite busy on weekend
+15:22
+samn ok sg
+15:22
+Haroon Anwar random wiring--- that would be last resort…. i dont prefer that
+15:24
+samn makes sense
+:+1:
+1
+
+*20aug10
+** check output on cycle (20aug7_B2_cycle__step_3_)
+
+python -i simdat.py backupcfg/20aug7_B2_cycle__step_3_sim.json
+
+ax=plotPerf(actreward,yl=(0,.55))
+savefig('gif/'+dstr+simstr+'perf.png') # gif/20aug10_20aug7_B2_cycle__step_3_perf.png
+
+lfn = ['20aug4_B0_cycle_','20aug6_B1_cycle_','20aug7_B2_cycle__step_0_','20aug7_B2_cycle__step_1_','20aug7_B2_cycle__step_2_','20aug7_B2_cycle__step_3_']
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0,.55))
+savefig('gif/'+dstr+simstr+'perf_all_steps_so_far.png') # gif/20aug10_20aug7_B2_cycle__step_3_perf_all_steps_so_far.png
+increasing for a while, then decreasing - due to overly high firing rates?
+
+looked like performance starting decaying around 0.4*1e7 ms
+0.4*1e7 # 4000 000.0 ... 4000 s ... stopped the sim ... 
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((1990e3,2000e3))
+savefig('gif/'+dstr+simstr+'rast.png') # gif/20aug10_20aug7_B2_cycle__step_3_rast.png
+xlim((1999e3,2000e3))
+savefig('gif/'+dstr+simstr+'rastB.png') # gif/20aug10_20aug7_B2_cycle__step_3_rastB.png
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','IM'],tlim=((1990e3,2000e3)))
+savefig('gif/'+dstr+simstr+'Vm.png') # gif/20aug10_20aug7_B2_cycle__step_3_Vm.png
+
+## fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4') #
+
+can restart the sim from where it was at 4000 s but first normalize the weights and then normalize weights every additional
+4000 s ... see if that helps ...
+
+so the first 4000 s were from these two 2000 s sims:
+20aug4_B0_cycle_sim.json and 20aug6_B1_cycle_sim.json
+so take weights from 20aug6_B1_cycle_synWeights_final.pkl and normalize them
+and use that to continue sim ...
+
+python -i simdat.py backupcfg/20aug6_B1_cycle_sim.json
+
+can make a flag to normalize weights at start ...
+
+and it will only be used when resumeSim:
+    if 'normalizeWeightsAtStart' in dconf['sim']:
+      if dconf['sim']['normalizeWeightsAtStart']:
+        print('normalizing adjustable weights at start')
+        normalizeAdjustableWeights(sim, 0, lpop = lrecpop)
+
+
+...
+        "name": "20aug10_B2_cycle_",
+    "simtype": {
+        "ResumeSim": 1,
+        "ResumeSimFromFile": "data/20aug6_B1_cycle_synWeights_final.pkl"
+    },
+	"normalizeWeightsAtStart": 1,
+
+./myrun 30 sn.json
+
+started @ 16:17 ...
+
+normalizing adjustable weights at start
+sim.rank= 0 davg: {'EMUP': 0.00015330298049694589, 'EMDOWN': 0.00014458421066697647} dfctr: {'EMUP': 0.3356975491603856, 'EMDOWN': 0.3356975491603856}
+
+** check 20aug7_C0_cycle_ (same as 20aug4_B0_cycle_ but with tstepPerAction==40)
+
+python -i simdat.py backupcfg/20aug7_C0_cycle_sim.json
+
+ax=plotPerf(actreward,yl=(0,.55))
+savefig('gif/'+dstr+simstr+'perf.png') # gif/20aug10_20aug7_C0_cycle_perf.png
+
+lfn = ['20aug4_B0_cycle_','20aug7_C0_cycle_']
+lpda = getindivactionreward(lfn)
+clf(); plotComparePerf(lpda,['b','r'],yl=(0,.55),lleg=lfn)
+savefig('gif/'+dstr+simstr+'compare_perf.png') # gif/20aug10_20aug7_C0_cycle_compare_perf.png
+
+the one with 20 ms tstepPerAction (blue) looks better, though it has 2X as much game-time
+compared to the one with 40 ms tstepPerAction ...
+
+** check output from gcp
+
+these are two sims without targetted RL
+
+20aug6_A0_gcp_ : same as 20aug4_A0_cycle_ but without targetted RL
+20aug6_B0_gcp_ : same as 20aug4_B0_cycle_ but without targetted RL, has
+RL plastic connectivity between EM populations
+
+python -i simdat.py backupcfg/20aug6_A0_gcp_sim.json
+
+ax=plotPerf(actreward,yl=(0,.55))
+savefig('gif/'+dstr+simstr+'perf.png') # gif/20aug10_20aug6_A0_gcp_perf.png
+hit/miss and score/miss somewhat worse than with targetted RL but the follow
+probability is surprisingly similar to with targetted RL
+
+lfn = ['20aug6_A0_gcp_', '20aug6_B0_gcp_']
+lpda = getindivactionreward(lfn)
+clf(); plotComparePerf(lpda,['b','r'],yl=(0,.55),lleg=lfn)
+savefig('gif/'+dstr+simstr+'compare_perf.png') # gif/20aug10_20aug6_A0_gcp_compare_perf.png
+in this case, the cross EM population recurrent connectivity (20aug6_B0_gcp_) sim
+does worse in follow and hit/miss compared to the sim without (20aug6_A0_gcp_)
+
+** V4, MT back?         "name": "20aug10_VM0_cycle_",
+
+./myrun 30 sn.json
+
+** conv for EV1->IV1 and IV1->EV1?
+
+that way all get fixed convergence and no boundary/edge effects ...
+
+add param to control whether I arranged topographically ... 
+	"VTopoI": 0,
+
+and then use it in code like this:
+
+VTopoI = True # whether interneurons have topological arrangement
+if "VTopoI" in dconf['net']: VTopoI = dconf['net']['VTopoI']
+
+netParams.connParams['EV1->IV1'] = {
+        'preConds': {'pop': 'EV1'},
+        'postConds': {'pop': 'IV1'},
+        'weight': 0.02 * cfg.EIGain,
+        'delay': 2,
+        'synMech': 'AMPA', 'sec':'soma', 'loc':0.5}
+if VTopoI:
+  netParams.connParams['EV1->IV1']['connList'] = blistEV1toIV1
+else:
+  netParams.connParams['EV1->IV1']['convergence'] = 9
+
+netParams.connParams['IV1->EV1'] = {
+  'preConds': {'pop': 'IV1'},
+  'postConds': {'pop': 'EV1'},
+  'weight': 0.2 * cfg.IEGain,
+  'delay': 2,
+  'synMech': 'GABA', 'sec':'soma', 'loc':0.5}
+if VTopoI: netParams.connParams['IV1->EV1']['connList'] = blistIV1toEV1
+else: netParams.connParams['IV1->EV1']['convergence'] = 25  
+
+        "name": "20aug10_VTopoI0_cycle_",
+
+./myrun 30 sn.json
+
+** add interneurons to dir selective pop?
+
+to breakup some of the hypersynch
+
+ok, started that run on gcp -         "name": "20aug10_VTopoI0_ID800_gcp_",
+with 800 ID neurons (project back to the EDir neurons)
+to use them have to specify
+	"EDirPops": ["EV1DE","EV1DNE","EV1DN","EV1DNW","EV1DW","EV1DSW","EV1DS","EV1DSE"],
+	"IDirPops": ["ID"],
+in json file
+and their number in allpops 
+
+*20aug11
+** ha finishing up padding and scaling
+
+scaling = same number of inputs for each neuron - is that different
+from fixed convergence? should be somewhat different since preserves
+topology
+
+** V4, MT?         "name": "20aug11_VTopoI0_ID800_V4MT_gcp_",
+
+more layers? more RL plasticity?
+
+will try with EV1->EV4 and EV4->EMT using RL plasticity
+and probabilistic connectivity with fixed convergence, rather than topographic ...
+
+EV4,EMT then project to EM populations with RL plasticity ...
+
+	    "EV4":100,
+	    "IV4":25,
+	    "EMT":100,
+	    "IMT":25,
+
+also have a new VisualRL flag that controls whether to use RL from EV1->EV4, EV4->EMT
+
+will leave targettedRL off since EV4,EMT do not produce motor commands directly ...
+but will keep intermediate rewards turned on ...
+
+also leave off         "EEMRecProbCross": 0,
+without targettedRL seems to do worse ... 
+
+./myrun 30 sn.json
+
+** sal response to netpyne forum INTF question
+
+You can just use: netParams.popParams['S'] = {'cellType': 'PYR', 'numCells': 1, 'cellModel': 'IntFire4'}
+
+As described in the docs, for point neurons you don't need to define cellParams, you can just
+include the name of the point neuron (ARTIFICIAL_CELL in mod file) as the cellModel :
+http://www.netpyne.org/reference.html#population-parameters
+
+You can also record any variables of the point neuron, e.g.: simConfig.recordTraces =
+{'intfire4_i1': {'var': 'i1'}}
+
+** fixing up INTF based on sal recc
+** check output from 20aug10_VTopoI0_ID800_gcp_
+
+python -i simdat.py backupcfg/20aug10_VTopoI0_ID800_gcp_sim.json
+
+VTopoI was set to 0, there were 800 ID interneurons (feedback inhib
+onto the direction selective excitatory neurons)
+
+ax=plotPerf(actreward,yl=(0,.55))
+savefig('gif/'+dstr+simstr+'perf.png') # gif/20aug12_20aug10_VTopoI0_ID800_gcp_perf.png
+looks similar to other simulations, so possible that inhib layout not an issue (inhib layout
+here is random)
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((1990e3,2000e3))
+savefig('gif/'+dstr+simstr+'rast.png') # gif/20aug12_20aug10_VTopoI0_ID800_gcp_rast.png
+xlim((1999e3,2000e3))
+savefig('gif/'+dstr+simstr+'rastB.png') # gif/20aug12_20aug10_VTopoI0_ID800_gcp_rastB.png
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','IM'],tlim=((1990e3,2000e3)))
+savefig('gif/'+dstr+simstr+'Vm.png') # gif/20aug12_20aug10_VTopoI0_ID800_gcp_Vm.png
+
+fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4') # gif/20aug12_20aug10_VTopoI0_ID800_gcp__input.mp4
+
+may as well continue ...
+
+cp backupcfg/20aug10_VTopoI0_ID800_gcp_sim.json sn.json
+adjust...
+
+        "name": "20aug11_VTopoI0_ID800_B_gcp_",
+    "simtype": {
+        "ResumeSim": 1,
+        "ResumeSimFromFile": "data/20aug10_VTopoI0_ID800_gcp_synWeights_final.pkl"	
+    },
+
+./myrun 30 sn.json
+
+** check output from 20aug10_B2_cycle_
+
+python -i simdat.py backupcfg/20aug10_B2_cycle_sim.json
+
+ax=plotPerf(actreward,yl=(0,.55))
+savefig('gif/'+dstr+simstr+'perf.png') # gif/20aug11_20aug10_B2_cycle_perf.png
+
+lfn = ['20aug4_B0_cycle_','20aug6_B1_cycle_','20aug10_B2_cycle_']
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0,.55))
+savefig('gif/'+dstr+simstr+'perf_all_steps_so_far.png') # gif/20aug11_20aug10_B2_cycle_perf_all_steps_so_far.png
+looks good in that performance not decaying but not really getting past the highest performance level achieved...
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((1990e3,2000e3))
+savefig('gif/'+dstr+simstr+'rast.png') # gif/20aug11_20aug10_B2_cycle_rast.png
+xlim((1999e3,2000e3))
+savefig('gif/'+dstr+simstr+'rastB.png') # gif/20aug11_20aug10_B2_cycle_rastB.png
+
+may continue later ... or now ... 
+
+        "name": "20aug11_B3_cycle_",
+
+    "simtype": {
+        "ResumeSim": 1,
+        "ResumeSimFromFile": "data/20aug10_B2_cycle_synWeights_final.pkl"	
+    },
+
+this time
+	"normalizeWeightsAtStart": 0,
+
+./myrun 30 sn.json
+
+*20aug12
+** check output from 20aug10_VTopoI0_
+
+python -i simdat.py backupcfg/20aug10_VTopoI0_cycle_sim.json
+
+ax=plotPerf(actreward,yl=(0,.55))
+savefig('gif/'+dstr+simstr+'perf.png') # gif/20aug12_20aug10_VTopoI0_cycle_perf.png
+
+looks similar to other simulations -->> interneuron layout / padding not critical?
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((1990e3,2000e3))
+savefig('gif/'+dstr+simstr+'rast.png') # gif/20aug12_20aug10_VTopoI0_cycle_rast.png
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP','EMSTAY'],lclr=['r','b','g'],plotindiv=True)
+xlabel('Time (ms)',fontsize=30); ylabel('Average weight',fontsize=30); tl(); 
+savefig('gif/'+dstr+simstr+'all_avg_weight.png') # gif/20aug12_20aug10_VTopoI0_cycle_all_avg_weight.png
+(note that did not use EMSTAY in this simulation!)
+
+simple measure of performance - how often is the paddle within a certain distance of the ball when
+the ball is at each y coordinate at the right side? then measure how that changes over time ...
+or just take average y distance from paddle to ball when ball is at right side (split by y position
+of ball)
+
+clf(); dobjpos = loadObjPos() ## 
+subplot(2,1,1); xlabel('Racket Y position'); hist(dobjpos['racket'][:,1])
+subplot(2,1,2); xlabel('Ball Y position'); hist(dobjpos['ball'][:,1])
+savefig('gif/'+dstr+simstr+'poshist.png') # gif/20aug12_20aug10_VTopoI0_cycle_poshist.png
+
+plot(dobjpos['ball'][:,1],'b')
+plot(dobjpos['racket'][:,1],'r')
+savefig('gif/'+dstr+simstr+'ball_racket_pos.png') # 
+
+from scipy.stats import pearsonr
+pearsonr(dobjpos['ball'][:,1],dobjpos['racket'][:,1]) # (0.20804581756251553, 0.0)
+that could be another performance measure ...
+
+plot(dobjpos['ball'][:,1],'b')
+plot(dobjpos['racket'][:,1],'r')
+
+len(dobjpos['ball']) # 99978
+len(dobjpos['racket']) # 99978
+
+ballX,ballY = dobjpos['ball'][:,0],dobjpos['ball'][:,1]
+racketX,racketY = dobjpos['racket'][:,0],dobjpos['racket'][:,1]
+
+min(ballX),max(ballX) # (18.0, 138.0)
+min(ballY),max(ballY) # (-1.0, 159.0)
+
+min(racketX),max(racketX),min(racketY),max(racketY) # (140.0, 142.0, 1.5, 157.5)
+why does racketX vary? shouldn't it always be the same?
+
+tt = np.linspace(0,totalDur,len(dobjpos['ball']))
+pdpos = pd.DataFrame(np.array([tt, ballX, ballY, racketX, racketY]).T,columns=['time','ballX','ballY','racketX','racketY'])
+
+pdposs = pdpos[(pdpos.ballY>-1.0) & (pdpos.ballX>137) & (pdpos.ballX<141)]
+
+dist = np.sqrt((pdposs.ballY - pdposs.racketY)**2)
+len(dist) # 1272
+
+lbally = np.unique(pdposs.ballY)
+
+lbally
+array([  9.5,  11.5,  15.5,  17.5,  19.5,  21.5,  23.5,  25.5,  31.5,
+        33.5,  43.5,  47.5,  53.5,  55.5,  57.5,  59.5,  61.5,  63.5,
+        65.5,  81.5,  91.5,  93.5,  94. ,  95.5,  97.5,  99.5, 101.5,
+       103.5, 105.5, 107.5, 109.5, 127.5, 129.5, 131.5, 135.5, 137.5,
+       138. , 139.5, 141.5, 143.5, 145.5, 149.5])
+
+note the non-integer values ... 
+
+plot(pdposs.time, dist)
+savefig('gif/'+dstr+simstr+'racket_ball_Y_dist_vs_time_pos.png') # gif/20aug12_20aug10_VTopoI0_cycle_racket_ball_Y_dist_vs_time_pos.png
+
+need to arrange distances between racket and ball y over time, to see if they improve
+note that these are the distances when ball is close to racket x position (right side of screen)
+
+lr = []; ly = []
+for y in lbally:
+  pdposss = pdposs[(pdposs.ballY==y)]
+  dist = np.sqrt((pdposss.ballY - pdposss.racketY)**2)
+  plot(pdposss.time, dist)
+  if len(pdposss.time) > 1:
+    r,p = pearsonr(pdposss.time, dist)
+    if p < 0.1:
+      lr.append(r)
+      ly.append(y)
+
+mean(lr) # -0.38121276265057785
+lr # [-0.13058295557793753, -0.9928797539872843, -0.9690671982663085, 0.9816262270426515, -0.28800520002775815, -0.2545581188678605, -0.8769565292049619, -0.32056193367274993, -0.32443788935043055, -0.6367042745931384]
+
+that's correlation of y distance with time. if learning, should see a decrease ...
+some of the values are decreasing, some are increasing ... should plot them as a function of y position at right side
+to see if any pattern ... 
+
+plot(ly, lr, 'ko', markersize=15)
+plot(ly, lr, 'k', linewidth=3)
+xlabel('Y position',fontsize=25); ylabel('Correlation between paddle/ball distance and time',fontsize=25)
+
+savefig('gif/'+dstr+simstr+'racket_ball_Y_dist_vs_time_corr.png') # gif/20aug12_20aug10_VTopoI0_cycle_racket_ball_Y_dist_vs_time_corr.png
+
+should make sure time saved properly for dobjpos to make sure consistent ... there was some offset at beginning ...
+
+dout = getdistvstimecorr(pdpos,pval=0.1)
+
+for y in dout['ly']:
+  plot(dout[y]['time'],dout[y]['dist'])
+
+
+dout['lbally']
+dout['lN'] # [582, 3, 8, 4, 57, 58, 5, 175, 171, 8]
+
+dout = getdistvstimecorr(pdpos,pval=1)
+plot(dout['lN'],dout['lr'],'ko',markersize=15)
+xlabel('Number examples',fontsize=25); ylabel('Correlation between paddle/ball distance and time',fontsize=25)
+
+savefig('gif/'+dstr+simstr+'num_examples_and_racket_ball_Y_dist_vs_time_corr.png')
+gif/20aug12_20aug10_VTopoI0_cycle_num_examples_and_racket_ball_Y_dist_vs_time_corr.png
+
+so there's not always a correlation between number of examples and the performance over time ...
+~600 examples going to upper right, and only weak learning ... some bug? or because racket
+partially off-screen at top-right?
+
+** check output from sim with VisualRL and V4,MT
+
+note that this one had no targettedRL
+
+python -i simdat.py backupcfg/20aug11_VTopoI0_ID800_V4MT_gcp_sim.json
+
+ax=plotPerf(actreward,yl=(0,.55))
+savefig('gif/'+dstr+simstr+'perf.png') # gif/20aug12_20aug11_VTopoI0_ID800_V4MT_gcp_perf.png
+
+well, improving but not as good as with targetted ...
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((1990e3,2000e3))
+savefig('gif/'+dstr+simstr+'rast.png') # gif/20aug12_20aug11_VTopoI0_ID800_V4MT_gcp_rast.png
+EV4,EMT barely firing ... 
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP','EV4','EMT'],lclr=['r','b','g','c'],plotindiv=True)
+xlabel('Time (ms)',fontsize=30); ylabel('Average weight',fontsize=30); tl(); 
+savefig('gif/'+dstr+simstr+'all_avg_weight.png') # gif/20aug12_20aug11_VTopoI0_ID800_V4MT_gcp_all_avg_weight.png
+
+pdfs = pdf[(pdf.postid>=dstartidx['EV4'])&(pdf.postid<=dendidx['EV4'])]
+len(pdfs) # 0
+
+hmm, so did not record the EV4, EMT weights? so can't continue this simulation
+
+lrecpop should have been updated to include EV4, EMT ... since VisualRL was turned on
+dconf['net']['VisualRL'] # 1
+
+fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4') # gif/20aug12_20aug11_VTopoI0_ID800_V4MT_gcp__input.mp4
+
+** check output from 20aug11_B3_cycle_
+
+python -i simdat.py backupcfg/20aug11_B3_cycle_sim.json
+
+ax=plotPerf(actreward,yl=(0,.55))
+savefig('gif/'+dstr+simstr+'perf.png') # gif/20aug12_20aug11_B3_cycle_perf.png
+better in beginning, then a little worse?
+
+lfn = ['20aug4_B0_cycle_','20aug6_B1_cycle_','20aug10_B2_cycle_', '20aug11_B3_cycle_']
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0,.55))
+savefig('gif/'+dstr+simstr+'perf_all_steps_so_far.png') # gif/20aug12_20aug11_B3_cycle_perf_all_steps_so_far.png
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((1990e3,2000e3))
+savefig('gif/'+dstr+simstr+'rast.png') # gif/20aug12_20aug11_B3_cycle_rast.png
+strange - westward moving activity for a stretch, but has some eastward activity too ...
+seems unlikely/impossible since only ball can move directly west or east -->> bug? poor representation?
+
+check video and flow ... 
+fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4',showflow=True,ldflow=ldflow) # gif/20aug12_20aug11_B3_cycle__input.mp4
+
+lfn = ['20aug4_B0_cycle_','20aug6_B1_cycle_','20aug10_B2_cycle_', '20aug11_B3_cycle_']
+lpda = getindivactionreward(lfn)
+clf(); plotComparePerf(lpda,['c','g','b','r'],yl=(0,1),lleg=lfn)
+savefig('gif/'+dstr+simstr+'perf_compare_all_steps_so_far.png')
+gif/20aug12_20aug11_B3_cycle_perf_compare_all_steps_so_far.png
+look pretty similar ...later steps a bit better ... could continue or adjust architecture ...
+
+will continue but have weight norm at start ...
+
+cp backupcfg/20aug11_B3_cycle_sim.json sn.json
+    "simtype": {
+        "ResumeSim": 1,
+        "ResumeSimFromFile": "data/20aug11_B3_cycle_synWeights_final.pkl"
+    },
+        "name": "20aug12_B4_cycle_",
+
+started ~16:52 ...
+
+** check output from sim with ID800 (20aug11_VTopoI0_ID800_B_gcp_)
+
+python -i simdat.py backupcfg/20aug11_VTopoI0_ID800_B_gcp_sim.json
+
+ax=plotPerf(actreward,yl=(0,.55))
+savefig('gif/'+dstr+simstr+'perf.png') # gif/20aug12_20aug11_VTopoI0_ID800_B_gcp_perf.png
+seems decent...some of the score values getting higher briefly...
+ylim((0,1)); savefig('gif/'+dstr+simstr+'perfB.png')
+gif/20aug12_20aug11_VTopoI0_ID800_B_gcp_perfB.png
+
+lfn = ['20aug10_VTopoI0_ID800_gcp_','20aug11_VTopoI0_ID800_B_gcp_']
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0,.55))
+savefig('gif/'+dstr+simstr+'perf_all_steps_so_far.png') # gif/20aug12_20aug11_VTopoI0_ID800_B_gcp_perf_all_steps_so_far.png
+
+lpda = getindivactionreward(lfn)
+clf(); plotComparePerf(lpda,['b','r'],yl=(0,1),lleg=lfn)
+savefig('gif/'+dstr+simstr+'perf_compare_all_steps_so_far.png')
+gif/20aug12_20aug11_VTopoI0_ID800_B_gcp_perf_compare_all_steps_so_far.png
+comparing individual steps seems more robust ... integrating cumulative over long
+periods of time seems to obscure the shorter-term performance ... which seems to
+clearly increase across steps here ... 
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((1990e3,2000e3))
+savefig('gif/'+dstr+simstr+'rast.png') # gif/20aug12_20aug11_VTopoI0_ID800_B_gcp_rast.png
+rates are low, note that there was weight normalization at start - so when continue this one
+should have that again ...
+
+clf(); dobjpos = loadObjPos() ## 
+subplot(2,1,1); xlabel('Racket Y position'); hist(dobjpos['racket'][:,1])
+subplot(2,1,2); xlabel('Ball Y position'); hist(dobjpos['ball'][:,1])
+savefig('gif/'+dstr+simstr+'poshist.png') # gif/20aug12_20aug11_VTopoI0_ID800_B_gcp_poshist.png
+
+pdpos = ObjPos2pd(dobjpos)
+dout = getdistvstimecorr(pdpos,pval=1)
+plot(dout['lN'],dout['lr'],'ko',markersize=15)
+xlabel('Number examples'); ylabel('Correlation between paddle/ball distance and time')
+savefig('gif/'+dstr+simstr+'num_examples_and_racket_ball_Y_dist_vs_time_corr.png')
+gif/20aug12_20aug11_VTopoI0_ID800_B_gcp_num_examples_and_racket_ball_Y_dist_vs_time_corr.png
+
+many of the values are positive ... though some for few examples ...
+top right corner is doing bad too ...
+
+plot(dout['lbally'], dout['lr'], 'ko', markersize=15)
+plot(dout['lbally'], dout['lr'], 'k', linewidth=3)
+xlabel('Y position'); ylabel('Correlation between paddle/ball distance and time')
+savefig('gif/'+dstr+simstr+'racket_ball_Y_dist_vs_time_corr.png')
+gif/20aug12_20aug11_VTopoI0_ID800_B_gcp_racket_ball_Y_dist_vs_time_corr.png
+
+some are down and some are up ...
+
+better to look at distance (between ball and paddle) over time at each y position ...
+
+cp backupcfg/20aug11_VTopoI0_ID800_B_gcp_sim.json sn.json
+then adjust ...
+
+        "name": "20aug12_VTopoI0_ID800_C_gcp_",
+	this one will have weight norm at beginning
+    "simtype": {
+        "ResumeSim": 1,
+        "ResumeSimFromFile": "data/20aug11_VTopoI0_ID800_B_gcp_synWeights_final.pkl"
+    },
+
+./myrun 30 sn.json
+
+started ~16:36 ...
+
+next one will have an additional weight norm halfway ...
+
+        "name": "20aug12_VTopoI0_ID800_D_gcp_",
+        "normalizeWeightStepSize": 50000,
+
+./myrun 30 sn.json
+
+started ~16:40 ...
+
+*20aug13
+** try new padding? bin images?
+

@@ -104,7 +104,7 @@ class AIGame:
     self.courtYRng = (34, 194) # court y range
     self.courtXRng = (20, 140) # court x range
     self.racketXRng = (141, 144) # racket x range
-    self.dObjPos = {'racket':[], 'ball':[]}
+    self.dObjPos = {'time':[], 'racket':[], 'ball':[]}
     self.last_obs = [] # previous observation
     self.last_ball_dir = 0 # last ball direction
     self.FullImages = [] # full resolution images from game environment
@@ -285,7 +285,7 @@ class AIGame:
             predY = predY_nodeflection
     return predY
 
-  def playGame (self, actions, epCount): #actions need to be generated from motor cortex
+  def playGame (self, actions, epCount, simtime): #actions need to be generated from motor cortex
     # PLAY GAME
     rewards = []; proposed_actions =[]; total_hits = []; Images = []
     input_dim = self.input_dim
@@ -325,6 +325,7 @@ class AIGame:
         #self.FullImages.append(np.sum(self.last_obs[courtYRng[0]:courtYRng[1],:,:],2))
         self.dObjPos['ball'].append([courtXRng[0]-1+xpos_Ball,ypos_Ball])
         self.dObjPos['racket'].append([racketXRng[0]-1+xpos_Racket,ypos_Racket])
+        self.dObjPos['time'].append(simtime)
       else:
         proposed_action = -1 #if there is no last_obs
         ypos_Ball = -1 #if there is no last_obs, no position of ball

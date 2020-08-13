@@ -81,7 +81,13 @@ else:
 if dconf['net']['EEPreMProb'] > 0.0 or dconf['net']['EEMFeedbackProb'] > 0.0 or dconf['net']['VisualFeedback']:
   for pop in ['EV1','EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE','EV4','EMT']:
     lrecpop.append(pop)
-  if dconf['net']['VisualFeedback'] and 'ER' in dconf['net']: lrecpop.append('ER')
+  if dconf['net']['VisualFeedback'] and dnumc['ER']>0: lrecpop.append('ER')
+
+VisualRL = False
+if 'VIsualRL' in dconf['net']: VisualRL = dconf['net']['VisualRL']
+if VisualRL:
+  if lrecpop.count('EV4')==0: lrecpop.append('EV4')
+  if lrecpop.count('EMT')==0: lrecpop.append('EMT')
   
 if 'EIPlast' in dconf['net']:
   if dconf['net']['EIPlast']:
@@ -90,6 +96,28 @@ if 'EIPlast' in dconf['net']:
 # Network parameters
 netParams = specs.NetParams() #object of class NetParams to store the network parameters
 netParams.defaultThreshold = 0.0 # spike threshold, 10 mV is NetCon default, lower it for all cells
+
+simConfig = specs.SimConfig()           # object of class SimConfig to store simulation configuration
+#Simulation options
+simConfig.duration = dconf['sim']['duration'] # 100e3 # 0.1e5                      # Duration of the simulation, in ms
+simConfig.dt = dconf['sim']['dt']                            # Internal integration timestep to use
+simConfig.hParams['celsius'] = 37 # make sure temperature is set. otherwise we're at squid temperature
+simConfig.verbose = dconf['sim']['verbose']                       # Show detailed messages
+simConfig.recordTraces = {'V_soma':{'sec':'soma','loc':0.5,'var':'v'}}  # Dict with traces to record
+simConfig.recordCellsSpikes = [-1]
+simConfig.recordStep = dconf['sim']['recordStep'] # Step size in ms to save data (e.g. V traces, LFP, etc)
+simConfig.filename = 'data/'+dconf['sim']['name']+'simConfig'  # Set file output name
+simConfig.saveJson = False
+simConfig.savePickle = True            # Save params, network and sim output to pickle file
+simConfig.saveMat = False
+simConfig.saveFolder = 'data'
+# simConfig.backupCfg = ['sim.json', 'backupcfg/'+dconf['sim']['name']+'sim.json']
+#simConfig.createNEURONObj = True  # create HOC objects when instantiating network
+#simConfig.createPyStruct = True  # create Python structure (simulator-independent) when instantiating network
+simConfig.analysis['plotTraces'] = {'include': [(pop, 0) for pop in ['ER','IR','EV1','EV1DE','ID','IV1','EV4','IV4','EMT','IMT','EMDOWN','EMUP','IM']]}
+simConfig.analysis['plotRaster'] = {'popRates':'overlay','showFig':dconf['sim']['doplot']}
+#simConfig.analysis['plot2Dnet'] = True 
+#simConfig.analysis['plotConn'] = True           # plot connectivity matrix
 
 ECellModel = 'Mainen'
 if 'ECellModel' in dconf['net']: ECellModel = dconf['net']['ECellModel']
@@ -117,14 +145,11 @@ def makeECellModel (ECellModel):
     RScellRule['secs']['soma']['geom'] = {'diam': 10, 'L': 10, 'cm': 31.831}
     RScellRule['secs']['soma']['pointps']['Izhi'] = {'mod':'Izhi2007b', 'C':1, 'k':0.7, 'vr':-60, 'vt':-40, 'vpeak':35, 'a':0.03, 'b':-2, 'c':-50, 'd':100, 'celltype':1}
     netParams.cellParams['IzhiRS'] = RScellRule  # add dict to list of cell properties
-  elif ECellModel == 'INTF':
-    RScellRule = {'conds': {'cellType': ETypes, 'cellModel': 'IntFire4RS'}, 'secs': {}}
-    RScellRule['secs']['soma'] = {'geom': {}, 'pointps':{}}  #  soma
-    #RScellRule['secs']['soma']['geom'] = {'diam': 10, 'L': 10, 'cm': 31.831}
-    RScellRule['secs']['soma']['pointps']['INTF'] = {'mod':'intfire4'}
-    RScellRule['secs']['soma']['pointps']['INTF']['vref'] = 'm' # specify that uses its own voltage V
-    netParams.cellParams['IntFire4RS'] = RScellRule  # add dict to list of cell properties
+  elif ECellModel == 'IntFire4':
     EExcitSec = 'soma' # section where excitatory synapses placed
+    simConfig.recordTraces = {'V_soma':{'var':'m'}}  # Dict with traces to record
+    for ty in ETypes:
+      netParams.popParams[ty] = {'cellType':ty, 'numCells': dnumc[ty], 'cellModel': ECellModel}#, 'params':{'taue':5.35,'taui1':9.1,'taui2':0.07,'taum':20}}    
   elif ECellModel == 'Friesen':
     cellRule = netParams.importCellParams(label='PYR_Friesen_rule', conds={'cellType': ETypes, 'cellModel': 'Friesen'},
                 fileName='cells/friesen.py', cellName='MakeRSFCELL')
@@ -142,17 +167,11 @@ def makeICellModel (ICellModel):
     FScellRule['secs']['soma'] = {'geom': {}, 'pointps':{}}  #  soma
     FScellRule['secs']['soma']['geom'] = {'diam': 10, 'L': 10, 'cm': 31.831}
     FScellRule['secs']['soma']['pointps']['Izhi'] = {'mod':'Izhi2007b', 'C':0.2, 'k':1.0, 'vr':-55, 'vt':-40, 'vpeak':25, 'a':0.2, 'b':-2, 'c':-45, 'd':-55, 'celltype':5}
-    RFScellRule['secs']['soma']['pointps']['INTF']['vref'] = 'm' # specify that uses its own voltage V  
     netParams.cellParams['IzhiFS'] = FScellRule  # add dict to list of cell properties
-  elif ICellModel == 'INTF':
-    #FScellRule = netParams.importCellParams(label='INTFFS_rule', conds={'cellType': ITypes, 'cellModel':'IntFire4'},
-    #                                        fileName='cells/IntFirewrapper.py',cellName='IntFire4Cell',  cellArgs={'host':'dummy'})  
-    FScellRule = {'conds': {'cellType': ITypes, 'cellModel': 'IntFire4'}, 'secs': {}}
-    FScellRule['secs']['soma'] = {'geom': {}, 'pointps':{}}  #  soma
-    #FScellRule['secs']['soma']['geom'] = {'diam': 10, 'L': 10, 'cm': 31.831}
-    FScellRule['secs']['soma']['pointps']['INTF'] = {'mod':'intfire4'}
-    FScellRule['secs']['soma']['pointps']['INTF']['vref'] = 'm' # specify that uses its own voltage V  
-    netParams.cellParams['IntFire4FS'] = FScellRule  # add dict to list of cell properties  
+  elif ICellModel == 'IntFire4':
+    simConfig.recordTraces = {'V_soma':{'var':'m'}}  # Dict with traces to record
+    for ty in ITypes:
+      netParams.popParams[ty] = {'cellType':ty, 'numCells': dnumc[ty], 'cellModel': ICellModel}#, 'params':{'taue':5.35,'taui1':9.1,'taui2':0.07,'taum':20}}        
   elif ICellModel == 'Friesen':
     cellRule = netParams.importCellParams(label='Bas_Friesen_rule', conds={'cellType': ITypes, 'cellModel': 'Friesen'},
                 fileName='cells/friesen.py', cellName='MakeFSFCELL')
@@ -278,31 +297,6 @@ if dnumc['IR']>0: blistIV1toER = connectLayerswithOverlapDiv(NBpreN = dnumc['IV1
 blistIV4toEV1 = connectLayerswithOverlapDiv(NBpreN = dnumc['IV4'], NBpostN = dnumc['EV1'], overlap_xdir = dtopoldivcons['IV4']['EV1'], padded_preneurons_xdir = dnumc_padx['IV4'], padded_postneurons_xdir = dnumc_padx['EV1'])
 blistIMTtoEV4 = connectLayerswithOverlapDiv(NBpreN = dnumc['IMT'], NBpostN = dnumc['EV4'], overlap_xdir = dtopoldivcons['IMT']['EV4'], padded_preneurons_xdir = dnumc_padx['IMT'], padded_postneurons_xdir = dnumc_padx['EV4'])
 
-#Simulation options
-simConfig = specs.SimConfig()           # object of class SimConfig to store simulation configuration
-
-simConfig.duration = dconf['sim']['duration'] # 100e3 # 0.1e5                      # Duration of the simulation, in ms
-simConfig.dt = dconf['sim']['dt']                            # Internal integration timestep to use
-simConfig.hParams['celsius'] = 37 # make sure temperature is set. otherwise we're at squid temperature
-simConfig.verbose = dconf['sim']['verbose']                       # Show detailed messages
-simConfig.recordTraces = {'V_soma':{'sec':'soma','loc':0.5,'var':'v'}}  # Dict with traces to record
-simConfig.recordCellsSpikes = [-1]
-simConfig.recordStep = dconf['sim']['recordStep'] # Step size in ms to save data (e.g. V traces, LFP, etc)
-simConfig.filename = 'data/'+dconf['sim']['name']+'simConfig'  # Set file output name
-simConfig.saveJson = False
-simConfig.savePickle = True            # Save params, network and sim output to pickle file
-simConfig.saveMat = False
-simConfig.saveFolder = 'data'
-# simConfig.backupCfg = ['sim.json', 'backupcfg/'+dconf['sim']['name']+'sim.json']
-
-#simConfig.createNEURONObj = True  # create HOC objects when instantiating network
-#simConfig.createPyStruct = True  # create Python structure (simulator-independent) when instantiating network
-
-simConfig.analysis['plotTraces'] = {'include': [(pop, 0) for pop in ['ER','IR','EV1','EV1DE','IV1','EMDOWN','EMUP','EMSTAY','IM']]}
-simConfig.analysis['plotRaster'] = {'popRates':'overlay','showFig':dconf['sim']['doplot']}
-#simConfig.analysis['plot2Dnet'] = True 
-#simConfig.analysis['plotConn'] = True           # plot connectivity matrix
-
 # synaptic weight gain (based on E, I types)
 cfg = simConfig
 cfg.EEGain = 1.0  # E to E scaling factor
@@ -357,50 +351,68 @@ if EEPreMProb > 0.0:
       }
       if dSTDPparamsRL[synmech]['RLon']: # only turn on plasticity when specified to do so
         netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL[synmech]}
-               
+
+VTopoI = True # whether interneurons have topological arrangement
+if "VTopoI" in dconf['net']: VTopoI = dconf['net']['VTopoI']
+        
 #E to I within area
 if dnumc['ER']>0:
   netParams.connParams['ER->IR'] = {
           'preConds': {'pop': 'ER'},
           'postConds': {'pop': 'IR'},
-          'connList': blistERtoIR,
           'weight': 0.02 * cfg.EIGain,
           'delay': 2,
           'synMech': 'AMPA', 'sec':'soma', 'loc':0.5}
+  if VTopoI:
+    netParams.connParams['ER->IR']['connList'] = blistERtoIR
+  else:
+    netParams.connParams['ER->IR']['convergence'] = 9
+  
 netParams.connParams['EV1->IV1'] = {
         'preConds': {'pop': 'EV1'},
         'postConds': {'pop': 'IV1'},
-        'connList': blistEV1toIV1,
         'weight': 0.02 * cfg.EIGain,
         'delay': 2,
         'synMech': 'AMPA', 'sec':'soma', 'loc':0.5}
+if VTopoI:
+  netParams.connParams['EV1->IV1']['connList'] = blistEV1toIV1
+else:
+  netParams.connParams['EV1->IV1']['convergence'] = 9
 
-"""
-for prety in EDirPops:
-  for poty in IDirPops:
-    netParams.connParams[prety+'->'+poty] = {
-      'preConds': {'pop': prety},
-      'postConds': {'pop': poty},
-      'connList': blistEV1DtoIV1D,
-      'weight': getInitWeight(0.02 * cfg.EIGain),
-      'delay': 2,
-      'synMech': 'AMPA', 'sec':'soma', 'loc':0.5}
-"""
+if 'EDirPops' in dconf['net'] and 'IDirPops' in dconf['net']:
+  if 'ID' in dconf['net']['allpops']:
+    if dnumc['ID']>0:
+      EDirPops = dconf['net']['EDirPops']
+      IDirPops = dconf['net']['IDirPops']
+      for prety in EDirPops:
+        for poty in IDirPops:
+          netParams.connParams[prety+'->'+poty] = {
+            'preConds': {'pop': prety},
+            'postConds': {'pop': poty},
+            'convergence': 9,
+            'weight': 0.02 * cfg.EIGain,
+            'delay': 2,
+            'synMech': 'AMPA', 'sec':'soma', 'loc':0.5}
 
 netParams.connParams['EV4->IV4'] = {
         'preConds': {'pop': 'EV4'},
         'postConds': {'pop': 'IV4'},
-        'connList': blistEV4toIV4,
         'weight': 0.02 * cfg.EIGain,
         'delay': 2,
         'synMech': 'AMPA', 'sec':'soma', 'loc':0.5}
+if VTopoI: netParams.connParams['EV4->IV4']['connList'] = blistEV4toIV4
+else: netParams.connParams['EV4->IV4']['convergence'] = 9
+
+
 netParams.connParams['EMT->IMT'] = {
         'preConds': {'pop': 'EMT'},
         'postConds': {'pop': 'IMT'},
-        'connList': blistEMTtoIMT,
         'weight': 0.02 * cfg.EIGain,
         'delay': 2,
         'synMech': 'AMPA', 'sec':'soma', 'loc':0.5}
+if VTopoI: netParams.connParams['EMT->IMT']['connList'] = blistEMTtoIMT
+else: netParams.connParams['EMT->IMT']['convergence'] = 9
+
 
 for prety in EMotorPops:
   k = prety+'->IM'
@@ -422,37 +434,45 @@ if dnumc['ER']>0:
   netParams.connParams['IR->ER'] = {
           'preConds': {'pop': 'IR'},
           'postConds': {'pop': 'ER'},
-          'connList': blistIRtoER,
           'weight': 0.2 * cfg.IEGain,
           'delay': 2,
           'synMech': 'GABA', 'sec':'soma', 'loc':0.5}
+  if VTopoI: netParams.connParams['IR->ER']['connList'] = blistIRtoER
+  else: netParams.connParams['IR->ER']['convergence'] = 25
+  
 netParams.connParams['IV1->EV1'] = {
-        'preConds': {'pop': 'IV1'},
-        'postConds': {'pop': 'EV1'},
-        'connList': blistIV1toEV1,
-        'weight': 0.2 * cfg.IEGain,
-        'delay': 2,
-        'synMech': 'GABA', 'sec':'soma', 'loc':0.5}
+  'preConds': {'pop': 'IV1'},
+  'postConds': {'pop': 'EV1'},
+  'weight': 0.2 * cfg.IEGain,
+  'delay': 2,
+  'synMech': 'GABA', 'sec':'soma', 'loc':0.5}
+if VTopoI: netParams.connParams['IV1->EV1']['connList'] = blistIV1toEV1
+else: netParams.connParams['IV1->EV1']['convergence'] = 25  
 
-"""
-for prety in IDirPops:
-  for poty in EDirPOps:
-    netParams.connParams[prety+'->'+poty] = {
-      'preConds': {'pop': prety},
-      'postConds': {'pop': poty},
-      'connList': blistIV1DtoEV1D,
-      'weight': 0.2 * cfg.IEGain,
-      'delay': 2,
-      'synMech': 'GABA', 'sec':'soma', 'loc':0.5}
-"""
+if 'EDirPops' in dconf['net'] and 'IDirPops' in dconf['net']:
+  if 'ID' in dconf['net']['allpops']:
+    if dnumc['ID']>0:
+      EDirPops = dconf['net']['EDirPops']
+      IDirPops = dconf['net']['IDirPops']
+      for prety in IDirPops:
+        for poty in EDirPops:
+          netParams.connParams[prety+'->'+poty] = {
+            'preConds': {'pop': prety},
+            'postConds': {'pop': poty},
+            'convergence': 25,
+            'weight': 0.2 * cfg.IEGain,
+            'delay': 2,
+            'synMech': 'GABA', 'sec':'soma', 'loc':0.5}
 
 netParams.connParams['IV4->EV4'] = {
         'preConds': {'pop': 'IV4'},
         'postConds': {'pop': 'EV4'},
-        'connList': blistIV4toEV4,
         'weight': 0.2 * cfg.IEGain,
         'delay': 2,
         'synMech': 'GABA', 'sec':'soma', 'loc':0.5}
+if VTopoI: netParams.connParams['IV4->EV4']['connList'] = blistIV4toEV4
+else: netParams.connParams['IV4->EV4']['convergence'] = 25
+
 netParams.connParams['IMT->EMT'] = {
         'preConds': {'pop': 'IMT'},
         'postConds': {'pop': 'EMT'},
@@ -460,6 +480,8 @@ netParams.connParams['IMT->EMT'] = {
         'weight': 0.2 * cfg.IEGain,
         'delay': 2,
         'synMech': 'GABA', 'sec':'soma', 'loc':0.5}
+if VTopoI: netParams.connParams['IMT->EMT']['connList'] = blistIMTtoEMT
+else: netParams.connParams['IMT->EMT']['convergence'] = 25
 
 for poty in EMotorPops: # I -> E for motor populations
   netParams.connParams['IM->'+poty] = {
@@ -471,7 +493,9 @@ for poty in EMotorPops: # I -> E for motor populations
     'synMech': 'GABA', 'sec':'soma', 'loc':0.5}
 
 #I to I
-for IType in ['IV1', 'IV4', 'IMT', 'IM']:
+for IType in ['IV1', 'IV4', 'IMT', 'IM', 'ID']:
+  if IType not in dnumc: continue
+  if dnumc[IType] <= 0: continue
   netParams.connParams[IType+'->'+IType] = {
     'preConds': {'pop': IType},
     'postConds': {'pop': IType},
@@ -480,31 +504,30 @@ for IType in ['IV1', 'IV4', 'IMT', 'IM']:
     'delay': 2,
     'synMech': 'GABA', 'sec':'soma', 'loc':0.5}  
 
-#E to E feedforward connections - AMPA
+#E to E feedforward connections - AMPA,NMDA
+lprety,lpoty,lblist = [],[],[]
 if dnumc['ER']>0:
-  netParams.connParams['ER->EV1'] = {
-          'preConds': {'pop': 'ER'},
-          'postConds': {'pop': 'EV1'},
-          'connList': blistERtoEV1,
-          'weight': 0.015 * cfg.EEGain,
-          'delay': 2,
-          'synMech': 'AMPA','sec':EExcitSec, 'loc':0.5}
-netParams.connParams['EV1->EV4'] = {
-        'preConds': {'pop': 'EV1'},
-        'postConds': {'pop': 'EV4'},
-        'connList': blistEV1toEV4,
-        'weight': 0.0075 * cfg.EEGain,
-        'delay': 2,
-        'synMech': 'AMPA','sec':EExcitSec, 'loc':0.5}
-netParams.connParams['EV4->EMT'] = {
-        'preConds': {'pop': 'EV4'},
-        'postConds': {'pop': 'EMT'},
-        'connList': blistEV4toEMT,
-        #'convergence': 10,
-        'weight': 0.0075 * cfg.EEGain,
-        'delay': 2,
-        'synMech': 'AMPA','sec':EExcitSec, 'loc':0.5}
-
+  lprety.append('ER')
+  lpoty.append('EV1')
+  lblist.append(blistERtoEV1)
+lprety.append('EV1'); lpoty.append('EV4'); lblist.append(blistEV1toEV4)
+lprety.append('EV4'); lpoty.append('EMT'); lblist.append(blistEV4toEMT)
+for prety,poty,blist in zip(lprety,lpoty,lblist):
+  for strty,synmech,weight in zip(['','n'],['AMPA', 'NMDA'],[dconf['net']['EEMWghtAM']*cfg.EEGain, dconf['net']['EEMWghtNM']*cfg.EEGain]):
+    if synmech=='NMDA': continue
+    k = strty+prety+'->'+strty+poty
+    netParams.connParams[k] = {
+            'preConds': {'pop': prety},
+            'postConds': {'pop': poty},
+            'weight': weight * 40,
+            'delay': 2,
+            'synMech': synmech,'sec':EExcitSec, 'loc':0.5}
+    if VTopoI: netParams.connParams[k]['connList'] = blist
+    else: netParams.connParams[k]['convergence'] = prob2conv(0.1,dnumc[prety])
+    if VisualRL and dSTDPparamsRL[synmech]['RLon']: # only turn on plasticity when specified to do so
+      netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL[synmech]}
+      netParams.connParams[k]['plast']['params']['RLhebbwt'] *= 40
+    
 """
 # these all have 0 weight, dont set them up - though no harm in setting them up
 #E to I feedforward connections
@@ -551,7 +574,7 @@ if VisualFeedback:
           'connList': connList,
           'weight': synweight * cfg.EEGain, 
           'delay': 2,
-          'synMech': 'AMPA','sec':EExcitSec, 'loc':0.5} # 'weight' should be fixed
+          'synMech': synmech,'sec':EExcitSec, 'loc':0.5} # 'weight' should be fixed
         if dSTDPparamsRL[synmech]['RLon']: # only turn on plasticity when specified to do so
           netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL[synmech]}        
   #I to E feedback connections
@@ -721,7 +744,7 @@ def recordAdjustableWeightsPop (sim, t, popname):
         lsynweights.append([t,conn.preGid,cell.gid,float(conn['hObj'].weight[0])])
   return len(lcell)
                     
-def recordAdjustableWeights (sim, t, lpop = EMotorPops):
+def recordAdjustableWeights (sim, t, lpop):
   """ record the STDP weights during the simulation - called in trainAgent
   """
   for pop in lpop: recordAdjustableWeightsPop(sim, t, pop)
@@ -812,7 +835,7 @@ def mulAdjustableWeights (sim, dfctr):
         if 'hSTDP' in conn:    
           conn['hObj'].weight[0] *= dfctr[pop] 
 
-def normalizeAdjustableWeights (sim, t, lpop = EMotorPops):
+def normalizeAdjustableWeights (sim, t, lpop):
   # normalize the STDP/RL weights during the simulation - called in trainAgent
   davg = getAverageAdjustableWeights(sim, lpop)
   try:
@@ -973,7 +996,7 @@ def trainAgent (t):
               actions.append(dconf['moves']['NOMOVE']) # No move
               noWinner = True
   if sim.rank == 0:
-    rewards, epCount, proposed_actions, total_hits = sim.AIGame.playGame(actions, epCount)
+    rewards, epCount, proposed_actions, total_hits = sim.AIGame.playGame(actions, epCount, t)
     print('t=',round(t,2),'proposed actions:', proposed_actions,', model actions:', actions)
     if dconf['sim']['RLFakeUpRule']: # fake rule for testing reinforcing of up moves
       critic = np.sign(actions.count(dconf['moves']['UP']) - actions.count(dconf['moves']['DOWN']))          
@@ -1116,12 +1139,12 @@ def trainAgent (t):
   if NBsteps % recordWeightStepSize == 0:
     if dconf['verbose'] > 0 and sim.rank==0:
       print('Weights Recording Time:', t, 'NBsteps:',NBsteps,'recordWeightStepSize:',recordWeightStepSize)
-    recordAdjustableWeights(sim, t, lpop = lrecpop) 
+    recordAdjustableWeights(sim, t, lrecpop) 
     #recordWeights(sim, t)
   if NBsteps % normalizeWeightStepSize == 0:
     if dconf['verbose'] > 0 and sim.rank==0:
       print('Weight Normalize Time:', t, 'NBsteps:',NBsteps,'normalizeWeightStepSize:',normalizeWeightStepSize)
-    normalizeAdjustableWeights(sim, t, lpop = lrecpop)     
+    normalizeAdjustableWeights(sim, t, lrecpop)
 
 def getAllSTDPObjects (sim):
   # get all the STDP objects from the simulation's cells
@@ -1184,6 +1207,10 @@ if dconf['simtype']['ResumeSim']:
     A = readweightsfile2pdf(dconf['simtype']['ResumeSimFromFile'])
     updateSTDPWeights(sim, A[A.time == max(A.time)]) # take the latest weights saved
     if sim.rank==0: print('Updated STDP weights')
+    if 'normalizeWeightsAtStart' in dconf['sim']:
+      if dconf['sim']['normalizeWeightsAtStart']:
+        print('normalizing adjustable weights at start')
+        normalizeAdjustableWeights(sim, 0, lrecpop)
   except:
     print('Could not restore STDP weights from file.')
 

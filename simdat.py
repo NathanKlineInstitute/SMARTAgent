@@ -24,7 +24,7 @@ rcParams['font.size'] = 12
 tl=tight_layout
 stepNB = -1
 totalDur = int(dconf['sim']['duration']) # total simulation duration
-allpossible_pops = ['ER','IR','EV1','EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE','IV1','EV4','IV4','EMT','IMT','EMDOWN','EMUP','EMSTAY','IM']
+allpossible_pops = list(dconf['net']['allpops'].keys())
 
 def pdf2weightsdict (pdf):
   # convert the pandas dataframe with synaptic weights into a dictionary
@@ -376,6 +376,45 @@ def loadInputImages (name=None):
 def loadMotionFields (name=None): return pickle.load(open('data/'+getsimname(name)+'MotionFields.pkl','rb'))
 
 def loadObjPos (name=None): return pickle.load(open('data/'+getsimname(name)+'objpos.pkl','rb'))
+
+def ObjPos2pd (dobjpos):
+  # convert object pos dictionary to pandas dataframe (for selection)
+  ballX,ballY = dobjpos['ball'][:,0],dobjpos['ball'][:,1]
+  racketX,racketY = dobjpos['racket'][:,0],dobjpos['racket'][:,1]
+  if 'time' in dobjpos:
+    time = dobjpos['time']
+  else:
+    time = np.linspace(0,totalDur,len(dobjpos['ball']))
+  pdpos = pd.DataFrame(np.array([time, ballX, ballY, racketX, racketY]).T,columns=['time','ballX','ballY','racketX','racketY'])
+  return pdpos
+
+def getdistvstimecorr (pdpos, ballxmin=137, ballxmax=141, pval=0.1):
+  # get distance vs time
+  pdposs = pdpos[(pdpos.ballY>-1.0) & (pdpos.ballX>ballxmin) & (pdpos.ballX<ballxmax)]
+  lbally = np.unique(pdposs.ballY)
+  dout = {}
+  lr,ly,lN,lpval = [],[],[],[]
+  for y in lbally:
+    dout[y] = {}
+    pdposss = pdposs[(pdposs.ballY==y)]
+    dist = np.sqrt((pdposss.ballY - pdposss.racketY)**2)
+    #plot(pdposss.time, dist)
+    dout[y]['time'] = pdposss.time
+    dout[y]['dist'] = dist
+    dout[y]['rackety'] = pdposss.racketY
+    if len(pdposss.time) > 1:
+      r,p = pearsonr(pdposss.time, dist)
+      if p < pval:
+        lpval.append(p)
+        lr.append(r)
+        ly.append(y)
+        lN.append(len(dist))
+  dout['lbally'] = ly
+  dout['lr'] = lr
+  dout['lpval'] = lpval
+  dout['lN'] = lN
+  return dout
+
 
 def getspikehist (spkT, dnumc, binsz, tmax):
   tt = np.arange(0,tmax,binsz)
@@ -1206,7 +1245,6 @@ def analyzeRepeatedInputSequences(dact, InputImages, targetPixel=(10,10),nbseq=1
     if i==0:
       lax[i+5].legend(lmotorpop,loc='best')
       lax[i+10].legend(['Actions','Proposed'],loc='best')
-
 
 def analyzeRepeatedInputForSingleEvent(dact, InputImages, targetPixel=(10,10)):
   midInds = np.where(InputImages[:,targetPixel[0],targetPixel[1]]>250)
