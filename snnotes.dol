@@ -16433,3 +16433,7 @@ looks like the weight normalization 1/2-way through did help a little ...
 
 python -i simdat.py backupcfg/20aug12_VTopoI0_ID800_D_gcp_sim.json
 
+** new version works?
+
+yes...seems to run ok
+
