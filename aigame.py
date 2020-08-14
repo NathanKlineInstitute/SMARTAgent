@@ -78,10 +78,7 @@ class AIGame:
     self.dInputs = OrderedDict({pop:int((np.sqrt(dconf['net']['allpops'][pop])+self.dReceptiveField[pop]-1)**2) for pop in self.lratepop})
     for d in self.ldir: self.lratepop.append('EV1D'+d)
     self.dFVec = OrderedDict({pop:h.Vector() for pop in self.lratepop}) # NEURON Vectors for firing rate calculations
-    #if dconf['net']['useNeuronPad']==1:
-    #  self.dFiringRates = OrderedDict({pop:np.zeros(self.dInputs[pop]) for pop in self.lratepop}) # python objects for firing rate calculations
-    #else:
-    self.dFiringRates = OrderedDict({pop:np.zeros(dconf['net']['allpops'][pop]) for pop in self.lratepop}) # python objects for firing rate calculations
+    self.dFiringRates = OrderedDict({pop:np.zeros(dconf['net']['allpops'][pop]) for pop in self.lratepop})# python objects for firing rate calculations
     if dconf['net']['useNeuronPad']:
       self.dFiringRates[self.InputPop] = np.zeros(self.dInputs[self.InputPop])
     self.dAngPeak = OrderedDict({'EV1DE': 0.0,'EV1DNE': 45.0, # receptive field peak angles for the direction selective populations
@@ -91,7 +88,6 @@ class AIGame:
     self.AngRFSigma = dconf['net']['AngRFSigma']
     self.AngRFSigma2 = dconf['net']['AngRFSigma']**2 # angular receptive field (RF) sigma squared used for dir selective neuron RFs
     if self.AngRFSigma2 <= 0.0: self.AngRFSigma2=1.0
-    self.EXPDir = True
     self.EXPDir = dconf['net']['EXPDir']
     if dconf['net']['useNeuronPad']:
       self.input_dim = int(np.sqrt(self.dInputs[self.InputPop]))
@@ -114,11 +110,9 @@ class AIGame:
       self.ct = CentroidTracker()
       self.objects = OrderedDict() # objects detected in current frame
       self.last_objects = OrderedDict() # objects detected in previous frame
-    if "stayStepLim" in dconf:
-      self.stayStepLim = dconf['stayStepLim']
-    else:
-      self.stayStepLim = 6 # number of steps to hold still after every move (to reduce momentum)
-      # Takes 6 stays instead of 3 because it seems every other input is ignored (check dad_notes.txt for details)
+    self.stayStepLim = dconf['stayStepLim'] # number of steps to hold still after every move (to reduce momentum)
+    # Note that takes 6 stays instead of 3 because it seems every other input is ignored (check dad_notes.txt for details)
+    # however, using stayStepLim > 0 means model behavior is slower
     self.downsampshape = (8,8) # default is 20x20 (20 = 1/8 of 160)
     if dconf['net']['allpops'][self.InputPop] == 1600: # this is for 40x40 (40 = 1/4 of 160)
       self.downsampshape = (4,4)
@@ -386,12 +380,8 @@ class AIGame:
       # previously I assumed when current_ball_dir is 0 there is no way to find out if the ball hit the racket
       if current_ball_dir-self.last_ball_dir<0 and reward==0 and xpos_Ball2>courtXRng[1]-courtXRng[0]-40:
         ball_hits_racket = 1
-      #print('Current_ball_dir', current_ball_dir)
-      #print('Last ball dir', self.last_ball_dir)
-      #print('current X pos Ball', xpos_Ball2)
-      #print('last X pos Ball', xpos_Ball)
-      #print('Court Range',courtXRng) 
-      print(ball_hits_racket)
+      #print('Current_ball_dir',current_ball_dir,'Last ball dir',self.last_ball_dir,'current X pos Ball', xpos_Ball2,'last X pos Ball', xpos_Ball)
+      #print(ball_hits_racket)
       self.last_ball_dir = current_ball_dir
       total_hits.append(ball_hits_racket) # i dont think this can be more than a single hit in 5 moves. so check if sum is greater than 1, print error
       if not useSimulatedEnv:
