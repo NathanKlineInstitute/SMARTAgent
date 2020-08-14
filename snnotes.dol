@@ -16523,3 +16523,40 @@ there's even a slight positive correlation between east and west motion ...
 fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4',showflow=True,ldflow=ldflow)
 gif/20aug14_20aug13_VTopoI0_ID800_E_gcp__input.mp4
 
+** check output and rates for east,west from 20aug13_A0_cycle_
+
+python -i simdat.py backupcfg/20aug13_A0_cycle_sim.json
+
+ax=plotPerf(actreward,yl=(0,.55))
+savefig('gif/'+dstr+simstr+'perf.png') # gif/20aug14_20aug13_A0_cycle_perf.png
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((1990e3,2000e3))
+savefig(gifpath()+'rast.png') # gif/20aug14_20aug13_A0_cycle_rast.png
+
+binsz=20
+dhist = {pop:getspikehist(dspkT[pop],dnumc,binsz,totalDur) for pop in ['EV1DE','EV1DW']}
+
+for k,clr in zip(list(dhist.keys()),['r','b']): plot(dhist[k][0],dhist[k][1],clr)
+
+lpatch = [mpatches.Patch(color=c,label=s) for c,s in zip(['r','b'],['EV1DE','EV1DW'])]
+ax=gca(); ax.legend(handles=lpatch,handlelength=1)
+xlabel('Time (ms)'); ylabel('Spikes')
+savefig(gifpath()+'EV1DE_EV1DW_spikes.png') # gif/20aug14_20aug13_A0_cycle_EV1DE_EV1DW_spikes.png
+savefig(gifpath()+'EV1DE_EV1DW_spikesB.png') # gif/20aug14_20aug13_A0_cycle_EV1DE_EV1DW_spikesB.png
+savefig(gifpath()+'EV1DE_EV1DW_spikesC.png') # gif/20aug14_20aug13_A0_cycle_EV1DE_EV1DW_spikesC.png
+
+pearsonr(dhist['EV1DE'][1],dhist['EV1DW'][1]) # (0.1413228469056423, 0.0)
+there's even a slight positive correlation between east and west motion ... 
+
+seems like a problem in this simulation too ...
+
+10 spikes in 20 ms ... 400 neurons ... is it a problem?
+
+nspk = 10
+ncell = 400
+rate = 1e3*nspk/(20*ncell) # 1.25
+
+nspk = 50
+ncell = 400
+rate = 1e3*nspk/(20*ncell) # 6.25
+
