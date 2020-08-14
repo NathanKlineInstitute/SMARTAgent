@@ -194,8 +194,7 @@ class AIGame:
       if np.shape(cimage)[0] != self.dirSensitiveNeuronDim or np.shape(cimage)[1] != self.dirSensitiveNeuronDim:
         dirX = resize(dirX, (self.dirSensitiveNeuronDim, self.dirSensitiveNeuronDim), anti_aliasing=True)
         dirY = resize(dirY, (self.dirSensitiveNeuronDim, self.dirSensitiveNeuronDim), anti_aliasing=True)
-      mag, ang = cv2.cartToPolar(dirX, -1*dirY)
-      ang = np.rad2deg(ang)
+      mag, ang = cv2.cartToPolar(dirX, -1*dirY, angleInDegrees=True)
       ang[mag == 0] = -100
       self.last_objects = deepcopy(self.objects)
       flow = np.zeros(shape=(self.dirSensitiveNeuronDim,self.dirSensitiveNeuronDim,2))
@@ -356,25 +355,23 @@ class AIGame:
         current_ball_dir = 0 #direction can't be determined because either current or last position of the ball is outside the court
 
       skipPred = False # skip prediction of y intercept?
-      if "followOnlyTowards" in dconf:
-        if dconf["followOnlyTowards"] and not ball_moves_towards_racket:
-          proposed_action = -1 # no proposed action if ball moving away from racket
-          skipPred = True # skip prediction if ba
+      if dconf["followOnlyTowards"] and not ball_moves_towards_racket:
+        proposed_action = -1 # no proposed action if ball moving away from racket
+        skipPred = True # skip prediction if ba
       
-      if not skipPred and "useRacketPredictedPos" in dconf:
-        if dconf["useRacketPredictedPos"]:
-          xpos_Racket2, ypos_Racket2 = self.findobj (observation, racketXRng, courtYRng)
-          predY = self.predictBallRacketYIntercept(xpos_Ball,ypos_Ball,xpos_Ball2,ypos_Ball2)
-          if predY==-1:
-            proposed_action = -1
+      if not skipPred and dconf["useRacketPredictedPos"]:
+        xpos_Racket2, ypos_Racket2 = self.findobj (observation, racketXRng, courtYRng)
+        predY = self.predictBallRacketYIntercept(xpos_Ball,ypos_Ball,xpos_Ball2,ypos_Ball2)
+        if predY==-1:
+          proposed_action = -1
+        else:
+          targetY = ypos_Racket2 - predY
+          if targetY>8:
+            proposed_action = dconf['moves']['UP'] #move up
+          elif targetY<-8:
+            proposed_action = dconf['moves']['DOWN'] #move down
           else:
-            targetY = ypos_Racket2 - predY
-            if targetY>8:
-              proposed_action = dconf['moves']['UP'] #move up
-            elif targetY<-8:
-              proposed_action = dconf['moves']['DOWN'] #move down
-            else:
-              proposed_action = dconf['moves']['NOMOVE'] #no move
+            proposed_action = dconf['moves']['NOMOVE'] #no move
 
       ball_hits_racket = 0
       # previously I assumed when current_ball_dir is 0 there is no way to find out if the ball hit the racket
