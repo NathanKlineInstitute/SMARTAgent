@@ -1395,6 +1395,8 @@ def updateBehaviorPlot (sim,InputImages,Images,dirSensitiveNeurons,Racket_pos,Ba
   return current_time_stepNB, f_ax, fig
 """
 
+def gifpath (): return 'gif/' + getdatestr() + dconf['sim']['name']
+
 if __name__ == '__main__':
   stepNB = -1
   if len(sys.argv) > 1:

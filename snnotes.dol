@@ -16466,3 +16466,60 @@ clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values()))));
 
 ./myrun 32 sn.json
 
+*20aug14
+** check output from 20aug13_VTopoI0_ID800_E_gcp_
+
+python -i simdat.py backupcfg/20aug13_VTopoI0_ID800_E_gcp_sim.json
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig('gif/'+dstr+simstr+'perf.png') # 'gif/'+dstr+simstr+'perf.png'
+looks good - has high hit/miss ratios (>0.5) for much of the simulation
+
+lfn = ['20aug10_VTopoI0_ID800_gcp_','20aug11_VTopoI0_ID800_B_gcp_','20aug12_VTopoI0_ID800_D_gcp_','20aug13_VTopoI0_ID800_E_gcp_']
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0,.55))
+savefig('gif/'+dstr+simstr+'perf_all_steps_so_far.png') # gif/20aug14_20aug13_VTopoI0_ID800_E_gcp_perf_all_steps_so_far.png
+looks like increasing, even in the cumulative
+
+lpda = getindivactionreward(lfn)
+clf(); plotComparePerf(lpda,['c','b','g','r'],yl=(0,1),lleg=lfn)
+savefig('gif/'+dstr+simstr+'perf_compare_all_steps_so_far.png')
+gif/20aug14_20aug13_VTopoI0_ID800_E_gcp_perf_compare_all_steps_so_far.png
+some evidence that improving overall, though not as clear as between first two steps
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((1990e3,2000e3))
+savefig('gif/'+dstr+simstr+'rast.png') # gif/20aug14_20aug13_VTopoI0_ID800_E_gcp_rast.png
+xlim((1992000,1993000))
+savefig('gif/'+dstr+simstr+'rastB.png') # gif/20aug14_20aug13_VTopoI0_ID800_E_gcp_rastB.png
+
+possible that this sim doing 'better' since dir selective neurons have stronger inputs?
+stimModInputW = 0.05
+if 'stimModInputW' in dconf['net']: stimModInputW = dconf['net']['stimModInputW']
+stimModDirW = 0.01
+if 'stimModDirW' in dconf['net']: stimModDirW = dconf['net']['stimModDirW']
+
+since have stimModDirW set to 0.05 ... compared to default in sim.py which is 0.01 ... 
+
+check if east/west firing at same time...
+
+binsz=20
+dhist = {pop:getspikehist(dspkT[pop],dnumc,binsz,totalDur) for pop in ['EV1DE','EV1DW']}
+
+for k,clr in zip(list(dhist.keys()),['r','b']): plot(dhist[k][0],dhist[k][1],clr)
+
+lpatch = [mpatches.Patch(color=c,label=s) for c,s in zip(['r','b'],['EV1DE','EV1DW'])]
+ax=gca(); ax.legend(handles=lpatch,handlelength=1)
+xlabel('Time (ms)'); ylabel('Spikes')
+savefig(gifpath()+'EV1DE_EV1DW_spikes.png') # gif/20aug14_20aug13_VTopoI0_ID800_E_gcp_EV1DE_EV1DW_spikes.png
+looks like there are many east,west spikes at same time?
+savefig(gifpath()+'EV1DE_EV1DW_spikesB.png') # gif/20aug14_20aug13_VTopoI0_ID800_E_gcp_EV1DE_EV1DW_spikesB.png
+savefig(gifpath()+'EV1DE_EV1DW_spikesC.png') # gif/20aug14_20aug13_VTopoI0_ID800_E_gcp_EV1DE_EV1DW_spikesC.png
+savefig(gifpath()+'EV1DE_EV1DW_spikesD.png') # gif/20aug14_20aug13_VTopoI0_ID800_E_gcp_EV1DE_EV1DW_spikesD.png
+that seems problematic for the motion encoding
+
+pearsonr(dhist['EV1DE'][1],dhist['EV1DW'][1]) # (0.08642091163838092, 4.800983035787333e-165)
+there's even a slight positive correlation between east and west motion ... 
+
+fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4',showflow=True,ldflow=ldflow)
+gif/20aug14_20aug13_VTopoI0_ID800_E_gcp__input.mp4
+
