@@ -16560,3 +16560,29 @@ nspk = 50
 ncell = 400
 rate = 1e3*nspk/(20*ncell) # 6.25
 
+** check nsloc
+
+it has a checkinterval flag
+
+python -i simdat.py backupcfg/20aug14_A0_cycle_sim.json
+
+ax=plotPerf(actreward,yl=(0,.55))
+
+drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); 
+
+binsz=20
+dhist = {pop:getspikehist(dspkT[pop],dnumc,binsz,totalDur) for pop in ['EV1DE','EV1DW']}
+
+for k,clr in zip(list(dhist.keys()),['r','b']): plot(dhist[k][0],dhist[k][1],clr)
+
+lpatch = [mpatches.Patch(color=c,label=s) for c,s in zip(['r','b'],['EV1DE','EV1DW'])]
+ax=gca(); ax.legend(handles=lpatch,handlelength=1)
+xlabel('Time (ms)'); ylabel('Spikes')
+
+savefig('gif/20aug14_test_nsloc_a0.png') # <- with nsloc check_interval of 0.1
+savefig('gif/20aug14_test_nsloc_a1.png') # <- with nsloc check_interval of 1
+savefig('gif/20aug14_test_nsloc_a2.png') # <- with nsloc check_interval of 1
+
+pearsonr(dhist['EV1DE'][1][1:],dhist['EV1DW'][1][1:]) # (-0.033181127887684764, 0.4595700382393278)
+
+
