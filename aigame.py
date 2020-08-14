@@ -172,7 +172,7 @@ class AIGame:
       ang = np.zeros(shape=(limage[-1].shape[0],limage[-1].shape[1]))
       ang[mag == 0] = -100
       goodInds = np.zeros(shape=(limage[-1].shape[0],limage[-1].shape[1]))
-      self.ldflow.append({'flow':flow,'mag':mag,'ang':ang,'goodInds':goodInds,'thang':ang,'thflow':flow})
+      self.ldflow.append({'flow':flow,'mag':mag,'ang':ang,'goodInds':goodInds})
     else:
       self.ldflow.append(getoptflow(limage[-2],limage[-1]))
 
@@ -208,13 +208,13 @@ class AIGame:
       flow[:,:,0] = dirX
       flow[:,:,1] = dirY
       goodInds = np.zeros(shape=(self.dirSensitiveNeuronDim,self.dirSensitiveNeuronDim))
-    self.ldflow.append({'flow':flow,'mag':mag,'ang':ang,'goodInds':goodInds,'thang':ang,'thflow':flow})
+    self.ldflow.append({'flow':flow,'mag':mag,'ang':ang,'goodInds':goodInds})
 
   def updateDirSensitiveRates (self):
     # update firing rate of dir sensitive neurons using dirs (2D array with motion direction at each coordinate)
     if len(self.ldflow) < 1: return
     dflow = self.ldflow[-1]
-    motiondir = dflow['thang'] # angles in degrees, but thresholded for significant motion; negative value means not used
+    motiondir = dflow['ang'] # angles in degrees, but thresholded for significant motion; negative value means not used
     dAngPeak = self.dAngPeak
     dirSensitiveNeuronDim = self.dirSensitiveNeuronDim
     if motiondir.shape[0] != dirSensitiveNeuronDim or motiondir.shape[1] != dirSensitiveNeuronDim:
