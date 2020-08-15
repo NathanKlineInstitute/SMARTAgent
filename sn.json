@@ -25,8 +25,8 @@
     "followOnlyTowards": 1,
     "useRacketPredictedPos": 1,
     "DirectionDetectionAlgo": {
-        "CentroidTracker": 1,
-        "OpticFlow": 0,
+        "CentroidTracker": 0,
+        "OpticFlow": 1,
         "FlowWidth": 1,
         "UseFull": 0
     },
@@ -47,7 +47,7 @@
         "RLFakeUpRule": 0,
         "RLFakeDownRule": 0,
         "RLFakeStayRule": 0,
-        "name": "20aug14_B0_cycle_",
+        "name": "20aug14_C0_cycle_",
         "doquit": 0,
         "doplot": 1,
         "saveCellSecs": 0,

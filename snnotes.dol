@@ -16620,3 +16620,21 @@ right that could lead to wrong intermediate reward signal
 the object positions also do not look correct, not in middle of object,
 as thought they were ...
 
+do same problems of E,W co-occurring happen with optical flow?
+
+python -i simdat.py backupcfg/20aug14_C0_cycle_sim.json
+
+dobjpos = loadObjPos() ## 
+binsz=20
+dhist = {pop:getspikehist(dspkT[pop],dnumc,binsz,totalDur) for pop in ['EV1DE','EV1DW']}
+
+clf(); viewInput(2300,InputImages,ldflow,dhist,['EV1DE','EV1DW'],['r','b'], twin=1000, dobjpos=dobjpos)
+t= 2300 ball x= 2.8125 y= 17.1875
+t= 2300 racket x= 17.625 y= 8.6875
+t= 2320 ball x= 2.6875 y= 17.3125
+t= 2320 racket x= 17.625 y= 8.6875
+
+savefig('gif/20aug14_test_viewinput_c0.png')
+
+motion detection output looks a lot worse ...
+
