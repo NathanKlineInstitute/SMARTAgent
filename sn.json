@@ -28,7 +28,7 @@
         "CentroidTracker": 1,
         "OpticFlow": 0,
         "FlowWidth": 1,
-        "UseFull": 1
+        "UseFull": 0
     },
     "verbose": 0,
     "stayStepLim": 0,
@@ -37,7 +37,7 @@
         "ResumeSimFromFile": "data/20aug11_B3_cycle_synWeights_final.pkl"
     },
     "sim": {
-        "duration": 60000,
+        "duration": 10000,
         "dt": 0.2,
         "verbose": 0,
         "recordStep": 0.6,
@@ -47,7 +47,7 @@
         "RLFakeUpRule": 0,
         "RLFakeDownRule": 0,
         "RLFakeStayRule": 0,
-        "name": "20aug14_A0_cycle_",
+        "name": "20aug14_B0_cycle_",
         "doquit": 0,
         "doplot": 1,
         "saveCellSecs": 0,

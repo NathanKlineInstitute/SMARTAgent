@@ -224,7 +224,7 @@ def viewInput (t, InputImages, ldflow, dhist, lpop = None, lclr = ['r','b'], twi
   tdx = int(t / tstepPerAction)
   imshow( InputImages[tdx][:,:], origin='upper', cmap='gray'); colorbar()
   ax.set_title('t = ' + str(t))
-  objfctr = 1.0
+  objfctr = 1.0/8
   if dconf['DirectionDetectionAlgo']['UseFull']: objfctr=1/8.
   minobjt = dobjpos['time'][0]
   objofftdx = int(minobjt/tstepPerAction)

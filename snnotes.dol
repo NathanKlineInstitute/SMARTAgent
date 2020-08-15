@@ -16592,12 +16592,27 @@ and firing rates of specific populations
 
 python -i simdat.py backupcfg/20aug14_A0_cycle_sim.json
 
+python -i simdat.py backupcfg/20aug14_B0_cycle_sim.json
+
 dobjpos = loadObjPos() ## 
+binsz=20
+dhist = {pop:getspikehist(dspkT[pop],dnumc,binsz,totalDur) for pop in ['EV1DE','EV1DW']}
 
 clf(); viewInput(0,InputImages,ldflow,dhist,['EV1DE','EV1DW'],['r','b'], twin=1000)
-clf(); viewInput(2000,InputImages,ldflow,dhist,['EV1DE','EV1DW'],['r','b'], twin=1000)
-clf(); viewInput(2300,InputImages,ldflow,dhist,['EV1DE','EV1DW'],['r','b'], twin=1000)
+clf(); viewInput(2000,InputImages,ldflow,dhist,['EV1DE','EV1DW'],['r','b'], twin=1000, dobjpos=dobjpos)
+clf(); viewInput(2300,InputImages,ldflow,dhist,['EV1DE','EV1DW'],['r','b'], twin=1000, dobjpos=dobjpos)
 clf(); viewInput(59000,InputImages,ldflow,dhist,['EV1DE','EV1DW'],['r','b'], twin=1000)
 
 clf(); viewInput(59000,InputImages,ldflow,dhist,['EV1DE','EV1DW'],['r','b'], twin=1000, dobjpos=dobjpos)
 clf(); viewInput(55000,InputImages,ldflow,dhist,['EV1DE','EV1DW'],['r','b'], twin=1000, dobjpos=dobjpos)
+
+clf(); viewInput(2300,InputImages,ldflow,dhist,['EV1DE','EV1DW'],['r','b'], twin=1000, dobjpos=dobjpos)
+t= 2300 ball x= 2.8125 y= 17.1875
+t= 2300 racket x= 17.625 y= 9.1875
+t= 2320 ball x= 2.6875 y= 17.3125
+t= 2320 racket x= 17.625 y= 9.1875
+savefig('gif/20aug14_test_viewinput_b0.png')
+
+hmm, ball not visible at all, why does findobj think it is? ball is offscreen
+and algorithm thinks opponent paddle is the ball...problem!
+
