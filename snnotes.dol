@@ -16615,4 +16615,8 @@ savefig('gif/20aug14_test_viewinput_b0.png')
 
 hmm, ball not visible at all, why does findobj think it is? ball is offscreen
 and algorithm thinks opponent paddle is the ball...problem!
+well, it's not correct, sometimes if opponent paddle mistakenly seen to move to the
+right that could lead to wrong intermediate reward signal
+the object positions also do not look correct, not in middle of object,
+as thought they were ...
 
