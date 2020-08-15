@@ -233,7 +233,7 @@ def viewInput (t, InputImages, ldflow, dhist, lpop = None, lclr = ['r','b'], twi
       lobjx,lobjy = [objfctr*dobjpos[k][tdx-objofftdx][0] for k in ['ball','racket']], [objfctr*dobjpos[k][tdx-objofftdx][1] for k in ['ball','racket']]
       #print('lobjx:',lobjx,'lobjy:',lobjy)
       for k in ['ball','racket']:
-        print('t=',tstepPerAction*(tdx-objofftdx),k,'x=',objfctr*dobjpos[k][tdx-objofftdx][0],'y=',objfctr*dobjpos[k][tdx-objofftdx][1])
+        print('t=',tstepPerAction*(tdx),k,'x=',objfctr*dobjpos[k][tdx-objofftdx][0],'y=',objfctr*dobjpos[k][tdx-objofftdx][1])
       ax.plot(lobjx,lobjy,'ro')
   drobjpos(ax, tdx)
   ax = subplot(2,2,2)
