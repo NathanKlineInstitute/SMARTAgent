@@ -16585,4 +16585,19 @@ savefig('gif/20aug14_test_nsloc_a2.png') # <- with nsloc check_interval of 1
 
 pearsonr(dhist['EV1DE'][1][1:],dhist['EV1DW'][1][1:]) # (-0.033181127887684764, 0.4595700382393278)
 
+** activity/image viewer
 
+allow step to specific time, show the previous input frame, current frame, motion fields,
+and firing rates of specific populations
+
+python -i simdat.py backupcfg/20aug14_A0_cycle_sim.json
+
+dobjpos = loadObjPos() ## 
+
+clf(); viewInput(0,InputImages,ldflow,dhist,['EV1DE','EV1DW'],['r','b'], twin=1000)
+clf(); viewInput(2000,InputImages,ldflow,dhist,['EV1DE','EV1DW'],['r','b'], twin=1000)
+clf(); viewInput(2300,InputImages,ldflow,dhist,['EV1DE','EV1DW'],['r','b'], twin=1000)
+clf(); viewInput(59000,InputImages,ldflow,dhist,['EV1DE','EV1DW'],['r','b'], twin=1000)
+
+clf(); viewInput(59000,InputImages,ldflow,dhist,['EV1DE','EV1DW'],['r','b'], twin=1000, dobjpos=dobjpos)
+clf(); viewInput(55000,InputImages,ldflow,dhist,['EV1DE','EV1DW'],['r','b'], twin=1000, dobjpos=dobjpos)

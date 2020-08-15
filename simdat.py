@@ -203,7 +203,7 @@ def animActivityMaps (outpath='gif/'+dconf['sim']['name']+'actmap.mp4', framerat
       else:
         offidx=0
       if ldx == flowdx:
-        ddat[ldx].set_UVC(ldflow[t+offidx]['flow'][:,:,0],-ldflow[t]['flow'][:,:,1])        
+        ddat[ldx].set_UVC(ldflow[t+offidx]['flow'][:,:,0],-ldflow[t+offidx]['flow'][:,:,1])        
       else:
         ddat[ldx].set_data(lact[idx][t+offidx,:,:])
         if ldx==0 and dobjpos is not None:
@@ -218,6 +218,43 @@ def animActivityMaps (outpath='gif/'+dconf['sim']['name']+'actmap.mp4', framerat
   ani.save(outpath, writer=writer); print('saved animation to', outpath)
   ion()
   return fig, axs, plt
+
+def viewInput (t, InputImages, ldflow, dhist, lpop = None, lclr = ['r','b'], twin=100, dobjpos = None):
+  ax = subplot(2,2,1)
+  tdx = int(t / tstepPerAction)
+  imshow( InputImages[tdx][:,:], origin='upper', cmap='gray'); colorbar()
+  ax.set_title('t = ' + str(t))
+  objfctr = 1.0
+  if dconf['DirectionDetectionAlgo']['UseFull']: objfctr=1/8.
+  minobjt = dobjpos['time'][0]
+  objofftdx = int(minobjt/tstepPerAction)
+  def drobjpos (ax, tdx):  
+    if dobjpos is not None and tdx - objofftdx >= 0:
+      lobjx,lobjy = [objfctr*dobjpos[k][tdx-objofftdx][0] for k in ['ball','racket']], [objfctr*dobjpos[k][tdx-objofftdx][1] for k in ['ball','racket']]
+      #print('lobjx:',lobjx,'lobjy:',lobjy)
+      for k in ['ball','racket']:
+        print('t=',tstepPerAction*(tdx-objofftdx),k,'x=',objfctr*dobjpos[k][tdx-objofftdx][0],'y=',objfctr*dobjpos[k][tdx-objofftdx][1])
+      ax.plot(lobjx,lobjy,'ro')
+  drobjpos(ax, tdx)
+  ax = subplot(2,2,2)
+  tdx += 1
+  imshow( InputImages[tdx][:,:], origin='upper', cmap='gray'); colorbar();
+  ax.set_title('t = ' + str(t+tstepPerAction))
+  drobjpos(ax,tdx)
+  tdx -= 1
+  ax = subplot(2,2,3)
+  ax.set_title('Motion, t = ' + str(t))
+  X, Y = np.meshgrid(np.arange(0, InputImages[0].shape[1], 1), np.arange(0,InputImages[0].shape[0],1))
+  ax.quiver(X,Y,ldflow[tdx]['flow'][:,:,0],-ldflow[tdx]['flow'][:,:,1], pivot='mid', units='inches',width=0.01,scale=1/0.9)
+  ax.set_xlim((0,InputImages[0].shape[1])); ax.set_ylim((0,InputImages[0].shape[0]))
+  ax.invert_yaxis()
+  ax = subplot(2,2,4)
+  for pop,clr in zip(lpop,lclr): ax.plot(dhist[pop][0],dhist[pop][1],clr)
+  lpatch = [mpatches.Patch(color=c,label=s) for c,s in zip(lclr,lpop)]
+  ax=gca(); ax.legend(handles=lpatch,handlelength=1)
+  ax.set_xlim(tdx*tstepPerAction - twin, tdx*tstepPerAction + twin)
+  xlabel('Time (ms)'); ylabel('Spikes')
+  
 
 #
 def animInput (InputImages, outpath, framerate=10, figsize=None, showflow=False, ldflow=None, dobjpos=None):
@@ -264,7 +301,7 @@ def animInput (InputImages, outpath, framerate=10, figsize=None, showflow=False,
           lobjx,lobjy = [objfctr*dobjpos[k][t,0] for k in dobjpos.keys()], [objfctr*dobjpos[k][t,1] for k in dobjpos.keys()]
           ddat['objpos'].set_data(lobjx,lobjy)
       else:
-        ddat[ldx].set_UVC(ldflow[t-1]['flow'][:,:,0],-ldflow[t]['flow'][:,:,1])        
+        ddat[ldx].set_UVC(ldflow[t]['flow'][:,:,0],-ldflow[t]['flow'][:,:,1])        
     return fig
   t1 = range(0,totalDur,tstepPerAction)
   nframe = len(t1)
