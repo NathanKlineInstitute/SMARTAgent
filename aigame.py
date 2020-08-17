@@ -86,7 +86,7 @@ class AIGame:
       self.dFiringRates[self.InputPop] = np.zeros(self.dInputs[self.InputPop])
     self.dAngPeak = OrderedDict({'EV1DE': 0.0,'EV1DNE': 45.0, # receptive field peak angles for the direction selective populations
                                 'EV1DN': 90.0,'EV1DNW': 135.0,
-                                'EV1DW': 180.0,'EV1DSW': 235.0,
+                                'EV1DW': 180.0,'EV1DSW': 225.0,
                                 'EV1DS': 270.0,'EV1DSE': 315.0})
     self.AngRFSigma = dconf['net']['AngRFSigma']
     self.AngRFSigma2 = dconf['net']['AngRFSigma']**2 # angular receptive field (RF) sigma squared used for dir selective neuron RFs
@@ -110,6 +110,8 @@ class AIGame:
     self.FullImages = [] # full resolution images from game environment
     self.ReducedImages = [] # low resolution images from game environment used as input to neuronal network model
     self.ldflow = [] # list of dictionary of optical flow (motion) fields
+    if dconf['sim']['saveAssignedFiringRates']:
+      self.dAllFiringRates = []
     if dconf['DirectionDetectionAlgo']['CentroidTracker']:
       self.ct = CentroidTracker()
       self.objects = OrderedDict() # objects detected in current frame
@@ -243,6 +245,9 @@ class AIGame:
       self.dFiringRates[pop]=np.reshape(self.dFiringRates[pop],dirSensitiveNeuronDim**2)
       #print(pop,np.amin(self.dFiringRates[pop]),np.amax(self.dFiringRates[pop]),np.mean(self.dFiringRates[pop]))
       #print(pop,self.dFiringRates[pop])
+    if dconf['sim']['saveAssignedFiringRates']:
+      frcopy = deepcopy(self.dFiringRates)
+      self.dAllFiringRates.append(frcopy)
           
   def findobj (self, img, xrng, yrng):
     # find an object's x, y position in the image (assumes bright object on dark background)

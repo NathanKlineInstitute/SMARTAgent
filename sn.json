@@ -54,7 +54,8 @@
         "saveCellConns": 0,
         "targettedRL": 1,
         "tstepPerAction": 20,
-        "saveWeights": 1
+        "saveWeights": 1,
+        "saveAssignedFiringRates": 0
     },
     "architecturePreMtoM": {
         "useProbabilistic": 1,

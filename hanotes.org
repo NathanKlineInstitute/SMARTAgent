@@ -4772,3 +4772,276 @@ fr_Images = 50/(1+np.exp((np.multiply(-1,dsum_Images)+123)/10))
 
         "useNeuronPad": 1,
         "useBinaryImage": 1,
+
+
+
+-- some idea for analysis:
+
+"i think its unfair to look at the hits/misses etc for all possible scenarios lumped together…… 
+the model learns from its experience. to judge the real performance, need to isolate which pattern 
+repeated and for that repeated pattern over time, did model learn to hit the ball or not over time….. 
+if during 2000 sec the model experienced 1000 times new sequence/pattern of ball and only 10 times 
+repeated sequence…. i should not expect from the model to hit the ball in those 1000 new sequences…. 
+if it did it was by chance. only for 10 times repeated sequences, the model should get better at 
+hitting the ball"
+
+
+-- revisting topological connectivity between preM and M neurons.
+
+1. Using topological connections between preM and M, only topologically relevant neurons will be involved in action generation.
+2. Lets say, the ball is at (10,10) and moving towards SE, the racket is at (10,19) moving North (i.e. UP):
+    -- The ball will activate neurons at location (10,10) in EV1 and EV1DSE.
+    -- The racket will activate neurons at location (10,19) in EV1 and EV1DN.
+    -- Goal is that when next time, these neurons are activated, Racket should move DOWN.
+    -- This could be acheieved 2 ways: 1. Strengthening connections between the activated neurons and EMDOWN or 2. Weakening connections between the activated neurons and EMUP.
+
+
+-- need to look into direction selectivitiy firing rates code.....
+
+
+>>> from neuron import h
+>>> from pylab import concatenate, figure, show, ion, ioff, pause,xlabel, ylabel, plot, Circle, sqrt, arctan, arctan2, close
+>>> from copy import copy, deepcopy
+>>> from random import uniform, seed, sample, randint
+>>> from matplotlib import pyplot as plt
+>>> import random
+>>> import numpy as np
+>>> from skimage.transform import downscale_local_mean, resize
+>>> from skimage.color import rgb2gray
+>>> from skimage.filters import threshold_otsu
+>>> import json
+>>> import gym
+>>> import sys
+>>> from gym import wrappers
+>>> from time import time
+>>> from collections import OrderedDict
+>>> from imgutils import getoptflow
+>>> from imgutils import getObjectsBoundingBoxes, getObjectMotionDirection
+>>> import cv2
+>>> from centroidtracker import CentroidTracker
+>>> from conf import dconf
+>>> env = gym.make(dconf['env']['name'],frameskip=dconf['env']['frameskip'],repeat_action_probability=0.)
+>>> env.reset()
+>>> courtYRng = (34, 194)
+>>> courtXRng = (20, 140)
+>>> racketXRng = (141, 144)
+>>> lobs_gimage_ds = [] # because no action has been taken place yet.
+caction = 3 # take a random action.
+observation, reward, done, info = env.step(caction)
+last_obs = observation
+gray_Image = 255.0*rgb2gray(observation[courtYRng[0]:courtYRng[1],:,:])
+gray_ns = np.where(gray_Image>np.min(gray_Image)+1,255,gray_Image)
+last_objects = OrderedDict()
+FullImages = []
+lgimage_ns = []
+lgimage_ns.append(gray_ns)
+nsum_Images = lgimage_ns[0]
+FullImages.append(nsum_Images)
+
+ct = CentroidTracker()
+objects = OrderedDict() # objects detected in current frame
+last_objects = OrderedDict() # objects detected in previous frame
+
+last_objects, ldflow = computeAllObjectsMotionDirections(FullImages, last_objects, ldflow, UseFull=1)
+
+def computeAllObjectsMotionDirections(FullImages, last_objects, ldflow, UseFull=False):
+  dirSensitiveNeuronDim = 20
+  #Detect the objects, and initialize the list of bounding box rectangles
+  if len(FullImages)==0: return
+  cimage = FullImages[-1]
+  rects = getObjectsBoundingBoxes(cimage)
+  cimage = np.ascontiguousarray(cimage, dtype=np.uint8)
+  # update our centroid tracker using the computed set of bounding box rectangles
+  objects = ct.update(rects)
+  if len(last_objects)==0: 
+    last_objects = deepcopy(objects)
+    flow = np.zeros(shape=(dirSensitiveNeuronDim,dirSensitiveNeuronDim,2))
+    mag = np.zeros(shape=(dirSensitiveNeuronDim,dirSensitiveNeuronDim))
+    ang = np.zeros(shape=(dirSensitiveNeuronDim,dirSensitiveNeuronDim))
+    ang[mag == 0] = -100
+    goodInds = np.zeros(shape=(dirSensitiveNeuronDim,dirSensitiveNeuronDim))
+  else:
+    dirX, dirY = getObjectMotionDirection(objects, last_objects, rects, dims=np.shape(cimage)[0],\
+                                          FlowWidth=dconf['DirectionDetectionAlgo']['FlowWidth'])
+    if np.shape(cimage)[0] != dirSensitiveNeuronDim or np.shape(cimage)[1] != dirSensitiveNeuronDim:
+      dirX = resize(dirX, (dirSensitiveNeuronDim, dirSensitiveNeuronDim), anti_aliasing=True)
+      dirY = resize(dirY, (dirSensitiveNeuronDim, dirSensitiveNeuronDim), anti_aliasing=True)
+    mag, ang = cv2.cartToPolar(dirX, -1*dirY)
+    ang = np.rad2deg(ang)
+    ang[mag == 0] = -100
+    last_objects = deepcopy(objects)
+    flow = np.zeros(shape=(dirSensitiveNeuronDim,dirSensitiveNeuronDim,2))
+    flow[:,:,0] = dirX
+    flow[:,:,1] = dirY
+    goodInds = np.zeros(shape=(dirSensitiveNeuronDim,dirSensitiveNeuronDim))
+  ldflow.append({'flow':flow,'mag':mag,'ang':ang,'goodInds':goodInds,'thang':ang,'thflow':flow})
+  return last_objects, ldflow
+
+
+
+-----------------------------------------------
+
+from netpyne import specs, sim
+from neuron import h
+import numpy as np
+import random
+from conf import dconf # configuration dictionary
+import pandas as pd
+import pickle
+from collections import OrderedDict
+from connUtils import *
+from matplotlib import pyplot as plt
+import os
+import time
+import anim
+from matplotlib import animation
+
+from aigame import AIGame
+sim.AIGame = AIGame()
+for _ in range(10000):
+  rewards, epCount, proposed_actions, total_hits = sim.AIGame.playGame([random.randint(3,4)], 0, t)
+
+t = 1
+def plotDSneuronsFiringRates(t,sim):
+  fig = plt.figure(figsize=(10, 7.5))
+  grid = plt.GridSpec(3, 4)
+  ax0 = fig.add_subplot(grid[0,0])
+  ax1 = fig.add_subplot(grid[0,1])
+  ax2 = fig.add_subplot(grid[0,2])
+  ax3 = fig.add_subplot(grid[0,3])
+  ax4 = fig.add_subplot(grid[1,:])
+  ax5 = fig.add_subplot(grid[2,:])
+  ax0.imshow(sim.AIGame.FullImages[t-1])
+  ax0.set_title('Image at [t-1]')
+  ax1.imshow(sim.AIGame.FullImages[t])
+  ax1.set_title('Image at [t]')
+  a2 = ax2.quiver(sim.AIGame.ldflow[t]['thflow'][:,:,0],-sim.AIGame.ldflow[t]['thflow'][:,:,1], pivot='mid', units='inches',width=0.022,scale=1/0.25)
+  ax2.invert_yaxis()
+  ax2.set_title('Directions')
+  a3 = ax3.imshow(sim.AIGame.ldflow[t]['ang'])
+  ax3.set_title('Direction Angles')
+  plt.colorbar(a3,ax=ax3)
+  ax4.plot(sim.AIGame.dAllFiringRates[t]['EV1DE'],'k')
+  ax4.plot(sim.AIGame.dAllFiringRates[t]['EV1DNE'],'r')
+  ax4.plot(sim.AIGame.dAllFiringRates[t]['EV1DN'],'b')
+  ax4.plot(sim.AIGame.dAllFiringRates[t]['EV1DNW'],'g')
+  ax4.set_ylabel('Firing rate (Hz)')
+  ax4.set_xlabel('Neurons')
+  ax4.legend(['E','NE','N','NW'])
+  ax5.plot(sim.AIGame.dAllFiringRates[t]['EV1DW'],'k--')
+  ax5.plot(sim.AIGame.dAllFiringRates[t]['EV1DSW'],'r--')
+  ax5.plot(sim.AIGame.dAllFiringRates[t]['EV1DS'],'b--')
+  ax5.plot(sim.AIGame.dAllFiringRates[t]['EV1DSE'],'g--')
+  ax5.set_ylabel('Firing rate (Hz)')
+  ax5.set_xlabel('Neurons')
+  ax5.legend(['W','SW','S','SE'])
+  plt.show()
+
+
+-- whenever S activates, 4-5 Hz activity in SW but not in SE. see t110, t119, t123
+-- SE got activated (4 Hz) in t118.
+
+
+--- look at the conversion from angle to Firing rates
+
+def updateDirSensitiveRates (sim,t):
+  dirSensitiveNeuronDim = 20
+  AngRFSigma2 = 22.5*22.5
+  MaxRate = 50
+  dAngPeak = OrderedDict({'EV1DE': 0.0,'EV1DNE': 45.0, # receptive field peak angles for the direction selective populations
+                          'EV1DN': 90.0,'EV1DNW': 135.0,
+                          'EV1DW': 180.0,'EV1DSW': 235.0,
+                          'EV1DS': 270.0,'EV1DSE': 315.0})
+  dflow = sim.AIGame.ldflow[t]
+  motiondir = dflow['thang'] # angles in degrees, but thresholded for significant motion; negative value means not used
+  for pop in sim.AIGame.ldirpop: dFiringRates[pop] = MaxRate * np.ones(shape=(dirSensitiveNeuronDim,dirSensitiveNeuronDim))
+  if EXPDir:
+    for y in range(motiondir.shape[0]):
+      for x in range(motiondir.shape[1]):
+        if motiondir[y,x] >= 0.0: # make sure it's a valid angle
+          for pop in sim.AIGame.ldirpop:
+            fctr = np.exp(-1.0*(getangdiff(motiondir[y][x],dAngPeak[pop])**2)/AngRFSigma2)
+            dFiringRates[pop][y,x] += MaxRate * fctr
+    
+
+
+
+--- try this from SAM:
+
+binsz=20
+dhist = {pop:getspikehist(dspkT[pop],dnumc,binsz,totalDur) for pop in ['EV1DE','EV1DW']}
+for k,clr in zip(list(dhist.keys()),['r','b']): plot(dhist[k][0],dhist[k][1],clr)
+
+
+
+
+dAngPeak = OrderedDict({'EV1DE': 0.0,'EV1DNE': 45.0,'EV1DN': 90.0,'EV1DNW': 135.0,'EV1DW': 180.0,'EV1DSW': 235.0,'EV1DS': 270.0,'EV1DSE': 315.0})
+
+
+
+-- 
+
+For 0 degree direction angle firing rates of direction selective neurons are:
+
+print('E:',50*np.exp(-1.0*(getangdiff(0,dAngPeak['EV1DE'])**2)/AngRFSigma2))
+print('NE:',50*np.exp(-1.0*(getangdiff(0,dAngPeak['EV1DNE'])**2)/AngRFSigma2))
+print('N:',50*np.exp(-1.0*(getangdiff(0,dAngPeak['EV1DN'])**2)/AngRFSigma2))
+print('NW:',50*np.exp(-1.0*(getangdiff(0,dAngPeak['EV1DNW'])**2)/AngRFSigma2))
+print('W:',50*np.exp(-1.0*(getangdiff(0,dAngPeak['EV1DW'])**2)/AngRFSigma2))
+print('SW:',50*np.exp(-1.0*(getangdiff(0,dAngPeak['EV1DSW'])**2)/AngRFSigma2))
+print('S:',50*np.exp(-1.0*(getangdiff(0,dAngPeak['EV1DS'])**2)/AngRFSigma2))
+print('SE:',50*np.exp(-1.0*(getangdiff(0,dAngPeak['EV1DSE'])**2)/AngRFSigma2))
+
+E: 50.0
+NE: 0.9157819444367089
+N: 5.626758735962956e-06
+NW: 1.1597614151217848e-14
+W: 8.019054452743189e-27
+SW: 1.971602355360359e-12
+S: 5.626758735962956e-06
+SE: 0.9157819444367089
+
+
+For 0 degree direction angle firing rates of direction selective neurons are:
+
+E = []
+NE = []
+N = []
+NW = []
+W = []
+SW = []
+S = []
+SE = []
+for a in range(0,360,1):
+  E.append(50*np.exp(-1.0*(getangdiff(a,dAngPeak['EV1DE'])**2)/AngRFSigma2))
+  NE.append(50*np.exp(-1.0*(getangdiff(a,dAngPeak['EV1DNE'])**2)/AngRFSigma2))
+  N.append(50*np.exp(-1.0*(getangdiff(a,dAngPeak['EV1DN'])**2)/AngRFSigma2))
+  NW.append(50*np.exp(-1.0*(getangdiff(a,dAngPeak['EV1DNW'])**2)/AngRFSigma2))
+  W.append(50*np.exp(-1.0*(getangdiff(a,dAngPeak['EV1DW'])**2)/AngRFSigma2))
+  SW.append(50*np.exp(-1.0*(getangdiff(a,dAngPeak['EV1DSW'])**2)/AngRFSigma2))
+  S.append(50*np.exp(-1.0*(getangdiff(a,dAngPeak['EV1DS'])**2)/AngRFSigma2))
+  SE.append(50*np.exp(-1.0*(getangdiff(a,dAngPeak['EV1DSE'])**2)/AngRFSigma2))
+
+
+from matplotlib import pyplot as plt
+plt.plot(E,'k')
+plt.plot(NE,'r')
+plt.plot(N,'b')
+plt.plot(NW,'g')
+plt.plot(W,'k--')
+plt.plot(SW,'r--')
+plt.plot(S,'b--')
+plt.plot(SE,'g--')
+plt.legend(['E','NE','N','NW','W','SW','S','SE'])
+plt.ylabel('Firing rate (Hz)')
+plt.show()
+
+
+-- The bug was in here:
+dAngPeak = OrderedDict({'EV1DE': 0.0,'EV1DNE': 45.0,'EV1DN': 90.0,'EV1DNW': 135.0,'EV1DW': 180.0,'EV1DSW': 235.0,'EV1DS': 270.0,'EV1DSE': 315.0})
+
+
+'EV1DSW': 235.0 ----> should be --->'EV1DSW': 225.0
+
+
+dAngPeak = OrderedDict({'EV1DE': 0.0,'EV1DNE': 45.0,'EV1DN': 90.0,'EV1DNW': 135.0,'EV1DW': 180.0,'EV1DSW': 225.0,'EV1DS': 270.0,'EV1DSE': 315.0})
