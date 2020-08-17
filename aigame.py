@@ -78,10 +78,7 @@ class AIGame:
     self.dInputs = OrderedDict({pop:int((np.sqrt(dconf['net']['allpops'][pop])+self.dReceptiveField[pop]-1)**2) for pop in self.lratepop})
     for d in self.ldir: self.lratepop.append('EV1D'+d)
     self.dFVec = OrderedDict({pop:h.Vector() for pop in self.lratepop}) # NEURON Vectors for firing rate calculations
-    #if dconf['net']['useNeuronPad']==1:
-    #  self.dFiringRates = OrderedDict({pop:np.zeros(self.dInputs[pop]) for pop in self.lratepop}) # python objects for firing rate calculations
-    #else:
-    self.dFiringRates = OrderedDict({pop:np.zeros(dconf['net']['allpops'][pop]) for pop in self.lratepop}) # python objects for firing rate calculations
+    self.dFiringRates = OrderedDict({pop:np.zeros(dconf['net']['allpops'][pop]) for pop in self.lratepop})# python objects for firing rate calculations
     if dconf['net']['useNeuronPad']:
       self.dFiringRates[self.InputPop] = np.zeros(self.dInputs[self.InputPop])
     self.dAngPeak = OrderedDict({'EV1DE': 0.0,'EV1DNE': 45.0, # receptive field peak angles for the direction selective populations
@@ -91,7 +88,6 @@ class AIGame:
     self.AngRFSigma = dconf['net']['AngRFSigma']
     self.AngRFSigma2 = dconf['net']['AngRFSigma']**2 # angular receptive field (RF) sigma squared used for dir selective neuron RFs
     if self.AngRFSigma2 <= 0.0: self.AngRFSigma2=1.0
-    self.EXPDir = True
     self.EXPDir = dconf['net']['EXPDir']
     if dconf['net']['useNeuronPad']:
       self.input_dim = int(np.sqrt(self.dInputs[self.InputPop]))
@@ -116,11 +112,9 @@ class AIGame:
       self.ct = CentroidTracker()
       self.objects = OrderedDict() # objects detected in current frame
       self.last_objects = OrderedDict() # objects detected in previous frame
-    if "stayStepLim" in dconf:
-      self.stayStepLim = dconf['stayStepLim']
-    else:
-      self.stayStepLim = 6 # number of steps to hold still after every move (to reduce momentum)
-      # Takes 6 stays instead of 3 because it seems every other input is ignored (check dad_notes.txt for details)
+    self.stayStepLim = dconf['stayStepLim'] # number of steps to hold still after every move (to reduce momentum)
+    # Note that takes 6 stays instead of 3 because it seems every other input is ignored (check dad_notes.txt for details)
+    # however, using stayStepLim > 0 means model behavior is slower
     self.downsampshape = (8,8) # default is 20x20 (20 = 1/8 of 160)
     if dconf['net']['allpops'][self.InputPop] == 1600: # this is for 40x40 (40 = 1/4 of 160)
       self.downsampshape = (4,4)
@@ -174,7 +168,7 @@ class AIGame:
       ang = np.zeros(shape=(limage[-1].shape[0],limage[-1].shape[1]))
       ang[mag == 0] = -100
       goodInds = np.zeros(shape=(limage[-1].shape[0],limage[-1].shape[1]))
-      self.ldflow.append({'flow':flow,'mag':mag,'ang':ang,'goodInds':goodInds,'thang':ang,'thflow':flow})
+      self.ldflow.append({'flow':flow,'mag':mag,'ang':ang,'goodInds':goodInds})
     else:
       self.ldflow.append(getoptflow(limage[-2],limage[-1]))
 
@@ -202,21 +196,20 @@ class AIGame:
       if np.shape(cimage)[0] != self.dirSensitiveNeuronDim or np.shape(cimage)[1] != self.dirSensitiveNeuronDim:
         dirX = resize(dirX, (self.dirSensitiveNeuronDim, self.dirSensitiveNeuronDim), anti_aliasing=True)
         dirY = resize(dirY, (self.dirSensitiveNeuronDim, self.dirSensitiveNeuronDim), anti_aliasing=True)
-      mag, ang = cv2.cartToPolar(dirX, -1*dirY)
-      ang = np.rad2deg(ang)
+      mag, ang = cv2.cartToPolar(dirX, -1*dirY, angleInDegrees=True)
       ang[mag == 0] = -100
       self.last_objects = deepcopy(self.objects)
       flow = np.zeros(shape=(self.dirSensitiveNeuronDim,self.dirSensitiveNeuronDim,2))
       flow[:,:,0] = dirX
       flow[:,:,1] = dirY
       goodInds = np.zeros(shape=(self.dirSensitiveNeuronDim,self.dirSensitiveNeuronDim))
-    self.ldflow.append({'flow':flow,'mag':mag,'ang':ang,'goodInds':goodInds,'thang':ang,'thflow':flow})
+    self.ldflow.append({'flow':flow,'mag':mag,'ang':ang,'goodInds':goodInds})
 
   def updateDirSensitiveRates (self):
     # update firing rate of dir sensitive neurons using dirs (2D array with motion direction at each coordinate)
     if len(self.ldflow) < 1: return
     dflow = self.ldflow[-1]
-    motiondir = dflow['thang'] # angles in degrees, but thresholded for significant motion; negative value means not used
+    motiondir = dflow['ang'] # angles in degrees, but thresholded for significant motion; negative value means not used
     dAngPeak = self.dAngPeak
     dirSensitiveNeuronDim = self.dirSensitiveNeuronDim
     if motiondir.shape[0] != dirSensitiveNeuronDim or motiondir.shape[1] != dirSensitiveNeuronDim:
@@ -367,36 +360,30 @@ class AIGame:
         current_ball_dir = 0 #direction can't be determined because either current or last position of the ball is outside the court
 
       skipPred = False # skip prediction of y intercept?
-      if "followOnlyTowards" in dconf:
-        if dconf["followOnlyTowards"] and not ball_moves_towards_racket:
-          proposed_action = -1 # no proposed action if ball moving away from racket
-          skipPred = True # skip prediction if ba
+      if dconf["followOnlyTowards"] and not ball_moves_towards_racket:
+        proposed_action = -1 # no proposed action if ball moving away from racket
+        skipPred = True # skip prediction if ba
       
-      if not skipPred and "useRacketPredictedPos" in dconf:
-        if dconf["useRacketPredictedPos"]:
-          xpos_Racket2, ypos_Racket2 = self.findobj (observation, racketXRng, courtYRng)
-          predY = self.predictBallRacketYIntercept(xpos_Ball,ypos_Ball,xpos_Ball2,ypos_Ball2)
-          if predY==-1:
-            proposed_action = -1
+      if not skipPred and dconf["useRacketPredictedPos"]:
+        xpos_Racket2, ypos_Racket2 = self.findobj (observation, racketXRng, courtYRng)
+        predY = self.predictBallRacketYIntercept(xpos_Ball,ypos_Ball,xpos_Ball2,ypos_Ball2)
+        if predY==-1:
+          proposed_action = -1
+        else:
+          targetY = ypos_Racket2 - predY
+          if targetY>8:
+            proposed_action = dconf['moves']['UP'] #move up
+          elif targetY<-8:
+            proposed_action = dconf['moves']['DOWN'] #move down
           else:
-            targetY = ypos_Racket2 - predY
-            if targetY>8:
-              proposed_action = dconf['moves']['UP'] #move up
-            elif targetY<-8:
-              proposed_action = dconf['moves']['DOWN'] #move down
-            else:
-              proposed_action = dconf['moves']['NOMOVE'] #no move
+            proposed_action = dconf['moves']['NOMOVE'] #no move
 
       ball_hits_racket = 0
       # previously I assumed when current_ball_dir is 0 there is no way to find out if the ball hit the racket
       if current_ball_dir-self.last_ball_dir<0 and reward==0 and xpos_Ball2>courtXRng[1]-courtXRng[0]-40:
         ball_hits_racket = 1
-      #print('Current_ball_dir', current_ball_dir)
-      #print('Last ball dir', self.last_ball_dir)
-      #print('current X pos Ball', xpos_Ball2)
-      #print('last X pos Ball', xpos_Ball)
-      #print('Court Range',courtXRng) 
-      print(ball_hits_racket)
+      #print('Current_ball_dir',current_ball_dir,'Last ball dir',self.last_ball_dir,'current X pos Ball', xpos_Ball2,'last X pos Ball', xpos_Ball)
+      #print(ball_hits_racket)
       self.last_ball_dir = current_ball_dir
       total_hits.append(ball_hits_racket) # i dont think this can be more than a single hit in 5 moves. so check if sum is greater than 1, print error
       if not useSimulatedEnv:

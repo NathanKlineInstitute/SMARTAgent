@@ -21,9 +21,11 @@ def ensureDefaults (dconf):
   if 'verbose' not in dconf: dconf['verbose'] = 0
   if 'EcellModel' not in dconf['net']: dconf['net']['ECellModel'] = 'Mainen'
   if 'ICellModel' not in dconf['net']: dconf['net']['ICellModel'] = 'FS_BasketCell'
+  for k in ['VisualRL', 'EIPlast', 'VisualFeedback']:
+    if k not in dconf['net']: dconf['net'][k] = False
   for k in ['EEGain', 'EIGain', 'IEGain', 'IIGain', 'scale']:
     if k not in dconf['net']: dconf['net'][k] = 1.0
-  for k in ['useBinaryImage', 'useNeuronPad', 'EXPDir']:
+  for k in ['useBinaryImage', 'useNeuronPad', 'EXPDir', 'VTopoI']:
     if k not in dconf['net']: dconf['net'][k] = True
   if 'movefctr' not in dconf: dconf['movefctr'] = 1.0
   for k in ["actionsPerPlay", "followOnlyTowards", "useRacketPredictedPos"]:
