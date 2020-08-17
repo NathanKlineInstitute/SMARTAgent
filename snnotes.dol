@@ -16306,3 +16306,335 @@ ensureDefaults
 did not put all of them in yet ... but for new ones, easier to add there
 than to enforce checking for presence of the params in the rest of the code
 
+** check output from 20aug12_B4_cycle_
+
+note that there was a weight norm at start ... 
+
+python -i simdat.py backupcfg/20aug12_B4_cycle_sim.json
+
+ax=plotPerf(actreward,yl=(0,.55))
+savefig('gif/'+dstr+simstr+'perf.png') # gif/20aug13_20aug12_B4_cycle_perf.png
+
+lfn = ['20aug4_B0_cycle_','20aug6_B1_cycle_','20aug10_B2_cycle_', '20aug11_B3_cycle_', '20aug12_B4_cycle_']
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0,.55))
+savefig('gif/'+dstr+simstr+'perf_all_steps_so_far.png') # gif/20aug13_20aug12_B4_cycle_perf_all_steps_so_far.png
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((1990e3,2000e3))
+savefig('gif/'+dstr+simstr+'rast.png') # gif/20aug13_20aug12_B4_cycle_rast.png
+
+lpda = getindivactionreward(lfn)
+clf(); plotComparePerf(lpda,['c','g','b','m','r'],yl=(0,1),lleg=lfn)
+savefig('gif/'+dstr+simstr+'perf_compare_all_steps_so_far.png') # gif/20aug13_20aug12_B4_cycle_perf_compare_all_steps_so_far.png
+
+apart from the first and others, the rest look pretty similar overall ... 
+
+clf(); dobjpos = loadObjPos() ## 
+pdpos = ObjPos2pd(dobjpos)
+dout = getdistvstimecorr(pdpos,minN=2)
+plot(dout['lN'],dout['lr'],'ro',markersize=25)
+xlabel('Number examples'); ylabel('Correlation between paddle/ball distance and time')
+savefig('gif/'+dstr+simstr+'num_examples_and_racket_ball_Y_dist_vs_time_corr.png')
+
+plot(dout['lbally'], dout['lr'], 'ko', markersize=15)
+plot(dout['lbally'], dout['lr'], 'k', linewidth=3)
+xlabel('Y position'); ylabel('Correlation between paddle/ball distance and time')
+savefig('gif/'+dstr+simstr+'racket_ball_Y_dist_vs_time_corr.png')
+
+should look at full distribution of distances (on right side) based on number
+of examples
+
+plot(dout[1.5]['time'],dout[1.5]['dist'],'ko',markersize=25)
+plot(dout[15.5]['time'],dout[15.5]['dist'],'ro',markersize=25)
+
+plot(dout['lbally'],dout['lN'],'ko',markersize=25)
+xlabel('Y intercept',fontsize=20); ylabel('Count',fontsize=20)
+savefig('gif/'+dstr+simstr+'ball_Y_intercept_count.png') # 'gif/'+dstr+simstr+'ball_Y_intercept_count.png'
+so again can see most of the locations do not have many examples, most of the time the
+ball goes to top right corner, followed by bottom right corner
+
+len(dout[21.5]['time']) # 503
+plot(dout[21.5]['time'],dout[21.5]['dist'])
+plot(dout[21.5]['time'],dout[21.5]['dist'],'ko',markersize=10)
+xlabel('time'); ylabel('distance')
+savefig('gif/'+dstr+simstr+'ball_Y_21.5_distance_time.png') # gif/20aug13_20aug12_B4_cycle_ball_Y_21.5_distance_time.png'
+that does not look like improvement...distance all over the place...should see paddle location at each time that
+ball crosses right side.
+
+hist(dout[21.5]['dist'])
+hist(dout[21.5]['dist'],bins=160)
+xlabel('Distance')
+ylabel('Count')
+savefig('gif/'+dstr+simstr+'ball_Y_21.5_distance_hist.png') # 'gif/'+dstr+simstr+'ball_Y_21.5_distance_hist.png'
+so distances are biased towards correct - though there's a wide distribution 
+that's somewhat reassuring ... but strange that there's a peak at distance of 20 
+
+hist(dout[21.5]['rackety'])
+hist(dout[21.5]['rackety'],bins=160)
+plot([21.5,21.5],[0,140],'k--',linewidth=3)
+savefig('gif/'+dstr+simstr+'ball_Y_21.5_position_hist.png') # 'gif/'+dstr+simstr+'ball_Y_21.5_position_hist.png'
+so as observed in videos, the racket is all the way up top instead of at correct location (21.5)
+
+will likely see same at other end (bottom of screen)
+
+clf()
+hist(dout[141.5]['rackety'])
+hist(dout[141.5]['rackety'],bins=40)
+plot([141.5,141.5],[0,90],'k--',linewidth=3)
+savefig('gif/'+dstr+simstr+'ball_Y_141.5_position_hist.png') # gif/20aug13_20aug12_B4_cycle_ball_Y_141.5_position_hist.png
+
+dout['lbally']
+len(dout[81.5]['time'])
+
+clf()
+ypos = 93.5
+hist(dout[ypos]['rackety'])
+hist(dout[ypos]['rackety'],bins=20)
+plot([ypos,ypos],[0,7],'k--',linewidth=3)
+savefig('gif/'+dstr+simstr+'ball_Y_'+str(ypos)+'_position_hist.png') # gif/20aug13_20aug12_B4_cycle_ball_Y_93.5_position_hist.png
+peak does not look as clear, but there are fewer examples ...
+
+** check output from 20aug12_VTopoI0_ID800_C_gcp_
+and 20aug12_VTopoI0_ID800_D_gcp_
+
+python -i simdat.py backupcfg/20aug12_VTopoI0_ID800_C_gcp_sim.json
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig('gif/'+dstr+simstr+'perf.png') # gif/20aug13_20aug12_VTopoI0_ID800_C_gcp_perf.png
+does not look bad ... gets to pretty high levels overall, though expect to see the usual problems at
+the top-right and bottom-right corners...
+
+lfn = ['20aug10_VTopoI0_ID800_gcp_','20aug11_VTopoI0_ID800_B_gcp_','20aug12_VTopoI0_ID800_C_gcp_']
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0,.55))
+savefig('gif/'+dstr+simstr+'perf_all_steps_so_far.png') # gif/20aug13_20aug12_VTopoI0_ID800_C_gcp_perf_all_steps_so_far.png
+
+lpda = getindivactionreward(lfn)
+clf(); plotComparePerf(lpda,['b','g','r'],yl=(0,1),lleg=lfn)
+savefig('gif/'+dstr+simstr+'perf_compare_all_steps_so_far.png')
+gif/20aug13_20aug12_VTopoI0_ID800_C_gcp_perf_compare_all_steps_so_far.png
+some evidence that improving overall, though not as clear as first two steps
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((1990e3,2000e3))
+savefig('gif/'+dstr+simstr+'rast.png') # gif/20aug13_20aug12_VTopoI0_ID800_C_gcp_rast.png
+again see east/west activity at same time; do not think that should occur
+xlim((1992000,1993000))
+savefig('gif/'+dstr+simstr+'rastB.png') # gif/20aug13_20aug12_VTopoI0_ID800_C_gcp_rastB.png
+could see if ball goes back and forth, seems unlikely...
+
+compare to the sim with the weight normalization in the middle ...
+
+lfn = ['20aug12_VTopoI0_ID800_C_gcp_', '20aug12_VTopoI0_ID800_D_gcp_']
+lpda = getindivactionreward(lfn)
+clf(); plotComparePerf(lpda,['b','r'],yl=(0,1),lleg=lfn)
+savefig('gif/'+dstr+simstr+'perf_compare_against_more_norm.png')
+gif/20aug13_20aug12_VTopoI0_ID800_C_gcp_perf_compare_against_more_norm.png
+looks like the weight normalization 1/2-way through did help a little ... 
+
+python -i simdat.py backupcfg/20aug12_VTopoI0_ID800_D_gcp_sim.json
+
+may as well run one more continuation on gcp ...
+
+cp backupcfg/20aug12_VTopoI0_ID800_D_gcp_sim.json sn.json
+but make sure to turn off new padding so can use the last weights saved
+
+        "name": "20aug13_VTopoI0_ID800_E_gcp_",
+        "useNeuronPad": 0,
+        "useBinaryImage": 0,
+    "simtype": {
+        "ResumeSim": 1,
+        "ResumeSimFromFile": "data/20aug12_VTopoI0_ID800_D_gcp_synWeights_final.pkl"
+    },
+	"normalizeWeightsAtStart": 1,
+        "normalizeWeightStepSize": 50000,
+
+./myrun 30 sn.json
+
+started ~17:33 ...
+
+** new version works?
+
+yes...seems to run ok
+
+python -i simdat.py backupcfg/20aug13_A0_cycle_sim.json
+
+ax=plotPerf(actreward,yl=(0,1))
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values()))));
+
+        "name": "20aug13_A0_cycle_",
+
+./myrun 32 sn.json
+
+*20aug14
+** check output from 20aug13_VTopoI0_ID800_E_gcp_
+
+python -i simdat.py backupcfg/20aug13_VTopoI0_ID800_E_gcp_sim.json
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig('gif/'+dstr+simstr+'perf.png') # 'gif/'+dstr+simstr+'perf.png'
+looks good - has high hit/miss ratios (>0.5) for much of the simulation
+
+lfn = ['20aug10_VTopoI0_ID800_gcp_','20aug11_VTopoI0_ID800_B_gcp_','20aug12_VTopoI0_ID800_D_gcp_','20aug13_VTopoI0_ID800_E_gcp_']
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0,.55))
+savefig('gif/'+dstr+simstr+'perf_all_steps_so_far.png') # gif/20aug14_20aug13_VTopoI0_ID800_E_gcp_perf_all_steps_so_far.png
+looks like increasing, even in the cumulative
+
+lpda = getindivactionreward(lfn)
+clf(); plotComparePerf(lpda,['c','b','g','r'],yl=(0,1),lleg=lfn)
+savefig('gif/'+dstr+simstr+'perf_compare_all_steps_so_far.png')
+gif/20aug14_20aug13_VTopoI0_ID800_E_gcp_perf_compare_all_steps_so_far.png
+some evidence that improving overall, though not as clear as between first two steps
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((1990e3,2000e3))
+savefig('gif/'+dstr+simstr+'rast.png') # gif/20aug14_20aug13_VTopoI0_ID800_E_gcp_rast.png
+xlim((1992000,1993000))
+savefig('gif/'+dstr+simstr+'rastB.png') # gif/20aug14_20aug13_VTopoI0_ID800_E_gcp_rastB.png
+
+possible that this sim doing 'better' since dir selective neurons have stronger inputs?
+stimModInputW = 0.05
+if 'stimModInputW' in dconf['net']: stimModInputW = dconf['net']['stimModInputW']
+stimModDirW = 0.01
+if 'stimModDirW' in dconf['net']: stimModDirW = dconf['net']['stimModDirW']
+
+since have stimModDirW set to 0.05 ... compared to default in sim.py which is 0.01 ... 
+
+check if east/west firing at same time...
+
+binsz=20
+dhist = {pop:getspikehist(dspkT[pop],dnumc,binsz,totalDur) for pop in ['EV1DE','EV1DW']}
+
+for k,clr in zip(list(dhist.keys()),['r','b']): plot(dhist[k][0],dhist[k][1],clr)
+
+lpatch = [mpatches.Patch(color=c,label=s) for c,s in zip(['r','b'],['EV1DE','EV1DW'])]
+ax=gca(); ax.legend(handles=lpatch,handlelength=1)
+xlabel('Time (ms)'); ylabel('Spikes')
+savefig(gifpath()+'EV1DE_EV1DW_spikes.png') # gif/20aug14_20aug13_VTopoI0_ID800_E_gcp_EV1DE_EV1DW_spikes.png
+looks like there are many east,west spikes at same time?
+savefig(gifpath()+'EV1DE_EV1DW_spikesB.png') # gif/20aug14_20aug13_VTopoI0_ID800_E_gcp_EV1DE_EV1DW_spikesB.png
+savefig(gifpath()+'EV1DE_EV1DW_spikesC.png') # gif/20aug14_20aug13_VTopoI0_ID800_E_gcp_EV1DE_EV1DW_spikesC.png
+savefig(gifpath()+'EV1DE_EV1DW_spikesD.png') # gif/20aug14_20aug13_VTopoI0_ID800_E_gcp_EV1DE_EV1DW_spikesD.png
+that seems problematic for the motion encoding
+
+pearsonr(dhist['EV1DE'][1],dhist['EV1DW'][1]) # (0.08642091163838092, 4.800983035787333e-165)
+there's even a slight positive correlation between east and west motion ... 
+
+fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4',showflow=True,ldflow=ldflow)
+gif/20aug14_20aug13_VTopoI0_ID800_E_gcp__input.mp4
+
+** check output and rates for east,west from 20aug13_A0_cycle_
+
+python -i simdat.py backupcfg/20aug13_A0_cycle_sim.json
+
+ax=plotPerf(actreward,yl=(0,.55))
+savefig('gif/'+dstr+simstr+'perf.png') # gif/20aug14_20aug13_A0_cycle_perf.png
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((1990e3,2000e3))
+savefig(gifpath()+'rast.png') # gif/20aug14_20aug13_A0_cycle_rast.png
+
+binsz=20
+dhist = {pop:getspikehist(dspkT[pop],dnumc,binsz,totalDur) for pop in ['EV1DE','EV1DW']}
+
+for k,clr in zip(list(dhist.keys()),['r','b']): plot(dhist[k][0],dhist[k][1],clr)
+
+lpatch = [mpatches.Patch(color=c,label=s) for c,s in zip(['r','b'],['EV1DE','EV1DW'])]
+ax=gca(); ax.legend(handles=lpatch,handlelength=1)
+xlabel('Time (ms)'); ylabel('Spikes')
+savefig(gifpath()+'EV1DE_EV1DW_spikes.png') # gif/20aug14_20aug13_A0_cycle_EV1DE_EV1DW_spikes.png
+savefig(gifpath()+'EV1DE_EV1DW_spikesB.png') # gif/20aug14_20aug13_A0_cycle_EV1DE_EV1DW_spikesB.png
+savefig(gifpath()+'EV1DE_EV1DW_spikesC.png') # gif/20aug14_20aug13_A0_cycle_EV1DE_EV1DW_spikesC.png
+
+pearsonr(dhist['EV1DE'][1],dhist['EV1DW'][1]) # (0.1413228469056423, 0.0)
+there's even a slight positive correlation between east and west motion ... 
+
+seems like a problem in this simulation too ...
+
+10 spikes in 20 ms ... 400 neurons ... is it a problem?
+
+nspk = 10
+ncell = 400
+rate = 1e3*nspk/(20*ncell) # 1.25
+
+nspk = 50
+ncell = 400
+rate = 1e3*nspk/(20*ncell) # 6.25
+
+** check nsloc
+
+it has a checkinterval flag
+
+python -i simdat.py backupcfg/20aug14_A0_cycle_sim.json
+
+ax=plotPerf(actreward,yl=(0,.55))
+
+drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); 
+
+binsz=20
+dhist = {pop:getspikehist(dspkT[pop],dnumc,binsz,totalDur) for pop in ['EV1DE','EV1DW']}
+
+for k,clr in zip(list(dhist.keys()),['r','b']): plot(dhist[k][0],dhist[k][1],clr)
+
+lpatch = [mpatches.Patch(color=c,label=s) for c,s in zip(['r','b'],['EV1DE','EV1DW'])]
+ax=gca(); ax.legend(handles=lpatch,handlelength=1)
+xlabel('Time (ms)'); ylabel('Spikes')
+
+savefig('gif/20aug14_test_nsloc_a0.png') # <- with nsloc check_interval of 0.1
+savefig('gif/20aug14_test_nsloc_a1.png') # <- with nsloc check_interval of 1
+savefig('gif/20aug14_test_nsloc_a2.png') # <- with nsloc check_interval of 1
+
+pearsonr(dhist['EV1DE'][1][1:],dhist['EV1DW'][1][1:]) # (-0.033181127887684764, 0.4595700382393278)
+
+** activity/image viewer
+
+allow step to specific time, show the previous input frame, current frame, motion fields,
+and firing rates of specific populations
+
+python -i simdat.py backupcfg/20aug14_A0_cycle_sim.json
+
+python -i simdat.py backupcfg/20aug14_B0_cycle_sim.json
+
+dobjpos = loadObjPos() ## 
+binsz=20
+dhist = {pop:getspikehist(dspkT[pop],dnumc,binsz,totalDur) for pop in ['EV1DE','EV1DW']}
+
+clf(); viewInput(0,InputImages,ldflow,dhist,['EV1DE','EV1DW'],['r','b'], twin=1000)
+clf(); viewInput(2000,InputImages,ldflow,dhist,['EV1DE','EV1DW'],['r','b'], twin=1000, dobjpos=dobjpos)
+clf(); viewInput(2300,InputImages,ldflow,dhist,['EV1DE','EV1DW'],['r','b'], twin=1000, dobjpos=dobjpos)
+clf(); viewInput(59000,InputImages,ldflow,dhist,['EV1DE','EV1DW'],['r','b'], twin=1000)
+
+clf(); viewInput(59000,InputImages,ldflow,dhist,['EV1DE','EV1DW'],['r','b'], twin=1000, dobjpos=dobjpos)
+clf(); viewInput(55000,InputImages,ldflow,dhist,['EV1DE','EV1DW'],['r','b'], twin=1000, dobjpos=dobjpos)
+
+clf(); viewInput(2300,InputImages,ldflow,dhist,['EV1DE','EV1DW'],['r','b'], twin=1000, dobjpos=dobjpos)
+t= 2300 ball x= 2.8125 y= 17.1875
+t= 2300 racket x= 17.625 y= 9.1875
+t= 2320 ball x= 2.6875 y= 17.3125
+t= 2320 racket x= 17.625 y= 9.1875
+savefig('gif/20aug14_test_viewinput_b0.png')
+
+hmm, ball not visible at all, why does findobj think it is? ball is offscreen
+and algorithm thinks opponent paddle is the ball...problem!
+well, it's not correct, sometimes if opponent paddle mistakenly seen to move to the
+right that could lead to wrong intermediate reward signal
+the object positions also do not look correct, not in middle of object,
+as thought they were ...
+
+do same problems of E,W co-occurring happen with optical flow?
+
+python -i simdat.py backupcfg/20aug14_C0_cycle_sim.json
+
+dobjpos = loadObjPos() ## 
+binsz=20
+dhist = {pop:getspikehist(dspkT[pop],dnumc,binsz,totalDur) for pop in ['EV1DE','EV1DW']}
+
+clf(); viewInput(2300,InputImages,ldflow,dhist,['EV1DE','EV1DW'],['r','b'], twin=1000, dobjpos=dobjpos)
+t= 2300 ball x= 2.8125 y= 17.1875
+t= 2300 racket x= 17.625 y= 8.6875
+t= 2320 ball x= 2.6875 y= 17.3125
+t= 2320 racket x= 17.625 y= 8.6875
+
+savefig('gif/20aug14_test_viewinput_c0.png')
+
+motion detection output looks a lot worse ...
+

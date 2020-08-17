@@ -59,7 +59,7 @@ dtopoldivcons = dconf['net']['alltopoldivcons']
 dtopolconvcons = dconf['net']['alltopolconvcons']
 allpops_withconvtopology = list(dtopolconvcons.keys())
 # below is the code for updating neuronal pop size to include padding. 
-if dconf['net']['useNeuronPad']==1:
+if dconf['net']['useNeuronPad']:
   for pop in allpops_withconvtopology:
     receptive_fields = []
     for postpop in list(dtopolconvcons[pop].keys()):
@@ -83,15 +83,11 @@ if dconf['net']['EEPreMProb'] > 0.0 or dconf['net']['EEMFeedbackProb'] > 0.0 or 
     lrecpop.append(pop)
   if dconf['net']['VisualFeedback'] and dnumc['ER']>0: lrecpop.append('ER')
 
-VisualRL = False
-if 'VIsualRL' in dconf['net']: VisualRL = dconf['net']['VisualRL']
-if VisualRL:
+if dconf['net']['VisualRL']:
   if lrecpop.count('EV4')==0: lrecpop.append('EV4')
   if lrecpop.count('EMT')==0: lrecpop.append('EMT')
   
-if 'EIPlast' in dconf['net']:
-  if dconf['net']['EIPlast']:
-    lrecpop.append('IM')
+if dconf['net']['EIPlast']: lrecpop.append('IM')
 
 # Network parameters
 netParams = specs.NetParams() #object of class NetParams to store the network parameters
@@ -352,8 +348,7 @@ if EEPreMProb > 0.0:
       if dSTDPparamsRL[synmech]['RLon']: # only turn on plasticity when specified to do so
         netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL[synmech]}
 
-VTopoI = True # whether interneurons have topological arrangement
-if "VTopoI" in dconf['net']: VTopoI = dconf['net']['VTopoI']
+VTopoI = dconf['net']['VTopoI'] # whether interneurons have topological arrangement
         
 #E to I within area
 if dnumc['ER']>0:
@@ -524,7 +519,7 @@ for prety,poty,blist in zip(lprety,lpoty,lblist):
             'synMech': synmech,'sec':EExcitSec, 'loc':0.5}
     if VTopoI: netParams.connParams[k]['connList'] = blist
     else: netParams.connParams[k]['convergence'] = prob2conv(0.1,dnumc[prety])
-    if VisualRL and dSTDPparamsRL[synmech]['RLon']: # only turn on plasticity when specified to do so
+    if dconf['net']['VisualRL'] and dSTDPparamsRL[synmech]['RLon']: # only turn on plasticity when specified to do so
       netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL[synmech]}
       netParams.connParams[k]['plast']['params']['RLhebbwt'] *= 40
     
@@ -557,9 +552,7 @@ netParams.connParams['EV4->IMT'] = {
         'synMech': 'AMPA','sec':'soma', 'loc':0.5}
 """
 
-VisualFeedback = False
-if "VisualFeedback" in dconf['net']: VisualFeedback = dconf['net']['VisualFeedback']
-if VisualFeedback:
+if dconf['net']['VisualFeedback']:
   # visual area feedback connections
   pretyList = ['EV1','EV4','EMT']
   potyList = ['ER','EV1','EV4']
@@ -617,48 +610,31 @@ netParams.connParams['IV4->IMT'] = {
         'synMech': 'GABA','sec':'soma', 'loc':0.5}
 
 if dconf['architecturePreMtoM']['useTopological']:
-  blistEV1toEM = connectLayerswithOverlap(NBpreN = dnumc['EV1'], NBpostN = dnumc['EMUP'], overlap_xdir = 3)
-  blistEV4toEM = connectLayerswithOverlapDiv(NBpreN = dnumc['EV4'], NBpostN = dnumc['EMUP'], overlap_xdir = 3)
-  blistEMTtoEM = connectLayerswithOverlapDiv(NBpreN = dnumc['EMT'], NBpostN = dnumc['EMUP'], overlap_xdir = 5)
   for prety in EPreMPops:
+    if dnumc[prety] <= 0: continue
     for poty in EMotorPops:
+      try:
+        div = dconf['net']['alltopoldivcons'][prety][poty]
+      except:
+        div = 3
+      blist = connectLayerswithOverlapDiv(NBpreN=dnumc[prety],NBpostN=dnumc[poty],overlap_xdir=div)
       for strty,synmech,weight in zip(['','n'],['AMPA', 'NMDA'],[dconf['net']['EEMWghtAM']*cfg.EEGain, dconf['net']['EEMWghtNM']*cfg.EEGain]):
         k = strty+prety+'->'+strty+poty
-        if prety=='EV4':
-          netParams.connParams[k] = {
-            'preConds': {'pop': prety},
-            'postConds': {'pop': poty},
-            'connList': blistEV4toEM, 
-            'weight': getInitWeight(weight),
-            'delay': 2,
-            'synMech': synmech,
-            'sec':EExcitSec, 'loc':0.5
-          }
-        elif prety=='EMT':
-          netParams.connParams[k] = {
-            'preConds': {'pop': prety},
-            'postConds': {'pop': poty},
-            'connList': blistEMTtoEM, 
-            'weight': getInitWeight(weight),
-            'delay': 2,
-            'synMech': synmech,
-            'sec':EExcitSec, 'loc':0.5
-          }
-        else:
-          netParams.connParams[k] = {
-            'preConds': {'pop': prety},
-            'postConds': {'pop': poty},
-            'connList': blistEV1toEM, 
-            'weight': getInitWeight(weight),
-            'delay': 2,
-            'synMech': synmech,
-            'sec':EExcitSec, 'loc':0.5
-          }
+        netParams.connParams[k] = {
+          'preConds': {'pop': prety},
+          'postConds': {'pop': poty},
+          'connList': blist, 
+          'weight': getInitWeight(weight),
+          'delay': 2,
+          'synMech': synmech,
+          'sec':EExcitSec, 'loc':0.5
+        }
         if dSTDPparamsRL[synmech]['RLon']: # only turn on plasticity when specified to do so
           netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL[synmech]}
 elif dconf['architecturePreMtoM']['useProbabilistic']:
   # Add connections from lower and higher visual areas to motor cortex and direct connections between premotor to motor areas
   for prety in EPreMPops:
+    if dnumc[prety] <= 0: continue
     EEMProb = 0.1 # default - feedforward connectivity
     if "EEMProb" in dconf['net']: EEMProb = dconf['net']['EEMProb']
     for poty in EMotorPops:
