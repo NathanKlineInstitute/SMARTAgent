@@ -1,4 +1,299 @@
 ########################################
+8-18-20
+########################################
+To-Do:
+-Submit abstract by 9/1
+	# waiting on friend
+-Troubleshoot aigame3.py
+	* Added fixed prediction code
+	* No errors when compiling
+-sim.py motor populations w/ help
+	-Haroon says to add to aigame.py which moves to use?
+-Update computer vision for racket predictions
+	-Currently limited coordinated to not include bricks for simplicity in object detections
+	-Check notes on 7/27
+-Make aigame3.py more modular
+
+Fixed getangdiff error in aigame3.py
+The try statement above it for env settings needed an except statement
+
+Added fixed racket prediction code
+  Only in aigame3.py not aigame2.py!!
+# simple fix, needed to respawn ball
+  if predX==-1:
+    caction = 1
+########################################
+8-17-20
+########################################
+To-Do:
+-Submit abstract by 9/1
+	# waiting on sam notes
+-Troubleshoot aigame3.py
+	-Add fixed racket predictions code
+-sim.py motor populations w/ help
+	-Haroon says to add to aigame.py which moves to use?
+-Update computer vision for racket predictions
+	-Currently limited coordinated to not include bricks for simplicity in object detections
+	-Check notes on 7/27
+
+$ python aigame3.py 
+
+
+  File "aigame3.py", line 84
+    def getangdiff (ang1, ang2):
+      ^
+SyntaxError: invalid syntax
+
+#not sure why, same code as aigame.py and that runs
+
+Finished abstract
+# friend to look at it before submitting
+########################################
+8-12-20
+########################################
+To-Do:
+-Finish Abstract on work I've done
+	# Second draft, then sam will look at it.
+-Combine aigame.py & aigame2.py
+	* Progess
+	# next to troubleshoot
+	  * next week
+	# Upload fixed racket prediction code
+-sim.py motor populations w/ help
+	-Haroon says to add to aigame.py which moves to use?
+-Update computer vision for racket predictions
+	-Currently limited coordinated to not include bricks for simplicity in object detections
+	-Check notes on 7/27
+
+Out tomorrow, day off for moving.
+########################################
+8-11-20
+########################################
+To-Do:
+-Test prediction for longer, see when ball goes above bricks
+	-needs ball to spawn back first
+		*Done
+	-When it misses, is it after close deflection or cuz of speed?
+		# need to observe over time
+# has been good to hit after deflection
+# mainly misses when paddle is too far left and doesn't move to right
+# majority of the time, when the racket misses, the ball is on the right (9/10 times)
+
+score after done:
+23
+72
+20
+48 
+43
+18
+29
+
+further back rows are worth more points
+* print reward to see if diff bricks give different reward
+>>> import gym
+>>> env = gym.make ('Breakout-v0', frameskip=3)
+>>> env.reset()
+>>> obs, reward, done, info = env.step(1); env.render(); print(reward)
+color - reward - point
+blue - 1.0 - 1
+green - 1.0 - 1
+yellow - 4.0 - 4
+orange 1 - 4.0 - 4
+orange 2 -
+red -
+# after hits a brick, ball ghosts through other bricks until it hits racket
+########################################
+8-10-20
+########################################
+To-Do:
+-Finish Abstract on work I've done
+	# plotRecurrentMaps, momentum (aigame1), breakout(aigame2, testRacketPrediction)
+-Test prediction for longer, see when ball goes above bricks
+	-needs ball to spawn back first
+		*Done
+	-When it misses, is it after close deflection or cuz of speed?
+		# need to observe over time
+-Combine aigame.py & aigame2.py
+	* Progess
+	# next to troubleshoot
+	# want to fix testRacketPredictions before moving forward
+-sim.py motor populations w/ help
+	-Haroon says to add to aigame.py which moves to use?
+-Update computer vision for racket predictions
+	-Currently limited coordinated to not include bricks for simplicity in object detections
+	-Check notes on 7/27
+
+stayStepLim will need to be changed accordingly
+# from memory, not 100% sure
+for pong: 6
+for breakout: 4
+
+# how each game is defined, only works for 1 dimension games
+  if dconf['env']['name'] == 'Pong-v0' or dconf['env']['name'] == 'Pong-v4':
+    isVertical = False
+    isHorizontal = True
+    courtYRng = (34, 194) # court y range
+    courtXRng = (20, 140) # court x range
+    racketXRng = (141, 144) # racket x range
+  if dconf['env']['name'] == 'Breakout-v0' or dconf['env']['name'] == 'Breakout-v4':
+    isVertical = True
+    isHorizontal = False
+    # courtXRng = (9, 159) # visible x rng + overhang on rig
+ht (cant see objects in overhang)
+    courtXRng = (9,149) # visible x rng
+    # courtYRng = (32, 189) # entire above racket
+    courtYRng = (93, 188) # just below bricks & above racket
+    racketYRng = (189,192) # racket
+
+
+playGame differences
+  aigame1 : aigame3
+    88-90 : 101-103 # court size   * done
+  262-272 : 298-308 # proposed action * done
+      282 : 318 # momentum loop conditions (actions) * done
+  293-297 : 329-333 # ball_moves_towards_racket * done
+  316-326 : 352-362 # proposed action * done
+      330 : 366 # ball_hits_racket conditions * donen
+
+RacketXRng vs RacketYRng
+Breakout uses YRng, pong uses XRng
+used at findObj function
+
+testRacketPredictions
+according to stackOverflow, at end of life you need to fire (action 1) to respawn ball
+!!!!!  * if predX = -1, caction = 1
+ran for 20,000
+it works for most part, misses sometimes
+
+########################################
+8-9-20
+########################################
+looked through aigame3
+
+fixes for differences in code:
+#variable ideas
+isHorizontal (boolean)
+isVertical (boolean)
+
+courtSize?
+if statement based on dcont['env'] == 'breakout' or 'pong'
+  also set for momentum loop
+proposed action will need seperate loops (different playgame functions
+
+class AIGame
+multiple playGame functions
+
+playGameBreakout
+playGamePong
+playGame
+
+if dconf['env'] == 'breakout'
+  playGame = playGameBreakout
+if dconf['env'] == 'pong'
+  playGame = playGamePong
+
+########################################
+8-7-20
+########################################
+having trouble open files.
+Uploaded notes to github
+  faced problems, looking into it...
+finished locating differences to merge aigame1 & aigame2 (pong & breakout)
+  now just need to create logic to merge
+
+########################################
+8-6-20
+########################################
+Did first draft of abstract, sent to sam
+
+playGame differences
+  aigame1 : aigame3
+    88-90 : 101-103 # court size  
+  262-272 : 298-308 # proposed action
+      282 : 318 # momentum loop conditions (actions)
+  293-297 : 329-333 # ball_moves_towards_racket
+  316-326 : 352-362 # proposed action
+      330 : 366 # ball_hits_racket conditions
+########################################
+8-5-20
+########################################
+-Finish Abstract on work I've done
+	# plotRecurrentMaps, momentum (aigame1), breakout(aigame2, testRacketPrediction)
+-Test prediction for longer, see when ball goes above bricks
+	-First need ball to spawnback after it is lost
+		*Paused
+-Combine aigame.py & aigame2.py
+	* Started
+-sim.py motor populations w/ help
+	-Haroon says to add to aigame.py which moves to use?
+-Update computer vision for racket predictions
+	-Currently limited coordinated to not include bricks for simplicity in object detections
+	-Check notes on 7/27
+
+Needs fix in aigame3.py:
+  simulated env 47-50, 81
+  default env 59-62
+  court size 101-103
+  x vs y intercept
+
+Notes:
+  updated predictBallRacketYIntercept from my predictBallRacketXIntercept
+    removed hard-coded numbers
+Questions:
+  hard-coded # in updateInputRates (same in both)
+
+All left is playGame. I also told lakshay to look at this function
+  court dimensions (88-90 aigame, 94-96 aigame2)
+  262-272, 292-306 aigame , 266-276, 296-310 aigame2
+########################################
+8-4-20
+########################################
+-Test prediction for longer, see when ball goes above bricks
+	-First need ball to spawnback after it is lost
+		*Paused
+-Combine aigame.py & aigame2.py
+	* Started
+-sim.py motor populations w/ help
+	-Haroon says to add to aigame.py which moves to use?
+-Update computer vision for racket predictions
+	-Currently limited coordinated to not include bricks for simplicity in object detections
+	-Check notes on 7/27
+
+invisible screensaver locked me out. Turned it off.
+Taking break on testRacketPredictions to rethink later
+
+Started combining scripts (aigame3.py = aigame.py + aigame2.py)
+* Lakshay joined to help 
+	* Told him to look at playGame function
+Needs logic:
+-simulated environment
+
+Ideas:
+-Break playGame into more functions and flesh it out into basic functions to be called based on dconf['env']
+  vertical vs horizontal to decide intercept
+  momentum loop is a function
+########################################
+8-3-20
+########################################
+-Test prediction for longer, see when ball goes above bricks
+	-First need ball to spawnback after it is lost
+		*Started
+-Update staymoves (momentum) loop
+	* Working with Lakshay (never happened)
+	* DONE, now dependent on stayStepLim (sim.json)
+	  * moves: LEFT, RIGHT, NOMOVE
+-Combine aigame.py & aigame2.py
+	* this week (?)
+-sim.py motor populations w/ help
+	-Haroon says to add to aigame.py which moves to use?
+-Update computer vision for racket predictions
+	-Currently limited coordinated to not include bricks for simplicity in object detections
+	-Check notes on 7/27
+
+Talked to s&h about ball not coming back in test
+After this, only some big projects left
+Broke down and commented through testRacketrPredictions to help fix bug
+########################################
 7-31-20
 ########################################
 To-Do:
@@ -7,8 +302,11 @@ To-Do:
 	# env = gym.make('Breakout-v0', frameskip=3)
 	* Updated time to 200,000. Ball still does not come back after first miss. 
 -Upload notes to github
+	* Done
 -Update staymoves (momentum) loop
+	* Working with Lakshay
 -Combine aigame.py & aigame2.py
+	* next week.
 -sim.py motor populations w/ help
 	-Haroon says to add to aigame.py which moves to use?
 -Update computer vision for racket predictions
@@ -21,6 +319,12 @@ Tutorial for pull request
 3. git push
 4. Go to github site to submit pull request
 
+ran testRacketPredictions2.py for 200,000
+Ball disappears after first miss and never spawns back.
+ran manual control over same env (breakoutv0, fk=3)
+Ball always reappears after some seconds
+Not sure what is preventing the ball to come back
+  will research into others with similar case
 ########################################
 7-30-20
 ########################################

@@ -1,23 +1,37 @@
+"""
+testRacketPrediction for Breakout environment
+Adapted from testRacketPrediction.py (originally for pong)
+Original Version: 2020aug3 by davidd
+"""
+
 import random
 from matplotlib import pyplot as plt
 import numpy as np
 import gym
 #from pylab import *
-nbsteps = 200000
+nbsteps = 20000
 
-#breakout-specfici 
-# courtXRng = (9, 159)
-courtXRng = (9,149)
-# courtYRng = (32, 189)
-courtYRng = (93, 188)
-racketYRng = (189,192) 
+# Global variables
+# courtXRng = (9, 159) # visible x rng + overhang on right (cant see objects in overhang)
+courtXRng = (9,149) # visible x rng
+# courtYRng = (32, 189) # entire above racket
+courtYRng = (93, 188) # just below bricks & above racket
+racketYRng = (189,192) # racket
+
+# Initialize variables
 
 xpos_Ball = -1 #previous location
 ypos_Ball = -1
 xpos_Ball2 = -1 #current location
 ypos_Ball2 = -1
 
-def findobj (img, xrng, yrng):
+# Initialize environment
+# env = gym.make('Pong-v0',frameskip=3)
+env = gym.make('Breakout-v0', frameskip=3)
+env.reset()
+
+# Functions
+def findobj (img, xrng, yrng):  # finds max pixels to detect objects that stand out the most from background
   subimg = img[yrng[0]:yrng[1],xrng[0]:xrng[1],:]
   sIC = np.sum(subimg,2)
   pixelVal = np.amax(sIC)
@@ -37,10 +51,6 @@ def findobj (img, xrng, yrng):
     ypos = np.median(Obj_inds,0)[0]
     xpos = np.median(Obj_inds,0)[1]
   return xpos, ypos
-
-# env = gym.make('Pong-v0',frameskip=3)
-env = gym.make('Breakout-v0', frameskip=3)
-env.reset()
 
 #For pong (horizontal game)
 def predictBallRacketYIntercept(xpos_Ball,ypos_Ball,xpos_Ball2,ypos_Ball2):
@@ -76,7 +86,7 @@ def predictBallRacketXIntercept(xpos1, ypos1, xpos2, ypos2):
     deltay = ypos2-ypos1
     if deltay<=0:
       predX = -1
-      print( deltay, ypos2, ypos1, predX)
+      # print( deltay, ypos2, ypos1, predX)
       # print ('Error 2')
     else:
       if xpos1<0:
@@ -95,18 +105,20 @@ def predictBallRacketXIntercept(xpos1, ypos1, xpos2, ypos2):
         else:
           predX = predX_nodeflection
   return predX
+# Starting environment off, updating necessary variables
+
 observation, reward, done, info = env.step(1)
 xpos_Ball2, ypos_Ball2 = findobj (observation, courtXRng, courtYRng)
 xpos_Racket2, ypos_Racket2 = findobj (observation, courtXRng, racketYRng)
 
-#breakout-specific
-predX = predictBallRacketXIntercept(xpos_Ball,ypos_Ball,xpos_Ball2,ypos_Ball2)
+predX = predictBallRacketXIntercept(xpos_Ball,ypos_Ball,xpos_Ball2,ypos_Ball2) # predX is breakout specific (vertical game)
 
-#ion()
-
+# Main function
 for _ in range(nbsteps):
+#picks action
   if predX==-1:
-    caction = np.random.randint(2,4) 	# 4 is not included, really pick of 2 and 3
+    caction = 1
+    #caction = np.random.randint(2,4) 	# 4 is not included, really pick of 2 and 3
     # print('Random')
   else:
     targetX = xpos_Racket2 - predX
@@ -119,13 +131,17 @@ for _ in range(nbsteps):
     else:
       caction = 1 #stay
       # print('Target stay')
+#execute action
   observation, reward, done, info = env.step(caction)
   env.render()
+  print(reward)
+#prepare for next action
   xpos_Ball = xpos_Ball2
   ypos_Ball = ypos_Ball2
   xpos_Ball2, ypos_Ball2 = findobj (observation, courtXRng, courtYRng)
   xpos_Racket2, ypos_Racket2 = findobj (observation, courtXRng, racketYRng)
   predX = predictBallRacketXIntercept(xpos_Ball,ypos_Ball,xpos_Ball2,ypos_Ball2)
   #imshow(observation,origin='upper'); plot([xpos_Racket2+courtXRng[0]],[predY+courtYRng[0]],'ro')
+#end game
   if done==1:
     env.reset()
