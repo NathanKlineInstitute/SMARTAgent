@@ -37,11 +37,7 @@ from centroidtracker import CentroidTracker
 from conf import dconf
 
 # make the environment - env is global so that it only gets created on a single node (important when using MPI with > 1 node)
-#Allows option for simulatedBreakout
-
-try:
-  if dconf['env']['name']
-
+#Allows option for simulated environment
 useSimulatedEnv = False
 try:
   if 'useSimulatedEnv' in dconf: useSimulatedEnv = dconf['useSimulatedEnv']	
@@ -57,9 +53,39 @@ try:
     env.reset()
 except:
   print('Exception in makeENV')
-  env = gym.make('BreakoutNoFrameskip-v4',repeat_action_probability=0.)
+  env = gym.make('Pong-v0',frameskip=2,repeat_action_probability=0.)
   env = wrappers.Monitor(env, './videos/' + str(time()) + '/',force=True)
   env.reset()
+
+# Specifics per game
+# initialize variables
+courtYRng = ()
+courtXRng = ()
+racketXRng = ()
+racketYRng = ()
+
+try:
+  if dconf['env']['name'] == 'Pong-v0' or dconf['env']['name'] == 'Pong-v4':
+    isVertical = False # only one can be true
+    isHorizontal = True
+    courtYRng = (34, 194) # court y range
+    courtXRng = (20, 140) # court x range
+    racketXRng = (141, 144) # racket x range
+  if dconf['env']['name'] == 'Breakout-v0' or dconf['env']['name'] == 'Breakout-v4':
+    isVertical = True
+    isHorizontal = False
+    # courtXRng = (9, 159) # visible x rng + overhang on right (cant see objects in overhang)
+    courtXRng = (9,149) # visible x rng
+    # courtYRng = (32, 189) # entire above racket
+    courtYRng = (93, 188) # just below bricks & above racket
+    racketYRng = (189,192) # racket
+except:
+  print('Exception in ENVspecifics')
+  isVertical = False # only one can be true
+  isHorizontal = True
+  courtYRng = (34, 194) # court y range
+  courtXRng = (20, 140) # court x range
+  racketXRng = (141, 144) # racket x range
 
 # get smallest angle difference
 def getangdiff (ang1, ang2):
@@ -98,9 +124,10 @@ class AIGame:
     self.dirSensitiveNeuronRate = (dconf['net']['DirMinRate'], dconf['net']['DirMaxRate']) # min, max firing rate (Hz) for dir sensitive neurons
     self.intaction = int(dconf['actionsPerPlay']) # integrate this many actions together before returning reward information to model
     # these are Breakout-specific coordinate ranges
-    self.courtYRng = (32, 192) # court y range
-    self.courtXRng = (8, 159) # court x range
-    self.racketYRng = (189, 192) # racket y range 
+    self.courtYRng = courtYRng
+    self.courtXRng = courtXRng
+    self.racketYRng = racketYRng # Either racketXRng or racketYRng will be zero for pong/breakout
+    self.racketXRng = racketXRng
     self.dObjPos = {'racket':[], 'ball':[]}
     self.last_obs = [] # previous observation
     self.last_ball_dir = 0 # last ball direction
@@ -271,7 +298,7 @@ class AIGame:
     rewards = []; proposed_actions =[]; total_hits = []; Images = []
     input_dim = self.input_dim
     done = False
-    courtYRng, courtXRng, racketYRng = self.courtYRng, self.courtXRng, self.racketYRng # coordinate ranges for different objects (Breakout-specific)    
+    courtYRng, courtXRng, racketYRng, racketXRng = self.courtYRng, self.courtXRng, self.racketYRng, self.racketXRng # coordinate ranges for different objects (Breakout-specific)    
     if self.intaction==1:
       lgwght = [1.0]
     else:
@@ -292,20 +319,36 @@ class AIGame:
 
       if np.shape(self.last_obs)[0]>0: #if last_obs is not empty              
         xpos_Ball, ypos_Ball = self.findobj(self.last_obs, courtXRng, courtYRng) # get x,y positions of ball
-        xpos_Racket, ypos_Racket = self.findobj(self.last_obs, courtXRng, racketYRng) # get x,y positions of racket          
+        if isVertical:
+          xpos_Racket, ypos_Racket = self.findobj(self.last_obs, courtXRng, racketYRng) # get x,y positions of racket
         #Now we know the position of racket relative to the ball. We can suggest the action for the racket so that it doesn't miss the ball.
         #For the time being, I am implementing a simple rule i.e. based on only the ypos of racket relative to the ball
-        if ypos_Ball==-1: #guess about proposed move can't be made because ball was not visible in the court
-          proposed_action = -1 #no valid action guessed        
-        elif xpos_Racket>xpos_Ball: #if the racket is right to the ball the suggestion is to move left
-          proposed_action = dconf['moves']['LEFT'] #move left
-        elif xpos_Racket<xpos_Ball: #if the racket is left to the ball the suggestion is to move right
-          proposed_action = dconf['moves']['RIGHT'] #move right
-        elif xpos_Racket==xpos_Ball:
-          proposed_action = dconf['moves']['NOMOVE'] #no move
+          if ypos_Ball==-1: #guess about proposed move can't be made because ball was not visible in the court
+            proposed_action = -1 #no valid action guessed        
+          elif xpos_Racket>xpos_Ball: #if the racket is right to the ball the suggestion is to move left
+            proposed_action = dconf['moves']['LEFT'] #move left
+          elif xpos_Racket<xpos_Ball: #if the racket is left to the ball the suggestion is to move right
+            proposed_action = dconf['moves']['RIGHT'] #move right
+          elif xpos_Racket==xpos_Ball:
+            proposed_action = dconf['moves']['NOMOVE'] #no move
         #self.FullImages.append(np.sum(self.last_obs[courtYRng[0]:courtYRng[1],:,:],2))
-        self.dObjPos['ball'].append([xpos_Ball,courtYRng[0]-1+ypos_Ball])
-        self.dObjPos['racket'].append([xpos_Racket,racketYRng[0]-1+ypos_Racket])
+          self.dObjPos['ball'].append([xpos_Ball,courtYRng[0]-1+ypos_Ball])
+          self.dObjPos['racket'].append([xpos_Racket,racketYRng[0]-1+ypos_Racket])
+        if isHorizontal:
+          xpos_Racket, ypos_Racket = self.findobj(self.last_obs, courtXRng, racketXRng) # get x,y positions of racket         
+        #Now we know the position of racket relative to the ball. We can suggest the action for the racket so that it doesn't miss the ball.
+        #For the time being, I am implementing a simple rule i.e. based on only the ypos of racket relative to the ball
+          if ypos_Ball==-1: #guess about proposed move can't be made because ball was not visible in the court
+            proposed_action = -1 #no valid action guessed        
+          elif ypos_Racket>ypos_Ball: #if the racket is lower than the ball the suggestion is to move up
+            proposed_action = dconf['moves']['UP'] #move up
+          elif ypos_Racket<ypos_Ball: #if the racket is higher than the ball the suggestion is to move down
+            proposed_action = dconf['moves']['DOWN'] #move down
+          elif ypos_Racket==ypos_Ball:
+            proposed_action = dconf['moves']['NOMOVE'] #no move
+        #self.FullImages.append(np.sum(self.last_obs[courtYRng[0]:courtYRng[1],:,:],2))
+          self.dObjPos['ball'].append([courtXRng[0]-1+xpos_Ball,ypos_Ball])
+          self.dObjPos['racket'].append([racketXRng[0]-1+xpos_Racket,ypos_Racket])        
       else:
         proposed_action = -1 #if there is no last_obs
         ypos_Ball = -1 #if there is no last_obs, no position of ball
@@ -315,7 +358,7 @@ class AIGame:
       else:
         observation, reward, done, info = self.env.step(caction) # Re-Initializes reward before if statement
         # To eliminate momentum
-        if caction in [dconf['moves']['LEFT'], dconf['moves']['RIGHT'], dconf['moves']['NOMOVE']]:
+        if caction in [dconf['moves']['DOWN'], dconf['moves']['UP'], dconf['moves']['LEFT'], dconf['moves']['RIGHT'], dconf['moves']['NOMOVE']]:
           # Follow down/up/stay with stay to prevent momentum problem (Pong-specific)
           stay_step = 0 # initialize
           while not done and stay_step < self.stayStepLim:
@@ -326,19 +369,34 @@ class AIGame:
 #find position of ball after action
       xpos_Ball2, ypos_Ball2 = self.findobj(observation, courtXRng, courtYRng)
       ball_moves_towards_racket = False
-      if ypos_Ball>0 and ypos_Ball2>0:
-        if ypos_Ball2 - ypos_Ball>0:
-          ball_moves_towards_racket = True # use proposed action for reward only when the ball moves towards the racket
-          current_ball_dir = 1 
-        elif ypos_Ball2 - ypos_Ball<0:
-          ball_moves_towards_racket = False
-          current_ball_dir = -1
+      if isVertical:
+        if ypos_Ball>0 and ypos_Ball2>0:
+          if ypos_Ball2 - ypos_Ball>0:
+            ball_moves_towards_racket = True # use proposed action for reward only when the ball moves towards the racket
+            current_ball_dir = 1 
+          elif ypos_Ball2 - ypos_Ball<0:
+            ball_moves_towards_racket = False
+            current_ball_dir = -1
+          else:
+            ball_moves_towards_racket = False
+            current_ball_dir = 0 #direction can't be determinted  prob. because the ball didn't move in x dir.
         else:
           ball_moves_towards_racket = False
-          current_ball_dir = 0 #direction can't be determinted  prob. because the ball didn't move in x dir.
-      else:
-        ball_moves_towards_racket = False
-        current_ball_dir = 0 #direction can't be determined because either current or last position of the ball is outside the court
+          current_ball_dir = 0 #direction can't be determined because either current or last position of the ball is outside the court
+      if isHorizontal:
+        if xpos_Ball>0 and xpos_Ball2>0:
+          if xpos_Ball2-xpos_Ball>0:
+            ball_moves_towards_racket = True # use proposed action for reward only when the ball moves towards the racket
+            current_ball_dir = 1 
+          elif xpos_Ball2-xpos_Ball<0:
+            ball_moves_towards_racket = False
+            current_ball_dir = -1
+          else:
+            ball_moves_towards_racket = False
+            current_ball_dir = 0 #direction can't be determinted  prob. because the ball didn't move in x dir.
+        else:
+          ball_moves_towards_racket = False
+          current_ball_dir = 0 #direction can't be determined because either current or last position of the ball is outside the court
 
       skipPred = False # skip prediction of x intercept?
       if "followOnlyTowards" in dconf:
@@ -349,22 +407,39 @@ class AIGame:
       if not skipPred and "useRacketPredictedPos" in dconf:
         if dconf["useRacketPredictedPos"]:
           xpos_Racket2, ypos_Racket2 = self.findobj (observation, courtXRng, racketYRng)
-          predX = self.predictBallRacketXIntercept(xpos_Ball,ypos_Ball,xpos_Ball2,ypos_Ball2)
-          if predX==-1:
-            proposed_action = -1
-          else:
-            targetX = xpos_Racket2 - predX # 8 is half the racket length (16 pixels total)
-            if targetX>8:	 # racket is to right of predX
-              proposed_action = dconf['moves']['LEFT'] #move left
-            elif targetX<-8:	# racket is to left of predX
-              proposed_action = dconf['moves']['RIGHT'] #move right
+          if isVertical:
+            predX = self.predictBallRacketXIntercept(xpos_Ball,ypos_Ball,xpos_Ball2,ypos_Ball2)
+            if predX==-1:
+              proposed_action = dconf['moves']['NOMOVE'] #for breakout, need caction=1 to respawn ball
             else:
-              proposed_action = dconf['moves']['NOMOVE'] #no move
+              targetX = xpos_Racket2 - predX # 8 is half the racket length (16 pixels total)
+              if targetX>8:	 # racket is to right of predX
+                proposed_action = dconf['moves']['LEFT'] #move left
+              elif targetX<-8:	# racket is to left of predX
+                proposed_action = dconf['moves']['RIGHT'] #move right
+              else:
+                proposed_action = dconf['moves']['NOMOVE'] #no move
+          if isHorizontal:
+            predY = self.predictBallRacketYIntercept(xpos_Ball,ypos_Ball,xpos_Ball2,ypos_Ball2)
+            if predY==-1:
+              proposed_action = -1
+            else:
+              targetY = ypos_Racket2 - predY
+              if targetY>8:
+                proposed_action = dconf['moves']['UP'] #move up
+              elif targetY<-8:
+                proposed_action = dconf['moves']['DOWN'] #move down
+              else:
+                proposed_action = dconf['moves']['NOMOVE'] #no move
 
       ball_hits_racket = 0
       # previously I assumed when current_ball_dir is 0 there is no way to find out if the ball hit the racket
-      if current_ball_dir-self.last_ball_dir<0 and reward==0 and ypos_Ball2>courtYRng[1]-courtYRng[0]-20:	#Last 20 pixels of court
-        ball_hits_racket = 1
+      if isVertical:
+        if current_ball_dir-self.last_ball_dir<0 and reward==0 and ypos_Ball2>courtYRng[1]-courtYRng[0]-20:	#Last 20 pixels of court
+          ball_hits_racket = 1
+      if isHorizontal:
+        if current_ball_dir-self.last_ball_dir<0 and reward==0 and xpos_Ball2>courtXRng[1]-courtXRng[0]-40:
+          ball_hits_racket = 1
       #print('Current_ball_dir', current_ball_dir)
       #print('Last ball dir', self.last_ball_dir)
       #print('current X pos Ball', xpos_Ball2)

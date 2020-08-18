@@ -1,8 +1,203 @@
 ########################################
+8-18-20
+########################################
+To-Do:
+-Submit abstract by 9/1
+	# waiting on friend
+-Troubleshoot aigame3.py
+	* Added fixed prediction code
+	* No errors when compiling
+-sim.py motor populations w/ help
+	-Haroon says to add to aigame.py which moves to use?
+-Update computer vision for racket predictions
+	-Currently limited coordinated to not include bricks for simplicity in object detections
+	-Check notes on 7/27
+-Make aigame3.py more modular
+
+Fixed getangdiff error in aigame3.py
+The try statement above it for env settings needed an except statement
+
+Added fixed racket prediction code
+  Only in aigame3.py not aigame2.py!!
+# simple fix, needed to respawn ball
+  if predX==-1:
+    caction = 1
+########################################
+8-17-20
+########################################
+To-Do:
+-Submit abstract by 9/1
+	# waiting on sam notes
+-Troubleshoot aigame3.py
+	-Add fixed racket predictions code
+-sim.py motor populations w/ help
+	-Haroon says to add to aigame.py which moves to use?
+-Update computer vision for racket predictions
+	-Currently limited coordinated to not include bricks for simplicity in object detections
+	-Check notes on 7/27
+
+$ python aigame3.py 
+
+
+  File "aigame3.py", line 84
+    def getangdiff (ang1, ang2):
+      ^
+SyntaxError: invalid syntax
+
+#not sure why, same code as aigame.py and that runs
+
+Finished abstract
+# friend to look at it before submitting
+########################################
+8-12-20
+########################################
+To-Do:
+-Finish Abstract on work I've done
+	# Second draft, then sam will look at it.
+-Combine aigame.py & aigame2.py
+	* Progess
+	# next to troubleshoot
+	  * next week
+	# Upload fixed racket prediction code
+-sim.py motor populations w/ help
+	-Haroon says to add to aigame.py which moves to use?
+-Update computer vision for racket predictions
+	-Currently limited coordinated to not include bricks for simplicity in object detections
+	-Check notes on 7/27
+
+Out tomorrow, day off for moving.
+########################################
+8-11-20
+########################################
+To-Do:
+-Test prediction for longer, see when ball goes above bricks
+	-needs ball to spawn back first
+		*Done
+	-When it misses, is it after close deflection or cuz of speed?
+		# need to observe over time
+# has been good to hit after deflection
+# mainly misses when paddle is too far left and doesn't move to right
+# majority of the time, when the racket misses, the ball is on the right (9/10 times)
+
+score after done:
+23
+72
+20
+48 
+43
+18
+29
+
+further back rows are worth more points
+* print reward to see if diff bricks give different reward
+>>> import gym
+>>> env = gym.make ('Breakout-v0', frameskip=3)
+>>> env.reset()
+>>> obs, reward, done, info = env.step(1); env.render(); print(reward)
+color - reward - point
+blue - 1.0 - 1
+green - 1.0 - 1
+yellow - 4.0 - 4
+orange 1 - 4.0 - 4
+orange 2 -
+red -
+# after hits a brick, ball ghosts through other bricks until it hits racket
+########################################
+8-10-20
+########################################
+To-Do:
+-Finish Abstract on work I've done
+	# plotRecurrentMaps, momentum (aigame1), breakout(aigame2, testRacketPrediction)
+-Test prediction for longer, see when ball goes above bricks
+	-needs ball to spawn back first
+		*Done
+	-When it misses, is it after close deflection or cuz of speed?
+		# need to observe over time
+-Combine aigame.py & aigame2.py
+	* Progess
+	# next to troubleshoot
+	# want to fix testRacketPredictions before moving forward
+-sim.py motor populations w/ help
+	-Haroon says to add to aigame.py which moves to use?
+-Update computer vision for racket predictions
+	-Currently limited coordinated to not include bricks for simplicity in object detections
+	-Check notes on 7/27
+
+stayStepLim will need to be changed accordingly
+# from memory, not 100% sure
+for pong: 6
+for breakout: 4
+
+# how each game is defined, only works for 1 dimension games
+  if dconf['env']['name'] == 'Pong-v0' or dconf['env']['name'] == 'Pong-v4':
+    isVertical = False
+    isHorizontal = True
+    courtYRng = (34, 194) # court y range
+    courtXRng = (20, 140) # court x range
+    racketXRng = (141, 144) # racket x range
+  if dconf['env']['name'] == 'Breakout-v0' or dconf['env']['name'] == 'Breakout-v4':
+    isVertical = True
+    isHorizontal = False
+    # courtXRng = (9, 159) # visible x rng + overhang on rig
+ht (cant see objects in overhang)
+    courtXRng = (9,149) # visible x rng
+    # courtYRng = (32, 189) # entire above racket
+    courtYRng = (93, 188) # just below bricks & above racket
+    racketYRng = (189,192) # racket
+
+
+playGame differences
+  aigame1 : aigame3
+    88-90 : 101-103 # court size   * done
+  262-272 : 298-308 # proposed action * done
+      282 : 318 # momentum loop conditions (actions) * done
+  293-297 : 329-333 # ball_moves_towards_racket * done
+  316-326 : 352-362 # proposed action * done
+      330 : 366 # ball_hits_racket conditions * donen
+
+RacketXRng vs RacketYRng
+Breakout uses YRng, pong uses XRng
+used at findObj function
+
+testRacketPredictions
+according to stackOverflow, at end of life you need to fire (action 1) to respawn ball
+!!!!!  * if predX = -1, caction = 1
+ran for 20,000
+it works for most part, misses sometimes
+
+########################################
+8-9-20
+########################################
+looked through aigame3
+
+fixes for differences in code:
+#variable ideas
+isHorizontal (boolean)
+isVertical (boolean)
+
+courtSize?
+if statement based on dcont['env'] == 'breakout' or 'pong'
+  also set for momentum loop
+proposed action will need seperate loops (different playgame functions
+
+class AIGame
+multiple playGame functions
+
+playGameBreakout
+playGamePong
+playGame
+
+if dconf['env'] == 'breakout'
+  playGame = playGameBreakout
+if dconf['env'] == 'pong'
+  playGame = playGamePong
+
+########################################
 8-7-20
 ########################################
 having trouble open files.
 Uploaded notes to github
+  faced problems, looking into it...
 finished locating differences to merge aigame1 & aigame2 (pong & breakout)
   now just need to create logic to merge
 
