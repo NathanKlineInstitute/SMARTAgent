@@ -321,8 +321,8 @@ class AIGame:
         elif ypos_Racket==ypos_Ball:
           proposed_action = dconf['moves']['NOMOVE'] #no move
         #self.FullImages.append(np.sum(self.last_obs[courtYRng[0]:courtYRng[1],:,:],2))
-        self.dObjPos['ball'].append([courtXRng[0]-1+xpos_Ball,ypos_Ball])
-        self.dObjPos['racket'].append([racketXRng[0]-1+xpos_Racket,ypos_Racket])
+        self.dObjPos['ball'].append([courtXRng[0]+xpos_Ball,ypos_Ball])
+        self.dObjPos['racket'].append([racketXRng[0]+xpos_Racket,ypos_Racket])
         self.dObjPos['time'].append(simtime)
       else:
         proposed_action = -1 #if there is no last_obs

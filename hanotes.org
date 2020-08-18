@@ -4898,7 +4898,8 @@ from matplotlib import animation
 
 from aigame import AIGame
 sim.AIGame = AIGame()
-for _ in range(10000):
+t = 0
+for _ in range(100000):
   rewards, epCount, proposed_actions, total_hits = sim.AIGame.playGame([random.randint(3,4)], 0, t)
 
 t = 1
@@ -4915,7 +4916,7 @@ def plotDSneuronsFiringRates(t,sim):
   ax0.set_title('Image at [t-1]')
   ax1.imshow(sim.AIGame.FullImages[t])
   ax1.set_title('Image at [t]')
-  a2 = ax2.quiver(sim.AIGame.ldflow[t]['thflow'][:,:,0],-sim.AIGame.ldflow[t]['thflow'][:,:,1], pivot='mid', units='inches',width=0.022,scale=1/0.25)
+  a2 = ax2.quiver(sim.AIGame.ldflow[t]['flow'][:,:,0],-sim.AIGame.ldflow[t]['flow'][:,:,1], pivot='mid', units='inches',width=0.022,scale=1/0.25)
   ax2.invert_yaxis()
   ax2.set_title('Directions')
   a3 = ax3.imshow(sim.AIGame.ldflow[t]['ang'])
@@ -4936,6 +4937,15 @@ def plotDSneuronsFiringRates(t,sim):
   ax5.set_xlabel('Neurons')
   ax5.legend(['W','SW','S','SE'])
   plt.show()
+
+
+-- could use another analysis first:
+E_fr = []
+W_fr = []
+for t in range(len(sim.AIGame.dAllFiringRates)):
+  E_fr.append(np.sum(sim.AIGame.dAllFiringRates[t]['EV1DE']))
+  W_fr.append(np.sum(sim.AIGame.dAllFiringRates[t]['EV1DW']))
+
 
 
 -- whenever S activates, 4-5 Hz activity in SW but not in SE. see t110, t119, t123
@@ -5045,3 +5055,270 @@ dAngPeak = OrderedDict({'EV1DE': 0.0,'EV1DNE': 45.0,'EV1DN': 90.0,'EV1DNW': 135.
 
 
 dAngPeak = OrderedDict({'EV1DE': 0.0,'EV1DNE': 45.0,'EV1DN': 90.0,'EV1DNW': 135.0,'EV1DW': 180.0,'EV1DSW': 225.0,'EV1DS': 270.0,'EV1DSE': 315.0})
+
+
+
+-- Use this code provided by sam to debug further.
+
+
+python -i simdat.py backupcfg/20aug14_C0_cycle_sim.json
+dobjpos = loadObjPos() ## 
+binsz=20
+dhist = {pop:getspikehist(dspkT[pop],dnumc,binsz,totalDur) for pop in ['EV1DE','EV1DW']}
+clf(); viewInput(2300,InputImages,ldflow,dhist,['EV1DE','EV1DW'],['r','b'], twin=1000, dobjpos=dobjpos)
+t= 2300 ball x= 2.8125 y= 17.1875
+t= 2300 racket x= 17.625 y= 8.6875
+t= 2320 ball x= 2.6875 y= 17.3125
+t= 2320 racket x= 17.625 y= 8.6875
+
+
+* 20aug18
+
+-- When i used the above code to plot the images, object locations, direction of motion and activity of neurons, the first thing we notice is that the coordinates of detected objects are slighly off.
+
+Task 1: Find the reason why is it so....
+-- could be a bug or could be saving incorrect information.
+
+First step: I will run the game seperately.
+
+-- I thought the problem might be that position was plotted for the last object and not the objects in the current frame. But the viewInput function in simdat.py takes care of this.
+
+-- So i need to test if the find object is working properly or not....
+
+from skimage.color import rgb2gray
+import numpy as np
+from matplotlib import pyplot as plt
+import gym
+env = gym.make('Pong-v0',repeat_action_probability=0.)
+courtYRng = (34, 194)
+courtXRng = (20, 140)
+racketXRng = (141, 144)
+dObjPos = {'time':[], 'racket':[], 'ball':[]}
+last_obs = []
+
+# will take 20 steps as it takes to get the game started i.e. 2 rackets and a ball appears on the screen
+
+for _ in range(20):
+  observation, reward, done, info = env.step(3)
+
+# since i used action = 3 for first 20 steps, the racket moved to the bottom corner. so i will run a couple of actions "UP" so that racket can move towards the center
+
+observation, reward, done, info = env.step(4)
+observation, reward, done, info = env.step(4)
+observation, reward, done, info = env.step(4)
+observation, reward, done, info = env.step(4)
+
+# Now i will test the function find_obj on the observation.
+
+def findobj (img, xrng, yrng):
+  # find an object's x, y position in the image (assumes bright object on dark background)
+  subimg = img[yrng[0]:yrng[1],xrng[0]:xrng[1],:]
+  sIC = np.sum(subimg,2) #assuming the color of object is uniform, add values or r,g,b to get a single value      
+  pixelVal = np.amax(sIC) #find the pixel value representing object assuming a black background
+  sIC[sIC<pixelVal]=0 #make binary image
+  Obj_inds = []
+  for i in range(sIC.shape[0]):
+    for j in range(sIC.shape[1]):
+      if sIC[i,j]>0:
+        Obj_inds.append([i,j])
+  if sIC.shape[0]*sIC.shape[1]==np.shape(Obj_inds)[0]: #if there is no object in the subimage
+    ypos = -1
+    xpos = -1
+  else:
+    ypos = np.median(Obj_inds,0)[0] #y position of the center of mass of the object
+    xpos = np.median(Obj_inds,0)[1] #x position of the center of mass of the object
+  return xpos, ypos
+
+last_obs = observation
+xpos_Ball, ypos_Ball = findobj(last_obs, courtXRng, courtYRng)
+xpos_Racket, ypos_Racket = findobj(last_obs, racketXRng, courtYRng)
+
+plt.imshow(observation)
+plt.plot(xpos_Ball+courtXRng[0],ypos_Ball+courtYRng[0],'ro')
+plt.plot(xpos_Racket+courtXRng[1]+1,ypos_Racket+courtYRng[0],'ro')
+
+
+the court X range is (20, 140) 
+the racket X range is (141, 144)
+the court Y range is (34, 194)
+
+so lets say that the ball is at pos: pos_x = 41.5 and pos_y = 99.5
+it means that the 
+lx0 = 20
+lxp = lx0+pos_x = 20+41.5
+
+ly0 = 34
+lyp = ly0+pos_y = 34+99.5
+
+so now lets say the racket is at pos: pos_x = 1, pos_y = 107.5
+it means that the
+lx0 = 141
+lxp = lx0+pos_x = 141+1
+
+ly0 = 34
+lyp = ly0+pos_y = 34+107.5
+
+so the plotting should be
+
+
+plt.imshow(observation)
+plt.plot(xpos_Ball+courtXRng[0],ypos_Ball+courtYRng[0],'ro')
+plt.plot(xpos_Racket+racketXRng[0],ypos_Racket+courtYRng[0],'ro')
+
+
+therefore accordingly
+
+self.dObjPos['ball'].append([courtXRng[0]+xpos_Ball,ypos_Ball]) # incorrect
+should be changed to 
+self.dObjPos['ball'].append([courtXRng[0]+xpos_Ball,ypos_Ball]) # correct
+
+and 
+
+self.dObjPos['racket'].append([racketXRng[0]-1+xpos_Racket,ypos_Racket]) # incorrect
+should be changed to 
+self.dObjPos['racket'].append([racketXRng[0]+xpos_Racket,ypos_Racket]) # correct
+
+
+-- OK so object location fixed but this location is for FullImage and we want to display object location on downsampled image
+
+from skimage.transform import downscale_local_mean
+downsampshape = (8,8)
+gray_Image = 255.0*rgb2gray(observation[courtYRng[0]:courtYRng[1],:,:])
+gray_ds = downscale_local_mean(gray_Image,downsampshape) # then downsample
+gray_ds = np.where(gray_ds>np.min(gray_ds)+1,255,gray_ds) # Different thresholding
+
+
+-- now lets see what we have for plotting in function viewInput in simdat.py
+
+objfctr = 1.0/8
+
+lobjx,lobjy = [objfctr*dobjpos[k][tdx-objofftdx][0] for k in ['ball','racket']], [objfctr*dobjpos[k][tdx-objofftdx][1] for k in ['ball','racket']]
+
+
+
+--- seems problematic
+
+-- solution is below:
+
+b = np.zeros(shape=(160,160))
+b[int(xpos_Ball+courtXRng[0]),int(ypos_Ball)]=1
+bc = downscale_local_mean(b,(8,8))
+bd = np.where(bc>0)
+
+r = np.zeros(shape=(160,160))
+r[int(xpos_Ball+courtXRng[0]),int(ypos_Ball)]=1
+rc = downscale_local_mean(r,(8,8))
+rd = np.where(rc>0)
+
+-- havent integrated the solution yet into the function. Want to focus on real problem which is investigating why E and W neurons fire at the same time.
+-- ALso was not sure how to to adapt the current code with this format.
+
+-- when i used the following code
+python -i simdat.py backupcfg/20aug14_A0_local_sim.json
+binsz=20
+dhist = {pop:getspikehist(dspkT[pop],dnumc,binsz,totalDur) for pop in ['EV1DE','EV1DW']}
+for k,clr in zip(list(dhist.keys()),['r','b']): plot(dhist[k][0],dhist[k][1],clr)
+
+I found 'E' and 'W' overlap at time 24500 ms--- till 25200 ms.
+
+clf(); viewInput(24500,InputImages,ldflow,dhist,['EV1DE','EV1DW'],['r','b'], twin=1000, dobjpos=dobjpos)
+
+
+-- better look crudely
+
+plt.plot(dhist['EV1DE'][1],'b')
+plt.plot(dhist['EV1DW'][1],'r')
+
+
+plt.plot(dhist['EV1DE'][1][1200:1299],'b')
+plt.plot(dhist['EV1DW'][1][1200:1299],'r')
+
+saved as Figs_Debugging_FR_EV1Dneurons/CompareEwithW.png
+
+-- look at 1250 time step of the simulation......
+
+to look at the activity of different direction selective neurons at 1250th time step load dact......
+
+dact = getdActMap (totalDur, tstepPerAction, dspkT, dspkID, dnumc, dstartidx,lpop = allpossible_pops)
+
+
+plt.imshow(dact['EV1DE'][1250])
+<matplotlib.image.AxesImage object at 0x13021b828>
+>>> plt.colorbar()
+<matplotlib.colorbar.Colorbar object at 0x1324b1f28>
+>>> plt.title('EV1DE at tstep=1250')
+
+-- Image saved as Figs_Debugging_FR_EV1Dneurons/EV1DE_tstep1250.png
+
+>>> np.where(dact['EV1DE'][1250]>0)
+(array([13, 13, 13, 14, 15]), array([13, 14, 15, 13, 13]))
+
+
+
+>>> plt.imshow(dact['EV1DW'][1250])
+<matplotlib.image.AxesImage object at 0x1324f6320>
+>>> plt.colorbar()
+<matplotlib.colorbar.Colorbar object at 0x13094a128>
+>>> plt.title('EV1DW at tstep=1250')
+Text(0.5, 1, 'EV1DW at tstep=1250')
+
+-- Image saved as Figs_Debugging_FR_EV1Dneurons/EV1DW_tstep1250.png
+
+>>> np.where(dact['EV1DW'][1250]>0)
+(array([13, 14, 15, 15, 16, 16, 16]), array([13, 12, 12, 13, 11, 12, 13]))
+
+-- also look at other directions for reference.
+
+>>> np.unique(ldflow[1249]['ang'])
+array([-100.        ,  153.43289657,  153.43289657,  153.43289657,
+        153.43289657,  153.43289657,  153.43289657,  153.43289657,
+        153.43289657,  153.43289657,  153.43289657,  153.43289657,
+        153.43289657,  153.43289657,  153.43289657,  153.43289657,
+        153.43289658,  153.4328966 ,  153.43289663,  153.43289673,
+        270.        ])
+
+at timestep 1249: Moving in S (SW and SE),NW (W)
+
+
+>>> np.unique(ldflow[1250]['ang'])
+array([-100.        ,   90.        ,  153.43289657,  153.43289657,
+        153.43289657,  153.43289657,  153.43289657,  153.43289657,
+        153.43289657,  153.43289657,  153.43289657,  153.43289657,
+        153.43289657,  153.43289657,  153.43289657,  153.43289657,
+        153.43289657,  153.43289666])
+
+at timestep 1250: Moving in N, NW.
+
+
+So the firing recorded from the neurons at timestep 1250 should correspond to ldflow recorded at timestep 1249.
+
+A few neurons in E and W pops are generating single spikes as shown above.... just for clarity writing again below..
+
+
+>>> np.where(dact['EV1DE'][1250]>0)
+(array([13, 13, 13, 14, 15]), array([13, 14, 15, 13, 13]))
+
+>>> np.where(dact['EV1DW'][1250]>0)
+(array([13, 14, 15, 15, 16, 16, 16]), array([13, 12, 12, 13, 11, 12, 13]))
+ when only W pop might have asigned firing rates because the direction angles are
+
+ ~153 for ball and 270 degrees for the racket as shown by 
+
+>>> np.unique(ldflow[1249]['ang'])
+array([-100.        ,  153.43289657,  153.43289657,  153.43289657,
+        153.43289657,  153.43289657,  153.43289657,  153.43289657,
+        153.43289657,  153.43289657,  153.43289657,  153.43289657,
+        153.43289657,  153.43289657,  153.43289657,  153.43289657,
+        153.43289658,  153.4328966 ,  153.43289663,  153.43289673,
+        270.        ])
+
+at timestep 1249: Moving in S (SW and SE),NW (W)
+
+
+-- The exact cause of these extra spikes is STILL UNCLEAR and requires FURTHER INVESTIGATION.
+__ Another important point to note is that i have this gut feeling that "downscale_local_mean" is causing a few problems in the model.
+------Depending on where the object pixel is, in the down scaled image, the obect pixels could stretch. This may create problem. Though I dont have any evidence for that.
+
+..... the investigation into the problem ... to be continued.
+
+
