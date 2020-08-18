@@ -1,6 +1,6 @@
 {
     "env": {
-        "name": "PongNoFrameskip-v4",
+        "name": "Pong-v0",
         "savemp4": 0
     },
     "moves": {
@@ -55,7 +55,7 @@
         "targettedRL": 1,
         "tstepPerAction": 20,
         "saveWeights": 1,
-        "saveAssignedFiringRates": 0
+        "saveAssignedFiringRates": 1
     },
     "architecturePreMtoM": {
         "useProbabilistic": 1,
