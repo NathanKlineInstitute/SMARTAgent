@@ -5322,3 +5322,133 @@ __ Another important point to note is that i have this gut feeling that "downsca
 ..... the investigation into the problem ... to be continued.
 
 
+* 20aug19
+
+-- Yesterday, I found single spikes generated in direction selective neurons when there was no motion detected in that direction.
+
+-- To further investigate what is going on, I included a function to save Assigned Firing Rates for direction selective neurons using an option "saveAssignedFiringRates": 1
+
+-- ran a 300 sec sim with "saveAssignedFiringRates": 1 in "20aug19_A0_local_" to compare Assigned firing rates with spiking activity of neurons.
+-- The goal is to investigate whether the direction selective neurons were able to produce those firing rates or not.
+
+--> simConfig = pickle.load(open('data/'+name+'simConfig.pkl','rb'))
+
+import pickle
+import numpy as np
+import matplotlib.pyplot as plt
+
+dAssignedFR = pickle.load(open('data/20aug19_A0_local_AssignedFiringRates.pkl','rb'))
+assignedFR_E = []
+assignedFR_W = []
+for i in range(len(dAssignedFR)):
+  assignedFR_E.append(np.sum(np.round(np.multiply(dAssignedFR[i]['EV1DE'],0.02))))
+  assignedFR_W.append(np.sum(np.round(np.multiply(dAssignedFR[i]['EV1DW'],0.02))))
+
+python -i simdat.py backupcfg/20aug19_A0_local_sim.json
+binsz=20
+dhist = {pop:getspikehist(dspkT[pop],dnumc,binsz,totalDur) for pop in ['EV1DE','EV1DW']}
+for k,clr in zip(list(dhist.keys()),['r','b']): plot(dhist[k][0],dhist[k][1],clr)
+
+
+-- run sim '20aug19_A1_local_noDirInput_' with 
+stimModDirW = 0 instead of stimModDirW = 0.01
+
+python -i simdat.py backupcfg/20aug19_A1_local_noDirInput_sim.json
+
+
+ok so no spiking in direction selective neurons when stimModDirW = 0
+means neurons are not active spontaneously
+
+-- run sim '20aug19_A2_local_' with 
+stim['hObj'].interval = 1e8
+
+.....
+
+* 20aug20
+
+
+python -i simdat.py backupcfg/20aug19_A2_local_sim.json
+binsz=20
+dhist = {pop:getspikehist(dspkT[pop],dnumc,binsz,totalDur) for pop in ['EV1DE','EV1DW']}
+
+... saved spike hist of E and W, plotted using 
+plt.plot(dhist['EV1DE'][1])
+plt.plot(dhist['EV1DW'][1],'r')
+and saved as spikeHist_EvsW_20aug19_A2_local.png
+
+dact = getdActMap (totalDur, tstepPerAction, dspkT, dspkID, dnumc, dstartidx,lpop = allpossible_pops)
+
+still extra spikes
+
+
+
+-- run sim '20aug19_A4_local_' with 
+stim['hObj'].number = 0
+
+python -i simdat.py backupcfg/20aug19_A4_local_sim.json
+dact = getdActMap (totalDur, tstepPerAction, dspkT, dspkID, dnumc, dstartidx,lpop = allpossible_pops)
+binsz=20
+dhist = {pop:getspikehist(dspkT[pop],dnumc,binsz,totalDur) for pop in ['EV1DE','EV1DW']}
+
+no spiking at all.....
+
+
+-- run sim '20aug19_A5_local_' with 
+
+          if dFiringRates[pop][int(cell.gid-offset)]==0:
+            #stim['hObj'].interval = 1e8
+            stim['hObj'].number = 0
+          else:
+            stim['hObj'].number = int(dFiringRates[pop][int(cell.gid-offset)]*0.020) 
+
+didnt change much.... its possible that we need to increase the weights because now we have less preM activity which could be insufficient to drive M neurons.
+anyway let sim run and increase weights afterwards.
+
+python -i simdat.py backupcfg/20aug19_A5_local_sim.json
+dact = getdActMap (totalDur, tstepPerAction, dspkT, dspkID, dnumc, dstartidx,lpop = allpossible_pops)
+binsz=20
+dhist = {pop:getspikehist(dspkT[pop],dnumc,binsz,totalDur) for pop in ['EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE']}
+
+
+
+probably start with making rates 5 times higher.....later
+
+----------------
+
+-- run sim '20aug19_A6_local_' with
+interval of 10 ms. 
+
+every neuron produces exactly 2 spikes in 20ms window starting from timepoint 2.
+timepoint 0 and timepoint1 has 1 spike per neuron in 20 ms window.
+
+-- run sim '20aug19_A7_local_' with
+          rind = random.randint(0,1)
+          fchoices = [20,100]
+          if dFiringRates[pop][int(cell.gid-offset)]==0:
+            stim['hObj'].interval = fchoices[rind]#1e8
+          else:
+            stim['hObj'].interval = fchoices[rind] 
+
+python -i simdat.py backupcfg/20aug19_A7_local_sim.json 
+binsz=20
+dhist = {pop:getspikehist(dspkT[pop],dnumc,binsz,totalDur) for pop in ['EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE']}
+plt.plot(dhist['EV1DE'][1],'b-o')
+plt.ylabel('# of spikes')
+plt.xlabel('tpnts')
+plt.title('NetStim-interval: 20 ms or 100 ms')
+....hist of EV1DE saved as dhist_20aug19_A7_local_sim_EV1DE.png
+dact = getdActMap (totalDur, tstepPerAction, dspkT, dspkID, dnumc, dstartidx,lpop = allpossible_pops)
+plt.imshow(dact['EV1DE'][20]) --->showing 0 to 4 spikes for different neurons. However it should have showed 1 spike every tpnt or 1spk every 4th tpnt.
+plt.colorbar()
+plt.title('dact[EV1DE][20]')
+SEEMS LIKE ONCE THE INTERVAL IS ASSIGNED, THE SPIKE WILL BE GENERATED AT LATER TIMEPNT REGARDLESS OF UPDATED INTERVAL
+
+... should rerun this sim and also save what firing rates were assigned.
+
+
+-- run sim '20aug19_A8_local_' with
+interval of 40 ms.
+hist of EV1DE saved as dhist_20aug19_A8_local_sim_EV1DE.png
+1 spike per neuron every other 20ms bin- as expected.
+
+Looks like no problem with NETSTIM... THE PROBLEM MIGHT BE IN THE WAY WE ARE USING IT.

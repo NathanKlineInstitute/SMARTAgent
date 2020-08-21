@@ -34,6 +34,10 @@ if 'saveWeights' in dconf['sim']: sim.saveWeights = dconf['sim']['saveWeights']
 sim.saveInputImages = 1 #save Input Images (5 game frames)
 sim.saveMotionFields = 1 # whether to save the motion fields
 sim.saveObjPos = 1 # save ball and paddle position to file
+if dconf['sim']['saveAssignedFiringRates']: 
+  sim.saveAssignedFiringRates = 1
+else:
+  sim.saveAssignedFiringRates = 0
 recordWeightStepSize = dconf['sim']['recordWeightStepSize']
 normalizeWeightStepSize = dconf['sim']['normalizeWeightStepSize']
 #recordWeightDT = 1000 # interval for recording synaptic weights (change later)
@@ -195,7 +199,7 @@ netParams.stimSourceParams['stimMod'] = {'type': 'NetStim', 'rate': 'variable', 
 
 stimModInputW = 0.05
 if 'stimModInputW' in dconf['net']: stimModInputW = dconf['net']['stimModInputW']
-stimModDirW = 0.01
+stimModDirW = 0.01  # stimModDirW = 0.01
 if 'stimModDirW' in dconf['net']: stimModDirW = dconf['net']['stimModDirW']
 
 if dnumc['ER']>0:
@@ -892,10 +896,12 @@ def updateInputRates ():
     for cell in lCell:  
       for stim in cell.stims:
         if stim['source'] == 'stimMod':
+          #rind = random.randint(0,1)
+          #fchoices = [20,100]
           if dFiringRates[pop][int(cell.gid-offset)]==0:
-            stim['hObj'].interval = 1e12
-          else:  
-            stim['hObj'].interval = 1000.0/dFiringRates[pop][int(cell.gid-offset)]
+            stim['hObj'].interval = 1e8
+          else:
+            stim['hObj'].interval = 1000.0/dFiringRates[pop][int(cell.gid-offset)] #40 #fchoices[rind] #10 #
           #print('cell GID: ', int(cell.gid), 'vs cell ID with offset: ', int(cell.gid-R_offset)) # interval in ms as a function of rate; is cell.gid correct index??? 
       
 def trainAgent (t):
@@ -1259,6 +1265,8 @@ def saveObjPos (dobjpos):
   for k in dobjpos.keys(): dobjpos[k] = np.array(dobjpos[k])
   pickle.dump(dobjpos, open('data/'+dconf['sim']['name']+'objpos.pkl', 'wb'))
 
+def saveAssignedFiringRates (dAllFiringRates): pickle.dump(dAllFiringRates, open('data/'+dconf['sim']['name']+'AssignedFiringRates.pkl', 'wb'))
+
 def saveInputImages (Images):
   # save input images to txt file (switch to pkl?)
   InputImages = np.array(Images)
@@ -1283,4 +1291,5 @@ if sim.rank == 0: # only rank 0 should save. otherwise all the other nodes could
   #anim.savemp4('/tmp/*.png','data/'+dconf['sim']['name']+'randGameBehavior.mp4',10)
   if sim.saveMotionFields: saveMotionFields(sim.AIGame.ldflow)
   if sim.saveObjPos: saveObjPos(sim.AIGame.dObjPos)
+  if sim.saveAssignedFiringRates: saveAssignedFiringRates(sim.AIGame.dAllFiringRates)
   if dconf['sim']['doquit']: quit()
