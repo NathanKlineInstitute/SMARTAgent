@@ -95,6 +95,7 @@ class AIGame:
       self.input_dim = int(np.sqrt(dconf['net']['allpops'][self.InputPop])) # input image XY plane width,height -- not used anywhere    
     self.dirSensitiveNeuronDim = int(np.sqrt(dconf['net']['allpops']['EV1DE'])) # direction sensitive neuron XY plane width,height
     self.dirSensitiveNeuronRate = (dconf['net']['DirMinRate'], dconf['net']['DirMaxRate']) # min, max firing rate (Hz) for dir sensitive neurons
+    self.FiringRateCutoff = dconf['net']['FiringRateCutoff']
     self.intaction = int(dconf['actionsPerPlay']) # integrate this many actions together before returning reward information to model
     # these are Pong-specific coordinate ranges; should later move out of this function into Pong-specific functions
     self.courtYRng = (34, 194) # court y range
@@ -224,6 +225,7 @@ class AIGame:
             for pop in self.ldirpop:
               fctr = np.exp(-1.0*(getangdiff(motiondir[y][x],dAngPeak[pop])**2)/AngRFSigma2)
               #print('updateDirRates',pop,x,y,fctr,dAngPeak[pop],motiondir[y][x])
+              if MaxRate * fctr < self.FiringRateCutoff: fctr = 0
               self.dFiringRates[pop][y,x] += MaxRate * fctr
     else:
       for y in range(motiondir.shape[0]):

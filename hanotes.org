@@ -5553,3 +5553,30 @@ plt.show()
 
 -- run 30 sec sim with peak firing rate for direction selective neurons of 150 Hz in "20aug21_A1_local_"
 ... also save assigned firing rates.
+
+python -i simdat.py backupcfg/20aug21_A1_local_sim.json
+dact = getdActMap (totalDur, tstepPerAction, dspkT, dspkID, dnumc, dstartidx,lpop = allpossible_pops) 
+binsz=20
+dhist = {pop:getspikehist(dspkT[pop],dnumc,binsz,totalDur) for pop in ['EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE']}
+....dhist_20aug21_A1_local_sim.png .... still overlap.
+
+
+-- just to test, change
+          if dFiringRates[pop][int(cell.gid-offset)]==0:
+            stim['hObj'].interval = 1e12
+to
+          if dFiringRates[pop][int(cell.gid-offset)]<50:
+            stim['hObj'].interval = 1e12
+... and run sim in "20aug21_A2_local_"
+... now i am restricting all the activity to 1 time bin. there should not be any overlap as there is no propagation of activity across timebins.
+
+python -i simdat.py backupcfg/20aug21_A2_local_sim.json
+
+
+
+dAssignedFR = pickle.load(open('data/20aug19_A0_local_AssignedFiringRates.pkl','rb'))
+
+
+-- Add "FiringRateCutoff" : 50.0 in sim.json.
+-- Add self.FiringRateCutoff = dconf['net']['FiringRateCutoff'] in aigame.py
+-- Add if MaxRate * fctr < self.FiringRateCutoff: fctr = 0 in function updateDirSensitiveRates (self) in aigame.py.
