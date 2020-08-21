@@ -896,12 +896,13 @@ def updateInputRates ():
     for cell in lCell:  
       for stim in cell.stims:
         if stim['source'] == 'stimMod':
-          #rind = random.randint(0,1)
-          #fchoices = [20,100]
+          #rind = random.randint(0,2)
+          #fchoices = [20,50,1000] #20 will represent 50Hz and so on 
           if dFiringRates[pop][int(cell.gid-offset)]==0:
-            stim['hObj'].interval = 1e8
+            stim['hObj'].interval = 1e12
           else:
             stim['hObj'].interval = 1000.0/dFiringRates[pop][int(cell.gid-offset)] #40 #fchoices[rind] #10 #
+          #sim.AIGame.dAllFiringRates[-1][pop][int(cell.gid-offset)] = fchoices[rind] 
           #print('cell GID: ', int(cell.gid), 'vs cell ID with offset: ', int(cell.gid-R_offset)) # interval in ms as a function of rate; is cell.gid correct index??? 
       
 def trainAgent (t):

@@ -5452,3 +5452,104 @@ hist of EV1DE saved as dhist_20aug19_A8_local_sim_EV1DE.png
 1 spike per neuron every other 20ms bin- as expected.
 
 Looks like no problem with NETSTIM... THE PROBLEM MIGHT BE IN THE WAY WE ARE USING IT.
+
+
+* 20aug21
+
+
+-- run sim '20aug21_A0_local_' with
+          rind = random.randint(0,2)
+          fchoices = [20,50,1000] #20 will represent 50Hz and so on 
+          if dFiringRates[pop][int(cell.gid-offset)]==0:
+            stim['hObj'].interval = fchoices[rind] #1e8
+          else:
+            stim['hObj'].interval = fchoices[rind] #1000.0/dFiringRates[pop][int(cell.gid-offset)] #40 #fchoices[rind] #10 #
+          sim.AIGame.dAllFiringRates[-1][pop][int(cell.gid-offset)] = fchoices[rind]
+
+python -i simdat.py backupcfg/20aug21_A0_local_sim.json 
+binsz=20
+dact = getdActMap (totalDur, tstepPerAction, dspkT, dspkID, dnumc, dstartidx,lpop = allpossible_pops)
+dhist = {pop:getspikehist(dspkT[pop],dnumc,binsz,totalDur) for pop in ['EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE']}
+plt.plot(dhist['EV1DE'][1],'b-o')
+plt.plot(dhist['EV1DW'][1],'r-o')
+plt.plot(dhist['EV1DN'][1],'g-o')
+plt.plot(dhist['EV1DS'][1],'c-o')
+plt.legend(['EV1DE','EV1DW','EV1DN','EV1DS'])
+plt.xlabel('tpnts')
+plt.ylabel('# of spikes')
+plt.title('NetStim Interval: [20,50,1000]')
+
+--PROBLEM: 
+....The problem was with the Firing rates we were using. e.g. we were using peak firing rate of 50Hz, firing rates for overlapping directions aroung 20Hz and firing rate at the boundary of direction tuning curve about 1 Hz.
+.... These firing rates translate to 20 ms, 50 ms and 1000 ms.
+.... we are using time bin of 20 ms (per game play).
+.... which means that for that particular 20 ms, we want to execute spike at 20 ms, 50ms and 1000 ms.
+.... we will have a single spike corresponding to 20 ms in the next interval and we will have another spike in the following interval corresponding to 50 ms but then we will have another spike at 50th timestep/time bin
+.... so the problem is that direction encoding for the environment and action will be spread across time. making it temporally less precise.
+.... We may lose temporal precision/ noise could become larger than the original signal. Original signal would be a single spike and signal from multiple previous steps could produce 3 spikes.
+-- SOLUTION:
+.... one solution is to increase the peak 2 or 3 times or even 4 times to increase the temporal precision... which would hopefully help differentiate between temporally delayed and temporally precise signals.
+
+-- Debugging:
+from collections import OrderedDict
+
+def getangdiff (ang1, ang2):
+  if ang1 > 180.0:
+    ang1 -= 360.0
+  if ang2 > 180.0:
+    ang2 -= 360.0
+  angdiff = ang1 - ang2
+  if angdiff > 180.0:
+    angdiff-=360.0
+  elif angdiff < -180.0:
+    angdiff+=360.0
+  return angdiff
+
+
+dAngPeak = OrderedDict({'EV1DE': 0.0,'EV1DNE': 45.0, # receptive field peak angles for the direction selective populations
+                        'EV1DN': 90.0,'EV1DNW': 135.0,
+                        'EV1DW': 180.0,'EV1DSW': 225.0,
+                        'EV1DS': 270.0,'EV1DSE': 315.0})
+
+#AngRFSigma2 = dconf['net']['AngRFSigma']**2
+AngRFSigma2 = 22.5**2
+
+E = []
+NE = []
+N = []
+NW = []
+W = []
+SW = []
+S = []
+SE = []
+for a in range(0,360,1):
+  E.append(150*np.exp(-1.0*(getangdiff(a,dAngPeak['EV1DE'])**2)/AngRFSigma2))
+  NE.append(150*np.exp(-1.0*(getangdiff(a,dAngPeak['EV1DNE'])**2)/AngRFSigma2))
+  N.append(150*np.exp(-1.0*(getangdiff(a,dAngPeak['EV1DN'])**2)/AngRFSigma2))
+  NW.append(150*np.exp(-1.0*(getangdiff(a,dAngPeak['EV1DNW'])**2)/AngRFSigma2))
+  W.append(150*np.exp(-1.0*(getangdiff(a,dAngPeak['EV1DW'])**2)/AngRFSigma2))
+  SW.append(150*np.exp(-1.0*(getangdiff(a,dAngPeak['EV1DSW'])**2)/AngRFSigma2))
+  S.append(150*np.exp(-1.0*(getangdiff(a,dAngPeak['EV1DS'])**2)/AngRFSigma2))
+  SE.append(150*np.exp(-1.0*(getangdiff(a,dAngPeak['EV1DSE'])**2)/AngRFSigma2))
+
+
+from matplotlib import pyplot as plt
+plt.plot(E,'k')
+plt.plot(NE,'r')
+plt.plot(N,'b')
+plt.plot(NW,'g')
+plt.plot(W,'k--')
+plt.plot(SW,'r--')
+plt.plot(S,'b--')
+plt.plot(SE,'g--')
+plt.legend(['E','NE','N','NW','W','SW','S','SE'])
+plt.ylabel('Firing rate (Hz)')
+plt.show()
+
+... saved as Angle2FiringRateConversion_withoutBug_NEW.png
+
+-- change peak firing rate from  "DirMaxRate": 50.0 to "DirMaxRate": 150.0
+
+
+-- run 30 sec sim with peak firing rate for direction selective neurons of 150 Hz in "20aug21_A1_local_"
+... also save assigned firing rates.
