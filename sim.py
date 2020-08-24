@@ -868,6 +868,20 @@ proposed_actions = []
 total_hits = [] #numbertimes ball is hit by racket as ball changes its direction and player doesn't lose a score (assign 1). if player loses
 dSTDPmech = {} # dictionary of list of STDP mechanisms
 
+def InitializeInputRates ():
+  # update the source firing rates for the ER neuron population, based on image contents
+  # also update the firing rates for the direction sensitive neurons based on image contents
+  if dnumc['ER']>0:
+    lratepop = ['ER', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW', 'EV1DSW', 'EV1DS', 'EV1DSE']
+  else:
+    lratepop = ['EV1', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW', 'EV1DSW', 'EV1DS', 'EV1DSE']  
+  for pop in lratepop:
+    lCell = [c for c in sim.net.cells if c.gid in sim.net.pops[pop].cellGids] # this is the set of cells
+    for cell in lCell:  
+      for stim in cell.stims:
+        if stim['source'] == 'stimMod':
+          stim['hObj'].interval = 1e12
+
 def updateInputRates ():
   # update the source firing rates for the ER neuron population, based on image contents
   # also update the firing rates for the direction sensitive neurons based on image contents
@@ -1211,6 +1225,7 @@ if dnumc['ER']>0:
 else:
   setdminID(sim, ['EV1', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW', 'EV1DSW', 'EV1DS', 'EV1DSE'])
 tPerPlay = tstepPerAction*dconf['actionsPerPlay']
+InitializeInputRates ()
 sim.runSimWithIntervalFunc(tPerPlay,trainAgent) # has periodic callback to adjust STDP weights based on RL signal
 if sim.rank==0 and fid4 is not None: fid4.close()
 sim.gatherData() # gather data from different nodes

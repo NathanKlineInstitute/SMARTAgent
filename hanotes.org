@@ -5580,3 +5580,290 @@ dAssignedFR = pickle.load(open('data/20aug19_A0_local_AssignedFiringRates.pkl','
 -- Add "FiringRateCutoff" : 50.0 in sim.json.
 -- Add self.FiringRateCutoff = dconf['net']['FiringRateCutoff'] in aigame.py
 -- Add if MaxRate * fctr < self.FiringRateCutoff: fctr = 0 in function updateDirSensitiveRates (self) in aigame.py.
+-- run 30 sec "20aug21_A3_local_"
+
+* 20aug24
+
+-- Make sure that the firing rates are properly implemented in direction selective neurons as well as ER or EV1 depending on which one is present in the circuit.
+I believe these parameters are required for direction selective neurons to fire in timely manner i.e. without producing noise e.g. when the firing rate was 1 Hz, the spike will be generated after 1000 ms which will be 880 ms delayed for the visual scene.
+        "AngRFSigma": 22.5,
+	      "EXPDir": 1,
+        "DirMinRate": 0.0,
+        "DirMaxRate": 150.0,
+        "FiringRateCutoff" : 50.0,
+
+
+python -i simdat.py backupcfg/20aug21_A3_local_sim.json
+dAssignedFR = pickle.load(open('data/20aug21_A3_local_AssignedFiringRates.pkl','rb'))
+
+FRs_V1 = []
+FRs_E = []
+FRs_NE = []
+FRs_N = []
+FRs_NW = []
+FRs_W = []
+FRs_SW = []
+FRs_S = []
+FRs_SE = []
+
+for tpnts in range(len(dAssignedFR)):
+  FRs_V1.append(dAssignedFR[tpnts]['EV1'])
+  FRs_E.append(dAssignedFR[tpnts]['EV1DE'])
+  FRs_NE.append(dAssignedFR[tpnts]['EV1DNE'])
+  FRs_N.append(dAssignedFR[tpnts]['EV1DN'])
+  FRs_NW.append(dAssignedFR[tpnts]['EV1DNW'])
+  FRs_W.append(dAssignedFR[tpnts]['EV1DW'])
+  FRs_SW.append(dAssignedFR[tpnts]['EV1DSW'])
+  FRs_S.append(dAssignedFR[tpnts]['EV1DS'])
+  FRs_SE.append(dAssignedFR[tpnts]['EV1DSE'])
+
+>>> np.unique(np.ceil(np.reshape(FRs_V1,(np.shape(FRs_V1)[0]*np.shape(FRs_V1)[1]))))
+array([ 0., 50.])
+>>> np.unique(np.ceil(np.reshape(FRs_E,(np.shape(FRs_E)[0]*np.shape(FRs_E)[1]))))
+array([  0.,  59.,  72.,  74.,  77.,  78.,  79.,  84.,  86.,  87.,  98.,
+       106., 111., 150.])
+>>> np.unique(np.ceil(np.reshape(FRs_NE,(np.shape(FRs_NE)[0]*np.shape(FRs_NE)[1]))))
+array([  0.,  52.,  53.,  54.,  55.,  58.,  59.,  61.,  63.,  64.,  66.,
+        67.,  68.,  69.,  71.,  73.,  74.,  75.,  76.,  77.,  79.,  82.,
+        83.,  85.,  90.,  92.,  93.,  96., 100., 101., 106., 107., 115.,
+       117., 118., 121., 123., 125., 126., 128., 132., 133., 135., 136.,
+       138., 139., 141., 142., 146., 147., 149., 150.])
+>>> np.unique(np.ceil(np.reshape(FRs_N,(np.shape(FRs_N)[0]*np.shape(FRs_N)[1]))))
+array([  0.,  52.,  53.,  54.,  55.,  56.,  57.,  58.,  59.,  60.,  61.,
+        62.,  65.,  67.,  68.,  69.,  70.,  72.,  73.,  75.,  76.,  77.,
+        79.,  80.,  81.,  82.,  83.,  84.,  88.,  96.,  97.,  99., 100.,
+       102., 103., 104., 107., 108., 110., 111., 113., 116., 119., 121.,
+       122., 123., 126., 128., 129., 130., 131., 132., 133., 134., 135.,
+       136., 138., 139., 140., 141., 142., 143., 145., 146., 147., 148.,
+       149., 150.])
+>>> np.unique(np.ceil(np.reshape(FRs_NW,(np.shape(FRs_NW)[0]*np.shape(FRs_NW)[1]))))
+array([  0.,  51.,  53.,  55.,  56.,  57.,  63.,  64.,  65.,  66.,  67.,
+        69.,  70.,  72.,  74.,  75.,  76.,  77.,  78.,  84.,  86.,  93.,
+        95., 102., 105., 107., 111., 114., 117., 126., 128., 131., 132.,
+       134., 135., 142., 143., 144., 147., 148., 149., 150.])
+>>> np.unique(np.ceil(np.reshape(FRs_W,(np.shape(FRs_W)[0]*np.shape(FRs_W)[1]))))
+array([  0.,  65.,  67.,  77., 117., 126., 129., 146., 150.])
+>>> np.unique(np.ceil(np.reshape(FRs_SW,(np.shape(FRs_SW)[0]*np.shape(FRs_SW)[1]))))
+array([  0.,  75.,  77.,  78.,  83.,  95., 112., 113., 114., 117., 119.,
+       123., 128., 129., 130., 132., 136., 137., 138., 139., 140., 141.,
+       142., 143., 144., 145., 146., 147., 148., 149., 150.])
+>>> np.unique(np.ceil(np.reshape(FRs_S,(np.shape(FRs_S)[0]*np.shape(FRs_S)[1]))))
+array([  0.,  51.,  53.,  57.,  61.,  65.,  68.,  70.,  72.,  75.,  77.,
+        86.,  88.,  89.,  92.,  93.,  94.,  97., 102., 104., 109., 110.,
+       112., 115., 116., 117., 119., 122., 123., 125., 127., 128., 129.,
+       131., 133., 135., 136., 137., 138., 139., 140., 141., 142., 143.,
+       144., 145., 147., 148., 149., 150.])
+>>> np.unique(np.ceil(np.reshape(FRs_SE,(np.shape(FRs_SE)[0]*np.shape(FRs_SE)[1]))))
+array([  0.,  52.,  55.,  59.,  60.,  64.,  66.,  67.,  69.,  70.,  71.,
+        72.,  74.,  75.,  76.,  77.,  78.,  79.,  82.,  84.,  91.,  95.,
+       102., 106., 116., 117., 127., 128., 129., 130., 131., 132., 133.,
+       134., 135., 138., 139., 140., 141., 144., 146., 147., 149., 150.])
+
+.... Assigned firing rates look good for 20 ms.
+
+dact = getdActMap (totalDur, tstepPerAction, dspkT, dspkID, dnumc, dstartidx,lpop = allpossible_pops) 
+binsz=20
+dhist = {pop:getspikehist(dspkT[pop],dnumc,binsz,totalDur) for pop in ['EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE']}
+
+
+
+plt.plot(dhist['EV1DE'][1],'b-')
+plt.plot(dhist['EV1DW'][1],'r-')
+plt.plot(dhist['EV1DN'][1],'g-')
+plt.plot(dhist['EV1DS'][1],'c-')
+plt.legend(['EV1DE','EV1DW','EV1DN','EV1DS'])
+plt.xlabel('tpnts')
+plt.ylabel('# of spikes')
+
+
+
+>>> dhist['EV1DE'][1][1410]
+0
+>>> dhist['EV1DNE'][1][1410]
+0
+>>> dhist['EV1DN'][1][1410]
+88
+>>> dhist['EV1DNW'][1][1410]
+39
+>>> dhist['EV1DW'][1][1410]
+0
+>>> dhist['EV1DSW'][1][1410]
+0
+>>> dhist['EV1DS'][1][1410]
+24
+>>> dhist['EV1DSE'][1][1410]
+0
+
+-- see the Assigned Firing rates at tpnt 1409:
+>>> np.unique(dAssignedFR[1409]['EV1DE'])
+array([0.])
+>>> np.unique(dAssignedFR[1409]['EV1DNE'])
+array([0.])
+>>> np.unique(dAssignedFR[1409]['EV1DN'])
+array([  0., 150.])
+>>> np.unique(dAssignedFR[1409]['EV1DNW'])
+array([ 0.        , 76.66776632, 76.66776651, 76.66776653, 76.66776653,
+       76.66776653, 76.66776653, 76.66776653, 76.66776653, 76.66776653,
+       76.66776653, 76.66776653, 76.66776653, 76.66776653, 76.66776653])
+>>> np.unique(dAssignedFR[1409]['EV1DW'])
+array([0.])
+>>> np.unique(dAssignedFR[1409]['EV1DSW'])
+array([0.])
+>>> np.unique(dAssignedFR[1409]['EV1DS'])
+array([  0., 150.])
+>>> np.unique(dAssignedFR[1409]['EV1DSE'])
+array([0.])
+
+--- see the dact of tpnt 1410 for N, NW, S
+--- comparing dact[1410] with dAssignedFR[1409]
+..... For EV1DN, left racket was assigned 150 Hz 
+..... but some pixels presenting left racket produced 150Hz (i.e. 3 spikes in 20 ms), where as others produced 100 Hz (i.e. 2 spikes in 20 ms). I guess 3rd spike will be produced in next time bin.
+
+.... For EV1DNW, ball was assigned ~75 Hz.
+.... but some pixels presenting ball produced 50 Hz, while the others (which were overlapping with previous ball location) produced 100 Hz, where as only a few pixels produced 150 Hz.
+
+.... For EV1DS, right racket was assigned 150 Hz.
+.... all pixels presenting right racket produced 50 Hz. so definitely remaining 2 spikes will show up in next bin.
+
+-- I still see all 400 neurons generating 1 spike......
+-- may be the potential solution is the following:
+netParams.stimSourceParams['stimMod'] = {'type': 'NetStim', 'rate': 'variable', 'noise': 0,'interval':1e24}
+.. added 'interval':1e24 for initializing 
+
+-- run sim in "20aug21_A4_local_" to test if "interval":1e24 works or not...
+.... No this didnt work.
+... May be write a function to initialize 
+
+
+
+def InitializeInputRates ():
+  # update the source firing rates for the ER neuron population, based on image contents
+  # also update the firing rates for the direction sensitive neurons based on image contents
+  if dnumc['ER']>0:
+    lratepop = ['ER', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW', 'EV1DSW', 'EV1DS', 'EV1DSE']
+  else:
+    lratepop = ['EV1', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW', 'EV1DSW', 'EV1DS', 'EV1DSE']  
+  for pop in lratepop:
+    lCell = [c for c in sim.net.cells if c.gid in sim.net.pops[pop].cellGids] # this is the set of cells
+    for cell in lCell:  
+      for stim in cell.stims:
+        if stim['source'] == 'stimMod':
+          stim['hObj'].interval = 1e12
+
+--- May be try this--->
+InitializeInputRates ()
+sim.runSimWithIntervalFunc(tPerPlay,trainAgent) # has periodic callback to adjust STDP weights based on RL signal
+
+-- This worked.
+
+-- 150Hz stimulation didnt cause the neurons to fire with the same frequency. I noticed a delayed response in neurons. I think this could be due to weaker connection weights.
+-- Therefore, to make it as a parameter, I included in sim.json.... "net"...
+        "stimModDirW": 0.05,
+        "stimModInputW": 0.05,
+-- check how temporally locked the rates are....
+
+
+import gym
+from skimage.transform import downscale_local_mean, resize
+from skimage.color import rgb2gray
+from skimage.filters import threshold_otsu
+from matplotlib import pyplot as plt
+import numpy as np
+
+courtYRng = (34, 194)
+env = gym.make('Pong-v0')
+env.reset()
+observation, reward, done, info = env.step(caction)
+gray_Image = 255.0*rgb2gray(observation[courtYRng[0]:courtYRng[1],:,:]) # convert to grayscale; rgb2gray has 0-1 range so mul by 255
+gray_ds = downscale_local_mean(gray_Image,(8,8)) # then downsample
+dsum_Images = np.where(gray_ds>np.min(gray_ds)+1,255,gray_ds) # Different thresholding
+dsum_Images = dsum_Images - np.amin(dsum_Images)
+dsum_Images = (255.0/np.amax(dsum_Images))*dsum_Images
+fr_Images = 50/(1+np.exp((np.multiply(-1,dsum_Images)+123)/10))
+fr_Images2 = 150/(1+np.exp((np.multiply(-1,dsum_Images)+123)/10))
+
+-- add in 'net' in sim.json.
+"LocMaxRate": 150.0,
+-- add in init in aigame.py
+self.locationNeuronRate = dconf['net']['LocMaxRate']
+
+-- use self.locationNeuronRate in both updateInputRates() and updateInputRatesWithPadding()
+
+-- run sim with above changes in 20aug21_A5_local_
+.... showing firing rates of M neurons 0.... and the racket is not moving....
+.... so may be reduce 
+        "stimModDirW": 0.05,
+        "stimModInputW": 0.05,
+to
+        "stimModDirW": 0.02,
+        "stimModInputW": 0.02,
+and rerun.
+
+
+python -i simdat.py backupcfg/20aug21_A5_local_sim.json 
+dact = getdActMap (totalDur, tstepPerAction, dspkT, dspkID, dnumc, dstartidx,lpop = allpossible_pops) 
+binsz=20
+dhist = {pop:getspikehist(dspkT[pop],dnumc,binsz,totalDur) for pop in ['EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE']}
+
+dAssignedFR = pickle.load(open('data/20aug21_A5_local_AssignedFiringRates.pkl','rb'))
+
+FRs_V1 = []
+FRs_E = []
+FRs_NE = []
+FRs_N = []
+FRs_NW = []
+FRs_W = []
+FRs_SW = []
+FRs_S = []
+FRs_SE = []
+
+for tpnts in range(len(dAssignedFR)):
+  FRs_V1.append(dAssignedFR[tpnts]['EV1'])
+  FRs_E.append(dAssignedFR[tpnts]['EV1DE'])
+  FRs_NE.append(dAssignedFR[tpnts]['EV1DNE'])
+  FRs_N.append(dAssignedFR[tpnts]['EV1DN'])
+  FRs_NW.append(dAssignedFR[tpnts]['EV1DNW'])
+  FRs_W.append(dAssignedFR[tpnts]['EV1DW'])
+  FRs_SW.append(dAssignedFR[tpnts]['EV1DSW'])
+  FRs_S.append(dAssignedFR[tpnts]['EV1DS'])
+  FRs_SE.append(dAssignedFR[tpnts]['EV1DSE'])
+
+>>> np.unique(np.ceil(np.reshape(FRs_V1,(np.shape(FRs_V1)[0]*np.shape(FRs_V1)[1]))))
+array([  0., 150.])
+>>> np.unique(np.ceil(np.reshape(FRs_E,(np.shape(FRs_E)[0]*np.shape(FRs_E)[1]))))
+array([0.])
+>>> np.unique(np.ceil(np.reshape(FRs_NE,(np.shape(FRs_NE)[0]*np.shape(FRs_NE)[1]))))
+array([  0.,  55.,  67.,  69.,  71.,  75.,  76.,  77., 101., 108.])
+>>> np.unique(np.ceil(np.reshape(FRs_N,(np.shape(FRs_N)[0]*np.shape(FRs_N)[1]))))
+array([  0.,  56.,  79.,  82., 100., 104., 126., 142., 143., 148., 149.,
+       150.])
+>>> np.unique(np.ceil(np.reshape(FRs_NW,(np.shape(FRs_NW)[0]*np.shape(FRs_NW)[1]))))
+array([0.])
+>>> np.unique(np.ceil(np.reshape(FRs_W,(np.shape(FRs_W)[0]*np.shape(FRs_W)[1]))))
+array([0.])
+>>> np.unique(np.ceil(np.reshape(FRs_SW,(np.shape(FRs_SW)[0]*np.shape(FRs_SW)[1]))))
+array([  0.,  95., 112., 113., 114., 138., 142., 147., 148., 149., 150.])
+>>> np.unique(np.ceil(np.reshape(FRs_S,(np.shape(FRs_S)[0]*np.shape(FRs_S)[1]))))
+array([  0.,  61.,  80., 102., 103., 110., 116., 136., 140., 143., 144.,
+       146., 147., 150.])
+>>> np.unique(np.ceil(np.reshape(FRs_SE,(np.shape(FRs_SE)[0]*np.shape(FRs_SE)[1]))))
+array([  0.,  51.,  76.,  77.,  80.,  82., 117., 126., 128., 132., 133.,
+       149., 150.])
+
+>>> plt.imshow(np.multiply(50,dact['EV1DN'][530]))
+<matplotlib.image.AxesImage object at 0x12d7be588>
+>>> plt.colorbar()
+<matplotlib.colorbar.Colorbar object at 0x12d645cc0>
+>>> plt.title('dact[EV1DN][530]')
+Text(0.5, 1, 'dact[EV1DN][530]')
+
+-- saved as dactFR_EV1DN_tpnt530_20aug21_A5_local.png
+
+-- Need to play with 
+        "stimModDirW": 0.02,
+        "stimModInputW": 0.02,
+on cycle.
+
+-- 1. "stimModDirW": 0.02, "stimModInputW": 0.02 -- "20aug24_A0_cycle_" for 300 sec
+-- 2. "stimModDirW": 0.03, "stimModInputW": 0.03 -- "20aug24_A1_cycle_" for 300 sec
+-- 3. "stimModDirW": 0.01, "stimModInputW": 0.01 -- "20aug24_A2_cycle_" for 300 sec

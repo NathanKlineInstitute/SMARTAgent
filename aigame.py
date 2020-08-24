@@ -93,6 +93,7 @@ class AIGame:
       self.input_dim = int(np.sqrt(self.dInputs[self.InputPop]))
     else:  
       self.input_dim = int(np.sqrt(dconf['net']['allpops'][self.InputPop])) # input image XY plane width,height -- not used anywhere    
+    self.locationNeuronRate = dconf['net']['LocMaxRate']
     self.dirSensitiveNeuronDim = int(np.sqrt(dconf['net']['allpops']['EV1DE'])) # direction sensitive neuron XY plane width,height
     self.dirSensitiveNeuronRate = (dconf['net']['DirMinRate'], dconf['net']['DirMaxRate']) # min, max firing rate (Hz) for dir sensitive neurons
     self.FiringRateCutoff = dconf['net']['FiringRateCutoff']
@@ -132,11 +133,11 @@ class AIGame:
     if dconf['net']['useBinaryImage']:
       thresh = threshold_otsu(padded_Image)
       binary_Image = padded_Image > thresh
-      fr_Images = 50.0*binary_Image
+      fr_Images = self.locationNeuronRate*binary_Image
     else:
       padded_Image = padded_Image - np.amin(padded_Image)
       padded_Image = (255.0/np.amax(padded_Image))*padded_Image # this will make sure that padded_Image spans 0-255
-      fr_Images = 50/(1+np.exp((np.multiply(-1,padded_Image)+123)/10))
+      fr_Images = self.locationNeuronRate/(1+np.exp((np.multiply(-1,padded_Image)+123)/10))
       #fr_Images = np.subtract(fr_Images,np.min(fr_Images)) #baseline firing rate subtraction. Instead all excitatory neurons are firing at 5Hz.
       #print(np.amin(fr_Images),np.amax(fr_Images))
     self.dFiringRates[self.InputPop] = np.reshape(fr_Images,self.dInputs[self.InputPop]) #400 for 20*20, 900 for 30*30, etc.
@@ -148,11 +149,11 @@ class AIGame:
     if dconf['net']['useBinaryImage']:
       thresh = threshold_otsu(dsum_Images)
       binary_Image = dsum_Images > thresh
-      fr_Images = 50.0*binary_Image
+      fr_Images = self.locationNeuronRate*binary_Image
     else:
       dsum_Images = dsum_Images - np.amin(dsum_Images)
       dsum_Images = (255.0/np.amax(dsum_Images))*dsum_Images
-      fr_Images = 50/(1+np.exp((np.multiply(-1,dsum_Images)+123)/10))
+      fr_Images = self.locationNeuronRate/(1+np.exp((np.multiply(-1,dsum_Images)+123)/10))
       #fr_Images = np.subtract(fr_Images,np.min(fr_Images)) #baseline firing rate subtraction. Instead all excitatory neurons are firing at 5Hz.
       #print(np.amax(fr_Images))
     self.dFiringRates[self.InputPop] = np.reshape(fr_Images,dconf['net']['allpops'][self.InputPop]) #400 for 20*20, 900 for 30*30, etc.
