@@ -5867,3 +5867,92 @@ on cycle.
 -- 1. "stimModDirW": 0.02, "stimModInputW": 0.02 -- "20aug24_A0_cycle_" for 300 sec
 -- 2. "stimModDirW": 0.03, "stimModInputW": 0.03 -- "20aug24_A1_cycle_" for 300 sec
 -- 3. "stimModDirW": 0.01, "stimModInputW": 0.01 -- "20aug24_A2_cycle_" for 300 sec
+
+* 20aug25
+
+-- submitted all 3 jobs (listed above) on cycle today.
+-- told sam that i ran a sim using "stimModDirW": 0.05, "stimModInputW": 0.05 but terminated it because i observed that racket was not moving for a while and also the firing rates printed were 0.
+-- sam suggested i should look at the membrane potential to see if there was a depolarization block
+-- or if needed connections between preM and M to be adjusted.
+-- So i ran sim on my local machine "20aug25_A0_local_" for 30 sec
+
+python -i simdat.py backupcfg/20aug25_A0_local_sim.json
+
+-- analyzing and saving plots for sims on cycle.
+....
+python -i simdat.py backupcfg/20aug24_A0_cycle_sim.json
+plotPerf(actreward)..... and save the plot as 20aug24_A0_cycle_Perf.png
+
+....
+clf(); dobjpos = loadObjPos() ## 
+subplot(2,1,1); xlabel('Racket Y position'); hist(dobjpos['racket'][:,1])
+subplot(2,1,2); xlabel('Ball Y position'); hist(dobjpos['ball'][:,1])
+and save the plot as 20aug24_A0_cycle_RacketBallYposHist.png
+
+....
+plot(dobjpos['ball'][:,1],'b')
+plot(dobjpos['racket'][:,1],'r')
+legend(['ball','racket'])
+xlabel('tpnts')
+ylabel('Y-Pixel loc')
+and save the plot as 20aug24_A0_cycle_RacketBallYposFull.png and 20aug24_A0_cycle_RacketBallYposZoomed.png
+
+....
+ballX,ballY = dobjpos['ball'][:,0],dobjpos['ball'][:,1]
+racketX,racketY = dobjpos['racket'][:,0],dobjpos['racket'][:,1]
+tt = np.linspace(0,totalDur,len(dobjpos['ball']))
+pdpos = pd.DataFrame(np.array([tt, ballX, ballY, racketX, racketY]).T,columns=['time','ballX','ballY','racketX','racketY'])
+dout = getdistvstimecorr(pdpos,minN=2)
+didnt save... not sure what to make out of it.....
+....
+python -i simdat.py backupcfg/20aug24_A1_cycle_sim.json
+plotPerf(actreward)..... and save the plot as 20aug24_A1_cycle_Perf.png.... looks worst than ever.
+saved the position histogram-plots as 20aug24_A1_cycle_RacketBallYposFull.png and 20aug24_A1_cycle_RacketBallYposZoomed.png
+
+-- resuming "stimModDirW": 0.02, "stimModInputW": 0.02 -- "20aug24_A0r1_cycle_" for 3000 sec
+-- resuming "stimModDirW": 0.01, "stimModInputW": 0.01 -- "20aug24_A2r1_cycle_" for 3000 sec 
+
+-- start running sim for 3000 sec in "20aug25_A0_cycle_" with
+stimModDirW = 0.01
+stimModInputW = 0.05 
+DirMaxRate = 150
+LocMaxRate = 50
+... i am choosing these parameters because while running locally i saw good performance for these params..... lets see....
+
+
+* 20aug26
+Copied from Line around 4789
+-- revisting topological connectivity between preM and M neurons.
+
+1. Using topological connections between preM and M, only topologically relevant neurons will be involved in action generation.
+2. Lets say, the ball is at (10,10) and moving towards SE, the racket is at (10,19) moving North (i.e. UP):
+    -- The ball will activate neurons at location (10,10) in EV1 and EV1DSE.
+    -- The racket will activate neurons at location (10,19) in EV1 and EV1DN.
+    -- Goal is that when next time, these neurons are activated, Racket should move DOWN.
+    -- This could be acheieved 2 ways: 1. Strengthening connections between the activated neurons and EMDOWN or 2. Weakening connections between the activated neurons and EMUP.
+
+
+Lets say that we connect 3x3 neurons from EV1 and EV1DX to both EMUP and EMDOWN.
+so ....
+.... when (10,10) EV1 neuron gets activated (by ball), it will activate (10,10) neuron in both EMUP and EMDOWN.
+.... when (10,10) EV1DSE neuron gets activated (by ball), it will activate (10,10) neuron in both EMUP and EMDOWN.
+.... when (10,19) EV1 neuron gets activated (by racket), it will activate (10,19) neuron in both EMUP and EMDOWN.
+.... when (10,19) EV1DN neuron gets activated (by racket), it will activate (10,19) neuron in both EMUP and EMDOWN.
+
+if the weights are same for all connections, FR_EMUP should be equal to FR_EMDOWN and therefore the target will not move.
+since the target didnt move when it was supposed to move DOWN, a punishment will be produced, which will be delivered to connections between PreM and EMDOWN and PreM and EMUP.
+this will reduce the connection strength so that when next time, same neurons fire in preM, it will produce less firing rates but same in both.
+
+so the big questions are:
+1. Didnt we do something wrong here? By decreasing the synaptic strength of DOWN and UP inputs, we made sure that next time, the same sequence of inputs generate NO movement (STAY).
+.... what would have happened if the correct decision was made. e.g. if DOWN action was generated and we had reinfoced the synapses, that would have been a correct thing to do.
+.... what would have happened if the correct decision was to STAY? Could strengthen both synapses (to EMUP and EMDOWN). Again correct decision.
+.... what if we had 3 pops of EM, then we would have decreased the strength of EMSTAY and next time we would see EMUP==EMSTAY and both EMUP > EMSTAY and EMDOWN>EMSTAY 
+2. Is decrease in synaptic strength sufficient so that next time it could influence the firing rate of EM poulations? 
+
+
+NOTE: need to rerun sims "20aug24...." because those were run without padding neurons.
+
+running sim on falcor "20aug26_A0_falcor_" with neuron padding and
+        "stimModDirW": 0.02,
+        "stimModInputW": 0.02,

@@ -1,7 +1,13 @@
 {
     "env": {
         "name": "Pong-v0",
+        "frameskip":2,
         "savemp4": 0
+    },
+    "useSimulatedEnv": 0,
+    "simulatedEnvParams": {
+        "yball":80,
+        "yracket":40
     },
     "moves": {
         "UP": 4,
@@ -37,7 +43,7 @@
         "ResumeSimFromFile": "data/20aug11_B3_cycle_synWeights_final.pkl"
     },
     "sim": {
-        "duration": 300000,
+        "duration": 100000,
         "dt": 0.2,
         "verbose": 0,
         "recordStep": 0.6,
@@ -47,21 +53,28 @@
         "RLFakeUpRule": 0,
         "RLFakeDownRule": 0,
         "RLFakeStayRule": 0,
-        "name": "20aug24_A0_cycle_",
+        "name": "20aug26_A0_falcor_",
         "doquit": 0,
         "doplot": 1,
         "saveCellSecs": 0,
         "saveCellConns": 0,
         "targettedRL": 1,
+        "anticipatedRL": 0,
         "tstepPerAction": 20,
         "saveWeights": 1,
-        "saveAssignedFiringRates": 1
+        "saveAssignedFiringRates": 0
     },
     "architecturePreMtoM": {
         "useProbabilistic": 1,
         "useTopological": 0
     },
     "net": {
+        "ECellModel": "Mainen",
+        "ICellModel": "FS_BasketCell",
+        "EEGain": 1.0,
+        "EIGain": 1.0,
+        "IEGain": 1.0,
+        "IIGain": 1.0,
         "scale": 1,
 	"allpops": {
 	    "ER":0,
@@ -83,7 +96,26 @@
 	    "EMDOWN":100,
 	    "EMUP":100,
 	    "EMSTAY":0,
-	    "IM":50},	
+        "IM":50},
+        "alltopoldivcons":{
+            "IR":{"ER":5},
+            "EV1":{"ER":3},
+            "IV1":{"EV1":5,"ER":5},
+            "EV4":{"EV1":3},
+            "IV4":{"EV4":5,"EV1":5},
+            "EMT":{"EV4":3},
+            "IMT":{"EMT":5,"EV4":5}
+        },
+        "alltopolconvcons":{
+            "ER":{"IR":3,"EV1":3},
+            "EV1":{"IV1":3,"EV4":3},
+            "IV1":{"IV4":5},
+            "EV4":{"IV4":3,"EMT":3},
+            "IV4":{"IMT":5},
+            "EMT":{"IMT":3}
+        },
+        "useNeuronPad": 1,
+        "useBinaryImage": 1,	
 	"ETypes": ["ER","EV1","EV1DE","EV1DNE","EV1DN","EV1DNW","EV1DW","EV1DSW","EV1DS","EV1DSE","EV4","EMT","EMDOWN","EMUP","EMSTAY"],
 	"ITypes": ["IR","IV1","IV4","IMT","IM"],
 	"EMotorPops": ["EMDOWN", "EMUP", "EMSTAY"],
