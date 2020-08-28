@@ -5956,3 +5956,167 @@ NOTE: need to rerun sims "20aug24...." because those were run without padding ne
 running sim on falcor "20aug26_A0_falcor_" with neuron padding and
         "stimModDirW": 0.02,
         "stimModInputW": 0.02,
+
+
+running sim on falcor "20aug26_A1_falcor_" with neuron padding and
+        stimModDirW = 0.01
+        stimModInputW = 0.05 
+        DirMaxRate = 150
+        LocMaxRate = 50
+
+* 20aug27
+
+-- try running with topol connectivity between preM and pre instead of probabilistic.
+    "useNeuronPad": 0,
+    "architecturePreMtoM": {
+        "useProbabilistic": 0,
+        "useTopological": 1
+    },
+    "name": "20aug27_A0_local_",
+    "duration": 10000,
+
+updated in sim.py
+blist = connectLayerswithOverlapDiv(NBpreN=dnumc[prety],NBpostN=dnumc[poty],overlap_xdir = dtopoldivcons[prety][poty], padded_preneurons_xdir = dnumc_padx[prety], padded_postneurons_xdir = dnumc_padx[poty])
+
+
+-- doesnt work when have same pop size...... so write a new function for that
+
+adapted sim.json based on pop size.....
+
+if preM size is smaller that M size, list in "alltopoldivcons"
+ 
+        "alltopoldivcons":{
+            "IR":{"ER":5},
+            "EV1":{"ER":3},
+            "IV1":{"EV1":5,"ER":5},
+            "EV4":{"EV1":3,"EMDOWN":3,"EMUP":3,"EMSTAY":0},
+            "IV4":{"EV4":5,"EV1":5},
+            "EMT":{"EV4":3,"EMDOWN":3,"EMUP":3,"EMSTAY":0},
+            "IMT":{"EMT":5,"EV4":5}
+        },
+
+if preM size is larger or equal to M size, list in "alltopolconvcons"
+
+        "alltopolconvcons":{
+            "ER":{"IR":3,"EV1":3,"EMDOWN":3,"EMUP":3,"EMSTAY":0},
+            "EV1":{"IV1":3,"EV4":3,"EMDOWN":3,"EMUP":3,"EMSTAY":0},
+            "EV1DE":{"EMDOWN":3,"EMUP":3,"EMSTAY":0},
+            "EV1DNE":{"EMDOWN":3,"EMUP":3,"EMSTAY":0},
+            "EV1DN":{"EMDOWN":3,"EMUP":3,"EMSTAY":0},
+            "EV1DNW":{"EMDOWN":3,"EMUP":3,"EMSTAY":0},
+            "EV1DW":{"EMDOWN":3,"EMUP":3,"EMSTAY":0},
+            "EV1DSW":{"EMDOWN":3,"EMUP":3,"EMSTAY":0},
+            "EV1DS":{"EMDOWN":3,"EMUP":3,"EMSTAY":0},
+            "EV1DSE":{"EMDOWN":3,"EMUP":3,"EMSTAY":0},
+            "IV1":{"IV4":5},
+            "EV4":{"IV4":3,"EMT":3},
+            "IV4":{"IMT":5},
+            "EMT":{"IMT":3}
+        },
+
+-- tried without padding -- works fine.
+-- tryign with padding and there is a problem...
+Running with interval func  ...
+t= 20.0  U,D spikes: [0.0] [0.0]
+t= 20.0 proposed actions: [-1] , model actions: [1]
+t= 20.0  game rewards: [0]
+Traceback (most recent call last):
+  File "sim.py", line 1245, in <module>
+    sim.runSimWithIntervalFunc(tPerPlay,trainAgent) # has periodic callback to adjust STDP weights based on RL signal
+  File "/Users/anwarharoon/Documents/NKI-modeling/NetPyNe_projects/virtual_arm/netpyne/sim/run.py", line 142, in runSimWithIntervalFunc
+    func(h.t) # function to be called at intervals
+  File "sim.py", line 1150, in trainAgent
+    updateInputRates() # update firing rate of inputs to R population (based on image content)                
+  File "sim.py", line 931, in updateInputRates
+    if dFiringRates[pop][int(cell.gid-offset)]==0:
+IndexError: index 400 is out of bounds for axis 0 with size 400
+  
+try debugging.....
+print(pop,offset) in updateInputRates()
+
+* 20aug28
+
+check if setdminID works properly....
+because offset computed above is based on it.
+setdminID works fine.
+
+
+I figured out the problem is with dFiringRates initialized in AIGame....
+>>> sim.AIGame.dFiringRates['EV1'].shape
+(484,)
+>>> sim.AIGame.dFiringRates['EV1DE'].shape
+(400,)
+>>> sim.AIGame.dFiringRates['EV1DNE'].shape
+(400,)
+
+
+--Debugged initialization of dFiringRates in aigame.
+
+    if dconf['net']['useNeuronPad']:
+      for pop in self.dInputs.keys():
+        self.dFiringRates[pop] = np.zeros(self.dInputs[pop])
+
+-- Check rate assignments.
+
+-- Right now all padded neurons are assigned 1e12 firing rate Interval. This could be adapted based on neighboring pixels.
+
+  def updateDirSensitiveRatesWithPadding (self):
+    # update firing rate of dir sensitive neurons using dirs (2D array with motion direction at each coordinate)
+    if len(self.ldflow) < 1: return
+    dflow = self.ldflow[-1]
+    motiondir = dflow['ang'] # angles in degrees, but thresholded for significant motion; negative value means not used
+    dAngPeak = self.dAngPeak
+    dirSensitiveNeuronDim = self.dirSensitiveNeuronDim + self.dReceptiveField['EV1DE']-1
+    offset = int((self.dReceptiveField['EV1DE']-1)/2)
+    padded_motiondir = np.zeros(shape=(dirSensitiveNeuronDim,dirSensitiveNeuronDim))
+    padded_motiondir[offset:offset+motiondir.shape[0],offset:offset+motiondir.shape[1]]=motiondir
+    AngRFSigma2 = self.AngRFSigma2
+    MaxRate = self.dirSensitiveNeuronRate[1]
+    for pop in self.ldirpop: self.dFiringRates[pop] = self.dirSensitiveNeuronRate[0] * np.ones(shape=(dirSensitiveNeuronDim,dirSensitiveNeuronDim))
+    if self.EXPDir:
+      for y in range(padded_motiondir.shape[0]):
+        for x in range(padded_motiondir.shape[1]):
+          if padded_motiondir[y,x] >= 0.0: # make sure it's a valid angle
+            for pop in self.ldirpop:
+              fctr = np.exp(-1.0*(getangdiff(padded_motiondir[y][x],dAngPeak[pop])**2)/AngRFSigma2)
+              #print('updateDirRates',pop,x,y,fctr,dAngPeak[pop],padded_motiondir[y][x])
+              if MaxRate * fctr < self.FiringRateCutoff: fctr = 0
+              self.dFiringRates[pop][y,x] += MaxRate * fctr
+    else:
+      for y in range(padded_motiondir.shape[0]):
+        for x in range(padded_motiondir.shape[1]):
+          if padded_motiondir[y,x] >= 0.0: # make sure it's a valid angle
+            for pop in self.ldirpop:
+              if abs(getangdiff(padded_motiondir[y][x],dAngPeak[pop])) <= self.AngRFSigma:
+                self.dFiringRates[pop][y,x] = MaxRate
+              #print('updateDirRates',pop,x,y,fctr,dAngPeak[pop],padded_motiondir[y][x])
+    #print('padded_motiondir',padded_motiondir)
+    for pop in self.ldirpop:
+      self.dFiringRates[pop]=np.reshape(self.dFiringRates[pop],dirSensitiveNeuronDim**2)
+      #print(pop,np.amin(self.dFiringRates[pop]),np.amax(self.dFiringRates[pop]),np.mean(self.dFiringRates[pop]))
+      #print(pop,self.dFiringRates[pop])
+    if dconf['sim']['saveAssignedFiringRates']:
+      frcopy = deepcopy(self.dFiringRates)
+      self.dAllFiringRates.append(frcopy)
+
+-- in playGame.....
+
+    if dconf['net']['useNeuronPad']==1:
+      self.updateDirSensitiveRatesWithPadding()
+    else:
+      self.updateDirSensitiveRates() # update motion sensitive neuron input rates
+
+-- ran sim "20aug27_A0_local_simConfig.pkl" with "useNeuronPad": 1, and "useTopological": 1
+-- run sim "20aug28_A0_local_simConfig.pkl" with "useNeuronPad": 0, and "useTopological": 1
+-- run sim "20aug28_A1_local_simConfig.pkl" with "useNeuronPad": 0, and     
+"architecturePreMtoM": {
+        "useProbabilistic": 1,
+        "useTopological": 0
+    },
+-- run sim "20aug28_A2_local_simConfig.pkl" with "useNeuronPad": 1, and     
+"architecturePreMtoM": {
+        "useProbabilistic": 1,
+        "useTopological": 0
+    },
+-- all above sims work. So i think "useNeuronPad" and "useTopological" both are working without any problem.
+-- still need to use random weights between preM and M while using topological.

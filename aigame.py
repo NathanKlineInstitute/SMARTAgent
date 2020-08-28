@@ -74,13 +74,14 @@ class AIGame:
     if dconf['net']['allpops']['ER']>0: self.InputPop = 'ER'
     else: self.InputPop = 'EV1'    
     self.lratepop = [self.InputPop] # populations that we calculate rates for
+    for d in self.ldir: self.lratepop.append('EV1D'+d)
     self.dReceptiveField = OrderedDict({pop:np.amax(list(dconf['net']['alltopolconvcons'][pop].values())) for pop in self.lratepop})
     self.dInputs = OrderedDict({pop:int((np.sqrt(dconf['net']['allpops'][pop])+self.dReceptiveField[pop]-1)**2) for pop in self.lratepop})
-    for d in self.ldir: self.lratepop.append('EV1D'+d)
     self.dFVec = OrderedDict({pop:h.Vector() for pop in self.lratepop}) # NEURON Vectors for firing rate calculations
     self.dFiringRates = OrderedDict({pop:np.zeros(dconf['net']['allpops'][pop]) for pop in self.lratepop})# python objects for firing rate calculations
     if dconf['net']['useNeuronPad']:
-      self.dFiringRates[self.InputPop] = np.zeros(self.dInputs[self.InputPop])
+      for pop in self.dInputs.keys():
+        self.dFiringRates[pop] = np.zeros(self.dInputs[pop])
     self.dAngPeak = OrderedDict({'EV1DE': 0.0,'EV1DNE': 45.0, # receptive field peak angles for the direction selective populations
                                 'EV1DN': 90.0,'EV1DNW': 135.0,
                                 'EV1DW': 180.0,'EV1DSW': 225.0,
@@ -244,7 +245,46 @@ class AIGame:
     if dconf['sim']['saveAssignedFiringRates']:
       frcopy = deepcopy(self.dFiringRates)
       self.dAllFiringRates.append(frcopy)
-          
+
+  def updateDirSensitiveRatesWithPadding (self):
+    # update firing rate of dir sensitive neurons using dirs (2D array with motion direction at each coordinate)
+    if len(self.ldflow) < 1: return
+    dflow = self.ldflow[-1]
+    motiondir = dflow['ang'] # angles in degrees, but thresholded for significant motion; negative value means not used
+    dAngPeak = self.dAngPeak
+    dirSensitiveNeuronDim = self.dirSensitiveNeuronDim + self.dReceptiveField['EV1DE']-1
+    offset = int((self.dReceptiveField['EV1DE']-1)/2)
+    padded_motiondir = np.zeros(shape=(dirSensitiveNeuronDim,dirSensitiveNeuronDim))
+    padded_motiondir[offset:offset+motiondir.shape[0],offset:offset+motiondir.shape[1]]=motiondir
+    AngRFSigma2 = self.AngRFSigma2
+    MaxRate = self.dirSensitiveNeuronRate[1]
+    for pop in self.ldirpop: self.dFiringRates[pop] = self.dirSensitiveNeuronRate[0] * np.ones(shape=(dirSensitiveNeuronDim,dirSensitiveNeuronDim))
+    if self.EXPDir:
+      for y in range(padded_motiondir.shape[0]):
+        for x in range(padded_motiondir.shape[1]):
+          if padded_motiondir[y,x] >= 0.0: # make sure it's a valid angle
+            for pop in self.ldirpop:
+              fctr = np.exp(-1.0*(getangdiff(padded_motiondir[y][x],dAngPeak[pop])**2)/AngRFSigma2)
+              #print('updateDirRates',pop,x,y,fctr,dAngPeak[pop],padded_motiondir[y][x])
+              if MaxRate * fctr < self.FiringRateCutoff: fctr = 0
+              self.dFiringRates[pop][y,x] += MaxRate * fctr
+    else:
+      for y in range(padded_motiondir.shape[0]):
+        for x in range(padded_motiondir.shape[1]):
+          if padded_motiondir[y,x] >= 0.0: # make sure it's a valid angle
+            for pop in self.ldirpop:
+              if abs(getangdiff(padded_motiondir[y][x],dAngPeak[pop])) <= self.AngRFSigma:
+                self.dFiringRates[pop][y,x] = MaxRate
+              #print('updateDirRates',pop,x,y,fctr,dAngPeak[pop],padded_motiondir[y][x])
+    #print('padded_motiondir',padded_motiondir)
+    for pop in self.ldirpop:
+      self.dFiringRates[pop]=np.reshape(self.dFiringRates[pop],dirSensitiveNeuronDim**2)
+      #print(pop,np.amin(self.dFiringRates[pop]),np.amax(self.dFiringRates[pop]),np.mean(self.dFiringRates[pop]))
+      #print(pop,self.dFiringRates[pop])
+    if dconf['sim']['saveAssignedFiringRates']:
+      frcopy = deepcopy(self.dFiringRates)
+      self.dAllFiringRates.append(frcopy)
+       
   def findobj (self, img, xrng, yrng):
     # find an object's x, y position in the image (assumes bright object on dark background)
     subimg = img[yrng[0]:yrng[1],xrng[0]:xrng[1],:]
@@ -430,7 +470,10 @@ class AIGame:
       self.computeMotionFields(UseFull=dconf['DirectionDetectionAlgo']['UseFull']) # compute the motion fields
     elif dconf['DirectionDetectionAlgo']['CentroidTracker']:
       self.computeAllObjectsMotionDirections(UseFull=dconf['DirectionDetectionAlgo']['UseFull']) # compute the motion field using CetroidTracking
-    self.updateDirSensitiveRates() # update motion sensitive neuron input rates
+    if dconf['net']['useNeuronPad']==1:
+      self.updateDirSensitiveRatesWithPadding()
+    else:
+      self.updateDirSensitiveRates() # update motion sensitive neuron input rates
 
     if done: # done means that 1 episode of the game finished, so the environment needs to be reset. 
       epCount.append(self.countAll)

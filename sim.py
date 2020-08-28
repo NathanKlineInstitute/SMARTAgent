@@ -62,6 +62,7 @@ dnumc_padx = OrderedDict({ty:dconf['net']['allpops'][ty]*0 for ty in allpops}) #
 dtopoldivcons = dconf['net']['alltopoldivcons']
 dtopolconvcons = dconf['net']['alltopolconvcons']
 allpops_withconvtopology = list(dtopolconvcons.keys())
+allpops_withdivtopology = list(dtopoldivcons.keys())
 # below is the code for updating neuronal pop size to include padding. 
 if dconf['net']['useNeuronPad']:
   for pop in allpops_withconvtopology:
@@ -69,6 +70,18 @@ if dconf['net']['useNeuronPad']:
     for postpop in list(dtopolconvcons[pop].keys()):
       if dnumc[postpop]>0:
         receptive_fields.append(dtopolconvcons[pop][postpop])
+    if len(receptive_fields)>0:
+      max_receptive_field = np.amax(receptive_fields)
+    else:
+      max_receptive_field = 0
+    if dnumc[pop]>0 and max_receptive_field>0:
+      dnumc[pop] = int((np.sqrt(dnumc[pop])+max_receptive_field-1)**2)
+      dnumc_padx[pop] = max_receptive_field-1
+  for pop in allpops_withdivtopology:
+    receptive_fields = []
+    for postpop in list(dtopoldivcons[pop].keys()):
+      if dnumc[postpop]>0:
+        receptive_fields.append(dtopoldivcons[pop][postpop])
     if len(receptive_fields)>0:
       max_receptive_field = np.amax(receptive_fields)
     else:
@@ -621,7 +634,10 @@ if dconf['architecturePreMtoM']['useTopological']:
         div = dconf['net']['alltopoldivcons'][prety][poty]
       except:
         div = 3
-      blist = connectLayerswithOverlapDiv(NBpreN=dnumc[prety],NBpostN=dnumc[poty],overlap_xdir=div)
+      if dconf['net']['allpops'][prety]==dconf['net']['allpops'][poty] or dconf['net']['allpops'][prety]>dconf['net']['allpops'][poty]: # BE CAREFUL. THERE IS ALWAYS A CHANCE TO USE dnumc[prety] nad dnumc[poty] that produces inaccuracies. works fine if used in multiples (400->100; 100->400; 100->100).
+        blist = connectLayerswithOverlap(NBpreN=dnumc[prety],NBpostN=dnumc[poty],overlap_xdir = dtopolconvcons[prety][poty], padded_preneurons_xdir = dnumc_padx[prety], padded_postneurons_xdir = dnumc_padx[poty])
+      elif dconf[prety]<dconf[poty]:
+        blist = connectLayerswithOverlapDiv(NBpreN=dnumc[prety],NBpostN=dnumc[poty],overlap_xdir = dtopoldivcons[prety][poty], padded_preneurons_xdir = dnumc_padx[prety], padded_postneurons_xdir = dnumc_padx[poty])
       for strty,synmech,weight in zip(['','n'],['AMPA', 'NMDA'],[dconf['net']['EEMWghtAM']*cfg.EEGain, dconf['net']['EEMWghtNM']*cfg.EEGain]):
         k = strty+prety+'->'+strty+poty
         netParams.connParams[k] = {
