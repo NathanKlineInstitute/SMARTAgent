@@ -210,10 +210,8 @@ if 'AMPAI' in dconf['RL']: dSTDPparamsRL['AMPAI'] = dconf['RL']['AMPAI']
 # these are the image-based inputs provided to the R (retinal) cells
 netParams.stimSourceParams['stimMod'] = {'type': 'NetStim', 'rate': 'variable', 'noise': 0}
 
-stimModInputW = 0.05
-if 'stimModInputW' in dconf['net']: stimModInputW = dconf['net']['stimModInputW']
-stimModDirW = 0.01  # stimModDirW = 0.01
-if 'stimModDirW' in dconf['net']: stimModDirW = dconf['net']['stimModDirW']
+stimModInputW = dconf['net']['stimModInputW']
+stimModDirW = dconf['net']['stimModDirW']
 
 if dnumc['ER']>0:
   netParams.stimTargetParams['stimMod->R'] = {'source': 'stimMod',

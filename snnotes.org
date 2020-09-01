@@ -16638,3 +16638,6 @@ savefig('gif/20aug14_test_viewinput_c0.png')
 
 motion detection output looks a lot worse ...
 
+* 20aug31
+** setup again
+

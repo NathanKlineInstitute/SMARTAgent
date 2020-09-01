@@ -37,7 +37,7 @@
         "ResumeSimFromFile": "data/20aug11_B3_cycle_synWeights_final.pkl"
     },
     "sim": {
-        "duration": 10000,
+        "duration": 5000,
         "dt": 0.2,
         "verbose": 0,
         "recordStep": 0.6,
@@ -47,19 +47,19 @@
         "RLFakeUpRule": 0,
         "RLFakeDownRule": 0,
         "RLFakeStayRule": 0,
-        "name": "20aug14_C0_cycle_",
+        "name": "20aug31_A0_cycle_",
         "doquit": 0,
         "doplot": 1,
         "saveCellSecs": 0,
         "saveCellConns": 0,
         "targettedRL": 1,
-        "tstepPerAction": 20,
+        "tstepPerAction": 50,
         "saveWeights": 1,
         "saveAssignedFiringRates": 0
     },
     "architecturePreMtoM": {
-        "useProbabilistic": 1,
-        "useTopological": 0
+        "useProbabilistic": 0,
+        "useTopological": 1
     },
     "net": {
         "scale": 1,
@@ -91,7 +91,11 @@
         "AngRFSigma": 22.5,
 	"EXPDir": 1,
         "DirMinRate": 0.0,
-        "DirMaxRate": 50.0,
+        "DirMaxRate": 150.0,
+        "LocMaxRate": 150.0,
+        "FiringRateCutoff" : 50.0,
+        "stimModDirW": 0.01,
+        "stimModInputW": 0.01,
         "EEMWghtAM": 5e-05,
         "EEMWghtNM": 5e-06,
         "EEPreMWghtAM": 8e-05,
