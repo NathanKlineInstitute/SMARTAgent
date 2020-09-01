@@ -74,7 +74,7 @@ class AIGame:
     if dconf['net']['allpops']['ER']>0: self.InputPop = 'ER'
     else: self.InputPop = 'EV1'    
     self.lratepop = [self.InputPop] # populations that we calculate rates for
-    for d in self.ldir: self.lratepop.append('EV1D'+d)
+    for pop in self.ldirpop: self.lratepop.append(pop)
     self.dReceptiveField = OrderedDict({pop:np.amax(list(dconf['net']['alltopolconvcons'][pop].values())) for pop in self.lratepop})
     self.dInputs = OrderedDict({pop:int((np.sqrt(dconf['net']['allpops'][pop])+self.dReceptiveField[pop]-1)**2) for pop in self.lratepop})
     self.dFVec = OrderedDict({pop:h.Vector() for pop in self.lratepop}) # NEURON Vectors for firing rate calculations

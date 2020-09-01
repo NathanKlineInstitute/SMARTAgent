@@ -132,10 +132,8 @@ simConfig.analysis['plotRaster'] = {'popRates':'overlay','showFig':dconf['sim'][
 #simConfig.analysis['plot2Dnet'] = True 
 #simConfig.analysis['plotConn'] = True           # plot connectivity matrix
 
-ECellModel = 'Mainen'
-if 'ECellModel' in dconf['net']: ECellModel = dconf['net']['ECellModel']
-ICellModel = 'FS_BasketCell'
-if 'ICellModel' in dconf['net']: ICellModel = dconf['net']['ICellModel']
+ECellModel = dconf['net']['ECellModel']
+ICellModel = dconf['net']['ICellModel']
 
 #Population parameters
 for ty in allpops:
@@ -156,7 +154,9 @@ def makeECellModel (ECellModel):
     RScellRule = {'conds': {'cellType': ETypes, 'cellModel': 'IzhiRS'}, 'secs': {}}
     RScellRule['secs']['soma'] = {'geom': {}, 'pointps':{}}  #  soma
     RScellRule['secs']['soma']['geom'] = {'diam': 10, 'L': 10, 'cm': 31.831}
-    RScellRule['secs']['soma']['pointps']['Izhi'] = {'mod':'Izhi2007b', 'C':1, 'k':0.7, 'vr':-60, 'vt':-40, 'vpeak':35, 'a':0.03, 'b':-2, 'c':-50, 'd':100, 'celltype':1}
+    RScellRule['secs']['soma']['pointps']['Izhi'] = {
+      'mod':'Izhi2007b', 'C':1, 'k':0.7, 'vr':-60, 'vt':-40, 'vpeak':35, 'a':0.03, 'b':-2, 'c':-50, 'd':100, 'celltype':1
+    }
     netParams.cellParams['IzhiRS'] = RScellRule  # add dict to list of cell properties
   elif ECellModel == 'IntFire4':
     EExcitSec = 'soma' # section where excitatory synapses placed
@@ -179,7 +179,9 @@ def makeICellModel (ICellModel):
     FScellRule = {'conds': {'cellType': ITypes, 'cellModel': 'IzhiFS'}, 'secs': {}}
     FScellRule['secs']['soma'] = {'geom': {}, 'pointps':{}}  #  soma
     FScellRule['secs']['soma']['geom'] = {'diam': 10, 'L': 10, 'cm': 31.831}
-    FScellRule['secs']['soma']['pointps']['Izhi'] = {'mod':'Izhi2007b', 'C':0.2, 'k':1.0, 'vr':-55, 'vt':-40, 'vpeak':25, 'a':0.2, 'b':-2, 'c':-45, 'd':-55, 'celltype':5}
+    FScellRule['secs']['soma']['pointps']['Izhi'] = {
+      'mod':'Izhi2007b', 'C':0.2, 'k':1.0, 'vr':-55, 'vt':-40, 'vpeak':25, 'a':0.2, 'b':-2, 'c':-45, 'd':-55, 'celltype':5
+    }
     netParams.cellParams['IzhiFS'] = FScellRule  # add dict to list of cell properties
   elif ICellModel == 'IntFire4':
     simConfig.recordTraces = {'V_soma':{'var':'m'}}  # Dict with traces to record
@@ -200,7 +202,7 @@ netParams.synMechParams['GABA'] = {'mod': 'Exp2Syn', 'tau1': 0.07, 'tau2': 9.1, 
 
 #wmin should be set to the initial/baseline weight of the connection.
 STDPparams = {'hebbwt': 0.0001, 'antiwt':-0.00001, 'wbase': 0.0012, 'wmax': 50, 'RLon': 0 , 'RLhebbwt': 0.001, 'RLantiwt': -0.000,
-        'tauhebb': 10, 'RLwindhebb': 50, 'useRLexp': 0, 'softthresh': 0, 'verbose':0}
+              'tauhebb': 10, 'RLwindhebb': 50, 'useRLexp': 0, 'softthresh': 0, 'verbose':0}
 
 
 dSTDPparamsRL = {} # STDP-RL parameters for AMPA,NMDA synapses; generally uses shorter/longer eligibility traces
@@ -210,32 +212,29 @@ if 'AMPAI' in dconf['RL']: dSTDPparamsRL['AMPAI'] = dconf['RL']['AMPAI']
 # these are the image-based inputs provided to the R (retinal) cells
 netParams.stimSourceParams['stimMod'] = {'type': 'NetStim', 'rate': 'variable', 'noise': 0}
 
-stimModInputW = 0.05
-if 'stimModInputW' in dconf['net']: stimModInputW = dconf['net']['stimModInputW']
-stimModDirW = 0.01  # stimModDirW = 0.01
-if 'stimModDirW' in dconf['net']: stimModDirW = dconf['net']['stimModDirW']
+stimModInputW = dconf['net']['stimModInputW']
+stimModDirW = dconf['net']['stimModDirW']
 
-if dnumc['ER']>0:
-  netParams.stimTargetParams['stimMod->R'] = {'source': 'stimMod',
-          'conds': {'pop': 'ER'},
-          'convergence': 1,
-          'weight': stimModInputW,
-          'delay': 1,
-          'synMech': 'AMPA'}
-else:
-  netParams.stimTargetParams['stimMod->V1'] = {'source': 'stimMod',
-          'conds': {'pop': 'EV1'},
-          'convergence': 1,
-          'weight': stimModInputW,
-          'delay': 1,
-          'synMech': 'AMPA'}
-  
-netParams.stimTargetParams['stimMod->DirSelInput'] = {'source': 'stimMod',
-        'conds': {'pop': ['EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE']},
-        'convergence': 1,
-        'weight': stimModDirW,
-        'delay': 1,
-        'synMech': 'AMPA'}
+inputPop = 'EV1' # which population gets the direct visual inputs (pixels)
+if dnumc['ER']>0: inputPop = 'ER'
+netParams.stimTargetParams['stimMod->'+inputPop] = {
+  'source': 'stimMod',
+  'conds': {'pop': inputPop},
+  'convergence': 1,
+  'weight': stimModInputW,
+  'delay': 1,
+  'synMech': 'AMPA'
+}
+
+for pop in ['EV1D'+Dir for Dir in ['E','NE','N', 'NW','W','SW','S','SE']]:
+  netParams.stimTargetParams['stimMod->'+pop] = {
+    'source': 'stimMod',
+    'conds': {'pop': pop},
+    'convergence': 1,
+    'weight': stimModDirW,
+    'delay': 1,
+    'synMech': 'AMPA'
+  }
 
 #background input to inhibitory neurons to increase their firing rate
 
@@ -244,7 +243,9 @@ netParams.stimTargetParams['stimMod->DirSelInput'] = {'source': 'stimMod',
 """ 
 # weights are currently at 0 so do not need to simulate them
 netParams.stimSourceParams['ebkg'] = {'type': 'NetStim', 'rate': 5, 'noise': 1.0}
-netParams.stimTargetParams['ebkg->all'] = {'source': 'ebkg', 'conds': {'cellType': ['EV1','EV4','EMT']}, 'weight': 0.0, 'delay': 'max(1, normal(5,2))', 'synMech': 'AMPA'}
+netParams.stimTargetParams['ebkg->all'] = {
+'source': 'ebkg', 'conds': {'cellType': ['EV1','EV4','EMT']}, 'weight': 0.0, 'delay': 'max(1, normal(5,2))', 'synMech': 'AMPA'
+}
 
 netParams.stimSourceParams['MLbkg'] = {'type': 'NetStim', 'rate': 5, 'noise': 1.0}
 netParams.stimTargetParams['MLbkg->all'] = {'source': 'MLbkg', 'conds': {'cellType': ['EMDOWN']}, 'weight': 0.0, 'delay': 1, 'synMech': 'AMPA'}
@@ -253,14 +254,18 @@ netParams.stimSourceParams['MRbkg'] = {'type': 'NetStim', 'rate': 5, 'noise': 1.
 netParams.stimTargetParams['MRbkg->all'] = {'source': 'MRbkg', 'conds': {'cellType': ['EMUP']}, 'weight': 0.0, 'delay': 1, 'synMech': 'AMPA'}
 
 netParams.stimSourceParams['bkg'] = {'type': 'NetStim', 'rate': 20, 'noise': 1.0}
-netParams.stimTargetParams['bkg->all'] = {'source': 'bkg', 'conds': {'cellType': ['IR','IV1','IV4','IMT']}, 'weight': 0.0, 'delay': 'max(1, normal(5,2))', 'synMech': 'AMPA'}
+netParams.stimTargetParams['bkg->all'] = {
+'source': 'bkg', 'conds': {'cellType': ['IR','IV1','IV4','IMT']}, 'weight': 0.0, 'delay': 'max(1, normal(5,2))', 'synMech': 'AMPA'
+}
 """
-if "Noise" in dconf:
-  for ty,sy in zip(["E","I"],["AMPA","GABA"]):
-    Weight,Rate = dconf["Noise"][ty]["Weight"],dconf["Noise"][ty]["Rate"]
-    if Weight > 0.0 and Rate > 0.0:
-      netParams.stimSourceParams[ty+'Mbkg'] = {'type': 'NetStim', 'rate': Rate, 'noise': 1.0}
-      netParams.stimTargetParams[ty+'Mbkg->all'] = {'source': ty+'Mbkg', 'conds': {'cellType': EMotorPops}, 'weight': Weight, 'delay': 'max(1, normal(5,2))', 'synMech': sy}
+# setup noise inputs
+for ty,sy in zip(["E","I"],["AMPA","GABA"]):
+  Weight,Rate = dconf["Noise"][ty]["Weight"],dconf["Noise"][ty]["Rate"]
+  if Weight > 0.0 and Rate > 0.0: # only create the netstims if rate,weight > 0
+    netParams.stimSourceParams[ty+'Mbkg'] = {'type': 'NetStim', 'rate': Rate, 'noise': 1.0}
+    netParams.stimTargetParams[ty+'Mbkg->all'] = {
+      'source': ty+'Mbkg', 'conds': {'cellType': EMotorPops}, 'weight': Weight, 'delay': 'max(1, normal(5,2))', 'synMech': sy
+    }
       
 ######################################################################################
 
@@ -312,14 +317,10 @@ blistIMTtoEV4 = connectLayerswithOverlapDiv(NBpreN = dnumc['IMT'], NBpostN = dnu
 
 # synaptic weight gain (based on E, I types)
 cfg = simConfig
-cfg.EEGain = 1.0  # E to E scaling factor
-cfg.EIGain = 1.0 # E to I scaling factor
-cfg.IEGain = 1.0 # I to E scaling factor
-cfg.IIGain = 1.0  # I to I scaling factor
-if 'EEGain' in dconf['net']: cfg.EEGain = dconf['net']['EEGain']
-if 'EIGain' in dconf['net']: cfg.EIGain = dconf['net']['EIGain']
-if 'IEGain' in dconf['net']: cfg.IEGain = dconf['net']['IEGain']
-if 'IIGain' in dconf['net']: cfg.IIGain = dconf['net']['IIGain']
+cfg.EEGain = dconf['net']['EEGain'] # E to E scaling factor
+cfg.EIGain = dconf['net']['EIGain'] # E to I scaling factor
+cfg.IEGain = dconf['net']['IEGain'] # I to E scaling factor
+cfg.IIGain = dconf['net']['IIGain'] # I to I scaling factor
 
 ### from https://www.neuron.yale.edu/phpBB/viewtopic.php?f=45&t=3770&p=16227&hilit=memory#p16122
 cfg.saveCellSecs = bool(dconf['sim']['saveCellSecs']) # if False removes all data on cell sections prior to gathering from nodes
@@ -327,10 +328,7 @@ cfg.saveCellConns = bool(dconf['sim']['saveCellConns']) # if False removes all d
 ###
 
 # weight variance -- check if need to vary the initial weights (note, they're over-written if resumeSim==1)
-if 'weightVar' in dconf['net']:
-  cfg.weightVar = dconf['net']['weightVar']
-else:
-  cfg.weightVar = 0.
+cfg.weightVar = dconf['net']['weightVar']
 
 def getInitWeight (weight):
   """get initial weight for a connection
@@ -345,8 +343,7 @@ def getInitWeight (weight):
 
 #Local excitation
 #E to E recurrent connectivity in premotor areas
-EEPreMProb = 0.0 # default - 0
-if "EEPreMProb" in dconf['net']: EEPreMProb = dconf['net']['EEPreMProb']
+EEPreMProb = dconf['net']['EEPreMProb']
 if EEPreMProb > 0.0:
   for epop in EPreMPops:
     if dnumc[epop] <= 0: continue # skip rule setup for empty population
@@ -630,14 +627,19 @@ if dconf['architecturePreMtoM']['useTopological']:
   for prety in EPreMPops:
     if dnumc[prety] <= 0: continue
     for poty in EMotorPops:
+      if dnumc[poty] <= 0: continue
       try:
         div = dconf['net']['alltopoldivcons'][prety][poty]
       except:
         div = 3
-      if dconf['net']['allpops'][prety]==dconf['net']['allpops'][poty] or dconf['net']['allpops'][prety]>dconf['net']['allpops'][poty]: # BE CAREFUL. THERE IS ALWAYS A CHANCE TO USE dnumc[prety] nad dnumc[poty] that produces inaccuracies. works fine if used in multiples (400->100; 100->400; 100->100).
-        blist = connectLayerswithOverlap(NBpreN=dnumc[prety],NBpostN=dnumc[poty],overlap_xdir = dtopolconvcons[prety][poty], padded_preneurons_xdir = dnumc_padx[prety], padded_postneurons_xdir = dnumc_padx[poty])
+      # BE CAREFUL. THERE IS ALWAYS A CHANCE TO USE dnumc[prety] nad dnumc[poty] that produces inaccuracies.
+      # works fine if used in multiples (400->100; 100->400; 100->100).        
+      if dconf['net']['allpops'][prety]==dconf['net']['allpops'][poty] or dconf['net']['allpops'][prety]>dconf['net']['allpops'][poty]: 
+        blist = connectLayerswithOverlap(NBpreN=dnumc[prety],NBpostN=dnumc[poty],overlap_xdir = dtopolconvcons[prety][poty], \
+                                         padded_preneurons_xdir = dnumc_padx[prety], padded_postneurons_xdir = dnumc_padx[poty])
       elif dconf[prety]<dconf[poty]:
-        blist = connectLayerswithOverlapDiv(NBpreN=dnumc[prety],NBpostN=dnumc[poty],overlap_xdir = dtopoldivcons[prety][poty], padded_preneurons_xdir = dnumc_padx[prety], padded_postneurons_xdir = dnumc_padx[poty])
+        blist = connectLayerswithOverlapDiv(NBpreN=dnumc[prety],NBpostN=dnumc[poty],overlap_xdir = dtopoldivcons[prety][poty], \
+                                            padded_preneurons_xdir = dnumc_padx[prety], padded_postneurons_xdir = dnumc_padx[poty])
       for strty,synmech,weight in zip(['','n'],['AMPA', 'NMDA'],[dconf['net']['EEMWghtAM']*cfg.EEGain, dconf['net']['EEMWghtNM']*cfg.EEGain]):
         k = strty+prety+'->'+strty+poty
         netParams.connParams[k] = {
@@ -655,9 +657,9 @@ elif dconf['architecturePreMtoM']['useProbabilistic']:
   # Add connections from lower and higher visual areas to motor cortex and direct connections between premotor to motor areas
   for prety in EPreMPops:
     if dnumc[prety] <= 0: continue
-    EEMProb = 0.1 # default - feedforward connectivity
-    if "EEMProb" in dconf['net']: EEMProb = dconf['net']['EEMProb']
+    EEMProb = dconf['net']['EEMProb'] # feedforward connectivity
     for poty in EMotorPops:
+      if dnumc[poty] <= 0: continue
       for strty,synmech,weight in zip(['','n'],['AMPA', 'NMDA'],[dconf['net']['EEMWghtAM']*cfg.EEGain, dconf['net']['EEMWghtNM']*cfg.EEGain]):
         k = strty+prety+'->'+strty+poty
         netParams.connParams[k] = {
@@ -673,8 +675,7 @@ elif dconf['architecturePreMtoM']['useProbabilistic']:
           netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL[synmech]}
 
 # add recurrent plastic connectivity within EM populations
-EEMRecProb = 0.0 # default
-if "EEMRecProb" in dconf['net']: EEMRecProb = dconf['net']['EEMRecProb']
+EEMRecProb = dconf['net']['EEMRecProb']
 if EEMRecProb > 0.0:
   for prety in EMotorPops:
     for poty in EMotorPops:
@@ -694,8 +695,7 @@ if EEMRecProb > 0.0:
             netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL[synmech]}  
 
 # add feedback plastic connectivity from EM populations to premotor/visual populations
-EEMFeedbackProb = 0.0 # default
-if "EEMFeedbackProb" in dconf['net']: EEMFeedbackProb = dconf['net']['EEMFeedbackProb']
+EEMFeedbackProb = dconf['net']['EEMFeedbackProb']
 if EEMFeedbackProb > 0.0:
   for prety in EMotorPops:
     for poty in EPreMPops:
@@ -918,7 +918,7 @@ def updateInputRates ():
       dFiringRates[pop] = vec.to_python()
       if dconf['verbose'] > 1:
         print(sim.rank,'received firing rates:',np.where(dFiringRates[pop]==np.amax(dFiringRates[pop])),np.amax(dFiringRates[pop]))          
-  # update input firing rates for stimuli to R and direction sensitive cells
+  # update input firing rates for stimuli to ER,EV1 and direction sensitive cells
   for pop in lratepop:
     lCell = [c for c in sim.net.cells if c.gid in sim.net.pops[pop].cellGids] # this is the set of cells
     offset = sim.simData['dminID'][pop]
@@ -1241,7 +1241,7 @@ if dnumc['ER']>0:
 else:
   setdminID(sim, ['EV1', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW', 'EV1DSW', 'EV1DS', 'EV1DSE'])
 tPerPlay = tstepPerAction*dconf['actionsPerPlay']
-InitializeInputRates ()
+InitializeInputRates()
 sim.runSimWithIntervalFunc(tPerPlay,trainAgent) # has periodic callback to adjust STDP weights based on RL signal
 if sim.rank==0 and fid4 is not None: fid4.close()
 sim.gatherData() # gather data from different nodes

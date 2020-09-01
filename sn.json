@@ -25,10 +25,10 @@
     "followOnlyTowards": 1,
     "useRacketPredictedPos": 1,
     "DirectionDetectionAlgo": {
-        "CentroidTracker": 0,
-        "OpticFlow": 1,
+        "CentroidTracker": 1,
+        "OpticFlow": 0,
         "FlowWidth": 1,
-        "UseFull": 0
+        "UseFull": 1
     },
     "verbose": 0,
     "stayStepLim": 0,
@@ -37,7 +37,7 @@
         "ResumeSimFromFile": "data/20aug11_B3_cycle_synWeights_final.pkl"
     },
     "sim": {
-        "duration": 10000,
+        "duration": 5000,
         "dt": 0.2,
         "verbose": 0,
         "recordStep": 0.6,
@@ -47,19 +47,19 @@
         "RLFakeUpRule": 0,
         "RLFakeDownRule": 0,
         "RLFakeStayRule": 0,
-        "name": "20aug14_C0_cycle_",
+        "name": "20sep1_A0_cycle_",
         "doquit": 0,
         "doplot": 1,
         "saveCellSecs": 0,
         "saveCellConns": 0,
         "targettedRL": 1,
-        "tstepPerAction": 20,
-        "saveWeights": 1,
+        "tstepPerAction": 50,
+        "saveWeights": 0,
         "saveAssignedFiringRates": 0
     },
     "architecturePreMtoM": {
-        "useProbabilistic": 1,
-        "useTopological": 0
+        "useProbabilistic": 0,
+        "useTopological": 1
     },
     "net": {
         "scale": 1,
@@ -90,8 +90,39 @@
 	"EPreMPops": ["EV1","EV1DE","EV1DNE","EV1DN","EV1DNW","EV1DW","EV1DSW","EV1DS","EV1DSE","EV4","EMT"],
         "AngRFSigma": 22.5,
 	"EXPDir": 1,
+        "alltopoldivcons":{
+            "IR":{"ER":5},
+            "EV1":{"ER":3},
+            "IV1":{"EV1":5,"ER":5},
+            "EV4":{"EV1":3,"EMDOWN":3,"EMUP":3,"EMSTAY":3},
+            "IV4":{"EV4":5,"EV1":5},
+            "EMT":{"EV4":3,"EMDOWN":3,"EMUP":3,"EMSTAY":3},
+            "IMT":{"EMT":5,"EV4":5}
+        },
+        "alltopolconvcons":{
+            "ER":{"IR":3,"EV1":3,"EMDOWN":3,"EMUP":3,"EMSTAY":3},
+            "EV1":{"IV1":3,"EV4":3,"EMDOWN":3,"EMUP":3,"EMSTAY":3},
+            "EV1DE":{"EMDOWN":3,"EMUP":3,"EMSTAY":3},
+            "EV1DNE":{"EMDOWN":3,"EMUP":3,"EMSTAY":3},
+            "EV1DN":{"EMDOWN":3,"EMUP":3,"EMSTAY":3},
+            "EV1DNW":{"EMDOWN":3,"EMUP":3,"EMSTAY":3},
+            "EV1DW":{"EMDOWN":3,"EMUP":3,"EMSTAY":3},
+            "EV1DSW":{"EMDOWN":3,"EMUP":3,"EMSTAY":3},
+            "EV1DS":{"EMDOWN":3,"EMUP":3,"EMSTAY":3},
+            "EV1DSE":{"EMDOWN":3,"EMUP":3,"EMSTAY":3},
+            "IV1":{"IV4":5},
+            "EV4":{"IV4":3,"EMT":3},
+            "IV4":{"IMT":5},
+            "EMT":{"IMT":3}
+        },	
+	"useBinaryImage": 1,
+	"useNeuronPad": 0,
         "DirMinRate": 0.0,
-        "DirMaxRate": 50.0,
+        "DirMaxRate": 150.0,
+        "LocMaxRate": 150.0,
+        "FiringRateCutoff" : 50.0,
+        "stimModDirW": 0.02,
+        "stimModInputW": 0.02,
         "EEMWghtAM": 5e-05,
         "EEMWghtNM": 5e-06,
         "EEPreMWghtAM": 8e-05,
