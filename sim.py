@@ -132,10 +132,8 @@ simConfig.analysis['plotRaster'] = {'popRates':'overlay','showFig':dconf['sim'][
 #simConfig.analysis['plot2Dnet'] = True 
 #simConfig.analysis['plotConn'] = True           # plot connectivity matrix
 
-ECellModel = 'Mainen'
-if 'ECellModel' in dconf['net']: ECellModel = dconf['net']['ECellModel']
-ICellModel = 'FS_BasketCell'
-if 'ICellModel' in dconf['net']: ICellModel = dconf['net']['ICellModel']
+ECellModel = dconf['net']['ECellModel']
+ICellModel = dconf['net']['ICellModel']
 
 #Population parameters
 for ty in allpops:
@@ -156,7 +154,9 @@ def makeECellModel (ECellModel):
     RScellRule = {'conds': {'cellType': ETypes, 'cellModel': 'IzhiRS'}, 'secs': {}}
     RScellRule['secs']['soma'] = {'geom': {}, 'pointps':{}}  #  soma
     RScellRule['secs']['soma']['geom'] = {'diam': 10, 'L': 10, 'cm': 31.831}
-    RScellRule['secs']['soma']['pointps']['Izhi'] = {'mod':'Izhi2007b', 'C':1, 'k':0.7, 'vr':-60, 'vt':-40, 'vpeak':35, 'a':0.03, 'b':-2, 'c':-50, 'd':100, 'celltype':1}
+    RScellRule['secs']['soma']['pointps']['Izhi'] = {
+      'mod':'Izhi2007b', 'C':1, 'k':0.7, 'vr':-60, 'vt':-40, 'vpeak':35, 'a':0.03, 'b':-2, 'c':-50, 'd':100, 'celltype':1
+    }
     netParams.cellParams['IzhiRS'] = RScellRule  # add dict to list of cell properties
   elif ECellModel == 'IntFire4':
     EExcitSec = 'soma' # section where excitatory synapses placed
@@ -179,7 +179,9 @@ def makeICellModel (ICellModel):
     FScellRule = {'conds': {'cellType': ITypes, 'cellModel': 'IzhiFS'}, 'secs': {}}
     FScellRule['secs']['soma'] = {'geom': {}, 'pointps':{}}  #  soma
     FScellRule['secs']['soma']['geom'] = {'diam': 10, 'L': 10, 'cm': 31.831}
-    FScellRule['secs']['soma']['pointps']['Izhi'] = {'mod':'Izhi2007b', 'C':0.2, 'k':1.0, 'vr':-55, 'vt':-40, 'vpeak':25, 'a':0.2, 'b':-2, 'c':-45, 'd':-55, 'celltype':5}
+    FScellRule['secs']['soma']['pointps']['Izhi'] = {
+      'mod':'Izhi2007b', 'C':0.2, 'k':1.0, 'vr':-55, 'vt':-40, 'vpeak':25, 'a':0.2, 'b':-2, 'c':-45, 'd':-55, 'celltype':5
+    }
     netParams.cellParams['IzhiFS'] = FScellRule  # add dict to list of cell properties
   elif ICellModel == 'IntFire4':
     simConfig.recordTraces = {'V_soma':{'var':'m'}}  # Dict with traces to record
@@ -200,7 +202,7 @@ netParams.synMechParams['GABA'] = {'mod': 'Exp2Syn', 'tau1': 0.07, 'tau2': 9.1, 
 
 #wmin should be set to the initial/baseline weight of the connection.
 STDPparams = {'hebbwt': 0.0001, 'antiwt':-0.00001, 'wbase': 0.0012, 'wmax': 50, 'RLon': 0 , 'RLhebbwt': 0.001, 'RLantiwt': -0.000,
-        'tauhebb': 10, 'RLwindhebb': 50, 'useRLexp': 0, 'softthresh': 0, 'verbose':0}
+              'tauhebb': 10, 'RLwindhebb': 50, 'useRLexp': 0, 'softthresh': 0, 'verbose':0}
 
 
 dSTDPparamsRL = {} # STDP-RL parameters for AMPA,NMDA synapses; generally uses shorter/longer eligibility traces
@@ -223,13 +225,16 @@ netParams.stimTargetParams['stimMod->'+inputPop] = {
   'delay': 1,
   'synMech': 'AMPA'
 }
-  
-netParams.stimTargetParams['stimMod->DirSelInput'] = {'source': 'stimMod',
-        'conds': {'pop': ['EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE']},
-        'convergence': 1,
-        'weight': stimModDirW,
-        'delay': 1,
-        'synMech': 'AMPA'}
+
+for pop in ['EV1D'+Dir for Dir in ['E','NE','N', 'NW','W','SW','S','SE']]:
+  netParams.stimTargetParams['stimMod->'+pop] = {
+    'source': 'stimMod',
+    'conds': {'pop': pop},
+    'convergence': 1,
+    'weight': stimModDirW,
+    'delay': 1,
+    'synMech': 'AMPA'
+  }
 
 #background input to inhibitory neurons to increase their firing rate
 
@@ -238,7 +243,9 @@ netParams.stimTargetParams['stimMod->DirSelInput'] = {'source': 'stimMod',
 """ 
 # weights are currently at 0 so do not need to simulate them
 netParams.stimSourceParams['ebkg'] = {'type': 'NetStim', 'rate': 5, 'noise': 1.0}
-netParams.stimTargetParams['ebkg->all'] = {'source': 'ebkg', 'conds': {'cellType': ['EV1','EV4','EMT']}, 'weight': 0.0, 'delay': 'max(1, normal(5,2))', 'synMech': 'AMPA'}
+netParams.stimTargetParams['ebkg->all'] = {
+'source': 'ebkg', 'conds': {'cellType': ['EV1','EV4','EMT']}, 'weight': 0.0, 'delay': 'max(1, normal(5,2))', 'synMech': 'AMPA'
+}
 
 netParams.stimSourceParams['MLbkg'] = {'type': 'NetStim', 'rate': 5, 'noise': 1.0}
 netParams.stimTargetParams['MLbkg->all'] = {'source': 'MLbkg', 'conds': {'cellType': ['EMDOWN']}, 'weight': 0.0, 'delay': 1, 'synMech': 'AMPA'}
@@ -247,14 +254,18 @@ netParams.stimSourceParams['MRbkg'] = {'type': 'NetStim', 'rate': 5, 'noise': 1.
 netParams.stimTargetParams['MRbkg->all'] = {'source': 'MRbkg', 'conds': {'cellType': ['EMUP']}, 'weight': 0.0, 'delay': 1, 'synMech': 'AMPA'}
 
 netParams.stimSourceParams['bkg'] = {'type': 'NetStim', 'rate': 20, 'noise': 1.0}
-netParams.stimTargetParams['bkg->all'] = {'source': 'bkg', 'conds': {'cellType': ['IR','IV1','IV4','IMT']}, 'weight': 0.0, 'delay': 'max(1, normal(5,2))', 'synMech': 'AMPA'}
+netParams.stimTargetParams['bkg->all'] = {
+'source': 'bkg', 'conds': {'cellType': ['IR','IV1','IV4','IMT']}, 'weight': 0.0, 'delay': 'max(1, normal(5,2))', 'synMech': 'AMPA'
+}
 """
 # setup noise inputs
 for ty,sy in zip(["E","I"],["AMPA","GABA"]):
   Weight,Rate = dconf["Noise"][ty]["Weight"],dconf["Noise"][ty]["Rate"]
   if Weight > 0.0 and Rate > 0.0: # only create the netstims if rate,weight > 0
     netParams.stimSourceParams[ty+'Mbkg'] = {'type': 'NetStim', 'rate': Rate, 'noise': 1.0}
-    netParams.stimTargetParams[ty+'Mbkg->all'] = {'source': ty+'Mbkg', 'conds': {'cellType': EMotorPops}, 'weight': Weight, 'delay': 'max(1, normal(5,2))', 'synMech': sy}
+    netParams.stimTargetParams[ty+'Mbkg->all'] = {
+      'source': ty+'Mbkg', 'conds': {'cellType': EMotorPops}, 'weight': Weight, 'delay': 'max(1, normal(5,2))', 'synMech': sy
+    }
       
 ######################################################################################
 
@@ -907,7 +918,7 @@ def updateInputRates ():
       dFiringRates[pop] = vec.to_python()
       if dconf['verbose'] > 1:
         print(sim.rank,'received firing rates:',np.where(dFiringRates[pop]==np.amax(dFiringRates[pop])),np.amax(dFiringRates[pop]))          
-  # update input firing rates for stimuli to R and direction sensitive cells
+  # update input firing rates for stimuli to ER,EV1 and direction sensitive cells
   for pop in lratepop:
     lCell = [c for c in sim.net.cells if c.gid in sim.net.pops[pop].cellGids] # this is the set of cells
     offset = sim.simData['dminID'][pop]
@@ -1230,7 +1241,7 @@ if dnumc['ER']>0:
 else:
   setdminID(sim, ['EV1', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW', 'EV1DSW', 'EV1DS', 'EV1DSE'])
 tPerPlay = tstepPerAction*dconf['actionsPerPlay']
-InitializeInputRates ()
+InitializeInputRates()
 sim.runSimWithIntervalFunc(tPerPlay,trainAgent) # has periodic callback to adjust STDP weights based on RL signal
 if sim.rank==0 and fid4 is not None: fid4.close()
 sim.gatherData() # gather data from different nodes

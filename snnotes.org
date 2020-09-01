@@ -16694,3 +16694,16 @@ saved animation to gif/20sep1_20sep1_A0_cycle__input.mp4
 
 do not see any east-pointing arrows in that mp4 ... 
 
+problem goes away when turn off the padding ... 
+
+	"useNeuronPad": 0,
+
+so padding likely still has some bugs ... 
+
+not sure this part in aigame.py makes sense:
+    if dconf['net']['useNeuronPad']:
+      self.input_dim = int(np.sqrt(self.dInputs[self.InputPop]))
+    else:  
+      self.input_dim = int(np.sqrt(dconf['net']['allpops'][self.InputPop])) # input image XY plane width,height -- not used anywhere    
+since after the padding the size does not have to be a square ?
+
