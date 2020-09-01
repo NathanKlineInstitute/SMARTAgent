@@ -11,8 +11,6 @@ for i in range(len(sys.argv)):
 def readconf (fnjson):    
   with open(fnjson,'r') as fp:
     dconf = json.load(fp)
-    if 'DirectionDetectionAlgo' not in dconf:
-      dconf['DirectionDetectionAlgo'] = {'CentroidTracker':0, 'OpticFlow':1, 'UseFull':1}
     #print(dconf)
   return dconf
 
@@ -23,6 +21,13 @@ def checkDefVal (d, k, val):
 
 def ensureDefaults (dconf):
   # make sure (some of the) default values are present so dont have to check for them throughout rest of code
+  if 'DirectionDetectionAlgo' not in dconf:
+    dconf['DirectionDetectionAlgo'] = {'CentroidTracker':0, 'OpticFlow':1, 'UseFull':1}  
+  checkDefVal(dconf,'net',{})
+  checkDefVal(dconf['net'], 'EEPreMProb', 0.0)  
+  checkDefVal(dconf['net'], 'EEMProb', 0.1)
+  checkDefVal(dconf['net'], 'EEMRecProb', 0.0)
+  checkDefVal(dconf['net'], 'EEMFeedbackProb', 0.0)  
   checkDefVal(dconf, 'verbose', 0)
   checkDefVal(dconf['net'], 'ECellModel', 'Mainen')
   checkDefVal(dconf['net'], 'ICellModel', 'FS_BasketCell')  
@@ -35,6 +40,7 @@ def ensureDefaults (dconf):
   checkDefVal(dconf['net'], 'FiringRateCutoff', 50.0)
   checkDefVal(dconf['net'], 'stimModDirW', 0.02)
   checkDefVal(dconf['net'], 'stimModInputW', 0.02)
+  checkDefVal(dconf['net'], 'weightVar', 0.0)
   checkDefVal(dconf, 'movefctr', 1.0)
   for k in ["actionsPerPlay", "followOnlyTowards", "useRacketPredictedPos"]: checkDefVal(dconf, k, 1)
   checkDefVal(dconf, 'stayStepLim', 0)
@@ -45,23 +51,23 @@ def ensureDefaults (dconf):
       "IR":{"ER":5},
       "EV1":{"ER":3},
       "IV1":{"EV1":5,"ER":5},
-      "EV4":{"EV1":3,"EMDOWN":3,"EMUP":3,"EMSTAY":0},
+      "EV4":{"EV1":3,"EMDOWN":3,"EMUP":3,"EMSTAY":3},
       "IV4":{"EV4":5,"EV1":5},
-      "EMT":{"EV4":3,"EMDOWN":3,"EMUP":3,"EMSTAY":0},
+      "EMT":{"EV4":3,"EMDOWN":3,"EMUP":3,"EMSTAY":3},
       "IMT":{"EMT":5,"EV4":5}      
     }
   if 'alltopolconvcons' not in dconf['net']:
     dconf['net']['alltopolconvcons'] = {
-      "ER":{"IR":3,"EV1":3,"EMDOWN":3,"EMUP":3,"EMSTAY":0},
-      "EV1":{"IV1":3,"EV4":3,"EMDOWN":3,"EMUP":3,"EMSTAY":0},
-      "EV1DE":{"EMDOWN":3,"EMUP":3,"EMSTAY":0},
-      "EV1DNE":{"EMDOWN":3,"EMUP":3,"EMSTAY":0},
-      "EV1DN":{"EMDOWN":3,"EMUP":3,"EMSTAY":0},
-      "EV1DNW":{"EMDOWN":3,"EMUP":3,"EMSTAY":0},
-      "EV1DW":{"EMDOWN":3,"EMUP":3,"EMSTAY":0},
-      "EV1DSW":{"EMDOWN":3,"EMUP":3,"EMSTAY":0},
-      "EV1DS":{"EMDOWN":3,"EMUP":3,"EMSTAY":0},
-      "EV1DSE":{"EMDOWN":3,"EMUP":3,"EMSTAY":0},
+      "ER":{"IR":3,"EV1":3,"EMDOWN":3,"EMUP":3,"EMSTAY":3},
+      "EV1":{"IV1":3,"EV4":3,"EMDOWN":3,"EMUP":3,"EMSTAY":3},
+      "EV1DE":{"EMDOWN":3,"EMUP":3,"EMSTAY":3},
+      "EV1DNE":{"EMDOWN":3,"EMUP":3,"EMSTAY":3},
+      "EV1DN":{"EMDOWN":3,"EMUP":3,"EMSTAY":3},
+      "EV1DNW":{"EMDOWN":3,"EMUP":3,"EMSTAY":3},
+      "EV1DW":{"EMDOWN":3,"EMUP":3,"EMSTAY":3},
+      "EV1DSW":{"EMDOWN":3,"EMUP":3,"EMSTAY":3},
+      "EV1DS":{"EMDOWN":3,"EMUP":3,"EMSTAY":3},
+      "EV1DSE":{"EMDOWN":3,"EMUP":3,"EMSTAY":3},
       "IV1":{"IV4":5},
       "EV4":{"IV4":3,"EMT":3},
       "IV4":{"IMT":5},

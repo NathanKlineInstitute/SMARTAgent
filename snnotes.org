@@ -16640,4 +16640,57 @@ motion detection output looks a lot worse ...
 
 * 20aug31
 ** setup again
+*20sep1
+** testing with topol
+
+have to adjust weights
+these are some of the params to set:
+        "DirMinRate": 0.0,
+        "DirMaxRate": 150.0,
+        "LocMaxRate": 150.0,
+        "FiringRateCutoff" : 50.0,
+        "stimModDirW": 0.02,
+        "stimModInputW": 0.02,
+
+put the default conv/div for topol connections into conf.py
+
+also trying with         "tstepPerAction": 50,
+
+had         "EEMWghtAM": 5e-05,
+        "EEMWghtNM": 5e-06,
+
+EV1DE is firing very fast ( > 90 Hz ) even with no apparent motion to east ...
+when game starts, the ball starts moving to west (towards opponent) - seems buggy??
+
+20sep1_rast_a0.png
+
+and this is with 
+        "stimModDirW": 0.005,
+        "stimModInputW": 0.005,
+
+similar occurs with tstepPerAction of 20 ... 
+
+does same occur without the topol conn?
+
+yeah, similar occurs with EV1DE firing way too much, and for no apparent reason (no motion east seen)
+
+and without useBinaryImage, useNeuronPad ?
+
+yes, still have the EV1DE firing at very high rates (~50 Hz)
+
+and with lower max rates?
+        "DirMaxRate": 50.0,
+        "LocMaxRate": 50.0,
+
+much lower firing rates for EV1DE (~19 Hz) but still much higher than
+the other direction selective neurons, even though no motion eastward ... 
+
+was it because accidentally had opticflow turned on (instead of centroid tracker) ?
+
+python -i simdat.py backupcfg/20sep1_A0_cycle_sim.json
+
+fig=animInput(InputImages,'gif/'+dstr+simstr+'_input.mp4',showflow=True,ldflow=ldflow)
+saved animation to gif/20sep1_20sep1_A0_cycle__input.mp4
+
+do not see any east-pointing arrows in that mp4 ... 
 

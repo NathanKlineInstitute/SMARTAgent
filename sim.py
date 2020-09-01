@@ -213,20 +213,16 @@ netParams.stimSourceParams['stimMod'] = {'type': 'NetStim', 'rate': 'variable', 
 stimModInputW = dconf['net']['stimModInputW']
 stimModDirW = dconf['net']['stimModDirW']
 
-if dnumc['ER']>0:
-  netParams.stimTargetParams['stimMod->R'] = {'source': 'stimMod',
-          'conds': {'pop': 'ER'},
-          'convergence': 1,
-          'weight': stimModInputW,
-          'delay': 1,
-          'synMech': 'AMPA'}
-else:
-  netParams.stimTargetParams['stimMod->V1'] = {'source': 'stimMod',
-          'conds': {'pop': 'EV1'},
-          'convergence': 1,
-          'weight': stimModInputW,
-          'delay': 1,
-          'synMech': 'AMPA'}
+inputPop = 'EV1' # which population gets the direct visual inputs (pixels)
+if dnumc['ER']>0: inputPop = 'ER'
+netParams.stimTargetParams['stimMod->'+inputPop] = {
+  'source': 'stimMod',
+  'conds': {'pop': inputPop},
+  'convergence': 1,
+  'weight': stimModInputW,
+  'delay': 1,
+  'synMech': 'AMPA'
+}
   
 netParams.stimTargetParams['stimMod->DirSelInput'] = {'source': 'stimMod',
         'conds': {'pop': ['EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE']},
@@ -253,12 +249,12 @@ netParams.stimTargetParams['MRbkg->all'] = {'source': 'MRbkg', 'conds': {'cellTy
 netParams.stimSourceParams['bkg'] = {'type': 'NetStim', 'rate': 20, 'noise': 1.0}
 netParams.stimTargetParams['bkg->all'] = {'source': 'bkg', 'conds': {'cellType': ['IR','IV1','IV4','IMT']}, 'weight': 0.0, 'delay': 'max(1, normal(5,2))', 'synMech': 'AMPA'}
 """
-if "Noise" in dconf:
-  for ty,sy in zip(["E","I"],["AMPA","GABA"]):
-    Weight,Rate = dconf["Noise"][ty]["Weight"],dconf["Noise"][ty]["Rate"]
-    if Weight > 0.0 and Rate > 0.0:
-      netParams.stimSourceParams[ty+'Mbkg'] = {'type': 'NetStim', 'rate': Rate, 'noise': 1.0}
-      netParams.stimTargetParams[ty+'Mbkg->all'] = {'source': ty+'Mbkg', 'conds': {'cellType': EMotorPops}, 'weight': Weight, 'delay': 'max(1, normal(5,2))', 'synMech': sy}
+# setup noise inputs
+for ty,sy in zip(["E","I"],["AMPA","GABA"]):
+  Weight,Rate = dconf["Noise"][ty]["Weight"],dconf["Noise"][ty]["Rate"]
+  if Weight > 0.0 and Rate > 0.0: # only create the netstims if rate,weight > 0
+    netParams.stimSourceParams[ty+'Mbkg'] = {'type': 'NetStim', 'rate': Rate, 'noise': 1.0}
+    netParams.stimTargetParams[ty+'Mbkg->all'] = {'source': ty+'Mbkg', 'conds': {'cellType': EMotorPops}, 'weight': Weight, 'delay': 'max(1, normal(5,2))', 'synMech': sy}
       
 ######################################################################################
 
@@ -310,14 +306,10 @@ blistIMTtoEV4 = connectLayerswithOverlapDiv(NBpreN = dnumc['IMT'], NBpostN = dnu
 
 # synaptic weight gain (based on E, I types)
 cfg = simConfig
-cfg.EEGain = 1.0  # E to E scaling factor
-cfg.EIGain = 1.0 # E to I scaling factor
-cfg.IEGain = 1.0 # I to E scaling factor
-cfg.IIGain = 1.0  # I to I scaling factor
-if 'EEGain' in dconf['net']: cfg.EEGain = dconf['net']['EEGain']
-if 'EIGain' in dconf['net']: cfg.EIGain = dconf['net']['EIGain']
-if 'IEGain' in dconf['net']: cfg.IEGain = dconf['net']['IEGain']
-if 'IIGain' in dconf['net']: cfg.IIGain = dconf['net']['IIGain']
+cfg.EEGain = dconf['net']['EEGain'] # E to E scaling factor
+cfg.EIGain = dconf['net']['EIGain'] # E to I scaling factor
+cfg.IEGain = dconf['net']['IEGain'] # I to E scaling factor
+cfg.IIGain = dconf['net']['IIGain'] # I to I scaling factor
 
 ### from https://www.neuron.yale.edu/phpBB/viewtopic.php?f=45&t=3770&p=16227&hilit=memory#p16122
 cfg.saveCellSecs = bool(dconf['sim']['saveCellSecs']) # if False removes all data on cell sections prior to gathering from nodes
@@ -325,10 +317,7 @@ cfg.saveCellConns = bool(dconf['sim']['saveCellConns']) # if False removes all d
 ###
 
 # weight variance -- check if need to vary the initial weights (note, they're over-written if resumeSim==1)
-if 'weightVar' in dconf['net']:
-  cfg.weightVar = dconf['net']['weightVar']
-else:
-  cfg.weightVar = 0.
+cfg.weightVar = dconf['net']['weightVar']
 
 def getInitWeight (weight):
   """get initial weight for a connection
@@ -343,8 +332,7 @@ def getInitWeight (weight):
 
 #Local excitation
 #E to E recurrent connectivity in premotor areas
-EEPreMProb = 0.0 # default - 0
-if "EEPreMProb" in dconf['net']: EEPreMProb = dconf['net']['EEPreMProb']
+EEPreMProb = dconf['net']['EEPreMProb']
 if EEPreMProb > 0.0:
   for epop in EPreMPops:
     if dnumc[epop] <= 0: continue # skip rule setup for empty population
@@ -628,14 +616,19 @@ if dconf['architecturePreMtoM']['useTopological']:
   for prety in EPreMPops:
     if dnumc[prety] <= 0: continue
     for poty in EMotorPops:
+      if dnumc[poty] <= 0: continue
       try:
         div = dconf['net']['alltopoldivcons'][prety][poty]
       except:
         div = 3
-      if dconf['net']['allpops'][prety]==dconf['net']['allpops'][poty] or dconf['net']['allpops'][prety]>dconf['net']['allpops'][poty]: # BE CAREFUL. THERE IS ALWAYS A CHANCE TO USE dnumc[prety] nad dnumc[poty] that produces inaccuracies. works fine if used in multiples (400->100; 100->400; 100->100).
-        blist = connectLayerswithOverlap(NBpreN=dnumc[prety],NBpostN=dnumc[poty],overlap_xdir = dtopolconvcons[prety][poty], padded_preneurons_xdir = dnumc_padx[prety], padded_postneurons_xdir = dnumc_padx[poty])
+      # BE CAREFUL. THERE IS ALWAYS A CHANCE TO USE dnumc[prety] nad dnumc[poty] that produces inaccuracies.
+      # works fine if used in multiples (400->100; 100->400; 100->100).        
+      if dconf['net']['allpops'][prety]==dconf['net']['allpops'][poty] or dconf['net']['allpops'][prety]>dconf['net']['allpops'][poty]: 
+        blist = connectLayerswithOverlap(NBpreN=dnumc[prety],NBpostN=dnumc[poty],overlap_xdir = dtopolconvcons[prety][poty], \
+                                         padded_preneurons_xdir = dnumc_padx[prety], padded_postneurons_xdir = dnumc_padx[poty])
       elif dconf[prety]<dconf[poty]:
-        blist = connectLayerswithOverlapDiv(NBpreN=dnumc[prety],NBpostN=dnumc[poty],overlap_xdir = dtopoldivcons[prety][poty], padded_preneurons_xdir = dnumc_padx[prety], padded_postneurons_xdir = dnumc_padx[poty])
+        blist = connectLayerswithOverlapDiv(NBpreN=dnumc[prety],NBpostN=dnumc[poty],overlap_xdir = dtopoldivcons[prety][poty], \
+                                            padded_preneurons_xdir = dnumc_padx[prety], padded_postneurons_xdir = dnumc_padx[poty])
       for strty,synmech,weight in zip(['','n'],['AMPA', 'NMDA'],[dconf['net']['EEMWghtAM']*cfg.EEGain, dconf['net']['EEMWghtNM']*cfg.EEGain]):
         k = strty+prety+'->'+strty+poty
         netParams.connParams[k] = {
@@ -653,9 +646,9 @@ elif dconf['architecturePreMtoM']['useProbabilistic']:
   # Add connections from lower and higher visual areas to motor cortex and direct connections between premotor to motor areas
   for prety in EPreMPops:
     if dnumc[prety] <= 0: continue
-    EEMProb = 0.1 # default - feedforward connectivity
-    if "EEMProb" in dconf['net']: EEMProb = dconf['net']['EEMProb']
+    EEMProb = dconf['net']['EEMProb'] # feedforward connectivity
     for poty in EMotorPops:
+      if dnumc[poty] <= 0: continue
       for strty,synmech,weight in zip(['','n'],['AMPA', 'NMDA'],[dconf['net']['EEMWghtAM']*cfg.EEGain, dconf['net']['EEMWghtNM']*cfg.EEGain]):
         k = strty+prety+'->'+strty+poty
         netParams.connParams[k] = {
@@ -671,8 +664,7 @@ elif dconf['architecturePreMtoM']['useProbabilistic']:
           netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL[synmech]}
 
 # add recurrent plastic connectivity within EM populations
-EEMRecProb = 0.0 # default
-if "EEMRecProb" in dconf['net']: EEMRecProb = dconf['net']['EEMRecProb']
+EEMRecProb = dconf['net']['EEMRecProb']
 if EEMRecProb > 0.0:
   for prety in EMotorPops:
     for poty in EMotorPops:
@@ -692,8 +684,7 @@ if EEMRecProb > 0.0:
             netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL[synmech]}  
 
 # add feedback plastic connectivity from EM populations to premotor/visual populations
-EEMFeedbackProb = 0.0 # default
-if "EEMFeedbackProb" in dconf['net']: EEMFeedbackProb = dconf['net']['EEMFeedbackProb']
+EEMFeedbackProb = dconf['net']['EEMFeedbackProb']
 if EEMFeedbackProb > 0.0:
   for prety in EMotorPops:
     for poty in EPreMPops:
