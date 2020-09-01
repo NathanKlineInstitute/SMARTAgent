@@ -16641,7 +16641,7 @@ motion detection output looks a lot worse ...
 * 20aug31
 ** setup again
 *20sep1
-** testing with topol
+** testing with topol (padding causes problems with direction selective neurons!) (20sep1_A0_cycle_)
 
 have to adjust weights
 these are some of the params to set:
@@ -16706,4 +16706,20 @@ not sure this part in aigame.py makes sense:
     else:  
       self.input_dim = int(np.sqrt(dconf['net']['allpops'][self.InputPop])) # input image XY plane width,height -- not used anywhere    
 since after the padding the size does not have to be a square ?
+
+python -i simdat.py backupcfg/20sep1_A0_cycle_sim.json
+
+ax=plotPerf(actreward,yl=(0,.55))
+
+ok, try a longer run with topol
+
+100 s took only ~5 minutes ... 
+
+try 2000 s ... note that tstepPerAction is 50 ms ... 
+
+./myrun 32 sn.json
+
+started ~16:29 on cycle ... 
+
+** and a comparison without topol (20sep1_B0_cycle_)
 
