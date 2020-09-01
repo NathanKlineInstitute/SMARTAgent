@@ -16717,9 +16717,23 @@ ok, try a longer run with topol
 
 try 2000 s ... note that tstepPerAction is 50 ms ... 
 
+    "architecturePreMtoM": {
+        "useProbabilistic": 0,
+        "useTopological": 1
+    },
+
 ./myrun 32 sn.json
 
 started ~16:29 on cycle ... 
 
 ** and a comparison without topol (20sep1_B0_cycle_)
+
+    "architecturePreMtoM": {
+        "useProbabilistic": 1,
+        "useTopological": 0
+    },
+
+./myrun 32 sn.json
+
+started ~16:34 on cylce ...
 
