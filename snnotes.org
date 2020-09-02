@@ -16839,6 +16839,12 @@ try another comparison with topo and w/o topo
 
 ./myrun 32 sn.json
 
+20sep2_A0_cycle_ started ~17:05
+
+./myrun 32 sn.json
+
+20sep2_B0_cycle_ started ~17:06
+
 
 ax=plotPerf(actreward,yl=(0,.55))
 drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); 
