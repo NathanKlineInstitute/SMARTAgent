@@ -47,7 +47,7 @@
         "RLFakeUpRule": 0,
         "RLFakeDownRule": 0,
         "RLFakeStayRule": 0,
-        "name": "20sep1_B0_cycle_",
+        "name": "20sep2_A0_cycle_",
         "doquit": 1,
         "doplot": 0,
         "saveCellSecs": 0,
@@ -58,8 +58,8 @@
         "saveAssignedFiringRates": 0
     },
     "architecturePreMtoM": {
-        "useProbabilistic": 1,
-        "useTopological": 0
+        "useProbabilistic": 0,
+        "useTopological": 1
     },
     "net": {
         "scale": 1,
@@ -145,10 +145,10 @@
             "wbase": 1e-07,
             "wmax": 0.00048,
             "RLon": 1,
-            "RLlenhebb": 200,
+            "RLlenhebb": 500,
             "RLlenanti": 50,
             "useRLexp": 1,
-            "RLhebbwt": 2.5e-06,
+            "RLhebbwt": 1e-06,
             "RLantiwt": -0.0,
             "hebbwt": 0,
             "antiwt": 0,

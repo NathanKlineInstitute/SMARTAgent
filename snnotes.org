@@ -16737,3 +16737,114 @@ started ~16:29 on cycle ...
 
 started ~16:34 on cylce ...
 
+* 20sep2
+** check output from sim with/without topol conn (but no padding; 20sep1_A0_cycle_, 20sep1_B0_cycle_)
+
+  Simulated time: 2000.0 s; 32 workers
+  Run time: 32544.85 s
+
+python -i simdat.py backupcfg/20sep1_A0_cycle_sim.json
+
+ax=plotPerf(actreward,yl=(0,.55))
+savefig(gifpath()+'perf.png') # gif/20sep2_20sep1_A0_cycle_perf.png
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((1990e3,2000e3))
+savefig(gifpath()+'rast.png') # gif/20sep2_20sep1_A0_cycle_rast.png
+
+rates look good
+
+binsz=20
+dhist = {pop:getspikehist(dspkT[pop],dnumc,binsz,totalDur) for pop in ['EV1DE','EV1DW']}
+
+for k,clr in zip(list(dhist.keys()),['r','b']): plot(dhist[k][0],dhist[k][1],clr)
+
+no longer see the overlap in E,W so that's good ... 
+
+fig=animInput(InputImages,gifpath()+'_input.mp4',showflow=True,ldflow=ldflow) # gif/20sep2_20sep1_A0_cycle__input.mp4
+
+looks ok for many cases but has the usual problem of overshooting when ball going to corner (paddle does not seem to
+get stuck in corner but instead shoots too far down, too quickly, missing contact with the ball; would the EMSTAY
+neurons help?)
+
+how does it compare to the sim without topol conn?
+
+lfn = ['20sep1_A0_cycle_', '20sep1_B0_cycle_']
+lpda = getindivactionreward(lfn)
+clf(); plotComparePerf(lpda,['b','r'],yl=(0,1),lleg=lfn)
+savefig(gifpath()+'perf_compare.png') # gif/20sep2_20sep1_A0_cycle_perf_compare.png
+not clear that topol better ... 
+
+check rates/activity for the other sim - looked like had much higher rates
+
+took a lot longer to run 20sep1_B0_cycle_
+  Run time: 55552.86 s
+
+python -i simdat.py backupcfg/20sep1_B0_cycle_sim.json
+
+ax=plotPerf(actreward,yl=(0,.55))
+savefig(gifpath()+'perf.png') # gif/20sep2_20sep1_B0_cycle_perf.png
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((1990e3,2000e3))
+savefig(gifpath()+'rast.png') # gif/20sep2_20sep1_B0_cycle_rast.png
+the EMDOWN,EMUP rates are much higher, but not pathologically high ... 
+xlim((1998e3,1999e3))
+savefig(gifpath()+'rastB.png') # gif/20sep2_20sep1_B0_cycle_rastB.png
+
+fig=animInput(InputImages,gifpath()+'_input.mp4',showflow=True,ldflow=ldflow) # gif/20sep2_20sep1_B0_cycle__input.mp4
+
+activity looks ok - nothing unusual ... 
+
+** some emacs adjustments
+
+M-x ielm (starts lisp interpreter)
+
+https://github.com/cpaulik/emacs-material-theme
+(put that el file into ~/.emacs.d/ )
+(load-theme 'material t) ; <- that loads the theme
+(setq org-support-shift-select t) ; <- use that to allow shift-selection in org mode
+
+M-x goto-line goes to a line, should add a key-binding
+
+https://emacs.stackexchange.com/questions/37887/send-region-to-shell-in-another-buffer
+
+** xv for ubunbtu - use snap to install
+
+https://snapcraft.io/install/xv/ubuntu
+
+sudo snap install xv --edge
+
+gets certificate error on cycle ... how to bypass certificate check with snap?
+
+** simple tuts on dqn
+
+https://www.analyticsvidhya.com/blog/2019/04/introduction-deep-q-learning-python/
+https://medium.com/@jonathan_hui/rl-introduction-to-deep-reinforcement-learning-35c25e04c199
+
+multiple networks
+target and prediction to prevent instability in training - copy from one network to other every so often
+experience replay important -- add it? store state,action,reward,next state then sample
+from it randomly; problem is that neuronal network has a dynamic state ... but couldn't it handle
+arbitrary inputs?
+
+** output encoding problematic?
+** other sims
+
+smaller weight increments (RLhebbwt of 1e-6) prevent instability? also inc RLlenhebb to 500 ms from 200 ms
+since tstepPerAction now longer (50 ms instead of 20 ms)
+
+try another comparison with topo and w/o topo
+
+20sep2_A0_cycle_ (with topo)
+20sep2_B0_cycle_ (without topo)
+
+./myrun 32 sn.json
+
+
+ax=plotPerf(actreward,yl=(0,.55))
+drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); 
+
+** other bugs
+
+noticed that when use EMSTAY now get a crash; also can only use certain sizes
+for the layers when using topo conn
+
