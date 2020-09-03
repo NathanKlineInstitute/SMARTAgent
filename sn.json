@@ -34,7 +34,7 @@
     "stayStepLim": 0,
     "simtype": {
         "ResumeSim": 1,
-        "ResumeSimFromFile": "data/20sep2_B0_cycle_synWeights_final.pkl"
+        "ResumeSimFromFile": "data/20sep2_A0_cycle_synWeights_final.pkl"
     },
     "sim": {
         "duration": 2000000,
@@ -47,7 +47,7 @@
         "RLFakeUpRule": 0,
         "RLFakeDownRule": 0,
         "RLFakeStayRule": 0,
-        "name": "20sep3_B1_cycle_",
+        "name": "20sep3_A1_cycle_",
         "doquit": 1,
         "doplot": 0,
         "saveCellSecs": 0,
@@ -58,8 +58,8 @@
         "saveAssignedFiringRates": 0
     },
     "architecturePreMtoM": {
-        "useProbabilistic": 1,
-        "useTopological": 0
+        "useProbabilistic": 0,
+        "useTopological": 1
     },
     "net": {
         "scale": 1,
