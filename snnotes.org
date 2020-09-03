@@ -16854,3 +16854,99 @@ drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values()))));
 noticed that when use EMSTAY now get a crash; also can only use certain sizes
 for the layers when using topo conn
 
+* 20sep3
+** check output from last two sims on cycle
+
+python -i simdat.py backupcfg/20sep2_A0_cycle_sim.json
+
+ax=plotPerf(actreward,yl=(0,.65))
+savefig(gifpath()+'perf.png') # gif/20sep3_20sep2_A0_cycle_perf.png
+
+some of the values get reasonably high (hit/miss), but happens so early on that
+may not be due to learning??
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((1990e3,2000e3))
+savefig(gifpath()+'rast.png') # gif/20sep3_20sep2_A0_cycle_rast.png
+
+very sparse firing for EMUP, EMDOWN (~0.2 Hz on average) - all rates look good
+
+how does it compare to the corresponding sim without topol conn?
+
+lfn = ['20sep2_A0_cycle_', '20sep2_B0_cycle_']
+lpda = getindivactionreward(lfn)
+clf(); plotComparePerf(lpda,['b','r'],yl=(0,1),lleg=lfn)
+savefig(gifpath()+'perf_compare.png') # gif/20sep3_20sep2_A0_cycle_perf_compare.png
+not clear which better; topol has higher hit/miss and score values but does not seem
+to be increasing ... while w/o topol hit/miss looks like increasing somewhat steadily ... 
+
+and compare against the sims with larger weight steps
+
+lfn = ['20sep1_A0_cycle_', '20sep2_A0_cycle_']
+lpda = getindivactionreward(lfn)
+clf(); plotComparePerf(lpda,['b','r'],yl=(0,1),lleg=lfn)
+savefig(gifpath()+'perf_compareB.png') # gif/20sep3_20sep2_A0_cycle_perf_compareB.png
+smaller step size with the longer RL tau seems better ... 
+
+weights?
+
+popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=True)
+xlabel('Time (ms)',fontsize=30); ylabel('Average weight',fontsize=30); tl(); 
+savefig(gifpath()+'all_avg_weight.png') # gif/20sep3_20sep2_A0_cycle_all_avg_weight.png
+many are flat, some rising
+
+fig=animInput(InputImages,gifpath()+'_input.mp4') # gif/20sep3_20sep2_A0_cycle__input.mp4
+
+does ok sometimes, but makes the same mistake many times and does not seem to adapt - are the EMUP,EMDOWN firing rates too low?
+
+check rates/activity for the other sim - has higher firing rates
+
+took longer to run 20sep2_B0_cycle_
+  Run time: 53903.56 s
+
+python -i simdat.py backupcfg/20sep2_B0_cycle_sim.json
+
+ax=plotPerf(actreward,yl=(0,.65))
+savefig(gifpath()+'perf.png') # gif/20sep3_20sep2_B0_cycle_perf.png
+hit/miss seems to be rising ... 
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((1990e3,2000e3))
+savefig(gifpath()+'rast.png') # gif/20sep3_20sep2_B0_cycle_rast.png
+as before, the EMDOWN,EMUP rates are much higher (~4 Hz) than topo model (~0.2 Hz), but not pathologically high ... 
+
+and compare to same sim (w/o topo) and with larger weight incs, shorter RL tau:
+lfn = ['20sep1_B0_cycle_', '20sep2_B0_cycle_']
+lpda = getindivactionreward(lfn)
+clf(); plotComparePerf(lpda,['b','r'],yl=(0,1),lleg=lfn)
+savefig(gifpath()+'perf_compareB.png') # [[./gif/20sep3_20sep2_B0_cycle_perf_compareB.png]]
+look pretty similar ... 
+
+weights?
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=True)
+xlabel('Time (ms)',fontsize=30); ylabel('Average weight',fontsize=30); tl(); 
+savefig(gifpath()+'all_avg_weight.png') # [[./gif/20sep3_20sep2_A0_cycle_all_avg_weight.png]]
+these weights are going up much more broadly - does that support the idea that the topological connectivity is an effective strategy
+to allow only the right weights to change?
+
+fig=animInput(InputImages,gifpath()+'_input.mp4') # gif/20sep3_20sep2_B0_cycle__input.mp4
+
+this one seems to perform better overall as the sim progresses ... has examples of returning the ball a few times in a row
+
+probably worth continuing both of these sims for further testing ... 
+
+with weight norm at beginning ... 
+
+    "simtype": {
+        "ResumeSim": 1,
+        "ResumeSimFromFile": "data/20sep2_B0_cycle_synWeights_final.pkl"
+    },
+        "name": "20sep3_B1_cycle_",
+	"normalizeWeightsAtStart": 1,
+    "architecturePreMtoM": {
+        "useProbabilistic": 1,
+        "useTopological": 0
+    },
+python multistepSim.py sn.json 32 10 20sep3_B1_cycle_multi
+
+data/20sep2_A0_cycle_synWeights_final.pkl
+python multistepSim.py sn.json 32 10 20sep3_A1_cycle_multi
+
