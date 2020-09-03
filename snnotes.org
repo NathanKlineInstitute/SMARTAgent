@@ -16946,6 +16946,7 @@ with weight norm at beginning ...
         "useTopological": 0
     },
 python multistepSim.py sn.json 32 10 20sep3_B1_cycle_multi
+started ~12:08 ... 
 
 data/20sep2_A0_cycle_synWeights_final.pkl
 python multistepSim.py sn.json 32 10 20sep3_A1_cycle_multi
