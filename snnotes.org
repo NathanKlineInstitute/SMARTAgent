@@ -16961,4 +16961,31 @@ started ~12:08 ...
 python multistepSim.py sn.json 32 10 20sep3_A1_cycle_multi
 started ~12:10 ...
 
+* 20sep4
+** stopped topo sims 20sep3_A1_cycle_multi, since did not look like improving
+** check output from 20sep3_B1_cycle_multi
+
+python -i simdat.py backupcfg/20sep3_B1_cycle__step_1_sim.json
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/20sep4_20sep3_B1_cycle__step_1_perf.png]]
+
+looks ~flat during those 2000 s ... 
+
+
+lfn = ['20sep2_B0_cycle_', '20sep3_B1_cycle__step_0_', '20sep3_B1_cycle__step_1_']
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0,1))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/20sep4_20sep3_B1_cycle__step_1_perf_all_steps_so_far.png]]
+hmm, performance degrading slowly after ~2000 s
+
+lpda = getindivactionreward(lfn)
+clf(); plotComparePerf(lpda,['g','b','r'],yl=(0,1),lleg=lfn)
+savefig(gifpath()+'perf_compareB.png') # [[./gif/20sep4_20sep3_B1_cycle__step_1_perf_compareB.png]]
+yes, perf getting worse ... need to understand if/why that's really occurring ... could be perf
+differs in diff contexts
+
+** only transfer weights periodically?
+
+used in anns to promote stabiltiy (two networks)
 
