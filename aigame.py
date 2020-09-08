@@ -254,7 +254,7 @@ class AIGame:
     dAngPeak = self.dAngPeak
     dirSensitiveNeuronDim = self.dirSensitiveNeuronDim + self.dReceptiveField['EV1DE']-1
     offset = int((self.dReceptiveField['EV1DE']-1)/2)
-    padded_motiondir = np.zeros(shape=(dirSensitiveNeuronDim,dirSensitiveNeuronDim))
+    padded_motiondir = np.multiply(-100,np.ones(shape=(dirSensitiveNeuronDim,dirSensitiveNeuronDim)))
     padded_motiondir[offset:offset+motiondir.shape[0],offset:offset+motiondir.shape[1]]=motiondir
     AngRFSigma2 = self.AngRFSigma2
     MaxRate = self.dirSensitiveNeuronRate[1]

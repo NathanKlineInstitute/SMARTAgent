@@ -6120,3 +6120,241 @@ I figured out the problem is with dFiringRates initialized in AIGame....
     },
 -- all above sims work. So i think "useNeuronPad" and "useTopological" both are working without any problem.
 -- still need to use random weights between preM and M while using topological.
+
+-- analyze "20aug25_A0_cycle_"
+... saved _Perf.png
+... saved _RacketBallYPosHist.png
+
+-- run "20aug28_A0_cycle_" - 8 nodes.
+.... useProbabilistic:1
+.... useNeuronPad: 0
+.... LocMaxRate:150
+.... DirMaxRate:150
+.... stimModDirW: 0.02
+.... stimModInputW: 0.02
+.... tstepPerAction: 50
+.... 3000 sec.
+
+-- run "20aug28_A1_cycle_" - 8 nodes.
+.... useProbabilistic:1
+.... useNeuronPad: 0
+.... LocMaxRate:150
+.... DirMaxRate:150
+.... stimModDirW: 0.03
+.... stimModInputW: 0.03
+.... tstepPerAction: 50
+.... 3000 sec.
+
+
+-- run "20aug28_A0_cycle_" - 8 nodes.
+.... useProbabilistic:1
+.... useNeuronPad: 0
+.... LocMaxRate:150
+.... DirMaxRate:150
+.... stimModDirW: 0.04
+.... stimModInputW: 0.04
+.... tstepPerAction: 50
+.... 3000 sec.
+
+
+-- running multistep sims on falcor.....
+
+python multistepSim.py sn.json 30 10 20aug7_B2_cycle_Multi
+
+  basefn = sys.argv[1]
+  ncore = int(sys.argv[2])
+  nstep = int(sys.argv[3])
+  outf = sys.argv[4]
+
+.... didnt work.....
+
+
+-- run "20aug28_A0_falcor_" - 8 nodes.
+.... useTopological:1
+.... useNeuronPad: 0
+.... LocMaxRate:150
+.... DirMaxRate:150
+.... stimModDirW: 0.02
+.... stimModInputW: 0.02
+.... tstepPerAction: 50
+.... 3000 sec.
+
+* 20sept08
+-- run "20sept08_A1_falcor" - 16 nodes
+.... useTopological:1
+.... useNeuronPad: 0
+.... LocMaxRate:150
+.... DirMaxRate:150
+.... stimModDirW: 0.03
+.... stimModInputW: 0.03
+.... tstepPerAction: 50
+.... 300 sec.
+
+I didnt wait for the simulation to end. I noticed that the ball was stuck on top corner so i decided to end the sim.
+
+
+-- rerun "20sept08_A1_falcor" - 16 nodes
+.... useTopological:1
+.... useNeuronPad: 0
+.... LocMaxRate:150
+.... DirMaxRate:150
+.... stimModDirW: 0.02
+.... stimModInputW: 0.02
+.... tstepPerAction: 50
+.... 300 sec.
+
+sam complained that direction selective neurons were not firing properly when using padding with topological architecture
+-- test on local machine - 20sept08_A0_local_
+.... useTopological:1
+.... useNeuronPad: 1
+.... LocMaxRate:150
+.... DirMaxRate:150
+.... stimModDirW: 0.02
+.... stimModInputW: 0.02
+.... tstepPerAction: 50
+.... 100 sec.
+.... "saveAssignedFiringRates": 1
+
+python -i simdat.py backupcfg/20sept08_A0_local_sim.json
+dact = getdActMap (totalDur, tstepPerAction, dspkT, dspkID, dnumc, dstartidx,lpop = allpossible_pops)
+binsz=20
+dhist = {pop:getspikehist(dspkT[pop],dnumc,binsz,totalDur) for pop in ['EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE']}
+dAssignedFR = pickle.load(open('data/20sept08_A0_local_AssignedFiringRates.pkl','rb'))
+
+Look at the angles computed for each game-step...
+>>> len(ldflow)
+500
+>>> ldflow[0].keys()
+dict_keys(['flow', 'mag', 'ang', 'goodInds'])
+
+plt.imshow(ldflow[0]['ang']) --- all values -100.
+plt.imshow(ldflow[1]['ang']) --- all values -100.
+.
+.
+.
+plt.imshow(ldflow[7]['ang']) -- all values -100.
+plt.imshow(ldflow[8]['ang']) -- all values -100 except right racket which shows N (90 degrees) direction.
+
+np.unique(ldflow[8]['ang'])
+array([-100.,   90.])
+
+plt.plot(dAssignedFR[8]['EV1DE'],'b')
+plt.plot(dAssignedFR[8]['EV1DN'],'r')
+
+>>> np.where(dAssignedFR[8]['EV1DN']>0)
+(array([149, 150, 151, 152, 171, 172, 173, 174, 193, 194, 195, 196, 215,
+       216, 217, 218, 237, 238, 239, 240, 259, 260, 261, 262]),)
+
+>>> np.where(dAssignedFR[8]['EV1DE']>0) ----> This is supposed to be empty.
+(array([  0,   1,   2,   3,   4,   5,   6,   7,   8,   9,  10,  11,  12,
+        13,  14,  15,  16,  17,  18,  19,  20,  21,  22,  43,  44,  65,
+        66,  87,  88, 109, 110, 131, 132, 153, 154, 175, 176, 197, 198,
+       219, 220, 241, 242, 263, 264, 285, 286, 307, 308, 329, 330, 351,
+       352, 373, 374, 395, 396, 417, 418, 439, 440, 461, 462, 463, 464,
+       465, 466, 467, 468, 469, 470, 471, 472, 473, 474, 475, 476, 477,
+       478, 479, 480, 481, 482, 483]),)
+
+-- FOUND THE BUG
+  padded_motiondir = np.zeros(shape=(dirSensitiveNeuronDim,dirSensitiveNeuronDim))
+  padded_motiondir[offset:offset+motiondir.shape[0],offset:offset+motiondir.shape[1]]=motiondir
+
+This assigned 0 degrees to the border pixels which later drove 'E' direction neurons.
+
+-- Fix this using
+  padded_motiondir = np.multiply(-100,np.ones(shape=(dirSensitiveNeuronDim,dirSensitiveNeuronDim)))
+
+-- After fixing the bug in direction selective neurons, rerun and check output again....
+-- test on local machine - 20sept08_A1_local_
+.... useTopological:1
+.... useNeuronPad: 1
+.... LocMaxRate:150
+.... DirMaxRate:150
+.... stimModDirW: 0.02
+.... stimModInputW: 0.02
+.... tstepPerAction: 50
+.... 100 sec.
+.... "saveAssignedFiringRates": 1
+
+python -i simdat.py backupcfg/20sept08_A1_local_sim.json
+dact = getdActMap (totalDur, tstepPerAction, dspkT, dspkID, dnumc, dstartidx,lpop = allpossible_pops)
+binsz=20
+dhist = {pop:getspikehist(dspkT[pop],dnumc,binsz,totalDur) for pop in ['EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE']}
+dAssignedFR = pickle.load(open('data/20sept08_A1_local_AssignedFiringRates.pkl','rb'))
+
+plt.imshow(ldflow[0]['ang']) --- all values -100.
+plt.imshow(ldflow[1]['ang']) --- all values -100.
+.
+.
+.
+plt.imshow(ldflow[29]['ang']) -- all values -100.
+plt.imshow(ldflow[30]['ang']) -- motion detected now.
+
+
+
+
+>>> np.where(dAssignedFR[29]['EV1DE']>0)
+(array([], dtype=int64),)
+>>> np.where(dAssignedFR[29]['EV1DNE']>0)
+(array([], dtype=int64),)
+>>> np.where(dAssignedFR[29]['EV1DN']>0)
+(array([], dtype=int64),)
+>>> np.where(dAssignedFR[29]['EV1DNW']>0)
+(array([], dtype=int64),)
+>>> np.where(dAssignedFR[29]['EV1DW']>0)
+(array([], dtype=int64),)
+>>> np.where(dAssignedFR[29]['EV1DSW']>0)
+(array([], dtype=int64),)
+>>> np.where(dAssignedFR[29]['EV1DS']>0)
+(array([], dtype=int64),)
+>>> np.where(dAssignedFR[29]['EV1DSE']>0)
+(array([], dtype=int64),)
+
+
+>>> np.unique(ldflow[30]['ang'])
+array([-100.        ,  225. ,  270.        ])
+
+>>> np.where(dAssignedFR[30]['EV1DE']>0)
+(array([], dtype=int64),)
+>>> np.where(dAssignedFR[30]['EV1DNE']>0)
+(array([], dtype=int64),)
+>>> np.where(dAssignedFR[30]['EV1DN']>0)
+(array([], dtype=int64),)
+>>> np.where(dAssignedFR[30]['EV1DNW']>0)
+(array([], dtype=int64),)
+>>> np.where(dAssignedFR[30]['EV1DW']>0)
+(array([], dtype=int64),)
+>>> np.where(dAssignedFR[30]['EV1DSW']>0)
+(array([228, 229, 230, 231, 250, 251, 252, 253, 272, 273, 274, 275, 294,
+       295, 296, 297]),)
+>>> np.where(dAssignedFR[30]['EV1DS']>0)
+(array([199, 200, 201, 202, 221, 222, 223, 224, 243, 244, 245, 246, 265,
+       266, 267, 268, 287, 288, 289, 290, 309, 310, 311, 312]),)
+>>> np.where(dAssignedFR[30]['EV1DSE']>0)
+(array([], dtype=int64),)
+
+
+-- Some ideas based on discussion with Sam
+1. main idea from when i looked at it was that the weights that contribute to one behavior should get stabilized so that new learning of other behaviors does not interfere
+they tested that rule with training several games in sequence
+the exact details of the rule may or may not apply
+based on --> this looks relevant for improving performance: https://www.pnas.org/content/114/13/3521.short
+Overcoming catastrophic forgetting in neural networks
+Deep neural networks are currently the most successful machine-learning technique for solving a variety of tasks, including language translation, image classification, and image generation. One weakness of such models is that, unlike humans, they are unable to learn multiple tasks sequentially. In this work we propose a practical solution to train such models sequentially by protecting the weights important for previous tasks. This approach, inspired by synaptic consolidation in neuroscience, enables state of the art results on multiple reinforcement learning problems experienced sequentially.
+
+Haroon Anwar  10:13 AM
+stabilizing- how?
+
+samn  10:13 AM
+yeah, those are the details that should look into
+the concept seems useful
+
+because we keep on changing weights without having any control over when something useful was learned
+and overlearning could mean forgetting
+
+2. the other potentially useful concept i saw was that in the DNQ networks they have two sub-networks,
+one that gets its weights updated ~continuously, and one that makes the decisions
+the weights for the decision-making network are only updated periodically to produce some stability
+
+3. the other possible direction for later was that they sample from memory buffer (frames, actions, rewards) randomly
+
+4. another area (like PFC) to direct planned actions
