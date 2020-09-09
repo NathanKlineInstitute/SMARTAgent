@@ -92,6 +92,7 @@ class AIGame:
     self.EXPDir = dconf['net']['EXPDir']
     if dconf['net']['useNeuronPad']:
       self.input_dim = int(np.sqrt(self.dInputs[self.InputPop]))
+      self.objExtension = 'Vertical'  # this could be included in sim.json....
     else:  
       self.input_dim = int(np.sqrt(dconf['net']['allpops'][self.InputPop])) # input image XY plane width,height -- not used anywhere    
     self.locationNeuronRate = dconf['net']['LocMaxRate']
@@ -128,9 +129,52 @@ class AIGame:
 
   def updateInputRatesWithPadding (self, dsum_Images):
     # update input rates to retinal neurons
+    tmp_padded_Image = np.amin(dsum_Images)*np.ones(shape=(self.input_dim,self.input_dim))
     padded_Image = np.amin(dsum_Images)*np.ones(shape=(self.input_dim,self.input_dim))
     offset = int((self.dReceptiveField[self.InputPop]-1)/2)
+    tmp_padded_Image[offset:offset+dsum_Images.shape[0],offset:offset+dsum_Images.shape[1]]=dsum_Images
     padded_Image[offset:offset+dsum_Images.shape[0],offset:offset+dsum_Images.shape[1]]=dsum_Images
+    # find the indices of padded pixels
+    paddingInds = []
+    for j in range(self.input_dim):
+      for i in range(offset):
+        paddingInds.append([i,j])
+        paddingInds.append([j,i])
+      for i in range(offset+dsum_Images.shape[0],self.input_dim):
+        paddingInds.append([i,j])
+        paddingInds.append([j,i])
+    if self.objExtension=='Horizontal':
+      for i in range(np.shape(paddingInds)[0]):
+        if paddingInds[i][1]<offset:
+          padded_Image[paddingInds[i][0],paddingInds[i][1]]=np.amax(tmp_padded_Image[paddingInds[i][0],paddingInds[i][1]:paddingInds[i][1]+offset+1])
+        elif paddingInds[i][1]>offset+19:
+          padded_Image[paddingInds[i][0],paddingInds[i][1]]=np.amax(tmp_padded_Image[paddingInds[i][0],paddingInds[i][1]-offset:paddingInds[i][1]])
+        else:
+          padded_Image[paddingInds[i][0],paddingInds[i][1]] = tmp_padded_Image[paddingInds[i][0],paddingInds[i][1]]
+    elif self.objExtension=='Vertical':
+      for i in range(np.shape(paddingInds)[0]):
+        if paddingInds[i][0]<offset:
+          padded_Image[paddingInds[i][0],paddingInds[i][1]]=np.amax(tmp_padded_Image[paddingInds[i][0]:paddingInds[i][0]+offset+1,paddingInds[i][1]])
+        elif paddingInds[i][0]>offset+19:
+          padded_Image[paddingInds[i][0],paddingInds[i][1]]=np.amax(tmp_padded_Image[paddingInds[i][0]-offset:paddingInds[i][0],paddingInds[i][1]])
+        else:
+          padded_Image[paddingInds[i][0],paddingInds[i][1]] = tmp_padded_Image[paddingInds[i][0],paddingInds[i][1]]
+    else:
+      for i in range(np.shape(paddingInds)[0]):
+        if (paddingInds[i][0]<offset+1) and (paddingInds[i][1]<offset+1):
+          padded_Image[paddingInds[i][0],paddingInds[i][1]]=np.amax(tmp_padded_Image[paddingInds[i][0]:paddingInds[i][0]+offset+1,paddingInds[i][1]:paddingInds[i][1]+offset+1])
+        elif (paddingInds[i][0]>offset+19) and (paddingInds[i][1]>offset+19):
+          padded_Image[paddingInds[i][0],paddingInds[i][1]]=np.amax(tmp_padded_Image[paddingInds[i][0]-offset:paddingInds[i][0],paddingInds[i][0]-offset:paddingInds[i][1]])
+        elif (paddingInds[i][0]<offset) and (paddingInds[i][1]>=offset):
+          padded_Image[paddingInds[i][0],paddingInds[i][1]]=np.amax(tmp_padded_Image[paddingInds[i][0]:paddingInds[i][0]+offset+1,paddingInds[i][1]-offset:paddingInds[i][1]])
+        elif (paddingInds[i][0]>offset+19) and (paddingInds[i][1]<=offset+19):
+          padded_Image[paddingInds[i][0],paddingInds[i][1]]=np.amax(tmp_padded_Image[paddingInds[i][0]-offset:paddingInds[i][0],paddingInds[i][1]:paddingInds[i][0]+offset+1])
+        elif (paddingInds[i][0]>offset) and (paddingInds[i][1]<offset):
+          padded_Image[paddingInds[i][0],paddingInds[i][1]]=np.amax(tmp_padded_Image[paddingInds[i][0],paddingInds[i][1]:paddingInds[i][1]+offset+1])
+        elif (paddingInds[i][0]<=offset+19) and (paddingInds[i][1]>offset+19):
+          padded_Image[paddingInds[i][0],paddingInds[i][1]]=np.amax(tmp_padded_Image[paddingInds[i][0],paddingInds[i][0]-offset:paddingInds[i][1]])
+        else:
+          padded_Image[paddingInds[i][0],paddingInds[i][1]] = tmp_padded_Image[paddingInds[i][0],paddingInds[i][1]]
     if dconf['net']['useBinaryImage']:
       thresh = threshold_otsu(padded_Image)
       binary_Image = padded_Image > thresh

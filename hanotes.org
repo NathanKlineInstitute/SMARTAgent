@@ -6358,3 +6358,169 @@ the weights for the decision-making network are only updated periodically to pro
 3. the other possible direction for later was that they sample from memory buffer (frames, actions, rewards) randomly
 
 4. another area (like PFC) to direct planned actions
+
+--- Below code is for testing the algorithm on fake image.
+
+-- create a list of indices of padded neurons.
+
+paddingInds2 = []
+offset = 2
+for j in range(24):
+  for i in range(offset):
+    paddingInds2.append([i,j])
+    paddingInds2.append([j,i])
+  for i in range(offset+20,24):
+    paddingInds2.append([i,j])
+    paddingInds2.append([j,i])
+
+test = np.zeros((24,24))
+for i in range(np.shape(paddingInds2)[0]):
+  test[paddingInds2[i][0],paddingInds2[i][1]]=100
+
+
+-- if want to extend the object pixels in the original image in horizontal dimension.
+
+test2 = np.zeros((24,24))
+count = 0
+for i in range(np.shape(paddingInds2)[0]):
+  if paddingInds2[i][1]<offset:
+    test2[paddingInds2[i][0],paddingInds2[i][1]]=np.amin(test[paddingInds2[i][0],paddingInds2[i][1]:paddingInds2[i][1]+offset+1])
+  elif paddingInds2[i][1]>offset+19:
+    test2[paddingInds2[i][0],paddingInds2[i][1]]=np.amin(test[paddingInds2[i][0],paddingInds2[i][1]-offset:paddingInds2[i][1]])
+  else:
+    test2[paddingInds2[i][0],paddingInds2[i][1]] = test[paddingInds2[i][0],paddingInds2[i][1]]
+
+-- if want to extend the object pixels in the original image in vertical dimension.
+
+test3 = np.zeros((24,24))
+for i in range(np.shape(paddingInds2)[0]):
+  if paddingInds2[i][0]<offset:
+    test3[paddingInds2[i][0],paddingInds2[i][1]]=np.amin(test[paddingInds2[i][0]:paddingInds2[i][0]+offset+1,paddingInds2[i][1]])
+  elif paddingInds2[i][0]>offset+19:
+    test3[paddingInds2[i][0],paddingInds2[i][1]]=np.amin(test[paddingInds2[i][0]-offset:paddingInds2[i][0],paddingInds2[i][1]])
+  else:
+    test3[paddingInds2[i][0],paddingInds2[i][1]] = test[paddingInds2[i][0],paddingInds2[i][1]]
+
+-- if want to extend the object pixels in the original image in both vertical and horizontal dimensions.
+
+test4 = np.zeros((24,24))
+for i in range(np.shape(paddingInds2)[0]):
+  if (paddingInds2[i][0]<offset+1) and (paddingInds2[i][1]<offset+1):
+    test4[paddingInds2[i][0],paddingInds2[i][1]]=np.amin(test[paddingInds2[i][0]:paddingInds2[i][0]+offset+1,paddingInds2[i][1]:paddingInds2[i][1]+offset+1])
+  elif (paddingInds2[i][0]>offset+19) and (paddingInds2[i][1]>offset+19):
+    test4[paddingInds2[i][0],paddingInds2[i][1]]=np.amin(test[paddingInds2[i][0]-offset:paddingInds2[i][0],paddingInds2[i][0]-offset:paddingInds2[i][1]])
+  elif (paddingInds2[i][0]<offset) and (paddingInds2[i][1]>=offset):
+    test4[paddingInds2[i][0],paddingInds2[i][1]]=np.amin(test[paddingInds2[i][0]:paddingInds2[i][0]+offset+1,paddingInds2[i][1]-offset:paddingInds2[i][1]])
+  elif (paddingInds2[i][0]>offset+19) and (paddingInds2[i][1]<=offset+19):
+    test4[paddingInds2[i][0],paddingInds2[i][1]]=np.amin(test[paddingInds2[i][0]-offset:paddingInds2[i][0],paddingInds2[i][1]:paddingInds2[i][0]+offset+1])
+  elif (paddingInds2[i][0]>offset) and (paddingInds2[i][1]<offset):
+    test4[paddingInds2[i][0],paddingInds2[i][1]]=np.amin(test[paddingInds2[i][0],paddingInds2[i][1]:paddingInds2[i][1]+offset+1])
+  elif (paddingInds2[i][0]<=offset+19) and (paddingInds2[i][1]>offset+19):
+    test4[paddingInds2[i][0],paddingInds2[i][1]]=np.amin(test[paddingInds2[i][0],paddingInds2[i][0]-offset:paddingInds2[i][1]])
+  else:
+    test4[paddingInds2[i][0],paddingInds2[i][1]] = test[paddingInds2[i][0],paddingInds2[i][1]]
+
+-- Note that the algorithm uses np.amax instead of np.amin in 
+def updateInputRatesWithPadding (self, dsum_Images):
+in aigame.py ----> see below
+
+
+  def updateInputRatesWithPadding (self, dsum_Images):
+    # update input rates to retinal neurons
+    tmp_padded_Image = np.amin(dsum_Images)*np.ones(shape=(self.input_dim,self.input_dim))
+    padded_Image = np.amin(dsum_Images)*np.ones(shape=(self.input_dim,self.input_dim))
+    offset = int((self.dReceptiveField[self.InputPop]-1)/2)
+    tmp_padded_Image[offset:offset+dsum_Images.shape[0],offset:offset+dsum_Images.shape[1]]=dsum_Images
+    # find the indices of padded pixels
+    paddingInds = []
+    for j in range(self.input_dim):
+      for i in range(offset):
+        paddingInds.append([i,j])
+        paddingInds.append([j,i])
+      for i in range(offset+dsum_Images.shape[0],self.input_dim):
+        paddingInds.append([i,j])
+        paddingInds.append([j,i])
+    if self.objExtension=='Horizontal':
+      for i in range(np.shape(paddingInds)[0]):
+        if paddingInds[i][1]<offset:
+          padded_Image[paddingInds[i][0],paddingInds[i][1]]=np.amax(tmp_padded_Image[paddingInds[i][0],paddingInds[i][1]:paddingInds[i][1]+offset+1])
+        elif paddingInds[i][1]>offset+19:
+          padded_Image[paddingInds[i][0],paddingInds[i][1]]=np.amax(tmp_padded_Image[paddingInds[i][0],paddingInds[i][1]-offset:paddingInds[i][1]])
+        else:
+          padded_Image[paddingInds[i][0],paddingInds[i][1]] = tmp_padded_Image[paddingInds[i][0],paddingInds[i][1]]
+    elif self.objExtension=='Vertical':
+      for i in range(np.shape(paddingInds)[0]):
+        if paddingInds[i][0]<offset:
+          padded_Image[paddingInds[i][0],paddingInds[i][1]]=np.amax(tmp_padded_Image[paddingInds[i][0]:paddingInds[i][0]+offset+1,paddingInds[i][1]])
+        elif paddingInds[i][0]>offset+19:
+          padded_Image[paddingInds[i][0],paddingInds[i][1]]=np.amax(tmp_padded_Image[paddingInds[i][0]-offset:paddingInds[i][0],paddingInds[i][1]])
+        else:
+          padded_Image[paddingInds[i][0],paddingInds[i][1]] = tmp_padded_Image[paddingInds[i][0],paddingInds[i][1]]
+    else:
+      for i in range(np.shape(paddingInds)[0]):
+        if (paddingInds[i][0]<offset+1) and (paddingInds[i][1]<offset+1):
+          padded_Image[paddingInds[i][0],paddingInds[i][1]]=np.amax(tmp_padded_Image[paddingInds[i][0]:paddingInds[i][0]+offset+1,paddingInds[i][1]:paddingInds[i][1]+offset+1])
+        elif (paddingInds[i][0]>offset+19) and (paddingInds[i][1]>offset+19):
+          padded_Image[paddingInds[i][0],paddingInds[i][1]]=np.amax(tmp_padded_Image[paddingInds[i][0]-offset:paddingInds[i][0],paddingInds[i][0]-offset:paddingInds[i][1]])
+        elif (paddingInds[i][0]<offset) and (paddingInds[i][1]>=offset):
+          padded_Image[paddingInds[i][0],paddingInds[i][1]]=np.amax(tmp_padded_Image[paddingInds[i][0]:paddingInds[i][0]+offset+1,paddingInds[i][1]-offset:paddingInds[i][1]])
+        elif (paddingInds[i][0]>offset+19) and (paddingInds[i][1]<=offset+19):
+          padded_Image[paddingInds[i][0],paddingInds[i][1]]=np.amax(tmp_padded_Image[paddingInds[i][0]-offset:paddingInds[i][0],paddingInds[i][1]:paddingInds[i][0]+offset+1])
+        elif (paddingInds[i][0]>offset) and (paddingInds[i][1]<offset):
+          padded_Image[paddingInds[i][0],paddingInds[i][1]]=np.amax(tmp_padded_Image[paddingInds[i][0],paddingInds[i][1]:paddingInds[i][1]+offset+1])
+        elif (paddingInds[i][0]<=offset+19) and (paddingInds[i][1]>offset+19):
+          padded_Image[paddingInds[i][0],paddingInds[i][1]]=np.amax(tmp_padded_Image[paddingInds[i][0],paddingInds[i][0]-offset:paddingInds[i][1]])
+        else:
+          padded_Image[paddingInds[i][0],paddingInds[i][1]] = tmp_padded_Image[paddingInds[i][0],paddingInds[i][1]]
+    if dconf['net']['useBinaryImage']:
+      thresh = threshold_otsu(padded_Image)
+      binary_Image = padded_Image > thresh
+      fr_Images = self.locationNeuronRate*binary_Image
+    else:
+      padded_Image = padded_Image - np.amin(padded_Image)
+      padded_Image = (255.0/np.amax(padded_Image))*padded_Image # this will make sure that padded_Image spans 0-255
+      fr_Images = self.locationNeuronRate/(1+np.exp((np.multiply(-1,padded_Image)+123)/10))
+      #fr_Images = np.subtract(fr_Images,np.min(fr_Images)) #baseline firing rate subtraction. Instead all excitatory neurons are firing at 5Hz.
+      #print(np.amin(fr_Images),np.amax(fr_Images))
+    self.dFiringRates[self.InputPop] = np.reshape(fr_Images,self.dInputs[self.InputPop]) #400 for 20*20, 900 for 30*30, etc.
+
+* 20sept09
+
+import gym
+import numpy as np  
+from skimage.transform import downscale_local_mean, resize
+from skimage.color import rgb2gray
+from matplotlib import pyplot as plt
+
+env = gym.make('Pong-v0')
+env.reset()
+caction = 3
+observation, reward, done, info = env.step(caction)
+courtYRng = (34, 194)
+gray_Image = 255.0*rgb2gray(observation[courtYRng[0]:courtYRng[1],:,:]) # convert to grayscale; rgb2gray has 0-1 range so mul by 255
+gray_ds = downscale_local_mean(gray_Image,(8,8)) # then downsample
+gray_ds = np.where(gray_ds>np.min(gray_ds)+1,255,gray_ds) # Different thresholding
+dsum_Images = gray_ds
+
+tmp_padded_Image = np.amin(dsum_Images)*np.ones(shape=(22,22))
+padded_Image = np.amin(dsum_Images)*np.ones(shape=(22,22))
+offset = 1
+tmp_padded_Image[offset:offset+dsum_Images.shape[0],offset:offset+dsum_Images.shape[1]]=dsum_Images
+padded_Image[offset:offset+dsum_Images.shape[0],offset:offset+dsum_Images.shape[1]]=dsum_Images
+paddingInds = []
+for j in range(22):
+  for i in range(offset):
+    paddingInds.append([i,j])
+    paddingInds.append([j,i])
+  for i in range(offset+dsum_Images.shape[0],22):
+    paddingInds.append([i,j])
+    paddingInds.append([j,i])
+for i in range(np.shape(paddingInds)[0]):
+  if paddingInds[i][0]<offset:
+    padded_Image[paddingInds[i][0],paddingInds[i][1]]=np.amax(tmp_padded_Image[paddingInds[i][0]:paddingInds[i][0]+offset+1,paddingInds[i][1]])
+  elif paddingInds[i][0]>offset+19:
+    padded_Image[paddingInds[i][0],paddingInds[i][1]]=np.amax(tmp_padded_Image[paddingInds[i][0]-offset:paddingInds[i][0],paddingInds[i][1]])
+  else:
+    padded_Image[paddingInds[i][0],paddingInds[i][1]] = tmp_padded_Image[paddingInds[i][0],paddingInds[i][1]]
+
+-- padding with extension works well...
