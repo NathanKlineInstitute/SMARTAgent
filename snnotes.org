@@ -16989,3 +16989,29 @@ differs in diff contexts
 
 used in anns to promote stabiltiy (two networks)
 
+* 20sep8
+** check output
+
+python -i simdat.py backupcfg/20sep3_B1_cycle__step_9_sim.json
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/20sep8_20sep3_B1_cycle__step_9_perf.png]]
+
+lfn = ['20sep2_B0_cycle_', '20sep3_B1_cycle__step_0_', '20sep3_B1_cycle__step_1_']
+for i in range(2,10,1): lfn.append('20sep3_B1_cycle__step_'+str(i)+'_')
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0,1))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/20sep8_20sep3_B1_cycle__step_9_perf_all_steps_so_far.png]]
+
+lpda = getindivactionreward(lfn)
+
+csm=cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+lclr = [csm.to_rgba(float(i)/(len(lpda))) for i in range(len(lpda))]
+
+clf(); plotComparePerf(lpda,lclr,yl=(0,1),lleg=lfn)
+savefig(gifpath()+'perf_compareB.png') # [[./gif/20sep8_20sep3_B1_cycle__step_9_perf_compareB.png]]
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((1990e3,2000e3))
+savefig(gifpath()+'rast.png') # [[./gif/20sep8_20sep3_B1_cycle__step_9_rast.png]]
+
+fig=animInput(InputImages,gifpath()+'_input.mp4') # [[./gif/20sep8_20sep3_B1_cycle__step_9__input.mp4]]

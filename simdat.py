@@ -529,11 +529,11 @@ def plotFollowBall (actreward, ax=None,cumulative=True,msz=3,binsz=1e3,color='r'
     rewardingActions = np.cumsum(rewardingActions) # cumulative of rewarding action
     cumActs = np.array(range(1,len(allproposed)+1))
     aout = np.divide(rewardingActions,cumActs)
-    ax.plot(allproposed.time,aout,color+'.',markersize=msz)
+    ax.plot(allproposed.time,aout,'.',color=color,markersize=msz)
   else:
     nbin = int(binsz / (np.array(actreward.time)[1]-np.array(actreward.time)[0]))
     aout = avgfollow = [mean(rewardingActions[sidx:sidx+nbin]) for sidx in arange(0,len(rewardingActions),nbin)]
-    ax.plot(np.linspace(0,np.amax(actreward.time),len(avgfollow)), avgfollow, color,linewidth=msz)
+    ax.plot(np.linspace(0,np.amax(actreward.time),len(avgfollow)), avgfollow, color=color,linewidth=msz)
   ax.set_xlim((0,np.amax(actreward.time)))
   ax.set_ylim((0,1))
   ax.set_xlabel('Time (ms)'); ax.set_ylabel('p(Follow Target)')
@@ -564,13 +564,13 @@ def plotHitMiss (actreward,ax=None,msz=3,asratio=False,asbin=False,binsz=10e3,lc
     ax.set_ylabel('Hit/(Hit+Miss) ('+str(round(score[-1],2))+')')    
     return score
   elif asratio:
-    ax.plot(action_times,cumHits/cumMissed,lclr[0]+'-o',markersize=msz)
+    ax.plot(action_times,cumHits/cumMissed,'-o',color=lclr[0],markersize=msz)
     ax.set_xlim((0,np.max(action_times)))
     ax.set_ylabel('Hit/Miss ('+str(round(cumHits[-1]/cumMissed[-1],2))+')')
     return cumHits[-1]/cumMissed[-1]
   else:
-    ax.plot(action_times,cumHits,lclr[0]+'-o',markersize=msz)
-    ax.plot(action_times,cumMissed,lclr[1]+'-o',markersize=msz)
+    ax.plot(action_times,cumHits,'-o',color=lclr[0],markersize=msz)
+    ax.plot(action_times,cumMissed,'-o',color=lclr[1],markersize=msz)
     ax.set_xlim((0,np.max(action_times)))
     ax.set_ylim((0,np.max([cumHits[-1],cumMissed[-1]])))    
     ax.set_ylabel('Hit Ball ('+str(cumHits[-1])+')','Miss Ball ('+str(cumMissed[-1])+')')
@@ -585,12 +585,12 @@ def plotScoreMiss (actreward,ax=None,msz=3,asratio=False,clr='r'):
   cumMissed = np.cumsum(allMissed) #if a reward is -1, replace it with 1 else replace it with 0.
   cumScore = getCumScore(actreward)
   if asratio:
-    ax.plot(action_times,cumScore/cumMissed,clr+'-o',markersize=msz)
+    ax.plot(action_times,cumScore/cumMissed,'-o',color=clr,markersize=msz)
     ax.set_xlim((0,np.max(action_times)))
     ax.set_ylabel('Score/Miss ('+str(round(cumScore[-1]/cumMissed[-1],2))+')')
     return cumScore[-1]/cumMissed[-1]
   else:
-    ax.plot(action_times,cumScore,clr+'-o',markersize=msz)
+    ax.plot(action_times,cumScore,'-o',color=clr,markersize=msz)
     ax.set_xlim((0,np.max(action_times)))
     ax.set_ylim((0,cumMissed[-1]))
     ax.set_ylabel('Score ('+str(cumScore[-1])+')')
