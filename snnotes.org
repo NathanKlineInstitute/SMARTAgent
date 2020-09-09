@@ -17015,3 +17015,6 @@ clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((1990
 savefig(gifpath()+'rast.png') # [[./gif/20sep8_20sep3_B1_cycle__step_9_rast.png]]
 
 fig=animInput(InputImages,gifpath()+'_input.mp4') # [[./gif/20sep8_20sep3_B1_cycle__step_9__input.mp4]]
+
+** ha fixed padding
+
