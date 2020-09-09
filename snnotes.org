@@ -16641,7 +16641,7 @@ motion detection output looks a lot worse ...
 * 20aug31
 ** setup again
 *20sep1
-** testing with topol
+** testing with topol (padding causes problems with direction selective neurons!) (20sep1_A0_cycle_)
 
 have to adjust weights
 these are some of the params to set:
@@ -16706,4 +16706,315 @@ not sure this part in aigame.py makes sense:
     else:  
       self.input_dim = int(np.sqrt(dconf['net']['allpops'][self.InputPop])) # input image XY plane width,height -- not used anywhere    
 since after the padding the size does not have to be a square ?
+
+python -i simdat.py backupcfg/20sep1_A0_cycle_sim.json
+
+ax=plotPerf(actreward,yl=(0,.55))
+
+ok, try a longer run with topol
+
+100 s took only ~5 minutes ... 
+
+try 2000 s ... note that tstepPerAction is 50 ms ... 
+
+    "architecturePreMtoM": {
+        "useProbabilistic": 0,
+        "useTopological": 1
+    },
+
+./myrun 32 sn.json
+
+started ~16:29 on cycle ... 
+
+** and a comparison without topol (20sep1_B0_cycle_)
+
+    "architecturePreMtoM": {
+        "useProbabilistic": 1,
+        "useTopological": 0
+    },
+
+./myrun 32 sn.json
+
+started ~16:34 on cylce ...
+
+* 20sep2
+** check output from sim with/without topol conn (but no padding; 20sep1_A0_cycle_, 20sep1_B0_cycle_)
+
+  Simulated time: 2000.0 s; 32 workers
+  Run time: 32544.85 s
+
+python -i simdat.py backupcfg/20sep1_A0_cycle_sim.json
+
+ax=plotPerf(actreward,yl=(0,.55))
+savefig(gifpath()+'perf.png') # gif/20sep2_20sep1_A0_cycle_perf.png
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((1990e3,2000e3))
+savefig(gifpath()+'rast.png') # gif/20sep2_20sep1_A0_cycle_rast.png
+
+rates look good
+
+binsz=20
+dhist = {pop:getspikehist(dspkT[pop],dnumc,binsz,totalDur) for pop in ['EV1DE','EV1DW']}
+
+for k,clr in zip(list(dhist.keys()),['r','b']): plot(dhist[k][0],dhist[k][1],clr)
+
+no longer see the overlap in E,W so that's good ... 
+
+fig=animInput(InputImages,gifpath()+'_input.mp4',showflow=True,ldflow=ldflow) # gif/20sep2_20sep1_A0_cycle__input.mp4
+
+looks ok for many cases but has the usual problem of overshooting when ball going to corner (paddle does not seem to
+get stuck in corner but instead shoots too far down, too quickly, missing contact with the ball; would the EMSTAY
+neurons help?)
+
+how does it compare to the sim without topol conn?
+
+lfn = ['20sep1_A0_cycle_', '20sep1_B0_cycle_']
+lpda = getindivactionreward(lfn)
+clf(); plotComparePerf(lpda,['b','r'],yl=(0,1),lleg=lfn)
+savefig(gifpath()+'perf_compare.png') # gif/20sep2_20sep1_A0_cycle_perf_compare.png
+not clear that topol better ... 
+
+check rates/activity for the other sim - looked like had much higher rates
+
+took a lot longer to run 20sep1_B0_cycle_
+  Run time: 55552.86 s
+
+python -i simdat.py backupcfg/20sep1_B0_cycle_sim.json
+
+ax=plotPerf(actreward,yl=(0,.55))
+savefig(gifpath()+'perf.png') # gif/20sep2_20sep1_B0_cycle_perf.png
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((1990e3,2000e3))
+savefig(gifpath()+'rast.png') # gif/20sep2_20sep1_B0_cycle_rast.png
+the EMDOWN,EMUP rates are much higher, but not pathologically high ... 
+xlim((1998e3,1999e3))
+savefig(gifpath()+'rastB.png') # gif/20sep2_20sep1_B0_cycle_rastB.png
+
+fig=animInput(InputImages,gifpath()+'_input.mp4',showflow=True,ldflow=ldflow) # gif/20sep2_20sep1_B0_cycle__input.mp4
+
+activity looks ok - nothing unusual ... 
+
+** some emacs adjustments
+
+M-x ielm (starts lisp interpreter)
+
+https://github.com/cpaulik/emacs-material-theme
+(put that el file into ~/.emacs.d/ )
+(load-theme 'material t) ; <- that loads the theme
+(setq org-support-shift-select t) ; <- use that to allow shift-selection in org mode
+
+M-x goto-line goes to a line, should add a key-binding
+
+https://emacs.stackexchange.com/questions/37887/send-region-to-shell-in-another-buffer
+
+** xv for ubunbtu - use snap to install
+
+https://snapcraft.io/install/xv/ubuntu
+
+sudo snap install xv --edge
+
+gets certificate error on cycle ... how to bypass certificate check with snap?
+
+** simple tuts on dqn
+
+https://www.analyticsvidhya.com/blog/2019/04/introduction-deep-q-learning-python/
+https://medium.com/@jonathan_hui/rl-introduction-to-deep-reinforcement-learning-35c25e04c199
+
+multiple networks
+target and prediction to prevent instability in training - copy from one network to other every so often
+experience replay important -- add it? store state,action,reward,next state then sample
+from it randomly; problem is that neuronal network has a dynamic state ... but couldn't it handle
+arbitrary inputs?
+
+** output encoding problematic?
+** other sims
+
+smaller weight increments (RLhebbwt of 1e-6) prevent instability? also inc RLlenhebb to 500 ms from 200 ms
+since tstepPerAction now longer (50 ms instead of 20 ms)
+
+try another comparison with topo and w/o topo
+
+20sep2_A0_cycle_ (with topo)
+20sep2_B0_cycle_ (without topo)
+
+./myrun 32 sn.json
+
+20sep2_A0_cycle_ started ~17:05
+
+./myrun 32 sn.json
+
+20sep2_B0_cycle_ started ~17:06
+
+
+ax=plotPerf(actreward,yl=(0,.55))
+drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); 
+
+** other bugs
+
+noticed that when use EMSTAY now get a crash; also can only use certain sizes
+for the layers when using topo conn
+
+* 20sep3
+** check output from last two sims on cycle
+
+python -i simdat.py backupcfg/20sep2_A0_cycle_sim.json
+
+ax=plotPerf(actreward,yl=(0,.65))
+savefig(gifpath()+'perf.png') # gif/20sep3_20sep2_A0_cycle_perf.png
+
+some of the values get reasonably high (hit/miss), but happens so early on that
+may not be due to learning??
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((1990e3,2000e3))
+savefig(gifpath()+'rast.png') # gif/20sep3_20sep2_A0_cycle_rast.png
+
+very sparse firing for EMUP, EMDOWN (~0.2 Hz on average) - all rates look good
+
+how does it compare to the corresponding sim without topol conn?
+
+lfn = ['20sep2_A0_cycle_', '20sep2_B0_cycle_']
+lpda = getindivactionreward(lfn)
+clf(); plotComparePerf(lpda,['b','r'],yl=(0,1),lleg=lfn)
+savefig(gifpath()+'perf_compare.png') # gif/20sep3_20sep2_A0_cycle_perf_compare.png
+not clear which better; topol has higher hit/miss and score values but does not seem
+to be increasing ... while w/o topol hit/miss looks like increasing somewhat steadily ... 
+
+and compare against the sims with larger weight steps
+
+lfn = ['20sep1_A0_cycle_', '20sep2_A0_cycle_']
+lpda = getindivactionreward(lfn)
+clf(); plotComparePerf(lpda,['b','r'],yl=(0,1),lleg=lfn)
+savefig(gifpath()+'perf_compareB.png') # gif/20sep3_20sep2_A0_cycle_perf_compareB.png
+smaller step size with the longer RL tau seems better ... 
+
+weights?
+
+popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=True)
+xlabel('Time (ms)',fontsize=30); ylabel('Average weight',fontsize=30); tl(); 
+savefig(gifpath()+'all_avg_weight.png') # gif/20sep3_20sep2_A0_cycle_all_avg_weight.png
+many are flat, some rising
+
+fig=animInput(InputImages,gifpath()+'_input.mp4') # gif/20sep3_20sep2_A0_cycle__input.mp4
+
+does ok sometimes, but makes the same mistake many times and does not seem to adapt - are the EMUP,EMDOWN firing rates too low?
+
+check rates/activity for the other sim - has higher firing rates
+
+took longer to run 20sep2_B0_cycle_
+  Run time: 53903.56 s
+
+python -i simdat.py backupcfg/20sep2_B0_cycle_sim.json
+
+ax=plotPerf(actreward,yl=(0,.65))
+savefig(gifpath()+'perf.png') # gif/20sep3_20sep2_B0_cycle_perf.png
+hit/miss seems to be rising ... 
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((1990e3,2000e3))
+savefig(gifpath()+'rast.png') # gif/20sep3_20sep2_B0_cycle_rast.png
+as before, the EMDOWN,EMUP rates are much higher (~4 Hz) than topo model (~0.2 Hz), but not pathologically high ... 
+
+and compare to same sim (w/o topo) and with larger weight incs, shorter RL tau:
+lfn = ['20sep1_B0_cycle_', '20sep2_B0_cycle_']
+lpda = getindivactionreward(lfn)
+clf(); plotComparePerf(lpda,['b','r'],yl=(0,1),lleg=lfn)
+savefig(gifpath()+'perf_compareB.png') # [[./gif/20sep3_20sep2_B0_cycle_perf_compareB.png]]
+look pretty similar ... 
+
+weights?
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=True)
+xlabel('Time (ms)',fontsize=30); ylabel('Average weight',fontsize=30); tl(); 
+savefig(gifpath()+'all_avg_weight.png') # [[./gif/20sep3_20sep2_A0_cycle_all_avg_weight.png]]
+these weights are going up much more broadly - does that support the idea that the topological connectivity is an effective strategy
+to allow only the right weights to change?
+
+fig=animInput(InputImages,gifpath()+'_input.mp4') # gif/20sep3_20sep2_B0_cycle__input.mp4
+
+this one seems to perform better overall as the sim progresses ... has examples of returning the ball a few times in a row
+
+probably worth continuing both of these sims for further testing ... 
+
+with weight norm at beginning ... 
+
+    "simtype": {
+        "ResumeSim": 1,
+        "ResumeSimFromFile": "data/20sep2_B0_cycle_synWeights_final.pkl"
+    },
+        "name": "20sep3_B1_cycle_",
+	"normalizeWeightsAtStart": 1,
+    "architecturePreMtoM": {
+        "useProbabilistic": 1,
+        "useTopological": 0
+    },
+python multistepSim.py sn.json 32 10 20sep3_B1_cycle_multi
+started ~12:08 ... 
+
+    "simtype": {
+        "ResumeSim": 1,
+        "ResumeSimFromFile": "data/20sep2_A0_cycle_synWeights_final.pkl"
+    },
+        "name": "20sep3_A1_cycle_",
+	"normalizeWeightsAtStart": 1,
+    "architecturePreMtoM": {
+        "useProbabilistic": 0,
+        "useTopological": 1
+    },
+python multistepSim.py sn.json 32 10 20sep3_A1_cycle_multi
+started ~12:10 ...
+
+* 20sep4
+** stopped topo sims 20sep3_A1_cycle_multi, since did not look like improving
+** check output from 20sep3_B1_cycle_multi
+
+python -i simdat.py backupcfg/20sep3_B1_cycle__step_1_sim.json
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/20sep4_20sep3_B1_cycle__step_1_perf.png]]
+
+looks ~flat during those 2000 s ... 
+
+
+lfn = ['20sep2_B0_cycle_', '20sep3_B1_cycle__step_0_', '20sep3_B1_cycle__step_1_']
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0,1))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/20sep4_20sep3_B1_cycle__step_1_perf_all_steps_so_far.png]]
+hmm, performance degrading slowly after ~2000 s
+
+lpda = getindivactionreward(lfn)
+clf(); plotComparePerf(lpda,['g','b','r'],yl=(0,1),lleg=lfn)
+savefig(gifpath()+'perf_compareB.png') # [[./gif/20sep4_20sep3_B1_cycle__step_1_perf_compareB.png]]
+yes, perf getting worse ... need to understand if/why that's really occurring ... could be perf
+differs in diff contexts
+
+** only transfer weights periodically?
+
+used in anns to promote stabiltiy (two networks)
+
+* 20sep8
+** check output
+
+python -i simdat.py backupcfg/20sep3_B1_cycle__step_9_sim.json
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/20sep8_20sep3_B1_cycle__step_9_perf.png]]
+
+lfn = ['20sep2_B0_cycle_', '20sep3_B1_cycle__step_0_', '20sep3_B1_cycle__step_1_']
+for i in range(2,10,1): lfn.append('20sep3_B1_cycle__step_'+str(i)+'_')
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0,1))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/20sep8_20sep3_B1_cycle__step_9_perf_all_steps_so_far.png]]
+
+lpda = getindivactionreward(lfn)
+
+csm=cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+lclr = [csm.to_rgba(float(i)/(len(lpda))) for i in range(len(lpda))]
+
+clf(); plotComparePerf(lpda,lclr,yl=(0,1),lleg=lfn)
+savefig(gifpath()+'perf_compareB.png') # [[./gif/20sep8_20sep3_B1_cycle__step_9_perf_compareB.png]]
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((1990e3,2000e3))
+savefig(gifpath()+'rast.png') # [[./gif/20sep8_20sep3_B1_cycle__step_9_rast.png]]
+
+fig=animInput(InputImages,gifpath()+'_input.mp4') # [[./gif/20sep8_20sep3_B1_cycle__step_9__input.mp4]]
+
+** ha fixed padding
 
