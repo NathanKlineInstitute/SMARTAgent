@@ -6524,3 +6524,152 @@ for i in range(np.shape(paddingInds)[0]):
     padded_Image[paddingInds[i][0],paddingInds[i][1]] = tmp_padded_Image[paddingInds[i][0],paddingInds[i][1]]
 
 -- padding with extension works well...
+
+-- run 5000 sec "20sept09_A1_cycle_"
+... with padding
+... with vertical object extension.
+... with tstepPerAction: 20ms 
+... normalizeWeightStepSize: 1000 seconds
+... stimModDirW: 0.02
+... stimModInputW: 0.02
+
+-- run 5000 sec "20sept09_A2_cycle_"
+... with padding
+... with vertical object extension.
+... with tstepPerAction: 50ms
+... normalizeWeightStepSize: 1000 seconds
+... stimModDirW: 0.02
+... stimModInputW: 0.02
+.... memory error while gathering the data before saving. restarted sim for  3000 sec instead of 5000 sec named "20sept10_A2_cycle"
+
+-- run 5000 sec "20sept09_A1_falcor_"
+... with padding
+... with vertical object extension.
+... with tstepPerAction: 20ms 
+... normalizeWeightStepSize: 1000 seconds
+... stimModDirW: 0.025
+... stimModInputW: 0.025
+---> no movement in rackets, use 0.015 instead of 0.025 and restart
+
+-- run 5000 sec "20sept09_A2_falcor_"
+... with padding
+... with vertical object extension.
+... with tstepPerAction: 50ms
+... normalizeWeightStepSize: 1000 seconds
+... stimModDirW: 0.025
+... stimModInputW: 0.025
+---> no movement in rackets, use 0.015 instead of 0.025 and restart
+
+* 20sept11
+
+-- analyzing "20sept10_A2_cycle"
+
+python -i simdat.py backupcfg/20sept10_A2_cycle_sim.json
+#dact = getdActMap (totalDur, tstepPerAction, dspkT, dspkID, dnumc, dstartidx,lpop = allpossible_pops)
+binsz=50
+dhist = {pop:getspikehist(dspkT[pop],dnumc,binsz,totalDur) for pop in lpop}
+
+
+plotPerf(actreward)..... and save the plot as 20sept10_A2_cycle_Perf.png
+
+....
+clf(); dobjpos = loadObjPos() ## 
+subplot(2,1,1); xlabel('Racket Y position'); hist(dobjpos['racket'][:,1])
+subplot(2,1,2); xlabel('Ball Y position'); hist(dobjpos['ball'][:,1])
+and save the plot as 20sept10_A2_cycle_RacketBallYposHist.png
+
+....
+plot(dobjpos['ball'][:,1],'b')
+plot(dobjpos['racket'][:,1],'r')
+legend(['ball','racket'])
+xlabel('tpnts')
+ylabel('Y-Pixel loc')
+didnt save this.. not very informative when saved in full.
+
+....
+ballX,ballY = dobjpos['ball'][:,0],dobjpos['ball'][:,1]
+racketX,racketY = dobjpos['racket'][:,0],dobjpos['racket'][:,1]
+tt = np.linspace(0,totalDur,len(dobjpos['ball']))
+pdpos = pd.DataFrame(np.array([tt, ballX, ballY, racketX, racketY]).T,columns=['time','ballX','ballY','racketX','racketY'])
+dout = getdistvstimecorr(pdpos)
+plot(dout['lN'],dout['lr'],'ko',markersize=15)
+xlabel('Number examples'); ylabel('Correlation between paddle/ball distance and time')
+and save the plot as 20sept10_A2_cycle_RacketBalldistcorr.png
+
+** based on discussion with Sam, i will keep connections between V1 and M neurons fixed (i.e. no RL)
+
+-- added in sim.json
+in "net"....
+        "RLconns":{
+            "VisualRL":0,
+            "RecurrentDirNeurons":0,
+            "RecurrentLocNeurons":0,
+            "FeedForwardDirNtoM":1,
+            "FeedForwardLocNtoM":0,
+            "FeedbackLocNeurons":0,
+            "RecurrentMNeurons":0,
+            "FeedbackMtoDirN":0,
+            "FeedbackMtoLocN":0
+        },
+
+and
+
+        "EPreMDirPops": ["EV1DE","EV1DNE","EV1DN","EV1DNW","EV1DW","EV1DSW","EV1DS","EV1DSE"],
+        "EPreMLocPops": ["EV1","EV4","EMT"],
+
+so that can allow RL only between Dir neurons and Motor neurons.
+excluding RL from V1 to Motor neurons' connections.
+
+-- for recurrent excitation in premotor neurons.
+
+      useRL = 0
+      if prety in dconf['net']['EPreMDirPops']:
+        if dconf['net']['RLconns']['RecurrentDirNeurons']: 
+          useRL = 1
+      if prety in dconf['net']['EPreMLocPops']:
+        if dconf['net']['RLconns']['RecurrentLocNeurons']: 
+          useRL = 1 
+      if useRL and dSTDPparamsRL[synmech]['RLon']: # only turn on plasticity when specified to do so
+        netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL[synmech]}
+
+--  change in EIPlast for motor cortex
+
+  if 'EIPlast' in dconf['net']['RLconns']:
+    if dconf['net']['RLconns']['EIPlast']:
+
+-- change dconf['net']['VisualRL'] to dconf['net']['RLconns']['VisualRL'] 
+
+-- for visual feedback
+
+        if dconf['net']['RLconns']['FeedbackLocNeurons'] and dSTDPparamsRL[synmech]['RLon']: # only turn on plasticity when specified to do so
+          netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL[synmech]}
+
+-- for feedforward EpreM to EM
+
+        useRL = 0
+        if prety in dconf['net']['EPreMDirPops']:
+          if dconf['net']['RLconns']['FeedForwardDirNtoM']: 
+            useRL = 1
+        if prety in dconf['net']['EPreMLocPops']:
+          if dconf['net']['RLconns']['FeedForwardLocNtoM']: 
+            useRL = 1
+        if useRL and dSTDPparamsRL[synmech]['RLon']: # only turn on plasticity when specified to do so
+          netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL[synmech]}
+
+-- for recurrent EM
+
+          if dconf['net']['RLconns']['RecurrentMNeurons'] and dSTDPparamsRL[synmech]['RLon']: # only turn on plasticity when specified to do so
+            netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL[synmech]}
+
+--- for feedback EM to EpreM
+
+          if poty in dconf['net']['EPreMDirPops']:
+            if dconf['net']['RLconns']['FeedbackMtoDirN']: 
+              useRL = 1
+          if poty in dconf['net']['EPreMLocPops']:
+            if dconf['net']['RLconns']['FeedbackMtoLocN']: 
+              useRL = 1
+          if useRL and dSTDPparamsRL[synmech]['RLon']: # only turn on plasticity when specified to do so
+            netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL[synmech]}
+
+-- test locally, if runs without any error... then submit on falcor.
