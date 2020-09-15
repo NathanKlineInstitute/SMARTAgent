@@ -6673,3 +6673,165 @@ excluding RL from V1 to Motor neurons' connections.
             netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL[synmech]}
 
 -- test locally, if runs without any error... then submit on falcor.
+
+* 20sept14
+
+-- run 3000 sec sim "20sept14_A0_falcor_" using "tstepPerAction": 20
+
+-- run 3000 sec sim "20sept14_A1_falcor_" using "tstepPerAction": 50
+
+-- run 3000 sec sim "20sept14_A0_cycle_" using "tstepPerAction": 20 and "EEMWghtAM": 5e-4 and "EEPreMWghtAM":8e-6
+
+-- run 3000 sec sim "20sept14_A1_cycle_" using "tstepPerAction": 50 and "EEMWghtAM": 5e-4 and "EEPreMWghtAM":8e-6
+
+-- run 100 sec sim "20sept14_B0_local_" using "tstepPerAction": 20 and "EEMWghtAM": 5e-4 and "EEPreMWghtAM":8e-6
+and     "useSimulatedEnv": 1,
+
+-- run 100 sec sim "20sept14_B1_local_" using "tstepPerAction": 50 and "EEMWghtAM": 5e-4 and "EEPreMWghtAM":8e-6
+and     "useSimulatedEnv": 1,
+
+-- analyzing sim with simulatedPong...
+
+python -i simdat.py backupcfg/20sept14_B0_local_sim.json
+dact = getdActMap (totalDur, tstepPerAction, dspkT, dspkID, dnumc, dstartidx,lpop = allpossible_pops)
+plt.imshow(np.sum(dact['EV1'],0))
+binsz = 20
+dhist = {pop:getspikehist(dspkT[pop],dnumc,binsz,totalDur) for pop in lpop}
+plt.hist(dhist['EV1'][1][1:],100) 
+
+plotPerf(actreward)
+
+....
+clf(); dobjpos = loadObjPos() ## 
+subplot(2,1,1); xlabel('Racket Y position'); hist(dobjpos['racket'][:,1])
+subplot(2,1,2); xlabel('Ball Y position'); hist(dobjpos['ball'][:,1])
+and save the plot as 20aug24_A0_cycle_RacketBallYposHist.png
+
+....
+plot(dobjpos['ball'][:,1],'b')
+plot(dobjpos['racket'][:,1],'r')
+legend(['ball','racket'])
+xlabel('tpnts')
+ylabel('Y-Pixel loc')
+and save the plot as 20aug24_A0_cycle_RacketBallYposFull.png and 20aug24_A0_cycle_RacketBallYposZoomed.png
+
+....
+ballX,ballY = dobjpos['ball'][:,0],dobjpos['ball'][:,1]
+racketX,racketY = dobjpos['racket'][:,0],dobjpos['racket'][:,1]
+tt = np.linspace(0,totalDur,len(dobjpos['ball']))
+pdpos = pd.DataFrame(np.array([tt, ballX, ballY, racketX, racketY]).T,columns=['time','ballX','ballY','racketX','racketY'])
+dout = getdistvstimecorr(pdpos)
+plot(dout['lN'],dout['lr'],'ko',markersize=15)
+xlabel('Number examples'); ylabel('Correlation between paddle/ball distance and time')
+didnt save... not sure what to make out of it.....
+
+-- more analysis
+.... for a pixel representing ball, and Model racket, find firing rates of poulation.
+
+e.g. 
+Ball_pixel = (10,10)
+Racket_pixel = (5,17)
+find all instrances, when Ball and racket were at these pixels.
+find possible Ball sequences, including the Ball_pixel as the first image in the sequence.
+then for the ball moving in a single direction, find whether model is learning in which direction to move or not.
+
+
+def analyzeActionLearningForRepeatedInputSequences(dact, InputImages, BallPixel=(10,10), RacketPixel=(5,17)):
+  nbseq=2
+  targetCorr=0.99
+  ballInds = np.where(InputImages[:,BallPixel[0],BallPixel[1]]>250)
+  racketInds = np.where(InputImages[:,RacketPixel[0],RacketPixel[1]]>250)
+  targetInds = []
+  for inds in racketInds[0]:
+    if inds in ballInds[0]:
+      targetInds.append(inds)
+  seqImages = []
+  for inds in targetInds:
+    seqImages.append(np.sum(InputImages[inds:inds+1,:,3:17],0))
+  x = seqImages[0]
+  goodInds = []
+  for j in range(np.shape(seqImages)[0]):
+    y = seqImages[j]
+    corr, p_value = pearsonr(x.flat, y.flat)
+    if corr>targetCorr:
+      goodInds.append(j)
+  lmotorpop = [pop for pop in dconf['net']['EMotorPops'] if dconf['net']['allpops'][pop]>0] 
+  goodSeqImages = []
+  repActions = []
+  repPropActions = []
+  repRewards = []
+  dseqOutputs = {pop:np.zeros((len(goodInds),dact[pop].shape[1],dact[pop].shape[2]),dtype=float) for pop in lmotorpop}
+  for inds in goodInds:
+    goodSeqImages.append(np.sum(InputImages[targetInds[inds]:targetInds[inds]+1,:,:],0))
+    repActions.append(actreward['action'][targetInds[inds]+1])
+    repRewards.append(actreward['reward'][targetInds[inds]+1])
+    repPropActions.append(actreward['proposed'][targetInds[inds]+1])
+    for pop in dseqOutputs.keys():
+      dseqOutputs[pop][inds,:,:]=dact[pop][targetInds[inds]+1,:,:]
+  dsummedOutputs = {pop:np.zeros((len(goodInds),1),dtype=float) for pop in lmotorpop}
+  for pop in lmotorpop:
+    dsummedOutputs[pop] = np.sum(np.sum(dseqOutputs[pop],axis=2),axis=1)
+  fig, axs = plt.subplots(3, 1, figsize=(10,8));
+  lax = axs.ravel()
+  lax[0].imshow(np.sum(goodSeqImages,0))
+  lax[0].axis('off')
+  for pop,clr in zip(lmotorpop,['b','r','g']):
+    lax[1].plot(dsummedOutputs[pop],clr+'-o',markersize=3)
+    lax[1].set_ylabel('# of pop spikes')
+  lax[1].legend(lmotorpop,loc='best')
+  lax[2].plot(repActions,'-o',color=(0,0,0,1),markersize=3)
+  lax[2].plot(repPropActions,'-o',color=(0.5,0.5,0.5,1),markersize=3)
+  lax[2].set_yticks([1,3,4])
+  lax[2].set_yticklabels(['STAY','DOWN','UP'])
+  lax[2].legend(['Actions','Proposed'],loc='best')
+
+-- added analyzeActionLearningForRepeatedInputSequences(dact, InputImages, BallPixel=(10,10), RacketPixel=(5,17)) in simdat.py
+
+-- -- run 1000 sec sim "20sept14_B2_local_" using "tstepPerAction": 50 and "EEMWghtAM": 5e-4 and "EEPreMWghtAM":8e-6
+and     "useSimulatedEnv": 1,
+
+
+* 20sept15
+
+-- resume 3000 sec sim "20sept14_A1R1_cycle_" using "tstepPerAction": 50 and "EEMWghtAM": 5e-4 and "EEPreMWghtAM":8e-6
+from data/20sept14_A1_cycle_synWeights_final.pkl
+
+
+-- disucssion with sam
+
+samn:speech_balloon:  12:09 PM
+see what's most useful and decide...i still feel we need to allow learning at longer timescales with sparser reward, etc.
+12:09
+ok - so what's on the list of choices?
+12:09
+thx for edits - sounds better now
+
+Haroon Anwar  12:10 PM
+targeted on smaller time scale + non-targeted at longer time scale
+12:10
+2. way to decide , how to use targeted for longer times
+12:11
+not sure how will we do that
+12:11
+or just see if we can train to follow the ball with targeted on small time scale
+12:11
+without worrying about complex patterns
+
+samn:speech_balloon:  12:11 PM
+i'm fine with that ... seems like we should be able to at least get that
+12:12
+even if it's not as good as winning the game
+
+Haroon Anwar  12:12 PM
+ok
+12:12
+so i will try these two then
+
+samn:speech_balloon:  12:12 PM
+3. motor command encoding - is it sufficient
+12:12
+since you had mentioned that before
+12:12
+but you pick which one seems most promising
+
+-- run simulatedPong on cycle.

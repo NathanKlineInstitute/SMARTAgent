@@ -1283,6 +1283,55 @@ def analyzeRepeatedInputSequences(dact, InputImages, targetPixel=(10,10),nbseq=1
       lax[i+5].legend(lmotorpop,loc='best')
       lax[i+10].legend(['Actions','Proposed'],loc='best')
 
+def analyzeActionLearningForRepeatedInputSequences(dact, InputImages, BallPixel=(10,10), RacketPixel=(5,17)):
+  nbseq=2
+  targetCorr=0.99
+  ballInds = np.where(InputImages[:,BallPixel[0],BallPixel[1]]>250)
+  racketInds = np.where(InputImages[:,RacketPixel[0],RacketPixel[1]]>250)
+  targetInds = []
+  for inds in racketInds[0]:
+    if inds in ballInds[0]:
+      targetInds.append(inds)
+  seqImages = []
+  for inds in targetInds:
+    seqImages.append(np.sum(InputImages[inds:inds+1,:,3:17],0))
+  x = seqImages[0]
+  goodInds = []
+  for j in range(np.shape(seqImages)[0]):
+    y = seqImages[j]
+    corr, p_value = pearsonr(x.flat, y.flat)
+    if corr>targetCorr:
+      goodInds.append(j)
+  lmotorpop = [pop for pop in dconf['net']['EMotorPops'] if dconf['net']['allpops'][pop]>0] 
+  goodSeqImages = []
+  repActions = []
+  repPropActions = []
+  repRewards = []
+  dseqOutputs = {pop:np.zeros((len(goodInds),dact[pop].shape[1],dact[pop].shape[2]),dtype=float) for pop in lmotorpop}
+  for inds in goodInds:
+    goodSeqImages.append(np.sum(InputImages[targetInds[inds]:targetInds[inds]+1,:,:],0))
+    repActions.append(actreward['action'][targetInds[inds]+1])
+    repRewards.append(actreward['reward'][targetInds[inds]+1])
+    repPropActions.append(actreward['proposed'][targetInds[inds]+1])
+    for pop in dseqOutputs.keys():
+      dseqOutputs[pop][inds,:,:]=dact[pop][targetInds[inds]+1,:,:]
+  dsummedOutputs = {pop:np.zeros((len(goodInds),1),dtype=float) for pop in lmotorpop}
+  for pop in lmotorpop:
+    dsummedOutputs[pop] = np.sum(np.sum(dseqOutputs[pop],axis=2),axis=1)
+  fig, axs = plt.subplots(3, 1, figsize=(10,8));
+  lax = axs.ravel()
+  lax[0].imshow(np.sum(goodSeqImages,0))
+  lax[0].axis('off')
+  for pop,clr in zip(lmotorpop,['b','r','g']):
+    lax[1].plot(dsummedOutputs[pop],clr+'-o',markersize=3)
+    lax[1].set_ylabel('# of pop spikes')
+  lax[1].legend(lmotorpop,loc='best')
+  lax[2].plot(repActions,'-o',color=(0,0,0,1),markersize=3)
+  lax[2].plot(repPropActions,'-o',color=(0.5,0.5,0.5,1),markersize=3)
+  lax[2].set_yticks([1,3,4])
+  lax[2].set_yticklabels(['STAY','DOWN','UP'])
+  lax[2].legend(['Actions','Proposed'],loc='best')
+
 def analyzeRepeatedInputForSingleEvent(dact, InputImages, targetPixel=(10,10)):
   midInds = np.where(InputImages[:,targetPixel[0],targetPixel[1]]>250)
   repSeqInds = []

@@ -4,7 +4,7 @@
         "frameskip":2,
         "savemp4": 0
     },
-    "useSimulatedEnv": 0,
+    "useSimulatedEnv": 1,
     "simulatedEnvParams": {
         "yball":80,
         "yracket":40
@@ -43,7 +43,7 @@
         "ResumeSimFromFile": "data/20aug11_B3_cycle_synWeights_final.pkl"
     },
     "sim": {
-        "duration": 3000000,
+        "duration": 1000000,
         "dt": 0.2,
         "verbose": 0,
         "recordStep": 0.6,
@@ -53,14 +53,14 @@
         "RLFakeUpRule": 0,
         "RLFakeDownRule": 0,
         "RLFakeStayRule": 0,
-        "name": "20sept14_A0_falcor_",
+        "name": "20sept14_B2_local_",
         "doquit": 0,
         "doplot": 1,
         "saveCellSecs": 0,
         "saveCellConns": 0,
         "targettedRL": 1,
         "anticipatedRL": 0,
-        "tstepPerAction": 20,
+        "tstepPerAction": 50,
         "saveWeights": 1,
         "saveAssignedFiringRates": 0
     },
@@ -149,9 +149,9 @@
         "FiringRateCutoff" : 50.0,
         "stimModDirW": 0.02,
         "stimModInputW": 0.02,
-        "EEMWghtAM": 5e-05,
+        "EEMWghtAM": 5e-04,
         "EEMWghtNM": 5e-06,
-        "EEPreMWghtAM": 8e-05,
+        "EEPreMWghtAM": 8e-06,
         "EEPreMWghtNM": 2.5e-06,
         "EEMWghtThreshMin": 6.25e-06,
         "EEMWghtThreshMax": 0.00032,
