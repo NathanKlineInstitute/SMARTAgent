@@ -6,6 +6,7 @@
     },
     "useSimulatedEnv": 1,
     "simulatedEnvParams": {
+        "random":1,
         "yball":80,
         "yracket":40
     },
@@ -53,7 +54,7 @@
         "RLFakeUpRule": 0,
         "RLFakeDownRule": 0,
         "RLFakeStayRule": 0,
-        "name": "20sept14_B2_local_",
+        "name": "20sept21_A0_simulated_cycle_",
         "doquit": 0,
         "doplot": 1,
         "saveCellSecs": 0,
@@ -171,7 +172,7 @@
             "wbase": 1e-07,
             "wmax": 0.00048,
             "RLon": 1,
-            "RLlenhebb": 200,
+            "RLlenhebb": 100,
             "RLlenanti": 50,
             "useRLexp": 1,
             "RLhebbwt": 2.5e-06,

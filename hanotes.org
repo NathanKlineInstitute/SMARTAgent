@@ -6796,6 +6796,8 @@ and     "useSimulatedEnv": 1,
 -- resume 3000 sec sim "20sept14_A1R1_cycle_" using "tstepPerAction": 50 and "EEMWghtAM": 5e-4 and "EEPreMWghtAM":8e-6
 from data/20sept14_A1_cycle_synWeights_final.pkl
 
+-- resume 3000 sec sim "20sept14_A0R1_cycle_" using "tstepPerAction": 50 and "EEMWghtAM": 5e-4 and "EEPreMWghtAM":8e-6
+from data/20sept14_A0_cycle_synWeights_final.pkl
 
 -- disucssion with sam
 
@@ -6835,3 +6837,333 @@ since you had mentioned that before
 but you pick which one seems most promising
 
 -- run simulatedPong on cycle.
+
+-- List of things to do...
+1. run simulatedPong on cycle to test
+.... how does the model behave in previous settings.... "RLlenhebb": 200, "RLwindhebb": 50 --- 3000 sec "20sept15_C0_simulated_cycle_"
+.... reduce the length of eligibility to 100 ms for ... "RLlenhebb": 100, "RLwindhebb": 50 (only if tSetpPerPlay is 50 ms)
+
+RLwindhebb, RLwindanti : Maximum interval between pre- and post-synaptic events for an starting an eligibility trace.  There are separate ones for the Hebbian and anti-Hebbian events.
+RLlenhebb, RLlenanti : Length of the eligibility Hebbian and anti-Hebbian eligibility traces, or the decay time constants if the traces are decaying exponentials.
+
+* 20sept16
+
+-- 3000 sec resumed sim "20sept14_A1R1_cycle_" finished. took 43492.43 sec to run using 24 cores on cycle.
+save concantenated performance using
+
+lfn = ['20sept14_A1_cycle_', '20jun30_A1R1_cycle_']
+lfn = ['data/'+x+'ActionsRewards.txt' for x in lfn]
+pdac = getconcatactionreward(lfn)
+
+
+saved as 'SMARTAgent/20sept14_A1andA1R1_cycle_Perf.png'
+
+-- resume further for 3000 sec in "20sept14_A1R2_cycle" using 16 cores instead of 24.
+
+-- 3000 sec sim "20sept15_C0_simulated_cycle_" finished. Performance very similar to what we see for full game.
+...means no learning or not stable learning.
+
+-- reduce for AMPA "RLlenhebb": 200 to "RLlenhebb": 100 and run 1000 sec sim in "20sept16_C0_simulated_cycle_"
+
+-- reduce for AMPA "RLlenhebb": 200 to "RLlenhebb": 50 and run 1000 sec sim in "20sept16_D0_simulated_cycle_"
+
+-- analyzing "20sept14_B2_local_"
+python -i simdat.py backupcfg/20sept14_B2_local_sim.json
+dact = getdActMap (totalDur, tstepPerAction, dspkT, dspkID, dnumc, dstartidx,lpop = allpossible_pops)
+binsz = 20
+dhist = {pop:getspikehist(dspkT[pop],dnumc,binsz,totalDur) for pop in lpop}
+plt.hist(dhist['EV1'][1][1:],100) 
+
+plotPerf(actreward)
+
+analyzeActionLearningForRepeatedInputSequences(dact, InputImages, BallPixel=(10,10), RacketPixel=(5,17))
+... looking at this plot, it clearly shows that the model has not learned that the racket has to move down.
+... need to look at the weights too.
+
+# look at the weights with preid between 484 and 967
+E_wghts = pdf[pdf.preid<968] 
+# pixel 10,10 would be neuronID 726 for EV1DE
+
+-- 1000 sec sim in "20sept16_C0_simulated_cycle_" completed.
+python -i simdat.py backupcfg/20sept16_C0_simulated_cycle_sim.json
+dact = getdActMap (totalDur, tstepPerAction, dspkT, dspkID, dnumc, dstartidx,lpop = allpossible_pops)
+
+-- 1000 sec sim in "20sept16_D0_simulated_cycle_" completed.
+
+-- reduce for AMPA "RLlenhebb": 200 to "RLlenhebb": 50 and run 1000 sec sim in "20sept16_E0_simulated_cycle_"
+also with follow the ball rewards.
+
+standard rewards are
+    "rewardcodes": {
+        "scorePoint": 1.0,
+        "losePoint": -0.1,
+        "followTarget": 0.1,
+        "avoidTarget": -0.01,
+        "hitBall": 0.5
+    },
+
+modified rewards for this sim are
+    "rewardcodes": {
+        "scorePoint": 0.0,
+        "losePoint": 0.0,
+        "followTarget": 0.5,
+        "avoidTarget": -0.05,
+        "hitBall": 0
+    },
+
+
+-- reduce for AMPA "RLlenhebb": 200 to "RLlenhebb": 100 and run 1000 sec sim in "20sept16_F0_simulated_cycle_"
+also with follow the ball rewards.
+
+standard rewards are
+    "rewardcodes": {
+        "scorePoint": 1.0,
+        "losePoint": -0.1,
+        "followTarget": 0.1,
+        "avoidTarget": -0.01,
+        "hitBall": 0.5
+    },
+
+modified rewards for this sim are
+    "rewardcodes": {
+        "scorePoint": 0.0,
+        "losePoint": 0.0,
+        "followTarget": 0.5,
+        "avoidTarget": -0.05,
+        "hitBall": 0
+    },
+
+* 20sept17
+
+-- 3000 sec in "20sept14_A0R1_cycle" finished.
+-- 3000 sec in "20sept14_A1R2_cycle" finished.
+-- 1000 sec sim in "20sept16_E0_simulated_cycle_" finished.
+... p(follow) ~ 0.4
+-- 1000 sec sim in "20sept16_F0_simulated_cycle_" finished.
+... p(follow) ~ 0.4
+
+so just using follow/not follow the ball rewards do not add any value to the performance.
+
+Why is the performance converging to around 0.4 for p(follow)? irrespective of different rewarding strategies we use and irrelevant of RL parameters we use.
+
+-- the analysis to establish causality
+1. For a chosen ball and right racket locations in a frame, find all timepoints when the same input (left racket could be at any location)
+2. look at the activity map of neurons for those time points.
+3. for all active neurons in (input layers) any of those time points, note down the IDs and only use those selected neurons to find the downstream neurons i.e. postsynaptic neurons and the associated weights.
+4. see how much influence the left racket driven neurons have on firing rates of M neurons.  
+--
+
+Since the pixel intensity level is translated into firing rate for next time interval, i should look at targetInds[goodInds[i]]+1
+
+FRV1_ball_pixel10_10 = dact['EV1'][targetInds[goodInds],11,11] ---> gives me error
+
+FRV1_ball_pixel10_10 = np.zeros((len(goodInds)))
+for i in range(len(goodInds)):
+  FRV1_ball_pixel10_10[i] = dact['EV1'][targetInds[goodInds[i]]+1,11,11]
+
+
+... ignoring corr
+FRV1_ball_pixel10_10 = np.zeros((len(targetInds)))
+for i in range(len(targetInds)):
+  FRV1_ball_pixel10_10[i] = dact['EV1'][targetInds[i]+1,11,11]
+... firing rate doesnt look as i expected. CHECK HERE.
+
+
+FRV1DE_ball_pixel10_10 = np.zeros((len(targetInds)))
+for i in range(len(targetInds)):
+  FRV1DE_ball_pixel10_10[i] = dact['EV1DE'][targetInds[i]+1,11,11]
+... checked all 8 directions... only 'E' is active and it has either 7 spikes or 8 spikes. (supposed to be 7.5 spikes in 50 ms to have 150 Hz)
+
+FRV1_racket_pixel6_18 = np.zeros((len(targetInds)))
+for i in range(len(targetInds)):
+  FRV1_racket_pixel6_18[i] = dact['EV1'][targetInds[i]+1,6,18]
+
+FRV1DN_racket_pixel6_18 = np.zeros((len(targetInds)))
+for i in range(len(targetInds)):
+  FRV1DN_racket_pixel6_18[i] = dact['EV1DN'][targetInds[i]+1,6,18]
+
+FRV1DS_racket_pixel6_18 = np.zeros((len(targetInds)))
+for i in range(len(targetInds)):
+  FRV1DS_racket_pixel6_18[i] = dact['EV1DS'][targetInds[i]+1,6,18]
+
+
+a. plot InputImage at time t-1 and t. (need 2 panels)
+plt.imshow(InputImages[targetInds[i]-1])
+plt.imshow(InputImages[targetInds[i]])
+OR
+plt.imshow(np.subtract(InputImages[targetInds[0]],InputImages[targetInds[0]-1]))
+
+b. plot direction angles at time t. (need 1 panel)
+plt.imshow(ldflow[targetInds[i]]['ang'])
+plt.colorbar()
+
+c. plot actmap for V1 at time t+1 (need 13 panels for c,d and e)
+and 
+d. plot actmap for direction selective neurons at time t+1
+and
+e. plot actmap for motor neurons at time t+1.
+for pop in lpop:
+  plt.imshow(dact[pop][targetInds[i]+1])
+
+f. plot raster 100 ms before and 100 ms after. (1 panel)
+
+repeat everything for next targetInds[i+1]
+
+-- leave other possible plots for now.
+
+g. plot weights (2 panels 1 for EMUP and 1 for EMDOWN).
+action vs proposed action at time t+1.
+
+h. Reward signal for time t+1.
+
+make 36 panels in 4 rows.
+
+fig, axs = plt.subplots(4, 9, figsize=(14,8));
+i = 0
+lax = axs.ravel()
+lax[0].imshow(InputImages[targetInds[i]])
+lax[0].set_title('InputImage[t]',fontsize=6)
+lax[0].axis('off')
+lax[1].imshow(np.subtract(InputImages[targetInds[i]],InputImages[targetInds[i]-1]))
+lax[1].set_title('InputImage[t]-InputImage[t-1]',fontsize=6)
+lax[1].axis('off')
+lax[2].imshow(ldflow[targetInds[i]]['ang'])
+lax[2].set_title('Angles',fontsize=6)
+lax[2].axis('off')
+count = 3
+lax[16].axis('off')
+lax[17].axis('off')
+for pop in lpop:
+  if pop=='IM':
+    pcm = lax[count].imshow(dact[pop][targetInds[i]+1],vmin=0,vmax=8)
+    fig.colorbar(pcm, ax = lax[count])
+  lax[count].imshow(dact[pop][targetInds[i]+1],vmin=0,vmax=8)
+  lax[count].set_title(pop+'[t+1]',fontsize=6)
+  lax[count].axis('off')
+  count = count + 1
+offset = 18
+i = 215
+lax[offset+0].imshow(InputImages[targetInds[i]])
+lax[offset+0].set_title('InputImage[t]',fontsize=6)
+lax[offset+0].axis('off')
+lax[offset+1].imshow(np.subtract(InputImages[targetInds[i]],InputImages[targetInds[i]-1]))
+lax[offset+1].set_title('InputImage[t]-InputImage[t-1]',fontsize=6)
+lax[offset+1].axis('off')
+lax[offset+2].imshow(ldflow[targetInds[i]]['ang'])
+lax[offset+2].set_title('Angles',fontsize=6)
+lax[offset+2].axis('off')
+count = 3
+lax[34].axis('off')
+lax[35].axis('off')
+for pop in lpop:
+  if pop=='IM':
+    pcm2 = lax[offset+count].imshow(dact[pop][targetInds[i]+1],vmin=0,vmax=8)
+    fig.colorbar(pcm2, ax = lax[offset+count])
+  lax[offset+count].imshow(dact[pop][targetInds[i]+1],vmin=0,vmax=8)
+  lax[offset+count].set_title(pop+'[t+1]',fontsize=6)
+  lax[offset+count].axis('off')
+  count = count + 1
+
+popwts = plotMeanWeights (pdf,ax=None,msz=1,xl=None,lpop=['EMDOWN','EMUP','EMSTAY'],lclr=['r','b','g'],plotindiv=True)
+>>> popwts.keys()
+dict_keys(['EMDOWN', 'EMUP'])
+
+
+--- draw average M activity 
+pop = 'EMUP'
+utimes = np.unique(pdf.time)
+nbNeurons = dendidx[pop]+1-dstartidx[pop]
+tpnts = len(utimes)
+wts_top = np.zeros((tpnts,nbNeurons))
+count = 0
+for idx in range(dstartidx[pop],dendidx[pop]+1,1): # first plot average weight onto each individual neuron
+  pdfs = pdf[(pdf.postid==idx)]  
+  wts = [np.mean(pdfs[(pdfs.time==t)].weight) for t in utimes]
+  wts_top[:,count] = wts
+  count = count+1
+
+tpnt1 = np.reshape(wts_top[0,:],(10,10))
+tpnt2 = np.reshape(wts_top[-1,:],(10,10))
+
+plt.imshow(np.subtract(tpnt2,tpnt1))
+plt.title('Change in weights-->EMUP')
+
+
+pop = 'EMDOWN'
+utimes = np.unique(pdf.time)
+nbNeurons = dendidx[pop]+1-dstartidx[pop]
+tpnts = len(utimes)
+wts_top = np.zeros((tpnts,nbNeurons))
+count = 0
+for idx in range(dstartidx[pop],dendidx[pop]+1,1): # first plot average weight onto each individual neuron
+  pdfs = pdf[(pdf.postid==idx)]  
+  wts = [np.mean(pdfs[(pdfs.time==t)].weight) for t in utimes]
+  wts_top[:,count] = wts
+  count = count+1
+
+tpnt3 = np.reshape(wts_top[0,:],(10,10))
+tpnt4 = np.reshape(wts_top[-1,:],(10,10))
+
+plt.imshow(np.subtract(tpnt4,tpnt3))
+plt.title('Change in weights-->EMDOWN')
+
+* 20sept21
+
+-- ran 1000 sec sim "20sept20_A0_simulated_cycle_"
+with
+    "rewardcodes": {
+        "scorePoint": 0,
+        "losePoint": 0,
+        "followTarget": 0.5,
+        "avoidTarget": -0.25,
+        "hitBall": 0
+see 20sept20_A0_simulated_cycle_perf.jpg---- p(follow) started dropping. ~0.32 @ 1000 sec.
+see 20sept20_A0_simulated_cycle_EMUPweightschange.jpg 
+and see 20sept20_A0_simulated_cycle_EMDOWNweightschange.jpg ... I guess the punishments and rewards didnt balance out the weights of ball and other rackets. Because there were much more punshiments than rewards.
+POTENTIAL IDEA: could have decaying values of rewards and punishments (representing desensitization). NOT SURE HOW TO IMPLEMENT THIS....
+
+-- ran 1000 sec sim "20sept20_B0_simulated_cycle_"
+    "rewardcodes": {
+        "scorePoint": 0,
+        "losePoint": 0,
+        "followTarget": 0.5,
+        "avoidTarget": -0.5,
+        "hitBall": 0
+see 20sept20_B0_simulated_cycle_perf.jpg---- p(follow) started dropping. ~0.29 @ 1000 sec.
+see 20sept20_A0_simulated_cycle_EMUPweightschange.jpg 
+and see 20sept20_A0_simulated_cycle_EMDOWNweightschange.jpg - larger decrease in weights for ball and other racket.
+
+-- ran 1000 sec sim "20sept20_C0_simulated_cycle_"
+    "rewardcodes": {
+        "scorePoint": 0,
+        "losePoint": 0,
+        "followTarget": 0.5,
+        "avoidTarget": -0.25,
+        "hitBall": 0
+    "architecturePreMtoM": {
+        "useProbabilistic": 1,
+see 20sept20_C0_simulated_cycle_perf.jpg---- p(follow) started dropping. ~0.24 @ 1000 sec.
+see 20sept20_C0_simulated_cycle_EMUPweightschange.jpg 
+and see 20sept20_C0_simulated_cycle_EMDOWNweightschange.jpg
+... the weights changed but no clue how to interpret the effect of learning on actions.
+
+-- modify simulatePong to have 3 input patterns. when using "random":1 in sim.json
+
+    "simulatedEnvParams": {
+        "random":1,
+        "yball":80,
+        "yracket":40
+    }
+
+in simulatePong:
+
+self.randomizeYpos = dconf['simulatedEnvParams']['random']
+
+      if self.randomizeYpos: 
+        shiftdir = random.choice([1,3,4])
+        if shiftdir==3:
+          self.ypos_ball = dconf['simulatedEnvParams']['yball'] + 40
+        elif shiftdir==4:
+          self.ypos_ball = dconf['simulatedEnvParams']['yball'] - 40
+        else:
+          self.ypos_ball = dconf['simulatedEnvParams']['yball'] 

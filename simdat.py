@@ -1309,7 +1309,7 @@ def analyzeActionLearningForRepeatedInputSequences(dact, InputImages, BallPixel=
   repRewards = []
   dseqOutputs = {pop:np.zeros((len(goodInds),dact[pop].shape[1],dact[pop].shape[2]),dtype=float) for pop in lmotorpop}
   for inds in goodInds:
-    goodSeqImages.append(np.sum(InputImages[targetInds[inds]:targetInds[inds]+1,:,:],0))
+    goodSeqImages.append(np.sum(InputImages[targetInds[inds]:targetInds[inds]+2,:,:],0))
     repActions.append(actreward['action'][targetInds[inds]+1])
     repRewards.append(actreward['reward'][targetInds[inds]+1])
     repPropActions.append(actreward['proposed'][targetInds[inds]+1])

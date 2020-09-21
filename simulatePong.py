@@ -10,6 +10,7 @@ class simulatePong:
     self.racket_width = 4
     self.racket_height = 16
     # start ball from the middle
+    self.randomizeYpos = dconf['simulatedEnvParams']['random'] 
     self.ypos_ball = dconf['simulatedEnvParams']['yball']  # this corresponds to 0 index
     self.xpos_ball = 20  # this corresponds to 1 index
     self.xpos_racket = 140 # this is fixed
@@ -113,6 +114,14 @@ class simulatePong:
           self.reward = 1
           self.b1x = self.xpos_ball
           self.b2x = self.xpos_ball+self.ball_width
+          if self.randomizeYpos: 
+            shiftdir = random.choice([1,3,4])
+            if shiftdir==3:
+              self.ypos_ball = dconf['simulatedEnvParams']['yball'] + 40
+            elif shiftdir==4:
+              self.ypos_ball = dconf['simulatedEnvParams']['yball'] - 40
+            else:
+              self.ypos_ball = dconf['simulatedEnvParams']['yball']
           self.b1y = self.court_top+self.ypos_ball
           self.b2y = self.court_top+self.ypos_ball+self.ball_height
           self.done = 1
@@ -127,6 +136,14 @@ class simulatePong:
     if self.b2x>self.r2x+4:
       self.b1x = self.xpos_ball
       self.b2x = self.xpos_ball+self.ball_width
+      if self.randomizeYpos: 
+        shiftdir = random.choice([1,3,4])
+        if shiftdir==3:
+          self.ypos_ball = dconf['simulatedEnvParams']['yball'] + 40
+        elif shiftdir==4:
+          self.ypos_ball = dconf['simulatedEnvParams']['yball'] - 40
+        else:
+          self.ypos_ball = dconf['simulatedEnvParams']['yball']  
       self.b1y = self.court_top+self.ypos_ball
       self.b2y = self.court_top+self.ypos_ball+self.ball_height
       self.done = 0
