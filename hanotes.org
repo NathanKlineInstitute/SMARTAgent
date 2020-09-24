@@ -6358,3 +6358,1473 @@ the weights for the decision-making network are only updated periodically to pro
 3. the other possible direction for later was that they sample from memory buffer (frames, actions, rewards) randomly
 
 4. another area (like PFC) to direct planned actions
+
+--- Below code is for testing the algorithm on fake image.
+
+-- create a list of indices of padded neurons.
+
+paddingInds2 = []
+offset = 2
+for j in range(24):
+  for i in range(offset):
+    paddingInds2.append([i,j])
+    paddingInds2.append([j,i])
+  for i in range(offset+20,24):
+    paddingInds2.append([i,j])
+    paddingInds2.append([j,i])
+
+test = np.zeros((24,24))
+for i in range(np.shape(paddingInds2)[0]):
+  test[paddingInds2[i][0],paddingInds2[i][1]]=100
+
+
+-- if want to extend the object pixels in the original image in horizontal dimension.
+
+test2 = np.zeros((24,24))
+count = 0
+for i in range(np.shape(paddingInds2)[0]):
+  if paddingInds2[i][1]<offset:
+    test2[paddingInds2[i][0],paddingInds2[i][1]]=np.amin(test[paddingInds2[i][0],paddingInds2[i][1]:paddingInds2[i][1]+offset+1])
+  elif paddingInds2[i][1]>offset+19:
+    test2[paddingInds2[i][0],paddingInds2[i][1]]=np.amin(test[paddingInds2[i][0],paddingInds2[i][1]-offset:paddingInds2[i][1]])
+  else:
+    test2[paddingInds2[i][0],paddingInds2[i][1]] = test[paddingInds2[i][0],paddingInds2[i][1]]
+
+-- if want to extend the object pixels in the original image in vertical dimension.
+
+test3 = np.zeros((24,24))
+for i in range(np.shape(paddingInds2)[0]):
+  if paddingInds2[i][0]<offset:
+    test3[paddingInds2[i][0],paddingInds2[i][1]]=np.amin(test[paddingInds2[i][0]:paddingInds2[i][0]+offset+1,paddingInds2[i][1]])
+  elif paddingInds2[i][0]>offset+19:
+    test3[paddingInds2[i][0],paddingInds2[i][1]]=np.amin(test[paddingInds2[i][0]-offset:paddingInds2[i][0],paddingInds2[i][1]])
+  else:
+    test3[paddingInds2[i][0],paddingInds2[i][1]] = test[paddingInds2[i][0],paddingInds2[i][1]]
+
+-- if want to extend the object pixels in the original image in both vertical and horizontal dimensions.
+
+test4 = np.zeros((24,24))
+for i in range(np.shape(paddingInds2)[0]):
+  if (paddingInds2[i][0]<offset+1) and (paddingInds2[i][1]<offset+1):
+    test4[paddingInds2[i][0],paddingInds2[i][1]]=np.amin(test[paddingInds2[i][0]:paddingInds2[i][0]+offset+1,paddingInds2[i][1]:paddingInds2[i][1]+offset+1])
+  elif (paddingInds2[i][0]>offset+19) and (paddingInds2[i][1]>offset+19):
+    test4[paddingInds2[i][0],paddingInds2[i][1]]=np.amin(test[paddingInds2[i][0]-offset:paddingInds2[i][0],paddingInds2[i][0]-offset:paddingInds2[i][1]])
+  elif (paddingInds2[i][0]<offset) and (paddingInds2[i][1]>=offset):
+    test4[paddingInds2[i][0],paddingInds2[i][1]]=np.amin(test[paddingInds2[i][0]:paddingInds2[i][0]+offset+1,paddingInds2[i][1]-offset:paddingInds2[i][1]])
+  elif (paddingInds2[i][0]>offset+19) and (paddingInds2[i][1]<=offset+19):
+    test4[paddingInds2[i][0],paddingInds2[i][1]]=np.amin(test[paddingInds2[i][0]-offset:paddingInds2[i][0],paddingInds2[i][1]:paddingInds2[i][0]+offset+1])
+  elif (paddingInds2[i][0]>offset) and (paddingInds2[i][1]<offset):
+    test4[paddingInds2[i][0],paddingInds2[i][1]]=np.amin(test[paddingInds2[i][0],paddingInds2[i][1]:paddingInds2[i][1]+offset+1])
+  elif (paddingInds2[i][0]<=offset+19) and (paddingInds2[i][1]>offset+19):
+    test4[paddingInds2[i][0],paddingInds2[i][1]]=np.amin(test[paddingInds2[i][0],paddingInds2[i][0]-offset:paddingInds2[i][1]])
+  else:
+    test4[paddingInds2[i][0],paddingInds2[i][1]] = test[paddingInds2[i][0],paddingInds2[i][1]]
+
+-- Note that the algorithm uses np.amax instead of np.amin in 
+def updateInputRatesWithPadding (self, dsum_Images):
+in aigame.py ----> see below
+
+
+  def updateInputRatesWithPadding (self, dsum_Images):
+    # update input rates to retinal neurons
+    tmp_padded_Image = np.amin(dsum_Images)*np.ones(shape=(self.input_dim,self.input_dim))
+    padded_Image = np.amin(dsum_Images)*np.ones(shape=(self.input_dim,self.input_dim))
+    offset = int((self.dReceptiveField[self.InputPop]-1)/2)
+    tmp_padded_Image[offset:offset+dsum_Images.shape[0],offset:offset+dsum_Images.shape[1]]=dsum_Images
+    # find the indices of padded pixels
+    paddingInds = []
+    for j in range(self.input_dim):
+      for i in range(offset):
+        paddingInds.append([i,j])
+        paddingInds.append([j,i])
+      for i in range(offset+dsum_Images.shape[0],self.input_dim):
+        paddingInds.append([i,j])
+        paddingInds.append([j,i])
+    if self.objExtension=='Horizontal':
+      for i in range(np.shape(paddingInds)[0]):
+        if paddingInds[i][1]<offset:
+          padded_Image[paddingInds[i][0],paddingInds[i][1]]=np.amax(tmp_padded_Image[paddingInds[i][0],paddingInds[i][1]:paddingInds[i][1]+offset+1])
+        elif paddingInds[i][1]>offset+19:
+          padded_Image[paddingInds[i][0],paddingInds[i][1]]=np.amax(tmp_padded_Image[paddingInds[i][0],paddingInds[i][1]-offset:paddingInds[i][1]])
+        else:
+          padded_Image[paddingInds[i][0],paddingInds[i][1]] = tmp_padded_Image[paddingInds[i][0],paddingInds[i][1]]
+    elif self.objExtension=='Vertical':
+      for i in range(np.shape(paddingInds)[0]):
+        if paddingInds[i][0]<offset:
+          padded_Image[paddingInds[i][0],paddingInds[i][1]]=np.amax(tmp_padded_Image[paddingInds[i][0]:paddingInds[i][0]+offset+1,paddingInds[i][1]])
+        elif paddingInds[i][0]>offset+19:
+          padded_Image[paddingInds[i][0],paddingInds[i][1]]=np.amax(tmp_padded_Image[paddingInds[i][0]-offset:paddingInds[i][0],paddingInds[i][1]])
+        else:
+          padded_Image[paddingInds[i][0],paddingInds[i][1]] = tmp_padded_Image[paddingInds[i][0],paddingInds[i][1]]
+    else:
+      for i in range(np.shape(paddingInds)[0]):
+        if (paddingInds[i][0]<offset+1) and (paddingInds[i][1]<offset+1):
+          padded_Image[paddingInds[i][0],paddingInds[i][1]]=np.amax(tmp_padded_Image[paddingInds[i][0]:paddingInds[i][0]+offset+1,paddingInds[i][1]:paddingInds[i][1]+offset+1])
+        elif (paddingInds[i][0]>offset+19) and (paddingInds[i][1]>offset+19):
+          padded_Image[paddingInds[i][0],paddingInds[i][1]]=np.amax(tmp_padded_Image[paddingInds[i][0]-offset:paddingInds[i][0],paddingInds[i][0]-offset:paddingInds[i][1]])
+        elif (paddingInds[i][0]<offset) and (paddingInds[i][1]>=offset):
+          padded_Image[paddingInds[i][0],paddingInds[i][1]]=np.amax(tmp_padded_Image[paddingInds[i][0]:paddingInds[i][0]+offset+1,paddingInds[i][1]-offset:paddingInds[i][1]])
+        elif (paddingInds[i][0]>offset+19) and (paddingInds[i][1]<=offset+19):
+          padded_Image[paddingInds[i][0],paddingInds[i][1]]=np.amax(tmp_padded_Image[paddingInds[i][0]-offset:paddingInds[i][0],paddingInds[i][1]:paddingInds[i][0]+offset+1])
+        elif (paddingInds[i][0]>offset) and (paddingInds[i][1]<offset):
+          padded_Image[paddingInds[i][0],paddingInds[i][1]]=np.amax(tmp_padded_Image[paddingInds[i][0],paddingInds[i][1]:paddingInds[i][1]+offset+1])
+        elif (paddingInds[i][0]<=offset+19) and (paddingInds[i][1]>offset+19):
+          padded_Image[paddingInds[i][0],paddingInds[i][1]]=np.amax(tmp_padded_Image[paddingInds[i][0],paddingInds[i][0]-offset:paddingInds[i][1]])
+        else:
+          padded_Image[paddingInds[i][0],paddingInds[i][1]] = tmp_padded_Image[paddingInds[i][0],paddingInds[i][1]]
+    if dconf['net']['useBinaryImage']:
+      thresh = threshold_otsu(padded_Image)
+      binary_Image = padded_Image > thresh
+      fr_Images = self.locationNeuronRate*binary_Image
+    else:
+      padded_Image = padded_Image - np.amin(padded_Image)
+      padded_Image = (255.0/np.amax(padded_Image))*padded_Image # this will make sure that padded_Image spans 0-255
+      fr_Images = self.locationNeuronRate/(1+np.exp((np.multiply(-1,padded_Image)+123)/10))
+      #fr_Images = np.subtract(fr_Images,np.min(fr_Images)) #baseline firing rate subtraction. Instead all excitatory neurons are firing at 5Hz.
+      #print(np.amin(fr_Images),np.amax(fr_Images))
+    self.dFiringRates[self.InputPop] = np.reshape(fr_Images,self.dInputs[self.InputPop]) #400 for 20*20, 900 for 30*30, etc.
+
+* 20sept09
+
+import gym
+import numpy as np  
+from skimage.transform import downscale_local_mean, resize
+from skimage.color import rgb2gray
+from matplotlib import pyplot as plt
+
+env = gym.make('Pong-v0')
+env.reset()
+caction = 3
+observation, reward, done, info = env.step(caction)
+courtYRng = (34, 194)
+gray_Image = 255.0*rgb2gray(observation[courtYRng[0]:courtYRng[1],:,:]) # convert to grayscale; rgb2gray has 0-1 range so mul by 255
+gray_ds = downscale_local_mean(gray_Image,(8,8)) # then downsample
+gray_ds = np.where(gray_ds>np.min(gray_ds)+1,255,gray_ds) # Different thresholding
+dsum_Images = gray_ds
+
+tmp_padded_Image = np.amin(dsum_Images)*np.ones(shape=(22,22))
+padded_Image = np.amin(dsum_Images)*np.ones(shape=(22,22))
+offset = 1
+tmp_padded_Image[offset:offset+dsum_Images.shape[0],offset:offset+dsum_Images.shape[1]]=dsum_Images
+padded_Image[offset:offset+dsum_Images.shape[0],offset:offset+dsum_Images.shape[1]]=dsum_Images
+paddingInds = []
+for j in range(22):
+  for i in range(offset):
+    paddingInds.append([i,j])
+    paddingInds.append([j,i])
+  for i in range(offset+dsum_Images.shape[0],22):
+    paddingInds.append([i,j])
+    paddingInds.append([j,i])
+for i in range(np.shape(paddingInds)[0]):
+  if paddingInds[i][0]<offset:
+    padded_Image[paddingInds[i][0],paddingInds[i][1]]=np.amax(tmp_padded_Image[paddingInds[i][0]:paddingInds[i][0]+offset+1,paddingInds[i][1]])
+  elif paddingInds[i][0]>offset+19:
+    padded_Image[paddingInds[i][0],paddingInds[i][1]]=np.amax(tmp_padded_Image[paddingInds[i][0]-offset:paddingInds[i][0],paddingInds[i][1]])
+  else:
+    padded_Image[paddingInds[i][0],paddingInds[i][1]] = tmp_padded_Image[paddingInds[i][0],paddingInds[i][1]]
+
+-- padding with extension works well...
+
+-- run 5000 sec "20sept09_A1_cycle_"
+... with padding
+... with vertical object extension.
+... with tstepPerAction: 20ms 
+... normalizeWeightStepSize: 1000 seconds
+... stimModDirW: 0.02
+... stimModInputW: 0.02
+
+-- run 5000 sec "20sept09_A2_cycle_"
+... with padding
+... with vertical object extension.
+... with tstepPerAction: 50ms
+... normalizeWeightStepSize: 1000 seconds
+... stimModDirW: 0.02
+... stimModInputW: 0.02
+.... memory error while gathering the data before saving. restarted sim for  3000 sec instead of 5000 sec named "20sept10_A2_cycle"
+
+-- run 5000 sec "20sept09_A1_falcor_"
+... with padding
+... with vertical object extension.
+... with tstepPerAction: 20ms 
+... normalizeWeightStepSize: 1000 seconds
+... stimModDirW: 0.025
+... stimModInputW: 0.025
+---> no movement in rackets, use 0.015 instead of 0.025 and restart
+
+-- run 5000 sec "20sept09_A2_falcor_"
+... with padding
+... with vertical object extension.
+... with tstepPerAction: 50ms
+... normalizeWeightStepSize: 1000 seconds
+... stimModDirW: 0.025
+... stimModInputW: 0.025
+---> no movement in rackets, use 0.015 instead of 0.025 and restart
+
+* 20sept11
+
+-- analyzing "20sept10_A2_cycle"
+
+python -i simdat.py backupcfg/20sept10_A2_cycle_sim.json
+#dact = getdActMap (totalDur, tstepPerAction, dspkT, dspkID, dnumc, dstartidx,lpop = allpossible_pops)
+binsz=50
+dhist = {pop:getspikehist(dspkT[pop],dnumc,binsz,totalDur) for pop in lpop}
+
+
+plotPerf(actreward)..... and save the plot as 20sept10_A2_cycle_Perf.png
+
+....
+clf(); dobjpos = loadObjPos() ## 
+subplot(2,1,1); xlabel('Racket Y position'); hist(dobjpos['racket'][:,1])
+subplot(2,1,2); xlabel('Ball Y position'); hist(dobjpos['ball'][:,1])
+and save the plot as 20sept10_A2_cycle_RacketBallYposHist.png
+
+....
+plot(dobjpos['ball'][:,1],'b')
+plot(dobjpos['racket'][:,1],'r')
+legend(['ball','racket'])
+xlabel('tpnts')
+ylabel('Y-Pixel loc')
+didnt save this.. not very informative when saved in full.
+
+....
+ballX,ballY = dobjpos['ball'][:,0],dobjpos['ball'][:,1]
+racketX,racketY = dobjpos['racket'][:,0],dobjpos['racket'][:,1]
+tt = np.linspace(0,totalDur,len(dobjpos['ball']))
+pdpos = pd.DataFrame(np.array([tt, ballX, ballY, racketX, racketY]).T,columns=['time','ballX','ballY','racketX','racketY'])
+dout = getdistvstimecorr(pdpos)
+plot(dout['lN'],dout['lr'],'ko',markersize=15)
+xlabel('Number examples'); ylabel('Correlation between paddle/ball distance and time')
+and save the plot as 20sept10_A2_cycle_RacketBalldistcorr.png
+
+** based on discussion with Sam, i will keep connections between V1 and M neurons fixed (i.e. no RL)
+
+-- added in sim.json
+in "net"....
+        "RLconns":{
+            "VisualRL":0,
+            "RecurrentDirNeurons":0,
+            "RecurrentLocNeurons":0,
+            "FeedForwardDirNtoM":1,
+            "FeedForwardLocNtoM":0,
+            "FeedbackLocNeurons":0,
+            "RecurrentMNeurons":0,
+            "FeedbackMtoDirN":0,
+            "FeedbackMtoLocN":0
+        },
+
+and
+
+        "EPreMDirPops": ["EV1DE","EV1DNE","EV1DN","EV1DNW","EV1DW","EV1DSW","EV1DS","EV1DSE"],
+        "EPreMLocPops": ["EV1","EV4","EMT"],
+
+so that can allow RL only between Dir neurons and Motor neurons.
+excluding RL from V1 to Motor neurons' connections.
+
+-- for recurrent excitation in premotor neurons.
+
+      useRL = 0
+      if prety in dconf['net']['EPreMDirPops']:
+        if dconf['net']['RLconns']['RecurrentDirNeurons']: 
+          useRL = 1
+      if prety in dconf['net']['EPreMLocPops']:
+        if dconf['net']['RLconns']['RecurrentLocNeurons']: 
+          useRL = 1 
+      if useRL and dSTDPparamsRL[synmech]['RLon']: # only turn on plasticity when specified to do so
+        netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL[synmech]}
+
+--  change in EIPlast for motor cortex
+
+  if 'EIPlast' in dconf['net']['RLconns']:
+    if dconf['net']['RLconns']['EIPlast']:
+
+-- change dconf['net']['VisualRL'] to dconf['net']['RLconns']['VisualRL'] 
+
+-- for visual feedback
+
+        if dconf['net']['RLconns']['FeedbackLocNeurons'] and dSTDPparamsRL[synmech]['RLon']: # only turn on plasticity when specified to do so
+          netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL[synmech]}
+
+-- for feedforward EpreM to EM
+
+        useRL = 0
+        if prety in dconf['net']['EPreMDirPops']:
+          if dconf['net']['RLconns']['FeedForwardDirNtoM']: 
+            useRL = 1
+        if prety in dconf['net']['EPreMLocPops']:
+          if dconf['net']['RLconns']['FeedForwardLocNtoM']: 
+            useRL = 1
+        if useRL and dSTDPparamsRL[synmech]['RLon']: # only turn on plasticity when specified to do so
+          netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL[synmech]}
+
+-- for recurrent EM
+
+          if dconf['net']['RLconns']['RecurrentMNeurons'] and dSTDPparamsRL[synmech]['RLon']: # only turn on plasticity when specified to do so
+            netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL[synmech]}
+
+--- for feedback EM to EpreM
+
+          if poty in dconf['net']['EPreMDirPops']:
+            if dconf['net']['RLconns']['FeedbackMtoDirN']: 
+              useRL = 1
+          if poty in dconf['net']['EPreMLocPops']:
+            if dconf['net']['RLconns']['FeedbackMtoLocN']: 
+              useRL = 1
+          if useRL and dSTDPparamsRL[synmech]['RLon']: # only turn on plasticity when specified to do so
+            netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL[synmech]}
+
+-- test locally, if runs without any error... then submit on falcor.
+
+* 20sept14
+
+-- run 3000 sec sim "20sept14_A0_falcor_" using "tstepPerAction": 20
+
+-- run 3000 sec sim "20sept14_A1_falcor_" using "tstepPerAction": 50
+
+-- run 3000 sec sim "20sept14_A0_cycle_" using "tstepPerAction": 20 and "EEMWghtAM": 5e-4 and "EEPreMWghtAM":8e-6
+
+-- run 3000 sec sim "20sept14_A1_cycle_" using "tstepPerAction": 50 and "EEMWghtAM": 5e-4 and "EEPreMWghtAM":8e-6
+
+-- run 100 sec sim "20sept14_B0_local_" using "tstepPerAction": 20 and "EEMWghtAM": 5e-4 and "EEPreMWghtAM":8e-6
+and     "useSimulatedEnv": 1,
+
+-- run 100 sec sim "20sept14_B1_local_" using "tstepPerAction": 50 and "EEMWghtAM": 5e-4 and "EEPreMWghtAM":8e-6
+and     "useSimulatedEnv": 1,
+
+-- analyzing sim with simulatedPong...
+
+python -i simdat.py backupcfg/20sept14_B0_local_sim.json
+dact = getdActMap (totalDur, tstepPerAction, dspkT, dspkID, dnumc, dstartidx,lpop = allpossible_pops)
+plt.imshow(np.sum(dact['EV1'],0))
+binsz = 20
+dhist = {pop:getspikehist(dspkT[pop],dnumc,binsz,totalDur) for pop in lpop}
+plt.hist(dhist['EV1'][1][1:],100) 
+
+plotPerf(actreward)
+
+....
+clf(); dobjpos = loadObjPos() ## 
+subplot(2,1,1); xlabel('Racket Y position'); hist(dobjpos['racket'][:,1])
+subplot(2,1,2); xlabel('Ball Y position'); hist(dobjpos['ball'][:,1])
+and save the plot as 20aug24_A0_cycle_RacketBallYposHist.png
+
+....
+plot(dobjpos['ball'][:,1],'b')
+plot(dobjpos['racket'][:,1],'r')
+legend(['ball','racket'])
+xlabel('tpnts')
+ylabel('Y-Pixel loc')
+and save the plot as 20aug24_A0_cycle_RacketBallYposFull.png and 20aug24_A0_cycle_RacketBallYposZoomed.png
+
+....
+ballX,ballY = dobjpos['ball'][:,0],dobjpos['ball'][:,1]
+racketX,racketY = dobjpos['racket'][:,0],dobjpos['racket'][:,1]
+tt = np.linspace(0,totalDur,len(dobjpos['ball']))
+pdpos = pd.DataFrame(np.array([tt, ballX, ballY, racketX, racketY]).T,columns=['time','ballX','ballY','racketX','racketY'])
+dout = getdistvstimecorr(pdpos)
+plot(dout['lN'],dout['lr'],'ko',markersize=15)
+xlabel('Number examples'); ylabel('Correlation between paddle/ball distance and time')
+didnt save... not sure what to make out of it.....
+
+-- more analysis
+.... for a pixel representing ball, and Model racket, find firing rates of poulation.
+
+e.g. 
+Ball_pixel = (10,10)
+Racket_pixel = (5,17)
+find all instrances, when Ball and racket were at these pixels.
+find possible Ball sequences, including the Ball_pixel as the first image in the sequence.
+then for the ball moving in a single direction, find whether model is learning in which direction to move or not.
+
+
+def analyzeActionLearningForRepeatedInputSequences(dact, InputImages, BallPixel=(10,10), RacketPixel=(5,17)):
+  nbseq=2
+  targetCorr=0.99
+  ballInds = np.where(InputImages[:,BallPixel[0],BallPixel[1]]>250)
+  racketInds = np.where(InputImages[:,RacketPixel[0],RacketPixel[1]]>250)
+  targetInds = []
+  for inds in racketInds[0]:
+    if inds in ballInds[0]:
+      targetInds.append(inds)
+  seqImages = []
+  for inds in targetInds:
+    seqImages.append(np.sum(InputImages[inds:inds+1,:,3:17],0))
+  x = seqImages[0]
+  goodInds = []
+  for j in range(np.shape(seqImages)[0]):
+    y = seqImages[j]
+    corr, p_value = pearsonr(x.flat, y.flat)
+    if corr>targetCorr:
+      goodInds.append(j)
+  lmotorpop = [pop for pop in dconf['net']['EMotorPops'] if dconf['net']['allpops'][pop]>0] 
+  goodSeqImages = []
+  repActions = []
+  repPropActions = []
+  repRewards = []
+  dseqOutputs = {pop:np.zeros((len(goodInds),dact[pop].shape[1],dact[pop].shape[2]),dtype=float) for pop in lmotorpop}
+  for inds in goodInds:
+    goodSeqImages.append(np.sum(InputImages[targetInds[inds]:targetInds[inds]+1,:,:],0))
+    repActions.append(actreward['action'][targetInds[inds]+1])
+    repRewards.append(actreward['reward'][targetInds[inds]+1])
+    repPropActions.append(actreward['proposed'][targetInds[inds]+1])
+    for pop in dseqOutputs.keys():
+      dseqOutputs[pop][inds,:,:]=dact[pop][targetInds[inds]+1,:,:]
+  dsummedOutputs = {pop:np.zeros((len(goodInds),1),dtype=float) for pop in lmotorpop}
+  for pop in lmotorpop:
+    dsummedOutputs[pop] = np.sum(np.sum(dseqOutputs[pop],axis=2),axis=1)
+  fig, axs = plt.subplots(3, 1, figsize=(10,8));
+  lax = axs.ravel()
+  lax[0].imshow(np.sum(goodSeqImages,0))
+  lax[0].axis('off')
+  for pop,clr in zip(lmotorpop,['b','r','g']):
+    lax[1].plot(dsummedOutputs[pop],clr+'-o',markersize=3)
+    lax[1].set_ylabel('# of pop spikes')
+  lax[1].legend(lmotorpop,loc='best')
+  lax[2].plot(repActions,'-o',color=(0,0,0,1),markersize=3)
+  lax[2].plot(repPropActions,'-o',color=(0.5,0.5,0.5,1),markersize=3)
+  lax[2].set_yticks([1,3,4])
+  lax[2].set_yticklabels(['STAY','DOWN','UP'])
+  lax[2].legend(['Actions','Proposed'],loc='best')
+
+-- added analyzeActionLearningForRepeatedInputSequences(dact, InputImages, BallPixel=(10,10), RacketPixel=(5,17)) in simdat.py
+
+-- -- run 1000 sec sim "20sept14_B2_local_" using "tstepPerAction": 50 and "EEMWghtAM": 5e-4 and "EEPreMWghtAM":8e-6
+and     "useSimulatedEnv": 1,
+
+
+* 20sept15
+
+-- resume 3000 sec sim "20sept14_A1R1_cycle_" using "tstepPerAction": 50 and "EEMWghtAM": 5e-4 and "EEPreMWghtAM":8e-6
+from data/20sept14_A1_cycle_synWeights_final.pkl
+
+-- resume 3000 sec sim "20sept14_A0R1_cycle_" using "tstepPerAction": 50 and "EEMWghtAM": 5e-4 and "EEPreMWghtAM":8e-6
+from data/20sept14_A0_cycle_synWeights_final.pkl
+
+-- disucssion with sam
+
+samn:speech_balloon:  12:09 PM
+see what's most useful and decide...i still feel we need to allow learning at longer timescales with sparser reward, etc.
+12:09
+ok - so what's on the list of choices?
+12:09
+thx for edits - sounds better now
+
+Haroon Anwar  12:10 PM
+targeted on smaller time scale + non-targeted at longer time scale
+12:10
+2. way to decide , how to use targeted for longer times
+12:11
+not sure how will we do that
+12:11
+or just see if we can train to follow the ball with targeted on small time scale
+12:11
+without worrying about complex patterns
+
+samn:speech_balloon:  12:11 PM
+i'm fine with that ... seems like we should be able to at least get that
+12:12
+even if it's not as good as winning the game
+
+Haroon Anwar  12:12 PM
+ok
+12:12
+so i will try these two then
+
+samn:speech_balloon:  12:12 PM
+3. motor command encoding - is it sufficient
+12:12
+since you had mentioned that before
+12:12
+but you pick which one seems most promising
+
+-- run simulatedPong on cycle.
+
+-- List of things to do...
+1. run simulatedPong on cycle to test
+.... how does the model behave in previous settings.... "RLlenhebb": 200, "RLwindhebb": 50 --- 3000 sec "20sept15_C0_simulated_cycle_"
+.... reduce the length of eligibility to 100 ms for ... "RLlenhebb": 100, "RLwindhebb": 50 (only if tSetpPerPlay is 50 ms)
+
+RLwindhebb, RLwindanti : Maximum interval between pre- and post-synaptic events for an starting an eligibility trace.  There are separate ones for the Hebbian and anti-Hebbian events.
+RLlenhebb, RLlenanti : Length of the eligibility Hebbian and anti-Hebbian eligibility traces, or the decay time constants if the traces are decaying exponentials.
+
+* 20sept16
+
+-- 3000 sec resumed sim "20sept14_A1R1_cycle_" finished. took 43492.43 sec to run using 24 cores on cycle.
+save concantenated performance using
+
+lfn = ['20sept14_A1_cycle_', '20jun30_A1R1_cycle_']
+lfn = ['data/'+x+'ActionsRewards.txt' for x in lfn]
+pdac = getconcatactionreward(lfn)
+
+
+saved as 'SMARTAgent/20sept14_A1andA1R1_cycle_Perf.png'
+
+-- resume further for 3000 sec in "20sept14_A1R2_cycle" using 16 cores instead of 24.
+
+-- 3000 sec sim "20sept15_C0_simulated_cycle_" finished. Performance very similar to what we see for full game.
+...means no learning or not stable learning.
+
+-- reduce for AMPA "RLlenhebb": 200 to "RLlenhebb": 100 and run 1000 sec sim in "20sept16_C0_simulated_cycle_"
+
+-- reduce for AMPA "RLlenhebb": 200 to "RLlenhebb": 50 and run 1000 sec sim in "20sept16_D0_simulated_cycle_"
+
+-- analyzing "20sept14_B2_local_"
+python -i simdat.py backupcfg/20sept14_B2_local_sim.json
+dact = getdActMap (totalDur, tstepPerAction, dspkT, dspkID, dnumc, dstartidx,lpop = allpossible_pops)
+binsz = 20
+dhist = {pop:getspikehist(dspkT[pop],dnumc,binsz,totalDur) for pop in lpop}
+plt.hist(dhist['EV1'][1][1:],100) 
+
+plotPerf(actreward)
+
+analyzeActionLearningForRepeatedInputSequences(dact, InputImages, BallPixel=(10,10), RacketPixel=(5,17))
+... looking at this plot, it clearly shows that the model has not learned that the racket has to move down.
+... need to look at the weights too.
+
+# look at the weights with preid between 484 and 967
+E_wghts = pdf[pdf.preid<968] 
+# pixel 10,10 would be neuronID 726 for EV1DE
+
+-- 1000 sec sim in "20sept16_C0_simulated_cycle_" completed.
+python -i simdat.py backupcfg/20sept16_C0_simulated_cycle_sim.json
+dact = getdActMap (totalDur, tstepPerAction, dspkT, dspkID, dnumc, dstartidx,lpop = allpossible_pops)
+
+-- 1000 sec sim in "20sept16_D0_simulated_cycle_" completed.
+
+-- reduce for AMPA "RLlenhebb": 200 to "RLlenhebb": 50 and run 1000 sec sim in "20sept16_E0_simulated_cycle_"
+also with follow the ball rewards.
+
+standard rewards are
+    "rewardcodes": {
+        "scorePoint": 1.0,
+        "losePoint": -0.1,
+        "followTarget": 0.1,
+        "avoidTarget": -0.01,
+        "hitBall": 0.5
+    },
+
+modified rewards for this sim are
+    "rewardcodes": {
+        "scorePoint": 0.0,
+        "losePoint": 0.0,
+        "followTarget": 0.5,
+        "avoidTarget": -0.05,
+        "hitBall": 0
+    },
+
+
+-- reduce for AMPA "RLlenhebb": 200 to "RLlenhebb": 100 and run 1000 sec sim in "20sept16_F0_simulated_cycle_"
+also with follow the ball rewards.
+
+standard rewards are
+    "rewardcodes": {
+        "scorePoint": 1.0,
+        "losePoint": -0.1,
+        "followTarget": 0.1,
+        "avoidTarget": -0.01,
+        "hitBall": 0.5
+    },
+
+modified rewards for this sim are
+    "rewardcodes": {
+        "scorePoint": 0.0,
+        "losePoint": 0.0,
+        "followTarget": 0.5,
+        "avoidTarget": -0.05,
+        "hitBall": 0
+    },
+
+* 20sept17
+
+-- 3000 sec in "20sept14_A0R1_cycle" finished.
+-- 3000 sec in "20sept14_A1R2_cycle" finished.
+-- 1000 sec sim in "20sept16_E0_simulated_cycle_" finished.
+... p(follow) ~ 0.4
+-- 1000 sec sim in "20sept16_F0_simulated_cycle_" finished.
+... p(follow) ~ 0.4
+
+so just using follow/not follow the ball rewards do not add any value to the performance.
+
+Why is the performance converging to around 0.4 for p(follow)? irrespective of different rewarding strategies we use and irrelevant of RL parameters we use.
+
+-- the analysis to establish causality
+1. For a chosen ball and right racket locations in a frame, find all timepoints when the same input (left racket could be at any location)
+2. look at the activity map of neurons for those time points.
+3. for all active neurons in (input layers) any of those time points, note down the IDs and only use those selected neurons to find the downstream neurons i.e. postsynaptic neurons and the associated weights.
+4. see how much influence the left racket driven neurons have on firing rates of M neurons.  
+--
+
+Since the pixel intensity level is translated into firing rate for next time interval, i should look at targetInds[goodInds[i]]+1
+
+FRV1_ball_pixel10_10 = dact['EV1'][targetInds[goodInds],11,11] ---> gives me error
+
+FRV1_ball_pixel10_10 = np.zeros((len(goodInds)))
+for i in range(len(goodInds)):
+  FRV1_ball_pixel10_10[i] = dact['EV1'][targetInds[goodInds[i]]+1,11,11]
+
+
+... ignoring corr
+FRV1_ball_pixel10_10 = np.zeros((len(targetInds)))
+for i in range(len(targetInds)):
+  FRV1_ball_pixel10_10[i] = dact['EV1'][targetInds[i]+1,11,11]
+... firing rate doesnt look as i expected. CHECK HERE.
+
+
+FRV1DE_ball_pixel10_10 = np.zeros((len(targetInds)))
+for i in range(len(targetInds)):
+  FRV1DE_ball_pixel10_10[i] = dact['EV1DE'][targetInds[i]+1,11,11]
+... checked all 8 directions... only 'E' is active and it has either 7 spikes or 8 spikes. (supposed to be 7.5 spikes in 50 ms to have 150 Hz)
+
+FRV1_racket_pixel6_18 = np.zeros((len(targetInds)))
+for i in range(len(targetInds)):
+  FRV1_racket_pixel6_18[i] = dact['EV1'][targetInds[i]+1,6,18]
+
+FRV1DN_racket_pixel6_18 = np.zeros((len(targetInds)))
+for i in range(len(targetInds)):
+  FRV1DN_racket_pixel6_18[i] = dact['EV1DN'][targetInds[i]+1,6,18]
+
+FRV1DS_racket_pixel6_18 = np.zeros((len(targetInds)))
+for i in range(len(targetInds)):
+  FRV1DS_racket_pixel6_18[i] = dact['EV1DS'][targetInds[i]+1,6,18]
+
+
+a. plot InputImage at time t-1 and t. (need 2 panels)
+plt.imshow(InputImages[targetInds[i]-1])
+plt.imshow(InputImages[targetInds[i]])
+OR
+plt.imshow(np.subtract(InputImages[targetInds[0]],InputImages[targetInds[0]-1]))
+
+b. plot direction angles at time t. (need 1 panel)
+plt.imshow(ldflow[targetInds[i]]['ang'])
+plt.colorbar()
+
+c. plot actmap for V1 at time t+1 (need 13 panels for c,d and e)
+and 
+d. plot actmap for direction selective neurons at time t+1
+and
+e. plot actmap for motor neurons at time t+1.
+for pop in lpop:
+  plt.imshow(dact[pop][targetInds[i]+1])
+
+f. plot raster 100 ms before and 100 ms after. (1 panel)
+
+repeat everything for next targetInds[i+1]
+
+-- leave other possible plots for now.
+
+g. plot weights (2 panels 1 for EMUP and 1 for EMDOWN).
+action vs proposed action at time t+1.
+
+h. Reward signal for time t+1.
+
+make 36 panels in 4 rows.
+
+fig, axs = plt.subplots(4, 9, figsize=(14,8));
+i = 0
+lax = axs.ravel()
+lax[0].imshow(InputImages[targetInds[i]])
+lax[0].set_title('InputImage[t]',fontsize=6)
+lax[0].axis('off')
+lax[1].imshow(np.subtract(InputImages[targetInds[i]],InputImages[targetInds[i]-1]))
+lax[1].set_title('InputImage[t]-InputImage[t-1]',fontsize=6)
+lax[1].axis('off')
+lax[2].imshow(ldflow[targetInds[i]]['ang'])
+lax[2].set_title('Angles',fontsize=6)
+lax[2].axis('off')
+count = 3
+lax[16].axis('off')
+lax[17].axis('off')
+for pop in lpop:
+  if pop=='IM':
+    pcm = lax[count].imshow(dact[pop][targetInds[i]+1],vmin=0,vmax=8)
+    fig.colorbar(pcm, ax = lax[count])
+  lax[count].imshow(dact[pop][targetInds[i]+1],vmin=0,vmax=8)
+  lax[count].set_title(pop+'[t+1]',fontsize=6)
+  lax[count].axis('off')
+  count = count + 1
+offset = 18
+i = 215
+lax[offset+0].imshow(InputImages[targetInds[i]])
+lax[offset+0].set_title('InputImage[t]',fontsize=6)
+lax[offset+0].axis('off')
+lax[offset+1].imshow(np.subtract(InputImages[targetInds[i]],InputImages[targetInds[i]-1]))
+lax[offset+1].set_title('InputImage[t]-InputImage[t-1]',fontsize=6)
+lax[offset+1].axis('off')
+lax[offset+2].imshow(ldflow[targetInds[i]]['ang'])
+lax[offset+2].set_title('Angles',fontsize=6)
+lax[offset+2].axis('off')
+count = 3
+lax[34].axis('off')
+lax[35].axis('off')
+for pop in lpop:
+  if pop=='IM':
+    pcm2 = lax[offset+count].imshow(dact[pop][targetInds[i]+1],vmin=0,vmax=8)
+    fig.colorbar(pcm2, ax = lax[offset+count])
+  lax[offset+count].imshow(dact[pop][targetInds[i]+1],vmin=0,vmax=8)
+  lax[offset+count].set_title(pop+'[t+1]',fontsize=6)
+  lax[offset+count].axis('off')
+  count = count + 1
+
+popwts = plotMeanWeights (pdf,ax=None,msz=1,xl=None,lpop=['EMDOWN','EMUP','EMSTAY'],lclr=['r','b','g'],plotindiv=True)
+>>> popwts.keys()
+dict_keys(['EMDOWN', 'EMUP'])
+
+
+--- draw average M activity 
+pop = 'EMUP'
+utimes = np.unique(pdf.time)
+nbNeurons = dendidx[pop]+1-dstartidx[pop]
+tpnts = len(utimes)
+wts_top = np.zeros((tpnts,nbNeurons))
+count = 0
+for idx in range(dstartidx[pop],dendidx[pop]+1,1): # first plot average weight onto each individual neuron
+  pdfs = pdf[(pdf.postid==idx)]  
+  wts = [np.mean(pdfs[(pdfs.time==t)].weight) for t in utimes]
+  wts_top[:,count] = wts
+  count = count+1
+
+tpnt1 = np.reshape(wts_top[0,:],(10,10))
+tpnt2 = np.reshape(wts_top[-1,:],(10,10))
+
+plt.imshow(np.subtract(tpnt2,tpnt1))
+plt.title('Change in weights-->EMUP')
+
+
+pop = 'EMDOWN'
+utimes = np.unique(pdf.time)
+nbNeurons = dendidx[pop]+1-dstartidx[pop]
+tpnts = len(utimes)
+wts_top = np.zeros((tpnts,nbNeurons))
+count = 0
+for idx in range(dstartidx[pop],dendidx[pop]+1,1): # first plot average weight onto each individual neuron
+  pdfs = pdf[(pdf.postid==idx)]  
+  wts = [np.mean(pdfs[(pdfs.time==t)].weight) for t in utimes]
+  wts_top[:,count] = wts
+  count = count+1
+
+tpnt3 = np.reshape(wts_top[0,:],(10,10))
+tpnt4 = np.reshape(wts_top[-1,:],(10,10))
+
+plt.imshow(np.subtract(tpnt4,tpnt3))
+plt.title('Change in weights-->EMDOWN')
+
+* 20sept21
+
+-- ran 1000 sec sim "20sept20_A0_simulated_cycle_"
+with
+    "rewardcodes": {
+        "scorePoint": 0,
+        "losePoint": 0,
+        "followTarget": 0.5,
+        "avoidTarget": -0.25,
+        "hitBall": 0
+see 20sept20_A0_simulated_cycle_perf.jpg---- p(follow) started dropping. ~0.32 @ 1000 sec.
+see 20sept20_A0_simulated_cycle_EMUPweightschange.jpg 
+and see 20sept20_A0_simulated_cycle_EMDOWNweightschange.jpg ... I guess the punishments and rewards didnt balance out the weights of ball and other rackets. Because there were much more punshiments than rewards.
+POTENTIAL IDEA: could have decaying values of rewards and punishments (representing desensitization). NOT SURE HOW TO IMPLEMENT THIS....
+
+-- ran 1000 sec sim "20sept20_B0_simulated_cycle_"
+    "rewardcodes": {
+        "scorePoint": 0,
+        "losePoint": 0,
+        "followTarget": 0.5,
+        "avoidTarget": -0.5,
+        "hitBall": 0
+see 20sept20_B0_simulated_cycle_perf.jpg---- p(follow) started dropping. ~0.29 @ 1000 sec.
+see 20sept20_A0_simulated_cycle_EMUPweightschange.jpg 
+and see 20sept20_A0_simulated_cycle_EMDOWNweightschange.jpg - larger decrease in weights for ball and other racket.
+
+-- ran 1000 sec sim "20sept20_C0_simulated_cycle_"
+    "rewardcodes": {
+        "scorePoint": 0,
+        "losePoint": 0,
+        "followTarget": 0.5,
+        "avoidTarget": -0.25,
+        "hitBall": 0
+    "architecturePreMtoM": {
+        "useProbabilistic": 1,
+see 20sept20_C0_simulated_cycle_perf.jpg---- p(follow) started dropping. ~0.24 @ 1000 sec.
+see 20sept20_C0_simulated_cycle_EMUPweightschange.jpg 
+and see 20sept20_C0_simulated_cycle_EMDOWNweightschange.jpg
+... the weights changed but no clue how to interpret the effect of learning on actions.
+
+-- modify simulatePong to have 3 input patterns. when using "random":1 in sim.json
+
+    "simulatedEnvParams": {
+        "random":1,
+        "yball":80,
+        "yracket":40
+    }
+
+in simulatePong:
+
+self.randomizeYpos = dconf['simulatedEnvParams']['random']
+
+      if self.randomizeYpos: 
+        shiftdir = random.choice([1,3,4])
+        if shiftdir==3:
+          self.ypos_ball = dconf['simulatedEnvParams']['yball'] + 40
+        elif shiftdir==4:
+          self.ypos_ball = dconf['simulatedEnvParams']['yball'] - 40
+        else:
+          self.ypos_ball = dconf['simulatedEnvParams']['yball'] 
+
+* 20sept22
+
+-- ran 1000 sec sim "20sept21_A0_simulated_cycle_" with "random" simulatedPong.
+
+What is happening with weights?
+
+-- ball and rackets activate neurons in preMotor area as well as neurons in M areas.
+-- Since the ball is following the same trajectory, it always activates same neurons.
+-- For timestep t, the right racket is above the ball, the proposed action is MOVE DOWN. If the racket moves up, a punishment will be passed.
+.... this punishment will decrease the weights for neurons representing ball and neurons representing rackets onto EMUP neurons.
+--For timestep t+1, the right racket is still above the ball, the proposed action is MOVE DOWN. If the racket moves down, a reward will be passed.
+... this reward will increase the weights for neurons representing ball and neurons representing rackets onto EMDOWN neurons.
+-- For timesetp t+2, the right racket is below the ball, the proposed action is MOVE UP. if the racket moves up, a reward will be passed.
+... this reward will increase the weights for neurons representing ball and neurons representing rackets onto EMUP neurons.
+-- comparing timestep t and t+2.... 
+... because same neurons represented ball (because of fixed ball trajectory), at time t the weights decreased but at time t+2 weights increased. (net result increase because reward was +0.1 and punishment was -0.01)
+... but different neurons represented racket at time t and t+2. at time t, racket was above the ball and at time t+2, racket was below the ball. at time t the weights of neurons on top right corner decreased...and at time t+2 the weights of neurons on bottom right corner increased. 
+
+SO THE PROBLEM IS.... NO ASSOCIATION BETWEEN BALL TRAJECTORY AND RACKET POSITION HAS BEEN ESTABLISHED.
+
+Can recurrent connectivity fix this problem???????
+
+-- Similar potential problem or not??:
+-- at time t ball moves horizontally (E) and the racket is above the ball, the proposed action is MOVE DOWN. If the racket moves up, a punishment will be passed.
+... this punishment will decrease weights of ball and rackets in EMUP.
+-- at time t+1 ball moves SE and the racket is above the ball, the proposed action is MOVE DOWN. If the racket moves down, a reward will be passed.
+... this reward will increase weights lf ball and rackets in EMDOWN.
+
+
+IDEA... good or bad???
+
+-- what if another network of neurons that we may call DECISION MAKING NEURONS (10x10) drives EM neurons....
+-- when learning is ON, the DECISION MAKING NEURONS get activated by topological inputs (fixed weights) from preM neurons, in turn activating M neurons (fixed weights).
+-- start with low weights (could be 0) between preM and M.
+
+.... not sure how to do this kind of thing.... 
+
+-- what happens when we have V4(100 neurons) and MT(100 neurons)
+-- ran 20sept22_B0_simulated_cycle_ with 
+EV4:100, IV4:25, EMT:25, IMT:9
+* 20sept23
+
+-- seems that the connections were not made propoerly from V4 and MT to EM.
+-- must check the connectivity after looking at the results of simulations:
+
+-- the connections should be either in divergent list or convergent list. cant be in both.
+... with 100 V4 neurons and 100 EM neurons, i choose to apply convergence of network connectivity.
+In "alltopoldivcons":
+changed "EV4":{"EV1":3,"EMDOWN":3,"EMUP":3,"EMSTAY":0}, to "EV4":{"EV1":3},
+and In "alltopolconvcons":
+change "EV4":{"IV4":3,"EMT":3},
+to "EV4":{"IV4":3,"EMT":3,"EMDOWN":3,"EMUP":3,"EMSTAY":0},
+... with 25 MT neurons and 100 EM neurons, i choose to apply divergence of network connectivity.
+
+-- check if all connections look good...
+
+-- Identified first problem:
+
+>>> dnumc
+OrderedDict([('ER', 0), ('IR', 0), ('EV1', 484), ('EV1DE', 484), ('EV1DNE', 484), ('EV1DN', 484), ('EV1DNW', 484), ('EV1DW', 484), ('EV1DSW', 484), ('EV1DS', 484), ('EV1DSE', 484), ('IV1', 324), ('EV4', 196), ('IV4', 169), ('EMT', 81), ('IMT', 49), ('EMDOWN', 100), ('EMUP', 100), ('EMSTAY', 0), ('IM', 50)])
+>>> receptive_fields
+[5, 5]
+>>> dnumc_padx
+OrderedDict([('ER', 0), ('IR', 0), ('EV1', 2), ('EV1DE', 2), ('EV1DNE', 2), ('EV1DN', 2), ('EV1DNW', 2), ('EV1DW', 2), ('EV1DSW', 2), ('EV1DS', 2), ('EV1DSE', 2), ('IV1', 4), ('EV4', 2), ('IV4', 4), ('EMT', 2), ('IMT', 4), ('EMDOWN', 0), ('EMUP', 0), ('EMSTAY', 0), ('IM', 0)])
+
+
+  for pop in allpops_withconvtopology:
+    receptive_fields = []
+    for postpop in list(dtopolconvcons[pop].keys()):
+      if dnumc[postpop]>0:
+        receptive_fields.append(dtopolconvcons[pop][postpop])
+    if len(receptive_fields)>0:
+      max_receptive_field = np.amax(receptive_fields)
+    else:
+      max_receptive_field = 0
+    if dnumc[pop]>0 and max_receptive_field>0:
+      # dnumc[pop] = int((np.sqrt(dnumc[pop])+max_receptive_field-1)**2)
+      dnumc_padx[pop] = max_receptive_field-1
+  for pop in allpops_withdivtopology:
+    receptive_fields = []
+    for postpop in list(dtopoldivcons[pop].keys()):
+      if dnumc[postpop]>0:
+        receptive_fields.append(dtopoldivcons[pop][postpop])
+    if len(receptive_fields)>0:
+      max_receptive_field = np.amax(receptive_fields)
+    else:
+      max_receptive_field = 0
+    if dnumc[pop]>0 and max_receptive_field>0:
+      # dnumc[pop] = int((np.sqrt(dnumc[pop])+max_receptive_field-1)**2)
+      dnumc_padx[pop] = max_receptive_field-1
+
+update dnumc separately as below....
+
+  for pop in allpops:
+    if dnumc[pop]>0 and dnumc_padx[pop]>0:
+      dnumc[pop] = int((np.sqrt(dnumc[pop])+dnumc_padx[pop])**2)
+
+
+JUST TO CONFIRM IT WORKS:
+
+
+>>> blistIMTtoEMT
+[[16, 0], [16, 1], [16, 2], [16, 3], 
+[16, 7], [16, 8], [16, 9], [16, 10], 
+[16, 14], [16, 15], [16, 16], [16, 17], 
+[16, 21], [16, 22], [16, 23], [16, 24], 
+
+[17, 0], [17, 1], [17, 2], [17, 3], [17, 4], 
+[17, 7], [17, 8], [17, 9], [17, 10], [17, 11], 
+[17, 14], [17, 15], [17, 16], [17, 17], [17, 18], 
+[17, 21], [17, 22], [17, 23], [17, 24], [17, 25], 
+
+[18, 1], [18, 2], [18, 3], [18, 4], [18, 5], 
+[18, 8], [18, 9], [18, 10], [18, 11], [18, 12], 
+[18, 15], [18, 16], [18, 17], [18, 18], [18, 19], 
+[18, 22], [18, 23], [18, 24], [18, 25], [18, 26],
+
+[23, 0], [23, 1], [23, 2], [23, 3], 
+[23, 7], [23, 8], [23, 9], [23, 10], 
+[23, 14], [23, 15], [23, 16], [23, 17], 
+[23, 21], [23, 22], [23, 23], [23, 24], 
+[23, 28], [23, 29], [23, 30], [23, 31], 
+
+[24, 0], [24, 1], [24, 2], [24, 3], [24, 4], 
+[24, 7], [24, 8], [24, 9], [24, 10], [24, 11], 
+[24, 14], [24, 15], [24, 16], [24, 17], [24, 18], 
+[24, 21], [24, 22], [24, 23], [24, 24], [24, 25], 
+[24, 28], [24, 29], [24, 30], [24, 31], [24, 32], 
+
+[25, 1], [25, 2], [25, 3], [25, 4], [25, 5], 
+[25, 8], [25, 9], [25, 10], [25, 11], [25, 12], 
+[25, 15], [25, 16], [25, 17], [25, 18], [25, 19], 
+[25, 22], [25, 23], [25, 24], [25, 25], [25, 26], 
+[25, 29], [25, 30], [25, 31], [25, 32], [25, 33], 
+
+[30, 7], [30, 8], [30, 9], [30, 10], 
+[30, 14], [30, 15], [30, 16], [30, 17], 
+[30, 21], [30, 22], [30, 23], [30, 24], 
+[30, 28], [30, 29], [30, 30], [30, 31], 
+[30, 35], [30, 36], [30, 37], [30, 38], 
+
+[31, 7], [31, 8], [31, 9], [31, 10], [31, 11], 
+[31, 14], [31, 15], [31, 16], [31, 17], [31, 18], 
+[31, 21], [31, 22], [31, 23], [31, 24], [31, 25], 
+[31, 28], [31, 29], [31, 30], [31, 31], [31, 32], 
+[31, 35], [31, 36], [31, 37], [31, 38], [31, 39], 
+
+[32, 8], [32, 9], [32, 10], [32, 11], [32, 12], 
+[32, 15], [32, 16], [32, 17], [32, 18], [32, 19], 
+[32, 22], [32, 23], [32, 24], [32, 25], [32, 26], 
+[32, 29], [32, 30], [32, 31], [32, 32], [32, 33], 
+[32, 36], [32, 37], [32, 38], [32, 39], [32, 40]]
+
+IMT:
+
+0   1     2   3   4     5   6
+7   8     9   10  11    12  13
+
+14  15    16  17  18    19  20
+21  22    23  24  25    26  27
+28  29    30  31  32    33  34
+
+35  36    37  38  39    40  41
+42  43    44  45  46    47  48
+
+
+EMT:
+
+0     1   2   3   4   5     6
+
+7     8   9   10  11  12    13
+14    15  16  17  18  19    20
+21    22  23  24  25  26    27
+28    29  30  31  32  33    34
+35    36  37  38  39  40    41
+
+42    43  44  45  46  47    48
+
+blistEMTtoIMT: "EMT":{"IMT":3} ---- converging
+[[0, 16], [1, 16], [2, 16], 
+[7, 16], [8, 16], [9, 16], 
+[14, 16], [15, 16], [16, 16], 
+
+[1, 17], [2, 17], [3, 17], 
+[8, 17], [9, 17], [10, 17], 
+[15, 17], [16, 17], [17, 17], 
+
+[2, 18], [3, 18], [4, 18], 
+[9, 18], [10, 18], [11, 18], 
+[16, 18], [17, 18], [18, 18], 
+
+[7, 23], [8, 23], [9, 23], 
+[14, 23], [15, 23], [16, 23], 
+[21, 23], [22, 23], [23, 23], 
+
+[8, 24], [9, 24], [10, 24], 
+[15, 24], [16, 24], [17, 24], 
+[22, 24], [23, 24], [24, 24], 
+
+[9, 25], [10, 25], [11, 25], 
+[16, 25], [17, 25], [18, 25], 
+[23, 25], [24, 25], [25, 25], 
+
+[14, 30], [15, 30], [16, 30], 
+[21, 30], [22, 30], [23, 30], 
+[28, 30], [29, 30], [30, 30], 
+
+[15, 31], [16, 31], [17, 31], 
+[22, 31], [23, 31], [24, 31], 
+[29, 31], [30, 31], [31, 31], 
+
+[16, 32], [17, 32], [18, 32], 
+[23, 32], [24, 32], [25, 32], 
+[30, 32], [31, 32], [32, 32]]
+
+
+EV4 EMDOWN --->Looks OK
+[[0, 0], [1, 0], [2, 0], [12, 0], [13, 0], [14, 0], [24, 0], [25, 0], [26, 0], 
+[1, 1], [2, 1], [3, 1], [13, 1], [14, 1], [15, 1], [25, 1], [26, 1], [27, 1], 
+[2, 2], [3, 2], [4, 2], [14, 2], [15, 2], [16, 2], [26, 2], [27, 2], [28, 2], 
+[3, 3], [4, 3], [5, 3], [15, 3], [16, 3], [17, 3], [27, 3], [28, 3], [29, 3], 
+[4, 4], [5, 4], [6, 4], [16, 4], [17, 4], [18, 4], [28, 4], [29, 4], [30, 4], 
+[5, 5], [6, 5], [7, 5], [17, 5], [18, 5], [19, 5], [29, 5], [30, 5], [31, 5], 
+[6, 6], [7, 6], [8, 6], [18, 6], [19, 6], [20, 6], [30, 6], [31, 6], [32, 6], 
+[7, 7], [8, 7], [9, 7], [19, 7], [20, 7], [21, 7], [31, 7], [32, 7], [33, 7], 
+[8, 8], [9, 8], [10, 8], [20, 8], [21, 8], [22, 8], [32, 8], [33, 8], [34, 8], 
+[9, 9], [10, 9], [11, 9], [21, 9], [22, 9], [23, 9], [33, 9], [34, 9], [35, 9], 
+[12, 10], [13, 10], [14, 10], [24, 10], [25, 10], [26, 10], [36, 10], [37, 10], [38, 10], 
+[13, 11], [14, 11], [15, 11], [25, 11], [26, 11], [27, 11], [37, 11], [38, 11], [39, 11], 
+[14, 12], [15, 12], [16, 12], [26, 12], [27, 12], [28, 12], [38, 12], [39, 12], [40, 12], 
+[15, 13], [16, 13], [17, 13], [27, 13], [28, 13], [29, 13], [39, 13], [40, 13], [41, 13], 
+[16, 14], [17, 14], [18, 14], [28, 14], [29, 14], [30, 14], [40, 14], [41, 14], [42, 14], 
+[17, 15], [18, 15], [19, 15], [29, 15], [30, 15], [31, 15], [41, 15], [42, 15], [43, 15], 
+[18, 16], [19, 16], [20, 16], [30, 16], [31, 16], [32, 16], [42, 16], [43, 16], [44, 16], 
+[19, 17], [20, 17], [21, 17], [31, 17], [32, 17], [33, 17], [43, 17], [44, 17], [45, 17], 
+[20, 18], [21, 18], [22, 18], [32, 18], [33, 18], [34, 18], [44, 18], [45, 18], [46, 18], 
+[21, 19], [22, 19], [23, 19], [33, 19], [34, 19], [35, 19], [45, 19], [46, 19], [47, 19], 
+[24, 20], [25, 20], [26, 20], [36, 20], [37, 20], [38, 20], [48, 20], [49, 20], [50, 20], 
+[25, 21], [26, 21], [27, 21], [37, 21], [38, 21], [39, 21], [49, 21], [50, 21], [51, 21], 
+[26, 22], [27, 22], [28, 22], [38, 22], [39, 22], [40, 22], [50, 22], [51, 22], [52, 22], 
+[27, 23], [28, 23], [29, 23], [39, 23], [40, 23], [41, 23], [51, 23], [52, 23], [53, 23], 
+[28, 24], [29, 24], [30, 24], [40, 24], [41, 24], [42, 24], [52, 24], [53, 24], [54, 24], 
+[29, 25], [30, 25], [31, 25], [41, 25], [42, 25], [43, 25], [53, 25], [54, 25], [55, 25], 
+[30, 26], [31, 26], [32, 26], [42, 26], [43, 26], [44, 26], [54, 26], [55, 26], [56, 26], 
+[31, 27], [32, 27], [33, 27], [43, 27], [44, 27], [45, 27], [55, 27], [56, 27], [57, 27], 
+[32, 28], [33, 28], [34, 28], [44, 28], [45, 28], [46, 28], [56, 28], [57, 28], [58, 28], 
+[33, 29], [34, 29], [35, 29], [45, 29], [46, 29], [47, 29], [57, 29], [58, 29], [59, 29], 
+[36, 30], [37, 30], [38, 30], [48, 30], [49, 30], [50, 30], [60, 30], [61, 30], [62, 30], 
+[37, 31], [38, 31], [39, 31], [49, 31], [50, 31], [51, 31], [61, 31], [62, 31], [63, 31], 
+[38, 32], [39, 32], [40, 32], [50, 32], [51, 32], [52, 32], [62, 32], [63, 32], [64, 32], 
+[39, 33], [40, 33], [41, 33], [51, 33], [52, 33], [53, 33], [63, 33], [64, 33], [65, 33], 
+[40, 34], [41, 34], [42, 34], [52, 34], [53, 34], [54, 34], [64, 34], [65, 34], [66, 34], 
+[41, 35], [42, 35], [43, 35], [53, 35], [54, 35], [55, 35], [65, 35], [66, 35], [67, 35], 
+[42, 36], [43, 36], [44, 36], [54, 36], [55, 36], [56, 36], [66, 36], [67, 36], [68, 36], 
+[43, 37], [44, 37], [45, 37], [55, 37], [56, 37], [57, 37], [67, 37], [68, 37], [69, 37], 
+[44, 38], [45, 38], [46, 38], [56, 38], [57, 38], [58, 38], [68, 38], [69, 38], [70, 38], 
+[45, 39], [46, 39], [47, 39], [57, 39], [58, 39], [59, 39], [69, 39], [70, 39], [71, 39], 
+[48, 40], [49, 40], [50, 40], [60, 40], [61, 40], [62, 40], [72, 40], [73, 40], [74, 40], 
+[49, 41], [50, 41], [51, 41], [61, 41], [62, 41], [63, 41], [73, 41], [74, 41], [75, 41], 
+[50, 42], [51, 42], [52, 42], [62, 42], [63, 42], [64, 42], [74, 42], [75, 42], [76, 42], 
+[51, 43], [52, 43], [53, 43], [63, 43], [64, 43], [65, 43], [75, 43], [76, 43], [77, 43], 
+[52, 44], [53, 44], [54, 44], [64, 44], [65, 44], [66, 44], [76, 44], [77, 44], [78, 44], 
+[53, 45], [54, 45], [55, 45], [65, 45], [66, 45], [67, 45], [77, 45], [78, 45], [79, 45], 
+[54, 46], [55, 46], [56, 46], [66, 46], [67, 46], [68, 46], [78, 46], [79, 46], [80, 46], 
+[55, 47], [56, 47], [57, 47], [67, 47], [68, 47], [69, 47], [79, 47], [80, 47], [81, 47], 
+[56, 48], [57, 48], [58, 48], [68, 48], [69, 48], [70, 48], [80, 48], [81, 48], [82, 48], 
+[57, 49], [58, 49], [59, 49], [69, 49], [70, 49], [71, 49], [81, 49], [82, 49], [83, 49], 
+[60, 50], [61, 50], [62, 50], [72, 50], [73, 50], [74, 50], [84, 50], [85, 50], [86, 50], 
+[61, 51], [62, 51], [63, 51], [73, 51], [74, 51], [75, 51], [85, 51], [86, 51], [87, 51], 
+[62, 52], [63, 52], [64, 52], [74, 52], [75, 52], [76, 52], [86, 52], [87, 52], [88, 52], 
+[63, 53], [64, 53], [65, 53], [75, 53], [76, 53], [77, 53], [87, 53], [88, 53], [89, 53], 
+[64, 54], [65, 54], [66, 54], [76, 54], [77, 54], [78, 54], [88, 54], [89, 54], [90, 54], 
+[65, 55], [66, 55], [67, 55], [77, 55], [78, 55], [79, 55], [89, 55], [90, 55], [91, 55], 
+[66, 56], [67, 56], [68, 56], [78, 56], [79, 56], [80, 56], [90, 56], [91, 56], [92, 56], 
+[67, 57], [68, 57], [69, 57], [79, 57], [80, 57], [81, 57], [91, 57], [92, 57], [93, 57], 
+[68, 58], [69, 58], [70, 58], [80, 58], [81, 58], [82, 58], [92, 58], [93, 58], [94, 58], 
+[69, 59], [70, 59], [71, 59], [81, 59], [82, 59], [83, 59], [93, 59], [94, 59], [95, 59], 
+[72, 60], [73, 60], [74, 60], [84, 60], [85, 60], [86, 60], [96, 60], [97, 60], [98, 60], 
+[73, 61], [74, 61], [75, 61], [85, 61], [86, 61], [87, 61], [97, 61], [98, 61], [99, 61], 
+[74, 62], [75, 62], [76, 62], [86, 62], [87, 62], [88, 62], [98, 62], [99, 62], [100, 62], 
+[75, 63], [76, 63], [77, 63], [87, 63], [88, 63], [89, 63], [99, 63], [100, 63], [101, 63], 
+[76, 64], [77, 64], [78, 64], [88, 64], [89, 64], [90, 64], [100, 64], [101, 64], [102, 64], 
+[77, 65], [78, 65], [79, 65], [89, 65], [90, 65], [91, 65], [101, 65], [102, 65], [103, 65], 
+[78, 66], [79, 66], [80, 66], [90, 66], [91, 66], [92, 66], [102, 66], [103, 66], [104, 66], 
+[79, 67], [80, 67], [81, 67], [91, 67], [92, 67], [93, 67], [103, 67], [104, 67], [105, 67], 
+[80, 68], [81, 68], [82, 68], [92, 68], [93, 68], [94, 68], [104, 68], [105, 68], [106, 68], 
+[81, 69], [82, 69], [83, 69], [93, 69], [94, 69], [95, 69], [105, 69], [106, 69], [107, 69], 
+[84, 70], [85, 70], [86, 70], [96, 70], [97, 70], [98, 70], [108, 70], [109, 70], [110, 70], 
+[85, 71], [86, 71], [87, 71], [97, 71], [98, 71], [99, 71], [109, 71], [110, 71], [111, 71], 
+[86, 72], [87, 72], [88, 72], [98, 72], [99, 72], [100, 72], [110, 72], [111, 72], [112, 72], 
+[87, 73], [88, 73], [89, 73], [99, 73], [100, 73], [101, 73], [111, 73], [112, 73], [113, 73], 
+[88, 74], [89, 74], [90, 74], [100, 74], [101, 74], [102, 74], [112, 74], [113, 74], [114, 74], 
+[89, 75], [90, 75], [91, 75], [101, 75], [102, 75], [103, 75], [113, 75], [114, 75], [115, 75], 
+[90, 76], [91, 76], [92, 76], [102, 76], [103, 76], [104, 76], [114, 76], [115, 76], [116, 76], 
+[91, 77], [92, 77], [93, 77], [103, 77], [104, 77], [105, 77], [115, 77], [116, 77], [117, 77], 
+[92, 78], [93, 78], [94, 78], [104, 78], [105, 78], [106, 78], [116, 78], [117, 78], [118, 78], 
+[93, 79], [94, 79], [95, 79], [105, 79], [106, 79], [107, 79], [117, 79], [118, 79], [119, 79], 
+[96, 80], [97, 80], [98, 80], [108, 80], [109, 80], [110, 80], [120, 80], [121, 80], [122, 80], 
+[97, 81], [98, 81], [99, 81], [109, 81], [110, 81], [111, 81], [121, 81], [122, 81], [123, 81], 
+[98, 82], [99, 82], [100, 82], [110, 82], [111, 82], [112, 82], [122, 82], [123, 82], [124, 82], 
+[99, 83], [100, 83], [101, 83], [111, 83], [112, 83], [113, 83], [123, 83], [124, 83], [125, 83], 
+[100, 84], [101, 84], [102, 84], [112, 84], [113, 84], [114, 84], [124, 84], [125, 84], [126, 84], 
+[101, 85], [102, 85], [103, 85], [113, 85], [114, 85], [115, 85], [125, 85], [126, 85], [127, 85], 
+[102, 86], [103, 86], [104, 86], [114, 86], [115, 86], [116, 86], [126, 86], [127, 86], [128, 86], 
+[103, 87], [104, 87], [105, 87], [115, 87], [116, 87], [117, 87], [127, 87], [128, 87], [129, 87], 
+[104, 88], [105, 88], [106, 88], [116, 88], [117, 88], [118, 88], [128, 88], [129, 88], [130, 88], 
+[105, 89], [106, 89], [107, 89], [117, 89], [118, 89], [119, 89], [129, 89], [130, 89], [131, 89], 
+[108, 90], [109, 90], [110, 90], [120, 90], [121, 90], [122, 90], [132, 90], [133, 90], [134, 90], 
+[109, 91], [110, 91], [111, 91], [121, 91], [122, 91], [123, 91], [133, 91], [134, 91], [135, 91], 
+[110, 92], [111, 92], [112, 92], [122, 92], [123, 92], [124, 92], [134, 92], [135, 92], [136, 92], 
+[111, 93], [112, 93], [113, 93], [123, 93], [124, 93], [125, 93], [135, 93], [136, 93], [137, 93], 
+[112, 94], [113, 94], [114, 94], [124, 94], [125, 94], [126, 94], [136, 94], [137, 94], [138, 94], 
+[113, 95], [114, 95], [115, 95], [125, 95], [126, 95], [127, 95], [137, 95], [138, 95], [139, 95], 
+[114, 96], [115, 96], [116, 96], [126, 96], [127, 96], [128, 96], [138, 96], [139, 96], [140, 96], 
+[115, 97], [116, 97], [117, 97], [127, 97], [128, 97], [129, 97], [139, 97], [140, 97], [141, 97], 
+[116, 98], [117, 98], [118, 98], [128, 98], [129, 98], [130, 98], [140, 98], [141, 98], [142, 98], 
+[117, 99], [118, 99], [119, 99], [129, 99], [130, 99], [131, 99], [141, 99], [142, 99], [143, 99]]
+
+EMT EMDOWN 
+[ [8, 0],   [8, 1],                                           [8, 10],  [8, 11], 
+  [9, 0],   [9, 1],   [9, 2],                                 [9, 10],  [9, 11],    [9, 12], 
+            [10, 1],  [10, 2],  [10, 3],                                [10, 11],   [10, 12], [10, 13], 
+                      [11, 2],  [11, 3],  [11, 4],                                  [11, 12], [11, 13], [11, 14], 
+                                [12, 3],  [12, 4],  [12, 5],                                  [12, 13], [12, 14], [12, 15], 
+  [15, 0],  [15, 1],                                          [15, 10], [15, 11], [15, 20], [15, 21], 
+  [16, 0],  [16, 1],  [16, 2],                                [16, 10], [16, 11], [16, 12], [16, 20], [16, 21], [16, 22], 
+            [17, 1],  [17, 2],  [17, 3],                                [17, 11], [17, 12], [17, 13], [17, 21], [17, 22], [17, 23], 
+                      [18, 2],  [18, 3],  [18, 4],                                [18, 12], [18, 13], [18, 14], [18, 22], [18, 23], [18, 24], 
+                                [19, 3],  [19, 4],  [19, 5],                                [19, 13], [19, 14], [19, 15], [19, 23], [19, 24], [19, 25], 
+                                                              [22, 10], [22, 11],                                         [22, 20], [22, 21], [22, 30], [22, 31], 
+                                                              [23, 10], [23, 11], [23, 12],                               [23, 20], [23, 21], [23, 22], [23, 30], [23, 31], [23, 32],
+                                                                        [24, 11], [24, 12], [24, 13], [24, 21], [24, 22], [24, 23], [24, 31], [24, 32], [24, 33], 
+                                                                        [25, 12], [25, 13], [25, 14], [25, 22], [25, 23], [25, 24], [25, 32], [25, 33], [25, 34], 
+                                                                        [26, 13], [26, 14], [26, 15], [26, 23], [26, 24], [26, 25], [26, 33], [26, 34], [26, 35], 
+                                                                        
+                                                                        [29, 20], [29, 21], [29, 30], [29, 31], [29, 40], [29, 41], 
+                                                                        [30, 20], [30, 21], [30, 22], [30, 30], [30, 31], [30, 32], [30, 40], [30, 41], [30, 42], 
+                                                                        [31, 21], [31, 22], [31, 23], [31, 31], [31, 32], [31, 33], [31, 41], [31, 42], [31, 43], 
+                                                                        [32, 22], [32, 23], [32, 24], [32, 32], [32, 33], [32, 34], [32, 42], [32, 43], [32, 44], 
+                                                                        [33, 23], [33, 24], [33, 25], [33, 33], [33, 34], [33, 35], [33, 43], [33, 44], [33, 45], 
+                                                                        [36, 30], [36, 31], [36, 40], [36, 41], [36, 50], [36, 51], 
+                                                                        [37, 30], [37, 31], [37, 32], [37, 40], [37, 41], [37, 42], [37, 50], [37, 51], [37, 52], 
+                                                                        [38, 31], [38, 32], [38, 33], [38, 41], [38, 42], [38, 43], [38, 51], [38, 52], [38, 53], 
+                                                                        [39, 32], [39, 33], [39, 34], [39, 42], [39, 43], [39, 44], [39, 52], [39, 53], [39, 54], 
+                                                                        [40, 33], [40, 34], [40, 35], [40, 43], [40, 44], [40, 45], [40, 53], [40, 54], [40, 55]]
+
+dnumc['EMT'] = 49
+dnumc['EMDOWN'] = 100
+overlap_xdir = 3
+padded_preneurons_xdir = 2
+padded_postneurons_xdir = 0
+blist = connectLayerswithOverlapDiv(NBpreN=49,NBpostN=100,overlap_xdir=3,padded_preneurons_xdir = 2, padded_postneurons_xdir = 0)
+
+
+
+>>> blist = connectLayerswithOverlapDiv(NBpreN=25,NBpostN=100,overlap_xdir=3,padded_preneurons_xdir = 0, padded_postneurons_xdir = 0)
+>>> blist
+[[0, 0], [0, 1], [0, 10], [0, 11], 
+[1, 1], [1, 2], [1, 3], [1, 11], [1, 12], [1, 13], 
+[2, 3], [2, 4], [2, 5], [2, 13], [2, 14], [2, 15], 
+[3, 5], [3, 6], [3, 7], [3, 15], [3, 16], [3, 17], 
+[4, 7], [4, 8], [4, 9], [4, 17], [4, 18], [4, 19], 
+[5, 10], [5, 11], [5, 20], [5, 21], [5, 30], [5, 31], 
+[6, 11], [6, 12], [6, 13], [6, 21], [6, 22], [6, 23], [6, 31], [6, 32], [6, 33], 
+[7, 13], [7, 14], [7, 15], [7, 23], [7, 24], [7, 25], [7, 33], [7, 34], [7, 35], 
+[8, 15], [8, 16], [8, 17], [8, 25], [8, 26], [8, 27], [8, 35], [8, 36], [8, 37], 
+[9, 17], [9, 18], [9, 19], [9, 27], [9, 28], [9, 29], [9, 37], [9, 38], [9, 39], 
+[10, 30], [10, 31], [10, 40], [10, 41], [10, 50], [10, 51], 
+[11, 31], [11, 32], [11, 33], [11, 41], [11, 42], [11, 43], [11, 51], [11, 52], [11, 53], 
+[12, 33], [12, 34], [12, 35], [12, 43], [12, 44], [12, 45], [12, 53], [12, 54], [12, 55], 
+[13, 35], [13, 36], [13, 37], [13, 45], [13, 46], [13, 47], [13, 55], [13, 56], [13, 57], 
+[14, 37], [14, 38], [14, 39], [14, 47], [14, 48], [14, 49], [14, 57], [14, 58], [14, 59], 
+[15, 50], [15, 51], [15, 60], [15, 61], [15, 70], [15, 71], 
+[16, 51], [16, 52], [16, 53], [16, 61], [16, 62], [16, 63], [16, 71], [16, 72], [16, 73], 
+[17, 53], [17, 54], [17, 55], [17, 63], [17, 64], [17, 65], [17, 73], [17, 74], [17, 75], 
+[18, 55], [18, 56], [18, 57], [18, 65], [18, 66], [18, 67], [18, 75], [18, 76], [18, 77], 
+[19, 57], [19, 58], [19, 59], [19, 67], [19, 68], [19, 69], [19, 77], [19, 78], [19, 79], 
+[20, 70], [20, 71], [20, 80], [20, 81], [20, 90], [20, 91], 
+[21, 71], [21, 72], [21, 73], [21, 81], [21, 82], [21, 83], [21, 91], [21, 92], [21, 93], 
+[22, 73], [22, 74], [22, 75], [22, 83], [22, 84], [22, 85], [22, 93], [22, 94], [22, 95], 
+[23, 75], [23, 76], [23, 77], [23, 85], [23, 86], [23, 87], [23, 95], [23, 96], [23, 97], 
+[24, 77], [24, 78], [24, 79], [24, 87], [24, 88], [24, 89], [24, 97], [24, 98], [24, 99]]
+
+
+
+
+>>> blist = connectLayerswithOverlapDiv(NBpreN=25,NBpostN=144,overlap_xdir=3,padded_preneurons_xdir = 0, padded_postneurons_xdir = 2)
+>>> blist
+[[0, 0], [0, 1], [0, 2], [0, 12], [0, 13], [0, 14], [0, 24], [0, 25], [0, 26], 
+[1, 2], [1, 3], [1, 4], [1, 14], [1, 15], [1, 16], [1, 26], [1, 27], [1, 28], 
+[2, 4], [2, 5], [2, 6], [2, 16], [2, 17], [2, 18], [2, 28], [2, 29], [2, 30], 
+[3, 6], [3, 7], [3, 8], [3, 18], [3, 19], [3, 20], [3, 30], [3, 31], [3, 32], 
+[4, 8], [4, 9], [4, 10], [4, 20], [4, 21], [4, 22], [4, 32], [4, 33], [4, 34], 
+[5, 24], [5, 25], [5, 26], [5, 36], [5, 37], [5, 38], [5, 48], [5, 49], [5, 50], 
+[6, 26], [6, 27], [6, 28], [6, 38], [6, 39], [6, 40], [6, 50], [6, 51], [6, 52], 
+[7, 28], [7, 29], [7, 30], [7, 40], [7, 41], [7, 42], [7, 52], [7, 53], [7, 54], 
+[8, 30], [8, 31], [8, 32], [8, 42], [8, 43], [8, 44], [8, 54], [8, 55], [8, 56], 
+[9, 32], [9, 33], [9, 34], [9, 44], [9, 45], [9, 46], [9, 56], [9, 57], [9, 58], 
+[10, 48], [10, 49], [10, 50], [10, 60], [10, 61], [10, 62], [10, 72], [10, 73], [10, 74], 
+[11, 50], [11, 51], [11, 52], [11, 62], [11, 63], [11, 64], [11, 74], [11, 75], [11, 76], 
+[12, 52], [12, 53], [12, 54], [12, 64], [12, 65], [12, 66], [12, 76], [12, 77], [12, 78], 
+[13, 54], [13, 55], [13, 56], [13, 66], [13, 67], [13, 68], [13, 78], [13, 79], [13, 80], 
+[14, 56], [14, 57], [14, 58], [14, 68], [14, 69], [14, 70], [14, 80], [14, 81], [14, 82], 
+[15, 72], [15, 73], [15, 74], [15, 84], [15, 85], [15, 86], [15, 96], [15, 97], [15, 98], 
+[16, 74], [16, 75], [16, 76], [16, 86], [16, 87], [16, 88], [16, 98], [16, 99], [16, 100], 
+[17, 76], [17, 77], [17, 78], [17, 88], [17, 89], [17, 90], [17, 100], [17, 101], [17, 102], 
+[18, 78], [18, 79], [18, 80], [18, 90], [18, 91], [18, 92], [18, 102], [18, 103], [18, 104], 
+[19, 80], [19, 81], [19, 82], [19, 92], [19, 93], [19, 94], [19, 104], [19, 105], [19, 106], 
+[20, 96], [20, 97], [20, 98], [20, 108], [20, 109], [20, 110], [20, 120], [20, 121], [20, 122], 
+[21, 98], [21, 99], [21, 100], [21, 110], [21, 111], [21, 112], [21, 122], [21, 123], [21, 124], 
+[22, 100], [22, 101], [22, 102], [22, 112], [22, 113], [22, 114], [22, 124], [22, 125], [22, 126], 
+[23, 102], [23, 103], [23, 104], [23, 114], [23, 115], [23, 116], [23, 126], [23, 127], [23, 128], 
+[24, 104], [24, 105], [24, 106], [24, 116], [24, 117], [24, 118], [24, 128], [24, 129], [24, 130]]
+
+
+
+-- added padding in "EMUP" and "EMDOWN"
+
+>>> dnumc
+OrderedDict([('ER', 0), ('IR', 0), ('EV1', 484), ('EV1DE', 484), ('EV1DNE', 484), ('EV1DN', 484), ('EV1DNW', 484), ('EV1DW', 484), ('EV1DSW', 484), ('EV1DS', 484), ('EV1DSE', 484), ('IV1', 196), ('EV4', 144), ('IV4', 81), ('EMT', 49), ('IMT', 49), ('EMDOWN', 144), ('EMUP', 144), ('EMSTAY', 0), ('IM', 50)])
+>>> dnumc_padx
+OrderedDict([('ER', 0), ('IR', 0), ('EV1', 2), ('EV1DE', 2), ('EV1DNE', 2), ('EV1DN', 2), ('EV1DNW', 2), ('EV1DW', 2), ('EV1DSW', 2), ('EV1DS', 2), ('EV1DSE', 2), ('IV1', 4), ('EV4', 2), ('IV4', 4), ('EMT', 2), ('IMT', 4), ('EMDOWN', 2), ('EMUP', 2), ('EMSTAY', 0), ('IM', 0)])
+
+
+
+EV1DSE EMUP 
+[[0, 13], [1, 13], [2, 13], [22, 13], [23, 13], [24, 13], [44, 13], [45, 13], [46, 13], 
+[1, 14], [2, 14], [3, 14], [23, 14], [24, 14], [25, 14], [45, 14], [46, 14], [47, 14], 
+[2, 15], [3, 15], [4, 15], [24, 15], [25, 15], [26, 15], [46, 15], [47, 15], [48, 15], 
+[3, 16], [4, 16], [5, 16], [25, 16], [26, 16], [27, 16], [47, 16], [48, 16], [49, 16], 
+[4, 17], [5, 17], [6, 17], [26, 17], [27, 17], [28, 17], [48, 17], [49, 17], [50, 17], 
+[5, 18], [6, 18], [7, 18], [27, 18], [28, 18], [29, 18], [49, 18], [50, 18], [51, 18], 
+[6, 19], [7, 19], [8, 19], [28, 19], [29, 19], [30, 19], [50, 19], [51, 19], [52, 19], 
+[7, 20], [8, 20], [9, 20], [29, 20], [30, 20], [31, 20], [51, 20], [52, 20], [53, 20], 
+[8, 21], [9, 21], [10, 21], [30, 21], [31, 21], [32, 21], [52, 21], [53, 21], [54, 21], 
+[9, 22], [10, 22], [11, 22], [31, 22], [32, 22], [33, 22], [53, 22], [54, 22], [55, 22], 
+[22, 25], [23, 25], [24, 25], [44, 25], [45, 25], [46, 25], [66, 25], [67, 25], [68, 25], 
+[23, 26], [24, 26], [25, 26], [45, 26], [46, 26], [47, 26], [67, 26], [68, 26], [69, 26], 
+[24, 27], [25, 27], [26, 27], [46, 27], [47, 27], [48, 27], [68, 27], [69, 27], [70, 27], 
+[25, 28], [26, 28], [27, 28], [47, 28], [48, 28], [49, 28], [69, 28], [70, 28], [71, 28], 
+[26, 29], [27, 29], [28, 29], [48, 29], [49, 29], [50, 29], [70, 29], [71, 29], [72, 29], 
+[27, 30], [28, 30], [29, 30], [49, 30], [50, 30], [51, 30], [71, 30], [72, 30], [73, 30], 
+[28, 31], [29, 31], [30, 31], [50, 31], [51, 31], [52, 31], [72, 31], [73, 31], [74, 31], 
+[29, 32], [30, 32], [31, 32], [51, 32], [52, 32], [53, 32], [73, 32], [74, 32], [75, 32], 
+[30, 33], [31, 33], [32, 33], [52, 33], [53, 33], [54, 33], [74, 33], [75, 33], [76, 33], 
+[31, 34], [32, 34], [33, 34], [53, 34], [54, 34], [55, 34], [75, 34], [76, 34], [77, 34], 
+[44, 37], [45, 37], [46, 37], [66, 37], [67, 37], [68, 37], [88, 37], [89, 37], [90, 37], 
+[45, 38], [46, 38], [47, 38], [67, 38], [68, 38], [69, 38], [89, 38], [90, 38], [91, 38], 
+[46, 39], [47, 39], [48, 39], [68, 39], [69, 39], [70, 39], [90, 39], [91, 39], [92, 39], 
+[47, 40], [48, 40], [49, 40], [69, 40], [70, 40], [71, 40], [91, 40], [92, 40], [93, 40], 
+[48, 41], [49, 41], [50, 41], [70, 41], [71, 41], [72, 41], [92, 41], [93, 41], [94, 41], 
+[49, 42], [50, 42], [51, 42], [71, 42], [72, 42], [73, 42], [93, 42], [94, 42], [95, 42], 
+[50, 43], [51, 43], [52, 43], [72, 43], [73, 43], [74, 43], [94, 43], [95, 43], [96, 43], 
+[51, 44], [52, 44], [53, 44], [73, 44], [74, 44], [75, 44], [95, 44], [96, 44], [97, 44], 
+[52, 45], [53, 45], [54, 45], [74, 45], [75, 45], [76, 45], [96, 45], [97, 45], [98, 45], 
+[53, 46], [54, 46], [55, 46], [75, 46], [76, 46], [77, 46], [97, 46], [98, 46], [99, 46], 
+[66, 49], [67, 49], [68, 49], [88, 49], [89, 49], [90, 49], [110, 49], [111, 49], [112, 49], 
+[67, 50], [68, 50], [69, 50], [89, 50], [90, 50], [91, 50], [111, 50], [112, 50], [113, 50], 
+[68, 51], [69, 51], [70, 51], [90, 51], [91, 51], [92, 51], [112, 51], [113, 51], [114, 51], 
+[69, 52], [70, 52], [71, 52], [91, 52], [92, 52], [93, 52], [113, 52], [114, 52], [115, 52], 
+[70, 53], [71, 53], [72, 53], [92, 53], [93, 53], [94, 53], [114, 53], [115, 53], [116, 53], 
+[71, 54], [72, 54], [73, 54], [93, 54], [94, 54], [95, 54], [115, 54], [116, 54], [117, 54], 
+[72, 55], [73, 55], [74, 55], [94, 55], [95, 55], [96, 55], [116, 55], [117, 55], [118, 55], 
+[73, 56], [74, 56], [75, 56], [95, 56], [96, 56], [97, 56], [117, 56], [118, 56], [119, 56], 
+[74, 57], [75, 57], [76, 57], [96, 57], [97, 57], [98, 57], [118, 57], [119, 57], [120, 57], 
+[75, 58], [76, 58], [77, 58], [97, 58], [98, 58], [99, 58], [119, 58], [120, 58], [121, 58], 
+[88, 61], [89, 61], [90, 61], [110, 61], [111, 61], [112, 61], [132, 61], [133, 61], [134, 61], 
+[89, 62], [90, 62], [91, 62], [111, 62], [112, 62], [113, 62], [133, 62], [134, 62], [135, 62], 
+[90, 63], [91, 63], [92, 63], [112, 63], [113, 63], [114, 63], [134, 63], [135, 63], [136, 63], 
+[91, 64], [92, 64], [93, 64], [113, 64], [114, 64], [115, 64], [135, 64], [136, 64], [137, 64], 
+[92, 65], [93, 65], [94, 65], [114, 65], [115, 65], [116, 65], [136, 65], [137, 65], [138, 65], 
+[93, 66], [94, 66], [95, 66], [115, 66], [116, 66], [117, 66], [137, 66], [138, 66], [139, 66], 
+[94, 67], [95, 67], [96, 67], [116, 67], [117, 67], [118, 67], [138, 67], [139, 67], [140, 67], 
+[95, 68], [96, 68], [97, 68], [117, 68], [118, 68], [119, 68], [139, 68], [140, 68], [141, 68], 
+[96, 69], [97, 69], [98, 69], [118, 69], [119, 69], [120, 69], [140, 69], [141, 69], [142, 69], 
+[97, 70], [98, 70], [99, 70], [119, 70], [120, 70], [121, 70], [141, 70], [142, 70], [143, 70], 
+[110, 73], [111, 73], [112, 73], [132, 73], [133, 73], [134, 73], [154, 73], [155, 73], [156, 73], 
+[111, 74], [112, 74], [113, 74], [133, 74], [134, 74], [135, 74], [155, 74], [156, 74], [157, 74], 
+[112, 75], [113, 75], [114, 75], [134, 75], [135, 75], [136, 75], [156, 75], [157, 75], [158, 75], 
+[113, 76], [114, 76], [115, 76], [135, 76], [136, 76], [137, 76], [157, 76], [158, 76], [159, 76], 
+[114, 77], [115, 77], [116, 77], [136, 77], [137, 77], [138, 77], [158, 77], [159, 77], [160, 77], 
+[115, 78], [116, 78], [117, 78], [137, 78], [138, 78], [139, 78], [159, 78], [160, 78], [161, 78], 
+[116, 79], [117, 79], [118, 79], [138, 79], [139, 79], [140, 79], [160, 79], [161, 79], [162, 79], 
+[117, 80], [118, 80], [119, 80], [139, 80], [140, 80], [141, 80], [161, 80], [162, 80], [163, 80], 
+[118, 81], [119, 81], [120, 81], [140, 81], [141, 81], [142, 81], [162, 81], [163, 81], [164, 81], 
+[119, 82], [120, 82], [121, 82], [141, 82], [142, 82], [143, 82], [163, 82], [164, 82], [165, 82],
+[132, 85], [133, 85], [134, 85], [154, 85], [155, 85], [156, 85], [176, 85], [177, 85], [178, 85], 
+[133, 86], [134, 86], [135, 86], [155, 86], [156, 86], [157, 86], [177, 86], [178, 86], [179, 86], 
+[134, 87], [135, 87], [136, 87], [156, 87], [157, 87], [158, 87], [178, 87], [179, 87], [180, 87], 
+[135, 88], [136, 88], [137, 88], [157, 88], [158, 88], [159, 88], [179, 88], [180, 88], [181, 88], 
+[136, 89], [137, 89], [138, 89], [158, 89], [159, 89], [160, 89], [180, 89], [181, 89], [182, 89], 
+[137, 90], [138, 90], [139, 90], [159, 90], [160, 90], [161, 90], [181, 90], [182, 90], [183, 90], 
+[138, 91], [139, 91], [140, 91], [160, 91], [161, 91], [162, 91], [182, 91], [183, 91], [184, 91], 
+[139, 92], [140, 92], [141, 92], [161, 92], [162, 92], [163, 92], [183, 92], [184, 92], [185, 92], 
+[140, 93], [141, 93], [142, 93], [162, 93], [163, 93], [164, 93], [184, 93], [185, 93], [186, 93], 
+[141, 94], [142, 94], [143, 94], [163, 94], [164, 94], [165, 94], [185, 94], [186, 94], [187, 94], 
+[154, 97], [155, 97], [156, 97], [176, 97], [177, 97], [178, 97], [198, 97], [199, 97], [200, 97], 
+[155, 98], [156, 98], [157, 98], [177, 98], [178, 98], [179, 98], [199, 98], [200, 98], [201, 98], 
+[156, 99], [157, 99], [158, 99], [178, 99], [179, 99], [180, 99], [200, 99], [201, 99], [202, 99], 
+[157, 100], [158, 100], [159, 100], [179, 100], [180, 100], [181, 100], [201, 100], [202, 100], [203, 100], 
+[158, 101], [159, 101], [160, 101], [180, 101], [181, 101], [182, 101], [202, 101], [203, 101], [204, 101], 
+[159, 102], [160, 102], [161, 102], [181, 102], [182, 102], [183, 102], [203, 102], [204, 102], [205, 102], 
+[160, 103], [161, 103], [162, 103], [182, 103], [183, 103], [184, 103], [204, 103], [205, 103], [206, 103], 
+[161, 104], [162, 104], [163, 104], [183, 104], [184, 104], [185, 104], [205, 104], [206, 104], [207, 104], 
+[162, 105], [163, 105], [164, 105], [184, 105], [185, 105], [186, 105], [206, 105], [207, 105], [208, 105], 
+[163, 106], [164, 106], [165, 106], [185, 106], [186, 106], [187, 106], [207, 106], [208, 106], [209, 106], 
+[176, 109], [177, 109], [178, 109], [198, 109], [199, 109], [200, 109], [220, 109], [221, 109], [222, 109], 
+[177, 110], [178, 110], [179, 110], [199, 110], [200, 110], [201, 110], [221, 110], [222, 110], [223, 110], 
+[178, 111], [179, 111], [180, 111], [200, 111], [201, 111], [202, 111], [222, 111], [223, 111], [224, 111], 
+[179, 112], [180, 112], [181, 112], [201, 112], [202, 112], [203, 112], [223, 112], [224, 112], [225, 112], 
+[180, 113], [181, 113], [182, 113], [202, 113], [203, 113], [204, 113], [224, 113], [225, 113], [226, 113], 
+[181, 114], [182, 114], [183, 114], [203, 114], [204, 114], [205, 114], [225, 114], [226, 114], [227, 114], 
+[182, 115], [183, 115], [184, 115], [204, 115], [205, 115], [206, 115], [226, 115], [227, 115], [228, 115], 
+[183, 116], [184, 116], [185, 116], [205, 116], [206, 116], [207, 116], [227, 116], [228, 116], [229, 116], 
+[184, 117], [185, 117], [186, 117], [206, 117], [207, 117], [208, 117], [228, 117], [229, 117], [230, 117], 
+[185, 118], [186, 118], [187, 118], [207, 118], [208, 118], [209, 118], [229, 118], [230, 118], [231, 118], 
+[198, 121], [199, 121], [200, 121], [220, 121], [221, 121], [222, 121], [242, 121], [243, 121], [244, 121], 
+[199, 122], [200, 122], [201, 122], [221, 122], [222, 122], [223, 122], [243, 122], [244, 122], [245, 122], 
+[200, 123], [201, 123], [202, 123], [222, 123], [223, 123], [224, 123], [244, 123], [245, 123], [246, 123], 
+[201, 124], [202, 124], [203, 124], [223, 124], [224, 124], [225, 124], [245, 124], [246, 124], [247, 124], 
+[202, 125], [203, 125], [204, 125], [224, 125], [225, 125], [226, 125], [246, 125], [247, 125], [248, 125], 
+[203, 126], [204, 126], [205, 126], [225, 126], [226, 126], [227, 126], [247, 126], [248, 126], [249, 126], 
+[204, 127], [205, 127], [206, 127], [226, 127], [227, 127], [228, 127], [248, 127], [249, 127], [250, 127], 
+[205, 128], [206, 128], [207, 128], [227, 128], [228, 128], [229, 128], [249, 128], [250, 128], [251, 128], 
+[206, 129], [207, 129], [208, 129], [228, 129], [229, 129], [230, 129], [250, 129], [251, 129], [252, 129], 
+[207, 130], [208, 130], [209, 130], [229, 130], [230, 130], [231, 130], [251, 130], [252, 130], [253, 130]]
+
+EV4 EMDOWN 
+[[0, 13], [1, 13], [2, 13], [12, 13], [13, 13], [14, 13], [24, 13], [25, 13], [26, 13], 
+[1, 14], [2, 14], [3, 14], [13, 14], [14, 14], [15, 14], [25, 14], [26, 14], [27, 14], 
+[2, 15], [3, 15], [4, 15], [14, 15], [15, 15], [16, 15], [26, 15], [27, 15], [28, 15], 
+[3, 16], [4, 16], [5, 16], [15, 16], [16, 16], [17, 16], [27, 16], [28, 16], [29, 16], 
+[4, 17], [5, 17], [6, 17], [16, 17], [17, 17], [18, 17], [28, 17], [29, 17], [30, 17], 
+[5, 18], [6, 18], [7, 18], [17, 18], [18, 18], [19, 18], [29, 18], [30, 18], [31, 18], 
+[6, 19], [7, 19], [8, 19], [18, 19], [19, 19], [20, 19], [30, 19], [31, 19], [32, 19], 
+[7, 20], [8, 20], [9, 20], [19, 20], [20, 20], [21, 20], [31, 20], [32, 20], [33, 20], 
+[8, 21], [9, 21], [10, 21], [20, 21], [21, 21], [22, 21], [32, 21], [33, 21], [34, 21], 
+[9, 22], [10, 22], [11, 22], [21, 22], [22, 22], [23, 22], [33, 22], [34, 22], [35, 22], 
+[12, 25], [13, 25], [14, 25], [24, 25], [25, 25], [26, 25], [36, 25], [37, 25], [38, 25], 
+[13, 26], [14, 26], [15, 26], [25, 26], [26, 26], [27, 26], [37, 26], [38, 26], [39, 26], 
+[14, 27], [15, 27], [16, 27], [26, 27], [27, 27], [28, 27], [38, 27], [39, 27], [40, 27], 
+[15, 28], [16, 28], [17, 28], [27, 28], [28, 28], [29, 28], [39, 28], [40, 28], [41, 28], 
+[16, 29], [17, 29], [18, 29], [28, 29], [29, 29], [30, 29], [40, 29], [41, 29], [42, 29], 
+[17, 30], [18, 30], [19, 30], [29, 30], [30, 30], [31, 30], [41, 30], [42, 30], [43, 30], 
+[18, 31], [19, 31], [20, 31], [30, 31], [31, 31], [32, 31], [42, 31], [43, 31], [44, 31], 
+[19, 32], [20, 32], [21, 32], [31, 32], [32, 32], [33, 32], [43, 32], [44, 32], [45, 32], 
+[20, 33], [21, 33], [22, 33], [32, 33], [33, 33], [34, 33], [44, 33], [45, 33], [46, 33], 
+[21, 34], [22, 34], [23, 34], [33, 34], [34, 34], [35, 34], [45, 34], [46, 34], [47, 34], 
+[24, 37], [25, 37], [26, 37], [36, 37], [37, 37], [38, 37], [48, 37], [49, 37], [50, 37], 
+[25, 38], [26, 38], [27, 38], [37, 38], [38, 38], [39, 38], [49, 38], [50, 38], [51, 38], 
+[26, 39], [27, 39], [28, 39], [38, 39], [39, 39], [40, 39], [50, 39], [51, 39], [52, 39], [27, 40], [28, 40], [29, 40], [39, 40], [40, 40], [41, 40], [51, 40], [52, 40], [53, 40], [28, 41], [29, 41], [30, 41], [40, 41], [41, 41], [42, 41], [52, 41], [53, 41], [54, 41], [29, 42], [30, 42], [31, 42], [41, 42], [42, 42], [43, 42], [53, 42], [54, 42], [55, 42], [30, 43], [31, 43], [32, 43], [42, 43], [43, 43], [44, 43], [54, 43], [55, 43], [56, 43], [31, 44], [32, 44], [33, 44], [43, 44], [44, 44], [45, 44], [55, 44], [56, 44], [57, 44], [32, 45], [33, 45], [34, 45], [44, 45], [45, 45], [46, 45], [56, 45], [57, 45], [58, 45], [33, 46], [34, 46], [35, 46], [45, 46], [46, 46], [47, 46], [57, 46], [58, 46], [59, 46], [36, 49], [37, 49], [38, 49], [48, 49], [49, 49], [50, 49], [60, 49], [61, 49], [62, 49], [37, 50], [38, 50], [39, 50], [49, 50], [50, 50], [51, 50], [61, 50], [62, 50], [63, 50], [38, 51], [39, 51], [40, 51], [50, 51], [51, 51], [52, 51], [62, 51], [63, 51], [64, 51], [39, 52], [40, 52], [41, 52], [51, 52], [52, 52], [53, 52], [63, 52], [64, 52], [65, 52], [40, 53], [41, 53], [42, 53], [52, 53], [53, 53], [54, 53], [64, 53], [65, 53], [66, 53], [41, 54], [42, 54], [43, 54], [53, 54], [54, 54], [55, 54], [65, 54], [66, 54], [67, 54], [42, 55], [43, 55], [44, 55], [54, 55], [55, 55], [56, 55], [66, 55], [67, 55], [68, 55], [43, 56], [44, 56], [45, 56], [55, 56], [56, 56], [57, 56], [67, 56], [68, 56], [69, 56], [44, 57], [45, 57], [46, 57], [56, 57], [57, 57], [58, 57], [68, 57], [69, 57], [70, 57], [45, 58], [46, 58], [47, 58], [57, 58], [58, 58], [59, 58], [69, 58], [70, 58], [71, 58], [48, 61], [49, 61], [50, 61], [60, 61], [61, 61], [62, 61], [72, 61], [73, 61], [74, 61], [49, 62], [50, 62], [51, 62], [61, 62], [62, 62], [63, 62], [73, 62], [74, 62], [75, 62], [50, 63], [51, 63], [52, 63], [62, 63], [63, 63], [64, 63], [74, 63], [75, 63], [76, 63], [51, 64], [52, 64], [53, 64], [63, 64], [64, 64], [65, 64], [75, 64], [76, 64], [77, 64], [52, 65], [53, 65], [54, 65], [64, 65], [65, 65], [66, 65], [76, 65], [77, 65], [78, 65], [53, 66], [54, 66], [55, 66], [65, 66], [66, 66], [67, 66], [77, 66], [78, 66], [79, 66], [54, 67], [55, 67], [56, 67], [66, 67], [67, 67], [68, 67], [78, 67], [79, 67], [80, 67], [55, 68], [56, 68], [57, 68], [67, 68], [68, 68], [69, 68], [79, 68], [80, 68], [81, 68], [56, 69], [57, 69], [58, 69], [68, 69], [69, 69], [70, 69], [80, 69], [81, 69], [82, 69], [57, 70], [58, 70], [59, 70], [69, 70], [70, 70], [71, 70], [81, 70], [82, 70], [83, 70], [60, 73], [61, 73], [62, 73], [72, 73], [73, 73], [74, 73], [84, 73], [85, 73], [86, 73], [61, 74], [62, 74], [63, 74], [73, 74], [74, 74], [75, 74], [85, 74], [86, 74], [87, 74], [62, 75], [63, 75], [64, 75], [74, 75], [75, 75], [76, 75], [86, 75], [87, 75], [88, 75], [63, 76], [64, 76], [65, 76], [75, 76], [76, 76], [77, 76], [87, 76], [88, 76], [89, 76], [64, 77], [65, 77], [66, 77], [76, 77], [77, 77], [78, 77], [88, 77], [89, 77], [90, 77], [65, 78], [66, 78], [67, 78], [77, 78], [78, 78], [79, 78], [89, 78], [90, 78], [91, 78], [66, 79], [67, 79], [68, 79], [78, 79], [79, 79], [80, 79], [90, 79], [91, 79], [92, 79], [67, 80], [68, 80], [69, 80], [79, 80], [80, 80], [81, 80], [91, 80], [92, 80], [93, 80], [68, 81], [69, 81], [70, 81], [80, 81], [81, 81], [82, 81], [92, 81], [93, 81], [94, 81], [69, 82], [70, 82], [71, 82], [81, 82], [82, 82], [83, 82], [93, 82], [94, 82], [95, 82], [72, 85], [73, 85], [74, 85], [84, 85], [85, 85], [86, 85], [96, 85], [97, 85], [98, 85], [73, 86], [74, 86], [75, 86], [85, 86], [86, 86], [87, 86], [97, 86], [98, 86], [99, 86], [74, 87], [75, 87], [76, 87], [86, 87], [87, 87], [88, 87], [98, 87], [99, 87], [100, 87], [75, 88], [76, 88], [77, 88], [87, 88], [88, 88], [89, 88], [99, 88], [100, 88], [101, 88], [76, 89], [77, 89], [78, 89], [88, 89], [89, 89], [90, 89], [100, 89], [101, 89], [102, 89], [77, 90], [78, 90], [79, 90], [89, 90], [90, 90], [91, 90], [101, 90], [102, 90], [103, 90], [78, 91], [79, 91], [80, 91], [90, 91], [91, 91], [92, 91], [102, 91], [103, 91], [104, 91], [79, 92], [80, 92], [81, 92], [91, 92], [92, 92], [93, 92], [103, 92], [104, 92], [105, 92], [80, 93], [81, 93], [82, 93], [92, 93], [93, 93], [94, 93], [104, 93], [105, 93], [106, 93], [81, 94], [82, 94], [83, 94], [93, 94], [94, 94], [95, 94], [105, 94], [106, 94], [107, 94], [84, 97], [85, 97], [86, 97], [96, 97], [97, 97], [98, 97], [108, 97], [109, 97], [110, 97], [85, 98], [86, 98], [87, 98], [97, 98], [98, 98], [99, 98], [109, 98], [110, 98], [111, 98], [86, 99], [87, 99], [88, 99], [98, 99], [99, 99], [100, 99], [110, 99], [111, 99], [112, 99], [87, 100], [88, 100], [89, 100], [99, 100], [100, 100], [101, 100], [111, 100], [112, 100], [113, 100], [88, 101], [89, 101], [90, 101], [100, 101], [101, 101], [102, 101], [112, 101], [113, 101], [114, 101], [89, 102], [90, 102], [91, 102], [101, 102], [102, 102], [103, 102], [113, 102], [114, 102], [115, 102], [90, 103], [91, 103], [92, 103], [102, 103], [103, 103], [104, 103], [114, 103], [115, 103], [116, 103], [91, 104], [92, 104], [93, 104], [103, 104], [104, 104], [105, 104], [115, 104], [116, 104], [117, 104], [92, 105], [93, 105], [94, 105], [104, 105], [105, 105], [106, 105], [116, 105], [117, 105], [118, 105], [93, 106], [94, 106], [95, 106], [105, 106], [106, 106], [107, 106], [117, 106], [118, 106], [119, 106], [96, 109], [97, 109], [98, 109], [108, 109], [109, 109], [110, 109], [120, 109], [121, 109], [122, 109], [97, 110], [98, 110], [99, 110], [109, 110], [110, 110], [111, 110], [121, 110], [122, 110], [123, 110], [98, 111], [99, 111], [100, 111], [110, 111], [111, 111], [112, 111], [122, 111], [123, 111], [124, 111], [99, 112], [100, 112], [101, 112], [111, 112], [112, 112], [113, 112], [123, 112], [124, 112], [125, 112], [100, 113], [101, 113], [102, 113], [112, 113], [113, 113], [114, 113], [124, 113], [125, 113], [126, 113], [101, 114], [102, 114], [103, 114], [113, 114], [114, 114], [115, 114], [125, 114], [126, 114], [127, 114], [102, 115], [103, 115], [104, 115], [114, 115], [115, 115], [116, 115], [126, 115], [127, 115], [128, 115], [103, 116], [104, 116], [105, 116], [115, 116], [116, 116], [117, 116], [127, 116], [128, 116], [129, 116], [104, 117], [105, 117], [106, 117], [116, 117], [117, 117], [118, 117], [128, 117], [129, 117], [130, 117], [105, 118], [106, 118], [107, 118], [117, 118], [118, 118], [119, 118], [129, 118], [130, 118], [131, 118], [108, 121], [109, 121], [110, 121], [120, 121], [121, 121], [122, 121], [132, 121], [133, 121], [134, 121], [109, 122], [110, 122], [111, 122], [121, 122], [122, 122], [123, 122], [133, 122], [134, 122], [135, 122], [110, 123], [111, 123], [112, 123], [122, 123], [123, 123], [124, 123], [134, 123], [135, 123], [136, 123], [111, 124], [112, 124], [113, 124], [123, 124], [124, 124], [125, 124], [135, 124], [136, 124], [137, 124], [112, 125], [113, 125], [114, 125], [124, 125], [125, 125], [126, 125], [136, 125], [137, 125], [138, 125], [113, 126], [114, 126], [115, 126], [125, 126], [126, 126], [127, 126], [137, 126], [138, 126], [139, 126], [114, 127], [115, 127], [116, 127], [126, 127], [127, 127], [128, 127], [138, 127], [139, 127], [140, 127], [115, 128], [116, 128], [117, 128], [127, 128], [128, 128], [129, 128], [139, 128], [140, 128], [141, 128], [116, 129], [117, 129], [118, 129], [128, 129], [129, 129], [130, 129], [140, 129], [141, 129], [142, 129], [117, 130], [118, 130], [119, 130], [129, 130], [130, 130], [131, 130], [141, 130], [142, 130], [143, 130]]
+
+EMT EMDOWN [[8, 0], [8, 1], [8, 2], [8, 12], [8, 13], [8, 14], [8, 24], [8, 25], [8, 26], [9, 1], [9, 2], [9, 3], [9, 13], [9, 14], [9, 15], [9, 25], [9, 26], [9, 27], [10, 2], [10, 3], [10, 4], [10, 14], [10, 15], [10, 16], [10, 26], [10, 27], [10, 28], [11, 3], [11, 4], [11, 5], [11, 15], [11, 16], [11, 17], [11, 27], [11, 28], [11, 29], [12, 4], [12, 5], [12, 6], [12, 16], [12, 17], [12, 18], [12, 28], [12, 29], [12, 30], [15, 12], [15, 13], [15, 14], [15, 24], [15, 25], [15, 26], [15, 36], [15, 37], [15, 38], [16, 13], [16, 14], [16, 15], [16, 25], [16, 26], [16, 27], [16, 37], [16, 38], [16, 39], [17, 14], [17, 15], [17, 16], [17, 26], [17, 27], [17, 28], [17, 38], [17, 39], [17, 40], [18, 15], [18, 16], [18, 17], [18, 27], [18, 28], [18, 29], [18, 39], [18, 40], [18, 41], [19, 16], [19, 17], [19, 18], [19, 28], [19, 29], [19, 30], [19, 40], [19, 41], [19, 42], [22, 24], [22, 25], [22, 26], [22, 36], [22, 37], [22, 38], [22, 48], [22, 49], [22, 50], [23, 25], [23, 26], [23, 27], [23, 37], [23, 38], [23, 39], [23, 49], [23, 50], [23, 51], [24, 26], [24, 27], [24, 28], [24, 38], [24, 39], [24, 40], [24, 50], [24, 51], [24, 52], [25, 27], [25, 28], [25, 29], [25, 39], [25, 40], [25, 41], [25, 51], [25, 52], [25, 53], [26, 28], [26, 29], [26, 30], [26, 40], [26, 41], [26, 42], [26, 52], [26, 53], [26, 54], [29, 36], [29, 37], [29, 38], [29, 48], [29, 49], [29, 50], [29, 60], [29, 61], [29, 62], [30, 37], [30, 38], [30, 39], [30, 49], [30, 50], [30, 51], [30, 61], [30, 62], [30, 63], [31, 38], [31, 39], [31, 40], [31, 50], [31, 51], [31, 52], [31, 62], [31, 63], [31, 64], [32, 39], [32, 40], [32, 41], [32, 51], [32, 52], [32, 53], [32, 63], [32, 64], [32, 65], [33, 40], [33, 41], [33, 42], [33, 52], [33, 53], [33, 54], [33, 64], [33, 65], [33, 66], [36, 48], [36, 49], [36, 50], [36, 60], [36, 61], [36, 62], [36, 72], [36, 73], [36, 74], [37, 49], [37, 50], [37, 51], [37, 61], [37, 62], [37, 63], [37, 73], [37, 74], [37, 75], [38, 50], [38, 51], [38, 52], [38, 62], [38, 63], [38, 64], [38, 74], [38, 75], [38, 76], [39, 51], [39, 52], [39, 53], [39, 63], [39, 64], [39, 65], [39, 75], [39, 76], [39, 77], [40, 52], [40, 53], [40, 54], [40, 64], [40, 65], [40, 66], [40, 76], [40, 77], [40, 78]]
+
+
+# Found some serious problem
+-->when without padding
+blistEV1toEV4 = connectLayerswithOverlap(NBpreN = 400, NBpostN = 100, overlap_xdir = 3, padded_preneurons_xdir = 0, padded_postneurons_xdir = 0)
+len(np.unique(np.array(blistEV1toEV4)[:,0])) = 400
+
+-->when with padding
+blistEV1toEV4 = connectLayerswithOverlap(NBpreN = 484, NBpostN = 144, overlap_xdir = 3, padded_preneurons_xdir = 2, padded_postneurons_xdir = 2)
+len(np.unique(np.array(blistEV1toEV4)[:,0])) = 144
+# my suggestion is to create a data structure with the info i mentioned and use that to create the cells and their connections
+
+-- DONT USE PADDING
+
+-- Testing without padding
+
+len(blistEV1toEV4) = 841
+len(np.unique(np.array(blistEV1toEV4)[:,0])) = 400
+len(np.unique(np.array(blistEV1toEV4)[:,1])) = 100
+
+len(blistEV4toEMT)= 196
+len(np.unique(np.array(blistEV4toEMT)[:,0])) = 100
+len(np.unique(np.array(blistEV4toEMT)[:,1])) = 25
+
+len(blistEV1toIV1) = 841
+len(np.unique(np.array(blistEV1toIV1)[:,0])) = 400
+len(np.unique(np.array(blistEV1toIV1)[:,1])) = 100
+
+len(blistEV4toIV4) = 196
+len(np.unique(np.array(blistEV4toIV4)[:,0])) = 100
+len(np.unique(np.array(blistEV4toIV4)[:,1])) = 25
+
+len(blistEMTtoIMT) = 64
+len(np.unique(np.array(blistEMTtoIMT)[:,0])) = 16
+len(np.unique(np.array(blistEMTtoIMT)[:,1])) = 9
+
+len(blistIV1toEV1) = 2209
+len(np.unique(np.array(blistIV1toEV1)[:,0])) = 100
+len(np.unique(np.array(blistIV1toEV1)[:,1])) = 400
+
+len(blistIV4toEV4) = 484
+len(np.unique(np.array(blistIV4toEV4)[:,0])) = 25
+len(np.unique(np.array(blistIV4toEV4)[:,1])) = 100
+
+len(blistIMTtoEMT) = 144
+len(np.unique(np.array(blistIMTtoEMT)[:,0])) =9
+len(np.unique(np.array(blistIMTtoEMT)[:,1])) =25
+
+print(prety,poty,len(blist),len(np.unique(np.array(blist)[:,0])),len(np.unique(np.array(blist)[:,1])))
+
+EV1 EMDOWN 841 400 100
+EV1 EMUP 841 400 100
+EV1DE EMDOWN 841 400 100
+EV1DE EMUP 841 400 100
+EV1DNE EMDOWN 841 400 100
+EV1DNE EMUP 841 400 100
+EV1DN EMDOWN 841 400 100
+EV1DN EMUP 841 400 100
+EV1DNW EMDOWN 841 400 100
+EV1DNW EMUP 841 400 100
+EV1DW EMDOWN 841 400 100
+EV1DW EMUP 841 400 100
+EV1DSW EMDOWN 841 400 100
+EV1DSW EMUP 841 400 100
+EV1DS EMDOWN 841 400 100
+EV1DS EMUP 841 400 100
+EV1DSE EMDOWN 841 400 100
+EV1DSE EMUP 841 400 100
+EV4 EMDOWN 784 100 100
+EV4 EMUP 784 100 100
+EMT EMDOWN 196 25 100
+EMT EMUP 196 25 100
+
+
+EMT EMDOWN 
+[[0, 0], [0, 1], [0, 10], [0, 11], 
+[1, 1], [1, 2], [1, 3], [1, 11], [1, 12], [1, 13], 
+[2, 3], [2, 4], [2, 5], [2, 13], [2, 14], [2, 15], 
+[3, 5], [3, 6], [3, 7], [3, 15], [3, 16], [3, 17], 
+[4, 7], [4, 8], [4, 9], [4, 17], [4, 18], [4, 19], 
+[5, 10], [5, 11], [5, 20], [5, 21], [5, 30], [5, 31], 
+[6, 11], [6, 12], [6, 13], [6, 21], [6, 22], [6, 23], [6, 31], [6, 32], [6, 33], 
+[7, 13], [7, 14], [7, 15], [7, 23], [7, 24], [7, 25], [7, 33], [7, 34], [7, 35], 
+[8, 15], [8, 16], [8, 17], [8, 25], [8, 26], [8, 27], [8, 35], [8, 36], [8, 37], 
+[9, 17], [9, 18], [9, 19], [9, 27], [9, 28], [9, 29], [9, 37], [9, 38], [9, 39], 
+[10, 30], [10, 31], [10, 40], [10, 41], [10, 50], [10, 51], 
+[11, 31], [11, 32], [11, 33], [11, 41], [11, 42], [11, 43], [11, 51], [11, 52], [11, 53], 
+[12, 33], [12, 34], [12, 35], [12, 43], [12, 44], [12, 45], [12, 53], [12, 54], [12, 55], 
+[13, 35], [13, 36], [13, 37], [13, 45], [13, 46], [13, 47], [13, 55], [13, 56], [13, 57], 
+[14, 37], [14, 38], [14, 39], [14, 47], [14, 48], [14, 49], [14, 57], [14, 58], [14, 59], 
+[15, 50], [15, 51], [15, 60], [15, 61], [15, 70], [15, 71], [16, 51], [16, 52], [16, 53], 
+[16, 61], [16, 62], [16, 63], [16, 71], [16, 72], [16, 73], 
+[17, 53], [17, 54], [17, 55], [17, 63], [17, 64], [17, 65], [17, 73], [17, 74], [17, 75], 
+[18, 55], [18, 56], [18, 57], [18, 65], [18, 66], [18, 67], [18, 75], [18, 76], [18, 77], 
+[19, 57], [19, 58], [19, 59], [19, 67], [19, 68], [19, 69], [19, 77], [19, 78], [19, 79], 
+[20, 70], [20, 71], [20, 80], [20, 81], [20, 90], [20, 91], 
+[21, 71], [21, 72], [21, 73], [21, 81], [21, 82], [21, 83], [21, 91], [21, 92], [21, 93], 
+[22, 73], [22, 74], [22, 75], [22, 83], [22, 84], [22, 85], [22, 93], [22, 94], [22, 95], 
+[23, 75], [23, 76], [23, 77], [23, 85], [23, 86], [23, 87], [23, 95], [23, 96], [23, 97], 
+[24, 77], [24, 78], [24, 79], [24, 87], [24, 88], [24, 89], [24, 97], [24, 98], [24, 99]]
+
+-- DONT RUN WITH PADDING i.e. always use "useNeuronPad": 0
+
+-- my suggestion is to create a data structure with the info i mentioned and use that to create the cells and their connections
+cellID, cell type, x location, y location, presynaptic IDs, postsynaptic IDs
+
+... will work on this....

@@ -46,8 +46,6 @@ tstepPerAction = dconf['sim']['tstepPerAction'] # time step per action (in ms)
 
 fid4=None # only used by rank 0
 
-useNeuronPad = 1 # should be specified in sim.json.
-
 scale = dconf['net']['scale'] # scales the size of the network (only number of neurons)
 
 ETypes = dconf['net']['ETypes'] # excitatory neuron types
@@ -65,6 +63,7 @@ allpops_withconvtopology = list(dtopolconvcons.keys())
 allpops_withdivtopology = list(dtopoldivcons.keys())
 # below is the code for updating neuronal pop size to include padding. 
 if dconf['net']['useNeuronPad']:
+  # first make dicionary of paddings in each dimension for each pop
   for pop in allpops_withconvtopology:
     receptive_fields = []
     for postpop in list(dtopolconvcons[pop].keys()):
@@ -75,7 +74,6 @@ if dconf['net']['useNeuronPad']:
     else:
       max_receptive_field = 0
     if dnumc[pop]>0 and max_receptive_field>0:
-      dnumc[pop] = int((np.sqrt(dnumc[pop])+max_receptive_field-1)**2)
       dnumc_padx[pop] = max_receptive_field-1
   for pop in allpops_withdivtopology:
     receptive_fields = []
@@ -87,9 +85,15 @@ if dconf['net']['useNeuronPad']:
     else:
       max_receptive_field = 0
     if dnumc[pop]>0 and max_receptive_field>0:
-      dnumc[pop] = int((np.sqrt(dnumc[pop])+max_receptive_field-1)**2)
       dnumc_padx[pop] = max_receptive_field-1
-
+  for pop in allpops:
+    if dnumc[pop]>0 and dnumc_padx[pop]>0:
+      dnumc[pop] = int((np.sqrt(dnumc[pop])+dnumc_padx[pop])**2)
+  dnumc_padx['EMUP'] = 2
+  dnumc_padx['EMDOWN'] = 2
+  if dnumc['EMSTAY']>0: dnumc_padx['EMSTAY'] = 2
+  dnumc['EMUP'] = int((np.sqrt(dnumc['EMUP'])+dnumc_padx['EMUP'])**2)
+  dnumc['EMDOWN'] = int((np.sqrt(dnumc['EMDOWN'])+dnumc_padx['EMDOWN'])**2)
 if dnumc['EMSTAY']>0:
   lrecpop = ['EMUP', 'EMDOWN','EMSTAY'] # which populations to record from
 else:
@@ -359,7 +363,14 @@ if EEPreMProb > 0.0:
         'synMech': synmech,
         'sec':EExcitSec, 'loc':0.5
       }
-      if dSTDPparamsRL[synmech]['RLon']: # only turn on plasticity when specified to do so
+      useRL = 0
+      if prety in dconf['net']['EPreMDirPops']:
+        if dconf['net']['RLconns']['RecurrentDirNeurons']: 
+          useRL = 1
+      if prety in dconf['net']['EPreMLocPops']:
+        if dconf['net']['RLconns']['RecurrentLocNeurons']: 
+          useRL = 1 
+      if useRL and dSTDPparamsRL[synmech]['RLon']: # only turn on plasticity when specified to do so
         netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL[synmech]}
 
 VTopoI = dconf['net']['VTopoI'] # whether interneurons have topological arrangement
@@ -432,8 +443,8 @@ for prety in EMotorPops:
     'weight': 0.02 * cfg.EIGain,
     'delay': 2,
     'synMech': 'AMPA', 'sec':'soma', 'loc':0.5}
-  if 'EIPlast' in dconf['net']:
-    if dconf['net']['EIPlast']:
+  if 'EIPlast' in dconf['net']['RLconns']:
+    if dconf['net']['RLconns']['EIPlast']:
       if dSTDPparamsRL['AMPAI']['RLon']: # only turn on plasticity when specified to do so
         netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL['AMPAI']}
   
@@ -533,7 +544,7 @@ for prety,poty,blist in zip(lprety,lpoty,lblist):
             'synMech': synmech,'sec':EExcitSec, 'loc':0.5}
     if VTopoI: netParams.connParams[k]['connList'] = blist
     else: netParams.connParams[k]['convergence'] = prob2conv(0.1,dnumc[prety])
-    if dconf['net']['VisualRL'] and dSTDPparamsRL[synmech]['RLon']: # only turn on plasticity when specified to do so
+    if dconf['net']['RLconns']['VisualRL'] and dSTDPparamsRL[synmech]['RLon']: # only turn on plasticity when specified to do so
       netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL[synmech]}
       netParams.connParams[k]['plast']['params']['RLhebbwt'] *= 40
     
@@ -582,7 +593,7 @@ if dconf['net']['VisualFeedback']:
           'weight': synweight * cfg.EEGain, 
           'delay': 2,
           'synMech': synmech,'sec':EExcitSec, 'loc':0.5} # 'weight' should be fixed
-        if dSTDPparamsRL[synmech]['RLon']: # only turn on plasticity when specified to do so
+        if dconf['net']['RLconns']['FeedbackLocNeurons'] and dSTDPparamsRL[synmech]['RLon']: # only turn on plasticity when specified to do so
           netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL[synmech]}        
   #I to E feedback connections
   netParams.connParams['IV1->ER'] = {
@@ -637,9 +648,12 @@ if dconf['architecturePreMtoM']['useTopological']:
       if dconf['net']['allpops'][prety]==dconf['net']['allpops'][poty] or dconf['net']['allpops'][prety]>dconf['net']['allpops'][poty]: 
         blist = connectLayerswithOverlap(NBpreN=dnumc[prety],NBpostN=dnumc[poty],overlap_xdir = dtopolconvcons[prety][poty], \
                                          padded_preneurons_xdir = dnumc_padx[prety], padded_postneurons_xdir = dnumc_padx[poty])
-      elif dconf[prety]<dconf[poty]:
+      elif dconf['net']['allpops'][prety]<dconf['net']['allpops'][poty]:
         blist = connectLayerswithOverlapDiv(NBpreN=dnumc[prety],NBpostN=dnumc[poty],overlap_xdir = dtopoldivcons[prety][poty], \
                                             padded_preneurons_xdir = dnumc_padx[prety], padded_postneurons_xdir = dnumc_padx[poty])
+        print(prety,poty,blist)
+      # print(prety,poty,len(blist),len(np.unique(np.array(blist)[:,0])),len(np.unique(np.array(blist)[:,1])))
+
       for strty,synmech,weight in zip(['','n'],['AMPA', 'NMDA'],[dconf['net']['EEMWghtAM']*cfg.EEGain, dconf['net']['EEMWghtNM']*cfg.EEGain]):
         k = strty+prety+'->'+strty+poty
         netParams.connParams[k] = {
@@ -651,7 +665,14 @@ if dconf['architecturePreMtoM']['useTopological']:
           'synMech': synmech,
           'sec':EExcitSec, 'loc':0.5
         }
-        if dSTDPparamsRL[synmech]['RLon']: # only turn on plasticity when specified to do so
+        useRL = 0
+        if prety in dconf['net']['EPreMDirPops']:
+          if dconf['net']['RLconns']['FeedForwardDirNtoM']: 
+            useRL = 1
+        if prety in dconf['net']['EPreMLocPops']:
+          if dconf['net']['RLconns']['FeedForwardLocNtoM']: 
+            useRL = 1
+        if dSTDPparamsRL[synmech]['RLon'] and useRL: # only turn on plasticity when specified to do so
           netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL[synmech]}
 elif dconf['architecturePreMtoM']['useProbabilistic']:
   # Add connections from lower and higher visual areas to motor cortex and direct connections between premotor to motor areas
@@ -671,7 +692,14 @@ elif dconf['architecturePreMtoM']['useProbabilistic']:
           'synMech': synmech,
           'sec':EExcitSec, 'loc':0.5
         }
-        if dSTDPparamsRL[synmech]['RLon']: # only turn on plasticity when specified to do so
+        useRL = 0
+        if prety in dconf['net']['EPreMDirPops']:
+          if dconf['net']['RLconns']['FeedForwardDirNtoM']: 
+            useRL = 1
+        if prety in dconf['net']['EPreMLocPops']:
+          if dconf['net']['RLconns']['FeedForwardLocNtoM']: 
+            useRL = 1
+        if useRL and dSTDPparamsRL[synmech]['RLon']: # only turn on plasticity when specified to do so
           netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL[synmech]}
 
 # add recurrent plastic connectivity within EM populations
@@ -691,7 +719,7 @@ if EEMRecProb > 0.0:
             'synMech': synmech,
             'sec':EExcitSec, 'loc':0.5
           }
-          if dSTDPparamsRL[synmech]['RLon']: # only turn on plasticity when specified to do so
+          if dconf['net']['RLconns']['RecurrentMNeurons'] and dSTDPparamsRL[synmech]['RLon']: # only turn on plasticity when specified to do so
             netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL[synmech]}  
 
 # add feedback plastic connectivity from EM populations to premotor/visual populations
@@ -710,7 +738,13 @@ if EEMFeedbackProb > 0.0:
             'synMech': synmech,
             'sec':EExcitSec, 'loc':0.5
           }
-          if dSTDPparamsRL[synmech]['RLon']: # only turn on plasticity when specified to do so
+          if poty in dconf['net']['EPreMDirPops']:
+            if dconf['net']['RLconns']['FeedbackMtoDirN']: 
+              useRL = 1
+          if poty in dconf['net']['EPreMLocPops']:
+            if dconf['net']['RLconns']['FeedbackMtoLocN']: 
+              useRL = 1
+          if useRL and dSTDPparamsRL[synmech]['RLon']: # only turn on plasticity when specified to do so
             netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL[synmech]}  
 
             
