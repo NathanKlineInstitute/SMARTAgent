@@ -17017,4 +17017,10 @@ savefig(gifpath()+'rast.png') # [[./gif/20sep8_20sep3_B1_cycle__step_9_rast.png]
 fig=animInput(InputImages,gifpath()+'_input.mp4') # [[./gif/20sep8_20sep3_B1_cycle__step_9__input.mp4]]
 
 ** ha fixed padding
-
+* 20sep24 - updates
+** something still wrong with padding - HA dropping for now
+** Had discussions with HA about multiple layers in V and M to produce more complex representations
+and whether that could improve performance
+** some code from Hananel using bindsnet to replicate circuitry - will discuss 
+** HA added more options for controlling which connections use RL
+** HA working on verifying connectivity/positions of cells
