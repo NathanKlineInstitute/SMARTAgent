@@ -17019,8 +17019,36 @@ fig=animInput(InputImages,gifpath()+'_input.mp4') # [[./gif/20sep8_20sep3_B1_cyc
 ** ha fixed padding
 * 20sep24 - updates
 ** something still wrong with padding - HA dropping for now
+
+make sure to set
+	"useNeuronPad": 0,
+
+he mentioned had only ~25% of V neurons projecting to M
+
 ** Had discussions with HA about multiple layers in V and M to produce more complex representations
 and whether that could improve performance
 ** some code from Hananel using bindsnet to replicate circuitry - will discuss 
+
+nki_network_v2.py
+nki.v3.py
+
+requires pytorch
+
 ** HA added more options for controlling which connections use RL
 ** HA working on verifying connectivity/positions of cells
+since implicit representations are more difficult to debug will
+plan to have a list of
+cell ID, cell type, x location, y location, presynaptic IDs, postsynaptic IDs
+
+visualization would be useful too 
+
+** test net - have some V4, IT, and VisualRL 
+
+adjusted some conn params
+
+./myrun 32 sn.json
+
+running for 1e3 s ... 
+
+started ~16:53 ... 
+
