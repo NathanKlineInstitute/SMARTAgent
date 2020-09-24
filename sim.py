@@ -46,8 +46,6 @@ tstepPerAction = dconf['sim']['tstepPerAction'] # time step per action (in ms)
 
 fid4=None # only used by rank 0
 
-useNeuronPad = 1 # should be specified in sim.json.
-
 scale = dconf['net']['scale'] # scales the size of the network (only number of neurons)
 
 ETypes = dconf['net']['ETypes'] # excitatory neuron types
@@ -65,6 +63,7 @@ allpops_withconvtopology = list(dtopolconvcons.keys())
 allpops_withdivtopology = list(dtopoldivcons.keys())
 # below is the code for updating neuronal pop size to include padding. 
 if dconf['net']['useNeuronPad']:
+  # first make dicionary of paddings in each dimension for each pop
   for pop in allpops_withconvtopology:
     receptive_fields = []
     for postpop in list(dtopolconvcons[pop].keys()):
@@ -75,7 +74,6 @@ if dconf['net']['useNeuronPad']:
     else:
       max_receptive_field = 0
     if dnumc[pop]>0 and max_receptive_field>0:
-      dnumc[pop] = int((np.sqrt(dnumc[pop])+max_receptive_field-1)**2)
       dnumc_padx[pop] = max_receptive_field-1
   for pop in allpops_withdivtopology:
     receptive_fields = []
@@ -87,9 +85,15 @@ if dconf['net']['useNeuronPad']:
     else:
       max_receptive_field = 0
     if dnumc[pop]>0 and max_receptive_field>0:
-      dnumc[pop] = int((np.sqrt(dnumc[pop])+max_receptive_field-1)**2)
       dnumc_padx[pop] = max_receptive_field-1
-
+  for pop in allpops:
+    if dnumc[pop]>0 and dnumc_padx[pop]>0:
+      dnumc[pop] = int((np.sqrt(dnumc[pop])+dnumc_padx[pop])**2)
+  dnumc_padx['EMUP'] = 2
+  dnumc_padx['EMDOWN'] = 2
+  if dnumc['EMSTAY']>0: dnumc_padx['EMSTAY'] = 2
+  dnumc['EMUP'] = int((np.sqrt(dnumc['EMUP'])+dnumc_padx['EMUP'])**2)
+  dnumc['EMDOWN'] = int((np.sqrt(dnumc['EMDOWN'])+dnumc_padx['EMDOWN'])**2)
 if dnumc['EMSTAY']>0:
   lrecpop = ['EMUP', 'EMDOWN','EMSTAY'] # which populations to record from
 else:
@@ -644,9 +648,12 @@ if dconf['architecturePreMtoM']['useTopological']:
       if dconf['net']['allpops'][prety]==dconf['net']['allpops'][poty] or dconf['net']['allpops'][prety]>dconf['net']['allpops'][poty]: 
         blist = connectLayerswithOverlap(NBpreN=dnumc[prety],NBpostN=dnumc[poty],overlap_xdir = dtopolconvcons[prety][poty], \
                                          padded_preneurons_xdir = dnumc_padx[prety], padded_postneurons_xdir = dnumc_padx[poty])
-      elif dconf[prety]<dconf[poty]:
+      elif dconf['net']['allpops'][prety]<dconf['net']['allpops'][poty]:
         blist = connectLayerswithOverlapDiv(NBpreN=dnumc[prety],NBpostN=dnumc[poty],overlap_xdir = dtopoldivcons[prety][poty], \
                                             padded_preneurons_xdir = dnumc_padx[prety], padded_postneurons_xdir = dnumc_padx[poty])
+        print(prety,poty,blist)
+      # print(prety,poty,len(blist),len(np.unique(np.array(blist)[:,0])),len(np.unique(np.array(blist)[:,1])))
+
       for strty,synmech,weight in zip(['','n'],['AMPA', 'NMDA'],[dconf['net']['EEMWghtAM']*cfg.EEGain, dconf['net']['EEMWghtNM']*cfg.EEGain]):
         k = strty+prety+'->'+strty+poty
         netParams.connParams[k] = {
