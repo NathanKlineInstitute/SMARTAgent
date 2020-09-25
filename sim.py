@@ -104,11 +104,11 @@ if dconf['net']['EEPreMProb'] > 0.0 or dconf['net']['EEMFeedbackProb'] > 0.0 or 
     lrecpop.append(pop)
   if dconf['net']['VisualFeedback'] and dnumc['ER']>0: lrecpop.append('ER')
 
-if dconf['net']['VisualRL']:
+if dconf['net']['RLconns']['VisualRL']:
   if lrecpop.count('EV4')==0: lrecpop.append('EV4')
   if lrecpop.count('EMT')==0: lrecpop.append('EMT')
   
-if dconf['net']['EIPlast']: lrecpop.append('IM')
+if dconf['net']['RLconns']['EIPlast']: lrecpop.append('IM')
 
 # Network parameters
 netParams = specs.NetParams() #object of class NetParams to store the network parameters
@@ -384,10 +384,8 @@ if dnumc['ER']>0:
           'weight': 0.02 * cfg.EIGain,
           'delay': 2,
           'synMech': 'AMPA', 'sec':'soma', 'loc':0.5}
-  if VTopoI:
-    netParams.connParams['ER->IR']['connList'] = blistERtoIR
-  else:
-    netParams.connParams['ER->IR']['convergence'] = prob2conv(0.0225, dnumc['EV1'])
+  if VTopoI: netParams.connParams['ER->IR']['connList'] = blistERtoIR
+  else: netParams.connParams['ER->IR']['convergence'] = prob2conv(0.0225, dnumc['EV1'])
   
 netParams.connParams['EV1->IV1'] = {
         'preConds': {'pop': 'EV1'},
@@ -395,10 +393,8 @@ netParams.connParams['EV1->IV1'] = {
         'weight': 0.02 * cfg.EIGain,
         'delay': 2,
         'synMech': 'AMPA', 'sec':'soma', 'loc':0.5}
-if VTopoI:
-  netParams.connParams['EV1->IV1']['connList'] = blistEV1toIV1
-else:
-  netParams.connParams['EV1->IV1']['convergence'] = prob2conv(0.0225, dnumc['EV1'])
+if VTopoI: netParams.connParams['EV1->IV1']['connList'] = blistEV1toIV1
+else: netParams.connParams['EV1->IV1']['convergence'] = prob2conv(0.0225, dnumc['EV1'])
 
 if 'EDirPops' in dconf['net'] and 'IDirPops' in dconf['net']:
   if 'ID' in dconf['net']['allpops']:
@@ -536,20 +532,21 @@ lprety.append('EV1'); lpoty.append('EV4'); lblist.append(blistEV1toEV4); lprob.a
 lprety.append('EV4'); lpoty.append('EMT'); lblist.append(blistEV4toEMT); lprob.append(0.45)
 for prety,poty,blist,prob in zip(lprety,lpoty,lblist,lprob):
   for strty,synmech,weight in zip(['','n'],['AMPA', 'NMDA'],[dconf['net']['EEMWghtAM']*cfg.EEGain, dconf['net']['EEMWghtNM']*cfg.EEGain]):
-    if synmech=='NMDA': continue
+    # if synmech=='NMDA': continue
+    wscale = 10.0
     k = strty+prety+'->'+strty+poty
     netParams.connParams[k] = {
             'preConds': {'pop': prety},
             'postConds': {'pop': poty},
-            'weight': weight * 40,
+            'weight': weight * wscale,
             'delay': 2,
             'synMech': synmech,'sec':EExcitSec, 'loc':0.5}
     if VTopoI: netParams.connParams[k]['connList'] = blist
     else: netParams.connParams[k]['convergence'] = prob2conv(prob,dnumc[prety])
     if dconf['net']['RLconns']['VisualRL'] and dSTDPparamsRL[synmech]['RLon']: # only turn on plasticity when specified to do so
-      netParams.connParams[k]['weight'] = getInitWeight(weight * 40) # make sure non-uniform weights
+      netParams.connParams[k]['weight'] = getInitWeight(weight * wscale) # make sure non-uniform weights
       netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL[synmech]}
-      netParams.connParams[k]['plast']['params']['RLhebbwt'] *= 40
+      netParams.connParams[k]['plast']['params']['RLhebbwt'] *= wscale
     
 """
 # these all have 0 weight, dont set them up - though no harm in setting them up

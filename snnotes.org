@@ -17051,4 +17051,49 @@ adjusted some conn params
 running for 1e3 s ... 
 
 started ~16:53 ... 
+finished @ ~03:16
 
+* 20sep25
+** check output from 20sep24_A0_cycle_
+
+python -i simdat.py backupcfg/20sep24_A0_cycle_sim.json
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/20sep25_20sep24_A0_cycle_perf.png]]
+hmm, nothing improved ... had targetted RL off ... 
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((990e3,1000e3))
+savefig(gifpath()+'rast.png') # [[./gif/20sep25_20sep24_A0_cycle_rast.png]]
+had VisualRL turned on ... EMT, IMT fired 0 times ... ?? 
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP','EV4','EMT'],lclr=['r','b','g','c'],plotindiv=True)
+xlabel('Time (ms)',fontsize=30); ylabel('Average weight',fontsize=30); tl(); 
+savefig(gifpath()+'all_avg_weight.png') # [[./gif/20sep25_20sep24_A0_cycle_all_avg_weight.png]]
+
+pdf.columns # Index(['time', 'preid', 'postid', 'weight'], dtype='object')
+
+pdfs = pdf[(pdf.postid>=dstartidx['EV4'])&(pdf.postid<=dendidx['EV4'])]
+len(pdfs) # 0
+
+hmm, EV4 weights not recorded ... 
+
+dconf['net']['VisualRL'] # False
+
+dconf['net']['RLconns']['VisualRL'] # 1
+
+had wrong test in sim.py: if dconf['net']['VisualRL']
+should now be if dconf['net']['RLconns']['VisualRL']
+
+** adjust sim
+
+20sep25_A0_cycle_
+
+python -i simdat.py backupcfg/20sep25_A0_cycle_sim.json
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/20sep25_20sep25_A0_cycle_perf.png]]
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); 
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP','EV4','EMT'],lclr=['r','b','g','c'],plotindiv=True)
+xlabel('Time (ms)',fontsize=30); ylabel('Average weight',fontsize=30); tl(); 
