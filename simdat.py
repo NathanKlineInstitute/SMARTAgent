@@ -1396,6 +1396,44 @@ def analyzeRepeatedInputForSingleEvent(dact, InputImages, targetPixel=(10,10)):
   lax[1].legend(lmotorpop,loc='best')
   lax[2].legend(['Actions','Proposed'],loc='best')
 
+def plotAllWeightsChangePreMtoM(pdf, dstartidx, dendidx, targetpop ,tpnt1 = 0, tpnt2 = -1):
+  utimes = np.unique(pdf.time)
+  nbNeurons = dendidx[targetpop]+1-dstartidx[targetpop]
+  tpnts = len(utimes)
+  wts_top = np.zeros((tpnts,nbNeurons))
+  count = 0
+  for idx in range(dstartidx[targetpop],dendidx[targetpop]+1,1): # first plot average weight onto each individual neuron
+    pdfs = pdf[(pdf.postid==idx)]  
+    wts = [np.mean(pdfs[(pdfs.time==t)].weight) for t in utimes]
+    wts_top[:,count] = wts
+    count = count+1
+  dim_neurons = int(np.sqrt(nbNeurons))
+  avgwt_tpnt1 = np.reshape(wts_top[tpnt1,:],(dim_neurons,dim_neurons))
+  avgwt_tpnt2 = np.reshape(wts_top[tpnt2,:],(dim_neurons,dim_neurons))
+  plt.imshow(np.subtract(tpnt2,tpnt1))
+  plt.title('Change in weights-->'+targetpop)
+  plt.colorbar()
+
+def plotWeightsChangeOnePreMtoM(pdf, dstartidx, dendidx, prepop , targetpop ,tpnt1 = 0, tpnt2 = -1):
+  utimes = np.unique(pdf.time)
+  nbNeurons = dendidx[targetpop]+1-dstartidx[targetpop]
+  tpnts = len(utimes)
+  wts_top = np.zeros((tpnts,nbNeurons))
+  count = 0
+  prestartidx = dstartidx[prepop]
+  preendidx = dendidx[prepop]
+  for idx in range(dstartidx[targetpop],dendidx[targetpop]+1,1): # first plot average weight onto each individual neuron
+    pdfs = pdf[(pdf.postid==idx) and (pdf.preid>=prestartidx) and (pdf.preid<=preendidx)]  
+    wts = [np.mean(pdfs[(pdfs.time==t)].weight) for t in utimes]
+    wts_top[:,count] = wts
+    count = count+1
+  dim_neurons = int(np.sqrt(nbNeurons))
+  avgwt_tpnt1 = np.reshape(wts_top[tpnt1,:],(dim_neurons,dim_neurons))
+  avgwt_tpnt2 = np.reshape(wts_top[tpnt2,:],(dim_neurons,dim_neurons))
+  plt.imshow(np.subtract(tpnt2,tpnt1))
+  plt.title('Change in weights '+prepop+' to '+targetpop)
+  plt.colorbar()
+
 """
 current_time_stepNB = 0
 cumRewardActions = []

@@ -7828,3 +7828,94 @@ EMT EMDOWN
 cellID, cell type, x location, y location, presynaptic IDs, postsynaptic IDs
 
 ... will work on this....
+
+-- run 1000 sec sim in 20sept24_A0_simulated_cyle_
+with
+    "rewardcodes": {
+        "scorePoint": 0.0,
+        "losePoint": 0.0,
+        "followTarget": 0.1,
+        "avoidTarget": -0.01,
+        "hitBall": 0.0
+    },
+
+-- run 1000 sec sim in 20sept24_A1_simulated_cyle_
+with
+    "rewardcodes": {
+        "scorePoint": 0.0,
+        "losePoint": 0.0,
+        "followTarget": 0.1,
+        "avoidTarget": -0.01,
+        "hitBall": 0.0
+    },
+and 
+"simulatedEnvParams": {
+        "random":0,
+
+-- run 1000 sec in 20sept24_A0_simulated_falcor_
+with 
+    "rewardcodes": {
+        "scorePoint": 0.0,
+        "losePoint": 0.0,
+        "followTarget": 0.2,
+        "avoidTarget": -0.02,
+        "hitBall": 0.0
+    },
+and 
+"simulatedEnvParams": {
+        "random":0,
+
+* 20sept25 
+
+-- python -i simdat.py backupcfg/20sept24_A0_simulated_falcor_sim.json
+-- plotPerf(actreward) .... very similar performance p(follow)~0.4
+save as 20sept24_A0_simulated_falcor_Perf.png
+
+-- plot weights change onto M neurons:
+
+--- draw average M activity 
+pop = 'EMUP'
+utimes = np.unique(pdf.time)
+nbNeurons = dendidx[pop]+1-dstartidx[pop]
+tpnts = len(utimes)
+wts_top = np.zeros((tpnts,nbNeurons))
+count = 0
+for idx in range(dstartidx[pop],dendidx[pop]+1,1): # first plot average weight onto each individual neuron
+  pdfs = pdf[(pdf.postid==idx)]  
+  wts = [np.mean(pdfs[(pdfs.time==t)].weight) for t in utimes]
+  wts_top[:,count] = wts
+  count = count+1
+
+tpnt1 = np.reshape(wts_top[0,:],(10,10))
+tpnt2 = np.reshape(wts_top[-1,:],(10,10))
+
+plt.imshow(np.subtract(tpnt2,tpnt1))
+plt.title('Change in weights-->EMUP')
+
+-- more comprehensive visualization.
+
+pop = 'EMUP'
+utimes = np.unique(pdf.time)
+nbNeurons = dendidx[pop]+1-dstartidx[pop]
+tpnts = len(utimes)
+wts_top = np.zeros((tpnts,nbNeurons))
+count = 0
+prepop = 'EMT'
+prestartidx = dstartidx[prepop]
+preendidx = dendidx[prepop]
+for idx in range(dstartidx[pop],dendidx[pop]+1,1): # first plot average weight onto each individual neuron
+  pdfs = pdf[(pdf.postid==idx) and (pdf.preid>=prestartidx) and (pdf.preid<=preendidx)]  
+  wts = [np.mean(pdfs[(pdfs.time==t)].weight) for t in utimes]
+  wts_top[:,count] = wts
+  count = count+1
+
+
+-- included 2 functions in simdat.py
+1. plotAllWeightsChangePreMtoM(pdf, dstartidx, dendidx, targetpop ,tpnt1 = 0, tpnt2 = -1)
+... this function plots avg weight change for all synaptic connection onto targetpop.
+... implemented to use targetpop as 'EMUP' or 'EMDOWN'.. havent checked for other targetpops
+... could be used as plotAllWeightsChangePreMtoM(pdf, dstartidx, dendidx, targetpop='EMUP')
+2. plotWeightsChangeOnePreMtoM(pdf, dstartidx, dendidx, prepop , targetpop = 'EMUP',tpnt1 = 0, tpnt2 = -1)
+... this function plots avg weight change synaptic connection from one preM area onto M (targetpop).
+... implemented to use targetpop as 'EMUP' or 'EMDOWN'.. havent checked for other targetpops
+... could be used as plotWeightsChangeOnePreMtoM(pdf, dstartidx, dendidx, prepop = 'EV1DE' , targetpop = 'EMUP')
