@@ -1423,7 +1423,7 @@ def plotWeightsChangeOnePreMtoM(pdf, dstartidx, dendidx, prepop , targetpop ,tpn
   prestartidx = dstartidx[prepop]
   preendidx = dendidx[prepop]
   for idx in range(dstartidx[targetpop],dendidx[targetpop]+1,1): # first plot average weight onto each individual neuron
-    pdfs = pdf[(pdf.postid==idx) and (pdf.preid>=prestartidx) and (pdf.preid<=preendidx)]  
+    pdfs = pdf[(pdf.postid==idx) & (pdf.preid>=prestartidx) & (pdf.preid<=preendidx)]  
     wts = [np.mean(pdfs[(pdfs.time==t)].weight) for t in utimes]
     wts_top[:,count] = wts
     count = count+1
