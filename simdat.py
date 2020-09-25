@@ -1410,7 +1410,7 @@ def plotAllWeightsChangePreMtoM(pdf, dstartidx, dendidx, targetpop ,tpnt1 = 0, t
   dim_neurons = int(np.sqrt(nbNeurons))
   avgwt_tpnt1 = np.reshape(wts_top[tpnt1,:],(dim_neurons,dim_neurons))
   avgwt_tpnt2 = np.reshape(wts_top[tpnt2,:],(dim_neurons,dim_neurons))
-  plt.imshow(np.subtract(tpnt2,tpnt1))
+  plt.imshow(np.subtract(avgwt_tpnt2,avgwt_tpnt1))
   plt.title('Change in weights-->'+targetpop)
   plt.colorbar()
 
@@ -1430,7 +1430,7 @@ def plotWeightsChangeOnePreMtoM(pdf, dstartidx, dendidx, prepop , targetpop ,tpn
   dim_neurons = int(np.sqrt(nbNeurons))
   avgwt_tpnt1 = np.reshape(wts_top[tpnt1,:],(dim_neurons,dim_neurons))
   avgwt_tpnt2 = np.reshape(wts_top[tpnt2,:],(dim_neurons,dim_neurons))
-  plt.imshow(np.subtract(tpnt2,tpnt1))
+  plt.imshow(np.subtract(avgwt_tpnt2,avgwt_tpnt1))
   plt.title('Change in weights '+prepop+' to '+targetpop)
   plt.colorbar()
 
