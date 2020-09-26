@@ -359,7 +359,7 @@ if EEPreMProb > 0.0:
         'preConds': {'pop': prety},
         'postConds': {'pop': poty},
         'convergence': prob2conv(EEPreMProb, dnumc[prety]),
-        'weight': weight,
+        'weight': getInitWeight(weight),
         'delay': 2,
         'synMech': synmech,
         'sec':EExcitSec, 'loc':0.5
@@ -590,7 +590,7 @@ if dconf['net']['VisualFeedback']:
           'preConds': {'pop': prety},
           'postConds': {'pop': poty},
           'connList': connList,
-          'weight': synweight * cfg.EEGain, 
+          'weight': getInitWeight(synweight),
           'delay': 2,
           'synMech': synmech,'sec':EExcitSec, 'loc':0.5} # 'weight' should be fixed
         if dconf['net']['RLconns']['FeedbackLocNeurons'] and dSTDPparamsRL[synmech]['RLon']: # only turn on plasticity when specified to do so
@@ -733,7 +733,7 @@ if EEMFeedbackProb > 0.0:
             'preConds': {'pop': prety},
             'postConds': {'pop': poty},
             'convergence': prob2conv(EEMFeedbackProb, dnumc[prety]),
-            'weight': weight,
+            'weight': getInitWeight(weight),
             'delay': 2,
             'synMech': synmech,
             'sec':EExcitSec, 'loc':0.5
@@ -745,7 +745,7 @@ if EEMFeedbackProb > 0.0:
             if dconf['net']['RLconns']['FeedbackMtoLocN']: 
               useRL = 1
           if useRL and dSTDPparamsRL[synmech]['RLon']: # only turn on plasticity when specified to do so
-            netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL[synmech]}  
+            netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL[synmech]}
 
             
 ###################################################################################################################################
