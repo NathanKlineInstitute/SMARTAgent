@@ -17097,3 +17097,6 @@ clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values()))));
 
 clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP','EV4','EMT'],lclr=['r','b','g','c'],plotindiv=True)
 xlabel('Time (ms)',fontsize=30); ylabel('Average weight',fontsize=30); tl(); 
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','IM'])
+
