@@ -17104,3 +17104,60 @@ clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','IM'])
 
 is it same as backprop with one output layer (M) ? 
 works OK as long as have one known output layer, but does not work when neuron/synapse has distance > 1 away from output
+
+* 20sep26
+** check output from 20sep25_A0_cycle_ & continue
+
+python -i simdat.py backupcfg/20sep25_A0_cycle_sim.json
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/20sep26_20sep25_A0_cycle_perf.png]]
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((990e3,1000e3))
+savefig(gifpath()+'rast.png') # [[./gif/20sep26_20sep25_A0_cycle_rast.png]]
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP','EV4','EMT'],lclr=['r','b','g','c'],plotindiv=True)
+xlabel('Time (ms)',fontsize=30); ylabel('Average weight',fontsize=30); tl(); 
+savefig(gifpath()+'all_avg_weight.png') # [[./gif/20sep26_20sep25_A0_cycle_all_avg_weight.png]]
+some of those EMT weights going towards max, could in limit ... 
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','IM'],tlim=(990e3,1000e3))
+savefig('gif/'+dstr+simstr+'Vm.png') # [[./gif/20sep26_20sep25_A0_cycle_Vm.png]]
+
+fig=animInput(InputImages,gifpath()+'_input.mp4') # [[gif/20sep26_20sep25_A0_cycle__input.mp4
+
+some improvement in performance? despite not using targetted RL ... no harm continuing ...   
+
+
+
+        "name": "20sep26_A1_cycle_",
+	"normalizeWeightsAtStart": 1,
+    "simtype": {
+        "ResumeSim": 1,
+        "ResumeSimFromFile": "data/20sep25_A0_cycle_synWeights_final.pkl"
+    },
+
+increase RL, AMPA :             "wmax": 0.0006,
+
+can run a multistep of 1000 s duration ... 
+each took ~12 hours ... try 5 steps ... 
+
+python multistepSim.py sn.json 32 5 20sep26_A1_cycle_multi
+
+started ~23:38 ...
+
+normalizing adjustable weights at start sim.rank= 0 davg: {'EMUP':
+0.00020867031962702758, 'EMDOWN': 0.00020779394768806876, 'EV1':
+5.167277828040315e-05, 'EV1DE': 2.2232877148600918e-05, 'EV1DNE':
+0.00012805242663008963, 'EV1DN': 0.00012180793988897896, 'EV1DNW':
+5.090969168689469e-05, 'EV1DW': 2.467512832385895e-05, 'EV1DSW':
+3.992928171723875e-05, 'EV1DS': 0.00013136003806881182, 'EV1DSE':
+0.00013527005146831366, 'EV4': 0.0003537733672259636, 'EMT':
+0.0004743774372884642} dfctr: {'EMUP': 0.19994613911988296, 'EMDOWN':
+0.19994613911988296, 'EV1': 0.19994613911988296, 'EV1DE':
+0.19994613911988296, 'EV1DNE': 0.19994613911988296, 'EV1DN':
+0.19994613911988296, 'EV1DNW': 0.19994613911988296, 'EV1DW':
+0.19994613911988296, 'EV1DSW': 0.19994613911988296, 'EV1DS':
+0.19994613911988296, 'EV1DSE': 0.19994613911988296, 'EV4':
+0.19994613911988296, 'EMT': 0.19994613911988296}
+
