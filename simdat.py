@@ -1414,7 +1414,7 @@ def plotAllWeightsChangePreMtoM(pdf, dstartidx, dendidx, targetpop ,tpnt1 = 0, t
   plt.title('Change in weights-->'+targetpop)
   plt.colorbar()
 
-def plotWeightsChangeOnePreMtoM(pdf, dstartidx, dendidx, prepop , targetpop ,tpnt1 = 0, tpnt2 = -1):
+def plotWeightsChangeOnePreMtoM(pdf, dstartidx, dendidx, prepop , targetpop ,tpnt1 = 0, tpnt2 = -1,drawplot=False):
   utimes = np.unique(pdf.time)
   nbNeurons = dendidx[targetpop]+1-dstartidx[targetpop]
   tpnts = len(utimes)
@@ -1430,9 +1430,37 @@ def plotWeightsChangeOnePreMtoM(pdf, dstartidx, dendidx, prepop , targetpop ,tpn
   dim_neurons = int(np.sqrt(nbNeurons))
   avgwt_tpnt1 = np.reshape(wts_top[tpnt1,:],(dim_neurons,dim_neurons))
   avgwt_tpnt2 = np.reshape(wts_top[tpnt2,:],(dim_neurons,dim_neurons))
-  plt.imshow(np.subtract(avgwt_tpnt2,avgwt_tpnt1))
-  plt.title('Change in weights '+prepop+' to '+targetpop)
-  plt.colorbar()
+  if drawplot:
+    plt.imshow(np.subtract(avgwt_tpnt2,avgwt_tpnt1))
+    plt.title('Change in weights '+prepop+' to '+targetpop)
+    plt.colorbar()
+  return np.subtract(avgwt_tpnt2,avgwt_tpnt1)
+
+def plotWeightChangeOnePreMtoMAll(pdf, dstartidx, dendidx, tpnt1 = 0, tpnt2 = -1, figsize=(14,8)):
+  minV = 0
+  maxV = 0
+  weightChanges = dict()
+  for prepop in dconf['net']['EPreMPops']:
+    if dconf['net']['allpops'][prepop]>0:
+      for targetpop in dconf['net']['EMotorPops']:
+        if dconf ['net']['allpops'][targetpop]>0:
+          weightChanges[prepop+'->'+targetpop] = plotWeightsChangeOnePreMtoM(pdf, dstartidx, dendidx, prepop = prepop , targetpop=targetpop)
+          if np.amin(weightChanges[prepop+'->'+targetpop])<minV: minV = np.amin(weightChanges[prepop+'->'+targetpop])
+          if np.amax(weightChanges[prepop+'->'+targetpop])>maxV: maxV = np.amax(weightChanges[prepop+'->'+targetpop])
+  nbrows = 4
+  nbcols = int(np.ceil(len(weightChanges)/4))
+  fig, axs = plt.subplots(nbrows, nbcols, figsize=figsize);
+  lax = axs.ravel()
+  cbaxes = fig.add_axes([0.92, 0.4, 0.01, 0.2])
+  conn_count = 0
+  for conns in weightChanges.keys():
+    pcm = lax[conn_count].imshow(weightChanges[conns],vmin = minV, vmax = maxV)
+    lax[conn_count].set_ylabel(conns,fontsize=8)
+    conn_count = conn_count+1
+    if conn_count==len(weightChanges): plt.colorbar(pcm, cax = cbaxes)
+  for _ in range(conn_count,nbrows*nbcols):
+    lax[conn_count].set_axis_off()
+    conn_count = conn_count+1
 
 """
 current_time_stepNB = 0
