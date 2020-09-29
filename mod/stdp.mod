@@ -99,49 +99,48 @@ PARAMETER {
 }
 
 NET_RECEIVE (w) {
-    deltaw = 0.0 : Default the weight change to 0.
-    skip = 0
+  deltaw = 0.0 : Default the weight change to 0.
+  skip = 0
     
-    if (verbose > 0)  { printf("t=%f (BEFORE) tlaspre=%f, tlastpost=%f, flag=%f, w=%f, deltaw=%f \n",t,tlastpre, tlastpost,flag,w,deltaw) }
+  : if (verbose > 0)  { printf("t=%f (BEFORE) tlaspre=%f, tlastpost=%f, flag=%f, w=%f, deltaw=%f \n",t,tlastpre, tlastpost,flag,w,deltaw) }
 
-    : Hebbian weight update happens 1ms later to check for simultaneous spikes (otherwise bug when using mpi)
-    if ((flag == -1) && (tlastpre != t-1)) {   
+  : Hebbian weight update happens 1ms later to check for simultaneous spikes (otherwise bug when using mpi)
+  if ((flag == -1) && (tlastpre != t-1)) {   
         skip = 1 : skip the 2nd set of conditions since this was artificial net event to update weights
         deltaw = hebbwt * exp(-interval / tauhebb) : Use the Hebbian decay to set the Hebbian weight adjustment. 
         if (softthresh == 1) { deltaw = softthreshold(deltaw) } : If we have soft-thresholding on, apply it.
         adjustweight(deltaw) : Adjust the weight.
-        if (verbose > 0) { printf("Hebbian STDP event: t = %f ms; tlastpre = %f; w = %f; deltaw = %f\n",t,tlastpre,w,deltaw) } : Show weight update information if debugging on.
-        }
-
-    : Ant-hebbian weight update happens 1ms later to check for simultaneous spikes (otherwise bug when using mpi)
-    else if ((flag == 1) && (tlastpost != t-1)) { :update weight 1ms later to check for simultaneous spikes (otherwise bug when using mpi)
+        :if (verbose > 0) { printf("Hebbian STDP event: t = %f ms; tlastpre = %f; w = %f; deltaw = %f\n",t,tlastpre,w,deltaw) } : Show weight update information if debugging on.
+  }
+  : Ant-hebbian weight update happens 1ms later to check for simultaneous spikes (otherwise bug when using mpi)
+  else if ((flag == 1) && (tlastpost != t-1)) { :update weight 1ms later to check for simultaneous spikes (otherwise bug when using mpi)
         skip = 1 : skip the 2nd set of conditions since this was artificial net event to update weights
         deltaw = antiwt * exp(interval / tauanti) : Use the anti-Hebbian decay to set the anti-Hebbian weight adjustment.
         if (softthresh == 1) { deltaw = softthreshold(deltaw) } : If we have soft-thresholding on, apply it.
         adjustweight(deltaw) : Adjust the weight.
-        if (verbose > 0) { printf("anti-Hebbian STDP event: t = %f ms; deltaw = %f\n",t,deltaw) } : Show weight update information if debugging on. 
+        :if (verbose > 0) { printf("anti-Hebbian STDP event: t = %f ms; deltaw = %f\n",t,deltaw) } : Show weight update information if debugging on. 
+  }
+
+
+  : If we receive a non-negative weight value, we are receiving a pre-synaptic spike (and thus need to check for an anti-Hebbian event, since the post-synaptic weight must be earlier).
+  if (skip == 0) {
+    if (w >= 0) {           
+      interval = tlastpost - t  : Get the interval; interval is negative
+      if  ((tlastpost > -1) && (-interval > 1.0)) { : If we had a post-synaptic spike and a non-zero interval...
+        if (STDPon == 1) { : If STDP learning is turned on...
+          :if (verbose > 0) {printf("net_send(1,1)\n")}
+            net_send(1,1) : instead of updating weight directly, use net_send to check if simultaneous spike occurred (otherwise bug when using mpi)
+	  }
+          : If RL and anti-Hebbian eligibility traces are turned on, and the interval falls within the maximum window for eligibility, remember the eligibilty trace start at the current time.	
+          if ((RLon == 1) && (-interval <= RLwindanti)) { tlastantielig = t } 
         }
-
-
-    : If we receive a non-negative weight value, we are receiving a pre-synaptic spike (and thus need to check for an anti-Hebbian event, since the post-synaptic weight must be earlier).
-    if (skip == 0) {
-        if (w >= 0) {           
-            interval = tlastpost - t  : Get the interval; interval is negative
-            if  ((tlastpost > -1) && (-interval > 1.0)) { : If we had a post-synaptic spike and a non-zero interval...
-                if (STDPon == 1) { : If STDP learning is turned on...
-                    if (verbose > 0) {printf("net_send(1,1)\n")}
-                    net_send(1,1) : instead of updating weight directly, use net_send to check if simultaneous spike occurred (otherwise bug when using mpi)
-                }
-                if ((RLon == 1) && (-interval <= RLwindanti)) { tlastantielig = t } : If RL and anti-Hebbian eligibility traces are turned on, and the interval falls within the maximum window for eligibility, remember the eligibilty trace start at the current time.
-            }
-            tlastpre = t : Remember the current spike time for next NET_RECEIVE.  
-        
-        : Else, if we receive a negative weight value, we are receiving a post-synaptic spike (and thus need to check for a Hebbian event, since the pre-synaptic weight must be earlier).    
-        } else {            
+        tlastpre = t : Remember the current spike time for next NET_RECEIVE.          
+  : Else, if we receive a negative weight value, we are receiving a post-synaptic spike (and thus need to check for a Hebbian event, since the pre-synaptic weight must be earlier).    
+  } else {            
             interval = t - tlastpre : Get the interval; interval is positive
             if  ((tlastpre > -1) && (interval > 1.0)) { : If we had a pre-synaptic spike and a non-zero interval...
                 if (STDPon == 1) { : If STDP learning is turned on...
-                    if (verbose > 0) {printf("net_send(1,-1)\n")}
+                    :if (verbose > 0) {printf("net_send(1,-1)\n")}
                     net_send(1,-1) : instead of updating weight directly, use net_send to check if simultaneous spike occurred (otherwise bug when using mpi)
                 }
                 if ((RLon == 1) && (interval <= RLwindhebb)) { 
@@ -150,47 +149,58 @@ NET_RECEIVE (w) {
             tlastpost = t : Remember the current spike time for next NET_RECEIVE.
         }
     }
-    if (verbose > 0)  { printf("t=%f (AFTER) tlaspre=%f, tlastpost=%f, flag=%f, w=%f, deltaw=%f \n",t,tlastpre, tlastpost,flag,w,deltaw) }
+    : if (verbose > 0)  { printf("t=%f (AFTER) tlaspre=%f, tlastpost=%f, flag=%f, w=%f, deltaw=%f \n",t,tlastpre, tlastpost,flag,w,deltaw) }
 }
 
 PROCEDURE reward_punish(reinf) {
   if (RLon == 1) { : If RL is turned on...
     deltaw = 0.0 : Start the weight change as being 0.
-    deltaw = deltaw + reinf * hebbRL() : If we have the Hebbian eligibility traces on, add their effect in.   
-    deltaw = deltaw + reinf * antiRL() : If we have the anti-Hebbian eligibility traces on, add their effect in.
+    if (RLhebbwt!=0.0 && reinf!=0.0) {				       
+      deltaw = deltaw + reinf * hebbRL() : If we have the Hebbian eligibility traces on, add their effect in.
+    }											       
+    if (RLantiwt!=0.0 && reinf!=0.0) {
+      deltaw = deltaw + reinf * antiRL() : If we have the anti-Hebbian eligibility traces on, add their effect in.
+    }												    
     if (softthresh == 1) { : If we have soft-thresholding on, apply it.  
       deltaw = softthreshold(deltaw)
     }  
     adjustweight(deltaw) : Adjust the weight.
-    if (verbose > 0) { : Show weight update information if debugging on.
-      printf("RL event: t = %f ms; reinf = %f; RLhebbwt = %f; RLlenhebb = %f; tlasthebbelig = %f; deltaw = %f\n",t,reinf,RLhebbwt,RLlenhebb,tlasthebbelig, deltaw) } 
-   }
+    :if (verbose > 0) { : Show weight update information if debugging on.
+    :  printf("RL event: t = %f ms; reinf = %f; RLhebbwt = %f; RLlenhebb = %f; tlasthebbelig = %f; deltaw = %f\n",t,reinf,RLhebbwt,RLlenhebb,tlasthebbelig, deltaw) 
+    :}
+  }
 }
 
 FUNCTION hebbRL() {
-  if ((RLon == 0) || (tlasthebbelig < 0.0)) { : If RL is turned off or eligibility has not occurred yet, return 0.0.
+  if (RLon == 0 || tlasthebbelig < 0.0 || RLhebbwt==0.0) { : If RL is turned off or eligibility has not occurred yet or RLhebbwt==0, return 0.0.
     hebbRL = 0.0
-  } else if (useRLexp == 0) { : If we are using a binary (i.e. square-wave) eligibility traces...
-      if (t - tlasthebbelig <= RLlenhebb) { : If we are within the length of the eligibility trace...
-          hebbRL = RLhebbwt : Otherwise (outside the length), return 0.0.
-      } else {
-          hebbRL = 0.0
-      } 
-    } else { : Otherwise (if we're using an exponential decay traces)...use the Hebbian decay to calculate the gain.
-        hebbRL = RLhebbwt * exp((tlasthebbelig - t) / RLlenhebb) 
-    }       
+  }
+  else if (useRLexp == 0) { : If we are using a binary (i.e. square-wave) eligibility traces...
+    if (t - tlasthebbelig <= RLlenhebb) { : If we are within the length of the eligibility trace...
+      hebbRL = RLhebbwt : Otherwise (outside the length), return 0.0.
+    }
+    else {
+      hebbRL = 0.0
+    }
+  }
+  else {  : Otherwise (if we are using an exponential decay traces)...use the Hebbian decay to calculate the gain.	    
+    hebbRL = RLhebbwt * exp((tlasthebbelig - t) / RLlenhebb)
+  }
 }
 
 FUNCTION antiRL() {
-  if ((RLon == 0) || (tlastantielig < 0.0)) { : If RL is turned off or eligibility has not occurred yet, return 0.0.
+  if (RLon == 0 || tlastantielig < 0.0 || RLantiwt==0.0) { : If RL is turned off or eligibility has not occurred yet or RLantiwt==0, return 0.0.
     antiRL = 0.0
-  } else if (useRLexp == 0) { : If we are using a binary (i.e. square-wave) eligibility traces...
+  }
+  else if (useRLexp == 0) { : If we are using a binary (i.e. square-wave) eligibility traces...
     if (t - tlastantielig <= RLlenanti) { : If we are within the length of the eligibility trace...
       antiRL = RLantiwt 
-    } else {
+    }
+    else { : Otherwise (outside the length), return 0.0.
       antiRL = 0.0 
-    } : Otherwise (outside the length), return 0.0.
-  } else { : Otherwise (if we're using an exponential decay traces), use the anti-Hebbian decay to calculate the gain.  
+    } 
+  }
+  else { : Otherwise (if we are using an exponential decay traces), use the anti-Hebbian decay to calculate the gain.  
     antiRL = RLantiwt * exp((tlastantielig - t) / RLlenanti)
   } 
 }
@@ -198,13 +208,14 @@ FUNCTION antiRL() {
 FUNCTION softthreshold(rawwc) {
   if (rawwc >= 0) {
     softthreshold = rawwc * (1.0 - synweight / wmax) : If the weight change is non-negative, scale by 1 - weight / wmax.
-  } else { : Otherwise (the weight change is negative), scale by weight / wmax.    
+  }
+  else { : Otherwise (the weight change is negative), scale by weight / wmax.    
     softthreshold = rawwc * synweight / wmax
-   } 
+  } 
 }
 
 PROCEDURE adjustweight(wc) {
-   synweight = synweight + wc : apply the synaptic modification, and then clip the weight if necessary to make sure it's between wbase and wmax.
+   synweight = synweight + wc : apply the synaptic modification, and then clip the weight if necessary to make sure it is between wbase and wmax.
    if (synweight > wmax) { synweight = wmax }
    if (synweight < wbase) { synweight = wbase }
 }
