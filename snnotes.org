@@ -17124,7 +17124,8 @@ some of those EMT weights going towards max, could in limit ...
 clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','IM'],tlim=(990e3,1000e3))
 savefig('gif/'+dstr+simstr+'Vm.png') # [[./gif/20sep26_20sep25_A0_cycle_Vm.png]]
 
-fig=animInput(InputImages,gifpath()+'_input.mp4') # [[gif/20sep26_20sep25_A0_cycle__input.mp4
+fig=animInput(InputImages,gifpath()+'_input.mp4') # [[./gif/20sep26_20sep25_A0_cycle__input.mp4]]
+in the mp4 seems to reach towards ball sometimes ... and makes some hits as well ...
 
 some improvement in performance? despite not using targetted RL ... no harm continuing ...   
 
@@ -17160,4 +17161,73 @@ normalizing adjustable weights at start sim.rank= 0 davg: {'EMUP':
 0.19994613911988296, 'EV1DSW': 0.19994613911988296, 'EV1DS':
 0.19994613911988296, 'EV1DSE': 0.19994613911988296, 'EV4':
 0.19994613911988296, 'EMT': 0.19994613911988296}
+
+* 20sep29
+** check output from last multistep (no targetted RL, recurrent, visual, feedback conn and RL at those synapses)
+
+python -i simdat.py backupcfg/20sep26_A1_cycle__step_3_sim.json
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/20sep29_20sep26_A1_cycle__step_3_perf.png]]
+
+strange-looking performance...
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((990e3,1000e3))
+savefig(gifpath()+'rast.png')
+[
+h#
+
+##333
+
+
+
+
+[[./gif/20sep29_20sep26_A1_cycle__step_3_rast.png]]
+network becomes hyperexcitable
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP','EV4','EMT'],lclr=['r','b','g','c'],plotindiv=True)
+xlabel('Time (ms)',fontsize=30); ylabel('Average weight',fontsize=30); tl(); 
+savefig(gifpath()+'all_avg_weight.png') # [[./gif/20sep29_20sep26_A1_cycle__step_3_all_avg_weight.png]]
+weights going up - then after ~200 s they get so high that leads to hyperexcit. but starting weight values seem to promote getting stuck
+at a certain position - see that no hits close to when the hyperexcit emerges.
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','IM'],tlim=(990e3,1000e3))
+savefig(gifpath()+'Vm.png') # [[./gif/20sep29_20sep26_A1_cycle__step_3_Vm.png]]
+note that no dep blockade
+
+# fig=animInput(InputImages,gifpath()+'_input.mp4') # 
+
+
+lfn = ['20sep25_A0_cycle_','20sep26_A1_cycle__step_0_','20sep26_A1_cycle__step_1_','20sep26_A1_cycle__step_2_','20sep26_A1_cycle__step_3_']
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0,0.5))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/20sep29_20sep26_A1_cycle__step_3_perf_all_steps_so_far.png]]
+so perf was increasing but then in middle of step 0 of the multistep it started getting worse ... maybe due to hyperexcit
+
+lpda = getindivactionreward(lfn)
+
+csm=cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+lclr = [csm.to_rgba(float(i)/(len(lpda))) for i in range(len(lpda))]
+
+clf(); plotComparePerf(lpda,lclr,yl=(0,0.5),lleg=lfn)
+savefig(gifpath()+'perf_compareB.png') # [[./gif/20sep29_20sep26_A1_cycle__step_3_perf_compareB.png]]
+
+** adjust net - to reduce hyperexcit
+
+        "name": "20sep29_A0_cycle_",
+
+could use ~same params but have weight norm every 300 s ... 
+to check if that helps/is the issue
+
+    "simtype": {
+        "ResumeSim": 1,
+        "ResumeSimFromFile": "data/20sep25_A0_cycle_synWeights_final.pkl"
+    },
+
+        "normalizeWeightStepSize": 15000,
+	"normalizeWeightsAtStart": 1,
+
+./myrun 32 sn.json
+
+started ~12:12 ... 
 
