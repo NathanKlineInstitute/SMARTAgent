@@ -24,6 +24,7 @@ def connectOnePreNtoOneMNeuron (NBNeurons,offset_pre,offset_post):
   
 def connectLayerswithOverlap (NBpreN, NBpostN, overlap_xdir,padded_preneurons_xdir,padded_postneurons_xdir):
     blist = []
+    connCoords = []
     if NBpreN < 1 or NBpostN < 1: return blist
     NBpreN_x = int(np.sqrt(NBpreN))
     NBpreN_y = int(np.sqrt(NBpreN))
@@ -78,11 +79,13 @@ def connectLayerswithOverlap (NBpreN, NBpostN, overlap_xdir,padded_preneurons_xd
             for xi in range(len(xinds)):
                 for yi in range(len(yinds)):
                     preN = int(preNIndices[xinds[xi],yinds[yi]])
-                    blist.append([preN,postN]) 			#list of [presynaptic_neuron, postsynaptic_neuron] 
-    return blist
+                    blist.append([preN,postN]) 			#list of [presynaptic_neuron, postsynaptic_neuron]
+                    connCoords.append([xinds[xi],yinds[yi],i,j])      # list of coordinates of preN and postN
+    return blist, connCoords
 
 def connectLayerswithOverlapDiv(NBpreN, NBpostN, overlap_xdir,padded_preneurons_xdir,padded_postneurons_xdir):
     blist = []
+    connCoords = []
     if NBpreN < 1 or NBpostN < 1: return blist  
     NBpreN_x = int(np.sqrt(NBpreN))
     NBpreN_y = int(np.sqrt(NBpreN))
@@ -132,5 +135,6 @@ def connectLayerswithOverlapDiv(NBpreN, NBpostN, overlap_xdir,padded_preneurons_
             for xi in range(len(xinds)):
                 for yi in range(len(yinds)):
                     postN = int(postNIndices[xinds[xi],yinds[yi]])
-                    blist.append([preN,postN]) 			#list of [presynaptic_neuron, postsynaptic_neuron] 
-    return blist
+                    blist.append([preN,postN]) #list of [presynaptic_neuron, postsynaptic_neuron]
+                    connCoords.append([i,j,xinds[xi],yinds[yi]]) # list of coordinates of preN and postN			 
+    return blist, connCoords
