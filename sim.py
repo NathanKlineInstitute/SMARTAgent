@@ -564,7 +564,7 @@ for IType in ['IV1', 'IV4', 'IMT', 'IM', 'ID']:
 
 #E to E feedforward connections - AMPA,NMDA
 
-lprety,lpoty,lblist,lconnsCoords = [],[],[],[]
+lprety,lpoty,lblist,lconnsCoords,lprob = [],[],[],[],[]
 if dnumc['ER']>0:
   lprety.append('ER')
   lpoty.append('EV1')
