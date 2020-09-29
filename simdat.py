@@ -8,6 +8,7 @@ import os
 import sys
 import anim
 import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import animation
 import matplotlib.gridspec as gridspec
 import matplotlib.patches as mpatches
@@ -1461,6 +1462,23 @@ def plotWeightChangeOnePreMtoMAll(pdf, dstartidx, dendidx, tpnt1 = 0, tpnt2 = -1
   for _ in range(conn_count,nbrows*nbcols):
     lax[conn_count].set_axis_off()
     conn_count = conn_count+1
+
+
+def plotConns(prepop,postpop):
+  fn = 'data/'+dconf['sim']['name']+'synConns.pkl'
+  D = pickle.load(open(fn,'rb'))
+  fig = plt.figure()
+  ax = fig.add_subplot(111, projection='3d')
+  for conns in D.keys():
+    if conns==prepop+'->'+postpop:
+      cConns = D[conns]['blist']
+      cCoords = D[conns]['coords']
+  for i in range(np.shape(cCoords)[0]):
+    prex, prey, postx, posty = cCoords[i][0],cCoords[i][1],cCoords[i][2],cCoords[i][3]
+    ax.plot([prex,postx],[prey,posty],[9,0],'ro-')
+    ax.set_zticks([0,9])
+    ax.set_zticklabels([postpop,prepop])
+  plt.show()
 
 """
 current_time_stepNB = 0
