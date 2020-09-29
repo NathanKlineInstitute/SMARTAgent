@@ -27,6 +27,7 @@ sim.MotorOutputsfilename = 'data/'+dconf['sim']['name']+'MotorOutputs.txt'
 sim.WeightsRecordingTimes = []
 sim.allRLWeights = [] # list to store weights --- should remove that
 sim.allNonRLWeights = [] # list to store weights --- should remove that
+sim.topologicalConns = dict() # dictionary to save topological connections.
 #sim.NonRLweightsfilename = 'data/'+dconf['sim']['name']+'NonRLweights.txt'  # file to store weights
 sim.plotWeights = 0  # plot weights
 sim.saveWeights = 1  # save weights
@@ -62,7 +63,7 @@ dtopolconvcons = dconf['net']['alltopolconvcons']
 allpops_withconvtopology = list(dtopolconvcons.keys())
 allpops_withdivtopology = list(dtopoldivcons.keys())
 # below is the code for updating neuronal pop size to include padding. 
-if dconf['net']['useNeuronPad']:
+if dconf['net']['useNeuronPad']: # PADDING NEEDS TO BE FIXED..... DONT USE IT UNTIL FIXED
   # first make dicionary of paddings in each dimension for each pop
   for pop in allpops_withconvtopology:
     receptive_fields = []
@@ -290,35 +291,35 @@ blistEV4toEMT = connectLayerswithOverlap(NBpreN = dnumc['EV4'], NBpostN = dnumc[
 #blistEV4toIMT = connectLayerswithOverlap(NBpreN = dnumc['EV4'], NBpostN = dnumc['IMT'], overlap_xdir = 3) 
 
 #E to I - WithinLayer connections
-if dnumc['ER']>0: blistERtoIR = connectLayerswithOverlap(NBpreN = dnumc['ER'], NBpostN = dnumc['IR'], overlap_xdir = dtopolconvcons['ER']['IR'], padded_preneurons_xdir = dnumc_padx['ER'], padded_postneurons_xdir = dnumc_padx['IR'])
-blistEV1toIV1 = connectLayerswithOverlap(NBpreN = dnumc['EV1'], NBpostN = dnumc['IV1'], overlap_xdir = dtopolconvcons['EV1']['IV1'], padded_preneurons_xdir = dnumc_padx['EV1'], padded_postneurons_xdir = dnumc_padx['IV1'])
+if dnumc['ER']>0: blistERtoIR, connCoordsERtoIR = connectLayerswithOverlap(NBpreN = dnumc['ER'], NBpostN = dnumc['IR'], overlap_xdir = dtopolconvcons['ER']['IR'], padded_preneurons_xdir = dnumc_padx['ER'], padded_postneurons_xdir = dnumc_padx['IR'])
+blistEV1toIV1, connCoordsEV1toIV1 = connectLayerswithOverlap(NBpreN = dnumc['EV1'], NBpostN = dnumc['IV1'], overlap_xdir = dtopolconvcons['EV1']['IV1'], padded_preneurons_xdir = dnumc_padx['EV1'], padded_postneurons_xdir = dnumc_padx['IV1'])
 #blistEV1DtoIV1D = connectLayerswithOverlap(NBpreN = dnumc['EV1DE'], NBpostN = dnumc['IV1D'], overlap_xdir = 3) # for dir selective E -> I
-blistEV4toIV4 = connectLayerswithOverlap(NBpreN = dnumc['EV4'], NBpostN = dnumc['IV4'], overlap_xdir = dtopolconvcons['EV4']['IV4'], padded_preneurons_xdir = dnumc_padx['EV4'], padded_postneurons_xdir = dnumc_padx['IV4'])
-blistEMTtoIMT = connectLayerswithOverlap(NBpreN = dnumc['EMT'], NBpostN = dnumc['IMT'], overlap_xdir = dtopolconvcons['EMT']['IMT'], padded_preneurons_xdir = dnumc_padx['EMT'], padded_postneurons_xdir = dnumc_padx['IMT'])
+blistEV4toIV4, connCoordsEV4toIV4 = connectLayerswithOverlap(NBpreN = dnumc['EV4'], NBpostN = dnumc['IV4'], overlap_xdir = dtopolconvcons['EV4']['IV4'], padded_preneurons_xdir = dnumc_padx['EV4'], padded_postneurons_xdir = dnumc_padx['IV4'])
+blistEMTtoIMT, connCoordsEMTtoIMT = connectLayerswithOverlap(NBpreN = dnumc['EMT'], NBpostN = dnumc['IMT'], overlap_xdir = dtopolconvcons['EMT']['IMT'], padded_preneurons_xdir = dnumc_padx['EMT'], padded_postneurons_xdir = dnumc_padx['IMT'])
 
 #I to E - WithinLayer Inhibition
-if dnumc['IR']>0: blistIRtoER = connectLayerswithOverlapDiv(NBpreN = dnumc['IR'], NBpostN = dnumc['ER'], overlap_xdir = dtopoldivcons['IR']['ER'], padded_preneurons_xdir = dnumc_padx['IR'], padded_postneurons_xdir = dnumc_padx['ER'])
-blistIV1toEV1 = connectLayerswithOverlapDiv(NBpreN = dnumc['IV1'], NBpostN = dnumc['EV1'], overlap_xdir = dtopoldivcons['IV1']['EV1'], padded_preneurons_xdir = dnumc_padx['IV1'], padded_postneurons_xdir = dnumc_padx['EV1'])
+if dnumc['IR']>0: blistIRtoER, connCoordsIRtoER = connectLayerswithOverlapDiv(NBpreN = dnumc['IR'], NBpostN = dnumc['ER'], overlap_xdir = dtopoldivcons['IR']['ER'], padded_preneurons_xdir = dnumc_padx['IR'], padded_postneurons_xdir = dnumc_padx['ER'])
+blistIV1toEV1, connCoordsIV1toEV1 = connectLayerswithOverlapDiv(NBpreN = dnumc['IV1'], NBpostN = dnumc['EV1'], overlap_xdir = dtopoldivcons['IV1']['EV1'], padded_preneurons_xdir = dnumc_padx['IV1'], padded_postneurons_xdir = dnumc_padx['EV1'])
 #blistIV1DtoEV1D = connectLayerswithOverlapDiv(NBpreN = dnumc['IV1D'], NBpostN = dnumc['EV1DE'], overlap_xdir = 5) # for dir selective I -> E
-blistIV4toEV4 = connectLayerswithOverlapDiv(NBpreN = dnumc['IV4'], NBpostN = dnumc['EV4'], overlap_xdir = dtopoldivcons['IV4']['EV4'], padded_preneurons_xdir = dnumc_padx['IV4'], padded_postneurons_xdir = dnumc_padx['EV4'])
-blistIMTtoEMT = connectLayerswithOverlapDiv(NBpreN = dnumc['IMT'], NBpostN = dnumc['EMT'], overlap_xdir = dtopoldivcons['IMT']['EMT'], padded_preneurons_xdir = dnumc_padx['IMT'], padded_postneurons_xdir = dnumc_padx['EMT'])
+blistIV4toEV4, connCoordsIV4toEV4 = connectLayerswithOverlapDiv(NBpreN = dnumc['IV4'], NBpostN = dnumc['EV4'], overlap_xdir = dtopoldivcons['IV4']['EV4'], padded_preneurons_xdir = dnumc_padx['IV4'], padded_postneurons_xdir = dnumc_padx['EV4'])
+blistIMTtoEMT, connCoordsIMTtoEMT = connectLayerswithOverlapDiv(NBpreN = dnumc['IMT'], NBpostN = dnumc['EMT'], overlap_xdir = dtopoldivcons['IMT']['EMT'], padded_preneurons_xdir = dnumc_padx['IMT'], padded_postneurons_xdir = dnumc_padx['EMT'])
 
 #Feedbackward excitation
 #E to E  
-if dnumc['ER']>0: blistEV1toER = connectLayerswithOverlapDiv(NBpreN = dnumc['EV1'], NBpostN = dnumc['ER'], overlap_xdir = dtopoldivcons['EV1']['ER'], padded_preneurons_xdir = dnumc_padx['EV1'], padded_postneurons_xdir = dnumc_padx['ER'])
-blistEV4toEV1 = connectLayerswithOverlapDiv(NBpreN = dnumc['EV4'], NBpostN = dnumc['EV1'], overlap_xdir = dtopoldivcons['EV4']['EV1'], padded_preneurons_xdir = dnumc_padx['EV4'], padded_postneurons_xdir = dnumc_padx['EV1'])
-blistEMTtoEV4 = connectLayerswithOverlapDiv(NBpreN = dnumc['EMT'], NBpostN = dnumc['EV4'], overlap_xdir = dtopoldivcons['EMT']['EV4'], padded_preneurons_xdir = dnumc_padx['EMT'], padded_postneurons_xdir = dnumc_padx['EV4'])
+if dnumc['ER']>0: blistEV1toER, connCoordsEV1toER = connectLayerswithOverlapDiv(NBpreN = dnumc['EV1'], NBpostN = dnumc['ER'], overlap_xdir = dtopoldivcons['EV1']['ER'], padded_preneurons_xdir = dnumc_padx['EV1'], padded_postneurons_xdir = dnumc_padx['ER'])
+blistEV4toEV1, connCoordsEV4toEV1  = connectLayerswithOverlapDiv(NBpreN = dnumc['EV4'], NBpostN = dnumc['EV1'], overlap_xdir = dtopoldivcons['EV4']['EV1'], padded_preneurons_xdir = dnumc_padx['EV4'], padded_postneurons_xdir = dnumc_padx['EV1'])
+blistEMTtoEV4, connCoordsEMTtoEV4  = connectLayerswithOverlapDiv(NBpreN = dnumc['EMT'], NBpostN = dnumc['EV4'], overlap_xdir = dtopoldivcons['EMT']['EV4'], padded_preneurons_xdir = dnumc_padx['EMT'], padded_postneurons_xdir = dnumc_padx['EV4'])
 
 #Feedforward inhibition
 #I to I
-blistIV1toIV4 = connectLayerswithOverlap(NBpreN = dnumc['IV1'], NBpostN = dnumc['IV4'], overlap_xdir = dtopolconvcons['IV1']['IV4'], padded_preneurons_xdir = dnumc_padx['IV1'], padded_postneurons_xdir = dnumc_padx['IV4'])
-blistIV4toIMT = connectLayerswithOverlap(NBpreN = dnumc['IV4'], NBpostN = dnumc['IMT'], overlap_xdir = dtopolconvcons['IV4']['IMT'], padded_preneurons_xdir = dnumc_padx['IV4'], padded_postneurons_xdir = dnumc_padx['IMT'])
+blistIV1toIV4, connCoordsIV1toIV4 = connectLayerswithOverlap(NBpreN = dnumc['IV1'], NBpostN = dnumc['IV4'], overlap_xdir = dtopolconvcons['IV1']['IV4'], padded_preneurons_xdir = dnumc_padx['IV1'], padded_postneurons_xdir = dnumc_padx['IV4'])
+blistIV4toIMT, connCoordsIV4toIMT = connectLayerswithOverlap(NBpreN = dnumc['IV4'], NBpostN = dnumc['IMT'], overlap_xdir = dtopolconvcons['IV4']['IMT'], padded_preneurons_xdir = dnumc_padx['IV4'], padded_postneurons_xdir = dnumc_padx['IMT'])
 
 #Feedbackward inhibition
 #I to E 
-if dnumc['IR']>0: blistIV1toER = connectLayerswithOverlapDiv(NBpreN = dnumc['IV1'], NBpostN = dnumc['ER'], overlap_xdir = dtopoldivcons['IV1']['ER'], padded_preneurons_xdir = dnumc_padx['IV1'], padded_postneurons_xdir = dnumc_padx['ER'])
-blistIV4toEV1 = connectLayerswithOverlapDiv(NBpreN = dnumc['IV4'], NBpostN = dnumc['EV1'], overlap_xdir = dtopoldivcons['IV4']['EV1'], padded_preneurons_xdir = dnumc_padx['IV4'], padded_postneurons_xdir = dnumc_padx['EV1'])
-blistIMTtoEV4 = connectLayerswithOverlapDiv(NBpreN = dnumc['IMT'], NBpostN = dnumc['EV4'], overlap_xdir = dtopoldivcons['IMT']['EV4'], padded_preneurons_xdir = dnumc_padx['IMT'], padded_postneurons_xdir = dnumc_padx['EV4'])
+if dnumc['IR']>0: blistIV1toER, connCoordsIV1toER = connectLayerswithOverlapDiv(NBpreN = dnumc['IV1'], NBpostN = dnumc['ER'], overlap_xdir = dtopoldivcons['IV1']['ER'], padded_preneurons_xdir = dnumc_padx['IV1'], padded_postneurons_xdir = dnumc_padx['ER'])
+blistIV4toEV1, connCoordsIV4toEV1 = connectLayerswithOverlapDiv(NBpreN = dnumc['IV4'], NBpostN = dnumc['EV1'], overlap_xdir = dtopoldivcons['IV4']['EV1'], padded_preneurons_xdir = dnumc_padx['IV4'], padded_postneurons_xdir = dnumc_padx['EV1'])
+blistIMTtoEV4, connCoordsIMTtoEV4 = connectLayerswithOverlapDiv(NBpreN = dnumc['IMT'], NBpostN = dnumc['EV4'], overlap_xdir = dtopoldivcons['IMT']['EV4'], padded_preneurons_xdir = dnumc_padx['IMT'], padded_postneurons_xdir = dnumc_padx['EV4'])
 
 # synaptic weight gain (based on E, I types)
 cfg = simConfig
@@ -393,8 +394,14 @@ netParams.connParams['EV1->IV1'] = {
         'weight': 0.02 * cfg.EIGain,
         'delay': 2,
         'synMech': 'AMPA', 'sec':'soma', 'loc':0.5}
-if VTopoI: netParams.connParams['EV1->IV1']['connList'] = blistEV1toIV1
-else: netParams.connParams['EV1->IV1']['convergence'] = prob2conv(0.0225, dnumc['EV1'])
+
+if VTopoI:
+  netParams.connParams['EV1->IV1']['connList'] = blistEV1toIV1
+  sim.topologicalConns['EV1->IV1'] = {}
+  sim.topologicalConns['EV1->IV1']['blist'] = blistEV1toIV1
+  sim.topologicalConns['EV1->IV1']['coords'] = connCoordsEV1toIV1
+else:
+  netParams.connParams['EV1->IV1']['convergence'] = prob2conv(0.0225, dnumc['EV1'])
 
 if 'EDirPops' in dconf['net'] and 'IDirPops' in dconf['net']:
   if 'ID' in dconf['net']['allpops']:
@@ -417,9 +424,14 @@ netParams.connParams['EV4->IV4'] = {
         'weight': 0.02 * cfg.EIGain,
         'delay': 2,
         'synMech': 'AMPA', 'sec':'soma', 'loc':0.5}
-if VTopoI: netParams.connParams['EV4->IV4']['connList'] = blistEV4toIV4
-else: netParams.connParams['EV4->IV4']['convergence'] = prob2conv(0.0225, dnumc['EV4'])
 
+if VTopoI: 
+  netParams.connParams['EV4->IV4']['connList'] = blistEV4toIV4
+  sim.topologicalConns['EV4->IV4'] = {}
+  sim.topologicalConns['EV4->IV4']['blist'] = blistEV4toIV4
+  sim.topologicalConns['EV4->IV4']['coords'] = connCoordsEV4toIV4
+else: 
+  netParams.connParams['EV4->IV4']['convergence'] = prob2conv(0.0225, dnumc['EV4'])
 
 netParams.connParams['EMT->IMT'] = {
         'preConds': {'pop': 'EMT'},
@@ -427,9 +439,14 @@ netParams.connParams['EMT->IMT'] = {
         'weight': 0.02 * cfg.EIGain,
         'delay': 2,
         'synMech': 'AMPA', 'sec':'soma', 'loc':0.5}
-if VTopoI: netParams.connParams['EMT->IMT']['connList'] = blistEMTtoIMT
-else: netParams.connParams['EMT->IMT']['convergence'] = prob2conv(0.0225, dnumc['EMT'])
 
+if VTopoI: 
+  netParams.connParams['EMT->IMT']['connList'] = blistEMTtoIMT
+  sim.topologicalConns['EMT->IMT'] = {}
+  sim.topologicalConns['EMT->IMT']['blist'] = blistEMTtoIMT
+  sim.topologicalConns['EMT->IMT']['coords'] = connCoordsEMTtoIMT
+else: 
+  netParams.connParams['EMT->IMT']['convergence'] = prob2conv(0.0225, dnumc['EMT'])
 
 for prety in EMotorPops:
   k = prety+'->IM'
@@ -454,8 +471,14 @@ if dnumc['ER']>0:
           'weight': 0.2 * cfg.IEGain,
           'delay': 2,
           'synMech': 'GABA', 'sec':'soma', 'loc':0.5}
-  if VTopoI: netParams.connParams['IR->ER']['connList'] = blistIRtoER
-  else: netParams.connParams['IR->ER']['convergence'] = prob2conv(0.0625, dnumc['ER'])
+
+  if VTopoI: 
+    netParams.connParams['IR->ER']['connList'] = blistIRtoER
+    sim.topologicalConns['IR->ER'] = {}
+    sim.topologicalConns['IR->ER']['blist'] = blistIRtoER
+    sim.topologicalConns['IR->ER']['coords'] = connCoordsIRtoER
+  else: 
+    netParams.connParams['IR->ER']['convergence'] = prob2conv(0.0625, dnumc['ER'])
   
 netParams.connParams['IV1->EV1'] = {
   'preConds': {'pop': 'IV1'},
@@ -463,8 +486,14 @@ netParams.connParams['IV1->EV1'] = {
   'weight': 0.2 * cfg.IEGain,
   'delay': 2,
   'synMech': 'GABA', 'sec':'soma', 'loc':0.5}
-if VTopoI: netParams.connParams['IV1->EV1']['connList'] = blistIV1toEV1
-else: netParams.connParams['IV1->EV1']['convergence'] = prob2conv(0.25, dnumc['IV1'])  
+
+if VTopoI: 
+  netParams.connParams['IV1->EV1']['connList'] = blistIV1toEV1
+  sim.topologicalConns['IV1->EV1'] = {}
+  sim.topologicalConns['IV1->EV1']['blist'] = blistIV1toEV1
+  sim.topologicalConns['IV1->EV1']['coords'] = connCoordsIV1toEV1
+else: 
+  netParams.connParams['IV1->EV1']['convergence'] = prob2conv(0.25, dnumc['IV1'])  
 
 if 'EDirPops' in dconf['net'] and 'IDirPops' in dconf['net']:
   if 'ID' in dconf['net']['allpops']:
@@ -487,8 +516,14 @@ netParams.connParams['IV4->EV4'] = {
         'weight': 0.2 * cfg.IEGain,
         'delay': 2,
         'synMech': 'GABA', 'sec':'soma', 'loc':0.5}
-if VTopoI: netParams.connParams['IV4->EV4']['connList'] = blistIV4toEV4
-else: netParams.connParams['IV4->EV4']['convergence'] = prob2conv(0.25, dnumc['IV4'])
+
+if VTopoI: 
+  netParams.connParams['IV4->EV4']['connList'] = blistIV4toEV4
+  sim.topologicalConns['IV4->EV4'] = {}
+  sim.topologicalConns['IV4->EV4']['blist'] = blistIV4toEV4
+  sim.topologicalConns['IV4->EV4']['coords'] = connCoordsIV4toEV4
+else: 
+  netParams.connParams['IV4->EV4']['convergence'] = prob2conv(0.25, dnumc['IV4'])
 
 netParams.connParams['IMT->EMT'] = {
         'preConds': {'pop': 'IMT'},
@@ -497,8 +532,14 @@ netParams.connParams['IMT->EMT'] = {
         'weight': 0.2 * cfg.IEGain,
         'delay': 2,
         'synMech': 'GABA', 'sec':'soma', 'loc':0.5}
-if VTopoI: netParams.connParams['IMT->EMT']['connList'] = blistIMTtoEMT
-else: netParams.connParams['IMT->EMT']['convergence'] = prob2conv(0.25, dnumc['IMT'])
+
+if VTopoI: 
+  netParams.connParams['IMT->EMT']['connList'] = blistIMTtoEMT
+  sim.topologicalConns['IMT->EMT'] = {}
+  sim.topologicalConns['IMT->EMT']['blist'] = blistIMTtoEMT
+  sim.topologicalConns['IMT->EMT']['coords'] = connCoordsIMTtoEMT
+else: 
+  netParams.connParams['IMT->EMT']['convergence'] = prob2conv(0.25, dnumc['IMT'])
 
 for poty in EMotorPops: # I -> E for motor populations
   netParams.connParams['IM->'+poty] = {
@@ -522,15 +563,17 @@ for IType in ['IV1', 'IV4', 'IMT', 'IM', 'ID']:
     'synMech': 'GABA', 'sec':'soma', 'loc':0.5}  
 
 #E to E feedforward connections - AMPA,NMDA
-lprety,lpoty,lblist,lprob = [],[],[],[]
+
+lprety,lpoty,lblist,lconnsCoords = [],[],[],[]
 if dnumc['ER']>0:
   lprety.append('ER')
   lpoty.append('EV1')
   lblist.append(blistERtoEV1)
   lprob.append(0.1)
-lprety.append('EV1'); lpoty.append('EV4'); lblist.append(blistEV1toEV4); lprob.append(0.3)
-lprety.append('EV4'); lpoty.append('EMT'); lblist.append(blistEV4toEMT); lprob.append(0.45)
-for prety,poty,blist,prob in zip(lprety,lpoty,lblist,lprob):
+  lconnsCoords.append(connCoordsERtoEV1)
+lprety.append('EV1'); lpoty.append('EV4'); lblist.append(blistEV1toEV4); lprob.append(0.3); lconnsCoords.append(connCoordsEV1toEV4)
+lprety.append('EV4'); lpoty.append('EMT'); lblist.append(blistEV4toEMT); lprob.append(0.45); lconnsCoords.append(connCoordsEV4toEMT)
+for prety,poty,blist,prob,connCoords in zip(lprety,lpoty,lblist,lprob,lconnsCoords):  
   for strty,synmech,weight in zip(['','n'],['AMPA', 'NMDA'],[dconf['net']['EEMWghtAM']*cfg.EEGain, dconf['net']['EEMWghtNM']*cfg.EEGain]):
     # if synmech=='NMDA': continue
     wscale = 10.0
@@ -541,8 +584,13 @@ for prety,poty,blist,prob in zip(lprety,lpoty,lblist,lprob):
             'weight': weight * wscale,
             'delay': 2,
             'synMech': synmech,'sec':EExcitSec, 'loc':0.5}
-    if VTopoI: netParams.connParams[k]['connList'] = blist
-    else: netParams.connParams[k]['convergence'] = prob2conv(prob,dnumc[prety])
+    if VTopoI: 
+      netParams.connParams[k]['connList'] = blist
+      sim.topologicalConns[prety+'->'+poty] = {}
+      sim.topologicalConns[prety+'->'+poty]['blist'] = blist
+      sim.topologicalConns[prety+'->'+poty]['coords'] = connCoords
+    else: 
+      netParams.connParams[k]['convergence'] = prob2conv(prob,dnumc[prety])
     if dconf['net']['RLconns']['VisualRL'] and dSTDPparamsRL[synmech]['RLon']: # only turn on plasticity when specified to do so
       netParams.connParams[k]['weight'] = getInitWeight(weight * wscale) # make sure non-uniform weights
       netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL[synmech]}
@@ -582,7 +630,8 @@ if dconf['net']['VisualFeedback']:
   pretyList = ['EV1','EV4','EMT']
   potyList = ['ER','EV1','EV4']
   allconnList = [blistEV1toER,blistEV4toEV1,blistEMTtoEV4]
-  for prety,poty,connList in zip(pretyList,potyList,allconnList):
+  allconnCoords = [connCoordsEV1toER,connCoordsEV4toEV1,connCoordsEMTtoEV4]
+  for prety,poty,connList,connCoords in zip(pretyList,potyList,allconnList,allconnCoords):
     if dnumc[prety] <= 0 or dnumc[poty] <= 0: continue # skip empty pops
     for strty,synmech,synweight in zip(['','n'],['AMPA', 'NMDA'],[dconf['net']['EEMWghtAM']*cfg.EEGain, dconf['net']['EEMWghtNM']*cfg.EEGain]):
         k = strty+prety+'->'+strty+poty
@@ -593,6 +642,9 @@ if dconf['net']['VisualFeedback']:
           'weight': getInitWeight(synweight),
           'delay': 2,
           'synMech': synmech,'sec':EExcitSec, 'loc':0.5} # 'weight' should be fixed
+        sim.topologicalConns[prety+'->'+poty] = {}
+        sim.topologicalConns[prety+'->'+poty]['blist'] = connList
+        sim.topologicalConns[prety+'->'+poty]['coords'] = connCoords  
         if dconf['net']['RLconns']['FeedbackLocNeurons'] and dSTDPparamsRL[synmech]['RLon']: # only turn on plasticity when specified to do so
           netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL[synmech]}        
   #I to E feedback connections
@@ -603,6 +655,9 @@ if dconf['net']['VisualFeedback']:
         'weight': 0.02 * cfg.IEGain, 
         'delay': 2,
         'synMech': 'GABA','sec':'soma', 'loc':0.5}
+  sim.topologicalConns['IV1->ER'] = {}
+  sim.topologicalConns['IV1->ER']['blist'] = blistIV1toER
+  sim.topologicalConns['IV1->ER']['coords'] = connCoordsIV1toER
   netParams.connParams['IV4->EV1'] = {
           'preConds': {'pop': 'IV4'},
           'postConds': {'pop': 'EV1'},
@@ -610,6 +665,9 @@ if dconf['net']['VisualFeedback']:
           'weight': 0.02 * cfg.IEGain, 
           'delay': 2,
           'synMech': 'GABA','sec':'soma', 'loc':0.5}
+  sim.topologicalConns['IV4->EV1'] = {}
+  sim.topologicalConns['IV4->EV1']['blist'] = blistIV4toEV1
+  sim.topologicalConns['IV4->EV1']['coords'] = connCoordsIV4toEV1
   netParams.connParams['IMT->EV4'] = {
           'preConds': {'pop': 'IMT'},
           'postConds': {'pop': 'EV4'},
@@ -617,6 +675,9 @@ if dconf['net']['VisualFeedback']:
           'weight': 0.02 * cfg.IEGain, 
           'delay': 2,
           'synMech': 'GABA','sec':'soma', 'loc':0.5}
+  sim.topologicalConns['IMT->EV4'] = {}
+  sim.topologicalConns['IMT->EV4']['blist'] = blistIMTtoEV4
+  sim.topologicalConns['IMT->EV4']['coords'] = connCoordsIMTtoEV4
 
 #I to I - between areas
 netParams.connParams['IV1->IV4'] = {
@@ -626,6 +687,9 @@ netParams.connParams['IV1->IV4'] = {
         'weight': 0.0075 * cfg.IIGain,
         'delay': 2,
         'synMech': 'GABA','sec':'soma', 'loc':0.5}
+sim.topologicalConns['IV1->IV4'] = {}
+sim.topologicalConns['IV1->IV4']['blist'] = blistIV1toIV4
+sim.topologicalConns['IV1->IV4']['coords'] = connCoordsIV1toIV4
 netParams.connParams['IV4->IMT'] = {
         'preConds': {'pop': 'IV4'},
         'postConds': {'pop': 'IMT'},
@@ -633,7 +697,9 @@ netParams.connParams['IV4->IMT'] = {
         'weight': 0.0075 * cfg.IIGain,
         'delay': 2,
         'synMech': 'GABA','sec':'soma', 'loc':0.5}
-
+sim.topologicalConns['IV4->IMT'] = {}
+sim.topologicalConns['IV4->IMT']['blist'] = blistIV4toIMT
+sim.topologicalConns['IV4->IMT']['coords'] = connCoordsIV4toIMT
 if dconf['architecturePreMtoM']['useTopological']:
   for prety in EPreMPops:
     if dnumc[prety] <= 0: continue
@@ -644,14 +710,19 @@ if dconf['architecturePreMtoM']['useTopological']:
       except:
         div = 3
       # BE CAREFUL. THERE IS ALWAYS A CHANCE TO USE dnumc[prety] nad dnumc[poty] that produces inaccuracies.
-      # works fine if used in multiples (400->100; 100->400; 100->100).        
+      # works fine if used in multiples (400->100; 100->400; 100->100).
+      blist = []
+      connCoords = []        
       if dconf['net']['allpops'][prety]==dconf['net']['allpops'][poty] or dconf['net']['allpops'][prety]>dconf['net']['allpops'][poty]: 
-        blist = connectLayerswithOverlap(NBpreN=dnumc[prety],NBpostN=dnumc[poty],overlap_xdir = dtopolconvcons[prety][poty], \
+        blist, connCoords = connectLayerswithOverlap(NBpreN=dnumc[prety],NBpostN=dnumc[poty],overlap_xdir = dtopolconvcons[prety][poty], \
                                          padded_preneurons_xdir = dnumc_padx[prety], padded_postneurons_xdir = dnumc_padx[poty])
       elif dconf['net']['allpops'][prety]<dconf['net']['allpops'][poty]:
-        blist = connectLayerswithOverlapDiv(NBpreN=dnumc[prety],NBpostN=dnumc[poty],overlap_xdir = dtopoldivcons[prety][poty], \
+        blist, connCoords = connectLayerswithOverlapDiv(NBpreN=dnumc[prety],NBpostN=dnumc[poty],overlap_xdir = dtopoldivcons[prety][poty], \
                                             padded_preneurons_xdir = dnumc_padx[prety], padded_postneurons_xdir = dnumc_padx[poty])
         print(prety,poty,blist)
+      sim.topologicalConns[prety+'->'+poty] = {}
+      sim.topologicalConns[prety+'->'+poty]['blist'] = blist
+      sim.topologicalConns[prety+'->'+poty]['coords'] = connCoords
       # print(prety,poty,len(blist),len(np.unique(np.array(blist)[:,0])),len(np.unique(np.array(blist)[:,1])))
 
       for strty,synmech,weight in zip(['','n'],['AMPA', 'NMDA'],[dconf['net']['EEMWghtAM']*cfg.EEGain, dconf['net']['EEMWghtNM']*cfg.EEGain]):
@@ -747,7 +818,8 @@ if EEMFeedbackProb > 0.0:
           if useRL and dSTDPparamsRL[synmech]['RLon']: # only turn on plasticity when specified to do so
             netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL[synmech]}
 
-            
+fconn = 'data/'+dconf['sim']['name']+'synConns.pkl'
+pickle.dump(sim.topologicalConns, open(fconn, 'wb'))            
 ###################################################################################################################################
 
 sim.AIGame = None # placeholder

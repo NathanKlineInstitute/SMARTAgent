@@ -8,6 +8,7 @@ import os
 import sys
 import anim
 import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import animation
 import matplotlib.gridspec as gridspec
 import matplotlib.patches as mpatches
@@ -1395,6 +1396,89 @@ def analyzeRepeatedInputForSingleEvent(dact, InputImages, targetPixel=(10,10)):
   lax[3].legend(['Rewards','Hit/Moss'])
   lax[1].legend(lmotorpop,loc='best')
   lax[2].legend(['Actions','Proposed'],loc='best')
+
+def plotAllWeightsChangePreMtoM(pdf, dstartidx, dendidx, targetpop ,tpnt1 = 0, tpnt2 = -1):
+  utimes = np.unique(pdf.time)
+  nbNeurons = dendidx[targetpop]+1-dstartidx[targetpop]
+  tpnts = len(utimes)
+  wts_top = np.zeros((tpnts,nbNeurons))
+  count = 0
+  for idx in range(dstartidx[targetpop],dendidx[targetpop]+1,1): # first plot average weight onto each individual neuron
+    pdfs = pdf[(pdf.postid==idx)]  
+    wts = [np.mean(pdfs[(pdfs.time==t)].weight) for t in utimes]
+    wts_top[:,count] = wts
+    count = count+1
+  dim_neurons = int(np.sqrt(nbNeurons))
+  avgwt_tpnt1 = np.reshape(wts_top[tpnt1,:],(dim_neurons,dim_neurons))
+  avgwt_tpnt2 = np.reshape(wts_top[tpnt2,:],(dim_neurons,dim_neurons))
+  plt.imshow(np.subtract(avgwt_tpnt2,avgwt_tpnt1))
+  plt.title('Change in weights-->'+targetpop)
+  plt.colorbar()
+
+def plotWeightsChangeOnePreMtoM(pdf, dstartidx, dendidx, prepop , targetpop ,tpnt1 = 0, tpnt2 = -1,drawplot=False):
+  utimes = np.unique(pdf.time)
+  nbNeurons = dendidx[targetpop]+1-dstartidx[targetpop]
+  tpnts = len(utimes)
+  wts_top = np.zeros((tpnts,nbNeurons))
+  count = 0
+  prestartidx = dstartidx[prepop]
+  preendidx = dendidx[prepop]
+  for idx in range(dstartidx[targetpop],dendidx[targetpop]+1,1): # first plot average weight onto each individual neuron
+    pdfs = pdf[(pdf.postid==idx) & (pdf.preid>=prestartidx) & (pdf.preid<=preendidx)]  
+    wts = [np.mean(pdfs[(pdfs.time==t)].weight) for t in utimes]
+    wts_top[:,count] = wts
+    count = count+1
+  dim_neurons = int(np.sqrt(nbNeurons))
+  avgwt_tpnt1 = np.reshape(wts_top[tpnt1,:],(dim_neurons,dim_neurons))
+  avgwt_tpnt2 = np.reshape(wts_top[tpnt2,:],(dim_neurons,dim_neurons))
+  if drawplot:
+    plt.imshow(np.subtract(avgwt_tpnt2,avgwt_tpnt1))
+    plt.title('Change in weights '+prepop+' to '+targetpop)
+    plt.colorbar()
+  return np.subtract(avgwt_tpnt2,avgwt_tpnt1)
+
+def plotWeightChangeOnePreMtoMAll(pdf, dstartidx, dendidx, tpnt1 = 0, tpnt2 = -1, figsize=(14,8)):
+  minV = 0
+  maxV = 0
+  weightChanges = dict()
+  for prepop in dconf['net']['EPreMPops']:
+    if dconf['net']['allpops'][prepop]>0:
+      for targetpop in dconf['net']['EMotorPops']:
+        if dconf ['net']['allpops'][targetpop]>0:
+          weightChanges[prepop+'->'+targetpop] = plotWeightsChangeOnePreMtoM(pdf, dstartidx, dendidx, prepop = prepop , targetpop=targetpop)
+          if np.amin(weightChanges[prepop+'->'+targetpop])<minV: minV = np.amin(weightChanges[prepop+'->'+targetpop])
+          if np.amax(weightChanges[prepop+'->'+targetpop])>maxV: maxV = np.amax(weightChanges[prepop+'->'+targetpop])
+  nbrows = 4
+  nbcols = int(np.ceil(len(weightChanges)/4))
+  fig, axs = plt.subplots(nbrows, nbcols, figsize=figsize);
+  lax = axs.ravel()
+  cbaxes = fig.add_axes([0.92, 0.4, 0.01, 0.2])
+  conn_count = 0
+  for conns in weightChanges.keys():
+    pcm = lax[conn_count].imshow(weightChanges[conns],vmin = minV, vmax = maxV)
+    lax[conn_count].set_ylabel(conns,fontsize=8)
+    conn_count = conn_count+1
+    if conn_count==len(weightChanges): plt.colorbar(pcm, cax = cbaxes)
+  for _ in range(conn_count,nbrows*nbcols):
+    lax[conn_count].set_axis_off()
+    conn_count = conn_count+1
+
+
+def plotConns(prepop,postpop):
+  fn = 'data/'+dconf['sim']['name']+'synConns.pkl'
+  D = pickle.load(open(fn,'rb'))
+  fig = plt.figure()
+  ax = fig.add_subplot(111, projection='3d')
+  for conns in D.keys():
+    if conns==prepop+'->'+postpop:
+      cConns = D[conns]['blist']
+      cCoords = D[conns]['coords']
+  for i in range(np.shape(cCoords)[0]):
+    prex, prey, postx, posty = cCoords[i][0],cCoords[i][1],cCoords[i][2],cCoords[i][3]
+    ax.plot([prex,postx],[prey,posty],[9,0],'ro-')
+    ax.set_zticks([0,9])
+    ax.set_zticklabels([postpop,prepop])
+  plt.show()
 
 """
 current_time_stepNB = 0

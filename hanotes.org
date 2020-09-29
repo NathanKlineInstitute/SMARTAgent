@@ -7828,3 +7828,230 @@ EMT EMDOWN
 cellID, cell type, x location, y location, presynaptic IDs, postsynaptic IDs
 
 ... will work on this....
+
+-- run 1000 sec sim in 20sept24_A0_simulated_cyle_
+with
+    "rewardcodes": {
+        "scorePoint": 0.0,
+        "losePoint": 0.0,
+        "followTarget": 0.1,
+        "avoidTarget": -0.01,
+        "hitBall": 0.0
+    },
+
+-- run 1000 sec sim in 20sept24_A1_simulated_cyle_
+with
+    "rewardcodes": {
+        "scorePoint": 0.0,
+        "losePoint": 0.0,
+        "followTarget": 0.1,
+        "avoidTarget": -0.01,
+        "hitBall": 0.0
+    },
+and 
+"simulatedEnvParams": {
+        "random":0,
+
+-- run 1000 sec in 20sept24_A0_simulated_falcor_
+with 
+    "rewardcodes": {
+        "scorePoint": 0.0,
+        "losePoint": 0.0,
+        "followTarget": 0.2,
+        "avoidTarget": -0.02,
+        "hitBall": 0.0
+    },
+and 
+"simulatedEnvParams": {
+        "random":0,
+
+* 20sept25 
+
+-- python -i simdat.py backupcfg/20sept24_A0_simulated_falcor_sim.json
+-- plotPerf(actreward) .... very similar performance p(follow)~0.4
+save as 20sept24_A0_simulated_falcor_Perf.png
+
+-- plot weights change onto M neurons:
+
+--- draw average M activity 
+pop = 'EMUP'
+utimes = np.unique(pdf.time)
+nbNeurons = dendidx[pop]+1-dstartidx[pop]
+tpnts = len(utimes)
+wts_top = np.zeros((tpnts,nbNeurons))
+count = 0
+for idx in range(dstartidx[pop],dendidx[pop]+1,1): # first plot average weight onto each individual neuron
+  pdfs = pdf[(pdf.postid==idx)]  
+  wts = [np.mean(pdfs[(pdfs.time==t)].weight) for t in utimes]
+  wts_top[:,count] = wts
+  count = count+1
+
+tpnt1 = np.reshape(wts_top[0,:],(10,10))
+tpnt2 = np.reshape(wts_top[-1,:],(10,10))
+
+plt.imshow(np.subtract(tpnt2,tpnt1))
+plt.title('Change in weights-->EMUP')
+
+-- more comprehensive visualization.
+
+pop = 'EMUP'
+utimes = np.unique(pdf.time)
+nbNeurons = dendidx[pop]+1-dstartidx[pop]
+tpnts = len(utimes)
+wts_top = np.zeros((tpnts,nbNeurons))
+count = 0
+prepop = 'EMT'
+prestartidx = dstartidx[prepop]
+preendidx = dendidx[prepop]
+for idx in range(dstartidx[pop],dendidx[pop]+1,1): # first plot average weight onto each individual neuron
+  pdfs = pdf[(pdf.postid==idx) and (pdf.preid>=prestartidx) and (pdf.preid<=preendidx)]  
+  wts = [np.mean(pdfs[(pdfs.time==t)].weight) for t in utimes]
+  wts_top[:,count] = wts
+  count = count+1
+
+
+-- included 2 functions in simdat.py
+1. plotAllWeightsChangePreMtoM(pdf, dstartidx, dendidx, targetpop ,tpnt1 = 0, tpnt2 = -1)
+... this function plots avg weight change for all synaptic connection onto targetpop.
+... implemented to use targetpop as 'EMUP' or 'EMDOWN'.. havent checked for other targetpops
+... could be used as plotAllWeightsChangePreMtoM(pdf, dstartidx, dendidx, targetpop='EMUP')
+2. plotWeightsChangeOnePreMtoM(pdf, dstartidx, dendidx, prepop , targetpop = 'EMUP',tpnt1 = 0, tpnt2 = -1)
+... this function plots avg weight change synaptic connection from one preM area onto M (targetpop).
+... implemented to use targetpop as 'EMUP' or 'EMDOWN'.. havent checked for other targetpops
+... could be used as plotWeightsChangeOnePreMtoM(pdf, dstartidx, dendidx, prepop = 'EV1DE' , targetpop = 'EMUP')
+
+-- run 1000 sec sim in 20sept25_A0_simulated_falcor_
+with 
+    "rewardcodes": {
+        "scorePoint": 0.0,
+        "losePoint": 0.0,
+        "followTarget": 0.2,
+        "avoidTarget": -0.02,
+        "hitBall": 0.0
+    },
+and 
+"simulatedEnvParams": {
+        "random":0,
+
+and 
+
+RLconns:
+"FeedForwardDirNtoM":1 --->this was 1 even in last sims.
+"FeedForwardLocNtoM":1
+... now allow RL-plasticity in location pops (V1, V4, MT) too.
+
+* 20sept28
+
+... no improvement in p(follow) ~ 0.38 ... saved as 20sept25_A0_simulated_falcor_Perf.png
+... plotted using 
+plotWeightsChangeOnePreMtoM(pdf, dstartidx, dendidx, prepop = 'EV1' , targetpop='EMUP')
+plotWeightsChangeOnePreMtoM(pdf, dstartidx, dendidx, prepop = 'EV4' , targetpop='EMUP')
+plotWeightsChangeOnePreMtoM(pdf, dstartidx, dendidx, prepop = 'EMT' , targetpop='EMUP')
+plotWeightsChangeOnePreMtoM(pdf, dstartidx, dendidx, prepop = 'EV1DE' , targetpop='EMUP')
+plotWeightsChangeOnePreMtoM(pdf, dstartidx, dendidx, prepop = 'EV1DNE' , targetpop='EMUP')
+plotWeightsChangeOnePreMtoM(pdf, dstartidx, dendidx, prepop = 'EV1DN' , targetpop='EMUP')
+plotWeightsChangeOnePreMtoM(pdf, dstartidx, dendidx, prepop = 'EV1DNW' , targetpop='EMUP')
+plotWeightsChangeOnePreMtoM(pdf, dstartidx, dendidx, prepop = 'EV1DW' , targetpop='EMUP')
+plotWeightsChangeOnePreMtoM(pdf, dstartidx, dendidx, prepop = 'EV1DSW' , targetpop='EMUP')
+plotWeightsChangeOnePreMtoM(pdf, dstartidx, dendidx, prepop = 'EV1DS' , targetpop='EMUP')
+plotWeightsChangeOnePreMtoM(pdf, dstartidx, dendidx, prepop = 'EV1DSE' , targetpop='EMUP')
+plotWeightsChangeOnePreMtoM(pdf, dstartidx, dendidx, prepop = 'EV1' , targetpop='EMDOWN')
+plotWeightsChangeOnePreMtoM(pdf, dstartidx, dendidx, prepop = 'EV4' , targetpop='EMDOWN')
+plotWeightsChangeOnePreMtoM(pdf, dstartidx, dendidx, prepop = 'EMT' , targetpop='EMDOWN')
+plotWeightsChangeOnePreMtoM(pdf, dstartidx, dendidx, prepop = 'EV1DE' , targetpop='EMDOWN')
+plotWeightsChangeOnePreMtoM(pdf, dstartidx, dendidx, prepop = 'EV1DNE' , targetpop='EMDOWN')
+plotWeightsChangeOnePreMtoM(pdf, dstartidx, dendidx, prepop = 'EV1DN' , targetpop='EMDOWN')
+plotWeightsChangeOnePreMtoM(pdf, dstartidx, dendidx, prepop = 'EV1DNW' , targetpop='EMDOWN')
+plotWeightsChangeOnePreMtoM(pdf, dstartidx, dendidx, prepop = 'EV1DW' , targetpop='EMDOWN')
+plotWeightsChangeOnePreMtoM(pdf, dstartidx, dendidx, prepop = 'EV1DSW' , targetpop='EMDOWN')
+plotWeightsChangeOnePreMtoM(pdf, dstartidx, dendidx, prepop = 'EV1DS' , targetpop='EMDOWN')
+plotWeightsChangeOnePreMtoM(pdf, dstartidx, dendidx, prepop = 'EV1DSE' , targetpop='EMDOWN')
+
+and saved all WeightChange with prefix 20sept25_A0_simulated_falcor_WeightChange*
+
+-- should have a function which takes care of all these plots.... see below. The function 
+plotWeightChangeOnePreMtoMAll(pdf, dstartidx, dendidx, tpnt1 = 0, tpnt2 = -1, figsize=(14,8))
+added to the simdat.py
+
+
+>>> dconf['net']['EPreMPops']
+['EV1', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW', 'EV1DSW', 'EV1DS', 'EV1DSE', 'EV4', 'EMT']
+>>> dconf['net']['EMotorPops']
+['EMDOWN', 'EMUP', 'EMSTAY']
+
+minV = 0
+maxV = 0
+weightChanges = dict()
+for prepop in dconf['net']['EPreMPops']:
+  if dconf['net']['allpops'][prepop]>0:
+    for targetpop in dconf['net']['EMotorPops']:
+      if dconf ['net']['allpops'][targetpop]>0:
+        weightChanges[prepop+'->'+targetpop] = plotWeightsChangeOnePreMtoM(pdf, dstartidx, dendidx, prepop = prepop , targetpop=targetpop)
+        if np.amin(weightChanges[prepop+'->'+targetpop])<minV: minV = np.amin(weightChanges[prepop+'->'+targetpop])
+        if np.amax(weightChanges[prepop+'->'+targetpop])>maxV: maxV = np.amax(weightChanges[prepop+'->'+targetpop])
+nbrows = 4
+nbcols = int(np.ceil(len(weightChanges)/4))
+figsize=(14,8)
+fig, axs = plt.subplots(nbrows, nbcols, figsize=figsize);
+lax = axs.ravel()
+cbaxes = fig.add_axes([0.92, 0.4, 0.01, 0.2])
+conn_count = 0
+for conns in weightChanges.keys():
+  pcm = lax[conn_count].imshow(weightChanges[conns],vmin = minV, vmax = maxV)
+  lax[conn_count].set_ylabel(conns,fontsize=8)
+  conn_count = conn_count+1
+  if conn_count==len(weightChanges): plt.colorbar(pcm, cax = cbaxes)
+for _ in range(conn_count,nbrows*nbcols):
+  lax[conn_count].set_axis_off()
+  conn_count = conn_count+1
+
+-- because of the large range of weight changes, small changes are invisible in individual weight changes when using 
+plotWeightChangeOnePreMtoMAll(pdf, dstartidx, dendidx)...
+
+-- ran plotPerf(actreward), plotWeightChangeOnePreMtoMAll(pdf, dstartidx, dendidx),
+plotAllWeightsChangePreMtoM(pdf, dstartidx, dendidx, targetpop ='EMUP') and
+plotAllWeightsChangePreMtoM(pdf, dstartidx, dendidx, targetpop ='EMDOWN').
+... no improvement in performance.
+... need to look carefully at the weights, if can learn anything or not??
+
+-- run 3000 sec sims on cycle with real game.
+
+-- should finish connection lists with coordinates....
+cellID, cell type, x location, y location, presynaptic IDs, postsynaptic IDs
+
+* 20sept29
+
+-- saving dict of syn connections 
+fconn = 'data/'+dconf['sim']['name']+'synConns.pkl'
+pickle.dump(sim.topologicalConns, open(fconn, 'wb')) 
+
+with 2 lists.
+
+      sim.topologicalConns[prety+'->'+poty] = {}
+      sim.topologicalConns[prety+'->'+poty]['blist'] = blist
+      sim.topologicalConns[prety+'->'+poty]['coords'] = connc]Coords
+
+where blist has preid and postid
+and coords have xcoord, y coords of preneuron and xcoords, y coords of postneuron.
+
+from mpl_toolkits.mplot3d import Axes3D
+import matplotlib.pyplot as plt
+import numpy as np
+import pickle
+
+# fn = 'data/'+dconf['sim']['name']+'synConns.pkl'
+def plotConns(prepop,postpop):
+  fn = 'data/20sept29_A0_simulated_local_synConns.pkl'
+  D = pickle.load(open(fn,'rb'))
+  fig = plt.figure()
+  ax = fig.add_subplot(111, projection='3d')
+  for conns in D.keys():
+    if conns==prepop+'->'+postpop:
+      cConns = D[conns]['blist']
+      cCoords = D[conns]['coords']
+  for i in range(np.shape(cCoords)[0]):
+    prex, prey, postx, posty = cCoords[i][0],cCoords[i][1],cCoords[i][2],cCoords[i][3]
+    ax.plot([prex,postx],[prey,posty],[9,0],'ro-')
+    ax.set_zticks([0,9])
+    ax.set_zticklabels([postpop,prepop])
+  plt.show()
