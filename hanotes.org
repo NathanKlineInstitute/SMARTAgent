@@ -8055,3 +8055,26 @@ def plotConns(prepop,postpop):
     ax.set_zticks([0,9])
     ax.set_zticklabels([postpop,prepop])
   plt.show()
+
+-- python -i simdat.py backupcfg/20sept28_A0_cycle_sim.json
+... 20sept28_A0_game_cycle_Perf.png --> plotPerf(actreward)
+... 20sept28_A0_game_cycle_weightschangeAll.png --> plotWeightChangeOnePreMtoMAll(pdf,dstartidx,dendidx)
+... 20sept28_A0_game_cycle_EMDOWNweightschange.png ---> plotAllWeightsChangePreMtoM(pdf,dstartidx,dendidx,targetpop='EMDOWN')
+... 20sept28_A0_game_cycle_EMUPweightschange.png ---> plotAllWeightsChangePreMtoM(pdf,dstartidx,dendidx,targetpop='EMUP')
+... 20sept28_A0_game_cycle_sumInputImages.png ---> plt.imshow(np.sum(InputImages,0))
+
+-- python -i simdat.py backupcfg/20sept25_A1_simulated_cycle_sim.json..... i forgot to change the name of the sim.... so previous simulation is gone.
+... 20sept25_A1_simulated_cycle_Perf.png --> plotPerf(actreward)
+... 20sept25_A1_simulated_cycle_weightschangeAll.png --> plotWeightChangeOnePreMtoMAll(pdf,dstartidx,dendidx)
+... 20sept25_A1_simulated_cycle_EMDOWNweightschange.png ---> plotAllWeightsChangePreMtoM(pdf,dstartidx,dendidx,targetpop='EMDOWN')
+... 20sept25_A1_simulated_cycle_EMUPweightschange.png ---> plotAllWeightsChangePreMtoM(pdf,dstartidx,dendidx,targetpop='EMUP')
+... 20sept25_A1_simulated_cycle_sumInputImages.png ---> plt.imshow(np.sum(InputImages,0))
+
+-- Interesting part of both simulations was that showed quite good ration for Hit/Miss. though i didnt use the reward for that.
+-- SHOULD LOOK CAREFULLY and MAY PURSUE FURTHER....both game simulations.
+backupcfg/20sept25_A1_simulated_cycle_sim.json and
+backupcfg/20sept28_A0_cycle_sim.json
+
+
+-- previous updates got lost somehow.....
+-- debugging those lost changes....
