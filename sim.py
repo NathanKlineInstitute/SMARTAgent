@@ -403,17 +403,17 @@ if VTopoI:
 else:
   netParams.connParams['EV1->IV1']['convergence'] = prob2conv(0.0225, dnumc['EV1'])
 
-if 'EDirPops' in dconf['net'] and 'IDirPops' in dconf['net']:
+if 'EPreMDirPops' in dconf['net'] and 'IPreMDirPops' in dconf['net']:
   if 'ID' in dconf['net']['allpops']:
     if dnumc['ID']>0:
-      EDirPops = dconf['net']['EDirPops']
-      IDirPops = dconf['net']['IDirPops']
+      EDirPops = dconf['net']['EPreMDirPops']
+      IDirPops = dconf['net']['IPreMDirPops']
       for prety in EDirPops:
         for poty in IDirPops:
           netParams.connParams[prety+'->'+poty] = {
             'preConds': {'pop': prety},
             'postConds': {'pop': poty},
-            'convergence': 9,
+            'convergence': prob2conv(0.0225, dnumc[prety]),
             'weight': 0.02 * cfg.EIGain,
             'delay': 2,
             'synMech': 'AMPA', 'sec':'soma', 'loc':0.5}
@@ -495,17 +495,17 @@ if VTopoI:
 else: 
   netParams.connParams['IV1->EV1']['convergence'] = prob2conv(0.25, dnumc['IV1'])  
 
-if 'EDirPops' in dconf['net'] and 'IDirPops' in dconf['net']:
+if 'EPreMDirPops' in dconf['net'] and 'IPreMDirPops' in dconf['net']:
   if 'ID' in dconf['net']['allpops']:
     if dnumc['ID']>0:
-      EDirPops = dconf['net']['EDirPops']
-      IDirPops = dconf['net']['IDirPops']
+      EDirPops = dconf['net']['EPreMDirPops']
+      IDirPops = dconf['net']['IPreMDirPops']
       for prety in IDirPops:
         for poty in EDirPops:
           netParams.connParams[prety+'->'+poty] = {
             'preConds': {'pop': prety},
             'postConds': {'pop': poty},
-            'convergence': 25,
+            'convergence': prob2conv(0.25, dnumc['ID']),
             'weight': 0.2 * cfg.IEGain,
             'delay': 2,
             'synMech': 'GABA', 'sec':'soma', 'loc':0.5}
