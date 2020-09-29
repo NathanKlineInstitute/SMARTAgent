@@ -172,7 +172,7 @@ PROCEDURE reward_punish(reinf) {
 }
 
 FUNCTION hebbRL() {
-  if (RLon == 0 || tlasthebbelig < 0.0 || RLhebbwt==0.0) { : If RL is turned off or eligibility has not occurred yet or RLhebbwt==0, return 0.0.
+  if (tlasthebbelig < 0.0) { : If eligibility has not occurred yet return 0.0.
     hebbRL = 0.0
   }
   else if (useRLexp == 0) { : If we are using a binary (i.e. square-wave) eligibility traces...
@@ -189,7 +189,7 @@ FUNCTION hebbRL() {
 }
 
 FUNCTION antiRL() {
-  if (RLon == 0 || tlastantielig < 0.0 || RLantiwt==0.0) { : If RL is turned off or eligibility has not occurred yet or RLantiwt==0, return 0.0.
+  if (tlastantielig < 0.0) { : If eligibility has not occurred yet return 0.0.
     antiRL = 0.0
   }
   else if (useRLexp == 0) { : If we are using a binary (i.e. square-wave) eligibility traces...
