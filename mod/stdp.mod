@@ -154,37 +154,53 @@ NET_RECEIVE (w) {
 }
 
 PROCEDURE reward_punish(reinf) {
-    if (RLon == 1) { : If RL is turned on...
-        deltaw = 0.0 : Start the weight change as being 0.
-        deltaw = deltaw + reinf * hebbRL() : If we have the Hebbian eligibility traces on, add their effect in.   
-        deltaw = deltaw + reinf * antiRL() : If we have the anti-Hebbian eligibility traces on, add their effect in.
-        if (softthresh == 1) { deltaw = softthreshold(deltaw) }  : If we have soft-thresholding on, apply it.  
-        adjustweight(deltaw) : Adjust the weight.
-        if (verbose > 0) { printf("RL event: t = %f ms; reinf = %f; RLhebbwt = %f; RLlenhebb = %f; tlasthebbelig = %f; deltaw = %f\n",t,reinf,RLhebbwt,RLlenhebb,tlasthebbelig, deltaw) } : Show weight update information if debugging on.     
-    }
+  if (RLon == 1) { : If RL is turned on...
+    deltaw = 0.0 : Start the weight change as being 0.
+    deltaw = deltaw + reinf * hebbRL() : If we have the Hebbian eligibility traces on, add their effect in.   
+    deltaw = deltaw + reinf * antiRL() : If we have the anti-Hebbian eligibility traces on, add their effect in.
+    if (softthresh == 1) { : If we have soft-thresholding on, apply it.  
+      deltaw = softthreshold(deltaw)
+    }  
+    adjustweight(deltaw) : Adjust the weight.
+    if (verbose > 0) { : Show weight update information if debugging on.
+      printf("RL event: t = %f ms; reinf = %f; RLhebbwt = %f; RLlenhebb = %f; tlasthebbelig = %f; deltaw = %f\n",t,reinf,RLhebbwt,RLlenhebb,tlasthebbelig, deltaw) } 
+   }
 }
 
 FUNCTION hebbRL() {
-    if ((RLon == 0) || (tlasthebbelig < 0.0)) { hebbRL = 0.0  } : If RL is turned off or eligibility has not occurred yet, return 0.0.
-    else if (useRLexp == 0) { : If we are using a binary (i.e. square-wave) eligibility traces...
-        if (t - tlasthebbelig <= RLlenhebb) { hebbRL = RLhebbwt } : If we are within the length of the eligibility trace...
-        else { hebbRL = 0.0 } : Otherwise (outside the length), return 0.0.
-    } 
-    else { hebbRL = RLhebbwt * exp((tlasthebbelig - t) / RLlenhebb) } : Otherwise (if we're using an exponential decay traces)...use the Hebbian decay to calculate the gain.
-      
+  if ((RLon == 0) || (tlasthebbelig < 0.0)) { : If RL is turned off or eligibility has not occurred yet, return 0.0.
+    hebbRL = 0.0
+  } else if (useRLexp == 0) { : If we are using a binary (i.e. square-wave) eligibility traces...
+      if (t - tlasthebbelig <= RLlenhebb) { : If we are within the length of the eligibility trace...
+          hebbRL = RLhebbwt : Otherwise (outside the length), return 0.0.
+      } else {
+          hebbRL = 0.0
+      } 
+    } else { : Otherwise (if we're using an exponential decay traces)...use the Hebbian decay to calculate the gain.
+        hebbRL = RLhebbwt * exp((tlasthebbelig - t) / RLlenhebb) 
+    }       
 }
+
 FUNCTION antiRL() {
-    if ((RLon == 0) || (tlastantielig < 0.0)) { antiRL = 0.0 } : If RL is turned off or eligibility has not occurred yet, return 0.0.
-    else if (useRLexp == 0) { : If we are using a binary (i.e. square-wave) eligibility traces...
-        if (t - tlastantielig <= RLlenanti) { antiRL = RLantiwt } : If we are within the length of the eligibility trace...
-        else {antiRL = 0.0 } : Otherwise (outside the length), return 0.0.
-    }
-    else { antiRL = RLantiwt * exp((tlastantielig - t) / RLlenanti) } : Otherwise (if we're using an exponential decay traces), use the anti-Hebbian decay to calculate the gain.  
+  if ((RLon == 0) || (tlastantielig < 0.0)) { : If RL is turned off or eligibility has not occurred yet, return 0.0.
+    antiRL = 0.0
+  } else if (useRLexp == 0) { : If we are using a binary (i.e. square-wave) eligibility traces...
+    if (t - tlastantielig <= RLlenanti) { : If we are within the length of the eligibility trace...
+      antiRL = RLantiwt 
+    } else {
+      antiRL = 0.0 
+    } : Otherwise (outside the length), return 0.0.
+  } else { : Otherwise (if we're using an exponential decay traces), use the anti-Hebbian decay to calculate the gain.  
+    antiRL = RLantiwt * exp((tlastantielig - t) / RLlenanti)
+  } 
 }
 
 FUNCTION softthreshold(rawwc) {
-    if (rawwc >= 0) { softthreshold = rawwc * (1.0 - synweight / wmax) } : If the weight change is non-negative, scale by 1 - weight / wmax.
-    else { softthreshold = rawwc * synweight / wmax } : Otherwise (the weight change is negative), scale by weight / wmax.    
+  if (rawwc >= 0) {
+    softthreshold = rawwc * (1.0 - synweight / wmax) : If the weight change is non-negative, scale by 1 - weight / wmax.
+  } else { : Otherwise (the weight change is negative), scale by weight / wmax.    
+    softthreshold = rawwc * synweight / wmax
+   } 
 }
 
 PROCEDURE adjustweight(wc) {
