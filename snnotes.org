@@ -17246,7 +17246,33 @@ sim.rank= 0 davg: {'EMUP': 0.00020867031962702758, 'EMDOWN':
 0.19994613911988296, 'EV4': 0.19994613911988296, 'EMT':
 0.19994613911988296}
 
-** other sim
+** other sim (20sep29_B0_cycle_)
 
 should aim for lower excitability
+
+        "name": "20sep29_B0_cycle_",
+
+python -i simdat.py backupcfg/20sep29_B0_cycle_sim.json
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/20sep29_20sep29_B0_cycle_perf.png]]
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((390e3,400e3))
+savefig(gifpath()+'rast.png') # [[./gif/20sep29_20sep29_B0_cycle_rast.png]]
+
+gets hyperexcitable again ... 
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP','EV4','EMT'],lclr=['r','b','g','c'],plotindiv=True)
+xlabel('Time (ms)',fontsize=30); ylabel('Average weight',fontsize=30); tl(); 
+savefig(gifpath()+'all_avg_weight.png') # [[./gif/20sep29_20sep29_B0_cycle_all_avg_weight.png]]
+
+EMT and EV4 weights going up too high ... may want stronger inhibition in those layers, if EV4, EMT start with higher AM weights ... 
+
+fig=animInput(InputImages,gifpath()+'_input.mp4') # [[./gif/20sep29_20sep29_B0_cycle__input.mp4]]
+
+** other sim (20sep29_C0_cycle_) - see if hyperexcit a factor by checking with weight norm
+
+try same as 20sep29_B0_cycle_ but with weight norm every 40 s ... 
+
+./myrun 32 sn.json
 
