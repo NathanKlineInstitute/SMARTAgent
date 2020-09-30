@@ -15,11 +15,11 @@
     ],
     "movefctr": 1.0,
     "rewardcodes": {
-        "scorePoint": 0.12,
-        "losePoint": -0.12,
+        "scorePoint": 1.0,
+        "losePoint": -0.1,
         "followTarget": 0.1,
         "avoidTarget": -0.01,
-        "hitBall": 0.11
+        "hitBall": 0.5
     },
     "actionsPerPlay": 1,
     "followOnlyTowards": 1,
@@ -37,7 +37,7 @@
         "ResumeSimFromFile": "data/20sep25_A0_cycle_synWeights_final.pkl"
     },
     "sim": {
-        "duration": 200000,
+        "duration": 400000,
         "dt": 0.2,
         "verbose": 0,
         "recordStep": 1.0,
@@ -167,7 +167,7 @@
         "EEMFeedbackWghtAM": 0.25e-05,
         "EEMFeedbackWghtNM": 3e-06,
         "VisualFeedback": 0,
-        "weightVar": 1.0
+        "weightVar": 0.5
     },
     "STDP": {
         "AMPA": {
@@ -180,10 +180,10 @@
             "useRLexp": 1,
             "RLhebbwt": 0.0,
             "RLantiwt": 0.0,
-            "hebbwt": 1e-06,
-            "antiwt": -1e-06,
-            "tauhebb": 10,
-	    "tauanti": 10,
+            "hebbwt": 1e-05,
+            "antiwt": -1e-05,
+            "tauhebb": 25,
+	    "tauanti": 25,
             "RLwindhebb": 50,
             "softthresh": 0,
             "verbose": 0
@@ -200,8 +200,8 @@
             "RLantiwt": -0.0,
             "hebbwt": 0,
             "antiwt": 0,
-            "tauhebb": 10,
-	    "tauanti": 10,	    
+            "tauhebb": 25,
+	    "tauanti": 25,	    
             "RLwindhebb": 50,
             "softthresh": 0,
             "verbose": 0
@@ -221,6 +221,7 @@
             "hebbwt": 0,
             "antiwt": 0,
             "tauhebb": 10,
+            "tauanti": 10,	    
             "RLwindhebb": 50,
             "softthresh": 0,
             "verbose": 0
@@ -238,6 +239,7 @@
             "hebbwt": 0,
             "antiwt": 0,
             "tauhebb": 10,
+            "tauanti": 10,	    
             "RLwindhebb": 50,
             "softthresh": 0,
             "verbose": 0
