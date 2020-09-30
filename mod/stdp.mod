@@ -46,7 +46,7 @@ NEURON {
     RANGE wbase, wmax : The maximum weight for the synapse. min weight for the synapse.
     RANGE softthresh : Flag turning on "soft thresholding" for the maximal adjustment parameters.
     RANGE STDPon : Flag for turning STDP adjustment on / off.
-    RANGE RLon : Flag for turning RL adjustment on / off.
+    RANGE RLon : Flag for turning RL adjustment on / off.													  
     RANGE verbose : Flag for turning off prints of weight update events for debugging.
     RANGE tlastpre, tlastpost : Remembered times for last pre- and post-synaptic spikes.
     RANGE tlasthebbelig, tlastantielig : Remembered times for Hebbian anti-Hebbian eligibility traces.
