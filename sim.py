@@ -575,39 +575,32 @@ if dnumc['ER']>0:
   lprety.append('ER')
   lpoty.append('EV1')
   lblist.append(blistERtoEV1)
-  lprob.append(0.1)
+  lprob.append(dconf['net']['EREV1Prob'])
   lconnsCoords.append(connCoordsERtoEV1)
-lprety.append('EV1'); lpoty.append('EV4'); lblist.append(blistEV1toEV4); lprob.append(0.3); lconnsCoords.append(connCoordsEV1toEV4)
-lprety.append('EV4'); lpoty.append('EMT'); lblist.append(blistEV4toEMT); lprob.append(0.45); lconnsCoords.append(connCoordsEV4toEMT)
+lprety.append('EV1'); lpoty.append('EV4'); lblist.append(blistEV1toEV4); lprob.append(dconf['net']['EV1EV4Prob']); lconnsCoords.append(connCoordsEV1toEV4)
+lprety.append('EV4'); lpoty.append('EMT'); lblist.append(blistEV4toEMT); lprob.append(dconf['net']['EV4EMTProb']); lconnsCoords.append(connCoordsEV4toEMT)
 for prety,poty,blist,prob,connCoords in zip(lprety,lpoty,lblist,lprob,lconnsCoords):  
-  for strty,synmech,weight in zip(['','n'],['AMPA', 'NMDA'],[dconf['net']['EEMWghtAM']*cfg.EEGain, dconf['net']['EEMWghtNM']*cfg.EEGain]):
-    # if synmech=='NMDA': continue
-    wscale = 10.0
+  for strty,synmech,weight in zip(['','n'],['AMPA', 'NMDA'],[dconf['net']['EEVisWghtAM']*cfg.EEGain, dconf['net']['EEVisWghtNM']*cfg.EEGain]):
     k = strty+prety+'->'+strty+poty
     netParams.connParams[k] = {
             'preConds': {'pop': prety},
             'postConds': {'pop': poty},
-            'weight': weight * wscale,
+            'weight': weight ,
             'delay': 2,
             'synMech': synmech,'sec':EExcitSec, 'loc':0.5}
-    if VTopoI: 
+    if VTopoI: # topological connections
       netParams.connParams[k]['connList'] = blist
       sim.topologicalConns[prety+'->'+poty] = {}
       sim.topologicalConns[prety+'->'+poty]['blist'] = blist
       sim.topologicalConns[prety+'->'+poty]['coords'] = connCoords
-    else: 
+    else: # random connectivity
       netParams.connParams[k]['convergence'] = prob2conv(prob,dnumc[prety])
     if dconf['net']['RLconns']['Visual'] and dSTDPparamsRL[synmech]['RLon']: # only turn on plasticity when specified to do so
-      netParams.connParams[k]['weight'] = getInitWeight(weight * wscale) # make sure non-uniform weights
+      netParams.connParams[k]['weight'] = getInitWeight(weight) # make sure non-uniform weights
       netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL[synmech]}
-      netParams.connParams[k]['plast']['params']['RLhebbwt'] *= wscale
-      netParams.connParams[k]['plast']['params']['RLantiwt'] *= wscale
     elif dconf['net']['STDPconns']['Visual'] and dSTDPparams[synmech]['STDPon']:
-      netParams.connParams[k]['weight'] = getInitWeight(weight * wscale) # make sure non-uniform weights
+      netParams.connParams[k]['weight'] = getInitWeight(weight) # make sure non-uniform weights
       netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparams[synmech]}
-      netParams.connParams[k]['plast']['params']['hebbwt'] *= wscale
-      netParams.connParams[k]['plast']['params']['antiwt'] *= wscale      
-
     
 """
 # these all have 0 weight, dont set them up - though no harm in setting them up

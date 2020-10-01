@@ -154,6 +154,8 @@
         "stimModInputW": 0.01,
         "EEMWghtAM": 2e-05,
         "EEMWghtNM": 3e-06,
+        "EEVisWghtAM": 2e-05,
+        "EEVisWghtNM": 3e-06,		
         "EEPreMWghtAM": 0.25e-05,
         "EEPreMWghtNM": 3e-06,
         "EEMWghtThreshMin": 6.25e-06,
@@ -167,7 +169,10 @@
         "EEMFeedbackWghtAM": 0.25e-05,
         "EEMFeedbackWghtNM": 3e-06,
         "VisualFeedback": 0,
-        "weightVar": 0.5
+        "weightVar": 0.5,
+	"EREV1Prob": 0.1,
+	"EV1EV4Prob": 0.3,
+	"EV4EMTProb": 0.45
     },
     "STDP": {
         "AMPA": {
