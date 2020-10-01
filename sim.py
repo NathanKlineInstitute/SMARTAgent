@@ -582,6 +582,7 @@ lprety.append('EV4'); lpoty.append('EMT'); lblist.append(blistEV4toEMT); lprob.a
 for prety,poty,blist,prob,connCoords in zip(lprety,lpoty,lblist,lprob,lconnsCoords):  
   for strty,synmech,weight in zip(['','n'],['AMPA', 'NMDA'],[dconf['net']['EEVisWghtAM']*cfg.EEGain, dconf['net']['EEVisWghtNM']*cfg.EEGain]):
     k = strty+prety+'->'+strty+poty
+    if poty == 'EMT': weight *= 3
     netParams.connParams[k] = {
             'preConds': {'pop': prety},
             'postConds': {'pop': poty},
@@ -960,7 +961,7 @@ def normalizeAdjustableWeights (sim, t, lpop):
   try:
     dfctr = {}
     # normalize weights across populations to avoid bias
-    initw = dconf['net']['EEMWghtAM'] # initial average weight
+    initw = dconf['net']['EEMWghtAM'] # initial average weight <<-- THAT ASSUMES ONLY USING NORM ON EM POPULATIONS!
     if dconf['net']['EEMPopNorm']:
       curravgw = np.mean([davg[k] for k in lpop]) # current average weight
       if curravgw <= 0.0: curravgw = initw
