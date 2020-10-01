@@ -17436,13 +17436,21 @@ or do both together to test ...
 python -i simdat.py backupcfg/20sep30_A0_cycle_sim.json
 
 ax=plotPerf(actreward,yl=(0,1))
-savefig(gifpath()+'perf.png') 
+savefig(gifpath()+'perf.png') # [[./gif/20sep30_20sep30_A0_cycle_perf.png]]
 
 clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((390e3,400e3))
-savefig(gifpath()+'rast.png') 
+savefig(gifpath()+'rast.png') # [./gif/20sep30_20sep30_A0_cycle_rast.png]] 
+
+rates went down too much, due to LTD
 
 clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP','EV4','EMT'],lclr=['r','b','g','c'],plotindiv=True)
 xlabel('Time (ms)',fontsize=30); ylabel('Average weight',fontsize=30); tl(); 
-savefig(gifpath()+'all_avg_weight.png') 
+savefig(gifpath()+'all_avg_weight.png') # ./gif/20sep30_20sep30_A0_cycle_all_avg_weight.png]]
+[[./gif/20sep30_20sep30_A0_cycle_all_avg_weightB.png]]
 
+EMT, EV4 weights went down, EMUP, EMDOWN weights went up ... 
+
+direction selective neuron weights must have decreased too?
+
+so as setup here, STDP not helpful ... 
 
