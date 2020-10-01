@@ -17454,3 +17454,44 @@ direction selective neuron weights must have decreased too?
 
 so as setup here, STDP not helpful ... 
 
+* 20oct1
+** check output from prev sim (20sep30_B0_cycle_)
+
+adjusted some of the weights to get more activity ... 
+
+python -i simdat.py backupcfg/20sep30_B0_cycle_sim.json
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/20oct1_20sep30_B0_cycle_perf.png]]
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((390e3,400e3))
+savefig(gifpath()+'rast.png') # [[./gif/20oct1_20sep30_B0_cycle_rast.png]]
+but EMT,IMT still not active
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP','EV4','EMT','EV1DN'],lclr=['r','b','g','c','m'],plotindiv=True)
+xlabel('Time (ms)',fontsize=30); ylabel('Average weight',fontsize=30); tl(); 
+savefig(gifpath()+'all_avg_weight.png') # [[./gif/20oct1_20sep30_B0_cycle_all_avg_weight.png]]
+savefig(gifpath()+'all_avg_weightB.png') # [[./gif/20oct1_20sep30_B0_cycle_all_avg_weightB.png]]
+
+main problem is not getting much firing from EMT
+
+** next sim (20oct1_A0_cycle_)
+
+python -i simdat.py backupcfg/20oct1_A0_cycle_sim.json
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/20oct1_20oct1_A0_cycle_perf.png]]
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((90e3,100e3))
+savefig(gifpath()+'rast.png') # [[./gif/20oct1_20oct1_A0_cycle_rast.png]]
+firing rates are too sparse ... so the weight scaling rule should help
+
+#clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP','EV4','EMT','EV1DN'],lclr=['r','b','g','c','m'],plotindiv=True)
+#xlabel('Time (ms)',fontsize=30); ylabel('Average weight',fontsize=30); tl(); 
+#savefig(gifpath()+'all_avg_weight.png') 
+#savefig(gifpath()+'all_avg_weightB.png') 
+
+** weight norm in sim.py only works for EM populations
+
+was not setup for other populations so even to use that with plast in other pathways requires adjustment
+
