@@ -44,7 +44,7 @@
         "ResumeSimFromFile": "data/20aug11_B3_cycle_synWeights_final.pkl"
     },
     "sim": {
-        "duration": 1000000,
+        "duration": 10000,
         "dt": 0.2,
         "verbose": 0,
         "recordStep": 0.6,
@@ -54,7 +54,7 @@
         "RLFakeUpRule": 0,
         "RLFakeDownRule": 0,
         "RLFakeStayRule": 0,
-        "name": "20sept29_A0_simulated_cycle_",
+        "name": "20oct02_A0_simulated_local_",
         "doquit": 0,
         "doplot": 1,
         "saveCellSecs": 0,
@@ -123,9 +123,21 @@
             "IV4":{"IMT":5},
             "EMT":{"IMT":3}
         },
+        "STDPconns":{
+            "EIPlast":0,
+            "Visual":1,
+            "RecurrentDirNeurons":0,
+            "RecurrentLocNeurons":0,
+            "FeedForwardDirNtoM":0,
+            "FeedForwardLocNtoM":0,
+            "FeedbackLocNeurons":0,
+            "RecurrentMNeurons":0,
+            "FeedbackMtoDirN":0,
+            "FeedbackMtoLocN":0
+        },		
         "RLconns":{
             "EIPlast":0,
-            "VisualRL":1,
+            "Visual":1,
             "RecurrentDirNeurons":1,
             "RecurrentLocNeurons":1,
             "FeedForwardDirNtoM":1,
@@ -153,6 +165,8 @@
         "stimModInputW": 0.02,
         "EEMWghtAM": 5e-04,
         "EEMWghtNM": 5e-06,
+        "EEVisWghtAM": 20e-05,
+        "EEVisWghtNM": 30e-06,
         "EEPreMWghtAM": 8e-06,
         "EEPreMWghtNM": 2.5e-06,
         "EEMWghtThreshMin": 6.25e-06,
@@ -161,12 +175,55 @@
         "EEMRecProb": 0.3,
         "EEPreMProb": 0.0,
         "EEMPopNorm": 1,
+        "CellWNorm": 1,
+        "homPlast": {"On":1, "dshift":0.00001,"targetFR":5,"hsIntervalSteps":100,"updateIntervalSteps":20},
         "EEMRecProbCross": 1,
         "EEMFeedbackProb": 0.0,
         "EEMFeedbackWghtAM": 1.25e-05,
         "EEMFeedbackWghtNM": 1.25e-06,
         "VisualFeedback": 0,
-        "weightVar": 0.5
+        "weightVar": 0.5,
+        "EREV1Prob": 0.1,
+        "EV1EV4Prob": 0.3,
+        "EV4EMTProb": 0.3
+    },
+    "STDP": {
+        "AMPA": {
+            "wbase": 1e-06,
+            "wmax": 0.0004,
+            "RLon": 0,
+	    "STDPon": 0,
+            "RLlenhebb": 500,
+            "RLlenanti": 500,
+            "useRLexp": 1,
+            "RLhebbwt": 0.0,
+            "RLantiwt": 0.0,
+            "hebbwt": 1e-06,
+            "antiwt": -1e-06,
+            "tauhebb": 25,
+	    "tauanti": 25,
+            "RLwindhebb": 50,
+            "softthresh": 0,
+            "verbose": 0
+        },
+        "NMDA": {
+            "wbase": 1e-06,
+            "wmax": 7.5e-05,
+            "RLon": 0,
+	    "STDPon": 0,
+            "RLlenhebb": 800,
+            "RLlenanti": 100,
+            "useRLexp": 1,
+            "RLhebbwt": 0.0,
+            "RLantiwt": -0.0,
+            "hebbwt": 0,
+            "antiwt": 0,
+            "tauhebb": 25,
+	    "tauanti": 25,	    
+            "RLwindhebb": 50,
+            "softthresh": 0,
+            "verbose": 0
+        }
     },
     "RL": {
         "AMPA": {

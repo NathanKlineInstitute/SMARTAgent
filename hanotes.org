@@ -8078,3 +8078,145 @@ backupcfg/20sept28_A0_cycle_sim.json
 
 -- previous updates got lost somehow.....
 -- debugging those lost changes....
+
+
+-- Cortical pattern generation during dextrous movement in input-driven (Nature 577, 386-391 (2020) Adam Hantman group @ Janelia) 
+... How do local dynamics and unputs interact to produce the cortical output pattern? 
+... In the extreme case of an autonomous system, the entire pattern can be produced without input.
+... while at the other extreme, the pattern may be inherited almst entirely from the inputs.
+... This paper shows something intermediate happens i.e.
+... When inputs are removed, the motor cortex does not merely produce a corrupted or scaled-down version of the normal pattern
+... but instead moves to a new fixed point.
+... Most likely, the local dynamics and inputs interact to produce this pattern.
+... Upstream brain regions have the information about the current and target state of the arm, then route this information through motor cortex to compensate for the perturbation.
+... Direct propioceptive information could be relayed through thalamus
+... OR May be maintained through persistent activity in another area, such as the frontal cortex. 
+
+
+-- For fixed weights, when presynaptic neurons fire at higher firing rate, the postsynaptic firing rate can increase.
+... for this case, the weights of all connections onto the postsynaptic neuron should be scaled.
+
+-- Homeostatic synaptic plasticity:
+
+check firing rates of all neurons.
+2 options: check every timestep or after 1000 timesteps.
+if firing rate of a postsynaptic neuron go above the threshold, decrease the weights of all synaptic connections associated with that postsynaptic neuron.
+Wij = Wij*(1-Dtar)
+Dtar = 0.0001
+
+If a postsynaptic neuron J fires > target rate, Sum of Wij (connection weights between the postsynaptic neuron J and all presynaptic neurons conneting with the J neuron) should be decreased as:
+Wj(n+1) = Wj(n)*(1-Dtar)
+
+If a postsynaptic neuron J fires < target rate, Sum of Wij should be increased as:
+Wj(n+1) = Wj(n)*(1+Dtar)
+
+1. Initialize the sumW for the neurons in each pop. 
+2. get firing rates of neurons in each pop at time between t and t+tlarge.
+3. If firing rate of a neuron is higher than the target rate, decrease sumW (sumW = sumW-dfctr). If firing rate of a neuron is lower than the target rate, increase sumW (sumW = sumW+dfctr).
+4. at each time step, look at the weights of all connections onto a neuron. This W1+W2+....+WN should be equal to sumW.
+... S = sumW/(W1+W2+....+WN)
+... W1new = S*W1
+... W2new = S*W2 and so on.
+
+*****
+
+1. Initialize the sumW for the neurons in each pop and setup dict for TargetFR.
+
+def initTargetFR(sim,allpops,initTargetFR=5):
+  sim.dTargetFR_AllNeurons = {}
+  for pop in allpops:
+    sim.dTargetFR_AllNeurons[pop]=[]
+    lcell = [c for c in sim.net.cells if c.gid in sim.net.pops[pop].cellGids] # this is the set of cells in a pop
+    for cell in lcell:
+      sim.dTargetFR_AllNeurons[pop].append([cell.gid,initTargetFR])
+
+def initTargetW(sim,allpops):
+  sim.dTargetW_AllNeurons = {}
+  for pop in allpops:
+    sim.dTargetW_AllNeurons[pop]=[]
+    lcell = [c for c in sim.net.cells if c.gid in sim.net.pops[pop].cellGids] # this is the set of cells in a pop
+    for cell in lcell:
+      cCellW = 0
+      for conn in cell.conns:    
+        cCellW+=conn['hObj'].weight[0]
+      sim.dTargetW_AllNeurons[pop].append([cell.gid,cCellW])
+
+
+initTargetFR(sim,allpops,initTargetFR=dconf['net']['homPlast']['targetFR']) # call this once before the simulation
+initTargetW(sim,allpops) # call this once before running the simulation.
+
+*****
+
+2. get firing rates of neurons in each pop at time between t and t+tlarge.
+
+def getFiringRateWithIntervalAllNeurons(sim, trange, allpops):
+  sim.dFR_AllNeurons = {}
+  for pop in allpops:
+    sim.dFR_AllNeurons[pop] = getFiringRateWithInterval (trange = trange, neuronal_pop = sim.net.pops[pop].cellGids)
+  
+
+def getFiringRateWithInterval (trange = None, neuronal_pop = None):
+  if len(neuronal_pop) < 1: return 0.0
+  spkts = sim.simData['spkt']
+  spkids = sim.simData['spkid']
+  ctspkids = spkids[np.where(spkts>=trange[0]&spkts <= trange[1])]
+  pop_firingrates = []
+  if len(spkts)>0:
+    for cellid in neuronal_pop:
+      pop_firingrates.append([cellid,1000*len(np.where(ctspkids==cellid)/(trange[1]-trange[0]))])
+  return pop_firingrates
+
+*****
+
+3. If firing rate of a neuron is higher than the target rate, decrease sumW (sumW = sumW-dfctr). If firing rate of a neuron is lower than the target rate, increase sumW (sumW = sumW+dfctr).
+def adjustTargetW
+
+getFiringRateWithIntervalAllNeurons(sim, [t,t-dconf['net']['homPlast']['hInterval']], allpops) # call this function at hsInterval
+
+def adjustTargetWBasedOnFiringRates (sim):
+  dshift = dconf['sim']['homPlast']['dshift']
+  for pop in sim.dTargetW_AllNeurons.keys():
+    for idx in range(len(sim.dTargetW_AllNeurons[pop])):
+      cid = sim.dTargetW_AllNeurons[pop][idx][0]
+      cTargetW = sim.dTargetW_AllNeurons[pop][idx][1]
+      if sim.dTargetFR_AllNeurons[pop][idx][0]==cid:
+        cTargetFR = sim.dTargetFR_AllNeurons[pop][idx][1]
+      if sim.dFR_AllNeurons[pop][idx][0]==cid:
+        cFR = sim.dFR_AllNeurons[pop][idx][1]
+      if cFR>cTargetFR:
+        sim.dTargetW_AllNeurons[pop][idx][1]-=dshift
+      elif cFR<cTargetFR:
+        sim.dTargetW_AllNeurons[pop][idx][1]+=dshift
+  return sim.dTargetW_AllNeurons
+
+adjustTargetWBasedOnFiringRates(sim) # call this function at hsInterval
+
+*****
+
+4. at each time step, look at the weights of all connections onto a neuron. This W1+W2+....+WN should be equal to sumW.
+... S = sumW/(W1+W2+....+WN)
+... W1new = S*W1
+... W2new = S*W2 and so on.
+
+
+def adjustWeightsBasedOnFiringRates (sim,lpop):
+  # normalize the STDP/RL weights during the simulation - called in trainAgent
+  for pop in lpop:
+    lcell = [c for c in sim.net.cells if c.gid in sim.net.pops[pop].cellGids] # this is the set of cells in a pop
+    lTargetW = sim.dTargetW_AllNeurons{pop}
+    for cell,targetW in zip(lcell,lTargetW):
+      cCellW = 0
+      for conn in cell.conns:    
+        cCellW+=conn['hObj'].weight[0]
+      sfctr = targetW[1]/cCellW
+      for conn in cell.conns:    
+        conn['hObj'].weight[0]=sfctr*conn['hObj'].weight[0]
+
+adjustWeightsBasedOnFiringRates (sim,allpops) # call this function every game timestep i.e 20ms/50ms/100ms.
+
+-- Integrated these functions into sim.py.
+-- add in sim.json
+"homPlast": {"On":1, "dshift":0.00001,"targetFR":5,"hsIntervalSteps":100,"updateIntervalSteps":20}
+
+-- seems to be working. Not sure if and how this will be helpful.
+-- right now targertFR is 5Hz for all neurons. Could be seperated for different pops. 
