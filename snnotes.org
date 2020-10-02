@@ -17523,3 +17523,9 @@ also note that had low weightVar here (only 0.1) . . .
 * 20oct2
 ** longer sim with CellWNorm==1; 20oct2_A0_cycle_
 
+put weightVar back to 0.5
+
+and with new cell-based weight norm every 1 s ... 
+
+./myrun 32 sn.json
+

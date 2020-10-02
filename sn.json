@@ -37,11 +37,11 @@
         "ResumeSimFromFile": "data/20sep25_A0_cycle_synWeights_final.pkl"
     },
     "sim": {
-        "duration": 100000,
+        "duration": 1000000,
         "dt": 0.2,
         "verbose": 0,
         "recordStep": 1.0,
-        "recordWeightStepSize": 50,
+        "recordWeightStepSize": 500,
         "normalizeWeightStepSize": 50,
 	"normalizeWeightsAtStart": 0,
         "RLFakeUpRule": 0,
@@ -170,7 +170,7 @@
         "EEMFeedbackWghtAM": 2e-05,
         "EEMFeedbackWghtNM": 3e-06,
         "VisualFeedback": 0,
-        "weightVar": 0.1,
+        "weightVar": 0.5,
 	"EREV1Prob": 0.1,
 	"EV1EV4Prob": 0.3,
 	"EV4EMTProb": 0.3
