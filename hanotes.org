@@ -8220,3 +8220,7 @@ adjustWeightsBasedOnFiringRates (sim,allpops) # call this function every game ti
 
 -- seems to be working. Not sure if and how this will be helpful.
 -- right now targertFR is 5Hz for all neurons. Could be seperated for different pops. 
+
+-- use targetFR of 2Hz.
+
+-- Change the homeostatic synaptic plasticity to take into account individual types of synapses.

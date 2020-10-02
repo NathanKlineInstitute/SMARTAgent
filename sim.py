@@ -1100,15 +1100,16 @@ def initTargetFR(sim,allpops,initTargetFR=5):
     for cell in lcell:
       sim.dTargetFR_AllNeurons[pop].append([cell.gid,initTargetFR])
 
-def initTargetW(sim,allpops):
+def initTargetW(sim,allpops,synType='AMPA'):
   sim.dTargetW_AllNeurons = {}
   for pop in allpops:
     sim.dTargetW_AllNeurons[pop]=[]
     lcell = [c for c in sim.net.cells if c.gid in sim.net.pops[pop].cellGids] # this is the set of cells in a pop
     for cell in lcell:
       cCellW = 0
-      for conn in cell.conns:    
-        cCellW+=conn['hObj'].weight[0]
+      for conn in cell.conns:
+        if conn.synMech==synType:
+          cCellW+=conn['hObj'].weight[0]
       sim.dTargetW_AllNeurons[pop].append([cell.gid,cCellW])
 
 def getFiringRateWithInterval (trange = None, neuronal_pop = None):
@@ -1143,7 +1144,7 @@ def adjustTargetWBasedOnFiringRates (sim):
         sim.dTargetW_AllNeurons[pop][idx][1]+=dshift
   return sim.dTargetW_AllNeurons
 
-def adjustWeightsBasedOnFiringRates (sim,lpop):
+def adjustWeightsBasedOnFiringRates (sim,lpop,synType='AMPA'):
   # normalize the STDP/RL weights during the simulation - called in trainAgent
   countScaleUps = 0
   countScaleDowns = 0
@@ -1152,15 +1153,18 @@ def adjustWeightsBasedOnFiringRates (sim,lpop):
     lTargetW = sim.dTargetW_AllNeurons[pop]
     for cell,targetW in zip(lcell,lTargetW):
       cCellW = 0
-      for conn in cell.conns:    
-        cCellW+=conn['hObj'].weight[0]
-      sfctr = targetW[1]/cCellW
-      if sfctr>1:
-        countScaleUps+=1
-      elif sfctr<1:
-        countScaleDowns+=1
-      for conn in cell.conns:    
-        conn['hObj'].weight[0]=sfctr*conn['hObj'].weight[0]
+      for conn in cell.conns:
+        if conn.synMech==synType:    # to make sure that only specific type of synapses are counted towars the sum.
+          cCellW+=conn['hObj'].weight[0]
+      if cCellW>0: # if no weight associated with the specific type of synapses, no need to asdjust weights.
+        sfctr = targetW[1]/cCellW
+        if sfctr>1:
+          countScaleUps+=1
+        elif sfctr<1:
+          countScaleDowns+=1
+        for conn in cell.conns:
+          if conn.synMech==synType:    
+            conn['hObj'].weight[0]=sfctr*conn['hObj'].weight[0]
   print('CountScaleUps, CountScaleDowns: ', countScaleUps, countScaleDowns)
 
 def trainAgent (t):
@@ -1392,7 +1396,7 @@ def trainAgent (t):
       getFiringRateWithIntervalAllNeurons(sim, [t,t-hsInterval], allpops) # call this function at hsInterval
       adjustTargetWBasedOnFiringRates(sim) # call this function at hsInterval
     if NBsteps % dconf['net']['homPlast']['updateIntervalSteps'] == 0:
-      adjustWeightsBasedOnFiringRates (sim,allpops)
+      adjustWeightsBasedOnFiringRates (sim,allpops,synType=dconf['net']['homPlast']['synType'])
 
 def getAllSTDPObjects (sim):
   # get all the STDP objects from the simulation's cells
@@ -1434,7 +1438,7 @@ dSTDPmech = getAllSTDPObjects(sim) # get all the STDP objects up-front
 
 if dconf['net']['homPlast']['On']:
   initTargetFR(sim,allpops,initTargetFR=dconf['net']['homPlast']['targetFR']) # call this once before the simulation
-  initTargetW(sim,allpops) # call this once before running the simulation.
+  initTargetW(sim,allpops,synType=dconf['net']['homPlast']['synType']) # call this once before running the simulation.
 
 def updateSTDPWeights (sim, W):
   #this function assign weights stored in 'ResumeSimFromFile' to all connections by matching pre and post neuron ids  
