@@ -17521,11 +17521,44 @@ but question is whether this will help ...
 also note that had low weightVar here (only 0.1) . . .
 
 * 20oct2
-** longer sim with CellWNorm==1; 20oct2_A0_cycle_
+** longer sim with CellWNorm==1; 20oct1_B0_cycle_
 
 put weightVar back to 0.5
 
 and with new cell-based weight norm every 1 s ... 
 
 ./myrun 32 sn.json
+
+python -i simdat.py backupcfg/20oct1_B0_cycle_sim.json
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/20oct2_20oct1_B0_cycle_perf.png]]
+similar to some of the older sims ... 
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((990e3,1000e3))
+savefig(gifpath()+'rast.png') # [[./gif/20oct2_20oct1_B0_cycle_rast.png]]
+decent rates at the end, but note that they vary by population - so using HA's new rule may
+require adjustment to target diff rates to each pop
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EV4','EMT'],lclr=['r','b','g','c','m'],plotindiv=True)
+xlabel('Time (ms)',fontsize=30); ylabel('Average weight',fontsize=30); tl(); 
+savefig(gifpath()+'all_avg_weight.png') # [[./gif/20oct2_20oct1_B0_cycle_all_avg_weight.png]]
+so that seems to work ... 
+
+ok, so weigths staying ~flat ... 
+
+tt = np.unique(pdf.time)
+
+dout = getpopinputmap(pdf, tt[0], dnumc, dstartidx, dendidx, 'EMDOWN')
+clf(); plotallinputmaps(pdf,tt[0],dstartidx['EMDOWN'],'EMDOWN',dnumc,dstartidx,dendidx,asweight=True,dmap=dout)
+savefig(gifpath()+'EMDOWN_inputmap_first.png') # [[./gif/20oct2_20oct1_B0_cycle_EMDOWN_inputmap_first.png]]
+
+dout = getpopinputmap(pdf, tt[-1], dnumc, dstartidx, dendidx, 'EMDOWN')
+clf(); plotallinputmaps(pdf,tt[-1],dstartidx['EMDOWN'],'EMDOWN',dnumc,dstartidx,dendidx,asweight=True,dmap=dout)
+savefig(gifpath()+'EMDOWN_inputmap_last.png') # [[./gif/20oct2_20oct1_B0_cycle_EMDOWN_inputmap_last.png]]
+
+not as much difference in input maps from start to end ... probably because the constraint on weights is too tight ... ? 
+and that prevents some learning ... ? 
+
+fig=animInput(InputImages,gifpath()+'_input.mp4') # [[./gif/20oct2_20oct1_B0_cycle__input.mp4]]
 
