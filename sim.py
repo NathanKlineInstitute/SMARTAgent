@@ -95,6 +95,7 @@ if dconf['net']['useNeuronPad']: # PADDING NEEDS TO BE FIXED..... DONT USE IT UN
   if dnumc['EMSTAY']>0: dnumc_padx['EMSTAY'] = 2
   dnumc['EMUP'] = int((np.sqrt(dnumc['EMUP'])+dnumc_padx['EMUP'])**2)
   dnumc['EMDOWN'] = int((np.sqrt(dnumc['EMDOWN'])+dnumc_padx['EMDOWN'])**2)
+  
 if dnumc['EMSTAY']>0:
   lrecpop = ['EMUP', 'EMDOWN','EMSTAY'] # which populations to record from
 else:
@@ -582,6 +583,7 @@ lprety.append('EV4'); lpoty.append('EMT'); lblist.append(blistEV4toEMT); lprob.a
 for prety,poty,blist,prob,connCoords in zip(lprety,lpoty,lblist,lprob,lconnsCoords):  
   for strty,synmech,weight in zip(['','n'],['AMPA', 'NMDA'],[dconf['net']['EEVisWghtAM']*cfg.EEGain, dconf['net']['EEVisWghtNM']*cfg.EEGain]):
     k = strty+prety+'->'+strty+poty
+    if poty == 'EMT': weight *= 3
     netParams.connParams[k] = {
             'preConds': {'pop': prety},
             'postConds': {'pop': poty},
@@ -843,6 +845,21 @@ sim.AIGame = None # placeholder
 
 lsynweights = [] # list of syn weights, per node
 
+dsumWInit = {}
+
+def getSumAdjustableWeights (sim):
+  dout = {}
+  for cell in sim.net.cells:
+    W = N = 0.0
+    for conn in cell.conns:
+      if 'hSTDP' in conn:
+        W += float(conn['hObj'].weight[0])
+        N += 1
+    if N > 0:
+      dout[cell.gid] = W / N
+  # print('getSumAdjustableWeights len=',len(dout))
+  return dout
+
 def sumAdjustableWeightsPop (sim, popname):
   # record the plastic weights for specified popname
   lcell = [c for c in sim.net.cells if c.gid in sim.net.pops[popname].cellGids] # this is the set of MR cells
@@ -956,27 +973,42 @@ def mulAdjustableWeights (sim, dfctr):
 
 def normalizeAdjustableWeights (sim, t, lpop):
   # normalize the STDP/RL weights during the simulation - called in trainAgent
-  davg = getAverageAdjustableWeights(sim, lpop)
-  try:
-    dfctr = {}
-    # normalize weights across populations to avoid bias
-    initw = dconf['net']['EEMWghtAM'] # initial average weight
-    if dconf['net']['EEMPopNorm']:
-      curravgw = np.mean([davg[k] for k in lpop]) # current average weight
-      if curravgw <= 0.0: curravgw = initw
-      for k in lpop: dfctr[k] = initw / curravgw
-    else:
-      for k in lpop:
-        if davg[k] < dconf['net']['EEMWghtThreshMin']:
-          dfctr[k] = dconf['net']['EEMWghtThreshMin'] / davg[k]
-        elif davg[k] > dconf['net']['EEMWghtThreshMax']:
-          dfctr[k] = dconf['net']['EEMWghtThreshMax'] / davg[k]
-        else:
-          dfctr[k] = 1.0
-    if sim.rank==0: print('sim.rank=',sim.rank,'davg:',davg,'dfctr:',dfctr)
-    mulAdjustableWeights(sim,dfctr)
-  except:
-    print('Exception; davg:',davg)
+  if dconf['net']['CellWNorm']:
+    # print('normalizing CellWNorm at t=',t)
+    global dsumWInit
+    dsumWCurr = getSumAdjustableWeights(sim) # get current sum of adjustable weight values
+    for cell in sim.net.cells:
+      if cell.gid in dsumWInit:
+        currW = dsumWCurr[cell.gid]
+        initW = dsumWInit[cell.gid]
+        if currW > 0 and currW != initW:
+          fctr = initW / currW
+          # print('initW:',initW,'currW:',currW,'fctr:',fctr)
+          for conn in cell.conns:
+            if 'hSTDP' in conn:
+              conn['hObj'].weight[0] *= fctr  
+  else:
+    davg = getAverageAdjustableWeights(sim, lpop)
+    try:
+      dfctr = {}
+      # normalize weights across populations to avoid bias    
+      initw = dconf['net']['EEMWghtAM'] # initial average weight <<-- THAT ASSUMES ONLY USING NORM ON EM POPULATIONS!
+      if dconf['net']['EEMPopNorm']:
+        curravgw = np.mean([davg[k] for k in lpop]) # current average weight
+        if curravgw <= 0.0: curravgw = initw
+        for k in lpop: dfctr[k] = initw / curravgw
+      else:
+        for k in lpop:
+          if davg[k] < dconf['net']['EEMWghtThreshMin']:
+            dfctr[k] = dconf['net']['EEMWghtThreshMin'] / davg[k]
+          elif davg[k] > dconf['net']['EEMWghtThreshMax']:
+            dfctr[k] = dconf['net']['EEMWghtThreshMax'] / davg[k]
+          else:
+            dfctr[k] = 1.0
+      if sim.rank==0: print('sim.rank=',sim.rank,'davg:',davg,'dfctr:',dfctr)
+      mulAdjustableWeights(sim,dfctr)
+    except:
+      print('Exception; davg:',davg)
 
 def saveGameBehavior(sim):
   with open(sim.ActionsRewardsfilename,'w') as fid3:
@@ -1365,6 +1397,7 @@ else:
   setdminID(sim, ['EV1', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW', 'EV1DSW', 'EV1DS', 'EV1DSE'])
 tPerPlay = tstepPerAction*dconf['actionsPerPlay']
 InitializeInputRates()
+dsumWInit = getSumAdjustableWeights(sim) # get sum of adjustable weights at start of sim
 sim.runSimWithIntervalFunc(tPerPlay,trainAgent) # has periodic callback to adjust STDP weights based on RL signal
 if sim.rank==0 and fid4 is not None: fid4.close()
 sim.gatherData() # gather data from different nodes
