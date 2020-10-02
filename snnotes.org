@@ -17495,3 +17495,31 @@ firing rates are too sparse ... so the weight scaling rule should help
 
 was not setup for other populations so even to use that with plast in other pathways requires adjustment
 
+** add simple cell based weight norm (20oct1_B0_cycle_) (CellWNorm==1)
+
+python -i simdat.py backupcfg/20oct1_B0_cycle_sim.json
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/20oct1_20oct1_B0_cycle_perf.png]]
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((90e3,100e3))
+savefig(gifpath()+'rast.png') # [[./gif/20oct1_20oct1_B0_cycle_rast.png]] 
+
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP','EV4','EMT','EV1DN'],lclr=['r','b','g','c','m'],plotindiv=True)
+xlabel('Time (ms)',fontsize=30); ylabel('Average weight',fontsize=30); tl(); 
+savefig(gifpath()+'all_avg_weight.png') # [[./gif/20oct1_20oct1_B0_cycle_all_avg_weight.png]]
+
+looks like mostly working - something strange going on with EMT weights in the beginning ... 
+
+note that this operates on individual cell basis; to keep total weight constant ... and had set it to occur every 1000 ms ... 
+
+it uses the initial weights as target ... so some individual weights can go up, others down, but sum remains ~constant 
+
+but question is whether this will help ... 
+
+also note that had low weightVar here (only 0.1) . . .
+
+* 20oct2
+** longer sim with CellWNorm==1; 20oct2_A0_cycle_
+
