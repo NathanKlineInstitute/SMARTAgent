@@ -17562,3 +17562,24 @@ and that prevents some learning ... ?
 
 fig=animInput(InputImages,gifpath()+'_input.mp4') # [[./gif/20oct2_20oct1_B0_cycle__input.mp4]]
 
+** check HA's new homeostasis rule
+
+it uses firing rates to normalize weights
+
+adjusted to allow setting min, max thresholds of firing rate used for weight adjustment
+
+not clear why the 2017 paper uses dshift (fixed increment) instead of scaling by more or less depending
+on how far from target rate
+
+and why smaller interval for adjusting synaptic weights, compared to adjusting the target weights based on firing rates?
+does that promote stability??
+
+try it out ... 
+
+keeping the EV1 and direction neuron min rate ~0.25 and up to 5 Hz
+for EV4,EMT,EMUP,EMDOWN min rate of 1, and max rate of 5,6 Hz
+
+        "name": "20oct2_A0_cycle_",
+
+started ~17:58 ...
+
