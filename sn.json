@@ -173,7 +173,7 @@
           "On":1, 
           "dshift":0.00001,
           "mintargetFR":{"EV1":0.25,"EV4":1,"EMT":1,"EV1DE":0.25,"EV1DW":0.25,"EV1DN":0.25,"EV1DS":0.25,"EV1DSE":0.25,"EV1DNE":0.25,"EV1DSW":0.25,"EV1DNW":1,"EMUP":1,"EMDOWN":1},
-          "maxtargetFR":{"EV1":5,"EV4":5,"EMT":5,"EV1DE":5,"EV1DW":5,"EV1DN":5,"EV1DS":5,"EV1DSE":5,"EV1DNE":5,"EV1DSW":5,"EV1DNW":5,"EMUP":6,"EMDOWN":6},
+          "maxtargetFR":{"EV1":6,"EV4":6,"EMT":6,"EV1DE":6,"EV1DW":6,"EV1DN":6,"EV1DS":6,"EV1DSE":6,"EV1DNE":6,"EV1DSW":6,"EV1DNW":6,"EMUP":6,"EMDOWN":6},
           "hsIntervalSteps":50,
           "updateIntervalSteps":50,
           "synType":"AMPA"
