@@ -166,8 +166,8 @@
         "EEMPopNorm": 0,
 	"CellWNorm": {
 	    "On": 0,
-	    "MinFctr":1
-	    "MaxFctr":3
+	    "MinFctr": 1,
+	    "MaxFctr": 3
 	},
         "homPlast": {
           "On":1, 
