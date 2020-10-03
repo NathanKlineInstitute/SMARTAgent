@@ -17620,11 +17620,23 @@ so now checking for hSTDP in conns ...
 also added rule that if dshift == 0, should scale weights by the factor of desired, current rates 
 rather than default, which is an arbitrary tiny dshift value on the weights ... 
 
+./myrun 32 sn.json
 
+started ~22:55 ... 
+
+hmm, something messed up ... have to fix
 
 ** adjusted the CellWNorm to have min, max factors as well 
 
 normalizes weight to boundaries of 
 minFactor * initialWeight, and maxFactor * initialWeight
 when weight falls below minFactor*initialWeight or above maxFactor*initialWeight
+
+        "name": "20oct2_C0_cycle_",
+
+keeping within range of 1X original weight and 3X original weight (sum)
+
+./myrun 32 sn.json
+
+started ~23:37 ... 
 

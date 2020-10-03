@@ -37,17 +37,17 @@
         "ResumeSimFromFile": "data/20sep25_A0_cycle_synWeights_final.pkl"
     },
     "sim": {
-        "duration": 200000,
+        "duration": 1000000,
         "dt": 0.2,
         "verbose": 0,
         "recordStep": 1.0,
-        "recordWeightStepSize": 50,
-        "normalizeWeightStepSize": 5000000000000000000000000,
+        "recordWeightStepSize": 500,
+        "normalizeWeightStepSize": 100,
 	"normalizeWeightsAtStart": 0,
         "RLFakeUpRule": 0,
         "RLFakeDownRule": 0,
         "RLFakeStayRule": 0,
-        "name": "20oct2_B0_cycle_",
+        "name": "20oct2_C0_cycle_",
         "doquit": 1,
         "doplot": 0,
         "saveCellSecs": 0,
@@ -165,17 +165,17 @@
         "EEPreMProb": 0.1,
         "EEMPopNorm": 0,
 	"CellWNorm": {
-	    "On": 0,
-	    "MinFctr": 1,
-	    "MaxFctr": 3
+	    "On": 1,
+	    "MinFctr": 1.0,
+	    "MaxFctr": 3.0
 	},
         "homPlast": {
-          "On":1, 
-          "dshift":0.00001,
-          "mintargetFR":{"EV1":0.25,"EV4":1,"EMT":1,"EV1DE":0.25,"EV1DW":0.25,"EV1DN":0.25,"EV1DS":0.25,"EV1DSE":0.25,"EV1DNE":0.25,"EV1DSW":0.25,"EV1DNW":1,"EMUP":1,"EMDOWN":1},
-          "maxtargetFR":{"EV1":6,"EV4":6,"EMT":6,"EV1DE":6,"EV1DW":6,"EV1DN":6,"EV1DS":6,"EV1DSE":6,"EV1DNE":6,"EV1DSW":6,"EV1DNW":6,"EMUP":6,"EMDOWN":6},
-          "hsIntervalSteps":50,
-          "updateIntervalSteps":50,
+          "On":0, 
+          "dshift": 0.0,
+          "mintargetFR":{"EV1":0.125,"EV4":0.125,"EMT":0.125,"EV1DE":0.125,"EV1DW":0.125,"EV1DN":0.125,"EV1DS":0.125,"EV1DSE":0.125,"EV1DNE":0.125,"EV1DSW":0.125,"EV1DNW":0.125,"EMUP":0.125,"EMDOWN":0.125},
+          "maxtargetFR":{"EV1":60,"EV4":60,"EMT":60,"EV1DE":60,"EV1DW":60,"EV1DN":60,"EV1DS":60,"EV1DSE":60,"EV1DNE":60,"EV1DSW":60,"EV1DNW":60,"EMUP":60,"EMDOWN":60},
+          "hsIntervalSteps":100,
+          "updateIntervalSteps":100,
           "synType":"AMPA"
         },
         "EEMRecProbCross": 1,

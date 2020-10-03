@@ -984,14 +984,18 @@ def normalizeAdjustableWeights (sim, t, lpop):
         initW = dsumWInit[cell.gid]
         if currW > 0 and currW != initW:
           fctrA = currW / initW
+          dochange = False
           if fctrA < MinFctr:
             fctrB = (MinFctr * initW) / currW # factor to restore weights to boundary
-          elif FctrA > MaxFctr:
+            dochange = True
+          elif fctrA > MaxFctr:
             fctrB = (MaxFctr * initW) / currW # factor to restore weights to boundary
+            dochange = True
           # print('initW:',initW,'currW:',currW,'fctr:',fctr)
-          for conn in cell.conns:
-            if 'hSTDP' in conn:
-              conn['hObj'].weight[0] *= fctrB
+          if dochange:
+            for conn in cell.conns:
+              if 'hSTDP' in conn:
+                conn['hObj'].weight[0] *= fctrB
   else:
     davg = getAverageAdjustableWeights(sim, lpop)
     try:
