@@ -17582,4 +17582,49 @@ for EV4,EMT,EMUP,EMDOWN min rate of 1, and max rate of 5,6 Hz
         "name": "20oct2_A0_cycle_",
 
 started ~17:58 ...
+finished ~20:59 ...
+
+python -i simdat.py backupcfg/20oct2_A0_cycle_sim.json
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/20oct2_20oct2_A0_cycle_perf.png]]
+looks pretty bad . . . 
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((190e3,200e3))
+savefig(gifpath()+'rast.png') # [[./gif/20oct2_20oct2_A0_cycle_rast.png]]
+rates are all reasonably low
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EV4','EMT'],lclr=['r','b','g','c','m'],plotindiv=True)
+xlabel('Time (ms)',fontsize=30); ylabel('Average weight',fontsize=30); tl(); 
+savefig(gifpath()+'all_avg_weight.png') # [[./gif/20oct2_20oct2_A0_cycle_all_avg_weight.png]]
+
+tt = np.unique(pdf.time)
+
+dout = getpopinputmap(pdf, tt[0], dnumc, dstartidx, dendidx, 'EMDOWN')
+clf(); plotallinputmaps(pdf,tt[0],dstartidx['EMDOWN'],'EMDOWN',dnumc,dstartidx,dendidx,asweight=True,dmap=dout)
+savefig(gifpath()+'EMDOWN_inputmap_first.png') # [[./gif/20oct2_20oct2_A0_cycle_EMDOWN_inputmap_first.png]]
+
+dout = getpopinputmap(pdf, tt[-1], dnumc, dstartidx, dendidx, 'EMDOWN')
+clf(); plotallinputmaps(pdf,tt[-1],dstartidx['EMDOWN'],'EMDOWN',dnumc,dstartidx,dendidx,asweight=True,dmap=dout)
+savefig(gifpath()+'EMDOWN_inputmap_last.png') # [[./gif/20oct2_20oct2_A0_cycle_EMDOWN_inputmap_last.png]]
+
+## fig=animInput(InputImages,gifpath()+'_input.mp4') 
+
+** found bug after changes to homPlast code, have to rerun
+
+bug was that did not use the updated datastructures properly ... 
+
+also noticed that if not careful, could have modified the stimMod weights which are also AMPA ...
+so now checking for hSTDP in conns ... 
+
+also added rule that if dshift == 0, should scale weights by the factor of desired, current rates 
+rather than default, which is an arbitrary tiny dshift value on the weights ... 
+
+
+
+** adjusted the CellWNorm to have min, max factors as well 
+
+normalizes weight to boundaries of 
+minFactor * initialWeight, and maxFactor * initialWeight
+when weight falls below minFactor*initialWeight or above maxFactor*initialWeight
 

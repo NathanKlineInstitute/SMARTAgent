@@ -973,20 +973,25 @@ def mulAdjustableWeights (sim, dfctr):
 
 def normalizeAdjustableWeights (sim, t, lpop):
   # normalize the STDP/RL weights during the simulation - called in trainAgent
-  if dconf['net']['CellWNorm']:
+  if dconf['net']['CellWNorm']['On']:
     # print('normalizing CellWNorm at t=',t)
     global dsumWInit
     dsumWCurr = getSumAdjustableWeights(sim) # get current sum of adjustable weight values
+    MinFctr, MaxFctr = dconf['net']['CellWNorm']['MinFctr'], dconf['net']['CellWNorm']['MaxFctr']
     for cell in sim.net.cells:
       if cell.gid in dsumWInit:
         currW = dsumWCurr[cell.gid]
         initW = dsumWInit[cell.gid]
         if currW > 0 and currW != initW:
-          fctr = initW / currW
+          fctrA = currW / initW
+          if fctrA < MinFctr:
+            fctrB = (MinFctr * initW) / currW # factor to restore weights to boundary
+          elif FctrA > MaxFctr:
+            fctrB = (MaxFctr * initW) / currW # factor to restore weights to boundary
           # print('initW:',initW,'currW:',currW,'fctr:',fctr)
           for conn in cell.conns:
             if 'hSTDP' in conn:
-              conn['hObj'].weight[0] *= fctr  
+              conn['hObj'].weight[0] *= fctrB
   else:
     davg = getAverageAdjustableWeights(sim, lpop)
     try:
@@ -1108,7 +1113,7 @@ def initTargetW (sim,lpop,synType='AMPA'):
     for cell in lcell:
       cCellW = 0
       for conn in cell.conns:
-        if conn.synMech==synType:
+        if conn.synMech==synType and 'hSTDP' in conn:
           cCellW+=conn['hObj'].weight[0]
       sim.dTargetW[cell.gid] = cCellW
 
@@ -1124,18 +1129,28 @@ def getFiringRateWithInterval (trange = None, neuronal_pop = None):
   return pop_firingrates
 
 def getFiringRateWithIntervalAllNeurons (sim, trange, allpops):
-  sim.dFR = {pop:getFiringRateWithInterval(trange = trange, neuronal_pop = sim.net.pops[pop].cellGids) for pop in allpops}
+  lgid = []
+  for pop in allpops:
+    for gid in sim.net.pops[pop].cellGids:
+      lgid.append(gid)
+  sim.dFR = getFiringRateWithInterval(trange = trange, neuronal_pop = lgid)
 
 def adjustTargetWBasedOnFiringRates (sim):
   dshift = dconf['net']['homPlast']['dshift'] # shift in weights to push within min,max firing rate bounds
   for gid,cTargetW in sim.dTargetW.items():
     cTargetFRMin, cTargetFRMax = sim.dMINTargetFR[gid], sim.dMAXTargetFR[gid]
     if gid not in sim.dFR: continue
-    cFR = sim.dFR[gid][0] # current cell firing rate
+    cFR = sim.dFR[gid] # current cell firing rate
     if cFR>cTargetFRMax: # above max threshold firing rate
-      sim.dTargetW[gid][0]-= dshift
+      if dshift == 0.0:
+        sim.dTargetW[gid] *= cTargetFRMax / cFR
+      else:
+        sim.dTargetW[gid] -= dshift
     elif cFR<cTargetFRMin: # below min threshold firing rate
-      sim.dTargetW += dshift
+      if dshift == 0:
+        sim.dTargetW[gid] *= cTargetFRMin / cFR 
+      else:
+        sim.dTargetW[gid] += dshift
   return sim.dTargetW
 
 def adjustWeightsBasedOnFiringRates (sim,lpop,synType='AMPA'):
@@ -1148,14 +1163,14 @@ def adjustWeightsBasedOnFiringRates (sim,lpop,synType='AMPA'):
       targetW = sim.dTargetW[cell.gid]
       cCellW = 0
       for conn in cell.conns:
-        if conn.synMech==synType:    # to make sure that only specific type of synapses are counted towards the sum.
+        if conn.synMech==synType and 'hSTDP' in conn: # to make sure that only specific type of synapses are counted towards the sum.
           cCellW+=conn['hObj'].weight[0]
       if cCellW>0: # if no weight associated with the specific type of synapses, no need to asdjust weights.
         sfctr = targetW/cCellW
         if sfctr>1: countScaleUps += 1
         elif sfctr<1: countScaleDowns += 1
         for conn in cell.conns:
-          if conn.synMech==synType:    
+          if conn.synMech==synType and 'hSTDP' in conn:
             conn['hObj'].weight[0] *= sfctr
   print('CountScaleUps, CountScaleDowns: ', countScaleUps, countScaleDowns)
 
