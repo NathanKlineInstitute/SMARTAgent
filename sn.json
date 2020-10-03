@@ -15,11 +15,11 @@
     ],
     "movefctr": 1.0,
     "rewardcodes": {
-        "scorePoint": 0.1,
-        "losePoint": -0.1,
-        "followTarget": 0.01,
-        "avoidTarget": -0.01,
-        "hitBall": 0.05
+        "scorePoint": 1.0,
+        "losePoint": -1.0,
+        "followTarget": 0.1,
+        "avoidTarget": -0.1,
+        "hitBall": 0.5
     },
     "actionsPerPlay": 1,
     "followOnlyTowards": 1,
@@ -47,7 +47,7 @@
         "RLFakeUpRule": 0,
         "RLFakeDownRule": 0,
         "RLFakeStayRule": 0,
-        "name": "20oct2_A0_cycle_",
+        "name": "20oct2_B0_cycle_",
         "doquit": 1,
         "doplot": 0,
         "saveCellSecs": 0,
@@ -164,7 +164,11 @@
         "EEMRecProb": 0.3,
         "EEPreMProb": 0.1,
         "EEMPopNorm": 0,
-	"CellWNorm": 0,
+	"CellWNorm": {
+	    "On": 0,
+	    "MinFctr":1
+	    "MaxFctr":3
+	},
         "homPlast": {
           "On":1, 
           "dshift":0.00001,
