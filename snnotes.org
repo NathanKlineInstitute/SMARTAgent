@@ -17640,3 +17640,89 @@ keeping within range of 1X original weight and 3X original weight (sum)
 
 started ~23:37 ... 
 
+* 20oct3
+** check 20oct2_C0_cycle_ 
+
+finished at 14:15 ... 
+
+python -i simdat.py backupcfg/20oct2_C0_cycle_sim.json
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/20oct3_20oct2_C0_cycle_perf.png]]
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((990e3,1000e3))
+savefig(gifpath()+'rast.png') # [[./gif/20oct3_20oct2_C0_cycle_rast.png]]
+firing rates appear close to original levels ... 
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN'],lclr=['r'],plotindiv=True)
+xlabel('Time (ms)',fontsize=30); ylabel('Average weight',fontsize=30); tl(); 
+savefig(gifpath()+'all_avg_weight.png') # [[./gif/20oct3_20oct2_C0_cycle_all_avg_weight.png]]
+those weights look mostly flat ... not increasing to ~3X initial ... 
+does that mean 2 s intervals for normalizing weights is too small?
+or ... not measuring weights often enough to see increase and reset ... 
+
+pdfs = pdf[(pdf.postid==dstartidx['EMDOWN'])&(pdf.preid==dstartidx['EV1DSW']+1)]
+len(pdfs) # 100
+
+plot(pdfs.time,pdfs.weight)
+savefig(gifpath()+'single_weightA.png') # [[./gif/20oct3_20oct2_C0_cycle_single_weightA.png]]
+so that weight is increasing ... 
+
+pdfs = pdf[(pdf.postid==dstartidx['EMDOWN'])&(pdf.preid>=dstartidx['EV1DSW'])&(pdf.preid<=dendidx['EV1DSW'])]
+len(pdfs) # 12000
+
+plot(pdfs.time,pdfs.weight,'ko')
+savefig(gifpath()+'many_weightA.png') # [[./gif/20oct3_20oct2_C0_cycle_many_weightA.png]]
+
+can look at individual weights and see if there are trends, indicating whether the pathway is 'useful'
+e.g. if weights are going down, that means weights not useful ... 
+prety = 'EMDOWN'; poty = 'EMUP'
+pdfs = pdf[(pdf.postid==dstartidx[poty])&(pdf.preid>=dstartidx[prety])&(pdf.preid<=dendidx[prety])]
+clf(); plot(pdfs.time,pdfs.weight,'ko')
+
+#
+prety = 'EMDOWN'; poty = 'EMUP'
+for pdx,prety in enumerate(['EV1', 'EV4', 'EMT', 'EV1DN', 'EV1DS', 'EV1DNW']):
+  subplot(3,2,pdx+1)
+  title(prety+'->'+poty)  
+  pdfs = pdf[(pdf.postid==dstartidx[poty])&(pdf.preid>=dstartidx[prety])&(pdf.preid<=dendidx[prety])]
+  plot(pdfs.time,pdfs.weight,'ko')
+
+savefig(gifpath()+'many_weightB.png') # [[./gif/20oct3_20oct2_C0_cycle_many_weightB.png]]
+
+EMT weights -> EMUP generally going down, others mixed ... 
+
+EV1 seems more useful, EV4 less (more going down), and EMT even less useful (all seem to decrease)
+and this sim was without topological conn for EV4 and EMT ... 
+
+so may need to keep topology in EV4 and EMT ... 
+
+#
+clf()
+poty = 'EMT'
+for pdx,prety in enumerate(['EV4', 'EMT', 'EMUP','EMDOWN']):
+  subplot(2,2,pdx+1)
+  title(prety+'->'+poty)  
+  pdfs = pdf[(pdf.postid==dstartidx[poty])&(pdf.preid>=dstartidx[prety])&(pdf.preid<=dendidx[prety])]
+  plot(pdfs.time,pdfs.weight,'ko')
+
+savefig(gifpath()+'many_weightC.png') # [[./gif/20oct3_20oct2_C0_cycle_many_weightC.png]]
+
+some going up, some down ... some stuck at ceiling ... 
+
+could raise max weight, max weight factor for norm, and also try longer interval between normalization ... 
+
+ok, run that in 
+        "name": "20oct3_A0_cycle_",
+	"CellWNorm": {
+	    "On": 1,
+	    "MinFctr": 1.0,
+	    "MaxFctr": 10.0
+	},
+            "wmax": 0.0005,
+        "normalizeWeightStepSize": 250,
+
+./myrun 32 sn.json
+
+started ~23:52 ... 
+

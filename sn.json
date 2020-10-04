@@ -42,12 +42,12 @@
         "verbose": 0,
         "recordStep": 1.0,
         "recordWeightStepSize": 500,
-        "normalizeWeightStepSize": 100,
+        "normalizeWeightStepSize": 250,
 	"normalizeWeightsAtStart": 0,
         "RLFakeUpRule": 0,
         "RLFakeDownRule": 0,
         "RLFakeStayRule": 0,
-        "name": "20oct2_C0_cycle_",
+        "name": "20oct3_A0_cycle_",
         "doquit": 1,
         "doplot": 0,
         "saveCellSecs": 0,
@@ -167,7 +167,7 @@
 	"CellWNorm": {
 	    "On": 1,
 	    "MinFctr": 1.0,
-	    "MaxFctr": 3.0
+	    "MaxFctr": 10.0
 	},
         "homPlast": {
           "On":0, 
@@ -229,7 +229,7 @@
     "RL": {
         "AMPA": {
             "wbase": 1e-06,
-            "wmax": 0.0004,
+            "wmax": 0.0005,
             "RLon": 1,
 	    "STDPon": 0,
             "RLlenhebb": 500,
