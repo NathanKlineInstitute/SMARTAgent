@@ -17726,3 +17726,6 @@ ok, run that in
 
 started ~23:52 ... 
 
+if output looks ~same, might indicate these reward weights not driving
+network towards epilepsy, and normalization params not critical yet ... 
+
