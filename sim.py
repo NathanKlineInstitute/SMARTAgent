@@ -133,7 +133,7 @@ simConfig.saveFolder = 'data'
 # simConfig.backupCfg = ['sim.json', 'backupcfg/'+dconf['sim']['name']+'sim.json']
 #simConfig.createNEURONObj = True  # create HOC objects when instantiating network
 #simConfig.createPyStruct = True  # create Python structure (simulator-independent) when instantiating network
-simConfig.analysis['plotTraces'] = {'include': [(pop, 0) for pop in ['ER','IR','EV1','EV1DE','ID','IV1','EV4','IV4','EMT','IMT','EMDOWN','EMUP','IM']]}
+simConfig.analysis['plotTraces'] = {'include': [(pop, 0) for pop in ['ER','IR','EV1','EV1DE','ID','IV1','EV4','IV4','EMT','IMT','EMDOWN','EMUP','IM','IMUP','IMDOWN']]}
 simConfig.analysis['plotRaster'] = {'popRates':'overlay','showFig':dconf['sim']['doplot']}
 #simConfig.analysis['plot2Dnet'] = True 
 #simConfig.analysis['plotConn'] = True           # plot connectivity matrix
@@ -455,6 +455,24 @@ if VTopoI:
 else: 
   netParams.connParams['EMT->IMT']['convergence'] = prob2conv(0.0225, dnumc['EMT'])
 
+"""  
+for prety in EPreMPops:
+  for epoty in EMotorPops:
+    poty = 'IM' + epoty[2:]
+    k = prety+'->'+poty
+    netParams.connParams[k] = {
+      'preConds': {'pop': prety},
+      'postConds': {'pop': poty},
+      'convergence': prob2conv(0.01, dnumc[prety]),
+      'weight': 0.001 * cfg.EIGain,
+      'delay': 2,
+      'synMech': 'AMPA', 'sec':'soma', 'loc':0.5}
+    if dconf['net']['RLconns']['EIPlast'] and dSTDPparamsRL['AMPAI']['RLon']: # only turn on plasticity when specified to do so
+      netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL['AMPAI']}
+    elif dconf['net']['STDPconns']['EIPlast'] and dSTDPparams['AMPAI']['STDPon']:
+      netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparams['AMPAI']}    
+"""
+
 for prety in EMotorPops:
   k = prety+'->IM'
   netParams.connParams[k] = {
@@ -477,8 +495,9 @@ for prety in EMotorPops:
     k = prety + '->' + poty
     netParams.connParams[k] = {
       'preConds': {'pop': prety},
-      'postConds': {'pop': poty,
-      'convergence': prob2conv(0.125/2, dnumc[prety]),
+      'postConds': {'pop': poty},
+      #'convergence': prob2conv(0.125/2, dnumc[prety]),
+      'convergence': prob2conv(0.13, dnumc[prety]),
       'weight': 0.02 * cfg.EIGain,
       'delay': 2,
       'synMech': 'AMPA', 'sec':'soma', 'loc':0.5}

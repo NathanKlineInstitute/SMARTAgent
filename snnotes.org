@@ -17881,3 +17881,18 @@ runaway activity and high variability in output
 
 ** some adjustments - try reciprocal inhibition between EMUP and EMDOWN
 
+also keeping IM population to provide some balance and not to allow EMUP or EMDOWN
+to dominate too much - that's what seems to happen w/o IM (that gets inputs from both
+EMUP and EMDOWN and projects to both - providing feedback inhib); IMUP and IMDOWN, in contrast
+receive inputs from one population and project only to the other ... after an initial run, there
+does seem to be clearer negative correlation between EMUP and EMDOWN firing activity ... to be
+seen if that's helpful; could also put in EIPLAST to regulate ... 
+
+also removed excitatory connections between the two dfferent EM populations ... 
+
+        "name": "20oct5_A0_cycle_",
+
+./myrun 32 sn.json
+
+started 1000 s run ~15:08 ... 
+
