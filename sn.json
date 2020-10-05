@@ -16,9 +16,9 @@
     "movefctr": 1.0,
     "rewardcodes": {
         "scorePoint": 1.0,
-        "losePoint": -1.0,
+        "losePoint": -0.1,
         "followTarget": 0.1,
-        "avoidTarget": -0.1,
+        "avoidTarget": -0.01,
         "hitBall": 0.5
     },
     "actionsPerPlay": 1,
@@ -47,7 +47,7 @@
         "RLFakeUpRule": 0,
         "RLFakeDownRule": 0,
         "RLFakeStayRule": 0,
-        "name": "20oct3_A0_cycle_",
+        "name": "20oct4_A0_cycle_",
         "doquit": 1,
         "doplot": 0,
         "saveCellSecs": 0,

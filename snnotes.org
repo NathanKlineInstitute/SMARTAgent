@@ -17729,3 +17729,83 @@ started ~23:52 ...
 if output looks ~same, might indicate these reward weights not driving
 network towards epilepsy, and normalization params not critical yet ... 
 
+* 20oct4
+** check output from 20oct3_A0_cycle_
+
+finished ~14:11 ... 
+
+python -i simdat.py backupcfg/20oct3_A0_cycle_sim.json
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') #  [[./gif/20oct4_20oct3_A0_cycle_perf.png]]
+perf looks pretty flat ...
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((990e3,1000e3))
+savefig(gifpath()+'rast.png') # [[./gif/20oct4_20oct3_A0_cycle_rast.png]]
+and the rates are similar to last run ... 
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN'],lclr=['r'],plotindiv=True)
+xlabel('Time (ms)',fontsize=30); ylabel('Average weight',fontsize=30); tl(); 
+savefig(gifpath()+'all_avg_weight.png') # [[./gif/20oct4_20oct3_A0_cycle_all_avg_weight.png]]
+also looks similar to last run ...
+
+pdfs = pdf[(pdf.postid==dstartidx['EMDOWN'])&(pdf.preid==dstartidx['EV1DSW']+1)]
+len(pdfs) # 100
+
+plot(pdfs.time,pdfs.weight)
+savefig(gifpath()+'single_weightA.png') # [[./gif/20oct4_20oct3_A0_cycle_single_weightA.png]]
+
+pdfs = pdf[(pdf.postid==dstartidx['EMDOWN'])&(pdf.preid>=dstartidx['EV1DSW'])&(pdf.preid<=dendidx['EV1DSW'])]
+len(pdfs) # 12000
+
+plot(pdfs.time,pdfs.weight,'ko')
+savefig(gifpath()+'many_weightA.png') # [[./gif/20oct4_20oct3_A0_cycle_many_weightA.png]]
+
+prety = 'EMDOWN'; poty = 'EMUP'
+pdfs = pdf[(pdf.postid==dstartidx[poty])&(pdf.preid>=dstartidx[prety])&(pdf.preid<=dendidx[prety])]
+clf(); plot(pdfs.time,pdfs.weight,'ko')
+
+#
+prety = 'EMDOWN'; poty = 'EMUP'
+for pdx,prety in enumerate(['EV1', 'EV4', 'EMT', 'EV1DN', 'EV1DS', 'EV1DNW']):
+  subplot(3,2,pdx+1)
+  title(prety+'->'+poty)  
+  pdfs = pdf[(pdf.postid==dstartidx[poty])&(pdf.preid>=dstartidx[prety])&(pdf.preid<=dendidx[prety])]
+  plot(pdfs.time,pdfs.weight,'ko')
+
+savefig(gifpath()+'many_weightB.png') # [[./gif/20oct4_20oct3_A0_cycle_many_weightB.png]]
+
+#
+clf()
+poty = 'EMT'
+for pdx,prety in enumerate(['EV4', 'EMT', 'EMUP','EMDOWN']):
+  subplot(2,2,pdx+1)
+  title(prety+'->'+poty)  
+  pdfs = pdf[(pdf.postid==dstartidx[poty])&(pdf.preid>=dstartidx[prety])&(pdf.preid<=dendidx[prety])]
+  plot(pdfs.time,pdfs.weight,'ko')
+
+savefig(gifpath()+'many_weightC.png') # [[./gif/20oct4_20oct3_A0_cycle_many_weightC.png]]
+
+these are the existing reward/punish values:
+        "scorePoint": 1.0,
+        "losePoint": -1.0,
+        "followTarget": 0.1,
+        "avoidTarget": -0.1,
+        "hitBall": 0.5
+
+...try same but with older reward scores to see if lack of improvement due to too much punishment...
+scorePoint = 1, losePoint = -0.1, followTarget = 0.1, avoidTarget = -0.01, hitBall = 0.5 ... 
+
+        "name": "20oct4_A0_cycle_",
+    "rewardcodes": {
+        "scorePoint": 1.0,
+        "losePoint": -0.1,
+        "followTarget": 0.1,
+        "avoidTarget": -0.01,
+        "hitBall": 0.5
+    },
+
+./myrun 32 sn.json
+
+started ~21:44 ...
+
