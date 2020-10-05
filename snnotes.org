@@ -17809,3 +17809,75 @@ scorePoint = 1, losePoint = -0.1, followTarget = 0.1, avoidTarget = -0.01, hitBa
 
 started ~21:44 ...
 
+* 20oct5 
+** check output from 20oct4_A0_cycle_
+
+finished at ~11:34
+
+python -i simdat.py backupcfg/20oct4_A0_cycle_sim.json
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/20oct5_20oct4_A0_cycle_perf.png]]
+this one looks better than previous ... 
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((990e3,1000e3))
+savefig(gifpath()+'rast.png') # [[./gif/20oct5_20oct4_A0_cycle_rast.png]]
+still not much firing ... intermittent gaps in activity of both EM populations...probably occur when ball off screen and no motion input
+yeah, that seems to be the case - note the lack of EV1D activity at those times of no EMUP,EMDOWN firing
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN'],lclr=['r'],plotindiv=True)
+xlabel('Time (ms)',fontsize=30); ylabel('Average weight',fontsize=30); tl(); 
+savefig(gifpath()+'all_avg_weight.png') # [[./gif/20oct5_20oct4_A0_cycle_all_avg_weight.png]]
+now the weights are going up and still have a lot of room to increase before hit limit where normalization kicks in ... 
+
+#
+prety = 'EMDOWN'; poty = 'EMUP'
+for pdx,prety in enumerate(['EV1', 'EV4', 'EMT', 'EV1DN', 'EV1DS', 'EV1DNW','EMUP','EMDOWN']):
+  subplot(2,4,pdx+1)
+  title(prety+'->'+poty)  
+  pdfs = pdf[(pdf.postid==dstartidx[poty])&(pdf.preid>=dstartidx[prety])&(pdf.preid<=dendidx[prety])]
+  plot(pdfs.time,pdfs.weight,'ko')
+
+savefig(gifpath()+'many_weightB.png') # [[./gif/20oct5_20oct4_A0_cycle_many_weightB.png]]
+now weights going up more ... from diff populations
+
+#
+clf()
+poty = 'EMT'
+for pdx,prety in enumerate(['EV4', 'EMT', 'EMUP','EMDOWN']):
+  subplot(2,2,pdx+1)
+  title(prety+'->'+poty)  
+  pdfs = pdf[(pdf.postid==dstartidx[poty])&(pdf.preid>=dstartidx[prety])&(pdf.preid<=dendidx[prety])]
+  plot(pdfs.time,pdfs.weight,'ko')
+
+savefig(gifpath()+'many_weightC.png') # [[./gif/20oct5_20oct4_A0_cycle_many_weightC.png]]
+
+** sanda 2017 also has output balancing
+
+output balancing same as constraining firing rates via homeostatic scaling? 
+could also implement with mutual inhib from one output pop to other output pop 
+
+"Thus,foreachmiddle-layercell,incrementsofthestrengthofoutgoingsynapsesresultingfromrewarded
+STDPeventsweredividedbytheratioofthecurrentsumofsynapticoutputstotheinitialsumofsynapticoutputs
+ofthesamecells(seeMethods).Theresultwasthatsynapsesoriginatingfromtheneuronswithmanystrongoutputs
+werenotabletoincreasetheirsynapticstrengthasquicklyassynapsesfromtheneuronswitha
+weakoutput.This gave a competitiveadvantagetothelaterneurons.It
+helpedtocontrolsynapticoutput,"
+
+so reward/punishment values scaled inversely by total input to the neuron 
+
+that sounds similar to the soft threshold rule ... but operates across all input synapses
+rather than individual synapse
+
+suggested that could be achieved by reciprocal inhibition between output neuron populations:
+"Output-sidebalancingallowedonlysynapsescorrelatedwithrewardtobestrengthenedviarewardedSTDPtraces.
+Whilewedonotknowdirectexperimentalevidenceforthismechanism,a similareffectcanbepotentiallyachieved
+bymorecomplexcircuitsinvolvingreciprocalinhibitionbetweenoutputneurons."
+
+that seems worth/easy trying
+
+also talked about importance of feedforward inhibition between layers, for preventing
+runaway activity and high variability in output
+
+** some adjustments - try reciprocal inhibition between EMUP and EMDOWN
+

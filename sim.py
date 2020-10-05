@@ -468,7 +468,26 @@ for prety in EMotorPops:
     netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL['AMPAI']}
   elif dconf['net']['STDPconns']['EIPlast'] and dSTDPparams['AMPAI']['STDPon']:
     netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparams['AMPAI']}    
-  
+
+# reciprocal inhibition 
+for prety in EMotorPops:
+  for epoty in EMotorPops:
+    if epoty == prety: continue # no self inhib here
+    poty = 'IM' + epoty[2:] # change name to interneuron
+    k = prety + '->' + poty
+    netParams.connParams[k] = {
+      'preConds': {'pop': prety},
+      'postConds': {'pop': poty,
+      'convergence': prob2conv(0.125/2, dnumc[prety]),
+      'weight': 0.02 * cfg.EIGain,
+      'delay': 2,
+      'synMech': 'AMPA', 'sec':'soma', 'loc':0.5}
+    if dconf['net']['RLconns']['EIPlast'] and dSTDPparamsRL['AMPAI']['RLon']: # only turn on plasticity when specified to do so
+      netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL['AMPAI']}
+    elif dconf['net']['STDPconns']['EIPlast'] and dSTDPparams['AMPAI']['STDPon']:
+      netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparams['AMPAI']}    
+
+    
 #Local inhibition
 #I to E within area
 if dnumc['ER']>0:
@@ -556,9 +575,17 @@ for poty in EMotorPops: # I -> E for motor populations
     'weight': 0.2 * cfg.IEGain,
     'delay': 2,
     'synMech': 'GABA', 'sec':'soma', 'loc':0.5}
+  prety = 'IM' + poty[2:] # for reciprocal inhibition between EM populations
+  netParams.connParams[prety+'->'+poty] = {
+    'preConds': {'pop': prety},
+    'postConds': {'pop': poty},
+    'convergence': prob2conv(0.125, dnumc[prety]),
+    'weight': 0.2 * cfg.IEGain,
+    'delay': 2,
+    'synMech': 'GABA', 'sec':'soma', 'loc':0.5}      
 
 #I to I
-for IType in ['IV1', 'IV4', 'IMT', 'IM', 'ID']:
+for IType in ITypes:
   if IType not in dnumc: continue
   if dnumc[IType] <= 0: continue
   netParams.connParams[IType+'->'+IType] = {
