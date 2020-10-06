@@ -110,7 +110,12 @@ if dconf['net']['RLconns']['Visual'] or dconf['net']['STDPconns']['Visual']:
   if lrecpop.count('EV4')==0: lrecpop.append('EV4')
   if lrecpop.count('EMT')==0: lrecpop.append('EMT')
   
-if dconf['net']['RLconns']['EIPlast'] or dconf['net']['STDPconns']['EIPlast']: lrecpop.append('IM')
+if dconf['net']['RLconns']['EIPlast'] or dconf['net']['STDPconns']['EIPlast']:
+  lrecpop.append('IM')
+  #lrecpop.append('ID')
+  lrecpop.append('IMUP')
+  lrecpop.append('IMDOWN')
+  lrecpop.append('IMSTAY')
 
 # Network parameters
 netParams = specs.NetParams() #object of class NetParams to store the network parameters
@@ -496,9 +501,8 @@ for prety in EMotorPops:
     netParams.connParams[k] = {
       'preConds': {'pop': prety},
       'postConds': {'pop': poty},
-      #'convergence': prob2conv(0.125/2, dnumc[prety]),
-      'convergence': prob2conv(0.13, dnumc[prety]),
-      'weight': 0.02 * cfg.EIGain,
+      'convergence': prob2conv(dconf['net']['EMIRecipProb'], dnumc[prety]),
+      'weight': dconf['net']['EMIRecipWght'] * cfg.EIGain,
       'delay': 2,
       'synMech': 'AMPA', 'sec':'soma', 'loc':0.5}
     if dconf['net']['RLconns']['EIPlast'] and dSTDPparamsRL['AMPAI']['RLon']: # only turn on plasticity when specified to do so
