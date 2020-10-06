@@ -17913,3 +17913,132 @@ python -i simdat.py backupcfg/20oct5_B0_cycle_sim.json
 pdfs = pdf[(pdf.postid==dstartidx['IMUP'])]
 len(pdfs) # 6
 plot(pdfs.time,pdfs.weight,'ko')
+
+* 20oct6
+** check output from 20oct5_A0_cycle_
+
+finished at ~7 AM
+
+python -i simdat.py backupcfg/20oct5_A0_cycle_sim.json
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/20oct6_20oct5_A0_cycle_perf.png]]
+overall performance is worse
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((990e3,1000e3))
+savefig(gifpath()+'rast.png') # [[./gif/20oct6_20oct5_A0_cycle_rast.png]]
+low rates for EMUP,EMDOWN; can see out of phase firing with EMUP and EMDOWN
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN'],lclr=['r'],plotindiv=True)
+xlabel('Time (ms)',fontsize=30); ylabel('Average weight',fontsize=30); tl(); 
+savefig(gifpath()+'all_avg_weight.png') # [[./gif/20oct6_20oct5_A0_cycle_all_avg_weight.png]]
+average is mostly flat, as should be with the indiv cell weight norm
+
+#
+prety = 'EMDOWN'; poty = 'EMUP'
+for pdx,prety in enumerate(['EV1', 'EV4', 'EMT', 'EV1DN', 'EV1DS', 'EV1DNW','EMUP','EMDOWN']):
+  subplot(2,4,pdx+1)
+  title(prety+'->'+poty)  
+  pdfs = pdf[(pdf.postid==dstartidx[poty])&(pdf.preid>=dstartidx[prety])&(pdf.preid<=dendidx[prety])]
+  plot(pdfs.time,pdfs.weight,'ko')
+
+savefig(gifpath()+'many_weightB.png') # [[./gif/20oct6_20oct5_A0_cycle_many_weightB.png]]
+many going up, many down
+
+#
+clf()
+poty = 'EMT'
+for pdx,prety in enumerate(['EV4', 'EMT', 'EMUP','EMDOWN']):
+  subplot(2,2,pdx+1)
+  title(prety+'->'+poty)  
+  pdfs = pdf[(pdf.postid==dstartidx[poty])&(pdf.preid>=dstartidx[prety])&(pdf.preid<=dendidx[prety])]
+  plot(pdfs.time,pdfs.weight,'ko')
+
+savefig(gifpath()+'many_weightC.png') # [[./gif/20oct6_20oct5_A0_cycle_many_weightC.png]]
+
+fig=animInput(InputImages,gifpath()+'_input.mp4') # [[./gif/20oct6_20oct5_A0_cycle__input.mp4]]
+
+** counteracting over-reach
+
+it's good that individual populations of EM neurons can now drive motion further
+but would be useful to counteract overreach ... can do that in a few ways. testing one
+in EIPLAST above (20oct5_B0_cycle_). could also use EMSTAY or restore connectivity between
+EMUP and EMDOWN ... 
+
+        "name": "20oct6_A0_cycle_",
+
+** py_broadcast, broadcast problems
+
+broadcast and py_broadcast sometimes producing wrong-sized array on destination
+
+had to use pyalltoall to get right size when including EMSTAY and IMSTAY populations
+
+** check output from 20oct5_B0_cycle_ (has EIPLAST)
+
+python -i simdat.py backupcfg/20oct5_B0_cycle_sim.json
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/20oct6_20oct5_B0_cycle_perf.png]]
+seems a little better ... than previous with no EIPLAST but reciprocal inhib (20oct5_A0_cycle_ [[./gif/20oct6_20oct5_A0_cycle_perf.png]])
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((990e3,1000e3))
+savefig(gifpath()+'rast.png') # [[./gif/20oct6_20oct5_B0_cycle_rast.png]]
+EMUP,EMDOWN no longer as much out of phase ... and have much higher rates than [[./20oct6_20oct5_A0_cycle_rast.png]]
+the higher EMUP,EMDOWN rates due to lower firing of IM,IMUP,IMDOWN which changed due to EIPLAST
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN'],lclr=['r'],plotindiv=True)
+xlabel('Time (ms)',fontsize=30); ylabel('Average weight',fontsize=30); tl(); 
+savefig(gifpath()+'all_avg_weight.png') # [[./gif/20oct6_20oct5_B0_cycle_all_avg_weight.png]]
+
+#
+poty = 'EMUP'
+for pdx,prety in enumerate(['EV1', 'EV4', 'EMT', 'EV1DN', 'EV1DS', 'EV1DNW','EMUP','EMDOWN']):
+  subplot(2,4,pdx+1)
+  title(prety+'->'+poty)  
+  pdfs = pdf[(pdf.postid==dstartidx[poty])&(pdf.preid>=dstartidx[prety])&(pdf.preid<=dendidx[prety])]
+  plot(pdfs.time,pdfs.weight,'ko')
+
+savefig(gifpath()+'many_weightB.png') # [[./gif/20oct6_20oct5_B0_cycle_many_weightB.png]]
+
+#
+clf()
+pdx=0
+for prety,poty in zip(['EMDOWN','EMDOWN','EMUP','EMUP'],['IMUP','IM','IMDOWN','IM']):
+  subplot(2,2,pdx+1)
+  title(prety+'->'+poty)  
+  pdfs = pdf[(pdf.postid>=dstartidx[poty])&(pdf.postid<=dendidx[poty])&(pdf.preid>=dstartidx[prety])&(pdf.preid<=dendidx[prety])]
+  tt = np.unique(pdfs.time)
+  lw = []
+  for t in tt:
+    pdfs2 = pdfs[(pdfs.time==t)]
+    lw.append(np.mean(pdfs.weight))
+  plot(tt,lw,'k')
+  pdx+=1
+
+savefig(gifpath()+'many_avgIB.png') # [[./gif/20oct6_20oct5_B0_cycle_many_avgIB.png]]
+hmm, avg weights onto interneurons not changing ... ??
+
+#
+clf()
+pdx=0
+for prety,poty in zip(['EMDOWN','EMDOWN','EMUP','EMUP'],['IMUP','IM','IMDOWN','IM']):
+  subplot(2,2,pdx+1)
+  title(prety+'->'+poty)  
+  pdfs = pdf[(pdf.postid==dstartidx[poty]+1)&(pdf.preid>=dstartidx[prety])&(pdf.preid<=dendidx[prety])&(pdf.postid==dstartidx[poty]+1)]
+  plot(pdfs.time,pdfs.weight,'ko')
+  pdx+=1
+
+
+#
+clf()
+poty = 'EMT'
+for pdx,prety in enumerate(['EV4', 'EMT', 'EMUP','EMDOWN']):
+  subplot(2,2,pdx+1)
+  title(prety+'->'+poty)  
+  pdfs = pdf[(pdf.postid==dstartidx[poty])&(pdf.preid>=dstartidx[prety])&(pdf.preid<=dendidx[prety])]
+  plot(pdfs.time,pdfs.weight,'ko')
+
+savefig(gifpath()+'many_weightC.png') # [[./gif/20oct6_20oct5_B0_cycle_many_weightC.png]]
+
+## fig=animInput(InputImages,gifpath()+'_input.mp4') 
+
