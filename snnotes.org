@@ -18042,3 +18042,16 @@ savefig(gifpath()+'many_weightC.png') # [[./gif/20oct6_20oct5_B0_cycle_many_weig
 
 ## fig=animInput(InputImages,gifpath()+'_input.mp4') 
 
+may as well continue this one for now ... since was doing best ... but need to check if EIPLAST working properly ... 
+
+        "name": "20oct6_B1_cycle_",
+
+    "simtype": {
+        "ResumeSim": 1,
+        "ResumeSimFromFile": "data/20oct5_B0_cycle_synWeights_final.pkl"
+    },
+
+./myrun 32 sn.json
+
+started ~16:45 ...
+
