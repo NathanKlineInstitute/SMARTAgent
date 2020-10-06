@@ -17967,6 +17967,12 @@ EMUP and EMDOWN ...
 
         "name": "20oct6_A0_cycle_",
 
+try this for 1000 s too ...
+
+./myrun 32 sn.json
+
+started ~16:52 ... 
+
 ** py_broadcast, broadcast problems
 
 broadcast and py_broadcast sometimes producing wrong-sized array on destination
@@ -18054,4 +18060,12 @@ may as well continue this one for now ... since was doing best ... but need to c
 ./myrun 32 sn.json
 
 started ~16:45 ...
+
+** multiple EDir layers?
+
+ideally want some place where motion of different objects is integrated - while that happens
+directly in EM populations, may want better coverage earlier too ... ?
+
+also, should the middle layers have larger number of neurons (for more complex rep)
+compared to earlier layers??
 
