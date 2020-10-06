@@ -125,7 +125,7 @@
         },
         "STDPconns":{
 	    "EIPlast":0,
-            "Visual":1,
+            "Visual":0,
             "RecurrentDirNeurons":0,
             "RecurrentLocNeurons":0,
             "FeedForwardDirNtoM":0,
@@ -136,7 +136,7 @@
             "FeedbackMtoLocN":0
         },		
         "RLconns":{
-	    "EIPlast":0,
+	    "EIPlast":1,
             "Visual":1,
             "RecurrentDirNeurons":1,
             "RecurrentLocNeurons":1,
@@ -232,6 +232,24 @@
         }
     },
     "RL": {
+         "AMPAI": {
+            "wbase": 1e-06,
+            "wmax": 0.003,
+            "RLon": 1,
+	    "STDPon": 0,
+            "RLlenhebb": 1000,
+            "RLlenanti": 1000,
+            "useRLexp": 1,
+            "RLhebbwt": 0.0006,
+            "RLantiwt": -0.0006,
+            "hebbwt": 0,
+            "antiwt": 0,
+            "tauhebb": 10,
+            "tauanti": 10,	    
+            "RLwindhebb": 50,
+            "softthresh": 0,
+            "verbose": 0
+        },	
         "AMPA": {
             "wbase": 1e-06,
             "wmax": 0.0005,

@@ -17896,3 +17896,20 @@ also removed excitatory connections between the two dfferent EM populations ...
 
 started 1000 s run ~15:08 ... 
 
+paddle seems to go too far in either direction - may partially be due to the reciprocal
+inhibition, since once one population starts firing, it suppresses the other, so there's a
+loss of balance ... EI plasticity might help avoid that ... 
+
+** lower activation to IMDOWN, IMUP ?  + EIPlast
+
+        "name": "20oct5_B0_cycle_",
+
+./myrun 32 sn.json
+
+started ~23:25 ... 
+
+python -i simdat.py backupcfg/20oct5_B0_cycle_sim.json
+
+pdfs = pdf[(pdf.postid==dstartidx['IMUP'])]
+len(pdfs) # 6
+plot(pdfs.time,pdfs.weight,'ko')
