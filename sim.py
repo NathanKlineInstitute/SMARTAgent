@@ -35,10 +35,7 @@ if 'saveWeights' in dconf['sim']: sim.saveWeights = dconf['sim']['saveWeights']
 sim.saveInputImages = 1 #save Input Images (5 game frames)
 sim.saveMotionFields = 1 # whether to save the motion fields
 sim.saveObjPos = 1 # save ball and paddle position to file
-if dconf['sim']['saveAssignedFiringRates']: 
-  sim.saveAssignedFiringRates = 1
-else:
-  sim.saveAssignedFiringRates = 0
+sim.saveAssignedFiringRates = dconf['sim']['saveAssignedFiringRates']
 recordWeightStepSize = dconf['sim']['recordWeightStepSize']
 normalizeWeightStepSize = dconf['sim']['normalizeWeightStepSize']
 #recordWeightDT = 1000 # interval for recording synaptic weights (change later)
@@ -138,7 +135,7 @@ simConfig.saveFolder = 'data'
 # simConfig.backupCfg = ['sim.json', 'backupcfg/'+dconf['sim']['name']+'sim.json']
 #simConfig.createNEURONObj = True  # create HOC objects when instantiating network
 #simConfig.createPyStruct = True  # create Python structure (simulator-independent) when instantiating network
-simConfig.analysis['plotTraces'] = {'include': [(pop, 0) for pop in ['ER','IR','EV1','EV1DE','ID','IV1','EV4','IV4','EMT','IMT','EMDOWN','EMUP','IM','IMUP','IMDOWN']]}
+simConfig.analysis['plotTraces'] = {'include': [(pop, 0) for pop in ['ER','IR','EV1','EV1DE','ID','IV1','EV4','IV4','EMT','IMT','EMDOWN','EMUP','EMSTAY','IM','IMUP','IMDOWN']]}
 simConfig.analysis['plotRaster'] = {'popRates':'overlay','showFig':dconf['sim']['doplot']}
 #simConfig.analysis['plot2Dnet'] = True 
 #simConfig.analysis['plotConn'] = True           # plot connectivity matrix
@@ -1118,30 +1115,70 @@ def updateInputRates ():
   if dnumc['ER']>0:
     lratepop = ['ER', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW', 'EV1DSW', 'EV1DS', 'EV1DSE']
   else:
-    lratepop = ['EV1', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW', 'EV1DSW', 'EV1DS', 'EV1DSE']  
+    lratepop = ['EV1', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW', 'EV1DSW', 'EV1DS', 'EV1DSE']
+  # sim.pc.barrier()
+
+  #root = 0 # any specific rank
+  #src = rank if rank == root else None
+  #dest = pc.py_broadcast(src, root)
+
+  #src = dict(sim.AIGame.dFiringRates) if sim.rank == 0 else None
+  #print('rank=',sim.rank,'src=',src)
+
+
+  # this py_alltoall seems to work, but is apparently not as fast as py_broadcast (which has problems - wrong-sized array sometimes!)
+  root = 0
+  nhost = sim.pc.nhost()
+  src = [sim.AIGame.dFiringRates]*nhost if sim.rank == root else [None]*nhost
+  dFiringRates = sim.pc.py_alltoall(src)[0]
+  if sim.rank == 0: dFiringRates = sim.AIGame.dFiringRates
+  # print(sim.rank,'dFiringRates:',dFiringRates)
+
+  """ # for some reason this code does not work - returns wrong sized array on dest sometimes, saw it produce MPI error too
   if sim.rank == 0:
-    dFiringRates = sim.AIGame.dFiringRates    
+    dFiringRates = sim.AIGame.dFiringRates
+    sim.pc.py_broadcast(dFiringRates, 0)
+  else:
+    dFiringRates = sim.pc.py_broadcast(None, 0)
+    #dFiringRates = {pop:np.zeros(dnumc[pop]) for pop in allpops}
+  # pop='EV1'; print('rank=',sim.rank,pop,len(dFiringRates[pop]))
+  """
+  
+  """ # this also sometimes produces wrong-sized array on dest
+  sim.pc.barrier()
+  if sim.rank == 0:
+    #print('rank0:',len(sim.AIGame.dFiringRates['EV1']))
+    #dFiringRates = sim.pc.py_broadcast(dict(sim.AIGame.dFiringRates), 0)
+    dFiringRates = sim.AIGame.dFiringRates
     for k in sim.AIGame.lratepop:
       sim.pc.broadcast(sim.AIGame.dFVec[k].from_python(dFiringRates[k]),0)
       if dconf['verbose'] > 1: print('Firing Rates of',k,np.where(dFiringRates[k]==np.amax(dFiringRates[k])),np.amax(dFiringRates[k]))
+      print('rank=',sim.rank,k,len(dFiringRates[k]))
   else:
+    #dFiringRates = sim.pc.py_broadcast(None, 0) # OrderedDict()
     dFiringRates = OrderedDict()
     for pop in lratepop:
       vec = h.Vector()
-      sim.pc.broadcast(vec,0)
+      destSz = sim.pc.broadcast(vec,0)
+      print('rank=',sim.rank,'destSz=',destSz)
       dFiringRates[pop] = vec.to_python()
       if dconf['verbose'] > 1:
-        print(sim.rank,'received firing rates:',np.where(dFiringRates[pop]==np.amax(dFiringRates[pop])),np.amax(dFiringRates[pop]))          
+        print(sim.rank,'received firing rates:',np.where(dFiringRates[pop]==np.amax(dFiringRates[pop])),np.amax(dFiringRates[pop]))
+      print('rank=',sim.rank,pop,len(dFiringRates[pop]))
+  sim.pc.barrier()
+  """
+  
   # update input firing rates for stimuli to ER,EV1 and direction sensitive cells
   for pop in lratepop:
     lCell = [c for c in sim.net.cells if c.gid in sim.net.pops[pop].cellGids] # this is the set of cells
     offset = sim.simData['dminID'][pop]
-    if dconf['verbose'] > 1: print(sim.rank,'updating len(',pop,len(lCell),'source firing rates. len(dFiringRates)=',len(dFiringRates[pop]))
+    #if dconf['verbose'] > 1: print(sim.rank,'updating len(',pop,len(lCell),'source firing rates. len(dFiringRates)=',len(dFiringRates[pop]))
     for cell in lCell:  
       for stim in cell.stims:
         if stim['source'] == 'stimMod':
           #rind = random.randint(0,2)
-          #fchoices = [20,50,1000] #20 will represent 50Hz and so on 
+          #fchoices = [20,50,1000] #20 will represent 50Hz and so on
+          # print(pop,len(dFiringRates[pop]),int(cell.gid-offset),cell.gid,offset)
           if dFiringRates[pop][int(cell.gid-offset)]==0:
             stim['hObj'].interval = 1e12
           else:
@@ -1338,6 +1375,9 @@ def trainAgent (t):
       #total rewards
       critic = critic + critic_for_avoidingloss + critic_for_following_ball
       rewards = [critic for i in range(len(rewards))]  # reset rewards to modified critic signal - should use more granular recording
+
+
+    """
     sim.pc.broadcast(vec.from_python([critic]), 0) # convert python list to hoc vector to broadcast critic value to other nodes
     UPactions = np.sum(np.where(np.array(actions)==dconf['moves']['UP'],1,0))
     DOWNactions = np.sum(np.where(np.array(actions)==dconf['moves']['DOWN'],1,0))
@@ -1349,7 +1389,23 @@ def trainAgent (t):
     if dconf['sim']['anticipatedRL']:
       print(proposed_actions)
       sim.pc.broadcast(vec5.from_python(proposed_actions),0) # used proposed actions to target/potentiate the pop representing anticipated action.
+    """
+    # use py_broadcast to avoid converting to/from Vector
+    sim.pc.py_broadcast(critic, 0) # broadcast critic value to other nodes
+    UPactions = np.sum(np.where(np.array(actions)==dconf['moves']['UP'],1,0))
+    DOWNactions = np.sum(np.where(np.array(actions)==dconf['moves']['DOWN'],1,0))
+    sim.pc.py_broadcast(UPactions,0) # broadcast UPactions
+    sim.pc.py_broadcast(DOWNactions,0) # broadcast DOWNactions
+    if dnumc['EMSTAY']>0:
+      STAYactions = np.sum(np.where(np.array(actions)==dconf['moves']['NOMOVE'],1,0))
+      sim.pc.py_broadcast(STAYactions,0) # broadcast STAYactions
+    if dconf['sim']['anticipatedRL']:
+      print(proposed_actions)
+      sim.pc.py_broadcast(proposed_actions,0) # used proposed actions to target/potentiate the pop representing anticipated action.
+      
   else: # other workers
+
+    """
     sim.pc.broadcast(vec, 0) # receive critic value from master node
     critic = vec.to_python()[0] # critic is first element of the array
     sim.pc.broadcast(vec2, 0)
@@ -1362,9 +1418,18 @@ def trainAgent (t):
     if dconf['sim']['anticipatedRL']:
       sim.pc.broadcast(vec5, 0)
       proposed_actions = vec5.to_python()[0] # this([0]) will just pick up the first element of the list.
+    """
+    
+    critic = sim.pc.py_broadcast(None, 0) # receive critic value from master node
+    UPactions = sim.pc.py_broadcast(None, 0)
+    DOWNactions = sim.pc.py_broadcast(None, 0)
+    if 'EMSTAY' in dconf['net']: STAYactions = sim.pc.broadcast(None, 0)
+    if dconf['sim']['anticipatedRL']: proposed_actions = sim.pc.py_broadcast(None, 0)
+      
     if dconf['verbose']:
       if dnumc['EMSTAY']>0: print('UPactions: ', UPactions,'DOWNactions: ', DOWNactions, 'STAYactions: ', STAYactions)
       else: print('UPactions: ', UPactions,'DOWNactions: ', DOWNactions)
+      
   if dconf['sim']['anticipatedRL']:
     cpaction = proposed_actions 
     anticipated_reward = dconf['rewardcodes']['followTarget']
@@ -1539,12 +1604,9 @@ def setdminID (sim, lpop):
   for tinds in range(len(alltags)):
     if alltags[tinds]['pop'] in lpop:
       dGIDs[alltags[tinds]['pop']].append(tinds)
-  sim.simData['dminID'] = {pop:np.amin(dGIDs[pop]) for pop in lpop}
+  sim.simData['dminID'] = {pop:np.amin(dGIDs[pop]) for pop in lpop if len(dGIDs[pop])>0}
 
-if dnumc['ER']>0:
-  setdminID(sim, ['ER', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW', 'EV1DSW', 'EV1DS', 'EV1DSE'])
-else:
-  setdminID(sim, ['EV1', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW', 'EV1DSW', 'EV1DS', 'EV1DSE'])
+setdminID(sim, allpops)
 tPerPlay = tstepPerAction*dconf['actionsPerPlay']
 InitializeInputRates()
 dsumWInit = getSumAdjustableWeights(sim) # get sum of adjustable weights at start of sim
