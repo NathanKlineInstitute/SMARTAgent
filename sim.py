@@ -1268,14 +1268,8 @@ def adjustWeightsBasedOnFiringRates (sim,lpop,synType='AMPA'):
 def trainAgent (t):
   """ training interface between simulation and game environment
   """
-  global NBsteps, epCount, proposed_actions, total_hits, fid4
-  global f_ax, fig
-  global tstepPerAction
+  global NBsteps, epCount, proposed_actions, total_hits, fid4, tstepPerAction
   vec = h.Vector()
-  vec2 = h.Vector()
-  vec3 = h.Vector()
-  vec4 = h.Vector()
-  vec5 = h.Vector()
   noWinner = False # no clear winner for the population firing rates (used below)
   if t<(tstepPerAction*dconf['actionsPerPlay']): # for the first time interval use randomly selected actions
     actions =[]
@@ -1375,21 +1369,6 @@ def trainAgent (t):
       #total rewards
       critic = critic + critic_for_avoidingloss + critic_for_following_ball
       rewards = [critic for i in range(len(rewards))]  # reset rewards to modified critic signal - should use more granular recording
-
-
-    """
-    sim.pc.broadcast(vec.from_python([critic]), 0) # convert python list to hoc vector to broadcast critic value to other nodes
-    UPactions = np.sum(np.where(np.array(actions)==dconf['moves']['UP'],1,0))
-    DOWNactions = np.sum(np.where(np.array(actions)==dconf['moves']['DOWN'],1,0))
-    sim.pc.broadcast(vec2.from_python([UPactions]),0)
-    sim.pc.broadcast(vec3.from_python([DOWNactions]),0)
-    if dnumc['EMSTAY']>0:
-      STAYactions = np.sum(np.where(np.array(actions)==dconf['moves']['NOMOVE'],1,0))
-      sim.pc.broadcast(vec4.from_python([STAYactions]),0)
-    if dconf['sim']['anticipatedRL']:
-      print(proposed_actions)
-      sim.pc.broadcast(vec5.from_python(proposed_actions),0) # used proposed actions to target/potentiate the pop representing anticipated action.
-    """
     # use py_broadcast to avoid converting to/from Vector
     sim.pc.py_broadcast(critic, 0) # broadcast critic value to other nodes
     UPactions = np.sum(np.where(np.array(actions)==dconf['moves']['UP'],1,0))
@@ -1401,31 +1380,13 @@ def trainAgent (t):
       sim.pc.py_broadcast(STAYactions,0) # broadcast STAYactions
     if dconf['sim']['anticipatedRL']:
       print(proposed_actions)
-      sim.pc.py_broadcast(proposed_actions,0) # used proposed actions to target/potentiate the pop representing anticipated action.
-      
+      sim.pc.py_broadcast(proposed_actions,0) # used proposed actions to target/potentiate the pop representing anticipated action.      
   else: # other workers
-
-    """
-    sim.pc.broadcast(vec, 0) # receive critic value from master node
-    critic = vec.to_python()[0] # critic is first element of the array
-    sim.pc.broadcast(vec2, 0)
-    UPactions = vec2.to_python()[0]
-    sim.pc.broadcast(vec3, 0)
-    DOWNactions = vec3.to_python()[0]
-    if 'EMSTAY' in dconf['net']:
-      sim.pc.broadcast(vec4, 0)
-      STAYactions = vec4.to_python()[0]
-    if dconf['sim']['anticipatedRL']:
-      sim.pc.broadcast(vec5, 0)
-      proposed_actions = vec5.to_python()[0] # this([0]) will just pick up the first element of the list.
-    """
-    
     critic = sim.pc.py_broadcast(None, 0) # receive critic value from master node
     UPactions = sim.pc.py_broadcast(None, 0)
     DOWNactions = sim.pc.py_broadcast(None, 0)
     if 'EMSTAY' in dconf['net']: STAYactions = sim.pc.broadcast(None, 0)
-    if dconf['sim']['anticipatedRL']: proposed_actions = sim.pc.py_broadcast(None, 0)
-      
+    if dconf['sim']['anticipatedRL']: proposed_actions = sim.pc.py_broadcast(None, 0)      
     if dconf['verbose']:
       if dnumc['EMSTAY']>0: print('UPactions: ', UPactions,'DOWNactions: ', DOWNactions, 'STAYactions: ', STAYactions)
       else: print('UPactions: ', UPactions,'DOWNactions: ', DOWNactions)
