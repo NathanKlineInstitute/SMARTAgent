@@ -18069,3 +18069,83 @@ directly in EM populations, may want better coverage earlier too ... ?
 also, should the middle layers have larger number of neurons (for more complex rep)
 compared to earlier layers??
 
+* 20oct7
+** check output from 20oct6_B1_cycle_
+
+python -i simdat.py backupcfg/20oct6_B1_cycle_sim.json
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/20oct7_20oct6_B1_cycle_perf.png]]
+~flat, does not look better than prior step ... 
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((990e3,1000e3))
+savefig(gifpath()+'rast.png') # [[./gif/20oct7_20oct6_B1_cycle_rast.png]]
+rates look ok - a little higher than before
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN'],lclr=['r'],plotindiv=True)
+xlabel('Time (ms)',fontsize=30); ylabel('Average weight',fontsize=30); tl(); 
+savefig(gifpath()+'all_avg_weight.png') # [[./gif/20oct7_20oct6_B1_cycle_all_avg_weight.png]]
+
+#
+poty = 'EMUP'
+for pdx,prety in enumerate(['EV1', 'EV4', 'EMT', 'EV1DN', 'EV1DS', 'EV1DNW','EMUP','EMDOWN']):
+  subplot(2,4,pdx+1)
+  title(prety+'->'+poty)  
+  pdfs = pdf[(pdf.postid==dstartidx[poty])&(pdf.preid>=dstartidx[prety])&(pdf.preid<=dendidx[prety])]
+  plot(pdfs.time,pdfs.weight,'ko')
+
+savefig(gifpath()+'many_weightB.png') # [[./gif/20oct7_20oct6_B1_cycle_many_weightB.png]]
+
+#
+clf()
+pdx=0
+for prety,poty in zip(['EMDOWN','EMDOWN','EMUP','EMUP'],['IMUP','IM','IMDOWN','IM']):
+  subplot(2,2,pdx+1)
+  title(prety+'->'+poty)  
+  pdfs = pdf[(pdf.postid>=dstartidx[poty])&(pdf.postid<=dendidx[poty])&(pdf.preid>=dstartidx[prety])&(pdf.preid<=dendidx[prety])]
+  tt = np.unique(pdfs.time)
+  lw = []
+  for t in tt:
+    pdfs2 = pdfs[(pdfs.time==t)]
+    lw.append(np.mean(pdfs.weight))
+  plot(tt,lw,'k')
+  pdx+=1
+
+savefig(gifpath()+'many_avgIB.png') # [[./gif/20oct7_20oct6_B1_cycle_many_avgIB.png]]
+
+#
+clf()
+pdx=0
+for prety,poty in zip(['EMDOWN','EMDOWN','EMUP','EMUP'],['IMUP','IM','IMDOWN','IM']):
+  subplot(2,2,pdx+1)
+  title(prety+'->'+poty)  
+  pdfs = pdf[(pdf.postid==dstartidx[poty]+1)&(pdf.preid>=dstartidx[prety])&(pdf.preid<=dendidx[prety])&(pdf.postid==dstartidx[poty]+1)]
+  plot(pdfs.time,pdfs.weight,'ko')
+  pdx+=1
+
+savefig(gifpath()+'many_IC.png') # [[./gif/20oct7_20oct6_B1_cycle_many_IC.png]]
+
+#
+clf()
+poty = 'EMT'
+for pdx,prety in enumerate(['EV4', 'EMT', 'EMUP','EMDOWN']):
+  subplot(2,2,pdx+1)
+  title(prety+'->'+poty)  
+  pdfs = pdf[(pdf.postid==dstartidx[poty])&(pdf.preid>=dstartidx[prety])&(pdf.preid<=dendidx[prety])]
+  plot(pdfs.time,pdfs.weight,'ko')
+
+savefig(gifpath()+'many_weightC.png') # [[./gif/20oct7_20oct6_B1_cycle_many_weightC.png]]
+
+do not see the EIPLAST working ... ? 
+
+lfn = ['20oct5_B0_cycle_','20oct6_B1_cycle_']
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0,0.5))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/20oct7_20oct6_B1_cycle_perf_all_steps_so_far.png]]
+
+lpda = getindivactionreward(lfn)
+clf(); plotComparePerf(lpda,['g','b','r'],yl=(0,1),lleg=lfn)
+savefig(gifpath()+'perf_compareB.png') # [[./gif/20oct7_20oct6_B1_cycle_perf_compareB.png]]
+
+fig=animInput(InputImages,gifpath()+'_input.mp4') # [[./gif/20oct7_20oct6_B1_cycle__input.mp4]]
+
