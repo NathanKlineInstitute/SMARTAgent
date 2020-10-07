@@ -18149,3 +18149,20 @@ savefig(gifpath()+'perf_compareB.png') # [[./gif/20oct7_20oct6_B1_cycle_perf_com
 
 fig=animInput(InputImages,gifpath()+'_input.mp4') # [[./gif/20oct7_20oct6_B1_cycle__input.mp4]]
 
+** why EIPLAST not working?
+
+        "name": "20oct7_A0_cycle_",
+
+
+** how to backprop?
+
+could look at connectome to determine what each neuron contributes to in terms of move
+and use that to decide whether to reinforce/punish specific synapses ... 
+
+but that still would only work for individual moves ... unless integrated multiple
+moves and compared to correct sequence ... 
+
+e.g. if need 3 moves up to get to ball and instead took 1 move up and 2 moves down
+then reinforce the path that led to 1 move up and punish the part that led to 2 moves down
+
+** check output from 
