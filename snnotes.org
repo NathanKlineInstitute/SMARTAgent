@@ -17562,3 +17562,650 @@ and that prevents some learning ... ?
 
 fig=animInput(InputImages,gifpath()+'_input.mp4') # [[./gif/20oct2_20oct1_B0_cycle__input.mp4]]
 
+** check HA's new homeostasis rule
+
+it uses firing rates to normalize weights
+
+adjusted to allow setting min, max thresholds of firing rate used for weight adjustment
+
+not clear why the 2017 paper uses dshift (fixed increment) instead of scaling by more or less depending
+on how far from target rate
+
+and why smaller interval for adjusting synaptic weights, compared to adjusting the target weights based on firing rates?
+does that promote stability??
+
+try it out ... 
+
+keeping the EV1 and direction neuron min rate ~0.25 and up to 5 Hz
+for EV4,EMT,EMUP,EMDOWN min rate of 1, and max rate of 5,6 Hz
+
+        "name": "20oct2_A0_cycle_",
+
+started ~17:58 ...
+finished ~20:59 ...
+
+python -i simdat.py backupcfg/20oct2_A0_cycle_sim.json
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/20oct2_20oct2_A0_cycle_perf.png]]
+looks pretty bad . . . 
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((190e3,200e3))
+savefig(gifpath()+'rast.png') # [[./gif/20oct2_20oct2_A0_cycle_rast.png]]
+rates are all reasonably low
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EV4','EMT'],lclr=['r','b','g','c','m'],plotindiv=True)
+xlabel('Time (ms)',fontsize=30); ylabel('Average weight',fontsize=30); tl(); 
+savefig(gifpath()+'all_avg_weight.png') # [[./gif/20oct2_20oct2_A0_cycle_all_avg_weight.png]]
+
+tt = np.unique(pdf.time)
+
+dout = getpopinputmap(pdf, tt[0], dnumc, dstartidx, dendidx, 'EMDOWN')
+clf(); plotallinputmaps(pdf,tt[0],dstartidx['EMDOWN'],'EMDOWN',dnumc,dstartidx,dendidx,asweight=True,dmap=dout)
+savefig(gifpath()+'EMDOWN_inputmap_first.png') # [[./gif/20oct2_20oct2_A0_cycle_EMDOWN_inputmap_first.png]]
+
+dout = getpopinputmap(pdf, tt[-1], dnumc, dstartidx, dendidx, 'EMDOWN')
+clf(); plotallinputmaps(pdf,tt[-1],dstartidx['EMDOWN'],'EMDOWN',dnumc,dstartidx,dendidx,asweight=True,dmap=dout)
+savefig(gifpath()+'EMDOWN_inputmap_last.png') # [[./gif/20oct2_20oct2_A0_cycle_EMDOWN_inputmap_last.png]]
+
+## fig=animInput(InputImages,gifpath()+'_input.mp4') 
+
+** found bug after changes to homPlast code, have to rerun
+
+bug was that did not use the updated datastructures properly ... 
+
+also noticed that if not careful, could have modified the stimMod weights which are also AMPA ...
+so now checking for hSTDP in conns ... 
+
+also added rule that if dshift == 0, should scale weights by the factor of desired, current rates 
+rather than default, which is an arbitrary tiny dshift value on the weights ... 
+
+./myrun 32 sn.json
+
+started ~22:55 ... 
+
+hmm, something messed up ... have to fix
+
+** adjusted the CellWNorm to have min, max factors as well 
+
+normalizes weight to boundaries of 
+minFactor * initialWeight, and maxFactor * initialWeight
+when weight falls below minFactor*initialWeight or above maxFactor*initialWeight
+
+        "name": "20oct2_C0_cycle_",
+
+keeping within range of 1X original weight and 3X original weight (sum)
+
+./myrun 32 sn.json
+
+started ~23:37 ... 
+
+* 20oct3
+** check 20oct2_C0_cycle_ 
+
+finished at 14:15 ... 
+
+python -i simdat.py backupcfg/20oct2_C0_cycle_sim.json
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/20oct3_20oct2_C0_cycle_perf.png]]
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((990e3,1000e3))
+savefig(gifpath()+'rast.png') # [[./gif/20oct3_20oct2_C0_cycle_rast.png]]
+firing rates appear close to original levels ... 
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN'],lclr=['r'],plotindiv=True)
+xlabel('Time (ms)',fontsize=30); ylabel('Average weight',fontsize=30); tl(); 
+savefig(gifpath()+'all_avg_weight.png') # [[./gif/20oct3_20oct2_C0_cycle_all_avg_weight.png]]
+those weights look mostly flat ... not increasing to ~3X initial ... 
+does that mean 2 s intervals for normalizing weights is too small?
+or ... not measuring weights often enough to see increase and reset ... 
+
+pdfs = pdf[(pdf.postid==dstartidx['EMDOWN'])&(pdf.preid==dstartidx['EV1DSW']+1)]
+len(pdfs) # 100
+
+plot(pdfs.time,pdfs.weight)
+savefig(gifpath()+'single_weightA.png') # [[./gif/20oct3_20oct2_C0_cycle_single_weightA.png]]
+so that weight is increasing ... 
+
+pdfs = pdf[(pdf.postid==dstartidx['EMDOWN'])&(pdf.preid>=dstartidx['EV1DSW'])&(pdf.preid<=dendidx['EV1DSW'])]
+len(pdfs) # 12000
+
+plot(pdfs.time,pdfs.weight,'ko')
+savefig(gifpath()+'many_weightA.png') # [[./gif/20oct3_20oct2_C0_cycle_many_weightA.png]]
+
+can look at individual weights and see if there are trends, indicating whether the pathway is 'useful'
+e.g. if weights are going down, that means weights not useful ... 
+prety = 'EMDOWN'; poty = 'EMUP'
+pdfs = pdf[(pdf.postid==dstartidx[poty])&(pdf.preid>=dstartidx[prety])&(pdf.preid<=dendidx[prety])]
+clf(); plot(pdfs.time,pdfs.weight,'ko')
+
+#
+prety = 'EMDOWN'; poty = 'EMUP'
+for pdx,prety in enumerate(['EV1', 'EV4', 'EMT', 'EV1DN', 'EV1DS', 'EV1DNW']):
+  subplot(3,2,pdx+1)
+  title(prety+'->'+poty)  
+  pdfs = pdf[(pdf.postid==dstartidx[poty])&(pdf.preid>=dstartidx[prety])&(pdf.preid<=dendidx[prety])]
+  plot(pdfs.time,pdfs.weight,'ko')
+
+savefig(gifpath()+'many_weightB.png') # [[./gif/20oct3_20oct2_C0_cycle_many_weightB.png]]
+
+EMT weights -> EMUP generally going down, others mixed ... 
+
+EV1 seems more useful, EV4 less (more going down), and EMT even less useful (all seem to decrease)
+and this sim was without topological conn for EV4 and EMT ... 
+
+so may need to keep topology in EV4 and EMT ... 
+
+#
+clf()
+poty = 'EMT'
+for pdx,prety in enumerate(['EV4', 'EMT', 'EMUP','EMDOWN']):
+  subplot(2,2,pdx+1)
+  title(prety+'->'+poty)  
+  pdfs = pdf[(pdf.postid==dstartidx[poty])&(pdf.preid>=dstartidx[prety])&(pdf.preid<=dendidx[prety])]
+  plot(pdfs.time,pdfs.weight,'ko')
+
+savefig(gifpath()+'many_weightC.png') # [[./gif/20oct3_20oct2_C0_cycle_many_weightC.png]]
+
+some going up, some down ... some stuck at ceiling ... 
+
+could raise max weight, max weight factor for norm, and also try longer interval between normalization ... 
+
+ok, run that in 
+        "name": "20oct3_A0_cycle_",
+	"CellWNorm": {
+	    "On": 1,
+	    "MinFctr": 1.0,
+	    "MaxFctr": 10.0
+	},
+            "wmax": 0.0005,
+        "normalizeWeightStepSize": 250,
+
+./myrun 32 sn.json
+
+started ~23:52 ... 
+
+if output looks ~same, might indicate these reward weights not driving
+network towards epilepsy, and normalization params not critical yet ... 
+
+* 20oct4
+** check output from 20oct3_A0_cycle_
+
+finished ~14:11 ... 
+
+python -i simdat.py backupcfg/20oct3_A0_cycle_sim.json
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') #  [[./gif/20oct4_20oct3_A0_cycle_perf.png]]
+perf looks pretty flat ...
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((990e3,1000e3))
+savefig(gifpath()+'rast.png') # [[./gif/20oct4_20oct3_A0_cycle_rast.png]]
+and the rates are similar to last run ... 
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN'],lclr=['r'],plotindiv=True)
+xlabel('Time (ms)',fontsize=30); ylabel('Average weight',fontsize=30); tl(); 
+savefig(gifpath()+'all_avg_weight.png') # [[./gif/20oct4_20oct3_A0_cycle_all_avg_weight.png]]
+also looks similar to last run ...
+
+pdfs = pdf[(pdf.postid==dstartidx['EMDOWN'])&(pdf.preid==dstartidx['EV1DSW']+1)]
+len(pdfs) # 100
+
+plot(pdfs.time,pdfs.weight)
+savefig(gifpath()+'single_weightA.png') # [[./gif/20oct4_20oct3_A0_cycle_single_weightA.png]]
+
+pdfs = pdf[(pdf.postid==dstartidx['EMDOWN'])&(pdf.preid>=dstartidx['EV1DSW'])&(pdf.preid<=dendidx['EV1DSW'])]
+len(pdfs) # 12000
+
+plot(pdfs.time,pdfs.weight,'ko')
+savefig(gifpath()+'many_weightA.png') # [[./gif/20oct4_20oct3_A0_cycle_many_weightA.png]]
+
+prety = 'EMDOWN'; poty = 'EMUP'
+pdfs = pdf[(pdf.postid==dstartidx[poty])&(pdf.preid>=dstartidx[prety])&(pdf.preid<=dendidx[prety])]
+clf(); plot(pdfs.time,pdfs.weight,'ko')
+
+#
+prety = 'EMDOWN'; poty = 'EMUP'
+for pdx,prety in enumerate(['EV1', 'EV4', 'EMT', 'EV1DN', 'EV1DS', 'EV1DNW']):
+  subplot(3,2,pdx+1)
+  title(prety+'->'+poty)  
+  pdfs = pdf[(pdf.postid==dstartidx[poty])&(pdf.preid>=dstartidx[prety])&(pdf.preid<=dendidx[prety])]
+  plot(pdfs.time,pdfs.weight,'ko')
+
+savefig(gifpath()+'many_weightB.png') # [[./gif/20oct4_20oct3_A0_cycle_many_weightB.png]]
+
+#
+clf()
+poty = 'EMT'
+for pdx,prety in enumerate(['EV4', 'EMT', 'EMUP','EMDOWN']):
+  subplot(2,2,pdx+1)
+  title(prety+'->'+poty)  
+  pdfs = pdf[(pdf.postid==dstartidx[poty])&(pdf.preid>=dstartidx[prety])&(pdf.preid<=dendidx[prety])]
+  plot(pdfs.time,pdfs.weight,'ko')
+
+savefig(gifpath()+'many_weightC.png') # [[./gif/20oct4_20oct3_A0_cycle_many_weightC.png]]
+
+these are the existing reward/punish values:
+        "scorePoint": 1.0,
+        "losePoint": -1.0,
+        "followTarget": 0.1,
+        "avoidTarget": -0.1,
+        "hitBall": 0.5
+
+...try same but with older reward scores to see if lack of improvement due to too much punishment...
+scorePoint = 1, losePoint = -0.1, followTarget = 0.1, avoidTarget = -0.01, hitBall = 0.5 ... 
+
+        "name": "20oct4_A0_cycle_",
+    "rewardcodes": {
+        "scorePoint": 1.0,
+        "losePoint": -0.1,
+        "followTarget": 0.1,
+        "avoidTarget": -0.01,
+        "hitBall": 0.5
+    },
+
+./myrun 32 sn.json
+
+started ~21:44 ...
+
+* 20oct5 
+** check output from 20oct4_A0_cycle_
+
+finished at ~11:34
+
+python -i simdat.py backupcfg/20oct4_A0_cycle_sim.json
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/20oct5_20oct4_A0_cycle_perf.png]]
+this one looks better than previous ... 
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((990e3,1000e3))
+savefig(gifpath()+'rast.png') # [[./gif/20oct5_20oct4_A0_cycle_rast.png]]
+still not much firing ... intermittent gaps in activity of both EM populations...probably occur when ball off screen and no motion input
+yeah, that seems to be the case - note the lack of EV1D activity at those times of no EMUP,EMDOWN firing
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN'],lclr=['r'],plotindiv=True)
+xlabel('Time (ms)',fontsize=30); ylabel('Average weight',fontsize=30); tl(); 
+savefig(gifpath()+'all_avg_weight.png') # [[./gif/20oct5_20oct4_A0_cycle_all_avg_weight.png]]
+now the weights are going up and still have a lot of room to increase before hit limit where normalization kicks in ... 
+
+#
+prety = 'EMDOWN'; poty = 'EMUP'
+for pdx,prety in enumerate(['EV1', 'EV4', 'EMT', 'EV1DN', 'EV1DS', 'EV1DNW','EMUP','EMDOWN']):
+  subplot(2,4,pdx+1)
+  title(prety+'->'+poty)  
+  pdfs = pdf[(pdf.postid==dstartidx[poty])&(pdf.preid>=dstartidx[prety])&(pdf.preid<=dendidx[prety])]
+  plot(pdfs.time,pdfs.weight,'ko')
+
+savefig(gifpath()+'many_weightB.png') # [[./gif/20oct5_20oct4_A0_cycle_many_weightB.png]]
+now weights going up more ... from diff populations
+
+#
+clf()
+poty = 'EMT'
+for pdx,prety in enumerate(['EV4', 'EMT', 'EMUP','EMDOWN']):
+  subplot(2,2,pdx+1)
+  title(prety+'->'+poty)  
+  pdfs = pdf[(pdf.postid==dstartidx[poty])&(pdf.preid>=dstartidx[prety])&(pdf.preid<=dendidx[prety])]
+  plot(pdfs.time,pdfs.weight,'ko')
+
+savefig(gifpath()+'many_weightC.png') # [[./gif/20oct5_20oct4_A0_cycle_many_weightC.png]]
+
+** sanda 2017 also has output balancing
+
+output balancing same as constraining firing rates via homeostatic scaling? 
+could also implement with mutual inhib from one output pop to other output pop 
+
+"Thus,foreachmiddle-layercell,incrementsofthestrengthofoutgoingsynapsesresultingfromrewarded
+STDPeventsweredividedbytheratioofthecurrentsumofsynapticoutputstotheinitialsumofsynapticoutputs
+ofthesamecells(seeMethods).Theresultwasthatsynapsesoriginatingfromtheneuronswithmanystrongoutputs
+werenotabletoincreasetheirsynapticstrengthasquicklyassynapsesfromtheneuronswitha
+weakoutput.This gave a competitiveadvantagetothelaterneurons.It
+helpedtocontrolsynapticoutput,"
+
+so reward/punishment values scaled inversely by total input to the neuron 
+
+that sounds similar to the soft threshold rule ... but operates across all input synapses
+rather than individual synapse
+
+suggested that could be achieved by reciprocal inhibition between output neuron populations:
+"Output-sidebalancingallowedonlysynapsescorrelatedwithrewardtobestrengthenedviarewardedSTDPtraces.
+Whilewedonotknowdirectexperimentalevidenceforthismechanism,a similareffectcanbepotentiallyachieved
+bymorecomplexcircuitsinvolvingreciprocalinhibitionbetweenoutputneurons."
+
+that seems worth/easy trying
+
+also talked about importance of feedforward inhibition between layers, for preventing
+runaway activity and high variability in output
+
+** some adjustments - try reciprocal inhibition between EMUP and EMDOWN
+
+also keeping IM population to provide some balance and not to allow EMUP or EMDOWN
+to dominate too much - that's what seems to happen w/o IM (that gets inputs from both
+EMUP and EMDOWN and projects to both - providing feedback inhib); IMUP and IMDOWN, in contrast
+receive inputs from one population and project only to the other ... after an initial run, there
+does seem to be clearer negative correlation between EMUP and EMDOWN firing activity ... to be
+seen if that's helpful; could also put in EIPLAST to regulate ... 
+
+also removed excitatory connections between the two dfferent EM populations ... 
+
+        "name": "20oct5_A0_cycle_",
+
+./myrun 32 sn.json
+
+started 1000 s run ~15:08 ... 
+
+paddle seems to go too far in either direction - may partially be due to the reciprocal
+inhibition, since once one population starts firing, it suppresses the other, so there's a
+loss of balance ... EI plasticity might help avoid that ... 
+
+** lower activation to IMDOWN, IMUP ?  + EIPlast
+
+        "name": "20oct5_B0_cycle_",
+
+./myrun 32 sn.json
+
+started ~23:25 ... 
+
+python -i simdat.py backupcfg/20oct5_B0_cycle_sim.json
+
+pdfs = pdf[(pdf.postid==dstartidx['IMUP'])]
+len(pdfs) # 6
+plot(pdfs.time,pdfs.weight,'ko')
+
+* 20oct6
+** check output from 20oct5_A0_cycle_
+
+finished at ~7 AM
+
+python -i simdat.py backupcfg/20oct5_A0_cycle_sim.json
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/20oct6_20oct5_A0_cycle_perf.png]]
+overall performance is worse
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((990e3,1000e3))
+savefig(gifpath()+'rast.png') # [[./gif/20oct6_20oct5_A0_cycle_rast.png]]
+low rates for EMUP,EMDOWN; can see out of phase firing with EMUP and EMDOWN
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN'],lclr=['r'],plotindiv=True)
+xlabel('Time (ms)',fontsize=30); ylabel('Average weight',fontsize=30); tl(); 
+savefig(gifpath()+'all_avg_weight.png') # [[./gif/20oct6_20oct5_A0_cycle_all_avg_weight.png]]
+average is mostly flat, as should be with the indiv cell weight norm
+
+#
+prety = 'EMDOWN'; poty = 'EMUP'
+for pdx,prety in enumerate(['EV1', 'EV4', 'EMT', 'EV1DN', 'EV1DS', 'EV1DNW','EMUP','EMDOWN']):
+  subplot(2,4,pdx+1)
+  title(prety+'->'+poty)  
+  pdfs = pdf[(pdf.postid==dstartidx[poty])&(pdf.preid>=dstartidx[prety])&(pdf.preid<=dendidx[prety])]
+  plot(pdfs.time,pdfs.weight,'ko')
+
+savefig(gifpath()+'many_weightB.png') # [[./gif/20oct6_20oct5_A0_cycle_many_weightB.png]]
+many going up, many down
+
+#
+clf()
+poty = 'EMT'
+for pdx,prety in enumerate(['EV4', 'EMT', 'EMUP','EMDOWN']):
+  subplot(2,2,pdx+1)
+  title(prety+'->'+poty)  
+  pdfs = pdf[(pdf.postid==dstartidx[poty])&(pdf.preid>=dstartidx[prety])&(pdf.preid<=dendidx[prety])]
+  plot(pdfs.time,pdfs.weight,'ko')
+
+savefig(gifpath()+'many_weightC.png') # [[./gif/20oct6_20oct5_A0_cycle_many_weightC.png]]
+
+fig=animInput(InputImages,gifpath()+'_input.mp4') # [[./gif/20oct6_20oct5_A0_cycle__input.mp4]]
+
+** counteracting over-reach
+
+it's good that individual populations of EM neurons can now drive motion further
+but would be useful to counteract overreach ... can do that in a few ways. testing one
+in EIPLAST above (20oct5_B0_cycle_). could also use EMSTAY or restore connectivity between
+EMUP and EMDOWN ... 
+
+        "name": "20oct6_A0_cycle_",
+
+try this for 1000 s too ...
+
+./myrun 32 sn.json
+
+started ~16:52 ... 
+
+** py_broadcast, broadcast problems
+
+broadcast and py_broadcast sometimes producing wrong-sized array on destination
+
+had to use pyalltoall to get right size when including EMSTAY and IMSTAY populations
+
+** check output from 20oct5_B0_cycle_ (has EIPLAST)
+
+python -i simdat.py backupcfg/20oct5_B0_cycle_sim.json
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/20oct6_20oct5_B0_cycle_perf.png]]
+seems a little better ... than previous with no EIPLAST but reciprocal inhib (20oct5_A0_cycle_ [[./gif/20oct6_20oct5_A0_cycle_perf.png]])
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((990e3,1000e3))
+savefig(gifpath()+'rast.png') # [[./gif/20oct6_20oct5_B0_cycle_rast.png]]
+EMUP,EMDOWN no longer as much out of phase ... and have much higher rates than [[./20oct6_20oct5_A0_cycle_rast.png]]
+the higher EMUP,EMDOWN rates due to lower firing of IM,IMUP,IMDOWN which changed due to EIPLAST
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN'],lclr=['r'],plotindiv=True)
+xlabel('Time (ms)',fontsize=30); ylabel('Average weight',fontsize=30); tl(); 
+savefig(gifpath()+'all_avg_weight.png') # [[./gif/20oct6_20oct5_B0_cycle_all_avg_weight.png]]
+
+#
+poty = 'EMUP'
+for pdx,prety in enumerate(['EV1', 'EV4', 'EMT', 'EV1DN', 'EV1DS', 'EV1DNW','EMUP','EMDOWN']):
+  subplot(2,4,pdx+1)
+  title(prety+'->'+poty)  
+  pdfs = pdf[(pdf.postid==dstartidx[poty])&(pdf.preid>=dstartidx[prety])&(pdf.preid<=dendidx[prety])]
+  plot(pdfs.time,pdfs.weight,'ko')
+
+savefig(gifpath()+'many_weightB.png') # [[./gif/20oct6_20oct5_B0_cycle_many_weightB.png]]
+
+#
+clf()
+pdx=0
+for prety,poty in zip(['EMDOWN','EMDOWN','EMUP','EMUP'],['IMUP','IM','IMDOWN','IM']):
+  subplot(2,2,pdx+1)
+  title(prety+'->'+poty)  
+  pdfs = pdf[(pdf.postid>=dstartidx[poty])&(pdf.postid<=dendidx[poty])&(pdf.preid>=dstartidx[prety])&(pdf.preid<=dendidx[prety])]
+  tt = np.unique(pdfs.time)
+  lw = []
+  for t in tt:
+    pdfs2 = pdfs[(pdfs.time==t)]
+    lw.append(np.mean(pdfs.weight))
+  plot(tt,lw,'k')
+  pdx+=1
+
+savefig(gifpath()+'many_avgIB.png') # [[./gif/20oct6_20oct5_B0_cycle_many_avgIB.png]]
+hmm, avg weights onto interneurons not changing ... ??
+
+#
+clf()
+pdx=0
+for prety,poty in zip(['EMDOWN','EMDOWN','EMUP','EMUP'],['IMUP','IM','IMDOWN','IM']):
+  subplot(2,2,pdx+1)
+  title(prety+'->'+poty)  
+  pdfs = pdf[(pdf.postid==dstartidx[poty]+1)&(pdf.preid>=dstartidx[prety])&(pdf.preid<=dendidx[prety])&(pdf.postid==dstartidx[poty]+1)]
+  plot(pdfs.time,pdfs.weight,'ko')
+  pdx+=1
+
+
+#
+clf()
+poty = 'EMT'
+for pdx,prety in enumerate(['EV4', 'EMT', 'EMUP','EMDOWN']):
+  subplot(2,2,pdx+1)
+  title(prety+'->'+poty)  
+  pdfs = pdf[(pdf.postid==dstartidx[poty])&(pdf.preid>=dstartidx[prety])&(pdf.preid<=dendidx[prety])]
+  plot(pdfs.time,pdfs.weight,'ko')
+
+savefig(gifpath()+'many_weightC.png') # [[./gif/20oct6_20oct5_B0_cycle_many_weightC.png]]
+
+## fig=animInput(InputImages,gifpath()+'_input.mp4') 
+
+may as well continue this one for now ... since was doing best ... but need to check if EIPLAST working properly ... 
+
+        "name": "20oct6_B1_cycle_",
+
+    "simtype": {
+        "ResumeSim": 1,
+        "ResumeSimFromFile": "data/20oct5_B0_cycle_synWeights_final.pkl"
+    },
+
+./myrun 32 sn.json
+
+started ~16:45 ...
+
+** multiple EDir layers?
+
+ideally want some place where motion of different objects is integrated - while that happens
+directly in EM populations, may want better coverage earlier too ... ?
+
+also, should the middle layers have larger number of neurons (for more complex rep)
+compared to earlier layers??
+
+* 20oct7
+** check output from 20oct6_B1_cycle_
+
+python -i simdat.py backupcfg/20oct6_B1_cycle_sim.json
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/20oct7_20oct6_B1_cycle_perf.png]]
+~flat, does not look better than prior step ... 
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((990e3,1000e3))
+savefig(gifpath()+'rast.png') # [[./gif/20oct7_20oct6_B1_cycle_rast.png]]
+rates look ok - a little higher than before
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN'],lclr=['r'],plotindiv=True)
+xlabel('Time (ms)',fontsize=30); ylabel('Average weight',fontsize=30); tl(); 
+savefig(gifpath()+'all_avg_weight.png') # [[./gif/20oct7_20oct6_B1_cycle_all_avg_weight.png]]
+
+#
+poty = 'EMUP'
+for pdx,prety in enumerate(['EV1', 'EV4', 'EMT', 'EV1DN', 'EV1DS', 'EV1DNW','EMUP','EMDOWN']):
+  subplot(2,4,pdx+1)
+  title(prety+'->'+poty)  
+  pdfs = pdf[(pdf.postid==dstartidx[poty])&(pdf.preid>=dstartidx[prety])&(pdf.preid<=dendidx[prety])]
+  plot(pdfs.time,pdfs.weight,'ko')
+
+savefig(gifpath()+'many_weightB.png') # [[./gif/20oct7_20oct6_B1_cycle_many_weightB.png]]
+
+#
+clf()
+pdx=0
+for prety,poty in zip(['EMDOWN','EMDOWN','EMUP','EMUP'],['IMUP','IM','IMDOWN','IM']):
+  subplot(2,2,pdx+1)
+  title(prety+'->'+poty)  
+  pdfs = pdf[(pdf.postid>=dstartidx[poty])&(pdf.postid<=dendidx[poty])&(pdf.preid>=dstartidx[prety])&(pdf.preid<=dendidx[prety])]
+  tt = np.unique(pdfs.time)
+  lw = []
+  for t in tt:
+    pdfs2 = pdfs[(pdfs.time==t)]
+    lw.append(np.mean(pdfs.weight))
+  plot(tt,lw,'k')
+  pdx+=1
+
+savefig(gifpath()+'many_avgIB.png') # [[./gif/20oct7_20oct6_B1_cycle_many_avgIB.png]]
+
+#
+clf()
+pdx=0
+for prety,poty in zip(['EMDOWN','EMDOWN','EMUP','EMUP'],['IMUP','IM','IMDOWN','IM']):
+  subplot(2,2,pdx+1)
+  title(prety+'->'+poty)  
+  pdfs = pdf[(pdf.postid==dstartidx[poty]+1)&(pdf.preid>=dstartidx[prety])&(pdf.preid<=dendidx[prety])&(pdf.postid==dstartidx[poty]+1)]
+  plot(pdfs.time,pdfs.weight,'ko')
+  pdx+=1
+
+savefig(gifpath()+'many_IC.png') # [[./gif/20oct7_20oct6_B1_cycle_many_IC.png]]
+
+#
+clf()
+poty = 'EMT'
+for pdx,prety in enumerate(['EV4', 'EMT', 'EMUP','EMDOWN']):
+  subplot(2,2,pdx+1)
+  title(prety+'->'+poty)  
+  pdfs = pdf[(pdf.postid==dstartidx[poty])&(pdf.preid>=dstartidx[prety])&(pdf.preid<=dendidx[prety])]
+  plot(pdfs.time,pdfs.weight,'ko')
+
+savefig(gifpath()+'many_weightC.png') # [[./gif/20oct7_20oct6_B1_cycle_many_weightC.png]]
+
+do not see the EIPLAST working ... ? 
+
+lfn = ['20oct5_B0_cycle_','20oct6_B1_cycle_']
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0,0.5))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/20oct7_20oct6_B1_cycle_perf_all_steps_so_far.png]]
+
+lpda = getindivactionreward(lfn)
+clf(); plotComparePerf(lpda,['g','b','r'],yl=(0,1),lleg=lfn)
+savefig(gifpath()+'perf_compareB.png') # [[./gif/20oct7_20oct6_B1_cycle_perf_compareB.png]]
+
+fig=animInput(InputImages,gifpath()+'_input.mp4') # [[./gif/20oct7_20oct6_B1_cycle__input.mp4]]
+
+** why EIPLAST not working?
+
+        "name": "20oct7_A0_cycle_",
+
+
+** how to backprop?
+
+could look at connectome to determine what each neuron contributes to in terms of move
+and use that to decide whether to reinforce/punish specific synapses ... so currently
+targetted looks at first degree synapses onto the EM pops; could look at 2nd degree conns
+and weight them a little elss; 3rd degree conns weight them less, etc. that way could
+take into account more of the synapses ... 
+
+but that still would only work for individual moves ... unless integrated multiple
+moves and compared to correct sequence ... 
+
+e.g. if need 3 moves up to get to ball and instead took 1 move up and 2 moves down
+then reinforce the path that led to 1 move up and punish the part that led to 2 moves down
+
+test in a simple way ... 20oct7_B0_cycle_
+
+hmm, bug in hit detection, saw it happen 2x in very short interval:
+t= 77800.0 - adjusting weights based on RL critic value: 0.5
+t= 77800.0  game rewards: [0.5]
+t= 78060.0 - adjusting weights based on RL critic value: 0.5
+t= 78060.0  game rewards: [0.5]
+
+only really occurred first time ... 
+
+also had too short recording duration ... will retry
+
+** check output from 20oct6_A0_cycle_ (has EMSTAY)
+
+python -i simdat.py backupcfg/20oct6_A0_cycle_sim.json
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/20oct7_20oct6_A0_cycle_perf.png]]
+hmm, looks much worse
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((990e3,1000e3))
+savefig(gifpath()+'rast.png') # [[./gif/20oct7_20oct6_A0_cycle_rast.png]]
+well, the network became epileptic ... 
+
+fig=animInput(InputImages,gifpath()+'_input.mp4') # [[./gif/20oct7_20oct6_A0_cycle__input.mp4]]
+
+* 20oct8
+** simpler test again
+
+        "name": "20oct8_A0_cycle_",
+        "targettedRL": 2,
+
+    "rewardcodes": {
+        "scorePoint": 0.0,
+        "losePoint": -0.0,
+        "followTarget": 0.1,
+        "avoidTarget": -0.1,
+        "hitBall": 0.0
+    },
+
+./myrun 32 sn.json

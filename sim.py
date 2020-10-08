@@ -35,10 +35,7 @@ if 'saveWeights' in dconf['sim']: sim.saveWeights = dconf['sim']['saveWeights']
 sim.saveInputImages = 1 #save Input Images (5 game frames)
 sim.saveMotionFields = 1 # whether to save the motion fields
 sim.saveObjPos = 1 # save ball and paddle position to file
-if dconf['sim']['saveAssignedFiringRates']: 
-  sim.saveAssignedFiringRates = 1
-else:
-  sim.saveAssignedFiringRates = 0
+sim.saveAssignedFiringRates = dconf['sim']['saveAssignedFiringRates']
 recordWeightStepSize = dconf['sim']['recordWeightStepSize']
 normalizeWeightStepSize = dconf['sim']['normalizeWeightStepSize']
 #recordWeightDT = 1000 # interval for recording synaptic weights (change later)
@@ -110,7 +107,12 @@ if dconf['net']['RLconns']['Visual'] or dconf['net']['STDPconns']['Visual']:
   if lrecpop.count('EV4')==0: lrecpop.append('EV4')
   if lrecpop.count('EMT')==0: lrecpop.append('EMT')
   
-if dconf['net']['RLconns']['EIPlast'] or dconf['net']['STDPconns']['EIPlast']: lrecpop.append('IM')
+if dconf['net']['RLconns']['EIPlast'] or dconf['net']['STDPconns']['EIPlast']:
+  lrecpop.append('IM')
+  #lrecpop.append('ID')
+  lrecpop.append('IMUP')
+  lrecpop.append('IMDOWN')
+  lrecpop.append('IMSTAY')
 
 # Network parameters
 netParams = specs.NetParams() #object of class NetParams to store the network parameters
@@ -133,7 +135,7 @@ simConfig.saveFolder = 'data'
 # simConfig.backupCfg = ['sim.json', 'backupcfg/'+dconf['sim']['name']+'sim.json']
 #simConfig.createNEURONObj = True  # create HOC objects when instantiating network
 #simConfig.createPyStruct = True  # create Python structure (simulator-independent) when instantiating network
-simConfig.analysis['plotTraces'] = {'include': [(pop, 0) for pop in ['ER','IR','EV1','EV1DE','ID','IV1','EV4','IV4','EMT','IMT','EMDOWN','EMUP','IM']]}
+simConfig.analysis['plotTraces'] = {'include': [(pop, 0) for pop in ['ER','IR','EV1','EV1DE','ID','IV1','EV4','IV4','EMT','IMT','EMDOWN','EMUP','EMSTAY','IM','IMUP','IMDOWN']]}
 simConfig.analysis['plotRaster'] = {'popRates':'overlay','showFig':dconf['sim']['doplot']}
 #simConfig.analysis['plot2Dnet'] = True 
 #simConfig.analysis['plotConn'] = True           # plot connectivity matrix
@@ -455,6 +457,24 @@ if VTopoI:
 else: 
   netParams.connParams['EMT->IMT']['convergence'] = prob2conv(0.0225, dnumc['EMT'])
 
+"""  
+for prety in EPreMPops:
+  for epoty in EMotorPops:
+    poty = 'IM' + epoty[2:]
+    k = prety+'->'+poty
+    netParams.connParams[k] = {
+      'preConds': {'pop': prety},
+      'postConds': {'pop': poty},
+      'convergence': prob2conv(0.01, dnumc[prety]),
+      'weight': 0.001 * cfg.EIGain,
+      'delay': 2,
+      'synMech': 'AMPA', 'sec':'soma', 'loc':0.5}
+    if dconf['net']['RLconns']['EIPlast'] and dSTDPparamsRL['AMPAI']['RLon']: # only turn on plasticity when specified to do so
+      netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL['AMPAI']}
+    elif dconf['net']['STDPconns']['EIPlast'] and dSTDPparams['AMPAI']['STDPon']:
+      netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparams['AMPAI']}    
+"""
+
 for prety in EMotorPops:
   k = prety+'->IM'
   netParams.connParams[k] = {
@@ -468,7 +488,26 @@ for prety in EMotorPops:
     netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL['AMPAI']}
   elif dconf['net']['STDPconns']['EIPlast'] and dSTDPparams['AMPAI']['STDPon']:
     netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparams['AMPAI']}    
-  
+
+# reciprocal inhibition 
+for prety in EMotorPops:
+  for epoty in EMotorPops:
+    if epoty == prety: continue # no self inhib here
+    poty = 'IM' + epoty[2:] # change name to interneuron
+    k = prety + '->' + poty
+    netParams.connParams[k] = {
+      'preConds': {'pop': prety},
+      'postConds': {'pop': poty},
+      'convergence': prob2conv(dconf['net']['EMIRecipProb'], dnumc[prety]),
+      'weight': dconf['net']['EMIRecipWght'] * cfg.EIGain,
+      'delay': 2,
+      'synMech': 'AMPA', 'sec':'soma', 'loc':0.5}
+    if dconf['net']['RLconns']['EIPlast'] and dSTDPparamsRL['AMPAI']['RLon']: # only turn on plasticity when specified to do so
+      netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL['AMPAI']}
+    elif dconf['net']['STDPconns']['EIPlast'] and dSTDPparams['AMPAI']['STDPon']:
+      netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparams['AMPAI']}    
+
+    
 #Local inhibition
 #I to E within area
 if dnumc['ER']>0:
@@ -556,9 +595,17 @@ for poty in EMotorPops: # I -> E for motor populations
     'weight': 0.2 * cfg.IEGain,
     'delay': 2,
     'synMech': 'GABA', 'sec':'soma', 'loc':0.5}
+  prety = 'IM' + poty[2:] # for reciprocal inhibition between EM populations
+  netParams.connParams[prety+'->'+poty] = {
+    'preConds': {'pop': prety},
+    'postConds': {'pop': poty},
+    'convergence': prob2conv(0.125, dnumc[prety]),
+    'weight': 0.2 * cfg.IEGain,
+    'delay': 2,
+    'synMech': 'GABA', 'sec':'soma', 'loc':0.5}      
 
 #I to I
-for IType in ['IV1', 'IV4', 'IMT', 'IM', 'ID']:
+for IType in ITypes:
   if IType not in dnumc: continue
   if dnumc[IType] <= 0: continue
   netParams.connParams[IType+'->'+IType] = {
@@ -973,20 +1020,29 @@ def mulAdjustableWeights (sim, dfctr):
 
 def normalizeAdjustableWeights (sim, t, lpop):
   # normalize the STDP/RL weights during the simulation - called in trainAgent
-  if dconf['net']['CellWNorm']:
+  if dconf['net']['CellWNorm']['On']:
     # print('normalizing CellWNorm at t=',t)
     global dsumWInit
     dsumWCurr = getSumAdjustableWeights(sim) # get current sum of adjustable weight values
+    MinFctr, MaxFctr = dconf['net']['CellWNorm']['MinFctr'], dconf['net']['CellWNorm']['MaxFctr']
     for cell in sim.net.cells:
       if cell.gid in dsumWInit:
         currW = dsumWCurr[cell.gid]
         initW = dsumWInit[cell.gid]
         if currW > 0 and currW != initW:
-          fctr = initW / currW
+          fctrA = currW / initW
+          dochange = False
+          if fctrA < MinFctr:
+            fctrB = (MinFctr * initW) / currW # factor to restore weights to boundary
+            dochange = True
+          elif fctrA > MaxFctr:
+            fctrB = (MaxFctr * initW) / currW # factor to restore weights to boundary
+            dochange = True
           # print('initW:',initW,'currW:',currW,'fctr:',fctr)
-          for conn in cell.conns:
-            if 'hSTDP' in conn:
-              conn['hObj'].weight[0] *= fctr  
+          if dochange:
+            for conn in cell.conns:
+              if 'hSTDP' in conn:
+                conn['hObj'].weight[0] *= fctrB
   else:
     davg = getAverageAdjustableWeights(sim, lpop)
     try:
@@ -1059,30 +1115,70 @@ def updateInputRates ():
   if dnumc['ER']>0:
     lratepop = ['ER', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW', 'EV1DSW', 'EV1DS', 'EV1DSE']
   else:
-    lratepop = ['EV1', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW', 'EV1DSW', 'EV1DS', 'EV1DSE']  
+    lratepop = ['EV1', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW', 'EV1DSW', 'EV1DS', 'EV1DSE']
+  # sim.pc.barrier()
+
+  #root = 0 # any specific rank
+  #src = rank if rank == root else None
+  #dest = pc.py_broadcast(src, root)
+
+  #src = dict(sim.AIGame.dFiringRates) if sim.rank == 0 else None
+  #print('rank=',sim.rank,'src=',src)
+
+
+  # this py_alltoall seems to work, but is apparently not as fast as py_broadcast (which has problems - wrong-sized array sometimes!)
+  root = 0
+  nhost = sim.pc.nhost()
+  src = [sim.AIGame.dFiringRates]*nhost if sim.rank == root else [None]*nhost
+  dFiringRates = sim.pc.py_alltoall(src)[0]
+  if sim.rank == 0: dFiringRates = sim.AIGame.dFiringRates
+  # print(sim.rank,'dFiringRates:',dFiringRates)
+
+  """ # for some reason this code does not work - returns wrong sized array on dest sometimes, saw it produce MPI error too
   if sim.rank == 0:
-    dFiringRates = sim.AIGame.dFiringRates    
+    dFiringRates = sim.AIGame.dFiringRates
+    sim.pc.py_broadcast(dFiringRates, 0)
+  else:
+    dFiringRates = sim.pc.py_broadcast(None, 0)
+    #dFiringRates = {pop:np.zeros(dnumc[pop]) for pop in allpops}
+  # pop='EV1'; print('rank=',sim.rank,pop,len(dFiringRates[pop]))
+  """
+  
+  """ # this also sometimes produces wrong-sized array on dest
+  sim.pc.barrier()
+  if sim.rank == 0:
+    #print('rank0:',len(sim.AIGame.dFiringRates['EV1']))
+    #dFiringRates = sim.pc.py_broadcast(dict(sim.AIGame.dFiringRates), 0)
+    dFiringRates = sim.AIGame.dFiringRates
     for k in sim.AIGame.lratepop:
       sim.pc.broadcast(sim.AIGame.dFVec[k].from_python(dFiringRates[k]),0)
       if dconf['verbose'] > 1: print('Firing Rates of',k,np.where(dFiringRates[k]==np.amax(dFiringRates[k])),np.amax(dFiringRates[k]))
+      print('rank=',sim.rank,k,len(dFiringRates[k]))
   else:
+    #dFiringRates = sim.pc.py_broadcast(None, 0) # OrderedDict()
     dFiringRates = OrderedDict()
     for pop in lratepop:
       vec = h.Vector()
-      sim.pc.broadcast(vec,0)
+      destSz = sim.pc.broadcast(vec,0)
+      print('rank=',sim.rank,'destSz=',destSz)
       dFiringRates[pop] = vec.to_python()
       if dconf['verbose'] > 1:
-        print(sim.rank,'received firing rates:',np.where(dFiringRates[pop]==np.amax(dFiringRates[pop])),np.amax(dFiringRates[pop]))          
+        print(sim.rank,'received firing rates:',np.where(dFiringRates[pop]==np.amax(dFiringRates[pop])),np.amax(dFiringRates[pop]))
+      print('rank=',sim.rank,pop,len(dFiringRates[pop]))
+  sim.pc.barrier()
+  """
+  
   # update input firing rates for stimuli to ER,EV1 and direction sensitive cells
   for pop in lratepop:
     lCell = [c for c in sim.net.cells if c.gid in sim.net.pops[pop].cellGids] # this is the set of cells
     offset = sim.simData['dminID'][pop]
-    if dconf['verbose'] > 1: print(sim.rank,'updating len(',pop,len(lCell),'source firing rates. len(dFiringRates)=',len(dFiringRates[pop]))
+    #if dconf['verbose'] > 1: print(sim.rank,'updating len(',pop,len(lCell),'source firing rates. len(dFiringRates)=',len(dFiringRates[pop]))
     for cell in lCell:  
       for stim in cell.stims:
         if stim['source'] == 'stimMod':
           #rind = random.randint(0,2)
-          #fchoices = [20,50,1000] #20 will represent 50Hz and so on 
+          #fchoices = [20,50,1000] #20 will represent 50Hz and so on
+          # print(pop,len(dFiringRates[pop]),int(cell.gid-offset),cell.gid,offset)
           if dFiringRates[pop][int(cell.gid-offset)]==0:
             stim['hObj'].interval = 1e12
           else:
@@ -1092,57 +1188,61 @@ def updateInputRates ():
 
 # homeostasis based on Sanda et al. 2017.
 
-def initTargetFR(sim,allpops,initTargetFR=5):
-  sim.dTargetFR_AllNeurons = {}
-  for pop in allpops:
-    sim.dTargetFR_AllNeurons[pop]=[]
-    lcell = [c for c in sim.net.cells if c.gid in sim.net.pops[pop].cellGids] # this is the set of cells in a pop
-    for cell in lcell:
-      sim.dTargetFR_AllNeurons[pop].append([cell.gid,initTargetFR])
+def initTargetFR (sim,dMINinitTargetFR,dMAXinitTargetFR):
+  sim.dMINTargetFR = {}
+  sim.dMAXTargetFR = {}
+  sim.dHPlastPops = list(dMINinitTargetFR.keys())
+  for pop in dMINinitTargetFR.keys():
+    for gid in sim.net.pops[pop].cellGids:
+      sim.dMINTargetFR[gid] = dMINinitTargetFR[pop]
+      sim.dMAXTargetFR[gid] = dMAXinitTargetFR[pop]
 
-def initTargetW(sim,allpops,synType='AMPA'):
-  sim.dTargetW_AllNeurons = {}
-  for pop in allpops:
-    sim.dTargetW_AllNeurons[pop]=[]
+def initTargetW (sim,lpop,synType='AMPA'):
+  sim.dTargetW = {}
+  for pop in lpop:
     lcell = [c for c in sim.net.cells if c.gid in sim.net.pops[pop].cellGids] # this is the set of cells in a pop
     for cell in lcell:
       cCellW = 0
       for conn in cell.conns:
-        if conn.synMech==synType:
+        if conn.synMech==synType and 'hSTDP' in conn:
           cCellW+=conn['hObj'].weight[0]
-      sim.dTargetW_AllNeurons[pop].append([cell.gid,cCellW])
+      sim.dTargetW[cell.gid] = cCellW
 
 def getFiringRateWithInterval (trange = None, neuronal_pop = None):
   if len(neuronal_pop) < 1: return 0.0
   spkts = np.array(sim.simData['spkt'])
   spkids = np.array(sim.simData['spkid'])
   ctspkids = spkids[(spkts>=trange[0])&(spkts <= trange[1])]
-  pop_firingrates = []
+  pop_firingrates = {}
   if len(spkts)>0:
     for cellid in neuronal_pop:
-      pop_firingrates.append([cellid,1000*len(np.where(ctspkids==cellid))/(trange[1]-trange[0])])
+      pop_firingrates[cellid] = 1000.0*len(np.where(ctspkids==cellid))/(trange[1]-trange[0])
   return pop_firingrates
 
-def getFiringRateWithIntervalAllNeurons(sim, trange, allpops):
-  sim.dFR_AllNeurons = {}
+def getFiringRateWithIntervalAllNeurons (sim, trange, allpops):
+  lgid = []
   for pop in allpops:
-    sim.dFR_AllNeurons[pop] = getFiringRateWithInterval (trange = trange, neuronal_pop = sim.net.pops[pop].cellGids)
+    for gid in sim.net.pops[pop].cellGids:
+      lgid.append(gid)
+  sim.dFR = getFiringRateWithInterval(trange = trange, neuronal_pop = lgid)
 
 def adjustTargetWBasedOnFiringRates (sim):
-  dshift = dconf['net']['homPlast']['dshift']
-  for pop in sim.dTargetW_AllNeurons.keys():
-    for idx in range(len(sim.dTargetW_AllNeurons[pop])):
-      cid = sim.dTargetW_AllNeurons[pop][idx][0]
-      cTargetW = sim.dTargetW_AllNeurons[pop][idx][1]
-      if sim.dTargetFR_AllNeurons[pop][idx][0]==cid:
-        cTargetFR = sim.dTargetFR_AllNeurons[pop][idx][1]
-      if sim.dFR_AllNeurons[pop][idx][0]==cid:
-        cFR = sim.dFR_AllNeurons[pop][idx][1]
-      if cFR>cTargetFR:
-        sim.dTargetW_AllNeurons[pop][idx][1]-=dshift
-      elif cFR<cTargetFR:
-        sim.dTargetW_AllNeurons[pop][idx][1]+=dshift
-  return sim.dTargetW_AllNeurons
+  dshift = dconf['net']['homPlast']['dshift'] # shift in weights to push within min,max firing rate bounds
+  for gid,cTargetW in sim.dTargetW.items():
+    cTargetFRMin, cTargetFRMax = sim.dMINTargetFR[gid], sim.dMAXTargetFR[gid]
+    if gid not in sim.dFR: continue
+    cFR = sim.dFR[gid] # current cell firing rate
+    if cFR>cTargetFRMax: # above max threshold firing rate
+      if dshift == 0.0:
+        sim.dTargetW[gid] *= cTargetFRMax / cFR
+      else:
+        sim.dTargetW[gid] -= dshift
+    elif cFR<cTargetFRMin: # below min threshold firing rate
+      if dshift == 0:
+        sim.dTargetW[gid] *= cTargetFRMin / cFR 
+      else:
+        sim.dTargetW[gid] += dshift
+  return sim.dTargetW
 
 def adjustWeightsBasedOnFiringRates (sim,lpop,synType='AMPA'):
   # normalize the STDP/RL weights during the simulation - called in trainAgent
@@ -1150,34 +1250,26 @@ def adjustWeightsBasedOnFiringRates (sim,lpop,synType='AMPA'):
   countScaleDowns = 0
   for pop in lpop:
     lcell = [c for c in sim.net.cells if c.gid in sim.net.pops[pop].cellGids] # this is the set of cells in a pop
-    lTargetW = sim.dTargetW_AllNeurons[pop]
-    for cell,targetW in zip(lcell,lTargetW):
+    for cell in lcell:
+      targetW = sim.dTargetW[cell.gid]
       cCellW = 0
       for conn in cell.conns:
-        if conn.synMech==synType:    # to make sure that only specific type of synapses are counted towars the sum.
+        if conn.synMech==synType and 'hSTDP' in conn: # to make sure that only specific type of synapses are counted towards the sum.
           cCellW+=conn['hObj'].weight[0]
       if cCellW>0: # if no weight associated with the specific type of synapses, no need to asdjust weights.
-        sfctr = targetW[1]/cCellW
-        if sfctr>1:
-          countScaleUps+=1
-        elif sfctr<1:
-          countScaleDowns+=1
+        sfctr = targetW/cCellW
+        if sfctr>1: countScaleUps += 1
+        elif sfctr<1: countScaleDowns += 1
         for conn in cell.conns:
-          if conn.synMech==synType:    
-            conn['hObj'].weight[0]=sfctr*conn['hObj'].weight[0]
+          if conn.synMech==synType and 'hSTDP' in conn:
+            conn['hObj'].weight[0] *= sfctr
   print('CountScaleUps, CountScaleDowns: ', countScaleUps, countScaleDowns)
 
 def trainAgent (t):
   """ training interface between simulation and game environment
   """
-  global NBsteps, epCount, proposed_actions, total_hits, fid4
-  global f_ax, fig
-  global tstepPerAction
+  global NBsteps, epCount, proposed_actions, total_hits, fid4, tstepPerAction
   vec = h.Vector()
-  vec2 = h.Vector()
-  vec3 = h.Vector()
-  vec4 = h.Vector()
-  vec5 = h.Vector()
   noWinner = False # no clear winner for the population firing rates (used below)
   if t<(tstepPerAction*dconf['actionsPerPlay']): # for the first time interval use randomly selected actions
     actions =[]
@@ -1277,33 +1369,28 @@ def trainAgent (t):
       #total rewards
       critic = critic + critic_for_avoidingloss + critic_for_following_ball
       rewards = [critic for i in range(len(rewards))]  # reset rewards to modified critic signal - should use more granular recording
-    sim.pc.broadcast(vec.from_python([critic]), 0) # convert python list to hoc vector to broadcast critic value to other nodes
+    # use py_broadcast to avoid converting to/from Vector
+    sim.pc.py_broadcast(critic, 0) # broadcast critic value to other nodes
     UPactions = np.sum(np.where(np.array(actions)==dconf['moves']['UP'],1,0))
     DOWNactions = np.sum(np.where(np.array(actions)==dconf['moves']['DOWN'],1,0))
-    sim.pc.broadcast(vec2.from_python([UPactions]),0)
-    sim.pc.broadcast(vec3.from_python([DOWNactions]),0)
+    sim.pc.py_broadcast(UPactions,0) # broadcast UPactions
+    sim.pc.py_broadcast(DOWNactions,0) # broadcast DOWNactions
     if dnumc['EMSTAY']>0:
       STAYactions = np.sum(np.where(np.array(actions)==dconf['moves']['NOMOVE'],1,0))
-      sim.pc.broadcast(vec4.from_python([STAYactions]),0)
+      sim.pc.py_broadcast(STAYactions,0) # broadcast STAYactions
     if dconf['sim']['anticipatedRL']:
       print(proposed_actions)
-      sim.pc.broadcast(vec5.from_python(proposed_actions),0) # used proposed actions to target/potentiate the pop representing anticipated action.
+      sim.pc.py_broadcast(proposed_actions,0) # used proposed actions to target/potentiate the pop representing anticipated action.      
   else: # other workers
-    sim.pc.broadcast(vec, 0) # receive critic value from master node
-    critic = vec.to_python()[0] # critic is first element of the array
-    sim.pc.broadcast(vec2, 0)
-    UPactions = vec2.to_python()[0]
-    sim.pc.broadcast(vec3, 0)
-    DOWNactions = vec3.to_python()[0]
-    if 'EMSTAY' in dconf['net']:
-      sim.pc.broadcast(vec4, 0)
-      STAYactions = vec4.to_python()[0]
-    if dconf['sim']['anticipatedRL']:
-      sim.pc.broadcast(vec5, 0)
-      proposed_actions = vec5.to_python()[0] # this([0]) will just pick up the first element of the list.
+    critic = sim.pc.py_broadcast(None, 0) # receive critic value from master node
+    UPactions = sim.pc.py_broadcast(None, 0)
+    DOWNactions = sim.pc.py_broadcast(None, 0)
+    if 'EMSTAY' in dconf['net']: STAYactions = sim.pc.broadcast(None, 0)
+    if dconf['sim']['anticipatedRL']: proposed_actions = sim.pc.py_broadcast(None, 0)      
     if dconf['verbose']:
       if dnumc['EMSTAY']>0: print('UPactions: ', UPactions,'DOWNactions: ', DOWNactions, 'STAYactions: ', STAYactions)
       else: print('UPactions: ', UPactions,'DOWNactions: ', DOWNactions)
+      
   if dconf['sim']['anticipatedRL']:
     cpaction = proposed_actions 
     anticipated_reward = dconf['rewardcodes']['followTarget']
@@ -1393,10 +1480,10 @@ def trainAgent (t):
   if dconf['net']['homPlast']['On']:
     if NBsteps % dconf['net']['homPlast']['hsIntervalSteps'] == 0:
       hsInterval = tstepPerAction*dconf['actionsPerPlay']*dconf['net']['homPlast']['hsIntervalSteps']
-      getFiringRateWithIntervalAllNeurons(sim, [t,t-hsInterval], allpops) # call this function at hsInterval
+      getFiringRateWithIntervalAllNeurons(sim, [t,t-hsInterval], sim.dHPlastPops) # call this function at hsInterval
       adjustTargetWBasedOnFiringRates(sim) # call this function at hsInterval
     if NBsteps % dconf['net']['homPlast']['updateIntervalSteps'] == 0:
-      adjustWeightsBasedOnFiringRates (sim,allpops,synType=dconf['net']['homPlast']['synType'])
+      adjustWeightsBasedOnFiringRates(sim,sim.dHPlastPops,synType=dconf['net']['homPlast']['synType'])
 
 def getAllSTDPObjects (sim):
   # get all the STDP objects from the simulation's cells
@@ -1404,6 +1491,7 @@ def getAllSTDPObjects (sim):
   if dnumc['EMSTAY']>0: Mpops.append('EMSTAY')
   dSTDPmech = {'all':[]} # dictionary of STDP objects keyed by type (all, for EMUP, EMDOWN populations)
   for pop in Mpops: dSTDPmech[pop] = []
+  if dconf['sim']['targettedRL']: dcell = {pop:[] for pop in Mpops} # SN: exptl  
   for cell in sim.net.cells:
     for conn in cell.conns:
       STDPmech = conn.get('hSTDP')  # check if the connection has a NEURON STDP mechanism object
@@ -1412,6 +1500,26 @@ def getAllSTDPObjects (sim):
         for pop in Mpops:
           if cell.gid in sim.net.pops[pop].cellGids:
             dSTDPmech[pop].append(STDPmech)
+            if dconf['sim']['targettedRL']: dcell[pop].append(conn.preGid) # SN: exptl presynaptic ID
+  # SN: exptl
+  #if not 'hSTDP' in conn: continue
+  #cpreID = conn.preGid  #find preID
+  #if type(cpreID) != int: continue
+  if dconf['sim']['targettedRL'] > 1:
+    for pop in Mpops: dcell[pop] = np.unique(dcell[pop])
+    nhost = sim.pc.nhost()
+    src = [dcell]*nhost
+    dcellgid = sim.pc.py_alltoall(src)
+    for dcell in dcellgid:
+      for pop in Mpops:
+        for cell in sim.net.cells:
+          if cell.gid in dcell[pop]:
+            for conn in cell.conns:
+              STDPmech = conn.get('hSTDP')
+              if STDPmech:
+                if STDPmech not in dSTDPmech[pop]:
+                  dSTDPmech[pop].append(STDPmech)
+  # SN: exptl
   return dSTDPmech
         
 # Alternate to create network and run simulation
@@ -1437,8 +1545,9 @@ sim.setupRecording()                  # setup variables to record for each cell 
 dSTDPmech = getAllSTDPObjects(sim) # get all the STDP objects up-front
 
 if dconf['net']['homPlast']['On']:
-  initTargetFR(sim,allpops,initTargetFR=dconf['net']['homPlast']['targetFR']) # call this once before the simulation
-  initTargetW(sim,allpops,synType=dconf['net']['homPlast']['synType']) # call this once before running the simulation.
+  # call this once before the simulation
+  initTargetFR(sim,dconf['net']['homPlast']['mintargetFR'],dconf['net']['homPlast']['maxtargetFR']) 
+  initTargetW(sim,list(dconf['net']['homPlast']['mintargetFR'].keys()),synType=dconf['net']['homPlast']['synType']) # call this once before running the simulation.
 
 def updateSTDPWeights (sim, W):
   #this function assign weights stored in 'ResumeSimFromFile' to all connections by matching pre and post neuron ids  
@@ -1477,12 +1586,9 @@ def setdminID (sim, lpop):
   for tinds in range(len(alltags)):
     if alltags[tinds]['pop'] in lpop:
       dGIDs[alltags[tinds]['pop']].append(tinds)
-  sim.simData['dminID'] = {pop:np.amin(dGIDs[pop]) for pop in lpop}
+  sim.simData['dminID'] = {pop:np.amin(dGIDs[pop]) for pop in lpop if len(dGIDs[pop])>0}
 
-if dnumc['ER']>0:
-  setdminID(sim, ['ER', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW', 'EV1DSW', 'EV1DS', 'EV1DSE'])
-else:
-  setdminID(sim, ['EV1', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW', 'EV1DSW', 'EV1DS', 'EV1DSE'])
+setdminID(sim, allpops)
 tPerPlay = tstepPerAction*dconf['actionsPerPlay']
 InitializeInputRates()
 dsumWInit = getSumAdjustableWeights(sim) # get sum of adjustable weights at start of sim
