@@ -18157,7 +18157,10 @@ fig=animInput(InputImages,gifpath()+'_input.mp4') # [[./gif/20oct7_20oct6_B1_cyc
 ** how to backprop?
 
 could look at connectome to determine what each neuron contributes to in terms of move
-and use that to decide whether to reinforce/punish specific synapses ... 
+and use that to decide whether to reinforce/punish specific synapses ... so currently
+targetted looks at first degree synapses onto the EM pops; could look at 2nd degree conns
+and weight them a little elss; 3rd degree conns weight them less, etc. that way could
+take into account more of the synapses ... 
 
 but that still would only work for individual moves ... unless integrated multiple
 moves and compared to correct sequence ... 
@@ -18165,4 +18168,16 @@ moves and compared to correct sequence ...
 e.g. if need 3 moves up to get to ball and instead took 1 move up and 2 moves down
 then reinforce the path that led to 1 move up and punish the part that led to 2 moves down
 
-** check output from 
+** check output from 20oct6_A0_cycle_ (has EMSTAY)
+
+python -i simdat.py backupcfg/20oct6_A0_cycle_sim.json
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/20oct7_20oct6_A0_cycle_perf.png]]
+hmm, looks much worse
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((990e3,1000e3))
+savefig(gifpath()+'rast.png') # [[./gif/20oct7_20oct6_A0_cycle_rast.png]]
+well, the network became epileptic ... 
+
+fig=animInput(InputImages,gifpath()+'_input.mp4') # [[./gif/20oct7_20oct6_A0_cycle__input.mp4]]

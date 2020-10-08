@@ -1491,6 +1491,7 @@ def getAllSTDPObjects (sim):
   if dnumc['EMSTAY']>0: Mpops.append('EMSTAY')
   dSTDPmech = {'all':[]} # dictionary of STDP objects keyed by type (all, for EMUP, EMDOWN populations)
   for pop in Mpops: dSTDPmech[pop] = []
+  if dconf['sim']['targettedRL']: dcell = {pop:[] for pop in Mpops} # SN: exptl  
   for cell in sim.net.cells:
     for conn in cell.conns:
       STDPmech = conn.get('hSTDP')  # check if the connection has a NEURON STDP mechanism object
@@ -1499,6 +1500,26 @@ def getAllSTDPObjects (sim):
         for pop in Mpops:
           if cell.gid in sim.net.pops[pop].cellGids:
             dSTDPmech[pop].append(STDPmech)
+            if dconf['sim']['targettedRL']: dcell[pop].append(conn.preGid) # SN: exptl presynaptic ID
+  # SN: exptl
+  #if not 'hSTDP' in conn: continue
+  #cpreID = conn.preGid  #find preID
+  #if type(cpreID) != int: continue
+  if dconf['sim']['targettedRL'] > 1:
+    for pop in Mpops: dcell[pop] = np.unique(dcell[pop])
+    nhost = sim.pc.nhost()
+    src = [dcell]*nhost
+    dcellgid = sim.pc.py_alltoall(src)
+    for dcell in dcellgid:
+      for pop in Mpops:
+        for cell in sim.net.cells:
+          if cell.gid in dcell[pop]:
+            for conn in cell.conns:
+              STDPmech = conn.get('hSTDP')
+              if STDPmech:
+                if STDPmech not in dSTDPmech[pop]:
+                  dSTDPmech[pop].append(STDPmech)
+  # SN: exptl
   return dSTDPmech
         
 # Alternate to create network and run simulation
