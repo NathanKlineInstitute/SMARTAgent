@@ -18168,7 +18168,7 @@ moves and compared to correct sequence ...
 e.g. if need 3 moves up to get to ball and instead took 1 move up and 2 moves down
 then reinforce the path that led to 1 move up and punish the part that led to 2 moves down
 
-test in a simple way ... 20aug10_B2_cycle_
+test in a simple way ... 20oct7_B0_cycle_
 
 hmm, bug in hit detection, saw it happen 2x in very short interval:
 t= 77800.0 - adjusting weights based on RL critic value: 0.5
@@ -18178,6 +18178,7 @@ t= 78060.0  game rewards: [0.5]
 
 only really occurred first time ... 
 
+also had too short recording duration ... will retry
 
 ** check output from 20oct6_A0_cycle_ (has EMSTAY)
 
@@ -18192,3 +18193,19 @@ savefig(gifpath()+'rast.png') # [[./gif/20oct7_20oct6_A0_cycle_rast.png]]
 well, the network became epileptic ... 
 
 fig=animInput(InputImages,gifpath()+'_input.mp4') # [[./gif/20oct7_20oct6_A0_cycle__input.mp4]]
+
+* 20oct8
+** simpler test again
+
+        "name": "20oct8_A0_cycle_",
+        "targettedRL": 2,
+
+    "rewardcodes": {
+        "scorePoint": 0.0,
+        "losePoint": -0.0,
+        "followTarget": 0.1,
+        "avoidTarget": -0.1,
+        "hitBall": 0.0
+    },
+
+./myrun 32 sn.json
