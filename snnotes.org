@@ -18168,6 +18168,17 @@ moves and compared to correct sequence ...
 e.g. if need 3 moves up to get to ball and instead took 1 move up and 2 moves down
 then reinforce the path that led to 1 move up and punish the part that led to 2 moves down
 
+test in a simple way ... 20aug10_B2_cycle_
+
+hmm, bug in hit detection, saw it happen 2x in very short interval:
+t= 77800.0 - adjusting weights based on RL critic value: 0.5
+t= 77800.0  game rewards: [0.5]
+t= 78060.0 - adjusting weights based on RL critic value: 0.5
+t= 78060.0  game rewards: [0.5]
+
+only really occurred first time ... 
+
+
 ** check output from 20oct6_A0_cycle_ (has EMSTAY)
 
 python -i simdat.py backupcfg/20oct6_A0_cycle_sim.json
