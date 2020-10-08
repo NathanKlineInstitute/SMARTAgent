@@ -481,7 +481,7 @@ for prety in EMotorPops:
     'preConds': {'pop': prety},
     'postConds': {'pop': 'IM'},
     'convergence': prob2conv(0.125/2, dnumc[prety]),
-    'weight': 0.02 * cfg.EIGain,
+    'weight': getInitWeight(0.02 * cfg.EIGain),
     'delay': 2,
     'synMech': 'AMPA', 'sec':'soma', 'loc':0.5}
   if dconf['net']['RLconns']['EIPlast'] and dSTDPparamsRL['AMPAI']['RLon']: # only turn on plasticity when specified to do so
@@ -489,7 +489,7 @@ for prety in EMotorPops:
   elif dconf['net']['STDPconns']['EIPlast'] and dSTDPparams['AMPAI']['STDPon']:
     netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparams['AMPAI']}    
 
-# reciprocal inhibition 
+# reciprocal inhibition - only active when all relevant populations created
 for prety in EMotorPops:
   for epoty in EMotorPops:
     if epoty == prety: continue # no self inhib here
@@ -499,7 +499,7 @@ for prety in EMotorPops:
       'preConds': {'pop': prety},
       'postConds': {'pop': poty},
       'convergence': prob2conv(dconf['net']['EMIRecipProb'], dnumc[prety]),
-      'weight': dconf['net']['EMIRecipWght'] * cfg.EIGain,
+      'weight': getInitWeight(dconf['net']['EMIRecipWght'] * cfg.EIGain),
       'delay': 2,
       'synMech': 'AMPA', 'sec':'soma', 'loc':0.5}
     if dconf['net']['RLconns']['EIPlast'] and dSTDPparamsRL['AMPAI']['RLon']: # only turn on plasticity when specified to do so
