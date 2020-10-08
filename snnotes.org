@@ -18209,3 +18209,82 @@ fig=animInput(InputImages,gifpath()+'_input.mp4') # [[./gif/20oct7_20oct6_A0_cyc
     },
 
 ./myrun 32 sn.json
+
+python -i simdat.py backupcfg/20oct8_A0_cycle_sim.json
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/20oct8_20oct8_A0_cycle_perf.png]]
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((490e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/20oct8_20oct8_A0_cycle_rast.png]]
+
+nothing special there ...
+
+** check EIplast
+
+maybe did not work since all weights started higher (0.02) than the max specified in AMPAI ...
+and did not have any weight var in those E->I synapses
+
+python -i simdat.py backupcfg/20oct8_B0_cycle_sim.json
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/20oct8_20oct8_B0_cycle_perf.png]]
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); 
+savefig(gifpath()+'rast.png') # [[./gif/20oct8_20oct8_B0_cycle_rast.png]]
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','IM'],lclr=['r','b'],plotindiv=True)
+xlabel('Time (ms)',fontsize=30); ylabel('Average weight',fontsize=30); tl(); 
+savefig(gifpath()+'all_avg_weight.png') # [[./gif/20oct8_20oct8_B0_cycle_all_avg_weight.png]]
+ok, good - now can see the weight changes to interneurons ...
+
+subplot(2,1,1)
+popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['IM'],lclr=['b'],plotindiv=True)
+xlim((0,10e3))
+subplot(2,1,2)
+plot(actreward.time,actreward.reward,'k')
+xlim((0,10e3))
+
+savefig(gifpath()+'IM_wght_reward.png') # [[./gif/20oct8_20oct8_B0_cycle_IM_wght_reward.png]]
+for some reason weights do not seem to go up even when have positive reward ... ??
+
+subplot(2,1,1)
+popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN'],lclr=['r'],plotindiv=True)
+xlim((0,10e3))
+subplot(2,1,2)
+plot(actreward.time,actreward.reward,'k')
+xlim((0,10e3))
+
+savefig(gifpath()+'EMDOWN_wght_reward.png') # [[./gif/20oct8_20oct8_B0_cycle_EMDOWN_wght_reward.png]]
+
+ok, can see more increases there for EMDOWN ... 
+savefig(gifpath()+'EMDOWN_wght_rewardB.png') # [[./gif/20oct8_20oct8_B0_cycle_EMDOWN_wght_rewardB.png]]
+
+so why for the interneurons do weights only decrease?
+
+look at indiv weights again ... 
+
+#
+clf()
+poty = 'IM'
+for prety,clr in zip(['EMDOWN','EMUP'],['r','b']):
+  pdfs = pdf[(pdf.postid>=dstartidx[poty])&(pdf.postid<=dstartidx[poty])&(pdf.preid>=dstartidx[prety])&(pdf.preid<=dendidx[prety])]
+  plot(pdfs.time,pdfs.weight,clr+'o')
+
+savefig(gifpath()+'IM_wght_C.png') # [[./gif/20oct8_20oct8_B0_cycle_IM_wght_C.png]]
+
+ok, some weights can be seen increasing ... 
+
+can put in the reciprocal inhibition again and see how that does ... 
+
+should also have fewer interneurons when adding new pop...
+	    "IM":13,
+	    "IMUP": 13,
+	    "IMDOWN": 13,
+
+ok, try that ... keep cell-based weight norm on too ... 
+
+./myrun 32 sn.json
+
+started ~16:56 ...
+
