@@ -54,6 +54,8 @@ NEURON {
     RANGE deltaw : The calculated weight change.
     RANGE newweight : New calculated weight.
     RANGE skip : Flag to skip 2nd set of conditions
+    RANGE cumreward : cumulative reward magnitude so far
+    RANGE maxreward : max reward for scaling						   
 }
 
 ASSIGNED {
@@ -75,6 +77,8 @@ INITIAL {
     interval = 0
     deltaw = 0
     newweight = 0
+    cumreward = 0				   
+    maxreward = 0
 }
 
 PARAMETER {
@@ -96,6 +100,8 @@ PARAMETER {
     RLon = 1
     verbose = 0
     skip = 0
+    cumreward = 0			       
+    maxreward = 0
 }
 
 NET_RECEIVE (w) {
@@ -162,7 +168,7 @@ NET_RECEIVE (w) {
   : if (verbose > 0)  { printf("t=%f (AFTER) tlaspre=%f, tlastpost=%f, flag=%f, w=%f, deltaw=%f \n",t,tlastpre, tlastpost,flag,w,deltaw) }
 }
 
-PROCEDURE reward_punish(reinf) {
+PROCEDURE reward_punish (reinf) {
   if (RLon == 1) { : If RL is turned on...
     deltaw = 0.0 : Start the weight change as being 0.
     if (RLhebbwt!=0.0 && reinf!=0.0) {				       
@@ -173,11 +179,19 @@ PROCEDURE reward_punish(reinf) {
     }												    
     if (softthresh == 1) { : If we have soft-thresholding on, apply it.  
       deltaw = softthreshold(deltaw)
-    }  
+    }
+    if (maxreward > 0.0) {
+      if (cumreward > maxreward) {
+        deltaw = 0.0		 
+      } else {
+        deltaw = deltaw * (1.0 - cumreward / maxreward)
+      }
+    }	 
     adjustweight(deltaw) : Adjust the weight.
     :if (verbose > 0) { : Show weight update information if debugging on.
     :  printf("RL event: t = %f ms; reinf = %f; RLhebbwt = %f; RLlenhebb = %f; tlasthebbelig = %f; deltaw = %f\n",t,reinf,RLhebbwt,RLlenhebb,tlasthebbelig, deltaw) 
     :}
+    cumreward = cumreward + abs(reinf) : cumulative reward magnitude
   }
 }
 
