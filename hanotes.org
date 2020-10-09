@@ -8224,3 +8224,17 @@ adjustWeightsBasedOnFiringRates (sim,allpops) # call this function every game ti
 -- use targetFR of 2Hz.
 
 -- Change the homeostatic synaptic plasticity to take into account individual types of synapses.
+
+-- Was working on progress report for ARO in first week of Oct.
+
+* 20Oct09
+
+-- If we use same value for reward and punishment, will we be able to get rid of irrelevant noise?
+
+-- update sim.json based on sn.json but still using 
+  "targetedRL":1 
+and 
+  "architecturePreMtoM": {
+        "useProbabilistic": 0,
+        "useTopological": 1}
+-- run the simulatedEnv in "20oct09_"
