@@ -18450,3 +18450,74 @@ fig=animInput(InputImages,gifpath()+'_input.mp4') # [[./gif/20oct10_20oct9_A0_cy
 
 ./myrun 32 sn.json
 
+started ~22:22 ... 
+
+* 20oct13
+** check output from 20oct10_A0_cycle_ -> had wrong param in sn.json
+
+finished ~08:57 on 20oct12 ... 
+
+python -i simdat.py backupcfg/20oct10_A0_cycle_sim.json
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/20oct13_20oct10_A0_cycle_perf.png]]
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((2490e3,2500e3))
+savefig(gifpath()+'rast.png') # [[./gif/20oct13_20oct10_A0_cycle_rast.png]]
+
+pop = 'EMDOWN'
+binsz = 20
+tt,nspk = getspikehist(dspkT[pop],dnumc,binsz,2500e3)
+clf(); plot(tt,nspk); xlim((0,2500e3))
+savefig(gifpath()+'EMDOWN_rate20.png') # [[./gifpath()+'EMDOWN_rate20.png']]
+
+dnspk = {pop:nspk}
+pop='EMUP'; dnspk['EMUP'] = getspikehist(dspkT[pop],dnumc,binsz,2500e3)
+plot(dnspk['EMUP'][0],dnspk['EMUP'][1],'r'); 
+savefig(gifpath()+'EMUP_EMDOWN_rate20.png') # [[./gif/20oct13_20oct10_A0_cycle_EMUP_EMDOWN_rate20.png]]
+
+plot(actreward.time,np.cumsum(actreward.reward))
+plot(actreward.time,np.cumsum(abs(actreward.reward)))
+savefig(gifpath()+'cumsum_absreward.png') # [[./gif/20oct13_20oct10_A0_cycle_cumsum_absreward.png]]
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','IM'],lclr=['r','b'],plotindiv=True)
+xlabel('Time (ms)',fontsize=30); ylabel('Average weight',fontsize=30); tl(); 
+savefig(gifpath()+'all_avg_weight.png') # [[./gif/20oct13_20oct10_A0_cycle_all_avg_weight.png]]
+savefig(gifpath()+'all_avg_weightB.png') # [[./gif/20oct13_20oct10_A0_cycle_all_avg_weightB.png]]
+
+hmm, weights decreasing because although had weight norm turned on for individual cells, the step size
+was too large ("normalizeWeightStepSize": 5000000000000000000), so never kicked in ... mistake!
+
+#
+clf()
+pdx=0
+for prety,poty in zip(['EMDOWN','EMDOWN','EMUP','EMUP'],['IMUP','IM','IMDOWN','IM']):
+  subplot(2,2,pdx+1)
+  title(prety+'->'+poty)  
+  pdfs = pdf[(pdf.postid==dstartidx[poty]+1)&(pdf.preid>=dstartidx[prety])&(pdf.preid<=dendidx[prety])&(pdf.postid==dstartidx[poty]+1)]
+  plot(pdfs.time,pdfs.cumreward,'ko')
+  pdx+=1
+
+savefig(gifpath()+'crewardC.png') # [[./gif/20oct13_20oct10_A0_cycle_crewardC.png]]
+
+#
+poty = 'EMUP'
+for pdx,prety in enumerate(['EV1', 'EV4', 'EMT', 'EV1DN', 'EV1DS', 'EV1DNW','EMUP','EMDOWN']):
+  subplot(2,4,pdx+1)
+  title(prety+'->'+poty)  
+  pdfs = pdf[(pdf.postid==dstartidx[poty])&(pdf.preid>=dstartidx[prety])&(pdf.preid<=dendidx[prety])]
+  plot(pdfs.time,pdfs.cumreward,'ko')
+
+savefig(gifpath()+'crewardD.png') # [[./gif/20oct13_20oct10_A0_cycle_crewardD.png]]
+
+# fig=animInput(InputImages,gifpath()+'_input.mp4') 
+
+** fixup last sim with intended parameters
+
+        "name": "20oct13_A0_cycle_",
+        "normalizeWeightStepSize": 500,
+
+./myrun 32 sn.json
+
+started ~11:06 ...
+
