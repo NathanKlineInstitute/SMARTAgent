@@ -18521,3 +18521,68 @@ savefig(gifpath()+'crewardD.png') # [[./gif/20oct13_20oct10_A0_cycle_crewardD.pn
 
 started ~11:06 ...
 
+** ball avoidance, origins
+
+model does the right thing, but too late, so loses a point, gets punished,
+with most recent action synapses having highest eligibility trace values,
+then next time around, the opposite action (avoidance) takes over?
+
+a related (or same) problem is that the most recent action might be correct, but all the
+other actions leading up to it could be incorrect. it seems that eligibility
+trace values will not properly encode that information. 
+
+example, ball going to bottom right. paddle is stuck at the top moving up and getting
+punished for many moves. finally the punishment signal allows the other population to 
+overcome the moves up and the paddle starts moving down. by then it's too late for the
+paddle to hit the ball, the model loses a point, and then gets punished for moving down.
+even though it got punished for moving up before, the punishment for moving down will
+still be remembered, and even may have a higher punishment value for lost point (-1.0) 
+compared to wrong move (-0.1).
+
+also, just because we find some problematic examples, doesn't mean it can't work (at all),
+but the frequency of problematic situations compared to non-problematic, will put a
+ceiling on learning ability and performance
+
+** STDP-RL rule currently used
+
+not really same as izhikevich
+in izhikevich (2007) eligibility trace amplitude is increased based on the STDP rule time difference
+and then decays exponentially
+the synaptic weight rate of change is product of eligibility trace and extracellular dopamine concentration
+and dopamine concentration is a function of reward/punishment signal
+
+dopamine concentration also follows exponential decay to baseline concentration 
+
+the STDP time difference impact on eligibility trace amplitude seems important since
+it means that high precision in firing times is more likely to get a larger reward 
+when dopamine is triggered ... 
+
+continuous integration of synaptic weights is also more costly ...
+
+** square pulse for RL? no score/lose point?
+
+that removes some of the time info but prevents mistake of recency and if have long enough window
+may attribute to all the synapses properly ?? but more likely to produce overly high credit
+assignments ...
+
+also, getting rid of score/lose point scores would prevent misleading info
+but that would mean the system is fairly simple in what it can assess ... ? 
+
+could also have different reward/punish adjustments for each metric
+one for follow
+one for hit
+one for score/loss
+which would require different synapses for each?
+
+try with no exp rl and only follow metric, shorter RL tau ... 
+
+20oct13_B0_cycle_
+
+run for 300 s to test ...
+
+other params same as last sim ...
+
+./myrun 32 sn.json
+
+started 16:49 ...
+
