@@ -18633,7 +18633,7 @@ started 9:37 ... stopped, since noticed problem with cumreward (mentioned below)
 restarted at 10:40 ... 
 
 
-** check output from 20oct13_A0_cycle_
+** check output from 20oct13_A0_cycle_ -->> had problem with cumreward
 
 python -i simdat.py backupcfg/20oct13_A0_cycle_sim.json
 
