@@ -35,76 +35,84 @@ Version: 2013oct24 by cliffk
 ENDCOMMENT
 
 NEURON {
-    POINT_PROCESS STDP : Definition of mechanism
-    POINTER synweight : Pointer to the weight (in a NetCon object) to be adjusted.
-    RANGE tauhebb, tauanti : LTP/LTD decay time constants (in ms) for the Hebbian (pre-before-post-synaptic spikes), and anti-Hebbian (post-before-pre-synaptic) cases. 
-    RANGE hebbwt, antiwt : Maximal adjustment (can be positive or negative) for Hebbian and anti-Hebbian cases (i.e., as inter-spike interval approaches zero).  This should be set positive for LTP and negative for LTD.
-    RANGE RLwindhebb, RLwindanti : Maximum interval between pre- and post-synaptic events for an starting an eligibility trace.  There are separate ones for the Hebbian and anti-Hebbian events.
-    RANGE useRLexp : Use exponentially decaying eligibility traces?  If 0, then the eligibility traces are binary, turning on at the beginning and completely off after time has passed corresponding to RLlen.
-    RANGE RLlenhebb, RLlenanti : Length of the eligibility Hebbian and anti-Hebbian eligibility traces, or the decay time constants if the traces are decaying exponentials.
-    RANGE RLhebbwt, RLantiwt : Maximum gains to be applied to the reward or punishing signal by Hebbian and anti-Hebbian eligibility traces.  
-    RANGE wbase, wmax : The maximum weight for the synapse. min weight for the synapse.
-    RANGE softthresh : Flag turning on "soft thresholding" for the maximal adjustment parameters.
-    RANGE STDPon : Flag for turning STDP adjustment on / off.
-    RANGE RLon : Flag for turning RL adjustment on / off.													  
-    RANGE verbose : Flag for turning off prints of weight update events for debugging.
-    RANGE tlastpre, tlastpost : Remembered times for last pre- and post-synaptic spikes.
-    RANGE tlasthebbelig, tlastantielig : Remembered times for Hebbian anti-Hebbian eligibility traces.
-    RANGE interval : Interval between current time t and previous spike.
-    RANGE deltaw : The calculated weight change.
-    RANGE newweight : New calculated weight.
-    RANGE skip : Flag to skip 2nd set of conditions
-    RANGE cumreward : cumulative reward magnitude so far
-    RANGE maxreward : max reward for scaling						   
+  POINT_PROCESS STDP : Definition of mechanism
+  POINTER synweight : Pointer to the weight (in a NetCon object) to be adjusted.
+  : LTP/LTD decay time constants (ms) for Hebbian (pre-before-post-synaptic spikes), and anti-Hebbian (post-before-pre-synaptic) cases.
+  RANGE tauhebb, tauanti 
+  : Max adjustment (positive or negative) for Hebbian and anti-Hebbian cases (i.e., as inter-spike interval approaches zero)
+  : Set positive for LTP and negative for LTD.
+  RANGE hebbwt, antiwt 
+  : Maximum interval between pre- and post-synaptic events for an starting an eligibility trace.
+  : There are separate ones for the Hebbian and anti-Hebbian events.
+  RANGE RLwindhebb, RLwindanti
+  : Use exponentially decaying eligibility traces?  If 0, eligibility traces are binary, turning on at beginning and off after time has
+  : passed corresponding to RLlen.						    
+  RANGE useRLexp 
+  : Length of eligibility Hebbian and anti-Hebbian eligibility traces, or decay time constants if traces are decaying exponentials
+  RANGE RLlenhebb, RLlenanti 
+  : Max synaptic weight adjustments based on reward or punishing signal by Hebbian and anti-Hebbian eligibility traces.  
+  RANGE RLhebbwt, RLantiwt 
+  RANGE wbase, wmax : The maximum,minimum weight for the synapse
+  RANGE softthresh : Flag turning on "soft thresholding" for the maximal adjustment parameters.
+  RANGE STDPon : Flag for turning STDP adjustment on / off.
+  RANGE RLon : Flag for turning RL adjustment on / off.	  
+  RANGE verbose : Flag for turning off prints of weight update events for debugging.
+  RANGE tlastpre, tlastpost : Remembered times for last pre- and post-synaptic spikes.
+  RANGE tlasthebbelig, tlastantielig : Remembered times for Hebbian anti-Hebbian eligibility traces.
+  RANGE interval : Interval between current time t and previous spike.
+  RANGE deltaw
+  RANGE newweight
+  RANGE skip : Flag to skip 2nd set of conditions
+  RANGE cumreward : cumulative reward magnitude so far
+  RANGE maxreward : max reward for scaling						   
 }
 
 ASSIGNED {
-    synweight        
-    tlastpre   (ms)    
-    tlastpost  (ms)   
-    tlasthebbelig   (ms)    
-    tlastantielig  (ms)        
-    interval    (ms)    
-    deltaw
-    newweight          
+  synweight        
+  tlastpre   (ms)    
+  tlastpost  (ms)   
+  tlasthebbelig   (ms)    
+  tlastantielig  (ms)        
+  interval    (ms)
+  deltaw
+  newweight
+  cumreward
 }
 
 INITIAL {
-    tlastpre = -1            : no spike yet
-    tlastpost = -1           : no spike yet
-    tlasthebbelig = -1      : no eligibility yet
-    tlastantielig = -1  : no eligibility yet   
-    interval = 0
-    deltaw = 0
-    newweight = 0
-    cumreward = 0				   
-    maxreward = 0
+  tlastpre = -1            : no spike yet
+  tlastpost = -1           : no spike yet
+  tlasthebbelig = -1      : no eligibility yet
+  tlastantielig = -1  : no eligibility yet   
+  interval = 0
+  cumreward = 0					     
 }
 
 PARAMETER {
-    tauhebb  = 10  (ms)   
-    tauanti  = 10  (ms)    
-    hebbwt = 1.0
-    antiwt = -1.0
-    RLwindhebb = 10 (ms)
-    RLwindanti = 10 (ms)
-    useRLexp = 0   : default to using binary eligibility traces
-    RLlenhebb =  100 (ms)
-    RLlenanti = 100 (ms)
-    RLhebbwt = 1.0
-    RLantiwt = -1.0
-    wbase = 0
-    wmax  = 15.0
-    softthresh = 0
-    STDPon = 1
-    RLon = 1
-    verbose = 0
-    skip = 0
-    cumreward = 0			       
-    maxreward = 0
+  tauhebb  = 10  (ms)   
+  tauanti  = 10  (ms)    
+  hebbwt =  1.0
+  antiwt = -1.0
+  RLwindhebb = 10 (ms)
+  RLwindanti = 10 (ms)
+  useRLexp = 0 : default to using binary eligibility traces
+  RLlenhebb = 100 (ms)
+  RLlenanti = 100 (ms)
+  RLhebbwt =  1.0
+  RLantiwt = -1.0
+  wbase = 0
+  wmax  = 15.0
+  softthresh = 0
+  STDPon = 1
+  RLon = 1
+  verbose = 0
+  skip = 0
+  maxreward = 0
+  : cumreward = 0				 
 }
 
 NET_RECEIVE (w) {
+		 :LOCAL deltaw
   deltaw = 0.0 : Default the weight change to 0.
   skip = 0
     
@@ -169,12 +177,15 @@ NET_RECEIVE (w) {
 }
 
 PROCEDURE reward_punish (reinf) {
-  if (RLon == 1) { : If RL is turned on...
+  :LOCAL deltaw
+  :printf("RLon=%g,reinf=%g,fabs(reinf)=%g,fabs(reinf)>0.0=%g\n",RLon,reinf,fabs(reinf),fabs(reinf)>0.0)
+  if (RLon == 1 && fabs(reinf)>0.0) { : If RL is turned on...
+    :if(fabs(reinf) > 0.0){printf("reinf=%g\n",reinf)}
     deltaw = 0.0 : Start the weight change as being 0.
-    if (RLhebbwt!=0.0 && reinf!=0.0) {				       
+    if (RLhebbwt>0.0) {				       
       deltaw = deltaw + reinf * hebbRL() : If we have the Hebbian eligibility traces on, add their effect in.
     }											       
-    if (RLantiwt!=0.0 && reinf!=0.0) {
+    if (RLantiwt<0.0) {
       deltaw = deltaw + reinf * antiRL() : If we have the anti-Hebbian eligibility traces on, add their effect in.
     }												    
     if (softthresh == 1) { : If we have soft-thresholding on, apply it.  
@@ -187,15 +198,17 @@ PROCEDURE reward_punish (reinf) {
         deltaw = deltaw * (1.0 - cumreward / maxreward)
       }
     }	 
-    adjustweight(deltaw) : Adjust the weight.
-    :if (verbose > 0) { : Show weight update information if debugging on.
-    :  printf("RL event: t = %f ms; reinf = %f; RLhebbwt = %f; RLlenhebb = %f; tlasthebbelig = %f; deltaw = %f\n",t,reinf,RLhebbwt,RLlenhebb,tlasthebbelig, deltaw) 
+    :if(fabs(deltaw)>0.0 && tlasthebbelig>20 && t>2400 && cumreward>0){
+    : printf("RL event: t = %g ms; reinf = %g; RLhebbwt = %g; RLlenhebb = %g; tlasthebbelig = %g; deltaw = %g, cumreward = %g\n",t,reinf,RLhebbwt,RLlenhebb,tlasthebbelig, deltaw, cumreward)
     :}
-    if (deltaw!=0.0){cumreward = cumreward + abs(reinf)} : cumulative reward magnitude; only if weight changed
+    if (fabs(deltaw)>0.0){
+      adjustweight(deltaw) : Adjust the weight.			      
+      cumreward = cumreward + fabs(reinf)
+    } : cumulative reward magnitude; only if weight changed
   }
 }
 
-FUNCTION hebbRL() {
+FUNCTION hebbRL () { : RL from pre before post spiking
   if (tlasthebbelig < 0.0) { : If eligibility has not occurred yet return 0.0.
     hebbRL = 0.0
   }
@@ -212,7 +225,7 @@ FUNCTION hebbRL() {
   }
 }
 
-FUNCTION antiRL() {
+FUNCTION antiRL () { : RL from post before pre spiking
   if (tlastantielig < 0.0) { : If eligibility has not occurred yet return 0.0.
     antiRL = 0.0
   }
@@ -229,7 +242,7 @@ FUNCTION antiRL() {
   } 
 }
 
-FUNCTION softthreshold(rawwc) {
+FUNCTION softthreshold (rawwc) {
   if (rawwc >= 0) {
     softthreshold = rawwc * (1.0 - synweight / wmax) : If the weight change is non-negative, scale by 1 - weight / wmax.
   }
@@ -238,7 +251,7 @@ FUNCTION softthreshold(rawwc) {
   } 
 }
 
-PROCEDURE adjustweight(wc) {
+PROCEDURE adjustweight (wc) {
    synweight = synweight + wc : apply the synaptic modification, and then clip the weight if necessary to make sure it is between wbase and wmax.
    if (synweight > wmax) { synweight = wmax }
    if (synweight < wbase) { synweight = wbase }

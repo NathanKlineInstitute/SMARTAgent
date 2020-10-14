@@ -1453,7 +1453,7 @@ def trainAgent (t):
               for STDPmech in dSTDPmech['EMDOWN']: STDPmech.reward_punish(float(critic))        
         else:
           if dconf['verbose']: print('APPLY RL to both EMUP and EMDOWN')
-          for STDPmech in dSTDPmech['all']: STDPmech.reward_punish(float(critic))
+          for STDPmech in dSTDPmech['all']: STDPmech.reward_punish(critic)
   if sim.rank==0:
     print('t=',round(t,2),' game rewards:', rewards) # only rank 0 has access to rewards      
     for action in actions:

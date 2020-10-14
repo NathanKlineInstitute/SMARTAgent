@@ -18632,6 +18632,7 @@ started 9:37 ... stopped, since noticed problem with cumreward (mentioned below)
 
 restarted at 10:40 ... 
 
+stopped - cumreward needs adjustment (see below)
 
 ** check output from 20oct13_A0_cycle_ -->> had problem with cumreward
 
@@ -18668,4 +18669,90 @@ to be synapse-specific signal ... so should check if deltaw != 0.0 before increm
 since deltaw != 0.0 only when a reward/punishment is provided to a synapse
 
 ok, will fix that up ... 
+
+** check reasonable values for maxreward
+
+20oct14_C0_cycle_
+
+./myrun 32 sn.json
+
+python -i simdat.py backupcfg/20oct14_C0_cycle_sim.json
+
+clf(); plot(actreward.time,np.cumsum(actreward.reward))
+plot(actreward.time,np.cumsum(abs(actreward.reward)))
+savefig(gifpath()+'cumsum_absreward.png') # [[./gif/20oct14_20oct14_C0_cycle_cumsum_absreward.png]]
+
+np.amin(pdf.cumreward), np.amax(pdf.cumreward), np.mean(pdf.cumreward) # (0.0, 42.10000000000033, 19.33201044091506)
+
+#
+poty = 'EMUP'
+for pdx,prety in enumerate(['EV1', 'EV4', 'EMT', 'EV1DN', 'EV1DS', 'EV1DNW','EMUP','EMDOWN']):
+  subplot(2,4,pdx+1)
+  title(prety+'->'+poty)  
+  pdfs = pdf[(pdf.postid>=dstartidx[poty])&(pdf.postid<=dendidx[poty])&(pdf.preid>=dstartidx[prety])&(pdf.preid<=dendidx[prety])]
+  plot(pdfs.time,pdfs.cumreward,'ko')
+
+savefig(gifpath()+'crewardD.png') # [[./gif/20oct14_20oct14_C0_cycle_crewardD.png]]
+
+most of those look identical ... and that's for whole pre to postsynaptic population ?? 
+
+different weight for each "synapse" ? but same cumreward variable, since that's associated with the STDP mechanism?
+no, should be an individual STDP mechanism with its own NetCon, one for each synapse ... 
+
+check stdp.mod comments at top - it uses two netcons, one netcon for receiving presynaptic neuron spikes and
+one netcon for receiving postsynaptic neuron spikes ... 
+
+i.e.,:
+"
+## Create synapses
+threshold = 10 # Set voltage threshold
+delay = 1 # Set connection delay
+singlesyn = h.NetCon(cells[0],cells[1], threshold, delay, 0.5) # Create a connection between the cells
+stdpmech = h.STDP(0,sec=dummy) # Create the STDP mechanism
+presyn = h.NetCon(cells[0],stdpmech, threshold, delay, 1) # Feed presynaptic spikes to the STDP mechanism -- must have weight >0
+pstsyn = h.NetCon(cells[1],stdpmech, threshold, delay, -1) # Feed postsynaptic spikes to the STDP mechanism -- must have weight <0
+h.setpointer(singlesyn._ref_weight[0],'synweight',stdpmech) # Point the STDP mechanism to the connection weight
+"
+
+singlesyn is the NetCon that has its weights adjusted by the STDP mechanism ... the other weights are not changed ... 
+
+maybe cumreward ~same for most synapses since rule is now if deltaw > 0 add to cumreward ?? and that could mean
+very small deltaw still produces the same impact ... but would not expect all synapses to get changed same way ... 
+
+lcreward = []; lctime = []
+prety = 'EV1'
+pdfs = pdf[(pdf.postid>=dstartidx[poty])&(pdf.postid<=dendidx[poty])&(pdf.preid>=dstartidx[prety])&(pdf.preid<=dendidx[prety])]
+for preid in np.unique(pdfs.preid):
+  pdfs2 = pdfs[(pdfs.preid==preid)]
+  plot(pdfs2.time,pdfs2.cumreward)
+  lcreward.append(np.array(pdfs2.cumreward))
+  lctime.append(np.array(pdfs2.time))
+
+lcreward = []; lctime = []
+prety = 'EV1'
+pdfs = pdf[(pdf.postid>=dstartidx[poty])&(pdf.postid<=dendidx[poty])&(pdf.preid>=dstartidx[prety])&(pdf.preid<=dendidx[prety])]
+for preid in np.unique(pdfs.preid):
+  pdfs2 = pdfs[(pdfs.preid==preid)&(pdfs.postid==dstartidx[poty])]
+  plot(pdfs2.time,pdfs2.cumreward)
+  lcreward.append(np.array(pdfs2.cumreward))
+  lctime.append(np.array(pdfs2.time))
+
+#
+poty = 'EMUP'
+for pdx,prety in enumerate(['EV1', 'EV4', 'EMT', 'EV1DN', 'EV1DS', 'EV1DNW','EMUP','EMDOWN']):
+  subplot(2,4,pdx+1)
+  title(prety+'->'+poty)  
+  pdfs = pdf[(pdf.postid>=dstartidx[poty])&(pdf.postid<=dendidx[poty])&(pdf.preid>=dstartidx[prety])&(pdf.preid<=dendidx[prety])]
+  plot(pdfs.time,pdfs.weight,'ko')
+
+does the same thing happen without RL exp ?? 
+        "name": "20oct14_D0_cycle_",
+
+python -i simdat.py backupcfg/20oct14_D0_cycle_sim.json
+
+some more diversity now in the cumreward values ... 
+
+the fabs(deltaw) > 0 rule not too sensible when using RLexp since
+that will almost always be true ... just surprising that all presynaptic
+neurons activated in 500 ms, and 25 ms between that and postsynaptic neuron firing ...
 
