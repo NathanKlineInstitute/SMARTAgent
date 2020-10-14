@@ -924,7 +924,8 @@ def recordAdjustableWeightsPop (sim, t, popname):
   for cell in lcell:
     for conn in cell.conns:
       if 'hSTDP' in conn:
-        lsynweights.append([t,conn.preGid,cell.gid,float(conn['hObj'].weight[0])])
+        hstdp = conn.get('hSTDP')
+        lsynweights.append([t,conn.preGid,cell.gid,float(conn['hObj'].weight[0]),hstdp.cumreward])
   return len(lcell)
                     
 def recordAdjustableWeights (sim, t, lpop):
@@ -1602,14 +1603,14 @@ def LSynWeightToD (L):
   print('converting synaptic weight list to dictionary...')
   dout = {}; doutfinal = {}
   for row in L:
-    t,preID,poID,w = row
+    t,preID,poID,w,cumreward = row
     if preID not in dout:
       dout[preID] = {}
       doutfinal[preID] = {}
     if poID not in dout[preID]:
       dout[preID][poID] = []
       doutfinal[preID][poID] = []
-    dout[preID][poID].append([t,w])
+    dout[preID][poID].append([t,w,cumreward])
   for preID in doutfinal.keys():
     for poID in doutfinal[preID].keys():
       doutfinal[preID][poID].append(dout[preID][poID][-1])
