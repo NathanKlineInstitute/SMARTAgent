@@ -18756,3 +18756,6 @@ the fabs(deltaw) > 0 rule not too sensible when using RLexp since
 that will almost always be true ... just surprising that all presynaptic
 neurons activated in 500 ms, and 25 ms between that and postsynaptic neuron firing ...
 
+try a bit longer run ... see if they diverge more, also decrease window for pre/post tagging
+and reduce duration of eligibility window
+
