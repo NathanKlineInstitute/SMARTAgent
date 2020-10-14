@@ -18586,3 +18586,36 @@ other params same as last sim ...
 
 started 16:49 ...
 
+finisehd ~23:02 ...
+
+python -i simdat.py backupcfg/20oct13_B0_cycle_sim.json
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/20oct13_20oct13_B0_cycle_perf.png]]
+similar to others ... some improvement - 
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((290e3,300e3))
+savefig(gifpath()+'rast.png') # [[./gif/20oct13_20oct13_B0_cycle_rast.png]]
+
+plot(actreward.time,np.cumsum(actreward.reward))
+plot(actreward.time,np.cumsum(abs(actreward.reward)))
+savefig(gifpath()+'cumsum_absreward.png') # [[./gif/20oct13_20oct13_B0_cycle_cumsum_absreward.png]]
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','IM'],lclr=['r','b'],plotindiv=True)
+xlabel('Time (ms)',fontsize=30); ylabel('Average weight',fontsize=30); tl(); 
+savefig(gifpath()+'all_avg_weight.png') # [[./gif/20oct13_20oct13_B0_cycle_all_avg_weight.png]]
+savefig(gifpath()+'all_avg_weightB.png') # [[./gif/20oct13_20oct13_B0_cycle_all_avg_weightB.png]]
+
+ok, performed ~as expected ... can run for 1500 s to compare to other recent sim above
+
+hmm, if took 6 hours to run with the other sim and IT's Matlab run in parallel, may as well wait until
+other sim finishes ... otherwise will take ~30 hours to run to completion ... 
+
+once re-setup gcp will have more cores available ... 
+
+** other way to minimize interference btwn metrics
+
+reduce the lose point punishment magnitude so it's similar to the non-follow ball value
+that way, losing a point won't mess up the incremental follow rewards as much if over-
+or under-shoot with some overall correctness
+
