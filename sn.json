@@ -15,11 +15,11 @@
     ],
     "movefctr": 1.0,
     "rewardcodes": {
-        "scorePoint": 1.0,
-        "losePoint": -1.0,
+        "scorePoint": 0.0,
+        "losePoint":  0.0,
         "followTarget": 0.1,
         "avoidTarget": -0.1,
-        "hitBall": 0.5
+        "hitBall": 0.0
     },
     "actionsPerPlay": 1,
     "followOnlyTowards": 1,
@@ -37,7 +37,7 @@
         "ResumeSimFromFile": "data/20sep25_A0_cycle_synWeights_final.pkl"
     },
     "sim": {
-        "duration": 1000000,
+        "duration": 1500000,
         "dt": 0.2,
         "verbose": 0,
         "recordStep": 1.0,
@@ -47,7 +47,7 @@
         "RLFakeUpRule": 0,
         "RLFakeDownRule": 0,
         "RLFakeStayRule": 0,
-        "name": "20oct8_B0_cycle_",
+        "name": "20oct14_B0_cycle_",
         "doquit": 1,
         "doplot": 0,
         "saveCellSecs": 0,
@@ -237,9 +237,9 @@
             "wmax": 0.1,
             "RLon": 1,
 	    "STDPon": 0,
-            "RLlenhebb": 2000,
-            "RLlenanti": 2000,
-            "useRLexp": 1,
+            "RLlenhebb": 100,
+            "RLlenanti": 100,
+            "useRLexp": 0,
             "RLhebbwt": 0.0006,
             "RLantiwt": -0.0006,
             "hebbwt": 0,
@@ -248,7 +248,8 @@
             "tauanti": 10,	    
             "RLwindhebb": 50,
             "softthresh": 0,
-            "verbose": 0
+            "verbose": 0,
+            "maxreward": 3000.0 
         },	
         "AMPA": {
             "wbase": 1e-06,
@@ -266,7 +267,8 @@
             "tauanti": 10,	    
             "RLwindhebb": 50,
             "softthresh": 0,
-            "verbose": 0
+            "verbose": 0,
+	    "maxreward": 2000.0
         },
         "NMDA": {
             "wbase": 1e-06,

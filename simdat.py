@@ -46,8 +46,8 @@ def readweightsfile2pdf (fn):
   for preID in D.keys():
     for poID in D[preID].keys():
       for row in D[preID][poID]:
-        A.append([row[0], preID, poID, row[1]])
-  return pd.DataFrame(A,columns=['time','preid','postid','weight'])
+        A.append([row[0], preID, poID, row[1], row[2]])
+  return pd.DataFrame(A,columns=['time','preid','postid','weight','cumreward'])
 
 #
 def readinweights (name,final=False):

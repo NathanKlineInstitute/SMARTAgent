@@ -18288,3 +18288,384 @@ ok, try that ... keep cell-based weight norm on too ...
 
 started ~16:56 ...
 
+* 20oct9
+** check output from 20oct8_B0_cycle_
+
+finished ~7 AM ... so took ~14 hours total
+
+python -i simdat.py backupcfg/20oct8_B0_cycle_sim.json
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/20oct9_20oct8_B0_cycle_perf.png]]
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((990e3,1000e3))
+savefig(gifpath()+'rast.png') # [[./gif/20oct9_20oct8_B0_cycle_rast.png]]
+
+what are the firing rates over time?
+
+pop = 'EMDOWN'
+binsz = 20
+tt,nspk = getspikehist(dspkT[pop],dnumc,binsz,100e3)
+plot(tt,nspk); xlim((0,100e3))
+savefig(gifpath()+'EMDOWN_rate20.png') # [[./gif/20oct9_20oct8_B0_cycle_EMDOWN_rate20.png]]
+
+dnspk = {pop:nspk}
+pop='EMUP'; dnspk['EMUP'] = getspikehist(dspkT[pop],dnumc,binsz,100e3)
+plot(dnspk['EMUP'][0],dnspk['EMUP'][1],'r'); 
+savefig(gifpath()+'EMUP_EMDOWN_rate20.png') # [[./gif/20oct9_20oct8_B0_cycle_EMUP_EMDOWN_rate20.png]]
+ylim((0,25))
+savefig(gifpath()+'EMUP_EMDOWN_rate20B.png') # [[./gif/20oct9_20oct8_B0_cycle_EMUP_EMDOWN_rate20B.png]]
+xlim((90e3,100e3))
+savefig(gifpath()+'EMUP_EMDOWN_rate20C.png') # [[./gif/20oct9_20oct8_B0_cycle_EMUP_EMDOWN_rate20C.png]]
+rates look pretty correlated ... but that could provide some balance ... ? 
+pearsonr(dnspk['EMUP'][1],dnspk['EMDOWN'][1])
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','IM'],lclr=['r','b'],plotindiv=True)
+xlabel('Time (ms)',fontsize=30); ylabel('Average weight',fontsize=30); tl(); 
+savefig(gifpath()+'all_avg_weight.png') # [[./gif/20oct9_20oct8_B0_cycle_all_avg_weight.png]]
+savefig(gifpath()+'all_avg_weightB.png') # [[./gif/20oct9_20oct8_B0_cycle_all_avg_weightB.png]]
+
+what's cumulative reward vs time?
+plot(actreward.time,actreward.reward)
+plot(actreward.time,np.cumsum(actreward.reward))
+savefig(gifpath()+'cumsumreward.png') # [[./gif/20oct9_20oct8_B0_cycle_cumsumreward.png]]
+plot(actreward.time,np.cumsum(abs(actreward.reward)))
+savefig(gifpath()+'cumsum_absreward.png') # [[./gif/20oct9_20oct8_B0_cycle_cumsum_absreward.png]]
+
+** papers/discussions about catastrophic forgetting
+** HA brainstorming gdoc: https://docs.google.com/document/d/1JqBesNhatOw2KF_aSdU_JhqIDQzBx7fFnm1RVi-Q8x0/edit
+
+EWC - elastic weight
+synaptic intelligence (ganguli)
+xdg - unit gating - via inhibitory plasticity?
+context signal (from pfc/ppc) - learned? how? HA suggests STDP ... sounds similar to bazhenov STDP -> RL
+
+** importance signal in stdp.mod ?
+
+so rate of learning will depend on previous reward/punishment values
+
+so if a synapse receives a lot of reward then it should have lower probability of changing further (?)
+      deltaw = deltaw * (1.0 - cumreward / maxreward)
+
+    cumreward = cumreward + abs(reinf) : cumulative reward magnitude
+
+could have different maxreward values for different cell/synapse pathways ...
+
+python -i simdat.py backupcfg/20oct9_A0_cycle_sim.json
+
+#
+clf()
+poty = 'IM'
+for prety,clr in zip(['EMDOWN','EMUP'],['r','b']):
+  pdfs = pdf[(pdf.postid>=dstartidx[poty])&(pdf.postid<=dstartidx[poty])&(pdf.preid>=dstartidx[prety])&(pdf.preid<=dendidx[prety])]
+  subplot(2,1,1); plot(pdfs.time,pdfs.weight,clr+'o')
+  subplot(2,1,2); plot(pdfs.time,pdfs.cumreward,clr+'o')
+
+savefig(gifpath()+'w_creward_a0.png') # [[./gif/20oct9_20oct9_A0_cycle_w_creward_a0.png]]
+
+so all those synapses seem to have gotten same rewards ... 
+
+note that it's abs of cum reward (so punishmenet signals will contribute too)
+
+set higher max reward for the interneurons ... lower for E neurons ... 
+
+ok ...
+
+./myrun 32 sn.json
+
+started ~16:54 ...
+
+* 20oct10
+** check output from 20oct9_A0_cycle_
+
+finished at ~19:28
+
+python -i simdat.py backupcfg/20oct9_A0_cycle_sim.json
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/20oct10_20oct9_A0_cycle_perf.png]]
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((1490e3,1500e3))
+savefig(gifpath()+'rast.png') # [[./gif/20oct10_20oct9_A0_cycle_rast.png]]
+
+pop = 'EMDOWN'
+binsz = 20
+tt,nspk = getspikehist(dspkT[pop],dnumc,binsz,1500e3)
+plot(tt,nspk); xlim((0,1500e3))
+savefig(gifpath()+'EMDOWN_rate20.png') # [[./gif/20oct10_20oct9_A0_cycle_EMDOWN_rate20.png]]
+
+dnspk = {pop:nspk}
+pop='EMUP'; dnspk['EMUP'] = getspikehist(dspkT[pop],dnumc,binsz,1500e3)
+plot(dnspk['EMUP'][0],dnspk['EMUP'][1],'r'); 
+savefig(gifpath()+'EMUP_EMDOWN_rate20.png') # [[./gif/20oct10_20oct9_A0_cycle_EMUP_EMDOWN_rate20.png]]
+
+what's cumulative reward vs time?
+plot(actreward.time,np.cumsum(actreward.reward))
+savefig(gifpath()+'cumsumreward.png') 
+plot(actreward.time,np.cumsum(abs(actreward.reward)))
+savefig(gifpath()+'cumsum_absreward.png') # [[./gif/20oct10_20oct9_A0_cycle_cumsum_absreward.png]]
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','IM'],lclr=['r','b'],plotindiv=True)
+xlabel('Time (ms)',fontsize=30); ylabel('Average weight',fontsize=30); tl(); 
+savefig(gifpath()+'all_avg_weight.png') # [[./gif/20oct10_20oct9_A0_cycle_all_avg_weight.png]]
+savefig(gifpath()+'all_avg_weightB.png') # [[./gif/20oct10_20oct9_A0_cycle_all_avg_weightB.png]]
+
+#
+clf()
+pdx=0
+for prety,poty in zip(['EMDOWN','EMDOWN','EMUP','EMUP'],['IMUP','IM','IMDOWN','IM']):
+  subplot(2,2,pdx+1)
+  title(prety+'->'+poty)  
+  pdfs = pdf[(pdf.postid==dstartidx[poty]+1)&(pdf.preid>=dstartidx[prety])&(pdf.preid<=dendidx[prety])&(pdf.postid==dstartidx[poty]+1)]
+  plot(pdfs.time,pdfs.cumreward,'ko')
+  pdx+=1
+
+savefig(gifpath()+'crewardC.png') # [[./gif/20oct10_20oct9_A0_cycle_crewardC.png]]
+
+so synapses haven't reached max reward magnitude yet ... 
+
+#
+poty = 'EMUP'
+for pdx,prety in enumerate(['EV1', 'EV4', 'EMT', 'EV1DN', 'EV1DS', 'EV1DNW','EMUP','EMDOWN']):
+  subplot(2,4,pdx+1)
+  title(prety+'->'+poty)  
+  pdfs = pdf[(pdf.postid==dstartidx[poty])&(pdf.preid>=dstartidx[prety])&(pdf.preid<=dendidx[prety])]
+  plot(pdfs.time,pdfs.cumreward,'ko')
+
+savefig(gifpath()+'crewardD.png') # [[./gif/20oct10_20oct9_A0_cycle_crewardD.png]]
+
+weights are all decreasing probably because there's too much punishment ... in similar simulation
+backupcfg/20oct8_B0_cycle_sim.json , the average weights were ~flat with the same reward/punishment scores
+but CellWNorm was On ... preventing the overall weights from moving too much ... and since cumreward only
+reached ~400-500 which is far below maxreward value, that rule probably not responsible ... 
+
+would it make sense to run same sim with CellWNorm turned on?
+or adjust reward scores ? 
+
+fig=animInput(InputImages,gifpath()+'_input.mp4') # [[./gif/20oct10_20oct9_A0_cycle__input.mp4]]
+
+** test CellWNorm with cumreward rule for deltaw
+
+        "name": "20oct10_A0_cycle_",
+
+./myrun 32 sn.json
+
+started ~22:22 ... 
+
+* 20oct13
+** check output from 20oct10_A0_cycle_ -> had wrong param in sn.json
+
+finished ~08:57 on 20oct12 ... 
+
+python -i simdat.py backupcfg/20oct10_A0_cycle_sim.json
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/20oct13_20oct10_A0_cycle_perf.png]]
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((2490e3,2500e3))
+savefig(gifpath()+'rast.png') # [[./gif/20oct13_20oct10_A0_cycle_rast.png]]
+
+pop = 'EMDOWN'
+binsz = 20
+tt,nspk = getspikehist(dspkT[pop],dnumc,binsz,2500e3)
+clf(); plot(tt,nspk); xlim((0,2500e3))
+savefig(gifpath()+'EMDOWN_rate20.png') # [[./gifpath()+'EMDOWN_rate20.png']]
+
+dnspk = {pop:nspk}
+pop='EMUP'; dnspk['EMUP'] = getspikehist(dspkT[pop],dnumc,binsz,2500e3)
+plot(dnspk['EMUP'][0],dnspk['EMUP'][1],'r'); 
+savefig(gifpath()+'EMUP_EMDOWN_rate20.png') # [[./gif/20oct13_20oct10_A0_cycle_EMUP_EMDOWN_rate20.png]]
+
+plot(actreward.time,np.cumsum(actreward.reward))
+plot(actreward.time,np.cumsum(abs(actreward.reward)))
+savefig(gifpath()+'cumsum_absreward.png') # [[./gif/20oct13_20oct10_A0_cycle_cumsum_absreward.png]]
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','IM'],lclr=['r','b'],plotindiv=True)
+xlabel('Time (ms)',fontsize=30); ylabel('Average weight',fontsize=30); tl(); 
+savefig(gifpath()+'all_avg_weight.png') # [[./gif/20oct13_20oct10_A0_cycle_all_avg_weight.png]]
+savefig(gifpath()+'all_avg_weightB.png') # [[./gif/20oct13_20oct10_A0_cycle_all_avg_weightB.png]]
+
+hmm, weights decreasing because although had weight norm turned on for individual cells, the step size
+was too large ("normalizeWeightStepSize": 5000000000000000000), so never kicked in ... mistake!
+
+#
+clf()
+pdx=0
+for prety,poty in zip(['EMDOWN','EMDOWN','EMUP','EMUP'],['IMUP','IM','IMDOWN','IM']):
+  subplot(2,2,pdx+1)
+  title(prety+'->'+poty)  
+  pdfs = pdf[(pdf.postid==dstartidx[poty]+1)&(pdf.preid>=dstartidx[prety])&(pdf.preid<=dendidx[prety])&(pdf.postid==dstartidx[poty]+1)]
+  plot(pdfs.time,pdfs.cumreward,'ko')
+  pdx+=1
+
+savefig(gifpath()+'crewardC.png') # [[./gif/20oct13_20oct10_A0_cycle_crewardC.png]]
+
+#
+poty = 'EMUP'
+for pdx,prety in enumerate(['EV1', 'EV4', 'EMT', 'EV1DN', 'EV1DS', 'EV1DNW','EMUP','EMDOWN']):
+  subplot(2,4,pdx+1)
+  title(prety+'->'+poty)  
+  pdfs = pdf[(pdf.postid==dstartidx[poty])&(pdf.preid>=dstartidx[prety])&(pdf.preid<=dendidx[prety])]
+  plot(pdfs.time,pdfs.cumreward,'ko')
+
+savefig(gifpath()+'crewardD.png') # [[./gif/20oct13_20oct10_A0_cycle_crewardD.png]]
+
+# fig=animInput(InputImages,gifpath()+'_input.mp4') 
+
+** fixup last sim with intended parameters
+
+        "name": "20oct13_A0_cycle_",
+        "normalizeWeightStepSize": 500,
+
+./myrun 32 sn.json
+
+started ~11:06 ...
+
+** ball avoidance, origins
+
+model does the right thing, but too late, so loses a point, gets punished,
+with most recent action synapses having highest eligibility trace values,
+then next time around, the opposite action (avoidance) takes over?
+
+a related (or same) problem is that the most recent action might be correct, but all the
+other actions leading up to it could be incorrect. it seems that eligibility
+trace values will not properly encode that information. 
+
+example, ball going to bottom right. paddle is stuck at the top moving up and getting
+punished for many moves. finally the punishment signal allows the other population to 
+overcome the moves up and the paddle starts moving down. by then it's too late for the
+paddle to hit the ball, the model loses a point, and then gets punished for moving down.
+even though it got punished for moving up before, the punishment for moving down will
+still be remembered, and even may have a higher punishment value for lost point (-1.0) 
+compared to wrong move (-0.1).
+
+also, just because we find some problematic examples, doesn't mean it can't work (at all),
+but the frequency of problematic situations compared to non-problematic, will put a
+ceiling on learning ability and performance
+
+** STDP-RL rule currently used
+
+not really same as izhikevich
+in izhikevich (2007) eligibility trace amplitude is increased based on the STDP rule time difference
+and then decays exponentially
+the synaptic weight rate of change is product of eligibility trace and extracellular dopamine concentration
+and dopamine concentration is a function of reward/punishment signal
+
+dopamine concentration also follows exponential decay to baseline concentration 
+
+the STDP time difference impact on eligibility trace amplitude seems important since
+it means that high precision in firing times is more likely to get a larger reward 
+when dopamine is triggered ... 
+
+continuous integration of synaptic weights is also more costly ...
+
+** square pulse for RL? no score/lose point?
+
+that removes some of the time info but prevents mistake of recency and if have long enough window
+may attribute to all the synapses properly ?? but more likely to produce overly high credit
+assignments ...
+
+also, getting rid of score/lose point scores would prevent misleading info
+but that would mean the system is fairly simple in what it can assess ... ? 
+
+could also have different reward/punish adjustments for each metric
+one for follow
+one for hit
+one for score/loss
+which would require different synapses for each?
+
+try with no exp rl and only follow metric, shorter RL tau ... 
+
+20oct13_B0_cycle_
+
+run for 300 s to test ...
+
+other params same as last sim ...
+
+./myrun 32 sn.json
+
+started 16:49 ...
+
+finisehd ~23:02 ...
+
+python -i simdat.py backupcfg/20oct13_B0_cycle_sim.json
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/20oct13_20oct13_B0_cycle_perf.png]]
+similar to others ... some improvement - 
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((290e3,300e3))
+savefig(gifpath()+'rast.png') # [[./gif/20oct13_20oct13_B0_cycle_rast.png]]
+
+plot(actreward.time,np.cumsum(actreward.reward))
+plot(actreward.time,np.cumsum(abs(actreward.reward)))
+savefig(gifpath()+'cumsum_absreward.png') # [[./gif/20oct13_20oct13_B0_cycle_cumsum_absreward.png]]
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','IM'],lclr=['r','b'],plotindiv=True)
+xlabel('Time (ms)',fontsize=30); ylabel('Average weight',fontsize=30); tl(); 
+savefig(gifpath()+'all_avg_weight.png') # [[./gif/20oct13_20oct13_B0_cycle_all_avg_weight.png]]
+savefig(gifpath()+'all_avg_weightB.png') # [[./gif/20oct13_20oct13_B0_cycle_all_avg_weightB.png]]
+
+ok, performed ~as expected ... can run for 1500 s to compare to other recent sim above
+
+hmm, if took 6 hours to run with the other sim and IT's Matlab run in parallel, may as well wait until
+other sim finishes ... otherwise will take ~30 hours to run to completion ... 
+
+once re-setup gcp will have more cores available ... 
+
+** other way to minimize interference btwn metrics
+
+reduce the lose point punishment magnitude so it's similar to the non-follow ball value
+that way, losing a point won't mess up the incremental follow rewards as much if over-
+or under-shoot with some overall correctness
+
+* 20oct14
+** run w/o score/lose/hit reward/punish signals
+
+"name": "20oct14_B0_cycle_",
+
+./myrun 32 sn.json
+
+started 9:37 ... stopped, since noticed problem with cumreward (mentioned below)
+
+./myrun 32 sn.json
+
+restarted at 10:40 ... 
+
+
+** check output from 20oct13_A0_cycle_
+
+python -i simdat.py backupcfg/20oct13_A0_cycle_sim.json
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/20oct14_20oct13_A0_cycle_perf.png]]
+not bad performance, relatively speaking ... may require a lot more time to improve ... 
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((1490e3,1500e3))
+savefig(gifpath()+'rast.png') # [[./gif/20oct14_20oct13_A0_cycle_rast.png]]
+
+clf(); plot(actreward.time,np.cumsum(actreward.reward))
+plot(actreward.time,np.cumsum(abs(actreward.reward)))
+savefig(gifpath()+'cumsum_absreward.png') # [[./gif/20oct14_20oct13_A0_cycle_cumsum_absreward.png]]
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','IM'],lclr=['r','b'],plotindiv=True)
+xlabel('Time (ms)',fontsize=30); ylabel('Average weight',fontsize=30); tl(); 
+savefig(gifpath()+'all_avg_weight.png') # [[./gif/20oct14_20oct13_A0_cycle_all_avg_weight.png]]
+savefig(gifpath()+'all_avg_weightB.png') # [[./gif/20oct14_20oct13_A0_cycle_all_avg_weightB.png]]
+
+#
+poty = 'EMUP'
+for pdx,prety in enumerate(['EV1', 'EV4', 'EMT', 'EV1DN', 'EV1DS', 'EV1DNW','EMUP','EMDOWN']):
+  #subplot(2,4,pdx+1)
+  #title(prety+'->'+poty)  
+  pdfs = pdf[(pdf.postid==dstartidx[poty])&(pdf.preid>=dstartidx[prety])&(pdf.preid<=dendidx[prety])]
+  plot(pdfs.time,pdfs.cumreward,'ko')
+
+savefig(gifpath()+'crewardD.png') # [[./gif/20oct14_20oct13_A0_cycle_crewardD.png]]
+
+hmm, all cumulative reward values are same - that means not implemented correctly, was supposed
+to be synapse-specific signal ... so should check if deltaw != 0.0 before incrementing cumreward
+since deltaw != 0.0 only when a reward/punishment is provided to a synapse
+
+ok, will fix that up ... 
+
