@@ -18619,3 +18619,53 @@ reduce the lose point punishment magnitude so it's similar to the non-follow bal
 that way, losing a point won't mess up the incremental follow rewards as much if over-
 or under-shoot with some overall correctness
 
+* 20oct14
+** run w/o score/lose/hit reward/punish signals
+
+"name": "20oct14_B0_cycle_",
+
+./myrun 32 sn.json
+
+started 9:37 ... stopped, since noticed problem with cumreward (mentioned below)
+
+./myrun 32 sn.json
+
+restarted at 10:40 ... 
+
+
+** check output from 20oct13_A0_cycle_
+
+python -i simdat.py backupcfg/20oct13_A0_cycle_sim.json
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/20oct14_20oct13_A0_cycle_perf.png]]
+not bad performance, relatively speaking ... may require a lot more time to improve ... 
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((1490e3,1500e3))
+savefig(gifpath()+'rast.png') # [[./gif/20oct14_20oct13_A0_cycle_rast.png]]
+
+clf(); plot(actreward.time,np.cumsum(actreward.reward))
+plot(actreward.time,np.cumsum(abs(actreward.reward)))
+savefig(gifpath()+'cumsum_absreward.png') # [[./gif/20oct14_20oct13_A0_cycle_cumsum_absreward.png]]
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','IM'],lclr=['r','b'],plotindiv=True)
+xlabel('Time (ms)',fontsize=30); ylabel('Average weight',fontsize=30); tl(); 
+savefig(gifpath()+'all_avg_weight.png') # [[./gif/20oct14_20oct13_A0_cycle_all_avg_weight.png]]
+savefig(gifpath()+'all_avg_weightB.png') # [[./gif/20oct14_20oct13_A0_cycle_all_avg_weightB.png]]
+
+#
+poty = 'EMUP'
+for pdx,prety in enumerate(['EV1', 'EV4', 'EMT', 'EV1DN', 'EV1DS', 'EV1DNW','EMUP','EMDOWN']):
+  #subplot(2,4,pdx+1)
+  #title(prety+'->'+poty)  
+  pdfs = pdf[(pdf.postid==dstartidx[poty])&(pdf.preid>=dstartidx[prety])&(pdf.preid<=dendidx[prety])]
+  plot(pdfs.time,pdfs.cumreward,'ko')
+
+savefig(gifpath()+'crewardD.png') # [[./gif/20oct14_20oct13_A0_cycle_crewardD.png]]
+
+hmm, all cumulative reward values are same - that means not implemented correctly, was supposed
+to be synapse-specific signal ... so should check if deltaw != 0.0 before incrementing cumreward
+since deltaw != 0.0 only when a reward/punishment is provided to a synapse
+
+ok, will fix that up ... 
+

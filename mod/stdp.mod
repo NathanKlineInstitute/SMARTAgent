@@ -191,7 +191,7 @@ PROCEDURE reward_punish (reinf) {
     :if (verbose > 0) { : Show weight update information if debugging on.
     :  printf("RL event: t = %f ms; reinf = %f; RLhebbwt = %f; RLlenhebb = %f; tlasthebbelig = %f; deltaw = %f\n",t,reinf,RLhebbwt,RLlenhebb,tlasthebbelig, deltaw) 
     :}
-    cumreward = cumreward + abs(reinf) : cumulative reward magnitude
+    if (deltaw!=0.0){cumreward = cumreward + abs(reinf)} : cumulative reward magnitude; only if weight changed
   }
 }
 
