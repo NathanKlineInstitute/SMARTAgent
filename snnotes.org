@@ -18830,3 +18830,79 @@ will have maxreward at 200 for AMPA and 600 for AMPAI...
 
 started ~23:24 ...
 
+* 20oct15
+** check output from 20oct14_E0_cycle_
+
+finished @ 13:00 ...
+
+python -i simdat.py backupcfg/20oct14_E0_cycle_sim.json
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/20oct15_20oct14_E0_cycle_perf.png]]
+not so good ... 
+
+np.amin(pdf.cumreward), np.amax(pdf.cumreward), np.mean(pdf.cumreward) # (0.0, 388.20000000001977, 1.3420942947377772)
+
+#
+poty = 'EMUP'
+for pdx,prety in enumerate(['EV1', 'EV4', 'EMT', 'EV1DN', 'EV1DS', 'EV1DNW','EMUP','EMDOWN']):
+  subplot(2,4,pdx+1)
+  title(prety+'->'+poty)  
+  pdfs = pdf[(pdf.postid>=dstartidx[poty])&(pdf.postid<=dendidx[poty])&(pdf.preid>=dstartidx[prety])&(pdf.preid<=dendidx[prety])]
+  plot(pdfs.time,pdfs.cumreward,'ko')
+
+savefig(gifpath()+'crewardD.png') # [[./gif/20oct15_20oct14_E0_cycle_crewardD.png]]
+
+some of those synapses are reaching the maxreward of 200 ... 
+
+#
+poty = 'EMUP'
+for pdx,prety in enumerate(['EV1', 'EV4', 'EMT', 'EV1DN', 'EV1DS', 'EV1DNW','EMUP','EMDOWN']):
+  subplot(2,4,pdx+1)
+  title(prety+'->'+poty)  
+  pdfs = pdf[(pdf.postid>=dstartidx[poty])&(pdf.postid<=dendidx[poty])&(pdf.preid>=dstartidx[prety])&(pdf.preid<=dendidx[prety])]
+  plot(pdfs.time,pdfs.weight,'ko')
+
+savefig(gifpath()+'cweightD.png') # [[./gif/20oct15_20oct14_E0_cycle_cweightD.png]]
+
+#
+poty = 'IM'; lclr = ['r','b']
+for pdx,prety in enumerate(['EMDOWN','EMUP']):
+  clr = lclr[pdx]
+  #title(prety+'->'+poty)  
+  pdfs = pdf[(pdf.postid>=dstartidx[poty])&(pdf.postid<=dendidx[poty])&(pdf.preid>=dstartidx[prety])&(pdf.preid<=dendidx[prety])]
+  plot(pdfs.time,pdfs.cumreward,clr+'o')
+
+savefig(gifpath()+'crewardI.png') # [[./gif/20oct15_20oct14_E0_cycle_crewardI.png]]
+
+#
+poty = 'IM'; lclr = ['r','b']
+for pdx,prety in enumerate(['EMDOWN','EMUP']):
+  clr = lclr[pdx]
+  #title(prety+'->'+poty)  
+  pdfs = pdf[(pdf.postid>=dstartidx[poty])&(pdf.postid<=dendidx[poty])&(pdf.preid>=dstartidx[prety])&(pdf.preid<=dendidx[prety])]
+  plot(pdfs.time,pdfs.weight,clr+'o')
+
+savefig(gifpath()+'cweightI.png') # [[./gif/20oct15_20oct14_E0_cycle_cweightI.png]]
+
+hmm, overall did not do as well as [[./gif/20oct14_20oct13_A0_cycle_perf.png]]
+
+fig=animInput(InputImages,gifpath()+'_input.mp4') # [[./gif/20oct15_20oct14_E0_cycle__input.mp4]]
+
+** simplify again - ??
+
+should aim to see good performance consistently, and during even the first 20 s of activity
+that's what had seen with the 2D arm model when it was working properly
+w/o that, seems unlikely to see good long term performance? 
+
+larger scores to enforce better behavior ... ? 
+
+no weight norm, cumreward tracking ... 
+
+20oct15_A0_cycle_
+
+python -i simdat.py backupcfg/20oct15_A0_cycle_sim.json
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png')
+
