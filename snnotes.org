@@ -18759,3 +18759,72 @@ neurons activated in 500 ms, and 25 ms between that and postsynaptic neuron firi
 try a bit longer run ... see if they diverge more, also decrease window for pre/post tagging
 and reduce duration of eligibility window
 
+150 s run finished @ 19:46 ... 
+
+#
+poty = 'EMUP'
+for pdx,prety in enumerate(['EV1', 'EV4', 'EMT', 'EV1DN', 'EV1DS', 'EV1DNW','EMUP','EMDOWN']):
+  subplot(2,4,pdx+1)
+  title(prety+'->'+poty)  
+  pdfs = pdf[(pdf.postid>=dstartidx[poty])&(pdf.postid<=dendidx[poty])&(pdf.preid>=dstartidx[prety])&(pdf.preid<=dendidx[prety])]
+  plot(pdfs.time,pdfs.cumreward,'ko')
+
+savefig(gifpath()+'crewardD.png') # [[./gif/20oct14_20oct14_D0_cycle_crewardD.png]]
+now cumulative rewards at all populations do not look the same 
+
+csm=cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+lclr = [csm.to_rgba(float(i)/(len(lpda))) for i in range(len(lpda))]
+
+prety = 'EV1'
+pdfs = pdf[(pdf.postid>=dstartidx[poty])&(pdf.postid<=dendidx[poty])&(pdf.preid>=dstartidx[prety])&(pdf.preid<=dendidx[prety])]
+lpreid = np.unique(pdfs.preid)
+for pdx,preid in enumerate(lpreid):
+  pdfs2 = pdfs[(pdfs.preid==preid)]
+  plot(pdfs2.time,pdfs2.cumreward,'o',color=csm.to_rgba(float(pdx)/(len(lpreid))))
+
+savefig(gifpath()+'crewardE.png') # [[./gif/20oct14_20oct14_D0_cycle_crewardE.png]]
+
+ok, look different now ... 
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/20oct14_20oct14_D0_cycle_perf.png]]
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','IM'],lclr=['r','b'],plotindiv=True)
+xlabel('Time (ms)',fontsize=30); ylabel('Average weight',fontsize=30); tl(); 
+
+savefig(gifpath()+'all_avg_weight.png') # [[./gif/20oct14_20oct14_D0_cycle_all_avg_weight.png]]
+savefig(gifpath()+'all_avg_weightB.png') # [[./gif/20oct14_20oct14_D0_cycle_all_avg_weightB.png]]
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((140e3,150e3))
+savefig(gifpath()+'rast.png') # [[./gif/20oct14_20oct14_D0_cycle_rast.png]]
+
+np.amin(pdf.cumreward), np.amax(pdf.cumreward), np.mean(pdf.cumreward) # (0.0, 161.8999999999951, 0.2228273540166179)
+
+lc,lcmin,lcmax = [],[],[]
+tt = np.unique(pdf.time)
+for t in tt: 
+  pdfs = pdf[pdf.time==t]
+  lc.append(np.mean(pdfs.cumreward))
+  lcmin.append(np.amin(pdfs.cumreward))
+  lcmax.append(np.amax(pdfs.cumreward))
+
+plot(tt,lc,'k')
+plot(tt,lcmin,'b')
+plot(tt,lcmax,'r')
+
+savefig(gifpath()+'crewardavgvst.png') # [[./gif/20oct14_20oct14_D0_cycle_crewardavgvst.png]]
+savefig(gifpath()+'crewardmaxvst.png') # [[./gif/20oct14_20oct14_D0_cycle_crewardmaxvst.png]]
+
+ok, cumreward increasing over time ... average pretty low , max pretty high, so there's a wide range
+
+fig=animInput(InputImages,gifpath()+'_input.mp4') # [[./gif/20oct14_20oct14_D0_cycle__input.mp4]]
+
+can sim with these params longer ... 1000 s ... have to adjust reload weight code to load in cumreward values, if they're available
+ok, adjusted that but will start from scratch anyway, so can set a different maxreward ... 
+
+        "name": "20oct14_E0_cycle_",
+
+will have maxreward at 200 for AMPA and 600 for AMPAI... 
+
+./myrun 32 sn.json
+

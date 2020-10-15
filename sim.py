@@ -1503,7 +1503,7 @@ def getAllSTDPObjects (sim):
             dSTDPmech[pop].append(STDPmech)
             if dconf['sim']['targettedRL']: dcell[pop].append(conn.preGid) # SN: exptl presynaptic ID
   # SN: exptl
-  #if not 'hSTDP' in conn: continue
+  #if 'hSTDP' not in conn: continue
   #cpreID = conn.preGid  #find preID
   #if type(cpreID) != int: continue
   if dconf['sim']['targettedRL'] > 1:
@@ -1555,15 +1555,18 @@ def updateSTDPWeights (sim, W):
   # get all the simulation's cells (on a given node)
   for cell in sim.net.cells:
     cpostID = cell.gid#find postID
+    WPost = W[(W.postid==cpostID)] #find the record for a connection with post neuron ID
     for conn in cell.conns:
-      if not 'hSTDP' in conn: continue
+      if 'hSTDP' not in conn: continue
       cpreID = conn.preGid  #find preID
       if type(cpreID) != int: continue
-      cConnW = W[(W.postid==cpostID) & (W.preid==cpreID)] #find the record for a connection with pre and post neuron ID
+      cConnW = WPost[(WPost.preid==cpreID)] #find the record for a connection with pre and post neuron ID
       #find weight for the STDP connection between preID and postID
       for idx in cConnW.index:
         cW = cConnW.at[idx,'weight']
         conn['hObj'].weight[0] = cW
+        hSTDP = conn.get('hSTDP')
+        hSTDP.cumreward = cConnW.at[idx,'cumreward']
         if dconf['verbose'] > 1: print('weight updated:', cW)
         
 #if specified 'ResumeSim' = 1, load the connection data from 'ResumeSimFromFile' and assign weights to STDP synapses  

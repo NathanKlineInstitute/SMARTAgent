@@ -37,17 +37,17 @@
         "ResumeSimFromFile": "data/20sep25_A0_cycle_synWeights_final.pkl"
     },
     "sim": {
-        "duration": 150000,
+        "duration": 1000000,
         "dt": 0.2,
         "verbose": 0,
         "recordStep": 1.0,
-        "recordWeightStepSize": 250,
+        "recordWeightStepSize": 500,
         "normalizeWeightStepSize": 500,
 	"normalizeWeightsAtStart": 0,
         "RLFakeUpRule": 0,
         "RLFakeDownRule": 0,
         "RLFakeStayRule": 0,
-        "name": "20oct14_D0_cycle_",
+        "name": "20oct14_E0_cycle_",
         "doquit": 1,
         "doplot": 0,
         "saveCellSecs": 0,
@@ -249,7 +249,7 @@
             "RLwindhebb": 20,
             "softthresh": 0,
             "verbose": 0,
-            "maxreward": 3000.0 
+            "maxreward": 600.0 
         },	
         "AMPA": {
             "wbase": 1e-06,
@@ -268,7 +268,7 @@
             "RLwindhebb": 20,
             "softthresh": 0,
             "verbose": 0,
-	    "maxreward": 2000.0
+	    "maxreward": 200.0
         },
         "NMDA": {
             "wbase": 1e-06,
