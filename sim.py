@@ -51,6 +51,8 @@ ITypes = dconf['net']['ITypes'] # inhibitory neuron types
 allpops = list(dconf['net']['allpops'].keys())
 EMotorPops = dconf['net']['EMotorPops'] # excitatory neuron motor populations
 EPreMPops = dconf['net']['EPreMPops'] # excitatory premotor populations
+EPreMDirPops = dconf['net']['EPreMDirPops']
+EVPops = [pop for pop in EPreMPops if pop not in EPreMDirPops] # excitatory visual populations (non direction selective)
 
 dnumc = OrderedDict({ty:dconf['net']['allpops'][ty]*scale for ty in allpops}) # number of neurons of a given type
 
@@ -480,7 +482,8 @@ for prety in EMotorPops:
   netParams.connParams[k] = {
     'preConds': {'pop': prety},
     'postConds': {'pop': 'IM'},
-    'convergence': prob2conv(0.125/2, dnumc[prety]),
+    #'convergence': prob2conv(0.125/2, dnumc[prety]),
+    'probability': 1,
     'weight': 0.02 * cfg.EIGain,
     'delay': 2,
     'synMech': 'AMPA', 'sec':'soma', 'loc':0.5}
@@ -500,7 +503,8 @@ for prety in EMotorPops:
     netParams.connParams[k] = {
       'preConds': {'pop': prety},
       'postConds': {'pop': poty},
-      'convergence': prob2conv(dconf['net']['EMIRecipProb'], dnumc[prety]),
+      #'convergence': prob2conv(dconf['net']['EMIRecipProb'], dnumc[prety]),
+      'probability': 1,
       'weight': dconf['net']['EMIRecipWght'] * cfg.EIGain,
       'delay': 2,
       'synMech': 'AMPA', 'sec':'soma', 'loc':0.5}
@@ -595,7 +599,8 @@ for poty in EMotorPops: # I -> E for motor populations
   netParams.connParams['IM->'+poty] = {
     'preConds': {'pop': 'IM'},
     'postConds': {'pop': poty},
-    'convergence': prob2conv(0.125, dnumc['IM']),
+    #'convergence': prob2conv(0.125, dnumc['IM']),
+    'probability': 1,
     'weight': 0.2 * cfg.IEGain,
     'delay': 2,
     'synMech': 'GABA', 'sec':'soma', 'loc':0.5}
@@ -603,7 +608,8 @@ for poty in EMotorPops: # I -> E for motor populations
   netParams.connParams[prety+'->'+poty] = {
     'preConds': {'pop': prety},
     'postConds': {'pop': poty},
-    'convergence': prob2conv(0.125, dnumc[prety]),
+    #'convergence': prob2conv(0.125, dnumc[prety]),
+    'probability': 1,
     'weight': 0.2 * cfg.IEGain,
     'delay': 2,
     'synMech': 'GABA', 'sec':'soma', 'loc':0.5}      
@@ -786,7 +792,11 @@ if dconf['architecturePreMtoM']['useTopological']:
       sim.topologicalConns[prety+'->'+poty]['coords'] = connCoords
       # print(prety,poty,len(blist),len(np.unique(np.array(blist)[:,0])),len(np.unique(np.array(blist)[:,1])))
 
-      for strty,synmech,weight in zip(['','n'],['AMPA', 'NMDA'],[dconf['net']['EEMWghtAM']*cfg.EEGain, dconf['net']['EEMWghtNM']*cfg.EEGain]):
+      lsynw = [dconf['net']['EEMWghtAM']*cfg.EEGain, dconf['net']['EEMWghtNM']*cfg.EEGain]
+      if prety in EVPops:
+        lsynw = [dconf['net']['VISMWghtAM']*cfg.EEGain, dconf['net']['VISMWghtNM']*cfg.EEGain]
+      
+      for strty,synmech,weight in zip(['','n'],['AMPA', 'NMDA'],lsynw):        
         k = strty+prety+'->'+strty+poty
         netParams.connParams[k] = {
           'preConds': {'pop': prety},
@@ -813,9 +823,12 @@ elif dconf['architecturePreMtoM']['useProbabilistic']:
   for prety in EPreMPops:
     if dnumc[prety] <= 0: continue
     EEMProb = dconf['net']['EEMProb'] # feedforward connectivity
+    lsynw = [dconf['net']['EEMWghtAM']*cfg.EEGain, dconf['net']['EEMWghtNM']*cfg.EEGain]
+    if prety in EVPops:
+      lsynw = [dconf['net']['VISMWghtAM']*cfg.EEGain, dconf['net']['VISMWghtNM']*cfg.EEGain]    
     for poty in EMotorPops:
       if dnumc[poty] <= 0: continue
-      for strty,synmech,weight in zip(['','n'],['AMPA', 'NMDA'],[dconf['net']['EEMWghtAM']*cfg.EEGain, dconf['net']['EEMWghtNM']*cfg.EEGain]):
+      for strty,synmech,weight in zip(['','n'],['AMPA', 'NMDA'],lsynw):
         k = strty+prety+'->'+strty+poty
         netParams.connParams[k] = {
           'preConds': {'pop': prety},

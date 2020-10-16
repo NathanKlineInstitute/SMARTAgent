@@ -18952,3 +18952,13 @@ and increase NM to M neurons (EEMWghtNM to 1e-6 instead of 0.9375e-6)
 
 started ~09:20 ...
 
+this one also turns to very low firing pretty quickly
+
+adjust & restart ... 
+
+./myrun 32 sn.json
+
+need higher pre V -> M weights, since far fewer pre V neurons? (compared to direction
+selective neurons - since noticed that don't get much/any firing unless direction
+selective neurons are activated when ball moving)
+
