@@ -482,8 +482,7 @@ for prety in EMotorPops:
   netParams.connParams[k] = {
     'preConds': {'pop': prety},
     'postConds': {'pop': 'IM'},
-    #'convergence': prob2conv(0.125/2, dnumc[prety]),
-    'probability': 1,
+    'convergence': prob2conv(0.125/2, dnumc[prety]),
     'weight': 0.02 * cfg.EIGain,
     'delay': 2,
     'synMech': 'AMPA', 'sec':'soma', 'loc':0.5}
@@ -503,8 +502,7 @@ for prety in EMotorPops:
     netParams.connParams[k] = {
       'preConds': {'pop': prety},
       'postConds': {'pop': poty},
-      #'convergence': prob2conv(dconf['net']['EMIRecipProb'], dnumc[prety]),
-      'probability': 1,
+      'convergence': prob2conv(dconf['net']['EMIRecipProb'], dnumc[prety]),
       'weight': dconf['net']['EMIRecipWght'] * cfg.EIGain,
       'delay': 2,
       'synMech': 'AMPA', 'sec':'soma', 'loc':0.5}
@@ -599,8 +597,7 @@ for poty in EMotorPops: # I -> E for motor populations
   netParams.connParams['IM->'+poty] = {
     'preConds': {'pop': 'IM'},
     'postConds': {'pop': poty},
-    #'convergence': prob2conv(0.125, dnumc['IM']),
-    'probability': 1,
+    'convergence': prob2conv(0.125, dnumc['IM']),
     'weight': 0.2 * cfg.IEGain,
     'delay': 2,
     'synMech': 'GABA', 'sec':'soma', 'loc':0.5}
@@ -608,8 +605,7 @@ for poty in EMotorPops: # I -> E for motor populations
   netParams.connParams[prety+'->'+poty] = {
     'preConds': {'pop': prety},
     'postConds': {'pop': poty},
-    #'convergence': prob2conv(0.125, dnumc[prety]),
-    'probability': 1,
+    'convergence': prob2conv(0.125, dnumc[prety]),
     'weight': 0.2 * cfg.IEGain,
     'delay': 2,
     'synMech': 'GABA', 'sec':'soma', 'loc':0.5}      
