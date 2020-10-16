@@ -18983,5 +18983,9 @@ neurons to have multiple states/associations at each neuron
 
 ** association layer
 
-EAssoc, IAssoc ... 
+EA, IA for EAssoc, IAssoc ... association neurons 
+
+adjusting architecture to include association area that projects to motor neurons ... 
+
+        "name": "20oct16_A0_cycle_",
 
