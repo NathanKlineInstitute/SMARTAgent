@@ -18904,5 +18904,39 @@ no weight norm, cumreward tracking ...
 python -i simdat.py backupcfg/20oct15_A0_cycle_sim.json
 
 ax=plotPerf(actreward,yl=(0,1))
-savefig(gifpath()+'perf.png')
+savefig(gifpath()+'perf.png') # [[./gif/20oct15_20oct15_A0_cycle_perf.png]]
+hmm, did not get such good results ... not many hits
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((290e3,300e3))
+savefig(gifpath()+'rast.png') # [[./gif/20oct15_20oct15_A0_cycle_rast.png]]
+well, it's a hyperactive network ... 
+
+#
+clf()
+poty = 'IM'; lclr = ['r','b']
+for pdx,prety in enumerate(['EMDOWN','EMUP']):
+  clr = lclr[pdx]
+  #title(prety+'->'+poty)  
+  pdfs = pdf[(pdf.postid>=dstartidx[poty])&(pdf.postid<=dendidx[poty])&(pdf.preid>=dstartidx[prety])&(pdf.preid<=dendidx[prety])]
+  plot(pdfs.time,pdfs.weight,clr+'o')
+
+savefig(gifpath()+'cweightI.png') # [[./gif/20oct15_20oct15_A0_cycle_cweightI.png]]
+E->I weights dropping to 0 ... had set wbase pretty low ... 
+
+simplifying network ... back to smaller EM output population, so can run longer ... 
+do away with many of the RL connections again ... all preM to M but with high weight variance (weightVar==1)
+
+        "name": "20oct15_B0_cycle_",
+
+python -i simdat.py backupcfg/20oct15_B0_cycle_sim.json
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((290e3,300e3))
+savefig(gifpath()+'rast.png') 
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','IM'])
+savefig(gifpath()+'Vm.png') 
+
+./myrun 32 sn.json
+
+started ~23:49 ... 
 

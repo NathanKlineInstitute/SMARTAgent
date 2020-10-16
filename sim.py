@@ -481,13 +481,15 @@ for prety in EMotorPops:
     'preConds': {'pop': prety},
     'postConds': {'pop': 'IM'},
     'convergence': prob2conv(0.125/2, dnumc[prety]),
-    'weight': getInitWeight(0.02 * cfg.EIGain),
+    'weight': 0.02 * cfg.EIGain,
     'delay': 2,
     'synMech': 'AMPA', 'sec':'soma', 'loc':0.5}
   if dconf['net']['RLconns']['EIPlast'] and dSTDPparamsRL['AMPAI']['RLon']: # only turn on plasticity when specified to do so
     netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL['AMPAI']}
+    netParams.connParams[k]['weight'] = getInitWeight(0.02 * cfg.EIGain)
   elif dconf['net']['STDPconns']['EIPlast'] and dSTDPparams['AMPAI']['STDPon']:
-    netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparams['AMPAI']}    
+    netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparams['AMPAI']}
+    netParams.connParams[k]['weight'] = getInitWeight(0.02 * cfg.EIGain)    
 
 # reciprocal inhibition - only active when all relevant populations created
 for prety in EMotorPops:
@@ -499,13 +501,15 @@ for prety in EMotorPops:
       'preConds': {'pop': prety},
       'postConds': {'pop': poty},
       'convergence': prob2conv(dconf['net']['EMIRecipProb'], dnumc[prety]),
-      'weight': getInitWeight(dconf['net']['EMIRecipWght'] * cfg.EIGain),
+      'weight': dconf['net']['EMIRecipWght'] * cfg.EIGain,
       'delay': 2,
       'synMech': 'AMPA', 'sec':'soma', 'loc':0.5}
     if dconf['net']['RLconns']['EIPlast'] and dSTDPparamsRL['AMPAI']['RLon']: # only turn on plasticity when specified to do so
       netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL['AMPAI']}
+      netParams.connParams[k]['weight'] = getInitWeight(dconf['net']['EMIRecipWght'] * cfg.EIGain)      
     elif dconf['net']['STDPconns']['EIPlast'] and dSTDPparams['AMPAI']['STDPon']:
-      netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparams['AMPAI']}    
+      netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparams['AMPAI']}
+      netParams.connParams[k]['weight'] = getInitWeight(dconf['net']['EMIRecipWght'] * cfg.EIGain)            
 
     
 #Local inhibition
@@ -517,7 +521,7 @@ if dnumc['ER']>0:
           'weight': 0.2 * cfg.IEGain,
           'delay': 2,
           'synMech': 'GABA', 'sec':'soma', 'loc':0.5}
-
+  
   if VTopoI: 
     netParams.connParams['IR->ER']['connList'] = blistIRtoER
     sim.topologicalConns['IR->ER'] = {}
