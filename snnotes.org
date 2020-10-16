@@ -18940,3 +18940,15 @@ savefig(gifpath()+'Vm.png')
 
 started ~23:49 ... 
 
+* 20oct16
+** stopped last sim -- not enough firing
+
+restart with weight norm for cell, every 10 s ... 
+and increase NM to M neurons (EEMWghtNM to 1e-6 instead of 0.9375e-6)
+
+        "name": "20oct16_A0_cycle_",
+
+./myrun 32 sn.json
+
+started ~09:20 ...
+
