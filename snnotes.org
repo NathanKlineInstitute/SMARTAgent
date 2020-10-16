@@ -18962,3 +18962,26 @@ need higher pre V -> M weights, since far fewer pre V neurons? (compared to dire
 selective neurons - since noticed that don't get much/any firing unless direction
 selective neurons are activated when ball moving)
 
+** connectivity/architecture
+
+ball in middle going down and to right, and will hit just above bottom right corner:
+ if paddle is above bottom right corner -> need move down neuron to know to move down; and move up neuron to stay silent
+ if paddle is below bottom right corner -> need move down neuron to know to stay silent; and move up neuron to fire
+
+in the extreme case, if each motor neuron receives ALL the information, can it still make the right decision in
+all situations? 
+
+ball in middle goin
+
+** discussion with ha re architecture
+
+comes to the conclusion that current architecture makes no sense; need middle area that has
+all associations between directions and positions ... then projects to motor neurons
+
+so that would required 3200 x 400 neurons (if neurons are simple), or more detailed
+neurons to have multiple states/associations at each neuron
+
+** association layer
+
+EAssoc, IAssoc ... 
+
