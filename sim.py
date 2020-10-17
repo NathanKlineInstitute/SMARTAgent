@@ -1016,8 +1016,8 @@ def recordAdjustableWeightsPop (sim, t, popname):
   for cell in lcell:
     for conn in cell.conns:
       if 'hSTDP' in conn:
-        hstdp = conn.get('hSTDP')
-        lsynweights.append([t,conn.preGid,cell.gid,float(conn['hObj'].weight[0]),hstdp.cumreward])
+        #hstdp = conn.get('hSTDP')
+        lsynweights.append([t,conn.preGid,cell.gid,float(conn['hObj'].weight[0])])#,hstdp.cumreward])
   return len(lcell)
                     
 def recordAdjustableWeights (sim, t, lpop):
@@ -1658,7 +1658,7 @@ def updateSTDPWeights (sim, W):
         cW = cConnW.at[idx,'weight']
         conn['hObj'].weight[0] = cW
         hSTDP = conn.get('hSTDP')
-        hSTDP.cumreward = cConnW.at[idx,'cumreward']
+        #hSTDP.cumreward = cConnW.at[idx,'cumreward']
         if dconf['verbose'] > 1: print('weight updated:', cW)
         
 #if specified 'ResumeSim' = 1, load the connection data from 'ResumeSimFromFile' and assign weights to STDP synapses  
@@ -1698,14 +1698,16 @@ def LSynWeightToD (L):
   print('converting synaptic weight list to dictionary...')
   dout = {}; doutfinal = {}
   for row in L:
-    t,preID,poID,w,cumreward = row
+    #t,preID,poID,w,cumreward = row
+    t,preID,poID,w = row
     if preID not in dout:
       dout[preID] = {}
       doutfinal[preID] = {}
     if poID not in dout[preID]:
       dout[preID][poID] = []
       doutfinal[preID][poID] = []
-    dout[preID][poID].append([t,w,cumreward])
+    #dout[preID][poID].append([t,w,cumreward])
+    dout[preID][poID].append([t,w])
   for preID in doutfinal.keys():
     for poID in doutfinal[preID].keys():
       doutfinal[preID][poID].append(dout[preID][poID][-1])

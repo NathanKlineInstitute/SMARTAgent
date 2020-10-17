@@ -18981,11 +18981,58 @@ all associations between directions and positions ... then projects to motor neu
 so that would required 3200 x 400 neurons (if neurons are simple), or more detailed
 neurons to have multiple states/associations at each neuron
 
-** association layer
+** association layer -> try it out (20oct16_A0_cycle_) -> may be improving
 
 EA, IA for EAssoc, IAssoc ... association neurons 
 
 adjusting architecture to include association area that projects to motor neurons ... 
 
         "name": "20oct16_A0_cycle_",
+
+./myrun 32 sn.json
+
+took ~3.5 hours ... 
+
+python -i simdat.py backupcfg/20oct16_A0_cycle_sim.json
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/20oct16_20oct16_A0_cycle_perf.png]]
+
+follow might be improving ... 
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((190e3,200e3))
+savefig(gifpath()+'rast.png') # [[./gif/20oct16_20oct16_A0_cycle_rast.png]]
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','EA', 'IM'],tlim=(190e3,200e3))
+savefig(gifpath()+'Vm.png') # [[./gif/20oct16_20oct16_A0_cycle_Vm.png]]
+
+fig=animInput(InputImages,gifpath()+'_input.mp4') # [[./gif/20oct16_20oct16_A0_cycle__input.mp4]]
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EA','EMDOWN','EMUP'],lclr=['r','g','b'],plotindiv=True)
+xlabel('Time (ms)',fontsize=30); ylabel('Average weight',fontsize=30); tl(); 
+
+savefig(gifpath()+'all_avg_weight.png') # [[./gif/20oct16_20oct16_A0_cycle_all_avg_weight.png]]
+savefig(gifpath()+'all_avg_weightB.png') # [[./gif/20oct16_20oct16_A0_cycle_all_avg_weightB.png]]
+
+binsz = 100
+dnspk = {pop:getspikehist(dspkT[pop],dnumc,binsz,200e3) for pop in ['EMDOWN','EMUP','EA']}
+for clr,pop in zip(['r','g','b'],['EA','EMDOWN','EMUP']): plot(dnspk[pop][0],dnspk[pop][1],clr)
+
+xlim((0,200e3)); ylim((-10,200))
+
+savefig(gifpath()+'EA_EMDOWN_rate100.png') # [[./gif/20oct16_20oct16_A0_cycle_EA_EMDOWN_rate100.png]]
+
+rates are pretty similar ... EA sets pace and EMDOWN,EMUP follow closely - though of course not identical 
+
+certainly worth running longer ... 
+
+synweights at 510 MB for 200 s run ... 
+
+can get rid of saving cumreward for now . . .
+
+ok, will run for 2000 s ... 
+
+./myrun 32 sn.json
+
+started ~22:00 ...
 

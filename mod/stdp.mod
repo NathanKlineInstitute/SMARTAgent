@@ -191,20 +191,20 @@ PROCEDURE reward_punish (reinf) {
     if (softthresh == 1) { : If we have soft-thresholding on, apply it.  
       deltaw = softthreshold(deltaw)
     }
-    if (maxreward > 0.0) {
-      if (cumreward > maxreward) {
-        deltaw = 0.0		 
-      } else {
-        deltaw = deltaw * (1.0 - cumreward / maxreward)
-      }
-    }	 
+    :if (maxreward > 0.0) {
+    :  if (cumreward > maxreward) {
+    :    deltaw = 0.0		 
+    :  } else {
+    :    deltaw = deltaw * (1.0 - cumreward / maxreward)
+    :  }
+    :}	 
     :if(fabs(deltaw)>0.0 && tlasthebbelig>20 && t>2400 && cumreward>0){
     : printf("RL event: t = %g ms; reinf = %g; RLhebbwt = %g; RLlenhebb = %g; tlasthebbelig = %g; deltaw = %g, cumreward = %g\n",t,reinf,RLhebbwt,RLlenhebb,tlasthebbelig, deltaw, cumreward)
     :}
-    if (fabs(deltaw)>0.0){
+    :if (fabs(deltaw)>0.0){
       adjustweight(deltaw) : Adjust the weight.			      
-      cumreward = cumreward + fabs(reinf)
-    } : cumulative reward magnitude; only if weight changed
+    :  cumreward = cumreward + fabs(reinf)
+    :} : cumulative reward magnitude; only if weight changed
   }
 }
 
