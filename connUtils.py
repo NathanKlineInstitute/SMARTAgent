@@ -25,7 +25,7 @@ def connectOnePreNtoOneMNeuron (NBNeurons,offset_pre,offset_post):
 def connectLayerswithOverlap (NBpreN, NBpostN, overlap_xdir,padded_preneurons_xdir,padded_postneurons_xdir):
     blist = []
     connCoords = []
-    if NBpreN < 1 or NBpostN < 1: return blist
+    if NBpreN < 1 or NBpostN < 1: return blist, connCoords
     NBpreN_x = int(np.sqrt(NBpreN))
     NBpreN_y = int(np.sqrt(NBpreN))
     #NBpostN = 6400	#number of postsynaptic neurons
@@ -86,7 +86,7 @@ def connectLayerswithOverlap (NBpreN, NBpostN, overlap_xdir,padded_preneurons_xd
 def connectLayerswithOverlapDiv(NBpreN, NBpostN, overlap_xdir,padded_preneurons_xdir,padded_postneurons_xdir):
     blist = []
     connCoords = []
-    if NBpreN < 1 or NBpostN < 1: return blist  
+    if NBpreN < 1 or NBpostN < 1: return blist, connCoords
     NBpreN_x = int(np.sqrt(NBpreN))
     NBpreN_y = int(np.sqrt(NBpreN))
     NBpostN_x = int(np.sqrt(NBpostN))
