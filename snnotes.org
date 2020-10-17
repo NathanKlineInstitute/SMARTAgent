@@ -19036,3 +19036,7 @@ ok, will run for 2000 s ...
 
 started ~22:00 ...
 
+** and another EA layer sim with adjusted connection probabilities?
+
+higher or lower prob, more/fewer EA?
+
