@@ -69,3 +69,26 @@ pip install netpyne --upgrade
 then from terminal in the SMARTAgent folder:
 nrnivmodl mod
 to compile the NEURON mod files
+
+=================================================================================================================
+for gcp with ubuntu 20 had to also install ...
+zlib1g-dev, build-essential, cmake, pkg-config (for matplotlib in netpyne) and some others ... 
+sudo apt-get install zlib1g-dev
+so that could install atarai[gym]
+sudo apt-get install build-essential
+sudo apt-get install cmake
+sudo apt-get install pkg-config
+sudo apt-get install libc6-dev
+sudo apt-get install flex
+sudo apt-get install binutils-dev
+
+libelf-dev
+libdwarf-dev
+
+still had problems with pip install netpyne --upgrade
+so had to install it from git repo development branch
+
+git clone git@github.com:Neurosim-lab/netpyne.git
+cd netpyne
+git checkout development
+pip install -e .
