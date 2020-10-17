@@ -19040,3 +19040,23 @@ started ~22:00 ...
 
 higher or lower prob, more/fewer EA?
 
+try on gcp ...
+
+        "name": "20oct16_B0_gcp_",
+
+48 cores seems to run a little faster than 32 (60 runs a bit slower)
+
+increase EEAProb from 0.4 to 0.8, and decrease EEARecProb from 0.35 to 0.175
+decrease the EEAWghts by 1/2 ... 
+        "EEAWghtAM": 1e-05,
+        "EEAWghtNM": 1.5e-06,	
+overall, this means each of the EA neurons get more info from the EV1 and EVDir neurons ... 
+so a lot more redundance, but more of the info preserved for learning  ... will see if it helps ... 
+
+short (10 s) run showed rates decent near start ... took ~35 MB to save weights
+will take ~3.5 GB for saving weights at 20 s intervals
+
+started 2000 s ~midnight ... 
+
+./myrun 48 sn.json
+
