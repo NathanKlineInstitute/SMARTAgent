@@ -18586,3 +18586,457 @@ other params same as last sim ...
 
 started 16:49 ...
 
+finisehd ~23:02 ...
+
+python -i simdat.py backupcfg/20oct13_B0_cycle_sim.json
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/20oct13_20oct13_B0_cycle_perf.png]]
+similar to others ... some improvement - 
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((290e3,300e3))
+savefig(gifpath()+'rast.png') # [[./gif/20oct13_20oct13_B0_cycle_rast.png]]
+
+plot(actreward.time,np.cumsum(actreward.reward))
+plot(actreward.time,np.cumsum(abs(actreward.reward)))
+savefig(gifpath()+'cumsum_absreward.png') # [[./gif/20oct13_20oct13_B0_cycle_cumsum_absreward.png]]
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','IM'],lclr=['r','b'],plotindiv=True)
+xlabel('Time (ms)',fontsize=30); ylabel('Average weight',fontsize=30); tl(); 
+savefig(gifpath()+'all_avg_weight.png') # [[./gif/20oct13_20oct13_B0_cycle_all_avg_weight.png]]
+savefig(gifpath()+'all_avg_weightB.png') # [[./gif/20oct13_20oct13_B0_cycle_all_avg_weightB.png]]
+
+ok, performed ~as expected ... can run for 1500 s to compare to other recent sim above
+
+hmm, if took 6 hours to run with the other sim and IT's Matlab run in parallel, may as well wait until
+other sim finishes ... otherwise will take ~30 hours to run to completion ... 
+
+once re-setup gcp will have more cores available ... 
+
+** other way to minimize interference btwn metrics
+
+reduce the lose point punishment magnitude so it's similar to the non-follow ball value
+that way, losing a point won't mess up the incremental follow rewards as much if over-
+or under-shoot with some overall correctness
+
+* 20oct14
+** run w/o score/lose/hit reward/punish signals
+
+"name": "20oct14_B0_cycle_",
+
+./myrun 32 sn.json
+
+started 9:37 ... stopped, since noticed problem with cumreward (mentioned below)
+
+./myrun 32 sn.json
+
+restarted at 10:40 ... 
+
+stopped - cumreward needs adjustment (see below)
+
+** check output from 20oct13_A0_cycle_ -->> had problem with cumreward
+
+python -i simdat.py backupcfg/20oct13_A0_cycle_sim.json
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/20oct14_20oct13_A0_cycle_perf.png]]
+not bad performance, relatively speaking ... may require a lot more time to improve ... 
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((1490e3,1500e3))
+savefig(gifpath()+'rast.png') # [[./gif/20oct14_20oct13_A0_cycle_rast.png]]
+
+clf(); plot(actreward.time,np.cumsum(actreward.reward))
+plot(actreward.time,np.cumsum(abs(actreward.reward)))
+savefig(gifpath()+'cumsum_absreward.png') # [[./gif/20oct14_20oct13_A0_cycle_cumsum_absreward.png]]
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','IM'],lclr=['r','b'],plotindiv=True)
+xlabel('Time (ms)',fontsize=30); ylabel('Average weight',fontsize=30); tl(); 
+savefig(gifpath()+'all_avg_weight.png') # [[./gif/20oct14_20oct13_A0_cycle_all_avg_weight.png]]
+savefig(gifpath()+'all_avg_weightB.png') # [[./gif/20oct14_20oct13_A0_cycle_all_avg_weightB.png]]
+
+#
+poty = 'EMUP'
+for pdx,prety in enumerate(['EV1', 'EV4', 'EMT', 'EV1DN', 'EV1DS', 'EV1DNW','EMUP','EMDOWN']):
+  #subplot(2,4,pdx+1)
+  #title(prety+'->'+poty)  
+  pdfs = pdf[(pdf.postid==dstartidx[poty])&(pdf.preid>=dstartidx[prety])&(pdf.preid<=dendidx[prety])]
+  plot(pdfs.time,pdfs.cumreward,'ko')
+
+savefig(gifpath()+'crewardD.png') # [[./gif/20oct14_20oct13_A0_cycle_crewardD.png]]
+
+hmm, all cumulative reward values are same - that means not implemented correctly, was supposed
+to be synapse-specific signal ... so should check if deltaw != 0.0 before incrementing cumreward
+since deltaw != 0.0 only when a reward/punishment is provided to a synapse
+
+ok, will fix that up ... 
+
+** check reasonable values for maxreward
+
+20oct14_C0_cycle_
+
+./myrun 32 sn.json
+
+python -i simdat.py backupcfg/20oct14_C0_cycle_sim.json
+
+clf(); plot(actreward.time,np.cumsum(actreward.reward))
+plot(actreward.time,np.cumsum(abs(actreward.reward)))
+savefig(gifpath()+'cumsum_absreward.png') # [[./gif/20oct14_20oct14_C0_cycle_cumsum_absreward.png]]
+
+np.amin(pdf.cumreward), np.amax(pdf.cumreward), np.mean(pdf.cumreward) # (0.0, 42.10000000000033, 19.33201044091506)
+
+#
+poty = 'EMUP'
+for pdx,prety in enumerate(['EV1', 'EV4', 'EMT', 'EV1DN', 'EV1DS', 'EV1DNW','EMUP','EMDOWN']):
+  subplot(2,4,pdx+1)
+  title(prety+'->'+poty)  
+  pdfs = pdf[(pdf.postid>=dstartidx[poty])&(pdf.postid<=dendidx[poty])&(pdf.preid>=dstartidx[prety])&(pdf.preid<=dendidx[prety])]
+  plot(pdfs.time,pdfs.cumreward,'ko')
+
+savefig(gifpath()+'crewardD.png') # [[./gif/20oct14_20oct14_C0_cycle_crewardD.png]]
+
+most of those look identical ... and that's for whole pre to postsynaptic population ?? 
+
+different weight for each "synapse" ? but same cumreward variable, since that's associated with the STDP mechanism?
+no, should be an individual STDP mechanism with its own NetCon, one for each synapse ... 
+
+check stdp.mod comments at top - it uses two netcons, one netcon for receiving presynaptic neuron spikes and
+one netcon for receiving postsynaptic neuron spikes ... 
+
+i.e.,:
+"
+## Create synapses
+threshold = 10 # Set voltage threshold
+delay = 1 # Set connection delay
+singlesyn = h.NetCon(cells[0],cells[1], threshold, delay, 0.5) # Create a connection between the cells
+stdpmech = h.STDP(0,sec=dummy) # Create the STDP mechanism
+presyn = h.NetCon(cells[0],stdpmech, threshold, delay, 1) # Feed presynaptic spikes to the STDP mechanism -- must have weight >0
+pstsyn = h.NetCon(cells[1],stdpmech, threshold, delay, -1) # Feed postsynaptic spikes to the STDP mechanism -- must have weight <0
+h.setpointer(singlesyn._ref_weight[0],'synweight',stdpmech) # Point the STDP mechanism to the connection weight
+"
+
+singlesyn is the NetCon that has its weights adjusted by the STDP mechanism ... the other weights are not changed ... 
+
+maybe cumreward ~same for most synapses since rule is now if deltaw > 0 add to cumreward ?? and that could mean
+very small deltaw still produces the same impact ... but would not expect all synapses to get changed same way ... 
+
+lcreward = []; lctime = []
+prety = 'EV1'
+pdfs = pdf[(pdf.postid>=dstartidx[poty])&(pdf.postid<=dendidx[poty])&(pdf.preid>=dstartidx[prety])&(pdf.preid<=dendidx[prety])]
+for preid in np.unique(pdfs.preid):
+  pdfs2 = pdfs[(pdfs.preid==preid)]
+  plot(pdfs2.time,pdfs2.cumreward)
+  lcreward.append(np.array(pdfs2.cumreward))
+  lctime.append(np.array(pdfs2.time))
+
+lcreward = []; lctime = []
+prety = 'EV1'
+pdfs = pdf[(pdf.postid>=dstartidx[poty])&(pdf.postid<=dendidx[poty])&(pdf.preid>=dstartidx[prety])&(pdf.preid<=dendidx[prety])]
+for preid in np.unique(pdfs.preid):
+  pdfs2 = pdfs[(pdfs.preid==preid)&(pdfs.postid==dstartidx[poty])]
+  plot(pdfs2.time,pdfs2.cumreward)
+  lcreward.append(np.array(pdfs2.cumreward))
+  lctime.append(np.array(pdfs2.time))
+
+#
+poty = 'EMUP'
+for pdx,prety in enumerate(['EV1', 'EV4', 'EMT', 'EV1DN', 'EV1DS', 'EV1DNW','EMUP','EMDOWN']):
+  subplot(2,4,pdx+1)
+  title(prety+'->'+poty)  
+  pdfs = pdf[(pdf.postid>=dstartidx[poty])&(pdf.postid<=dendidx[poty])&(pdf.preid>=dstartidx[prety])&(pdf.preid<=dendidx[prety])]
+  plot(pdfs.time,pdfs.weight,'ko')
+
+does the same thing happen without RL exp ?? 
+        "name": "20oct14_D0_cycle_",
+
+python -i simdat.py backupcfg/20oct14_D0_cycle_sim.json
+
+some more diversity now in the cumreward values ... 
+
+the fabs(deltaw) > 0 rule not too sensible when using RLexp since
+that will almost always be true ... just surprising that all presynaptic
+neurons activated in 500 ms, and 25 ms between that and postsynaptic neuron firing ...
+
+try a bit longer run ... see if they diverge more, also decrease window for pre/post tagging
+and reduce duration of eligibility window
+
+150 s run finished @ 19:46 ... 
+
+#
+poty = 'EMUP'
+for pdx,prety in enumerate(['EV1', 'EV4', 'EMT', 'EV1DN', 'EV1DS', 'EV1DNW','EMUP','EMDOWN']):
+  subplot(2,4,pdx+1)
+  title(prety+'->'+poty)  
+  pdfs = pdf[(pdf.postid>=dstartidx[poty])&(pdf.postid<=dendidx[poty])&(pdf.preid>=dstartidx[prety])&(pdf.preid<=dendidx[prety])]
+  plot(pdfs.time,pdfs.cumreward,'ko')
+
+savefig(gifpath()+'crewardD.png') # [[./gif/20oct14_20oct14_D0_cycle_crewardD.png]]
+now cumulative rewards at all populations do not look the same 
+
+csm=cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+lclr = [csm.to_rgba(float(i)/(len(lpda))) for i in range(len(lpda))]
+
+prety = 'EV1'
+pdfs = pdf[(pdf.postid>=dstartidx[poty])&(pdf.postid<=dendidx[poty])&(pdf.preid>=dstartidx[prety])&(pdf.preid<=dendidx[prety])]
+lpreid = np.unique(pdfs.preid)
+for pdx,preid in enumerate(lpreid):
+  pdfs2 = pdfs[(pdfs.preid==preid)]
+  plot(pdfs2.time,pdfs2.cumreward,'o',color=csm.to_rgba(float(pdx)/(len(lpreid))))
+
+savefig(gifpath()+'crewardE.png') # [[./gif/20oct14_20oct14_D0_cycle_crewardE.png]]
+
+ok, look different now ... 
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/20oct14_20oct14_D0_cycle_perf.png]]
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','IM'],lclr=['r','b'],plotindiv=True)
+xlabel('Time (ms)',fontsize=30); ylabel('Average weight',fontsize=30); tl(); 
+
+savefig(gifpath()+'all_avg_weight.png') # [[./gif/20oct14_20oct14_D0_cycle_all_avg_weight.png]]
+savefig(gifpath()+'all_avg_weightB.png') # [[./gif/20oct14_20oct14_D0_cycle_all_avg_weightB.png]]
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((140e3,150e3))
+savefig(gifpath()+'rast.png') # [[./gif/20oct14_20oct14_D0_cycle_rast.png]]
+
+np.amin(pdf.cumreward), np.amax(pdf.cumreward), np.mean(pdf.cumreward) # (0.0, 161.8999999999951, 0.2228273540166179)
+
+lc,lcmin,lcmax = [],[],[]
+tt = np.unique(pdf.time)
+for t in tt: 
+  pdfs = pdf[pdf.time==t]
+  lc.append(np.mean(pdfs.cumreward))
+  lcmin.append(np.amin(pdfs.cumreward))
+  lcmax.append(np.amax(pdfs.cumreward))
+
+plot(tt,lc,'k')
+plot(tt,lcmin,'b')
+plot(tt,lcmax,'r')
+
+savefig(gifpath()+'crewardavgvst.png') # [[./gif/20oct14_20oct14_D0_cycle_crewardavgvst.png]]
+savefig(gifpath()+'crewardmaxvst.png') # [[./gif/20oct14_20oct14_D0_cycle_crewardmaxvst.png]]
+
+ok, cumreward increasing over time ... average pretty low , max pretty high, so there's a wide range
+
+fig=animInput(InputImages,gifpath()+'_input.mp4') # [[./gif/20oct14_20oct14_D0_cycle__input.mp4]]
+
+can sim with these params longer ... 1000 s ... have to adjust reload weight code to load in cumreward values, if they're available
+ok, adjusted that but will start from scratch anyway, so can set a different maxreward ... 
+
+        "name": "20oct14_E0_cycle_",
+
+will have maxreward at 200 for AMPA and 600 for AMPAI... 
+
+./myrun 32 sn.json
+
+started ~23:24 ...
+
+* 20oct15
+** check output from 20oct14_E0_cycle_
+
+finished @ 13:00 ...
+
+python -i simdat.py backupcfg/20oct14_E0_cycle_sim.json
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/20oct15_20oct14_E0_cycle_perf.png]]
+not so good ... 
+
+np.amin(pdf.cumreward), np.amax(pdf.cumreward), np.mean(pdf.cumreward) # (0.0, 388.20000000001977, 1.3420942947377772)
+
+#
+poty = 'EMUP'
+for pdx,prety in enumerate(['EV1', 'EV4', 'EMT', 'EV1DN', 'EV1DS', 'EV1DNW','EMUP','EMDOWN']):
+  subplot(2,4,pdx+1)
+  title(prety+'->'+poty)  
+  pdfs = pdf[(pdf.postid>=dstartidx[poty])&(pdf.postid<=dendidx[poty])&(pdf.preid>=dstartidx[prety])&(pdf.preid<=dendidx[prety])]
+  plot(pdfs.time,pdfs.cumreward,'ko')
+
+savefig(gifpath()+'crewardD.png') # [[./gif/20oct15_20oct14_E0_cycle_crewardD.png]]
+
+some of those synapses are reaching the maxreward of 200 ... 
+
+#
+poty = 'EMUP'
+for pdx,prety in enumerate(['EV1', 'EV4', 'EMT', 'EV1DN', 'EV1DS', 'EV1DNW','EMUP','EMDOWN']):
+  subplot(2,4,pdx+1)
+  title(prety+'->'+poty)  
+  pdfs = pdf[(pdf.postid>=dstartidx[poty])&(pdf.postid<=dendidx[poty])&(pdf.preid>=dstartidx[prety])&(pdf.preid<=dendidx[prety])]
+  plot(pdfs.time,pdfs.weight,'ko')
+
+savefig(gifpath()+'cweightD.png') # [[./gif/20oct15_20oct14_E0_cycle_cweightD.png]]
+
+#
+poty = 'IM'; lclr = ['r','b']
+for pdx,prety in enumerate(['EMDOWN','EMUP']):
+  clr = lclr[pdx]
+  #title(prety+'->'+poty)  
+  pdfs = pdf[(pdf.postid>=dstartidx[poty])&(pdf.postid<=dendidx[poty])&(pdf.preid>=dstartidx[prety])&(pdf.preid<=dendidx[prety])]
+  plot(pdfs.time,pdfs.cumreward,clr+'o')
+
+savefig(gifpath()+'crewardI.png') # [[./gif/20oct15_20oct14_E0_cycle_crewardI.png]]
+
+#
+poty = 'IM'; lclr = ['r','b']
+for pdx,prety in enumerate(['EMDOWN','EMUP']):
+  clr = lclr[pdx]
+  #title(prety+'->'+poty)  
+  pdfs = pdf[(pdf.postid>=dstartidx[poty])&(pdf.postid<=dendidx[poty])&(pdf.preid>=dstartidx[prety])&(pdf.preid<=dendidx[prety])]
+  plot(pdfs.time,pdfs.weight,clr+'o')
+
+savefig(gifpath()+'cweightI.png') # [[./gif/20oct15_20oct14_E0_cycle_cweightI.png]]
+
+hmm, overall did not do as well as [[./gif/20oct14_20oct13_A0_cycle_perf.png]]
+
+fig=animInput(InputImages,gifpath()+'_input.mp4') # [[./gif/20oct15_20oct14_E0_cycle__input.mp4]]
+
+** simplify again - ??
+
+should aim to see good performance consistently, and during even the first 20 s of activity
+that's what had seen with the 2D arm model when it was working properly
+w/o that, seems unlikely to see good long term performance? 
+
+larger scores to enforce better behavior ... ? 
+
+no weight norm, cumreward tracking ... 
+
+20oct15_A0_cycle_
+
+python -i simdat.py backupcfg/20oct15_A0_cycle_sim.json
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/20oct15_20oct15_A0_cycle_perf.png]]
+hmm, did not get such good results ... not many hits
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((290e3,300e3))
+savefig(gifpath()+'rast.png') # [[./gif/20oct15_20oct15_A0_cycle_rast.png]]
+well, it's a hyperactive network ... 
+
+#
+clf()
+poty = 'IM'; lclr = ['r','b']
+for pdx,prety in enumerate(['EMDOWN','EMUP']):
+  clr = lclr[pdx]
+  #title(prety+'->'+poty)  
+  pdfs = pdf[(pdf.postid>=dstartidx[poty])&(pdf.postid<=dendidx[poty])&(pdf.preid>=dstartidx[prety])&(pdf.preid<=dendidx[prety])]
+  plot(pdfs.time,pdfs.weight,clr+'o')
+
+savefig(gifpath()+'cweightI.png') # [[./gif/20oct15_20oct15_A0_cycle_cweightI.png]]
+E->I weights dropping to 0 ... had set wbase pretty low ... 
+
+simplifying network ... back to smaller EM output population, so can run longer ... 
+do away with many of the RL connections again ... all preM to M but with high weight variance (weightVar==1)
+
+        "name": "20oct15_B0_cycle_",
+
+python -i simdat.py backupcfg/20oct15_B0_cycle_sim.json
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((290e3,300e3))
+savefig(gifpath()+'rast.png') 
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','IM'])
+savefig(gifpath()+'Vm.png') 
+
+./myrun 32 sn.json
+
+started ~23:49 ... 
+
+* 20oct16
+** stopped last sim -- not enough firing
+
+restart with weight norm for cell, every 10 s ... 
+and increase NM to M neurons (EEMWghtNM to 1e-6 instead of 0.9375e-6)
+
+        "name": "20oct16_A0_cycle_",
+
+./myrun 32 sn.json
+
+started ~09:20 ...
+
+this one also turns to very low firing pretty quickly
+
+adjust & restart ... 
+
+./myrun 32 sn.json
+
+need higher pre V -> M weights, since far fewer pre V neurons? (compared to direction
+selective neurons - since noticed that don't get much/any firing unless direction
+selective neurons are activated when ball moving)
+
+** connectivity/architecture
+
+ball in middle going down and to right, and will hit just above bottom right corner:
+ if paddle is above bottom right corner -> need move down neuron to know to move down; and move up neuron to stay silent
+ if paddle is below bottom right corner -> need move down neuron to know to stay silent; and move up neuron to fire
+
+in the extreme case, if each motor neuron receives ALL the information, can it still make the right decision in
+all situations? 
+
+ball in middle goin
+
+** discussion with ha re architecture
+
+comes to the conclusion that current architecture makes no sense; need middle area that has
+all associations between directions and positions ... then projects to motor neurons
+
+so that would required 3200 x 400 neurons (if neurons are simple), or more detailed
+neurons to have multiple states/associations at each neuron
+
+** association layer -> try it out (20oct16_A0_cycle_) -> may be improving
+
+EA, IA for EAssoc, IAssoc ... association neurons 
+
+adjusting architecture to include association area that projects to motor neurons ... 
+
+        "name": "20oct16_A0_cycle_",
+
+./myrun 32 sn.json
+
+took ~3.5 hours ... 
+
+python -i simdat.py backupcfg/20oct16_A0_cycle_sim.json
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/20oct16_20oct16_A0_cycle_perf.png]]
+
+follow might be improving ... 
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((190e3,200e3))
+savefig(gifpath()+'rast.png') # [[./gif/20oct16_20oct16_A0_cycle_rast.png]]
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','EA', 'IM'],tlim=(190e3,200e3))
+savefig(gifpath()+'Vm.png') # [[./gif/20oct16_20oct16_A0_cycle_Vm.png]]
+
+fig=animInput(InputImages,gifpath()+'_input.mp4') # [[./gif/20oct16_20oct16_A0_cycle__input.mp4]]
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EA','EMDOWN','EMUP'],lclr=['r','g','b'],plotindiv=True)
+xlabel('Time (ms)',fontsize=30); ylabel('Average weight',fontsize=30); tl(); 
+
+savefig(gifpath()+'all_avg_weight.png') # [[./gif/20oct16_20oct16_A0_cycle_all_avg_weight.png]]
+savefig(gifpath()+'all_avg_weightB.png') # [[./gif/20oct16_20oct16_A0_cycle_all_avg_weightB.png]]
+
+binsz = 100
+dnspk = {pop:getspikehist(dspkT[pop],dnumc,binsz,200e3) for pop in ['EMDOWN','EMUP','EA']}
+for clr,pop in zip(['r','g','b'],['EA','EMDOWN','EMUP']): plot(dnspk[pop][0],dnspk[pop][1],clr)
+
+xlim((0,200e3)); ylim((-10,200))
+
+savefig(gifpath()+'EA_EMDOWN_rate100.png') # [[./gif/20oct16_20oct16_A0_cycle_EA_EMDOWN_rate100.png]]
+
+rates are pretty similar ... EA sets pace and EMDOWN,EMUP follow closely - though of course not identical 
+
+certainly worth running longer ... 
+
+synweights at 510 MB for 200 s run ... 
+
+can get rid of saving cumreward for now . . .
+
+ok, will run for 2000 s ... 
+
+./myrun 32 sn.json
+
+started ~22:00 ...
+
+** and another EA layer sim with adjusted connection probabilities?
+
+higher or lower prob, more/fewer EA?
+
