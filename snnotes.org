@@ -19060,3 +19060,28 @@ started 2000 s ~midnight ...
 
 ./myrun 48 sn.json
 
+* 20oct17
+** next day ~23:28 - gcp run ~115/200 of the way done
+
+but firing seems too high - many of the EMUP,EMDOWN rates near 100 for many
+of the time-steps... the dense connectivity and not enough punishment may
+prevent good outcome ... 
+
+could run to 1000 s and see output - if any better than sim running on cycle
+
+will run with higher punish value for move away from ball ... 
+
+    "rewardcodes": {
+        "scorePoint": 1.0,
+        "losePoint":  0.0,
+        "followTarget": 0.1,
+        "avoidTarget": -0.1,
+        "hitBall": 0.5
+    },
+
+and only run for 1000 s ... 
+
+        "name": "20oct17_A0_gcp_",
+
+./myrun 48 sn.json
+
