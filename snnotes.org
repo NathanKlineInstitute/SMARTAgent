@@ -19085,3 +19085,16 @@ and only run for 1000 s ...
 
 ./myrun 48 sn.json
 
+* 20oct18
+** check output from 20oct17_A0_gcp_
+
+finished ~23:30 ...
+
+python -i simdat.py backupcfg/20oct17_A0_gcp_sim.json
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/20oct19_20oct17_A0_gcp_perf.png]]
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((990e3,1000e3))
+savefig(gifpath()+'rast.png') # [[./gif/20oct19_20oct17_A0_gcp_rast.png]]
+
