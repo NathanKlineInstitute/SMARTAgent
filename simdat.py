@@ -46,8 +46,8 @@ def readweightsfile2pdf (fn):
   for preID in D.keys():
     for poID in D[preID].keys():
       for row in D[preID][poID]:
-        A.append([row[0], preID, poID, row[1], row[2]])
-  return pd.DataFrame(A,columns=['time','preid','postid','weight','cumreward'])
+        A.append([row[0], preID, poID, row[1]]) # A.append([row[0], preID, poID, row[1], row[2]])
+  return pd.DataFrame(A,columns=['time','preid','postid','weight']) # ,(['cumreward'])
 
 #
 def readinweights (name,final=False):
@@ -66,7 +66,7 @@ def savefinalweights (pdf, simstr):
 
 def getsimname (name=None):
   if name is None:
-    if stepNB is -1: name = dconf['sim']['name']
+    if stepNB == -1: name = dconf['sim']['name']
     elif stepNB > -1: name = dconf['sim']['name'] + '_step_' + str(stepNB) + '_'
   return name
 
