@@ -699,7 +699,7 @@ def plotMeanNeuronWeight (pdf,postid,clr='k',ax=None,msz=1,xl=None):
   ax.set_ylabel('Average weight'); 
   return wts    
   
-def plotMeanWeights (pdf,ax=None,msz=1,xl=None,lpop=['EMDOWN','EMUP','EMSTAY'],lclr=['r','b','g'],plotindiv=True):
+def plotMeanWeights (pdf,ax=None,msz=1,xl=None,lpop=['EMDOWN','EMUP','EMSTAY'],lclr=['k','r','b','g'],plotindiv=True):
   #plot mean weights of all plastic synaptic weights onto lpop
   if ax is None: ax = gca()
   utimes = np.unique(pdf.time)
