@@ -19099,7 +19099,7 @@ clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((990e
 savefig(gifpath()+'rast.png') # [[./gif/20oct19_20oct17_A0_gcp_rast.png]]
 
 * 20oct19
-** continue with output check on gcp
+** continue with output check on gcp -> perf. not good
 
 python -i simdat.py backupcfg/20oct17_A0_gcp_sim.json
 
@@ -19130,4 +19130,50 @@ some feature selection via initial hebb/stdp ... ?
 also, trajectory is fixed/determined right after ball hits racket, so do not need
 direction selective neurons at every 20x20 location - just put at left/right edges
 of screen (close to paddles)
+
+** check output from 20oct16_A0_cycle_
+
+python -i simdat.py backupcfg/20oct16_A0_cycle_sim.json
+
+ax=plotPerf(actreward,yl=(0,0.35))
+savefig(gifpath()+'perf.png') # [[./gif/20oct19_20oct16_A0_cycle_perf.png]]
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((1990e3,2000e3))
+savefig(gifpath()+'rast.png') # [[./gif/20oct19_20oct16_A0_cycle_rast.png]]
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EA','EMDOWN','EMUP'],lclr=['r','g','b'],plotindiv=True)
+xlabel('Time (ms)',fontsize=30); ylabel('Average weight',fontsize=30); tl(); 
+
+savefig(gifpath()+'all_avg_weight.png') 
+savefig(gifpath()+'all_avg_weightB.png') 
+
+** adjust architecture for EA
+
+how many synapses to/within EA useful ? keep fixed ? 
+
+ideally would have all temporally correlated representations grouped together into objects
+... and that should all be learned ... to allow flexibility in representation 
+
+https://psycnet.apa.org/fulltext/2018-25960-001.html <<-- akihiro eguchi paper on spiking
+network model of ventral visual stream and spike polychronization for feature binding (via stdp)
+suggests mechanism for object detection; will probably avoid adding that to current model for now...
+
+in current model, intensity (V1) and direction (EV1) are kind of redundant since EV1 only get
+activated if an object is detected in the neighborhood ... so may not need V1 at all. instead could have
+integration of the direction selective neuron populations ... well, when paddle is stationary, still useful
+to have that representation ... 
+
+so, the simple idea of pairs of features
+400 x 3200 = 1280000
+that's ~how many neurons needed
+but could have > 1 feature pair per neuron (noisy?)
+
+had set 400 EA neurons ... with 0.4 conn prob
+3600 * 0.4 = 900 connections per neuron
+900 * 400 = 360000 ... only ~30% of total number of synapses needed ... 
+but there was also recurrent connectivity ... 
+
+so try ~1420 EA neurons w/o RL STDP ... ?
+
+        "name": "20oct19_A0_cycle_",
 
