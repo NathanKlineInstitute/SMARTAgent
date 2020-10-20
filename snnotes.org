@@ -19040,3 +19040,94 @@ started ~22:00 ...
 
 higher or lower prob, more/fewer EA?
 
+try on gcp ...
+
+        "name": "20oct16_B0_gcp_",
+
+48 cores seems to run a little faster than 32 (60 runs a bit slower)
+
+increase EEAProb from 0.4 to 0.8, and decrease EEARecProb from 0.35 to 0.175
+decrease the EEAWghts by 1/2 ... 
+        "EEAWghtAM": 1e-05,
+        "EEAWghtNM": 1.5e-06,	
+overall, this means each of the EA neurons get more info from the EV1 and EVDir neurons ... 
+so a lot more redundance, but more of the info preserved for learning  ... will see if it helps ... 
+
+short (10 s) run showed rates decent near start ... took ~35 MB to save weights
+will take ~3.5 GB for saving weights at 20 s intervals
+
+started 2000 s ~midnight ... 
+
+./myrun 48 sn.json
+
+* 20oct17
+** next day ~23:28 - gcp run ~115/200 of the way done
+
+but firing seems too high - many of the EMUP,EMDOWN rates near 100 for many
+of the time-steps... the dense connectivity and not enough punishment may
+prevent good outcome ... 
+
+could run to 1000 s and see output - if any better than sim running on cycle
+
+will run with higher punish value for move away from ball ... 
+
+    "rewardcodes": {
+        "scorePoint": 1.0,
+        "losePoint":  0.0,
+        "followTarget": 0.1,
+        "avoidTarget": -0.1,
+        "hitBall": 0.5
+    },
+
+and only run for 1000 s ... 
+
+        "name": "20oct17_A0_gcp_",
+
+./myrun 48 sn.json
+
+* 20oct18
+** check output from 20oct17_A0_gcp_
+
+finished ~23:30 ...
+
+python -i simdat.py backupcfg/20oct17_A0_gcp_sim.json
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/20oct19_20oct17_A0_gcp_perf.png]]
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((990e3,1000e3))
+savefig(gifpath()+'rast.png') # [[./gif/20oct19_20oct17_A0_gcp_rast.png]]
+
+* 20oct19
+** continue with output check on gcp
+
+python -i simdat.py backupcfg/20oct17_A0_gcp_sim.json
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EA','EMDOWN','EMUP'],lclr=['r','g','b'],plotindiv=True)
+xlabel('Time (ms)',fontsize=30); ylabel('Average weight',fontsize=30); tl(); 
+
+savefig(gifpath()+'all_avg_weight.png') # [[./gif/20oct20_20oct17_A0_gcp_all_avg_weight.png]]
+savefig(gifpath()+'all_avg_weightB.png') # [[./gif/20oct20_20oct17_A0_gcp_all_avg_weightB.png]]
+
+ok, now all weights decreasing ... and firing rates/performance ~decreasing in tandem
+
+[this next test with EA layer on gcp, probably not useful yet ... need to adjust architecture further]
+
+what about normalizing population weights periodically as did before, while having lower punishment
+magnitude?
+
+** pairs, triples, etc., and architecture
+
+EA layer might be better designed if it was static set of pairs of features
+e.g. motion in one direction + high pixel intensity in another location 
+static since do not need to learn these integrations ... can just pass them forward
+
+however, that's high space complexity ... 400 x 3200 neurons for all pairs; so first
+pass of learning which pairs of features useful could be valuable ... and those pairs
+could be determined by spiking co-occurrence (hebbian or stdp) ... so could have
+some feature selection via initial hebb/stdp ... ?
+
+also, trajectory is fixed/determined right after ball hits racket, so do not need
+direction selective neurons at every 20x20 location - just put at left/right edges
+of screen (close to paddles)
+
