@@ -8238,3 +8238,205 @@ and
         "useProbabilistic": 0,
         "useTopological": 1}
 -- run the simulatedEnv in "20oct09_"
+
+* 20Oct14/20Oct15
+
+** Potential models for RL.
+
+-- Farries and Fairhall JNeurophys 2007
+---- STDP:
+F(Delta_t) = A_plus * exp(-|Delta_t|/tau_plus) if Delta_t>0 (LTP) .... tau_plus = 13 ms
+F(Delta_t) = A_neg * exp(-|Delta_t|/tau_neg) if Delta_t<0 (LTD) .... tau_neg = 35 ms
+
+Delta_t is timing of the postsynaptic spike relative to the presynaptic spike.
+
+Froemke and Dan (2002) added a spike suppression model, where the effectiveness of a pre- or postsynaptic spike at inducing synaptic changes is supressed by preceeding spikes.
+Each spike is assigned an "efficacy" eta = 1 - exp(-tspike/taus)
+tspike is the time of the preceding spike.
+
+delta_w_ij = eta_pre_i * eta_post_j * F(Detla_t_ij)
+eta_pre_i = 1 - exp(-tspike_pre_i/taus_pre) ..... taus_pre = 28 ms
+eta_post_j = 1 - exp(-tspike_post_j/taus_post) ..... taus_post = 88 ms
+
+wmax--- 10*w_initial
+wmin--- 0.1*w_initial
+
+---- activity dependent synaptic scaling.
+If the activity of the postsynaptic neuron increased more than the upper limit of allowed firing rates, they scaled down the synaptic weight using some multiplicative factor
+If the activity of the postsynaptic neuron decreased below the lower limit of allowed firing rates, they scaled up the synaptic weights using some multiplicative factor.
+activity dependent scaling was done at end of each trial (so should use large time-interval).
+......in a few sims, they implemented activity-dependent changes in intrinsic excitability instead of synaptic scaling.....see the paper for details.
+
+
+---- RL through modulation of synaptic plasticity.
+reward signal * unmodulated STDP.
+
+adaptation of temporal difference algorithm
+delta_R = R_received - R_expected
+
+* 20Oct20
+
+** Reduce V1 dir
+
+Haroon: If we go that path, then i would say reduce V1 dir to 8 neurons to only encode the direction of the ball. I don't think that the direction of racket ever contributes to the decision. Only the racket's position is relevant. E.g.
+S(t) = [Pixel_RO(t),Pixel_RM(t),Pixel_B(t),Dir_B(t)]
+S(t) is state of the environment at time t
+Pixel_RO(t) is pixel representing opponent racket at time t ---> Position of opponent racket
+Pixel_RM(t) is pixel representing model racket at time t ---> Position of model racket
+Dir_B(t) is direction vector representing direction of ball at time t ---> Direction of the ball
+
+** Reduce V1 too for making associations.
+
+Haroon: One thing is for sure that we need an association layer, but not sure if what is described above makes sense. Associations are not to be made only between location and directions, but also between locations and directions. So 400x3200 pairs are not going to add anything that is in comparison to how many associations are needed. This is a huge space. I think we may reduce the whole problem (I hate it because this will only work for paddle/racket games) by only encoding the y-position of the ball and rackets using 20x3 neurons. Want to have 3 columns to separately encode 3 objects.So if we do that we will have 60 location encoding neurons and 8 direction encoding neurons, and we will have 68 neurons to make all possible associations. And then we will need quadruplets to make associations.
+yLoc_RO, yLoc_RM, yLoc_Ball, dir_Ball
+Choose 1 number from 1-20 for yLoc_RO - 20 options 
+Choose 1 number from 1-20 for yLoc_RM - 20 options
+Choose 1 number from 1-20 for yLoc_Ball - 20 options
+Choose 1 number from 1-8 for dir_Ball   - 8 options
+Total associations will be 20x20x20x8 = 64000
+Or we could even reduce it further by ignoring yLoc_RO in making associations and that will require only 3200 neurons in EA.
+
+** Sam has already started developing EA, association area so I should switch to development branch to develop further.
+-- switch to development branch
+git pull origin development
+
+-- adaption sim.json according to sn.json.... this will change eventually.
+
+-- have a seperate option for reduced network....
+
+-- use "useReducedNetwork": 1 in "sim" in sim.json.
+-- use same "net" but with different values.
+	    "allpops": {
+	        "ER":0,
+	        "IR":0,
+	        "EV1":60,
+	        "EV1DE":1,
+	        "EV1DNE":1,
+	        "EV1DN":1,
+	        "EV1DNW":1,
+	        "EV1DW":1,
+	        "EV1DSW":1,
+	        "EV1DS":1,
+            "EV1DSE":1,
+            "ID":0,
+	        "IV1":10,
+	        "EV4":0,
+	        "IV4":0,
+	        "EMT":0,
+            "IMT":0,
+            "EA":64000,
+            "IA":640,
+	        "EMDOWN":100,
+	        "EMUP":100,
+	        "EMSTAY":0,
+            "IM":13,
+            "IMUP": 13,
+            "IMDOWN": 13,
+            "IMSTAY": 0
+      }
+
+-- update function updateDirSensitiveRates() in aigame.py
+
+    if self.reducedNet:
+      AngRFSigma2 = self.AngRFSigma2
+      MaxRate = self.dirSensitiveNeuronRate[1]
+      for pop in self.ldirpop: self.dFiringRates[pop] = self.dirSensitiveNeuronRate[0] * np.ones(shape=(1,1)) # should have a single angle per direction selective neuron pop
+      court_motiondir = motiondir[:,self.courtXRng[0]:self.courtXRng[1]] # only motion direction of ball in the court
+      unique_angles = np.unique(court_motiondir)
+      for a in unique_angles:
+        if a >= 0.0:
+          for pop in self.ldirpop:
+            if self.EXPDir:
+              fctr = np.exp(-1.0*(getangdiff(a,dAngPeak[pop])**2)/AngRFSigma2)
+              if MaxRate * fctr < self.FiringRateCutoff: fctr = 0
+              self.dFiringRates[pop] += MaxRate * fctr
+            else:
+              self.dFiringRates[pop] = MaxRate
+
+-- update function updateInputRates() in aigame.py
+
+    if self.reducedNet:
+      if dconf['net']['useBinaryImage']:
+        thresh = threshold_otsu(dsum_Images)
+        binary_Image = dsum_Images > thresh
+        fr_Image = np.zeros(shape=(self.input_dim,3))
+        fr_Images_RO = self.locationNeuronRate*sum(binary_Image[:,0:self.courtXRng[0]-1],1)
+        fr_Images_Ball = self.locationNeuronRate*sum(binary_Image[:,self.courtXRng[0]:self.courtXRng[0]],1)
+        fr_Images_RM = self.locationNeuronRate*sum(binary_Image[:,self.courtXRng[1]+1:-1],1)
+        fr_Image[:,0] = fr_Images_RO
+        fr_Image[:,1] = fr_Images_Ball
+        fr_Image[:,2] = fr_Images_RM
+      else:
+        dsum_Images = dsum_Images - np.amin(dsum_Images)
+        dsum_Images = (255.0/np.amax(dsum_Images))*dsum_Images
+        fr_Images = self.locationNeuronRate/(1+np.exp((np.multiply(-1,dsum_Images)+123)/10))
+        fr_Image[:,0] = sum(fr_Images[:,0:self.courtXRng[0]-1],1) # opponent racket y loc
+        fr_Image[:,1] = sum(fr_Images[:,self.courtXRng[0]:self.courtXRng[1]],1) # ball y loc
+        fr_Image[:,2] = sum(fr_Images[:,self.courtXRng[1]+1:-1],1) # model racket y loc
+
+-- now adjust the architecture in sim.py
+... first connections...
+
+V1 neurons:
+1,2,3
+4,5,6
+7,8,9
+10,11,12
+.....
+58,59,60
+
+# cLV1toEA, cLV1DEtoEA, cLV1DNEtoEA, cLV1DNtoEA, cLV1DNWtoEA, cLV1DWtoEA, cLV1DSWtoEA, cLV1DStoEA, cLV1DSEtoEA = createConnListV1toEA(60,3)
+def createConnListV1toEA(NBpreN,NBobjs): # This function is hard coded.... Not sure how to make it more generalized.
+    RO_neurons = []
+    Ball_neurons = []
+    RM_neurons = []
+    count = 0
+    for _ in range(int(NBpreN/NBobjs)): # this is assuming 3 objects represented by RO (Opponent Racket), Ball and RM (Model Racket)
+        RO_neurons.append(count)
+        Ball_neurons.append(count+1)
+        RM_neurons.append(count+2)
+        count = count+NBobjs
+        # Dir neurons: E, NE, N, NW, W, SW, S, SE
+    Dir_neurons = [0,1,2,3,4,5,6,7]
+    combs = []
+    for ro in RO_neurons:
+        for b in Ball_neurons:
+            for rm in RM_neurons:
+                for dirs in Dir_neurons:
+                    combs.append([ro,b,rm,dirs])
+    connsListV1toEA = []
+    connsListV1DEtoEA = []
+    connsListV1DNEtoEA = []
+    connsListV1DNtoEA = []
+    connsListV1DNWtoEA = []
+    connsListV1DWtoEA = []
+    connsListV1DSWtoEA = []
+    connsListV1DStoEA = []
+    connsListV1DSEtoEA = []
+    postid = 0
+    for comb in combs:
+        combV1 =  comb[0:3] #comb[0:NBobjs] # assuming NBobjs = 3
+        combDirV1 = comb[3]
+        for ob in combV1: 
+            connsListV1toEA.append([ob,postid])
+        if combDirV1==0: #E
+            connsListV1DEtoEA.append([0,postid])
+        elif combDirV1==1: #NE
+            connsListV1DNEtoEA.append([0,postid])
+        elif combDirV1==2: #N
+            connsListV1DNtoEA.append([0,postid])
+        elif combDirV1==3: #NW
+            connsListV1DNWtoEA.append([0,postid])
+        elif combDirV1==4: #W
+            connsListV1DWtoEA.append([0,postid])
+        elif combDirV1==5: #SW
+            connsListV1DSWtoEA.append([0,postid])
+        elif combDirV1==6: #S
+            connsListV1DStoEA.append([0,postid])
+        elif combDirV1==7: #SE
+            connsListV1DSEtoEA.append([0,postid])
+        postid = postid+1 
+    return connsListV1toEA, connsListV1DEtoEA, connsListV1DNEtoEA, connsListV1DNtoEA, connsListV1DNWtoEA, connsListV1DWtoEA, connsListV1DSWtoEA, connsListV1DStoEA, connsListV1DSEtoEA
+
+
+-- nothing tested....

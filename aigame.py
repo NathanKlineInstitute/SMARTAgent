@@ -75,6 +75,7 @@ class AIGame:
     else: self.InputPop = 'EV1'    
     self.lratepop = [self.InputPop] # populations that we calculate rates for
     for pop in self.ldirpop: self.lratepop.append(pop)
+    self.reducedNet = dconf['sim']['useReducedNetwork'] # reduced architecture with associations
     self.dReceptiveField = OrderedDict({pop:np.amax(list(dconf['net']['alltopolconvcons'][pop].values())) for pop in self.lratepop})
     self.dInputs = OrderedDict({pop:int((np.sqrt(dconf['net']['allpops'][pop])+self.dReceptiveField[pop]-1)**2) for pop in self.lratepop})
     #self.dFVec = OrderedDict({pop:h.Vector() for pop in self.lratepop}) # NEURON Vectors for firing rate calculations
@@ -191,16 +192,37 @@ class AIGame:
     # update input rates to retinal neurons
     #fr_Images = np.where(dsum_Images>1.0,100,dsum_Images) #Using this to check what number would work for firing rate
     #fr_Images = np.where(dsum_Images<10.0,0,dsum_Images)
-    if dconf['net']['useBinaryImage']:
-      thresh = threshold_otsu(dsum_Images)
-      binary_Image = dsum_Images > thresh
-      fr_Images = self.locationNeuronRate*binary_Image
+    if self.reducedNet:
+      if dconf['net']['useBinaryImage']:
+        thresh = threshold_otsu(dsum_Images)
+        binary_Image = dsum_Images > thresh
+        fr_Image = np.zeros(shape=(self.input_dim,3))
+        fr_Images_RO = self.locationNeuronRate*sum(binary_Image[:,0:self.courtXRng[0]-1],1)
+        fr_Images_Ball = self.locationNeuronRate*sum(binary_Image[:,self.courtXRng[0]:self.courtXRng[0]],1)
+        fr_Images_RM = self.locationNeuronRate*sum(binary_Image[:,self.courtXRng[1]+1:-1],1)
+        fr_Image[:,0] = fr_Images_RO
+        fr_Image[:,1] = fr_Images_Ball
+        fr_Image[:,2] = fr_Images_RM
+      else:
+        dsum_Images = dsum_Images - np.amin(dsum_Images)
+        dsum_Images = (255.0/np.amax(dsum_Images))*dsum_Images
+        fr_Images = self.locationNeuronRate/(1+np.exp((np.multiply(-1,dsum_Images)+123)/10))
+        fr_Image[:,0] = sum(fr_Images[:,0:self.courtXRng[0]-1],1) # opponent racket y loc
+        fr_Image[:,1] = sum(fr_Images[:,self.courtXRng[0]:self.courtXRng[1]],1) # ball y loc
+        fr_Image[:,2] = sum(fr_Images[:,self.courtXRng[1]+1:-1],1) # model racket y loc
+        #fr_Images = np.subtract(fr_Images,np.min(fr_Images)) #baseline firing rate subtraction. Instead all excitatory neurons are firing at 5Hz.
+        #print(np.amax(fr_Images))
     else:
-      dsum_Images = dsum_Images - np.amin(dsum_Images)
-      dsum_Images = (255.0/np.amax(dsum_Images))*dsum_Images
-      fr_Images = self.locationNeuronRate/(1+np.exp((np.multiply(-1,dsum_Images)+123)/10))
-      #fr_Images = np.subtract(fr_Images,np.min(fr_Images)) #baseline firing rate subtraction. Instead all excitatory neurons are firing at 5Hz.
-      #print(np.amax(fr_Images))
+      if dconf['net']['useBinaryImage']:
+        thresh = threshold_otsu(dsum_Images)
+        binary_Image = dsum_Images > thresh
+        fr_Images = self.locationNeuronRate*binary_Image
+      else:
+        dsum_Images = dsum_Images - np.amin(dsum_Images)
+        dsum_Images = (255.0/np.amax(dsum_Images))*dsum_Images
+        fr_Images = self.locationNeuronRate/(1+np.exp((np.multiply(-1,dsum_Images)+123)/10))
+        #fr_Images = np.subtract(fr_Images,np.min(fr_Images)) #baseline firing rate subtraction. Instead all excitatory neurons are firing at 5Hz.
+        #print(np.amax(fr_Images))
     self.dFiringRates[self.InputPop] = np.reshape(fr_Images,dconf['net']['allpops'][self.InputPop]) #400 for 20*20, 900 for 30*30, etc.
 
   def computeMotionFields (self, UseFull=False):
@@ -258,34 +280,50 @@ class AIGame:
     dflow = self.ldflow[-1]
     motiondir = dflow['ang'] # angles in degrees, but thresholded for significant motion; negative value means not used
     dAngPeak = self.dAngPeak
-    dirSensitiveNeuronDim = self.dirSensitiveNeuronDim
-    if motiondir.shape[0] != dirSensitiveNeuronDim or motiondir.shape[1] != dirSensitiveNeuronDim:
-      motiondir = resize(motiondir, (dirSensitiveNeuronDim, dirSensitiveNeuronDim), anti_aliasing=True)
-    AngRFSigma2 = self.AngRFSigma2
-    MaxRate = self.dirSensitiveNeuronRate[1]
-    for pop in self.ldirpop: self.dFiringRates[pop] = self.dirSensitiveNeuronRate[0] * np.ones(shape=(dirSensitiveNeuronDim,dirSensitiveNeuronDim))
-    if self.EXPDir:
-      for y in range(motiondir.shape[0]):
-        for x in range(motiondir.shape[1]):
-          if motiondir[y,x] >= 0.0: # make sure it's a valid angle
-            for pop in self.ldirpop:
-              fctr = np.exp(-1.0*(getangdiff(motiondir[y][x],dAngPeak[pop])**2)/AngRFSigma2)
-              #print('updateDirRates',pop,x,y,fctr,dAngPeak[pop],motiondir[y][x])
+    if self.reducedNet:
+      AngRFSigma2 = self.AngRFSigma2
+      MaxRate = self.dirSensitiveNeuronRate[1]
+      for pop in self.ldirpop: self.dFiringRates[pop] = self.dirSensitiveNeuronRate[0] * np.ones(shape=(1,1)) # should have a single angle per direction selective neuron pop
+      court_motiondir = motiondir[:,self.courtXRng[0]:self.courtXRng[1]] # only motion direction of ball in the court
+      unique_angles = np.unique(court_motiondir)
+      for a in unique_angles:
+        if a >= 0.0:
+          for pop in self.ldirpop:
+            if self.EXPDir:
+              fctr = np.exp(-1.0*(getangdiff(a,dAngPeak[pop])**2)/AngRFSigma2)
               if MaxRate * fctr < self.FiringRateCutoff: fctr = 0
-              self.dFiringRates[pop][y,x] += MaxRate * fctr
+              self.dFiringRates[pop][0] += MaxRate * fctr
+            else:
+              self.dFiringRates[pop][0] = MaxRate
     else:
-      for y in range(motiondir.shape[0]):
-        for x in range(motiondir.shape[1]):
-          if motiondir[y,x] >= 0.0: # make sure it's a valid angle
-            for pop in self.ldirpop:
-              if abs(getangdiff(motiondir[y][x],dAngPeak[pop])) <= self.AngRFSigma:
-                self.dFiringRates[pop][y,x] = MaxRate
-              #print('updateDirRates',pop,x,y,fctr,dAngPeak[pop],motiondir[y][x])
-    #print('motiondir',motiondir)
-    for pop in self.ldirpop:
-      self.dFiringRates[pop]=np.reshape(self.dFiringRates[pop],dirSensitiveNeuronDim**2)
-      #print(pop,np.amin(self.dFiringRates[pop]),np.amax(self.dFiringRates[pop]),np.mean(self.dFiringRates[pop]))
-      #print(pop,self.dFiringRates[pop])
+      dirSensitiveNeuronDim = self.dirSensitiveNeuronDim
+      if motiondir.shape[0] != dirSensitiveNeuronDim or motiondir.shape[1] != dirSensitiveNeuronDim:
+        motiondir = resize(motiondir, (dirSensitiveNeuronDim, dirSensitiveNeuronDim), anti_aliasing=True)
+      AngRFSigma2 = self.AngRFSigma2
+      MaxRate = self.dirSensitiveNeuronRate[1]
+      for pop in self.ldirpop: self.dFiringRates[pop] = self.dirSensitiveNeuronRate[0] * np.ones(shape=(dirSensitiveNeuronDim,dirSensitiveNeuronDim))
+      if self.EXPDir:
+        for y in range(motiondir.shape[0]):
+          for x in range(motiondir.shape[1]):
+            if motiondir[y,x] >= 0.0: # make sure it's a valid angle
+              for pop in self.ldirpop:
+                fctr = np.exp(-1.0*(getangdiff(motiondir[y][x],dAngPeak[pop])**2)/AngRFSigma2)
+                #print('updateDirRates',pop,x,y,fctr,dAngPeak[pop],motiondir[y][x])
+                if MaxRate * fctr < self.FiringRateCutoff: fctr = 0
+                self.dFiringRates[pop][y,x] += MaxRate * fctr
+      else:
+        for y in range(motiondir.shape[0]):
+          for x in range(motiondir.shape[1]):
+            if motiondir[y,x] >= 0.0: # make sure it's a valid angle
+              for pop in self.ldirpop:
+                if abs(getangdiff(motiondir[y][x],dAngPeak[pop])) <= self.AngRFSigma:
+                  self.dFiringRates[pop][y,x] = MaxRate
+                #print('updateDirRates',pop,x,y,fctr,dAngPeak[pop],motiondir[y][x])
+      #print('motiondir',motiondir)
+      for pop in self.ldirpop:
+        self.dFiringRates[pop]=np.reshape(self.dFiringRates[pop],dirSensitiveNeuronDim**2)
+        #print(pop,np.amin(self.dFiringRates[pop]),np.amax(self.dFiringRates[pop]),np.mean(self.dFiringRates[pop]))
+        #print(pop,self.dFiringRates[pop])
     if dconf['sim']['saveAssignedFiringRates']:
       frcopy = deepcopy(self.dFiringRates)
       self.dAllFiringRates.append(frcopy)

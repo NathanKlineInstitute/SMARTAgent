@@ -138,3 +138,56 @@ def connectLayerswithOverlapDiv(NBpreN, NBpostN, overlap_xdir,padded_preneurons_
                     blist.append([preN,postN]) #list of [presynaptic_neuron, postsynaptic_neuron]
                     connCoords.append([i,j,xinds[xi],yinds[yi]]) # list of coordinates of preN and postN			 
     return blist, connCoords
+
+# cLV1toEA, cLV1DEtoEA, cLV1DNEtoEA, cLV1DNtoEA, cLV1DNWtoEA, cLV1DWtoEA, cLV1DSWtoEA, cLV1DStoEA, cLV1DSEtoEA = createConnListV1toEA(60,3)
+def createConnListV1toEA(NBpreN,NBobjs): # This function is hard coded.... Not sure how to make it more generalized.
+    RO_neurons = []
+    Ball_neurons = []
+    RM_neurons = []
+    count = 0
+    for _ in range(int(NBpreN/NBobjs)): # this is assuming 3 objects represented by RO (Opponent Racket), Ball and RM (Model Racket)
+        RO_neurons.append(count)
+        Ball_neurons.append(count+1)
+        RM_neurons.append(count+2)
+        count = count+NBobjs
+        # Dir neurons: E, NE, N, NW, W, SW, S, SE
+    Dir_neurons = [0,1,2,3,4,5,6,7]
+    combs = []
+    for ro in RO_neurons:
+        for b in Ball_neurons:
+            for rm in RM_neurons:
+                for dirs in Dir_neurons:
+                    combs.append([ro,b,rm,dirs])
+    connsListV1toEA = []
+    connsListV1DEtoEA = []
+    connsListV1DNEtoEA = []
+    connsListV1DNtoEA = []
+    connsListV1DNWtoEA = []
+    connsListV1DWtoEA = []
+    connsListV1DSWtoEA = []
+    connsListV1DStoEA = []
+    connsListV1DSEtoEA = []
+    postid = 0
+    for comb in combs:
+        combV1 =  comb[0:3] #comb[0:NBobjs] # assuming NBobjs = 3
+        combDirV1 = comb[3]
+        for ob in combV1: 
+            connsListV1toEA.append([ob,postid])
+        if combDirV1==0: #E
+            connsListV1DEtoEA.append([0,postid])
+        elif combDirV1==1: #NE
+            connsListV1DNEtoEA.append([0,postid])
+        elif combDirV1==2: #N
+            connsListV1DNtoEA.append([0,postid])
+        elif combDirV1==3: #NW
+            connsListV1DNWtoEA.append([0,postid])
+        elif combDirV1==4: #W
+            connsListV1DWtoEA.append([0,postid])
+        elif combDirV1==5: #SW
+            connsListV1DSWtoEA.append([0,postid])
+        elif combDirV1==6: #S
+            connsListV1DStoEA.append([0,postid])
+        elif combDirV1==7: #SE
+            connsListV1DSEtoEA.append([0,postid])
+        postid = postid+1 
+    return connsListV1toEA, connsListV1DEtoEA, connsListV1DNEtoEA, connsListV1DNtoEA, connsListV1DNWtoEA, connsListV1DWtoEA, connsListV1DSWtoEA, connsListV1DStoEA, connsListV1DSEtoEA
