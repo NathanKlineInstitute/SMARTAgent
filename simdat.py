@@ -46,8 +46,8 @@ def readweightsfile2pdf (fn):
   for preID in D.keys():
     for poID in D[preID].keys():
       for row in D[preID][poID]:
-        A.append([row[0], preID, poID, row[1], row[2]])
-  return pd.DataFrame(A,columns=['time','preid','postid','weight','cumreward'])
+        A.append([row[0], preID, poID, row[1]]) # A.append([row[0], preID, poID, row[1], row[2]])
+  return pd.DataFrame(A,columns=['time','preid','postid','weight']) # ,(['cumreward'])
 
 #
 def readinweights (name,final=False):
@@ -66,7 +66,7 @@ def savefinalweights (pdf, simstr):
 
 def getsimname (name=None):
   if name is None:
-    if stepNB is -1: name = dconf['sim']['name']
+    if stepNB == -1: name = dconf['sim']['name']
     elif stepNB > -1: name = dconf['sim']['name'] + '_step_' + str(stepNB) + '_'
   return name
 
@@ -699,7 +699,7 @@ def plotMeanNeuronWeight (pdf,postid,clr='k',ax=None,msz=1,xl=None):
   ax.set_ylabel('Average weight'); 
   return wts    
   
-def plotMeanWeights (pdf,ax=None,msz=1,xl=None,lpop=['EMDOWN','EMUP','EMSTAY'],lclr=['r','b','g'],plotindiv=True):
+def plotMeanWeights (pdf,ax=None,msz=1,xl=None,lpop=['EMDOWN','EMUP','EMSTAY'],lclr=['k','r','b','g'],plotindiv=True):
   #plot mean weights of all plastic synaptic weights onto lpop
   if ax is None: ax = gca()
   utimes = np.unique(pdf.time)
