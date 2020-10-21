@@ -19177,3 +19177,16 @@ so try ~1420 EA neurons w/o RL STDP ... ?
 
         "name": "20oct19_A0_cycle_",
 
+[[./gif/20oct19_A0_cycle_rast.png]]
+
+* 20oct20
+** mistake in calc above about number of EA neurons, synapses needed for all pairs
+
+pairs from 3600 neurons would be 3600 x 3599 = 12956400
+so that's a lot more ... 
+
+** discuss EA arch & simplified network architecture with H.A.
+
+simplified arch. should be a good proof of concept and capture the relationships
+between different objects (see brainstorming doc for some details)
+
