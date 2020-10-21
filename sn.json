@@ -37,7 +37,7 @@
         "ResumeSimFromFile": "data/20sep25_A0_cycle_synWeights_final.pkl"
     },
     "sim": {
-        "duration": 10000,
+        "duration": 5000,
         "dt": 0.2,
         "verbose": 0,
         "recordStep": 1.0,
@@ -175,7 +175,7 @@
         "EEMWghtThreshMax": 0.00032,
 	"EEAProb": 0.4,
         "EEMProb": 0.3,
-	"EEARecProb": 0.2,
+	"EEARecProb": 0.25,
         "EEMRecProb": 0.3,
         "EEPreAProb": 0.0,
         "EEMPopNorm": 0,
