@@ -19200,3 +19200,8 @@ note each EA neuron could represent more than a 'pair' of features (each simple 
 ReceptiveF ield of a V1, EV1DE neuron), if each synaptic input is a 1D feature. although
 then information is less selective, it still seems possible for the network to learn a correct
 decision based on partial information received by each neuron.
+
+./myrun 48 sn.json
+
+run for 100 s to test - was having hyperexcit
+
