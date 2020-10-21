@@ -19190,3 +19190,13 @@ so that's a lot more ...
 simplified arch. should be a good proof of concept and capture the relationships
 between different objects (see brainstorming doc for some details)
 
+** back to sim
+
+        "name": "20oct20_A0_cycle_",
+
+try with > EA neurons
+
+note each EA neuron could represent more than a 'pair' of features (each simple feature is
+ReceptiveF ield of a V1, EV1DE neuron), if each synaptic input is a 1D feature. although
+then information is less selective, it still seems possible for the network to learn a correct
+decision based on partial information received by each neuron.
