@@ -8440,3 +8440,67 @@ def createConnListV1toEA(NBpreN,NBobjs): # This function is hard coded.... Not s
 
 
 -- nothing tested....
+
+* 20Oct21
+
+-- may be keep the reduced network model simple and dont include any recurrent connections or feedback connections.
+.... we should have those included once understand the dynamics (pop firing rates etc) of the reduced network.
+
+-- change "EEPreMProb" to "EEPreAProb" and set it to "EEPreAProb": 0.0 (want to test network with on FF conns)
+
+-- if VTopoI    to    if VTopoI and dconf['sim']['useReducedNetwork']==0
+
+-- TODO: should include connCoords for createConnListV1toEA function.
+
+-- for now only using AMPA syns for V1toEA and V1DirtoEA.
+
+-- tried running but seems like too many connections to be established on local machine.
+... may be "EEMProb": 0.3 is too high, will change it to 0.0003
+... still taking so much long time. may be the problem is somewhere else....
+
+
+* 20Oct22
+
+-- primarliy debugging to make sure that reduced model runs before tuning the parameters.
+
+-- looks like there was no problem with the connections. Just that with recurrent connections, there were too many connections to take care.
+
+Creating network of 26 cell populations on 1 hosts...
+  Number of cells on node 0: 64968 
+  Done; cell creation time = 26.49 s.
+Making connections...
+  Number of connections on node 0: 13161070 
+  Number of synaptic contacts on node 0: 18281070 
+  Done; cell connection time = 2902.55 s.
+Adding stims...
+  Number of stims on node 0: 68 
+  Done; cell stims creation time = 0.51 s.
+Recording 8 traces of 1 types on node 0
+
+... removing Feedback and recurrent connections by setting probs to 0, it took about 10 mins. and then there was some bug in aigame.py.
+
+Creating network of 26 cell populations on 1 hosts...
+  Number of cells on node 0: 64968 
+  Done; cell creation time = 29.86 s.
+Making connections...
+  Number of connections on node 0: 8041070 
+  Done; cell connection time = 581.51 s.
+Adding stims...
+  Number of stims on node 0: 68 
+  Done; cell stims creation time = 0.29 s.
+Recording 8 traces of 1 types on node 0
+
+-- so once the connections were established found a couple of more bugs related to reduced network model in aigame.py
+
+-- one problem was using the coordinates to split the ylocs of two rackets and a ball.
+.... i was using coordinates considering full image but firingrates for loc (for driving EV1) were computed using downsampled image.
+.... therefore i changed the coordinates to
+fr_Images_RO = self.locationNeuronRate*np.sum(binary_Image[:,0:3],1)
+fr_Images_Ball = self.locationNeuronRate*np.sum(binary_Image[:,3:17],1)
+fr_Images_RM = self.locationNeuronRate*np.sum(binary_Image[:,17:],1)
+
+-- fixed some minor typos.
+
+-- reduced model seems to be running. will keep testing more.
+
+-- the model is annoyingly slow now. should run on cluster and start tuning parameters.

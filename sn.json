@@ -47,7 +47,7 @@
         "RLFakeUpRule": 0,
         "RLFakeDownRule": 0,
         "RLFakeStayRule": 0,
-        "name": "20oct19_A0_cycle_",
+        "name": "20oct1_A0_local_",
         "doquit": 0,
         "doplot": 1,
         "saveCellSecs": 0,
@@ -55,7 +55,8 @@
         "targettedRL": 0,
         "tstepPerAction": 20,
         "saveWeights": 1,
-        "saveAssignedFiringRates": 0
+        "saveAssignedFiringRates": 0,
+        "useReducedNetwork": 0
     },
     "architecturePreAtoA": {
         "useProbabilistic": 1,
