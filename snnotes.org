@@ -16640,7 +16640,7 @@ motion detection output looks a lot worse ...
 
 * 20aug31
 ** setup again
-*20sep1
+* 20sep1
 ** testing with topol (padding causes problems with direction selective neurons!) (20sep1_A0_cycle_)
 
 have to adjust weights
@@ -19204,4 +19204,51 @@ decision based on partial information received by each neuron.
 ./myrun 48 sn.json
 
 run for 100 s to test - was having hyperexcit
+
+took ~8 hours ... 
+
+python -i simdat.py backupcfg/20oct20_A0_cycle_sim.json
+
+ax=plotPerf(actreward,yl=(0,0.35))
+savefig(gifpath()+'perf.png') # [[./gif/20oct21_20oct20_A0_cycle_perf.png]]
+hmm, waste of sim time ... 
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((90e3,100e3))
+savefig(gifpath()+'rast.png') # [[./gif/20oct21_20oct20_A0_cycle_rast.png]]
+just hyperexcitable
+
+xlim((10e3,20e3))
+savefig(gifpath()+'rastB.png') # [[./gif/20oct21_20oct20_A0_cycle_rastB.png]]
+and started that way ... 
+
+xlim((0e3,10e3))
+savefig(gifpath()+'rastC.png') # [[./gif/20oct21_20oct20_A0_cycle_rastC.png]]
+
+* 20oct21
+** had not increased IA
+
+20oct20_A0_cycle_
+
+./myrun 48 sn.json
+
+* 20oct22
+** other adjustments (20oct22_A0_cycle_)
+
+        "name": "20oct22_A0_cycle_",
+
+ok, setting up to get some firing continuing in EA, EM ... 
+
+better to have relatively sparse connectivity onto EA and higher
+convergence onto EM ... ? even if contradictions arise in EA 
+features, projection to EMUP and EMDOWN and RL could resolve them ... ?
+
+had to increase weights to EM a lot to maintain firing there, since EA
+rates are so low (~0.3 Hz)
+
+        "EEMWghtAM": 200e-05,
+        "EEMWghtNM": 100e-06,
+
+./myrun 32 sn.json
+
+started ~12:12 ... 
 
