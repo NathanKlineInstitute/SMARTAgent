@@ -19297,5 +19297,16 @@ move based on first order info. but could direct pathway provide static context 
 move, given the EA projections?
 
 * 20oct23
-** direct path
+** direct path and other conn changes (cmat)
+
+added it ... adjusted conn rules/specifications for more clarity
+(use cmat in json file - )
+
+VL, VD are shorthands for loc and dir sensitive visual neurons
+
+20oct23_A0_cycle_
+
+./myrun 32 sn.json
+
+started ~5 PM
 

@@ -356,7 +356,7 @@ def getInitWeight (weight):
     return 'uniform(%g,%g)' % (weight*(1.0-cfg.weightVar),weight*(1.0+cfg.weightVar))
 
 #Local excitation
-#E to E recurrent connectivity in preassociation areas
+#E to E recurrent connectivity within visual areas
 for epop in EVPops:
   if dnumc[epop] <= 0: continue # skip rule setup for empty population
   prety = poty = epop
@@ -404,17 +404,15 @@ if dnumc['ER']>0:
 netParams.connParams['EV1->IV1'] = {
         'preConds': {'pop': 'EV1'},
         'postConds': {'pop': 'IV1'},
-        'weight': 0.02 * cfg.EIGain,
+        'weight': cmat['EV1']['IV1']['GA'] * cfg.EIGain,
         'delay': 2,
         'synMech': 'AMPA', 'sec':'soma', 'loc':0.5}
 
 if VTopoI:
   netParams.connParams['EV1->IV1']['connList'] = blistEV1toIV1
-  sim.topologicalConns['EV1->IV1'] = {}
-  sim.topologicalConns['EV1->IV1']['blist'] = blistEV1toIV1
-  sim.topologicalConns['EV1->IV1']['coords'] = connCoordsEV1toIV1
+  sim.topologicalConns['EV1->IV1'] = {'blist':blistEV1toIV1, 'coords':connCoordsEV1toIV1}
 else:
-  netParams.connParams['EV1->IV1']['convergence'] = prob2conv(0.0225, dnumc['EV1'])
+  netParams.connParams['EV1->IV1']['convergence'] = prob2conv(cmat['EV1']['IV1']['p'], dnumc['EV1'])
 
 if 'EVDirPops' in dconf['net'] and 'IVDirPops' in dconf['net']:
   if 'ID' in dconf['net']['allpops']:
@@ -434,32 +432,28 @@ if 'EVDirPops' in dconf['net'] and 'IVDirPops' in dconf['net']:
 netParams.connParams['EV4->IV4'] = {
         'preConds': {'pop': 'EV4'},
         'postConds': {'pop': 'IV4'},
-        'weight': 0.02 * cfg.EIGain,
+        'weight': cmat['EV4']['IV4']['GA'] * cfg.EIGain,
         'delay': 2,
         'synMech': 'AMPA', 'sec':'soma', 'loc':0.5}
 
 if VTopoI: 
   netParams.connParams['EV4->IV4']['connList'] = blistEV4toIV4
-  sim.topologicalConns['EV4->IV4'] = {}
-  sim.topologicalConns['EV4->IV4']['blist'] = blistEV4toIV4
-  sim.topologicalConns['EV4->IV4']['coords'] = connCoordsEV4toIV4
+  sim.topologicalConns['EV4->IV4'] = {'blist':blistEV4toIV4, 'coords':connCoordsEV4toIV4}
 else: 
-  netParams.connParams['EV4->IV4']['convergence'] = prob2conv(0.0225, dnumc['EV4'])
+  netParams.connParams['EV4->IV4']['convergence'] = prob2conv(cmat['EV4']['IV4']['p'], dnumc['EV4'])
 
 netParams.connParams['EMT->IMT'] = {
         'preConds': {'pop': 'EMT'},
         'postConds': {'pop': 'IMT'},
-        'weight': 0.02 * cfg.EIGain,
+        'weight': cmat['EMT']['IMT']['GA'] * cfg.EIGain,
         'delay': 2,
         'synMech': 'AMPA', 'sec':'soma', 'loc':0.5}
 
 if VTopoI: 
   netParams.connParams['EMT->IMT']['connList'] = blistEMTtoIMT
-  sim.topologicalConns['EMT->IMT'] = {}
-  sim.topologicalConns['EMT->IMT']['blist'] = blistEMTtoIMT
-  sim.topologicalConns['EMT->IMT']['coords'] = connCoordsEMTtoIMT
+  sim.topologicalConns['EMT->IMT'] = {'blist':blistEMTtoIMT, 'coords':connCoordsEMTtoIMT}
 else: 
-  netParams.connParams['EMT->IMT']['convergence'] = prob2conv(0.0225, dnumc['EMT'])
+  netParams.connParams['EMT->IMT']['convergence'] = prob2conv(cmat['EMT']['IMT']['p'], dnumc['EMT'])
 
 """  
 for prety in EVPops:
@@ -545,9 +539,7 @@ if dnumc['ER']>0:
   
   if VTopoI: 
     netParams.connParams['IR->ER']['connList'] = blistIRtoER
-    sim.topologicalConns['IR->ER'] = {}
-    sim.topologicalConns['IR->ER']['blist'] = blistIRtoER
-    sim.topologicalConns['IR->ER']['coords'] = connCoordsIRtoER
+    sim.topologicalConns['IR->ER'] = {'blist':blistIRtoER, 'coords':connCoordsIRtoER}
   else: 
     netParams.connParams['IR->ER']['convergence'] = prob2conv(cmat['IR']['ER']['p'], dnumc['ER'])
   
@@ -560,9 +552,7 @@ netParams.connParams['IV1->EV1'] = {
 
 if VTopoI: 
   netParams.connParams['IV1->EV1']['connList'] = blistIV1toEV1
-  sim.topologicalConns['IV1->EV1'] = {}
-  sim.topologicalConns['IV1->EV1']['blist'] = blistIV1toEV1
-  sim.topologicalConns['IV1->EV1']['coords'] = connCoordsIV1toEV1
+  sim.topologicalConns['IV1->EV1'] = {'blist':blistIV1toEV1, 'coords':connCoordsIV1toEV1}
 else: 
   netParams.connParams['IV1->EV1']['convergence'] = prob2conv(cmat['IV1']['EV1']['p'], dnumc['IV1'])  
 
@@ -588,9 +578,7 @@ netParams.connParams['IV4->EV4'] = {
 
 if VTopoI: 
   netParams.connParams['IV4->EV4']['connList'] = blistIV4toEV4
-  sim.topologicalConns['IV4->EV4'] = {}
-  sim.topologicalConns['IV4->EV4']['blist'] = blistIV4toEV4
-  sim.topologicalConns['IV4->EV4']['coords'] = connCoordsIV4toEV4
+  sim.topologicalConns['IV4->EV4'] = {'blist':blistIV4toEV4, 'coords':connCoordsIV4toEV4}
 else: 
   netParams.connParams['IV4->EV4']['convergence'] = prob2conv(cmat['IV4']['EV4']['p'], dnumc['IV4'])
 
@@ -603,9 +591,7 @@ netParams.connParams['IMT->EMT'] = {
 
 if VTopoI: 
   netParams.connParams['IMT->EMT']['connList'] = blistIMTtoEMT
-  sim.topologicalConns['IMT->EMT'] = {}
-  sim.topologicalConns['IMT->EMT']['blist'] = blistIMTtoEMT
-  sim.topologicalConns['IMT->EMT']['coords'] = connCoordsIMTtoEMT
+  sim.topologicalConns['IMT->EMT'] = {'blist':blistIMTtoEMT, 'coords':connCoordsIMTtoEMT}
 else: 
   netParams.connParams['IMT->EMT']['convergence'] = prob2conv(cmat['IMT']['EMT']['p'], dnumc['IMT'])
 
@@ -866,7 +852,7 @@ for prety in ['EA']:
       elif dSTDPparams[synmech]['STDPon'] and useSTDP:
         netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparams[synmech]}                  
                     
-# add recurrent plastic connectivity within EA populations
+# add recurrent plastic connectivity within EA population
 if cmat['EA']['EA']['p'] > 0.0:
   prety = poty = 'EA'
   for strty,synmech,weight in zip(['','n'],['AMPA', 'NMDA'],[cmat['EA']['EA']['AM']*cfg.EEGain, cmat['EA']['EA']['NM']*cfg.EEGain]):
