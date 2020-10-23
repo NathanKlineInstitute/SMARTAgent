@@ -19251,4 +19251,48 @@ rates are so low (~0.3 Hz)
 ./myrun 32 sn.json
 
 started ~12:12 ... 
+finished ~22:22 ...
+
+python -i simdat.py backupcfg/20oct22_A0_cycle_sim.json
+
+ax=plotPerf(actreward,yl=(0,0.35))
+savefig(gifpath()+'perf.png') # [[./gif/20oct22_20oct22_A0_cycle_perf.png]]
+
+unusual pattern of increase, decrease, increase in perf ... 
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((90e3,100e3))
+savefig(gifpath()+'rast.png') # [[./gif/20oct22_20oct22_A0_cycle_rast.png]]
+
+savefig(gifpath()+'rastB.png') # [[./gif/20oct22_20oct22_A0_cycle_rastB.png]]
+
+looks like too much synchrony ... EMDOWN and EMUP firing too much together; too much inhib
+for the EAs, though a sparse code has its benefits
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EA','EMDOWN','EMUP'],lclr=['r','g','b'],plotindiv=True)
+xlabel('Time (ms)',fontsize=30); ylabel('Average weight',fontsize=30); tl(); 
+
+savefig(gifpath()+'all_avg_weight.png') # [[./gif/20oct22_20oct22_A0_cycle_all_avg_weight.png]]
+
+weights barely changing ... 
+
+** direct path
+
+also add direct path from EV1, EV1D to M ?
+
+direct path would provide first order sensory info but would not be reward modulated ... 
+
+so EA provides relationships (second, higher order) and direct path primary sensory
+
+paddle in middle Y position ball moving to northeast (should move up to get reward); but 
+if an EMDOWN gets that pixel and NE direction and if the paddle moves down then those synapses should get weakened
+if an EMUP gets that pixel and NE direction and paddle moves down, those synapses should get strengthened (if that EMUP
+fires later)
+
+so using those direct pathways, the model could still learn something ... ? but only if it gets non-contradictory info
+for example, if the EMDOWN neuron got the middle Y pixel but also a SE dir input and should therefore move down... the middle pixel
+synapse would have been weakened, while the SE synapse should get strengthened ... 
+
+ok, so RL-STDP for the direct path seems useless and leads to problems due to ambiguity in the correct
+move based on first order info. but could direct pathway provide static context useful to make the correct
+move, given the EA projections?
 
