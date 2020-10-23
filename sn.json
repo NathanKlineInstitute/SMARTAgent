@@ -58,10 +58,14 @@
         "saveAssignedFiringRates": 0,
 	"useReducedNetwork": 0
     },
-    "architecturePreAtoA": {
+    "architectureVtoA": {
         "useProbabilistic": 1,
         "useTopological": 0
     },
+    "architectureVtoM": {
+        "useProbabilistic": 1,
+        "useTopological": 0
+    },    
     "net": {
         "scale": 1,
 	"allpops": {
@@ -94,10 +98,10 @@
 	"ETypes": ["ER","EV1","EV1DE","EV1DNE","EV1DN","EV1DNW","EV1DW","EV1DSW","EV1DS","EV1DSE","EV4","EMT","EMDOWN","EMUP","EMSTAY","EA"],
 	"ITypes": ["IR","IV1","IV4","IMT","IM","ID","IMUP","IMDOWN","IMSTAY","IA"],
 	"EMotorPops": ["EMDOWN", "EMUP", "EMSTAY"],
-	"EPreAPops": ["EV1","EV1DE","EV1DNE","EV1DN","EV1DNW","EV1DW","EV1DSW","EV1DS","EV1DSE","EV4","EMT"],
-        "EPreADirPops": ["EV1DE","EV1DNE","EV1DN","EV1DNW","EV1DW","EV1DSW","EV1DS","EV1DSE"],
-	"IPreADirPops": ["ID"],
-        "EPreALocPops": ["EV1","EV4","EMT"],	
+	"EVPops": ["EV1","EV1DE","EV1DNE","EV1DN","EV1DNW","EV1DW","EV1DSW","EV1DS","EV1DSE","EV4","EMT"],
+        "EVDirPops": ["EV1DE","EV1DNE","EV1DN","EV1DNW","EV1DW","EV1DSW","EV1DS","EV1DSE"],
+	"IVDirPops": ["ID"],
+        "EVLocPops": ["EV1","EV4","EMT"],	
         "AngRFSigma": 22.5,
 	"EXPDir": 1,	
 	"VTopoI": 0,
@@ -160,28 +164,36 @@
         "DirMaxRate": 150.0,
         "LocMaxRate": 150.0,
         "FiringRateCutoff" : 50.0,
-        "stimModDirW": 0.02,
-        "stimModInputW": 0.02,
-        "EEAWghtAM": 4.5e-05,
-        "EEAWghtNM": 10e-06,	
-        "EEMWghtAM": 200e-05,
-        "EEMWghtNM": 30e-06,
-        "VISAWghtAM": 5.3e-06,
-        "VISAWghtNM": 5.3e-06,		
-        "EEVisWghtAM": 20e-05,
-        "EEVisWghtNM": 30e-06,		
-        "EEPreAWghtAM": 1e-05,
-        "EEPreAWghtNM": 3e-06,
+        "stimModVD": 0.02,
+        "stimModVL": 0.02,
+	"cmat": {
+	    "VL":{
+		"VD":{"AM":0,"NM":0,"p":0},		
+		"VL":{"AM":20e-5,"NM":30e-6,"p":0},
+		"EA":{"AM":4.5e-5,"NM":10e-6,"p":0.08},
+		"EM":{"AM":0,"NM":0,"p":0}
+	    },
+	    "VD":{
+		"VL":{"AM":0,"NM":0,"p":0},
+		"VD":{"AM":0,"NM":0,"p":0},
+		"EA":{"AM":4.5e-5,"NM":10e-6,"p":0.08},
+		"EM":{"AM":0,"NM":0,"p":0}		
+	    },
+	    "EM":{
+		"EM":{"AM":0,"NM":0,"p":0.15},
+		"EA":{"AM":0,"NM":0,"p":0.0},
+		"IRecip": {"AM":0.02, "NM":0, "p":0.0625},
+		"IM":{"GA":0.02,"p":0.0625}
+	    },
+	    "EA":{
+		"EA":{"AM":0,"NM":0,"p":0.0}
+		"EM":{"AM":200e-5,"NM":30e-6,"p":0.2},
+		"IA":{"GA": 0.02, "p":0.0625}
+	    }
+	},
         "EEMWghtThreshMin": 6.25e-06,
         "EEMWghtThreshMax": 0.00032,
-	"EEAProb": 0.08,
-        "EEMProb": 0.2,
-	"EEARecProb": 0.0,
-        "EEMRecProb": 0.15,
-        "EEPreAProb": 0.0,
         "EEMPopNorm": 0,
-	"EMIRecipProb": 0.0625,
-	"EMIRecipWght": 0.02,
 	"CellWNorm": {
 	    "On": 0,
 	    "MinFctr": 1.0,

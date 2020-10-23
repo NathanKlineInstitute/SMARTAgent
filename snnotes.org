@@ -19296,3 +19296,6 @@ ok, so RL-STDP for the direct path seems useless and leads to problems due to am
 move based on first order info. but could direct pathway provide static context useful to make the correct
 move, given the EA projections?
 
+* 20oct23
+** direct path
+
