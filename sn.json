@@ -137,6 +137,8 @@
             "RecurrentLocNeurons":0,
             "FeedForwardDirNtoA":0,
             "FeedForwardLocNtoA":0,
+            "FeedForwardDirNtoM":0,
+            "FeedForwardLocNtoM":0,	    
             "FeedForwardAtoM":0,	    
             "FeedbackLocNeurons":0,
             "RecurrentMNeurons":0,
@@ -151,6 +153,8 @@
             "RecurrentLocNeurons":0,
             "FeedForwardDirNtoA":0,
             "FeedForwardLocNtoA":0,
+            "FeedForwardDirNtoM":0,
+            "FeedForwardLocNtoM":0,	    
             "FeedForwardAtoM":1,
             "FeedbackLocNeurons":0,
             "RecurrentMNeurons":1,
@@ -171,13 +175,13 @@
 		"VD":{"AM":0,"NM":0,"p":0},		
 		"VL":{"AM":20e-5,"NM":30e-6,"p":0},
 		"EA":{"AM":4.5e-5,"NM":10e-6,"p":0.08},
-		"EM":{"AM":0,"NM":0,"p":0}
+		"EM":{"AM":4.5e-5,"NM":10e-6,"p":0.08}
 	    },
 	    "VD":{
 		"VL":{"AM":0,"NM":0,"p":0},
 		"VD":{"AM":0,"NM":0,"p":0},
 		"EA":{"AM":4.5e-5,"NM":10e-6,"p":0.08},
-		"EM":{"AM":0,"NM":0,"p":0}		
+		"EM":{"AM":4.5e-5,"NM":10e-6,"p":0.08}
 	    },
 	    "EM":{
 		"EM":{"AM":0,"NM":0,"p":0.15},
@@ -189,6 +193,79 @@
 		"EA":{"AM":0,"NM":0,"p":0.0}
 		"EM":{"AM":200e-5,"NM":30e-6,"p":0.2},
 		"IA":{"GA": 0.02, "p":0.0625}
+	    },
+	    "IR": {
+		"ER": {"GA": 0.2, "p":0.0625}
+	    },
+	    "IV1": {
+		"EV1": {"GA": 0.2, "p":0.25}
+	    },
+	    "ID": {
+		"ED": {"GA": 0.2, "p":0.25}
+	    },
+	    "IV4": {
+		"EV4": {"GA":0.2, "p":0.25}
+	    },
+	    "IMT": {
+		"EMT": {"GA":0.2, "p":0.25}
+	    },
+	    "IM": {
+		"EM": {"GA":0.2, "p":0.125}
+	    },
+	    "IMRecip": {
+		"EM": {"GA":0.2, "p":0.125}
+	    },
+	    "IA": {
+		"EA": {"GA":0.2, "p":0.125}
+	    },
+	    "IR": {
+		"IR": {"GA":0.05, "p":0.25}
+	    },
+	    "IV1": {
+		"IV1": {"GA":0.05, "p":0.25},
+		"ER": {"GA":0.02, "p":0.0},
+		"IV4": {"GA":0.0075, "p":0.0}
+	    },
+	    "IV4": {
+		"IV4": {"GA":0.05, "p":0.25},
+		"EV1": {"GA":0.02, "p":0.0},
+		"IMT": {"GA":0.0075, "p":0.0}
+	    },
+	    "IMT": {
+		"IMT": {"GA":0.05, "p":0.25},
+		"EV4": {"GA":0.02, "p":0.0}
+	    },
+	    "IM": {
+		"IM": {"GA":0.05, "p":0.25}
+	    },
+	    "ID": {
+		"ID": {"GA":0.05, "p":0.25}
+	    },
+	    "IMUP": {
+		"IMUP": {"GA":0.05, "p":0.25}
+	    },
+	    "IMDOWN": {
+		"IMDOWN": {"GA":0.05, "p":0.25}
+	    },
+	    "IMSTAY": {
+		"IMSTAY": {"GA":0.05, "p":0.25}
+	    },
+	    "IA": {
+		"IA": {"GA":0.05, "p":0.25}
+	    },
+	    "ER": {
+		"EV1": {"AM": 20e-5, "NM": 30e-6, "p":0.1}
+	    },
+	    "EV1": {
+		"EV4": {"AM": 20e-5, "NM": 30e-6, "p":0.3},
+		"ER": {"AM":0 , "NM":0, "p":0}
+	    },
+	    "EV4": {
+		"EMT": {"AM": 60e-5, "NM": 90e-6, "p":0.3},
+		"EV1": {"AM":0 , "NM":0, "p":0}		
+	    },
+	    "EMT": {
+		"EV4": {"AM":0 , "NM":0, "p":0}	
 	    }
 	},
         "EEMWghtThreshMin": 6.25e-06,
@@ -213,10 +290,7 @@
         "EEMFeedbackWghtAM": 2e-05,
         "EEMFeedbackWghtNM": 3e-06,
         "VisualFeedback": 0,
-        "weightVar": 0.5,
-	"EREV1Prob": 0.1,
-	"EV1EV4Prob": 0.3,
-	"EV4EMTProb": 0.3
+        "weightVar": 0.5
     },
     "STDP": {
         "AMPA": {
