@@ -642,7 +642,7 @@ for IType in ITypes:
   netParams.connParams[IType+'->'+IType] = {
     'preConds': {'pop': IType},
     'postConds': {'pop': IType},
-    'convergence': prob2conv(cmat[IType][ITYpe]['p'], dnumc[IType]),
+    'convergence': prob2conv(cmat[IType][IType]['p'], dnumc[IType]),
     'weight': cmat[IType][IType]['p'] * cfg.IIGain, 
     'delay': 2,
     'synMech': 'GABA', 'sec':'soma', 'loc':0.5}  
@@ -785,10 +785,11 @@ sim.topologicalConns['IV4->IMT'] = {'blist':blistIV4toIMT, 'coords':connCoordsIV
 
 
 def connectEVToTarget (lpoty, useTopological):
-  if dnumc[poty] <= 0: return
+  # connect excitatory visual area neurons to list of postsynaptic types (lpoty)
   for prety in EVPops:
     if dnumc[prety] <= 0: continue
     for poty in lpoty:
+      if dnumc[poty] <= 0: continue
       suffix = 'M'      
       if poty == 'EA': suffix = 'A'      
       if useTopological:
