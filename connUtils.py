@@ -191,3 +191,53 @@ def createConnListV1toEA(NBpreN,NBobjs): # This function is hard coded.... Not s
             connsListV1DSEtoEA.append([0,postid])
         postid = postid+1 
     return connsListV1toEA, connsListV1DEtoEA, connsListV1DNEtoEA, connsListV1DNtoEA, connsListV1DNWtoEA, connsListV1DWtoEA, connsListV1DSWtoEA, connsListV1DStoEA, connsListV1DSEtoEA
+
+
+def createConnListV1toEA2(NBpreN,NBobjs): # This function is hard coded.... Not sure how to make it more generalized.
+    Ball_neurons = []
+    RM_neurons = []
+    count = 0
+    for _ in range(int(NBpreN/NBobjs)): # this is assuming 3 objects represented by RO (Opponent Racket), Ball and RM (Model Racket)
+        Ball_neurons.append(count)
+        RM_neurons.append(count+1)
+        count = count+NBobjs
+        # Dir neurons: E, NE, N, NW, W, SW, S, SE
+    Dir_neurons = [0,1,2,3,4,5,6,7]
+    combs = []
+    for b in Ball_neurons:
+        for rm in RM_neurons:
+            for dirs in Dir_neurons:
+                combs.append([b,rm,dirs])
+    connsListV1toEA = []
+    connsListV1DEtoEA = []
+    connsListV1DNEtoEA = []
+    connsListV1DNtoEA = []
+    connsListV1DNWtoEA = []
+    connsListV1DWtoEA = []
+    connsListV1DSWtoEA = []
+    connsListV1DStoEA = []
+    connsListV1DSEtoEA = []
+    postid = 0
+    for comb in combs:
+        combV1 =  comb[0:2] #comb[0:NBobjs] # assuming NBobjs = 2
+        combDirV1 = comb[2]
+        for ob in combV1: 
+            connsListV1toEA.append([ob,postid])
+        if combDirV1==0: #E
+            connsListV1DEtoEA.append([0,postid])
+        elif combDirV1==1: #NE
+            connsListV1DNEtoEA.append([0,postid])
+        elif combDirV1==2: #N
+            connsListV1DNtoEA.append([0,postid])
+        elif combDirV1==3: #NW
+            connsListV1DNWtoEA.append([0,postid])
+        elif combDirV1==4: #W
+            connsListV1DWtoEA.append([0,postid])
+        elif combDirV1==5: #SW
+            connsListV1DSWtoEA.append([0,postid])
+        elif combDirV1==6: #S
+            connsListV1DStoEA.append([0,postid])
+        elif combDirV1==7: #SE
+            connsListV1DSEtoEA.append([0,postid])
+        postid = postid+1 
+    return connsListV1toEA, connsListV1DEtoEA, connsListV1DNEtoEA, connsListV1DNtoEA, connsListV1DNWtoEA, connsListV1DWtoEA, connsListV1DSWtoEA, connsListV1DStoEA, connsListV1DSEtoEA

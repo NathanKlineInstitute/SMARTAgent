@@ -8504,3 +8504,64 @@ fr_Images_RM = self.locationNeuronRate*np.sum(binary_Image[:,17:],1)
 -- reduced model seems to be running. will keep testing more.
 
 -- the model is annoyingly slow now. should run on cluster and start tuning parameters.
+
+-- run 100sec sim "20oct22_A0_game_falcor_" to see the results. (will start tuning afterwards)
+... EEMProb = 0.2
+-- pushed sim.json has EEMProb = 0 ---> Change it to 0.2 and run.
+
+-- run 100sec sim "20oct22_A0_game_cycle_" to see the results. (will start tuning afterwards)
+... i think i used targetedRL for this sim.
+... EEMProb = 0.2
+
+-- Looks like EEMProb of 0.2 is not producing any actions.
+... probably too much drive causing depolarization block.... needs to be checked.....
+
+* 20Oct23
+
+-- No activity observed in 'EA' in sim "20oct22_A0_game_cycle_"
+change dconf['net']['EEAWghtAM'] from "EEAWghtAM": 2e-05 to "EEAWghtAM": 2e-04
+and rerun sim for 10sec. 
+
+-- run sim "20oct23_A0_game_cycle_" by increase EEAWghtAM from 2e-5 to 2e-4 to see if this is enough to relay information from V1 to EA>
+
+-- terminate sim "20oct22_A0_game_falcor_" and rerun in "20oct23_A0_game_falcor_" with "EEAWghtAM": 2e-04
+
+-- should have an option to run even simpler network with only ball and model racket represented.....
+
+        if dconf['net']['captureTwoObjs']:
+          fr_Images = np.zeros(shape=(20,2))
+          fr_Images_Ball = self.locationNeuronRate*np.sum(binary_Image[:,3:17],1)
+          fr_Images_RM = self.locationNeuronRate*np.sum(binary_Image[:,17:],1)
+          fr_Images[:,0] = fr_Images_Ball
+          fr_Images[:,1] = fr_Images_RM
+          print(fr_Images)        
+
+-- make sure to use 40 neurons for EV1 when using reduced network capturing ball and model racket.
+... also have another function in connUtils.py to have connectivity from V1 and V1DIR to EA.
+-- make sure to use 60 neurons for EV1 when using reduced network capturing opponent racket, ball and model racket.
+
+-- poor coding choice ... may be should fix it...
+
+  if dconf['sim']['captureTwoObjs']:
+    cLV1toEA, cLV1DEtoEA, cLV1DNEtoEA, cLV1DNtoEA, cLV1DNWtoEA, cLV1DWtoEA, cLV1DSWtoEA, cLV1DStoEA, cLV1DSEtoEA = createConnListV1toEA2(dnumc['EV1'],2) # 3 objects in the game
+  else:
+    cLV1toEA, cLV1DEtoEA, cLV1DNEtoEA, cLV1DNtoEA, cLV1DNWtoEA, cLV1DWtoEA, cLV1DSWtoEA, cLV1DStoEA, cLV1DSEtoEA = createConnListV1toEA(dnumc['EV1'],3) # 3 objects in the game
+
+-- use "EA":64000 when "EV1":60 representing 3 objects (20+20+20) NB associations: 20x20x20x8 = 64000
+-- use "EA":3200 when "EV1":60 representing 2 objects (20+20) NB associations: 20x20x8 = 3200 
+
+
+-- I THINK THERE IS A BUG IN MOTIONDIRECTION CODE FOR REDUCEDNETWORK MODEL.....
+-- Found the bug.... it was related to dirSensitiveNeuronDim.
+... the code was written assuming we will use direction sensitive neurons encoding direction of objects at their locations.
+
+... for reduced model, we are using 1 neuron to encode 1 directions so in total 8 neurons to encode 8 directions 
+... also the direction is encoded only for the ball. 
+
+... the quick fix to the problem is below....
+    if self.reducedNet:
+      self.dirSensitiveNeuronDim = 20 #Assuming the downscaling factor is 8.
+    else:
+      self.dirSensitiveNeuronDim = int(np.sqrt(dconf['net']['allpops']['EV1DE']))
+
+-- still tuning parameters.....
