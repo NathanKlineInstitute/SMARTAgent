@@ -19310,3 +19310,46 @@ VL, VD are shorthands for loc and dir sensitive visual neurons
 
 started ~5 PM
 
+** whether to include plasticity in the pathway to EA neurons? probably not
+
+in some situations would that help produce stronger/correct inputs
+onto EA neurons?
+
+for example, ball moving from top left SE, paddle in middle Y
+those first order representations converge onto an EA neuron
+the EA neuron projects to EMDOWN; if EMDOWN activated, that
+synapse onto EMDOWN is strengthened, and so are the SE and middle Y
+inputs onto the EA neuron. next time that context arises, the SE
+and middle Y inputs to EA will be stronger, and that path will
+more strongly drive the EMDOWN. other first order representations
+that converge onto the EA neuron would not be strengthened if
+their presynaptic neurons did not fire. however, if later the
+paddle is already at bottom right of screen, when ball is moving
+SE to bottom right corner, the EMDOWN neuron will be more
+strongly activated to move down further from stronger SE->EA->EMDOWN. 
+so having plasticity onto the EA neuron will lead to  increased probability of an
+incorrect response in the second context. however, the middle Y->EA->EMDOWN
+will not be active, since paddle is in bottom right, counterbalancing the
+increase from SE->EA->EMDOWN. each of those synaptic inputs by themselves
+are ambiguous - what to do - but when they're both activated they will 
+be more likely to drive EMDOWN properly. since each of those inputs
+are ambiguous, it's likely that other combinations of inputs will
+later reduce those synaptic weights. so, any benefit from that
+could be short-lived. but difficult to predict and to rule out
+any benefit ... 
+
+** test similar model on gcp
+
+forgot to put AM,NM weights for EM -> EM recurrent
+connections in last sim on cycle  (20oct23_A0_cycle_)
+
+will add that here ... 
+
+run for 1000 s ... see how it does ... may want to scale up EA or EM populations later ... 
+
+20oct23_B0_gcp_
+
+./myrun 48 sn.json
+
+started ~22:22 ...
+
