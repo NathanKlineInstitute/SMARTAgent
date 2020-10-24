@@ -33,21 +33,21 @@
     "verbose": 0,
     "stayStepLim": 0,
     "simtype": {
-        "ResumeSim": 0,
-        "ResumeSimFromFile": "data/20sep25_A0_cycle_synWeights_final.pkl"
+        "ResumeSim": 1,
+        "ResumeSimFromFile": "data/20oct23_A0_cycle_synWeights_final.pkl"
     },
     "sim": {
-        "duration": 1000000,
+        "duration": 200000,
         "dt": 0.2,
         "verbose": 0,
         "recordStep": 1.0,
         "recordWeightStepSize": 500,
         "normalizeWeightStepSize": 50000000000000000000000000,
-	"normalizeWeightsAtStart": 0,
+	"normalizeWeightsAtStart": 1,
         "RLFakeUpRule": 0,
         "RLFakeDownRule": 0,
         "RLFakeStayRule": 0,
-        "name": "20oct23_B0_gcp_",
+        "name": "20oct24_A1_cycle_",
         "doquit": 1,
         "doplot": 0,
         "saveCellSecs": 0,
@@ -188,7 +188,7 @@
 		"EMSTAY":{"AM":4.5e-5,"NM":10e-6,"p":0.08}		
 	    },
 	    "EM":{
-		"EM":{"AM":4.5e-5,"NM":10e-6,"p":0.08},
+		"EM":{"AM":0,"NM":0,"p":0.15},
 		"EA":{"AM":0,"NM":0,"p":0.0},
 		"IRecip": {"AM":0.02, "NM":0, "p":0.0625},
 		"IM":{"GA":0.02,"p":0.0625}
@@ -265,7 +265,7 @@
 	},
         "EEMWghtThreshMin": 6.25e-06,
         "EEMWghtThreshMax": 0.00032,
-        "EEMPopNorm": 0,
+        "EEMPopNorm": 1,
 	"CellWNorm": {
 	    "On": 0,
 	    "MinFctr": 1.0,

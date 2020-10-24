@@ -1085,7 +1085,7 @@ def normalizeAdjustableWeights (sim, t, lpop):
     try:
       dfctr = {}
       # normalize weights across populations to avoid bias    
-      initw = dconf['net']['EEMWghtAM'] # initial average weight <<-- THAT ASSUMES ONLY USING NORM ON EM POPULATIONS!
+      initw = cmat['EA']['EM']['AM'] # initial average weight <<-- THAT ASSUMES ONLY USING NORM ON EM POPULATIONS!
       if dconf['net']['EEMPopNorm']:
         curravgw = np.mean([davg[k] for k in lpop]) # current average weight
         if curravgw <= 0.0: curravgw = initw
