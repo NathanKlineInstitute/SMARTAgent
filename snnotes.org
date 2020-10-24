@@ -19353,3 +19353,5 @@ run for 1000 s ... see how it does ... may want to scale up EA or EM populations
 
 started ~22:22 ...
 
+firing rates get too high around 200 s ... need to put in (global) weight norm 
+
