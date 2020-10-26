@@ -765,22 +765,22 @@ if dconf['sim']['useReducedNetwork']==0:
         'delay': 2,
         'synMech': 'GABA','sec':'soma', 'loc':0.5}
 
-sim.topologicalConns['IV1->IV4'] = {'blist':blistIV1toIV4, 'coords':connCoordsIV1toIV4}
+  sim.topologicalConns['IV1->IV4'] = {'blist':blistIV1toIV4, 'coords':connCoordsIV1toIV4}
 
-netParams.connParams['IV4->IMT'] = {
+  netParams.connParams['IV4->IMT'] = {
         'preConds': {'pop': 'IV4'},
         'postConds': {'pop': 'IMT'},
         'connList': blistIV4toIMT,
         'weight': cmat['IV4']['IMT']['GA'] * cfg.IIGain,
         'delay': 2,
         'synMech': 'GABA','sec':'soma', 'loc':0.5}
-sim.topologicalConns['IV4->IMT'] = {'blist':blistIV4toIMT, 'coords':connCoordsIV4toIMT}
+  sim.topologicalConns['IV4->IMT'] = {'blist':blistIV4toIMT, 'coords':connCoordsIV4toIMT}
 
 def connectEVToTarget (lpoty, useTopological):  
   if dconf['sim']['useReducedNetwork']:    
     print(cLV1toEA)
     synmech = 'AMPA'
-    weight = dconf['net']['EEAWghtAM']*cfg.EEGain
+    weight = cfg.EEGain*cmat['VL']['EA']['AM']
     netParams.connParams['EV1->EA'] = {
         'preConds': {'pop': 'EV1'},
         'postConds': {'pop': 'EA'},
@@ -794,6 +794,7 @@ def connectEVToTarget (lpoty, useTopological):
       netParams.connParams['EV1->EA']['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL[synmech]}
     elif dconf['net']['STDPconns']['FeedForwardLocNtoA'] and dSTDPparams[synmech]['STDPon']:
       netParams.connParams['EV1->EA']['plast'] = {'mech': 'STDP', 'params': dSTDPparams[synmech]}
+    weight = cfg.EEGain*cmat['VD']['EA']['AM']
     netParams.connParams['EV1DE->EA'] = {
         'preConds': {'pop': 'EV1DE'},
         'postConds': {'pop': 'EA'},

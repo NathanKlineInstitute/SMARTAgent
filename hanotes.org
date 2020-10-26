@@ -8565,3 +8565,35 @@ and rerun sim for 10sec.
       self.dirSensitiveNeuronDim = int(np.sqrt(dconf['net']['allpops']['EV1DE']))
 
 -- still tuning parameters.....
+
+-- started new sims (1000 sec each) on falcor (20oct23_...._nontargeted)and cycle (20oct23_...._targeted).
+
+* 20Oct26
+
+-- the simulation ran on falcor on oct23 was too slow. took more than 2 days to run 84 sec.
+-- should run the reduced model on falcor.
+"20oct26_A0_game_falcor_reduced2_targeted_"
+"captureTwoObj":1 <--[0]
+"EV1":40  <--[60]
+"EA":3200 <--[64000]
+run for 10 sec to adjust parameters.
+... look at EV1cell0, seems like a depol block (see the fig)
+... looking at raster (see the fig), highly synchronized activity in EA and IA.... should lower the weight
+... looking at raster, for long duration, no activity in M.... should lower the weights onto M too.
+
+-- "20oct26_A1_game_falcor_reduced2_targeted_"
+"stimModInputW":0.015   <--[0.02]
+"EEAWghtAM": 1e-3   <--[2e-3]
+"EEMWghtAM":4.5e-5  <--[4.5e-4] decreased
+... didnt save any fig.
+... no motor activity generated. so may be need to increase "EEMWghtAM" or increase convergence from 0.2 to 0.4.
+
+-- "20oct26_A2_game_falcor_reduced2_targeted_"
+"stimModInputW":0.015   <--[0.02]
+"EEAWghtAM": 1e-3   <--[2e-3]
+"EEMWghtAM":4.5e-3  <--[4.5e-4] increased this time
+"EEMFeedbackWghtAM":2e-15   <--[2e-5].... should not have affected because EEMFeedbackProb was already set to 0.
+
+-- still not completely sure about the choice of parameters, but with a 10sec run, see decent firing rates. May be should try running on falcor.
+
+-- run "20oct26_B0_falcor_reduced_2obj_"
