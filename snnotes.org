@@ -19432,9 +19432,21 @@ not clear if weight norm is the problem ... ?
 clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP'],lclr=['r','g','b'],plotindiv=True)
 xlabel('Time (ms)',fontsize=30); ylabel('Average weight',fontsize=30); tl(); 
 
-savefig(gifpath()+'all_avg_weight.png') 
+savefig(gifpath()+'all_avg_weight.png') # [[./gif/20oct26_20oct24_A1_cycle__step_3_all_avg_weight.png]]
 
-fig=animInput(InputImages,gifpath()+'_input.mp4')
+fig=animInput(InputImages,gifpath()+'_input.mp4') # [[./gif/20oct26_20oct24_A1_cycle__step_3__input.mp4]]
 
 ...
+
+binsz = 100
+dnspk = {pop:getspikehist(dspkT[pop],dnumc,binsz,200e3) for pop in ['EMDOWN','EMUP','EA']}
+for clr,pop in zip(['r','g','b'],['EA','EMDOWN','EMUP']): plot(dnspk[pop][0],dnspk[pop][1],clr)
+xlim((0,200e3))
+savefig(gifpath()+'EA_EMDOWN_rate100.png') # [[./gif/20oct26_20oct24_A1_cycle__step_3_EA_EMDOWN_rate100.png]]
+
+EMUP,EMDOWN rates are going up and there are many more population spikes towards the end of the simulation ... 
+
+either need more frequent norm or lower starting weights ... with sparser connectivity ... and larger EA layer ? 
+
+model is pretty slow to run already ... 
 
