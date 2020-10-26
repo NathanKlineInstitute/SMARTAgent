@@ -16640,7 +16640,7 @@ motion detection output looks a lot worse ...
 
 * 20aug31
 ** setup again
-*20sep1
+* 20sep1
 ** testing with topol (padding causes problems with direction selective neurons!) (20sep1_A0_cycle_)
 
 have to adjust weights
@@ -19190,3 +19190,248 @@ so that's a lot more ...
 simplified arch. should be a good proof of concept and capture the relationships
 between different objects (see brainstorming doc for some details)
 
+** back to sim
+
+        "name": "20oct20_A0_cycle_",
+
+try with > EA neurons
+
+note each EA neuron could represent more than a 'pair' of features (each simple feature is
+ReceptiveF ield of a V1, EV1DE neuron), if each synaptic input is a 1D feature. although
+then information is less selective, it still seems possible for the network to learn a correct
+decision based on partial information received by each neuron.
+
+./myrun 48 sn.json
+
+run for 100 s to test - was having hyperexcit
+
+took ~8 hours ... 
+
+python -i simdat.py backupcfg/20oct20_A0_cycle_sim.json
+
+ax=plotPerf(actreward,yl=(0,0.35))
+savefig(gifpath()+'perf.png') # [[./gif/20oct21_20oct20_A0_cycle_perf.png]]
+hmm, waste of sim time ... 
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((90e3,100e3))
+savefig(gifpath()+'rast.png') # [[./gif/20oct21_20oct20_A0_cycle_rast.png]]
+just hyperexcitable
+
+xlim((10e3,20e3))
+savefig(gifpath()+'rastB.png') # [[./gif/20oct21_20oct20_A0_cycle_rastB.png]]
+and started that way ... 
+
+xlim((0e3,10e3))
+savefig(gifpath()+'rastC.png') # [[./gif/20oct21_20oct20_A0_cycle_rastC.png]]
+
+* 20oct21
+** had not increased IA
+
+20oct20_A0_cycle_
+
+./myrun 48 sn.json
+
+* 20oct22
+** other adjustments (20oct22_A0_cycle_)
+
+        "name": "20oct22_A0_cycle_",
+
+ok, setting up to get some firing continuing in EA, EM ... 
+
+better to have relatively sparse connectivity onto EA and higher
+convergence onto EM ... ? even if contradictions arise in EA 
+features, projection to EMUP and EMDOWN and RL could resolve them ... ?
+
+had to increase weights to EM a lot to maintain firing there, since EA
+rates are so low (~0.3 Hz)
+
+        "EEMWghtAM": 200e-05,
+        "EEMWghtNM": 100e-06,
+
+./myrun 32 sn.json
+
+started ~12:12 ... 
+finished ~22:22 ...
+
+python -i simdat.py backupcfg/20oct22_A0_cycle_sim.json
+
+ax=plotPerf(actreward,yl=(0,0.35))
+savefig(gifpath()+'perf.png') # [[./gif/20oct22_20oct22_A0_cycle_perf.png]]
+
+unusual pattern of increase, decrease, increase in perf ... 
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((90e3,100e3))
+savefig(gifpath()+'rast.png') # [[./gif/20oct22_20oct22_A0_cycle_rast.png]]
+
+savefig(gifpath()+'rastB.png') # [[./gif/20oct22_20oct22_A0_cycle_rastB.png]]
+
+looks like too much synchrony ... EMDOWN and EMUP firing too much together; too much inhib
+for the EAs, though a sparse code has its benefits
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EA','EMDOWN','EMUP'],lclr=['r','g','b'],plotindiv=True)
+xlabel('Time (ms)',fontsize=30); ylabel('Average weight',fontsize=30); tl(); 
+
+savefig(gifpath()+'all_avg_weight.png') # [[./gif/20oct22_20oct22_A0_cycle_all_avg_weight.png]]
+
+weights barely changing ... 
+
+** direct path
+
+also add direct path from EV1, EV1D to M ?
+
+direct path would provide first order sensory info but would not be reward modulated ... 
+
+so EA provides relationships (second, higher order) and direct path primary sensory
+
+paddle in middle Y position ball moving to northeast (should move up to get reward); but 
+if an EMDOWN gets that pixel and NE direction and if the paddle moves down then those synapses should get weakened
+if an EMUP gets that pixel and NE direction and paddle moves down, those synapses should get strengthened (if that EMUP
+fires later)
+
+so using those direct pathways, the model could still learn something ... ? but only if it gets non-contradictory info
+for example, if the EMDOWN neuron got the middle Y pixel but also a SE dir input and should therefore move down... the middle pixel
+synapse would have been weakened, while the SE synapse should get strengthened ... 
+
+ok, so RL-STDP for the direct path seems useless and leads to problems due to ambiguity in the correct
+move based on first order info. but could direct pathway provide static context useful to make the correct
+move, given the EA projections?
+
+* 20oct23
+** direct path and other conn changes (cmat)
+
+added it ... adjusted conn rules/specifications for more clarity
+(use cmat in json file - )
+
+VL, VD are shorthands for loc and dir sensitive visual neurons
+
+20oct23_A0_cycle_
+
+./myrun 32 sn.json
+
+started ~5 PM
+
+** whether to include plasticity in the pathway to EA neurons? probably not
+
+in some situations would that help produce stronger/correct inputs
+onto EA neurons?
+
+for example, ball moving from top left SE, paddle in middle Y
+those first order representations converge onto an EA neuron
+the EA neuron projects to EMDOWN; if EMDOWN activated, that
+synapse onto EMDOWN is strengthened, and so are the SE and middle Y
+inputs onto the EA neuron. next time that context arises, the SE
+and middle Y inputs to EA will be stronger, and that path will
+more strongly drive the EMDOWN. other first order representations
+that converge onto the EA neuron would not be strengthened if
+their presynaptic neurons did not fire. however, if later the
+paddle is already at bottom right of screen, when ball is moving
+SE to bottom right corner, the EMDOWN neuron will be more
+strongly activated to move down further from stronger SE->EA->EMDOWN. 
+so having plasticity onto the EA neuron will lead to  increased probability of an
+incorrect response in the second context. however, the middle Y->EA->EMDOWN
+will not be active, since paddle is in bottom right, counterbalancing the
+increase from SE->EA->EMDOWN. each of those synaptic inputs by themselves
+are ambiguous - what to do - but when they're both activated they will 
+be more likely to drive EMDOWN properly. since each of those inputs
+are ambiguous, it's likely that other combinations of inputs will
+later reduce those synaptic weights. so, any benefit from that
+could be short-lived. but difficult to predict and to rule out
+any benefit ... 
+
+** test similar model on gcp
+
+forgot to put AM,NM weights for EM -> EM recurrent
+connections in last sim on cycle  (20oct23_A0_cycle_)
+
+will add that here ... 
+
+run for 1000 s ... see how it does ... may want to scale up EA or EM populations later ... 
+
+20oct23_B0_gcp_
+
+./myrun 48 sn.json
+
+started ~22:22 ...
+
+firing rates get too high around 200 s ... need to put in (global) weight norm 
+
+* 20oct24
+** check output from 20oct23_A0_cycle_
+
+finished at 04:11 AM ... 
+
+python -i simdat.py backupcfg/20oct23_A0_cycle_sim.json
+
+ax=plotPerf(actreward,yl=(0,0.6))
+savefig(gifpath()+'perf.png') # [[./gif/20oct24_20oct23_A0_cycle_perf.png]]
+interesting, looks like a clear increase in hit/miss ratio
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((90e3,100e3))
+savefig(gifpath()+'rast.png') # [[./gif/20oct24_20oct23_A0_cycle_rast.png]]
+but firing rates seem too high ... 
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP'],lclr=['r','g','b'],plotindiv=True)
+xlabel('Time (ms)',fontsize=30); ylabel('Average weight',fontsize=30); tl(); 
+
+savefig(gifpath()+'all_avg_weight.png') # [[./gif/20oct24_20oct23_A0_cycle_all_avg_weight.png]]
+
+weights going straight up ... 
+
+fig=animInput(InputImages,gifpath()+'_input.mp4') # [[./gif/20oct24_20oct23_A0_cycle__input.mp4]]
+
+so, this sim looks interesting ... but probably need to include weight norm to prevent firing rates
+from getting too high ... 
+
+in this sim only had learning at EM synapses ... so may not need to adjust the normalization code 
+
+    "simtype": {
+        "ResumeSim": 1,
+        "ResumeSimFromFile": "data/20oct23_A0_cycle_synWeights_final.pkl"
+    },
+
+	"normalizeWeightsAtStart": 1,
+        "EEMPopNorm": 1,
+
+and use cmat[EA][EM][AM] for norm of populations ... 
+
+python multistepSim.py sn.json 32 5 20oct24_A1_cycle_multi
+
+each step only 200 s ... 
+
+started ~12:49 ... 
+
+sim.rank= 0 davg: {'EMUP': 0.00183445747841833, 'EMDOWN': 0.0018308646473646731, 'EA': 0.0}
+dfctr: {'EMUP': 0.32739277990298066, 'EMDOWN': 0.32739277990298066, 'EA': 0.32739277990298066}
+
+* 20oct26
+** check output from multistep sims with EA (20oct24_A1_cycle__step_3_)
+
+right now, it's at last step of multistep sim (20oct24_A1_cycle__step_4_)
+that sim will finish later today
+
+python -i simdat.py backupcfg/20oct24_A1_cycle__step_3_sim.json
+
+ax=plotPerf(actreward,yl=(0,0.6))
+savefig(gifpath()+'perf.png') # [[./gif/20oct26_20oct24_A1_cycle__step_3_perf.png]]
+hmm, perf much worse than first run ... so normalization might be problematic?
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((190e3,200e3))
+savefig(gifpath()+'rast.png') # [[./gif/20oct26_20oct24_A1_cycle__step_3_rast.png]]
+
+lfn = ['20oct23_A0_cycle_', '20oct24_A1_cycle__step_0_','20oct24_A1_cycle__step_1_','20oct24_A1_cycle__step_2_','20oct24_A1_cycle__step_3_']
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0,0.6))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/20oct26_20oct24_A1_cycle__step_3_perf_all_steps_so_far.png]]
+
+lpda = getindivactionreward(lfn)
+clf(); plotComparePerf(lpda,['g','b','r','c','m'],yl=(0,1),lleg=lfn)
+savefig(gifpath()+'perf_compareB.png') # [[./gif/20oct26_20oct24_A1_cycle__step_3_perf_compareB.png]]
+
+not clear if weight norm is the problem ... ?
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP'],lclr=['r','g','b'],plotindiv=True)
+xlabel('Time (ms)',fontsize=30); ylabel('Average weight',fontsize=30); tl(); 
+
+savefig(gifpath()+'all_avg_weight.png') 
+
+fig=animInput(InputImages,gifpath()+'_input.mp4')
