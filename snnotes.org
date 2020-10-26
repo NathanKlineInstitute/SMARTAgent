@@ -19435,3 +19435,6 @@ xlabel('Time (ms)',fontsize=30); ylabel('Average weight',fontsize=30); tl();
 savefig(gifpath()+'all_avg_weight.png') 
 
 fig=animInput(InputImages,gifpath()+'_input.mp4')
+
+...
+
