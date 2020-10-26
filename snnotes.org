@@ -19403,3 +19403,35 @@ started ~12:49 ...
 sim.rank= 0 davg: {'EMUP': 0.00183445747841833, 'EMDOWN': 0.0018308646473646731, 'EA': 0.0}
 dfctr: {'EMUP': 0.32739277990298066, 'EMDOWN': 0.32739277990298066, 'EA': 0.32739277990298066}
 
+* 20oct26
+** check output from multistep sims with EA (20oct24_A1_cycle__step_3_)
+
+right now, it's at last step of multistep sim (20oct24_A1_cycle__step_4_)
+that sim will finish later today
+
+python -i simdat.py backupcfg/20oct24_A1_cycle__step_3_sim.json
+
+ax=plotPerf(actreward,yl=(0,0.6))
+savefig(gifpath()+'perf.png') # [[./gif/20oct26_20oct24_A1_cycle__step_3_perf.png]]
+hmm, perf much worse than first run ... so normalization might be problematic?
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((190e3,200e3))
+savefig(gifpath()+'rast.png') # [[./gif/20oct26_20oct24_A1_cycle__step_3_rast.png]]
+
+lfn = ['20oct23_A0_cycle_', '20oct24_A1_cycle__step_0_','20oct24_A1_cycle__step_1_','20oct24_A1_cycle__step_2_','20oct24_A1_cycle__step_3_']
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0,0.6))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/20oct26_20oct24_A1_cycle__step_3_perf_all_steps_so_far.png]]
+
+lpda = getindivactionreward(lfn)
+clf(); plotComparePerf(lpda,['g','b','r','c','m'],yl=(0,1),lleg=lfn)
+savefig(gifpath()+'perf_compareB.png') # [[./gif/20oct26_20oct24_A1_cycle__step_3_perf_compareB.png]]
+
+not clear if weight norm is the problem ... ?
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP'],lclr=['r','g','b'],plotindiv=True)
+xlabel('Time (ms)',fontsize=30); ylabel('Average weight',fontsize=30); tl(); 
+
+savefig(gifpath()+'all_avg_weight.png') 
+
+fig=animInput(InputImages,gifpath()+'_input.mp4')
