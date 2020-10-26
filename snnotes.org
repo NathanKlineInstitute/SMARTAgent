@@ -19461,3 +19461,9 @@ python -i simdat.py backupcfg/20oct26_A0_lp_sim.json
 ax=plotPerf(actreward,yl=(0,0.6))
 savefig(gifpath()+'perf.png')
 
+** similar test on gcp (20oct26_A0_gcp_)
+
+./myrun 48 sn.json
+
+started ~16:56 ...
+
