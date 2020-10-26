@@ -19450,3 +19450,11 @@ either need more frequent norm or lower starting weights ... with sparser connec
 
 model is pretty slow to run already ... 
 
+** follow ball paradigm
+
+should probably look at distance relative to ball rather than movement command
+since movement command is internal state
+distance is dependent on external environment
+
+python -i simdat.py backupcfg/20oct26_A0_lp_sim.json
+

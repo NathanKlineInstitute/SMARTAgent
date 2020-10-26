@@ -430,7 +430,7 @@ class AIGame:
 
   def playGame (self, actions, epCount, simtime): #actions need to be generated from motor cortex
     # PLAY GAME
-    rewards = []; proposed_actions =[]; total_hits = []; Images = []
+    rewards = []; proposed_actions =[]; total_hits = []; Images = []; MovedCloser = False
     input_dim = self.input_dim
     done = False
     courtYRng, courtXRng, racketXRng = self.courtYRng, self.courtXRng, self.racketXRng # coordinate ranges for different objects (PONG-specific)    
@@ -454,11 +454,11 @@ class AIGame:
 
       if np.shape(self.last_obs)[0]>0: #if last_obs is not empty              
         xpos_Ball, ypos_Ball = self.findobj(self.last_obs, courtXRng, courtYRng) # get x,y positions of ball
-        xpos_Racket, ypos_Racket = self.findobj(self.last_obs, racketXRng, courtYRng) # get x,y positions of racket          
+        xpos_Racket, ypos_Racket = self.findobj(self.last_obs, racketXRng, courtYRng) # get x,y positions of racket
         #Now we know the position of racket relative to the ball. We can suggest the action for the racket so that it doesn't miss the ball.
         #For the time being, I am implementing a simple rule i.e. based on only the ypos of racket relative to the ball
         if ypos_Ball==-1: #guess about proposed move can't be made because ball was not visible in the court
-          proposed_action = -1 #no valid action guessed        
+          proposed_action = -1 #no valid action guessed
         elif ypos_Racket>ypos_Ball: #if the racket is lower than the ball the suggestion is to move up
           proposed_action = dconf['moves']['UP'] #move up
         elif ypos_Racket<ypos_Ball: #if the racket is higher than the ball the suggestion is to move down
@@ -522,6 +522,9 @@ class AIGame:
             proposed_action = dconf['moves']['DOWN'] #move down
           else:
             proposed_action = dconf['moves']['NOMOVE'] #no move
+          YDist = abs(ypos_Racket - predY) # pre-move distance to predicted y intercept
+          YDist2 = abs(ypos_Racket2 - predY) # post-move distance to predicted y intercept
+          if YDist2 < YDist or YDist2 == 0: MovedCloser = True
 
       ball_hits_racket = 0
       # previously I assumed when current_ball_dir is 0 there is no way to find out if the ball hit the racket
@@ -587,5 +590,5 @@ class AIGame:
       print('ERROR COMPUTING NUMBER OF HITS')
     for r in range(len(rewards)):
       if rewards[r]==-1: total_hits[r]=-1 #when the ball misses the racket, the reward is -1
-    return rewards, epCount, proposed_actions, total_hits
+    return rewards, epCount, proposed_actions, total_hits, MovedCloser
             

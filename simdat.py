@@ -110,7 +110,7 @@ def loadsimdat (name=None,getactmap=True,lpop = allpossible_pops): # load simula
       pdf = readinweights(name,final=True)
     except:
       pass
-  actreward = pd.DataFrame(np.loadtxt('data/'+name+'ActionsRewards.txt'),columns=['time','action','reward','proposed','hit'])
+  actreward = pd.DataFrame(np.loadtxt('data/'+name+'ActionsRewards.txt'),columns=['time','action','reward','proposed','hit','movedcloser'])
   dnumc = {}
   for p in simConfig['net']['pops'].keys():
     if p in dstartidx:
@@ -525,7 +525,10 @@ def plotFollowBall (actreward, ax=None,cumulative=True,msz=3,binsz=1e3,color='r'
   if ax is None: ax = gca()
   ax.plot([0,np.amax(actreward.time)],[0.5,0.5],'--',color='gray')    
   allproposed = actreward[(actreward.proposed!=-1)] # only care about cases when can suggest a proposed action
-  rewardingActions = np.where(allproposed.proposed-allproposed.action==0,1,0)
+  if dconf['useFollowMoveOutput']:
+    rewardingActions = np.where(allproposed.movedcloser==1,1,0)  
+  else:
+    rewardingActions = np.where(allproposed.proposed-allproposed.action==0,1,0)
   if cumulative:
     rewardingActions = np.cumsum(rewardingActions) # cumulative of rewarding action
     cumActs = np.array(range(1,len(allproposed)+1))
