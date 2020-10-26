@@ -19458,3 +19458,6 @@ distance is dependent on external environment
 
 python -i simdat.py backupcfg/20oct26_A0_lp_sim.json
 
+ax=plotPerf(actreward,yl=(0,0.6))
+savefig(gifpath()+'perf.png')
+
