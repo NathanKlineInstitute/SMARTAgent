@@ -97,7 +97,10 @@ class AIGame:
     else:  
       self.input_dim = int(np.sqrt(dconf['net']['allpops'][self.InputPop])) # input image XY plane width,height -- not used anywhere    
     self.locationNeuronRate = dconf['net']['LocMaxRate']
-    self.dirSensitiveNeuronDim = int(np.sqrt(dconf['net']['allpops']['EV1DE'])) # direction sensitive neuron XY plane width,height
+    if self.reducedNet:
+      self.dirSensitiveNeuronDim = 20 #Assuming the downscaling factor is 8.
+    else:
+      self.dirSensitiveNeuronDim = int(np.sqrt(dconf['net']['allpops']['EV1DE'])) # direction sensitive neuron XY plane width,height
     self.dirSensitiveNeuronRate = (dconf['net']['DirMinRate'], dconf['net']['DirMaxRate']) # min, max firing rate (Hz) for dir sensitive neurons
     self.FiringRateCutoff = dconf['net']['FiringRateCutoff']
     self.intaction = int(dconf['actionsPerPlay']) # integrate this many actions together before returning reward information to model
@@ -192,24 +195,39 @@ class AIGame:
     # update input rates to retinal neurons
     #fr_Images = np.where(dsum_Images>1.0,100,dsum_Images) #Using this to check what number would work for firing rate
     #fr_Images = np.where(dsum_Images<10.0,0,dsum_Images)
-    if self.reducedNet:
+    if self.reducedNet>0:
       if dconf['net']['useBinaryImage']:
         thresh = threshold_otsu(dsum_Images)
         binary_Image = dsum_Images > thresh
-        fr_Image = np.zeros(shape=(self.input_dim,3))
-        fr_Images_RO = self.locationNeuronRate*sum(binary_Image[:,0:self.courtXRng[0]-1],1)
-        fr_Images_Ball = self.locationNeuronRate*sum(binary_Image[:,self.courtXRng[0]:self.courtXRng[0]],1)
-        fr_Images_RM = self.locationNeuronRate*sum(binary_Image[:,self.courtXRng[1]+1:-1],1)
-        fr_Image[:,0] = fr_Images_RO
-        fr_Image[:,1] = fr_Images_Ball
-        fr_Image[:,2] = fr_Images_RM
+        if dconf['sim']['captureTwoObjs']:
+          fr_Images = np.zeros(shape=(20,2))
+          fr_Images_Ball = self.locationNeuronRate*np.sum(binary_Image[:,3:17],1)
+          fr_Images_RM = self.locationNeuronRate*np.sum(binary_Image[:,17:],1)
+          fr_Images[:,0] = fr_Images_Ball
+          fr_Images[:,1] = fr_Images_RM
+          print(fr_Images)        
+        else:
+          fr_Images = np.zeros(shape=(20,3))
+          #print('Image:',binary_Image)
+          fr_Images_RO = self.locationNeuronRate*np.sum(binary_Image[:,0:3],1)
+          print('RO:',fr_Images_RO)
+          #print('Ball:',binary_Image[:,self.courtXRng[0]:self.courtXRng[1]])
+          fr_Images_Ball = self.locationNeuronRate*np.sum(binary_Image[:,3:17],1)
+          print(fr_Images_Ball)
+          fr_Images_RM = self.locationNeuronRate*np.sum(binary_Image[:,17:],1)
+          print('RM:',fr_Images_RM)
+          fr_Images[:,0] = fr_Images_RO
+          fr_Images[:,1] = fr_Images_Ball
+          fr_Images[:,2] = fr_Images_RM
+          print(fr_Images)
       else:
         dsum_Images = dsum_Images - np.amin(dsum_Images)
         dsum_Images = (255.0/np.amax(dsum_Images))*dsum_Images
-        fr_Images = self.locationNeuronRate/(1+np.exp((np.multiply(-1,dsum_Images)+123)/10))
-        fr_Image[:,0] = sum(fr_Images[:,0:self.courtXRng[0]-1],1) # opponent racket y loc
-        fr_Image[:,1] = sum(fr_Images[:,self.courtXRng[0]:self.courtXRng[1]],1) # ball y loc
-        fr_Image[:,2] = sum(fr_Images[:,self.courtXRng[1]+1:-1],1) # model racket y loc
+        fr_Image = self.locationNeuronRate/(1+np.exp((np.multiply(-1,dsum_Images)+123)/10))
+        fr_Images = np.zeros(shape=(20,3))
+        fr_Images[:,0] = np.sum(fr_Image[:,0:3],1) # opponent racket y loc
+        fr_Images[:,1] = np.sum(fr_Image[:,3:17],1) # ball y loc
+        fr_Images[:,2] = np.sum(fr_Image[:,17:],1) # model racket y loc
         #fr_Images = np.subtract(fr_Images,np.min(fr_Images)) #baseline firing rate subtraction. Instead all excitatory neurons are firing at 5Hz.
         #print(np.amax(fr_Images))
     else:
@@ -284,8 +302,9 @@ class AIGame:
       AngRFSigma2 = self.AngRFSigma2
       MaxRate = self.dirSensitiveNeuronRate[1]
       for pop in self.ldirpop: self.dFiringRates[pop] = self.dirSensitiveNeuronRate[0] * np.ones(shape=(1,1)) # should have a single angle per direction selective neuron pop
-      court_motiondir = motiondir[:,self.courtXRng[0]:self.courtXRng[1]] # only motion direction of ball in the court
-      unique_angles = np.unique(court_motiondir)
+      court_motiondir = motiondir[:,4:16] # only motion direction of ball in the court
+      unique_angles = np.unique(np.floor(court_motiondir))
+      print('angles:',unique_angles)
       for a in unique_angles:
         if a >= 0.0:
           for pop in self.ldirpop:
@@ -295,6 +314,7 @@ class AIGame:
               self.dFiringRates[pop][0] += MaxRate * fctr
             else:
               self.dFiringRates[pop][0] = MaxRate
+      print(self.dFiringRates)
     else:
       dirSensitiveNeuronDim = self.dirSensitiveNeuronDim
       if motiondir.shape[0] != dirSensitiveNeuronDim or motiondir.shape[1] != dirSensitiveNeuronDim:

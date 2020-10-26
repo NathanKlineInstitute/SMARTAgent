@@ -8440,3 +8440,128 @@ def createConnListV1toEA(NBpreN,NBobjs): # This function is hard coded.... Not s
 
 
 -- nothing tested....
+
+* 20Oct21
+
+-- may be keep the reduced network model simple and dont include any recurrent connections or feedback connections.
+.... we should have those included once understand the dynamics (pop firing rates etc) of the reduced network.
+
+-- change "EEPreMProb" to "EEPreAProb" and set it to "EEPreAProb": 0.0 (want to test network with on FF conns)
+
+-- if VTopoI    to    if VTopoI and dconf['sim']['useReducedNetwork']==0
+
+-- TODO: should include connCoords for createConnListV1toEA function.
+
+-- for now only using AMPA syns for V1toEA and V1DirtoEA.
+
+-- tried running but seems like too many connections to be established on local machine.
+... may be "EEMProb": 0.3 is too high, will change it to 0.0003
+... still taking so much long time. may be the problem is somewhere else....
+
+
+* 20Oct22
+
+-- primarliy debugging to make sure that reduced model runs before tuning the parameters.
+
+-- looks like there was no problem with the connections. Just that with recurrent connections, there were too many connections to take care.
+
+Creating network of 26 cell populations on 1 hosts...
+  Number of cells on node 0: 64968 
+  Done; cell creation time = 26.49 s.
+Making connections...
+  Number of connections on node 0: 13161070 
+  Number of synaptic contacts on node 0: 18281070 
+  Done; cell connection time = 2902.55 s.
+Adding stims...
+  Number of stims on node 0: 68 
+  Done; cell stims creation time = 0.51 s.
+Recording 8 traces of 1 types on node 0
+
+... removing Feedback and recurrent connections by setting probs to 0, it took about 10 mins. and then there was some bug in aigame.py.
+
+Creating network of 26 cell populations on 1 hosts...
+  Number of cells on node 0: 64968 
+  Done; cell creation time = 29.86 s.
+Making connections...
+  Number of connections on node 0: 8041070 
+  Done; cell connection time = 581.51 s.
+Adding stims...
+  Number of stims on node 0: 68 
+  Done; cell stims creation time = 0.29 s.
+Recording 8 traces of 1 types on node 0
+
+-- so once the connections were established found a couple of more bugs related to reduced network model in aigame.py
+
+-- one problem was using the coordinates to split the ylocs of two rackets and a ball.
+.... i was using coordinates considering full image but firingrates for loc (for driving EV1) were computed using downsampled image.
+.... therefore i changed the coordinates to
+fr_Images_RO = self.locationNeuronRate*np.sum(binary_Image[:,0:3],1)
+fr_Images_Ball = self.locationNeuronRate*np.sum(binary_Image[:,3:17],1)
+fr_Images_RM = self.locationNeuronRate*np.sum(binary_Image[:,17:],1)
+
+-- fixed some minor typos.
+
+-- reduced model seems to be running. will keep testing more.
+
+-- the model is annoyingly slow now. should run on cluster and start tuning parameters.
+
+-- run 100sec sim "20oct22_A0_game_falcor_" to see the results. (will start tuning afterwards)
+... EEMProb = 0.2
+-- pushed sim.json has EEMProb = 0 ---> Change it to 0.2 and run.
+
+-- run 100sec sim "20oct22_A0_game_cycle_" to see the results. (will start tuning afterwards)
+... i think i used targetedRL for this sim.
+... EEMProb = 0.2
+
+-- Looks like EEMProb of 0.2 is not producing any actions.
+... probably too much drive causing depolarization block.... needs to be checked.....
+
+* 20Oct23
+
+-- No activity observed in 'EA' in sim "20oct22_A0_game_cycle_"
+change dconf['net']['EEAWghtAM'] from "EEAWghtAM": 2e-05 to "EEAWghtAM": 2e-04
+and rerun sim for 10sec. 
+
+-- run sim "20oct23_A0_game_cycle_" by increase EEAWghtAM from 2e-5 to 2e-4 to see if this is enough to relay information from V1 to EA>
+
+-- terminate sim "20oct22_A0_game_falcor_" and rerun in "20oct23_A0_game_falcor_" with "EEAWghtAM": 2e-04
+
+-- should have an option to run even simpler network with only ball and model racket represented.....
+
+        if dconf['net']['captureTwoObjs']:
+          fr_Images = np.zeros(shape=(20,2))
+          fr_Images_Ball = self.locationNeuronRate*np.sum(binary_Image[:,3:17],1)
+          fr_Images_RM = self.locationNeuronRate*np.sum(binary_Image[:,17:],1)
+          fr_Images[:,0] = fr_Images_Ball
+          fr_Images[:,1] = fr_Images_RM
+          print(fr_Images)        
+
+-- make sure to use 40 neurons for EV1 when using reduced network capturing ball and model racket.
+... also have another function in connUtils.py to have connectivity from V1 and V1DIR to EA.
+-- make sure to use 60 neurons for EV1 when using reduced network capturing opponent racket, ball and model racket.
+
+-- poor coding choice ... may be should fix it...
+
+  if dconf['sim']['captureTwoObjs']:
+    cLV1toEA, cLV1DEtoEA, cLV1DNEtoEA, cLV1DNtoEA, cLV1DNWtoEA, cLV1DWtoEA, cLV1DSWtoEA, cLV1DStoEA, cLV1DSEtoEA = createConnListV1toEA2(dnumc['EV1'],2) # 3 objects in the game
+  else:
+    cLV1toEA, cLV1DEtoEA, cLV1DNEtoEA, cLV1DNtoEA, cLV1DNWtoEA, cLV1DWtoEA, cLV1DSWtoEA, cLV1DStoEA, cLV1DSEtoEA = createConnListV1toEA(dnumc['EV1'],3) # 3 objects in the game
+
+-- use "EA":64000 when "EV1":60 representing 3 objects (20+20+20) NB associations: 20x20x20x8 = 64000
+-- use "EA":3200 when "EV1":60 representing 2 objects (20+20) NB associations: 20x20x8 = 3200 
+
+
+-- I THINK THERE IS A BUG IN MOTIONDIRECTION CODE FOR REDUCEDNETWORK MODEL.....
+-- Found the bug.... it was related to dirSensitiveNeuronDim.
+... the code was written assuming we will use direction sensitive neurons encoding direction of objects at their locations.
+
+... for reduced model, we are using 1 neuron to encode 1 directions so in total 8 neurons to encode 8 directions 
+... also the direction is encoded only for the ball. 
+
+... the quick fix to the problem is below....
+    if self.reducedNet:
+      self.dirSensitiveNeuronDim = 20 #Assuming the downscaling factor is 8.
+    else:
+      self.dirSensitiveNeuronDim = int(np.sqrt(dconf['net']['allpops']['EV1DE']))
+
+-- still tuning parameters.....

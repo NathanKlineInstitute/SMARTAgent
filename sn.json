@@ -56,7 +56,7 @@
         "tstepPerAction": 20,
         "saveWeights": 1,
         "saveAssignedFiringRates": 0,
-	"useReducedNetwork": 0
+	      "useReducedNetwork": 0
     },
     "architectureVtoA": {
         "useProbabilistic": 1,

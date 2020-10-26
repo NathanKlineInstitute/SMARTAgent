@@ -298,7 +298,10 @@ for ty,sy in zip(["E","I"],["AMPA","GABA"]):
 #Feedforward excitation
 #E to E - Feedforward connections
 if dconf['sim']['useReducedNetwork']:
-  cLV1toEA, cLV1DEtoEA, cLV1DNEtoEA, cLV1DNtoEA, cLV1DNWtoEA, cLV1DWtoEA, cLV1DSWtoEA, cLV1DStoEA, cLV1DSEtoEA = createConnListV1toEA(dnumc['EV1'],3) # 3 objects in the game
+  if dconf['sim']['captureTwoObjs']:
+    cLV1toEA, cLV1DEtoEA, cLV1DNEtoEA, cLV1DNtoEA, cLV1DNWtoEA, cLV1DWtoEA, cLV1DSWtoEA, cLV1DStoEA, cLV1DSEtoEA = createConnListV1toEA2(dnumc['EV1'],2) # 3 objects in the game
+  else:
+    cLV1toEA, cLV1DEtoEA, cLV1DNEtoEA, cLV1DNtoEA, cLV1DNWtoEA, cLV1DWtoEA, cLV1DSWtoEA, cLV1DStoEA, cLV1DSEtoEA = createConnListV1toEA(dnumc['EV1'],3) # 3 objects in the game
   #cLV1toEA, cLV1DEtoEA, cLV1DNEtoEA, cLV1DNtoEA, cLV1DNWtoEA, cLV1DWtoEA, cLV1DSWtoEA, cLV1DStoEA, cLV1DSEtoEA = createConnListV1toEA(60,3)
 else:
   if dnumc['ER']>0: blistERtoEV1, connCoordsERtoEV1 = connectLayerswithOverlap(NBpreN = dnumc['ER'], NBpostN = dnumc['EV1'], overlap_xdir = dtopolconvcons['ER']['EV1'], padded_preneurons_xdir = dnumc_padx['ER'], padded_postneurons_xdir = dnumc_padx['EV1'])
@@ -398,7 +401,7 @@ if dnumc['ER']>0:
           'weight': 0.02 * cfg.EIGain,
           'delay': 2,
           'synMech': 'AMPA', 'sec':'soma', 'loc':0.5}
-  if VTopoI: netParams.connParams['ER->IR']['connList'] = blistERtoIR
+  if VTopoI and dconf['sim']['useReducedNetwork']==0: netParams.connParams['ER->IR']['connList'] = blistERtoIR
   else: netParams.connParams['ER->IR']['convergence'] = prob2conv(0.0225, dnumc['EV1'])
   
 netParams.connParams['EV1->IV1'] = {
@@ -408,7 +411,7 @@ netParams.connParams['EV1->IV1'] = {
         'delay': 2,
         'synMech': 'AMPA', 'sec':'soma', 'loc':0.5}
 
-if VTopoI:
+if VTopoI and dconf['sim']['useReducedNetwork']==0:
   netParams.connParams['EV1->IV1']['connList'] = blistEV1toIV1
   sim.topologicalConns['EV1->IV1'] = {'blist':blistEV1toIV1, 'coords':connCoordsEV1toIV1}
 else:
@@ -436,7 +439,7 @@ netParams.connParams['EV4->IV4'] = {
         'delay': 2,
         'synMech': 'AMPA', 'sec':'soma', 'loc':0.5}
 
-if VTopoI: 
+if VTopoI and dconf['sim']['useReducedNetwork']==0: 
   netParams.connParams['EV4->IV4']['connList'] = blistEV4toIV4
   sim.topologicalConns['EV4->IV4'] = {'blist':blistEV4toIV4, 'coords':connCoordsEV4toIV4}
 else: 
@@ -449,7 +452,7 @@ netParams.connParams['EMT->IMT'] = {
         'delay': 2,
         'synMech': 'AMPA', 'sec':'soma', 'loc':0.5}
 
-if VTopoI: 
+if VTopoI and dconf['sim']['useReducedNetwork']==0: 
   netParams.connParams['EMT->IMT']['connList'] = blistEMTtoIMT
   sim.topologicalConns['EMT->IMT'] = {'blist':blistEMTtoIMT, 'coords':connCoordsEMTtoIMT}
 else: 
@@ -537,7 +540,7 @@ if dnumc['ER']>0:
           'delay': 2,
           'synMech': 'GABA', 'sec':'soma', 'loc':0.5}
   
-  if VTopoI: 
+  if VTopoI and dconf['sim']['useReducedNetwork']==0: 
     netParams.connParams['IR->ER']['connList'] = blistIRtoER
     sim.topologicalConns['IR->ER'] = {'blist':blistIRtoER, 'coords':connCoordsIRtoER}
   else: 
@@ -550,7 +553,7 @@ netParams.connParams['IV1->EV1'] = {
   'delay': 2,
   'synMech': 'GABA', 'sec':'soma', 'loc':0.5}
 
-if VTopoI: 
+if VTopoI and dconf['sim']['useReducedNetwork']==0: 
   netParams.connParams['IV1->EV1']['connList'] = blistIV1toEV1
   sim.topologicalConns['IV1->EV1'] = {'blist':blistIV1toEV1, 'coords':connCoordsIV1toEV1}
 else: 
@@ -576,7 +579,7 @@ netParams.connParams['IV4->EV4'] = {
         'delay': 2,
         'synMech': 'GABA', 'sec':'soma', 'loc':0.5}
 
-if VTopoI: 
+if VTopoI and dconf['sim']['useReducedNetwork']==0: 
   netParams.connParams['IV4->EV4']['connList'] = blistIV4toEV4
   sim.topologicalConns['IV4->EV4'] = {'blist':blistIV4toEV4, 'coords':connCoordsIV4toEV4}
 else: 
@@ -589,7 +592,7 @@ netParams.connParams['IMT->EMT'] = {
         'delay': 2,
         'synMech': 'GABA', 'sec':'soma', 'loc':0.5}
 
-if VTopoI: 
+if VTopoI and dconf['sim']['useReducedNetwork']==0: 
   netParams.connParams['IMT->EMT']['connList'] = blistIMTtoEMT
   sim.topologicalConns['IMT->EMT'] = {'blist':blistIMTtoEMT, 'coords':connCoordsIMTtoEMT}
 else: 
@@ -635,37 +638,38 @@ for IType in ITypes:
 
 #E to E feedforward connections - AMPA,NMDA
 lprety,lpoty,lblist,lconnsCoords,lprob = [],[],[],[],[]
-if dnumc['ER']>0:
-  lprety.append('ER')
-  lpoty.append('EV1')
-  lblist.append(blistERtoEV1)
-  lprob.append(cmat['ER']['EV1']['p'])
-  lconnsCoords.append(connCoordsERtoEV1)
-lprety.append('EV1'); lpoty.append('EV4'); lblist.append(blistEV1toEV4); lprob.append(cmat['EV1']['EV4']['p']); lconnsCoords.append(connCoordsEV1toEV4)
-lprety.append('EV4'); lpoty.append('EMT'); lblist.append(blistEV4toEMT); lprob.append(cmat['EV4']['EMT']['p']); lconnsCoords.append(connCoordsEV4toEMT)
-for prety,poty,blist,prob,connCoords in zip(lprety,lpoty,lblist,lprob,lconnsCoords):  
-  for strty,synmech,weight in zip(['','n'],['AMPA', 'NMDA'],[cmat[prety][poty]['AM']*cfg.EEGain, cmat[prety][poty]['NM']*cfg.EEGain]):
-    k = strty+prety+'->'+strty+poty
-    netParams.connParams[k] = {
+if not dconf['sim']['useReducedNetwork']:
+  if dnumc['ER']>0:
+    lprety.append('ER')
+    lpoty.append('EV1')
+    lblist.append(blistERtoEV1)
+    lprob.append(cmat['ER']['EV1']['p'])
+    lconnsCoords.append(connCoordsERtoEV1)
+  lprety.append('EV1'); lpoty.append('EV4'); lblist.append(blistEV1toEV4); lprob.append(cmat['EV1']['EV4']['p']); lconnsCoords.append(connCoordsEV1toEV4)
+  lprety.append('EV4'); lpoty.append('EMT'); lblist.append(blistEV4toEMT); lprob.append(cmat['EV4']['EMT']['p']); lconnsCoords.append(connCoordsEV4toEMT)
+  for prety,poty,blist,prob,connCoords in zip(lprety,lpoty,lblist,lprob,lconnsCoords):  
+    for strty,synmech,weight in zip(['','n'],['AMPA', 'NMDA'],[cmat[prety][poty]['AM']*cfg.EEGain, cmat[prety][poty]['NM']*cfg.EEGain]):
+      k = strty+prety+'->'+strty+poty
+      netParams.connParams[k] = {
             'preConds': {'pop': prety},
             'postConds': {'pop': poty},
             'weight': weight ,
             'delay': 2,
             'synMech': synmech,'sec':EExcitSec, 'loc':0.5}
-    if VTopoI: # topological connections
-      netParams.connParams[k]['connList'] = blist
-      sim.topologicalConns[prety+'->'+poty] = {}
-      sim.topologicalConns[prety+'->'+poty]['blist'] = blist
-      sim.topologicalConns[prety+'->'+poty]['coords'] = connCoords
-    else: # random connectivity
-      netParams.connParams[k]['convergence'] = prob2conv(prob,dnumc[prety])
-    if dconf['net']['RLconns']['Visual'] and dSTDPparamsRL[synmech]['RLon']: # only turn on plasticity when specified to do so
-      netParams.connParams[k]['weight'] = getInitWeight(weight) # make sure non-uniform weights
-      netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL[synmech]}
-    elif dconf['net']['STDPconns']['Visual'] and dSTDPparams[synmech]['STDPon']:
-      netParams.connParams[k]['weight'] = getInitWeight(weight) # make sure non-uniform weights
-      netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparams[synmech]}
-    
+      if VTopoI: # topological connections
+        netParams.connParams[k]['connList'] = blist
+        sim.topologicalConns[prety+'->'+poty] = {}
+        sim.topologicalConns[prety+'->'+poty]['blist'] = blist
+        sim.topologicalConns[prety+'->'+poty]['coords'] = connCoords
+      else: # random connectivity
+        netParams.connParams[k]['convergence'] = prob2conv(prob,dnumc[prety])
+      if dconf['net']['RLconns']['Visual'] and dSTDPparamsRL[synmech]['RLon']: # only turn on plasticity when specified to do so
+        netParams.connParams[k]['weight'] = getInitWeight(weight) # make sure non-uniform weights
+        netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL[synmech]}
+      elif dconf['net']['STDPconns']['Visual'] and dSTDPparams[synmech]['STDPon']:
+        netParams.connParams[k]['weight'] = getInitWeight(weight) # make sure non-uniform weights
+        netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparams[synmech]}
+
 """
 # these all have 0 weight, dont set them up - though no harm in setting them up
 #E to I feedforward connections
@@ -695,7 +699,7 @@ netParams.connParams['EV4->IMT'] = {
         'synMech': 'AMPA','sec':'soma', 'loc':0.5}
 """
 
-if dconf['net']['VisualFeedback']:
+if dconf['net']['VisualFeedback'] and not dconf['sim']['useReducedNetwork']:
   # visual area feedback connections
   pretyList = ['EV1','EV4','EMT']
   potyList = ['ER','EV1','EV4']
@@ -752,14 +756,17 @@ if dconf['net']['VisualFeedback']:
   sim.topologicalConns['IMT->EV4'] = {'blist':blistIMTtoEV4, 'coords':connCoordsIMTtoEV4}
 
 #I to I - between areas
-netParams.connParams['IV1->IV4'] = {
+if dconf['sim']['useReducedNetwork']==0:
+  netParams.connParams['IV1->IV4'] = {
         'preConds': {'pop': 'IV1'},
         'postConds': {'pop': 'IV4'},
         'connList': blistIV1toIV4,
         'weight': cmat['IV1']['IV4']['GA'] * cfg.IIGain,
         'delay': 2,
         'synMech': 'GABA','sec':'soma', 'loc':0.5}
+
 sim.topologicalConns['IV1->IV4'] = {'blist':blistIV1toIV4, 'coords':connCoordsIV1toIV4}
+
 netParams.connParams['IV4->IMT'] = {
         'preConds': {'pop': 'IV4'},
         'postConds': {'pop': 'IMT'},
@@ -769,60 +776,156 @@ netParams.connParams['IV4->IMT'] = {
         'synMech': 'GABA','sec':'soma', 'loc':0.5}
 sim.topologicalConns['IV4->IMT'] = {'blist':blistIV4toIMT, 'coords':connCoordsIV4toIMT}
 
-
-def connectEVToTarget (lpoty, useTopological):
-  # connect excitatory visual area neurons to list of postsynaptic types (lpoty)
-  for prety in EVPops:
-    if dnumc[prety] <= 0: continue
-    for poty in lpoty:
-      if dnumc[poty] <= 0: continue
-      suffix = 'M'      
-      if poty == 'EA': suffix = 'A'      
-      if useTopological:
-        try: div = dconf['net']['alltopoldivcons'][prety][poty]
-        except: div = 3
-        # BE CAREFUL. THERE IS ALWAYS A CHANCE TO USE dnumc[prety] nad dnumc[poty] that produces inaccuracies.
-        # works fine if used in multiples (400->100; 100->400; 100->100).
-        blist = []
-        connCoords = []        
-        if dconf['net']['allpops'][prety]==dconf['net']['allpops'][poty] or dconf['net']['allpops'][prety]>dconf['net']['allpops'][poty]: 
-          blist, connCoords = connectLayerswithOverlap(NBpreN=dnumc[prety],NBpostN=dnumc[poty],overlap_xdir = dtopolconvcons[prety][poty], \
-                                           padded_preneurons_xdir = dnumc_padx[prety], padded_postneurons_xdir = dnumc_padx[poty])
-        elif dconf['net']['allpops'][prety]<dconf['net']['allpops'][poty]:
-          blist, connCoords = connectLayerswithOverlapDiv(NBpreN=dnumc[prety],NBpostN=dnumc[poty],overlap_xdir = dtopoldivcons[prety][poty], \
-                                              padded_preneurons_xdir = dnumc_padx[prety], padded_postneurons_xdir = dnumc_padx[poty])
-          print(prety,poty,blist)
-        sim.topologicalConns[prety+'->'+poty] = {'blist':blist,'coords':connCoords}          
-      prob = cmat['VD'][poty]['p'] # connection probability (not used when topological connectivity on)
-      lsynw = [cmat['VD'][poty]['AM']*cfg.EEGain, cmat['VD'][poty]['NM']*cfg.EEGain]
-      if prety in EVLocPops:
-        lsynw = [cmat['VL'][poty]['AM']*cfg.EEGain, cmat['VL'][poty]['NM']*cfg.EEGain]
-        prob = cmat['VL'][poty]['p']          
-      for strty,synmech,weight in zip(['','n'],['AMPA', 'NMDA'],lsynw):        
-        k = strty+prety+'->'+strty+poty
-        netParams.connParams[k] = {
-          'preConds': {'pop': prety},
-          'postConds': {'pop': poty},
-          'weight': getInitWeight(weight),
-          'delay': 2,
-          'synMech': synmech,
-          'sec':EExcitSec, 'loc':0.5
-        }
+def connectEVToTarget (lpoty, useTopological):  
+  if dconf['sim']['useReducedNetwork']:    
+    print(cLV1toEA)
+    synmech = 'AMPA'
+    weight = dconf['net']['EEAWghtAM']*cfg.EEGain
+    netParams.connParams['EV1->EA'] = {
+        'preConds': {'pop': 'EV1'},
+        'postConds': {'pop': 'EA'},
+        'connList': cLV1toEA, 
+        'weight': getInitWeight(weight),
+        'delay': 2,
+        'synMech': synmech,
+        'sec':EExcitSec, 'loc':0.5
+    }
+    if dconf['net']['RLconns']['FeedForwardLocNtoA'] and dSTDPparamsRL[synmech]['RLon']: 
+      netParams.connParams['EV1->EA']['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL[synmech]}
+    elif dconf['net']['STDPconns']['FeedForwardLocNtoA'] and dSTDPparams[synmech]['STDPon']:
+      netParams.connParams['EV1->EA']['plast'] = {'mech': 'STDP', 'params': dSTDPparams[synmech]}
+    netParams.connParams['EV1DE->EA'] = {
+        'preConds': {'pop': 'EV1DE'},
+        'postConds': {'pop': 'EA'},
+        'connList': cLV1DEtoEA, 
+        'weight': getInitWeight(weight),
+        'delay': 2,
+        'synMech': synmech,
+        'sec':EExcitSec, 'loc':0.5
+    }
+    netParams.connParams['EV1DNE->EA'] = {
+        'preConds': {'pop': 'EV1DNE'},
+        'postConds': {'pop': 'EA'},
+        'connList': cLV1DNEtoEA, 
+        'weight': getInitWeight(weight),
+        'delay': 2,
+        'synMech': synmech,
+        'sec':EExcitSec, 'loc':0.5
+    }
+    netParams.connParams['EV1DN->EA'] = {
+        'preConds': {'pop': 'EV1DN'},
+        'postConds': {'pop': 'EA'},
+        'connList': cLV1DNtoEA, 
+        'weight': getInitWeight(weight),
+        'delay': 2,
+        'synMech': synmech,
+        'sec':EExcitSec, 'loc':0.5
+    }
+    netParams.connParams['EV1DNW->EA'] = {
+        'preConds': {'pop': 'EV1DNW'},
+        'postConds': {'pop': 'EA'},
+        'connList': cLV1DNWtoEA, 
+        'weight': getInitWeight(weight),
+        'delay': 2,
+        'synMech': synmech,
+        'sec':EExcitSec, 'loc':0.5
+    }
+    netParams.connParams['EV1DW->EA'] = {
+        'preConds': {'pop': 'EV1DW'},
+        'postConds': {'pop': 'EA'},
+        'connList': cLV1DWtoEA, 
+        'weight': getInitWeight(weight),
+        'delay': 2,
+        'synMech': synmech,
+        'sec':EExcitSec, 'loc':0.5
+    }
+    netParams.connParams['EV1DSW->EA'] = {
+        'preConds': {'pop': 'EV1DSW'},
+        'postConds': {'pop': 'EA'},
+        'connList': cLV1DSWtoEA, 
+        'weight': getInitWeight(weight),
+        'delay': 2,
+        'synMech': synmech,
+        'sec':EExcitSec, 'loc':0.5
+    }
+    netParams.connParams['EV1DS->EA'] = {
+        'preConds': {'pop': 'EV1DS'},
+        'postConds': {'pop': 'EA'},
+        'connList': cLV1DStoEA, 
+        'weight': getInitWeight(weight),
+        'delay': 2,
+        'synMech': synmech,
+        'sec':EExcitSec, 'loc':0.5
+    }
+    netParams.connParams['EV1DSE->EA'] = {
+        'preConds': {'pop': 'EV1DSE'},
+        'postConds': {'pop': 'EA'},
+        'connList': cLV1DSEtoEA, 
+        'weight': getInitWeight(weight),
+        'delay': 2,
+        'synMech': synmech,
+        'sec':EExcitSec, 'loc':0.5
+    }
+    ldirconns = ['EV1DE->EA','EV1DNE->EA','EV1DN->EA','EV1DNW->EA','EV1DW->EA','EV1DSW->EA','EV1DS->EA','EV1DSE->EA']
+    if dconf['net']['RLconns']['FeedForwardDirNtoA'] and dSTDPparamsRL[synmech]['RLon']:
+      for dirconns in ldirconns: 
+        netParams.connParams[dirconns]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL[synmech]}
+    elif dconf['net']['STDPconns']['FeedForwardDirNtoA'] and dSTDPparams[synmech]['STDPon']:
+      for dirconns in ldirconns:
+        netParams.connParams[dirconns]['plast'] = {'mech': 'STDP', 'params': dSTDPparams[synmech]}    
+  else:
+    # connect excitatory visual area neurons to list of postsynaptic types (lpoty)
+    for prety in EVPops:
+      if dnumc[prety] <= 0: continue
+      for poty in lpoty:
+        if dnumc[poty] <= 0: continue
+        suffix = 'M'      
+        if poty == 'EA': suffix = 'A'      
         if useTopological:
-          netParams.connParams[k]['connList'] = blist
-        else:
-          netParams.connParams[k]['convergence'] = prob2conv(prob, dnumc[prety])          
-        useRL = useSTDP = False
-        if prety in EVDirPops:
-          if dconf['net']['RLconns']['FeedForwardDirNto'+suffix]: useRL = True
-          if dconf['net']['STDPconns']['FeedForwardDirNto'+suffix]: useSTDP = True          
+          try: div = dconf['net']['alltopoldivcons'][prety][poty]
+          except: div = 3          
+          # BE CAREFUL. THERE IS ALWAYS A CHANCE TO USE dnumc[prety] nad dnumc[poty] that produces inaccuracies.
+          # works fine if used in multiples (400->100; 100->400; 100->100).
+          blist = []
+          connCoords = []        
+          if dconf['net']['allpops'][prety]==dconf['net']['allpops'][poty] or dconf['net']['allpops'][prety]>dconf['net']['allpops'][poty]: 
+            blist, connCoords = connectLayerswithOverlap(NBpreN=dnumc[prety],NBpostN=dnumc[poty],overlap_xdir = dtopolconvcons[prety][poty], \
+                                             padded_preneurons_xdir = dnumc_padx[prety], padded_postneurons_xdir = dnumc_padx[poty])
+          elif dconf['net']['allpops'][prety]<dconf['net']['allpops'][poty]:
+            blist, connCoords = connectLayerswithOverlapDiv(NBpreN=dnumc[prety],NBpostN=dnumc[poty],overlap_xdir = dtopoldivcons[prety][poty], \
+                                                padded_preneurons_xdir = dnumc_padx[prety], padded_postneurons_xdir = dnumc_padx[poty])
+            print(prety,poty,blist)
+          sim.topologicalConns[prety+'->'+poty] = {'blist':blist,'coords':connCoords}          
+        prob = cmat['VD'][poty]['p'] # connection probability (not used when topological connectivity on)
+        lsynw = [cmat['VD'][poty]['AM']*cfg.EEGain, cmat['VD'][poty]['NM']*cfg.EEGain]
         if prety in EVLocPops:
-          if dconf['net']['RLconns']['FeedForwardLocNto'+suffix]: useRL = True
-          if dconf['net']['STDPconns']['FeedForwardLocNto'+suffix]: useSTDP = True
-        if dSTDPparamsRL[synmech]['RLon'] and useRL: # only turn on plasticity when specified to do so
-          netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL[synmech]}
-        elif dSTDPparams[synmech]['STDPon'] and useSTDP:
-          netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparams[synmech]}          
+          lsynw = [cmat['VL'][poty]['AM']*cfg.EEGain, cmat['VL'][poty]['NM']*cfg.EEGain]
+          prob = cmat['VL'][poty]['p']          
+        for strty,synmech,weight in zip(['','n'],['AMPA', 'NMDA'],lsynw):        
+          k = strty+prety+'->'+strty+poty
+          netParams.connParams[k] = {
+            'preConds': {'pop': prety},
+            'postConds': {'pop': poty},
+            'weight': getInitWeight(weight),
+            'delay': 2,
+            'synMech': synmech,
+            'sec':EExcitSec, 'loc':0.5
+          }
+          if useTopological:
+            netParams.connParams[k]['connList'] = blist
+          else:
+            netParams.connParams[k]['convergence'] = prob2conv(prob, dnumc[prety])          
+          useRL = useSTDP = False
+          if prety in EVDirPops:
+            if dconf['net']['RLconns']['FeedForwardDirNto'+suffix]: useRL = True
+            if dconf['net']['STDPconns']['FeedForwardDirNto'+suffix]: useSTDP = True          
+          if prety in EVLocPops:
+            if dconf['net']['RLconns']['FeedForwardLocNto'+suffix]: useRL = True
+            if dconf['net']['STDPconns']['FeedForwardLocNto'+suffix]: useSTDP = True
+          if dSTDPparamsRL[synmech]['RLon'] and useRL: # only turn on plasticity when specified to do so
+            netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL[synmech]}
+          elif dSTDPparams[synmech]['STDPon'] and useSTDP:
+            netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparams[synmech]}                           
 
 connectEVToTarget(['EA'], dconf['architectureVtoA']['useTopological'])
 connectEVToTarget(EMotorPops, dconf['architectureVtoM']['useTopological'])
