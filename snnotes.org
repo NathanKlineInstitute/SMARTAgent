@@ -19501,3 +19501,12 @@ other neurons that are correctly punished), so may want to avoid that ... will t
 
 started ~23:21 ...
 
+* 20oct27
+** added cells/hht.py for one comp HH cell model
+
+main reason is to speed-up simulation (compared to mainen)
+if using, will have to re-tune 
+
+uses HHE, HHI for the EcellModel, ICellModel in json
+the FS basket cell was already single compartment, so probably would not need to use it there ... 
+

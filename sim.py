@@ -190,6 +190,11 @@ def makeECellModel (ECellModel):
                 fileName='cells/friesen.py', cellName='MakeRSFCELL')
     cellRule['secs']['axon']['spikeGenLoc'] = 0.5  # spike generator location.
     EExcitSec = 'dend' # section where excitatory synapses placed
+  elif ECellModel == 'HH':
+    EExcitSec = 'soma'
+    netParams.importCellParams(label='HHE_rule', conds={'cellType': ETypes}, fileName='cells/hht.py', cellName='HHE')
+    netParams.cellParams['HHE_rule']['secs']['soma']['threshold'] = -10.0
+    
   return EExcitSec
 
 def makeICellModel (ICellModel):
@@ -212,7 +217,10 @@ def makeICellModel (ICellModel):
   elif ICellModel == 'Friesen':
     cellRule = netParams.importCellParams(label='Bas_Friesen_rule', conds={'cellType': ITypes, 'cellModel': 'Friesen'},
                 fileName='cells/friesen.py', cellName='MakeFSFCELL')
-    cellRule['secs']['axon']['spikeGenLoc'] = 0.5  # spike generator location.  
+    cellRule['secs']['axon']['spikeGenLoc'] = 0.5  # spike generator location.
+  elif ICellModel == 'HH':
+    netParams.importCellParams(label='HHI_rule', conds={'cellType': ITypes}, fileName='cells/hht.py', cellName='HHI')
+    netParams.cellParams['HHI_rule']['secs']['soma']['threshold'] = -10.0
       
 EExcitSec = makeECellModel(ECellModel)
 makeICellModel(ICellModel)
