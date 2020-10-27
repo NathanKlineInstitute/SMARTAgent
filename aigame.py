@@ -430,7 +430,7 @@ class AIGame:
 
   def playGame (self, actions, epCount, simtime): #actions need to be generated from motor cortex
     # PLAY GAME
-    rewards = []; proposed_actions =[]; total_hits = []; Images = []; MovedCloser = False
+    rewards = []; proposed_actions =[]; total_hits = []; Images = []; FollowTargetSign = 0
     input_dim = self.input_dim
     done = False
     courtYRng, courtXRng, racketXRng = self.courtYRng, self.courtXRng, self.racketXRng # coordinate ranges for different objects (PONG-specific)    
@@ -524,7 +524,10 @@ class AIGame:
             proposed_action = dconf['moves']['NOMOVE'] #no move
           YDist = abs(ypos_Racket - predY) # pre-move distance to predicted y intercept
           YDist2 = abs(ypos_Racket2 - predY) # post-move distance to predicted y intercept
-          if YDist2 < YDist or YDist2 == 0: MovedCloser = True # if smaller distance to target or already at target
+          if YDist2 < YDist: # smaller distance to target? set to positive value (reward)
+            FollowTargetSign = 1
+          elif YDist2 > YDist: # larger distance to target? set to negative value (punishment)
+            FollowTargetSign = -1
 
       ball_hits_racket = 0
       # previously I assumed when current_ball_dir is 0 there is no way to find out if the ball hit the racket
@@ -590,5 +593,5 @@ class AIGame:
       print('ERROR COMPUTING NUMBER OF HITS')
     for r in range(len(rewards)):
       if rewards[r]==-1: total_hits[r]=-1 #when the ball misses the racket, the reward is -1
-    return rewards, epCount, proposed_actions, total_hits, MovedCloser
+    return rewards, epCount, proposed_actions, total_hits, FollowTargetSign
             

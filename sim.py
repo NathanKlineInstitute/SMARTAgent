@@ -22,7 +22,7 @@ sim.allActions = [] # list to store all actions
 sim.allProposedActions = [] # list to store all proposed actions
 sim.allHits = [] #list to store all hits
 sim.allMotorOutputs = [] # list to store firing rate of output motor neurons.
-sim.movedCloser = [] # whether racket moved towards y intercept at each step
+sim.followTargetSign = [] # whether racket moved closer (1) or farther (-1) from y intercept target at each step
 sim.ActionsRewardsfilename = 'data/'+dconf['sim']['name']+'ActionsRewards.txt'
 sim.MotorOutputsfilename = 'data/'+dconf['sim']['name']+'MotorOutputs.txt'
 sim.WeightsRecordingTimes = []
@@ -1215,7 +1215,7 @@ def saveGameBehavior(sim):
       fid3.write('\t%0.5f' % sim.allRewards[i])
       fid3.write('\t%0.1f' % sim.allProposedActions[i]) #the number of proposed action should be equal to the number of actions
       fid3.write('\t%0.1f' % sim.allHits[i]) #1 when the racket hits the ball and -1 when the racket misses the ball
-      fid3.write('\t%d' % sim.movedCloser[i])
+      fid3.write('\t%d' % sim.followTargetSign[i])
       fid3.write('\n')
 
 ######################################################################################
@@ -1475,7 +1475,7 @@ def trainAgent (t):
               actions.append(dconf['moves']['NOMOVE']) # No move
               noWinner = True
   if sim.rank == 0:
-    rewards, epCount, proposed_actions, total_hits, MovedCloser = sim.AIGame.playGame(actions, epCount, t)
+    rewards, epCount, proposed_actions, total_hits, FollowTargetSign = sim.AIGame.playGame(actions, epCount, t)
     print('t=',round(t,2),'proposed actions:', proposed_actions,', model actions:', actions)
     if dconf['sim']['RLFakeUpRule']: # fake rule for testing reinforcing of up moves
       critic = np.sign(actions.count(dconf['moves']['UP']) - actions.count(dconf['moves']['DOWN']))          
@@ -1505,9 +1505,9 @@ def trainAgent (t):
         for caction, cproposed_action in zip(actions, proposed_actions):
           if cproposed_action == -1: # invalid action since e.g. ball not visible
             continue
-          elif MovedCloser: # model moved racket towards predicted y intercept - gets a reward
+          elif FollowTargetSign > 0: # model moved racket towards predicted y intercept - gets a reward
             critic_for_following_ball += dconf['rewardcodes']['followTarget'] #follow the ball
-          else: # model moved racket away from predicted y intercept - gets a punishment
+          elif FollowTargetSign < 0: # model moved racket away from predicted y intercept - gets a punishment
             critic_for_following_ball += dconf['rewardcodes']['avoidTarget'] # didn't follow the ball        
       else:
         for caction, cproposed_action in zip(actions, proposed_actions):
@@ -1610,7 +1610,7 @@ def trainAgent (t):
     for pactions in proposed_actions: sim.allProposedActions.append(pactions) #also record proposed actions
     for reward in rewards: sim.allRewards.append(reward)
     for hits in total_hits: sim.allHits.append(hits) # hit or no hit
-    sim.movedCloser.append(MovedCloser) 
+    sim.followTargetSign.append(FollowTargetSign) 
     tvec_actions = []
     for ts in range(len(actions)): tvec_actions.append(t-tstepPerAction*(len(actions)-ts-1))
     for ltpnt in tvec_actions: sim.allTimes.append(ltpnt)
