@@ -19510,3 +19510,71 @@ if using, will have to re-tune
 uses HHE, HHI for the EcellModel, ICellModel in json
 the FS basket cell was already single compartment, so probably would not need to use it there ... 
 
+** check output from 20oct26_B0_gcp_
+
+finished ~10:57 AM ...
+
+python -i simdat.py backupcfg/20oct26_B0_gcp_sim.json
+
+ax=plotPerf(actreward,yl=(0,0.6))
+savefig(gifpath()+'perf.png') # [[./gif/20oct27_20oct26_B0_gcp_perf.png]]
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((390e3,400e3))
+savefig(gifpath()+'rast.png') # [[./gif/20oct27_20oct26_B0_gcp_rast.png]]
+
+fig=animInput(InputImages,gifpath()+'_input.mp4') # [[./gif/20oct27_20oct26_B0_gcp__input.mp4]] 
+
+performance improving ... ? some learning likely taking place ... but firing rates probably
+too high and needs much more time to learn ... ?
+
+** coreneuron
+
+https://github.com/Neurosim-lab/netpyne/blob/coreneuron/examples/coreneuron/tut2_coreneuron.py
+https://github.com/BlueBrain/CoreNeuron
+
+might work with this model?
+
+to compile mod files:
+nrnivmodl -coreneuron mod
+
+for netpyne have to have:
+simConfig.coreneuron = True
+
+pip install neuron-nightly --upgrade
+pip install netpyne --upgrade
+
+nrnivmodl -coreneuron mod
+
+INFO : Using neuron-nightly Package (Developer Version)
+/home/samnemo/SMARTAgent
+mod/A.mod mod/GABAa.mod mod/Nca.mod mod/OFThpo.mod mod/OFThresh.mod mod/cadad.mod mod/hsyn.mod mod/izhi2007b.mod mod/kca.mod mod/kdrbwb.mod mod/km.mod mod/kv.mod mod/nafbwb.mod mod/naz.mod mod/nsloc.mod mod/stdp.mod
+A.mod GABAa.mod Nca.mod OFThpo.mod OFThresh.mod cadad.mod hsyn.mod izhi2007b.mod kca.mod kdrbwb.mod km.mod kv.mod nafbwb.mod naz.mod nsloc.mod stdp.mod
+ERROR : CoreNEURON support is not enabled!
+
+so have to build ... 
+
+cd ~
+git clone git@github.com:neuronsimulator/nrn.git
+cd nrn
+
+mkdir build
+cd build
+
+cmake .. \
+ -DNRN_ENABLE_CORENEURON=ON \
+ -DNRN_ENABLE_INTERVIEWS=OFF \
+ -DNRN_ENABLE_RX3D=OFF \
+ -DCMAKE_INSTALL_PREFIX=$HOME/install
+
+will try on laptop first ... 
+
+** adjust model on gcp for lower firing rates
+
+        "name": "20oct27_A0_gcp_",
+
+ok, got lower firing rates ... will run for 500 s ... 
+
+./myrun 48 sn.json
+
+started ~15:25 ... 
+

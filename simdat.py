@@ -516,7 +516,7 @@ def drawcellVm (simConfig, ldrawpop=None,tlim=None):
   if tlim is not None: ax.set_xlim(tlim)
   
 #  
-def plotFollowBall (actreward, ax=None,cumulative=True,msz=3,binsz=1e3,color='r'):
+def plotFollowBall (actreward, ax=None,cumulative=True,msz=3,binsz=1e3,color='r',pun=False):
   # plot probability of model racket following target(predicted ball y intercept) vs time
   # when cumulative == True, plots cumulative probability; otherwise bins probabilities over binsz interval
   # not a good way to plot probabilities over time when uneven sampling - could resample to uniform intervals ...
@@ -526,7 +526,9 @@ def plotFollowBall (actreward, ax=None,cumulative=True,msz=3,binsz=1e3,color='r'
   ax.plot([0,np.amax(actreward.time)],[0.5,0.5],'--',color='gray')    
   allproposed = actreward[(actreward.proposed!=-1)] # only care about cases when can suggest a proposed action
   if dconf['useFollowMoveOutput']:
-    rewardingActions = np.where(allproposed.followtargetsign==1,1,0)  
+    val = 1
+    if pun: val = -1
+    rewardingActions = np.where(allproposed.followtargetsign==val,1,0)
   else:
     rewardingActions = np.where(allproposed.proposed-allproposed.action==0,1,0)
   if cumulative:
@@ -619,12 +621,16 @@ def plotScoreLoss (actreward,ax=None,msz=3):
 
 def plotPerf (actreward,yl=(0,1)):
   # plot performance
-  plotFollowBall(actreward,ax=subplot(1,1,1),cumulative=True,color='b');  
+  plotFollowBall(actreward,ax=subplot(1,1,1),cumulative=True,color='b');
+  if dconf['useFollowMoveOutput']: plotFollowBall(actreward,ax=subplot(1,1,1),cumulative=True,color='m',pun=True);    
   plotHitMiss(actreward,ax=subplot(1,1,1),lclr=['g'],asratio=True); 
   plotScoreMiss(actreward,ax=subplot(1,1,1),clr='r',asratio=True);
   ylim(yl)
   ylabel('Performance')
-  lpatch = [mpatches.Patch(color=c,label=s) for c,s in zip(['b','g','r'],['Follow','Hit/Miss','Score/Miss'])]
+  if dconf['useFollowMoveOutput']:
+    lpatch = [mpatches.Patch(color=c,label=s) for c,s in zip(['b','m','g','r'],['Follow','Avoid','Hit/Miss','Score/Miss'])]
+  else:
+    lpatch = [mpatches.Patch(color=c,label=s) for c,s in zip(['b','g','r'],['Follow','Hit/Miss','Score/Miss'])]    
   ax=gca()
   ax.legend(handles=lpatch,handlelength=1)
   return ax

@@ -153,6 +153,7 @@ simConfig.analysis['plotTraces'] = {'include': [(pop, 0) for pop in ['ER','IR','
 simConfig.analysis['plotRaster'] = {'popRates':'overlay','showFig':dconf['sim']['doplot']}
 #simConfig.analysis['plot2Dnet'] = True 
 #simConfig.analysis['plotConn'] = True           # plot connectivity matrix
+# simConfig.coreneuron = True
 
 ECellModel = dconf['net']['ECellModel']
 ICellModel = dconf['net']['ICellModel']
