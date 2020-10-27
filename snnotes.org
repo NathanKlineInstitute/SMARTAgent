@@ -19578,3 +19578,25 @@ ok, got lower firing rates ... will run for 500 s ...
 
 started ~15:25 ... 
 
+** core neuron on laptop?
+
+cd ~
+git clone https://github.com/neuronsimulator/nrn
+cd nrn
+mkdir build
+cd build
+
+cmake .. \
+ -DNRN_ENABLE_CORENEURON=ON \
+ -DNRN_ENABLE_INTERVIEWS=OFF \
+ -DNRN_ENABLE_RX3D=OFF \
+ -DCMAKE_INSTALL_PREFIX=$HOME/install
+
+export PYTHONPATH=$HOME/install/lib/python:$PYTHONPATH
+export PATH=$HOME/install/bin:$PATH
+
+cd ~/SMARTAgent
+nrnivmodl -coreneuron mod_directory
+
+compilation produces a lot of errors ... 
+

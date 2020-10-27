@@ -38,7 +38,7 @@
         "ResumeSimFromFile": "data/20oct23_A0_cycle_synWeights_final.pkl"
     },
     "sim": {
-        "duration": 500000,
+        "duration": 200,
         "dt": 0.2,
         "verbose": 0,
         "recordStep": 1.0,
@@ -49,15 +49,15 @@
         "RLFakeDownRule": 0,
         "RLFakeStayRule": 0,
         "name": "20oct27_A0_gcp_",
-        "doquit": 1,
-        "doplot": 0,
+        "doquit": 0,
+        "doplot": 1,
         "saveCellSecs": 0,
         "saveCellConns": 0,
         "targettedRL": 0,
         "tstepPerAction": 20,
         "saveWeights": 1,
         "saveAssignedFiringRates": 0,
-	      "useReducedNetwork": 0
+	"useReducedNetwork": 0
     },
     "architectureVtoA": {
         "useProbabilistic": 1,
@@ -68,6 +68,8 @@
         "useTopological": 0
     },    
     "net": {
+	"ECellModel":"IntFire4",
+	"ICellModel":"IntFire4",
         "scale": 1,
 	"allpops": {
 	    "ER":0,
@@ -87,8 +89,8 @@
 	    "IV4":0,
 	    "EMT":0,
 	    "IMT":0,
-	    "EA":1400,
-	    "IA":350,
+	    "EA":140,
+	    "IA":35,
 	    "EMDOWN":100,
 	    "EMUP":100,
 	    "EMSTAY":0,
@@ -383,11 +385,11 @@
     },
     "Noise": {
         "I": {
-            "Rate": 0,
+            "Rate": 10000,
             "Weight": 0.5e-05
         },
         "E": {
-            "Rate": 0,
+            "Rate": 10000,
             "Weight": 1e-05
         }
     }
