@@ -524,7 +524,7 @@ class AIGame:
             proposed_action = dconf['moves']['NOMOVE'] #no move
           YDist = abs(ypos_Racket - predY) # pre-move distance to predicted y intercept
           YDist2 = abs(ypos_Racket2 - predY) # post-move distance to predicted y intercept
-          if YDist2 < YDist or YDist2 == 0: MovedCloser = True
+          if YDist2 < YDist or YDist2 == 0: MovedCloser = True # if smaller distance to target or already at target
 
       ball_hits_racket = 0
       # previously I assumed when current_ball_dir is 0 there is no way to find out if the ball hit the racket

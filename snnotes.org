@@ -19450,6 +19450,9 @@ either need more frequent norm or lower starting weights ... with sparser connec
 
 model is pretty slow to run already ... 
 
+check last step ... 
+
+
 ** follow ball paradigm
 
 should probably look at distance relative to ball rather than movement command
@@ -19459,7 +19462,12 @@ distance is dependent on external environment
 python -i simdat.py backupcfg/20oct26_A0_lp_sim.json
 
 ax=plotPerf(actreward,yl=(0,0.6))
-savefig(gifpath()+'perf.png')
+savefig(gifpath()+'perf.png') # [[./gif/20oct26_20oct26_A0_lp_perf.png]]
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((190e3,200e3))
+savefig(gifpath()+'rast.png') # [[./gif/20oct26_20oct26_A0_lp_rast.png]]
+
+not really doing better ... but have fewer neurons in EA in this model 
 
 ** similar test on gcp (20oct26_A0_gcp_)
 
