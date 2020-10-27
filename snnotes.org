@@ -19491,8 +19491,13 @@ EMUP,EMDOWN firing rates are too high ...
 
 should revise the follow target closer rule - when gets closer to target
 reward, when moves away punish, when same no reward or punish ... 
+same = staying still - perhaps punishing staying still will punish/suppress some
+of the neurons that could contribute to the correct move (in addition to the
+other neurons that are correctly punished), so may want to avoid that ... will test it ... 
 
 20oct26_B0_gcp_
 
 ./myrun 48 sn.json
+
+started ~23:21 ...
 
