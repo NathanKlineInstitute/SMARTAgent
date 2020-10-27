@@ -19452,7 +19452,6 @@ model is pretty slow to run already ...
 
 check last step ... 
 
-
 ** follow ball paradigm
 
 should probably look at distance relative to ball rather than movement command
@@ -19474,4 +19473,26 @@ not really doing better ... but have fewer neurons in EA in this model
 ./myrun 48 sn.json
 
 started ~16:56 ...
+finished ~22:29 ...
+
+python -i simdat.py backupcfg/20oct26_A0_gcp_sim.json
+
+ax=plotPerf(actreward,yl=(0,0.6))
+savefig(gifpath()+'perf.png') # [[./gif/20oct27_20oct26_A0_gcp_perf.png]]
+does not seem to improve (follow ~0.2, hit goes up a bit, score a bit)
+note that follow here not identical to original follow score; here it's 
+cumulative of when moves are considered closer 
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((190e3,200e3))
+savefig(gifpath()+'rast.png') # [[./gif/20oct27_20oct26_A0_gcp_rast.png]]
+EMUP,EMDOWN firing rates are too high ... 
+
+** revise new follow rule
+
+should revise the follow target closer rule - when gets closer to target
+reward, when moves away punish, when same no reward or punish ... 
+
+20oct26_B0_gcp_
+
+./myrun 48 sn.json
 
