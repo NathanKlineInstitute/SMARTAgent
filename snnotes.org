@@ -19602,3 +19602,14 @@ nrnivmodl -coreneuron mod_directory
 
 compilation produces a lot of errors ... 
 
+** try IntFire4 again
+
+this works:
+https://github.com/Neurosim-lab/netpyne/blob/802bb6a5ce5a9da40a740add4f119ad2249f5611/doc/source/code/tut_artif.py
+
+python -i tut_artif.py
+
+savefig('gif/20oct27_cycle_artif_a0.png') # [[./gif/20oct27_cycle_artif_a0.png]]
+
+        "name": "20oct27_I0_cycle_",
+

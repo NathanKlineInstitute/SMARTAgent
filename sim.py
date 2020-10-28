@@ -185,7 +185,9 @@ def makeECellModel (ECellModel):
     EExcitSec = 'soma' # section where excitatory synapses placed
     simConfig.recordTraces = {'V_soma':{'var':'m'}}  # Dict with traces to record
     for ty in ETypes:
-      netParams.popParams[ty] = {'cellType':ty, 'numCells': dnumc[ty], 'cellModel': ECellModel}#, 'params':{'taue':5.35,'taui1':9.1,'taui2':0.07,'taum':20}}    
+      #netParams.popParams[ty]={'cellType':ty,'numCells':dnumc[ty],'cellModel':ECellModel}#, 'params':{'taue':5.35,'taui1':9.1,'taui2':0.07,'taum':20}}
+      netParams.popParams[ty] = {'cellType':ty, 'cellModel': 'IntFire4', 'numCells': dnumc[ty], 'taue': 1.0}  # pop of IntFire4
+      
   elif ECellModel == 'Friesen':
     cellRule = netParams.importCellParams(label='PYR_Friesen_rule', conds={'cellType': ETypes, 'cellModel': 'Friesen'},
                 fileName='cells/friesen.py', cellName='MakeRSFCELL')
@@ -214,7 +216,8 @@ def makeICellModel (ICellModel):
   elif ICellModel == 'IntFire4':
     simConfig.recordTraces = {'V_soma':{'var':'m'}}  # Dict with traces to record
     for ty in ITypes:
-      netParams.popParams[ty] = {'cellType':ty, 'numCells': dnumc[ty], 'cellModel': ICellModel}#, 'params':{'taue':5.35,'taui1':9.1,'taui2':0.07,'taum':20}}        
+      #netParams.popParams[ty]={'cellType':ty,'numCells':dnumc[ty],'cellModel':ICellModel}#,'params':{'taue':5.35,'taui1':9.1,'taui2':0.07,'taum':20}}
+      netParams.popParams[ty] = {'cellType':ty, 'cellModel': 'IntFire4', 'numCells': dnumc[ty], 'taue': 1.0}  # pop of IntFire4
   elif ICellModel == 'Friesen':
     cellRule = netParams.importCellParams(label='Bas_Friesen_rule', conds={'cellType': ITypes, 'cellModel': 'Friesen'},
                 fileName='cells/friesen.py', cellName='MakeFSFCELL')
@@ -257,9 +260,8 @@ netParams.stimTargetParams['stimMod->'+inputPop] = {
   'conds': {'pop': inputPop},
   'convergence': 1,
   'weight': stimModLocW,
-  'delay': 1,
-  'synMech': 'AMPA'
-}
+  'delay': 1}
+if ECellModel != 'IntFire4': netParams.stimTargetParams['stimMod->'+inputPop]['synMech'] = 'AMPA'
 
 for pop in ['EV1D'+Dir for Dir in ['E','NE','N', 'NW','W','SW','S','SE']]:
   netParams.stimTargetParams['stimMod->'+pop] = {
@@ -267,9 +269,12 @@ for pop in ['EV1D'+Dir for Dir in ['E','NE','N', 'NW','W','SW','S','SE']]:
     'conds': {'pop': pop},
     'convergence': 1,
     'weight': stimModDirW,
-    'delay': 1,
-    'synMech': 'AMPA'
-  }
+    'delay': 1}
+  if ECellModel != 'IntFire4': netParams.stimTargetParams['stimMod->'+pop]['synMech'] = 'AMPA'
+
+# testing with IntFire4 
+#netParams.stimSourceParams['background'] = {'type': 'NetStim', 'interval': 10, 'number': 1e5, 'start': 0, 'noise': 0.5}  
+#netParams.stimTargetParams['bkg->EV1'] = {'source': 'background', 'conds': {'pop': 'EV1'}, 'weight': 5, 'delay': 1}
 
 #background input to inhibitory neurons to increase their firing rate
 
