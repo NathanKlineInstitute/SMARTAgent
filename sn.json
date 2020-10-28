@@ -24,7 +24,7 @@
     "actionsPerPlay": 1,
     "followOnlyTowards": 1,
     "useRacketPredictedPos": 1,
-    "useFollowMoveOutput": 1,
+    "useFollowMoveOutput": 0,
     "DirectionDetectionAlgo": {
         "CentroidTracker": 1,
         "OpticFlow": 0,
