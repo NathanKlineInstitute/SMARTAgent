@@ -19673,3 +19673,12 @@ trying it out ...
 
         "name": "20oct28_A0_gcp_",
 
+** issue with INTFs
+
+sa: the issue is that adding stims via stimSourceParams/stimTargetParams is not yet implemented to target artificial cells
+however, you can get the same effect by creating a pop of netstims and connecting it to the artif3 (Intfire4) pop
+should work too if have a source population of stimmod connected (using connParams) to an Intfire4 population
+
+
+try that again ... 
+

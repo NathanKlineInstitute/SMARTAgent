@@ -255,22 +255,49 @@ stimModDirW = dconf['net']['stimModVD']
 
 inputPop = 'EV1' # which population gets the direct visual inputs (pixels)
 if dnumc['ER']>0: inputPop = 'ER'
-netParams.stimTargetParams['stimMod->'+inputPop] = {
-  'source': 'stimMod',
-  'conds': {'pop': inputPop},
-  'convergence': 1,
-  'weight': stimModLocW,
-  'delay': 1}
-if ECellModel != 'IntFire4': netParams.stimTargetParams['stimMod->'+inputPop]['synMech'] = 'AMPA'
 
-for pop in ['EV1D'+Dir for Dir in ['E','NE','N', 'NW','W','SW','S','SE']]:
-  netParams.stimTargetParams['stimMod->'+pop] = {
-    'source': 'stimMod',
-    'conds': {'pop': pop},
-    'convergence': 1,
-    'weight': stimModDirW,
-    'delay': 1}
-  if ECellModel != 'IntFire4': netParams.stimTargetParams['stimMod->'+pop]['synMech'] = 'AMPA'
+if ECellModel == 'IntFire4':
+    netParams.popParams['stimModLoc'] = {'cellModel': 'NetStim', 'numCells': dnumc[inputPop], \
+                                             'rate': 'variable', 'noise': 0, 'start': 0
+        }
+    for pop in inputPop:
+        blist = [[i,i] for i in range(dnumc[inputPop])]
+        netParams.connParams['stimModLoc->'+inputPop] = {
+            'preConds': {'pop':'stimModLoc'},
+            'postConds': {'pop':inputPop},
+            'weight':stimModLocW,
+            'delay':2,
+            'connList':blist}
+
+    """
+    netParams.popParams['stimModDir'] = {
+      'cellModel': 'NetStim', 'numCells': sum([dnumc[pop] for pop in ['EV1D'+Dir for Dir in ['E','NE','N', 'NW','W','SW','S','SE']]]),\
+      'rate': 'variable', 'noise': 0, 'start': 0
+        }
+    blist = []
+    ipreidx,ipostidx = 0,0
+    for pop in ['EV1D'+Dir for Dir in ['E','NE','N', 'NW','W','SW','S','SE']]:
+        for i in range(dnumc[pop]):
+            blist.append([ipreidx
+    """
+        
+else:
+    netParams.stimTargetParams['stimMod->'+inputPop] = {
+      'source': 'stimMod',
+      'conds': {'pop': inputPop},
+      'convergence': 1,
+      'weight': stimModLocW,
+      'delay': 1,
+      'synMech': 'AMPA'
+    }
+    for pop in ['EV1D'+Dir for Dir in ['E','NE','N', 'NW','W','SW','S','SE']]:
+      netParams.stimTargetParams['stimMod->'+pop] = {
+        'source': 'stimMod',
+        'conds': {'pop': pop},
+        'convergence': 1,
+        'weight': stimModDirW,
+        'delay': 1,
+        'synMech': 'AMPA'}
 
 # testing with IntFire4 
 #netParams.stimSourceParams['background'] = {'type': 'NetStim', 'interval': 10, 'number': 1e5, 'start': 0, 'noise': 0.5}  
