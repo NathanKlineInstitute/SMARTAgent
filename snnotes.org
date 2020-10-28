@@ -19613,3 +19613,63 @@ savefig('gif/20oct27_cycle_artif_a0.png') # [[./gif/20oct27_cycle_artif_a0.png]]
 
         "name": "20oct27_I0_cycle_",
 
+* 20oct28
+** sa debugging intf in netpyne
+
+does not seem to be able to receive netstim inputs properly
+
+** check output from 20oct27_A0_gcp_
+
+finished ~10:49 ...
+
+python -i simdat.py backupcfg/20oct27_A0_gcp_sim.json
+
+ax=plotPerf(actreward,yl=(0,0.6))
+savefig(gifpath()+'perf.png') # [[./gif/20oct28_20oct27_A0_gcp_perf.png]]
+looks decent, relative to other sims - early performance seems better than late performance
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((490e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/20oct28_20oct27_A0_gcp_rast.png]]
+in general firing rates are ok but EA looks hypersynchronous ... is that how it looks early in the sim?
+
+xlim((10e3,20e3))
+savefig(gifpath()+'rastB.png') # [[./gif/20oct28_20oct27_A0_gcp_rastB.png]]
+
+looks like do not have the hypersynch earlier in the simulation; surprising that hypersynch develops
+given that there's no plasticity for the EA neurons
+
+binsz = 100
+dnspk = {pop:getspikehist(dspkT[pop],dnumc,binsz,500e3) for pop in ['EMDOWN','EMUP','EA']}
+for clr,pop in zip(['r','g','b'],['EA','EMDOWN','EMUP']): plot(dnspk[pop][0],dnspk[pop][1],clr)
+xlim((0,500e3))
+savefig(gifpath()+'EA_EMDOWN_rate100.png') # [[./gif/20oct28_20oct27_A0_gcp_EA_EMDOWN_rate100.png]]
+looks like those synchronous EA spikes occur multiple times during the simulation, not
+just at the end; seem to occur together with high EM firing
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP'],lclr=['r','g','b'],plotindiv=True)
+xlabel('Time (ms)',fontsize=30); ylabel('Average weight',fontsize=30); tl(); 
+
+savefig(gifpath()+'all_avg_weight.png') # [[./gif/20oct28_20oct27_A0_gcp_all_avg_weight.png]]
+interesting, as the weights go down, the performance is decreasing ... 
+will perf and weights increase again later? or punishment weights from moving away are too large ... 
+
+fig=animInput(InputImages,gifpath()+'_input.mp4') # [[./gif/20oct28_20oct27_A0_gcp__input.mp4]]
+
+the hypersynch may be due to recurrent EA connections
+
+** other changes to architecture
+
+get rid of directional neurons? implicit in the pixels/EV1 is movement directions ... 
+
+add another EA layer? EA2 ... integrating EA inputs and could have some RL plasticity from
+EA -> EA2
+EA -> EM
+EA2 -> EA2
+EM -> EM
+
+EA2, that would be ~same as V4 ... 
+
+trying it out ... 
+
+        "name": "20oct28_A0_gcp_",
+

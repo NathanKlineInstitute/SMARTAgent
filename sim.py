@@ -103,9 +103,9 @@ def getpadding ():
 dnumc_padx, dtopoldivcons,dtopolconvcons,allpops_withconvtopology,allpops_withdivtopology = getpadding()
   
 if dnumc['EMSTAY']>0:
-  lrecpop = ['EMUP', 'EMDOWN','EMSTAY','EA'] # which populations to record from
+  lrecpop = ['EMUP', 'EMDOWN','EMSTAY','EA','EA2'] # which populations to record from
 else:
-  lrecpop = ['EMUP', 'EMDOWN','EA'] # which populations to record from
+  lrecpop = ['EMUP', 'EMDOWN','EA','EA2'] # which populations to record from
   
 if cmat['VD']['VD']['p'] > 0.0 or \
    cmat['VD']['VL']['p'] > 0.0 or \
@@ -149,7 +149,7 @@ simConfig.saveFolder = 'data'
 # simConfig.backupCfg = ['sim.json', 'backupcfg/'+dconf['sim']['name']+'sim.json']
 #simConfig.createNEURONObj = True  # create HOC objects when instantiating network
 #simConfig.createPyStruct = True  # create Python structure (simulator-independent) when instantiating network
-simConfig.analysis['plotTraces'] = {'include': [(pop, 0) for pop in ['ER','IR','EV1','EV1DE','ID','IV1','EV4','IV4','EMT','IMT','EMDOWN','EMUP','EMSTAY','IM','IMUP','IMDOWN','EA','IA']]}
+simConfig.analysis['plotTraces'] = {'include': [(pop, 0) for pop in ['ER','IR','EV1','EV1DE','ID','IV1','EV4','IV4','EMT','IMT','EMDOWN','EMUP','EMSTAY','IM','IMUP','IMDOWN','EA','IA','EA2','IA2']]}
 simConfig.analysis['plotRaster'] = {'popRates':'overlay','showFig':dconf['sim']['doplot']}
 #simConfig.analysis['plot2Dnet'] = True 
 #simConfig.analysis['plotConn'] = True           # plot connectivity matrix
@@ -491,24 +491,26 @@ for prety in EVPops:
       netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparams['AMPAI']}    
 """
 
-for prety in ['EA']:
-  k = prety+'->IA'
+for prety,poty in zip(['EA','EA2'],['IA','IA2']):
+  if dnumc[prety] <= 0 or dnumc[poty] <= 0: continue
+  k = prety+'->'+poty
   netParams.connParams[k] = {
     'preConds': {'pop': prety},
-    'postConds': {'pop': 'IA'},
-    'convergence': prob2conv(cmat['EA']['IA']['p'], dnumc[prety]),
-    'weight': cmat['EA']['IA']['GA'] * cfg.EIGain,
+    'postConds': {'pop': poty},
+    'convergence': prob2conv(cmat[prety][poty]['p'], dnumc[prety]),
+    'weight': cmat[prety][poty]['GA'] * cfg.EIGain,
     'delay': 2,
     'synMech': 'AMPA', 'sec':'soma', 'loc':0.5}
   if dconf['net']['RLconns']['EIPlast'] and dSTDPparamsRL['AMPAI']['RLon']: # only turn on plasticity when specified to do so
     netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL['AMPAI']}
-    netParams.connParams[k]['weight'] = getInitWeight(cmat['EA']['IA']['GA'] * cfg.EIGain)
+    netParams.connParams[k]['weight'] = getInitWeight(cmat[prety][poty]['GA'] * cfg.EIGain)
   elif dconf['net']['STDPconns']['EIPlast'] and dSTDPparams['AMPAI']['STDPon']:
     netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparams['AMPAI']}
-    netParams.connParams[k]['weight'] = getInitWeight(cmat['EA']['IA']['GA'] * cfg.EIGain)    
+    netParams.connParams[k]['weight'] = getInitWeight(cmat[prety][poty]['GA'] * cfg.EIGain)    
 
 
 for prety in EMotorPops:
+  if dnumc[prety] <= 0: continue
   k = prety+'->IM'
   netParams.connParams[k] = {
     'preConds': {'pop': prety},
@@ -630,15 +632,16 @@ for poty in EMotorPops: # I -> E for motor populations
     'delay': 2,
     'synMech': 'GABA', 'sec':'soma', 'loc':0.5}
 
-for poty in ['EA']:
-  netParams.connParams['IA->'+poty] = {
-    'preConds': {'pop': 'IA'},
+
+for prety,poty in zip(['IA','IA2'],['EA','EA2']):  
+  netParams.connParams[prety+'->'+poty] = {
+    'preConds': {'pop': prety},
     'postConds': {'pop': poty},
-    'convergence': prob2conv(cmat['IA']['EA']['p'], dnumc['IA']),
-    'weight': cmat['IA']['EA']['GA'] * cfg.IEGain,
+    'convergence': prob2conv(cmat[prety][poty]['p'], dnumc[prety]),
+    'weight': cmat[prety][poty]['GA'] * cfg.IEGain,
     'delay': 2,
     'synMech': 'GABA', 'sec':'soma', 'loc':0.5}
-
+  
 #I to I
 for IType in ITypes:
   if IType not in dnumc: continue
@@ -942,13 +945,38 @@ def connectEVToTarget (lpoty, useTopological):
           elif dSTDPparams[synmech]['STDPon'] and useSTDP:
             netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparams[synmech]}                           
 
-connectEVToTarget(['EA'], dconf['architectureVtoA']['useTopological'])
-connectEVToTarget(EMotorPops, dconf['architectureVtoM']['useTopological'])
-  
-# Add connections from visual association area to motor cortex
-for prety in ['EA']:
+connectEVToTarget(['EA'], dconf['architectureVtoA']['useTopological']) # connect primary visual to visual association
+connectEVToTarget(EMotorPops, dconf['architectureVtoM']['useTopological']) # connect primary visual to motor
+
+# add connections from first to second visual association area
+# EA -> EA2
+prety = 'EA'; poty = 'EA2'
+if dnumc[prety] > 0 and dnumc[poty] > 0:  
+  lsynw = [cmat[prety][poty]['AM']*cfg.EEGain, cmat[prety][poty]['NM']*cfg.EEGain]
+  for strty,synmech,weight in zip(['','n'],['AMPA', 'NMDA'],lsynw):
+    k = strty+prety+'->'+strty+poty
+    netParams.connParams[k] = {
+      'preConds': {'pop': prety},
+      'postConds': {'pop': poty},
+      'convergence': prob2conv(cmat[prety][poty]['p'], dnumc[prety]),
+      'weight': getInitWeight(weight),
+      'delay': 2,
+      'synMech': synmech,
+      'sec':EExcitSec, 'loc':0.5
+    }
+    useRL = useSTDP = False
+    ffconnty = 'FeedForwardAtoA2'
+    if dconf['net']['RLconns'][ffconnty]: useRL = True
+    if dconf['net']['STDPconns'][ffconnty]: useSTDP = True          
+    if dSTDPparamsRL[synmech]['RLon'] and useRL: # only turn on plasticity when specified to do so
+      netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL[synmech]}
+    elif dSTDPparams[synmech]['STDPon'] and useSTDP:
+      netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparams[synmech]}
+
+# Add connections from visual association areas to motor cortex, and reccurrent conn within visual association areas
+for prety,ffconnty,recconnty in zip(['EA', 'EA2'],['FeedForwardAtoM','FeedForwardA2toM'],['RecurrentANeurons','RecurrentA2Neurons']):
   if dnumc[prety] <= 0: continue
-  lsynw = [cmat['EA']['EM']['AM']*cfg.EEGain, cmat['EA']['EM']['NM']*cfg.EEGain]
+  lsynw = [cmat[prety]['EM']['AM']*cfg.EEGain, cmat[prety]['EM']['NM']*cfg.EEGain]
   for poty in EMotorPops:
     if dnumc[poty] <= 0: continue
     for strty,synmech,weight in zip(['','n'],['AMPA', 'NMDA'],lsynw):
@@ -956,39 +984,37 @@ for prety in ['EA']:
       netParams.connParams[k] = {
         'preConds': {'pop': prety},
         'postConds': {'pop': poty},
-        'convergence': prob2conv(cmat['EA']['EM']['p'], dnumc[prety]),
+        'convergence': prob2conv(cmat[prety]['EM']['p'], dnumc[prety]),
         'weight': getInitWeight(weight),
         'delay': 2,
         'synMech': synmech,
         'sec':EExcitSec, 'loc':0.5
       }
       useRL = useSTDP = False
-      if dconf['net']['RLconns']['FeedForwardAtoM']: useRL = True
-      if dconf['net']['STDPconns']['FeedForwardAtoM']: useSTDP = True          
+      if dconf['net']['RLconns'][ffconnty]: useRL = True
+      if dconf['net']['STDPconns'][ffconnty]: useSTDP = True          
       if dSTDPparamsRL[synmech]['RLon'] and useRL: # only turn on plasticity when specified to do so
         netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL[synmech]}
       elif dSTDPparams[synmech]['STDPon'] and useSTDP:
-        netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparams[synmech]}                  
-                    
-# add recurrent plastic connectivity within EA population
-if cmat['EA']['EA']['p'] > 0.0:
-  prety = poty = 'EA'
-  for strty,synmech,weight in zip(['','n'],['AMPA', 'NMDA'],[cmat['EA']['EA']['AM']*cfg.EEGain, cmat['EA']['EA']['NM']*cfg.EEGain]):
-    k = strty+prety+'->'+strty+poty
-    netParams.connParams[k] = {
-      'preConds': {'pop': prety},
-      'postConds': {'pop': poty},
-      'convergence': prob2conv(cmat['EA']['EA']['p'], dnumc[prety]),
-      'weight': getInitWeight(weight),
-      'delay': 2,
-      'synMech': synmech,
-      'sec':EExcitSec, 'loc':0.5
-    }
-    if dconf['net']['RLconns']['RecurrentANeurons'] and dSTDPparamsRL[synmech]['RLon']: # only turn on plasticity when specified to do so
-      netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL[synmech]}
-    elif dconf['net']['STDPconns']['RecurrentANeurons'] and dSTDPparams[synmech]['STDPon']:
-      netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparams[synmech]}            
-
+        netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparams[synmech]}                                      
+  # add recurrent plastic connectivity within EA populations
+  poty = prety
+  if cmat[prety][poty]['p'] > 0.0 and dnumc[poty]>0:
+    for strty,synmech,weight in zip(['','n'],['AMPA', 'NMDA'],[cmat[prety][poty]['AM']*cfg.EEGain, cmat[prety][poty]['NM']*cfg.EEGain]):
+      k = strty+prety+'->'+strty+poty
+      netParams.connParams[k] = {
+        'preConds': {'pop': prety},
+        'postConds': {'pop': poty},
+        'convergence': prob2conv(cmat[prety][poty]['p'], dnumc[prety]),
+        'weight': getInitWeight(weight),
+        'delay': 2,
+        'synMech': synmech,
+        'sec':EExcitSec, 'loc':0.5
+      }
+      if dconf['net']['RLconns'][recconnty] and dSTDPparamsRL[synmech]['RLon']: # only turn on plasticity when specified to do so
+        netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL[synmech]}
+      elif dconf['net']['STDPconns'][recconnty] and dSTDPparams[synmech]['STDPon']:
+        netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparams[synmech]}            
           
 # add recurrent plastic connectivity within EM populations
 if cmat['EM']['EM']['p'] > 0.0:
@@ -1014,7 +1040,7 @@ if cmat['EM']['EM']['p'] > 0.0:
 # add feedback plastic connectivity from EM populations to association populations
 if cmat['EM']['EA']['p'] > 0.0:
   for prety in EMotorPops:
-    for poty in ['EA']:
+    for poty in ['EA','EA2']:
         for strty,synmech,weight in zip(['','n'],['AMPA', 'NMDA'],[cmat['EM']['EA']['AM']*cfg.EEGain, cmat['EM']['EA']['NM']*cfg.EEGain]):
           k = strty+prety+'->'+strty+poty
           netParams.connParams[k] = {
@@ -1272,78 +1298,28 @@ def updateInputRates ():
     lratepop = ['ER', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW', 'EV1DSW', 'EV1DS', 'EV1DSE']
   else:
     lratepop = ['EV1', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW', 'EV1DSW', 'EV1DS', 'EV1DSE']
-  # sim.pc.barrier()
-
-  #root = 0 # any specific rank
-  #src = rank if rank == root else None
-  #dest = pc.py_broadcast(src, root)
-
-  #src = dict(sim.AIGame.dFiringRates) if sim.rank == 0 else None
-  #print('rank=',sim.rank,'src=',src)
-
-
   # this py_alltoall seems to work, but is apparently not as fast as py_broadcast (which has problems - wrong-sized array sometimes!)
   root = 0
   nhost = sim.pc.nhost()
   src = [sim.AIGame.dFiringRates]*nhost if sim.rank == root else [None]*nhost
   dFiringRates = sim.pc.py_alltoall(src)[0]
   if sim.rank == 0: dFiringRates = sim.AIGame.dFiringRates
-  # print(sim.rank,'dFiringRates:',dFiringRates)
-
-  """ # for some reason this code does not work - returns wrong sized array on dest sometimes, saw it produce MPI error too
-  if sim.rank == 0:
-    dFiringRates = sim.AIGame.dFiringRates
-    sim.pc.py_broadcast(dFiringRates, 0)
-  else:
-    dFiringRates = sim.pc.py_broadcast(None, 0)
-    #dFiringRates = {pop:np.zeros(dnumc[pop]) for pop in allpops}
-  # pop='EV1'; print('rank=',sim.rank,pop,len(dFiringRates[pop]))
-  """
-  
-  """ # this also sometimes produces wrong-sized array on dest
-  sim.pc.barrier()
-  if sim.rank == 0:
-    #print('rank0:',len(sim.AIGame.dFiringRates['EV1']))
-    #dFiringRates = sim.pc.py_broadcast(dict(sim.AIGame.dFiringRates), 0)
-    dFiringRates = sim.AIGame.dFiringRates
-    for k in sim.AIGame.lratepop:
-      sim.pc.broadcast(sim.AIGame.dFVec[k].from_python(dFiringRates[k]),0)
-      if dconf['verbose'] > 1: print('Firing Rates of',k,np.where(dFiringRates[k]==np.amax(dFiringRates[k])),np.amax(dFiringRates[k]))
-      print('rank=',sim.rank,k,len(dFiringRates[k]))
-  else:
-    #dFiringRates = sim.pc.py_broadcast(None, 0) # OrderedDict()
-    dFiringRates = OrderedDict()
-    for pop in lratepop:
-      vec = h.Vector()
-      destSz = sim.pc.broadcast(vec,0)
-      print('rank=',sim.rank,'destSz=',destSz)
-      dFiringRates[pop] = vec.to_python()
-      if dconf['verbose'] > 1:
-        print(sim.rank,'received firing rates:',np.where(dFiringRates[pop]==np.amax(dFiringRates[pop])),np.amax(dFiringRates[pop]))
-      print('rank=',sim.rank,pop,len(dFiringRates[pop]))
-  sim.pc.barrier()
-  """
-  
+  # print(sim.rank,'dFiringRates:',dFiringRates)  
   # update input firing rates for stimuli to ER,EV1 and direction sensitive cells
   for pop in lratepop:
+    if dnumc[pop] <= 0: continue
     lCell = [c for c in sim.net.cells if c.gid in sim.net.pops[pop].cellGids] # this is the set of cells
     offset = sim.simData['dminID'][pop]
     #if dconf['verbose'] > 1: print(sim.rank,'updating len(',pop,len(lCell),'source firing rates. len(dFiringRates)=',len(dFiringRates[pop]))
     for cell in lCell:  
       for stim in cell.stims:
         if stim['source'] == 'stimMod':
-          #rind = random.randint(0,2)
-          #fchoices = [20,50,1000] #20 will represent 50Hz and so on
-          # print(pop,len(dFiringRates[pop]),int(cell.gid-offset),cell.gid,offset)
           if dFiringRates[pop][int(cell.gid-offset)]==0:
             stim['hObj'].interval = 1e12
           else:
             stim['hObj'].interval = 1000.0/dFiringRates[pop][int(cell.gid-offset)] #40 #fchoices[rind] #10 #
-          #sim.AIGame.dAllFiringRates[-1][pop][int(cell.gid-offset)] = fchoices[rind] 
-          #print('cell GID: ', int(cell.gid), 'vs cell ID with offset: ', int(cell.gid-R_offset)) # interval in ms as a function of rate; is cell.gid correct index??? 
 
 # homeostasis based on Sanda et al. 2017.
-
 def initTargetFR (sim,dMINinitTargetFR,dMAXinitTargetFR):
   sim.dMINTargetFR = {}
   sim.dMAXTargetFR = {}

@@ -574,14 +574,17 @@ class AIGame:
     if self.intaction==1: #if only one frame used per play, then add the downsampled and scaled image from last_obs for direction computation 
       if len(lobs_gimage_ds)>0:
         dsum_Images = np.maximum(dsum_Images,lobs_gimage_ds)
-    if dconf['DirectionDetectionAlgo']['OpticFlow']:
-      self.computeMotionFields(UseFull=dconf['DirectionDetectionAlgo']['UseFull']) # compute the motion fields
-    elif dconf['DirectionDetectionAlgo']['CentroidTracker']:
-      self.computeAllObjectsMotionDirections(UseFull=dconf['DirectionDetectionAlgo']['UseFull']) # compute the motion field using CetroidTracking
-    if dconf['net']['useNeuronPad']==1:
-      self.updateDirSensitiveRatesWithPadding()
-    else:
-      self.updateDirSensitiveRates() # update motion sensitive neuron input rates
+
+    if self.dirSensitiveNeuronDim > 0: # as long as we have direction selective neurons
+      if dconf['DirectionDetectionAlgo']['OpticFlow']:
+        self.computeMotionFields(UseFull=dconf['DirectionDetectionAlgo']['UseFull']) # compute the motion fields
+      elif dconf['DirectionDetectionAlgo']['CentroidTracker']:
+        # compute the motion field using CetroidTracking
+        self.computeAllObjectsMotionDirections(UseFull=dconf['DirectionDetectionAlgo']['UseFull']) 
+      if dconf['net']['useNeuronPad']==1:
+        self.updateDirSensitiveRatesWithPadding()
+      else:
+        self.updateDirSensitiveRates() # update motion sensitive neuron input rates
 
     if done: # done means that 1 episode of the game finished, so the environment needs to be reset. 
       epCount.append(self.countAll)
