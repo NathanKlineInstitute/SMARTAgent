@@ -19673,6 +19673,35 @@ trying it out ...
 
         "name": "20oct28_A0_gcp_",
 
+python -i simdat.py backupcfg/20oct28_A0_gcp_sim.json
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/20oct28_20oct28_A0_gcp_perf.png]]
+
+perf looks similar to model with the direction selective neurons ... 
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((190e3,200e3))
+savefig(gifpath()+'rast.png') # [[./gif/20oct28_20oct28_A0_gcp_rast.png]]
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP','EA2'],lclr=['r','g','b'],plotindiv=True)
+xlabel('Time (ms)',fontsize=30); ylabel('Average weight',fontsize=30); tl(); 
+
+savefig(gifpath()+'all_avg_weight.png') 
+
+fig=animInput(InputImages,gifpath()+'_input.mp4') 
+
+may as well continue ... 
+
+        "name": "20oct28_A1_gcp_",
+    "simtype": {
+        "ResumeSim": 1,
+        "ResumeSimFromFile": "data/20oct28_A0_gcp_synWeights_final.pkl"
+    },
+
+./myrun 32 sn.json
+
+started ~5PM
+
 ** issue with INTFs
 
 sa: the issue is that adding stims via stimSourceParams/stimTargetParams is not yet implemented to target artificial cells
