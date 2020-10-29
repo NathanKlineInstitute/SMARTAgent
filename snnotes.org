@@ -19758,3 +19758,6 @@ could add EA2 and take it from there ...
 
 python multistepSim.py sn.json 48 20 20oct28_E0_cycle_multi
 
+* 20oct29
+** intfs
+

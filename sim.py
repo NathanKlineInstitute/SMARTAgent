@@ -184,6 +184,7 @@ def makeECellModel (ECellModel):
   elif ECellModel == 'IntFire4':
     EExcitSec = 'soma' # section where excitatory synapses placed
     simConfig.recordTraces = {'V_soma':{'var':'m'}}  # Dict with traces to record
+    netParams.defaultThreshold = 0.0 
     for ty in ETypes:
       #netParams.popParams[ty]={'cellType':ty,'numCells':dnumc[ty],'cellModel':ECellModel}#, 'params':{'taue':5.35,'taui1':9.1,'taui2':0.07,'taum':20}}
       netParams.popParams[ty] = {'cellType':ty, 'cellModel': 'IntFire4', 'numCells': dnumc[ty], 'taue': 1.0}  # pop of IntFire4
@@ -215,6 +216,7 @@ def makeICellModel (ICellModel):
     netParams.cellParams['IzhiFS'] = FScellRule  # add dict to list of cell properties
   elif ICellModel == 'IntFire4':
     simConfig.recordTraces = {'V_soma':{'var':'m'}}  # Dict with traces to record
+    netParams.defaultThreshold = 0.0     
     for ty in ITypes:
       #netParams.popParams[ty]={'cellType':ty,'numCells':dnumc[ty],'cellModel':ICellModel}#,'params':{'taue':5.35,'taui1':9.1,'taui2':0.07,'taum':20}}
       netParams.popParams[ty] = {'cellType':ty, 'cellModel': 'IntFire4', 'numCells': dnumc[ty], 'taue': 1.0}  # pop of IntFire4
@@ -247,49 +249,39 @@ dSTDPparams = {} # STDPL parameters for AMPA,NMDA synapses; generally uses short
 for sy in ['AMPA', 'NMDA']: dSTDPparams[sy] = dconf['STDP'][sy]
 if 'AMPAI' in dconf['STDP']: dSTDPparams['AMPAI'] = dconf['STDP']['AMPAI']
 
-# these are the image-based inputs provided to the R (retinal) cells
-netParams.stimSourceParams['stimMod'] = {'type': 'NetStim', 'rate': 'variable', 'noise': 0}
-
-stimModLocW = dconf['net']['stimModVL']
-stimModDirW = dconf['net']['stimModVD']
-
-inputPop = 'EV1' # which population gets the direct visual inputs (pixels)
-if dnumc['ER']>0: inputPop = 'ER'
-
-if ECellModel == 'IntFire4':
-    netParams.popParams['stimModLoc'] = {'cellModel': 'NetStim', 'numCells': dnumc[inputPop], \
-                                             'rate': 'variable', 'noise': 0, 'start': 0
-        }
-    for pop in inputPop:
-        blist = [[i,i] for i in range(dnumc[inputPop])]
-        netParams.connParams['stimModLoc->'+inputPop] = {
-            'preConds': {'pop':'stimModLoc'},
-            'postConds': {'pop':inputPop},
-            'weight':stimModLocW,
-            'delay':2,
-            'connList':blist}
-
-    """
-    netParams.popParams['stimModDir'] = {
-      'cellModel': 'NetStim', 'numCells': sum([dnumc[pop] for pop in ['EV1D'+Dir for Dir in ['E','NE','N', 'NW','W','SW','S','SE']]]),\
-      'rate': 'variable', 'noise': 0, 'start': 0
-        }
-    blist = []
-    ipreidx,ipostidx = 0,0
-    for pop in ['EV1D'+Dir for Dir in ['E','NE','N', 'NW','W','SW','S','SE']]:
-        for i in range(dnumc[pop]):
-            blist.append([ipreidx
-    """
-        
-else:
+def setupStimMod ():
+  # setup variable rate NetStim sources (send spikes based on image contents)
+  lstimty = []
+  inputPop = 'EV1' # which population gets the direct visual inputs (pixels)
+  if dnumc['ER']>0: inputPop = 'ER'
+  stimModLocW = dconf['net']['stimModVL']
+  stimModDirW = dconf['net']['stimModVD']    
+  if ECellModel == 'IntFire4':
+    lpoty = [inputPop]
+    for poty in ['EV1D'+Dir for Dir in ['E','NE','N', 'NW','W','SW','S','SE']]: lpoty.append(poty)
+    wt = stimModLocW      
+    for poty in lpoty:
+      stimty = 'stimMod'+poty
+      lstimty.append(stimty)
+      netParams.popParams[stimty] = {'cellModel': 'NetStim', 'numCells': dnumc[poty],'rate': 'variable', 'noise': 0, 'start': 0}
+      blist = [[i,i] for i in range(dnumc[poty])]
+      netParams.connParams[stimty+'->'+poty] = {
+        'preConds': {'pop':stimty},
+        'postConds': {'pop':poty},
+        'weight':wt,
+        'delay':2,
+        'connList':blist}
+      wt = stimModDirW # rest of inputs use this weight
+  else:
+    # these are the image-based inputs provided to the R (retinal) cells
+    netParams.stimSourceParams['stimMod'] = {'type': 'NetStim', 'rate': 'variable', 'noise': 0}  
     netParams.stimTargetParams['stimMod->'+inputPop] = {
       'source': 'stimMod',
       'conds': {'pop': inputPop},
       'convergence': 1,
       'weight': stimModLocW,
       'delay': 1,
-      'synMech': 'AMPA'
-    }
+      'synMech': 'AMPA'}
     for pop in ['EV1D'+Dir for Dir in ['E','NE','N', 'NW','W','SW','S','SE']]:
       netParams.stimTargetParams['stimMod->'+pop] = {
         'source': 'stimMod',
@@ -298,7 +290,11 @@ else:
         'weight': stimModDirW,
         'delay': 1,
         'synMech': 'AMPA'}
+  return lstimty
 
+sim.lstimty = setupStimMod() # when using IntFire4 cells lstimty has the NetStim populations that send spikes to EV1, EV1DE, etc.
+for ty in sim.lstimty: allpops.append(ty)
+            
 # testing with IntFire4 
 #netParams.stimSourceParams['background'] = {'type': 'NetStim', 'interval': 10, 'number': 1e5, 'start': 0, 'noise': 0.5}  
 #netParams.stimTargetParams['bkg->EV1'] = {'source': 'background', 'conds': {'pop': 'EV1'}, 'weight': 5, 'delay': 1}
@@ -1305,22 +1301,29 @@ total_hits = [] #numbertimes ball is hit by racket as ball changes its direction
 dSTDPmech = {} # dictionary of list of STDP mechanisms
 
 def InitializeInputRates ():
-  # update the source firing rates for the ER neuron population, based on image contents
-  # also update the firing rates for the direction sensitive neurons based on image contents
-  if dnumc['ER']>0:
-    lratepop = ['ER', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW', 'EV1DSW', 'EV1DS', 'EV1DSE']
+  # initialize the source firing rates for the primary visual neuron populations (location V1 and direction sensitive)
+  # based on image contents
+  if ECellModel == 'IntFire4':
+    for pop in sim.lstimty:
+      if pop in sim.net.pops:
+        for cell in sim.net.cells:
+          if cell.gid in sim.net.pops[pop].cellGids:
+            cell.interval = 1 # e12
   else:
-    lratepop = ['EV1', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW', 'EV1DSW', 'EV1DS', 'EV1DSE']  
-  for pop in lratepop:
-    lCell = [c for c in sim.net.cells if c.gid in sim.net.pops[pop].cellGids] # this is the set of cells
-    for cell in lCell:  
-      for stim in cell.stims:
-        if stim['source'] == 'stimMod':
-          stim['hObj'].interval = 1e12
+    if dnumc['ER']>0:
+      lratepop = ['ER', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW', 'EV1DSW', 'EV1DS', 'EV1DSE']
+    else:
+      lratepop = ['EV1', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW', 'EV1DSW', 'EV1DS', 'EV1DSE']    
+    for pop in lratepop:
+      lCell = [c for c in sim.net.cells if c.gid in sim.net.pops[pop].cellGids] # this is the set of cells
+      for cell in lCell:  
+        for stim in cell.stims:
+          if stim['source'] == 'stimMod':
+            stim['hObj'].interval = 1e12
 
 def updateInputRates ():
-  # update the source firing rates for the ER neuron population, based on image contents
-  # also update the firing rates for the direction sensitive neurons based on image contents
+  # update the source firing rates for the primary visual neuron populations (location V1 and direction sensitive)
+  # based on image contents
   if dnumc['ER']>0:
     lratepop = ['ER', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW', 'EV1DSW', 'EV1DS', 'EV1DSE']
   else:
@@ -1333,18 +1336,31 @@ def updateInputRates ():
   if sim.rank == 0: dFiringRates = sim.AIGame.dFiringRates
   # print(sim.rank,'dFiringRates:',dFiringRates)  
   # update input firing rates for stimuli to ER,EV1 and direction sensitive cells
-  for pop in lratepop:
-    if dnumc[pop] <= 0: continue
-    lCell = [c for c in sim.net.cells if c.gid in sim.net.pops[pop].cellGids] # this is the set of cells
-    offset = sim.simData['dminID'][pop]
-    #if dconf['verbose'] > 1: print(sim.rank,'updating len(',pop,len(lCell),'source firing rates. len(dFiringRates)=',len(dFiringRates[pop]))
-    for cell in lCell:  
-      for stim in cell.stims:
-        if stim['source'] == 'stimMod':
-          if dFiringRates[pop][int(cell.gid-offset)]==0:
-            stim['hObj'].interval = 1e12
+  if ECellModel == 'IntFire4':
+    lsz = len('stimMod')
+    for pop in sim.lstimty:
+      if pop in sim.net.pops:
+        lCell = [c for c in sim.net.cells if c.gid in sim.net.pops[pop].cellGids] # this is the set of cells
+        offset = sim.simData['dminID'][pop]
+        #print(pop,pop[lsz:],offset)
+        for cell in lCell:
+          if dFiringRates[pop[lsz:]][int(cell.gid-offset)]==0:
+            cell.interval = 1e12
           else:
-            stim['hObj'].interval = 1000.0/dFiringRates[pop][int(cell.gid-offset)] #40 #fchoices[rind] #10 #
+            cell.interval = 1000.0/dFiringRates[pop[lsz:]][int(cell.gid-offset)] #40 #fchoices[rind] #10 #
+  else:
+    for pop in lratepop:
+      if dnumc[pop] <= 0: continue
+      lCell = [c for c in sim.net.cells if c.gid in sim.net.pops[pop].cellGids] # this is the set of cells
+      offset = sim.simData['dminID'][pop]
+      #if dconf['verbose'] > 1: print(sim.rank,'updating len(',pop,len(lCell),'source firing rates. len(dFiringRates)=',len(dFiringRates[pop]))
+      for cell in lCell:  
+        for stim in cell.stims:
+          if stim['source'] == 'stimMod':
+            if dFiringRates[pop][int(cell.gid-offset)]==0:
+              stim['hObj'].interval = 1e12
+            else:
+              stim['hObj'].interval = 1000.0/dFiringRates[pop][int(cell.gid-offset)] #40 #fchoices[rind] #10 #
 
 # homeostasis based on Sanda et al. 2017.
 def initTargetFR (sim,dMINinitTargetFR,dMAXinitTargetFR):
