@@ -1308,7 +1308,7 @@ def InitializeInputRates ():
       if pop in sim.net.pops:
         for cell in sim.net.cells:
           if cell.gid in sim.net.pops[pop].cellGids:
-            cell.interval = 1 # e12
+            cell.interval = 1e12
   else:
     if dnumc['ER']>0:
       lratepop = ['ER', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW', 'EV1DSW', 'EV1DS', 'EV1DSE']
@@ -1324,10 +1324,6 @@ def InitializeInputRates ():
 def updateInputRates ():
   # update the source firing rates for the primary visual neuron populations (location V1 and direction sensitive)
   # based on image contents
-  if dnumc['ER']>0:
-    lratepop = ['ER', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW', 'EV1DSW', 'EV1DS', 'EV1DSE']
-  else:
-    lratepop = ['EV1', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW', 'EV1DSW', 'EV1DS', 'EV1DSE']
   # this py_alltoall seems to work, but is apparently not as fast as py_broadcast (which has problems - wrong-sized array sometimes!)
   root = 0
   nhost = sim.pc.nhost()
@@ -1336,19 +1332,23 @@ def updateInputRates ():
   if sim.rank == 0: dFiringRates = sim.AIGame.dFiringRates
   # print(sim.rank,'dFiringRates:',dFiringRates)  
   # update input firing rates for stimuli to ER,EV1 and direction sensitive cells
-  if ECellModel == 'IntFire4':
-    lsz = len('stimMod')
-    for pop in sim.lstimty:
-      if pop in sim.net.pops:
-        lCell = [c for c in sim.net.cells if c.gid in sim.net.pops[pop].cellGids] # this is the set of cells
+  if ECellModel == 'IntFire4': # different rules/code when dealing with artificial cells
+    lsz = len('stimMod') # this is a prefix
+    for pop in sim.lstimty: # go through NetStim populations
+      if pop in sim.net.pops: # make sure the population exists
+        lCell = [c for c in sim.net.cells if c.gid in sim.net.pops[pop].cellGids] # this is the set of NetStim cells
         offset = sim.simData['dminID'][pop]
         #print(pop,pop[lsz:],offset)
         for cell in lCell:
           if dFiringRates[pop[lsz:]][int(cell.gid-offset)]==0:
             cell.interval = 1e12
           else:
-            cell.interval = 1000.0/dFiringRates[pop[lsz:]][int(cell.gid-offset)] #40 #fchoices[rind] #10 #
+            cell.interval = 1000.0/dFiringRates[pop[lsz:]][int(cell.gid-offset)] #40 
   else:
+    if dnumc['ER']>0:
+      lratepop = ['ER', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW', 'EV1DSW', 'EV1DS', 'EV1DSE']
+    else:
+      lratepop = ['EV1', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW', 'EV1DSW', 'EV1DS', 'EV1DSE']    
     for pop in lratepop:
       if dnumc[pop] <= 0: continue
       lCell = [c for c in sim.net.cells if c.gid in sim.net.pops[pop].cellGids] # this is the set of cells
