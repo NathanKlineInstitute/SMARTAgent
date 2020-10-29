@@ -19702,6 +19702,26 @@ may as well continue ...
 ./myrun 32 sn.json
 
 started ~5PM
+finished ~9:40PM
+
+python -i simdat.py backupcfg/20oct28_A1_gcp_sim.json
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/20oct29_20oct28_A1_gcp_perf.png]]
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((390e3,400e3))
+savefig(gifpath()+'rast.png') # [[./gif/20oct29_20oct28_A1_gcp_rast.png]]
+
+lfn = ['20oct28_A0_gcp_','20oct28_A1_gcp_']
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0,0.6))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/20oct29_20oct28_A1_gcp_perf_all_steps_so_far.png]]
+
+lpda = getindivactionreward(lfn)
+clf(); plotComparePerf(lpda,['g','b','r','c','m'],yl=(0,1),lleg=lfn)
+savefig(gifpath()+'perf_compareB.png') # [[./gif/20oct29_20oct28_A1_gcp_perf_compareB.png]]
+
+not improved and worse than model with the dir selective neurons
 
 ** issue with INTFs
 
@@ -19711,4 +19731,30 @@ should work too if have a source population of stimmod connected (using connPara
 
 
 try that again ... 
+
+** dir selective neurons
+
+does it make sense to exclude dir selective neurons? right now, without them, no mechanism for integrating
+the movement sequences ... individual pixel locations are not enough to determine a movement decision ... 
+
+could have pixel at one location (PA) project to EA at delay=1, pixel at other location (PB) project
+to EA at delay=2
+PA, PB -> EA -> EM
+when PA,PB get activated and activate EA and EM if EM is correct action
+then EA->EM is strengthened and so are PA,PB -> EA ? 
+but may not want PA,PB -> EA to always get strengthened;; ... PA,PB -> EA are static
+but if some EA receives a neighboring PA,PB then it will implicitly encode movement ...
+though when EA fires, it could fire either due to PA or due to PB or due to both firing ... 
+
+should probably keep the dir selective neurons around for now, though expensive computationally ... 
+
+** next sim on gcp
+
+this one was ok: 20oct27_A0_gcp_
+
+could add EA2 and take it from there ... 
+
+        "name": "20oct28_E0_gcp_",
+
+python multistepSim.py sn.json 48 20 20oct28_E0_cycle_multi
 

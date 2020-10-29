@@ -678,7 +678,7 @@ def getconcatactionreward (lfn):
   pda = None
   for fn in lfn:
     if not fn.endswith('ActionsRewards.txt'): fn = 'data/'+fn+'ActionsRewards.txt'
-    acl = pd.DataFrame(np.loadtxt(fn),columns=['time','action','reward','proposed','hit'])
+    acl = pd.DataFrame(np.loadtxt(fn),columns=['time','action','reward','proposed','hit','followtargetsign'])
     if pda is None:
       pda = acl
     else:
@@ -690,9 +690,9 @@ def getindivactionreward (lfn):
   # get the individual actionreward data frames separately so can compare cumulative rewards,actions,etc.
   # lfn is a list of actionrewards filenames from the simulation or list of simulation names
   if lfn[0].endswith('ActionsRewards.txt'): 
-    return [pd.DataFrame(np.loadtxt(fn),columns=['time','action','reward','proposed','hit']) for fn in lfn]
+    return [pd.DataFrame(np.loadtxt(fn),columns=['time','action','reward','proposed','hit','followtargetsign']) for fn in lfn]
   else:
-    return [pd.DataFrame(np.loadtxt('data/'+fn+'ActionsRewards.txt'),columns=['time','action','reward','proposed','hit']) for fn in lfn]    
+    return [pd.DataFrame(np.loadtxt('data/'+fn+'ActionsRewards.txt'),columns=['time','action','reward','proposed','hit','followtargetsign']) for fn in lfn]    
 
 def plotMeanNeuronWeight (pdf,postid,clr='k',ax=None,msz=1,xl=None):
   if ax is None: ax = gca()

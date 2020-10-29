@@ -34,21 +34,21 @@
     "verbose": 0,
     "stayStepLim": 0,
     "simtype": {
-        "ResumeSim": 1,
-        "ResumeSimFromFile": "data/20oct28_A0_gcp_synWeights_final.pkl"
+        "ResumeSim": 0,
+        "ResumeSimFromFile": "data/20oct23_A0_cycle_synWeights_final.pkl"
     },
     "sim": {
-        "duration": 400000,
+        "duration": 500000,
         "dt": 0.2,
         "verbose": 0,
         "recordStep": 1.0,
         "recordWeightStepSize": 500,
         "normalizeWeightStepSize": 50000000000000000000000000,
-	"normalizeWeightsAtStart": 0,
+	"normalizeWeightsAtStart": 1,
         "RLFakeUpRule": 0,
         "RLFakeDownRule": 0,
         "RLFakeStayRule": 0,
-        "name": "20oct28_A1_gcp_",
+        "name": "20oct28_E0_gcp_",
         "doquit": 1,
         "doplot": 0,
         "saveCellSecs": 0,
@@ -73,14 +73,14 @@
 	    "ER":0,
 	    "IR":0,
 	    "EV1":400,
-	    "EV1DE":0,
-	    "EV1DNE":0,
-	    "EV1DN":0,
-	    "EV1DNW":0,
-	    "EV1DW":0,
-	    "EV1DSW":0,
-	    "EV1DS":0,
-	    "EV1DSE":0,
+	    "EV1DE":400,
+	    "EV1DNE":400,
+	    "EV1DN":400,
+	    "EV1DNW":400,
+	    "EV1DW":400,
+	    "EV1DSW":400,
+	    "EV1DS":400,
+	    "EV1DSE":400,
 	    "ID": 0,
 	    "IV1":100,
 	    "EV4":0,
@@ -90,7 +90,7 @@
 	    "EA":1400,
 	    "IA":350,
 	    "EA2": 700,
-	    "IA2": 175,
+	    "IA2": 175,	    
 	    "EMDOWN":100,
 	    "EMUP":100,
 	    "EMSTAY":0,
@@ -178,42 +178,42 @@
         "LocMaxRate": 150.0,
         "FiringRateCutoff" : 50.0,
         "stimModVD": 0.02,
-        "stimModVL": 0.05,
+        "stimModVL": 0.02,
 	"cmat": {
 	    "VL":{
 		"VD":{"AM":0,"NM":0,"p":0},		
 		"VL":{"AM":20e-5,"NM":30e-6,"p":0},
-		"EA":{"AM":70e-5,"NM":40e-6,"p":0.4},
-		"EMDOWN":{"AM":15e-5,"NM":18e-6,"p":0.08},
-		"EMUP":{"AM":15e-5,"NM":18e-6,"p":0.08},
-		"EMSTAY":{"AM":15e-5,"NM":18e-6,"p":0.08}		
+		"EA":{"AM":4.5e-5,"NM":10e-6,"p":0.4},
+		"EMDOWN":{"AM":5e-5,"NM":6e-6,"p":0.08},
+		"EMUP":{"AM":5e-5,"NM":6e-6,"p":0.08},
+		"EMSTAY":{"AM":5e-5,"NM":6e-6,"p":0.08}		
 	    },
 	    "VD":{
 		"VL":{"AM":0,"NM":0,"p":0},
 		"VD":{"AM":0,"NM":0,"p":0},
-		"EA":{"AM":40.5e-5,"NM":10e-6,"p":0.4},
+		"EA":{"AM":4.5e-5,"NM":10e-6,"p":0.4},
 		"EMDOWN":{"AM":5e-5,"NM":6e-6,"p":0.08},
 		"EMUP":{"AM":5e-5,"NM":6e-6,"p":0.08},
 		"EMSTAY":{"AM":5e-5,"NM":6e-6,"p":0.08}		
 	    },
 	    "EM":{
-		"EM":{"AM":10e-5,"NM":12e-6,"p":0.1},
+		"EM":{"AM":5e-5,"NM":6e-6,"p":0.1},
 		"EA":{"AM":0,"NM":0,"p":0.0},
 		"IRecip": {"AM":0.02, "NM":0, "p":0.0625},
 		"IM":{"GA":0.02,"p":0.0625}
 	    },
 	    "EA":{
-		"EA":{"AM":10e-5,"NM":12e-6,"p":0.0},
-		"EA2":{"AM":35e-5,"NM":20e-6,"p":0.3},
-		"EM":{"AM":35e-5,"NM":20e-6,"p":0.2},
+		"EA":{"AM":5e-5,"NM":6e-6,"p":0.0},
+		"EA2":{"AM":5e-5,"NM":6e-6,"p":0.2},
+		"EM":{"AM":5e-5,"NM":6e-6,"p":0.2},
 		"IA":{"GA": 0.02, "p":0.0625}
 	    },
 	    "EA2":{
 		"EA":{"AM":5e-5,"NM":6e-6,"p":0.0},
-		"EA2":{"AM":35e-5,"NM":20e-6,"p":0.1},
-		"EM":{"AM":35e-5,"NM":20e-6,"p":0.2},
+		"EA2":{"AM":5e-5,"NM":6e-6,"p":0.1},
+		"EM":{"AM":5e-5,"NM":6e-6,"p":0.2},
 		"IA2":{"GA": 0.02, "p":0.0625}
-	    },	    
+	    },	   	    
 	    "IR": {
 		"ER": {"GA": 0.2, "p":0.0625}
 	    },
@@ -252,7 +252,7 @@
 	    "IA2": {
 		"EA2": {"GA":0.25, "p":0.125},
 		"IA2": {"GA":0.05, "p":0.25}		
-	    },	    
+	    },	    	    
 	    "IR": {
 		"IR": {"GA":0.05, "p":0.25}
 	    },
@@ -346,7 +346,7 @@
          "AMPAI": {
             "wbase": 0.0,
             "wmax": 0.1,
-            "RLon": 1,
+            "RLon": 0,
 	    "STDPon": 0,
             "RLlenhebb": 2000,
             "RLlenanti": 2000,
@@ -363,15 +363,15 @@
             "maxreward": 0.0 
         },	
         "AMPA": {
-            "wbase": 5e-05,
-            "wmax": 0.0014,
+            "wbase": 4e-06,
+            "wmax": 8e-04,
             "RLon": 1,
 	    "STDPon": 0,
             "RLlenhebb": 200,
             "RLlenanti": 200,
             "useRLexp": 1,
-            "RLhebbwt": 1.75e-5,
-            "RLantiwt": -1.75e-5,
+            "RLhebbwt": 5e-06,
+            "RLantiwt": -5e-06,
             "hebbwt": 0.0,
             "antiwt": 0.0,
             "tauhebb": 10,
