@@ -19801,9 +19801,23 @@ note that the stimMod (NetStim populations) are drawn in raster too - should all
 clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','EA', 'IM'])
 savefig(gifpath()+'Vm.png') # [[./gif/20oct29_20oct29_I0_lp_Vm.png]]
 
+try on cycle ...
 
+./myrun 32 sn.json
+
+python -i simdat.py backupcfg/20oct29_I0_cycle_sim.json
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/20oct29_20oct29_I0_cycle_perf.png]]
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); 
+savefig(gifpath()+'rast.png') # [[./gif/20oct29_20oct29_I0_cycle_rast.png]]
+
+EA, IA, IM firing too fast ... 
 
 clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP'],lclr=['r','g','b'],plotindiv=True)
 xlabel('Time (ms)',fontsize=30); ylabel('Average weight',fontsize=30); tl(); 
-
 savefig(gifpath()+'all_avg_weight.png')
+
+hmm, weights empty ... maybe stdp not setup properly to work with IntFire4 ... 
+
