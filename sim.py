@@ -261,9 +261,10 @@ def setupStimMod ():
     for poty in ['EV1D'+Dir for Dir in ['E','NE','N', 'NW','W','SW','S','SE']]: lpoty.append(poty)
     wt = stimModLocW      
     for poty in lpoty:
+      if dnumc[poty] <= 0: continue
       stimty = 'stimMod'+poty
       lstimty.append(stimty)
-      netParams.popParams[stimty] = {'cellModel': 'NetStim', 'numCells': dnumc[poty],'rate': 'variable', 'noise': 0, 'start': 0}
+      netParams.popParams[stimty] = {'cellModel': 'NSLOC', 'numCells': dnumc[poty],'rate': 'variable', 'noise': 0, 'start': 0}
       blist = [[i,i] for i in range(dnumc[poty])]
       netParams.connParams[stimty+'->'+poty] = {
         'preConds': {'pop':stimty},
@@ -1308,7 +1309,7 @@ def InitializeInputRates ():
       if pop in sim.net.pops:
         for cell in sim.net.cells:
           if cell.gid in sim.net.pops[pop].cellGids:
-            cell.interval = 1e12
+            cell.hPointp.interval = 1e12
   else:
     if dnumc['ER']>0:
       lratepop = ['ER', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW', 'EV1DSW', 'EV1DS', 'EV1DSE']
@@ -1330,7 +1331,7 @@ def updateInputRates ():
   src = [sim.AIGame.dFiringRates]*nhost if sim.rank == root else [None]*nhost
   dFiringRates = sim.pc.py_alltoall(src)[0]
   if sim.rank == 0: dFiringRates = sim.AIGame.dFiringRates
-  # print(sim.rank,'dFiringRates:',dFiringRates)  
+  # if sim.rank==0: print(dFiringRates['EV1'])  
   # update input firing rates for stimuli to ER,EV1 and direction sensitive cells
   if ECellModel == 'IntFire4': # different rules/code when dealing with artificial cells
     lsz = len('stimMod') # this is a prefix
@@ -1341,9 +1342,9 @@ def updateInputRates ():
         #print(pop,pop[lsz:],offset)
         for cell in lCell:
           if dFiringRates[pop[lsz:]][int(cell.gid-offset)]==0:
-            cell.interval = 1e12
+            cell.hPointp.interval = 1e12
           else:
-            cell.interval = 1000.0/dFiringRates[pop[lsz:]][int(cell.gid-offset)] #40 
+            cell.hPointp.interval = 1000.0/dFiringRates[pop[lsz:]][int(cell.gid-offset)] #40 
   else:
     if dnumc['ER']>0:
       lratepop = ['ER', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW', 'EV1DSW', 'EV1DS', 'EV1DSE']
