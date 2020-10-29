@@ -250,14 +250,14 @@ def readSTDPParams ():
   for sy,gain in zip(lsy,[cfg.EEGain,cfg.EEGain,cfg.EIGain]):
     dSTDPparamsRL[sy] = dconf['RL'][sy]
     for k in dSTDPparamsRL[sy].keys():
-      if k.count('wt'): dSTDPparamsRL[sy][k] *= gain    
+      if k.count('wt') or k.count('wbase') or k.count('wmax'): dSTDPparamsRL[sy][k] *= gain      
   lsy = ['AMPA', 'NMDA']
   if 'AMPAI' in dconf['STDP']: lsy.append('AMPAI')  
   dSTDPparams = {} # STDPL parameters for AMPA,NMDA synapses; generally uses shorter/longer eligibility traces
   for sy,gain in zip(lsy,[cfg.EEGain,cfg.EEGain,cfg.EIGain]):
     dSTDPparams[sy] = dconf['STDP'][sy]
     for k in dSTDPparams[sy].keys():
-      if k.count('wt'): dSTDPparams[sy][k] *= gain
+      if k.count('wt') or k.count('wbase') or k.count('wmax'): dSTDPparams[sy][k] *= gain
   return dSTDPparamsRL, dSTDPparams
   
 dSTDPparamsRL, dSTDPparams = readSTDPParams()  
