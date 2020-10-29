@@ -154,6 +154,13 @@ simConfig.analysis['plotRaster'] = {'popRates':'overlay','showFig':dconf['sim'][
 #simConfig.analysis['plot2Dnet'] = True 
 #simConfig.analysis['plotConn'] = True           # plot connectivity matrix
 # simConfig.coreneuron = True
+# synaptic weight gain (based on E, I types)
+cfg = simConfig
+cfg.EEGain = dconf['net']['EEGain'] # E to E scaling factor
+cfg.EIGain = dconf['net']['EIGain'] # E to I scaling factor
+cfg.IEGain = dconf['net']['IEGain'] # I to E scaling factor
+cfg.IIGain = dconf['net']['IIGain'] # I to I scaling factor
+
 
 ECellModel = dconf['net']['ECellModel']
 ICellModel = dconf['net']['ICellModel']
@@ -236,19 +243,25 @@ netParams.synMechParams['AMPA'] = {'mod': 'Exp2Syn', 'tau1': 0.05, 'tau2': 5.3, 
 netParams.synMechParams['NMDA'] = {'mod': 'Exp2Syn', 'tau1': 0.15, 'tau2': 166.0, 'e': 0} # NMDA
 netParams.synMechParams['GABA'] = {'mod': 'Exp2Syn', 'tau1': 0.07, 'tau2': 9.1, 'e': -80}  # inhibitory synaptic mechanism
 
-#wmin should be set to the initial/baseline weight of the connection.
-STDPparams = {'hebbwt': 0.0001, 'antiwt':-0.00001, 'wbase': 0.0012, 'wmax': 50, 'RLon': 0 , 'RLhebbwt': 0.001, 'RLantiwt': -0.000,
-              'tauhebb': 10, 'RLwindhebb': 50, 'useRLexp': 0, 'softthresh': 0, 'verbose':0}
-
-
-dSTDPparamsRL = {} # STDP-RL parameters for AMPA,NMDA synapses; generally uses shorter/longer eligibility traces
-for sy in ['AMPA', 'NMDA']: dSTDPparamsRL[sy] = dconf['RL'][sy]
-if 'AMPAI' in dconf['RL']: dSTDPparamsRL['AMPAI'] = dconf['RL']['AMPAI']
-
-dSTDPparams = {} # STDPL parameters for AMPA,NMDA synapses; generally uses shorter/longer eligibility traces
-for sy in ['AMPA', 'NMDA']: dSTDPparams[sy] = dconf['STDP'][sy]
-if 'AMPAI' in dconf['STDP']: dSTDPparams['AMPAI'] = dconf['STDP']['AMPAI']
-
+def readSTDPParams ():
+  dSTDPparamsRL = {} # STDP-RL parameters for AMPA,NMDA synapses; generally uses shorter/longer eligibility traces
+  lsy = ['AMPA', 'NMDA']
+  if 'AMPAI' in dconf['RL']: lsy.append('AMPAI')  
+  for sy,gain in zip(lsy,[cfg.EEGain,cfg.EEGain,cfg.EIGain]):
+    dSTDPparamsRL[sy] = dconf['RL'][sy]
+    for k in dSTDPparamsRL[sy].keys():
+      if k.count('wt'): dSTDPparamsRL[sy][k] *= gain    
+  lsy = ['AMPA', 'NMDA']
+  if 'AMPAI' in dconf['STDP']: lsy.append('AMPAI')  
+  dSTDPparams = {} # STDPL parameters for AMPA,NMDA synapses; generally uses shorter/longer eligibility traces
+  for sy,gain in zip(lsy,[cfg.EEGain,cfg.EEGain,cfg.EIGain]):
+    dSTDPparams[sy] = dconf['STDP'][sy]
+    for k in dSTDPparams[sy].keys():
+      if k.count('wt'): dSTDPparams[sy][k] *= gain
+  return dSTDPparamsRL, dSTDPparams
+  
+dSTDPparamsRL, dSTDPparams = readSTDPParams()  
+  
 def setupStimMod ():
   # setup variable rate NetStim sources (send spikes based on image contents)
   lstimty = []
@@ -371,13 +384,6 @@ else:
   blistIV4toEV1, connCoordsIV4toEV1 = connectLayerswithOverlapDiv(NBpreN = dnumc['IV4'], NBpostN = dnumc['EV1'], overlap_xdir = dtopoldivcons['IV4']['EV1'], padded_preneurons_xdir = dnumc_padx['IV4'], padded_postneurons_xdir = dnumc_padx['EV1'])
   blistIMTtoEV4, connCoordsIMTtoEV4 = connectLayerswithOverlapDiv(NBpreN = dnumc['IMT'], NBpostN = dnumc['EV4'], overlap_xdir = dtopoldivcons['IMT']['EV4'], padded_preneurons_xdir = dnumc_padx['IMT'], padded_postneurons_xdir = dnumc_padx['EV4'])
   
-# synaptic weight gain (based on E, I types)
-cfg = simConfig
-cfg.EEGain = dconf['net']['EEGain'] # E to E scaling factor
-cfg.EIGain = dconf['net']['EIGain'] # E to I scaling factor
-cfg.IEGain = dconf['net']['IEGain'] # I to E scaling factor
-cfg.IIGain = dconf['net']['IIGain'] # I to I scaling factor
-
 ### from https://www.neuron.yale.edu/phpBB/viewtopic.php?f=45&t=3770&p=16227&hilit=memory#p16122
 cfg.saveCellSecs = bool(dconf['sim']['saveCellSecs']) # if False removes all data on cell sections prior to gathering from nodes
 cfg.saveCellConns = bool(dconf['sim']['saveCellConns']) # if False removes all data on cell connections prior to gathering from nodes

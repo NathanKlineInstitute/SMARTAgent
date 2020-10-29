@@ -68,10 +68,10 @@
         "useTopological": 0
     },    
     "net": {
-	"EEGain": 85,
-	"EIGain": 85,
-	"IEGain": -0.1,
-	"IIGain": -0.1,
+	"EEGain": 250,
+	"EIGain": 100,
+	"IEGain": -0.01,
+	"IIGain": -0.01,
 	"ECellModel":"IntFire4",
 	"ICellModel":"IntFire4",
         "scale": 1,

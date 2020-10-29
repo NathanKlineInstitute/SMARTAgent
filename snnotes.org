@@ -19759,5 +19759,51 @@ could add EA2 and take it from there ...
 python multistepSim.py sn.json 48 20 20oct28_E0_cycle_multi
 
 * 20oct29
-** intfs
+** intfs (IntFire4)
 
+got most of it to work properly
+see sim.py
+have to use hPointp to set the interval of the variable rate NetStim (NSLOC)
+and have to explicitly make a population of NetStims that represent the
+visual input (rather than the simpler connecting source and target)
+there's a population of netstims (with 1-to-1 connectivity to target) for
+each type of visual input (EV1, EV1DE, etc.)
+
+inhibitory synapses require negative weights so make sure to set IEGain, IIGain
+to a negative number in the json file
+
+need to make sure that negative weights do not mess up stdp.mod's functioning
+
+get some crashes once in a while depending on scaling weights
+
+had to scale up the EEGain and EIGain a lot to get any activity using the
+previous weights ... 
+
+        "name": "20oct29_I0_lp_",
+
+runs pretty quickly on laptop with 12 cores ... 
+
+problem with IntFire4 is only has a single excitatory input type...INTF6 has
+AM,AM2,NM,NM2 but doesn't compile properly without mkmod ... could try that too later on
+if need arises ... 
+
+./myrun 12 sn.json
+
+python -i simdat.py backupcfg/20oct29_I0_lp_sim.json
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') 
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); 
+savefig(gifpath()+'rast.png') # [[./gif/20oct29_20oct29_I0_lp_rast.png]]
+note that the stimMod (NetStim populations) are drawn in raster too - should allow excluding some populations
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','EA', 'IM'])
+savefig(gifpath()+'Vm.png') # [[./gif/20oct29_20oct29_I0_lp_Vm.png]]
+
+
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP'],lclr=['r','g','b'],plotindiv=True)
+xlabel('Time (ms)',fontsize=30); ylabel('Average weight',fontsize=30); tl(); 
+
+savefig(gifpath()+'all_avg_weight.png')
