@@ -147,8 +147,8 @@ simConfig.savePickle = True            # Save params, network and sim output to 
 simConfig.saveMat = False
 simConfig.saveFolder = 'data'
 # simConfig.backupCfg = ['sim.json', 'backupcfg/'+dconf['sim']['name']+'sim.json']
-#simConfig.createNEURONObj = True  # create HOC objects when instantiating network
-#simConfig.createPyStruct = True  # create Python structure (simulator-independent) when instantiating network
+simConfig.createNEURONObj = True  # create HOC objects when instantiating network
+simConfig.createPyStruct = True  # create Python structure (simulator-independent) when instantiating network
 simConfig.analysis['plotTraces'] = {'include': [(pop, 0) for pop in ['ER','IR','EV1','EV1DE','ID','IV1','EV4','IV4','EMT','IMT','EMDOWN','EMUP','EMSTAY','IM','IMUP','IMDOWN','EA','IA','EA2','IA2']]}
 simConfig.analysis['plotRaster'] = {'popRates':'overlay','showFig':dconf['sim']['doplot']}
 #simConfig.analysis['plot2Dnet'] = True 
@@ -1682,6 +1682,7 @@ def getAllSTDPObjects (sim):
   for pop in Mpops: dSTDPmech[pop] = []
   if dconf['sim']['targettedRL']: dcell = {pop:[] for pop in Mpops} # SN: exptl  
   for cell in sim.net.cells:
+    #if cell.gid in sim.net.pops['EMDOWN'].cellGids and cell.gid==sim.simData['dminID']['EMDOWN']: print(cell.conns)
     for conn in cell.conns:
       STDPmech = conn.get('hSTDP')  # check if the connection has a NEURON STDP mechanism object
       if STDPmech:

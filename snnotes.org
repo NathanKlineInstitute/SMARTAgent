@@ -19938,3 +19938,34 @@ also, too slow to run right now ... may want to use INTFs instead ...
 at minimum could replace EV1, EV1D, etc. with INTFs, since they
 do not even have plasticity right now ... 
 
+** try fixup for INTFs
+
+first on laptop ... 
+
+python import netpyne netpyne.__version__ '0.9.6' 
+import sys
+sys.path ['','/usr/site/python/netpyne', '/usr/arch/nrn/lib/python', '/usr/arch/nrn/nrn/share/nrn/lib/python',
+'/usr/site/nrniv/python/anaconda3/envs/py36/lib/python3.6/site-packages',
+'/usr/arch/nrn/share/python/lib/python', '/usr/site/nrniv/local/python',
+'/usr/site/nrniv/local/python/anaconda3/envs/py36/lib/python36.zip',
+'/usr/site/nrniv/local/python/anaconda3/envs/py36/lib/python3.6',
+'/usr/site/nrniv/local/python/anaconda3/envs/py36/lib/python3.6/lib-dynload',
+'/usr/site/nrniv/local/python/anaconda3/envs/py36/lib/python3.6/site-packages'] 
+
+/usr/site/python/netpyne is empty ... 
+
+should have netpyne installed in conda py3 env
+
+/usr/site/nrniv/local/python/anaconda3/envs/py36/lib/python3.6/site-packages/netpyne
+
+/usr/site/nrniv/local/python/anaconda3/envs/py36/lib/python3.6/site-packages/netpyne/cell/pointCell.py
+
+ok, added the _addConnPlasticity code to the pointCell class ... will see if works
+
+./myrun 12 sn.json
+
+python -i simdat.py backupcfg/20oct30_I0_lp_sim.json
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP'],lclr=['r','g','b'],plotindiv=True)
+xlabel('Time (ms)',fontsize=30); ylabel('Average weight',fontsize=30); tl(); 
+
