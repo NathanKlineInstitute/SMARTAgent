@@ -279,7 +279,7 @@ def setupStimMod ():
   if dnumc['ER']>0: inputPop = 'ER'
   stimModLocW = dconf['net']['stimModVL']
   stimModDirW = dconf['net']['stimModVD']    
-  if ECellModel == 'IntFire4':
+  if ECellModel == 'IntFire4' or ECellModel == 'INTF6':
     lpoty = [inputPop]
     for poty in ['EV1D'+Dir for Dir in ['E','NE','N', 'NW','W','SW','S','SE']]: lpoty.append(poty)
     wt = stimModLocW      
@@ -1320,13 +1320,14 @@ dSTDPmech = {} # dictionary of list of STDP mechanisms
 def InitializeInputRates ():
   # initialize the source firing rates for the primary visual neuron populations (location V1 and direction sensitive)
   # based on image contents
-  if ECellModel == 'IntFire4':
+  if ECellModel == 'IntFire4' or ECellModel == 'INTF6':
+    np.random.seed(1234)
     for pop in sim.lstimty:
       if pop in sim.net.pops:
         for cell in sim.net.cells:
           if cell.gid in sim.net.pops[pop].cellGids:
             cell.hPointp.interval = 1e12
-            cell.hPointp.start = 200
+            cell.hPointp.start = np.random.uniform(0,1200) 
   else:
     if dnumc['ER']>0:
       lratepop = ['ER', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW', 'EV1DSW', 'EV1DS', 'EV1DSE']
@@ -1350,7 +1351,7 @@ def updateInputRates ():
   if sim.rank == 0: dFiringRates = sim.AIGame.dFiringRates
   # if sim.rank==0: print(dFiringRates['EV1'])  
   # update input firing rates for stimuli to ER,EV1 and direction sensitive cells
-  if ECellModel == 'IntFire4': # different rules/code when dealing with artificial cells
+  if ECellModel == 'IntFire4' or ECellModel == 'INTF6': # different rules/code when dealing with artificial cells
     lsz = len('stimMod') # this is a prefix
     for pop in sim.lstimty: # go through NetStim populations
       if pop in sim.net.pops: # make sure the population exists
@@ -1527,7 +1528,7 @@ def trainAgent (t):
               noWinner = True
   if sim.rank == 0:
     rewards, epCount, proposed_actions, total_hits, FollowTargetSign = sim.AIGame.playGame(actions, epCount, t)
-    print('t=',round(t,2),'proposed actions:', proposed_actions,', model actions:', actions)
+    print('t=',round(t,2),'proposed act=', proposed_actions,', model act=', actions)
     if dconf['sim']['RLFakeUpRule']: # fake rule for testing reinforcing of up moves
       critic = np.sign(actions.count(dconf['moves']['UP']) - actions.count(dconf['moves']['DOWN']))          
       rewards = [critic for i in range(len(rewards))]
@@ -1609,7 +1610,7 @@ def trainAgent (t):
       print('No anticipated action for the input!!!')
   else:
     if critic != 0: # if critic signal indicates punishment (-1) or reward (+1)
-      if sim.rank==0: print('t=',round(t,2),'- adjusting weights based on RL critic value:', critic)
+      if sim.rank==0: print('t=',round(t,2),'- adjust wts. critic=', critic)
       if dnumc['EMSTAY']>0:
         if dconf['sim']['targettedRL']:
           if not noWinner: # if there's a clear winner in terms of firing rates
