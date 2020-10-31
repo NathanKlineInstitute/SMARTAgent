@@ -20049,3 +20049,14 @@ python multistepSim.py sn.json 32 10 20oct30_K0_cycle_multi
 
 started ~23:58 ... 
 
+after ~8 hours, rates go towards 0 ... and paddle mostly stays still ... not a good param regime
+
+* 20oct31
+** adjust the IntFire4 sim some more
+
+        "name": "20oct31_A0_cycle_",
+
+python multistepSim.py sn.json 32 10 20oct31_A0_cycle_multi
+
+started ~8:39 ...
+

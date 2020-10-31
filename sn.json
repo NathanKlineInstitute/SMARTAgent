@@ -48,7 +48,7 @@
         "RLFakeUpRule": 0,
         "RLFakeDownRule": 0,
         "RLFakeStayRule": 0,
-        "name": "20oct30_K0_cycle_",
+        "name": "20oct31_A0_cycle_",
         "doquit": 1,
         "doplot": 0,
         "saveCellSecs": 0,
@@ -68,10 +68,10 @@
         "useTopological": 0
     },    
     "net": {
-	"EEGain": 300.0,
-	"EIGain": 9.0,
-	"IEGain": -0.06,
-	"IIGain": -0.06,
+	"EEGain": 325.0,
+	"EIGain": 8.0,
+	"IEGain": -0.05,
+	"IIGain": -0.05,
 	"ECellModel":"IntFire4",
 	"ICellModel":"IntFire4",
         "scale": 1,
@@ -203,7 +203,7 @@
 		"EMSTAY":{"AM":5e-5,"NM":6e-6,"p":0.08}		
 	    },
 	    "EM":{
-		"EM":{"AM":5e-5,"NM":6e-6,"p":0.05},
+		"EM":{"AM":5e-5,"NM":6e-6,"p":0.1},
 		"EA":{"AM":0,"NM":0,"p":0.0},
 		"IRecip": {"AM":0.02, "NM":0, "p":0.0625},
 		"IM":{"GA":0.02,"p":0.0625}
@@ -211,7 +211,7 @@
 	    "EA":{
 		"EA":{"AM":5e-5,"NM":6e-6,"p":0.0},
 		"EA2":{"AM":5e-5,"NM":6e-6,"p":0.2},
-		"EM":{"AM":5e-5,"NM":6e-6,"p":0.1},
+		"EM":{"AM":5e-5,"NM":6e-6,"p":0.15},
 		"IA":{"GA": 0.02, "p":0.0625}
 	    },
 	    "EA2":{
