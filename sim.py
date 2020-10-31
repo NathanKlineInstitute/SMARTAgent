@@ -1797,7 +1797,11 @@ setdminID(sim, allpops)
 tPerPlay = tstepPerAction*dconf['actionsPerPlay']
 InitializeInputRates()
 dsumWInit = getSumAdjustableWeights(sim) # get sum of adjustable weights at start of sim
+#if len(sim.net.cells) > 0 and ECellModel == 'INTF6':
+#  sim.net.cells[0].global_init()
 sim.runSimWithIntervalFunc(tPerPlay,trainAgent) # has periodic callback to adjust STDP weights based on RL signal
+#if len(sim.net.cells) > 0 and ECellModel == 'INTF6':
+#  sim.net.cells[0].global_fini()
 if sim.rank==0 and fid4 is not None: fid4.close()
 sim.gatherData() # gather data from different nodes
 sim.saveData() # save data to disk
