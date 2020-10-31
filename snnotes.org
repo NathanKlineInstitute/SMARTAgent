@@ -19432,6 +19432,620 @@ not clear if weight norm is the problem ... ?
 clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP'],lclr=['r','g','b'],plotindiv=True)
 xlabel('Time (ms)',fontsize=30); ylabel('Average weight',fontsize=30); tl(); 
 
-savefig(gifpath()+'all_avg_weight.png') 
+savefig(gifpath()+'all_avg_weight.png') # [[./gif/20oct26_20oct24_A1_cycle__step_3_all_avg_weight.png]]
 
-fig=animInput(InputImages,gifpath()+'_input.mp4')
+fig=animInput(InputImages,gifpath()+'_input.mp4') # [[./gif/20oct26_20oct24_A1_cycle__step_3__input.mp4]]
+
+...
+
+binsz = 100
+dnspk = {pop:getspikehist(dspkT[pop],dnumc,binsz,200e3) for pop in ['EMDOWN','EMUP','EA']}
+for clr,pop in zip(['r','g','b'],['EA','EMDOWN','EMUP']): plot(dnspk[pop][0],dnspk[pop][1],clr)
+xlim((0,200e3))
+savefig(gifpath()+'EA_EMDOWN_rate100.png') # [[./gif/20oct26_20oct24_A1_cycle__step_3_EA_EMDOWN_rate100.png]]
+
+EMUP,EMDOWN rates are going up and there are many more population spikes towards the end of the simulation ... 
+
+either need more frequent norm or lower starting weights ... with sparser connectivity ... and larger EA layer ? 
+
+model is pretty slow to run already ... 
+
+check last step ... 
+
+** follow ball paradigm
+
+should probably look at distance relative to ball rather than movement command
+since movement command is internal state
+distance is dependent on external environment
+
+python -i simdat.py backupcfg/20oct26_A0_lp_sim.json
+
+ax=plotPerf(actreward,yl=(0,0.6))
+savefig(gifpath()+'perf.png') # [[./gif/20oct26_20oct26_A0_lp_perf.png]]
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((190e3,200e3))
+savefig(gifpath()+'rast.png') # [[./gif/20oct26_20oct26_A0_lp_rast.png]]
+
+not really doing better ... but have fewer neurons in EA in this model 
+
+** similar test on gcp (20oct26_A0_gcp_)
+
+./myrun 48 sn.json
+
+started ~16:56 ...
+finished ~22:29 ...
+
+python -i simdat.py backupcfg/20oct26_A0_gcp_sim.json
+
+ax=plotPerf(actreward,yl=(0,0.6))
+savefig(gifpath()+'perf.png') # [[./gif/20oct27_20oct26_A0_gcp_perf.png]]
+does not seem to improve (follow ~0.2, hit goes up a bit, score a bit)
+note that follow here not identical to original follow score; here it's 
+cumulative of when moves are considered closer 
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((190e3,200e3))
+savefig(gifpath()+'rast.png') # [[./gif/20oct27_20oct26_A0_gcp_rast.png]]
+EMUP,EMDOWN firing rates are too high ... 
+
+** revise new follow rule
+
+should revise the follow target closer rule - when gets closer to target
+reward, when moves away punish, when same no reward or punish ... 
+same = staying still - perhaps punishing staying still will punish/suppress some
+of the neurons that could contribute to the correct move (in addition to the
+other neurons that are correctly punished), so may want to avoid that ... will test it ... 
+
+20oct26_B0_gcp_
+
+./myrun 48 sn.json
+
+started ~23:21 ...
+
+* 20oct27
+** added cells/hht.py for one comp HH cell model
+
+main reason is to speed-up simulation (compared to mainen)
+if using, will have to re-tune 
+
+uses HHE, HHI for the EcellModel, ICellModel in json
+the FS basket cell was already single compartment, so probably would not need to use it there ... 
+
+** check output from 20oct26_B0_gcp_
+
+finished ~10:57 AM ...
+
+python -i simdat.py backupcfg/20oct26_B0_gcp_sim.json
+
+ax=plotPerf(actreward,yl=(0,0.6))
+savefig(gifpath()+'perf.png') # [[./gif/20oct27_20oct26_B0_gcp_perf.png]]
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((390e3,400e3))
+savefig(gifpath()+'rast.png') # [[./gif/20oct27_20oct26_B0_gcp_rast.png]]
+
+fig=animInput(InputImages,gifpath()+'_input.mp4') # [[./gif/20oct27_20oct26_B0_gcp__input.mp4]] 
+
+performance improving ... ? some learning likely taking place ... but firing rates probably
+too high and needs much more time to learn ... ?
+
+** coreneuron
+
+https://github.com/Neurosim-lab/netpyne/blob/coreneuron/examples/coreneuron/tut2_coreneuron.py
+https://github.com/BlueBrain/CoreNeuron
+
+might work with this model?
+
+to compile mod files:
+nrnivmodl -coreneuron mod
+
+for netpyne have to have:
+simConfig.coreneuron = True
+
+pip install neuron-nightly --upgrade
+pip install netpyne --upgrade
+
+nrnivmodl -coreneuron mod
+
+INFO : Using neuron-nightly Package (Developer Version)
+/home/samnemo/SMARTAgent
+mod/A.mod mod/GABAa.mod mod/Nca.mod mod/OFThpo.mod mod/OFThresh.mod mod/cadad.mod mod/hsyn.mod mod/izhi2007b.mod mod/kca.mod mod/kdrbwb.mod mod/km.mod mod/kv.mod mod/nafbwb.mod mod/naz.mod mod/nsloc.mod mod/stdp.mod
+A.mod GABAa.mod Nca.mod OFThpo.mod OFThresh.mod cadad.mod hsyn.mod izhi2007b.mod kca.mod kdrbwb.mod km.mod kv.mod nafbwb.mod naz.mod nsloc.mod stdp.mod
+ERROR : CoreNEURON support is not enabled!
+
+so have to build ... 
+
+cd ~
+git clone git@github.com:neuronsimulator/nrn.git
+cd nrn
+
+mkdir build
+cd build
+
+cmake .. \
+ -DNRN_ENABLE_CORENEURON=ON \
+ -DNRN_ENABLE_INTERVIEWS=OFF \
+ -DNRN_ENABLE_RX3D=OFF \
+ -DCMAKE_INSTALL_PREFIX=$HOME/install
+
+will try on laptop first ... 
+
+** adjust model on gcp for lower firing rates
+
+        "name": "20oct27_A0_gcp_",
+
+ok, got lower firing rates ... will run for 500 s ... 
+
+./myrun 48 sn.json
+
+started ~15:25 ... 
+
+gets stuck ... restart with somewhat higher weights @ 18:42 ...
+
+** core neuron on laptop?
+
+cd ~
+git clone https://github.com/neuronsimulator/nrn
+cd nrn
+mkdir build
+cd build
+
+cmake .. \
+ -DNRN_ENABLE_CORENEURON=ON \
+ -DNRN_ENABLE_INTERVIEWS=OFF \
+ -DNRN_ENABLE_RX3D=OFF \
+ -DCMAKE_INSTALL_PREFIX=$HOME/install
+
+export PYTHONPATH=$HOME/install/lib/python:$PYTHONPATH
+export PATH=$HOME/install/bin:$PATH
+
+cd ~/SMARTAgent
+nrnivmodl -coreneuron mod_directory
+
+compilation produces a lot of errors ... 
+
+** try IntFire4 again
+
+this works:
+https://github.com/Neurosim-lab/netpyne/blob/802bb6a5ce5a9da40a740add4f119ad2249f5611/doc/source/code/tut_artif.py
+
+python -i tut_artif.py
+
+savefig('gif/20oct27_cycle_artif_a0.png') # [[./gif/20oct27_cycle_artif_a0.png]]
+
+        "name": "20oct27_I0_cycle_",
+
+* 20oct28
+** sa debugging intf in netpyne
+
+does not seem to be able to receive netstim inputs properly
+
+** check output from 20oct27_A0_gcp_
+
+finished ~10:49 ...
+
+python -i simdat.py backupcfg/20oct27_A0_gcp_sim.json
+
+ax=plotPerf(actreward,yl=(0,0.6))
+savefig(gifpath()+'perf.png') # [[./gif/20oct28_20oct27_A0_gcp_perf.png]]
+looks decent, relative to other sims - early performance seems better than late performance
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((490e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/20oct28_20oct27_A0_gcp_rast.png]]
+in general firing rates are ok but EA looks hypersynchronous ... is that how it looks early in the sim?
+
+xlim((10e3,20e3))
+savefig(gifpath()+'rastB.png') # [[./gif/20oct28_20oct27_A0_gcp_rastB.png]]
+
+looks like do not have the hypersynch earlier in the simulation; surprising that hypersynch develops
+given that there's no plasticity for the EA neurons
+
+binsz = 100
+dnspk = {pop:getspikehist(dspkT[pop],dnumc,binsz,500e3) for pop in ['EMDOWN','EMUP','EA']}
+for clr,pop in zip(['r','g','b'],['EA','EMDOWN','EMUP']): plot(dnspk[pop][0],dnspk[pop][1],clr)
+xlim((0,500e3))
+savefig(gifpath()+'EA_EMDOWN_rate100.png') # [[./gif/20oct28_20oct27_A0_gcp_EA_EMDOWN_rate100.png]]
+looks like those synchronous EA spikes occur multiple times during the simulation, not
+just at the end; seem to occur together with high EM firing
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP'],lclr=['r','g','b'],plotindiv=True)
+xlabel('Time (ms)',fontsize=30); ylabel('Average weight',fontsize=30); tl(); 
+
+savefig(gifpath()+'all_avg_weight.png') # [[./gif/20oct28_20oct27_A0_gcp_all_avg_weight.png]]
+interesting, as the weights go down, the performance is decreasing ... 
+will perf and weights increase again later? or punishment weights from moving away are too large ... 
+
+fig=animInput(InputImages,gifpath()+'_input.mp4') # [[./gif/20oct28_20oct27_A0_gcp__input.mp4]]
+
+the hypersynch may be due to recurrent EA connections
+
+** other changes to architecture
+
+get rid of directional neurons? implicit in the pixels/EV1 is movement directions ... 
+
+add another EA layer? EA2 ... integrating EA inputs and could have some RL plasticity from
+EA -> EA2
+EA -> EM
+EA2 -> EA2
+EM -> EM
+
+EA2, that would be ~same as V4 ... 
+
+trying it out ... 
+
+        "name": "20oct28_A0_gcp_",
+
+python -i simdat.py backupcfg/20oct28_A0_gcp_sim.json
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/20oct28_20oct28_A0_gcp_perf.png]]
+
+perf looks similar to model with the direction selective neurons ... 
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((190e3,200e3))
+savefig(gifpath()+'rast.png') # [[./gif/20oct28_20oct28_A0_gcp_rast.png]]
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP','EA2'],lclr=['r','g','b'],plotindiv=True)
+xlabel('Time (ms)',fontsize=30); ylabel('Average weight',fontsize=30); tl(); 
+
+savefig(gifpath()+'all_avg_weight.png') # [[./gif/20oct28_20oct28_A0_gcp_all_avg_weight.png]]
+EA2 weights do not rise as quickly ... 
+
+fig=animInput(InputImages,gifpath()+'_input.mp4') # [[./gif/20oct28_20oct28_A0_gcp__input.mp4]]
+
+may as well continue ... 
+
+        "name": "20oct28_A1_gcp_",
+    "simtype": {
+        "ResumeSim": 1,
+        "ResumeSimFromFile": "data/20oct28_A0_gcp_synWeights_final.pkl"
+    },
+
+./myrun 32 sn.json
+
+started ~5PM
+finished ~9:40PM
+
+python -i simdat.py backupcfg/20oct28_A1_gcp_sim.json
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/20oct29_20oct28_A1_gcp_perf.png]]
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((390e3,400e3))
+savefig(gifpath()+'rast.png') # [[./gif/20oct29_20oct28_A1_gcp_rast.png]]
+
+lfn = ['20oct28_A0_gcp_','20oct28_A1_gcp_']
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0,0.6))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/20oct29_20oct28_A1_gcp_perf_all_steps_so_far.png]]
+
+lpda = getindivactionreward(lfn)
+clf(); plotComparePerf(lpda,['g','b','r','c','m'],yl=(0,1),lleg=lfn)
+savefig(gifpath()+'perf_compareB.png') # [[./gif/20oct29_20oct28_A1_gcp_perf_compareB.png]]
+
+not improved and worse than model with the dir selective neurons
+
+** issue with INTFs
+
+sa: the issue is that adding stims via stimSourceParams/stimTargetParams is not yet implemented to target artificial cells
+however, you can get the same effect by creating a pop of netstims and connecting it to the artif3 (Intfire4) pop
+should work too if have a source population of stimmod connected (using connParams) to an Intfire4 population
+
+
+try that again ... 
+
+** dir selective neurons
+
+does it make sense to exclude dir selective neurons? right now, without them, no mechanism for integrating
+the movement sequences ... individual pixel locations are not enough to determine a movement decision ... 
+
+could have pixel at one location (PA) project to EA at delay=1, pixel at other location (PB) project
+to EA at delay=2
+PA, PB -> EA -> EM
+when PA,PB get activated and activate EA and EM if EM is correct action
+then EA->EM is strengthened and so are PA,PB -> EA ? 
+but may not want PA,PB -> EA to always get strengthened;; ... PA,PB -> EA are static
+but if some EA receives a neighboring PA,PB then it will implicitly encode movement ...
+though when EA fires, it could fire either due to PA or due to PB or due to both firing ... 
+
+should probably keep the dir selective neurons around for now, though expensive computationally ... 
+
+** next sim on gcp
+
+this one was ok: 20oct27_A0_gcp_
+
+could add EA2 and take it from there ... 
+
+        "name": "20oct28_E0_gcp_",
+
+python multistepSim.py sn.json 48 20 20oct28_E0_cycle_multi
+
+* 20oct29
+** intfs (IntFire4)
+
+got most of it to work properly
+see sim.py
+have to use hPointp to set the interval of the variable rate NetStim (NSLOC)
+and have to explicitly make a population of NetStims that represent the
+visual input (rather than the simpler connecting source and target)
+there's a population of netstims (with 1-to-1 connectivity to target) for
+each type of visual input (EV1, EV1DE, etc.)
+
+inhibitory synapses require negative weights so make sure to set IEGain, IIGain
+to a negative number in the json file
+
+need to make sure that negative weights do not mess up stdp.mod's functioning
+
+get some crashes once in a while depending on scaling weights
+
+had to scale up the EEGain and EIGain a lot to get any activity using the
+previous weights ... 
+
+        "name": "20oct29_I0_lp_",
+
+runs pretty quickly on laptop with 12 cores ... 
+
+problem with IntFire4 is only has a single excitatory input type...INTF6 has
+AM,AM2,NM,NM2 but doesn't compile properly without mkmod ... could try that too later on
+if need arises ... 
+
+./myrun 12 sn.json
+
+python -i simdat.py backupcfg/20oct29_I0_lp_sim.json
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') 
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); 
+savefig(gifpath()+'rast.png') # [[./gif/20oct29_20oct29_I0_lp_rast.png]]
+note that the stimMod (NetStim populations) are drawn in raster too - should allow excluding some populations
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','EA', 'IM'])
+savefig(gifpath()+'Vm.png') # [[./gif/20oct29_20oct29_I0_lp_Vm.png]]
+
+try on cycle ...
+
+./myrun 32 sn.json
+
+python -i simdat.py backupcfg/20oct29_I0_cycle_sim.json
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/20oct29_20oct29_I0_cycle_perf.png]]
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); 
+savefig(gifpath()+'rast.png') # [[./gif/20oct29_20oct29_I0_cycle_rast.png]]
+
+EA, IA, IM firing too fast ... 
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP'],lclr=['r','g','b'],plotindiv=True)
+xlabel('Time (ms)',fontsize=30); ylabel('Average weight',fontsize=30); tl(); 
+savefig(gifpath()+'all_avg_weight.png')
+
+hmm, weights empty ... maybe stdp not setup properly to work with IntFire4 ... 
+
+* 20oct30
+** info from sa on plasticity problem in NetPyNE in IntFire4 
+
+10:16
+samn:speech_balloon: happen to know if any reason stdp.mod/hSTDP wouldn't work with IntFire4? thx
+10:39
+salvadord hmm I guess you are using the ‘plasticitiy’ field to insert the syn with stdp?
+10:39
+samn:speech_balloon: yeah
+10:39
+salvadord that might not be implemented for point neurons… let me check
+10:39
+samn:speech_balloon: thx
+10:41
+salvadord yeah, so the stdp.mod needs to be connected in a particular way and it’s only implemetned for multicomp neurons
+10:41
+Untitled 
+    def _addConnPlasticity (self, params, sec, netcon, weightIndex):
+        from .. import sim
+        plasticity = params.get('plast')
+        if plasticity and sim.cfg.createNEURONObj:
+            try:
+                plastMech = getattr(h, plasticity['mech'], None)(0, sec=sec['hObj'])  # create plasticity mechanism (eg. h.STDP)
+                for plastParamName,plastParamValue in plasticity['params'].items():  # add params of the plasticity mechanism
+                    setattr(plastMech, plastParamName, plastParamValue)
+                if plasticity['mech'] == 'STDP':  # specific implementation steps required for the STDP mech
+                    precon = sim.pc.gid_connect(params['preGid'], plastMech); precon.weight[0] = 1 # Send presynaptic spikes to the STDP adjuster
+                    pstcon = sim.pc.gid_connect(self.gid, plastMech); pstcon.weight[0] = -1 # Send postsynaptic spikes to the STDP adjuster
+                    h.setpointer(netcon._ref_weight[weightIndex], 'synweight', plastMech) # Associate the STDP adjuster with this weight
+                    #self.conns[-1]['hPlastSection'] = plastSection
+                    self.conns[-1]['hSTDP']         = plastMech
+                    self.conns[-1]['hSTDPprecon']   = precon
+                    self.conns[-1]['hSTDPpstcon']   = pstcon
+                    self.conns[-1]['STDPdata']      = {'preGid':params['preGid'], 'postGid': self.gid, 'receptor': weightIndex} # Not used; FYI only; store here just so it's all in one place
+                    if sim.cfg.verbose: print('  Added STDP plasticity to synaptic mechanism')
+            except:
+                print('Error: exception when adding plasticity using %s mechanism' % (plasticity['mech']))
+Collapse
+
+
+
+10:41
+samn:speech_balloon: :disappointed:
+10:41
+salvadord you can try adding the corresponding code in netpyne/cells/pointCell.py
+10:42
+or can try doing it ‘manually’ for your net after the net is created
+10:42
+samn:speech_balloon: ic, thx - will take a look at adding that
+10:42
+salvadord can also add an issue and will look into it asap, or ask joe to have a look
+10:43
+samn:speech_balloon: joe - if has time, i can add an issue
+10:43
+will look too later
+10:43
+salvadord here’s the code for compart cells: https://github.com/Neurosim-lab/netpyne/blob/development/netpyne/cell/compartCell.py#L1242
+
+netpyne/cell/compartCell.py:1242
+    def _addConnPlasticity (self, params, sec, netcon, weightIndex):
+<https://github.com/Neurosim-lab/netpyne|Neurosim-lab/netpyne>Neurosim-lab/netpyne | Added by GitHub
+10:44
+joe working on a bunch of things, but maybe he can have a look next week at some point
+10:44
+samn:speech_balloon: sg, will create issue and take a look myself meanwhile
+10:47
+not sure if this should be bug or feature request but added as bug: https://github.com/Neurosim-lab/netpyne/issues/535
+
+samnemosamnemo
+#535 [Bug report] plasticity not working in point neurons
+Describe the bug
+plasticity rules, such as STDP are not working/implemented in point neurons
+Reproducing the bug
+Steps to reproduce the behavior:  
+create a network with artificial neurons (IntFire4) and add plasticity rule (e.g. stdp.mod)
+Expected behavior
+plasticity works across neuron types supported by netpyne
+Labels
+bug
+<https://github.com/Neurosim-lab/netpyne|Neurosim-lab/netpyne>Neurosim-lab/netpyne | Today at 10:47 | Added by GitHub
+:+1:
+1
+
+10:48
+will try your suggestion later
+
+** check output from gcp runs
+
+python -i simdat.py backupcfg/20oct28_E0_gcp__step_1_sim.json
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/20oct30_20oct28_E0_gcp__step_1_perf.png]]
+hmm, very bad performance ... much worse than first step ... 
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); 
+savefig(gifpath()+'rast.png') # [[./gif/20oct30_20oct28_E0_gcp__step_1_rast.png]]
+
+xlim((499e3,500e3))
+savefig(gifpath()+'rastB.png') # [[./gif/20oct30_20oct28_E0_gcp__step_1_rastB.png]]
+
+lfn = ['20oct28_E0_gcp__step_0_','20oct28_E0_gcp__step_1_']
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0,0.6))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/20oct30_20oct28_E0_gcp__step_1_perf_all_steps_so_far.png]]
+
+lpda = getindivactionreward(lfn)
+clf(); plotComparePerf(lpda,['g','b','r','c','m'],yl=(0,1),lleg=lfn)
+savefig(gifpath()+'perf_compareB.png') # [[./gif/20oct30_20oct28_E0_gcp__step_1_perf_compareB.png]]
+overall 2nd step is worse than 1st step ... but hit probability may be increasing slowly?
+
+stopped this on gcp for now ... 
+
+also, too slow to run right now ... may want to use INTFs instead ... 
+
+at minimum could replace EV1, EV1D, etc. with INTFs, since they
+do not even have plasticity right now ... 
+
+** try fixup for INTFs
+
+first on laptop ... 
+
+python import netpyne netpyne.__version__ '0.9.6' 
+import sys
+sys.path ['','/usr/site/python/netpyne', '/usr/arch/nrn/lib/python', '/usr/arch/nrn/nrn/share/nrn/lib/python',
+'/usr/site/nrniv/python/anaconda3/envs/py36/lib/python3.6/site-packages',
+'/usr/arch/nrn/share/python/lib/python', '/usr/site/nrniv/local/python',
+'/usr/site/nrniv/local/python/anaconda3/envs/py36/lib/python36.zip',
+'/usr/site/nrniv/local/python/anaconda3/envs/py36/lib/python3.6',
+'/usr/site/nrniv/local/python/anaconda3/envs/py36/lib/python3.6/lib-dynload',
+'/usr/site/nrniv/local/python/anaconda3/envs/py36/lib/python3.6/site-packages'] 
+
+/usr/site/python/netpyne is empty ... 
+
+should have netpyne installed in conda py3 env
+
+/usr/site/nrniv/local/python/anaconda3/envs/py36/lib/python3.6/site-packages/netpyne
+
+/usr/site/nrniv/local/python/anaconda3/envs/py36/lib/python3.6/site-packages/netpyne/cell/pointCell.py
+
+ok, added the _addConnPlasticity code to the pointCell class ... will see if works
+
+./myrun 12 sn.json
+
+python -i simdat.py backupcfg/20oct30_I0_lp_sim.json
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP'],lclr=['r','g','b'],plotindiv=True)
+xlabel('Time (ms)',fontsize=30); ylabel('Average weight',fontsize=30); tl(); 
+
+looks like they're changing, as they should ... 
+
+made pull request to netpyne here:
+ https://github.com/Neurosim-lab/netpyne/pull/536
+
+meanwhile, on cycle also copied modified pointCell.py code to /opt/anaconda3/lib/python3.7/site-packages/netpyne/cell/pointCell.py
+
+try on cycle ...
+
+./myrun 32 sn.json
+
+python -i simdat.py backupcfg/20oct30_I0_cycle_sim.json
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP'],lclr=['r','g','b'],plotindiv=True)
+xlabel('Time (ms)',fontsize=30); ylabel('Average weight',fontsize=30); tl(); 
+
+savefig(gifpath()+'all_avg_weight.png') # [[./gif/20oct30_20oct30_I0_cycle_all_avg_weight.png]]
+
+now run and make sure that rates increase over time ... 
+
+python -i simdat.py backupcfg/20oct30_I0_cycle_sim.json
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP'],lclr=['r','g','b'],plotindiv=True)
+xlabel('Time (ms)',fontsize=30); ylabel('Average weight',fontsize=30); tl(); 
+
+savefig(gifpath()+'all_avg_weightB.png') # [[./gif/20oct30_20oct30_I0_cycle_all_avg_weightB.png]]
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); 
+xlim((190e3,200e3))
+savefig(gifpath()+'rast.png') # [[./gif/20oct30_20oct30_I0_cycle_rast.png]]
+
+binsz = 100
+dnspk = {pop:getspikehist(dspkT[pop],dnumc,binsz,totalDur) for pop in ['EMDOWN','EMUP']}
+for clr,pop in zip(['r','g'],['EMDOWN','EMUP']): plot(dnspk[pop][0],dnspk[pop][1],clr)
+xlim((0,totalDur))
+ylim((0,150))
+savefig(gifpath()+'EMDOWN_EMUP_rate100.png') # [[./gif/20oct30_20oct30_I0_cycle_EMDOWN_EMUP_rate100.png]]
+
+yes, rates look like they increase ... 
+
+and make sure there's a different pattern when RLon == 0 
+or when no positive reward ... 
+
+        "name": "20oct30_J0_cycle_",
+    "rewardcodes": {
+        "scorePoint": 0.0,
+        "losePoint":  0.0,
+        "followTarget": 0.0,
+        "avoidTarget": -0.01,
+        "hitBall": 0.0
+    },
+
+./myrun 32 sn.json
+
+python -i simdat.py backupcfg/20oct30_J0_cycle_sim.json
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP'],lclr=['r','g','b'],plotindiv=True)
+xlabel('Time (ms)',fontsize=30); ylabel('Average weight',fontsize=30); tl(); 
+
+savefig(gifpath()+'all_avg_weight.png') # [[./gifpath()+'all_avg_weight.png']]
+
+weights mostly going down now
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((190e3,200e3))
+savefig(gifpath()+'rast.png') # [[./gif/20oct30_20oct30_J0_cycle_rast.png]]
+and the firing rates are much lower ... so seems to be working as expected ...
+
+        "name": "20oct30_K0_cycle_",
+
+python -i simdat.py backupcfg/20oct30_K0_cycle_sim.json
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); 
+savefig(gifpath()+'rast.png')
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','EA', 'IM'])
+
+python multistepSim.py sn.json 32 10 20oct30_K0_cycle_multi
+
+started ~23:58 ... 
+
