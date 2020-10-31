@@ -17,8 +17,8 @@
     "rewardcodes": {
         "scorePoint": 1.0,
         "losePoint":  0.0,
-        "followTarget": 0.1,
-        "avoidTarget": -0.01,
+        "followTarget": 0.15,
+        "avoidTarget": -0.005,
         "hitBall": 0.5
     },
     "actionsPerPlay": 1,
@@ -68,10 +68,10 @@
         "useTopological": 0
     },    
     "net": {
-	"EEGain": 325.0,
-	"EIGain": 8.0,
-	"IEGain": -0.05,
-	"IIGain": -0.05,
+	"EEGain": 340.0,
+	"EIGain": 7.0,
+	"IEGain": -0.045,
+	"IIGain": -0.045,
 	"ECellModel":"IntFire4",
 	"ICellModel":"IntFire4",
         "scale": 1,
@@ -203,7 +203,7 @@
 		"EMSTAY":{"AM":5e-5,"NM":6e-6,"p":0.08}		
 	    },
 	    "EM":{
-		"EM":{"AM":5e-5,"NM":6e-6,"p":0.1},
+		"EM":{"AM":5e-5,"NM":6e-6,"p":0.15},
 		"EA":{"AM":0,"NM":0,"p":0.0},
 		"IRecip": {"AM":0.02, "NM":0, "p":0.0625},
 		"IM":{"GA":0.02,"p":0.0625}
@@ -211,7 +211,7 @@
 	    "EA":{
 		"EA":{"AM":5e-5,"NM":6e-6,"p":0.0},
 		"EA2":{"AM":5e-5,"NM":6e-6,"p":0.2},
-		"EM":{"AM":5e-5,"NM":6e-6,"p":0.15},
+		"EM":{"AM":5e-5,"NM":6e-6,"p":0.25},
 		"IA":{"GA": 0.02, "p":0.0625}
 	    },
 	    "EA2":{

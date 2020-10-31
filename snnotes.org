@@ -20058,5 +20058,5 @@ after ~8 hours, rates go towards 0 ... and paddle mostly stays still ... not a g
 
 python multistepSim.py sn.json 32 10 20oct31_A0_cycle_multi
 
-started ~8:39 ...
+re-started ~13:57 ...
 
