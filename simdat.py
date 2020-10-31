@@ -110,7 +110,11 @@ def loadsimdat (name=None,getactmap=True,lpop = allpossible_pops): # load simula
       pdf = readinweights(name,final=True)
     except:
       pass
-  actreward = pd.DataFrame(np.loadtxt('data/'+name+'ActionsRewards.txt'),columns=['time','action','reward','proposed','hit','followtargetsign'])
+  actreward=None
+  try:
+    actreward = pd.DataFrame(np.loadtxt('data/'+name+'ActionsRewards.txt'),columns=['time','action','reward','proposed','hit','followtargetsign'])
+  except:
+    pass
   dnumc = {}
   for p in simConfig['net']['pops'].keys():
     if p in dstartidx:
@@ -125,8 +129,14 @@ def loadsimdat (name=None,getactmap=True,lpop = allpossible_pops): # load simula
       dspkID[pop] = spkID[(spkID >= dstartidx[pop]) & (spkID <= dendidx[pop])]
       dspkT[pop] = spkT[(spkID >= dstartidx[pop]) & (spkID <= dendidx[pop])]
   InputImages=ldflow=None
-  InputImages = loadInputImages(dconf['sim']['name'])
-  ldflow = loadMotionFields(dconf['sim']['name'])
+  try:
+    InputImages = loadInputImages(dconf['sim']['name'])
+  except:
+    pass
+  try:
+    ldflow = loadMotionFields(dconf['sim']['name'])
+  except:
+    pass
   totalDur = int(dconf['sim']['duration'])
   tstepPerAction = dconf['sim']['tstepPerAction'] # time step per action (in ms)  
   dact = None

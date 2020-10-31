@@ -19969,3 +19969,79 @@ python -i simdat.py backupcfg/20oct30_I0_lp_sim.json
 clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP'],lclr=['r','g','b'],plotindiv=True)
 xlabel('Time (ms)',fontsize=30); ylabel('Average weight',fontsize=30); tl(); 
 
+looks like they're changing, as they should ... 
+
+made pull request to netpyne here:
+ https://github.com/Neurosim-lab/netpyne/pull/536
+
+meanwhile, on cycle also copied modified pointCell.py code to /opt/anaconda3/lib/python3.7/site-packages/netpyne/cell/pointCell.py
+
+try on cycle ...
+
+./myrun 32 sn.json
+
+python -i simdat.py backupcfg/20oct30_I0_cycle_sim.json
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP'],lclr=['r','g','b'],plotindiv=True)
+xlabel('Time (ms)',fontsize=30); ylabel('Average weight',fontsize=30); tl(); 
+
+savefig(gifpath()+'all_avg_weight.png') # [[./gif/20oct30_20oct30_I0_cycle_all_avg_weight.png]]
+
+now run and make sure that rates increase over time ... 
+
+python -i simdat.py backupcfg/20oct30_I0_cycle_sim.json
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP'],lclr=['r','g','b'],plotindiv=True)
+xlabel('Time (ms)',fontsize=30); ylabel('Average weight',fontsize=30); tl(); 
+
+savefig(gifpath()+'all_avg_weightB.png') # [[./gif/20oct30_20oct30_I0_cycle_all_avg_weightB.png]]
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); 
+xlim((190e3,200e3))
+savefig(gifpath()+'rast.png') # [[./gif/20oct30_20oct30_I0_cycle_rast.png]]
+
+binsz = 100
+dnspk = {pop:getspikehist(dspkT[pop],dnumc,binsz,totalDur) for pop in ['EMDOWN','EMUP']}
+for clr,pop in zip(['r','g'],['EMDOWN','EMUP']): plot(dnspk[pop][0],dnspk[pop][1],clr)
+xlim((0,totalDur))
+ylim((0,150))
+savefig(gifpath()+'EMDOWN_EMUP_rate100.png') # [[./gif/20oct30_20oct30_I0_cycle_EMDOWN_EMUP_rate100.png]]
+
+yes, rates look like they increase ... 
+
+and make sure there's a different pattern when RLon == 0 
+or when no positive reward ... 
+
+        "name": "20oct30_J0_cycle_",
+    "rewardcodes": {
+        "scorePoint": 0.0,
+        "losePoint":  0.0,
+        "followTarget": 0.0,
+        "avoidTarget": -0.01,
+        "hitBall": 0.0
+    },
+
+./myrun 32 sn.json
+
+python -i simdat.py backupcfg/20oct30_J0_cycle_sim.json
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP'],lclr=['r','g','b'],plotindiv=True)
+xlabel('Time (ms)',fontsize=30); ylabel('Average weight',fontsize=30); tl(); 
+
+savefig(gifpath()+'all_avg_weight.png') # [[./gifpath()+'all_avg_weight.png']]
+
+weights mostly going down now
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((190e3,200e3))
+savefig(gifpath()+'rast.png') # [[./gif/20oct30_20oct30_J0_cycle_rast.png]]
+and the firing rates are much lower ... so seems to be working as expected ...
+
+        "name": "20oct30_K0_cycle_",
+
+python -i simdat.py backupcfg/20oct30_K0_cycle_sim.json
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); 
+savefig(gifpath()+'rast.png')
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','EA', 'IM'])
+
