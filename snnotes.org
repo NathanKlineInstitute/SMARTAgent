@@ -20047,5 +20047,5 @@ clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EMDOWN','EA', 'IM'])
 
 python multistepSim.py sn.json 32 10 20oct30_K0_cycle_multi
 
-started ~23:17 ... 
+started ~23:36 ... 
 

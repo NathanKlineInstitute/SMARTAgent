@@ -68,7 +68,7 @@
         "useTopological": 0
     },    
     "net": {
-	"EEGain": 250,
+	"EEGain": 275,
 	"EIGain": 10,
 	"IEGain": -0.0625,
 	"IIGain": -0.0625,
