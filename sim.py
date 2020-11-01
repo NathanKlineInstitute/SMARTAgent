@@ -1528,7 +1528,7 @@ def trainAgent (t):
               noWinner = True
   if sim.rank == 0:
     rewards, epCount, proposed_actions, total_hits, FollowTargetSign = sim.AIGame.playGame(actions, epCount, t)
-    print('t=',round(t,2),'proposed act=', proposed_actions,', model act=', actions)
+    print('t=',round(t,2),'proposed,model action:', proposed_actions,actions)
     if dconf['sim']['RLFakeUpRule']: # fake rule for testing reinforcing of up moves
       critic = np.sign(actions.count(dconf['moves']['UP']) - actions.count(dconf['moves']['DOWN']))          
       rewards = [critic for i in range(len(rewards))]
@@ -1610,7 +1610,7 @@ def trainAgent (t):
       print('No anticipated action for the input!!!')
   else:
     if critic != 0: # if critic signal indicates punishment (-1) or reward (+1)
-      if sim.rank==0: print('t=',round(t,2),'- adjust wts. critic=', critic)
+      if sim.rank==0: print('t=',round(t,2),'RLcritic:',critic)
       if dnumc['EMSTAY']>0:
         if dconf['sim']['targettedRL']:
           if not noWinner: # if there's a clear winner in terms of firing rates
@@ -1657,7 +1657,7 @@ def trainAgent (t):
           if dconf['verbose']: print('APPLY RL to both EMUP and EMDOWN')
           for STDPmech in dSTDPmech['all']: STDPmech.reward_punish(critic)
   if sim.rank==0:
-    print('t=',round(t,2),' game rewards:', rewards) # only rank 0 has access to rewards      
+    # print('t=',round(t,2),' game rewards:', rewards) # only rank 0 has access to rewards      
     for action in actions: sim.allActions.append(action)
     for pactions in proposed_actions: sim.allProposedActions.append(pactions) #also record proposed actions
     for reward in rewards: sim.allRewards.append(reward)
