@@ -38,7 +38,7 @@
         "ResumeSimFromFile": "data/20oct23_A0_cycle_synWeights_final.pkl"
     },
     "sim": {
-        "duration": 350000,
+        "duration": 10000,
         "dt": 0.2,
         "verbose": 0,
         "recordStep": 1.0,
@@ -48,9 +48,9 @@
         "RLFakeUpRule": 0,
         "RLFakeDownRule": 0,
         "RLFakeStayRule": 0,
-        "name": "20nov1_B0_cycle_",
-        "doquit": 1,
-        "doplot": 0,
+        "name": "20nov2_A0_cycle_",
+        "doquit": 0,
+        "doplot": 1,
         "saveCellSecs": 0,
         "saveCellConns": 0,
         "targettedRL": 0,
@@ -68,7 +68,7 @@
         "useTopological": 0
     },    
     "net": {
-	"EEGain": 310.0,
+	"EEGain": 275.0,
 	"EIGain": 9.0,
 	"IEGain": -0.06,
 	"IIGain": -0.06,
@@ -225,13 +225,13 @@
 	    },
 	    "IV1": {
 		"EV1": {"GA": 0.2, "p":0.25},
-		"IV1": {"GA":0.05, "p":0.25},
+		"IV1": {"GA":0.05, "p":0.15},
 		"ER": {"GA":0.02, "p":0.0},
 		"IV4": {"GA":0.0075, "p":0.0}		
 	    },
 	    "ID": {
 		"ED": {"GA": 0.2, "p":0.25},
-		"ID": {"GA":0.05, "p":0.25}		
+		"ID": {"GA":0.05, "p":0.15}		
 	    },
 	    "IV4": {
 		"EV4": {"GA":0.2, "p":0.25},
@@ -246,30 +246,30 @@
 	    },
 	    "IM": {
 		"EM": {"GA":0.25, "p":0.125},
-		"IM": {"GA":0.05, "p":0.25}
+		"IM": {"GA":0.05, "p":0.15}
 	    },
 	    "IMRecip": {
 		"EM": {"GA":0.2, "p":0.125}
 	    },
 	    "IA": {
 		"EA": {"GA":0.25, "p":0.125},
-		"IA": {"GA":0.05, "p":0.25}		
+		"IA": {"GA":0.05, "p":0.15}
 	    },
 	    "IA2": {
 		"EA2": {"GA":0.25, "p":0.125},
-		"IA2": {"GA":0.05, "p":0.25}		
+		"IA2": {"GA":0.05, "p":0.15}
 	    },	    	    
 	    "IR": {
-		"IR": {"GA":0.05, "p":0.25}
+		"IR": {"GA":0.05, "p":0.15}
 	    },
 	    "IMUP": {
-		"IMUP": {"GA":0.05, "p":0.25}
+		"IMUP": {"GA":0.05, "p":0.15}
 	    },
 	    "IMDOWN": {
-		"IMDOWN": {"GA":0.05, "p":0.25}
+		"IMDOWN": {"GA":0.05, "p":0.15}
 	    },
 	    "IMSTAY": {
-		"IMSTAY": {"GA":0.05, "p":0.25}
+		"IMSTAY": {"GA":0.05, "p":0.15}
 	    },
 	    "ER": {
 		"EV1": {"AM": 20e-5, "NM": 30e-6, "p":0.1}
