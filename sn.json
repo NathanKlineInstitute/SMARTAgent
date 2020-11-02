@@ -18,7 +18,7 @@
         "scorePoint": 1.0,
         "losePoint":  0.0,
         "followTarget": 0.1,
-        "avoidTarget": -0.001,
+        "avoidTarget": -0.0025,
         "hitBall": 0.5
     },
     "actionsPerPlay": 1,
@@ -48,7 +48,7 @@
         "RLFakeUpRule": 0,
         "RLFakeDownRule": 0,
         "RLFakeStayRule": 0,
-        "name": "20oct31_A0_cycle_",
+        "name": "20nov1_A0_cycle_",
         "doquit": 1,
         "doplot": 0,
         "saveCellSecs": 0,
@@ -68,10 +68,10 @@
         "useTopological": 0
     },    
     "net": {
-	"EEGain": 340.0,
-	"EIGain": 7.0,
-	"IEGain": -0.045,
-	"IIGain": -0.045,
+	"EEGain": 320.0,
+	"EIGain": 9.0,
+	"IEGain": -0.06,
+	"IIGain": -0.06,
 	"ECellModel":"IntFire4",
 	"ICellModel":"IntFire4",
         "scale": 1,

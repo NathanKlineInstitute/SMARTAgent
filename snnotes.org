@@ -20068,3 +20068,62 @@ restart a single sim ...
 
 23:44 ...
 
+* 20nov1
+** check output from 20oct31_A0_cycle_
+
+t= 71760.0  U,D spikes: [0.0] [0.0]
+t= 71760.0 proposed,model action: [-1] [1]
+t= 71780.0  U,D spikes: [0.0] [0.0]
+t= 71780.0 proposed,model action: [-1] [1]
+t= 71800.0  U,D spikes: [0.0] [0.0]
+t= 71800.0 proposed,model action: [-1] [1]
+t= 71820.0  U,D spikes: [0.0] [0.0]
+t= 71820.0 proposed,model action: [-1] [1]
+t= 71840.0  U,D spikes: [0.0] [0.0]
+t= 71840.0 proposed,model action: [-1] [1]
+t= 71860.0  U,D spikes: [0.0] [0.0]
+t= 71860.0 proposed,model action: [-1] [1]
+t= 71880.0  U,D spikes: [0.0] [0.0]
+t= 71880.0 proposed,model action: [-1] [1]
+t= 71900.0  U,D spikes: [180.0] [21.0]
+t= 71900.0 proposed,model action: [-1] [4]
+t= 71920.0  U,D spikes: [5111.0] [3444.0]
+t= 71920.0 proposed,model action: [-1] [4]
+t= 71940.0  U,D spikes: [19826.0] [8270.0]
+t= 71940.0 proposed,model action: [-1] [4]
+t= 71960.0  U,D spikes: [43615.0] [261.0]
+t= 71960.0 proposed,model action: [-1] [4]
+t= 71980.0  U,D spikes: [97266.0] [0.0]
+t= 71980.0 proposed,model action: [-1] [4]
+t= 72000.0  U,D spikes: [277322.0] [0.0]
+t= 72000.0 proposed,model action: [-1] [4]
+t= 72020.0  U,D spikes: [926587.0] [0.0]
+t= 72020.0 proposed,model action: [-1] [4]
+t= 72040.0  U,D spikes: [3310498.0] [0.0]
+t= 72040.0 proposed,model action: [-1] [4]
+t= 72060.0  U,D spikes: [12085577.0] [0.0]
+t= 72060.0 proposed,model action: [-1] [4]
+t= 72080.0  U,D spikes: [44447982.0] [0.0]
+t= 72080.0 proposed,model action: [-1] [4]
+nrn_timeout t=72081
+--------------------------------------------------------------------------
+MPI_ABORT was invoked on rank 0 in communicator MPI_COMM_WORLD
+with errorcode 0.
+
+NOTE: invoking MPI_ABORT causes Open MPI to kill all MPI processes.
+You may or may not see output from other processes, depending on
+exactly when Open MPI kills them.
+--------------------------------------------------------------------------
+(base) samn@cycle:~/SMARTAgent$ 
+(base) samn@cycle:~/SMARTAgent$ 
+
+never finished ... had overly high firing rates ... 
+
+** another adjustment for IntFire4 test (20nov1_A0_cycle_)
+
+./myrun 32 sn.json
+
+started ~22:28 ...
+
+** & another adjustment for IntFire4 test (20nov1_B0_cycle_)
+
