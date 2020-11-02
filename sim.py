@@ -345,14 +345,36 @@ netParams.stimTargetParams['bkg->all'] = {
 'source': 'bkg', 'conds': {'cellType': ['IR','IV1','IV4','IMT']}, 'weight': 0.0, 'delay': 'max(1, normal(5,2))', 'synMech': 'AMPA'
 }
 """
-# setup noise inputs
-for ty,sy in zip(["E","I"],["AMPA","GABA"]):
-  Weight,Rate = dconf["Noise"][ty]["Weight"],dconf["Noise"][ty]["Rate"]
-  if Weight > 0.0 and Rate > 0.0: # only create the netstims if rate,weight > 0
-    netParams.stimSourceParams[ty+'Mbkg'] = {'type': 'NetStim', 'rate': Rate, 'noise': 1.0}
-    netParams.stimTargetParams[ty+'Mbkg->all'] = {
-      'source': ty+'Mbkg', 'conds': {'cellType': EMotorPops}, 'weight': Weight, 'delay': 'max(1, normal(5,2))', 'synMech': sy
-    }
+
+def setupNoiseStim ():
+  # setup noisy NetStim sources (send random spikes)
+  if ECellModel == 'IntFire4' or ECellModel == 'INTF6':
+    for ty,sy in zip(["E","I"],["AMPA","GABA"]):
+      Weight,Rate = dconf["Noise"][ty]["Weight"],dconf["Noise"][ty]["Rate"]
+      if ty == 'E': Weight *= cfg.EEGain
+      if ty == 'I': Weight *= cfg.IEGain
+      if Weight > 0.0 and Rate > 0.0: # only create the netstims if rate,weight > 0
+        for poty in EMotorPops:
+          stimty = 'stimNoise'+poty
+          netParams.popParams[stimty] = {'cellModel': 'NetStim', 'numCells': dnumc[poty],'rate': Rate, 'noise': 1.00, 'start': 0}
+          blist = [[i,i] for i in range(dnumc[poty])]
+          netParams.connParams[stimty+'->'+poty] = {
+            'preConds': {'pop':stimty},
+            'postConds': {'pop':poty},
+            'weight':Weight,
+            'delay':2,
+            'connList':blist}
+  else:
+    # setup noise inputs
+    for ty,sy in zip(["E","I"],["AMPA","GABA"]):
+      Weight,Rate = dconf["Noise"][ty]["Weight"],dconf["Noise"][ty]["Rate"]
+      if Weight > 0.0 and Rate > 0.0: # only create the netstims if rate,weight > 0
+        netParams.stimSourceParams[ty+'Mbkg'] = {'type': 'NetStim', 'rate': Rate, 'noise': 1.0}
+        netParams.stimTargetParams[ty+'Mbkg->all'] = {
+          'source': ty+'Mbkg', 'conds': {'cellType': EMotorPops}, 'weight': Weight, 'delay': 'max(1, normal(5,2))', 'synMech': sy
+        }
+
+setupNoiseStim()        
       
 ######################################################################################
 
@@ -453,7 +475,7 @@ if dnumc['ER']>0:
   netParams.connParams['ER->IR'] = {
           'preConds': {'pop': 'ER'},
           'postConds': {'pop': 'IR'},
-          'weight': 0.02 * cfg.EIGain,
+          'weight': cmat['ER']['IR']['AM'] * cfg.EIGain,
           'delay': 2,
           'synMech': 'AMPA', 'sec':'soma', 'loc':0.5}
   if VTopoI and dconf['sim']['useReducedNetwork']==0: netParams.connParams['ER->IR']['connList'] = blistERtoIR
@@ -462,7 +484,7 @@ if dnumc['ER']>0:
 netParams.connParams['EV1->IV1'] = {
         'preConds': {'pop': 'EV1'},
         'postConds': {'pop': 'IV1'},
-        'weight': cmat['EV1']['IV1']['GA'] * cfg.EIGain,
+        'weight': cmat['EV1']['IV1']['AM'] * cfg.EIGain,
         'delay': 2,
         'synMech': 'AMPA', 'sec':'soma', 'loc':0.5}
 
@@ -472,25 +494,23 @@ if VTopoI and dconf['sim']['useReducedNetwork']==0:
 else:
   netParams.connParams['EV1->IV1']['convergence'] = prob2conv(cmat['EV1']['IV1']['p'], dnumc['EV1'])
 
-if 'EVDirPops' in dconf['net'] and 'IVDirPops' in dconf['net']:
-  if 'ID' in dconf['net']['allpops']:
-    if dnumc['ID']>0:
-      EDirPops = dconf['net']['EVDirPops']
-      IDirPops = dconf['net']['IVDirPops']
-      for prety in EDirPops:
-        for poty in IDirPops:
-          netParams.connParams[prety+'->'+poty] = {
-            'preConds': {'pop': prety},
-            'postConds': {'pop': poty},
-            'convergence': prob2conv(0.0225, dnumc[prety]),
-            'weight': 0.02 * cfg.EIGain,
-            'delay': 2,
-            'synMech': 'AMPA', 'sec':'soma', 'loc':0.5}
+if dnumc['ID']>0:
+  EVDirPops = dconf['net']['EVDirPops']
+  IVDirPops = dconf['net']['IVDirPops']
+  for prety in EVDirPops:
+    for poty in IVDirPops:
+      netParams.connParams[prety+'->'+poty] = {
+        'preConds': {'pop': prety},
+        'postConds': {'pop': poty},
+        'convergence': prob2conv(cmat['VD']['ID']['p'], dnumc[prety]),
+        'weight': cmat['VD']['ID']['AM'] * cfg.EIGain,
+        'delay': 2,
+        'synMech': 'AMPA', 'sec':'soma', 'loc':0.5}
 
 netParams.connParams['EV4->IV4'] = {
         'preConds': {'pop': 'EV4'},
         'postConds': {'pop': 'IV4'},
-        'weight': cmat['EV4']['IV4']['GA'] * cfg.EIGain,
+        'weight': cmat['EV4']['IV4']['AM'] * cfg.EIGain,
         'delay': 2,
         'synMech': 'AMPA', 'sec':'soma', 'loc':0.5}
 
@@ -503,7 +523,7 @@ else:
 netParams.connParams['EMT->IMT'] = {
         'preConds': {'pop': 'EMT'},
         'postConds': {'pop': 'IMT'},
-        'weight': cmat['EMT']['IMT']['GA'] * cfg.EIGain,
+        'weight': cmat['EMT']['IMT']['AM'] * cfg.EIGain,
         'delay': 2,
         'synMech': 'AMPA', 'sec':'soma', 'loc':0.5}
 
@@ -538,15 +558,15 @@ for prety,poty in zip(['EA','EA2'],['IA','IA2']):
     'preConds': {'pop': prety},
     'postConds': {'pop': poty},
     'convergence': prob2conv(cmat[prety][poty]['p'], dnumc[prety]),
-    'weight': cmat[prety][poty]['GA'] * cfg.EIGain,
+    'weight': cmat[prety][poty]['AM'] * cfg.EIGain,
     'delay': 2,
     'synMech': 'AMPA', 'sec':'soma', 'loc':0.5}
   if dconf['net']['RLconns']['EIPlast'] and dSTDPparamsRL['AMPAI']['RLon']: # only turn on plasticity when specified to do so
     netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL['AMPAI']}
-    netParams.connParams[k]['weight'] = getInitWeight(cmat[prety][poty]['GA'] * cfg.EIGain)
+    netParams.connParams[k]['weight'] = getInitWeight(cmat[prety][poty]['AM'] * cfg.EIGain)
   elif dconf['net']['STDPconns']['EIPlast'] and dSTDPparams['AMPAI']['STDPon']:
     netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparams['AMPAI']}
-    netParams.connParams[k]['weight'] = getInitWeight(cmat[prety][poty]['GA'] * cfg.EIGain)    
+    netParams.connParams[k]['weight'] = getInitWeight(cmat[prety][poty]['AM'] * cfg.EIGain)    
 
 
 for prety in EMotorPops:
@@ -556,15 +576,15 @@ for prety in EMotorPops:
     'preConds': {'pop': prety},
     'postConds': {'pop': 'IM'},
     'convergence': prob2conv(cmat['EM']['IM']['p'], dnumc[prety]),
-    'weight': cmat['EM']['IM']['GA'] * cfg.EIGain,
+    'weight': cmat['EM']['IM']['AM'] * cfg.EIGain,
     'delay': 2,
     'synMech': 'AMPA', 'sec':'soma', 'loc':0.5}
   if dconf['net']['RLconns']['EIPlast'] and dSTDPparamsRL['AMPAI']['RLon']: # only turn on plasticity when specified to do so
     netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL['AMPAI']}
-    netParams.connParams[k]['weight'] = getInitWeight(cmat['EM']['IM']['GA'] * cfg.EIGain)
+    netParams.connParams[k]['weight'] = getInitWeight(cmat['EM']['IM']['AM'] * cfg.EIGain)
   elif dconf['net']['STDPconns']['EIPlast'] and dSTDPparams['AMPAI']['STDPon']:
     netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparams['AMPAI']}
-    netParams.connParams[k]['weight'] = getInitWeight(cmat['EM']['IM']['GA'] * cfg.EIGain)    
+    netParams.connParams[k]['weight'] = getInitWeight(cmat['EM']['IM']['AM'] * cfg.EIGain)    
 
 # reciprocal inhibition - only active when all relevant populations created
 for prety in EMotorPops:
@@ -616,18 +636,17 @@ if VTopoI and dconf['sim']['useReducedNetwork']==0:
 else: 
   netParams.connParams['IV1->EV1']['convergence'] = prob2conv(cmat['IV1']['EV1']['p'], dnumc['IV1'])  
 
-if 'ID' in dconf['net']['allpops']:
-  if dnumc['ID']>0:
-    IVDirPops = dconf['net']['IVDirPops']
-    for prety in IVDirPops:
-      for poty in EVDirPops:
-        netParams.connParams[prety+'->'+poty] = {
-          'preConds': {'pop': prety},
-          'postConds': {'pop': poty},
-          'convergence': prob2conv(cmat['ID']['ED']['p'], dnumc['ID']),
-          'weight': cmat['ID']['ED']['GA'] * cfg.IEGain,
-          'delay': 2,
-          'synMech': 'GABA', 'sec':'soma', 'loc':0.5}
+if dnumc['ID']>0:
+  IVDirPops = dconf['net']['IVDirPops']
+  for prety in IVDirPops:
+    for poty in EVDirPops:
+      netParams.connParams[prety+'->'+poty] = {
+        'preConds': {'pop': prety},
+        'postConds': {'pop': poty},
+        'convergence': prob2conv(cmat['ID']['ED']['p'], dnumc['ID']),
+        'weight': cmat['ID']['ED']['GA'] * cfg.IEGain,
+        'delay': 2,
+        'synMech': 'GABA', 'sec':'soma', 'loc':0.5}
 
 netParams.connParams['IV4->EV4'] = {
         'preConds': {'pop': 'IV4'},

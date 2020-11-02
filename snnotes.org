@@ -20140,3 +20140,7 @@ crashed after a while ... firing rates god too high
 * 20nov2
 ** more adjustments for IntFire4 net
 
+        "name": "20nov2_A0_cycle_",
+
+./myrun 32 sn.json
+

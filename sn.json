@@ -38,7 +38,7 @@
         "ResumeSimFromFile": "data/20oct23_A0_cycle_synWeights_final.pkl"
     },
     "sim": {
-        "duration": 10000,
+        "duration": 200000,
         "dt": 0.2,
         "verbose": 0,
         "recordStep": 1.0,
@@ -49,15 +49,15 @@
         "RLFakeDownRule": 0,
         "RLFakeStayRule": 0,
         "name": "20nov2_A0_cycle_",
-        "doquit": 0,
-        "doplot": 1,
+        "doquit": 1,
+        "doplot": 0,
         "saveCellSecs": 0,
         "saveCellConns": 0,
         "targettedRL": 0,
         "tstepPerAction": 20,
         "saveWeights": 1,
         "saveAssignedFiringRates": 0,
-	      "useReducedNetwork": 0
+	"useReducedNetwork": 0
     },
     "architectureVtoA": {
         "useProbabilistic": 1,
@@ -68,8 +68,8 @@
         "useTopological": 0
     },    
     "net": {
-	"EEGain": 275.0,
-	"EIGain": 9.0,
+	"EEGain": 200.0,
+	"EIGain": 8.0,
 	"IEGain": -0.06,
 	"IIGain": -0.06,
 	"ECellModel":"IntFire4",
@@ -87,7 +87,7 @@
 	    "EV1DSW":400,
 	    "EV1DS":400,
 	    "EV1DSE":400,
-	    "ID": 0,
+	    "ID": 800,
 	    "IV1":100,
 	    "EV4":0,
 	    "IV4":0,
@@ -200,38 +200,39 @@
 		"EA":{"AM":4.5e-5,"NM":10e-6,"p":0.2},
 		"EMDOWN":{"AM":5e-5,"NM":6e-6,"p":0.08},
 		"EMUP":{"AM":5e-5,"NM":6e-6,"p":0.08},
-		"EMSTAY":{"AM":5e-5,"NM":6e-6,"p":0.08}		
+		"EMSTAY":{"AM":5e-5,"NM":6e-6,"p":0.08},
+		"ID": {"AM":0.02, "p":0.015}
 	    },
 	    "EM":{
 		"EM":{"AM":5e-5,"NM":6e-6,"p":0.15},
 		"EA":{"AM":0,"NM":0,"p":0.0},
 		"IRecip": {"AM":0.02, "NM":0, "p":0.0625},
-		"IM":{"GA":0.02,"p":0.0625}
+		"IM":{"AM":0.02,"p":0.03}
 	    },
 	    "EA":{
 		"EA":{"AM":5e-5,"NM":6e-6,"p":0.0},
 		"EA2":{"AM":5e-5,"NM":6e-6,"p":0.2},
 		"EM":{"AM":5e-5,"NM":6e-6,"p":0.25},
-		"IA":{"GA": 0.02, "p":0.0625}
+		"IA":{"AM": 0.02, "p":0.03}
 	    },
 	    "EA2":{
 		"EA":{"AM":5e-5,"NM":6e-6,"p":0.0},
 		"EA2":{"AM":5e-5,"NM":6e-6,"p":0.1},
 		"EM":{"AM":5e-5,"NM":6e-6,"p":0.2},
-		"IA2":{"GA": 0.02, "p":0.0625}
+		"IA2":{"AM": 0.02, "p":0.0625}
 	    },	   	    
 	    "IR": {
 		"ER": {"GA": 0.2, "p":0.0625}
 	    },
 	    "IV1": {
-		"EV1": {"GA": 0.2, "p":0.25},
-		"IV1": {"GA":0.05, "p":0.15},
+		"EV1": {"GA": 0.25, "p":0.1},
+		"IV1": {"GA":0.05, "p":0.1},
 		"ER": {"GA":0.02, "p":0.0},
 		"IV4": {"GA":0.0075, "p":0.0}		
 	    },
 	    "ID": {
-		"ED": {"GA": 0.2, "p":0.25},
-		"ID": {"GA":0.05, "p":0.15}		
+		"ED": {"GA": 0.25, "p":0.1},
+		"ID": {"GA":0.05, "p":0.1}
 	    },
 	    "IV4": {
 		"EV4": {"GA":0.2, "p":0.25},
@@ -245,15 +246,15 @@
 		"EV4": {"GA":0.02, "p":0.0}		
 	    },
 	    "IM": {
-		"EM": {"GA":0.25, "p":0.125},
-		"IM": {"GA":0.05, "p":0.15}
+		"EM": {"GA":0.25, "p":0.1},
+		"IM": {"GA":0.05, "p":0.1}
 	    },
 	    "IMRecip": {
 		"EM": {"GA":0.2, "p":0.125}
 	    },
 	    "IA": {
-		"EA": {"GA":0.25, "p":0.125},
-		"IA": {"GA":0.05, "p":0.15}
+		"EA": {"GA":0.25, "p":0.1},
+		"IA": {"GA":0.05, "p":0.1}
 	    },
 	    "IA2": {
 		"EA2": {"GA":0.25, "p":0.125},
@@ -277,16 +278,16 @@
 	    "EV1": {
 		"EV4": {"AM": 20e-5, "NM": 30e-6, "p":0.3},
 		"ER": {"AM":0 , "NM":0, "p":0},
-		"IV1": {"GA":0.02, "p":0.0225}
+		"IV1": {"AM":0.02, "p":0.03}
 	    },
 	    "EV4": {
 		"EMT": {"AM": 60e-5, "NM": 90e-6, "p":0.3},
 		"EV1": {"AM":0 , "NM":0, "p":0},
-		"IV4": {"GA":0.02, "p":0.0225}		
+		"IV4": {"AM":0.02, "p":0.0225}		
 	    },
 	    "EMT": {
 		"EV4": {"AM":0 , "NM":0, "p":0},
-		"IMT": {"GA":0.02, "p":0.0225}
+		"IMT": {"AM":0.02, "p":0.0225}
 	    }
 	},
         "EEMWghtThreshMin": 6.25e-06,
@@ -409,7 +410,7 @@
     "Noise": {
         "I": {
             "Rate": 0,
-            "Weight": 0.5e-05
+            "Weight": 0.05
         },
         "E": {
             "Rate": 0,
