@@ -20127,3 +20127,9 @@ started ~22:28 ...
 
 ** & another adjustment for IntFire4 test (20nov1_B0_cycle_)
 
+same as one above but slightly lower EEGain ... 
+
+./myrun 32 sn.json
+
+started ~22:38 ...
+
