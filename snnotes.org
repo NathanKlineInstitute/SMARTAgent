@@ -20144,3 +20144,7 @@ crashed after a while ... firing rates god too high
 
 ./myrun 32 sn.json
 
+** adjusting intf6.mod to minimum in mod/intf7.mod
+
+intf6.mod was more flexible in time constants and so on ... compared to IntFire4
+
