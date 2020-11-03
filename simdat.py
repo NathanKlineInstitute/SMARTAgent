@@ -110,7 +110,11 @@ def loadsimdat (name=None,getactmap=True,lpop = allpossible_pops): # load simula
       pdf = readinweights(name,final=True)
     except:
       pass
-  actreward = pd.DataFrame(np.loadtxt('data/'+name+'ActionsRewards.txt'),columns=['time','action','reward','proposed','hit'])
+  actreward=None
+  try:
+    actreward = pd.DataFrame(np.loadtxt('data/'+name+'ActionsRewards.txt'),columns=['time','action','reward','proposed','hit','followtargetsign'])
+  except:
+    pass
   dnumc = {}
   for p in simConfig['net']['pops'].keys():
     if p in dstartidx:
@@ -125,8 +129,14 @@ def loadsimdat (name=None,getactmap=True,lpop = allpossible_pops): # load simula
       dspkID[pop] = spkID[(spkID >= dstartidx[pop]) & (spkID <= dendidx[pop])]
       dspkT[pop] = spkT[(spkID >= dstartidx[pop]) & (spkID <= dendidx[pop])]
   InputImages=ldflow=None
-  InputImages = loadInputImages(dconf['sim']['name'])
-  ldflow = loadMotionFields(dconf['sim']['name'])
+  try:
+    InputImages = loadInputImages(dconf['sim']['name'])
+  except:
+    pass
+  try:
+    ldflow = loadMotionFields(dconf['sim']['name'])
+  except:
+    pass
   totalDur = int(dconf['sim']['duration'])
   tstepPerAction = dconf['sim']['tstepPerAction'] # time step per action (in ms)  
   dact = None
@@ -516,7 +526,7 @@ def drawcellVm (simConfig, ldrawpop=None,tlim=None):
   if tlim is not None: ax.set_xlim(tlim)
   
 #  
-def plotFollowBall (actreward, ax=None,cumulative=True,msz=3,binsz=1e3,color='r'):
+def plotFollowBall (actreward, ax=None,cumulative=True,msz=3,binsz=1e3,color='r',pun=False):
   # plot probability of model racket following target(predicted ball y intercept) vs time
   # when cumulative == True, plots cumulative probability; otherwise bins probabilities over binsz interval
   # not a good way to plot probabilities over time when uneven sampling - could resample to uniform intervals ...
@@ -525,7 +535,12 @@ def plotFollowBall (actreward, ax=None,cumulative=True,msz=3,binsz=1e3,color='r'
   if ax is None: ax = gca()
   ax.plot([0,np.amax(actreward.time)],[0.5,0.5],'--',color='gray')    
   allproposed = actreward[(actreward.proposed!=-1)] # only care about cases when can suggest a proposed action
-  rewardingActions = np.where(allproposed.proposed-allproposed.action==0,1,0)
+  if dconf['useFollowMoveOutput']:
+    val = 1
+    if pun: val = -1
+    rewardingActions = np.where(allproposed.followtargetsign==val,1,0)
+  else:
+    rewardingActions = np.where(allproposed.proposed-allproposed.action==0,1,0)
   if cumulative:
     rewardingActions = np.cumsum(rewardingActions) # cumulative of rewarding action
     cumActs = np.array(range(1,len(allproposed)+1))
@@ -616,12 +631,16 @@ def plotScoreLoss (actreward,ax=None,msz=3):
 
 def plotPerf (actreward,yl=(0,1)):
   # plot performance
-  plotFollowBall(actreward,ax=subplot(1,1,1),cumulative=True,color='b');  
+  plotFollowBall(actreward,ax=subplot(1,1,1),cumulative=True,color='b');
+  if dconf['useFollowMoveOutput']: plotFollowBall(actreward,ax=subplot(1,1,1),cumulative=True,color='m',pun=True);    
   plotHitMiss(actreward,ax=subplot(1,1,1),lclr=['g'],asratio=True); 
   plotScoreMiss(actreward,ax=subplot(1,1,1),clr='r',asratio=True);
   ylim(yl)
   ylabel('Performance')
-  lpatch = [mpatches.Patch(color=c,label=s) for c,s in zip(['b','g','r'],['Follow','Hit/Miss','Score/Miss'])]
+  if dconf['useFollowMoveOutput']:
+    lpatch = [mpatches.Patch(color=c,label=s) for c,s in zip(['b','m','g','r'],['Follow','Avoid','Hit/Miss','Score/Miss'])]
+  else:
+    lpatch = [mpatches.Patch(color=c,label=s) for c,s in zip(['b','g','r'],['Follow','Hit/Miss','Score/Miss'])]    
   ax=gca()
   ax.legend(handles=lpatch,handlelength=1)
   return ax
@@ -669,7 +688,7 @@ def getconcatactionreward (lfn):
   pda = None
   for fn in lfn:
     if not fn.endswith('ActionsRewards.txt'): fn = 'data/'+fn+'ActionsRewards.txt'
-    acl = pd.DataFrame(np.loadtxt(fn),columns=['time','action','reward','proposed','hit'])
+    acl = pd.DataFrame(np.loadtxt(fn),columns=['time','action','reward','proposed','hit','followtargetsign'])
     if pda is None:
       pda = acl
     else:
@@ -681,9 +700,9 @@ def getindivactionreward (lfn):
   # get the individual actionreward data frames separately so can compare cumulative rewards,actions,etc.
   # lfn is a list of actionrewards filenames from the simulation or list of simulation names
   if lfn[0].endswith('ActionsRewards.txt'): 
-    return [pd.DataFrame(np.loadtxt(fn),columns=['time','action','reward','proposed','hit']) for fn in lfn]
+    return [pd.DataFrame(np.loadtxt(fn),columns=['time','action','reward','proposed','hit','followtargetsign']) for fn in lfn]
   else:
-    return [pd.DataFrame(np.loadtxt('data/'+fn+'ActionsRewards.txt'),columns=['time','action','reward','proposed','hit']) for fn in lfn]    
+    return [pd.DataFrame(np.loadtxt('data/'+fn+'ActionsRewards.txt'),columns=['time','action','reward','proposed','hit','followtargetsign']) for fn in lfn]    
 
 def plotMeanNeuronWeight (pdf,postid,clr='k',ax=None,msz=1,xl=None):
   if ax is None: ax = gca()

@@ -22,6 +22,7 @@ sim.allActions = [] # list to store all actions
 sim.allProposedActions = [] # list to store all proposed actions
 sim.allHits = [] #list to store all hits
 sim.allMotorOutputs = [] # list to store firing rate of output motor neurons.
+sim.followTargetSign = [] # whether racket moved closer (1) or farther (-1) from y intercept target at each step
 sim.ActionsRewardsfilename = 'data/'+dconf['sim']['name']+'ActionsRewards.txt'
 sim.MotorOutputsfilename = 'data/'+dconf['sim']['name']+'MotorOutputs.txt'
 sim.WeightsRecordingTimes = []
@@ -102,9 +103,9 @@ def getpadding ():
 dnumc_padx, dtopoldivcons,dtopolconvcons,allpops_withconvtopology,allpops_withdivtopology = getpadding()
   
 if dnumc['EMSTAY']>0:
-  lrecpop = ['EMUP', 'EMDOWN','EMSTAY','EA'] # which populations to record from
+  lrecpop = ['EMUP', 'EMDOWN','EMSTAY','EA','EA2'] # which populations to record from
 else:
-  lrecpop = ['EMUP', 'EMDOWN','EA'] # which populations to record from
+  lrecpop = ['EMUP', 'EMDOWN','EA','EA2'] # which populations to record from
   
 if cmat['VD']['VD']['p'] > 0.0 or \
    cmat['VD']['VL']['p'] > 0.0 or \
@@ -146,12 +147,20 @@ simConfig.savePickle = True            # Save params, network and sim output to 
 simConfig.saveMat = False
 simConfig.saveFolder = 'data'
 # simConfig.backupCfg = ['sim.json', 'backupcfg/'+dconf['sim']['name']+'sim.json']
-#simConfig.createNEURONObj = True  # create HOC objects when instantiating network
-#simConfig.createPyStruct = True  # create Python structure (simulator-independent) when instantiating network
-simConfig.analysis['plotTraces'] = {'include': [(pop, 0) for pop in ['ER','IR','EV1','EV1DE','ID','IV1','EV4','IV4','EMT','IMT','EMDOWN','EMUP','EMSTAY','IM','IMUP','IMDOWN','EA','IA']]}
+simConfig.createNEURONObj = True  # create HOC objects when instantiating network
+simConfig.createPyStruct = True  # create Python structure (simulator-independent) when instantiating network
+simConfig.analysis['plotTraces'] = {'include': [(pop, 0) for pop in ['ER','IR','EV1','EV1DE','ID','IV1','EV4','IV4','EMT','IMT','EMDOWN','EMUP','EMSTAY','IM','IMUP','IMDOWN','EA','IA','EA2','IA2']]}
 simConfig.analysis['plotRaster'] = {'popRates':'overlay','showFig':dconf['sim']['doplot']}
 #simConfig.analysis['plot2Dnet'] = True 
 #simConfig.analysis['plotConn'] = True           # plot connectivity matrix
+# simConfig.coreneuron = True
+# synaptic weight gain (based on E, I types)
+cfg = simConfig
+cfg.EEGain = dconf['net']['EEGain'] # E to E scaling factor
+cfg.EIGain = dconf['net']['EIGain'] # E to I scaling factor
+cfg.IEGain = dconf['net']['IEGain'] # I to E scaling factor
+cfg.IIGain = dconf['net']['IIGain'] # I to I scaling factor
+
 
 ECellModel = dconf['net']['ECellModel']
 ICellModel = dconf['net']['ICellModel']
@@ -182,13 +191,26 @@ def makeECellModel (ECellModel):
   elif ECellModel == 'IntFire4':
     EExcitSec = 'soma' # section where excitatory synapses placed
     simConfig.recordTraces = {'V_soma':{'var':'m'}}  # Dict with traces to record
+    netParams.defaultThreshold = 0.0 
     for ty in ETypes:
-      netParams.popParams[ty] = {'cellType':ty, 'numCells': dnumc[ty], 'cellModel': ECellModel}#, 'params':{'taue':5.35,'taui1':9.1,'taui2':0.07,'taum':20}}    
+      #netParams.popParams[ty]={'cellType':ty,'numCells':dnumc[ty],'cellModel':ECellModel}#, 'params':{'taue':5.35,'taui1':9.1,'taui2':0.07,'taum':20}}
+      netParams.popParams[ty] = {'cellType':ty, 'cellModel': 'IntFire4', 'numCells': dnumc[ty], 'taue': 1.0}  # pop of IntFire4
+  elif ECellModel == 'INTF6':
+    EExcitSec = 'soma' # section where excitatory synapses placed
+    simConfig.recordTraces = {'V_soma':{'var':'Vm'}}  # Dict with traces to record
+    netParams.defaultThreshold = -45.0
+    for ty in ETypes:
+      netParams.popParams[ty] = {'cellType':ty, 'cellModel': 'INTF6', 'numCells': dnumc[ty]}#, 'taue': 1.0}  # pop of IntFire4    
   elif ECellModel == 'Friesen':
     cellRule = netParams.importCellParams(label='PYR_Friesen_rule', conds={'cellType': ETypes, 'cellModel': 'Friesen'},
                 fileName='cells/friesen.py', cellName='MakeRSFCELL')
     cellRule['secs']['axon']['spikeGenLoc'] = 0.5  # spike generator location.
     EExcitSec = 'dend' # section where excitatory synapses placed
+  elif ECellModel == 'HH':
+    EExcitSec = 'soma'
+    netParams.importCellParams(label='HHE_rule', conds={'cellType': ETypes}, fileName='cells/hht.py', cellName='HHE')
+    netParams.cellParams['HHE_rule']['secs']['soma']['threshold'] = -10.0
+    
   return EExcitSec
 
 def makeICellModel (ICellModel):
@@ -206,12 +228,22 @@ def makeICellModel (ICellModel):
     netParams.cellParams['IzhiFS'] = FScellRule  # add dict to list of cell properties
   elif ICellModel == 'IntFire4':
     simConfig.recordTraces = {'V_soma':{'var':'m'}}  # Dict with traces to record
+    netParams.defaultThreshold = 0.0     
     for ty in ITypes:
-      netParams.popParams[ty] = {'cellType':ty, 'numCells': dnumc[ty], 'cellModel': ICellModel}#, 'params':{'taue':5.35,'taui1':9.1,'taui2':0.07,'taum':20}}        
+      netParams.popParams[ty] = {'cellType':ty, 'cellModel': 'IntFire4', 'numCells': dnumc[ty], 'taue': 1.0}  # pop of IntFire4
+  elif ICellModel == 'INTF6':
+    EExcitSec = 'soma' # section where excitatory synapses placed
+    simConfig.recordTraces = {'V_soma':{'var':'Vm'}}  # Dict with traces to record
+    netParams.defaultThreshold = -45.0
+    for ty in ITypes:
+      netParams.popParams[ty] = {'cellType':ty, 'cellModel': 'INTF6', 'numCells': dnumc[ty]}#, 'taue': 1.0}  # pop of IntFire4          
   elif ICellModel == 'Friesen':
     cellRule = netParams.importCellParams(label='Bas_Friesen_rule', conds={'cellType': ITypes, 'cellModel': 'Friesen'},
                 fileName='cells/friesen.py', cellName='MakeFSFCELL')
-    cellRule['secs']['axon']['spikeGenLoc'] = 0.5  # spike generator location.  
+    cellRule['secs']['axon']['spikeGenLoc'] = 0.5  # spike generator location.
+  elif ICellModel == 'HH':
+    netParams.importCellParams(label='HHI_rule', conds={'cellType': ITypes}, fileName='cells/hht.py', cellName='HHI')
+    netParams.cellParams['HHI_rule']['secs']['soma']['threshold'] = -10.0
       
 EExcitSec = makeECellModel(ECellModel)
 makeICellModel(ICellModel)
@@ -221,45 +253,75 @@ netParams.synMechParams['AMPA'] = {'mod': 'Exp2Syn', 'tau1': 0.05, 'tau2': 5.3, 
 netParams.synMechParams['NMDA'] = {'mod': 'Exp2Syn', 'tau1': 0.15, 'tau2': 166.0, 'e': 0} # NMDA
 netParams.synMechParams['GABA'] = {'mod': 'Exp2Syn', 'tau1': 0.07, 'tau2': 9.1, 'e': -80}  # inhibitory synaptic mechanism
 
-#wmin should be set to the initial/baseline weight of the connection.
-STDPparams = {'hebbwt': 0.0001, 'antiwt':-0.00001, 'wbase': 0.0012, 'wmax': 50, 'RLon': 0 , 'RLhebbwt': 0.001, 'RLantiwt': -0.000,
-              'tauhebb': 10, 'RLwindhebb': 50, 'useRLexp': 0, 'softthresh': 0, 'verbose':0}
+def readSTDPParams ():
+  dSTDPparamsRL = {} # STDP-RL parameters for AMPA,NMDA synapses; generally uses shorter/longer eligibility traces
+  lsy = ['AMPA', 'NMDA']
+  if 'AMPAI' in dconf['RL']: lsy.append('AMPAI')  
+  for sy,gain in zip(lsy,[cfg.EEGain,cfg.EEGain,cfg.EIGain]):
+    dSTDPparamsRL[sy] = dconf['RL'][sy]
+    for k in dSTDPparamsRL[sy].keys():
+      if k.count('wt') or k.count('wbase') or k.count('wmax'): dSTDPparamsRL[sy][k] *= gain      
+  lsy = ['AMPA', 'NMDA']
+  if 'AMPAI' in dconf['STDP']: lsy.append('AMPAI')  
+  dSTDPparams = {} # STDPL parameters for AMPA,NMDA synapses; generally uses shorter/longer eligibility traces
+  for sy,gain in zip(lsy,[cfg.EEGain,cfg.EEGain,cfg.EIGain]):
+    dSTDPparams[sy] = dconf['STDP'][sy]
+    for k in dSTDPparams[sy].keys():
+      if k.count('wt') or k.count('wbase') or k.count('wmax'): dSTDPparams[sy][k] *= gain
+  return dSTDPparamsRL, dSTDPparams
+  
+dSTDPparamsRL, dSTDPparams = readSTDPParams()  
+  
+def setupStimMod ():
+  # setup variable rate NetStim sources (send spikes based on image contents)
+  lstimty = []
+  inputPop = 'EV1' # which population gets the direct visual inputs (pixels)
+  if dnumc['ER']>0: inputPop = 'ER'
+  stimModLocW = dconf['net']['stimModVL']
+  stimModDirW = dconf['net']['stimModVD']    
+  if ECellModel == 'IntFire4' or ECellModel == 'INTF6':
+    lpoty = [inputPop]
+    for poty in ['EV1D'+Dir for Dir in ['E','NE','N', 'NW','W','SW','S','SE']]: lpoty.append(poty)
+    wt = stimModLocW      
+    for poty in lpoty:
+      if dnumc[poty] <= 0: continue
+      stimty = 'stimMod'+poty
+      lstimty.append(stimty)
+      netParams.popParams[stimty] = {'cellModel': 'NSLOC', 'numCells': dnumc[poty],'rate': 'variable', 'noise': 0, 'start': 0}
+      blist = [[i,i] for i in range(dnumc[poty])]
+      netParams.connParams[stimty+'->'+poty] = {
+        'preConds': {'pop':stimty},
+        'postConds': {'pop':poty},
+        'weight':wt,
+        'delay':2,
+        'connList':blist}
+      wt = stimModDirW # rest of inputs use this weight
+  else:
+    # these are the image-based inputs provided to the R (retinal) cells
+    netParams.stimSourceParams['stimMod'] = {'type': 'NetStim', 'rate': 'variable', 'noise': 0}  
+    netParams.stimTargetParams['stimMod->'+inputPop] = {
+      'source': 'stimMod',
+      'conds': {'pop': inputPop},
+      'convergence': 1,
+      'weight': stimModLocW,
+      'delay': 1,
+      'synMech': 'AMPA'}
+    for pop in ['EV1D'+Dir for Dir in ['E','NE','N', 'NW','W','SW','S','SE']]:
+      netParams.stimTargetParams['stimMod->'+pop] = {
+        'source': 'stimMod',
+        'conds': {'pop': pop},
+        'convergence': 1,
+        'weight': stimModDirW,
+        'delay': 1,
+        'synMech': 'AMPA'}
+  return lstimty
 
-
-dSTDPparamsRL = {} # STDP-RL parameters for AMPA,NMDA synapses; generally uses shorter/longer eligibility traces
-for sy in ['AMPA', 'NMDA']: dSTDPparamsRL[sy] = dconf['RL'][sy]
-if 'AMPAI' in dconf['RL']: dSTDPparamsRL['AMPAI'] = dconf['RL']['AMPAI']
-
-dSTDPparams = {} # STDPL parameters for AMPA,NMDA synapses; generally uses shorter/longer eligibility traces
-for sy in ['AMPA', 'NMDA']: dSTDPparams[sy] = dconf['STDP'][sy]
-if 'AMPAI' in dconf['STDP']: dSTDPparams['AMPAI'] = dconf['STDP']['AMPAI']
-
-# these are the image-based inputs provided to the R (retinal) cells
-netParams.stimSourceParams['stimMod'] = {'type': 'NetStim', 'rate': 'variable', 'noise': 0}
-
-stimModLocW = dconf['net']['stimModVL']
-stimModDirW = dconf['net']['stimModVD']
-
-inputPop = 'EV1' # which population gets the direct visual inputs (pixels)
-if dnumc['ER']>0: inputPop = 'ER'
-netParams.stimTargetParams['stimMod->'+inputPop] = {
-  'source': 'stimMod',
-  'conds': {'pop': inputPop},
-  'convergence': 1,
-  'weight': stimModLocW,
-  'delay': 1,
-  'synMech': 'AMPA'
-}
-
-for pop in ['EV1D'+Dir for Dir in ['E','NE','N', 'NW','W','SW','S','SE']]:
-  netParams.stimTargetParams['stimMod->'+pop] = {
-    'source': 'stimMod',
-    'conds': {'pop': pop},
-    'convergence': 1,
-    'weight': stimModDirW,
-    'delay': 1,
-    'synMech': 'AMPA'
-  }
+sim.lstimty = setupStimMod() # when using IntFire4 cells lstimty has the NetStim populations that send spikes to EV1, EV1DE, etc.
+for ty in sim.lstimty: allpops.append(ty)
+            
+# testing with IntFire4 
+#netParams.stimSourceParams['background'] = {'type': 'NetStim', 'interval': 10, 'number': 1e5, 'start': 0, 'noise': 0.5}  
+#netParams.stimTargetParams['bkg->EV1'] = {'source': 'background', 'conds': {'pop': 'EV1'}, 'weight': 5, 'delay': 1}
 
 #background input to inhibitory neurons to increase their firing rate
 
@@ -332,13 +394,6 @@ else:
   blistIV4toEV1, connCoordsIV4toEV1 = connectLayerswithOverlapDiv(NBpreN = dnumc['IV4'], NBpostN = dnumc['EV1'], overlap_xdir = dtopoldivcons['IV4']['EV1'], padded_preneurons_xdir = dnumc_padx['IV4'], padded_postneurons_xdir = dnumc_padx['EV1'])
   blistIMTtoEV4, connCoordsIMTtoEV4 = connectLayerswithOverlapDiv(NBpreN = dnumc['IMT'], NBpostN = dnumc['EV4'], overlap_xdir = dtopoldivcons['IMT']['EV4'], padded_preneurons_xdir = dnumc_padx['IMT'], padded_postneurons_xdir = dnumc_padx['EV4'])
   
-# synaptic weight gain (based on E, I types)
-cfg = simConfig
-cfg.EEGain = dconf['net']['EEGain'] # E to E scaling factor
-cfg.EIGain = dconf['net']['EIGain'] # E to I scaling factor
-cfg.IEGain = dconf['net']['IEGain'] # I to E scaling factor
-cfg.IIGain = dconf['net']['IIGain'] # I to I scaling factor
-
 ### from https://www.neuron.yale.edu/phpBB/viewtopic.php?f=45&t=3770&p=16227&hilit=memory#p16122
 cfg.saveCellSecs = bool(dconf['sim']['saveCellSecs']) # if False removes all data on cell sections prior to gathering from nodes
 cfg.saveCellConns = bool(dconf['sim']['saveCellConns']) # if False removes all data on cell connections prior to gathering from nodes
@@ -476,24 +531,26 @@ for prety in EVPops:
       netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparams['AMPAI']}    
 """
 
-for prety in ['EA']:
-  k = prety+'->IA'
+for prety,poty in zip(['EA','EA2'],['IA','IA2']):
+  if dnumc[prety] <= 0 or dnumc[poty] <= 0: continue
+  k = prety+'->'+poty
   netParams.connParams[k] = {
     'preConds': {'pop': prety},
-    'postConds': {'pop': 'IA'},
-    'convergence': prob2conv(cmat['EA']['IA']['p'], dnumc[prety]),
-    'weight': cmat['EA']['IA']['GA'] * cfg.EIGain,
+    'postConds': {'pop': poty},
+    'convergence': prob2conv(cmat[prety][poty]['p'], dnumc[prety]),
+    'weight': cmat[prety][poty]['GA'] * cfg.EIGain,
     'delay': 2,
     'synMech': 'AMPA', 'sec':'soma', 'loc':0.5}
   if dconf['net']['RLconns']['EIPlast'] and dSTDPparamsRL['AMPAI']['RLon']: # only turn on plasticity when specified to do so
     netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL['AMPAI']}
-    netParams.connParams[k]['weight'] = getInitWeight(cmat['EA']['IA']['GA'] * cfg.EIGain)
+    netParams.connParams[k]['weight'] = getInitWeight(cmat[prety][poty]['GA'] * cfg.EIGain)
   elif dconf['net']['STDPconns']['EIPlast'] and dSTDPparams['AMPAI']['STDPon']:
     netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparams['AMPAI']}
-    netParams.connParams[k]['weight'] = getInitWeight(cmat['EA']['IA']['GA'] * cfg.EIGain)    
+    netParams.connParams[k]['weight'] = getInitWeight(cmat[prety][poty]['GA'] * cfg.EIGain)    
 
 
 for prety in EMotorPops:
+  if dnumc[prety] <= 0: continue
   k = prety+'->IM'
   netParams.connParams[k] = {
     'preConds': {'pop': prety},
@@ -615,15 +672,16 @@ for poty in EMotorPops: # I -> E for motor populations
     'delay': 2,
     'synMech': 'GABA', 'sec':'soma', 'loc':0.5}
 
-for poty in ['EA']:
-  netParams.connParams['IA->'+poty] = {
-    'preConds': {'pop': 'IA'},
+
+for prety,poty in zip(['IA','IA2'],['EA','EA2']):  
+  netParams.connParams[prety+'->'+poty] = {
+    'preConds': {'pop': prety},
     'postConds': {'pop': poty},
-    'convergence': prob2conv(cmat['IA']['EA']['p'], dnumc['IA']),
-    'weight': cmat['IA']['EA']['GA'] * cfg.IEGain,
+    'convergence': prob2conv(cmat[prety][poty]['p'], dnumc[prety]),
+    'weight': cmat[prety][poty]['GA'] * cfg.IEGain,
     'delay': 2,
     'synMech': 'GABA', 'sec':'soma', 'loc':0.5}
-
+  
 #I to I
 for IType in ITypes:
   if IType not in dnumc: continue
@@ -928,13 +986,38 @@ def connectEVToTarget (lpoty, useTopological):
           elif dSTDPparams[synmech]['STDPon'] and useSTDP:
             netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparams[synmech]}                           
 
-connectEVToTarget(['EA'], dconf['architectureVtoA']['useTopological'])
-connectEVToTarget(EMotorPops, dconf['architectureVtoM']['useTopological'])
-  
-# Add connections from visual association area to motor cortex
-for prety in ['EA']:
+connectEVToTarget(['EA'], dconf['architectureVtoA']['useTopological']) # connect primary visual to visual association
+connectEVToTarget(EMotorPops, dconf['architectureVtoM']['useTopological']) # connect primary visual to motor
+
+# add connections from first to second visual association area
+# EA -> EA2
+prety = 'EA'; poty = 'EA2'
+if dnumc[prety] > 0 and dnumc[poty] > 0:  
+  lsynw = [cmat[prety][poty]['AM']*cfg.EEGain, cmat[prety][poty]['NM']*cfg.EEGain]
+  for strty,synmech,weight in zip(['','n'],['AMPA', 'NMDA'],lsynw):
+    k = strty+prety+'->'+strty+poty
+    netParams.connParams[k] = {
+      'preConds': {'pop': prety},
+      'postConds': {'pop': poty},
+      'convergence': prob2conv(cmat[prety][poty]['p'], dnumc[prety]),
+      'weight': getInitWeight(weight),
+      'delay': 2,
+      'synMech': synmech,
+      'sec':EExcitSec, 'loc':0.5
+    }
+    useRL = useSTDP = False
+    ffconnty = 'FeedForwardAtoA2'
+    if dconf['net']['RLconns'][ffconnty]: useRL = True
+    if dconf['net']['STDPconns'][ffconnty]: useSTDP = True          
+    if dSTDPparamsRL[synmech]['RLon'] and useRL: # only turn on plasticity when specified to do so
+      netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL[synmech]}
+    elif dSTDPparams[synmech]['STDPon'] and useSTDP:
+      netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparams[synmech]}
+
+# Add connections from visual association areas to motor cortex, and reccurrent conn within visual association areas
+for prety,ffconnty,recconnty in zip(['EA', 'EA2'],['FeedForwardAtoM','FeedForwardA2toM'],['RecurrentANeurons','RecurrentA2Neurons']):
   if dnumc[prety] <= 0: continue
-  lsynw = [cmat['EA']['EM']['AM']*cfg.EEGain, cmat['EA']['EM']['NM']*cfg.EEGain]
+  lsynw = [cmat[prety]['EM']['AM']*cfg.EEGain, cmat[prety]['EM']['NM']*cfg.EEGain]
   for poty in EMotorPops:
     if dnumc[poty] <= 0: continue
     for strty,synmech,weight in zip(['','n'],['AMPA', 'NMDA'],lsynw):
@@ -942,39 +1025,37 @@ for prety in ['EA']:
       netParams.connParams[k] = {
         'preConds': {'pop': prety},
         'postConds': {'pop': poty},
-        'convergence': prob2conv(cmat['EA']['EM']['p'], dnumc[prety]),
+        'convergence': prob2conv(cmat[prety]['EM']['p'], dnumc[prety]),
         'weight': getInitWeight(weight),
         'delay': 2,
         'synMech': synmech,
         'sec':EExcitSec, 'loc':0.5
       }
       useRL = useSTDP = False
-      if dconf['net']['RLconns']['FeedForwardAtoM']: useRL = True
-      if dconf['net']['STDPconns']['FeedForwardAtoM']: useSTDP = True          
+      if dconf['net']['RLconns'][ffconnty]: useRL = True
+      if dconf['net']['STDPconns'][ffconnty]: useSTDP = True          
       if dSTDPparamsRL[synmech]['RLon'] and useRL: # only turn on plasticity when specified to do so
         netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL[synmech]}
       elif dSTDPparams[synmech]['STDPon'] and useSTDP:
-        netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparams[synmech]}                  
-                    
-# add recurrent plastic connectivity within EA population
-if cmat['EA']['EA']['p'] > 0.0:
-  prety = poty = 'EA'
-  for strty,synmech,weight in zip(['','n'],['AMPA', 'NMDA'],[cmat['EA']['EA']['AM']*cfg.EEGain, cmat['EA']['EA']['NM']*cfg.EEGain]):
-    k = strty+prety+'->'+strty+poty
-    netParams.connParams[k] = {
-      'preConds': {'pop': prety},
-      'postConds': {'pop': poty},
-      'convergence': prob2conv(cmat['EA']['EA']['p'], dnumc[prety]),
-      'weight': getInitWeight(weight),
-      'delay': 2,
-      'synMech': synmech,
-      'sec':EExcitSec, 'loc':0.5
-    }
-    if dconf['net']['RLconns']['RecurrentANeurons'] and dSTDPparamsRL[synmech]['RLon']: # only turn on plasticity when specified to do so
-      netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL[synmech]}
-    elif dconf['net']['STDPconns']['RecurrentANeurons'] and dSTDPparams[synmech]['STDPon']:
-      netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparams[synmech]}            
-
+        netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparams[synmech]}                                      
+  # add recurrent plastic connectivity within EA populations
+  poty = prety
+  if cmat[prety][poty]['p'] > 0.0 and dnumc[poty]>0:
+    for strty,synmech,weight in zip(['','n'],['AMPA', 'NMDA'],[cmat[prety][poty]['AM']*cfg.EEGain, cmat[prety][poty]['NM']*cfg.EEGain]):
+      k = strty+prety+'->'+strty+poty
+      netParams.connParams[k] = {
+        'preConds': {'pop': prety},
+        'postConds': {'pop': poty},
+        'convergence': prob2conv(cmat[prety][poty]['p'], dnumc[prety]),
+        'weight': getInitWeight(weight),
+        'delay': 2,
+        'synMech': synmech,
+        'sec':EExcitSec, 'loc':0.5
+      }
+      if dconf['net']['RLconns'][recconnty] and dSTDPparamsRL[synmech]['RLon']: # only turn on plasticity when specified to do so
+        netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL[synmech]}
+      elif dconf['net']['STDPconns'][recconnty] and dSTDPparams[synmech]['STDPon']:
+        netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparams[synmech]}            
           
 # add recurrent plastic connectivity within EM populations
 if cmat['EM']['EM']['p'] > 0.0:
@@ -1000,7 +1081,7 @@ if cmat['EM']['EM']['p'] > 0.0:
 # add feedback plastic connectivity from EM populations to association populations
 if cmat['EM']['EA']['p'] > 0.0:
   for prety in EMotorPops:
-    for poty in ['EA']:
+    for poty in ['EA','EA2']:
         for strty,synmech,weight in zip(['','n'],['AMPA', 'NMDA'],[cmat['EM']['EA']['AM']*cfg.EEGain, cmat['EM']['EA']['NM']*cfg.EEGain]):
           k = strty+prety+'->'+strty+poty
           netParams.connParams[k] = {
@@ -1215,6 +1296,7 @@ def saveGameBehavior(sim):
       fid3.write('\t%0.5f' % sim.allRewards[i])
       fid3.write('\t%0.1f' % sim.allProposedActions[i]) #the number of proposed action should be equal to the number of actions
       fid3.write('\t%0.1f' % sim.allHits[i]) #1 when the racket hits the ball and -1 when the racket misses the ball
+      fid3.write('\t%d' % sim.followTargetSign[i])
       fid3.write('\n')
 
 ######################################################################################
@@ -1237,98 +1319,70 @@ total_hits = [] #numbertimes ball is hit by racket as ball changes its direction
 dSTDPmech = {} # dictionary of list of STDP mechanisms
 
 def InitializeInputRates ():
-  # update the source firing rates for the ER neuron population, based on image contents
-  # also update the firing rates for the direction sensitive neurons based on image contents
-  if dnumc['ER']>0:
-    lratepop = ['ER', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW', 'EV1DSW', 'EV1DS', 'EV1DSE']
+  # initialize the source firing rates for the primary visual neuron populations (location V1 and direction sensitive)
+  # based on image contents
+  if ECellModel == 'IntFire4' or ECellModel == 'INTF6':
+    np.random.seed(1234)
+    for pop in sim.lstimty:
+      if pop in sim.net.pops:
+        for cell in sim.net.cells:
+          if cell.gid in sim.net.pops[pop].cellGids:
+            cell.hPointp.interval = 1e12
+            cell.hPointp.start = np.random.uniform(0,1200) 
   else:
-    lratepop = ['EV1', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW', 'EV1DSW', 'EV1DS', 'EV1DSE']  
-  for pop in lratepop:
-    lCell = [c for c in sim.net.cells if c.gid in sim.net.pops[pop].cellGids] # this is the set of cells
-    for cell in lCell:  
-      for stim in cell.stims:
-        if stim['source'] == 'stimMod':
-          stim['hObj'].interval = 1e12
+    if dnumc['ER']>0:
+      lratepop = ['ER', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW', 'EV1DSW', 'EV1DS', 'EV1DSE']
+    else:
+      lratepop = ['EV1', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW', 'EV1DSW', 'EV1DS', 'EV1DSE']    
+    for pop in lratepop:
+      lCell = [c for c in sim.net.cells if c.gid in sim.net.pops[pop].cellGids] # this is the set of cells
+      for cell in lCell:  
+        for stim in cell.stims:
+          if stim['source'] == 'stimMod':
+            stim['hObj'].interval = 1e12
 
 def updateInputRates ():
-  # update the source firing rates for the ER neuron population, based on image contents
-  # also update the firing rates for the direction sensitive neurons based on image contents
-  if dnumc['ER']>0:
-    lratepop = ['ER', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW', 'EV1DSW', 'EV1DS', 'EV1DSE']
-  else:
-    lratepop = ['EV1', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW', 'EV1DSW', 'EV1DS', 'EV1DSE']
-  # sim.pc.barrier()
-
-  #root = 0 # any specific rank
-  #src = rank if rank == root else None
-  #dest = pc.py_broadcast(src, root)
-
-  #src = dict(sim.AIGame.dFiringRates) if sim.rank == 0 else None
-  #print('rank=',sim.rank,'src=',src)
-
-
+  # update the source firing rates for the primary visual neuron populations (location V1 and direction sensitive)
+  # based on image contents
   # this py_alltoall seems to work, but is apparently not as fast as py_broadcast (which has problems - wrong-sized array sometimes!)
   root = 0
   nhost = sim.pc.nhost()
   src = [sim.AIGame.dFiringRates]*nhost if sim.rank == root else [None]*nhost
   dFiringRates = sim.pc.py_alltoall(src)[0]
   if sim.rank == 0: dFiringRates = sim.AIGame.dFiringRates
-  # print(sim.rank,'dFiringRates:',dFiringRates)
-
-  """ # for some reason this code does not work - returns wrong sized array on dest sometimes, saw it produce MPI error too
-  if sim.rank == 0:
-    dFiringRates = sim.AIGame.dFiringRates
-    sim.pc.py_broadcast(dFiringRates, 0)
-  else:
-    dFiringRates = sim.pc.py_broadcast(None, 0)
-    #dFiringRates = {pop:np.zeros(dnumc[pop]) for pop in allpops}
-  # pop='EV1'; print('rank=',sim.rank,pop,len(dFiringRates[pop]))
-  """
-  
-  """ # this also sometimes produces wrong-sized array on dest
-  sim.pc.barrier()
-  if sim.rank == 0:
-    #print('rank0:',len(sim.AIGame.dFiringRates['EV1']))
-    #dFiringRates = sim.pc.py_broadcast(dict(sim.AIGame.dFiringRates), 0)
-    dFiringRates = sim.AIGame.dFiringRates
-    for k in sim.AIGame.lratepop:
-      sim.pc.broadcast(sim.AIGame.dFVec[k].from_python(dFiringRates[k]),0)
-      if dconf['verbose'] > 1: print('Firing Rates of',k,np.where(dFiringRates[k]==np.amax(dFiringRates[k])),np.amax(dFiringRates[k]))
-      print('rank=',sim.rank,k,len(dFiringRates[k]))
-  else:
-    #dFiringRates = sim.pc.py_broadcast(None, 0) # OrderedDict()
-    dFiringRates = OrderedDict()
-    for pop in lratepop:
-      vec = h.Vector()
-      destSz = sim.pc.broadcast(vec,0)
-      print('rank=',sim.rank,'destSz=',destSz)
-      dFiringRates[pop] = vec.to_python()
-      if dconf['verbose'] > 1:
-        print(sim.rank,'received firing rates:',np.where(dFiringRates[pop]==np.amax(dFiringRates[pop])),np.amax(dFiringRates[pop]))
-      print('rank=',sim.rank,pop,len(dFiringRates[pop]))
-  sim.pc.barrier()
-  """
-  
+  # if sim.rank==0: print(dFiringRates['EV1'])  
   # update input firing rates for stimuli to ER,EV1 and direction sensitive cells
-  for pop in lratepop:
-    lCell = [c for c in sim.net.cells if c.gid in sim.net.pops[pop].cellGids] # this is the set of cells
-    offset = sim.simData['dminID'][pop]
-    #if dconf['verbose'] > 1: print(sim.rank,'updating len(',pop,len(lCell),'source firing rates. len(dFiringRates)=',len(dFiringRates[pop]))
-    for cell in lCell:  
-      for stim in cell.stims:
-        if stim['source'] == 'stimMod':
-          #rind = random.randint(0,2)
-          #fchoices = [20,50,1000] #20 will represent 50Hz and so on
-          # print(pop,len(dFiringRates[pop]),int(cell.gid-offset),cell.gid,offset)
-          if dFiringRates[pop][int(cell.gid-offset)]==0:
-            stim['hObj'].interval = 1e12
+  if ECellModel == 'IntFire4' or ECellModel == 'INTF6': # different rules/code when dealing with artificial cells
+    lsz = len('stimMod') # this is a prefix
+    for pop in sim.lstimty: # go through NetStim populations
+      if pop in sim.net.pops: # make sure the population exists
+        lCell = [c for c in sim.net.cells if c.gid in sim.net.pops[pop].cellGids] # this is the set of NetStim cells
+        offset = sim.simData['dminID'][pop]
+        #print(pop,pop[lsz:],offset)
+        for cell in lCell:
+          if dFiringRates[pop[lsz:]][int(cell.gid-offset)]==0:
+            cell.hPointp.interval = 1e12
           else:
-            stim['hObj'].interval = 1000.0/dFiringRates[pop][int(cell.gid-offset)] #40 #fchoices[rind] #10 #
-          #sim.AIGame.dAllFiringRates[-1][pop][int(cell.gid-offset)] = fchoices[rind] 
-          #print('cell GID: ', int(cell.gid), 'vs cell ID with offset: ', int(cell.gid-R_offset)) # interval in ms as a function of rate; is cell.gid correct index??? 
+            cell.hPointp.interval = 1000.0/dFiringRates[pop[lsz:]][int(cell.gid-offset)] #40 
+  else:
+    if dnumc['ER']>0:
+      lratepop = ['ER', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW', 'EV1DSW', 'EV1DS', 'EV1DSE']
+    else:
+      lratepop = ['EV1', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW', 'EV1DSW', 'EV1DS', 'EV1DSE']    
+    for pop in lratepop:
+      if dnumc[pop] <= 0: continue
+      lCell = [c for c in sim.net.cells if c.gid in sim.net.pops[pop].cellGids] # this is the set of cells
+      offset = sim.simData['dminID'][pop]
+      #if dconf['verbose'] > 1: print(sim.rank,'updating len(',pop,len(lCell),'source firing rates. len(dFiringRates)=',len(dFiringRates[pop]))
+      for cell in lCell:  
+        for stim in cell.stims:
+          if stim['source'] == 'stimMod':
+            if dFiringRates[pop][int(cell.gid-offset)]==0:
+              stim['hObj'].interval = 1e12
+            else:
+              stim['hObj'].interval = 1000.0/dFiringRates[pop][int(cell.gid-offset)] #40 #fchoices[rind] #10 #
 
 # homeostasis based on Sanda et al. 2017.
-
 def initTargetFR (sim,dMINinitTargetFR,dMAXinitTargetFR):
   sim.dMINTargetFR = {}
   sim.dMAXTargetFR = {}
@@ -1474,8 +1528,8 @@ def trainAgent (t):
               actions.append(dconf['moves']['NOMOVE']) # No move
               noWinner = True
   if sim.rank == 0:
-    rewards, epCount, proposed_actions, total_hits = sim.AIGame.playGame(actions, epCount, t)
-    print('t=',round(t,2),'proposed actions:', proposed_actions,', model actions:', actions)
+    rewards, epCount, proposed_actions, total_hits, FollowTargetSign = sim.AIGame.playGame(actions, epCount, t)
+    print('t=',round(t,2),'proposed act=', proposed_actions,', model act=', actions)
     if dconf['sim']['RLFakeUpRule']: # fake rule for testing reinforcing of up moves
       critic = np.sign(actions.count(dconf['moves']['UP']) - actions.count(dconf['moves']['DOWN']))          
       rewards = [critic for i in range(len(rewards))]
@@ -1500,13 +1554,22 @@ def trainAgent (t):
         critic_for_avoidingloss = dconf['rewardcodes']['hitBall'] #should be able to change this number from config file
       #rewards for following or avoiding the ball
       critic_for_following_ball = 0
-      for caction, cproposed_action in zip(actions, proposed_actions):
-        if cproposed_action == -1: # invalid action since e.g. ball not visible
-          continue
-        elif caction - cproposed_action == 0: # model followed proposed action - gets a reward
-          critic_for_following_ball += dconf['rewardcodes']['followTarget'] #follow the ball
-        else: # model did not follow proposed action - gets a punishment
-          critic_for_following_ball += dconf['rewardcodes']['avoidTarget'] # didn't follow the ball
+      if dconf['useFollowMoveOutput']:
+        for caction, cproposed_action in zip(actions, proposed_actions):
+          if cproposed_action == -1: # invalid action since e.g. ball not visible
+            continue
+          elif FollowTargetSign > 0: # model moved racket towards predicted y intercept - gets a reward
+            critic_for_following_ball += dconf['rewardcodes']['followTarget'] #follow the ball
+          elif FollowTargetSign < 0: # model moved racket away from predicted y intercept - gets a punishment
+            critic_for_following_ball += dconf['rewardcodes']['avoidTarget'] # didn't follow the ball        
+      else:
+        for caction, cproposed_action in zip(actions, proposed_actions):
+          if cproposed_action == -1: # invalid action since e.g. ball not visible
+            continue
+          elif caction - cproposed_action == 0: # model followed proposed action - gets a reward
+            critic_for_following_ball += dconf['rewardcodes']['followTarget'] #follow the ball
+          else: # model did not follow proposed action - gets a punishment
+            critic_for_following_ball += dconf['rewardcodes']['avoidTarget'] # didn't follow the ball
       #total rewards
       critic = critic + critic_for_avoidingloss + critic_for_following_ball
       rewards = [critic for i in range(len(rewards))]  # reset rewards to modified critic signal - should use more granular recording
@@ -1548,7 +1611,7 @@ def trainAgent (t):
       print('No anticipated action for the input!!!')
   else:
     if critic != 0: # if critic signal indicates punishment (-1) or reward (+1)
-      if sim.rank==0: print('t=',round(t,2),'- adjusting weights based on RL critic value:', critic)
+      if sim.rank==0: print('t=',round(t,2),'- adjust wts. critic=', critic)
       if dnumc['EMSTAY']>0:
         if dconf['sim']['targettedRL']:
           if not noWinner: # if there's a clear winner in terms of firing rates
@@ -1596,14 +1659,11 @@ def trainAgent (t):
           for STDPmech in dSTDPmech['all']: STDPmech.reward_punish(critic)
   if sim.rank==0:
     print('t=',round(t,2),' game rewards:', rewards) # only rank 0 has access to rewards      
-    for action in actions:
-        sim.allActions.append(action)
-    for pactions in proposed_actions: #also record proposed actions
-        sim.allProposedActions.append(pactions)
-    for reward in rewards: # this generates an error - since rewards only declared for sim.rank==0; bug?
-        sim.allRewards.append(reward)
-    for hits in total_hits:
-        sim.allHits.append(hits) #hit or no hit
+    for action in actions: sim.allActions.append(action)
+    for pactions in proposed_actions: sim.allProposedActions.append(pactions) #also record proposed actions
+    for reward in rewards: sim.allRewards.append(reward)
+    for hits in total_hits: sim.allHits.append(hits) # hit or no hit
+    sim.followTargetSign.append(FollowTargetSign) 
     tvec_actions = []
     for ts in range(len(actions)): tvec_actions.append(t-tstepPerAction*(len(actions)-ts-1))
     for ltpnt in tvec_actions: sim.allTimes.append(ltpnt)
@@ -1634,6 +1694,7 @@ def getAllSTDPObjects (sim):
   for pop in Mpops: dSTDPmech[pop] = []
   if dconf['sim']['targettedRL']: dcell = {pop:[] for pop in Mpops} # SN: exptl  
   for cell in sim.net.cells:
+    #if cell.gid in sim.net.pops['EMDOWN'].cellGids and cell.gid==sim.simData['dminID']['EMDOWN']: print(cell.conns)
     for conn in cell.conns:
       STDPmech = conn.get('hSTDP')  # check if the connection has a NEURON STDP mechanism object
       if STDPmech:
@@ -1716,10 +1777,12 @@ if dconf['simtype']['ResumeSim']:
     A = readweightsfile2pdf(dconf['simtype']['ResumeSimFromFile'])
     updateSTDPWeights(sim, A[A.time == max(A.time)]) # take the latest weights saved
     if sim.rank==0: print('Updated STDP weights')
+    sim.pc.barrier() # wait for other nodes
     if 'normalizeWeightsAtStart' in dconf['sim']:
       if dconf['sim']['normalizeWeightsAtStart']:
-        print('normalizing adjustable weights at start')
         normalizeAdjustableWeights(sim, 0, lrecpop)
+        print(sim.rank,'normalized adjustable weights at start')
+        sim.pc.barrier() # wait for other nodes
   except:
     print('Could not restore STDP weights from file.')
 
@@ -1736,7 +1799,11 @@ setdminID(sim, allpops)
 tPerPlay = tstepPerAction*dconf['actionsPerPlay']
 InitializeInputRates()
 dsumWInit = getSumAdjustableWeights(sim) # get sum of adjustable weights at start of sim
+#if len(sim.net.cells) > 0 and ECellModel == 'INTF6':
+#  sim.net.cells[0].global_init()
 sim.runSimWithIntervalFunc(tPerPlay,trainAgent) # has periodic callback to adjust STDP weights based on RL signal
+#if len(sim.net.cells) > 0 and ECellModel == 'INTF6':
+#  sim.net.cells[0].global_fini()
 if sim.rank==0 and fid4 is not None: fid4.close()
 sim.gatherData() # gather data from different nodes
 sim.saveData() # save data to disk
