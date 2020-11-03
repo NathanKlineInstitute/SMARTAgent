@@ -20154,3 +20154,34 @@ intf6.mod was more flexible in time constants and so on ... compared to IntFire4
 
 first testing from adjusted tut_artif.py
 
+need to adjust Netpyne's pointCell.py to allow specifying weightIndex
+to use for a specific connection, since that's how intf7.mod right now
+supports different synapse types within its NET_RECEIVE
+
+on cycle
+/opt/anaconda3/lib/python3.7/site-packages/netpyne/cell/pointCell.py
+
+ok, made modification, will try it out ... 
+
+also need to change _addCellConn in
+/opt/anaconda3/lib/python3.7/site-packages/netpyne/network/conn.py
+        if 'weightIndex' in connParam: params['weightIndex'] = connParam.get('weightIndex')
+
+ok, made that adjustment and it seems to work ... will modify local netpyne, do pull request, etc.
+
+for that make push via samnemo fork
+git push git@github.com:samnemo/netpyne.git
+and then do pull request to main neurosim netpyne repo
+
+samndp7730% git checkout development
+Switched to branch 'development'
+Your branch is ahead of 'origin/development' by 1 commit.
+  (use "git push" to publish your local commits)
+samndp7730% pwd
+/u/samn/netpyne
+samndp7730% git add netpyne/cell/pointCell.py netpyne/network/conn.py
+samndp7730% git commit -m 'add weightIndex option to connParam for pointCell'
+[development ef79fc6] add weightIndex option to connParam for pointCell
+ 2 files changed, 5 insertions(+), 3 deletions(-)
+samndp7730% git push git@github.com:samnemo/netpyne.git
+

@@ -48,7 +48,7 @@ NEURON {
   : other stuff
   RANGE  t0,tg,twg,refractory,trrs :::: t0,tg save times for analytic calc
   RANGE  cbur                         :::: burst statevar
-  GLOBAL nxt,RES,ESIN,Psk      :::: table look up values for exp,sin
+  GLOBAL nxt,RES      :::: table look up values for exp
   GLOBAL nsw, rebeg             :::: for debugging moves
   GLOBAL installed,verbose        :::: simplest output
 }
@@ -82,7 +82,6 @@ PARAMETER {
   rebeg=0
   stopoq=0
   verbose=1
-  DELMIN=1e-5 : min delay to bother using queue -- otherwise considered simultaneous
   STDAM=0
   STDNM=0
   STDGA=0
@@ -93,7 +92,7 @@ PARAMETER {
 ASSIGNED {
   Vm VAM VNM VGA AHP VAM2 VNM2 VGA2
   t0 tg twg refractory nxt trrs
-  RES ESIN Psk savclock slowset FLAG
+  RES
   installed
 }
 
