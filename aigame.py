@@ -201,20 +201,20 @@ class AIGame:
         binary_Image = dsum_Images > thresh
         if dconf['sim']['captureTwoObjs']:
           fr_Images = np.zeros(shape=(20,2))
-          fr_Images_Ball = self.locationNeuronRate*np.sum(binary_Image[:,3:17],1)
-          fr_Images_RM = self.locationNeuronRate*np.sum(binary_Image[:,17:],1)
+          fr_Images_Ball = self.locationNeuronRate*np.amax(binary_Image[:,3:17],1)
+          fr_Images_RM = self.locationNeuronRate*np.amax(binary_Image[:,17:],1)
           fr_Images[:,0] = fr_Images_Ball
           fr_Images[:,1] = fr_Images_RM
           print(fr_Images)        
         else:
           fr_Images = np.zeros(shape=(20,3))
           #print('Image:',binary_Image)
-          fr_Images_RO = self.locationNeuronRate*np.sum(binary_Image[:,0:3],1)
+          fr_Images_RO = self.locationNeuronRate*np.amax(binary_Image[:,0:3],1)
           print('RO:',fr_Images_RO)
           #print('Ball:',binary_Image[:,self.courtXRng[0]:self.courtXRng[1]])
-          fr_Images_Ball = self.locationNeuronRate*np.sum(binary_Image[:,3:17],1)
+          fr_Images_Ball = self.locationNeuronRate*np.amax(binary_Image[:,3:17],1)
           print(fr_Images_Ball)
-          fr_Images_RM = self.locationNeuronRate*np.sum(binary_Image[:,17:],1)
+          fr_Images_RM = self.locationNeuronRate*np.amax(binary_Image[:,17:],1)
           print('RM:',fr_Images_RM)
           fr_Images[:,0] = fr_Images_RO
           fr_Images[:,1] = fr_Images_Ball

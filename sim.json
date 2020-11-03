@@ -3,6 +3,7 @@
         "name": "PongNoFrameskip-v4",
         "savemp4": 0
     },
+    "randmove":0,
     "useSimulatedEnv": 0,
     "simulatedEnvParams": {
         "random":1,
@@ -43,7 +44,7 @@
         "ResumeSimFromFile": "data/20oct23_A0_cycle_synWeights_final.pkl"
     },
     "sim": {
-        "duration": 10000,
+        "duration": 2000000,
         "dt": 0.2,
         "verbose": 0,
         "recordStep": 1.0,
@@ -53,7 +54,7 @@
         "RLFakeUpRule": 0,
         "RLFakeDownRule": 0,
         "RLFakeStayRule": 0,
-        "name": "20oct26_B0_falcor_reduced_2obj_",
+        "name": "20nov03_A3long_cycle_reduced_2obj_",
         "doquit": 0,
         "doplot": 1,
         "saveCellSecs": 0,
@@ -89,7 +90,7 @@
 	    "EV1DS":1,
 	    "EV1DSE":1,
 	    "ID": 0,
-	    "IV1":10,
+	    "IV1":0,
 	    "EV4":0,
 	    "IV4":0,
 	    "EMT":0,
@@ -176,13 +177,13 @@
         "DirMaxRate": 150.0,
         "LocMaxRate": 150.0,
         "FiringRateCutoff" : 50.0,
-        "stimModVD": 0.02,
-        "stimModVL": 0.02,
+        "stimModVD": 0.003,
+        "stimModVL": 0.003,
 	"cmat": {
 	    "VL":{
 		"VD":{"AM":0,"NM":0,"p":0},		
 		"VL":{"AM":20e-5,"NM":30e-6,"p":0},
-		"EA":{"AM":4.5e-3,"NM":10e-6,"p":0.4},
+		"EA":{"AM":2e-3,"NM":10e-6,"p":0.4},
 		"EMDOWN":{"AM":4.5e-5,"NM":10e-6,"p":0.08},
 		"EMUP":{"AM":4.5e-5,"NM":10e-6,"p":0.08},
 		"EMSTAY":{"AM":4.5e-5,"NM":10e-6,"p":0.08}		
@@ -190,7 +191,7 @@
 	    "VD":{
 		"VL":{"AM":0,"NM":0,"p":0},
 		"VD":{"AM":0,"NM":0,"p":0},
-		"EA":{"AM":4.5e-3,"NM":10e-6,"p":0.4},
+		"EA":{"AM":2e-3,"NM":10e-6,"p":0.4},
 		"EMDOWN":{"AM":4.5e-5,"NM":10e-6,"p":0.08},
 		"EMUP":{"AM":4.5e-5,"NM":10e-6,"p":0.08},
 		"EMSTAY":{"AM":4.5e-5,"NM":10e-6,"p":0.08}		
@@ -203,20 +204,20 @@
 	    },
 	    "EA":{
 		"EA":{"AM":0,"NM":0,"p":0.0},
-		"EM":{"AM":40e-5,"NM":10e-6,"p":0.2},
-		"IA":{"GA": 0.02, "p":0.0625}
+		"EM":{"AM":4e-3,"NM":10e-6,"p":0.2},
+		"IA":{"GA": 0.005, "p":0.0625}
 	    },
 	    "IR": {
 		"ER": {"GA": 0.2, "p":0.0625}
 	    },
 	    "IV1": {
-		"EV1": {"GA": 0.2, "p":0.25},
+		"EV1": {"GA": 0.3, "p":0.5},
 		"IV1": {"GA":0.05, "p":0.25},
 		"ER": {"GA":0.02, "p":0.0},
 		"IV4": {"GA":0.0075, "p":0.0}		
 	    },
 	    "ID": {
-		"ED": {"GA": 0.2, "p":0.25},
+		"ED": {"GA": 0.2, "p":1},
 		"ID": {"GA":0.05, "p":0.25}		
 	    },
 	    "IV4": {
