@@ -8,11 +8,6 @@ netParams = specs.NetParams()  # object of class NetParams to store the network 
 simConfig = specs.SimConfig()  # dictionary to store sets of simulation configurations
 simConfig.hParams['celsius'] = 37
 
-#from neuron import h
-#h.install_vecst()
-#h.install_stats()
-#from labels import *
-
 ###############################################################################
 # NETWORK PARAMETERS
 ###############################################################################
@@ -42,7 +37,7 @@ netParams.connParams[k] = {
     'preConds': {'pop': 'artif1'}, 'postConds': {'pop': 'artif3'},
     #'probability': 0.2,
     'connList': connList,
-    'weight': 0.2,                    
+    'weight': 20,
     #'synMech': 'AMPA',                
     'delay': 'uniform(1,5)'}
 
@@ -96,23 +91,35 @@ def mycallback (t):
   # for stdpmech in lSTDPmech: stdpmech.reward_punish(1.0)
   # recordAdjustableWeights(sim,t)
 
+def insertSpikes (sim, spkht=50):
+    sampr = 1e3 / simConfig.dt
+    import pandas as pd
+    import numpy as np
+    spkt, spkid = sim.simData['spkt'], sim.simData['spkid']
+    spk = pd.DataFrame(np.array([spkid, spkt]).T,columns=['spkid','spkt'])
+    for kvolt in sim.simData['Vsoma'].keys():
+        cellID = int(kvolt.split('_')[1])
+        spkts = spk[spk.spkid == cellID]
+        if len(spkts):
+            for idx in spkts.index:
+                tdx = int(spk.at[idx, 'spkt'] * sampr / 1e3)
+                sim.simData['Vsoma'][kvolt][tdx] = spkht
+
 lcell3 = [c for c in sim.net.cells if c.gid in sim.net.pops['artif3'].cellGids]
 c = lcell3[0]
-#h("INTF6[0].jitcondiv(cells,0,&ix,&ixe,&div,&numc,&wmat,&wd0,&delm,&deld)")
-#h("INTF6[0].flag(\"jcn\",1,1)")
-#for c in lcell3:
-#  c.hPointp.cinit(0)
-#h.finitialize() 
-#h.cvode.re_init()
-#c.hPointp.global_init()
-
-#c
   
 sim.run.runSim()
-#sim.createSimulateAnalyze()
 #sim.runSimWithIntervalFunc(50,mycallback)
 sim.gatherData()
+
+insertSpikes(sim)
+
 sim.analysis.plotData()
+
+from pylab import *
+ion()
+figure()
+plot(sim.simData['t'],sim.simData['Vsoma']['cell_100'])
 
 """
 #sim.createSimulateAnalyze()

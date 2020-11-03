@@ -20148,3 +20148,9 @@ crashed after a while ... firing rates god too high
 
 intf6.mod was more flexible in time constants and so on ... compared to IntFire4
 
+* 20nov3
+** check intf7.mod
+
+
+first testing from adjusted tut_artif.py
+
