@@ -297,7 +297,7 @@ def setupStimMod ():
         'postConds': {'pop':poty},
         'weight':wt,
         'delay':2,
-        'connList':blist}
+        'connList':blist, 'weightIndex':getWeightIndex('AMPA',ECellModel)}
       wt = stimModDirW # rest of inputs use this weight
   else:
     # these are the image-based inputs provided to the R (retinal) cells
