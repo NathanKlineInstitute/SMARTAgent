@@ -2,6 +2,9 @@ from neuron import h
 
 # synaptic indices used in intf7.mod NET_RECEIVE
 dsyn = {'AM':0, 'NM':1, 'GA':2, 'AM2':3, 'NM2':4, 'GA2':5}
+dsyn['AMPA'] = dsyn['AM']
+dsyn['NMDA'] = dsyn['NM']
+dsyn['GABA'] = dsyn['GA']
 
 class INTF7E ():
   # parameters for excitatory neurons

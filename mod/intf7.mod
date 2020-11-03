@@ -1,11 +1,5 @@
-: $Id: intf7.mod,v 1.100 2012/04/05 22:38:25 samn Exp $
-
-:* main COMMENT
 COMMENT
-
-intf7.mod was branched from intf6.mod on 20nov2
-log/diffs to see anything prior. note that AM2,NM2,GA2 code was mostly taken from
-intf.mod version 815.
+intf7.mod was branched/simplified from intf6.mod on 20nov2 by samn
 
 artificial cell incorporating 4 input weights with different time constants and signs
 typically a fast AMPA, slow NMDA, and fast GABAA
@@ -14,17 +8,8 @@ features:
   2. depolarization blockade
   3. AHP affects both Vm and refractory period  (adaptation)
   4. decrementing excitatory and/or inhibitory activity post spk (another adaptation)
-since artificial cells only do calculations when they receive events, a set of vec
-  pointers are maintained to allow state var information storage when event arrives
-  (see initrec() and record())
+note that artificial cells only do calculations when they receive events
 ENDCOMMENT
-
-:* main VERBATIM block
-VERBATIM
-
-#define PI 3.14159265358979323846264338327950288419716939937510
-static int AM=0, NM=1, GA=2, GB=3, AM2=4, NM2=5, GA2=6, SU=3, IN=4, DP=2; // from labels.hoc
-ENDVERBATIM
 
 :* NEURON, PARAMETER, ASSIGNED blocks
 NEURON {
@@ -47,8 +32,6 @@ NEURON {
   : other stuff
   RANGE  t0,tg,twg,refractory,trrs :::: t0,tg save times for analytic calc
   GLOBAL RES      :::: table look up values for exp
-  GLOBAL nsw, rebeg             :::: for debugging moves
-  GLOBAL verbose        :::: simplest output
 }
 
 : PARAMETER block - sets all variables to defaults at start
@@ -76,9 +59,6 @@ PARAMETER {
   ENM = 90
   EGA = -15
   spkht = 50 : height of paste-on spike (handled on python side)
-  nsw=0
-  rebeg=0
-  verbose=1
   STDAM=0
   STDNM=0
   STDGA=0
@@ -154,7 +134,7 @@ NET_RECEIVE (wAM,wNM,wGA,wAM2,wNM2,wGA2,wflg) { LOCAL tmp,id
   Vm = VAM+VNM+VGA+AHP+VAM2+VNM2+VGA2 : membrane deviation from rest
   if (Vm> -RMP) {Vm= -RMP}: 65 mV above rest
   if (Vm<  RMP) {Vm= RMP} : 65 mV below rest
-:*** only add weights if an external excitation
+  :*** only add weights if an external excitation
   if (flag==0) { 
     : AMPA Erev=0 (0-RMP==65 mV above rest)
     if (wAM>0) {
@@ -196,7 +176,7 @@ VERBATIM
     return; //@ done
 ENDVERBATIM
   }
-:** check for Vm>VTH -> fire
+  :** check for Vm>VTH -> fire
   Vm = VAM+VNM+VGA+RMP+AHP+VAM2+VNM2+VGA2 : WARNING -- Vm defined differently than above
   if (Vm>0)   {Vm= 0 }
   if (Vm<-90) {Vm=-90}  
@@ -219,11 +199,6 @@ ENDVERBATIM
     refractory = 1 : abs. refrac on = do not allow any more spikes/bursts to begin (even for IB cells)
     net_send(refrac-AHP*AHP2REF, 3) :event for end of abs. refrac., sent separately for IB cells @ end of burst
   }
-}
-
-:** vers gives version
-PROCEDURE vers () {
-  printf("$Id: intf7.mod 1.100 2020 samn $\n")
 }
 
 :* TABLES
