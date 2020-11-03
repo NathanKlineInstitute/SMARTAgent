@@ -23,7 +23,7 @@ netParams.synMechParams['AMPA'] = {'mod': 'Exp2Syn', 'tau1': 0.05, 'tau2': 5.3, 
 
 if useArtif:
   netParams.popParams['artif3'] = {'cellModel': 'INTF7', 'numCells': numCells}#, 'taue': 5.0, 'taui1':10,'taui2':20,'taum':50}  # pop of IntFire4
-  simConfig.recordTraces = {'Vsoma':{'var':'Vm'}}  # Dict with traces to record  
+  simConfig.recordTraces = {'V_soma':{'var':'Vm'}}  # Dict with traces to record  
 else:
   netParams.popParams['artif3'] = {'numCells': numCells, 'cellModel': 'Mainen'}
   #netParams.importCellParams(label='PYR_Mainen_rule', conds={'cellType': ['artif3']}, fileName='cells/mainen.py', cellName='PYR2')
@@ -98,29 +98,30 @@ def insertSpikes (sim, spkht=50):
     import numpy as np
     spkt, spkid = sim.simData['spkt'], sim.simData['spkid']
     spk = pd.DataFrame(np.array([spkid, spkt]).T,columns=['spkid','spkt'])
-    for kvolt in sim.simData['Vsoma'].keys():
+    for kvolt in sim.simData['V_soma'].keys():
         cellID = int(kvolt.split('_')[1])
         spkts = spk[spk.spkid == cellID]
         if len(spkts):
             for idx in spkts.index:
                 tdx = int(spk.at[idx, 'spkt'] * sampr / 1e3)
-                sim.simData['Vsoma'][kvolt][tdx] = spkht
+                sim.simData['V_soma'][kvolt][tdx] = spkht
 
 lcell3 = [c for c in sim.net.cells if c.gid in sim.net.pops['artif3'].cellGids]
 c = lcell3[0]
   
 sim.run.runSim()
 #sim.runSimWithIntervalFunc(50,mycallback)
-sim.gatherData()
 
 insertSpikes(sim)
+
+sim.gatherData()
 
 sim.analysis.plotData()
 
 from pylab import *
 ion()
 figure()
-plot(sim.simData['t'],sim.simData['Vsoma']['cell_100'])
+plot(sim.simData['t'],sim.simData['V_soma']['cell_100'])
 
 """
 #sim.createSimulateAnalyze()

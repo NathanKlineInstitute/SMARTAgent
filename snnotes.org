@@ -20189,3 +20189,7 @@ samndp7730% git push git@github.com:samnemo/netpyne.git
 
         "name": "20nov3_A0_cycle_",
 
+python -i simdat.py backupcfg/20nov3_A0_cycle_sim.json
+
+drawcellVm(simConfig,ldrawpop=['EV1','EMUP','EMDOWN','EA', 'IM'])
+

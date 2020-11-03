@@ -202,7 +202,7 @@ def makeECellModel (ECellModel):
     netParams.defaultThreshold = -40.0
     for ty in ETypes:
       netParams.popParams[ty] = {'cellType':ty, 'cellModel': 'INTF7', 'numCells': dnumc[ty]} # pop of IntFire4
-      netParams.popParams[ty]['params'] = intf7.INTF7E.dparam.copy()
+      for k,v in intf7.INTF7E.dparam.items(): netParams.popParams[ty][k] = v
   elif ECellModel == 'Friesen':
     cellRule = netParams.importCellParams(label='PYR_Friesen_rule', conds={'cellType': ETypes, 'cellModel': 'Friesen'},
                 fileName='cells/friesen.py', cellName='MakeRSFCELL')
@@ -239,7 +239,7 @@ def makeICellModel (ICellModel):
     netParams.defaultThreshold = -40.0
     for ty in ITypes:
       netParams.popParams[ty] = {'cellType':ty, 'cellModel': 'INTF7', 'numCells': dnumc[ty]}
-      netParams.popParams[ty]['params'] = intf7.INTF7I.dparam.copy()
+      for k,v in intf7.INTF7I.dparam.items(): netParams.popParams[ty][k] = v
   elif ICellModel == 'Friesen':
     cellRule = netParams.importCellParams(label='Bas_Friesen_rule', conds={'cellType': ITypes, 'cellModel': 'Friesen'},
                 fileName='cells/friesen.py', cellName='MakeFSFCELL')
@@ -1831,8 +1831,8 @@ InitializeInputRates()
 dsumWInit = getSumAdjustableWeights(sim) # get sum of adjustable weights at start of sim
 sim.runSimWithIntervalFunc(tPerPlay,trainAgent) # has periodic callback to adjust STDP weights based on RL signal
 if sim.rank==0 and fid4 is not None: fid4.close()
+if ECellModel == 'INTF7' or ICellModel == 'INTF7': intf7.insertSpikes(sim, simConfig.recordStep)
 sim.gatherData() # gather data from different nodes
-if ECellModel == 'INTF7' or ICellModel == 'INTF7': intf7.insertSpikes(sim)
 sim.saveData() # save data to disk
 
 def LSynWeightToD (L):
