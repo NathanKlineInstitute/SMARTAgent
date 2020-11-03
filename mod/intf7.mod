@@ -132,18 +132,13 @@ PROCEDURE reset () {
 }
 
 :* NET_RECEIVE
-NET_RECEIVE (wAM,wNM,wGA,wGB,wAM2,wNM2,wGA2,wflg) { LOCAL tmp,jcn,id
-  INITIAL { wAM=wAM wNM=wNM wGA=wGA wGB=wGB wAM2=wAM2 wNM2=wNM2 wGA2=wGA2 wflg=0}
-  : intra-burst, generate next spike as needed
-VERBATIM
-  //id0 *ppre; int prty,poty,prin,prid,poid,ii,sy,nsyn,distal; double STDf,wgain,syw1,syw2; //@
-ENDVERBATIM
+NET_RECEIVE (wAM,wNM,wGA,wAM2,wNM2,wGA2,wflg) { LOCAL tmp,id
+  INITIAL { wAM=wAM wNM=wNM wGA=wGA wAM2=wAM2 wNM2=wNM2 wGA2=wGA2 wflg=0}
   :printf("DB0: flag=%g Vm=%g",flag,VAM+VNM+VGA+RMP+AHP+VAM2+VNM2+VGA2)
   :if (flag==0) { printf(" (%g %g %g %g %g %g %g)",wAM,wNM,wGA,wAM2,wNM2,wGA2,wflg) }
   :printf("\n")
-
-: causes of spiking: between VTH and Vblock
-:** update state variables: VAM, VNM, VGA
+  : causes of spiking: between VTH and Vblock
+  : update state variables: VAM, VNM, VGA
   if (VAM>hoc_epsilon)  { VAM = VAM*EXP(-(t - t0)/tauAM) } else { VAM=0 } :AMPA
   if (VNM>hoc_epsilon)  { VNM = VNM*EXP(-(t - t0)/tauNM) } else { VNM=0 } :NMDA
   if (VGA< -hoc_epsilon){ VGA = VGA*EXP(-(t - t0)/tauGA) } else { VGA=0 } :GABAA    
