@@ -273,7 +273,12 @@ def readSTDPParams ():
       if k.count('wt') or k.count('wbase') or k.count('wmax'): dSTDPparams[sy][k] *= gain
   return dSTDPparamsRL, dSTDPparams
   
-dSTDPparamsRL, dSTDPparams = readSTDPParams()  
+dSTDPparamsRL, dSTDPparams = readSTDPParams()
+
+def getWeightIndex (synMech, cellModel):
+  # get weight index for connParams
+  if cellModel == 'INTF7': return intf7.dsyn[synmech]
+  return 0
   
 def setupStimMod ():
   # setup variable rate NetStim sources (send spikes based on image contents)
@@ -440,11 +445,6 @@ def getInitWeight (weight):
   else:
     print('uniform(%g,%g)' % (weight*(1.0-cfg.weightVar),weight*(1.0+cfg.weightVar)))
     return 'uniform(%g,%g)' % (weight*(1.0-cfg.weightVar),weight*(1.0+cfg.weightVar))
-
-def getWeightIndex (synMech, cellModel):
-  # get weight index for connParams
-  if cellModel == 'INTF7': return intf7.dsyn[synmech]
-  return 0
   
 #Local excitation
 #E to E recurrent connectivity within visual areas
