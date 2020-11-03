@@ -39,29 +39,18 @@ NEURON {
   RANGE tauRR , RRWght                 :::: relative refrac. period tau, wght of Vblock-VTH for refrac
   RANGE RMP,VTH,Vblock,VTHC,VTHR       :::: Vblock for depol blockade
   RANGE incRR : whether allow VTHC to increment past RRWght*(Vblock-VTH) over successive refrac periods
-  RANGE nbur,tbur,refrac,AHP2REF        :::: burst size, interval; refrac period and extender
-  RANGE invl,oinvl,WINV,invlt           :::: interval bursting params
-  RANGE Vbrefrac                        
-  RANGE STDAM, STDNM, STDGA             :::: specific amounts of STD for each type of synapse
-                                        :::: NB: before using STDAM,STDNM,STDGA need to debug/check
-                                        :::: for possible unintended interations with wts,_args 
-                                        :::: to make sure no interference with the weights in net_receive
-                                        ::::
+  RANGE refrac,AHP2REF                  :::: refrac period and extender
   RANGE mg0                             :::: sensitivity to Mg2+, used in rates
   RANGE maxnmc                          :::: maximum NMDA 'conductance', used in rates
   GLOBAL EAM, ENM, EGA,mg               :::: "reverse potential" distance from rest
   GLOBAL spkht                          :::: display: spike height
   GLOBAL stopoq                         :::: flags: stop if q is empty, use STD
   : other stuff
-  RANGE  spck,xloc,yloc,zloc
   RANGE  t0,tg,twg,refractory,trrs :::: t0,tg save times for analytic calc
   RANGE  cbur                         :::: burst statevar
-  RANGE  WEX                          :::: weight of external input < 0 == inhib, > 0 ==excit
-  RANGE  EXSY                         :::: synapse target of external input
-  RANGE  lfpscale                     :::: scales contribution to lfp, only if cell is being recorded in wrecord
   GLOBAL nxt,RES,ESIN,Psk      :::: table look up values for exp,sin
-  GLOBAL prnum, nsw, rebeg             :::: for debugging moves
-  GLOBAL tmax,installed,verbose        :::: simplest output
+  GLOBAL nsw, rebeg             :::: for debugging moves
+  GLOBAL installed,verbose        :::: simplest output
 }
 
 : PARAMETER block - sets all variables to defaults at start
@@ -72,14 +61,11 @@ PARAMETER {
   tauAM2 = 20 (ms)
   tauNM2 = 300 (ms)
   tauGA2 = 20 (ms)
-  invl =  100 (ms)
-  WINV =  0
   ahpwt = 0
   tauahp= 10 (ms)
   tauRR = 6 (ms)
   refrac = 5 (ms)
   AHP2REF = 0.0 : default is no refrac period increment/decrmenet
-  Vbrefrac = 20 (ms)
   RRWght = 0.75
   VTH = -45      : fixed spike threshold
   VTHC = -45
@@ -87,17 +73,13 @@ PARAMETER {
   incRR = 0
   Vblock = -20   : level of depolarization blockade
   mg = 1         : for NMDA Mg dep.
-  nbur=1
-  tbur=2
   RMP=-65
   EAM = 65
   ENM = 90
   EGA = -15
   spkht = 50
-  prnum = -1
   nsw=0
   rebeg=0
-  WVAR=0.2
   stopoq=0
   verbose=1
   DELMIN=1e-5 : min delay to bother using queue -- otherwise considered simultaneous
@@ -110,8 +92,8 @@ PARAMETER {
 
 ASSIGNED {
   Vm VAM VNM VGA AHP VAM2 VNM2 VGA2
-  t0 tg twg refractory nxt xloc yloc zloc trrs
-  WEX EXSY RES ESIN Psk cbur invlt oinvl tmax spck savclock slowset FLAG
+  t0 tg twg refractory nxt trrs
+  RES ESIN Psk savclock slowset FLAG
   installed
 }
 
@@ -130,7 +112,6 @@ INITIAL { LOCAL id
   tg = 0
   twg = 0
   trrs = 0
-  tmax=0
 }
 
 PROCEDURE reset () {
@@ -142,12 +123,10 @@ PROCEDURE reset () {
   VAM2 = 0
   VNM2 = 0
   VGA2 = 0
-  invlt = -1
   t0 = t
   tg = t
   twg = t
   trrs = t
-  spck = 0 : spike count to 0
   refractory = 0 : 1 means cell is absolute refractory
   VTHC=VTH :set current threshold to absolute threshold value
   VTHR=VTH :set this one too to make sure it is initialized
@@ -160,14 +139,11 @@ NET_RECEIVE (wAM,wNM,wGA,wGB,wAM2,wNM2,wGA2,wflg) { LOCAL tmp,jcn,id
 VERBATIM
   //id0 *ppre; int prty,poty,prin,prid,poid,ii,sy,nsyn,distal; double STDf,wgain,syw1,syw2; //@
 ENDVERBATIM
-  tmax=t
-
   :printf("DB0: flag=%g Vm=%g",flag,VAM+VNM+VGA+RMP+AHP+VAM2+VNM2+VGA2)
   :if (flag==0) { printf(" (%g %g %g %g %g %g %g)",wAM,wNM,wGA,wAM2,wNM2,wGA2,wflg) }
   :printf("\n")
 
-: causes of spiking: between VTH and Vblock, random from vsp (flag 2), within burst
-:** JITcon code - only meant for intra-COLUMN events
+: causes of spiking: between VTH and Vblock
 :** update state variables: VAM, VNM, VGA
   if (VAM>hoc_epsilon)  { VAM = VAM*EXP(-(t - t0)/tauAM) } else { VAM=0 } :AMPA
   if (VNM>hoc_epsilon)  { VNM = VNM*EXP(-(t - t0)/tauNM) } else { VNM=0 } :NMDA
@@ -192,40 +168,34 @@ ENDVERBATIM
   if (flag==0) { 
     : AMPA Erev=0 (0-RMP==65 mV above rest)
     if (wAM>0) {
-      if (STDAM==0) { VAM = VAM + wAM*(1-Vm/EAM)
-      } 
+      VAM = VAM + wAM*(1-Vm/EAM)
       if (VAM>EAM) { 
       } else if (VAM<0) { VAM=0 }
     }
     if (wAM2>0) { : AMPA from distal dends
-      if (STDAM==0) { VAM2 = VAM2 + wAM2*(1-Vm/EAM)
-      } 
+      VAM2 = VAM2 + wAM2*(1-Vm/EAM)
       if (VAM2>EAM) { 
       } else if (VAM2<0) { VAM2=0 }
     }
     : NMDA; Mg effect based on total activation in rates()
     if (wNM>0 && VNM<ENM) { 
-      if (STDNM==0) { VNM = VNM + wNM*rates(RMP+Vm)*(1-Vm/ENM) 
-      } 
+      VNM = VNM + wNM*rates(RMP+Vm)*(1-Vm/ENM) 
       if (VNM>ENM) { 
       } else if (VNM<0) { VNM=0 }
     }
     if (wNM2>0 && VNM2<ENM) { : NMDA from distal dends
-      if (STDNM==0) { VNM2 = VNM2 + wNM2*rates(RMP+Vm)*(1-Vm/ENM)
-      } 
+      VNM2 = VNM2 + wNM2*rates(RMP+Vm)*(1-Vm/ENM)
       if (VNM2>ENM) { 
       } else if (VNM2<0) { VNM2=0 }
     }
     : GABAA , GABAA2 : note that all wts are positive
     if (wGA>0 && VGA>EGA) { : the neg here gives the inhibition
-      if (STDGA==0) {  VGA = VGA - wGA*(1-Vm/EGA) 
-      } 
+      VGA = VGA - wGA*(1-Vm/EGA) 
       if (VGA<EGA) { 
       } else if (VGA>0) { VGA=0 } : if want reversal of VGA need to also edit above
     }
     if (wGA2>0 && VGA2>EGA) { : the neg here gives the inhibition, GABAA2, inputs further from soma
-      if (STDGA==0) {  VGA2 = VGA2 - wGA2*(1-Vm/EGA)
-      } 
+      VGA2 = VGA2 - wGA2*(1-Vm/EGA)
       if (VGA2<EGA) { 
       } else if (VGA2>0) { VGA2=0 } : if want reversal of VGA2 need to also edit above
     }
@@ -234,7 +204,6 @@ ENDVERBATIM
     trrs = t : save time of start of relative refractory period
 VERBATIM
     return; //@ done
-
 ENDVERBATIM
   }
 :** check for Vm>VTH -> fire
@@ -258,21 +227,13 @@ ENDVERBATIM
     }
     VTHR=VTHC :starting thresh value for relative refrac period, keep track of it
     refractory = 1 : abs. refrac on = do not allow any more spikes/bursts to begin (even for IB cells)
-
-  if (Vm>Vblock) 
-{ 
-      net_send(Vbrefrac,3) 
-VERBATIM
-      return; //@ done
-ENDVERBATIM
-    }
     net_send(refrac-AHP*AHP2REF, 3) :event for end of abs. refrac., sent separately for IB cells @ end of burst
   }
 }
 
 :** vers gives version
 PROCEDURE vers () {
-  printf("$Id: intf6.mod,v 1.100 2012/04/05 22:38:25 samn Exp $\n")
+  printf("$Id: intf7.mod 1.100 2020 samn $\n")
 }
 
 :* TABLES
@@ -286,10 +247,6 @@ FUNCTION EXP (x) {
   EXP = RES
 }
 
-PROCEDURE ESINo (x) {
-  TABLE ESIN FROM 0 TO 2*PI WITH 3000 : one cycle
-  ESIN = sin(x)
-}
 
 FUNCTION rates (vv) {
   : from Stevens & Jahr 1990a,b
