@@ -44,13 +44,11 @@ NEURON {
   RANGE maxnmc                          :::: maximum NMDA 'conductance', used in rates
   GLOBAL EAM, ENM, EGA,mg               :::: "reverse potential" distance from rest
   GLOBAL spkht                          :::: display: spike height
-  GLOBAL stopoq                         :::: flags: stop if q is empty, use STD
   : other stuff
   RANGE  t0,tg,twg,refractory,trrs :::: t0,tg save times for analytic calc
-  RANGE  cbur                         :::: burst statevar
-  GLOBAL nxt,RES      :::: table look up values for exp
+  GLOBAL RES      :::: table look up values for exp
   GLOBAL nsw, rebeg             :::: for debugging moves
-  GLOBAL installed,verbose        :::: simplest output
+  GLOBAL verbose        :::: simplest output
 }
 
 : PARAMETER block - sets all variables to defaults at start
@@ -72,15 +70,14 @@ PARAMETER {
   VTHR = -45
   incRR = 0
   Vblock = -20   : level of depolarization blockade
-  mg = 1         : for NMDA Mg dep.
+  mg = 1.6       : for NMDA Mg dep.
   RMP=-65
-  EAM = 65
+  EAM = 65 : deviation above RMP
   ENM = 90
   EGA = -15
-  spkht = 50
+  spkht = 50 : height of paste-on spike (handled on python side)
   nsw=0
   rebeg=0
-  stopoq=0
   verbose=1
   STDAM=0
   STDNM=0
@@ -91,9 +88,8 @@ PARAMETER {
 
 ASSIGNED {
   Vm VAM VNM VGA AHP VAM2 VNM2 VGA2
-  t0 tg twg refractory nxt trrs
+  t0 tg twg refractory trrs
   RES
-  installed
 }
 
 :* CONSTRUCTOR, DESTRUCTOR, INITIAL

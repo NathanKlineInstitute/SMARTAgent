@@ -1,13 +1,77 @@
 from neuron import h
-dummy = h.Section()
 
-class IntFire4Cell (): 
-  '''Create an IntFire4 cell based on 2007 parameterization using either izhi2007.mod (no hosting section) or izhi2007b.mod (v in created section)
-  If host is omitted or None, this will be a section-based version that uses Izhi2007b with state vars v, u where v is the section voltage
-  If host is given then this will be a shared unused section that simply houses an Izhi2007 using state vars V and u
-'''
+# synaptic indices used in intf7.mod NET_RECEIVE
+dsyn = {'AM':0, 'NM':1, 'GA':2, 'AM2':3, 'NM2':4, 'GA2':5}
+
+class INTF7E ():
+  # parameters for excitatory neurons
+  dparam = {"ahpwt":1,
+            "tauahp":400,
+            "RMP": -65,
+            "VTH": -40,
+            "refrac":  5,
+            "Vblock": -25,
+            "tauGA": 10,
+            "tauGA2": 20,
+            "tauAM2": 20,
+            "tauNM2": 300,
+            "tauRR": 1,
+            "RRWght": 0.25}  
   def __init__ (self):
-    self.type=type
-    self.sec = dummy
-    self.intf = h.IntFire4(0.5, sec=self.sec) # Create a new u,V 2007 neuron at location 0.5 (doesn't matter where)    
-  #def init (self): self.sec(0.5).v = self.vinit
+    cell = self.intf = h.INTF7()
+    cell.ahpwt=1
+    cell.tauahp=400
+    cell.RMP= -65
+    cell.VTH= -40 
+    cell.refrac=  5
+    cell.Vblock= -25    
+    cell.tauGA  = 10
+    cell.tauGA2 = 20
+    cell.tauAM2 = 20
+    cell.tauNM2 = 300            
+    cell.tauRR = 1
+    cell.RRWght = .25
+
+class INTF7I ():
+  # parameters for fast-spiking interneurons
+  dparam = {"ahpwt":0.5,
+            "tauahp":50,
+            "RMP": -63,
+            "VTH": -40,
+            "refrac":  2.5,
+            "Vblock": -10,
+            "tauGA": 10,
+            "tauGA2": 20,
+            "tauAM2": 20,
+            "tauNM2": 300,            
+            "tauRR": 1,
+            "RRWght": 0.25}    
+  def __init__ (self):
+    cell = self.intf = h.INTF7()
+    cell.ahpwt=0.5
+    cell.refrac= 2.5
+    cell.tauahp=50
+    cell.Vblock=-10    
+    cell.RMP = -63
+    cell.VTH= -40
+    cell.tauGA  = 10
+    cell.tauGA2 = 20
+    cell.tauAM2 = 20
+    cell.tauNM2 = 300    
+    cell.tauRR = 1
+    cell.RRWght = 0.25
+    
+def insertSpikes (sim, spkht=50):
+  # inserts spikes into voltage traces (paste-on); depends on NetPyNE simulation data format
+  import pandas as pd
+  import numpy as np
+  sampr = 1e3 / simConfig.dt # sampling rate
+  spkt, spkid = sim.simData['spkt'], sim.simData['spkid']
+  spk = pd.DataFrame(np.array([spkid, spkt]).T,columns=['spkid','spkt'])
+  for kvolt in sim.simData['Vsoma'].keys():
+    cellID = int(kvolt.split('_')[1])
+    spkts = spk[spk.spkid == cellID]
+    if len(spkts):
+      for idx in spkts.index:
+        tdx = int(spk.at[idx, 'spkt'] * sampr / 1e3)
+        sim.simData['Vsoma'][kvolt][tdx] = spkht
