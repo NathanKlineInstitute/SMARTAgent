@@ -275,7 +275,7 @@ def readSTDPParams ():
   
 dSTDPparamsRL, dSTDPparams = readSTDPParams()
 
-def getWeightIndex (synMech, cellModel):
+def getWeightIndex (synmech, cellModel):
   # get weight index for connParams
   if cellModel == 'INTF7': return intf7.dsyn[synmech]
   return 0
