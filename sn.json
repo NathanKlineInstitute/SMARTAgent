@@ -38,7 +38,7 @@
         "ResumeSimFromFile": "data/20oct23_A0_cycle_synWeights_final.pkl"
     },
     "sim": {
-        "duration": 500,
+        "duration": 5000,
         "dt": 0.4,
         "verbose": 0,
         "recordStep": 1.0,
@@ -68,10 +68,10 @@
         "useTopological": 0
     },    
     "net": {
-	"EEGain": 2000.0,
-	"EIGain": 80.0,
-	"IEGain": -0.6,
-	"IIGain": -0.6,
+	"EEGain": 18000.0,
+	"EIGain": 1000.0,
+	"IEGain": 50,
+	"IIGain": 50,
 	"ECellModel":"INTF7",
 	"ICellModel":"INTF7",
         "scale": 1,
@@ -93,8 +93,8 @@
 	    "IV4":0,
 	    "EMT":0,
 	    "IMT":0,
-	    "EA":1400,
-	    "IA":350,
+	    "EA":2800,
+	    "IA":700,
 	    "EA2": 0,
 	    "IA2": 0,	    
 	    "EMDOWN":100,
@@ -189,36 +189,36 @@
 	    "VL":{
 		"VD":{"AM":0,"NM":0,"p":0},		
 		"VL":{"AM":20e-5,"NM":30e-6,"p":0},
-		"EA":{"AM":4.5e-5,"NM":10e-6,"p":0.2},
-		"EMDOWN":{"AM":5e-5,"NM":6e-6,"p":0.08},
-		"EMUP":{"AM":5e-5,"NM":6e-6,"p":0.08},
-		"EMSTAY":{"AM":5e-5,"NM":6e-6,"p":0.08}		
+		"EA":{"AM":6e-5,"NM":10e-6,"p":0.2},
+		"EMDOWN":{"AM":6e-5,"NM":10e-6,"p":0.08},
+		"EMUP":{"AM":6e-5,"NM":10e-6,"p":0.08},
+		"EMSTAY":{"AM":6e-5,"NM":6e-6,"p":0.08}		
 	    },
 	    "VD":{
 		"VL":{"AM":0,"NM":0,"p":0},
 		"VD":{"AM":0,"NM":0,"p":0},
-		"EA":{"AM":4.5e-5,"NM":10e-6,"p":0.2},
-		"EMDOWN":{"AM":5e-5,"NM":6e-6,"p":0.08},
-		"EMUP":{"AM":5e-5,"NM":6e-6,"p":0.08},
-		"EMSTAY":{"AM":5e-5,"NM":6e-6,"p":0.08},
+		"EA":{"AM":6e-5,"NM":10e-6,"p":0.2},
+		"EMDOWN":{"AM":6e-5,"NM":10e-6,"p":0.08},
+		"EMUP":{"AM":6e-5,"NM":10e-6,"p":0.08},
+		"EMSTAY":{"AM":6e-5,"NM":6e-6,"p":0.08},
 		"ID": {"AM":0.02, "p":0.015}
 	    },
 	    "EM":{
-		"EM":{"AM":5e-5,"NM":6e-6,"p":0.15},
+		"EM":{"AM":6e-5,"NM":6e-6,"p":0.15},
 		"EA":{"AM":0,"NM":0,"p":0.0},
 		"IRecip": {"AM":0.02, "NM":0, "p":0.0625},
 		"IM":{"AM":0.02,"p":0.03}
 	    },
 	    "EA":{
-		"EA":{"AM":5e-5,"NM":6e-6,"p":0.0},
-		"EA2":{"AM":5e-5,"NM":6e-6,"p":0.2},
-		"EM":{"AM":5e-5,"NM":6e-6,"p":0.25},
+		"EA":{"AM":6e-5,"NM":6e-6,"p":0.0},
+		"EA2":{"AM":6e-5,"NM":6e-6,"p":0.2},
+		"EM":{"AM":6e-5,"NM":6e-6,"p":0.25},
 		"IA":{"AM": 0.02, "p":0.03}
 	    },
 	    "EA2":{
-		"EA":{"AM":5e-5,"NM":6e-6,"p":0.0},
-		"EA2":{"AM":5e-5,"NM":6e-6,"p":0.1},
-		"EM":{"AM":5e-5,"NM":6e-6,"p":0.2},
+		"EA":{"AM":6e-5,"NM":6e-6,"p":0.0},
+		"EA2":{"AM":6e-5,"NM":6e-6,"p":0.1},
+		"EM":{"AM":6e-5,"NM":6e-6,"p":0.2},
 		"IA2":{"AM": 0.02, "p":0.0625}
 	    },	   	    
 	    "IR": {
@@ -409,12 +409,12 @@
     },
     "Noise": {
         "I": {
-            "Rate": 0,
-            "Weight": 0.05
+            "Rate": 50,
+            "Weight": 0.01
         },
         "E": {
-            "Rate": 0,
-            "Weight": 1e-05
+            "Rate": 50,
+            "Weight": 1
         }
     }
 }
