@@ -20330,3 +20330,11 @@ python -i simdat.py backupcfg/20nov4_A0_cycle_sim.json
 clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP'],lclr=['r','g','b'],plotindiv=True)
 xlabel('Time (ms)',fontsize=30); ylabel('Average weight',fontsize=30); tl(); 
 
+** restart sim on gcp (20nov4_A0_gcp_)
+
+this one is same as 20nov4_A0_cycle_ but with targetted RL ... 
+
+./myrun 32 sn.json
+
+started ~15:44 ... 
+
