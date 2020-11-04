@@ -48,7 +48,7 @@
         "RLFakeUpRule": 0,
         "RLFakeDownRule": 0,
         "RLFakeStayRule": 0,
-        "name": "20nov4_A0_gcp_",
+        "name": "20nov4_B0_gcp_",
         "doquit": 1,
         "doplot": 0,
         "saveCellSecs": 0,
@@ -68,7 +68,7 @@
         "useTopological": 0
     },    
     "net": {
-	"EEGain": 20000.0,
+	"EEGain": 22500.0,
 	"EIGain": 1000.0,
 	"IEGain": 50,
 	"IIGain": 50,
@@ -413,7 +413,7 @@
             "Weight": 0.01
         },
         "E": {
-            "Rate": 50,
+            "Rate": 0,
             "Weight": 0.5
         }
     }

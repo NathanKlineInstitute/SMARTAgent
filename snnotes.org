@@ -20224,11 +20224,17 @@ produces spiking in the intf7 cells
 
 started ~9:47 ...
 
-** try same sim as on cycle but w/o noise (20nov4_B0_gcp_)
+** try ~same sim as on cycle but w/o noise (20nov4_B0_gcp_), with targetted RL
 
 ./myrun 32 sn.json
 
 no firing  ... have to readjust weights if leaving off noise
+
+ok, readjusted (increased EEGain) - start over
+
+./myrun 32 sn.json
+
+started ~10:22 ... 
 
 ** note for stdp.mod weight array -- only uses weight[0]
 
