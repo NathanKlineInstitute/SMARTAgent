@@ -20191,5 +20191,14 @@ samndp7730% git push git@github.com:samnemo/netpyne.git
 
 python -i simdat.py backupcfg/20nov3_A0_cycle_sim.json
 
-drawcellVm(simConfig,ldrawpop=['EV1','EMUP','EMDOWN','EA', 'IM'])
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); 
+savefig(gifpath()+'rast.png') # [[./gif/20nov3_20nov3_A0_cycle_rast.png]]
+not enough firing ... 
 
+clf(); drawcellVm(simConfig,ldrawpop=['EV1','EMUP','EMDOWN','EA', 'IM'])
+savefig(gifpath()+'Vm.png') # [[./gif/20nov3_20nov3_A0_cycle_Vm.png]]
+
+python -i simdat.py backupcfg/20nov3_B0_cycle_sim.json
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); 
+clf(); drawcellVm(simConfig,ldrawpop=['EV1','EMUP','EMDOWN','EA', 'IM'])
