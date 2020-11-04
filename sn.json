@@ -38,7 +38,7 @@
         "ResumeSimFromFile": "data/20oct23_A0_cycle_synWeights_final.pkl"
     },
     "sim": {
-        "duration": 1000000,
+        "duration": 3000,
         "dt": 0.4,
         "verbose": 0,
         "recordStep": 1.0,
@@ -48,9 +48,9 @@
         "RLFakeUpRule": 0,
         "RLFakeDownRule": 0,
         "RLFakeStayRule": 0,
-        "name": "20nov4_B0_gcp_",
-        "doquit": 1,
-        "doplot": 0,
+        "name": "20nov4_C0_gcp_",
+        "doquit": 0,
+        "doplot": 1,
         "saveCellSecs": 0,
         "saveCellConns": 0,
         "targettedRL": 1,
@@ -68,7 +68,7 @@
         "useTopological": 0
     },    
     "net": {
-	"EEGain": 25000.0,
+	"EEGain": 20000.0,
 	"EIGain": 1000.0,
 	"IEGain": 50,
 	"IIGain": 50,
@@ -87,8 +87,8 @@
 	    "EV1DSW":400,
 	    "EV1DS":400,
 	    "EV1DSE":400,
-	    "ID": 800,	    
-	    "IV1":100,
+	    "ID": 0,
+	    "IV1":0,
 	    "EV4":0,
 	    "IV4":0,
 	    "EMT":0,
@@ -189,7 +189,7 @@
 	    "VL":{
 		"VD":{"AM":0,"NM":0,"p":0},		
 		"VL":{"AM":20e-5,"NM":30e-6,"p":0},
-		"EA":{"AM":6e-5,"NM":10e-6,"p":0.2},
+		"EA":{"AM":3e-5,"NM":5e-6,"p":0.4},
 		"EMDOWN":{"AM":6e-5,"NM":10e-6,"p":0.08},
 		"EMUP":{"AM":6e-5,"NM":10e-6,"p":0.08},
 		"EMSTAY":{"AM":6e-5,"NM":6e-6,"p":0.08}		
@@ -197,7 +197,7 @@
 	    "VD":{
 		"VL":{"AM":0,"NM":0,"p":0},
 		"VD":{"AM":0,"NM":0,"p":0},
-		"EA":{"AM":6e-5,"NM":10e-6,"p":0.2},
+		"EA":{"AM":3e-5,"NM":5e-6,"p":0.4},
 		"EMDOWN":{"AM":6e-5,"NM":10e-6,"p":0.08},
 		"EMUP":{"AM":6e-5,"NM":10e-6,"p":0.08},
 		"EMSTAY":{"AM":6e-5,"NM":6e-6,"p":0.08},
@@ -309,7 +309,7 @@
         },
         "EEMRecProbCross": 0,
         "VisualFeedback": 0,
-        "weightVar": 0.5
+        "weightVar": 1
     },
     "STDP": {
         "AMPA": {
@@ -413,7 +413,7 @@
             "Weight": 0.01
         },
         "E": {
-            "Rate": 0,
+            "Rate": 50,
             "Weight": 0.5
         }
     }

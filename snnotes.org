@@ -20267,3 +20267,7 @@ in that case EV1, EV1DE may as well just be NSLOC type NetStim ...
 
 but then if ever want feedback connectivity/plasticity would have to redo ... 
 
+** other test
+
+increase conv onto EA??
+
