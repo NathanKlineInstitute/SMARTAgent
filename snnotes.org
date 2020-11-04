@@ -20271,3 +20271,46 @@ but then if ever want feedback connectivity/plasticity would have to redo ...
 
 increase conv onto EA??
 
+** check output from (20nov3_B0_cycle_)
+
+python -i simdat.py backupcfg/20nov3_B0_cycle_sim.json
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/20nov4_20nov3_B0_cycle_perf.png]]
+not bad for follow ~0.44 at end
+hit, score are a bit low ... 
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((990e3,1000e3))
+savefig(gifpath()+'rast.png') # [[./gif/20nov4_20nov3_B0_cycle_rast.png]]
+EA rates close to 0 ... do not see firing at end ... 
+average EMDOWN,EMUP rates high ... ~30 Hz overall
+were EA neurons turned off due to lack of input from EV1,EV1D?? from netstims running out of spikes to send?
+
+xlim((0,10e3))
+savefig(gifpath()+'rastB.png') # [[./gif/20nov4_20nov3_B0_cycle_rastB.png]]
+
+xlim((500e3,510e3))
+savefig(gifpath()+'rastC.png') # [[./gif/20nov4_20nov3_B0_cycle_rastC.png]]
+
+xlim((250e3,260e3))
+savefig(gifpath()+'rastD.png') # [[./gif/20nov4_20nov3_B0_cycle_rastD.png]]
+
+xlim((0,1000e3))
+savefig(gifpath()+'rastE.png') # [[./gif/20nov4_20nov3_B0_cycle_rastE.png]]
+strange, activity definitely getting more sparse over the course of the simulation...
+even EV1DN has sparser activity as the simulation progresses ... 
+
+nsloc.mod has default number at 3000 ... and only used nsloc (as opposed to NetStim)
+when using the INTF cells ... 
+
+lc = [c for c in sim.net.cells if c.gid in sim.net.pops['stimModEV1DN'].cellGids]
+ln = [c.hPointp.number for c in lc]
+
+lc = [c for c in sim.net.cells if c.gid in sim.net.pops['stimModEV1'].cellGids]
+ln = [c.hPointp.number for c in lc]
+
+for pop in ['EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW', 'EV1DSW', 'EV1DS', 'EV1DSE']:
+  lc = [c for c in sim.net.cells if c.gid in sim.net.pops['stimMod'+pop].cellGids]
+  ln = [c.hPointp.number for c in lc]
+  lint = [c.hPointp.ispike for c in lc]
+  print(pop,ln,lint)
