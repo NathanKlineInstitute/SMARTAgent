@@ -20314,3 +20314,19 @@ for pop in ['EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW', 'EV1DSW', 'EV1DS', 'E
   ln = [c.hPointp.number for c in lc]
   lint = [c.hPointp.ispike for c in lc]
   print(pop,ln,lint)
+
+** fixed nsloc.mod -- to not limit number of spikes
+
+removed conditional where ispike compared to number to turn off further spikes
+
+** restart sim on cycle (20nov4_A0_cycle_)
+
+./myrun 32 sn.json
+
+started ~15:42 ... 
+
+python -i simdat.py backupcfg/20nov4_A0_cycle_sim.json
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP'],lclr=['r','g','b'],plotindiv=True)
+xlabel('Time (ms)',fontsize=30); ylabel('Average weight',fontsize=30); tl(); 
+
