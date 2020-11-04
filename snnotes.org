@@ -20185,7 +20185,7 @@ samndp7730% git commit -m 'add weightIndex option to connParam for pointCell'
  2 files changed, 5 insertions(+), 3 deletions(-)
 samndp7730% git push git@github.com:samnemo/netpyne.git
 
-** test INTF7 in full sim
+** test INTF7 in full sim (20nov3_A0_cycle_)
 
         "name": "20nov3_A0_cycle_",
 
@@ -20202,3 +20202,37 @@ python -i simdat.py backupcfg/20nov3_B0_cycle_sim.json
 
 clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); 
 clf(); drawcellVm(simConfig,ldrawpop=['EV1','EMUP','EMDOWN','EA', 'IM'])
+* 20nov4
+** update netpyne pointCell related changes on gcp
+
+python
+import netpyne
+netpyne.__file__ # '/home/samnemo/netpyne/netpyne/__init__.py
+
+updated /home/samnemo/netpyne/netpyne/cell/pointCell.py
+from samnemo fork of netpyne
+
+updated /home/samnemo/netpyne/netpyne/network/conn.py
+from samnemo fork of netpyne
+
+python -i tut_artif.py
+produces spiking in the intf7 cells
+
+** try same sim as on cycle but with targetted RL (20nov4_A0_gcp_)
+
+./myrun 32 sn.json
+
+started ~9:47 ...
+
+** try same sim as on cycle but w/o noise (20nov4_B0_gcp_)
+
+./myrun 32 sn.json
+
+no firing  ... have to readjust weights if leaving off noise
+
+** note for stdp.mod weight array -- only uses weight[0]
+
+h.setpointer(singlesyn._ref_weight[0],'synweight',stdpmech) # Point the STDP mechanism to the connection weight
+
+so for now when using on intf7 cells make sure only using plast at AM (AMPA) synapse (has weightIndex of 0)
+
