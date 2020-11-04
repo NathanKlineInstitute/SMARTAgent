@@ -37,10 +37,10 @@ netParams.connParams[k] = {
     'preConds': {'pop': 'artif1'}, 'postConds': {'pop': 'artif3'},
     #'probability': 0.2,
     'connList': connList,
-    'weight': 1,
+    'weight': 10,
     #'synMech': 'AMPA',                
     'delay': 'uniform(1,5)',
-    'weightIndex': 2}
+    'weightIndex': 0}
 
 # netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': {'RLon':1,'RLlenhebb':200,'RLhebbwt':0.001,'RLwindhebb':50,'wbase':0,'wmax':2}}
 
