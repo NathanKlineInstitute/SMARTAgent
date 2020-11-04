@@ -20049,3 +20049,201 @@ python multistepSim.py sn.json 32 10 20oct30_K0_cycle_multi
 
 started ~23:58 ... 
 
+after ~8 hours, rates go towards 0 ... and paddle mostly stays still ... not a good param regime
+
+* 20oct31
+** adjust the IntFire4 sim some more
+
+        "name": "20oct31_A0_cycle_",
+
+python multistepSim.py sn.json 32 10 20oct31_A0_cycle_multi
+
+re-started ~13:57 ...
+
+still goes mostly towards 0 ... 
+
+restart a single sim ...
+
+./myrun 32 sn.json
+
+23:44 ...
+
+* 20nov1
+** check output from 20oct31_A0_cycle_
+
+t= 71760.0  U,D spikes: [0.0] [0.0]
+t= 71760.0 proposed,model action: [-1] [1]
+t= 71780.0  U,D spikes: [0.0] [0.0]
+t= 71780.0 proposed,model action: [-1] [1]
+t= 71800.0  U,D spikes: [0.0] [0.0]
+t= 71800.0 proposed,model action: [-1] [1]
+t= 71820.0  U,D spikes: [0.0] [0.0]
+t= 71820.0 proposed,model action: [-1] [1]
+t= 71840.0  U,D spikes: [0.0] [0.0]
+t= 71840.0 proposed,model action: [-1] [1]
+t= 71860.0  U,D spikes: [0.0] [0.0]
+t= 71860.0 proposed,model action: [-1] [1]
+t= 71880.0  U,D spikes: [0.0] [0.0]
+t= 71880.0 proposed,model action: [-1] [1]
+t= 71900.0  U,D spikes: [180.0] [21.0]
+t= 71900.0 proposed,model action: [-1] [4]
+t= 71920.0  U,D spikes: [5111.0] [3444.0]
+t= 71920.0 proposed,model action: [-1] [4]
+t= 71940.0  U,D spikes: [19826.0] [8270.0]
+t= 71940.0 proposed,model action: [-1] [4]
+t= 71960.0  U,D spikes: [43615.0] [261.0]
+t= 71960.0 proposed,model action: [-1] [4]
+t= 71980.0  U,D spikes: [97266.0] [0.0]
+t= 71980.0 proposed,model action: [-1] [4]
+t= 72000.0  U,D spikes: [277322.0] [0.0]
+t= 72000.0 proposed,model action: [-1] [4]
+t= 72020.0  U,D spikes: [926587.0] [0.0]
+t= 72020.0 proposed,model action: [-1] [4]
+t= 72040.0  U,D spikes: [3310498.0] [0.0]
+t= 72040.0 proposed,model action: [-1] [4]
+t= 72060.0  U,D spikes: [12085577.0] [0.0]
+t= 72060.0 proposed,model action: [-1] [4]
+t= 72080.0  U,D spikes: [44447982.0] [0.0]
+t= 72080.0 proposed,model action: [-1] [4]
+nrn_timeout t=72081
+--------------------------------------------------------------------------
+MPI_ABORT was invoked on rank 0 in communicator MPI_COMM_WORLD
+with errorcode 0.
+
+NOTE: invoking MPI_ABORT causes Open MPI to kill all MPI processes.
+You may or may not see output from other processes, depending on
+exactly when Open MPI kills them.
+--------------------------------------------------------------------------
+(base) samn@cycle:~/SMARTAgent$ 
+(base) samn@cycle:~/SMARTAgent$ 
+
+never finished ... had overly high firing rates ... 
+
+** another adjustment for IntFire4 test (20nov1_A0_cycle_)
+
+./myrun 32 sn.json
+
+started ~22:28 ...
+
+crashed after a while ... firing rates god too high
+
+** & another adjustment for IntFire4 test (20nov1_B0_cycle_)
+
+same as one above but slightly lower EEGain ... 
+
+./myrun 32 sn.json
+
+started ~22:38 ...
+
+crashed after a while ... firing rates god too high
+
+* 20nov2
+** more adjustments for IntFire4 net
+
+        "name": "20nov2_A0_cycle_",
+
+./myrun 32 sn.json
+
+** adjusting intf6.mod to minimum in mod/intf7.mod
+
+intf6.mod was more flexible in time constants and so on ... compared to IntFire4
+
+* 20nov3
+** check intf7.mod
+
+
+first testing from adjusted tut_artif.py
+
+need to adjust Netpyne's pointCell.py to allow specifying weightIndex
+to use for a specific connection, since that's how intf7.mod right now
+supports different synapse types within its NET_RECEIVE
+
+on cycle
+/opt/anaconda3/lib/python3.7/site-packages/netpyne/cell/pointCell.py
+
+ok, made modification, will try it out ... 
+
+also need to change _addCellConn in
+/opt/anaconda3/lib/python3.7/site-packages/netpyne/network/conn.py
+        if 'weightIndex' in connParam: params['weightIndex'] = connParam.get('weightIndex')
+
+ok, made that adjustment and it seems to work ... will modify local netpyne, do pull request, etc.
+
+for that make push via samnemo fork
+git push git@github.com:samnemo/netpyne.git
+and then do pull request to main neurosim netpyne repo
+
+samndp7730% git checkout development
+Switched to branch 'development'
+Your branch is ahead of 'origin/development' by 1 commit.
+  (use "git push" to publish your local commits)
+samndp7730% pwd
+/u/samn/netpyne
+samndp7730% git add netpyne/cell/pointCell.py netpyne/network/conn.py
+samndp7730% git commit -m 'add weightIndex option to connParam for pointCell'
+[development ef79fc6] add weightIndex option to connParam for pointCell
+ 2 files changed, 5 insertions(+), 3 deletions(-)
+samndp7730% git push git@github.com:samnemo/netpyne.git
+
+** test INTF7 in full sim (20nov3_A0_cycle_)
+
+        "name": "20nov3_A0_cycle_",
+
+python -i simdat.py backupcfg/20nov3_A0_cycle_sim.json
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); 
+savefig(gifpath()+'rast.png') # [[./gif/20nov3_20nov3_A0_cycle_rast.png]]
+not enough firing ... 
+
+clf(); drawcellVm(simConfig,ldrawpop=['EV1','EMUP','EMDOWN','EA', 'IM'])
+savefig(gifpath()+'Vm.png') # [[./gif/20nov3_20nov3_A0_cycle_Vm.png]]
+
+python -i simdat.py backupcfg/20nov3_B0_cycle_sim.json
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); 
+clf(); drawcellVm(simConfig,ldrawpop=['EV1','EMUP','EMDOWN','EA', 'IM'])
+* 20nov4
+** update netpyne pointCell related changes on gcp
+
+python
+import netpyne
+netpyne.__file__ # '/home/samnemo/netpyne/netpyne/__init__.py
+
+updated /home/samnemo/netpyne/netpyne/cell/pointCell.py
+from samnemo fork of netpyne
+
+updated /home/samnemo/netpyne/netpyne/network/conn.py
+from samnemo fork of netpyne
+
+python -i tut_artif.py
+produces spiking in the intf7 cells
+
+** try same sim as on cycle but with targetted RL (20nov4_A0_gcp_)
+
+./myrun 32 sn.json
+
+started ~9:47 ...
+
+** try ~same sim as on cycle but w/o noise (20nov4_B0_gcp_), with targetted RL
+
+./myrun 32 sn.json
+
+no firing  ... have to readjust weights if leaving off noise
+
+ok, readjusted (increased EEGain) - start over
+
+./myrun 32 sn.json
+
+started ~10:22 ... 
+increased EEGain again since rates went to 0
+10:36 ...
+
+./myrun 32 sn.json
+
+
+** note for stdp.mod weight array -- only uses weight[0]
+
+h.setpointer(singlesyn._ref_weight[0],'synweight',stdpmech) # Point the STDP mechanism to the connection weight
+
+so for now when using on intf7 cells make sure only using plast at AM (AMPA) synapse (has weightIndex of 0)
+

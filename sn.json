@@ -18,7 +18,7 @@
         "scorePoint": 1.0,
         "losePoint":  0.0,
         "followTarget": 0.1,
-        "avoidTarget": -0.01,
+        "avoidTarget": -0.0025,
         "hitBall": 0.5
     },
     "actionsPerPlay": 1,
@@ -39,7 +39,7 @@
     },
     "sim": {
         "duration": 1000000,
-        "dt": 0.2,
+        "dt": 0.4,
         "verbose": 0,
         "recordStep": 1.0,
         "recordWeightStepSize": 500,
@@ -48,16 +48,16 @@
         "RLFakeUpRule": 0,
         "RLFakeDownRule": 0,
         "RLFakeStayRule": 0,
-        "name": "20oct30_K0_cycle_",
+        "name": "20nov4_B0_gcp_",
         "doquit": 1,
         "doplot": 0,
         "saveCellSecs": 0,
         "saveCellConns": 0,
-        "targettedRL": 0,
+        "targettedRL": 1,
         "tstepPerAction": 20,
         "saveWeights": 1,
         "saveAssignedFiringRates": 0,
-	      "useReducedNetwork": 0
+	"useReducedNetwork": 0
     },
     "architectureVtoA": {
         "useProbabilistic": 1,
@@ -68,12 +68,12 @@
         "useTopological": 0
     },    
     "net": {
-	"EEGain": 300.0,
-	"EIGain": 9.0,
-	"IEGain": -0.06,
-	"IIGain": -0.06,
-	"ECellModel":"IntFire4",
-	"ICellModel":"IntFire4",
+	"EEGain": 25000.0,
+	"EIGain": 1000.0,
+	"IEGain": 50,
+	"IIGain": 50,
+	"ECellModel":"INTF7",
+	"ICellModel":"INTF7",
         "scale": 1,
 	"allpops": {
 	    "ER":0,
@@ -87,7 +87,7 @@
 	    "EV1DSW":400,
 	    "EV1DS":400,
 	    "EV1DSE":400,
-	    "ID": 0,
+	    "ID": 800,
 	    "IV1":100,
 	    "EV4":0,
 	    "IV4":0,
@@ -97,8 +97,8 @@
 	    "IA":700,
 	    "EA2": 0,
 	    "IA2": 0,	    
-	    "EMDOWN":200,
-	    "EMUP":200,
+	    "EMDOWN":100,
+	    "EMUP":100,
 	    "EMSTAY":0,
 	    "IM":100,
 	    "IMUP": 0,
@@ -183,55 +183,56 @@
         "DirMaxRate": 150.0,
         "LocMaxRate": 150.0,
         "FiringRateCutoff" : 50.0,
-        "stimModVD": 1,
-        "stimModVL": 1,
+        "stimModVD": 35,
+        "stimModVL": 35,
 	"cmat": {
 	    "VL":{
 		"VD":{"AM":0,"NM":0,"p":0},		
 		"VL":{"AM":20e-5,"NM":30e-6,"p":0},
-		"EA":{"AM":4.5e-5,"NM":10e-6,"p":0.2},
-		"EMDOWN":{"AM":5e-5,"NM":6e-6,"p":0.08},
-		"EMUP":{"AM":5e-5,"NM":6e-6,"p":0.08},
-		"EMSTAY":{"AM":5e-5,"NM":6e-6,"p":0.08}		
+		"EA":{"AM":6e-5,"NM":10e-6,"p":0.2},
+		"EMDOWN":{"AM":6e-5,"NM":10e-6,"p":0.08},
+		"EMUP":{"AM":6e-5,"NM":10e-6,"p":0.08},
+		"EMSTAY":{"AM":6e-5,"NM":6e-6,"p":0.08}		
 	    },
 	    "VD":{
 		"VL":{"AM":0,"NM":0,"p":0},
 		"VD":{"AM":0,"NM":0,"p":0},
-		"EA":{"AM":4.5e-5,"NM":10e-6,"p":0.2},
-		"EMDOWN":{"AM":5e-5,"NM":6e-6,"p":0.08},
-		"EMUP":{"AM":5e-5,"NM":6e-6,"p":0.08},
-		"EMSTAY":{"AM":5e-5,"NM":6e-6,"p":0.08}		
+		"EA":{"AM":6e-5,"NM":10e-6,"p":0.2},
+		"EMDOWN":{"AM":6e-5,"NM":10e-6,"p":0.08},
+		"EMUP":{"AM":6e-5,"NM":10e-6,"p":0.08},
+		"EMSTAY":{"AM":6e-5,"NM":6e-6,"p":0.08},
+		"ID": {"AM":0.02, "p":0.015}
 	    },
 	    "EM":{
-		"EM":{"AM":5e-5,"NM":6e-6,"p":0.05},
+		"EM":{"AM":6e-5,"NM":6e-6,"p":0.15},
 		"EA":{"AM":0,"NM":0,"p":0.0},
 		"IRecip": {"AM":0.02, "NM":0, "p":0.0625},
-		"IM":{"GA":0.02,"p":0.0625}
+		"IM":{"AM":0.02,"p":0.03}
 	    },
 	    "EA":{
-		"EA":{"AM":5e-5,"NM":6e-6,"p":0.0},
-		"EA2":{"AM":5e-5,"NM":6e-6,"p":0.2},
-		"EM":{"AM":5e-5,"NM":6e-6,"p":0.1},
-		"IA":{"GA": 0.02, "p":0.0625}
+		"EA":{"AM":6e-5,"NM":6e-6,"p":0.0},
+		"EA2":{"AM":6e-5,"NM":6e-6,"p":0.2},
+		"EM":{"AM":6e-5,"NM":6e-6,"p":0.25},
+		"IA":{"AM": 0.02, "p":0.03}
 	    },
 	    "EA2":{
-		"EA":{"AM":5e-5,"NM":6e-6,"p":0.0},
-		"EA2":{"AM":5e-5,"NM":6e-6,"p":0.1},
-		"EM":{"AM":5e-5,"NM":6e-6,"p":0.2},
-		"IA2":{"GA": 0.02, "p":0.0625}
+		"EA":{"AM":6e-5,"NM":6e-6,"p":0.0},
+		"EA2":{"AM":6e-5,"NM":6e-6,"p":0.1},
+		"EM":{"AM":6e-5,"NM":6e-6,"p":0.2},
+		"IA2":{"AM": 0.02, "p":0.0625}
 	    },	   	    
 	    "IR": {
 		"ER": {"GA": 0.2, "p":0.0625}
 	    },
 	    "IV1": {
-		"EV1": {"GA": 0.2, "p":0.25},
-		"IV1": {"GA":0.05, "p":0.25},
+		"EV1": {"GA": 0.25, "p":0.1},
+		"IV1": {"GA":0.05, "p":0.1},
 		"ER": {"GA":0.02, "p":0.0},
 		"IV4": {"GA":0.0075, "p":0.0}		
 	    },
 	    "ID": {
-		"ED": {"GA": 0.2, "p":0.25},
-		"ID": {"GA":0.05, "p":0.25}		
+		"ED": {"GA": 0.25, "p":0.1},
+		"ID": {"GA":0.05, "p":0.1}
 	    },
 	    "IV4": {
 		"EV4": {"GA":0.2, "p":0.25},
@@ -245,31 +246,31 @@
 		"EV4": {"GA":0.02, "p":0.0}		
 	    },
 	    "IM": {
-		"EM": {"GA":0.25, "p":0.125},
-		"IM": {"GA":0.05, "p":0.25}
+		"EM": {"GA":0.25, "p":0.1},
+		"IM": {"GA":0.05, "p":0.1}
 	    },
 	    "IMRecip": {
 		"EM": {"GA":0.2, "p":0.125}
 	    },
 	    "IA": {
-		"EA": {"GA":0.25, "p":0.125},
-		"IA": {"GA":0.05, "p":0.25}		
+		"EA": {"GA":0.25, "p":0.1},
+		"IA": {"GA":0.05, "p":0.1}
 	    },
 	    "IA2": {
 		"EA2": {"GA":0.25, "p":0.125},
-		"IA2": {"GA":0.05, "p":0.25}		
+		"IA2": {"GA":0.05, "p":0.15}
 	    },	    	    
 	    "IR": {
-		"IR": {"GA":0.05, "p":0.25}
+		"IR": {"GA":0.05, "p":0.15}
 	    },
 	    "IMUP": {
-		"IMUP": {"GA":0.05, "p":0.25}
+		"IMUP": {"GA":0.05, "p":0.15}
 	    },
 	    "IMDOWN": {
-		"IMDOWN": {"GA":0.05, "p":0.25}
+		"IMDOWN": {"GA":0.05, "p":0.15}
 	    },
 	    "IMSTAY": {
-		"IMSTAY": {"GA":0.05, "p":0.25}
+		"IMSTAY": {"GA":0.05, "p":0.15}
 	    },
 	    "ER": {
 		"EV1": {"AM": 20e-5, "NM": 30e-6, "p":0.1}
@@ -277,16 +278,16 @@
 	    "EV1": {
 		"EV4": {"AM": 20e-5, "NM": 30e-6, "p":0.3},
 		"ER": {"AM":0 , "NM":0, "p":0},
-		"IV1": {"GA":0.02, "p":0.0225}
+		"IV1": {"AM":0.02, "p":0.03}
 	    },
 	    "EV4": {
 		"EMT": {"AM": 60e-5, "NM": 90e-6, "p":0.3},
 		"EV1": {"AM":0 , "NM":0, "p":0},
-		"IV4": {"GA":0.02, "p":0.0225}		
+		"IV4": {"AM":0.02, "p":0.0225}		
 	    },
 	    "EMT": {
 		"EV4": {"AM":0 , "NM":0, "p":0},
-		"IMT": {"GA":0.02, "p":0.0225}
+		"IMT": {"AM":0.02, "p":0.0225}
 	    }
 	},
         "EEMWghtThreshMin": 6.25e-06,
@@ -377,7 +378,7 @@
             "RLlenanti": 200,
             "useRLexp": 1,
             "RLhebbwt": 5e-06,
-            "RLantiwt": -5e-06,
+            "RLantiwt": 0,
             "hebbwt": 0.0,
             "antiwt": 0.0,
             "tauhebb": 10,
@@ -409,11 +410,11 @@
     "Noise": {
         "I": {
             "Rate": 0,
-            "Weight": 0.5e-05
+            "Weight": 0.01
         },
         "E": {
             "Rate": 0,
-            "Weight": 1e-05
+            "Weight": 0.5
         }
     }
 }
