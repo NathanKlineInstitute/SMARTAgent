@@ -8565,3 +8565,207 @@ and rerun sim for 10sec.
       self.dirSensitiveNeuronDim = int(np.sqrt(dconf['net']['allpops']['EV1DE']))
 
 -- still tuning parameters.....
+
+-- started new sims (1000 sec each) on falcor (20oct23_...._nontargeted)and cycle (20oct23_...._targeted).
+
+* 20Oct26
+
+-- the simulation ran on falcor on oct23 was too slow. took more than 2 days to run 84 sec.
+-- should run the reduced model on falcor.
+"20oct26_A0_game_falcor_reduced2_targeted_"
+"captureTwoObj":1 <--[0]
+"EV1":40  <--[60]
+"EA":3200 <--[64000]
+run for 10 sec to adjust parameters.
+... look at EV1cell0, seems like a depol block (see the fig)
+... looking at raster (see the fig), highly synchronized activity in EA and IA.... should lower the weight
+... looking at raster, for long duration, no activity in M.... should lower the weights onto M too.
+
+-- "20oct26_A1_game_falcor_reduced2_targeted_"
+"stimModInputW":0.015   <--[0.02]
+"EEAWghtAM": 1e-3   <--[2e-3]
+"EEMWghtAM":4.5e-5  <--[4.5e-4] decreased
+... didnt save any fig.
+... no motor activity generated. so may be need to increase "EEMWghtAM" or increase convergence from 0.2 to 0.4.
+
+-- "20oct26_A2_game_falcor_reduced2_targeted_"
+"stimModInputW":0.015   <--[0.02]
+"EEAWghtAM": 1e-3   <--[2e-3]
+"EEMWghtAM":4.5e-3  <--[4.5e-4] increased this time
+"EEMFeedbackWghtAM":2e-15   <--[2e-5].... should not have affected because EEMFeedbackProb was already set to 0.
+
+-- still not completely sure about the choice of parameters, but with a 10sec run, see decent firing rates. May be should try running on falcor.
+
+-- run "20oct26_B0_falcor_reduced_2obj_"
+
+* 20oct27
+
+-- saved rasters: 
+20oct26_B0_rasterZ0.png - Full 
+.... firing rates are high
+......... 1. probably should reduce either the strength of connections from stimMod to V1
+......... 2. or decrease the firing rate of stimMod.
+......... 3. may be both 1 and 2.
+.... some times, EV1 cells went to depolarization block, which could be due to high firing rate inputs.
+......... not sure what is causing it. could be high input firing rates or weights.
+.... seems like V to EA and EA to M weights are working fine.
+
+-- run "20oct27_B0_falcor_reduced_2obj_" for 100 sec.
+"DirMaxRate": 100
+"LocMaxRate": 100
+
+-- run "20oct27_A0_cycle_reduced_2obj_" for 100 sec on cycle:
+
+"DirMaxRate": 100
+"LocMaxRate": 100
+"stimModVD":0.02
+"stimModVL":0.02
+
+* 20oct28
+
+-- yesterday, i ran quite a few parameters for "DirMaxRate", "LocMaxRate", "stimModVD" and "stimModVL" ...
+... but could not find a good set of parameters to get a stable firing. saw some dep block in cell0 of EV1 ....
+... and some silent periods in raster. (havent saved all raster).
+
+-- play with inhibition IV1 to EV1.
+IV1 to EV1: GA = 0.1 (0.2 originally), p = 0.5 (0.25 originally)
+set ID neuron to 1.
+"20oct28_A0_cycle_reduced_2obj_" ... 100 sec.
+... raster saved... looks ok
+
+-- play with inhibition IV1 to EV1.
+IV1 to EV1: GA = 0.3 (0.2 originally), p = 0.5 (0.25 originally)
+ID to ED: GA = 0.2, p = 1 <--additional change
+set ID neuron to 1.
+"20oct28_A1_cycle_reduced_2obj_" ... 100 sec.
+
+-- play with inhibition IV1 to EV1.
+stimModVD: 0.005
+stimModVL: 0.005
+IV1 to EV1: GA = 0.3 (0.2 originally), p = 0.5 (0.25 originally)
+ID to ED: GA = 0.2, p = 1 <--additional change
+set ID neuron to 1.
+"20oct28_A2_cycle_reduced_2obj_" ... 100 sec.
+
+-- remove inhibition onto EV1.
+stimModVD: 0.02
+stimModVL: 0.02
+IV1 to EV1: p = 0 (originally 0.25)
+"20oct28_A0_falcor_reduced_2obj_" ... 100 sec.
+
+seems like need inhibition and probably more than before.
+
+-- restore inhibition onto EV1.
+stimModVD: 0.02
+stimModVL: 0.02
+IV1 to EV1: GA=0.2 and p = 0.5 (originally 0.25)
+"20oct28_A1_falcor_reduced_2obj_" ... 100 sec.
+
+-- restore inhibition onto EV1.
+stimModVD: 0.02
+stimModVL: 0.02
+IV1 to EV1: GA=0.1 and p = 0.75 (originally 0.25)
+ID to ED: GA = 0.2, p = 1
+"20oct28_A2_falcor_reduced_2obj_" ... 100 sec.
+
+
+-- restore inhibition onto EV1. and decrease input weights.
+stimModVD: 0.01
+stimModVL: 0.01
+IV1 to EV1: GA=0.1 and p = 0.75 (originally 0.25)
+ID to ED: GA = 0.2, p = 1
+"20oct28_A3_falcor_reduced_2obj_" ... 100 sec.
+
+-- restore inhibition onto EV1. and decrease input weights.
+stimModVD: 0.005
+stimModVL: 0.005
+IV1 to EV1: GA=0.1 and p = 0.75 (originally 0.25)
+ID to ED: GA = 0.2, p = 1
+"20oct28_A4_falcor_reduced_2obj_" ... 100 sec.
+
+* 20oct29
+
+-- found that for reducedModel, inhibition was too strong and might be unnecessary.
+-- therefore get rid of inhibition for now.
+set "IV1":0
+-- once inhibition is gone, much less weight is required for the excitation.
+set "stimModVL": 0.002
+and also set "stimModVD": 0.002
+-- another issue is with firing rates higher than 150Hz. put
+          elif dFiringRates[pop][int(cell.gid-offset)]>dconf['net']['LocMaxRate']:
+            stim['hObj'].interval = 1000.0/dconf['net']['LocMaxRate']
+
+
+-- better solution: use amax instead of sum so that can get maximum projection on a plane.
+e.g. in function updateInputRates (self, dsum_Images) in aigame.py 
+fr_Images_Ball = self.locationNeuronRate*np.amax(binary_Image[:,3:17],1)
+
+-- fix in aigame.py on falcor, and then run a 100 sec sim
+"20oct29_A0_falcor_reduced_2obj_"
+"ID":0
+"IV1":0 
+stimModVD: 0.002
+stimModVL: 0.002
+... seems like the racket didnt move much.
+
+-- changed EA to EM = 4.5e-3... check the value
+"20oct29_A1_falcor_reduced_2obj_"
+"ID":0
+"IV1":0 
+stimModVD: 0.002
+stimModVL: 0.002
+
+- changed VL to EA and VD to EA to 4.5e-2
+EA to EM = 4.5e-3... check the value
+"20oct29_A2_falcor_reduced_2obj_"
+"ID":0
+"IV1":0 
+stimModVD: 0.002
+stimModVL: 0.002
+
+* 20nov02
+
+-- weights from Loc and Dir neurons onto EA should be adjusted so that EA neurons get activated when all 3 presynaptic neurons are active.
+
+-- i had problem compiling mod on new computer. was giving error that misc.h missing.
+-- sam suggested: for now you can delete intf6.mod and misc.h, misc.mod from the mod folder
+intf6.mod is an integrate and fire model i worked on in the past
+... removed these files and it works.
+
+-- still mpi is not working on my new mac. need to figure out....
+
+-- adjusting weights from Loc and Dir neurons onto EA, so that EA neurons get activated when all 3 presynaptic neurons are active.
+20nov02_A0_cycle
+0.002 seems a bit low…. Because I see only 2 neurons firing for the racket.
+
+W between Loc and EA and dir and EA is still high as I see EA neurons spiking even in the absence of 3 types of neurons (B, R and D) activating.
+
+20nov02_A1_cycle
+0.0025 to make sure successful inputs without dropping
+1.5e-3 instead of 4.5e-3 from VL to EA and VD to EA
+
+
+20nov02_A2_cycle
+0.0025 to make sure successful inputs without dropping — seems reasonable for now
+2e-3 instead of 4.5e-3 from VL to EA and VD to EA
+0.01 instead of 0.02 from EA to IA
+4e-3 instead of 4e-4 from EA to EM
+
+
+20nov02_A3_cycle
+0.003 to make sure successful inputs without dropping — seems reasonable for now
+2e-3 instead of 4.5e-3 from VL to EA and VD to EA
+0.005 instead of 0.02 from EA to IA
+4e-3 instead of 4e-4 from EA to EM
+
+
+20nov02_A3long_cycle
+Run 300 sec sim.---> took 13289 sec (221 mins or 3hrs41mins) using 12 cores
+save raster as "20nov02_A3long_cycle_reduced_2obj_raster.png"
+save perf as "20nov02_A3long_cycle_reduced_2obj_Perf.png"
+
+could potentially be run for longer durations.
+
+* 20nov03
+
+-- run 20nov03_A3long_cycle for 2000 sec.
