@@ -31,6 +31,7 @@
     "actionsPerPlay": 1,
     "followOnlyTowards": 1,
     "useRacketPredictedPos": 1,
+    "useFollowMoveOutput": 0,
     "DirectionDetectionAlgo": {
         "CentroidTracker": 1,
         "OpticFlow": 0,
@@ -96,7 +97,9 @@
 	    "EMT":0,
 	    "IMT":0,
 	    "EA":3200,
-	    "IA":640,
+        "IA":640,
+        "EA2": 0,
+	    "IA2": 0,
 	    "EMDOWN":100,
 	    "EMUP":100,
 	    "EMSTAY":0,
@@ -104,8 +107,8 @@
 	    "IMUP": 0,
 	    "IMDOWN": 0,
 	    "IMSTAY": 0},
-	"ETypes": ["ER","EV1","EV1DE","EV1DNE","EV1DN","EV1DNW","EV1DW","EV1DSW","EV1DS","EV1DSE","EV4","EMT","EMDOWN","EMUP","EMSTAY","EA"],
-	"ITypes": ["IR","IV1","IV4","IMT","IM","ID","IMUP","IMDOWN","IMSTAY","IA"],
+	"ETypes": ["ER","EV1","EV1DE","EV1DNE","EV1DN","EV1DNW","EV1DW","EV1DSW","EV1DS","EV1DSE","EV4","EMT","EMDOWN","EMUP","EMSTAY","EA","EA2"],
+	"ITypes": ["IR","IV1","IV4","IMT","IM","ID","IMUP","IMDOWN","IMSTAY","IA","IA2"],
 	"EMotorPops": ["EMDOWN", "EMUP", "EMSTAY"],
 	"EVPops": ["EV1","EV1DE","EV1DNE","EV1DN","EV1DNW","EV1DW","EV1DSW","EV1DS","EV1DSE","EV4","EMT"],
         "EVDirPops": ["EV1DE","EV1DNE","EV1DN","EV1DNW","EV1DW","EV1DSW","EV1DS","EV1DSE"],
@@ -148,10 +151,13 @@
             "FeedForwardLocNtoA":0,
             "FeedForwardDirNtoM":0,
             "FeedForwardLocNtoM":0,	    
-            "FeedForwardAtoM":0,	    
+            "FeedForwardAtoM":0,
+            "FeedForwardAtoA2":0,	    
+            "FeedForwardA2toM":0,	    	    	    
             "FeedbackLocNeurons":0,
             "RecurrentMNeurons":0,
-            "RecurrentANeurons":0,	    
+            "RecurrentANeurons":0,
+            "RecurrentA2Neurons":0,	    
             "FeedbackAtoDirN":0,
             "FeedbackAtoLocN":0
         },		
@@ -165,9 +171,12 @@
             "FeedForwardDirNtoM":0,
             "FeedForwardLocNtoM":0,	    
             "FeedForwardAtoM":1,
+            "FeedForwardAtoA2":1,	    
+            "FeedForwardA2toM":1,
             "FeedbackLocNeurons":0,
             "RecurrentMNeurons":1,
             "RecurrentANeurons":0,
+            "RecurrentA2Neurons":1,
             "FeedbackAtoDirN":0,
             "FeedbackAtoLocN":0
         },	
@@ -203,10 +212,17 @@
 		"IM":{"GA":0.02,"p":0.0625}
 	    },
 	    "EA":{
-		"EA":{"AM":0,"NM":0,"p":0.0},
+        "EA":{"AM":0,"NM":0,"p":0.0},
+        "EA2":{"AM":5e-5,"NM":6e-6,"p":0.2},
 		"EM":{"AM":4e-3,"NM":10e-6,"p":0.2},
 		"IA":{"GA": 0.005, "p":0.0625}
-	    },
+        },
+        "EA2":{
+            "EA":{"AM":5e-5,"NM":6e-6,"p":0.0},
+            "EA2":{"AM":5e-5,"NM":6e-6,"p":0.1},
+            "EM":{"AM":5e-5,"NM":6e-6,"p":0.2},
+            "IA2":{"GA": 0.02, "p":0.0625}
+            },
 	    "IR": {
 		"ER": {"GA": 0.2, "p":0.0625}
 	    },
@@ -241,7 +257,11 @@
 	    "IA": {
 		"EA": {"GA":0.25, "p":0.125},
 		"IA": {"GA":0.05, "p":0.25}		
-	    },
+        },
+        "IA2": {
+            "EA2": {"GA":0.25, "p":0.125},
+            "IA2": {"GA":0.05, "p":0.25}		
+            },
 	    "IR": {
 		"IR": {"GA":0.05, "p":0.25}
 	    },
