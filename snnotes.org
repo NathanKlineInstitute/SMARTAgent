@@ -20240,10 +20240,30 @@ increased EEGain again since rates went to 0
 
 ./myrun 32 sn.json
 
+stopped again - rates went down too low once more
 
 ** note for stdp.mod weight array -- only uses weight[0]
 
 h.setpointer(singlesyn._ref_weight[0],'synweight',stdpmech) # Point the STDP mechanism to the connection weight
 
 so for now when using on intf7 cells make sure only using plast at AM (AMPA) synapse (has weightIndex of 0)
+
+** ID -> IV1DE, IV1DNE, etc. ?
+
+each population should be treated separately?
+otherwise too much competition between direction selective neurons
+
+not clear that would help ... 
+
+well, if opponent racket is moving south and ball moving north
+then opponent racket activity would inhibit north moving activity ... 
+
+for that reason may want topo for the interneurons ... 
+
+or since EV1, EV1DE are mostly just spike sources
+could avoid the interneurons in those areas ... 
+
+in that case EV1, EV1DE may as well just be NSLOC type NetStim ... 
+
+but then if ever want feedback connectivity/plasticity would have to redo ... 
 
