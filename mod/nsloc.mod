@@ -4,7 +4,7 @@
 
 NEURON	{ 
   ARTIFICIAL_CELL NSLOC
-  RANGE interval, number, start, xloc, yloc, zloc, id, type, subtype, fflag, mlenmin, mlenmax, checkInterval
+  RANGE interval, number, start, xloc, yloc, zloc, id, type, subtype, fflag, mlenmin, mlenmax, checkInterval, ispike
   RANGE noise
   THREADSAFE : only true if every instance has its own distinct Random
   POINTER donotuse
@@ -23,6 +23,7 @@ PARAMETER {
     subtype = -1
     fflag           = 1             : don't change -- indicates that this is an artcell
     check_interval = 1.0 (ms) : time between checking if interval has changed
+    ispike = 0
 }
 
 ASSIGNED {
@@ -30,7 +31,6 @@ ASSIGNED {
 	last_interval (ms)
 	transition
 	on
-	ispike
 	donotuse
 }
 
@@ -124,9 +124,6 @@ ENDVERBATIM
 PROCEDURE next_invl() {
 	if (number > 0) {
 		event = invl(interval)
-	}
-	if (ispike >= number) {
-		on = 0
 	}
 }
 
