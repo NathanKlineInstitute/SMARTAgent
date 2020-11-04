@@ -20235,6 +20235,11 @@ ok, readjusted (increased EEGain) - start over
 ./myrun 32 sn.json
 
 started ~10:22 ... 
+increased EEGain again since rates went to 0
+10:36 ...
+
+./myrun 32 sn.json
+
 
 ** note for stdp.mod weight array -- only uses weight[0]
 
