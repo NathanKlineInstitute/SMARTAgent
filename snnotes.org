@@ -20416,10 +20416,19 @@ clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((990e
 savefig(gifpath()+'rast.png') # [[./gif/20nov5_20nov4_A0_cycle_rast.png]]
 same as other recent model from yesterday (20nov4_A0_gcp_) too much noise to EM
 
-** next sim on cycle
+** next sim on cycle/gcp
 
 seems like not enough exploration , overly synchronized firing when
 EM turns on - could add some noise or reduce conv onto EA and weight from EA -> EM
 
         "name": "20nov5_A0_cycle_",
 
+        "name": "20nov5_A0_gcp_",
+
+python -i simdat.py backupcfg/20nov5_A0_gcp_sim.json
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') 
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((990e3,1000e3))
+savefig(gifpath()+'rast.png')
