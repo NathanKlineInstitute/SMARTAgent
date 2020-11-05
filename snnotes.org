@@ -20385,11 +20385,25 @@ hmm, the noise weights were way too high ... 10000 (since 0.5 x EEGain)
 
 so no sense in continuing that sim ... 
 
-** readjust params for gcp sim
+** readjust params for gcp sim -->> 20nov5_A0_gcp_ activity too sparse, hypersynch
 
         "name": "20nov5_A0_gcp_",
 
 ok...started ~11:33 ... 500 s sim ...
+
+python -i simdat.py backupcfg/20nov5_A0_gcp_sim.json
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/20nov5_20nov5_A0_gcp_perf.png]]
+savefig(gifpath()+'perfB.png') # [[./gif/20nov5_20nov5_A0_gcp_perfB.png]]
+pretty bad overall - but is it improving?
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((490e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/20nov5_20nov5_A0_gcp_rast.png]]
+
+EMDOWN,EMUP activity too sparse ... ? and hypersynch when it does occur
+
+savefig(gifpath()+'rastB.png') # [[./gif/20nov5_20nov5_A0_gcp_rastB.png]]
 
 ** check output from 20nov4_A0_cycle_
 
