@@ -18,7 +18,7 @@
         "scorePoint": 1.0,
         "losePoint":  0.0,
         "followTarget": 0.1,
-        "avoidTarget": -0.0025,
+        "avoidTarget": -0.01,
         "hitBall": 0.5
     },
     "actionsPerPlay": 1,
@@ -35,10 +35,10 @@
     "stayStepLim": 0,
     "simtype": {
         "ResumeSim": 0,
-        "ResumeSimFromFile": "data/20oct23_A0_cycle_synWeights_final.pkl"
+        "ResumeSimFromFile": "data/20nov4_A0_gcp_synWeights_final.pkl"
     },
     "sim": {
-        "duration": 1000000,
+        "duration": 500000,
         "dt": 0.4,
         "verbose": 0,
         "recordStep": 1.0,
@@ -48,7 +48,7 @@
         "RLFakeUpRule": 0,
         "RLFakeDownRule": 0,
         "RLFakeStayRule": 0,
-        "name": "20nov4_A0_gcp_",
+        "name": "20nov5_A0_gcp_",
         "doquit": 1,
         "doplot": 0,
         "saveCellSecs": 0,
@@ -189,22 +189,22 @@
 	    "VL":{
 		"VD":{"AM":0,"NM":0,"p":0},		
 		"VL":{"AM":20e-5,"NM":30e-6,"p":0},
-		"EA":{"AM":6e-5,"NM":10e-6,"p":0.2},
-		"EMDOWN":{"AM":6e-5,"NM":10e-6,"p":0.08},
-		"EMUP":{"AM":6e-5,"NM":10e-6,"p":0.08},
-		"EMSTAY":{"AM":6e-5,"NM":6e-6,"p":0.08}		
+		"EA":{"AM":9e-5,"NM":10e-6,"p":0.2},
+		"EMDOWN":{"AM":3e-5,"NM":3e-6,"p":0.08},
+		"EMUP":{"AM":3e-5,"NM":3e-6,"p":0.08},
+		"EMSTAY":{"AM":3e-5,"NM":3e-6,"p":0.08}		
 	    },
 	    "VD":{
 		"VL":{"AM":0,"NM":0,"p":0},
 		"VD":{"AM":0,"NM":0,"p":0},
-		"EA":{"AM":6e-5,"NM":10e-6,"p":0.2},
-		"EMDOWN":{"AM":6e-5,"NM":10e-6,"p":0.08},
-		"EMUP":{"AM":6e-5,"NM":10e-6,"p":0.08},
-		"EMSTAY":{"AM":6e-5,"NM":6e-6,"p":0.08},
+		"EA":{"AM":9e-5,"NM":10e-6,"p":0.2},
+		"EMDOWN":{"AM":3e-5,"NM":3e-6,"p":0.08},
+		"EMUP":{"AM":3e-5,"NM":3e-6,"p":0.08},
+		"EMSTAY":{"AM":3e-5,"NM":3e-6,"p":0.08},
 		"ID": {"AM":0.02, "p":0.015}
 	    },
 	    "EM":{
-		"EM":{"AM":6e-5,"NM":6e-6,"p":0.15},
+		"EM":{"AM":4e-5,"NM":4e-6,"p":0.15},
 		"EA":{"AM":0,"NM":0,"p":0.0},
 		"IRecip": {"AM":0.02, "NM":0, "p":0.0625},
 		"IM":{"AM":0.02,"p":0.03}
@@ -212,7 +212,7 @@
 	    "EA":{
 		"EA":{"AM":6e-5,"NM":6e-6,"p":0.0},
 		"EA2":{"AM":6e-5,"NM":6e-6,"p":0.2},
-		"EM":{"AM":6e-5,"NM":6e-6,"p":0.25},
+		"EM":{"AM":4e-5,"NM":4e-6,"p":0.25},
 		"IA":{"AM": 0.02, "p":0.03}
 	    },
 	    "EA2":{
@@ -413,8 +413,8 @@
             "Weight": 0.01
         },
         "E": {
-            "Rate": 50,
-            "Weight": 0.5
+            "Rate": 0,
+            "Weight": 6e-5
         }
     }
 }

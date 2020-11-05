@@ -20338,3 +20338,56 @@ this one is same as 20nov4_A0_cycle_ but with targetted RL ...
 
 started ~15:44 ... 
 
+* 20nov5
+** check output from 20nov4_A0_gcp_
+
+python -i simdat.py backupcfg/20nov4_A0_gcp_sim.json
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/20nov5_20nov4_A0_gcp_perf.png]]
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((990e3,1000e3))
+savefig(gifpath()+'rast.png') # [[./gif/20nov5_20nov4_A0_gcp_rast.png]]
+
+EMDOWN,EMUP rates look too high
+
+## clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EA', 'IM'])
+
+binsz = 100
+dnspk = {pop:getspikehist(dspkT[pop],dnumc,binsz,totalDur) for pop in ['EMDOWN','EMUP','EA']}
+for clr,pop in zip(['r','g','b'],['EMDOWN','EMUP','EA']): plot(dnspk[pop][0],dnspk[pop][1],clr)
+xlim((0,totalDur))
+ylim((0,900))
+savefig(gifpath()+'EMDOWN_EMUP_EA_rate100.png') # [[./gif/20nov5_20nov4_A0_gcp_EMDOWN_EMUP_EA_rate100.png]]
+EMDOWN,EMUP firing rates went up but couldn't get that high ... 
+that was just a count of spikes - make getspikehist return freq in Hz
+
+binsz = 1000
+dnspk = {pop:getspikehist(dspkT[pop],dnumc[pop],binsz,totalDur) for pop in ['EMDOWN','EMUP','EA']}
+
+for clr,pop in zip(['r','g','b'],['EMDOWN','EMUP','EA']): plot(dnspk[pop][0],dnspk[pop][1],clr)
+xlim((0,totalDur))
+ylim((0,50))
+savefig(gifpath()+'EMDOWN_EMUP_EA_rate1000.png') # [[./gif/20nov5_20nov4_A0_gcp_EMDOWN_EMUP_EA_rate1000.png]]
+so rate goes much higher ~1/2 way through ... 
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP'],lclr=['r','g'],plotindiv=False)
+xlabel('Time (ms)',fontsize=30); ylabel('Average weight',fontsize=30); tl(); 
+savefig(gifpath()+'all_avg_weight.png') # [[./gif/20nov5_20nov4_A0_gcp_all_avg_weight.png]]
+ok, so avg weights increasing (at least intf7 stdp/rl working properly)
+
+could run a continuation and/or get rid of noise ... 
+or reduce noise since weights went up
+
+        "name": "20nov5_A1_gcp_",
+
+hmm, the noise weights were way too high ... 10000 (since 0.5 x EEGain)
+
+so no sense in continuing that sim ... 
+
+** readjust params for gcp sim
+
+        "name": "20nov5_A0_gcp_",
+
+ok...started ~11:01 ... 500 s sim ...
+

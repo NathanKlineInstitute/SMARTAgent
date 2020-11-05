@@ -464,9 +464,10 @@ def getdistvstimecorr (pdpos, ballxmin=137, ballxmax=141, minN=2):
   return dout
 
 
-def getspikehist (spkT, dnumc, binsz, tmax):
+def getspikehist (spkT, numc, binsz, tmax):
   tt = np.arange(0,tmax,binsz)
   nspk = [len(spkT[(spkT>=tstart) & (spkT<tstart+binsz)]) for tstart in tt]
+  nspk = [1e3*x/(binsz*numc) for x in nspk]
   return tt,nspk
 
 #
