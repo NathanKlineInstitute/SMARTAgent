@@ -38,7 +38,7 @@
         "ResumeSimFromFile": "data/20nov4_A0_gcp_synWeights_final.pkl"
     },
     "sim": {
-        "duration": 500000,
+        "duration": 100000,
         "dt": 0.4,
         "verbose": 0,
         "recordStep": 1.0,
@@ -48,7 +48,7 @@
         "RLFakeUpRule": 0,
         "RLFakeDownRule": 0,
         "RLFakeStayRule": 0,
-        "name": "20nov5_A0_gcp_",
+        "name": "20nov5_A0_cycle_",
         "doquit": 1,
         "doplot": 0,
         "saveCellSecs": 0,
@@ -97,8 +97,8 @@
 	    "IA":700,
 	    "EA2": 0,
 	    "IA2": 0,	    
-	    "EMDOWN":100,
-	    "EMUP":100,
+	    "EMDOWN":200,
+	    "EMUP":200,
 	    "EMSTAY":0,
 	    "IM":100,
 	    "IMUP": 0,
@@ -189,7 +189,7 @@
 	    "VL":{
 		"VD":{"AM":0,"NM":0,"p":0},		
 		"VL":{"AM":20e-5,"NM":30e-6,"p":0},
-		"EA":{"AM":9e-5,"NM":10e-6,"p":0.2},
+		"EA":{"AM":18e-5,"NM":10e-6,"p":0.1},
 		"EMDOWN":{"AM":4e-5,"NM":4e-6,"p":0.08},
 		"EMUP":{"AM":4e-5,"NM":4e-6,"p":0.08},
 		"EMSTAY":{"AM":4e-5,"NM":4e-6,"p":0.08}		
@@ -197,14 +197,14 @@
 	    "VD":{
 		"VL":{"AM":0,"NM":0,"p":0},
 		"VD":{"AM":0,"NM":0,"p":0},
-		"EA":{"AM":9e-5,"NM":10e-6,"p":0.2},
+		"EA":{"AM":18e-5,"NM":10e-6,"p":0.1},
 		"EMDOWN":{"AM":4e-5,"NM":4e-6,"p":0.08},
 		"EMUP":{"AM":4e-5,"NM":4e-6,"p":0.08},
 		"EMSTAY":{"AM":4e-5,"NM":4e-6,"p":0.08},
 		"ID": {"AM":0.02, "p":0.015}
 	    },
 	    "EM":{
-		"EM":{"AM":4.5e-5,"NM":4.5e-6,"p":0.15},
+		"EM":{"AM":9e-5,"NM":9e-6,"p":0.15},
 		"EA":{"AM":0,"NM":0,"p":0.0},
 		"IRecip": {"AM":0.02, "NM":0, "p":0.0625},
 		"IM":{"AM":0.02,"p":0.03}
@@ -212,7 +212,7 @@
 	    "EA":{
 		"EA":{"AM":6e-5,"NM":6e-6,"p":0.0},
 		"EA2":{"AM":6e-5,"NM":6e-6,"p":0.2},
-		"EM":{"AM":4.5e-5,"NM":4.5e-6,"p":0.25},
+		"EM":{"AM":9e-5,"NM":9e-6,"p":0.1},
 		"IA":{"AM": 0.02, "p":0.03}
 	    },
 	    "EA2":{
@@ -309,7 +309,9 @@
         },
         "EEMRecProbCross": 0,
         "VisualFeedback": 0,
-        "weightVar": 0.5
+        "weightVar": 0.5,
+	"delayMin": 2,
+	"delayMax": 5
     },
     "STDP": {
         "AMPA": {
