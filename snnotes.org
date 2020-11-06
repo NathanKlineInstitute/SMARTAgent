@@ -20443,4 +20443,5 @@ xlim((0,totalDur))
 savefig(gifpath()+'EMDOWN_EMUP_EA_rate1000.png') # [[./gif/20nov6_20nov5_A0_gcp_EMDOWN_EMUP_EA_rate1000.png]]
 
 ** next sim on gcp (20nov5_B0_gcp_)
+** next sim on cycle (20nov5_B0_cycle_)
 
