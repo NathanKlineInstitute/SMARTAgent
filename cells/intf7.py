@@ -14,10 +14,12 @@ class INTF7E ():
             "VTH": -40,
             "refrac":  5,
             "Vblock": -25,
+            "tauAM": 5.5,
+            "tauNM": 166,
             "tauGA": 10,
             "tauGA2": 20,
             "tauAM2": 20,
-            "tauNM2": 300,
+            "tauNM2": 166,
             "tauRR": 1,
             "RRWght": 0.25}  
   def __init__ (self):
@@ -27,11 +29,13 @@ class INTF7E ():
     cell.RMP= -65
     cell.VTH= -40 
     cell.refrac=  5
-    cell.Vblock= -25    
+    cell.Vblock= -25
+    cell.tauAM = 5.5
+    cell.tauNM = 166
     cell.tauGA  = 10
     cell.tauGA2 = 20
     cell.tauAM2 = 20
-    cell.tauNM2 = 300            
+    cell.tauNM2 = 166
     cell.tauRR = 1
     cell.RRWght = .25
 
@@ -43,10 +47,12 @@ class INTF7I ():
             "VTH": -40,
             "refrac":  2.5,
             "Vblock": -10,
+            "tauAM": 5.5,
+            "tauNM": 166,
             "tauGA": 10,
             "tauGA2": 20,
             "tauAM2": 20,
-            "tauNM2": 300,            
+            "tauNM2": 166,            
             "tauRR": 1,
             "RRWght": 0.25}    
   def __init__ (self):
@@ -57,10 +63,12 @@ class INTF7I ():
     cell.Vblock=-10    
     cell.RMP = -63
     cell.VTH= -40
+    cell.tauAM = 5.5
+    cell.tauNM = 166
     cell.tauGA  = 10
     cell.tauGA2 = 20
     cell.tauAM2 = 20
-    cell.tauNM2 = 300    
+    cell.tauNM2 = 166
     cell.tauRR = 1
     cell.RRWght = 0.25
     

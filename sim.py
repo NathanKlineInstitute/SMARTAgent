@@ -162,6 +162,33 @@ cfg.EIGain = dconf['net']['EIGain'] # E to I scaling factor
 cfg.IEGain = dconf['net']['IEGain'] # I to E scaling factor
 cfg.IIGain = dconf['net']['IIGain'] # I to I scaling factor
 
+### from https://www.neuron.yale.edu/phpBB/viewtopic.php?f=45&t=3770&p=16227&hilit=memory#p16122
+cfg.saveCellSecs = bool(dconf['sim']['saveCellSecs']) # if False removes all data on cell sections prior to gathering from nodes
+cfg.saveCellConns = bool(dconf['sim']['saveCellConns']) # if False removes all data on cell connections prior to gathering from nodes
+###
+
+# weight variance -- check if need to vary the initial weights (note, they're over-written if resumeSim==1)
+cfg.weightVar = dconf['net']['weightVar']
+cfg.delayMin = dconf['net']['delayMin']
+cfg.delayMax = dconf['net']['delayMax']
+
+def getInitWeight (weight):
+  """get initial weight for a connection
+     checks if weightVar is non-zero, if so will use a uniform distribution 
+     with range on interval: (1-var)*weight, (1+var)*weight
+  """
+  if cfg.weightVar == 0.0:
+    return weight
+  else:
+    # print('uniform(%g,%g)' % (weight*(1.0-cfg.weightVar),weight*(1.0+cfg.weightVar)))
+    return 'uniform(%g,%g)' % (weight*(1.0-cfg.weightVar),weight*(1.0+cfg.weightVar))
+
+def getInitDelay ():
+  if cfg.delayMin == cfg.delayMax:
+    return cfg.delayMin
+  else:
+    return 'uniform(%g,%g)' % (cfg.delayMin, cfg.delayMax)
+
 
 ECellModel = dconf['net']['ECellModel']
 ICellModel = dconf['net']['ICellModel']
@@ -301,7 +328,7 @@ def setupStimMod ():
         'preConds': {'pop':stimty},
         'postConds': {'pop':poty},
         'weight':wt,
-        'delay':2,
+        'delay': getInitDelay(),
         'connList':blist, 'weightIndex':getWeightIndex('AMPA',ECellModel)}
       wt = stimModDirW # rest of inputs use this weight
   else:
@@ -372,7 +399,7 @@ def setupNoiseStim ():
             'preConds': {'pop':stimty},
             'postConds': {'pop':poty},
             'weight':Weight,
-            'delay':2,
+            'delay': getInitDelay(),
             'connList':blist,
             'weightIndex':weightIndex}
   else:
@@ -426,26 +453,7 @@ else:
   if dnumc['IR']>0: blistIV1toER, connCoordsIV1toER = connectLayerswithOverlapDiv(NBpreN = dnumc['IV1'], NBpostN = dnumc['ER'], overlap_xdir = dtopoldivcons['IV1']['ER'], padded_preneurons_xdir = dnumc_padx['IV1'], padded_postneurons_xdir = dnumc_padx['ER'])
   blistIV4toEV1, connCoordsIV4toEV1 = connectLayerswithOverlapDiv(NBpreN = dnumc['IV4'], NBpostN = dnumc['EV1'], overlap_xdir = dtopoldivcons['IV4']['EV1'], padded_preneurons_xdir = dnumc_padx['IV4'], padded_postneurons_xdir = dnumc_padx['EV1'])
   blistIMTtoEV4, connCoordsIMTtoEV4 = connectLayerswithOverlapDiv(NBpreN = dnumc['IMT'], NBpostN = dnumc['EV4'], overlap_xdir = dtopoldivcons['IMT']['EV4'], padded_preneurons_xdir = dnumc_padx['IMT'], padded_postneurons_xdir = dnumc_padx['EV4'])
-  
-### from https://www.neuron.yale.edu/phpBB/viewtopic.php?f=45&t=3770&p=16227&hilit=memory#p16122
-cfg.saveCellSecs = bool(dconf['sim']['saveCellSecs']) # if False removes all data on cell sections prior to gathering from nodes
-cfg.saveCellConns = bool(dconf['sim']['saveCellConns']) # if False removes all data on cell connections prior to gathering from nodes
-###
-
-# weight variance -- check if need to vary the initial weights (note, they're over-written if resumeSim==1)
-cfg.weightVar = dconf['net']['weightVar']
-
-def getInitWeight (weight):
-  """get initial weight for a connection
-     checks if weightVar is non-zero, if so will use a uniform distribution 
-     with range on interval: (1-var)*weight, (1+var)*weight
-  """
-  if cfg.weightVar == 0.0:
-    return weight
-  else:
-    print('uniform(%g,%g)' % (weight*(1.0-cfg.weightVar),weight*(1.0+cfg.weightVar)))
-    return 'uniform(%g,%g)' % (weight*(1.0-cfg.weightVar),weight*(1.0+cfg.weightVar))
-  
+    
 #Local excitation
 #E to E recurrent connectivity within visual areas
 for epop in EVPops:
@@ -463,7 +471,7 @@ for epop in EVPops:
       'postConds': {'pop': poty},
       'convergence': prob2conv(prob, dnumc[prety]),
       'weight': getInitWeight(weight),
-      'delay': 2,
+      'delay': getInitDelay(),
       'synMech': synmech,
       'sec':EExcitSec, 'loc':0.5,
       'weightIndex':getWeightIndex(synmech, ECellModel)
@@ -488,7 +496,7 @@ if dnumc['ER']>0:
           'preConds': {'pop': 'ER'},
           'postConds': {'pop': 'IR'},
           'weight': cmat['ER']['IR']['AM'] * cfg.EIGain,
-          'delay': 2,
+          'delay': getInitDelay(),
           'synMech': 'AMPA', 'sec':'soma', 'loc':0.5,'weightIndex':getWeightIndex('AMPA', ICellModel)}
   if VTopoI and dconf['sim']['useReducedNetwork']==0: netParams.connParams['ER->IR']['connList'] = blistERtoIR
   else: netParams.connParams['ER->IR']['convergence'] = prob2conv(0.0225, dnumc['EV1'])
@@ -497,7 +505,7 @@ netParams.connParams['EV1->IV1'] = {
         'preConds': {'pop': 'EV1'},
         'postConds': {'pop': 'IV1'},
         'weight': cmat['EV1']['IV1']['AM'] * cfg.EIGain,
-        'delay': 2,
+        'delay': getInitDelay(),
         'synMech': 'AMPA', 'sec':'soma', 'loc':0.5,'weightIndex':getWeightIndex('AMPA', ICellModel)}
 
 if VTopoI and dconf['sim']['useReducedNetwork']==0:
@@ -516,14 +524,14 @@ if dnumc['ID']>0:
         'postConds': {'pop': poty},
         'convergence': prob2conv(cmat['VD']['ID']['p'], dnumc[prety]),
         'weight': cmat['VD']['ID']['AM'] * cfg.EIGain,
-        'delay': 2,
+        'delay': getInitDelay(),
         'synMech': 'AMPA', 'sec':'soma', 'loc':0.5, 'weightIndex':getWeightIndex('AMPA', ICellModel)}
 
 netParams.connParams['EV4->IV4'] = {
         'preConds': {'pop': 'EV4'},
         'postConds': {'pop': 'IV4'},
         'weight': cmat['EV4']['IV4']['AM'] * cfg.EIGain,
-        'delay': 2,
+        'delay': getInitDelay(),
         'synMech': 'AMPA', 'sec':'soma', 'loc':0.5, 'weightIndex':getWeightIndex('AMPA', ICellModel)}
 
 if VTopoI and dconf['sim']['useReducedNetwork']==0: 
@@ -536,7 +544,7 @@ netParams.connParams['EMT->IMT'] = {
         'preConds': {'pop': 'EMT'},
         'postConds': {'pop': 'IMT'},
         'weight': cmat['EMT']['IMT']['AM'] * cfg.EIGain,
-        'delay': 2,
+        'delay': getInitDelay(),
         'synMech': 'AMPA', 'sec':'soma', 'loc':0.5,'weightIndex':getWeightIndex('AMPA', ICellModel)}
 
 if VTopoI and dconf['sim']['useReducedNetwork']==0: 
@@ -555,7 +563,7 @@ for prety in EVPops:
       'postConds': {'pop': poty},
       'convergence': prob2conv(0.01, dnumc[prety]),
       'weight': 0.001 * cfg.EIGain,
-      'delay': 2,
+      'delay': getInitDelay(),
       'synMech': 'AMPA', 'sec':'soma', 'loc':0.5}
     if dconf['net']['RLconns']['EIPlast'] and dSTDPparamsRL['AMPAI']['RLon']: # only turn on plasticity when specified to do so
       netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL['AMPAI']}
@@ -571,7 +579,7 @@ for prety,poty in zip(['EA','EA2'],['IA','IA2']):
     'postConds': {'pop': poty},
     'convergence': prob2conv(cmat[prety][poty]['p'], dnumc[prety]),
     'weight': cmat[prety][poty]['AM'] * cfg.EIGain,
-    'delay': 2,
+    'delay': getInitDelay(),
     'synMech': 'AMPA', 'sec':'soma', 'loc':0.5,'weightIndex':getWeightIndex('AMPA', ICellModel)}
   if dconf['net']['RLconns']['EIPlast'] and dSTDPparamsRL['AMPAI']['RLon']: # only turn on plasticity when specified to do so
     netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL['AMPAI']}
@@ -589,7 +597,7 @@ for prety in EMotorPops:
     'postConds': {'pop': 'IM'},
     'convergence': prob2conv(cmat['EM']['IM']['p'], dnumc[prety]),
     'weight': cmat['EM']['IM']['AM'] * cfg.EIGain,
-    'delay': 2,
+    'delay': getInitDelay(),
     'synMech': 'AMPA', 'sec':'soma', 'loc':0.5, 'weightIndex':getWeightIndex('AMPA', ICellModel)}
   if dconf['net']['RLconns']['EIPlast'] and dSTDPparamsRL['AMPAI']['RLon']: # only turn on plasticity when specified to do so
     netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL['AMPAI']}
@@ -609,7 +617,7 @@ for prety in EMotorPops:
       'postConds': {'pop': poty},
       'convergence': prob2conv(cmat['EM']['IRecip']['p'], dnumc[prety]),
       'weight': cmat['EM']['IRecip']['AM'] * cfg.EIGain,
-      'delay': 2,
+      'delay': getInitDelay(),
       'synMech': 'AMPA', 'sec':'soma', 'loc':0.5, 'weightIndex':getWeightIndex('AMPA', ICellModel)}
     if dconf['net']['RLconns']['EIPlast'] and dSTDPparamsRL['AMPAI']['RLon']: # only turn on plasticity when specified to do so
       netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL['AMPAI']}
@@ -626,7 +634,7 @@ if dnumc['ER']>0:
           'preConds': {'pop': 'IR'},
           'postConds': {'pop': 'ER'},
           'weight': cmat['IR']['ER']['GA'] * cfg.IEGain,
-          'delay': 2,
+          'delay': getInitDelay(),
           'synMech': 'GABA', 'sec':'soma', 'loc':0.5, 'weightIndex':getWeightIndex('GA', ICellModel)}
   
   if VTopoI and dconf['sim']['useReducedNetwork']==0: 
@@ -639,7 +647,7 @@ netParams.connParams['IV1->EV1'] = {
   'preConds': {'pop': 'IV1'},
   'postConds': {'pop': 'EV1'},
   'weight': cmat['IV1']['EV1']['GA'] * cfg.IEGain,
-  'delay': 2,
+  'delay': getInitDelay(),
   'synMech': 'GABA', 'sec':'soma', 'loc':0.5,'weightIndex':getWeightIndex('GA', ECellModel)}
 
 if VTopoI and dconf['sim']['useReducedNetwork']==0: 
@@ -657,14 +665,14 @@ if dnumc['ID']>0:
         'postConds': {'pop': poty},
         'convergence': prob2conv(cmat['ID']['ED']['p'], dnumc['ID']),
         'weight': cmat['ID']['ED']['GA'] * cfg.IEGain,
-        'delay': 2,
+        'delay': getInitDelay(),
         'synMech': 'GABA', 'sec':'soma', 'loc':0.5,'weightIndex':getWeightIndex('GA', ECellModel)}
 
 netParams.connParams['IV4->EV4'] = {
         'preConds': {'pop': 'IV4'},
         'postConds': {'pop': 'EV4'},
         'weight': cmat['IV4']['EV4']['GA'] * cfg.IEGain,
-        'delay': 2,
+        'delay': getInitDelay(),
         'synMech': 'GABA', 'sec':'soma', 'loc':0.5,'weightIndex':getWeightIndex('GA', ECellModel)}
 
 if VTopoI and dconf['sim']['useReducedNetwork']==0: 
@@ -677,7 +685,7 @@ netParams.connParams['IMT->EMT'] = {
         'preConds': {'pop': 'IMT'},
         'postConds': {'pop': 'EMT'},
         'weight': cmat['IMT']['EMT']['GA'] * cfg.IEGain,
-        'delay': 2,
+        'delay': getInitDelay(),
         'synMech': 'GABA', 'sec':'soma', 'loc':0.5,'weightIndex':getWeightIndex('GA', ECellModel)}
 
 if VTopoI and dconf['sim']['useReducedNetwork']==0: 
@@ -692,7 +700,7 @@ for poty in EMotorPops: # I -> E for motor populations
     'postConds': {'pop': poty},
     'convergence': prob2conv(cmat['IM']['EM']['p'], dnumc['IM']),
     'weight': cmat['IM']['EM']['GA'] * cfg.IEGain,
-    'delay': 2,
+    'delay': getInitDelay(),
     'synMech': 'GABA', 'sec':'soma', 'loc':0.5,'weightIndex':getWeightIndex('GA', ECellModel)}
   prety = 'IM' + poty[2:] # for reciprocal inhibition between EM populations
   netParams.connParams[prety+'->'+poty] = {
@@ -700,7 +708,7 @@ for poty in EMotorPops: # I -> E for motor populations
     'postConds': {'pop': poty},
     'convergence': prob2conv(cmat['IMRecip']['EM']['p'], dnumc[prety]),
     'weight': cmat['IMRecip']['EM']['GA'] * cfg.IEGain,
-    'delay': 2,
+    'delay': getInitDelay(),
     'synMech': 'GABA', 'sec':'soma', 'loc':0.5,'weightIndex':getWeightIndex('GA', ECellModel)}
 
 
@@ -710,7 +718,7 @@ for prety,poty in zip(['IA','IA2'],['EA','EA2']):
     'postConds': {'pop': poty},
     'convergence': prob2conv(cmat[prety][poty]['p'], dnumc[prety]),
     'weight': cmat[prety][poty]['GA'] * cfg.IEGain,
-    'delay': 2,
+    'delay': getInitDelay(),
     'synMech': 'GABA', 'sec':'soma', 'loc':0.5,'weightIndex':getWeightIndex('GA', ECellModel)}
   
 #I to I
@@ -722,7 +730,7 @@ for IType in ITypes:
     'postConds': {'pop': IType},
     'convergence': prob2conv(cmat[IType][IType]['p'], dnumc[IType]),
     'weight': cmat[IType][IType]['p'] * cfg.IIGain, 
-    'delay': 2,
+    'delay': getInitDelay(),
     'synMech': 'GABA', 'sec':'soma', 'loc':0.5,'weightIndex':getWeightIndex('GA', ICellModel)}
 
 #E to E feedforward connections - AMPA,NMDA
@@ -743,7 +751,7 @@ if not dconf['sim']['useReducedNetwork']:
             'preConds': {'pop': prety},
             'postConds': {'pop': poty},
             'weight': weight ,
-            'delay': 2,
+            'delay': getInitDelay(),
             'synMech': synmech,'sec':EExcitSec, 'loc':0.5,'weightIndex':getWeightIndex(synmech, ECellModel)}
       if VTopoI: # topological connections
         netParams.connParams[k]['connList'] = blist
@@ -768,7 +776,7 @@ netParams.connParams['ER->IV1'] = {
         'connList': blistERtoIV1,
         #'convergence': 10,
         'weight': 0.00 * cfg.EIGain, #0.002
-        'delay': 2,
+        'delay': getInitDelay(),
         'synMech': 'AMPA','sec':'soma', 'loc':0.5}
 netParams.connParams['EV1->IV4'] = {
         'preConds': {'pop': 'EV1'},
@@ -776,7 +784,7 @@ netParams.connParams['EV1->IV4'] = {
         'connList': blistEV1toIV4,
         #'convergence': 10,
         'weight': 0.00 * cfg.EIGain, #0.002
-        'delay': 2,
+        'delay': getInitDelay(),
         'synMech': 'AMPA','sec':'soma', 'loc':0.5}
 netParams.connParams['EV4->IMT'] = {
         'preConds': {'pop': 'EV4'},
@@ -784,7 +792,7 @@ netParams.connParams['EV4->IMT'] = {
         'connList': blistEV4toIMT,
         #'convergence': 10,
         'weight': 0.00 * cfg.EIGain, #0.002
-        'delay': 2,
+        'delay': getInitDelay(),
         'synMech': 'AMPA','sec':'soma', 'loc':0.5}
 """
 
@@ -804,7 +812,7 @@ if dconf['net']['VisualFeedback'] and not dconf['sim']['useReducedNetwork']:
           'postConds': {'pop': poty},
           'connList': connList,
           'weight': getInitWeight(synweight),
-          'delay': 2,
+          'delay': getInitDelay(),
           'synMech': synmech,'sec':EExcitSec, 'loc':0.5,'weightIndex':getWeightIndex(synmech, ECellModel)} # 'weight' should be fixed
         sim.topologicalConns[prety+'->'+poty] = {}
         sim.topologicalConns[prety+'->'+poty]['blist'] = connList
@@ -820,7 +828,7 @@ if dconf['net']['VisualFeedback'] and not dconf['sim']['useReducedNetwork']:
         'postConds': {'pop': 'ER'},
         'connList': blistIV1toER,
         'weight': cmat['IV1']['ER']['GA'] * cfg.IEGain, 
-        'delay': 2,
+        'delay': getInitDelay(),
         'synMech': 'GABA','sec':'soma', 'loc':0.5,'weightIndex':getWeightIndex('GA', ECellModel)}
   sim.topologicalConns['IV1->ER'] = {}
   sim.topologicalConns['IV1->ER']['blist'] = blistIV1toER
@@ -830,7 +838,7 @@ if dconf['net']['VisualFeedback'] and not dconf['sim']['useReducedNetwork']:
           'postConds': {'pop': 'EV1'},
           'connList': blistIV4toEV1,
           'weight': cmat['IV4']['EV1']['GA'] * cfg.IEGain, 
-          'delay': 2,
+          'delay': getInitDelay(),
           'synMech': 'GABA','sec':'soma', 'loc':0.5,'weightIndex':getWeightIndex('GA', ECellModel)}
   sim.topologicalConns['IV4->EV1'] = {}
   sim.topologicalConns['IV4->EV1']['blist'] = blistIV4toEV1
@@ -840,7 +848,7 @@ if dconf['net']['VisualFeedback'] and not dconf['sim']['useReducedNetwork']:
           'postConds': {'pop': 'EV4'},
           'connList': blistIMTtoEV4,
           'weight': cmat['IMT']['EV4']['GA'] * cfg.IEGain, 
-          'delay': 2,
+          'delay': getInitDelay(),
           'synMech': 'GABA','sec':'soma', 'loc':0.5,'weightIndex':getWeightIndex('GA', ECellModel)}
   sim.topologicalConns['IMT->EV4'] = {'blist':blistIMTtoEV4, 'coords':connCoordsIMTtoEV4}
 
@@ -851,7 +859,7 @@ if dconf['sim']['useReducedNetwork']==0:
         'postConds': {'pop': 'IV4'},
         'connList': blistIV1toIV4,
         'weight': cmat['IV1']['IV4']['GA'] * cfg.IIGain,
-        'delay': 2,
+        'delay': getInitDelay(),
         'synMech': 'GABA','sec':'soma', 'loc':0.5,'weightIndex':getWeightIndex('GA', ICellModel)}
 
   sim.topologicalConns['IV1->IV4'] = {'blist':blistIV1toIV4, 'coords':connCoordsIV1toIV4}
@@ -861,7 +869,7 @@ if dconf['sim']['useReducedNetwork']==0:
         'postConds': {'pop': 'IMT'},
         'connList': blistIV4toIMT,
         'weight': cmat['IV4']['IMT']['GA'] * cfg.IIGain,
-        'delay': 2,
+        'delay': getInitDelay(),
         'synMech': 'GABA','sec':'soma', 'loc':0.5,'weightIndex':getWeightIndex('GA', ICellModel)}
   sim.topologicalConns['IV4->IMT'] = {'blist':blistIV4toIMT, 'coords':connCoordsIV4toIMT}
 
@@ -875,7 +883,7 @@ def connectEVToTarget (lpoty, useTopological):
         'postConds': {'pop': 'EA'},
         'connList': cLV1toEA, 
         'weight': getInitWeight(weight),
-        'delay': 2,
+        'delay': getInitDelay(),
         'synMech': synmech,
         'sec':EExcitSec, 'loc':0.5,'weightIndex':getWeightIndex(synmech, ECellModel)
     }
@@ -889,7 +897,7 @@ def connectEVToTarget (lpoty, useTopological):
         'postConds': {'pop': 'EA'},
         'connList': cLV1DEtoEA, 
         'weight': getInitWeight(weight),
-        'delay': 2,
+        'delay': getInitDelay(),
         'synMech': synmech,
         'sec':EExcitSec, 'loc':0.5,'weightIndex':getWeightIndex(synmech, ECellModel)
     }
@@ -898,7 +906,7 @@ def connectEVToTarget (lpoty, useTopological):
         'postConds': {'pop': 'EA'},
         'connList': cLV1DNEtoEA, 
         'weight': getInitWeight(weight),
-        'delay': 2,
+        'delay': getInitDelay(),
         'synMech': synmech,
         'sec':EExcitSec, 'loc':0.5,'weightIndex':getWeightIndex(synmech, ECellModel)
     }
@@ -907,7 +915,7 @@ def connectEVToTarget (lpoty, useTopological):
         'postConds': {'pop': 'EA'},
         'connList': cLV1DNtoEA, 
         'weight': getInitWeight(weight),
-        'delay': 2,
+        'delay': getInitDelay(),
         'synMech': synmech,
         'sec':EExcitSec, 'loc':0.5,'weightIndex':getWeightIndex(synmech, ECellModel)
     }
@@ -916,7 +924,7 @@ def connectEVToTarget (lpoty, useTopological):
         'postConds': {'pop': 'EA'},
         'connList': cLV1DNWtoEA, 
         'weight': getInitWeight(weight),
-        'delay': 2,
+        'delay': getInitDelay(),
         'synMech': synmech,
         'sec':EExcitSec, 'loc':0.5,'weightIndex':getWeightIndex(synmech, ECellModel)
     }
@@ -925,7 +933,7 @@ def connectEVToTarget (lpoty, useTopological):
         'postConds': {'pop': 'EA'},
         'connList': cLV1DWtoEA, 
         'weight': getInitWeight(weight),
-        'delay': 2,
+        'delay': getInitDelay(),
         'synMech': synmech,
         'sec':EExcitSec, 'loc':0.5,'weightIndex':getWeightIndex(synmech, ECellModel)
     }
@@ -934,7 +942,7 @@ def connectEVToTarget (lpoty, useTopological):
         'postConds': {'pop': 'EA'},
         'connList': cLV1DSWtoEA, 
         'weight': getInitWeight(weight),
-        'delay': 2,
+        'delay': getInitDelay(),
         'synMech': synmech,
         'sec':EExcitSec, 'loc':0.5,'weightIndex':getWeightIndex(synmech, ECellModel)
     }
@@ -943,7 +951,7 @@ def connectEVToTarget (lpoty, useTopological):
         'postConds': {'pop': 'EA'},
         'connList': cLV1DStoEA, 
         'weight': getInitWeight(weight),
-        'delay': 2,
+        'delay': getInitDelay(),
         'synMech': synmech,
         'sec':EExcitSec, 'loc':0.5,'weightIndex':getWeightIndex(synmech, ECellModel)
     }
@@ -952,7 +960,7 @@ def connectEVToTarget (lpoty, useTopological):
         'postConds': {'pop': 'EA'},
         'connList': cLV1DSEtoEA, 
         'weight': getInitWeight(weight),
-        'delay': 2,
+        'delay': getInitDelay(),
         'synMech': synmech,
         'sec':EExcitSec, 'loc':0.5,'weightIndex':getWeightIndex(synmech, ECellModel)
     }
@@ -997,7 +1005,7 @@ def connectEVToTarget (lpoty, useTopological):
             'preConds': {'pop': prety},
             'postConds': {'pop': poty},
             'weight': getInitWeight(weight),
-            'delay': 2,
+            'delay': getInitDelay(),
             'synMech': synmech,
             'sec':EExcitSec, 'loc':0.5,'weightIndex':getWeightIndex(synmech, ECellModel)
           }
@@ -1032,7 +1040,7 @@ if dnumc[prety] > 0 and dnumc[poty] > 0:
       'postConds': {'pop': poty},
       'convergence': prob2conv(cmat[prety][poty]['p'], dnumc[prety]),
       'weight': getInitWeight(weight),
-      'delay': 2,
+      'delay': getInitDelay(),
       'synMech': synmech,
       'sec':EExcitSec, 'loc':0.5,'weightIndex':getWeightIndex(synmech, ECellModel)
     }
@@ -1058,7 +1066,7 @@ for prety,ffconnty,recconnty in zip(['EA', 'EA2'],['FeedForwardAtoM','FeedForwar
         'postConds': {'pop': poty},
         'convergence': prob2conv(cmat[prety]['EM']['p'], dnumc[prety]),
         'weight': getInitWeight(weight),
-        'delay': 2,
+        'delay': getInitDelay(),
         'synMech': synmech,
         'sec':EExcitSec, 'loc':0.5,'weightIndex':getWeightIndex(synmech, ECellModel)
       }
@@ -1079,7 +1087,7 @@ for prety,ffconnty,recconnty in zip(['EA', 'EA2'],['FeedForwardAtoM','FeedForwar
         'postConds': {'pop': poty},
         'convergence': prob2conv(cmat[prety][poty]['p'], dnumc[prety]),
         'weight': getInitWeight(weight),
-        'delay': 2,
+        'delay': getInitDelay(),
         'synMech': synmech,
         'sec':EExcitSec, 'loc':0.5,'weightIndex':getWeightIndex(synmech, ECellModel)
       }
@@ -1100,7 +1108,7 @@ if cmat['EM']['EM']['p'] > 0.0:
             'postConds': {'pop': poty},
             'convergence': prob2conv(cmat['EM']['EM']['p'], dnumc[prety]),
             'weight': getInitWeight(weight),
-            'delay': 2,
+            'delay': getInitDelay(),
             'synMech': synmech,
             'sec':EExcitSec, 'loc':0.5,'weightIndex':getWeightIndex(synmech, ECellModel)
           }
@@ -1120,7 +1128,7 @@ if cmat['EM']['EA']['p'] > 0.0:
             'postConds': {'pop': poty},
             'convergence': prob2conv(cmat['EM']['EA']['p'], dnumc[prety]),
             'weight': getInitWeight(weight),
-            'delay': 2,
+            'delay': getInitDelay(),
             'synMech': synmech,
             'sec':EExcitSec, 'loc':0.5,'weightIndex':getWeightIndex(synmech, ECellModel)
           }
