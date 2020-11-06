@@ -20416,7 +20416,7 @@ clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((990e
 savefig(gifpath()+'rast.png') # [[./gif/20nov5_20nov4_A0_cycle_rast.png]]
 same as other recent model from yesterday (20nov4_A0_gcp_) too much noise to EM
 
-** next sim on cycle/gcp
+** next sim on cycle/gcp -->> rates too high
 
 seems like not enough exploration , overly synchronized firing when
 EM turns on - could add some noise or reduce conv onto EA and weight from EA -> EM
@@ -20428,7 +20428,19 @@ EM turns on - could add some noise or reduce conv onto EA and weight from EA -> 
 python -i simdat.py backupcfg/20nov5_A0_gcp_sim.json
 
 ax=plotPerf(actreward,yl=(0,1))
-savefig(gifpath()+'perf.png') 
+savefig(gifpath()+'perf.png') # [[./gif/20nov6_20nov5_A0_gcp_perf.png]]
+bad performance - EMUP and EMDOWN populations got stuck competing too much ... 
 
-clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((990e3,1000e3))
-savefig(gifpath()+'rast.png')
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((490e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/20nov6_20nov5_A0_gcp_rast.png]]
+
+rates way too high ...
+
+binsz = 1000
+dnspk = {pop:getspikehist(dspkT[pop],dnumc[pop],binsz,totalDur) for pop in ['EMDOWN','EMUP','EA']}
+for clr,pop in zip(['r','g','b'],['EMDOWN','EMUP','EA']): plot(dnspk[pop][0],dnspk[pop][1],clr)
+xlim((0,totalDur))
+savefig(gifpath()+'EMDOWN_EMUP_EA_rate1000.png') # [[./gif/20nov6_20nov5_A0_gcp_EMDOWN_EMUP_EA_rate1000.png]]
+
+** next sim on gcp (20nov5_B0_gcp_)
+
