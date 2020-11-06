@@ -38,17 +38,17 @@
         "ResumeSimFromFile": "data/20nov4_A0_gcp_synWeights_final.pkl"
     },
     "sim": {
-        "duration": 1000000,
-        "dt": 0.4,
+        "duration": 500000,
+        "dt": 0.5,
         "verbose": 0,
         "recordStep": 1.0,
         "recordWeightStepSize": 500,
-        "normalizeWeightStepSize": 50000000000000000000000000,
+        "normalizeWeightStepSize": 5000,
 	"normalizeWeightsAtStart": 0,
         "RLFakeUpRule": 0,
         "RLFakeDownRule": 0,
         "RLFakeStayRule": 0,
-        "name": "20nov5_B0_cycle_",
+        "name": "20nov6_A0_cycle_",
         "doquit": 1,
         "doplot": 0,
         "saveCellSecs": 0,
@@ -97,8 +97,8 @@
 	    "IA":0,
 	    "EA2": 0,
 	    "IA2": 0,	    
-	    "EMDOWN":200,
-	    "EMUP":200,
+	    "EMDOWN":100,
+	    "EMUP":100,
 	    "EMSTAY":0,
 	    "IM":100,
 	    "IMUP": 0,
@@ -190,29 +190,29 @@
 		"VD":{"AM":0,"NM":0,"p":0},		
 		"VL":{"AM":4,"NM":0.6,"p":0},
 		"EA":{"AM":3.6,"NM":0.36,"p":0.1},
-		"EMDOWN":{"AM":0.5,"NM":0.001,"p":0.08},
-		"EMUP":{"AM":0.5,"NM":0.001,"p":0.08},
-		"EMSTAY":{"AM":0.5,"NM":0.001,"p":0.08}		
+		"EMDOWN":{"AM":0.5,"NM":0.0,"p":0.08},
+		"EMUP":{"AM":0.5,"NM":0.0,"p":0.08},
+		"EMSTAY":{"AM":0.5,"NM":0.0,"p":0.08}		
 	    },
 	    "VD":{
 		"VL":{"AM":0,"NM":0,"p":0},
 		"VD":{"AM":0,"NM":0,"p":0},
 		"EA":{"AM":3.6,"NM":0.36,"p":0.1},
-		"EMDOWN":{"AM":0.5,"NM":0.001,"p":0.08},
-		"EMUP":{"AM":0.5,"NM":0.001,"p":0.08},
-		"EMSTAY":{"AM":0.5,"NM":0.001,"p":0.08},
+		"EMDOWN":{"AM":0.5,"NM":0.0,"p":0.08},
+		"EMUP":{"AM":0.5,"NM":0.0,"p":0.08},
+		"EMSTAY":{"AM":0.5,"NM":0.0,"p":0.08},
 		"ID": {"AM":10, "p":0.03}
 	    },
 	    "EM":{
-		"EM":{"AM":1.6,"NM":0.001,"p":0.15},
+		"EM":{"AM":1.6,"NM":0.0,"p":0.15},
 		"EA":{"AM":0,"NM":0,"p":0.0},
 		"IRecip": {"AM":20, "NM":0, "p":0.0625},
-		"IM":{"AM":10,"p":0.125}
+		"IM":{"AM":10,"p":0.15}
 	    },
 	    "EA":{
 		"EA":{"AM":1.2,"NM":0.12,"p":0.0},
 		"EA2":{"AM":1.2,"NM":0.12,"p":0.2},
-		"EM":{"AM":1.6,"NM":0.001,"p":0.15},
+		"EM":{"AM":1.6,"NM":0.0,"p":0.15},
 		"IA":{"AM": 10, "p":0.1}
 	    },
 	    "EA2":{
@@ -311,7 +311,7 @@
         "VisualFeedback": 0,
         "weightVar": 0.5,
 	"delayMin": 2,
-	"delayMax": 5
+	"delayMax": 4
     },
     "STDP": {
         "AMPA": {
@@ -379,7 +379,7 @@
             "RLlenhebb": 200,
             "RLlenanti": 200,
             "useRLexp": 1,
-            "RLhebbwt": 1.6,
+            "RLhebbwt": 0.16,
             "RLantiwt": 0,
             "hebbwt": 0.0,
             "antiwt": 0.0,

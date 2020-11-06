@@ -20444,4 +20444,25 @@ savefig(gifpath()+'EMDOWN_EMUP_EA_rate1000.png') # [[./gif/20nov6_20nov5_A0_gcp_
 
 ** next sim on gcp (20nov5_B0_gcp_)
 ** next sim on cycle (20nov5_B0_cycle_)
+* 20nov6
+** rates got too high - even early in sim (~20 s)
 
+and then paddle gets stuck at top or bottom
+
+stopped sim ... 
+
+** adjust intf7 sim some more
+
+turned off most of NM, adjusted EIGain ... 
+reduce EM to 100 each ...
+put in weight norm every 100 s ... to prevent later hypersynch ... 
+
+./myrun 32 sn.json
+
+started ~16:53 ... 
+
+python -i simdat.py backupcfg/20nov6_A0_cycle_sim.json
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); 
+
+clf(); drawcellVm(simConfig,ldrawpop=['EMUP','EA', 'IM'])
