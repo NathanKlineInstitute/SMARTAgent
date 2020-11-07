@@ -20492,7 +20492,7 @@ savefig(gifpath()+'EMDOWN_EMUP_EA_rate1000.png') # [[./gif/20nov6_20nov6_A0_cycl
 ok, adjusted normalization ... 
 
 * 20nov7
-** next sim
+** next sim - norm, multistep
 
 seems that paddle gets stuck when model first learns to go to one corner, then eventually weights get shifted in other
 direction after many misses; but then there's a bias in the other direction and paddle gets stuck there
@@ -20500,4 +20500,13 @@ smaller weights may help but it seems like the model just flips back and forth b
 so that means not learning much about the context ... or it is but requires refinement via small weight changes?
 
 thought that the norm rule might keep balance between competing populations ... 
+
+try a multistep to test ... 
+
+have norm every 10 s when pop weights get below 0.9 or > 1.5 original ... 
+small weight step (0.01) and short rl hebb window (15 ms) to try to prevent overlearning/getting stuck
+
+python multistepSim.py sn.json 32 20 20nov7_A0_cycle_multi
+
+started ~00:09 ...
 
