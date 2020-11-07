@@ -501,14 +501,15 @@ def drawraster (dspkT,dspkID,tlim=None,msz=2):
   ax.legend(handles=lpatch,handlelength=1,loc='best')
 
 #
-def drawcellVm (simConfig, ldrawpop=None,tlim=None):
+def drawcellVm (simConfig, ldrawpop=None,tlim=None, lclr=None):
   csm=cm.ScalarMappable(cmap=cm.prism); csm.set_clim(0,len(dspkT.keys()))
   if tlim is not None:
     dt = simConfig['simData']['t'][1]-simConfig['simData']['t'][0]    
     sidx,eidx = int(0.5+tlim[0]/dt),int(0.5+tlim[1]/dt)
   dclr = OrderedDict(); lpop = []
   for kdx,k in enumerate(list(simConfig['simData']['V_soma'].keys())):  
-    color = csm.to_rgba(kdx); 
+    color = csm.to_rgba(kdx);
+    if lclr is not None and kdx < len(lclr): color = lclr[kdx]
     cty = simConfig['net']['cells'][int(k.split('_')[1])]['tags']['cellType']
     if ldrawpop is not None and cty not in ldrawpop: continue
     dclr[kdx]=color
@@ -719,7 +720,7 @@ def plotMeanNeuronWeight (pdf,postid,clr='k',ax=None,msz=1,xl=None):
   ax.set_ylabel('Average weight'); 
   return wts    
   
-def plotMeanWeights (pdf,ax=None,msz=1,xl=None,lpop=['EMDOWN','EMUP','EMSTAY'],lclr=['k','r','b','g'],plotindiv=True):
+def plotMeanWeights (pdf,ax=None,msz=1,xl=None,lpop=['EMDOWN','EMUP','EMSTAY'],lclr=['k','r','b','g'],plotindiv=True,fsz=15,prety=None):
   #plot mean weights of all plastic synaptic weights onto lpop
   if ax is None: ax = gca()
   utimes = np.unique(pdf.time)
@@ -734,13 +735,16 @@ def plotMeanWeights (pdf,ax=None,msz=1,xl=None,lpop=['EMDOWN','EMUP','EMSTAY'],l
           mnw=min(mnw, min(lwt))
           mxw=max(mxw, max(lwt))    
       pdfs = pdf[(pdf.postid>=dstartidx[pop]) & (pdf.postid<=dendidx[pop])]
+      if prety is not None:
+        pdfs = pdfs[(pdfs.preid>=dstartidx[prety]) & (pdfs.preid<=dendidx[prety])]
       popwts[pop] = [np.mean(pdfs[(pdfs.time==t)].weight) for t in utimes] #wts of connections onto pop
       ax.plot(utimes,popwts[pop],clr+'-o',markersize=msz)
       mnw=min(mnw, np.amin(popwts[pop]))
       mxw=max(mxw, np.amax(popwts[pop]))            
   if xl is not None: ax.set_xlim(xl)
   ax.set_ylim((mnw,mxw))
-  ax.set_ylabel('Average weight'); 
+  ax.set_ylabel('Average weight',fontsize=fsz);
+  ax.set_xlabel('Time (ms)',fontsize=fsz);
   ax.legend(handles=[mpatches.Patch(color=c,label=s) for c,s in zip(lclr,lpop)],handlelength=1,loc='best')
   return popwts
 
