@@ -34,8 +34,8 @@
     "verbose": 0,
     "stayStepLim": 0,
     "simtype": {
-        "ResumeSim": 0,
-        "ResumeSimFromFile": "data/20nov4_A0_gcp_synWeights_final.pkl"
+        "ResumeSim": 1,
+        "ResumeSimFromFile": "data/20nov7_A0_cycle__step_6_synWeights_final.pkl"
     },
     "sim": {
         "duration": 500000,
@@ -48,7 +48,7 @@
         "RLFakeUpRule": 0,
         "RLFakeDownRule": 0,
         "RLFakeStayRule": 0,
-        "name": "20nov7_A0_cycle_",
+        "name": "20nov7_B0_cycle_",
         "doquit": 1,
         "doplot": 0,
         "saveCellSecs": 0,
@@ -291,7 +291,7 @@
 	    }
 	},
         "EEMWghtThreshMin": 0.9,
-        "EEMWghtThreshMax": 1.5,
+        "EEMWghtThreshMax": 3.0,
         "EEMPopNorm": 0,
 	"CellWNorm": {
 	    "On": 0,

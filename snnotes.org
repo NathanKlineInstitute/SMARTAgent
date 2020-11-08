@@ -20492,7 +20492,7 @@ savefig(gifpath()+'EMDOWN_EMUP_EA_rate1000.png') # [[./gif/20nov6_20nov6_A0_cycl
 ok, adjusted normalization ... 
 
 * 20nov7
-** next sim - norm, multistep
+** next sim - norm, multistep (20nov7_A0_cycle_)
 
 seems that paddle gets stuck when model first learns to go to one corner, then eventually weights get shifted in other
 direction after many misses; but then there's a bias in the other direction and paddle gets stuck there
@@ -20509,4 +20509,54 @@ small weight step (0.01) and short rl hebb window (15 ms) to try to prevent over
 python multistepSim.py sn.json 32 20 20nov7_A0_cycle_multi
 
 started ~00:09 ...
+
+** check output
+
+got through ~5 steps by 20:15 ... 
+
+synaptic weights are close to max of 2.4 (1.5X original of 1.6)
+
+python -i simdat.py backupcfg/20nov7_A0_cycle__step_5_sim.json
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/20nov7_20nov7_A0_cycle__step_5_perf.png]]
+not terrible ... relative to other sims
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((490e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/20nov7_20nov7_A0_cycle__step_5_rast.png]]
+but EMDOWN,EMUP rates have gotten pretty high (~28 Hz)
+
+clf(); drawcellVm(simConfig,tlim=(490e3,500e3),lclr=['r','g','b','c','m','y'])
+savefig(gifpath()+'Vm.png') # [[./gif/20nov7_20nov7_A0_cycle__step_5_Vm.png]]
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP'],lclr=['r','g'],plotindiv=False)
+savefig(gifpath()+'all_avg_weight.png') # [[./gif/20nov7_20nov7_A0_cycle__step_5_all_avg_weight.png]]
+weights already maxed-out...some alternation between whether EMUP or EMDOWN has higher weights... 
+
+lfn = ['20nov7_A0_cycle__step_' + str(i) + '_' for i in range(0,7,1)]
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0,0.3))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/20nov7_20nov7_A0_cycle__step_5_perf_all_steps_so_far.png]]
+values increasing ... but haven't gotten to best perf seen yet (compared to prev sims) ... 
+
+lpda = getindivactionreward(lfn)
+clf(); plotComparePerf(lpda,['g','b','r','c','m','y','k'],yl=(0,1),lleg=lfn)
+savefig(gifpath()+'perf_compareB.png') # [[./gif/20nov7_20nov7_A0_cycle__step_5_perf_compareB.png]]
+
+can see if improves further but firing rates already pretty high and average weights close to limit ... so 
+reshuffling weights only way to reorg network to produce appropriate response ... 
+
+could run another sim from here - with higher max weights - or first normalize weights to starting level (preserving
+relative values)... 
+
+will see if allowing the weights to move higher helps ... 
+
+** another multirun in parallel - higher max weights (continue from 20nov7_A0_cycle_ into 20nov7_B0_cycle_)
+
+use these as starting weights:
+data/20nov7_A0_cycle__step_6_synWeights_final.pkl
+
+python multistepSim.py sn.json 32 13 20nov7_B0_cycle_multi
+
+started ~23:22 ... 
 
