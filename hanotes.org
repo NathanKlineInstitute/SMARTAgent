@@ -8768,4 +8768,186 @@ could potentially be run for longer durations.
 
 * 20nov03
 
--- run 20nov03_A3long_cycle for 2000 sec.
+-- run 20nov03_A3long_cycle for 2000 sec. (only follow the ball)
+
+-- run 20nov03_A3longAllRewards_cycle for 2000 sec.
+scorePoint:1.0
+losePoint:-0.5
+hitBall:0.5
+
+followTarget: 0.1
+avoidTarget: -0.01
+
+-- on falcor i ran sim "20nov02_A0Long_falcor_reduced_2obj" for 300 sec. still running.
+
+-- run 20nov03_A3long_falcor for 500 sec. (only follow the ball)
+... same parameters are 20nov03_A3long_cycle except targetedRL = 0
+
+-- setup complete on new mac
+now can run using mpi on new machine.
+
+mpiexec -n 4 nrniv -python -mpi sim.py
+
+pythonw issue: https://github.com/Neurosim-lab/netpyne/issues/496
+
+* 20nov04
+
+-- got this code from sam
+
+# SN: exptl
+  #if 'hSTDP' not in conn: continue
+  #cpreID = conn.preGid  #find preID
+  #if type(cpreID) != int: continue
+  if dconf['sim']['targettedRL'] > 1:
+    for pop in Mpops: dcell[pop] = np.unique(dcell[pop])
+    nhost = sim.pc.nhost()
+    src = [dcell]*nhost
+    dcellgid = sim.pc.py_alltoall(src)
+    for dcell in dcellgid:
+      for pop in Mpops:
+        for cell in sim.net.cells:
+          if cell.gid in dcell[pop]:
+            for conn in cell.conns:
+              STDPmech = conn.get('hSTDP')
+              if STDPmech:
+                if STDPmech not in dSTDPmech[pop]:
+                  dSTDPmech[pop].append(STDPmech)
+
+-- start with the motor pops at the first level or level 0. so EMUP and EMDOWN.
+-- to get all rlstdp synapses at previous stage....
+for each neuron in pops
+get thre preid
+
+
+-- PROBLEM: at some places in cmat we use EMDOWN and EMUP whereas at other places we use EM
+
+Mpops = ['EMUP','EMDOWN','EM']
+l1pop = []
+for mpop in Mpops:
+  for prepops in dconf['net']['cmat'].keys():
+    if mpop in dconf['net']['cmat'][prepops].keys():
+      if prepops not in l1pop and dconf['net']['allpops'][prepops]>0:
+        l1pop.append(prepops)
+
+* 20nov05
+
+-- resume sim in "20nov05_A3longAllrewards_cycle" (should have been without Allrewards in the name) using "20nov03_A3long_cycle"
+not better than early version of the model without EA.
+still want to run it for longer duration.
+
+-- run sim in "20nov05_A3long_cycle_reduced_2obj_pong0_"
+same parameters as in for sim "20nov03_A3long_cycle" but use pong-v0
+
+-- later run with pong-v0 and 
+            "RLlenhebb": 100,
+            "RLlenanti": 100,
+    instead of 
+                "RLlenhebb": 2000,
+            "RLlenanti": 2000,
+TO BE DONE. 
+I want to run this because with 2000 ms, associations might form between temporal distant environment and actions. 
+
+-- now check what happened on falcor sims. still running....
+
+-- continue preparing lists of conns for each postsynaptic neuron pop.
+
+# this function return a dictonary of postsynaptic pops with presynpatic pops
+
+def presynPopsDict():
+  # create list of potential postsynaptic populations.
+  pot_postpops = []
+  for pops in dconf['net']['allpops'].keys():
+    if dconf['net']['allpops'][pops]>0:
+      pot_postpops.append(pops)
+  pot_postpops.append('EM')
+  pot_postpops.append('VD')
+  pot_postpops.append('VL')
+  # create a dictionary, where for each potential postsynaptic population, include presynaptic pops.
+  dprepops = {pop:[] for pop in pot_postpops} # SN: exptl
+  lLocpops = ['EV1']
+  lDirpops = ['EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE']
+  lMpops = ['EMDOWN','EMUP']
+  for prepops in dconf['net']['cmat'].keys():
+    for postpops in dconf['net']['cmat'][prepops].keys():
+      if postpops in pot_postpops and prepops in pot_postpops:
+        if postpops=='EM':
+          for postmpops in lMpops:
+            if prepops=='EM':
+              for prempops in lMpops:
+                dprepops[postmpops].append(prempops)
+            elif prepops=='VD':
+              for predirpops in lDirpops:
+                dprepops[postmpops].append(predirpops)
+            elif prepops=='VL':
+              for prelocpops in lLocpops:
+                dprepops[postmpops].append(prelocpops)
+            else:
+              dprepops[postmpops].append(prepops)
+        elif postpops=='VD':
+          for postdirpops in lDirpops:
+            if prepops=='EM':
+              for prempops in lMpops:
+                dprepops[postdirpops].append(prempops)
+            elif prepops=='VD':
+              for predirpops in lDirpops:
+                dprepops[postdirpops].append(predirpops)
+            elif prepops=='VL':
+              for prelocpops in lLocpops:
+                dprepops[postdirpops].append(prelocpops)
+            else:
+              dprepops[postdirpops].append(prepops)
+        elif postpops=='VL':
+          for postlocpops in lLocpops:
+            if prepops=='EM':
+              for prempops in lMpops:
+                dprepops[postlocpops].append(prempops)
+            elif prepops=='VD':
+              for predirpops in lDirpops:
+                dprepops[postlocpops].append(predirpops)
+            elif prepops=='VL':
+              for prelocpops in lLocpops:
+                dprepops[postlocpops].append(prelocpops)
+            else:
+              dprepops[postlocpops].append(prepops)
+        else:
+          if prepops=='EM':
+            for prempops in lMpops:
+              dprepops[postpops].append(prempops)
+          elif prepops=='VD':
+            for predirpops in lDirpops:
+              dprepops[postpops].append(predirpops)
+          elif prepops=='VL':
+            for prelocpops in lLocpops:
+              dprepops[postpops].append(prelocpops)
+          else:
+            dprepops[postpops].append(prepops)
+  return dprepops
+
+def getAllSTDPObjects2 (sim):
+  # get all the STDP objects from the simulation's cells
+  dprepops = presynPopsDict() # for each pop, has a list of prepops
+  dSTDPmech = {'all':[]} # dictionary of STDP objects keyed by type (all, for EMUP, EMDOWN populations)
+  dSTDPmechRec = {'all':[]}
+  for pop in dprepops.keys(): 
+    dSTDPmech[pop] = []
+    dSTDPmechRec[pop] = []
+  for cell in sim.net.cells:
+    for conn in cell.conns:
+      STDPmech = conn.get('hSTDP')  # check if the connection has a NEURON STDP mechanism object
+      if STDPmech:
+        dSTDPmech['all'].append(STDPmech)
+        for pop in dprepops.keys():
+          if len(dprepops[pop])>0: # if the pop has presyn pop
+            if cell.gid in sim.net.pops[pop].cellGids:
+              if conn.preGid in sim.net.pops[pop].cellGids:
+                dSTDPmechRec['all'].append(STDPmech)
+                dSTDPmechRec[pop].append(STDPmech)
+              else:
+                dSTDPmech[pop].append(STDPmech)
+return dSTDPmech, dSTDPmechRec
+
+
+.... still need to include these in the sim.py and use it too.....
+
+first need to get started with INTF7.
+
