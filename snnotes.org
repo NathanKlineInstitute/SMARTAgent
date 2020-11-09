@@ -20631,3 +20631,40 @@ savefig(gifpath()+'perf_compareB2.png') # [[./gif/20nov9_20nov7_B0_cycle__step_4
 
 will stop this multistep run ... should revise rules for normalization ... 
 
+** check output from 20nov7_A0_cycle__step_13_
+
+python -i simdat.py backupcfg/20nov7_A0_cycle__step_13_sim.json
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/20nov9_20nov7_A0_cycle__step_13_perf.png]]
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((490e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/20nov9_20nov7_A0_cycle__step_13_rast.png]]
+
+clf(); drawcellVm(simConfig,tlim=(490e3,500e3),lclr=['r','g','b','c','m','y'])
+savefig(gifpath()+'Vm.png') # [[./gif/20nov9_20nov7_A0_cycle__step_13_Vm.png]]
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP'],lclr=['r','g'],plotindiv=False)
+savefig(gifpath()+'all_avg_weight.png') # [[./gif/20nov9_20nov7_A0_cycle__step_13_all_avg_weight.png]]
+
+lfn = ['20nov7_A0_cycle__step_' + str(i) + '_' for i in range(0,14,1)]
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0,0.4))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/20nov9_20nov7_A0_cycle__step_13_perf_all_steps_so_far.png]]
+
+lpda = getindivactionreward(lfn)
+csm=cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+lclr = [csm.to_rgba(float(i)/(len(lpda))) for i in range(len(lpda))]
+clf(); plotComparePerf(lpda,lclr,yl=(0,1),lleg=lfn)
+savefig(gifpath()+'perf_compareB.png') # [[./gif/20nov9_20nov7_A0_cycle__step_13_perf_compareB.png]]
+
+** adjust norm rules
+
+not clear which rule to use for norm ... ideally would want to preserve learning - would pop norm work
+if same scaling factor was applied periodically? rate based homeostasis is ok but then have to push the
+weights back to a boundary ... 
+
+original weight norm rule may be ok if applied more often ... ? and would avoid rates ever getting too high ... 
+
+        "name": "20nov9_C0_cycle_",
+
