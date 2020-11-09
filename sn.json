@@ -34,7 +34,7 @@
     "verbose": 0,
     "stayStepLim": 0,
     "simtype": {
-        "ResumeSim": 1,
+        "ResumeSim": 0,
         "ResumeSimFromFile": "data/20nov7_A0_cycle__step_6_synWeights_final.pkl"
     },
     "sim": {
@@ -44,11 +44,11 @@
         "recordStep": 1.0,
         "recordWeightStepSize": 500,
         "normalizeWeightStepSize": 500,
-	"normalizeWeightsAtStart": 1,
+	"normalizeWeightsAtStart": 0,
         "RLFakeUpRule": 0,
         "RLFakeDownRule": 0,
         "RLFakeStayRule": 0,
-        "name": "20nov9_C0_cycle_",
+        "name": "20nov9_D0_lp_",
         "doquit": 1,
         "doplot": 0,
         "saveCellSecs": 0,
@@ -372,6 +372,7 @@
             "maxreward": 0.0 
         },	
         "AMPA": {
+	    "NOSTDPTAG": 1,
             "wbase": 0.16,
             "wmax": 16,
             "RLon": 1,
