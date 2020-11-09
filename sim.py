@@ -1314,12 +1314,27 @@ def normalizeAdjustableWeights (sim, t, lpop):
     davg = getAverageAdjustableWeights(sim, lpop)
     try:
       dfctr = {}
+      MinFctr, MaxFctr = dconf['net']['EEMWghtThreshMin'], dconf['net']['EEMWghtThreshMax']      
       # normalize weights across populations to avoid bias    
       initavgW = cmat['EA']['EM']['AM'] # initial average weight <<-- THAT ASSUMES ONLY USING NORM ON EM POPULATIONS!
       if dconf['net']['EEMPopNorm']:
         curravgW = np.mean([davg[k] for k in lpop]) # current average weight
         if curravgW <= 0.0: curravgw = initavgW
-        for k in lpop: dfctr[k] = initavgW / curravgW
+        if curravgW > 0 and curravgW != initavgW:
+          fctrA = curravgW / initavgW
+          dochange = False
+          if fctrA < MinFctr:
+            fctrB = (MinFctr * initavgW) / curravgW # factor to restore weights to boundary
+            dochange = True
+          elif fctrA > MaxFctr:            
+            # fctrB = ((1.0+MaxFctr/2.0)*initavgW) / curravgW # factor to move weight to mid btwn start and max
+            fctrB = initavgW / curravgW # go back to initial
+            dochange = True
+          # print('initW:',initW,'currW:',currW,'fctr:',fctr)
+          if dochange:
+            for k in lpop: dfctr[k] = fctrB
+          else:
+            for k in lpop: dfctr[k] = 1.0    
       else:
         MinFctr, MaxFctr = dconf['net']['EEMWghtThreshMin'], dconf['net']['EEMWghtThreshMax']
         for k in lpop:

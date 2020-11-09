@@ -44,11 +44,11 @@
         "recordStep": 1.0,
         "recordWeightStepSize": 500,
         "normalizeWeightStepSize": 500,
-	"normalizeWeightsAtStart": 0,
+	"normalizeWeightsAtStart": 1,
         "RLFakeUpRule": 0,
         "RLFakeDownRule": 0,
         "RLFakeStayRule": 0,
-        "name": "20nov9_D0_cycle_",
+        "name": "20nov9_F0_cycle_",
         "doquit": 1,
         "doplot": 0,
         "saveCellSecs": 0,
@@ -291,7 +291,7 @@
 	    }
 	},
         "EEMWghtThreshMin": 0.9,
-        "EEMWghtThreshMax": 3.0,
+        "EEMWghtThreshMax": 1.75,
         "EEMPopNorm": 1,
 	"CellWNorm": {
 	    "On": 0,
@@ -372,7 +372,6 @@
             "maxreward": 0.0 
         },	
         "AMPA": {
-	    "NOSTDPTAG": 1,
             "wbase": 0.16,
             "wmax": 16,
             "RLon": 1,
@@ -380,13 +379,13 @@
             "RLlenhebb": 200,
             "RLlenanti": 200,
             "useRLexp": 1,
-            "RLhebbwt": 0.01,
+            "RLhebbwt": 0.005,
             "RLantiwt": 0,
             "hebbwt": 0.0,
             "antiwt": 0.0,
             "tauhebb": 10,
             "tauanti": 10,	    
-            "RLwindhebb": 15,
+            "RLwindhebb": 10,
             "softthresh": 0,
             "verbose": 0,
 	    "maxreward": 0.0

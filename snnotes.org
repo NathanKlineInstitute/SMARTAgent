@@ -20668,3 +20668,30 @@ original weight norm rule may be ok if applied more often ... ? and would avoid 
 
         "name": "20nov9_C0_cycle_",
 
+python -i simdat.py backupcfg/20nov9_C0_cycle_sim.json
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/20nov9_20nov9_C0_cycle_perf.png]]
+that looks worse than last step checked above from multirun ... ( [[./gif/20nov9_20nov7_A0_cycle__step_13_perf.png]] )
+and from the comparable (from duration) step 7 of the multirun, seen here [[./gif/20nov9_20nov7_A0_cycle__step_13_perf_compareB.png]]
+
+so that original weight norm rule did not seem to help ... 
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((490e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/20nov9_20nov9_C0_cycle_rast.png]]
+
+clf(); drawcellVm(simConfig,tlim=(490e3,500e3),lclr=['r','g','b','c','m','y'])
+savefig(gifpath()+'Vm.png') # [[./gif/20nov9_20nov9_C0_cycle_Vm.png]]
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP'],lclr=['r','g'],plotindiv=False)
+savefig(gifpath()+'all_avg_weight.png') # [[./gif/20nov9_20nov9_C0_cycle_all_avg_weight.png]]
+
+** other norm rule - go back to start after pass max thresh
+
+use pop weight norm but allow more room for weights to change
+go back to initial weight after passes max threshold ... and allow it to continue from there
+
+python multistepSim.py sn.json 32 20 20nov9_E0_cycle_multi
+
+started ~16:16 ...
+
