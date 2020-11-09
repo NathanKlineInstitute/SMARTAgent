@@ -20686,10 +20686,12 @@ savefig(gifpath()+'Vm.png') # [[./gif/20nov9_20nov9_C0_cycle_Vm.png]]
 clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP'],lclr=['r','g'],plotindiv=False)
 savefig(gifpath()+'all_avg_weight.png') # [[./gif/20nov9_20nov9_C0_cycle_all_avg_weight.png]]
 
-** other norm rule - go back to start after pass max thresh
+** other norm rule - go back to start after pass max thresh (20nov9_E0_cycle_multi)
 
 use pop weight norm but allow more room for weights to change
-go back to initial weight after passes max threshold ... and allow it to continue from there
+go back to initial weight after passes max threshold ... and allow it to continue from there 
+
+this sim also has smaller window for stdp tagging (10 ms) and smaller weight increments
 
 python multistepSim.py sn.json 32 20 20nov9_E0_cycle_multi
 
