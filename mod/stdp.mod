@@ -65,7 +65,7 @@ NEURON {
   RANGE skip : Flag to skip 2nd set of conditions
   RANGE cumreward : cumulative reward magnitude so far
   RANGE maxreward : max reward for scaling						   
-  RANGE NOSTDPTAG
+  :RANGE NOSTDPTAG
 }			
 
 ASSIGNED {
@@ -110,7 +110,7 @@ PARAMETER {
   skip = 0
   maxreward = 0
   : cumreward = 0				 
-  NOSTDPTAG = 0
+  :NOSTDPTAG = 0
 }				      
 
 NET_RECEIVE (w) {
@@ -211,10 +211,11 @@ PROCEDURE reward_punish (reinf) {
 }
 
 FUNCTION hebbRL () { : RL from pre before post spiking
-  if (NOSTDPTAG) {
-    hebbRL = RLhebbwt
-  }   
-  else if (tlasthebbelig < 0.0) { : If eligibility has not occurred yet return 0.0.
+  :if (NOSTDPTAG) {
+  :  hebbRL = RLhebbwt
+  :}   
+  :else
+  if (tlasthebbelig < 0.0) { : If eligibility has not occurred yet return 0.0.
     hebbRL = 0.0
   }
   else if (useRLexp == 0) { : If we are using a binary (i.e. square-wave) eligibility traces...
@@ -231,9 +232,9 @@ FUNCTION hebbRL () { : RL from pre before post spiking
 }
 
 FUNCTION antiRL () { : RL from post before pre spiking
-  if (NOSTDPTAG) {
-    antiRL = RLantiwt
-  }   			  
+  :if (NOSTDPTAG) {
+  :  antiRL = RLantiwt
+  :}   			  
   if (tlastantielig < 0.0) { : If eligibility has not occurred yet return 0.0.
     antiRL = 0.0
   }
