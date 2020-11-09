@@ -20560,3 +20560,74 @@ python multistepSim.py sn.json 32 13 20nov7_B0_cycle_multi
 
 started ~23:22 ... 
 
+* 20nov9
+** check output from 20nov7_A0_cycle__step_12
+
+python -i simdat.py backupcfg/20nov7_A0_cycle__step_12_sim.json
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/20nov9_20nov7_A0_cycle__step_12_perf.png]]
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((490e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/20nov9_20nov7_A0_cycle__step_12_rast.png]]
+so the rates have continued to rise despire the normalization every 10 s ... and this one had max of 1.5 x initial weight
+for each pop
+
+clf(); drawcellVm(simConfig,tlim=(490e3,500e3),lclr=['r','g','b','c','m','y'])
+savefig(gifpath()+'Vm.png') # [[./gif/20nov9_20nov7_A0_cycle__step_12_Vm.png]]
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP'],lclr=['r','g'],plotindiv=False)w
+savefig(gifpath()+'all_avg_weight.png') # [[./gif/20nov9_20nov7_A0_cycle__step_12_all_avg_weight.png]]
+no stability yet ... 
+
+lfn = ['20nov7_A0_cycle__step_' + str(i) + '_' for i in range(0,13,1)]
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0,0.4))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/20nov9_20nov7_A0_cycle__step_12_perf_all_steps_so_far.png]]
+
+lpda = getindivactionreward(lfn)
+csm=cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+lclr = [csm.to_rgba(float(i)/(len(lpda))) for i in range(len(lpda))]
+clf(); plotComparePerf(lpda,lclr,yl=(0,1),lleg=lfn)
+savefig(gifpath()+'perf_compareB.png') # [[./gif/20nov9_20nov7_A0_cycle__step_12_perf_compareB.png]]
+
+see some gradual improvements ... ? at least follow seems to be increasing ... 
+
+fig=animInput(InputImages,gifpath()+'_input.mp4') # [[./gif/20nov9_20nov7_A0_cycle__step_12__input.mp4]]
+
+should compare that one against the one with higher max weights, below ... 
+
+** check output from 20nov7_B0_cycle__step_4
+
+python -i simdat.py backupcfg/20nov7_B0_cycle__step_4_sim.json
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/20nov9_20nov7_B0_cycle__step_4_perf.png]]
+this one looks decidedly worse ... 
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((490e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/20nov9_20nov7_B0_cycle__step_4_rast.png]]
+EMDOWN,EMUP rates close to 200 Hz on avg, IM close to 400 Hz ... 
+
+clf(); drawcellVm(simConfig,tlim=(490e3,500e3),lclr=['r','g','b','c','m','y'])
+savefig(gifpath()+'Vm.png') # [[./gif/20nov9_20nov7_B0_cycle__step_4_Vm.png]]
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP'],lclr=['r','g'],plotindiv=False)
+savefig(gifpath()+'all_avg_weight.png') # [[./gif/20nov9_20nov7_B0_cycle__step_4_all_avg_weight.png]]
+
+lfn = ['20nov7_A0_cycle__step_' + str(i) + '_' for i in range(0,7,1)]
+for i in range(0,5,1): lfn.append('20nov7_B0_cycle__step_'+str(i)+'_')
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0,0.4))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/20nov9_20nov7_B0_cycle__step_4_perf_all_steps_so_far.png]]
+went up for a bit then started to decay, prob due to hypersynch
+
+lpda = getindivactionreward(lfn)
+csm=cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+lclr = [csm.to_rgba(float(i)/(len(lpda))) for i in range(len(lpda))]
+clf(); plotComparePerf(lpda,lclr,yl=(0,1),lleg=lfn)
+savefig(gifpath()+'perf_compareB.png') # [[./gif/20nov9_20nov7_B0_cycle__step_4_perf_compareB.png]]
+savefig(gifpath()+'perf_compareB2.png') # [[./gif/20nov9_20nov7_B0_cycle__step_4_perf_compareB2.png]]
+
+will stop this multistep run ... should revise rules for normalization ... 
+
