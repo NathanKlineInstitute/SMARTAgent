@@ -20686,7 +20686,7 @@ savefig(gifpath()+'Vm.png') # [[./gif/20nov9_20nov9_C0_cycle_Vm.png]]
 clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP'],lclr=['r','g'],plotindiv=False)
 savefig(gifpath()+'all_avg_weight.png') # [[./gif/20nov9_20nov9_C0_cycle_all_avg_weight.png]]
 
-** other norm rule - go back to start after pass max thresh (20nov9_E0_cycle_multi)
+** other norm rule - go back to start after pass max thresh (20nov9_F0_cycle_)
 
 use pop weight norm but allow more room for weights to change
 go back to initial weight after passes max threshold ... and allow it to continue from there 
@@ -20697,3 +20697,9 @@ python multistepSim.py sn.json 32 20 20nov9_E0_cycle_multi
 
 started ~16:16 ...
 
+** another to compare (20nov9_G0_cycle_) -->> later
+
+shorter RLlenhebb (from 200 to 50) and no reward for scoring point
+
+will leave that for later ... sometimes a few frames before move taken even with command from a few ago, 
+so could keep longer window ... 
