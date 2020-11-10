@@ -20814,3 +20814,11 @@ maybe because there are a lot more direction selective neurons compared to locat
 generally northeast moving ball means paddle should move up so the signal for ball moving northeast
 may overwhelm the location specific information??
 
+could increase weights/connections from EV1 -> EA
+could have a rule that prevents paddle from moving up if already at top, or from moving down if already at bottom
+see if that helps ... 
+
+python -i simdat.py backupcfg/20nov10_A0_cycle_sim.json
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); 
+savefig(gifpath()+'rast.png')
