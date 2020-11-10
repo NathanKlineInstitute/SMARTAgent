@@ -20697,9 +20697,62 @@ python multistepSim.py sn.json 32 20 20nov9_E0_cycle_multi
 
 started ~16:16 ...
 
-** another to compare (20nov9_G0_cycle_) -->> later
+check first few steps ~21:45 ..
+
+python -i simdat.py backupcfg/20nov9_F0_cycle__step_1_sim.json
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/20nov9_20nov9_F0_cycle__step_1_perf.png]]
+
+lfn = ['20nov9_F0_cycle__step_0_', '20nov9_F0_cycle__step_1_']
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0,0.4))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/20nov9_20nov9_F0_cycle__step_1_perf_all_steps_so_far.png]]
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((490e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/20nov9_20nov9_F0_cycle__step_1_rast.png]]
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP'],lclr=['r','g'],plotindiv=False)
+savefig(gifpath()+'all_avg_weight.png') # [[./gif/20nov9_20nov9_F0_cycle__step_1_all_avg_weight.png]]
+
+** another to compare (20nov9_G0_cycle_) -->> later -->> now
 
 shorter RLlenhebb (from 200 to 50) and no reward for scoring point
 
-will leave that for later ... sometimes a few frames before move taken even with command from a few ago, 
+will leave that for later (or now) ... sometimes a few frames before move taken even with command from a few ago, 
 so could keep longer window ... 
+
+    "rewardcodes": {
+        "scorePoint": 0.0,
+        "losePoint":  0.0,
+        "followTarget": 0.1,
+        "avoidTarget": -0.1,
+        "hitBall": 0.5
+    },
+
+        "AMPA": {
+            "wbase": 0.16,
+            "wmax": 16,
+            "RLon": 1,
+	    "STDPon": 0,
+            "RLlenhebb": 50,
+            "RLlenanti": 50,
+            "useRLexp": 0,
+            "RLhebbwt": 0.005,
+            "RLantiwt": 0,
+            "hebbwt": 0.0,
+            "antiwt": 0.0,
+            "tauhebb": 10,
+            "tauanti": 10,	    
+            "RLwindhebb": 10,
+            "softthresh": 0,
+            "verbose": 0,
+	    "maxreward": 0.0
+        },
+
+norm same as above ... 
+
+python multistepSim.py sn.json 32 20 20nov9_G0_cycle_multi
+
+started ~22:23 ...
+
