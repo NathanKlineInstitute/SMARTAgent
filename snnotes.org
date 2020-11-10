@@ -20808,7 +20808,7 @@ savefig(gifpath()+'perf_compareB.png') # [[./gif/20nov10_20nov9_F0_cycle__step_3
 
 improving ... will take time 
 
-** why does paddle get stuck at corners? (20nov10_A0_cycle_)
+** why does paddle get stuck at corners? (20nov10_B0_cycle_)
 
 maybe because there are a lot more direction selective neurons compared to location specific?
 generally northeast moving ball means paddle should move up so the signal for ball moving northeast
@@ -20818,7 +20818,11 @@ could increase weights/connections from EV1 -> EA
 could have a rule that prevents paddle from moving up if already at top, or from moving down if already at bottom
 see if that helps ... 
 
-python -i simdat.py backupcfg/20nov10_A0_cycle_sim.json
+ok, added a simple rule for that ... will try it out ...
+
+./myrun 32 sn.json 
+
+python -i simdat.py backupcfg/20nov10_B0_cycle_sim.json
 
 clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); 
 savefig(gifpath()+'rast.png')

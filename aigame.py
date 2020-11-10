@@ -124,22 +124,22 @@ class AIGame:
     # Note that takes 6 stays instead of 3 because it seems every other input is ignored (check dad_notes.txt for details)
     # however, using stayStepLim > 0 means model behavior is slower
     self.downsampshape = (8,8) # default is 20x20 (20 = 1/8 of 160)
-    self.racketH = 3 # racket height in pixels
-    self.maxYPixel = 20 - 1
+    self.racketH = 16 #3 # racket height in pixels
+    self.maxYPixel = 160 - 1 # 20 - 1
     self.avoidStuck = False
     if 'avoidStuck' in dconf: self.avoidStuck = dconf['avoidStuck']
     if dconf['net']['allpops'][self.InputPop] == 1600: # this is for 40x40 (40 = 1/4 of 160)
       self.downsampshape = (4,4)
-      self.racketH *= 2
-      self.maxYPixel = 40 - 1
+      #self.racketH *= 2
+      #self.maxYPixel = 40 - 1
     elif dconf['net']['allpops'][self.InputPop] == 6400: # this is for 80x80 (1/2 resolution)
       self.downsampshape = (2,2)
-      self.racketH *= 4
-      self.maxYPixel = 80 - 1      
+      #self.racketH *= 4
+      #self.maxYPixel = 80 - 1      
     elif dconf['net']['allpops'][self.InputPop] == 25600: # this is for 160x160 (full resolution)
       self.downsampshape = (1,1)
-      self.racketH *= 8
-      self.maxYPixel = 160 - 1
+      #self.racketH *= 8
+      #self.maxYPixel = 160 - 1
 
   def updateInputRatesWithPadding (self, dsum_Images):
     # update input rates to retinal neurons
@@ -481,10 +481,15 @@ class AIGame:
         self.dObjPos['time'].append(simtime)
         # do not allow racket to get stuck at top or bottom
         if self.avoidStuck:
-          if ypos_Racket - 1 - self.racketH/2 <= 0 and (proposed_action == dconf['moves']['DOWN'] or proposed_action == dconf['moves']['NOMOVE']):
+          #print('ypos_Racket=',ypos_Racket, 'racketH=',self.racketH, 'proposed_action=',proposed_action, 'maxYPixel=',self.maxYPixel)
+          if ypos_Racket - 1 - self.racketH*0.8125 <= 0 and caction==dconf['moves']['UP']:
+            print('STOP UP, YPOS RACKET=', ypos_Racket, 'bound=',ypos_Racket - 1 - self.racketH/2)
             caction = dconf['moves']['NOMOVE']
-          elif ypos_Racket + 1 + self.racketH/2 >= self.maxYPixel and (proposed_action == dconf['moves']['UP'] or proposed_action == dconf['moves']['NOMOVE']):
-            caction = dconf['moves']['NOMOVE']        
+          elif ypos_Racket + 1 + self.racketH*0.8125 >= self.maxYPixel and caction==dconf['moves']['DOWN']:
+            print('STOP DOWN, YPOS RACKET=',ypos_Racket, 'bound=',ypos_Racket + 1 + self.racketH/2)
+            caction = dconf['moves']['NOMOVE']
+          #else:
+          #  print('YPOS RACKET=',ypos_Racket)
       else:
         proposed_action = -1 #if there is no last_obs
         ypos_Ball = -1 #if there is no last_obs, no position of ball

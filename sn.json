@@ -39,7 +39,7 @@
         "ResumeSimFromFile": "data/20nov4_A0_gcp_synWeights_final.pkl"
     },
     "sim": {
-        "duration": 30000,
+        "duration": 500000,
         "dt": 0.6,
         "verbose": 0,
         "recordStep": 1.0,
@@ -50,8 +50,8 @@
         "RLFakeDownRule": 0,
         "RLFakeStayRule": 0,
         "name": "20nov10_B0_cycle_",	
-        "doquit": 0,
-        "doplot": 1,
+        "doquit": 1,
+        "doplot": 0,
         "saveCellSecs": 0,
         "saveCellConns": 0,
         "targettedRL": 1,
@@ -190,7 +190,7 @@
 	    "VL":{
 		"VD":{"AM":0,"NM":0,"p":0},		
 		"VL":{"AM":4,"NM":0.6,"p":0},
-		"EA":{"AM":7.2,"NM":0.72,"p":0.1},
+		"EA":{"AM":3.6,"NM":0.36,"p":0.1},
 		"EMDOWN":{"AM":1,"NM":0.0,"p":0.08},
 		"EMUP":{"AM":1,"NM":0.0,"p":0.08},
 		"EMSTAY":{"AM":1,"NM":0.0,"p":0.08}		
