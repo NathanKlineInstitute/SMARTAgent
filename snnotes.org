@@ -20808,3 +20808,9 @@ savefig(gifpath()+'perf_compareB.png') # [[./gif/20nov10_20nov9_F0_cycle__step_3
 
 improving ... will take time 
 
+** why does paddle get stuck at corners? (20nov10_A0_cycle_)
+
+maybe because there are a lot more direction selective neurons compared to location specific?
+generally northeast moving ball means paddle should move up so the signal for ball moving northeast
+may overwhelm the location specific information??
+
