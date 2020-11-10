@@ -20826,3 +20826,31 @@ python -i simdat.py backupcfg/20nov10_B0_cycle_sim.json
 
 clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); 
 savefig(gifpath()+'rast.png')
+
+** meanwhile check 20nov9_F0_cycle__step_7_ -->> some improvements
+
+python -i simdat.py backupcfg/20nov9_F0_cycle__step_7_sim.json
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/20nov10_20nov9_F0_cycle__step_7_perf.png]]
+
+lfn = ['20nov9_F0_cycle__step_' + str(i) + '_' for i in range(0,8,1)]
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0,0.4))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/20nov10_20nov9_F0_cycle__step_7_perf_all_steps_so_far.png]]
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((490e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/20nov10_20nov9_F0_cycle__step_7_rast.png]]
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP'],lclr=['r','g'],plotindiv=False)
+savefig(gifpath()+'all_avg_weight.png') # [[./gif/20nov10_20nov9_F0_cycle__step_7_all_avg_weight.png]]
+
+weights getting close to boundary of 2.8 when normalization will activate, can then see if results
+improve further with normalization-induced lower firing rates
+
+lpda = getindivactionreward(lfn)
+csm=cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+lclr = [csm.to_rgba(float(i)/(len(lpda))) for i in range(len(lpda))]
+clf(); plotComparePerf(lpda,lclr,yl=(0,1),lleg=lfn)
+savefig(gifpath()+'perf_compareB.png') # [[./gif/20nov10_20nov9_F0_cycle__step_7_perf_compareB.png]]
+
