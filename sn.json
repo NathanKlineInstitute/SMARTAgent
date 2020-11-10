@@ -14,6 +14,7 @@
         4
     ],
     "movefctr": 1.0,
+    "avoidStuck": 1,
     "rewardcodes": {
         "scorePoint": 1.0,
         "losePoint":  0.0,
@@ -48,7 +49,7 @@
         "RLFakeUpRule": 0,
         "RLFakeDownRule": 0,
         "RLFakeStayRule": 0,
-        "name": "20nov10_A0_cycle_",	
+        "name": "20nov10_B0_cycle_",	
         "doquit": 0,
         "doplot": 1,
         "saveCellSecs": 0,
