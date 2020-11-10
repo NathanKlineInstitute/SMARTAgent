@@ -8951,3 +8951,44 @@ return dSTDPmech, dSTDPmechRec
 
 first need to get started with INTF7.
 
+* 20nov09
+
+-- start using INTF7
+-- started with weights from sn.json
+-- increased VD->EA and VL->EA to 6.6 .... no firing in EA
+-- increased VD->EA and VL->EA to 16.6.... too high firing in EA (~70Hz)
+...reduce 16.6 to 10.6.
+-- decreased VD->EA and VL->EA to 10.6.... still high firing  and EM ~160Hz
+... reduce to 8.6
+-- decreased VD->EA and VL->EA to 8.6 
+
+-- to use INTF7.... need the following
+/opt/anaconda3/lib/python3.7/site-packages/netpyne/network/conn.py
+and
+/opt/anaconda3/lib/python3.7/site-packages/netpyne/cell/pointCell.py
+
+-- on new mac:
+scp hanwar@10.76.252.198:/opt/anaconda3/lib/python3.7/site-packages/netpyne/cell/pointCell.py ~/netpyne/netpyne/cell/.
+scp hanwar@10.76.252.198:/opt/anaconda3/lib/python3.7/site-packages/netpyne/network/conn.py ~/netpyne/netpyne/network/.
+
+-- rerun again with VD->EA and VL->EA of 8.6
+
+-- too high firing rate using stimmod of 35.
+
+-- now use lower values
+       "stimModVD": 25,
+        "stimModVL": 25,
+.... may be these values work.... but no activity in EA. increase VD and VL to EA. increase from 8.6 to 12.
+
+-- 10 might work for VD and VL to EA. with 12, EA fires even when only VL is active. Also try with EA->EM 6 instead of 1.6 which didnt show any activity in EM.
+no activity in EM.
+
+-- 10.6 for VD and VL to EA. 12 for EA->EM.
+
+-- 10.6 for VD and VL to EA. 16 for EA->EM
+
+-- 10.6 for VD and VL to EA. 20 for EA->EM and p = 0.2.
+
+* 20nov10
+
+-- start running on cycle and falcor.
