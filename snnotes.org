@@ -20986,3 +20986,30 @@ savefig(gifpath()+'all_avg_weight.png') # [[./gif/20nov11_20nov10_B1_cycle__step
 
 fig=animInput(InputImages,gifpath()+'_input.mp4') # [[./gif/20nov11_20nov10_B1_cycle__step_1__input.mp4]]
 
+** other adjustments to improve perf
+
+analog output - similar to simon's output encoding?
+higher resolution for visual inputs? 
+higher weight from EV1 -> X ? to have a way out of the explicit avoid stuck rule? or
+other punishment signal for when gets stuck in corner?
+or leave that issue alone for now - note that we're using a 'crutch' - and when get
+better/winning performance go back and see if worth fixing ... 
+
+** try with 1600 EV1 (40x40) neurons 
+
+        "name": "20nov11_C0_cycle_",
+
+since increased the number of EV1 4X reduced their weights to EA, EMDOWN, EMUP somewhat
+though not exactly by 1/4 ... since EV1 have sparse firing rates ... got similar rates in EA (~3 Hz)
+and similar starting rates for EMDOWN, EMUP ... running for 500 s to test ... not noticeably slower
+than with lower number of EV1 ... 
+
+./myrun 32 sn.json
+
+python -i simdat.py backupcfg/20nov11_C0_cycle_sim.json
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png')
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); 
+savefig(gifpath()+'rast.png')
