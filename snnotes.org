@@ -20844,6 +20844,17 @@ fig=animInput(InputImages,gifpath()+'_input.mp4') # [[./gif/20nov10_20nov10_B0_c
 
 will continue this one in a multistep run ... 
 
+    "avoidStuck": 1,
+        "name": "20nov10_B1_cycle_",
+    "simtype": {
+        "ResumeSim": 1,
+        "ResumeSimFromFile": "data/20nov10_B0_cycle_synWeights.pkl"
+    },
+
+python multistepSim.py sn.json 32 20 20nov10_B1_cycle_multi
+
+started ~22:53 ...
+
 ** meanwhile check 20nov9_F0_cycle__step_7_ -->> some improvements
 
 python -i simdat.py backupcfg/20nov9_F0_cycle__step_7_sim.json

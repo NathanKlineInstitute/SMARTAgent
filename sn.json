@@ -35,8 +35,8 @@
     "verbose": 0,
     "stayStepLim": 0,
     "simtype": {
-        "ResumeSim": 0,
-        "ResumeSimFromFile": "data/20nov4_A0_gcp_synWeights_final.pkl"
+        "ResumeSim": 1,
+        "ResumeSimFromFile": "data/20nov10_B0_cycle_synWeights.pkl"
     },
     "sim": {
         "duration": 500000,
@@ -44,12 +44,12 @@
         "verbose": 0,
         "recordStep": 1.0,
         "recordWeightStepSize": 500,
-        "normalizeWeightStepSize": 5000,
+        "normalizeWeightStepSize": 500,
 	"normalizeWeightsAtStart": 0,
         "RLFakeUpRule": 0,
         "RLFakeDownRule": 0,
         "RLFakeStayRule": 0,
-        "name": "20nov10_B0_cycle_",	
+        "name": "20nov10_B1_cycle_",
         "doquit": 1,
         "doplot": 0,
         "saveCellSecs": 0,
