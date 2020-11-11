@@ -20824,8 +20824,25 @@ ok, added a simple rule for that ... will try it out ...
 
 python -i simdat.py backupcfg/20nov10_B0_cycle_sim.json
 
-clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); 
-savefig(gifpath()+'rast.png')
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/20nov10_20nov10_B0_cycle_perf.png]]
+looks much better than w/o the avoidstuck rule ... 
+
+lfn = ['20nov10_B0_cycle_', '20nov9_F0_cycle__step_0_']
+lpda = getindivactionreward(lfn)
+lclr = ['r','b']
+clf(); plotComparePerf(lpda,lclr,yl=(0,1),lleg=lfn)
+savefig(gifpath()+'perf_compareA.png') # [[./gif/20nov10_20nov10_B0_cycle_perf_compareA.png]]
+much better with the avoidstuck rule ... question is whether it's ok to use it
+or other way around ... alternatives are to penalize for spending time in corner, or increase
+weight of visual location neurons ... 
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((490e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/20nov10_20nov10_B0_cycle_rast.png]]
+
+fig=animInput(InputImages,gifpath()+'_input.mp4') # [[./gif/20nov10_20nov10_B0_cycle__input.mp4]]
+
+will continue this one in a multistep run ... 
 
 ** meanwhile check 20nov9_F0_cycle__step_7_ -->> some improvements
 
