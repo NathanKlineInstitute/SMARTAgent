@@ -20995,6 +20995,11 @@ other punishment signal for when gets stuck in corner?
 or leave that issue alone for now - note that we're using a 'crutch' - and when get
 better/winning performance go back and see if worth fixing ... 
 
+other circuit solution for avoidstuck - have more interneurons synapse on EMUP at
+the top and mre interneurons synapse on EMDOWN at the bottom ... but that would only
+work if there was some topology to the EM populations ... or it could be learned
+via I -> E plasticity ... 
+
 ** try with 1600 EV1 (40x40) neurons 
 
         "name": "20nov11_C0_cycle_",
