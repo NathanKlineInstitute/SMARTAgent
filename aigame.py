@@ -205,7 +205,7 @@ class AIGame:
     # update input rates to retinal neurons
     #fr_Images = np.where(dsum_Images>1.0,100,dsum_Images) #Using this to check what number would work for firing rate
     #fr_Images = np.where(dsum_Images<10.0,0,dsum_Images)
-    if self.reducedNet>0:
+    if self.reducedNet:
       if dconf['net']['useBinaryImage']:
         thresh = threshold_otsu(dsum_Images)
         binary_Image = dsum_Images > thresh
