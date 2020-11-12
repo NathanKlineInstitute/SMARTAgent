@@ -1594,6 +1594,9 @@ def trainAgent (t):
               actions.append(dconf['moves']['UP'])
             elif F_DOWNs[ts]>F_UPs[ts]: # DOWN WINS
               actions.append(dconf['moves']['DOWN'])
+            elif dconf['0rand'] and F_DOWNs[ts]==0 and F_UPs[ts]==0: # random move when 0 rate for both pops?
+              lmoves = list(dconf['moves'].values())
+              actions.append(lmoves[np.random.randint(0,len(lmoves))])
             else:
               actions.append(dconf['moves']['NOMOVE']) # No move
               noWinner = True

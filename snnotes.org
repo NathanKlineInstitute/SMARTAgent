@@ -21192,3 +21192,23 @@ fig=animInput(InputImages,gifpath()+'_input.mp4') # [[./gif/20nov12_20nov11_D0_g
 
 should show ongoing score and metrics in animInput ... 
 
+stopped this one for now ... 
+
+** other sim on gcp - no interm reward
+
+no targetted, only score/loss ? ? 
+
+        "name": "20nov12_E0_gcp_",
+
+and use first 500 s of training with targetted + intermediate rewards to bootstrap?
+
+unlikely to work but worth a try ... 
+
+python -i simdat.py backupcfg/20nov12_E0_gcp_sim.json
+
+drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); 
+
+python multistepSim.py sn.json 32 20 20nov12_E0_gcp_multi
+
+started ~16:54 ...
+

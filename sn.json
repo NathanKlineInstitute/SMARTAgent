@@ -13,14 +13,15 @@
         3,
         4
     ],
+    "0rand": 0,
     "movefctr": 1.0,
-    "avoidStuck": 1,
+    "avoidStuck": 0,
     "rewardcodes": {
         "scorePoint": 1.0,
-        "losePoint":  0.0,
-        "followTarget": 0.1,
-        "avoidTarget": -0.01,
-        "hitBall": 0.5
+        "losePoint":  -0.01,
+        "followTarget": 0.0,
+        "avoidTarget": 0.0,
+        "hitBall": 0.0
     },
     "actionsPerPlay": 1,
     "followOnlyTowards": 1,
@@ -39,7 +40,7 @@
         "ResumeSimFromFile": "data/20nov11_C0_cycle_synWeights_final.pkl"
     },
     "sim": {
-        "duration": 500000,
+        "duration": 60000,
         "dt": 0.6,
         "verbose": 0,
         "recordStep": 1.0,
@@ -49,12 +50,12 @@
         "RLFakeUpRule": 0,
         "RLFakeDownRule": 0,
         "RLFakeStayRule": 0,
-        "name": "20nov11_D0_gcp_",
+        "name": "20nov12_E0_gcp_",
         "doquit": 1,
         "doplot": 0,
         "saveCellSecs": 0,
         "saveCellConns": 0,
-        "targettedRL": 1,
+        "targettedRL": 0,
         "tstepPerAction": 20,
         "saveWeights": 1,
         "saveAssignedFiringRates": 0,
@@ -291,7 +292,7 @@
 		"IMT": {"AM":20, "p":0.0225}
 	    }
 	},
-        "EEMWghtThreshMin": 0.9,
+        "EEMWghtThreshMin": 0.95,
         "EEMWghtThreshMax": 1.75,
         "EEMPopNorm": 1,
 	"CellWNorm": {
@@ -377,8 +378,8 @@
             "wmax": 16,
             "RLon": 1,
             "STDPon": 0,
-            "RLlenhebb": 200,
-            "RLlenanti": 200,
+            "RLlenhebb": 2000,
+            "RLlenanti": 2000,
             "useRLexp": 1,
             "RLhebbwt": 0.005,
             "RLantiwt": 0,
