@@ -21027,3 +21027,36 @@ savefig(gifpath()+'perf_compareA.png') # [[./gif/20nov11_20nov11_C0_cycle_perf_c
 higher res for EV1 (red) slightly better in hits/ & score ... although also has very slightly higher firing rates ... 
 
 fig=animInput(InputImages,gifpath()+'_input.mp4') # [[./gif/20nov11_20nov11_C0_cycle__input.mp4]]
+note that in that movie the ball's shape changes when it flies across the screen; it alternates
+between being vertically or horizontally oriented; ...although
+it's probably a thresholding/discretization artifact, this might contribute to some errors
+could check the image processing/downsampling routines and make sure no better way to do it
+(simon suggested taking max instead of mean? would that preserve shape better?)
+
+** continue 1600 EV1 (40x40) with multistep on gcp
+
+copied 20nov11_C0_cycle_synWeights_final.pkl from cycle to nrngames3
+copied 20nov11_C0_cycle_sim.json from cycle to nrngames3
+
+while at it could inc size of direction selective neurons too ...
+and EA ... or just inc size of EV1 ... to 80x80 since motion directions
+are highly redundant but spatial/location info more critical for moving
+to precise location to hit ball (?) ... will do that later ... for now
+will keep with the 1600 EV1, already higher resolution ...
+
+#python -i simdat.py backupcfg/20nov11_D0_gcp_sim.json
+#
+#clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); 
+#savefig(gifpath()+'rast.png')
+#
+#clf(); drawcellVm(simConfig,lclr=['r','g','b','c','m','y'])
+
+    "simtype": {
+        "ResumeSim": 1,
+        "ResumeSimFromFile": "data/20nov11_C0_cycle_synWeights_final.pkl"
+    },
+
+python multistepSim.py sn.json 32 20 20nov11_D0_gcp_multi
+
+started ~23:21 ...
+
