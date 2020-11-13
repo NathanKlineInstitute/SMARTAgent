@@ -21269,3 +21269,18 @@ order information.
 
 worth a try ... 
 
+** new opt stochmove
+
+when stochmove == 1 then randomly pick an up/down move if it's a tie between EMUP,EMDOWN (including if both 0)
+
+** simpler arch - based on karpathy
+
+    "stochmove": 1,
+        "name": "20nov13_A0_lp_",
+
+python -i simdat.py backupcfg/20nov13_A0_lp_sim.json
+
+drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); 
+
+drawcellVm(simConfig,lclr=['r','g','b','c','m','y'])
+

@@ -1572,11 +1572,17 @@ def trainAgent (t):
         for ts in range(int(dconf['actionsPerPlay'])): fid4.write('\t%0.1f' % F_STAYs[ts])
       fid4.write('\n')
       actions = []
-      randmove = 0
-      if 'randmove' in dconf: randmove=dconf['randmove']
-      if randmove:
+      if dconf['randmove']:
         lmoves = list(dconf['moves'].values())
         for ts in range(int(dconf['actionsPerPlay'])): actions.append(lmoves[np.random.randint(0,len(lmoves))])
+      elif dconf['stochmove']:
+        if F_UPs[ts]>F_DOWNs[ts]: # UP WINS
+          actions.append(dconf['moves']['UP'])
+        elif F_DOWNs[ts]>F_UPs[ts]: # DOWN WINS
+          actions.append(dconf['moves']['DOWN'])
+        else:
+          lmoves = [dconf['moves']['UP'], dconf['moves']['DOWN']]
+          actions.append(lmoves[np.random.randint(0,len(lmoves))])
       else:
         for ts in range(int(dconf['actionsPerPlay'])):
           if dnumc['EMSTAY']>0: 
