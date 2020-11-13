@@ -41,7 +41,7 @@
         "ResumeSimFromFile": "data/20nov11_C0_cycle_synWeights_final.pkl"
     },
     "sim": {
-        "duration": 3000,
+        "duration": 10000,
         "dt": 0.6,
         "verbose": 0,
         "recordStep": 1.0,
@@ -51,7 +51,7 @@
         "RLFakeUpRule": 0,
         "RLFakeDownRule": 0,
         "RLFakeStayRule": 0,
-        "name": "20nov13_A0_lp_",
+        "name": "20nov13_A0_gcp_",
         "doquit": 0,
         "doplot": 1,
         "saveCellSecs": 0,
@@ -100,10 +100,10 @@
 	    "IA":0,
 	    "EA2": 0,
 	    "IA2": 0,	    
-	    "EMDOWN":32,
-	    "EMUP":32,
+	    "EMDOWN":16,
+	    "EMUP":16,
 	    "EMSTAY":0,
-	    "IM":16,
+	    "IM":8,
 	    "IMUP": 0,
 	    "IMDOWN": 0,
 	    "IMSTAY": 0},
@@ -192,7 +192,7 @@
 	    "VL":{
 		"VD":{"AM":0,"NM":0,"p":0},		
 		"VL":{"AM":4,"NM":0.6,"p":0},
-		"EA":{"AM":0.72,"NM":0.04,"p":1},
+		"EA":{"AM":0.5,"NM":0.01,"p":1},
 		"EMDOWN":{"AM":0.5,"NM":0.0,"p":0.0},
 		"EMUP":{"AM":0.5,"NM":0.0,"p":0.0},
 		"EMSTAY":{"AM":0.5,"NM":0.0,"p":0.0}		
@@ -200,7 +200,7 @@
 	    "VD":{
 		"VL":{"AM":0,"NM":0,"p":0},
 		"VD":{"AM":0,"NM":0,"p":0},
-		"EA":{"AM":0.72,"NM":0.04,"p":1},
+		"EA":{"AM":0.5,"NM":0.01,"p":1},
 		"EMDOWN":{"AM":0.5,"NM":0.0,"p":0.0},
 		"EMUP":{"AM":0.5,"NM":0.0,"p":0.0},
 		"EMSTAY":{"AM":0.5,"NM":0.0,"p":0.0},
@@ -375,7 +375,7 @@
             "maxreward": 0.0 
          },
         "AMPA": {
-            "wbase": 0.16,
+            "wbase": 0.15,
             "wmax": 20,
             "RLon": 1,
             "STDPon": 0,
