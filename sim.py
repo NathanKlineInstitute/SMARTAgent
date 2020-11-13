@@ -104,9 +104,9 @@ def getpadding ():
 dnumc_padx, dtopoldivcons,dtopolconvcons,allpops_withconvtopology,allpops_withdivtopology = getpadding()
   
 if dnumc['EMSTAY']>0:
-  lrecpop = ['EMUP', 'EMDOWN','EMSTAY','EA','EA2'] # which populations to record from
+  lrecpop = ['EMUP', 'EMDOWN','EMSTAY'] # which populations to record from
 else:
-  lrecpop = ['EMUP', 'EMDOWN','EA','EA2'] # which populations to record from
+  lrecpop = ['EMUP', 'EMDOWN'] # which populations to record from
   
 if cmat['VD']['VD']['p'] > 0.0 or \
    cmat['VD']['VL']['p'] > 0.0 or \
@@ -118,6 +118,12 @@ if cmat['VD']['VD']['p'] > 0.0 or \
     lrecpop.append(pop)
   if dconf['net']['VisualFeedback'] and dnumc['ER']>0: lrecpop.append('ER')
 
+if dnumc['EA']>0 and (dconf['net']['RLconns']['RecurrentANeurons'] or dconf['net']['STDPconns']['RecurrentANeurons']):
+  lrecpop.append('EA')
+
+if dnumc['EA2']>0 and (dconf['net']['RLconns']['RecurrentA2Neurons'] or dconf['net']['STDPconns']['RecurrentA2Neurons']):
+  lrecpop.append('EA2')
+  
 if dconf['net']['RLconns']['Visual'] or dconf['net']['STDPconns']['Visual']:
   if lrecpop.count('EV4')==0: lrecpop.append('EV4')
   if lrecpop.count('EMT')==0: lrecpop.append('EMT')
@@ -1308,20 +1314,45 @@ def normalizeAdjustableWeights (sim, t, lpop):
     davg = getAverageAdjustableWeights(sim, lpop)
     try:
       dfctr = {}
+      MinFctr, MaxFctr = dconf['net']['EEMWghtThreshMin'], dconf['net']['EEMWghtThreshMax']      
       # normalize weights across populations to avoid bias    
-      initw = cmat['EA']['EM']['AM'] # initial average weight <<-- THAT ASSUMES ONLY USING NORM ON EM POPULATIONS!
+      initavgW = cmat['EA']['EM']['AM'] # initial average weight <<-- THAT ASSUMES ONLY USING NORM ON EM POPULATIONS!
       if dconf['net']['EEMPopNorm']:
-        curravgw = np.mean([davg[k] for k in lpop]) # current average weight
-        if curravgw <= 0.0: curravgw = initw
-        for k in lpop: dfctr[k] = initw / curravgw
-      else:
-        for k in lpop:
-          if davg[k] < dconf['net']['EEMWghtThreshMin']:
-            dfctr[k] = dconf['net']['EEMWghtThreshMin'] / davg[k]
-          elif davg[k] > dconf['net']['EEMWghtThreshMax']:
-            dfctr[k] = dconf['net']['EEMWghtThreshMax'] / davg[k]
+        curravgW = np.mean([davg[k] for k in lpop]) # current average weight
+        if curravgW <= 0.0: curravgw = initavgW
+        if curravgW > 0 and curravgW != initavgW:
+          fctrA = curravgW / initavgW
+          dochange = False
+          if fctrA < MinFctr:
+            fctrB = (MinFctr * initavgW) / curravgW # factor to restore weights to boundary
+            dochange = True
+          elif fctrA > MaxFctr:            
+            # fctrB = ((1.0+MaxFctr/2.0)*initavgW) / curravgW # factor to move weight to mid btwn start and max
+            fctrB = initavgW / curravgW # go back to initial
+            dochange = True
+          # print('initW:',initW,'currW:',currW,'fctr:',fctr)
+          if dochange:
+            for k in lpop: dfctr[k] = fctrB
           else:
-            dfctr[k] = 1.0
+            for k in lpop: dfctr[k] = 1.0    
+      else:
+        MinFctr, MaxFctr = dconf['net']['EEMWghtThreshMin'], dconf['net']['EEMWghtThreshMax']
+        for k in lpop:
+          curravgW = davg[k]
+          if curravgW > 0 and curravgW != initavgW:
+            fctrA = curravgW / initavgW
+            dochange = False
+            if fctrA < MinFctr:
+              fctrB = (MinFctr * initavgW) / curravgW # factor to restore weights to boundary
+              dochange = True
+            elif fctrA > MaxFctr:
+              fctrB = (MaxFctr * initavgW) / curravgW # factor to restore weights to boundary
+              dochange = True
+            # print('initW:',initW,'currW:',currW,'fctr:',fctr)
+            if dochange:
+              dfctr[k] = fctrB
+            else:
+              dfctr[k] = 1.0
       if sim.rank==0: print('sim.rank=',sim.rank,'davg:',davg,'dfctr:',dfctr)
       mulAdjustableWeights(sim,dfctr)
     except:
@@ -1716,7 +1747,9 @@ def trainAgent (t):
   if NBsteps % normalizeWeightStepSize == 0:
     if dconf['verbose'] > 0 and sim.rank==0:
       print('Weight Normalize Time:', t, 'NBsteps:',NBsteps,'normalizeWeightStepSize:',normalizeWeightStepSize)
+    sim.pc.barrier()
     normalizeAdjustableWeights(sim, t, lrecpop)
+    sim.pc.barrier()    
   if dconf['net']['homPlast']['On']:
     if NBsteps % dconf['net']['homPlast']['hsIntervalSteps'] == 0:
       hsInterval = tstepPerAction*dconf['actionsPerPlay']*dconf['net']['homPlast']['hsIntervalSteps']
