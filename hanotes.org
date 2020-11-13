@@ -8992,3 +8992,27 @@ no activity in EM.
 * 20nov10
 
 -- start running on cycle and falcor.
+
+-- while i was tuning parameters for reduced network model with INTF7, sam raised a question:
+Is it possible that when the racket is half outside the corner, the network balance gets distrubed... 
+... because now we have higher contribution from direction selective neurons as compared to the location neurons....
+... because half of the pixels of racket wont get activated because they are outside field of view.
+... This might force racket to stay at the location (getting stuck).
+
+I think its possible for the reason mentioned above and for another reason too.
+When the racket gets stuck, it will not produce any motion field and therefore will further reduce its impact on motor areas ...
+...that will reduce input to motor cortex.
+
+-- I proposed that before we try a circuit level fix to this problem, why dont we limit the actions when the racket is close to the edges.
+
+-- while sam started looking at the ycoords of the racket, he observed that for an action, racket moved 40 pixels.
+this raised suspicion that what was going on?
+
+-- we suspected that there might be a bug in location detection.
+
+-- 2 different algorithms are used for location detection. findobj for location detection involved in reward generation...
+and centroid tracking for object direction computations.
+
+-- i think that this bug associated with findobj should not have any impact on reward assignment, but think its better to double check it
+
+-- now trying to think about ways to test it.
