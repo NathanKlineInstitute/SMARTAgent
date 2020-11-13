@@ -21275,6 +21275,10 @@ when stochmove == 1 then randomly pick an up/down move if it's a tie between EMU
 
 ** simpler arch - based on karpathy
 
+it's just all to all for two layers ... and up/down w/o any stay moves
+plast between VL,VD -> EA -> EM
+but not clear VL,VD -> EA should use RL/STDP ... 
+
     "stochmove": 1,
         "name": "20nov13_A0_lp_",
 
