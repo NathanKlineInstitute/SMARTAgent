@@ -8992,3 +8992,175 @@ no activity in EM.
 * 20nov10
 
 -- start running on cycle and falcor.
+
+-- run 20 sec sim "20nov10_A0_cycle_reduced_2obj_INTF7_" with _v4 game. dt = 0.2.
+
+-- run 20 sec sim "20nov10_A1_cycle_reduced_2obj_INTF7_" with _v4 game. dt = 0.6 to speed up.
+
+-- run 20 sec sim "20nov10_A2_cycle_reduced_2obj_INTF7_" with _v4 game. dt = 0.6 to speed up.
+stimModVD and stimModVL 20.
+
+
+* 20nov12
+
+stimModVD: 30 (35)
+stimModVL: 30 (35)
+VL->EA: 10 (1.8)
+VD->EA: 10 (3.6)
+EA->EM: 20 (1.8)
+
+-- no activity in EA or EM with 
+
+stimModVD: 35
+stimModVL: 35
+VL->EA: 1.8
+VD->EA: 3.6
+EA->EM: 1.8
+
+-- see activity in EA but not in EM.
+
+stimModVD: 35
+stimModVL: 35
+VL->EA: 10
+VD->EA: 0
+EA->EM: 1.8
+
+but the values should be used to evoke activity in EA only when both VL and VD neurons are active. but here we didnt connect VD with EA.
+must reduce VL->EA first or alternatively reduce stimModVD and stimModVL
+
+-- still sparse activity in EA just driven by VL
+
+stimModVD: 30
+stimModVL: 30
+VL->EA: 10
+VD->EA: 0
+EA->EM: 1.8
+
+now reduce VL->EA
+
+-- activity in EA stopped
+
+stimModVD: 30
+stimModVL: 30
+VL->EA: 8
+VD->EA: 0
+EA->EM: 1.8
+
+now test same with only VD ->EA
+
+-- no activity in EA.
+
+stimModVD: 30
+stimModVL: 30
+VL->EA: 0
+VD->EA: 8
+EA->EM: 1.8
+
+
+-- too much sparse
+
+stimModVD: 30
+stimModVL: 30
+VL->EA: 8
+VD->EA: 8
+EA->EM: 1.8
+
+
+-- may be too much activity
+
+stimModVD: 30
+stimModVL: 30
+VL->EA: 8
+VD->EA: 16
+EA->EM: 1.8
+
+
+-- probably OK for now.....
+
+stimModVD: 30
+stimModVL: 30
+VL->EA: 8
+VD->EA: 12
+EA->EM: 1.8
+
+... now need to play with EA->EM
+
+-- only a few actions
+
+FeedForwardAtoM: 0
+stimModVD: 30
+stimModVL: 30
+VL->EA: 8
+VD->EA: 12
+EA->EM: 10
+
+
+-- M neurons fired whenever EA neurons fired.
+
+FeedForwardAtoM: 0
+stimModVD: 30
+stimModVL: 30
+VL->EA: 8
+VD->EA: 12
+EA->EM: 20
+
+
+-- M neurons stopped firing at 6 sec.
+
+FeedForwardAtoM: 1
+stimModVD: 30
+stimModVL: 30
+VL->EA: 8
+VD->EA: 12
+EA->EM: 20
+... fix RL parameters......
+
+-- seems to work.
+
+FeedForwardAtoM: 1
+stimModVD: 30
+stimModVL: 30
+VL->EA: 8
+VD->EA: 12
+EA->EM: 20
+"RL":{
+  "AMPA":{
+    "wbase":0.16,
+    "wmax":16,
+    RLlenhebb:100,
+    RLlenanti:100,
+    useRLexp:1,
+    RLhebbwt:0.005,
+    RLantiwt:0,
+    tauhebb:10,
+    tauanti:10,
+    RLwinhebb:10,
+  }
+}
+
+-- run for 200 sec on cycle. "20nov12_A0_cycle_reduced_2obj_INTF7"
+
+FeedForwardAtoM: 1
+stimModVD: 30
+stimModVL: 30
+VL->EA: 8
+VD->EA: 12
+EA->EM: 20
+"RL":{
+  "AMPA":{
+    "wbase":10,
+    "wmax":40,
+    RLlenhebb:100,
+    RLlenanti:100,
+    useRLexp:1,
+    RLhebbwt:0.005,
+    RLantiwt:0,
+    tauhebb:10,
+    tauanti:10,
+    RLwinhebb:10,
+  }
+}
+
+-- run for 2000 sec on cycle. "20nov12_A1_cycle_reduced_2obj_INTF7"
+
+-- before pushing sim.json used for  "20nov12_A1_cycle_reduced_2obj_INTF7", remove "avoidStuck":1,

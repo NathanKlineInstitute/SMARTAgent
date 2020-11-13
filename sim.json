@@ -21,6 +21,7 @@
         4
     ],
     "movefctr": 1.0,
+    "avoidStuck":1,
     "rewardcodes": {
         "scorePoint": 0.0,
         "losePoint":  0.0,
@@ -45,8 +46,8 @@
         "ResumeSimFromFile": "data/20oct23_A0_cycle_synWeights_final.pkl"
     },
     "sim": {
-        "duration": 20000,
-        "dt": 0.2,
+        "duration": 200000,
+        "dt": 0.6,
         "verbose": 0,
         "recordStep": 1.0,
         "recordWeightStepSize": 500,
@@ -55,9 +56,9 @@
         "RLFakeUpRule": 0,
         "RLFakeDownRule": 0,
         "RLFakeStayRule": 0,
-        "name": "20nov09_A0_local_reduced_2obj_INTF7_",
-        "doquit": 1,
-        "doplot": 0,
+        "name": "20nov12_A0_cycle_reduced_2obj_INTF7_",
+        "doquit": 0,
+        "doplot": 1,
         "saveCellSecs": 0,
         "saveCellConns": 0,
         "targettedRL": 1,
@@ -103,7 +104,7 @@
 	    "EMT":0,
 	    "IMT":0,
 	    "EA":3200,
-        "IA":640,
+        "IA":0,
         "EA2": 0,
 	    "IA2": 0,
 	    "EMDOWN":100,
@@ -177,12 +178,12 @@
             "FeedForwardDirNtoM":0,
             "FeedForwardLocNtoM":0,	    
             "FeedForwardAtoM":1,
-            "FeedForwardAtoA2":1,	    
-            "FeedForwardA2toM":1,
+            "FeedForwardAtoA2":0,	    
+            "FeedForwardA2toM":0,
             "FeedbackLocNeurons":0,
-            "RecurrentMNeurons":1,
+            "RecurrentMNeurons":0,
             "RecurrentANeurons":0,
-            "RecurrentA2Neurons":1,
+            "RecurrentA2Neurons":0,
             "FeedbackAtoDirN":0,
             "FeedbackAtoLocN":0
         },	
@@ -192,13 +193,13 @@
         "DirMaxRate": 150.0,
         "LocMaxRate": 150.0,
         "FiringRateCutoff" : 50.0,
-        "stimModVD": 25,
-        "stimModVL": 25,
+        "stimModVD": 30,
+        "stimModVL": 30,
 	"cmat": {
 	    "VL":{
             "VD":{"AM":0,"NM":0,"p":0},		
             "VL":{"AM":4,"NM":0.6,"p":0},
-            "EA":{"AM":10.6,"NM":0.36,"p":0.1},
+            "EA":{"AM":8,"NM":0.36,"p":0.1},
             "EMDOWN":{"AM":0.5,"NM":0.001,"p":0.08},
             "EMUP":{"AM":0.5,"NM":0.001,"p":0.08},
             "EMSTAY":{"AM":0.5,"NM":0.001,"p":0.08}		
@@ -206,7 +207,7 @@
             "VD":{
             "VL":{"AM":0,"NM":0,"p":0},
             "VD":{"AM":0,"NM":0,"p":0},
-            "EA":{"AM":10.6,"NM":0.36,"p":0.1},
+            "EA":{"AM":12,"NM":0.36,"p":0.1},
             "EMDOWN":{"AM":0.5,"NM":0.001,"p":0.08},
             "EMUP":{"AM":0.5,"NM":0.001,"p":0.08},
             "EMSTAY":{"AM":0.5,"NM":0.001,"p":0.08},
@@ -221,8 +222,8 @@
             "EA":{
             "EA":{"AM":1.2,"NM":0.12,"p":0.0},
             "EA2":{"AM":1.2,"NM":0.12,"p":0.2},
-            "EM":{"AM":20,"NM":0.001,"p":0.2},
-            "IA":{"AM": 10, "p":0.1}
+            "EM":{"AM":20,"NM":0.001,"p":0.1},
+            "IA":{"AM":10, "p":0.1}
             },
             "EA2":{
             "EA":{"AM":1.2,"NM":0.12,"p":0.0},
@@ -299,8 +300,8 @@
             "IMT": {"AM":20, "p":0.0225}
             }
         },
-        "EEMWghtThreshMin": 6.25e-06,
-        "EEMWghtThreshMax": 0.00032,
+        "EEMWghtThreshMin": 0.9,
+        "EEMWghtThreshMax": 30,
         "EEMPopNorm": 1,
 	"CellWNorm": {
 	    "On": 0,
@@ -381,20 +382,20 @@
             "maxreward": 0.0 
         },	
         "AMPA": {
-            "wbase": 0.0005,
-            "wmax": 0.04,
+            "wbase": 0.16,
+            "wmax": 16,
             "RLon": 1,
 	    "STDPon": 0,
-            "RLlenhebb": 200,
-            "RLlenanti": 200,
+            "RLlenhebb": 100,
+            "RLlenanti": 100,
             "useRLexp": 1,
-            "RLhebbwt": 7.5e-05,
-            "RLantiwt": -7.5e-05,
+            "RLhebbwt": 0.005,
+            "RLantiwt": 0,
             "hebbwt": 0.0,
             "antiwt": 0.0,
             "tauhebb": 10,
             "tauanti": 10,	    
-            "RLwindhebb": 50,
+            "RLwindhebb": 10,
             "softthresh": 0,
             "verbose": 0,
 	    "maxreward": 0.0
