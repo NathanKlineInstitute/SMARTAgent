@@ -21210,5 +21210,5 @@ drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values()))));
 
 python multistepSim.py sn.json 32 20 20nov12_E0_gcp_multi
 
-started ~16:54 ...
+started ~20:56 ...
 
