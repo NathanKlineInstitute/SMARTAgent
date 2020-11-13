@@ -21212,3 +21212,60 @@ python multistepSim.py sn.json 32 20 20nov12_E0_gcp_multi
 
 started ~20:56 ...
 
+* 20nov13
+** check output from 20nov12_E0_gcp__step_4_
+
+python -i simdat.py backupcfg/20nov12_E0_gcp__step_4_sim.json
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/20nov13_20nov12_E0_gcp__step_4_perf.png]]
+expected it to be doing worse ... given only the sparse rewards ... maybe due
+to initial training with intermediate rewards ...
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((490e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/20nov13_20nov12_E0_gcp__step_4_rast.png]]
+rates are ok ... but overall the activity is sparse/bursty and there aren't moves
+generated on each step ... too many 0s ... might do better with some firing on every step
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP'],lclr=['r','g'],plotindiv=False)
+savefig(gifpath()+'all_avg_weight.png') # [[./gif/20nov13_20nov12_E0_gcp__step_4_all_avg_weight.png]]
+weights are still going up on average due to model scoring points, and in between down slightly each time
+(more numerous) a point is lost. 
+
+lfn = ['20nov11_C0_cycle_'] # sim with the intermediate rewards
+for i in range(5): lfn.append('20nov12_E0_gcp__step_'+str(i)+'_')
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0,0.4))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/20nov13_20nov12_E0_gcp__step_4_perf_all_steps_so_far.png]]
+not clear getting better ... ? maybe slightly ... note that 0-500 s is using the intermediate
+training, then at 500 s it's turned off and only uses score/lose ... might improve a bit
+ylim((0.25,0.375))
+savefig(gifpath()+'perf_all_steps_so_farB.png') # [[./gif/20nov13_20nov12_E0_gcp__step_4_perf_all_steps_so_farB.png]]
+ylim((0.04,0.14))
+savefig(gifpath()+'perf_all_steps_so_farC.png') # [[./gif/20nov13_20nov12_E0_gcp__step_4_perf_all_steps_so_farC.png]]
+
+lpda = getindivactionreward(lfn)
+csm=cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+lclr = [csm.to_rgba(float(i)/(len(lpda))) for i in range(len(lpda))]
+clf(); plotComparePerf(lpda,lclr,yl=(0,1.5),lleg=lfn)
+savefig(gifpath()+'perf_compareD.png') # [[./gif/20nov13_20nov12_E0_gcp__step_4_perf_compareD.png]]
+step 3 seems best ... and that's after intermediate reward was turned off ... 
+
+** useful karpathy article
+
+https://karpathy.github.io/2016/05/31/rl/
+
+2 layers with policy gradient
+first hidden layer gets all inputs (all to all; 100 neurons), second layer gets all from first hidden
+layer and uses that to make decision stochastically. when probability of output variable > threshold
+produce an up move, otherwise down (no stay move used). uses gradient descent to train weights to
+hidden layer and to policy output. makes the argument that credit assignment problem does not have to
+be solved, just twiddling the weights over time will smooth out the errors in credit assignment.
+would a similar architecture work in our case?
+
+stochastic decisions would allow removing one population of EM (or just a single output neuron)
+as well as the interneurons. but would require learning all to hidden layer, which is first
+order information.
+
+worth a try ... 
+
