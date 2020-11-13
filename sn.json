@@ -57,7 +57,7 @@
         "saveCellSecs": 0,
         "saveCellConns": 0,
         "targettedRL": 0,
-        "tstepPerAction": 20,
+        "tstepPerAction": 40,
         "saveWeights": 1,
         "saveAssignedFiringRates": 0,
 	"useReducedNetwork": 0
@@ -97,13 +97,13 @@
 	    "EMT":0,
 	    "IMT":0,
 	    "EA":100,
-	    "IA":0,
+	    "IA":25,
 	    "EA2": 0,
 	    "IA2": 0,	    
-	    "EMDOWN":16,
-	    "EMUP":16,
+	    "EMDOWN":1,
+	    "EMUP":1,
 	    "EMSTAY":0,
-	    "IM":8,
+	    "IM":1,
 	    "IMUP": 0,
 	    "IMDOWN": 0,
 	    "IMSTAY": 0},
@@ -192,7 +192,7 @@
 	    "VL":{
 		"VD":{"AM":0,"NM":0,"p":0},		
 		"VL":{"AM":4,"NM":0.6,"p":0},
-		"EA":{"AM":0.5,"NM":0.01,"p":1},
+		"EA":{"AM":0.625,"NM":0.0,"p":1},
 		"EMDOWN":{"AM":0.5,"NM":0.0,"p":0.0},
 		"EMUP":{"AM":0.5,"NM":0.0,"p":0.0},
 		"EMSTAY":{"AM":0.5,"NM":0.0,"p":0.0}		
@@ -200,7 +200,7 @@
 	    "VD":{
 		"VL":{"AM":0,"NM":0,"p":0},
 		"VD":{"AM":0,"NM":0,"p":0},
-		"EA":{"AM":0.5,"NM":0.01,"p":1},
+		"EA":{"AM":0.625,"NM":0.0,"p":1},
 		"EMDOWN":{"AM":0.5,"NM":0.0,"p":0.0},
 		"EMUP":{"AM":0.5,"NM":0.0,"p":0.0},
 		"EMSTAY":{"AM":0.5,"NM":0.0,"p":0.0},
@@ -215,8 +215,8 @@
 	    "EA":{
 		"EA":{"AM":1.2,"NM":0.12,"p":0.0},
 		"EA2":{"AM":1.2,"NM":0.12,"p":0.2},
-		"EM":{"AM":2,"NM":0.0,"p":1},
-		"IA":{"AM": 10, "p":0.1}
+		"EM":{"AM":3,"NM":0.0,"p":1},
+		"IA":{"AM": 10, "p":0.15}
 	    },
 	    "EA2":{
 		"EA":{"AM":1.2,"NM":0.12,"p":0.0},
@@ -256,7 +256,7 @@
 		"EM": {"GA":10, "p":0.125}
 	    },
 	    "IA": {
-		"EA": {"GA":5, "p":0.1},
+		"EA": {"GA":5, "p":0.25},
 		"IA": {"GA":2.5, "p":0.1}
 	    },
 	    "IA2": {
@@ -312,7 +312,7 @@
         },
         "EEMRecProbCross": 0,
         "VisualFeedback": 0,
-        "weightVar": 0.75,
+        "weightVar": 0.9,
 	"delayMin": 2,
 	"delayMax": 4
     },
@@ -375,7 +375,7 @@
             "maxreward": 0.0 
          },
         "AMPA": {
-            "wbase": 0.15,
+            "wbase": 0.0625,
             "wmax": 20,
             "RLon": 1,
             "STDPon": 0,
