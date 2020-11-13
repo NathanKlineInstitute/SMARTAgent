@@ -15,7 +15,7 @@
     ],
     "0rand": 0,
     "movefctr": 1.0,
-    "avoidStuck": 0,
+    "avoidStuck": 1,
     "rewardcodes": {
         "scorePoint": 1.0,
         "losePoint":  -0.01,
