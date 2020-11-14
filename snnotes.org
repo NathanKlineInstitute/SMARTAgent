@@ -21362,3 +21362,13 @@ add these:
 if paddle < 8 go down
 if paddle > 152 go up
 
+** sim with EA2 on cycle (20nov13_B0_cycle_)
+
+have plast in EA2 recurrent and EA2 -> EM, EA -> EA2
+no targetted RL, no intermediate ... only score/loss
+but have avoidstuck on ...
+
+python multistepSim.py sn.json 32 20 20nov13_B0_gcp_multi
+
+started ~23:25 ...
+

@@ -13,7 +13,7 @@
         3,
         4
     ],
-    "stochmove": 1,
+    "stochmove": 0,
     "0rand": 0,
     "movefctr": 1.0,
     "avoidStuck": 1,
@@ -41,7 +41,7 @@
         "ResumeSimFromFile": "data/20nov11_C0_cycle_synWeights_final.pkl"
     },
     "sim": {
-        "duration": 10000,
+        "duration": 500000,
         "dt": 0.6,
         "verbose": 0,
         "recordStep": 1.0,
@@ -51,9 +51,9 @@
         "RLFakeUpRule": 0,
         "RLFakeDownRule": 0,
         "RLFakeStayRule": 0,
-        "name": "20nov13_A0_cycle_",
-        "doquit": 0,
-        "doplot": 1,
+        "name": "20nov13_B0_cycle_",
+        "doquit": 1,
+        "doplot": 0,
         "saveCellSecs": 0,
         "saveCellConns": 0,
         "targettedRL": 0,
@@ -96,14 +96,14 @@
 	    "IV4":0,
 	    "EMT":0,
 	    "IMT":0,
-	    "EA":100,
-	    "IA":25,
-	    "EA2": 0,
-	    "IA2": 0,	    
-	    "EMDOWN":1,
-	    "EMUP":1,
+	    "EA":2800,
+	    "IA":0,
+	    "EA2": 100,
+	    "IA2": 25,	    
+	    "EMDOWN":100,
+	    "EMUP":100,
 	    "EMSTAY":0,
-	    "IM":1,
+	    "IM":100,
 	    "IMUP": 0,
 	    "IMDOWN": 0,
 	    "IMSTAY": 0},
@@ -166,8 +166,8 @@
             "Visual":0,
             "RecurrentDirNeurons":0,
             "RecurrentLocNeurons":0,
-            "FeedForwardDirNtoA":1,
-            "FeedForwardLocNtoA":1,
+            "FeedForwardDirNtoA":0,
+            "FeedForwardLocNtoA":0,
             "FeedForwardDirNtoM":0,
             "FeedForwardLocNtoM":0,	    
             "FeedForwardAtoM":1,
@@ -192,37 +192,37 @@
 	    "VL":{
 		"VD":{"AM":0,"NM":0,"p":0},		
 		"VL":{"AM":4,"NM":0.6,"p":0},
-		"EA":{"AM":0.625,"NM":0.0,"p":1},
-		"EMDOWN":{"AM":0.5,"NM":0.0,"p":0.0},
-		"EMUP":{"AM":0.5,"NM":0.0,"p":0.0},
-		"EMSTAY":{"AM":0.5,"NM":0.0,"p":0.0}		
+		"EA":{"AM":3.6,"NM":0.36,"p":0.1},
+		"EMDOWN":{"AM":1,"NM":0.0,"p":0.08},
+		"EMUP":{"AM":1,"NM":0.0,"p":0.08},
+		"EMSTAY":{"AM":1,"NM":0.0,"p":0.08}		
 	    },
 	    "VD":{
 		"VL":{"AM":0,"NM":0,"p":0},
 		"VD":{"AM":0,"NM":0,"p":0},
-		"EA":{"AM":0.625,"NM":0.0,"p":1},
-		"EMDOWN":{"AM":0.5,"NM":0.0,"p":0.0},
-		"EMUP":{"AM":0.5,"NM":0.0,"p":0.0},
-		"EMSTAY":{"AM":0.5,"NM":0.0,"p":0.0},
+		"EA":{"AM":3.6,"NM":0.36,"p":0.1},
+		"EMDOWN":{"AM":0.5,"NM":0.0,"p":0.08},
+		"EMUP":{"AM":0.5,"NM":0.0,"p":0.08},
+		"EMSTAY":{"AM":0.5,"NM":0.0,"p":0.08},
 		"ID": {"AM":10, "p":0.03}
 	    },
 	    "EM":{
-		"EM":{"AM":1.6,"NM":0.0,"p":0.0},
+		"EM":{"AM":1.2,"NM":0.0,"p":0.15},
 		"EA":{"AM":0,"NM":0,"p":0.0},
 		"IRecip": {"AM":20, "NM":0, "p":0.0625},
 		"IM":{"AM":10,"p":0.15}
 	    },
 	    "EA":{
 		"EA":{"AM":1.2,"NM":0.12,"p":0.0},
-		"EA2":{"AM":1.2,"NM":0.12,"p":0.2},
-		"EM":{"AM":3,"NM":0.0,"p":1},
-		"IA":{"AM": 10, "p":0.15}
+		"EA2":{"AM":1.2,"NM":0.0,"p":0.15},
+		"EM":{"AM":1.2,"NM":0.0,"p":0.15},
+		"IA":{"AM": 10, "p":0.1}
 	    },
 	    "EA2":{
 		"EA":{"AM":1.2,"NM":0.12,"p":0.0},
-		"EA2":{"AM":1.2,"NM":0.12,"p":0.1},
-		"EM":{"AM":1.2,"NM":0.12,"p":0.2},
-		"IA2":{"AM": 10, "p":0.0625}
+		"EA2":{"AM":1.2,"NM":0.0,"p":0.15},
+		"EM":{"AM":1.2,"NM":0.0,"p":0.15},
+		"IA2":{"AM": 10, "p":0.15}
 	    },	   	    
 	    "IR": {
 		"ER": {"GA": 10, "p":0.0625}
@@ -256,7 +256,7 @@
 		"EM": {"GA":10, "p":0.125}
 	    },
 	    "IA": {
-		"EA": {"GA":5, "p":0.25},
+		"EA": {"GA":5, "p":0.1},
 		"IA": {"GA":2.5, "p":0.1}
 	    },
 	    "IA2": {
@@ -294,7 +294,7 @@
 	    }
 	},
         "EEMWghtThreshMin": 0.9,
-        "EEMWghtThreshMax": 2.0,
+        "EEMWghtThreshMax": 2.3,
         "EEMPopNorm": 1,
 	"CellWNorm": {
 	    "On": 0,
@@ -312,7 +312,7 @@
         },
         "EEMRecProbCross": 0,
         "VisualFeedback": 0,
-        "weightVar": 0.9,
+        "weightVar": 0.5,
 	"delayMin": 2,
 	"delayMax": 4
     },
@@ -375,14 +375,14 @@
             "maxreward": 0.0 
          },
         "AMPA": {
-            "wbase": 0.0625,
-            "wmax": 20,
+            "wbase": 0.14,
+            "wmax": 16,
             "RLon": 1,
             "STDPon": 0,
             "RLlenhebb": 2000,
             "RLlenanti": 2000,
             "useRLexp": 1,
-            "RLhebbwt": 0.001,
+            "RLhebbwt": 0.005,
             "RLantiwt": 0,
             "hebbwt": 0.0,
             "antiwt": 0.0,
