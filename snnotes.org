@@ -21288,7 +21288,7 @@ drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values()))));
 
 drawcellVm(simConfig,lclr=['r','g','b','c','m','y'])
 
-** check output from 20nov10_B1_cycle__step_17_
+** check output from 20nov10_B1_cycle__step_17_ and final step of multistep (19)
 
 python -i simdat.py backupcfg/20nov10_B1_cycle__step_17_sim.json
 
@@ -21330,4 +21330,35 @@ clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['du
 savefig(gifpath()+'all_avg_weight.png') # [[./gif/20nov13_20nov10_B1_cycle__step_7_all_avg_weight.png]]
 
 fig=animInput(InputImages,gifpath()+'_input.mp4') # [[./gif/20nov13_20nov10_B1_cycle__step_7__input.mp4]]
+
+python -i simdat.py backupcfg/20nov10_B1_cycle__step_19_sim.json
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/20nov13_20nov10_B1_cycle__step_19_perf.png]]
+
+lfn = ['20nov10_B0_cycle_']
+for i in range(0,20,1): lfn.append('20nov10_B1_cycle__step_' + str(i) + '_')
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0,1))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/20nov13_20nov10_B1_cycle__step_19_perf_all_steps_so_far.png]]
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((490e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/20nov13_20nov10_B1_cycle__step_19_rast.png]]
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP'],lclr=['r','g'],plotindiv=False)
+savefig(gifpath()+'all_avg_weight.png') # [[./gif/20nov13_20nov10_B1_cycle__step_19_all_avg_weight.png]][[
+
+lpda = getindivactionreward(lfn)
+csm=cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+lclr = [csm.to_rgba(float(i)/(len(lpda))) for i in range(len(lpda))]
+clf(); plotComparePerf(lpda,lclr,yl=(0,1.5),lleg=lfn)
+savefig(gifpath()+'perf_compareB.png') # [[./gif/20nov13_20nov10_B1_cycle__step_19_perf_compareB.png]]
+
+so now that this sim is finished and the perf not increased as much as had hoped - continue or adjust avoidstuck rule?
+
+** adjust avoidstuck
+
+add these:
+if paddle < 8 go down
+if paddle > 152 go up
 
