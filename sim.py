@@ -30,6 +30,7 @@ sim.WeightsRecordingTimes = []
 sim.allRLWeights = [] # list to store weights --- should remove that
 sim.allNonRLWeights = [] # list to store weights --- should remove that
 sim.topologicalConns = dict() # dictionary to save topological connections.
+sim.lastMove = dconf['moves']['NOMOVE']
 #sim.NonRLweightsfilename = 'data/'+dconf['sim']['name']+'NonRLweights.txt'  # file to store weights
 sim.plotWeights = 0  # plot weights
 sim.saveWeights = 1  # save weights
@@ -1580,9 +1581,13 @@ def trainAgent (t):
           actions.append(dconf['moves']['UP'])
         elif F_DOWNs[ts]>F_UPs[ts]: # DOWN WINS
           actions.append(dconf['moves']['DOWN'])
+        elif F_DOWNs[ts] == 0:
+          actions.append(sim.lastMove)
         else:
-          lmoves = [dconf['moves']['UP'], dconf['moves']['DOWN']]
-          actions.append(lmoves[np.random.randint(0,len(lmoves))])
+          actions.append(dconf['moves']['NOMOVE'])
+          #lmoves = [dconf['moves']['UP'], dconf['moves']['DOWN']]
+          #actions.append(lmoves[np.random.randint(0,len(lmoves))])
+        sim.lastMove = actions[-1]
       else:
         for ts in range(int(dconf['actionsPerPlay'])):
           if dnumc['EMSTAY']>0: 

@@ -482,18 +482,18 @@ class AIGame:
         # do not allow racket to get stuck at top or bottom
         if self.avoidStuck:
           #print('ypos_Racket=',ypos_Racket, 'racketH=',self.racketH, 'proposed_action=',proposed_action, 'maxYPixel=',self.maxYPixel)
-          if ypos_Racket - 1 - self.racketH*0.8125 <= 0 and caction==dconf['moves']['UP']:
+          if ypos_Racket <= 8:
+            print('STUCK MOVE DOWN, YPOS RACKET=',ypos_Racket)
+            caction = dconf['moves']['DOWN']
+          elif ypos_Racket >= 152:
+            print('STUCK MOVE UP, YPOS RACKET=',ypos_Racket)
+            caction = dconf['moves']['UP']                      
+          elif ypos_Racket - 1 - self.racketH*0.8125 <= 0 and caction==dconf['moves']['UP']:
             print('STUCK STOP UP, YPOS RACKET=', ypos_Racket, 'bound=',ypos_Racket - 1 - self.racketH/2)
             caction = dconf['moves']['NOMOVE']
           elif ypos_Racket + 1 + self.racketH*0.8125 >= self.maxYPixel and caction==dconf['moves']['DOWN']:
             print('STUCK STOP DOWN, YPOS RACKET=',ypos_Racket, 'bound=',ypos_Racket + 1 + self.racketH/2)
             caction = dconf['moves']['NOMOVE']
-          elif ypos_Racket <= 8:
-            print('STUCK MOVE DOWN, YPOS RACKET=',ypos_Racket)
-            caction = dconf['moves']['DOWN']
-          elif ypos_Racket >= 152:
-            print('STUCK MOVE UP, YPOS RACKET=',ypos_Racket)
-            caction = dconf['moves']['UP']            
           #else:
           #  print('YPOS RACKET=',ypos_Racket)
       else:
