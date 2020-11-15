@@ -19,10 +19,10 @@
     "avoidStuck": 1,
     "rewardcodes": {
         "scorePoint": 1.0,
-        "losePoint":  -0.01,
-        "followTarget": 0.0,
-        "avoidTarget": 0.0,
-        "hitBall": 0.0
+        "losePoint":  0.0,
+        "followTarget": 0.1,
+        "avoidTarget": -0.01,
+        "hitBall": 0.5
     },
     "actionsPerPlay": 1,
     "followOnlyTowards": 1,
@@ -51,12 +51,12 @@
         "RLFakeUpRule": 0,
         "RLFakeDownRule": 0,
         "RLFakeStayRule": 0,
-        "name": "20nov13_B0_cycle_",
+        "name": "20nov14_A0_cycle_",
         "doquit": 1,
         "doplot": 0,
         "saveCellSecs": 0,
         "saveCellConns": 0,
-        "targettedRL": 0,
+        "targettedRL": 1,
         "tstepPerAction": 20,
         "saveWeights": 1,
         "saveAssignedFiringRates": 0,
@@ -171,12 +171,12 @@
             "FeedForwardDirNtoM":0,
             "FeedForwardLocNtoM":0,	    
             "FeedForwardAtoM":1,
-            "FeedForwardAtoA2":1,	    
+            "FeedForwardAtoA2":0,
             "FeedForwardA2toM":1,	    
             "FeedbackLocNeurons":0,
             "RecurrentMNeurons":1,
             "RecurrentANeurons":0,
-            "RecurrentA2Neurons":1,	    
+            "RecurrentA2Neurons":0,
             "FeedbackAtoDirN":0,
             "FeedbackAtoLocN":0
         },	
@@ -294,7 +294,7 @@
 	    }
 	},
         "EEMWghtThreshMin": 0.9,
-        "EEMWghtThreshMax": 2.3,
+        "EEMWghtThreshMax": 2.5,
         "EEMPopNorm": 1,
 	"CellWNorm": {
 	    "On": 0,

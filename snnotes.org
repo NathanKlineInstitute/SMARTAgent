@@ -21437,3 +21437,19 @@ more to where model could learn ...
 
 stopped for now ... 
 
+** update to rules
+
+what if instead of stochmove in case there's a tie or 0 rates, just continued in same direction as last move?
+that way sparse rates would not always be a problem ... that's similar to analog with 100% weighting for last move
+tried that with stochmove param - looks like often goes too far 
+also changed avoidstuck to first check if needs to go in opposite direction, to avoid having it stuck for longer...
+that creates a bounce-back effect ... 
+
+** 20nov14_A0_cycle_
+
+back to targetted ... but also have the EA2 with RL plast to EM ... 
+
+python multistepSim.py sn.json 32 20 20nov14_A0_gcp_multi
+
+started ~23:21 ...
+
