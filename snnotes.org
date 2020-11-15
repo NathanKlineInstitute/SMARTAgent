@@ -21401,3 +21401,39 @@ savefig(gifpath()+'perf_compareD.png') # [[./gif/20nov15_20nov12_E0_gcp__step_19
 
 not clear if normalization is preventing improvement ... could use softhresh rule with same max weight ... 
 
+** check output from 20nov13_B0_cycle__step_4_
+
+python -i simdat.py backupcfg/20nov13_B0_cycle__step_4_sim.json
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/20nov14_20nov13_B0_cycle__step_4_perf.png]]
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((490e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/20nov14_20nov13_B0_cycle__step_4_rast.png]]
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP'],lclr=['r','g'],plotindiv=False)
+savefig(gifpath()+'all_avg_weight.png') # [[./gif/20nov14_20nov13_B0_cycle__step_4_all_avg_weight.png]]
+weights just dropping ... 
+
+lfn = ['20nov13_B0_cycle__step_'+str(i)+'_' for i in range(5)] 
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0,0.4))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/20nov14_20nov13_B0_cycle__step_4_perf_all_steps_so_far.png]]
+does not look like improving ... except for during a small stretch
+
+lpda = getindivactionreward(lfn)
+csm=cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+lclr = [csm.to_rgba(float(i)/(len(lpda))) for i in range(len(lpda))]
+clf(); plotComparePerf(lpda,lclr,yl=(0,.5),lleg=lfn)
+savefig(gifpath()+'perf_compareD.png') # [[./gif/20nov14_20nov13_B0_cycle__step_4_perf_compareD.png]]
+
+do not see improvement ... at least in those metrics ... do see score once in a long while,
+which is why average weight slightly above initial (1.2)
+
+too many 0s in firing rates ... could try the stochmove and see if helps move paddle
+more to where model could learn ... 
+
+0 punishment would help weights avoid getting too low ... but miss out on most of the learning ... 
+
+stopped for now ... 
+
