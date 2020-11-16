@@ -8768,4 +8768,529 @@ could potentially be run for longer durations.
 
 * 20nov03
 
--- run 20nov03_A3long_cycle for 2000 sec.
+-- run 20nov03_A3long_cycle for 2000 sec. (only follow the ball)
+
+-- run 20nov03_A3longAllRewards_cycle for 2000 sec.
+scorePoint:1.0
+losePoint:-0.5
+hitBall:0.5
+
+followTarget: 0.1
+avoidTarget: -0.01
+
+-- on falcor i ran sim "20nov02_A0Long_falcor_reduced_2obj" for 300 sec. still running.
+
+-- run 20nov03_A3long_falcor for 500 sec. (only follow the ball)
+... same parameters are 20nov03_A3long_cycle except targetedRL = 0
+
+-- setup complete on new mac
+now can run using mpi on new machine.
+
+mpiexec -n 4 nrniv -python -mpi sim.py
+
+pythonw issue: https://github.com/Neurosim-lab/netpyne/issues/496
+
+* 20nov04
+
+-- got this code from sam
+
+# SN: exptl
+  #if 'hSTDP' not in conn: continue
+  #cpreID = conn.preGid  #find preID
+  #if type(cpreID) != int: continue
+  if dconf['sim']['targettedRL'] > 1:
+    for pop in Mpops: dcell[pop] = np.unique(dcell[pop])
+    nhost = sim.pc.nhost()
+    src = [dcell]*nhost
+    dcellgid = sim.pc.py_alltoall(src)
+    for dcell in dcellgid:
+      for pop in Mpops:
+        for cell in sim.net.cells:
+          if cell.gid in dcell[pop]:
+            for conn in cell.conns:
+              STDPmech = conn.get('hSTDP')
+              if STDPmech:
+                if STDPmech not in dSTDPmech[pop]:
+                  dSTDPmech[pop].append(STDPmech)
+
+-- start with the motor pops at the first level or level 0. so EMUP and EMDOWN.
+-- to get all rlstdp synapses at previous stage....
+for each neuron in pops
+get thre preid
+
+
+-- PROBLEM: at some places in cmat we use EMDOWN and EMUP whereas at other places we use EM
+
+Mpops = ['EMUP','EMDOWN','EM']
+l1pop = []
+for mpop in Mpops:
+  for prepops in dconf['net']['cmat'].keys():
+    if mpop in dconf['net']['cmat'][prepops].keys():
+      if prepops not in l1pop and dconf['net']['allpops'][prepops]>0:
+        l1pop.append(prepops)
+
+* 20nov05
+
+-- resume sim in "20nov05_A3longAllrewards_cycle" (should have been without Allrewards in the name) using "20nov03_A3long_cycle"
+not better than early version of the model without EA.
+still want to run it for longer duration.
+
+-- run sim in "20nov05_A3long_cycle_reduced_2obj_pong0_"
+same parameters as in for sim "20nov03_A3long_cycle" but use pong-v0
+
+-- later run with pong-v0 and 
+            "RLlenhebb": 100,
+            "RLlenanti": 100,
+    instead of 
+                "RLlenhebb": 2000,
+            "RLlenanti": 2000,
+TO BE DONE. 
+I want to run this because with 2000 ms, associations might form between temporal distant environment and actions. 
+
+-- now check what happened on falcor sims. still running....
+
+-- continue preparing lists of conns for each postsynaptic neuron pop.
+
+# this function return a dictonary of postsynaptic pops with presynpatic pops
+
+def presynPopsDict():
+  # create list of potential postsynaptic populations.
+  pot_postpops = []
+  for pops in dconf['net']['allpops'].keys():
+    if dconf['net']['allpops'][pops]>0:
+      pot_postpops.append(pops)
+  pot_postpops.append('EM')
+  pot_postpops.append('VD')
+  pot_postpops.append('VL')
+  # create a dictionary, where for each potential postsynaptic population, include presynaptic pops.
+  dprepops = {pop:[] for pop in pot_postpops} # SN: exptl
+  lLocpops = ['EV1']
+  lDirpops = ['EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE']
+  lMpops = ['EMDOWN','EMUP']
+  for prepops in dconf['net']['cmat'].keys():
+    for postpops in dconf['net']['cmat'][prepops].keys():
+      if postpops in pot_postpops and prepops in pot_postpops:
+        if postpops=='EM':
+          for postmpops in lMpops:
+            if prepops=='EM':
+              for prempops in lMpops:
+                dprepops[postmpops].append(prempops)
+            elif prepops=='VD':
+              for predirpops in lDirpops:
+                dprepops[postmpops].append(predirpops)
+            elif prepops=='VL':
+              for prelocpops in lLocpops:
+                dprepops[postmpops].append(prelocpops)
+            else:
+              dprepops[postmpops].append(prepops)
+        elif postpops=='VD':
+          for postdirpops in lDirpops:
+            if prepops=='EM':
+              for prempops in lMpops:
+                dprepops[postdirpops].append(prempops)
+            elif prepops=='VD':
+              for predirpops in lDirpops:
+                dprepops[postdirpops].append(predirpops)
+            elif prepops=='VL':
+              for prelocpops in lLocpops:
+                dprepops[postdirpops].append(prelocpops)
+            else:
+              dprepops[postdirpops].append(prepops)
+        elif postpops=='VL':
+          for postlocpops in lLocpops:
+            if prepops=='EM':
+              for prempops in lMpops:
+                dprepops[postlocpops].append(prempops)
+            elif prepops=='VD':
+              for predirpops in lDirpops:
+                dprepops[postlocpops].append(predirpops)
+            elif prepops=='VL':
+              for prelocpops in lLocpops:
+                dprepops[postlocpops].append(prelocpops)
+            else:
+              dprepops[postlocpops].append(prepops)
+        else:
+          if prepops=='EM':
+            for prempops in lMpops:
+              dprepops[postpops].append(prempops)
+          elif prepops=='VD':
+            for predirpops in lDirpops:
+              dprepops[postpops].append(predirpops)
+          elif prepops=='VL':
+            for prelocpops in lLocpops:
+              dprepops[postpops].append(prelocpops)
+          else:
+            dprepops[postpops].append(prepops)
+  return dprepops
+
+def getAllSTDPObjects2 (sim):
+  # get all the STDP objects from the simulation's cells
+  dprepops = presynPopsDict() # for each pop, has a list of prepops
+  dSTDPmech = {'all':[]} # dictionary of STDP objects keyed by type (all, for EMUP, EMDOWN populations)
+  dSTDPmechRec = {'all':[]}
+  for pop in dprepops.keys(): 
+    dSTDPmech[pop] = []
+    dSTDPmechRec[pop] = []
+  for cell in sim.net.cells:
+    for conn in cell.conns:
+      STDPmech = conn.get('hSTDP')  # check if the connection has a NEURON STDP mechanism object
+      if STDPmech:
+        dSTDPmech['all'].append(STDPmech)
+        for pop in dprepops.keys():
+          if len(dprepops[pop])>0: # if the pop has presyn pop
+            if cell.gid in sim.net.pops[pop].cellGids:
+              if conn.preGid in sim.net.pops[pop].cellGids:
+                dSTDPmechRec['all'].append(STDPmech)
+                dSTDPmechRec[pop].append(STDPmech)
+              else:
+                dSTDPmech[pop].append(STDPmech)
+return dSTDPmech, dSTDPmechRec
+
+
+.... still need to include these in the sim.py and use it too.....
+
+first need to get started with INTF7.
+
+* 20nov09
+
+-- start using INTF7
+-- started with weights from sn.json
+-- increased VD->EA and VL->EA to 6.6 .... no firing in EA
+-- increased VD->EA and VL->EA to 16.6.... too high firing in EA (~70Hz)
+...reduce 16.6 to 10.6.
+-- decreased VD->EA and VL->EA to 10.6.... still high firing  and EM ~160Hz
+... reduce to 8.6
+-- decreased VD->EA and VL->EA to 8.6 
+
+-- to use INTF7.... need the following
+/opt/anaconda3/lib/python3.7/site-packages/netpyne/network/conn.py
+and
+/opt/anaconda3/lib/python3.7/site-packages/netpyne/cell/pointCell.py
+
+-- on new mac:
+scp hanwar@10.76.252.198:/opt/anaconda3/lib/python3.7/site-packages/netpyne/cell/pointCell.py ~/netpyne/netpyne/cell/.
+scp hanwar@10.76.252.198:/opt/anaconda3/lib/python3.7/site-packages/netpyne/network/conn.py ~/netpyne/netpyne/network/.
+
+-- rerun again with VD->EA and VL->EA of 8.6
+
+-- too high firing rate using stimmod of 35.
+
+-- now use lower values
+       "stimModVD": 25,
+        "stimModVL": 25,
+.... may be these values work.... but no activity in EA. increase VD and VL to EA. increase from 8.6 to 12.
+
+-- 10 might work for VD and VL to EA. with 12, EA fires even when only VL is active. Also try with EA->EM 6 instead of 1.6 which didnt show any activity in EM.
+no activity in EM.
+
+-- 10.6 for VD and VL to EA. 12 for EA->EM.
+
+-- 10.6 for VD and VL to EA. 16 for EA->EM
+
+-- 10.6 for VD and VL to EA. 20 for EA->EM and p = 0.2.
+
+* 20nov10
+
+-- start running on cycle and falcor.
+
+-- while i was tuning parameters for reduced network model with INTF7, sam raised a question:
+Is it possible that when the racket is half outside the corner, the network balance gets distrubed... 
+... because now we have higher contribution from direction selective neurons as compared to the location neurons....
+... because half of the pixels of racket wont get activated because they are outside field of view.
+... This might force racket to stay at the location (getting stuck).
+
+I think its possible for the reason mentioned above and for another reason too.
+When the racket gets stuck, it will not produce any motion field and therefore will further reduce its impact on motor areas ...
+...that will reduce input to motor cortex.
+
+-- I proposed that before we try a circuit level fix to this problem, why dont we limit the actions when the racket is close to the edges.
+
+-- while sam started looking at the ycoords of the racket, he observed that for an action, racket moved 40 pixels.
+this raised suspicion that what was going on?
+
+-- we suspected that there might be a bug in location detection.
+
+-- 2 different algorithms are used for location detection. findobj for location detection involved in reward generation...
+and centroid tracking for object direction computations.
+
+-- i think that this bug associated with findobj should not have any impact on reward assignment, but think its better to double check it
+
+-- now trying to think about ways to test it.
+-- run 20 sec sim "20nov10_A0_cycle_reduced_2obj_INTF7_" with _v4 game. dt = 0.2.
+
+-- run 20 sec sim "20nov10_A1_cycle_reduced_2obj_INTF7_" with _v4 game. dt = 0.6 to speed up.
+
+-- run 20 sec sim "20nov10_A2_cycle_reduced_2obj_INTF7_" with _v4 game. dt = 0.6 to speed up.
+stimModVD and stimModVL 20.
+
+
+* 20nov12
+
+stimModVD: 30 (35)
+stimModVL: 30 (35)
+VL->EA: 10 (1.8)
+VD->EA: 10 (3.6)
+EA->EM: 20 (1.8)
+
+-- no activity in EA or EM with 
+
+stimModVD: 35
+stimModVL: 35
+VL->EA: 1.8
+VD->EA: 3.6
+EA->EM: 1.8
+
+-- see activity in EA but not in EM.
+
+stimModVD: 35
+stimModVL: 35
+VL->EA: 10
+VD->EA: 0
+EA->EM: 1.8
+
+but the values should be used to evoke activity in EA only when both VL and VD neurons are active. but here we didnt connect VD with EA.
+must reduce VL->EA first or alternatively reduce stimModVD and stimModVL
+
+-- still sparse activity in EA just driven by VL
+
+stimModVD: 30
+stimModVL: 30
+VL->EA: 10
+VD->EA: 0
+EA->EM: 1.8
+
+now reduce VL->EA
+
+-- activity in EA stopped
+
+stimModVD: 30
+stimModVL: 30
+VL->EA: 8
+VD->EA: 0
+EA->EM: 1.8
+
+now test same with only VD ->EA
+
+-- no activity in EA.
+
+stimModVD: 30
+stimModVL: 30
+VL->EA: 0
+VD->EA: 8
+EA->EM: 1.8
+
+
+-- too much sparse
+
+stimModVD: 30
+stimModVL: 30
+VL->EA: 8
+VD->EA: 8
+EA->EM: 1.8
+
+
+-- may be too much activity
+
+stimModVD: 30
+stimModVL: 30
+VL->EA: 8
+VD->EA: 16
+EA->EM: 1.8
+
+
+-- probably OK for now.....
+
+stimModVD: 30
+stimModVL: 30
+VL->EA: 8
+VD->EA: 12
+EA->EM: 1.8
+
+... now need to play with EA->EM
+
+-- only a few actions
+
+FeedForwardAtoM: 0
+stimModVD: 30
+stimModVL: 30
+VL->EA: 8
+VD->EA: 12
+EA->EM: 10
+
+
+-- M neurons fired whenever EA neurons fired.
+
+FeedForwardAtoM: 0
+stimModVD: 30
+stimModVL: 30
+VL->EA: 8
+VD->EA: 12
+EA->EM: 20
+
+
+-- M neurons stopped firing at 6 sec.
+
+FeedForwardAtoM: 1
+stimModVD: 30
+stimModVL: 30
+VL->EA: 8
+VD->EA: 12
+EA->EM: 20
+... fix RL parameters......
+
+-- seems to work.
+
+FeedForwardAtoM: 1
+stimModVD: 30
+stimModVL: 30
+VL->EA: 8
+VD->EA: 12
+EA->EM: 20
+"RL":{
+  "AMPA":{
+    "wbase":0.16,
+    "wmax":16,
+    RLlenhebb:100,
+    RLlenanti:100,
+    useRLexp:1,
+    RLhebbwt:0.005,
+    RLantiwt:0,
+    tauhebb:10,
+    tauanti:10,
+    RLwinhebb:10,
+  }
+}
+
+-- run for 200 sec on cycle. "20nov12_A0_cycle_reduced_2obj_INTF7"
+
+FeedForwardAtoM: 1
+stimModVD: 30
+stimModVL: 30
+VL->EA: 8
+VD->EA: 12
+EA->EM: 20
+"RL":{
+  "AMPA":{
+    "wbase":10,
+    "wmax":40,
+    RLlenhebb:100,
+    RLlenanti:100,
+    useRLexp:1,
+    RLhebbwt:0.005,
+    RLantiwt:0,
+    tauhebb:10,
+    tauanti:10,
+    RLwinhebb:10,
+  }
+}
+
+-- run for 2000 sec on cycle. "20nov12_A1_cycle_reduced_2obj_INTF7"
+
+-- run for 2000 sec on cycle. "20nov12_A1pongv0_cycle_reduced_2obj_INTF7"
+
+-- before pushing sim.json used for  "20nov12_A1_cycle_reduced_2obj_INTF7", remove "avoidStuck":1,
+
+
+* 20nov13
+
+-- need to pad image....
+from matplotlib import pyplot as plt
+from skimage.color import rgb2gray
+import numpy as np
+import gym
+from skimage.filters import threshold_otsu
+
+padding_dim = 16
+
+env = gym.make('Pong-v0')
+env.reset()
+for _ in range(30):
+  observation, reward, done, info = env.step(3)
+
+courtYRng = (34, 194)
+courtXRng = (20, 140)
+racketXRng = (141, 144)
+obs = observation[courtYRng[0]:courtYRng[1],:,:]
+
+
+def getPaddedImage(obs,padding_dim,courtXRng,racketXRng):
+  expected_racket_len = 16
+  gs_obs = 255.0*rgb2gray(obs)
+  input_dim = gs_obs.shape[0] + 2*padding_dim
+  padded_Image = np.amin(gs_obs)*np.ones(shape=(input_dim,input_dim))
+  padded_Image[padding_dim:padding_dim+gs_obs.shape[0],padding_dim:padding_dim+gs_obs.shape[1]] = gs_obs
+  racket2 = gs_obs[:,courtXRng[0]-4:courtXRng[0]-1]
+  thresh = threshold_otsu(racket2)
+  binary_racket2 = racket2 > thresh
+  racket2_ypixels = np.unique(np.where(binary_racket2)[0])
+  racket2_len = len(racket2_ypixels)
+  racket1 = gs_obs[:,racketXRng[0]:racketXRng[1]]
+  thresh = threshold_otsu(racket1)
+  binary_racket1 = racket1 > thresh
+  racket1_ypixels = np.unique(np.where(binary_racket1)[0])
+  racket1_len = len(racket1_ypixels)
+  if expected_racket_len>racket1_len:
+    missing_racket1_len = expected_racket_len-racket1_len
+    if 0 in racket1_ypixels:
+      for ind in range(missing_racket1_len):
+        for jind in range(racketXRng[1]-racketXRng[0]+1):
+          padded_Image[padding_dim-ind,racketXRng[0]+padding_dim+jind-1] = racket1[0,0]
+    else:
+      for ind in range(missing_racket1_len):
+        for jind in range(racketXRng[1]-racketXRng[0]+1):
+          padded_Image[gs_obs.shape[0]+padding_dim+ind,racketXRng[0]+padding_dim+jind-1] = racket1[-1,0]
+  if expected_racket_len>racket2_len:
+    missing_racket2_len = expected_racket_len-racket2_len
+    if 0 in racket2_ypixels:
+      for ind in range(missing_racket2_len):
+        for jind in range(racketXRng[1]-racketXRng[0]+1):
+          padded_Image[padding_dim-1-ind,courtXRng[0]+padding_dim-1-jind] = racket2[0,0]
+    else:
+      for ind in range(missing_racket2_len):
+        for jind in range(racketXRng[1]-racketXRng[0]+1):
+          padded_Image[gs_obs.shape[0]+padding_dim+ind,courtXRng[0]+padding_dim-1-jind] = racket2[-1,0]
+  return padded_Image
+
+for _ in range(10):
+  observation, reward, done, info = env.step(4)
+  env.render()
+
+obs = observation[courtYRng[0]:courtYRng[1],:,:]
+padded_Image = getPaddedImage(obs,padding_dim,courtXRng,racketXRng)
+plt.imshow(padded_Image)
+plt.show()
+
+-- saved "20nov12_A1pongv0_cycle_reduced_2obj_INTF7_Perf.png".... P(Follow)~0.4, Hit/miss <0.2
+not good at all.
+.... also save raster in "20nov12_A1pongv0_cycle_reduced_2obj_INTF7_Raster.png"... firing rates look OK.
+EMUP = 2.14 Hz, EMDOWN = 2.15 Hz. EA = 0.03 Hz.
+
+-- saved "20nov12_A1_cycle_reduced_2obj_INTF7_Perf.png".... P(Follow)~0.32, Hit/miss <0.1
+worse than before.
+... also save raster in "20nov12_A1_cycle_reduced_2obj_INTF7_Raster.png"... firing rates look OK but
+sparser than when used frameskip-v4 .... EMUP = 0.73 Hz, EMDOWN = 0.74 Hz. EA = 0.01 Hz.
+
+-- any effct of 20 ms tSetpPerAction?? rerun with same params as in ""20nov12_A1pongv0_cycle_reduced_2obj_INTF7_"  and 
+.... "20nov12_A1_cycle_reduced_2obj_INTF7_"
+
+
+-- when using "useImagePadding" and "captureTwoObjs" with "useReducedNetwork"
+	    "EV1":48,
+	    "EA":4608,
+
+otherwise when "useImagePadding"
+      "EV1":576
+      and all EV1Dirs:576
+
+-- when using "useImagePadding" with sam's network in sn.json
+use 
+	    "EV1":576,
+	    "EV1DE":576,
+	    "EV1DNE":576,
+	    "EV1DN":576,
+	    "EV1DNW":576,
+	    "EV1DW":576,
+	    "EV1DSW":576,
+	    "EV1DS":576,
+	    "EV1DSE":576,
+

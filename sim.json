@@ -21,12 +21,13 @@
         4
     ],
     "movefctr": 1.0,
+    "avoidStuck":1,
     "rewardcodes": {
         "scorePoint": 0.0,
         "losePoint":  0.0,
         "followTarget": 0.1,
         "avoidTarget": -0.01,
-        "hitBall": 0.0
+        "hitBall": 0.2
     },
     "actionsPerPlay": 1,
     "followOnlyTowards": 1,
@@ -45,17 +46,17 @@
         "ResumeSimFromFile": "data/20oct23_A0_cycle_synWeights_final.pkl"
     },
     "sim": {
-        "duration": 2000000,
-        "dt": 0.2,
+        "duration": 20000,
+        "dt": 0.6,
         "verbose": 0,
         "recordStep": 1.0,
         "recordWeightStepSize": 500,
         "normalizeWeightStepSize": 50000000000000000000000000,
-	"normalizeWeightsAtStart": 1,
+	"normalizeWeightsAtStart": 0,
         "RLFakeUpRule": 0,
         "RLFakeDownRule": 0,
         "RLFakeStayRule": 0,
-        "name": "20nov03_A3long_cycle_reduced_2obj_",
+        "name": "20nov16_A0_testPaddedImage_reduced_2obj_INTF7_",
         "doquit": 0,
         "doplot": 1,
         "saveCellSecs": 0,
@@ -77,11 +78,17 @@
         "useTopological": 0
     },    
     "net": {
+        "EEGain": 1.0,
+        "EIGain": 1.0,
+        "IEGain": 1.0,
+        "IIGain": 1.0,
+        "ECellModel":"INTF7",
+        "ICellModel":"INTF7",
         "scale": 1,
 	"allpops": {
 	    "ER":0,
 	    "IR":0,
-	    "EV1":40,
+	    "EV1":48,
 	    "EV1DE":1,
 	    "EV1DNE":1,
 	    "EV1DN":1,
@@ -96,8 +103,8 @@
 	    "IV4":0,
 	    "EMT":0,
 	    "IMT":0,
-	    "EA":3200,
-        "IA":640,
+	    "EA":4608,
+        "IA":0,
         "EA2": 0,
 	    "IA2": 0,
 	    "EMDOWN":100,
@@ -171,129 +178,131 @@
             "FeedForwardDirNtoM":0,
             "FeedForwardLocNtoM":0,	    
             "FeedForwardAtoM":1,
-            "FeedForwardAtoA2":1,	    
-            "FeedForwardA2toM":1,
+            "FeedForwardAtoA2":0,	    
+            "FeedForwardA2toM":0,
             "FeedbackLocNeurons":0,
-            "RecurrentMNeurons":1,
+            "RecurrentMNeurons":0,
             "RecurrentANeurons":0,
-            "RecurrentA2Neurons":1,
+            "RecurrentA2Neurons":0,
             "FeedbackAtoDirN":0,
             "FeedbackAtoLocN":0
         },	
-	"useBinaryImage": 1,
+    "useBinaryImage": 1,
+    "useImagePadding":1,
 	"useNeuronPad": 0,
         "DirMinRate": 0.0,
         "DirMaxRate": 150.0,
         "LocMaxRate": 150.0,
         "FiringRateCutoff" : 50.0,
-        "stimModVD": 0.003,
-        "stimModVL": 0.003,
+        "stimModVD": 30,
+        "stimModVL": 30,
 	"cmat": {
 	    "VL":{
-		"VD":{"AM":0,"NM":0,"p":0},		
-		"VL":{"AM":20e-5,"NM":30e-6,"p":0},
-		"EA":{"AM":2e-3,"NM":10e-6,"p":0.4},
-		"EMDOWN":{"AM":4.5e-5,"NM":10e-6,"p":0.08},
-		"EMUP":{"AM":4.5e-5,"NM":10e-6,"p":0.08},
-		"EMSTAY":{"AM":4.5e-5,"NM":10e-6,"p":0.08}		
-	    },
-	    "VD":{
-		"VL":{"AM":0,"NM":0,"p":0},
-		"VD":{"AM":0,"NM":0,"p":0},
-		"EA":{"AM":2e-3,"NM":10e-6,"p":0.4},
-		"EMDOWN":{"AM":4.5e-5,"NM":10e-6,"p":0.08},
-		"EMUP":{"AM":4.5e-5,"NM":10e-6,"p":0.08},
-		"EMSTAY":{"AM":4.5e-5,"NM":10e-6,"p":0.08}		
-	    },
-	    "EM":{
-		"EM":{"AM":0,"NM":0,"p":0.15},
-		"EA":{"AM":0,"NM":0,"p":0.0},
-		"IRecip": {"AM":0.02, "NM":0, "p":0.0625},
-		"IM":{"GA":0.02,"p":0.0625}
-	    },
-	    "EA":{
-        "EA":{"AM":0,"NM":0,"p":0.0},
-        "EA2":{"AM":5e-5,"NM":6e-6,"p":0.2},
-		"EM":{"AM":4e-3,"NM":10e-6,"p":0.2},
-		"IA":{"GA": 0.005, "p":0.0625}
-        },
-        "EA2":{
-            "EA":{"AM":5e-5,"NM":6e-6,"p":0.0},
-            "EA2":{"AM":5e-5,"NM":6e-6,"p":0.1},
-            "EM":{"AM":5e-5,"NM":6e-6,"p":0.2},
-            "IA2":{"GA": 0.02, "p":0.0625}
+            "VD":{"AM":0,"NM":0,"p":0},		
+            "VL":{"AM":4,"NM":0.6,"p":0},
+            "EA":{"AM":8,"NM":0.36,"p":0.1},
+            "EMDOWN":{"AM":0.5,"NM":0.001,"p":0.08},
+            "EMUP":{"AM":0.5,"NM":0.001,"p":0.08},
+            "EMSTAY":{"AM":0.5,"NM":0.001,"p":0.08}		
             },
-	    "IR": {
-		"ER": {"GA": 0.2, "p":0.0625}
-	    },
-	    "IV1": {
-		"EV1": {"GA": 0.3, "p":0.5},
-		"IV1": {"GA":0.05, "p":0.25},
-		"ER": {"GA":0.02, "p":0.0},
-		"IV4": {"GA":0.0075, "p":0.0}		
-	    },
-	    "ID": {
-		"ED": {"GA": 0.2, "p":1},
-		"ID": {"GA":0.05, "p":0.25}		
-	    },
-	    "IV4": {
-		"EV4": {"GA":0.2, "p":0.25},
-		"IV4": {"GA":0.05, "p":0.25},
-		"EV1": {"GA":0.02, "p":0.0},
-		"IMT": {"GA":0.0075, "p":0.0}		
-	    },
-	    "IMT": {
-		"EMT": {"GA":0.2, "p":0.25},
-		"IMT": {"GA":0.05, "p":0.25},
-		"EV4": {"GA":0.02, "p":0.0}		
-	    },
-	    "IM": {
-		"EM": {"GA":0.25, "p":0.125},
-		"IM": {"GA":0.05, "p":0.25}
-	    },
-	    "IMRecip": {
-		"EM": {"GA":0.2, "p":0.125}
-	    },
-	    "IA": {
-		"EA": {"GA":0.25, "p":0.125},
-		"IA": {"GA":0.05, "p":0.25}		
-        },
-        "IA2": {
-            "EA2": {"GA":0.25, "p":0.125},
-            "IA2": {"GA":0.05, "p":0.25}		
+            "VD":{
+            "VL":{"AM":0,"NM":0,"p":0},
+            "VD":{"AM":0,"NM":0,"p":0},
+            "EA":{"AM":12,"NM":0.36,"p":0.1},
+            "EMDOWN":{"AM":0.5,"NM":0.001,"p":0.08},
+            "EMUP":{"AM":0.5,"NM":0.001,"p":0.08},
+            "EMSTAY":{"AM":0.5,"NM":0.001,"p":0.08},
+            "ID": {"AM":10, "p":0.03}
             },
-	    "IR": {
-		"IR": {"GA":0.05, "p":0.25}
-	    },
-	    "IMUP": {
-		"IMUP": {"GA":0.05, "p":0.25}
-	    },
-	    "IMDOWN": {
-		"IMDOWN": {"GA":0.05, "p":0.25}
-	    },
-	    "IMSTAY": {
-		"IMSTAY": {"GA":0.05, "p":0.25}
-	    },
-	    "ER": {
-		"EV1": {"AM": 20e-5, "NM": 30e-6, "p":0.1}
-	    },
-	    "EV1": {
-		"EV4": {"AM": 20e-5, "NM": 30e-6, "p":0.3},
-		"ER": {"AM":0 , "NM":0, "p":0},
-		"IV1": {"GA":0.02, "p":0.0225}
-	    },
-	    "EV4": {
-		"EMT": {"AM": 60e-5, "NM": 90e-6, "p":0.3},
-		"EV1": {"AM":0 , "NM":0, "p":0},
-		"IV4": {"GA":0.02, "p":0.0225}		
-	    },
-	    "EMT": {
-		"EV4": {"AM":0 , "NM":0, "p":0},
-		"IMT": {"GA":0.02, "p":0.0225}
-	    }
-	},
-        "EEMWghtThreshMin": 6.25e-06,
-        "EEMWghtThreshMax": 0.00032,
+            "EM":{
+            "EM":{"AM":1.6,"NM":0.001,"p":0.15},
+            "EA":{"AM":0,"NM":0,"p":0.0},
+            "IRecip": {"AM":20, "NM":0, "p":0.0625},
+            "IM":{"AM":10,"p":0.125}
+            },
+            "EA":{
+            "EA":{"AM":1.2,"NM":0.12,"p":0.0},
+            "EA2":{"AM":1.2,"NM":0.12,"p":0.2},
+            "EM":{"AM":20,"NM":0.001,"p":0.1},
+            "IA":{"AM":10, "p":0.1}
+            },
+            "EA2":{
+            "EA":{"AM":1.2,"NM":0.12,"p":0.0},
+            "EA2":{"AM":1.2,"NM":0.12,"p":0.1},
+            "EM":{"AM":1.2,"NM":0.12,"p":0.2},
+            "IA2":{"AM": 10, "p":0.0625}
+            },	   	    
+            "IR": {
+            "ER": {"GA": 10, "p":0.0625}
+            },
+            "IV1": {
+            "EV1": {"GA": 5, "p":0.1},
+            "IV1": {"GA":2.5, "p":0.1},
+            "ER": {"GA":1.0, "p":0.0},
+            "IV4": {"GA":0.375, "p":0.0}		
+            },
+            "ID": {
+            "ED": {"GA": 5, "p":0.1},
+            "ID": {"GA":2.5, "p":0.1}
+            },
+            "IV4": {
+            "EV4": {"GA":10, "p":0.25},
+            "IV4": {"GA":2.5, "p":0.25},
+            "EV1": {"GA":1.0, "p":0.0},
+            "IMT": {"GA":0.375, "p":0.0}		
+            },
+            "IMT": {
+            "EMT": {"GA":10, "p":0.25},
+            "IMT": {"GA":2.5, "p":0.25},
+            "EV4": {"GA":1.0, "p":0.0}		
+            },
+            "IM": {
+            "EM": {"GA":5, "p":0.25},
+            "IM": {"GA":2.5, "p":0.1}
+            },
+            "IMRecip": {
+            "EM": {"GA":10, "p":0.125}
+            },
+            "IA": {
+            "EA": {"GA":5, "p":0.1},
+            "IA": {"GA":2.5, "p":0.1}
+            },
+            "IA2": {
+            "EA2": {"GA":5, "p":0.1},
+            "IA2": {"GA":2.5, "p":0.15}
+            },	    	    
+            "IR": {
+            "IR": {"GA":2.5, "p":0.15}
+            },
+            "IMUP": {
+            "IMUP": {"GA":2.5, "p":0.15}
+            },
+            "IMDOWN": {
+            "IMDOWN": {"GA":2.5, "p":0.15}
+            },
+            "IMSTAY": {
+            "IMSTAY": {"GA":2.5, "p":0.15}
+            },
+            "ER": {
+            "EV1": {"AM": 4.0, "NM": 0.6, "p":0.1}
+            },
+            "EV1": {
+            "EV4": {"AM": 4.0, "NM": 0.6, "p":0.3},
+            "ER": {"AM":0 , "NM":0, "p":0},
+            "IV1": {"AM":10.0, "p":0.03}
+            },
+            "EV4": {
+            "EMT": {"AM": 12, "NM": 1.8, "p":0.3},
+            "EV1": {"AM":0 , "NM":0, "p":0},
+            "IV4": {"AM":20, "p":0.0225}		
+            },
+            "EMT": {
+            "EV4": {"AM":0 , "NM":0, "p":0},
+            "IMT": {"AM":20, "p":0.0225}
+            }
+        },
+        "EEMWghtThreshMin": 0.9,
+        "EEMWghtThreshMax": 30,
         "EEMPopNorm": 1,
 	"CellWNorm": {
 	    "On": 0,
@@ -311,6 +320,8 @@
         },
         "EEMRecProbCross": 0,
         "VisualFeedback": 0,
+        "delayMin": 2,
+        "delayMax": 5,    
         "weightVar": 0.5
     },
     "STDP": {
@@ -372,20 +383,20 @@
             "maxreward": 0.0 
         },	
         "AMPA": {
-            "wbase": 0.0005,
-            "wmax": 0.04,
+            "wbase": 0.16,
+            "wmax": 16,
             "RLon": 1,
 	    "STDPon": 0,
-            "RLlenhebb": 200,
-            "RLlenanti": 200,
+            "RLlenhebb": 100,
+            "RLlenanti": 100,
             "useRLexp": 1,
-            "RLhebbwt": 7.5e-05,
-            "RLantiwt": -7.5e-05,
+            "RLhebbwt": 0.005,
+            "RLantiwt": 0,
             "hebbwt": 0.0,
             "antiwt": 0.0,
             "tauhebb": 10,
             "tauanti": 10,	    
-            "RLwindhebb": 50,
+            "RLwindhebb": 10,
             "softthresh": 0,
             "verbose": 0,
 	    "maxreward": 0.0
