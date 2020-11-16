@@ -13,6 +13,8 @@
         3,
         4
     ],
+    "stochmove": 0,
+    "0rand": 0,
     "movefctr": 1.0,
     "avoidStuck": 1,
     "rewardcodes": {
@@ -35,11 +37,11 @@
     "verbose": 0,
     "stayStepLim": 0,
     "simtype": {
-        "ResumeSim": 1,
-        "ResumeSimFromFile": "data/20nov10_B0_cycle_synWeights.pkl"
+        "ResumeSim": 0,
+        "ResumeSimFromFile": "data/20nov11_C0_cycle_synWeights_final.pkl"
     },
     "sim": {
-        "duration": 500000,
+        "duration": 3000,
         "dt": 0.6,
         "verbose": 0,
         "recordStep": 1.0,
@@ -49,9 +51,9 @@
         "RLFakeUpRule": 0,
         "RLFakeDownRule": 0,
         "RLFakeStayRule": 0,
-        "name": "20nov10_B1_cycle_",
-        "doquit": 1,
-        "doplot": 0,
+        "name": "20nov16_A0_cycle_",
+        "doquit": 0,
+        "doplot": 1,
         "saveCellSecs": 0,
         "saveCellConns": 0,
         "targettedRL": 1,
@@ -79,7 +81,7 @@
 	"allpops": {
 	    "ER":0,
 	    "IR":0,
-	    "EV1":400,
+	    "EV1":1600,
 	    "EV1DE":400,
 	    "EV1DNE":400,
 	    "EV1DN":400,
@@ -96,12 +98,12 @@
 	    "IMT":0,
 	    "EA":2800,
 	    "IA":0,
-	    "EA2": 0,
-	    "IA2": 0,	    
-	    "EMDOWN":100,
-	    "EMUP":100,
+	    "EA2": 100,
+	    "IA2": 0,
+	    "EMDOWN":400,
+	    "EMUP":400,
 	    "EMSTAY":0,
-	    "IM":100,
+	    "IM":200,
 	    "IMUP": 0,
 	    "IMDOWN": 0,
 	    "IMSTAY": 0},
@@ -169,12 +171,12 @@
             "FeedForwardDirNtoM":0,
             "FeedForwardLocNtoM":0,	    
             "FeedForwardAtoM":1,
-            "FeedForwardAtoA2":1,	    
+            "FeedForwardAtoA2":1,
             "FeedForwardA2toM":1,	    
             "FeedbackLocNeurons":0,
             "RecurrentMNeurons":1,
             "RecurrentANeurons":0,
-            "RecurrentA2Neurons":1,	    
+            "RecurrentA2Neurons":1,
             "FeedbackAtoDirN":0,
             "FeedbackAtoLocN":0
         },	
@@ -205,22 +207,22 @@
 		"ID": {"AM":10, "p":0.03}
 	    },
 	    "EM":{
-		"EM":{"AM":1.6,"NM":0.0,"p":0.15},
+		"EM":{"AM":1.2,"NM":0.0,"p":0.15},
 		"EA":{"AM":0,"NM":0,"p":0.0},
 		"IRecip": {"AM":20, "NM":0, "p":0.0625},
 		"IM":{"AM":10,"p":0.15}
 	    },
 	    "EA":{
 		"EA":{"AM":1.2,"NM":0.12,"p":0.0},
-		"EA2":{"AM":1.2,"NM":0.12,"p":0.2},
-		"EM":{"AM":1.6,"NM":0.0,"p":0.15},
+		"EA2":{"AM":1.2,"NM":0.0,"p":0.15},
+		"EM":{"AM":1.2,"NM":0.0,"p":0.15},
 		"IA":{"AM": 10, "p":0.1}
 	    },
 	    "EA2":{
 		"EA":{"AM":1.2,"NM":0.12,"p":0.0},
-		"EA2":{"AM":1.2,"NM":0.12,"p":0.1},
-		"EM":{"AM":1.2,"NM":0.12,"p":0.2},
-		"IA2":{"AM": 10, "p":0.0625}
+		"EA2":{"AM":1.2,"NM":0.0,"p":0.15},
+		"EM":{"AM":1.2,"NM":0.0,"p":0.15},
+		"IA2":{"AM": 10, "p":0.15}
 	    },	   	    
 	    "IR": {
 		"ER": {"GA": 10, "p":0.0625}
@@ -292,7 +294,7 @@
 	    }
 	},
         "EEMWghtThreshMin": 0.9,
-        "EEMWghtThreshMax": 1.75,
+        "EEMWghtThreshMax": 2.5,
         "EEMPopNorm": 1,
 	"CellWNorm": {
 	    "On": 0,
@@ -373,7 +375,7 @@
             "maxreward": 0.0 
          },
         "AMPA": {
-            "wbase": 0.16,
+            "wbase": 0.14,
             "wmax": 16,
             "RLon": 1,
             "STDPon": 0,

@@ -42,6 +42,10 @@ def ensureDefaults (dconf):
   checkDefVal(dconf['net'], 'stimModInputW', 0.02)
   checkDefVal(dconf['net'], 'weightVar', 0.0)
   checkDefVal(dconf, 'movefctr', 1.0)
+  checkDefVal(dconf,"0rand",0)
+  checkDefVal(dconf,"randmove",0)
+  checkDefVal(dconf,"stochmove",0)
+  checkDefVal(dconf,"avoidStuck",0)  
   for k in ["actionsPerPlay", "followOnlyTowards", "useRacketPredictedPos"]: checkDefVal(dconf, k, 1)
   checkDefVal(dconf, 'stayStepLim', 0)
   for k in ['anticipatedRL', 'RLFakeUpRule', 'RLFakeDownRule', 'RLFakeStayRule', 'doplot', 'saveCellSecs', 'saveCellConns']:
