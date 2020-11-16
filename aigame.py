@@ -128,11 +128,8 @@ class AIGame:
     self.maxYPixel = 160 - 1 # 20 - 1
     self.avoidStuck = False
     self.avoidStuck = dconf['avoidStuck']
-    if 'useImagePadding' in dconf['net']: 
-      self.useImagePadding = dconf['net']['useImagePadding'] # make sure the number of neurons is correct
-      self.padPixelEachSide = 16 # keeping it fix for maximum number of pixels for racket.
-    else:
-      self.useImagePadding = 0
+    self.useImagePadding = dconf['net']['useImagePadding'] # make sure the number of neurons is correct
+    self.padPixelEachSide = 16 # keeping it fix for maximum number of pixels for racket.
     if dconf['net']['allpops'][self.InputPop] == 1600: # this is for 40x40 (40 = 1/4 of 160)
       self.downsampshape = (4,4)
       #self.racketH *= 2
