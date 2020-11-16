@@ -128,6 +128,11 @@ class AIGame:
     self.maxYPixel = 160 - 1 # 20 - 1
     self.avoidStuck = False
     if 'avoidStuck' in dconf: self.avoidStuck = dconf['avoidStuck']
+    if 'useImagePadding' in dconf['net']: 
+      self.useImagePadding = dconf['net']['useImagePadding'] # make sure the number of neurons is correct
+      self.padPixelEachSide = 16 # keeping it fix for maximum number of pixels for racket.
+    else:
+      self.useImagePadding = 0
     if dconf['net']['allpops'][self.InputPop] == 1600: # this is for 40x40 (40 = 1/4 of 160)
       self.downsampshape = (4,4)
       #self.racketH *= 2
@@ -210,22 +215,26 @@ class AIGame:
         thresh = threshold_otsu(dsum_Images)
         binary_Image = dsum_Images > thresh
         if dconf['sim']['captureTwoObjs']:
-          fr_Images = np.zeros(shape=(20,2))
-          fr_Images_Ball = self.locationNeuronRate*np.amax(binary_Image[:,3:17],1)
-          fr_Images_RM = self.locationNeuronRate*np.amax(binary_Image[:,17:],1)
+          fr_Images = np.zeros(shape=(dsum_Images.shape[0],2))
+          if self.useImagePadding:
+            fr_Images_Ball = self.locationNeuronRate*np.amax(binary_Image[:,5:19],1)
+            fr_Images_RM = self.locationNeuronRate*np.amax(binary_Image[:,19:],1)
+          else:
+            fr_Images_Ball = self.locationNeuronRate*np.amax(binary_Image[:,3:17],1)
+            fr_Images_RM = self.locationNeuronRate*np.amax(binary_Image[:,17:],1)
           fr_Images[:,0] = fr_Images_Ball
           fr_Images[:,1] = fr_Images_RM
           print(fr_Images)        
         else:
-          fr_Images = np.zeros(shape=(20,3))
-          #print('Image:',binary_Image)
-          fr_Images_RO = self.locationNeuronRate*np.amax(binary_Image[:,0:3],1)
-          print('RO:',fr_Images_RO)
-          #print('Ball:',binary_Image[:,self.courtXRng[0]:self.courtXRng[1]])
-          fr_Images_Ball = self.locationNeuronRate*np.amax(binary_Image[:,3:17],1)
-          print(fr_Images_Ball)
-          fr_Images_RM = self.locationNeuronRate*np.amax(binary_Image[:,17:],1)
-          print('RM:',fr_Images_RM)
+          fr_Images = np.zeros(shape=(dsum_Images.shape[0],3))
+          if self.useImagePadding:
+            fr_Images_RO = self.locationNeuronRate*np.amax(binary_Image[:,0:5],1)
+            fr_Images_Ball = self.locationNeuronRate*np.amax(binary_Image[:,5:19],1)
+            fr_Images_RM = self.locationNeuronRate*np.amax(binary_Image[:,19:],1)
+          else:
+            fr_Images_RO = self.locationNeuronRate*np.amax(binary_Image[:,0:3],1)
+            fr_Images_Ball = self.locationNeuronRate*np.amax(binary_Image[:,3:17],1)
+            fr_Images_RM = self.locationNeuronRate*np.amax(binary_Image[:,17:],1)
           fr_Images[:,0] = fr_Images_RO
           fr_Images[:,1] = fr_Images_Ball
           fr_Images[:,2] = fr_Images_RM
@@ -234,7 +243,7 @@ class AIGame:
         dsum_Images = dsum_Images - np.amin(dsum_Images)
         dsum_Images = (255.0/np.amax(dsum_Images))*dsum_Images
         fr_Image = self.locationNeuronRate/(1+np.exp((np.multiply(-1,dsum_Images)+123)/10))
-        fr_Images = np.zeros(shape=(20,3))
+        fr_Images = np.zeros(shape=(dsum_Images.shape[0],3))
         fr_Images[:,0] = np.sum(fr_Image[:,0:3],1) # opponent racket y loc
         fr_Images[:,1] = np.sum(fr_Image[:,3:17],1) # ball y loc
         fr_Images[:,2] = np.sum(fr_Image[:,17:],1) # model racket y loc
@@ -312,7 +321,10 @@ class AIGame:
       AngRFSigma2 = self.AngRFSigma2
       MaxRate = self.dirSensitiveNeuronRate[1]
       for pop in self.ldirpop: self.dFiringRates[pop] = self.dirSensitiveNeuronRate[0] * np.ones(shape=(1,1)) # should have a single angle per direction selective neuron pop
-      court_motiondir = motiondir[:,4:16] # only motion direction of ball in the court
+      if self.useImagePadding:
+        court_motiondir = motiondir[:,6:18] # only motion direction of ball in the court
+      else:
+        court_motiondir = motiondir[:,4:16] # only motion direction of ball in the court
       unique_angles = np.unique(np.floor(court_motiondir))
       print('angles:',unique_angles)
       for a in unique_angles:
@@ -438,6 +450,50 @@ class AIGame:
             predY = predY_nodeflection
     return predY
 
+  def getPaddedImage(self,gs_obs,padding_dim,courtXRng,racketXRng):
+    expected_racket_len = 16
+    #gs_obs = 255.0*rgb2gray(obs)
+    input_dim = gs_obs.shape[0] + 2*padding_dim
+    padded_Image = np.amin(gs_obs)*np.ones(shape=(input_dim,input_dim))
+    padded_Image[padding_dim:padding_dim+gs_obs.shape[0],padding_dim:padding_dim+gs_obs.shape[1]] = gs_obs
+    racket2 = gs_obs[:,courtXRng[0]-4:courtXRng[0]-1]
+    if len(np.unique(racket2))>1:
+      thresh = threshold_otsu(racket2)
+      binary_racket2 = racket2 > thresh
+      racket2_ypixels = np.unique(np.where(binary_racket2)[0])
+      racket2_len = len(racket2_ypixels)
+    else:
+      racket2_len =0
+    racket1 = gs_obs[:,racketXRng[0]:racketXRng[1]]
+    if len(np.unique(racket2))>1:
+      thresh = threshold_otsu(racket1)
+      binary_racket1 = racket1 > thresh
+      racket1_ypixels = np.unique(np.where(binary_racket1)[0])
+      racket1_len = len(racket1_ypixels)
+    else:
+      racket1_len = 0
+    if racket1_len>0 and expected_racket_len>racket1_len:
+      missing_racket1_len = expected_racket_len-racket1_len
+      if 0 in racket1_ypixels:
+        for ind in range(missing_racket1_len):
+          for jind in range(racketXRng[1]-racketXRng[0]+1):
+            padded_Image[padding_dim-ind,racketXRng[0]+padding_dim+jind-1] = racket1[0,0]
+      else:
+        for ind in range(missing_racket1_len):
+          for jind in range(racketXRng[1]-racketXRng[0]+1):
+            padded_Image[gs_obs.shape[0]+padding_dim+ind,racketXRng[0]+padding_dim+jind-1] = racket1[-1,0]
+    if racket2_len>0 and expected_racket_len>racket2_len:
+      missing_racket2_len = expected_racket_len-racket2_len
+      if 0 in racket2_ypixels:
+        for ind in range(missing_racket2_len):
+          for jind in range(racketXRng[1]-racketXRng[0]+1):
+            padded_Image[padding_dim-1-ind,courtXRng[0]+padding_dim-1-jind] = racket2[0,0]
+      else:
+        for ind in range(missing_racket2_len):
+          for jind in range(racketXRng[1]-racketXRng[0]+1):
+            padded_Image[gs_obs.shape[0]+padding_dim+ind,courtXRng[0]+padding_dim-1-jind] = racket2[-1,0]
+    return padded_Image
+
   def playGame (self, actions, epCount, simtime): #actions need to be generated from motor cortex
     # PLAY GAME
     rewards = []; proposed_actions =[]; total_hits = []; Images = []; FollowTargetSign = 0
@@ -453,7 +509,10 @@ class AIGame:
     if len(self.last_obs)==0: #if its the first action of the episode, there won't be any last_obs, therefore no last image
       lobs_gimage_ds = []
     else:
-      lobs_gimage = 255.0*rgb2gray(self.last_obs[courtYRng[0]:courtYRng[1],:,:]) 
+      lobs_gimage = 255.0*rgb2gray(self.last_obs[courtYRng[0]:courtYRng[1],:,:])
+      if self.useImagePadding: 
+        padding_dim = self.padPixelEachSide
+        lobs_gimage = self.getPaddedImage(lobs_gimage,padding_dim,courtXRng,racketXRng) 
       lobs_gimage_ds = downscale_local_mean(lobs_gimage,self.downsampshape)
       lobs_gimage_ds = np.where(lobs_gimage_ds>np.min(lobs_gimage_ds)+1,255,lobs_gimage_ds)
       lobs_gimage_ds = 0.5*lobs_gimage_ds #use this image for motion computation only
@@ -569,6 +628,9 @@ class AIGame:
       rewards.append(reward)
       proposed_actions.append(proposed_action)    
       gray_Image = 255.0*rgb2gray(observation[courtYRng[0]:courtYRng[1],:,:]) # convert to grayscale; rgb2gray has 0-1 range so mul by 255
+      if self.useImagePadding: 
+        padding_dim = self.padPixelEachSide
+        gray_Image = self.getPaddedImage(gray_Image,padding_dim,courtXRng,racketXRng)
       gray_ds = downscale_local_mean(gray_Image,self.downsampshape) # then downsample
       gray_ds = np.where(gray_ds>np.min(gray_ds)+1,255,gray_ds) # Different thresholding
       gray_ns = np.where(gray_Image>np.min(gray_Image)+1,255,gray_Image)

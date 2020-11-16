@@ -9186,4 +9186,111 @@ EA->EM: 20
 
 -- run for 2000 sec on cycle. "20nov12_A1_cycle_reduced_2obj_INTF7"
 
+-- run for 2000 sec on cycle. "20nov12_A1pongv0_cycle_reduced_2obj_INTF7"
+
 -- before pushing sim.json used for  "20nov12_A1_cycle_reduced_2obj_INTF7", remove "avoidStuck":1,
+
+
+* 20nov13
+
+-- need to pad image....
+from matplotlib import pyplot as plt
+from skimage.color import rgb2gray
+import numpy as np
+import gym
+from skimage.filters import threshold_otsu
+
+padding_dim = 16
+
+env = gym.make('Pong-v0')
+env.reset()
+for _ in range(30):
+  observation, reward, done, info = env.step(3)
+
+courtYRng = (34, 194)
+courtXRng = (20, 140)
+racketXRng = (141, 144)
+obs = observation[courtYRng[0]:courtYRng[1],:,:]
+
+
+def getPaddedImage(obs,padding_dim,courtXRng,racketXRng):
+  expected_racket_len = 16
+  gs_obs = 255.0*rgb2gray(obs)
+  input_dim = gs_obs.shape[0] + 2*padding_dim
+  padded_Image = np.amin(gs_obs)*np.ones(shape=(input_dim,input_dim))
+  padded_Image[padding_dim:padding_dim+gs_obs.shape[0],padding_dim:padding_dim+gs_obs.shape[1]] = gs_obs
+  racket2 = gs_obs[:,courtXRng[0]-4:courtXRng[0]-1]
+  thresh = threshold_otsu(racket2)
+  binary_racket2 = racket2 > thresh
+  racket2_ypixels = np.unique(np.where(binary_racket2)[0])
+  racket2_len = len(racket2_ypixels)
+  racket1 = gs_obs[:,racketXRng[0]:racketXRng[1]]
+  thresh = threshold_otsu(racket1)
+  binary_racket1 = racket1 > thresh
+  racket1_ypixels = np.unique(np.where(binary_racket1)[0])
+  racket1_len = len(racket1_ypixels)
+  if expected_racket_len>racket1_len:
+    missing_racket1_len = expected_racket_len-racket1_len
+    if 0 in racket1_ypixels:
+      for ind in range(missing_racket1_len):
+        for jind in range(racketXRng[1]-racketXRng[0]+1):
+          padded_Image[padding_dim-ind,racketXRng[0]+padding_dim+jind-1] = racket1[0,0]
+    else:
+      for ind in range(missing_racket1_len):
+        for jind in range(racketXRng[1]-racketXRng[0]+1):
+          padded_Image[gs_obs.shape[0]+padding_dim+ind,racketXRng[0]+padding_dim+jind-1] = racket1[-1,0]
+  if expected_racket_len>racket2_len:
+    missing_racket2_len = expected_racket_len-racket2_len
+    if 0 in racket2_ypixels:
+      for ind in range(missing_racket2_len):
+        for jind in range(racketXRng[1]-racketXRng[0]+1):
+          padded_Image[padding_dim-1-ind,courtXRng[0]+padding_dim-1-jind] = racket2[0,0]
+    else:
+      for ind in range(missing_racket2_len):
+        for jind in range(racketXRng[1]-racketXRng[0]+1):
+          padded_Image[gs_obs.shape[0]+padding_dim+ind,courtXRng[0]+padding_dim-1-jind] = racket2[-1,0]
+  return padded_Image
+
+for _ in range(10):
+  observation, reward, done, info = env.step(4)
+  env.render()
+
+obs = observation[courtYRng[0]:courtYRng[1],:,:]
+padded_Image = getPaddedImage(obs,padding_dim,courtXRng,racketXRng)
+plt.imshow(padded_Image)
+plt.show()
+
+-- saved "20nov12_A1pongv0_cycle_reduced_2obj_INTF7_Perf.png".... P(Follow)~0.4, Hit/miss <0.2
+not good at all.
+.... also save raster in "20nov12_A1pongv0_cycle_reduced_2obj_INTF7_Raster.png"... firing rates look OK.
+EMUP = 2.14 Hz, EMDOWN = 2.15 Hz. EA = 0.03 Hz.
+
+-- saved "20nov12_A1_cycle_reduced_2obj_INTF7_Perf.png".... P(Follow)~0.32, Hit/miss <0.1
+worse than before.
+... also save raster in "20nov12_A1_cycle_reduced_2obj_INTF7_Raster.png"... firing rates look OK but
+sparser than when used frameskip-v4 .... EMUP = 0.73 Hz, EMDOWN = 0.74 Hz. EA = 0.01 Hz.
+
+-- any effct of 20 ms tSetpPerAction?? rerun with same params as in ""20nov12_A1pongv0_cycle_reduced_2obj_INTF7_"  and 
+.... "20nov12_A1_cycle_reduced_2obj_INTF7_"
+
+
+-- when using "useImagePadding" and "captureTwoObjs" with "useReducedNetwork"
+	    "EV1":48,
+	    "EA":4608,
+
+otherwise when "useImagePadding"
+      "EV1":576
+      and all EV1Dirs:576
+
+-- when using "useImagePadding" with sam's network in sn.json
+use 
+	    "EV1":576,
+	    "EV1DE":576,
+	    "EV1DNE":576,
+	    "EV1DN":576,
+	    "EV1DNW":576,
+	    "EV1DW":576,
+	    "EV1DSW":576,
+	    "EV1DS":576,
+	    "EV1DSE":576,
+
