@@ -21525,3 +21525,63 @@ python multistepSim.py sn.json 32 20 20nov15_B0_gcp_multi
 
 started ~22:25 ... 
 
+* 20nov16
+** check 20nov15_B0_cycle__step_1_
+
+python -i simdat.py backupcfg/20nov15_B0_cycle__step_1_sim.json
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/20nov16_20nov15_B0_cycle__step_1_perf.png]]
+worse perf than with the punishment for point loss ... 
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((490e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/20nov16_20nov15_B0_cycle__step_1_rast.png]]
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP'],lclr=['r','g'],plotindiv=False)
+savefig(gifpath()+'all_avg_weight.png') # [[./gif/20nov16_20nov15_B0_cycle__step_1_all_avg_weight.png]]
+
+lfn = ['20nov15_B0_cycle__step_'+str(i)+'_' for i in range(2)] 
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0,0.5))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/20nov16_20nov15_B0_cycle__step_1_perf_all_steps_so_far.png]]
+
+lpda = getindivactionreward(lfn)
+csm=cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+lclr = [csm.to_rgba(float(i)/(len(lpda))) for i in range(len(lpda))]
+clf(); plotComparePerf(lpda,lclr,yl=(0,1),lleg=lfn)
+savefig(gifpath()+'perf_compareD.png') # [[./gif/20nov16_20nov15_B0_cycle__step_1_perf_compareD.png]]
+
+so barely any progress with that one ... 
+
+** check 20nov14_A0_cycle__step_8_
+
+python -i simdat.py backupcfg/20nov14_A0_cycle__step_8_sim.json
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/20nov16_20nov14_A0_cycle__step_8_perf.png]]
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((490e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/20nov16_20nov14_A0_cycle__step_8_rast.png]]
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP'],lclr=['r','g'],plotindiv=False)
+savefig(gifpath()+'all_avg_weight.png') # [[./gif/20nov16_20nov14_A0_cycle__step_8_all_avg_weight.png]]
+
+lfn = ['20nov14_A0_cycle__step_'+str(i)+'_' for i in range(9)] 
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0,0.5))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/20nov16_20nov14_A0_cycle__step_8_perf_all_steps_so_far.png]]
+
+lpda = getindivactionreward(lfn)
+csm=cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+lclr = [csm.to_rgba(float(i)/(len(lpda))) for i in range(len(lpda))]
+clf(); plotComparePerf(lpda,lclr,yl=(0,1),lleg=lfn)
+savefig(gifpath()+'perf_compareD.png') # [[./gif/20nov16_20nov14_A0_cycle__step_8_perf_compareD.png]]
+
+step 5 still best ... 
+
+** other sim
+
+should prob shorten the RL tau for the sim with targetted RL ... 
+
+        "name": "20nov16_A0_cycle_",
+
