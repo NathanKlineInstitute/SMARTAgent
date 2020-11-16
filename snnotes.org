@@ -21579,9 +21579,19 @@ savefig(gifpath()+'perf_compareD.png') # [[./gif/20nov16_20nov14_A0_cycle__step_
 
 step 5 still best ... 
 
+** HA put useImagePadding option in
+
+to use set it in json file and increase number of neurons to 576 (EV1, EV1DE, etc.)
+24**2
+
 ** other sim
 
 should prob shorten the RL tau for the sim with targetted RL ... 
 
         "name": "20nov16_A0_cycle_",
 
+python -i simdat.py backupcfg/20nov16_A0_cycle_sim.json
+
+drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); 
+
+drawcellVm(simConfig,lclr=['r','g','b','c','m','y'])

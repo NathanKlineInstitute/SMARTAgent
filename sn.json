@@ -16,7 +16,8 @@
     "stochmove": 0,
     "0rand": 0,
     "movefctr": 1.0,
-    "avoidStuck": 1,
+    "avoidStuck": 0,
+    "useImagePadding": 1,
     "rewardcodes": {
         "scorePoint": 1.0,
         "losePoint":  0.0,
@@ -41,7 +42,7 @@
         "ResumeSimFromFile": "data/20nov11_C0_cycle_synWeights_final.pkl"
     },
     "sim": {
-        "duration": 3000,
+        "duration": 20000,
         "dt": 0.6,
         "verbose": 0,
         "recordStep": 1.0,
@@ -52,8 +53,8 @@
         "RLFakeDownRule": 0,
         "RLFakeStayRule": 0,
         "name": "20nov16_A0_cycle_",
-        "doquit": 0,
-        "doplot": 1,
+        "doquit": 1,
+        "doplot": 0,
         "saveCellSecs": 0,
         "saveCellConns": 0,
         "targettedRL": 1,
@@ -81,29 +82,29 @@
 	"allpops": {
 	    "ER":0,
 	    "IR":0,
-	    "EV1":1600,
-	    "EV1DE":400,
-	    "EV1DNE":400,
-	    "EV1DN":400,
-	    "EV1DNW":400,
-	    "EV1DW":400,
-	    "EV1DSW":400,
-	    "EV1DS":400,
-	    "EV1DSE":400,
+	    "EV1":576,
+	    "EV1DE":576,
+	    "EV1DNE":576,
+	    "EV1DN":576,
+	    "EV1DNW":576,
+	    "EV1DW":576,
+	    "EV1DSW":576,
+	    "EV1DS":576,
+	    "EV1DSE":576,
 	    "ID": 0,
 	    "IV1":0,
 	    "EV4":0,
 	    "IV4":0,
 	    "EMT":0,
 	    "IMT":0,
-	    "EA":2800,
+	    "EA":6400,
 	    "IA":0,
-	    "EA2": 100,
+	    "EA2": 0,
 	    "IA2": 0,
-	    "EMDOWN":400,
-	    "EMUP":400,
+	    "EMDOWN":100,
+	    "EMUP":100,
 	    "EMSTAY":0,
-	    "IM":200,
+	    "IM":100,
 	    "IMUP": 0,
 	    "IMDOWN": 0,
 	    "IMSTAY": 0},
@@ -171,12 +172,12 @@
             "FeedForwardDirNtoM":0,
             "FeedForwardLocNtoM":0,	    
             "FeedForwardAtoM":1,
-            "FeedForwardAtoA2":1,
+            "FeedForwardAtoA2":0,
             "FeedForwardA2toM":1,	    
             "FeedbackLocNeurons":0,
             "RecurrentMNeurons":1,
             "RecurrentANeurons":0,
-            "RecurrentA2Neurons":1,
+            "RecurrentA2Neurons":0,
             "FeedbackAtoDirN":0,
             "FeedbackAtoLocN":0
         },	
@@ -192,36 +193,36 @@
 	    "VL":{
 		"VD":{"AM":0,"NM":0,"p":0},		
 		"VL":{"AM":4,"NM":0.6,"p":0},
-		"EA":{"AM":3.6,"NM":0.36,"p":0.1},
-		"EMDOWN":{"AM":1,"NM":0.0,"p":0.08},
-		"EMUP":{"AM":1,"NM":0.0,"p":0.08},
-		"EMSTAY":{"AM":1,"NM":0.0,"p":0.08}		
+		"EA":{"AM":3.0,"NM":0.18,"p":1},
+		"EMDOWN":{"AM":1,"NM":0.0,"p":0.0},
+		"EMUP":{"AM":1,"NM":0.0,"p":0.0},
+		"EMSTAY":{"AM":1,"NM":0.0,"p":0.0}		
 	    },
 	    "VD":{
 		"VL":{"AM":0,"NM":0,"p":0},
 		"VD":{"AM":0,"NM":0,"p":0},
-		"EA":{"AM":3.6,"NM":0.36,"p":0.1},
-		"EMDOWN":{"AM":0.5,"NM":0.0,"p":0.08},
-		"EMUP":{"AM":0.5,"NM":0.0,"p":0.08},
-		"EMSTAY":{"AM":0.5,"NM":0.0,"p":0.08},
+		"EA":{"AM":0.5,"NM":0.18,"p":0.2},
+		"EMDOWN":{"AM":1,"NM":0.0,"p":0.0},
+		"EMUP":{"AM":1,"NM":0.0,"p":0.0},
+		"EMSTAY":{"AM":1,"NM":0.0,"p":0.0},
 		"ID": {"AM":10, "p":0.03}
 	    },
 	    "EM":{
-		"EM":{"AM":1.2,"NM":0.0,"p":0.15},
+		"EM":{"AM":0.8,"NM":0.0,"p":0.15},
 		"EA":{"AM":0,"NM":0,"p":0.0},
 		"IRecip": {"AM":20, "NM":0, "p":0.0625},
 		"IM":{"AM":10,"p":0.15}
 	    },
 	    "EA":{
 		"EA":{"AM":1.2,"NM":0.12,"p":0.0},
-		"EA2":{"AM":1.2,"NM":0.0,"p":0.15},
-		"EM":{"AM":1.2,"NM":0.0,"p":0.15},
+		"EA2":{"AM":1.0,"NM":0.0,"p":0.2},
+		"EM":{"AM":0.8,"NM":0.0,"p":0.15},
 		"IA":{"AM": 10, "p":0.1}
 	    },
 	    "EA2":{
 		"EA":{"AM":1.2,"NM":0.12,"p":0.0},
 		"EA2":{"AM":1.2,"NM":0.0,"p":0.15},
-		"EM":{"AM":1.2,"NM":0.0,"p":0.15},
+		"EM":{"AM":0.9,"NM":0.0,"p":0.2},
 		"IA2":{"AM": 10, "p":0.15}
 	    },	   	    
 	    "IR": {
@@ -249,7 +250,7 @@
 		"EV4": {"GA":1.0, "p":0.0}		
 	    },
 	    "IM": {
-		"EM": {"GA":5, "p":0.25},
+		"EM": {"GA":10, "p":0.25},
 		"IM": {"GA":2.5, "p":0.1}
 	    },
 	    "IMRecip": {
@@ -312,9 +313,9 @@
         },
         "EEMRecProbCross": 0,
         "VisualFeedback": 0,
-        "weightVar": 0.5,
+        "weightVar": 0.8,
 	"delayMin": 2,
-	"delayMax": 4
+	"delayMax": 5
     },
     "STDP": {
         "AMPA": {
@@ -375,7 +376,7 @@
             "maxreward": 0.0 
          },
         "AMPA": {
-            "wbase": 0.14,
+            "wbase": 0.1,
             "wmax": 16,
             "RLon": 1,
             "STDPon": 0,
