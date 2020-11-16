@@ -21453,3 +21453,75 @@ python multistepSim.py sn.json 32 20 20nov14_A0_gcp_multi
 
 started ~23:21 ...
 
+* 20nov15
+** check output from 20nov14_A0_cycle__step_5_ -->> doing well (has targetted RL + intermediate reward)
+
+python -i simdat.py backupcfg/20nov14_A0_cycle__step_5_sim.json
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/20nov15_20nov14_A0_cycle__step_5_perf.png]]
+perf looks pretty high ... including score/miss ... 
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((490e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/20nov15_20nov14_A0_cycle__step_5_rast.png]]
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP'],lclr=['r','g'],plotindiv=False)
+savefig(gifpath()+'all_avg_weight.png') # [[./gif/20nov15_20nov14_A0_cycle__step_5_all_avg_weight.png]]
+
+lfn = ['20nov14_A0_cycle__step_'+str(i)+'_' for i in range(6)] 
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0,0.5))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/20nov15_20nov14_A0_cycle__step_5_perf_all_steps_so_far.png]]
+
+lpda = getindivactionreward(lfn)
+csm=cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+lclr = [csm.to_rgba(float(i)/(len(lpda))) for i in range(len(lpda))]
+clf(); plotComparePerf(lpda,lclr,yl=(0,1),lleg=lfn)
+savefig(gifpath()+'perf_compareD.png') # [[./gif/20nov15_20nov14_A0_cycle__step_5_perf_compareD.png]]
+
+so far last step is the best ... seems better than other sims in terms of overall score/loss
+
+fig=animInput(InputImages,gifpath()+'_input.mp4') # [[./gif/20nov15_20nov14_A0_cycle__step_5__input.mp4]]
+
+by mistake had rllenhebb of 2000 ... leftover from when had no interm reward ... 
+
+** comparison sim
+
+still would be good to get progress w/o intermediate reward ... 
+
+could compare what get w/o intermediate reward, no targetted RL, and no punishment for loss ... to see
+if decreasing weights/rates are the issue/problem
+
+        "name": "20nov15_B0_cycle_",
+        "targettedRL": 0,
+    "rewardcodes": {
+        "scorePoint": 1.0,
+        "losePoint":  0.0,
+        "followTarget": 0.0,
+        "avoidTarget": 0.0,
+        "hitBall": 0.0
+    },
+        "RLconns":{
+	    "EIPlast":0,
+            "Visual":0,
+            "RecurrentDirNeurons":0,
+            "RecurrentLocNeurons":0,
+            "FeedForwardDirNtoA":0,
+            "FeedForwardLocNtoA":0,
+            "FeedForwardDirNtoM":0,
+            "FeedForwardLocNtoM":0,	    
+            "FeedForwardAtoM":1,
+            "FeedForwardAtoA2":1,
+            "FeedForwardA2toM":1,	    
+            "FeedbackLocNeurons":0,
+            "RecurrentMNeurons":1,
+            "RecurrentANeurons":0,
+            "RecurrentA2Neurons":1,
+            "FeedbackAtoDirN":0,
+            "FeedbackAtoLocN":0
+        },	
+
+python multistepSim.py sn.json 32 20 20nov15_B0_gcp_multi
+
+started ~22:25 ... 
+
