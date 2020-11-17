@@ -1621,4 +1621,6 @@ if __name__ == '__main__':
   #plotSynWeightsPostNeuronID(pdf,25)
   #plotSynWeightsPostNeuronID(pdf,35)
   #plotSynWeightsPostNeuronID(pdf,45)
-  fig=animInput(InputImages,gifpath()+'_input.mp4') 
+  #fig=animInput(InputImages,gifpath()+'_input.mp4')
+  drawraster(dspkT,dspkID)
+  figure(); drawcellVm(simConfig,lclr=['r','g','b','c','m','y'])
