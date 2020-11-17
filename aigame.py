@@ -211,44 +211,82 @@ class AIGame:
     #fr_Images = np.where(dsum_Images>1.0,100,dsum_Images) #Using this to check what number would work for firing rate
     #fr_Images = np.where(dsum_Images<10.0,0,dsum_Images)
     if self.reducedNet:
+      fr_Images = []
       if dconf['net']['useBinaryImage']:
         thresh = threshold_otsu(dsum_Images)
         binary_Image = dsum_Images > thresh
         if dconf['sim']['captureTwoObjs']:
-          fr_Images = np.zeros(shape=(dsum_Images.shape[0],2))
+          #fr_Images = np.zeros(shape=(dsum_Images.shape[0],2))
           if self.useImagePadding:
+            fr_Images_RO = []
             fr_Images_Ball = self.locationNeuronRate*np.amax(binary_Image[:,5:19],1)
+            fr_Images_Ballxpos = self.locationNeuronRate*np.amax(binary_Image[:,5:19],0) #14 neurons required for ballxpos encoding.
             fr_Images_RM = self.locationNeuronRate*np.amax(binary_Image[:,19:],1)
           else:
+            fr_Images_RO = []
             fr_Images_Ball = self.locationNeuronRate*np.amax(binary_Image[:,3:17],1)
-            fr_Images_RM = self.locationNeuronRate*np.amax(binary_Image[:,17:],1)
-          fr_Images[:,0] = fr_Images_Ball
-          fr_Images[:,1] = fr_Images_RM
-          print(fr_Images)        
+            fr_Images_Ballxpos = self.locationNeuronRate*np.amax(binary_Image[:,3:17],0) #14 neurons required for ballxpos encoding.
+            fr_Images_RM = self.locationNeuronRate*np.amax(binary_Image[:,17:],1)  
+          #fr_Images[:,0] = fr_Images_Ball
+          #fr_Images[0:len(fr_Images_Ballxpos),1] = fr_Images_Ballxpos
+          #fr_Images[:,1] = fr_Images_RM
+          #print(fr_Images)        
         else:
-          fr_Images = np.zeros(shape=(dsum_Images.shape[0],3))
+          fr_Images = np.zeros(shape=(dsum_Images.shape[0],4))
           if self.useImagePadding:
             fr_Images_RO = self.locationNeuronRate*np.amax(binary_Image[:,0:5],1)
             fr_Images_Ball = self.locationNeuronRate*np.amax(binary_Image[:,5:19],1)
+            fr_Images_Ballxpos = self.locationNeuronRate*np.amax(binary_Image[:,5:19],0)
             fr_Images_RM = self.locationNeuronRate*np.amax(binary_Image[:,19:],1)
           else:
             fr_Images_RO = self.locationNeuronRate*np.amax(binary_Image[:,0:3],1)
             fr_Images_Ball = self.locationNeuronRate*np.amax(binary_Image[:,3:17],1)
+            fr_Images_Ballxpos = self.locationNeuronRate*np.amax(binary_Image[:,3:17],0)
             fr_Images_RM = self.locationNeuronRate*np.amax(binary_Image[:,17:],1)
-          fr_Images[:,0] = fr_Images_RO
-          fr_Images[:,1] = fr_Images_Ball
-          fr_Images[:,2] = fr_Images_RM
-          print(fr_Images)
+          #fr_Images[:,0] = fr_Images_RO
+          #fr_Images[:,1] = fr_Images_Ball
+          #fr_Images[0:len(fr_Images_Ballxpos),1] = fr_Images_Ballxpos
+          #fr_Images[:,4] = fr_Images_RM
+          #print(fr_Images)
       else:
         dsum_Images = dsum_Images - np.amin(dsum_Images)
         dsum_Images = (255.0/np.amax(dsum_Images))*dsum_Images
         fr_Image = self.locationNeuronRate/(1+np.exp((np.multiply(-1,dsum_Images)+123)/10))
-        fr_Images = np.zeros(shape=(dsum_Images.shape[0],3))
-        fr_Images[:,0] = np.sum(fr_Image[:,0:3],1) # opponent racket y loc
-        fr_Images[:,1] = np.sum(fr_Image[:,3:17],1) # ball y loc
-        fr_Images[:,2] = np.sum(fr_Image[:,17:],1) # model racket y loc
-        #fr_Images = np.subtract(fr_Images,np.min(fr_Images)) #baseline firing rate subtraction. Instead all excitatory neurons are firing at 5Hz.
-        #print(np.amax(fr_Images))
+        if dconf['sim']['captureTwoObjs']:
+          #fr_Images = np.zeros(shape=(dsum_Images.shape[0],3))
+          if self.useImagePadding:
+            fr_Images_Ball = np.sum(fr_Image[:,5:19],1) # ball y loc
+            fr_Images_Ballxpos = np.sum(fr_Image[:,5:19],0) # ball x loc
+            fr_Images_RM = np.sum(fr_Image[:,19:],1) # model racket y loc
+          else:
+            fr_Images_Ball = np.sum(fr_Image[:,3:17],1) # ball y loc
+            fr_Images_Ballxpos = np.sum(fr_Image[:,5:19],0) # ball x loc
+            fr_Images_RM = np.sum(fr_Image[:,17:],1) # model racket y loc
+        else:
+          #fr_Images = np.zeros(shape=(dsum_Images.shape[0],4))
+          if self.useImagePadding:
+            fr_Images_RO = np.sum(fr_Image[:,0:5],1) # opponent racket y loc
+            fr_Images_Ball = np.sum(fr_Image[:,5:19],1) # ball y loc
+            fr_Images_Ballxpos = np.sum(fr_Image[:,5:19],0) # ball x loc
+            fr_Images_RM = np.sum(fr_Image[:,19:],1) # model racket y loc
+          else:
+            fr_Images_RO = np.sum(fr_Image[:,0:3],1) # opponent racket y loc
+            fr_Images_Ball = np.sum(fr_Image[:,3:17],1) # ball y loc
+            fr_Images_Ballxpos = np.sum(fr_Image[:,5:19],0) # ball x loc
+            fr_Images_RM = np.sum(fr_Image[:,17:],1) # model racket y loc
+      for fr in fr_Images_RO:
+        fr_Images.append(fr)
+      for fr in fr_Images_Ball:
+        fr_Images.append(fr)
+      for fr in fr_Images_Ballxpos:
+        fr_Images.append(fr)
+      for fr in fr_Images_RM:
+        fr_Images.append(fr)
+      #print(fr_Images)
+      #print(self.InputPop)
+      #if len(fr_Images)==dconf['net']['allpops'][self.InputPop]:  
+      loc_firingrates = np.array(fr_Images)
+      print(loc_firingrates)
     else:
       if dconf['net']['useBinaryImage']:
         thresh = threshold_otsu(dsum_Images)
@@ -260,7 +298,8 @@ class AIGame:
         fr_Images = self.locationNeuronRate/(1+np.exp((np.multiply(-1,dsum_Images)+123)/10))
         #fr_Images = np.subtract(fr_Images,np.min(fr_Images)) #baseline firing rate subtraction. Instead all excitatory neurons are firing at 5Hz.
         #print(np.amax(fr_Images))
-    self.dFiringRates[self.InputPop] = np.reshape(fr_Images,dconf['net']['allpops'][self.InputPop]) #400 for 20*20, 900 for 30*30, etc.
+      loc_firingrates = np.reshape(fr_Images,dconf['net']['allpops'][self.InputPop])
+    self.dFiringRates[self.InputPop] = loc_firingrates #400 for 20*20, 900 for 30*30, etc.
 
   def computeMotionFields (self, UseFull=False):
     # compute and store the motion fields and associated data

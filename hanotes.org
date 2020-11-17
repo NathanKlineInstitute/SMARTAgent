@@ -9294,3 +9294,12 @@ use
 	    "EV1DS":576,
 	    "EV1DSE":576,
 
+* 20nov16
+
+-- testing useImagePadding
+
+-- add 20 or 24 neurons for encoding x ball position in the reduced network model
+
+-- added neurons for encoding ball_xpos.... when using "useReducedNetwork": 1
+
+-- retune the model parameters from V to EA....
