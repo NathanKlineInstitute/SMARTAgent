@@ -1,1 +1,3 @@
 mpiexec -n $1 --use-hwthread-cpus nrniv -python -mpi sim.py $2
+python simdat.py backupcfg/20nov17_A0_lp_sim.json
+vlc gif/20nov17_20nov17_A0_lp__input.mp4 &

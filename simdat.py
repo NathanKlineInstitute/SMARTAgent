@@ -1621,3 +1621,4 @@ if __name__ == '__main__':
   #plotSynWeightsPostNeuronID(pdf,25)
   #plotSynWeightsPostNeuronID(pdf,35)
   #plotSynWeightsPostNeuronID(pdf,45)
+  fig=animInput(InputImages,gifpath()+'_input.mp4') 
