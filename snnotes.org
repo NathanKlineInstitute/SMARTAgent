@@ -21592,6 +21592,19 @@ should prob shorten the RL tau for the sim with targetted RL ...
 
 python -i simdat.py backupcfg/20nov16_A0_cycle_sim.json
 
-drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); 
+python -i simdat.py backupcfg/20nov16_B0_cycle_sim.json
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png')
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((490e3,500e3))
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP','EA','EA2'],lclr=['r','g','b','c'],plotindiv=False)
 
 drawcellVm(simConfig,lclr=['r','g','b','c','m','y'])
+
+binsz = 1000
+dnspk = {pop:getspikehist(dspkT[pop],dnumc[pop],binsz,totalDur) for pop in ['EMDOWN','EMUP','EA','EA2']}
+for clr,pop in zip(['r','g','b','c'],['EMDOWN','EMUP','EA','EA2']): plot(dnspk[pop][0],dnspk[pop][1],clr)
+xlim((0,totalDur))
+ylim((0,200))
