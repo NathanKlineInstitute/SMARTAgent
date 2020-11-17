@@ -1583,12 +1583,15 @@ def trainAgent (t):
           actions.append(dconf['moves']['UP'])
         elif F_DOWNs[ts]>F_UPs[ts]: # DOWN WINS
           actions.append(dconf['moves']['DOWN'])
-        elif F_DOWNs[ts] == 0:
-          actions.append(sim.lastMove)
         else:
-          actions.append(dconf['moves']['NOMOVE'])
-          #lmoves = [dconf['moves']['UP'], dconf['moves']['DOWN']]
-          #actions.append(lmoves[np.random.randint(0,len(lmoves))])
+          lmoves = [dconf['moves']['UP'], dconf['moves']['DOWN']]
+          actions.append(lmoves[np.random.randint(0,len(lmoves))])          
+        #elif F_DOWNs[ts] == 0:
+        #  actions.append(dconf['moves']['NOMOVE'])
+        #else:
+        #  actions.append(sim.lastMove)          
+        #lmoves = [dconf['moves']['UP'], dconf['moves']['DOWN']]
+        #actions.append(lmoves[np.random.randint(0,len(lmoves))])
         sim.lastMove = actions[-1]
       else:
         for ts in range(int(dconf['actionsPerPlay'])):

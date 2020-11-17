@@ -21608,3 +21608,19 @@ dnspk = {pop:getspikehist(dspkT[pop],dnumc[pop],binsz,totalDur) for pop in ['EMD
 for clr,pop in zip(['r','g','b','c'],['EMDOWN','EMUP','EA','EA2']): plot(dnspk[pop][0],dnspk[pop][1],clr)
 xlim((0,totalDur))
 ylim((0,200))
+
+* 20nov17
+** stochmove,imagepadding test
+
+python -i simdat.py backupcfg/20nov16_C0_cycle_sim.json
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/20nov17_20nov16_C0_cycle_perf.png]]
+
+clf(); drawraster(dspkT,dspkID); ylim((0,sum(list(dnumc.values())))); xlim((490e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/20nov17_20nov16_C0_cycle_rast.png]]
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP'],lclr=['r','g','b','c'],plotindiv=False)
+savefig(gifpath()+'all_avg_weight.png') # [[./gif/20nov17_20nov16_C0_cycle_all_avg_weight.png]]
+
+fig=animInput(InputImages,gifpath()+'_input.mp4') # [[./gif/20nov17_20nov16_C0_cycle__input.mp4]]

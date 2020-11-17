@@ -13,7 +13,7 @@
         3,
         4
     ],
-    "stochmove": 0,
+    "stochmove": 1,
     "0rand": 0,
     "movefctr": 1.0,
     "avoidStuck": 0,
@@ -52,12 +52,12 @@
         "RLFakeUpRule": 0,
         "RLFakeDownRule": 0,
         "RLFakeStayRule": 0,
-        "name": "20nov16_B0_cycle_",
+        "name": "20nov16_C0_cycle_",
         "doquit": 1,
         "doplot": 0,
         "saveCellSecs": 0,
         "saveCellConns": 0,
-        "targettedRL": 0,
+        "targettedRL": 1,
         "tstepPerAction": 20,
         "saveWeights": 1,
         "saveAssignedFiringRates": 0,
@@ -97,14 +97,14 @@
 	    "IV4":0,
 	    "EMT":0,
 	    "IMT":0,
-	    "EA":500,
-	    "IA":125,
-	    "EA2": 500,
-	    "IA2": 125,
+	    "EA":2800,
+	    "IA":0,
+	    "EA2": 100,
+	    "IA2": 25,
 	    "EMDOWN":100,
 	    "EMUP":100,
 	    "EMSTAY":0,
-	    "IM":50,
+	    "IM":100,
 	    "IMUP": 0,
 	    "IMDOWN": 0,
 	    "IMSTAY": 0},
@@ -172,12 +172,12 @@
             "FeedForwardDirNtoM":0,
             "FeedForwardLocNtoM":0,	    
             "FeedForwardAtoM":1,
-            "FeedForwardAtoA2":1,
+            "FeedForwardAtoA2":0,
             "FeedForwardA2toM":1,	    
             "FeedbackLocNeurons":0,
             "RecurrentMNeurons":1,
-            "RecurrentANeurons":1,
-            "RecurrentA2Neurons":1,
+            "RecurrentANeurons":0,
+            "RecurrentA2Neurons":0,
             "FeedbackAtoDirN":0,
             "FeedbackAtoLocN":0
         },	
@@ -193,7 +193,7 @@
 	    "VL":{
 		"VD":{"AM":0,"NM":0,"p":0},		
 		"VL":{"AM":4,"NM":0.6,"p":0},
-		"EA":{"AM":3.6,"NM":0.36,"p":0.2},
+		"EA":{"AM":3.6,"NM":0.36,"p":0.1},
 		"EMDOWN":{"AM":1,"NM":0.0,"p":0.08},
 		"EMUP":{"AM":1,"NM":0.0,"p":0.08},
 		"EMSTAY":{"AM":1,"NM":0.0,"p":0.08}		
@@ -201,28 +201,28 @@
 	    "VD":{
 		"VL":{"AM":0,"NM":0,"p":0},
 		"VD":{"AM":0,"NM":0,"p":0},
-		"EA":{"AM":3.6,"NM":0.36,"p":0.2},
+		"EA":{"AM":3.6,"NM":0.36,"p":0.1},
 		"EMDOWN":{"AM":0.5,"NM":0.0,"p":0.08},
 		"EMUP":{"AM":0.5,"NM":0.0,"p":0.08},
 		"EMSTAY":{"AM":0.5,"NM":0.0,"p":0.08},
 		"ID": {"AM":10, "p":0.03}
 	    },
 	    "EM":{
-		"EM":{"AM":1.8,"NM":0.0,"p":0.15},
+		"EM":{"AM":1.2,"NM":0.0,"p":0.15},
 		"EA":{"AM":0,"NM":0,"p":0.0},
 		"IRecip": {"AM":20, "NM":0, "p":0.0625},
 		"IM":{"AM":10,"p":0.15}
 	    },
 	    "EA":{
-		"EA":{"AM":2.2,"NM":0.0,"p":0.05},
-		"EA2":{"AM":2.2,"NM":0.0,"p":0.3},
-		"EM":{"AM":2.2,"NM":0.0,"p":0.15},
-		"IA":{"AM": 10, "p":0.15}
+		"EA":{"AM":1.2,"NM":0.12,"p":0.0},
+		"EA2":{"AM":1.2,"NM":0.0,"p":0.15},
+		"EM":{"AM":1.2,"NM":0.0,"p":0.15},
+		"IA":{"AM": 10, "p":0.1}
 	    },
 	    "EA2":{
 		"EA":{"AM":1.2,"NM":0.12,"p":0.0},
-		"EA2":{"AM":2.2,"NM":0.0,"p":0.05},
-		"EM":{"AM":2.2,"NM":0.0,"p":0.15},
+		"EA2":{"AM":1.2,"NM":0.0,"p":0.15},
+		"EM":{"AM":1.2,"NM":0.0,"p":0.15},
 		"IA2":{"AM": 10, "p":0.15}
 	    },	   	    
 	    "IR": {
@@ -257,11 +257,11 @@
 		"EM": {"GA":10, "p":0.125}
 	    },
 	    "IA": {
-		"EA": {"GA":5, "p":0.25},
+		"EA": {"GA":5, "p":0.1},
 		"IA": {"GA":2.5, "p":0.1}
 	    },
 	    "IA2": {
-		"EA2": {"GA":5, "p":0.25},
+		"EA2": {"GA":5, "p":0.1},
 		"IA2": {"GA":2.5, "p":0.15}
 	    },	    	    
 	    "IR": {
@@ -293,7 +293,7 @@
 		"EV4": {"AM":0 , "NM":0, "p":0},
 		"IMT": {"AM":20, "p":0.0225}
 	    }
-	},	
+	},
         "EEMWghtThreshMin": 0.9,
         "EEMWghtThreshMax": 2.5,
         "EEMPopNorm": 1,
