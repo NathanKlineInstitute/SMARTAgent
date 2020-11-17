@@ -21624,3 +21624,9 @@ clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['du
 savefig(gifpath()+'all_avg_weight.png') # [[./gif/20nov17_20nov16_C0_cycle_all_avg_weight.png]]
 
 fig=animInput(InputImages,gifpath()+'_input.mp4') # [[./gif/20nov17_20nov16_C0_cycle__input.mp4]]
+** fixup issues with image padding (paddle size changing) and ball size changing
+
+./myrun 12 sn.json
+
+#python -i simdat.py backupcfg/20nov17_A0_lp_sim.json
+#fig=animInput(InputImages,gifpath()+'_input.mp4') 
