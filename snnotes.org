@@ -21798,3 +21798,8 @@ can try with full scale for EV1 and no directional neurons?
 #pravgrates(dspkT,dspkID,dnumc)
 drawraster(dspkT,dspkID)
 drawcellVm(simConfig,lclr=['r','g','b','c','m','y'])
+
+./myrun 48 sn.json
+
+started ~17:25 ...
+

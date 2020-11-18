@@ -42,7 +42,7 @@
         "ResumeSimFromFile": "data/20nov17_A0_cycle_synWeights_final.pkl"
     },
     "sim": {
-        "duration": 200000,
+        "duration": 500000,
         "dt": 0.6,
         "verbose": 0,
         "recordStep": 1.0,
@@ -97,10 +97,10 @@
 	    "IV4":0,
 	    "EMT":0,
 	    "IMT":0,
-	    "EA":3000,
+	    "EA":2800,
 	    "IA":0,
-	    "EA2": 200,
-	    "IA2": 50,	    
+	    "EA2": 100,
+	    "IA2": 25,	    
 	    "EMDOWN":400,
 	    "EMUP":400,
 	    "EMSTAY":0,
@@ -193,7 +193,7 @@
 	    "VL":{
 		"VD":{"AM":0,"NM":0,"p":0},		
 		"VL":{"AM":4,"NM":0.6,"p":0},
-		"EA":{"AM":1.5,"NM":0.26,"p":0.1},
+		"EA":{"AM":1.4,"NM":0.26,"p":0.1},
 		"EMDOWN":{"AM":0.5,"NM":0.0,"p":0.08},
 		"EMUP":{"AM":0.5,"NM":0.0,"p":0.08},
 		"EMSTAY":{"AM":0.5,"NM":0.0,"p":0.08}
