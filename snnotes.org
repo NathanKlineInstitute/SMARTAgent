@@ -21731,3 +21731,58 @@ a,b,c = getCumPerfCols(actreward)
 
 fig=animInput(InputImages,'test.mp4',actreward=actreward)
 
+binsz = 20
+dnspk = {pop:getspikehist(dspkT[pop],dnumc[pop],binsz,totalDur) for pop in ['EMDOWN','EMUP']}
+for clr,pop in zip(['r','b'],['EMDOWN','EMUP']): plot(dnspk[pop][0],dnspk[pop][1],clr)
+
+EMDOWN, EMUP rates are almost the same at each step ... 
+
+rdiff = np.array(dnspk['EMUP'][1]) - np.array(dnspk['EMDOWN'][1])
+
+plot(dnspk['EMDOWN'][0], rdiff, color='k', linewidth=3); xlim((0,totalDur))
+savefig(gifpath()+'EMUP_minus_EMDOWN.png') # [[./gif/20nov18_20nov17_A1_cycle__step_0_EMUP_minus_EMDOWN.png]]
+
+
+would be useful to visualize what each EM neuron knows about the environment - RFs
+that's what getinputmap shows ... but only 1st order connections ... and uses pdf ... which only
+has the plastic weights ... or to show the spatial evidence/weight for a specific move 
+
+meanwhile, check next step
+
+python -i simdat.py backupcfg/20nov17_A1_cycle__step_1_sim.json
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/20nov18_20nov17_A1_cycle__step_1_perf.png]]
+
+clf(); drawraster(dspkT,dspkID); xlim((490e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/20nov18_20nov17_A1_cycle__step_1_rast.png]]
+rates have gone up quite a bit ... 
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False)
+savefig(gifpath()+'all_avg_weight.png') # [[./gif/20nov18_20nov17_A1_cycle__step_1_all_avg_weight.png]]
+
+lfn = ['20nov17_A0_cycle_', '20nov17_A1_cycle__step_0_',  '20nov17_A1_cycle__step_1_']
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0,0.425))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/20nov18_20nov17_A1_cycle__step_1_perf_all_steps_so_far.png]]
+
+lpda = getindivactionreward(lfn)
+csm=cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+lclr = [csm.to_rgba(float(i)/(len(lpda))) for i in range(len(lpda))]
+clf(); plotComparePerf(lpda,lclr,yl=(0,1),lleg=lfn)
+savefig(gifpath()+'perf_compareD.png') # [[./gif/20nov18_20nov17_A1_cycle__step_1_perf_compareD.png]]
+looks clearly better this step ...
+
+fig=animInput(InputImages,gifpath()+'_input.mp4',actreward=actreward) # [[./gif/20nov18_20nov17_A1_cycle__step_1__input.mp4]]
+
+
+tt = np.unique(pdf.time)
+
+dout = getpopinputmap(pdf, tt[0], dnumc, dstartidx, dendidx, 'EA')
+clf(); plotallinputmaps(pdf,tt[0],dstartidx['EMDOWN'],'EMDOWN',dnumc,dstartidx,dendidx,asweight=True,dmap=dout)
+
+savefig(gifpath()+'EMDOWN_inputmap_first.png') 
+
+dout = getpopinputmap(pdf, tt[-1], dnumc, dstartidx, dendidx, 'EMDOWN')
+clf(); plotallinputmaps(pdf,tt[-1],dstartidx['EMDOWN'],'EMDOWN',dnumc,dstartidx,dendidx,asweight=True,dmap=dout)
+savefig(gifpath()+'EMDOWN_inputmap_last.png') 

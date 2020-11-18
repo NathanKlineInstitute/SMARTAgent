@@ -268,7 +268,8 @@ def viewInput (t, InputImages, ldflow, dhist, lpop = None, lclr = ['r','b'], twi
   
 
 #
-def animInput (InputImages, outpath, framerate=10, figsize=None, showflow=False, ldflow=None, dobjpos=None, actreward=None, nframe=None):
+def animInput (InputImages, outpath, framerate=10, figsize=None, showflow=False, ldflow=None, dobjpos=None,\
+               actreward=None, nframe=None):
   # animate the input images; showflow specifies whether to calculate/animate optical flow
   ioff()
   # plot input images and optionally optical flow
@@ -291,7 +292,7 @@ def animInput (InputImages, outpath, framerate=10, figsize=None, showflow=False,
     if ldx==0:
       pcm = ax.imshow( lact[idx][0,:,:], origin='upper', cmap='gray', vmin=0, vmax=lvmax[idx])
       ddat[ldx] = pcm
-      ax.set_ylabel(ltitle[idx])
+      # ax.set_ylabel(ltitle[idx])
       if dobjpos is not None:
         lobjx,lobjy = [objfctr*dobjpos[k][0,0] for k in dobjpos.keys()], [objfctr*dobjpos[k][0,1] for k in dobjpos.keys()]
         ddat['objpos'], = ax.plot(lobjx,lobjy,'ro')
