@@ -268,7 +268,7 @@ def viewInput (t, InputImages, ldflow, dhist, lpop = None, lclr = ['r','b'], twi
   
 
 #
-def animInput (InputImages, outpath, framerate=10, figsize=None, showflow=False, ldflow=None, dobjpos=None, actreward=None):
+def animInput (InputImages, outpath, framerate=10, figsize=None, showflow=False, ldflow=None, dobjpos=None, actreward=None, nframe=None):
   # animate the input images; showflow specifies whether to calculate/animate optical flow
   ioff()
   # plot input images and optionally optical flow
@@ -301,8 +301,13 @@ def animInput (InputImages, outpath, framerate=10, figsize=None, showflow=False,
       ax.set_xlim((0,InputImages[0].shape[1])); ax.set_ylim((0,InputImages[0].shape[0]))
       ax.invert_yaxis()
     idx += 1
+  cumHits, cumMissed, cumScore = None,None,None
+  if actreward is not None:
+    cumHits, cumMissed, cumScore = getCumPerfCols(actreward)    
   def updatefig (t):
-    fig.suptitle('Time = ' + str(t*tstepPerAction) + ' ms')
+    stitle = 'Time = ' + str(t*tstepPerAction) + ' ms'
+    if cumHits is not None: stitle += '\nOpponent Points:'+str(cumMissed[t])+'   Model Points:'+str(cumScore[t]) + '   Model Hits:'+str(cumHits[t])
+    fig.suptitle(stitle)
     if t < 1: return fig # already rendered t=0 above
     print('frame t = ', str(t*tstepPerAction))    
     for ldx,ax in enumerate(lax):
@@ -315,7 +320,7 @@ def animInput (InputImages, outpath, framerate=10, figsize=None, showflow=False,
         ddat[ldx].set_UVC(ldflow[t]['flow'][:,:,0],-ldflow[t]['flow'][:,:,1])        
     return fig
   t1 = range(0,totalDur,tstepPerAction)
-  nframe = len(t1)
+  if nframe is None: nframe = len(t1)
   if showflow: nframe-=1
   ani = animation.FuncAnimation(fig, updatefig, interval=1, frames=nframe)
   writer = anim.getwriter(outpath, framerate=framerate)
@@ -634,8 +639,8 @@ def plotScoreLoss (actreward,ax=None,msz=3):
   ax.legend(('Score Point ('+str(cumScore[-1])+')','Lose Point ('+str(cumLoss[-1])+')'),loc='best')
   return cumScore[-1],cumLoss[-1]
 
-def addCumPerfCols (actreward):
-  # add cumulative performance columns (as ratio; cumulative follow probability)
+def getCumPerfCols (actreward):
+  # get cumulative performance arrays
   action_times = np.array(actreward.time)
   Hit_Missed = np.array(actreward.hit)
   allMissed = np.where(Hit_Missed==-1,1,0)
@@ -652,7 +657,7 @@ def addCumPerfCols (actreward):
   cumHits = np.cumsum(allHit) #cumulative hits evolving with time.
   cumMissed = np.cumsum(allMissed) #if a reward is -1, replace it with 1 else replace it with 0.
   #actreward['cumHitMissRatio'] = cumHits/cumMissed # cumulative hits/missed ratio
-  return cumScore/cumMissed, np.divide(rewardingActions,cumActs), cumHits/cumMissed
+  return cumHits, cumMissed, cumScore
   
 
 def plotPerf (actreward,yl=(0,1)):

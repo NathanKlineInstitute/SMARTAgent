@@ -21727,4 +21727,7 @@ should include the scores/metrics in animinput ...
 
 fig=animInput(InputImages,gifpath()+'_input.mp4') # [[./gifpath()+'_input.mp4']]
 
+a,b,c = getCumPerfCols(actreward)
+
+fig=animInput(InputImages,'test.mp4',actreward=actreward)
 
