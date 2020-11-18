@@ -483,11 +483,13 @@ def pravgrates(dspkT,dspkID,dnumc):
   for pop in dspkT.keys(): print(pop,round(getrate(dspkT,dspkID,pop,dnumc),2),'Hz')
 
 #
-def drawraster (dspkT,dspkID,tlim=None,msz=2):
+def drawraster (dspkT,dspkID,tlim=None,msz=2,skipstimMod=True):
   # draw raster (x-axis: time, y-axis: neuron ID)
+  lpop=list(dspkT.keys()); lpop.reverse()
+  lpop = [x for x in lpop if not skipstimMod or x.count('stimMod')==0]  
   csm=cm.ScalarMappable(cmap=cm.prism); csm.set_clim(0,len(dspkT.keys()))
   lclr = []
-  for pdx,pop in enumerate(list(dspkT.keys())):
+  for pdx,pop in enumerate(lpop):
     color = csm.to_rgba(pdx); lclr.append(color)
     plot(dspkT[pop],dspkID[pop],'o',color=color,markersize=msz)
   if tlim is not None:
@@ -495,10 +497,11 @@ def drawraster (dspkT,dspkID,tlim=None,msz=2):
   else:
     xlim((0,totalDur))
   xlabel('Time (ms)')
-  lclr.reverse(); lpop=list(dspkT.keys()); lpop.reverse()
+  lclr.reverse(); 
   lpatch = [mpatches.Patch(color=c,label=s+' '+str(round(getrate(dspkT,dspkID,s,dnumc),2))+' Hz') for c,s in zip(lclr,lpop)]
   ax=gca()
   ax.legend(handles=lpatch,handlelength=1,loc='best')
+  ylim((0,sum([dnumc[x] for x in lpop])))
 
 #
 def drawcellVm (simConfig, ldrawpop=None,tlim=None, lclr=None):
