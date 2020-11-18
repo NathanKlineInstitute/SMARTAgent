@@ -391,6 +391,8 @@ netParams.stimTargetParams['bkg->all'] = {
 def setupNoiseStim ():
   # setup noisy NetStim sources (send random spikes)
   if ECellModel == 'IntFire4' or ECellModel == 'INTF7':
+    lpoty = [x for x in EMotorPops]
+    lpoty.append('EA2')
     for ty,sy in zip(["E","I"],["AMPA","GABA"]):
       Weight,Rate = dconf["Noise"][ty]["Weight"],dconf["Noise"][ty]["Rate"]
       weightIndex = 0
@@ -398,7 +400,7 @@ def setupNoiseStim ():
       if ty == 'E': Weight *= cfg.EEGain
       if ty == 'I': Weight *= cfg.IEGain
       if Weight > 0.0 and Rate > 0.0: # only create the netstims if rate,weight > 0
-        for poty in EMotorPops:
+        for poty in lpoty:
           stimty = 'stimNoise'+poty
           netParams.popParams[stimty] = {'cellModel': 'NetStim', 'numCells': dnumc[poty],'rate': Rate, 'noise': 1.00, 'start': 0}
           blist = [[i,i] for i in range(dnumc[poty])]
@@ -1581,12 +1583,15 @@ def trainAgent (t):
           actions.append(dconf['moves']['UP'])
         elif F_DOWNs[ts]>F_UPs[ts]: # DOWN WINS
           actions.append(dconf['moves']['DOWN'])
-        elif F_DOWNs[ts] == 0:
-          actions.append(sim.lastMove)
         else:
-          actions.append(dconf['moves']['NOMOVE'])
-          #lmoves = [dconf['moves']['UP'], dconf['moves']['DOWN']]
-          #actions.append(lmoves[np.random.randint(0,len(lmoves))])
+          lmoves = [dconf['moves']['UP'], dconf['moves']['DOWN']]
+          actions.append(lmoves[np.random.randint(0,len(lmoves))])          
+        #elif F_DOWNs[ts] == 0:
+        #  actions.append(dconf['moves']['NOMOVE'])
+        #else:
+        #  actions.append(sim.lastMove)          
+        #lmoves = [dconf['moves']['UP'], dconf['moves']['DOWN']]
+        #actions.append(lmoves[np.random.randint(0,len(lmoves))])
         sim.lastMove = actions[-1]
       else:
         for ts in range(int(dconf['actionsPerPlay'])):

@@ -128,11 +128,8 @@ class AIGame:
     self.maxYPixel = 160 - 1 # 20 - 1
     self.avoidStuck = False
     self.avoidStuck = dconf['avoidStuck']
-    if 'useImagePadding' in dconf['net']: 
-      self.useImagePadding = dconf['net']['useImagePadding'] # make sure the number of neurons is correct
-      self.padPixelEachSide = 16 # keeping it fix for maximum number of pixels for racket.
-    else:
-      self.useImagePadding = 0
+    self.useImagePadding = dconf['useImagePadding'] # make sure the number of neurons is correct
+    self.padPixelEachSide = 16 # keeping it fix for maximum number of pixels for racket.
     if dconf['net']['allpops'][self.InputPop] == 1600: # this is for 40x40 (40 = 1/4 of 160)
       self.downsampshape = (4,4)
       #self.racketH *= 2
@@ -145,6 +142,12 @@ class AIGame:
       self.downsampshape = (1,1)
       #self.racketH *= 8
       #self.maxYPixel = 160 - 1
+    self.thresh = 100 # 140
+    self.binary_Image = None
+
+  def getThreshold (self, I):
+    return self.thresh
+    return threshold_otsu(I) 
 
   def updateInputRatesWithPadding (self, dsum_Images):
     # update input rates to retinal neurons
@@ -195,8 +198,7 @@ class AIGame:
         else:
           padded_Image[paddingInds[i][0],paddingInds[i][1]] = tmp_padded_Image[paddingInds[i][0],paddingInds[i][1]]
     if dconf['net']['useBinaryImage']:
-      thresh = threshold_otsu(padded_Image)
-      binary_Image = padded_Image > thresh
+      self.binary_Image = binary_Image  = padded_Image > self.getThreshold(padded_Image)
       fr_Images = self.locationNeuronRate*binary_Image
     else:
       padded_Image = padded_Image - np.amin(padded_Image)
@@ -213,8 +215,7 @@ class AIGame:
     if self.reducedNet:
       fr_Images = []
       if dconf['net']['useBinaryImage']:
-        thresh = threshold_otsu(dsum_Images)
-        binary_Image = dsum_Images > thresh
+        self.binary_Image = binary_Image = dsum_Images > self.getThreshold(dsum_Images)
         if dconf['sim']['captureTwoObjs']:
           #fr_Images = np.zeros(shape=(dsum_Images.shape[0],2))
           if self.useImagePadding:
@@ -289,8 +290,7 @@ class AIGame:
       print(loc_firingrates)
     else:
       if dconf['net']['useBinaryImage']:
-        thresh = threshold_otsu(dsum_Images)
-        binary_Image = dsum_Images > thresh
+        self.binary_Image = binary_Image = dsum_Images > self.getThreshold(dsum_Images)
         fr_Images = self.locationNeuronRate*binary_Image
       else:
         dsum_Images = dsum_Images - np.amin(dsum_Images)
@@ -497,16 +497,14 @@ class AIGame:
     padded_Image[padding_dim:padding_dim+gs_obs.shape[0],padding_dim:padding_dim+gs_obs.shape[1]] = gs_obs
     racket2 = gs_obs[:,courtXRng[0]-4:courtXRng[0]-1]
     if len(np.unique(racket2))>1:
-      thresh = threshold_otsu(racket2)
-      binary_racket2 = racket2 > thresh
+      binary_racket2 = racket2 > self.getThreshold(racket2)
       racket2_ypixels = np.unique(np.where(binary_racket2)[0])
       racket2_len = len(racket2_ypixels)
     else:
       racket2_len =0
     racket1 = gs_obs[:,racketXRng[0]:racketXRng[1]]
     if len(np.unique(racket2))>1:
-      thresh = threshold_otsu(racket1)
-      binary_racket1 = racket1 > thresh
+      binary_racket1 = racket1 > self.getThreshold(racket1)
       racket1_ypixels = np.unique(np.where(binary_racket1)[0])
       racket1_len = len(racket1_ypixels)
     else:
@@ -533,6 +531,23 @@ class AIGame:
             padded_Image[gs_obs.shape[0]+padding_dim+ind,courtXRng[0]+padding_dim-1-jind] = racket2[-1,0]
     return padded_Image
 
+  def downscale (self, I, downshape):
+    #x = resize(I, (I.shape[0]/self.downsampshape[0],I.shape[1]/self.downsampshape[1]), anti_aliasing=False)#,anti_aliasing_sigma=2)
+    #return x
+    #erosion = cv2.erode(x,np.ones((2,2),np.uint8),iterations = 1)
+    #return erosion
+    #return cv2.resize( cv2.resize(I,(0,0),fx=4,fy=4,interpolation=cv2.INTER_LINEAR), (0,0), fx=0.25/downshape[0], fy=0.25/downshape[1], interpolation = cv2.INTER_NEAREST)
+    #return cv2.resize(I, (int(I.shape[0]/downshape[0]),int(I.shape[1]/downshape[1])), interpolation = cv2.INTER_NEAREST
+    if downshape[0] >= 4:
+      return downscale_local_mean(I,downshape)
+    else:
+      return I[::downshape[0],::downshape[1]] # downsample by factor of shape      
+    #x = resize(I, (I.shape[0]*8,I.shape[1]*8))
+    #return resize(x, (I.shape[0]/(8*self.downsampshape[0]),I.shape[1]/(8*self.downsampshape[1])))    
+    #return resize(I, (I.shape[0]/self.downsampshape[0],I.shape[1]/self.downsampshape[1]), anti_aliasing=True,anti_aliasing_sigma=1.5)
+    #return I.astype(np.float).ravel()
+    
+
   def playGame (self, actions, epCount, simtime): #actions need to be generated from motor cortex
     # PLAY GAME
     rewards = []; proposed_actions =[]; total_hits = []; Images = []; FollowTargetSign = 0
@@ -551,8 +566,9 @@ class AIGame:
       lobs_gimage = 255.0*rgb2gray(self.last_obs[courtYRng[0]:courtYRng[1],:,:])
       if self.useImagePadding: 
         padding_dim = self.padPixelEachSide
-        lobs_gimage = self.getPaddedImage(lobs_gimage,padding_dim,courtXRng,racketXRng) 
-      lobs_gimage_ds = downscale_local_mean(lobs_gimage,self.downsampshape)
+        lobs_gimage = self.getPaddedImage(lobs_gimage,padding_dim,courtXRng,racketXRng)
+      #lobs_gimage_ds = self.downscale(lobs_gimage, self.downsampshape)
+      lobs_gimage_ds = self.downscale(lobs_gimage,self.downsampshape)
       lobs_gimage_ds = np.where(lobs_gimage_ds>np.min(lobs_gimage_ds)+1,255,lobs_gimage_ds)
       lobs_gimage_ds = 0.5*lobs_gimage_ds #use this image for motion computation only
       
@@ -676,7 +692,7 @@ class AIGame:
       if self.useImagePadding: 
         padding_dim = self.padPixelEachSide
         gray_Image = self.getPaddedImage(gray_Image,padding_dim,courtXRng,racketXRng)
-      gray_ds = downscale_local_mean(gray_Image,self.downsampshape) # then downsample
+      gray_ds = self.downscale(gray_Image,self.downsampshape) # then downsample
       gray_ds = np.where(gray_ds>np.min(gray_ds)+1,255,gray_ds) # Different thresholding
       gray_ns = np.where(gray_Image>np.min(gray_Image)+1,255,gray_Image)
       lgimage_ns.append(lgwght[adx]*gray_ns)
@@ -694,7 +710,10 @@ class AIGame:
       dsum_Images = lgimage[0]
       nsum_Images = lgimage_ns[0]
     self.FullImages.append(nsum_Images) # save full images ----> THIS IS JUST USED FOR DIRECTIONS (for accuracy)
-    self.ReducedImages.append(dsum_Images) # save the input image
+    if self.binary_Image is not None:
+      self.ReducedImages.append(255.0 * self.binary_Image)
+    else:
+      self.ReducedImages.append(dsum_Images) # save the input image
     if dconf['net']['useNeuronPad']==1:
       self.updateInputRatesWithPadding(dsum_Images)
     else:

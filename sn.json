@@ -17,6 +17,7 @@
     "0rand": 0,
     "movefctr": 1.0,
     "avoidStuck": 1,
+    "useImagePadding": 0,
     "rewardcodes": {
         "scorePoint": 1.0,
         "losePoint":  0.0,
@@ -37,11 +38,11 @@
     "verbose": 0,
     "stayStepLim": 0,
     "simtype": {
-        "ResumeSim": 0,
-        "ResumeSimFromFile": "data/20nov11_C0_cycle_synWeights_final.pkl"
+        "ResumeSim": 1,
+        "ResumeSimFromFile": "data/20nov17_A0_cycle_synWeights_final.pkl"
     },
     "sim": {
-        "duration": 3000,
+        "duration": 500000,
         "dt": 0.6,
         "verbose": 0,
         "recordStep": 1.0,
@@ -51,9 +52,9 @@
         "RLFakeUpRule": 0,
         "RLFakeDownRule": 0,
         "RLFakeStayRule": 0,
-        "name": "20nov16_A0_cycle_",
-        "doquit": 0,
-        "doplot": 1,
+        "name": "20nov17_A1_cycle_",
+        "doquit": 1,
+        "doplot": 0,
         "saveCellSecs": 0,
         "saveCellConns": 0,
         "targettedRL": 1,
@@ -81,7 +82,7 @@
 	"allpops": {
 	    "ER":0,
 	    "IR":0,
-	    "EV1":1600,
+	    "EV1":6400,
 	    "EV1DE":400,
 	    "EV1DNE":400,
 	    "EV1DN":400,
@@ -99,11 +100,11 @@
 	    "EA":2800,
 	    "IA":0,
 	    "EA2": 100,
-	    "IA2": 0,
-	    "EMDOWN":400,
-	    "EMUP":400,
+	    "IA2": 25,	    
+	    "EMDOWN":300,
+	    "EMUP":300,
 	    "EMSTAY":0,
-	    "IM":200,
+	    "IM":300,
 	    "IMUP": 0,
 	    "IMDOWN": 0,
 	    "IMSTAY": 0},
@@ -171,12 +172,12 @@
             "FeedForwardDirNtoM":0,
             "FeedForwardLocNtoM":0,	    
             "FeedForwardAtoM":1,
-            "FeedForwardAtoA2":1,
+            "FeedForwardAtoA2":0,
             "FeedForwardA2toM":1,	    
             "FeedbackLocNeurons":0,
             "RecurrentMNeurons":1,
             "RecurrentANeurons":0,
-            "RecurrentA2Neurons":1,
+            "RecurrentA2Neurons":0,
             "FeedbackAtoDirN":0,
             "FeedbackAtoLocN":0
         },	
@@ -192,7 +193,7 @@
 	    "VL":{
 		"VD":{"AM":0,"NM":0,"p":0},		
 		"VL":{"AM":4,"NM":0.6,"p":0},
-		"EA":{"AM":3.6,"NM":0.36,"p":0.1},
+		"EA":{"AM":2.6,"NM":0.26,"p":0.1},
 		"EMDOWN":{"AM":1,"NM":0.0,"p":0.08},
 		"EMUP":{"AM":1,"NM":0.0,"p":0.08},
 		"EMSTAY":{"AM":1,"NM":0.0,"p":0.08}		
@@ -200,14 +201,14 @@
 	    "VD":{
 		"VL":{"AM":0,"NM":0,"p":0},
 		"VD":{"AM":0,"NM":0,"p":0},
-		"EA":{"AM":3.6,"NM":0.36,"p":0.1},
+		"EA":{"AM":2.6,"NM":0.26,"p":0.1},
 		"EMDOWN":{"AM":0.5,"NM":0.0,"p":0.08},
 		"EMUP":{"AM":0.5,"NM":0.0,"p":0.08},
 		"EMSTAY":{"AM":0.5,"NM":0.0,"p":0.08},
 		"ID": {"AM":10, "p":0.03}
 	    },
 	    "EM":{
-		"EM":{"AM":1.2,"NM":0.0,"p":0.15},
+		"EM":{"AM":1.2,"NM":0.0,"p":0.1},
 		"EA":{"AM":0,"NM":0,"p":0.0},
 		"IRecip": {"AM":20, "NM":0, "p":0.0625},
 		"IM":{"AM":10,"p":0.15}
@@ -292,9 +293,9 @@
 		"EV4": {"AM":0 , "NM":0, "p":0},
 		"IMT": {"AM":20, "p":0.0225}
 	    }
-	},
+	},	
         "EEMWghtThreshMin": 0.9,
-        "EEMWghtThreshMax": 2.5,
+        "EEMWghtThreshMax": 4,
         "EEMPopNorm": 1,
 	"CellWNorm": {
 	    "On": 0,
@@ -318,23 +319,24 @@
     },
     "STDP": {
         "AMPA": {
-            "wbase": 1e-06,
-            "wmax": 0.0004,
+            "wbase": 0.16,
+            "wmax": 16,
             "RLon": 0,
-	    "STDPon": 0,
-            "RLlenhebb": 500,
-            "RLlenanti": 500,
+            "STDPon": 0,
+            "RLlenhebb": 200,
+            "RLlenanti": 200,
             "useRLexp": 1,
             "RLhebbwt": 0.0,
             "RLantiwt": 0.0,
-            "hebbwt": 1e-06,
-            "antiwt": -1e-06,
+            "hebbwt": 0.005,
+            "antiwt": 0.0,
             "tauhebb": 25,
-	    "tauanti": 25,
-            "RLwindhebb": 50,
+            "tauanti": 25,
+            "RLwindhebb": 10,
             "softthresh": 0,
-            "verbose": 0
-        },
+            "verbose": 0,
+            "maxreward": 0.0
+        },	
         "NMDA": {
             "wbase": 1e-06,
             "wmax": 7.5e-05,
@@ -375,7 +377,7 @@
             "maxreward": 0.0 
          },
         "AMPA": {
-            "wbase": 0.14,
+            "wbase": 0.16,
             "wmax": 16,
             "RLon": 1,
             "STDPon": 0,
@@ -388,7 +390,7 @@
             "antiwt": 0.0,
             "tauhebb": 10,
             "tauanti": 10,
-            "RLwindhebb": 10,
+            "RLwindhebb": 15,
             "softthresh": 0,
             "verbose": 0,
             "maxreward": 0.0
