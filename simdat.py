@@ -268,7 +268,7 @@ def viewInput (t, InputImages, ldflow, dhist, lpop = None, lclr = ['r','b'], twi
   
 
 #
-def animInput (InputImages, outpath, framerate=10, figsize=None, showflow=False, ldflow=None, dobjpos=None):
+def animInput (InputImages, outpath, framerate=10, figsize=None, showflow=False, ldflow=None, dobjpos=None, actreward=None):
   # animate the input images; showflow specifies whether to calculate/animate optical flow
   ioff()
   # plot input images and optionally optical flow
@@ -633,6 +633,27 @@ def plotScoreLoss (actreward,ax=None,msz=3):
   ax.set_ylim((0,np.max([cumScore[-1],cumLoss[-1]])))
   ax.legend(('Score Point ('+str(cumScore[-1])+')','Lose Point ('+str(cumLoss[-1])+')'),loc='best')
   return cumScore[-1],cumLoss[-1]
+
+def addCumPerfCols (actreward):
+  # add cumulative performance columns (as ratio; cumulative follow probability)
+  action_times = np.array(actreward.time)
+  Hit_Missed = np.array(actreward.hit)
+  allMissed = np.where(Hit_Missed==-1,1,0)
+  cumMissed = np.cumsum(allMissed) #if a reward is -1, replace it with 1 else replace it with 0.  
+  cumScore = getCumScore(actreward)
+  #actreward['cumScoreRatio'] = cumScore/cumMissed # cumulative score/loss ratio
+  allproposed = actreward[(actreward.proposed!=-1)] # only care about cases when can suggest a proposed action
+  rewardingActions = np.where(allproposed.proposed-allproposed.action==0,1,0)
+  rewardingActions = np.cumsum(rewardingActions) # cumulative of rewarding action
+  cumActs = np.array(range(1,len(allproposed)+1))
+  #actreward['cumFollow'] = np.divide(rewardingActions,cumActs) # cumulative follow probability
+  allHit = np.where(Hit_Missed==1,1,0) 
+  allMissed = np.where(Hit_Missed==-1,1,0)
+  cumHits = np.cumsum(allHit) #cumulative hits evolving with time.
+  cumMissed = np.cumsum(allMissed) #if a reward is -1, replace it with 1 else replace it with 0.
+  #actreward['cumHitMissRatio'] = cumHits/cumMissed # cumulative hits/missed ratio
+  return cumScore/cumMissed, np.divide(rewardingActions,cumActs), cumHits/cumMissed
+  
 
 def plotPerf (actreward,yl=(0,1)):
   # plot performance
