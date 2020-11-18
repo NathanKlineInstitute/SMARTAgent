@@ -503,7 +503,7 @@ def drawraster (dspkT,dspkID,tlim=None,msz=2,skipstimMod=True):
   else:
     xlim((0,totalDur))
   xlabel('Time (ms)')
-  lclr.reverse(); 
+  #lclr.reverse(); 
   lpatch = [mpatches.Patch(color=c,label=s+' '+str(round(getrate(dspkT,dspkID,s,dnumc),2))+' Hz') for c,s in zip(lclr,lpop)]
   ax=gca()
   ax.legend(handles=lpatch,handlelength=1,loc='best')
@@ -1654,3 +1654,4 @@ if __name__ == '__main__':
   #fig=animInput(InputImages,gifpath()+'_input.mp4')
   #drawraster(dspkT,dspkID)
   #figure(); drawcellVm(simConfig,lclr=['r','g','b','c','m','y'])
+  pravgrates(dspkT,dspkID,dnumc)
