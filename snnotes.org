@@ -21786,3 +21786,15 @@ savefig(gifpath()+'EMDOWN_inputmap_first.png')
 dout = getpopinputmap(pdf, tt[-1], dnumc, dstartidx, dendidx, 'EMDOWN')
 clf(); plotallinputmaps(pdf,tt[-1],dstartidx['EMDOWN'],'EMDOWN',dnumc,dstartidx,dendidx,asweight=True,dmap=dout)
 savefig(gifpath()+'EMDOWN_inputmap_last.png') 
+
+** related sim on gcp -- more EV1 (25600), no EV1DE, etc.
+
+        "name": "20nov18_A0_gcp_",
+
+can try with full scale for EV1 and no directional neurons?
+
+160**2 = 25600
+
+#pravgrates(dspkT,dspkID,dnumc)
+drawraster(dspkT,dspkID)
+drawcellVm(simConfig,lclr=['r','g','b','c','m','y'])
