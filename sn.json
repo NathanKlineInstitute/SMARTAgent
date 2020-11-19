@@ -304,7 +304,7 @@
 	},
         "homPlast": {
           "On":1,
-	  "dscale": 0.005,
+	  "dscale": 0.001,
           "dshift": 0.0,
           "mintargetFR":{"EMUP":0.25,"EMDOWN":0.25},
           "maxtargetFR":{"EMUP":25,"EMDOWN":25},
