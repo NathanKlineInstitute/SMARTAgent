@@ -1531,7 +1531,7 @@ def adjustWeightsBasedOnFiringRates (sim,lpop,synType='AMPA'):
         for conn in cell.conns:
           if conn.synMech==synType and 'hSTDP' in conn:
             conn['hObj'].weight[0] *= sfctr
-  print('CountScaleUps, CountScaleDowns: ', countScaleUps, countScaleDowns)
+  print('adjustWeightsBasedOnFiringRates: CountScaleUps, CountScaleDowns: ', countScaleUps, countScaleDowns)
 
 def trainAgent (t):
   """ training interface between simulation and game environment
@@ -1771,10 +1771,12 @@ def trainAgent (t):
     sim.pc.barrier()    
   if dconf['net']['homPlast']['On']:
     if NBsteps % dconf['net']['homPlast']['hsIntervalSteps'] == 0:
+      print('adjustTargetWBasedOnFiringRates')
       hsInterval = tstepPerAction*dconf['actionsPerPlay']*dconf['net']['homPlast']['hsIntervalSteps']
       getFiringRateWithIntervalAllNeurons(sim, [t,t-hsInterval], sim.dHPlastPops) # call this function at hsInterval
       adjustTargetWBasedOnFiringRates(sim) # call this function at hsInterval
     if NBsteps % dconf['net']['homPlast']['updateIntervalSteps'] == 0:
+      print('adjustWeightsBasedOnFiringRates')
       adjustWeightsBasedOnFiringRates(sim,sim.dHPlastPops,synType=dconf['net']['homPlast']['synType'])
 
 def getAllSTDPObjects (sim):
@@ -1837,11 +1839,6 @@ sim.setupRecording()                  # setup variables to record for each cell 
 
 dSTDPmech = getAllSTDPObjects(sim) # get all the STDP objects up-front
 
-if dconf['net']['homPlast']['On']:
-  # call this once before the simulation
-  initTargetFR(sim,dconf['net']['homPlast']['mintargetFR'],dconf['net']['homPlast']['maxtargetFR']) 
-  initTargetW(sim,list(dconf['net']['homPlast']['mintargetFR'].keys()),synType=dconf['net']['homPlast']['synType']) # call this once before running the simulation.
-
 def updateSTDPWeights (sim, W):
   #this function assign weights stored in 'ResumeSimFromFile' to all connections by matching pre and post neuron ids  
   # get all the simulation's cells (on a given node)
@@ -1876,6 +1873,12 @@ if dconf['simtype']['ResumeSim']:
         sim.pc.barrier() # wait for other nodes
   except:
     print('Could not restore STDP weights from file.')
+
+if dconf['net']['homPlast']['On']:
+  # call this once before the simulation
+  initTargetFR(sim,dconf['net']['homPlast']['mintargetFR'],dconf['net']['homPlast']['maxtargetFR'])
+  # call this once before running the simulation.    
+  initTargetW(sim,list(dconf['net']['homPlast']['mintargetFR'].keys()),synType=dconf['net']['homPlast']['synType']) 
 
 def setdminID (sim, lpop):
   # setup min ID for each population in lpop
