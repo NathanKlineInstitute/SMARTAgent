@@ -21810,5 +21810,48 @@ adjusted weights and kept probabilities  as original ... note that there are
 
 ./myrun 48 sn.json
 
-started ~23:45 ...
+started ~23:45 ... finished ~6 AM
+
+* 20nov19
+** check output from 20nov18_A0_gcp_ -->> continue
+
+python -i simdat.py backupcfg/20nov18_A0_gcp_sim.json
+
+had good rates overall:
+EV1 0.69 Hz
+EA 3.55 Hz
+EA2 5.3 Hz
+IA2 12.91 Hz
+EMDOWN 15.91 Hz
+EMUP 15.91 Hz
+IM 27.01 Hz
+stimModEV1 0.76 Hz
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/20nov19_20nov18_A0_gcp_perf.png]]
+not great, but similar to other first steps ...
+
+clf(); drawraster(dspkT,dspkID); xlim((496e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/20nov19_20nov18_A0_gcp_rast.png]]
+based on the raster, EA,EM only fire when there's motion, even though there are no
+explicitly motion-sensitive neurons ... or just due to ball being on screen, contributing
+to firing activity
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False)
+savefig(gifpath()+'all_avg_weight.png') # [[./gif/20nov19_20nov18_A0_gcp_all_avg_weight.png]]
+
+fig=animInput(InputImages,gifpath()+'_input.mp4',actreward=actreward) # [[./gif/20nov19_20nov18_A0_gcp__input.mp4]]
+
+so, worth continuing this one in multistep ... or lowering weights/rates of EM first
+
+binsz = 1000
+dnspk = {pop:getspikehist(dspkT[pop],dnumc[pop],binsz,totalDur) for pop in ['EMDOWN','EMUP']}
+for clr,pop in zip(['r','b'],['EMDOWN','EMUP']): plot(dnspk[pop][0],dnspk[pop][1],clr)
+
+savefig(gifpath()+'EM_rate_hist.png') # [[./gif/20nov19_20nov18_A0_gcp_EM_rate_hist.png]]
+rates increasing ... start somewhat high ... firing also seems more bursty in this sim ... 
+
+** adjust gcp sim
+
+./myrun 48 sn.json
 

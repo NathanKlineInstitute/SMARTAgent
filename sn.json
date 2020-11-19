@@ -39,7 +39,7 @@
     "stayStepLim": 0,
     "simtype": {
         "ResumeSim": 0,
-        "ResumeSimFromFile": "data/20nov17_A0_cycle_synWeights_final.pkl"
+        "ResumeSimFromFile": "data/20nov18_A0_gcp_synWeights_final.pkl"
     },
     "sim": {
         "duration": 500000,
@@ -52,7 +52,7 @@
         "RLFakeUpRule": 0,
         "RLFakeDownRule": 0,
         "RLFakeStayRule": 0,
-        "name": "20nov18_A0_gcp_",
+        "name": "20nov19_A0_gcp_",
         "doquit": 1,
         "doplot": 0,
         "saveCellSecs": 0,
@@ -97,10 +97,10 @@
 	    "IV4":0,
 	    "EMT":0,
 	    "IMT":0,
-	    "EA":2800,
+	    "EA":5600,
 	    "IA":0,
-	    "EA2": 100,
-	    "IA2": 25,	    
+	    "EA2": 200,
+	    "IA2": 50,	    
 	    "EMDOWN":400,
 	    "EMUP":400,
 	    "EMSTAY":0,
@@ -208,22 +208,22 @@
 		"ID": {"AM":10, "p":0.03}
 	    },
 	    "EM":{
-		"EM":{"AM":1.2,"NM":0.0,"p":0.1},
+		"EM":{"AM":0.5,"NM":0.0,"p":0.1},
 		"EA":{"AM":0,"NM":0,"p":0.0},
 		"IRecip": {"AM":20, "NM":0, "p":0.0625},
-		"IM":{"AM":10,"p":0.15}
+		"IM":{"AM":5,"p":0.15}
 	    },
 	    "EA":{
 		"EA":{"AM":1.1,"NM":0.12,"p":0.0},
-		"EA2":{"AM":1.2,"NM":0.0,"p":0.15},
-		"EM":{"AM":1.2,"NM":0.0,"p":0.15},
-		"IA":{"AM": 10, "p":0.1}
+		"EA2":{"AM":0.5,"NM":0.0,"p":0.15},
+		"EM":{"AM":0.5,"NM":0.0,"p":0.15},
+		"IA":{"AM": 5, "p":0.15}
 	    },
 	    "EA2":{
 		"EA":{"AM":1.2,"NM":0.12,"p":0.0},
-		"EA2":{"AM":1.2,"NM":0.0,"p":0.15},
-		"EM":{"AM":1.2,"NM":0.0,"p":0.15},
-		"IA2":{"AM": 10, "p":0.15}
+		"EA2":{"AM":0.5,"NM":0.0,"p":0.15},
+		"EM":{"AM":0.5,"NM":0.0,"p":0.15},
+		"IA2":{"AM": 5, "p":0.15}
 	    },	   	    
 	    "IR": {
 		"ER": {"GA": 10, "p":0.0625}
@@ -250,7 +250,7 @@
 		"EV4": {"GA":1.0, "p":0.0}		
 	    },
 	    "IM": {
-		"EM": {"GA":5, "p":0.25},
+		"EM": {"GA":2.5, "p":0.25},
 		"IM": {"GA":2.5, "p":0.1}
 	    },
 	    "IMRecip": {
@@ -261,7 +261,7 @@
 		"IA": {"GA":2.5, "p":0.1}
 	    },
 	    "IA2": {
-		"EA2": {"GA":5, "p":0.1},
+		"EA2": {"GA":2.5, "p":0.25},
 		"IA2": {"GA":2.5, "p":0.15}
 	    },	    	    
 	    "IR": {
@@ -384,7 +384,7 @@
             "RLlenhebb": 200,
             "RLlenanti": 200,
             "useRLexp": 1,
-            "RLhebbwt": 0.005,
+            "RLhebbwt": 0.0025,
             "RLantiwt": 0,
             "hebbwt": 0.0,
             "antiwt": 0.0,
