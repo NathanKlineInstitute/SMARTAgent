@@ -21855,3 +21855,10 @@ rates increasing ... start somewhat high ... firing also seems more bursty in th
 
 ./myrun 48 sn.json
 
+too slow ... not terrible but perhaps no need for 160x160
+
+** next sim on gcp
+
+will use same sim as on cycle with EV1 of 80x80 (instead of 160x160) , remove direction selective
+neurons, and scale up weights from EV1 -> X ...
+
