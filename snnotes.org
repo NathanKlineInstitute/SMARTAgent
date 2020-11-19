@@ -21862,3 +21862,7 @@ too slow ... not terrible but perhaps no need for 160x160
 will use same sim as on cycle with EV1 of 80x80 (instead of 160x160) , remove direction selective
 neurons, and scale up weights from EV1 -> X ...
 
+ok, somewhat better rates ... 
+
+./myrun 32 sn.json
+
