@@ -303,8 +303,9 @@
 	    "MaxFctr": 15.0
 	},
         "homPlast": {
-          "On":1, 
-          "dshift": 0.00001,
+          "On":1,
+	  "dscale": 0.005,
+          "dshift": 0.0,
           "mintargetFR":{"EMUP":0.25,"EMDOWN":0.25},
           "maxtargetFR":{"EMUP":25,"EMDOWN":25},
           "hsIntervalSteps":100,

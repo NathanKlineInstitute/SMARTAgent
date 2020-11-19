@@ -21981,5 +21981,11 @@ were getting close to max ... but include the homplast to prevent rates from get
           "synType":"AMPA"
         },
 
+old dshift value was linear and set to small amount:           "dshift": 0.00001,
+
+instead could just multiply by fraction of total weight ... e.g. 0.5% ... 
+dscale = 0.005 ...
+will try that ...
+
 ./myrun 32 sn.json
 

@@ -1496,20 +1496,25 @@ def getFiringRateWithIntervalAllNeurons (sim, trange, allpops):
 
 def adjustTargetWBasedOnFiringRates (sim):
   dshift = dconf['net']['homPlast']['dshift'] # shift in weights to push within min,max firing rate bounds
+  dscale = dconf['net']['homPlast']['dscale'] # shift in weights to push within min,max firing rate bounds  
   for gid,cTargetW in sim.dTargetW.items():
     cTargetFRMin, cTargetFRMax = sim.dMINTargetFR[gid], sim.dMAXTargetFR[gid]
     if gid not in sim.dFR: continue
     cFR = sim.dFR[gid] # current cell firing rate
     if cFR>cTargetFRMax: # above max threshold firing rate
-      if dshift == 0.0:
-        sim.dTargetW[gid] *= cTargetFRMax / cFR
-      else:
+      if dshift != 0.0:
         sim.dTargetW[gid] -= dshift
-    elif cFR<cTargetFRMin: # below min threshold firing rate
-      if dshift == 0:
-        sim.dTargetW[gid] *= cTargetFRMin / cFR 
+      elif dscale != 0.0:
+        sim.dTargetW[gid] *= (1.0 - dscale)
       else:
+        sim.dTargetW[gid] *= cTargetFRMax / cFR
+    elif cFR<cTargetFRMin: # below min threshold firing rate
+      if dshift != 0.0:
         sim.dTargetW[gid] += dshift
+      elif dscale != 0.0:
+        sim.dTargetW[gid] *= (1.0 + dscale)
+      else:
+        sim.dTargetW[gid] *= cTargetFRMin / cFR 
   return sim.dTargetW
 
 def adjustWeightsBasedOnFiringRates (sim,lpop,synType='AMPA'):
@@ -1531,7 +1536,7 @@ def adjustWeightsBasedOnFiringRates (sim,lpop,synType='AMPA'):
         for conn in cell.conns:
           if conn.synMech==synType and 'hSTDP' in conn:
             conn['hObj'].weight[0] *= sfctr
-  print('adjustWeightsBasedOnFiringRates: CountScaleUps, CountScaleDowns: ', countScaleUps, countScaleDowns)
+  if sim.rank==0: print('adjustWeightsBasedOnFiringRates: CountScaleUps, CountScaleDowns: ', countScaleUps, countScaleDowns)
 
 def trainAgent (t):
   """ training interface between simulation and game environment
@@ -1771,13 +1776,14 @@ def trainAgent (t):
     sim.pc.barrier()    
   if dconf['net']['homPlast']['On']:
     if NBsteps % dconf['net']['homPlast']['hsIntervalSteps'] == 0:
-      print('adjustTargetWBasedOnFiringRates')
+      if sim.rank==0: print('adjustTargetWBasedOnFiringRates')
       hsInterval = tstepPerAction*dconf['actionsPerPlay']*dconf['net']['homPlast']['hsIntervalSteps']
       getFiringRateWithIntervalAllNeurons(sim, [t,t-hsInterval], sim.dHPlastPops) # call this function at hsInterval
       adjustTargetWBasedOnFiringRates(sim) # call this function at hsInterval
     if NBsteps % dconf['net']['homPlast']['updateIntervalSteps'] == 0:
-      print('adjustWeightsBasedOnFiringRates')
+      if sim.rank==0: print('adjustWeightsBasedOnFiringRates')
       adjustWeightsBasedOnFiringRates(sim,sim.dHPlastPops,synType=dconf['net']['homPlast']['synType'])
+      sim.pc.barrier()
 
 def getAllSTDPObjects (sim):
   # get all the STDP objects from the simulation's cells
