@@ -9303,3 +9303,320 @@ use
 -- added neurons for encoding ball_xpos.... when using "useReducedNetwork": 1
 
 -- retune the model parameters from V to EA....
+
+* 20nov17
+
+-- modified reduced network architecture to include ball_xpos
+
+-- now number of neurons increased
+
+"EV1":62, (24 for ball y pos +14 for ball x pos + 24 for racket y pos)
+"EA":64512, (24x14x24x8)
+
+-- runs successfully... but now the sim is too slow....
+
+-- also realized that the connections from EV1 to EA might not be accurate.... should check.
+
+-- decided to change the architecture because probably its not worth it....
+
+-- Sam pointed out that the ball and racket change their sizes which is a big issue.
+
+-- Sam suspected that the problem might be because of the padding but i suspected the problem might be due to downscaling.
+... Sam argued that if the problem was because of downsampling it should have affected other racket too which appeared not to be the case.
+
+-- Upon further investigation, Sam confirmed that the problem was due to the downsampling... so we decided to use 80x80 image instead of 20x20 image for most of the simulations.
+
+-- Using 80x80 image might be a problem for me when using reducedNetwork. (TO BE DONE)
+.... would need 80 neurons to encode ypos of ball.
+.... would need 80 neurons to encode ypos of racket.
+.... would need 8 neurons to encode dir of racket.
+... this would require 80x80x8 (=51200) neurons in EA.
+
+-- other idea to reduce further..... (TO BE DONE)
+....80 neurons to encode y pos of ball
+....80 neurons to encode y pos of racket
+....3 neurons to encode motion direction of the ball.
+.... this would require 80x80x3 (=19200) neurons in EA.
+
+-- other idea to reduce further..... (TO BE DONE)
+....80 neurons to encode y pos of ball
+....3 neurons to encode y pos of racket
+....3 neurons to encode motion direction of the ball.
+.... this would require 80x3x3 (=720) neurons in EA.
+
+
+* 20nov18
+
+-- I asked Sam about not using Imagepadding and he made me realized that Imagepadding only works for 20x20 image.
+
+-- I should fix that part to make it more general.
+.... gray_Image = self.getPaddedImage(gray_Image,padding_dim,courtXRng,racketXRng) ---> This works fine.....
+.... need to adjust 
+updateInputRates(dsum_Images)
+and
+updateDirSensitiveRates()
+
+.... need to use new values for courtXrng and racketRng based on downscale factor and padding.
+
+self.courtXRng = (20, 140) # court x range
+self.racketXRng = (140, 144) # racket x range
+self.racket0XRng = (16, 20)
+
+
+from skimage.transform import downscale_local_mean, resize
+downsampshape = (8,8)
+
+racket0 = gray_Image[:,racket0XRng[0]:racket0XRng[1]]
+racket = gray_Image[:,racketXRng[0]:racketXRng[1]]
+court = gray_Image[:,courtXRng[0]:courtXRng[1]]
+>>> court.shape
+(160, 120)
+>>> racket.shape
+(160, 3)
+>>> racket0.shape
+(160, 3)
+
+
+
+>>> I1 = downscale_local_mean(gray_Image,(8,8))
+>>> I2 = downscale_local_mean(gray_Image,(4,4))
+>>> I3 = downscale_local_mean(gray_Image,(2,2))
+
+if downsampshape[0]==8
+  if useImagePadding:
+    ds_courtXRng = (5, 19) # court x range
+    ds_racketXRng = (19, 20) # racket x range... when used in an image
+    ds_racket0XRng = (4, 5)
+  else:
+    ds_courtXRng = (3, 17) # court x range
+    ds_racketXRng = (17, 18) # racket x range... when used in an image
+    ds_racket0XRng = (2, 3)
+
+>>> I1[:,2:3].shape
+(20, 1)
+>>> I1[:,17:18].shape
+(20, 1)
+>>> I1[:,3:17].shape
+(20, 14)
+
+
+if downsampshape[0]==4
+  if useImagePadding:
+    ds_courtXRng = (9, 39) # court x range
+    ds_racketXRng = (39, 40) # racket x range... when used in an image
+    ds_racket0XRng = (8, 9)  
+  else:
+    ds_courtXRng = (5, 35) # court x range
+    ds_racketXRng = (35, 36) # racket x range... when used in an image
+    ds_racket0XRng = (4, 5)
+
+>>> I2[:,4:5].shape
+(40, 1)
+>>> I2[:,35:36].shape
+(40, 1)
+>>> I2[:,5:35].shape
+(40, 30)
+
+
+if downsampshape[0]==2
+  if useImagePadding:
+    ds_courtXRng = (18, 78)
+    ds_racketXRng = (78, 80)
+    ds_racket0XRng = (16, 18)  
+  else:
+    ds_courtXRng = (10, 70) # court x range
+    ds_racketXRng = (70, 72) # racket x range... when used in an image
+    ds_racket0XRng = (8, 10)
+
+>>> plt.show()
+>>> I3[:,10:70].shape
+(80, 60)
+>>> I3[:,70:72].shape
+(80, 2)
+>>> I3[:,8:10].shape
+(80, 2)
+
+
+if downsampshape[0]==1
+  if useImagePadding:
+    ds_courtXRng = (36, 156) # court x range
+    ds_racketXRng = (156,160) # racket x range... when used in an image
+    ds_racket0XRng = (32, 36)
+  else:
+    ds_courtXRng = courtXRng # court x range
+    ds_racketXRng = racketXRng # racket x range... when used in an image
+    ds_racket0XRng = racket0XRng
+
+
+def getPaddedImage(gs_obs,padding_dim,courtXRng,racketXRng):
+  expected_racket_len = 16
+  input_dim = gs_obs.shape[0] + 2*padding_dim
+  padded_Image = np.amin(gs_obs)*np.ones(shape=(input_dim,input_dim))
+  padded_Image[padding_dim:padding_dim+gs_obs.shape[0],padding_dim:padding_dim+gs_obs.shape[1]] = gs_obs
+  racket2 = gs_obs[:,courtXRng[0]-4:courtXRng[0]-1]
+  if len(np.unique(racket2))>1:
+    binary_racket2 = racket2 > 100
+    racket2_ypixels = np.unique(np.where(binary_racket2)[0])
+    racket2_len = len(racket2_ypixels)
+  else:
+    racket2_len =0
+  racket1 = gs_obs[:,racketXRng[0]:racketXRng[1]]
+  if len(np.unique(racket2))>1:
+    binary_racket1 = racket1 > 100
+    racket1_ypixels = np.unique(np.where(binary_racket1)[0])
+    racket1_len = len(racket1_ypixels)
+  else:
+    racket1_len = 0
+  if racket1_len>0 and expected_racket_len>racket1_len:
+    missing_racket1_len = expected_racket_len-racket1_len
+    if 0 in racket1_ypixels:
+      for ind in range(missing_racket1_len):
+        for jind in range(racketXRng[1]-racketXRng[0]+1):
+          padded_Image[padding_dim-ind,racketXRng[0]+padding_dim+jind-1] = racket1[0,0]
+    else:
+      for ind in range(missing_racket1_len):
+        for jind in range(racketXRng[1]-racketXRng[0]+1):
+          padded_Image[gs_obs.shape[0]+padding_dim+ind,racketXRng[0]+padding_dim+jind-1] = racket1[-1,0]
+  if racket2_len>0 and expected_racket_len>racket2_len:
+    missing_racket2_len = expected_racket_len-racket2_len
+    if 0 in racket2_ypixels:
+      for ind in range(missing_racket2_len):
+        for jind in range(racketXRng[1]-racketXRng[0]+1):
+          padded_Image[padding_dim-1-ind,courtXRng[0]+padding_dim-1-jind] = racket2[0,0]
+    else:
+      for ind in range(missing_racket2_len):
+        for jind in range(racketXRng[1]-racketXRng[0]+1):
+          padded_Image[gs_obs.shape[0]+padding_dim+ind,courtXRng[0]+padding_dim-1-jind] = racket2[-1,0]
+  return padded_Image
+
+
+
+padded_I = getPaddedImage(gray_Image,16,courtXRng,racketXRng)
+
+pI1 = downscale_local_mean(padded_I,(8,8))
+pI2 = downscale_local_mean(padded_I,(4,4))
+pI3 = downscale_local_mean(padded_I,(2,2))
+
+
+>>> np.unique(pI1)
+array([ 83.3345   ,  87.1010875,  92.8236375, 102.4176875, 109.7006125,
+       111.8019125, 113.4672   , 121.29105  ])
+>>> np.unique(pI3)
+array([ 83.3345 , 113.4672 , 143.5999 , 159.2476 , 159.66725, 236.     ])
+>>> np.unique(pI2)
+array([ 83.3345   ,  98.40085  , 102.4176875, 121.29105  , 121.29105  ,
+       128.53355  , 140.5840625, 143.5999   , 159.2476   ])
+
+-- fix thresholding in the code.
+
+def getThreshold (self, I):
+  return np.amin(I)+0.1
+
+
+-- might have a potential problem here
+
+lobs_gimage_ds = np.where(lobs_gimage_ds>np.min(lobs_gimage_ds)+1,255,lobs_gimage_ds)
+
+lobs_gimage_ds ---> this is gray scale down sampled image.
+
+>>> np.unique(pI1)
+array([ 83.3345   ,  87.1010875,  92.8236375, 102.4176875, 109.7006125,
+       111.8019125, 113.4672   , 121.29105  ])
+
+pI1 = np.where(pI1>np.min(pI1)+1,255,pI1)
+
+.... no this works absolutely fine.....
+
+
+--
+
+def getNewCoords():
+  if downsampshape[0]==8
+    if useImagePadding:
+      ds_courtXRng = (5, 19) # court x range
+      ds_racketXRng = (19, 20) # racket x range... when used in an image
+      ds_racket0XRng = (4, 5)
+    else:
+      ds_courtXRng = (3, 17) # court x range
+      ds_racketXRng = (17, 18) # racket x range... when used in an image
+      ds_racket0XRng = (2, 3)
+  elif downsampshape[0]==4
+    if useImagePadding:
+      ds_courtXRng = (9, 39) # court x range
+      ds_racketXRng = (39, 40) # racket x range... when used in an image
+      ds_racket0XRng = (8, 9)  
+    else:
+      ds_courtXRng = (5, 35) # court x range
+      ds_racketXRng = (35, 36) # racket x range... when used in an image
+      ds_racket0XRng = (4, 5)
+  elif downsampshape[0]==2
+    if useImagePadding:
+      ds_courtXRng = (18, 78)
+      ds_racketXRng = (78, 80)
+      ds_racket0XRng = (16, 18)  
+    else:
+      ds_courtXRng = (10, 70) # court x range
+      ds_racketXRng = (70, 72) # racket x range... when used in an image
+      ds_racket0XRng = (8, 10)
+  elif downsampshape[0]==1
+    if useImagePadding:
+      ds_courtXRng = (36, 156) # court x range
+      ds_racketXRng = (156,160) # racket x range... when used in an image
+      ds_racket0XRng = (32, 36)
+    else:
+      ds_courtXRng = courtXRng # court x range
+      ds_racketXRng = racketXRng # racket x range... when used in an image
+      ds_racket0XRng = racket0XRng
+  return ds_courtXRng, ds_racket0XRng, ds_racketXRng
+
+
+
+-- testing the following for different downscales for "useReducedNetwork": 1, "captureTwoObjs":1
+and "useImagePadding":1
+
+"EV1":48, ((20+4) + (20+4))
+"EA":4608, (24x24x8)
+... model runs...
+
+"EV1":96 ((40+8) + (40+8))
+"EA":18432 (48x48x8)
+... model runs ...
+
+"EV1":192 ((80+16) + (80+16))
+"EA":73728 (96x96x8)
+... model runs ...
+
+"EV1":384 ((160+32) + (160+32))
+"EA":294912 (192x192x8)
+... model runs.
+
+---- testing the following for different downscales for "useReducedNetwork": 1, "captureTwoObjs":1
+and "useImagePadding":0
+
+"EV1":40, ((20) + (20))
+"EA":3200, (20x20x8)
+... model runs...
+
+"EV1":80 ((40) + (40))
+"EA":12800 (40x40x8)
+... model runs ...
+
+"EV1":160 ((80) + (80))
+"EA":51200 (80x80x8)
+... model runs ...
+
+"EV1":320 ((160) + (160))
+"EA":204800 (160x160x8)
+... model runs.
+
+-- checking sn.json with "useImagePadding":0 and "useReducedNetwork": 0
+
+"EV1":6400 (80x80)
+... model runs.
+
+-- checking sn.json with "useImagePadding":1 and "useReducedNetwork": 0
+
+"EV1":9216 (96x96)
+... model runs.
+
+-- Everything seems to work now run on cycle....

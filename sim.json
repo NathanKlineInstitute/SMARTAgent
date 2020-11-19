@@ -20,8 +20,11 @@
         3,
         4
     ],
+    "stochmove": 0,
+    "0rand": 0,
     "movefctr": 1.0,
     "avoidStuck":0,
+    "useImagePadding":1,
     "rewardcodes": {
         "scorePoint": 0.0,
         "losePoint":  0.0,
@@ -46,7 +49,7 @@
         "ResumeSimFromFile": "data/20oct23_A0_cycle_synWeights_final.pkl"
     },
     "sim": {
-        "duration": 200000,
+        "duration": 20000,
         "dt": 0.6,
         "verbose": 0,
         "recordStep": 1.0,
@@ -56,7 +59,7 @@
         "RLFakeUpRule": 0,
         "RLFakeDownRule": 0,
         "RLFakeStayRule": 0,
-        "name": "20nov17_A0_cycle_reduced_2obj_INTF7_",
+        "name": "20nov19_A0_cycle_reduced_2obj_INTF7_",
         "doquit": 0,
         "doplot": 1,
         "saveCellSecs": 0,
@@ -88,7 +91,7 @@
 	"allpops": {
 	    "ER":0,
 	    "IR":0,
-	    "EV1":62,
+	    "EV1":48,
 	    "EV1DE":1,
 	    "EV1DNE":1,
 	    "EV1DN":1,
@@ -103,7 +106,7 @@
 	    "IV4":0,
 	    "EMT":0,
 	    "IMT":0,
-	    "EA":64512,
+	    "EA":4608,
         "IA":0,
         "EA2": 0,
 	    "IA2": 0,
@@ -188,7 +191,6 @@
             "FeedbackAtoLocN":0
         },	
     "useBinaryImage": 1,
-    "useImagePadding":1,
 	"useNeuronPad": 0,
         "DirMinRate": 0.0,
         "DirMaxRate": 150.0,
@@ -383,8 +385,8 @@
             "maxreward": 0.0 
         },	
         "AMPA": {
-            "wbase": 0.16,
-            "wmax": 16,
+            "wbase": 10,
+            "wmax": 40,
             "RLon": 1,
 	    "STDPon": 0,
             "RLlenhebb": 100,
