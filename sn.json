@@ -304,11 +304,11 @@
 	},
         "homPlast": {
           "On":1,
-	  "dscale": 0.001,
+	  "dscale": 0.005,
           "dshift": 0.0,
-          "mintargetFR":{"EMUP":0.25,"EMDOWN":0.25},
-          "maxtargetFR":{"EMUP":25,"EMDOWN":25},
-          "hsIntervalSteps":100,
+          "mintargetFR":{"EMUP":0.125,"EMDOWN":0.125},
+          "maxtargetFR":{"EMUP":30,"EMDOWN":30},
+          "hsIntervalSteps":500,
           "updateIntervalSteps":500,
           "synType":"AMPA"
         },
