@@ -1536,7 +1536,7 @@ def adjustWeightsBasedOnFiringRates (sim,lpop,synType='AMPA'):
         for conn in cell.conns:
           if conn.synMech==synType and 'hSTDP' in conn:
             conn['hObj'].weight[0] *= sfctr
-  if sim.rank==0: print('adjustWeightsBasedOnFiringRates: CountScaleUps, CountScaleDowns: ', countScaleUps, countScaleDowns)
+  print(sim.rank,'adjustWeightsBasedOnFiringRates: CountScaleUps, CountScaleDowns: ', countScaleUps, countScaleDowns)
 
 def trainAgent (t):
   """ training interface between simulation and game environment
