@@ -22079,17 +22079,35 @@ changed towards target weight if the firing rate is out of the min/max firing ra
 
 fixed that so can run again ... 
 
-        "name": "20nov20_A0_cycle_",
+        "name": "20nov20_A2_cycle_",
         "homPlast": {
           "On":1,
 	  "dscale": 0.005,
           "dshift": 0.0,
           "mintargetFR":{"EMUP":0.125,"EMDOWN":0.125},
           "maxtargetFR":{"EMUP":30,"EMDOWN":30},
-          "hsIntervalSteps":500,
-          "updateIntervalSteps":500,
+          "hsIntervalSteps":250,
+          "updateIntervalSteps":250,
           "synType":"AMPA"
         },
 
 ./myrun 32 sn.json
+
+python -i simdat.py backupcfg/20nov20_A0_cycle_sim.json
+
+clf(); drawraster(dspkT,dspkID); 
+
+binsz = 250
+dnspk = {pop:getspikehist(dspkT[pop],dnumc[pop],binsz,totalDur) for pop in ['EMDOWN','EMUP']}
+for clr,pop in zip(['r','b'],['EMDOWN','EMUP']): plot(dnspk[pop][0],dnspk[pop][1],clr)
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False)
+
+ok, see what's expected ... will try a multistep sim using these homplast params ... but overall, seems somewhat problematic in that
+the weights will get pushed down to lower high firing rates, but then will just go back up again ... but pushing them too far down will potentially
+lose info and reduce perf.
+
+python multistepSim.py sn.json 32 20 20nov20_A2_gcp_multi
+
+started ~16:17 ...
 
