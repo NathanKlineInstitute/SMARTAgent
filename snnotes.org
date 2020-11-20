@@ -22004,12 +22004,12 @@ activity got out of hand ...
 
 fig=animInput(InputImages,gifpath()+'_input.mp4') # [[./gif/20nov19_20nov17_A1_cycle__step_1__input.mp4]]
 
-** next sim on cycle - 20nov19_A2_cycle_ homplast
+** next sim on cycle - 20nov19_A0_cycle_ homplast
 
 continue it from data/20nov17_A1_cycle__step_1_synWeights_final.pkl since that had learning and rates
 were getting close to max ... but include the homplast to prevent rates from getting too high ...
 
-        "name": "20nov19_A2_cycle_",
+        "name": "20nov19_A0_cycle_",
 
         "homPlast": {
           "On":1, 
@@ -22030,6 +22030,66 @@ rate), which is usually smaller than updateIntervalSteps ...
 
 then looks like weights getting pushed up if use too small of an interval ... since the EMs are sometimes
 quiet when no activity...so will switch to hsIntervalSteps of 500 ... (10 seconds) and dscale of 0.005 ...
+
+./myrun 32 sn.json
+
+* 20nov20
+** check output from 20nov19_A0_cycle_
+
+python -i simdat.py backupcfg/20nov19_A0_cycle_sim.json
+
+EV1 0.7 Hz
+EV1DE 0.18 Hz
+EV1DNE 1.12 Hz
+EV1DN 4.13 Hz
+EV1DNW 0.55 Hz
+EV1DW 0.12 Hz
+EV1DSW 0.4 Hz
+EV1DS 2.74 Hz
+EV1DSE 0.79 Hz
+EA 3.65 Hz
+EA2 11.04 Hz
+IA2 24.92 Hz
+EMDOWN 32.14 Hz
+EMUP 32.21 Hz
+IM 46.78 Hz
+
+those rates seem too high ... the weights were always getting pushed up ... did not see them get pushed down
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/20nov20_20nov19_A0_cycle_perf.png]]
+but from 100 s on - perf is improving; for the first 100 s, what's going on? initialization problem?
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False)
+savefig(gifpath()+'all_avg_weight.png') # [[./gif/20nov20_20nov19_A0_cycle_all_avg_weight.png]]
+
+clf(); drawraster(dspkT,dspkID); xlim((490e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/20nov20_20nov19_A0_cycle_rast.png]]
+
+binsz = 10000
+dnspk = {pop:getspikehist(dspkT[pop],dnumc[pop],binsz,totalDur) for pop in ['EMDOWN','EMUP']}
+for clr,pop in zip(['r','b'],['EMDOWN','EMUP']): plot(dnspk[pop][0],dnspk[pop][1],clr)
+
+savefig(gifpath()+'EMUPDOWN_rates.png') # [[./gif/20nov20_20nov19_A0_cycle_EMUPDOWN_rates.png]]
+
+hmm, so rates going up past 30 Hz despite the homplast on...?? something not working ...
+
+there was a bug in the code for checking the firing rate over the interval ... and the weight should only get
+changed towards target weight if the firing rate is out of the min/max firing rate bounds ... 
+
+fixed that so can run again ... 
+
+        "name": "20nov20_A0_cycle_",
+        "homPlast": {
+          "On":1,
+	  "dscale": 0.005,
+          "dshift": 0.0,
+          "mintargetFR":{"EMUP":0.125,"EMDOWN":0.125},
+          "maxtargetFR":{"EMUP":30,"EMDOWN":30},
+          "hsIntervalSteps":500,
+          "updateIntervalSteps":500,
+          "synType":"AMPA"
+        },
 
 ./myrun 32 sn.json
 
