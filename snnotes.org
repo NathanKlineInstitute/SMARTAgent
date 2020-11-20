@@ -21866,6 +21866,46 @@ ok, somewhat better rates ...
 
 ./myrun 32 sn.json
 
+python -i simdat.py backupcfg/20nov19_A0_gcp_sim.json
+
+EV1 0.7 Hz
+EA 5.25 Hz
+EA2 8.35 Hz
+IA2 20.73 Hz
+EMDOWN 11.85 Hz
+EMUP 11.83 Hz
+IM 44.98 Hz
+stimModEV1 0.76 Hz
+
+overall rates ok so far ... 
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/20nov20_20nov19_A0_gcp_perf.png]]
+perf (hit/miss) increasing slowly ...
+
+clf(); drawraster(dspkT,dspkID); xlim((490e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/20nov20_20nov19_A0_gcp_rast.png]]
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False)
+savefig(gifpath()+'all_avg_weight.png') # [[./gif/20nov20_20nov19_A0_gcp_all_avg_weight.png]]
+
+fig=animInput(InputImages,gifpath()+'_input.mp4',actreward=actreward) # [[./gif/20nov20_20nov19_A0_gcp__input.mp4]]
+
+so may as well continue this one in a multistep ... 
+
+    "name": "20nov19_A1_gcp_",
+    "simtype": {
+        "ResumeSim": 1,
+        "ResumeSimFromFile": "data/20nov19_A0_gcp_synWeights_final.pkl"
+    },
+
+will use old norm rules and after a few steps if rates get too high will adjust ... 
+still testing homplast in sim on cycle below ...
+
+python multistepSim.py sn.json 32 20 20nov19_A1_gcp_multi
+
+started ~21:17 ... 
+
 ** check output from 20nov17_A1_cycle__step_4_
 
 python -i simdat.py backupcfg/20nov17_A1_cycle__step_4_sim.json
