@@ -49,7 +49,7 @@
         "ResumeSimFromFile": "data/20oct23_A0_cycle_synWeights_final.pkl"
     },
     "sim": {
-        "duration": 20000,
+        "duration": 2000000,
         "dt": 0.6,
         "verbose": 0,
         "recordStep": 1.0,
@@ -59,7 +59,7 @@
         "RLFakeUpRule": 0,
         "RLFakeDownRule": 0,
         "RLFakeStayRule": 0,
-        "name": "20nov19_A0_cycle_reduced_2obj_INTF7_",
+        "name": "20nov20_A0_cycle_reduced_2obj_INTF7_",
         "doquit": 0,
         "doplot": 1,
         "saveCellSecs": 0,
@@ -196,8 +196,8 @@
         "DirMaxRate": 150.0,
         "LocMaxRate": 150.0,
         "FiringRateCutoff" : 50.0,
-        "stimModVD": 30,
-        "stimModVL": 30,
+        "stimModVD": 25,
+        "stimModVL": 25,
 	"cmat": {
 	    "VL":{
             "VD":{"AM":0,"NM":0,"p":0},		

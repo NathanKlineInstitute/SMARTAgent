@@ -322,24 +322,32 @@ class AIGame:
     self.objects = self.ct.update(rects)
     if len(self.last_objects)==0: 
       self.last_objects = deepcopy(self.objects)
-      flow = np.zeros(shape=(self.dirSensitiveNeuronDim,self.dirSensitiveNeuronDim,2))
-      mag = np.zeros(shape=(self.dirSensitiveNeuronDim,self.dirSensitiveNeuronDim))
-      ang = np.zeros(shape=(self.dirSensitiveNeuronDim,self.dirSensitiveNeuronDim))
-      ang[mag == 0] = -100
-      goodInds = np.zeros(shape=(self.dirSensitiveNeuronDim,self.dirSensitiveNeuronDim))
+      if self.reducedNet:
+        flow = np.zeros(shape=(cimage.shape[0],cimage.shape[1],2))
+        mag = np.zeros(shape=(cimage.shape[0],cimage.shape[1]))
+        ang = np.zeros(shape=(cimage.shape[0],cimage.shape[1]))
+        ang[mag == 0] = -100
+        goodInds = np.zeros(shape=(cimage.shape[0],cimage.shape[1]))
+      else:
+        flow = np.zeros(shape=(self.dirSensitiveNeuronDim,self.dirSensitiveNeuronDim,2))
+        mag = np.zeros(shape=(self.dirSensitiveNeuronDim,self.dirSensitiveNeuronDim))
+        ang = np.zeros(shape=(self.dirSensitiveNeuronDim,self.dirSensitiveNeuronDim))
+        ang[mag == 0] = -100
+        goodInds = np.zeros(shape=(self.dirSensitiveNeuronDim,self.dirSensitiveNeuronDim))
     else:
       dirX, dirY = getObjectMotionDirection(self.objects, self.last_objects, rects, dims=np.shape(cimage)[0],\
                                             FlowWidth=dconf['DirectionDetectionAlgo']['FlowWidth'])
-      if np.shape(cimage)[0] != self.dirSensitiveNeuronDim or np.shape(cimage)[1] != self.dirSensitiveNeuronDim:
-        dirX = resize(dirX, (self.dirSensitiveNeuronDim, self.dirSensitiveNeuronDim), anti_aliasing=True)
-        dirY = resize(dirY, (self.dirSensitiveNeuronDim, self.dirSensitiveNeuronDim), anti_aliasing=True)
+      if not self.reducedNet:
+        if np.shape(cimage)[0] != self.dirSensitiveNeuronDim or np.shape(cimage)[1] != self.dirSensitiveNeuronDim:
+          dirX = resize(dirX, (self.dirSensitiveNeuronDim, self.dirSensitiveNeuronDim), anti_aliasing=True)
+          dirY = resize(dirY, (self.dirSensitiveNeuronDim, self.dirSensitiveNeuronDim), anti_aliasing=True)
       mag, ang = cv2.cartToPolar(dirX, -1*dirY, angleInDegrees=True)
       ang[mag == 0] = -100
       self.last_objects = deepcopy(self.objects)
-      flow = np.zeros(shape=(self.dirSensitiveNeuronDim,self.dirSensitiveNeuronDim,2))
+      flow = np.zeros(shape=(dirX.shape[0],dirX.shape[1],2))
       flow[:,:,0] = dirX
       flow[:,:,1] = dirY
-      goodInds = np.zeros(shape=(self.dirSensitiveNeuronDim,self.dirSensitiveNeuronDim))
+      goodInds = np.zeros(shape=(dirX.shape[0],dirX.shape[1]))
     self.ldflow.append({'flow':flow,'mag':mag,'ang':ang,'goodInds':goodInds})
 
   def updateDirSensitiveRates (self):
@@ -348,12 +356,14 @@ class AIGame:
     dflow = self.ldflow[-1]
     motiondir = dflow['ang'] # angles in degrees, but thresholded for significant motion; negative value means not used
     dAngPeak = self.dAngPeak
-    ds_courtXRng, ds_racket0XRng, ds_racketXRng = self.getNewCoords()
     if self.reducedNet:
       AngRFSigma2 = self.AngRFSigma2
       MaxRate = self.dirSensitiveNeuronRate[1]
       for pop in self.ldirpop: self.dFiringRates[pop] = self.dirSensitiveNeuronRate[0] * np.ones(shape=(1,1)) # should have a single angle per direction selective neuron pop
-      court_motiondir = motiondir[:,ds_courtXRng[0]:ds_courtXRng[1]] # only motion direction of ball in the court
+      if self.useImagePadding:
+        court_motiondir = motiondir[:,self.courtXRng[0]+self.padPixelEachSide:self.courtXRng[1]+self.padPixelEachSide] # only motion direction of ball in the court
+      else:
+        court_motiondir = motiondir[:,self.courtXRng[0]:self.courtXRng[1]] # only motion direction of ball in the court
       unique_angles = np.unique(np.floor(court_motiondir))
       print('angles:',unique_angles)
       for a in unique_angles:

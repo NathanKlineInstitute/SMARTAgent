@@ -9620,3 +9620,69 @@ and "useImagePadding":0
 ... model runs.
 
 -- Everything seems to work now run on cycle....
+
+* 20nov19
+
+
+-- run 2000 sec "20nov19_A0_cycle_reduced_2obj_INTF7_" with stimModVD=25 and stimModVL = 25
+"EV1":48, ((20+4) + (20+4))
+"EA":4608, (24x24x8)
+
+-- run 500 sec "20nov19_A0_cycle_reduced_2obj_INTF7_" with stimModVD=25 and stimModVL = 25 and 
+"EV1":192 ((80+16) + (80+16))
+"EA":73728 (96x96x8)
+
+
+* 20nov20
+
+-- when using the below configuration, noticed the angles of motion were not computed correctly.
+
+
+"useReducedNetwork": 1, 
+"captureTwoObjs":1
+"useImagePadding":1
+
+
+"EV1":192 ((80+16) + (80+16))
+"EA":73728 (96x96x8)
+
+
+
+-- debugging:
+
+there were two Problems
+1. computeAllObjectsMotionDirections(UseFull=True) was returning ldflow based on dirSensitiveNeuronDim.
+This worked fine with full network model that sam is using but was incorrect for reducedNet model.
+... fixed by including following code in the function.
+
+      if self.reducedNet:
+        flow = np.zeros(shape=(cimage.shape[0],cimage.shape[1],2))
+        mag = np.zeros(shape=(cimage.shape[0],cimage.shape[1]))
+        ang = np.zeros(shape=(cimage.shape[0],cimage.shape[1]))
+        ang[mag == 0] = -100
+        goodInds = np.zeros(shape=(cimage.shape[0],cimage.shape[1]))
+      else:
+        ...
+
+and
+
+if not self.reducedNet:
+  if np.shape(cimage)[0] != self.dirSensitiveNeuronDim or np.shape(cimage)[1] != self.dirSensitiveNeuronDim:
+    dirX = resize(dirX, (self.dirSensitiveNeuronDim, self.dirSensitiveNeuronDim), anti_aliasing=True)
+    ...
+
+and making the following independent of dirSensitiveNeuronDim
+
+flow = np.zeros(shape=(dirX.shape[0],dirX.shape[1],2))
+
+2. second issue was in function updateDirSensitiveRates(), that wrong indices were used for the court.
+updated the code to include correct indices....
+
+      if self.useImagePadding:
+        court_motiondir = motiondir[:,self.courtXRng[0]+self.padPixelEachSide:self.courtXRng[1]+self.padPixelEachSide] # only motion direction of ball in the court
+      else:
+        court_motiondir = motiondir[:,self.courtXRng[0]:self.courtXRng[1]] # only motion direction of ball in the court
+
+
+
+
