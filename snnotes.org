@@ -22108,6 +22108,95 @@ the weights will get pushed down to lower high firing rates, but then will just 
 lose info and reduce perf.
 
 python multistepSim.py sn.json 32 20 20nov20_A2_gcp_multi
+(note the name gcp not correct but does not impact output; also first name was 20nov20_A2_cycle_)
 
 started ~16:17 ...
+
+** check output from 20nov19_A1_gcp__step_2_
+
+python -i simdat.py backupcfg/20nov19_A1_gcp__step_2_sim.json
+
+EV1 0.72 Hz
+EA 6.14 Hz
+EA2 10.5 Hz
+IA2 26.06 Hz
+EMDOWN 83.34 Hz
+EMUP 82.84 Hz
+IM 36.15 Hz
+stimModEV1 0.76 Hz
+
+rates already too high ...
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/20nov20_20nov19_A1_gcp__step_2_perf.png]]
+
+lfn = ['20nov19_A0_gcp_']
+for i in range(3): lfn.append('20nov19_A1_gcp__step_' + str(i) + '_')
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0,0.4))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/20nov20_20nov19_A1_gcp__step_2_perf_all_steps_so_far.png]]
+so perf increased for a while then stopped ... probably from overly high rates ...
+
+lpda = getindivactionreward(lfn)
+csm=cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+lclr = [csm.to_rgba(float(i)/(len(lpda))) for i in range(len(lpda))]
+clf(); plotComparePerf(lpda,lclr,yl=(0,1),lleg=lfn)
+savefig(gifpath()+'perf_compareD.png') # [[./gif/20nov20_20nov19_A1_gcp__step_2_perf_compareD.png]]
+
+step 0 or step 1 are best ... then performance drops ...
+
+will check step 0 to see rates ... 
+
+python -i simdat.py backupcfg/20nov19_A1_gcp__step_0_sim.json
+
+EV1 0.72 Hz
+EA 6.19 Hz
+EA2 10.64 Hz
+IA2 26.49 Hz
+EMDOWN 26.89 Hz
+EMUP 26.92 Hz
+IM 68.02 Hz
+stimModEV1 0.77 Hz
+
+ok, those rates are already pretty high ... so can use that one as starting point for continuation
+with homeostatic plasticity ... 
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/20nov20_20nov19_A1_gcp__step_0_perf.png]]
+
+well, first check rates in next step
+
+python -i simdat.py backupcfg/20nov19_A1_gcp__step_1_sim.json
+
+EV1 0.72 Hz
+EA 6.29 Hz
+EA2 10.8 Hz
+IA2 26.9 Hz
+EMDOWN 51.52 Hz
+EMUP 51.82 Hz
+IM 61.67 Hz
+stimModEV1 0.76 Hz
+
+yeah, those rates are too high ... 
+
+continue with multistep
+        "name": "20nov20_A2_gcp_",
+    "simtype": {
+        "ResumeSim": 1,
+        "ResumeSimFromFile": "data/20nov19_A1_gcp__step_0_synWeights_final.pkl"
+    },
+        "homPlast": {
+          "On":1,
+	  "dscale": 0.005,
+          "dshift": 0.0,
+          "mintargetFR":{"EMUP":0.125,"EMDOWN":0.125},
+          "maxtargetFR":{"EMUP":30,"EMDOWN":30},
+          "hsIntervalSteps":250,
+          "updateIntervalSteps":250,
+          "synType":"AMPA"
+        },	
+
+python multistepSim.py sn.json 32 20 20nov20_A2_real_gcp_multi
+
+started ~16:51 ...
 
