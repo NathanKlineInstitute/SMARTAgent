@@ -39,7 +39,7 @@
     "stayStepLim": 0,
     "simtype": {
         "ResumeSim": 1,
-        "ResumeSimFromFile": "data/20nov17_A0_cycle_synWeights_final.pkl"
+        "ResumeSimFromFile": "data/20nov19_A1_gcp__step_0_synWeights_final.pkl"
     },
     "sim": {
         "duration": 500000,
@@ -47,12 +47,12 @@
         "verbose": 0,
         "recordStep": 1.0,
         "recordWeightStepSize": 500,
-        "normalizeWeightStepSize": 500,
+        "normalizeWeightStepSize": 5000000000000000000000000000000000,
 	"normalizeWeightsAtStart": 0,
         "RLFakeUpRule": 0,
         "RLFakeDownRule": 0,
         "RLFakeStayRule": 0,
-        "name": "20nov17_A1_cycle_",
+        "name": "20nov20_A2_gcp_",
         "doquit": 1,
         "doplot": 0,
         "saveCellSecs": 0,
@@ -83,14 +83,14 @@
 	    "ER":0,
 	    "IR":0,
 	    "EV1":6400,
-	    "EV1DE":400,
-	    "EV1DNE":400,
-	    "EV1DN":400,
-	    "EV1DNW":400,
-	    "EV1DW":400,
-	    "EV1DSW":400,
-	    "EV1DS":400,
-	    "EV1DSE":400,
+	    "EV1DE":0,
+	    "EV1DNE":0,
+	    "EV1DN":0,
+	    "EV1DNW":0,
+	    "EV1DW":0,
+	    "EV1DSW":0,
+	    "EV1DS":0,
+	    "EV1DSE":0,
 	    "ID": 0,
 	    "IV1":0,
 	    "EV4":0,
@@ -193,10 +193,10 @@
 	    "VL":{
 		"VD":{"AM":0,"NM":0,"p":0},		
 		"VL":{"AM":4,"NM":0.6,"p":0},
-		"EA":{"AM":2.6,"NM":0.26,"p":0.1},
-		"EMDOWN":{"AM":1,"NM":0.0,"p":0.08},
-		"EMUP":{"AM":1,"NM":0.0,"p":0.08},
-		"EMSTAY":{"AM":1,"NM":0.0,"p":0.08}		
+		"EA":{"AM":2.6,"NM":0.26,"p":0.25},
+		"EMDOWN":{"AM":1,"NM":0.0,"p":0.0},
+		"EMUP":{"AM":1,"NM":0.0,"p":0.0},
+		"EMSTAY":{"AM":1,"NM":0.0,"p":0.0}
 	    },
 	    "VD":{
 		"VL":{"AM":0,"NM":0,"p":0},
@@ -293,7 +293,7 @@
 		"EV4": {"AM":0 , "NM":0, "p":0},
 		"IMT": {"AM":20, "p":0.0225}
 	    }
-	},	
+	},		
         "EEMWghtThreshMin": 0.9,
         "EEMWghtThreshMax": 4,
         "EEMPopNorm": 1,
@@ -303,14 +303,15 @@
 	    "MaxFctr": 15.0
 	},
         "homPlast": {
-          "On":0, 
+          "On":1,
+	  "dscale": 0.005,
           "dshift": 0.0,
-          "mintargetFR":{"EV1":0.125,"EV4":0.125,"EMT":0.125,"EV1DE":0.125,"EV1DW":0.125,"EV1DN":0.125,"EV1DS":0.125,"EV1DSE":0.125,"EV1DNE":0.125,"EV1DSW":0.125,"EV1DNW":0.125,"EMUP":0.125,"EMDOWN":0.125},
-          "maxtargetFR":{"EV1":60,"EV4":60,"EMT":60,"EV1DE":60,"EV1DW":60,"EV1DN":60,"EV1DS":60,"EV1DSE":60,"EV1DNE":60,"EV1DSW":60,"EV1DNW":60,"EMUP":60,"EMDOWN":60},
-          "hsIntervalSteps":100,
-          "updateIntervalSteps":100,
+          "mintargetFR":{"EMUP":0.125,"EMDOWN":0.125},
+          "maxtargetFR":{"EMUP":30,"EMDOWN":30},
+          "hsIntervalSteps":250,
+          "updateIntervalSteps":250,
           "synType":"AMPA"
-        },
+        },	
         "EEMRecProbCross": 0,
         "VisualFeedback": 0,
         "weightVar": 0.5,

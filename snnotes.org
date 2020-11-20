@@ -21624,6 +21624,7 @@ clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['du
 savefig(gifpath()+'all_avg_weight.png') # [[./gif/20nov17_20nov16_C0_cycle_all_avg_weight.png]]
 
 fig=animInput(InputImages,gifpath()+'_input.mp4') # [[./gif/20nov17_20nov16_C0_cycle__input.mp4]]
+
 ** fixup issues with image padding (paddle size changing) and ball size changing
 
 ./myrun 12 sn.json
@@ -21691,3 +21692,511 @@ may as well continue overnight ...
     },
 
 python multistepSim.py sn.json 32 20 20nov17_A1_gcp_multi
+
+* 20nov18
+** check output from 20nov17_A1_cycle__step_0_
+
+python -i simdat.py backupcfg/20nov17_A1_cycle__step_0_sim.json
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/20nov18_20nov17_A1_cycle__step_0_perf.png]]
+that jumped up quite a bit from last step ... 
+
+clf(); drawraster(dspkT,dspkID); xlim((490e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/20nov18_20nov17_A1_cycle__step_0_rast.png]]
+
+adjusted drawraster to not draw the stimmods by default
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False)
+savefig(gifpath()+'all_avg_weight.png') # [[./gif/20nov18_20nov17_A1_cycle__step_0_all_avg_weight.png]]
+
+lfn = ['20nov17_A0_cycle_', '20nov17_A1_cycle__step_0_']
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0,0.36))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/20nov18_20nov17_A1_cycle__step_0_perf_all_steps_so_far.png]]
+
+looks like clearly improving ...
+
+lpda = getindivactionreward(lfn)
+csm=cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+lclr = [csm.to_rgba(float(i)/(len(lpda))) for i in range(len(lpda))]
+clf(); plotComparePerf(lpda,lclr,yl=(0,1),lleg=lfn)
+savefig(gifpath()+'perf_compareD.png') # [[./gif/20nov18_20nov17_A1_cycle__step_0_perf_compareD.png]]
+
+should include the scores/metrics in animinput ... 
+
+fig=animInput(InputImages,gifpath()+'_input.mp4') # [[./gifpath()+'_input.mp4']]
+
+a,b,c = getCumPerfCols(actreward)
+
+fig=animInput(InputImages,'test.mp4',actreward=actreward)
+
+binsz = 20
+dnspk = {pop:getspikehist(dspkT[pop],dnumc[pop],binsz,totalDur) for pop in ['EMDOWN','EMUP']}
+for clr,pop in zip(['r','b'],['EMDOWN','EMUP']): plot(dnspk[pop][0],dnspk[pop][1],clr)
+
+EMDOWN, EMUP rates are almost the same at each step ... 
+
+rdiff = np.array(dnspk['EMUP'][1]) - np.array(dnspk['EMDOWN'][1])
+
+plot(dnspk['EMDOWN'][0], rdiff, color='k', linewidth=3); xlim((0,totalDur))
+savefig(gifpath()+'EMUP_minus_EMDOWN.png') # [[./gif/20nov18_20nov17_A1_cycle__step_0_EMUP_minus_EMDOWN.png]]
+
+
+would be useful to visualize what each EM neuron knows about the environment - RFs
+that's what getinputmap shows ... but only 1st order connections ... and uses pdf ... which only
+has the plastic weights ... or to show the spatial evidence/weight for a specific move 
+
+meanwhile, check next step
+
+python -i simdat.py backupcfg/20nov17_A1_cycle__step_1_sim.json
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/20nov18_20nov17_A1_cycle__step_1_perf.png]]
+
+clf(); drawraster(dspkT,dspkID); xlim((490e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/20nov18_20nov17_A1_cycle__step_1_rast.png]]
+rates have gone up quite a bit ... 
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False)
+savefig(gifpath()+'all_avg_weight.png') # [[./gif/20nov18_20nov17_A1_cycle__step_1_all_avg_weight.png]]
+
+lfn = ['20nov17_A0_cycle_', '20nov17_A1_cycle__step_0_',  '20nov17_A1_cycle__step_1_']
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0,0.425))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/20nov18_20nov17_A1_cycle__step_1_perf_all_steps_so_far.png]]
+
+lpda = getindivactionreward(lfn)
+csm=cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+lclr = [csm.to_rgba(float(i)/(len(lpda))) for i in range(len(lpda))]
+clf(); plotComparePerf(lpda,lclr,yl=(0,1),lleg=lfn)
+savefig(gifpath()+'perf_compareD.png') # [[./gif/20nov18_20nov17_A1_cycle__step_1_perf_compareD.png]]
+looks clearly better this step ...
+
+fig=animInput(InputImages,gifpath()+'_input.mp4',actreward=actreward) # [[./gif/20nov18_20nov17_A1_cycle__step_1__input.mp4]]
+
+
+tt = np.unique(pdf.time)
+
+dout = getpopinputmap(pdf, tt[0], dnumc, dstartidx, dendidx, 'EA')
+clf(); plotallinputmaps(pdf,tt[0],dstartidx['EMDOWN'],'EMDOWN',dnumc,dstartidx,dendidx,asweight=True,dmap=dout)
+
+savefig(gifpath()+'EMDOWN_inputmap_first.png') 
+
+dout = getpopinputmap(pdf, tt[-1], dnumc, dstartidx, dendidx, 'EMDOWN')
+clf(); plotallinputmaps(pdf,tt[-1],dstartidx['EMDOWN'],'EMDOWN',dnumc,dstartidx,dendidx,asweight=True,dmap=dout)
+savefig(gifpath()+'EMDOWN_inputmap_last.png') 
+
+** related sim on gcp -- more EV1 (25600), no EV1DE, etc.
+
+        "name": "20nov18_A0_gcp_",
+
+can try with full scale for EV1 and no directional neurons?
+
+160**2 = 25600
+
+#pravgrates(dspkT,dspkID,dnumc)
+drawraster(dspkT,dspkID)
+drawcellVm(simConfig,lclr=['r','g','b','c','m','y'])
+
+./myrun 48 sn.json
+
+started ~17:25 ...
+
+no more firing after a few hundred s ... weights were too low to start ... 
+
+adjusted weights and kept probabilities  as original ... note that there are
+400 EM neurons ... 
+
+./myrun 48 sn.json
+
+started ~23:45 ... finished ~6 AM
+
+* 20nov19
+** check output from 20nov18_A0_gcp_ -->> continue
+
+python -i simdat.py backupcfg/20nov18_A0_gcp_sim.json
+
+had good rates overall:
+EV1 0.69 Hz
+EA 3.55 Hz
+EA2 5.3 Hz
+IA2 12.91 Hz
+EMDOWN 15.91 Hz
+EMUP 15.91 Hz
+IM 27.01 Hz
+stimModEV1 0.76 Hz
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/20nov19_20nov18_A0_gcp_perf.png]]
+not great, but similar to other first steps ...
+
+clf(); drawraster(dspkT,dspkID); xlim((496e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/20nov19_20nov18_A0_gcp_rast.png]]
+based on the raster, EA,EM only fire when there's motion, even though there are no
+explicitly motion-sensitive neurons ... or just due to ball being on screen, contributing
+to firing activity
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False)
+savefig(gifpath()+'all_avg_weight.png') # [[./gif/20nov19_20nov18_A0_gcp_all_avg_weight.png]]
+
+fig=animInput(InputImages,gifpath()+'_input.mp4',actreward=actreward) # [[./gif/20nov19_20nov18_A0_gcp__input.mp4]]
+
+so, worth continuing this one in multistep ... or lowering weights/rates of EM first
+
+binsz = 1000
+dnspk = {pop:getspikehist(dspkT[pop],dnumc[pop],binsz,totalDur) for pop in ['EMDOWN','EMUP']}
+for clr,pop in zip(['r','b'],['EMDOWN','EMUP']): plot(dnspk[pop][0],dnspk[pop][1],clr)
+
+savefig(gifpath()+'EM_rate_hist.png') # [[./gif/20nov19_20nov18_A0_gcp_EM_rate_hist.png]]
+rates increasing ... start somewhat high ... firing also seems more bursty in this sim ... 
+
+** adjust gcp sim
+
+./myrun 48 sn.json
+
+too slow ... not terrible but perhaps no need for 160x160
+
+** next sim on gcp
+
+will use same sim as on cycle with EV1 of 80x80 (instead of 160x160) , remove direction selective
+neurons, and scale up weights from EV1 -> X ...
+
+ok, somewhat better rates ... 
+
+./myrun 32 sn.json
+
+python -i simdat.py backupcfg/20nov19_A0_gcp_sim.json
+
+EV1 0.7 Hz
+EA 5.25 Hz
+EA2 8.35 Hz
+IA2 20.73 Hz
+EMDOWN 11.85 Hz
+EMUP 11.83 Hz
+IM 44.98 Hz
+stimModEV1 0.76 Hz
+
+overall rates ok so far ... 
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/20nov20_20nov19_A0_gcp_perf.png]]
+perf (hit/miss) increasing slowly ...
+
+clf(); drawraster(dspkT,dspkID); xlim((490e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/20nov20_20nov19_A0_gcp_rast.png]]
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False)
+savefig(gifpath()+'all_avg_weight.png') # [[./gif/20nov20_20nov19_A0_gcp_all_avg_weight.png]]
+
+fig=animInput(InputImages,gifpath()+'_input.mp4',actreward=actreward) # [[./gif/20nov20_20nov19_A0_gcp__input.mp4]]
+
+so may as well continue this one in a multistep ... 
+
+    "name": "20nov19_A1_gcp_",
+    "simtype": {
+        "ResumeSim": 1,
+        "ResumeSimFromFile": "data/20nov19_A0_gcp_synWeights_final.pkl"
+    },
+
+will use old norm rules and after a few steps if rates get too high will adjust ... 
+still testing homplast in sim on cycle below ...
+
+python multistepSim.py sn.json 32 20 20nov19_A1_gcp_multi
+
+started ~21:17 ... 
+
+** check output from 20nov17_A1_cycle__step_4_
+
+python -i simdat.py backupcfg/20nov17_A1_cycle__step_4_sim.json
+
+EV1 0.7 Hz
+EV1DE 0.26 Hz
+EV1DNE 1.24 Hz
+EV1DN 4.0 Hz
+EV1DNW 0.3 Hz
+EV1DW 0.11 Hz
+EV1DSW 0.27 Hz
+EV1DS 2.42 Hz
+EV1DSE 0.92 Hz
+EA 3.25 Hz
+EA2 8.14 Hz
+IA2 18.4 Hz
+EMDOWN 51.97 Hz
+EMUP 52.25 Hz
+IM 34.87 Hz
+stimModEV1 0.75 Hz
+stimModEV1DE 0.27 Hz
+stimModEV1DNE 1.62 Hz
+stimModEV1DN 4.28 Hz
+stimModEV1DNW 0.34 Hz
+stimModEV1DW 0.12 Hz
+stimModEV1DSW 0.32 Hz
+stimModEV1DS 2.51 Hz
+stimModEV1DSE 0.99 Hz
+
+rates too high . . . so performance not as good as previous . ?
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/20nov19_20nov17_A1_cycle__step_4_perf.png]]
+
+clf(); drawraster(dspkT,dspkID); xlim((490e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/20nov19_20nov17_A1_cycle__step_4_rast.png]]
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False)
+savefig(gifpath()+'all_avg_weight.png') # [[./gif/20nov19_20nov17_A1_cycle__step_4_all_avg_weight.png]]
+too much difference between EMUP and EMDOWN weights ... should add a func to load weights across steps of multistep (same as concat for actions, etc.)
+
+lfn = ['20nov17_A0_cycle_']
+for i in range(5): lfn.append('20nov17_A1_cycle__step_' + str(i) + '_')
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0,0.36))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/20nov19_20nov17_A1_cycle__step_4_perf_all_steps_so_far.png]]
+so perf was increasing then started decreasing for a while now ... should stop sim and figure out homeostasis/norm
+or lower the upper weight limit
+
+lpda = getindivactionreward(lfn)
+csm=cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+lclr = [csm.to_rgba(float(i)/(len(lpda))) for i in range(len(lpda))]
+clf(); plotComparePerf(lpda,lclr,yl=(0,1),lleg=lfn)
+savefig(gifpath()+'perf_compareD.png') # [[./gif/20nov19_20nov17_A1_cycle__step_4_perf_compareD.png]]
+20nov17_A1_cycle__step_1_ was best perf and after that decayed - weights got too high
+
+check that step ...
+
+python -i simdat.py backupcfg/20nov17_A1_cycle__step_1_sim.json
+
+those rates better ... so max should be ~20 Hz ...
+
+EV1 0.7 Hz
+EV1DE 0.22 Hz
+EV1DNE 0.89 Hz
+EV1DN 4.03 Hz
+EV1DNW 0.48 Hz
+EV1DW 0.15 Hz
+EV1DSW 0.38 Hz
+EV1DS 2.8 Hz
+EV1DSE 1.12 Hz
+EA 3.43 Hz
+EA2 9.69 Hz
+IA2 21.82 Hz
+EMDOWN 18.49 Hz
+EMUP 18.49 Hz
+IM 39.03 Hz
+stimModEV1 0.77 Hz
+stimModEV1DE 0.23 Hz
+stimModEV1DNE 1.11 Hz
+stimModEV1DN 4.37 Hz
+stimModEV1DNW 0.54 Hz
+stimModEV1DW 0.15 Hz
+stimModEV1DSW 0.47 Hz
+stimModEV1DS 2.94 Hz
+stimModEV1DSE 1.22 Hz
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/20nov19_20nov17_A1_cycle__step_1_perf.png]]
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False)
+savefig(gifpath()+'all_avg_weight.png') # [[./gif/20nov19_20nov17_A1_cycle__step_1_all_avg_weight.png]]
+
+so may want to keep upper weight limit ~1.5-1.6 -- and original average weight was 1.2 ... so only increased ~33% on average before
+activity got out of hand ... 
+
+fig=animInput(InputImages,gifpath()+'_input.mp4') # [[./gif/20nov19_20nov17_A1_cycle__step_1__input.mp4]]
+
+** next sim on cycle - 20nov19_A0_cycle_ homplast
+
+continue it from data/20nov17_A1_cycle__step_1_synWeights_final.pkl since that had learning and rates
+were getting close to max ... but include the homplast to prevent rates from getting too high ...
+
+        "name": "20nov19_A0_cycle_",
+
+        "homPlast": {
+          "On":1, 
+          "dshift": 0.00001,
+          "mintargetFR":{"EMUP":0.25,"EMDOWN":0.25},
+          "maxtargetFR":{"EMUP":25,"EMDOWN":25},
+          "hsIntervalSteps":100,
+          "updateIntervalSteps":500,
+          "synType":"AMPA"
+        },
+
+old dshift value was linear and set to small amount:           "dshift": 0.00001,
+
+instead could just multiply by fraction of total weight ... e.g. 0.5% ... 
+dscale = 0.001 ...
+will try that ... since dscale gets integrated (5x above) using hsIntervalSteps (based on cell firing
+rate), which is usually smaller than updateIntervalSteps ... 
+
+then looks like weights getting pushed up if use too small of an interval ... since the EMs are sometimes
+quiet when no activity...so will switch to hsIntervalSteps of 500 ... (10 seconds) and dscale of 0.005 ...
+
+./myrun 32 sn.json
+
+* 20nov20
+** check output from 20nov19_A0_cycle_
+
+python -i simdat.py backupcfg/20nov19_A0_cycle_sim.json
+
+EV1 0.7 Hz
+EV1DE 0.18 Hz
+EV1DNE 1.12 Hz
+EV1DN 4.13 Hz
+EV1DNW 0.55 Hz
+EV1DW 0.12 Hz
+EV1DSW 0.4 Hz
+EV1DS 2.74 Hz
+EV1DSE 0.79 Hz
+EA 3.65 Hz
+EA2 11.04 Hz
+IA2 24.92 Hz
+EMDOWN 32.14 Hz
+EMUP 32.21 Hz
+IM 46.78 Hz
+
+those rates seem too high ... the weights were always getting pushed up ... did not see them get pushed down
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/20nov20_20nov19_A0_cycle_perf.png]]
+but from 100 s on - perf is improving; for the first 100 s, what's going on? initialization problem?
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False)
+savefig(gifpath()+'all_avg_weight.png') # [[./gif/20nov20_20nov19_A0_cycle_all_avg_weight.png]]
+
+clf(); drawraster(dspkT,dspkID); xlim((490e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/20nov20_20nov19_A0_cycle_rast.png]]
+
+binsz = 10000
+dnspk = {pop:getspikehist(dspkT[pop],dnumc[pop],binsz,totalDur) for pop in ['EMDOWN','EMUP']}
+for clr,pop in zip(['r','b'],['EMDOWN','EMUP']): plot(dnspk[pop][0],dnspk[pop][1],clr)
+
+savefig(gifpath()+'EMUPDOWN_rates.png') # [[./gif/20nov20_20nov19_A0_cycle_EMUPDOWN_rates.png]]
+
+hmm, so rates going up past 30 Hz despite the homplast on...?? something not working ...
+
+there was a bug in the code for checking the firing rate over the interval ... and the weight should only get
+changed towards target weight if the firing rate is out of the min/max firing rate bounds ... 
+
+fixed that so can run again ... 
+
+        "name": "20nov20_A2_cycle_",
+        "homPlast": {
+          "On":1,
+	  "dscale": 0.005,
+          "dshift": 0.0,
+          "mintargetFR":{"EMUP":0.125,"EMDOWN":0.125},
+          "maxtargetFR":{"EMUP":30,"EMDOWN":30},
+          "hsIntervalSteps":250,
+          "updateIntervalSteps":250,
+          "synType":"AMPA"
+        },
+
+./myrun 32 sn.json
+
+python -i simdat.py backupcfg/20nov20_A0_cycle_sim.json
+
+clf(); drawraster(dspkT,dspkID); 
+
+binsz = 250
+dnspk = {pop:getspikehist(dspkT[pop],dnumc[pop],binsz,totalDur) for pop in ['EMDOWN','EMUP']}
+for clr,pop in zip(['r','b'],['EMDOWN','EMUP']): plot(dnspk[pop][0],dnspk[pop][1],clr)
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False)
+
+ok, see what's expected ... will try a multistep sim using these homplast params ... but overall, seems somewhat problematic in that
+the weights will get pushed down to lower high firing rates, but then will just go back up again ... but pushing them too far down will potentially
+lose info and reduce perf.
+
+python multistepSim.py sn.json 32 20 20nov20_A2_gcp_multi
+(note the name gcp not correct but does not impact output; also first name was 20nov20_A2_cycle_)
+
+started ~16:17 ...
+
+** check output from 20nov19_A1_gcp__step_2_
+
+python -i simdat.py backupcfg/20nov19_A1_gcp__step_2_sim.json
+
+EV1 0.72 Hz
+EA 6.14 Hz
+EA2 10.5 Hz
+IA2 26.06 Hz
+EMDOWN 83.34 Hz
+EMUP 82.84 Hz
+IM 36.15 Hz
+stimModEV1 0.76 Hz
+
+rates already too high ...
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/20nov20_20nov19_A1_gcp__step_2_perf.png]]
+
+lfn = ['20nov19_A0_gcp_']
+for i in range(3): lfn.append('20nov19_A1_gcp__step_' + str(i) + '_')
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0,0.4))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/20nov20_20nov19_A1_gcp__step_2_perf_all_steps_so_far.png]]
+so perf increased for a while then stopped ... probably from overly high rates ...
+
+lpda = getindivactionreward(lfn)
+csm=cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+lclr = [csm.to_rgba(float(i)/(len(lpda))) for i in range(len(lpda))]
+clf(); plotComparePerf(lpda,lclr,yl=(0,1),lleg=lfn)
+savefig(gifpath()+'perf_compareD.png') # [[./gif/20nov20_20nov19_A1_gcp__step_2_perf_compareD.png]]
+
+step 0 or step 1 are best ... then performance drops ...
+
+will check step 0 to see rates ... 
+
+python -i simdat.py backupcfg/20nov19_A1_gcp__step_0_sim.json
+
+EV1 0.72 Hz
+EA 6.19 Hz
+EA2 10.64 Hz
+IA2 26.49 Hz
+EMDOWN 26.89 Hz
+EMUP 26.92 Hz
+IM 68.02 Hz
+stimModEV1 0.77 Hz
+
+ok, those rates are already pretty high ... so can use that one as starting point for continuation
+with homeostatic plasticity ... 
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/20nov20_20nov19_A1_gcp__step_0_perf.png]]
+
+well, first check rates in next step
+
+python -i simdat.py backupcfg/20nov19_A1_gcp__step_1_sim.json
+
+EV1 0.72 Hz
+EA 6.29 Hz
+EA2 10.8 Hz
+IA2 26.9 Hz
+EMDOWN 51.52 Hz
+EMUP 51.82 Hz
+IM 61.67 Hz
+stimModEV1 0.76 Hz
+
+yeah, those rates are too high ... 
+
+continue with multistep
+        "name": "20nov20_A2_gcp_",
+    "simtype": {
+        "ResumeSim": 1,
+        "ResumeSimFromFile": "data/20nov19_A1_gcp__step_0_synWeights_final.pkl"
+    },
+        "homPlast": {
+          "On":1,
+	  "dscale": 0.005,
+          "dshift": 0.0,
+          "mintargetFR":{"EMUP":0.125,"EMDOWN":0.125},
+          "maxtargetFR":{"EMUP":30,"EMDOWN":30},
+          "hsIntervalSteps":250,
+          "updateIntervalSteps":250,
+          "synType":"AMPA"
+        },	
+
+python multistepSim.py sn.json 32 20 20nov20_A2_real_gcp_multi
+
+started ~16:51 ...
+

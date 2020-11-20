@@ -268,7 +268,8 @@ def viewInput (t, InputImages, ldflow, dhist, lpop = None, lclr = ['r','b'], twi
   
 
 #
-def animInput (InputImages, outpath, framerate=10, figsize=None, showflow=False, ldflow=None, dobjpos=None):
+def animInput (InputImages, outpath, framerate=10, figsize=None, showflow=False, ldflow=None, dobjpos=None,\
+               actreward=None, nframe=None):
   # animate the input images; showflow specifies whether to calculate/animate optical flow
   ioff()
   # plot input images and optionally optical flow
@@ -291,7 +292,7 @@ def animInput (InputImages, outpath, framerate=10, figsize=None, showflow=False,
     if ldx==0:
       pcm = ax.imshow( lact[idx][0,:,:], origin='upper', cmap='gray', vmin=0, vmax=lvmax[idx])
       ddat[ldx] = pcm
-      ax.set_ylabel(ltitle[idx])
+      # ax.set_ylabel(ltitle[idx])
       if dobjpos is not None:
         lobjx,lobjy = [objfctr*dobjpos[k][0,0] for k in dobjpos.keys()], [objfctr*dobjpos[k][0,1] for k in dobjpos.keys()]
         ddat['objpos'], = ax.plot(lobjx,lobjy,'ro')
@@ -301,8 +302,13 @@ def animInput (InputImages, outpath, framerate=10, figsize=None, showflow=False,
       ax.set_xlim((0,InputImages[0].shape[1])); ax.set_ylim((0,InputImages[0].shape[0]))
       ax.invert_yaxis()
     idx += 1
+  cumHits, cumMissed, cumScore = None,None,None
+  if actreward is not None:
+    cumHits, cumMissed, cumScore = getCumPerfCols(actreward)    
   def updatefig (t):
-    fig.suptitle('Time = ' + str(t*tstepPerAction) + ' ms')
+    stitle = 'Time = ' + str(t*tstepPerAction) + ' ms'
+    if cumHits is not None: stitle += '\nOpponent Points:'+str(cumMissed[t])+'   Model Points:'+str(cumScore[t]) + '   Model Hits:'+str(cumHits[t])
+    fig.suptitle(stitle)
     if t < 1: return fig # already rendered t=0 above
     print('frame t = ', str(t*tstepPerAction))    
     for ldx,ax in enumerate(lax):
@@ -315,7 +321,7 @@ def animInput (InputImages, outpath, framerate=10, figsize=None, showflow=False,
         ddat[ldx].set_UVC(ldflow[t]['flow'][:,:,0],-ldflow[t]['flow'][:,:,1])        
     return fig
   t1 = range(0,totalDur,tstepPerAction)
-  nframe = len(t1)
+  if nframe is None: nframe = len(t1)
   if showflow: nframe-=1
   ani = animation.FuncAnimation(fig, updatefig, interval=1, frames=nframe)
   writer = anim.getwriter(outpath, framerate=framerate)
@@ -483,11 +489,13 @@ def pravgrates(dspkT,dspkID,dnumc):
   for pop in dspkT.keys(): print(pop,round(getrate(dspkT,dspkID,pop,dnumc),2),'Hz')
 
 #
-def drawraster (dspkT,dspkID,tlim=None,msz=2):
+def drawraster (dspkT,dspkID,tlim=None,msz=2,skipstimMod=True):
   # draw raster (x-axis: time, y-axis: neuron ID)
+  lpop=list(dspkT.keys()); lpop.reverse()
+  lpop = [x for x in lpop if not skipstimMod or x.count('stimMod')==0]  
   csm=cm.ScalarMappable(cmap=cm.prism); csm.set_clim(0,len(dspkT.keys()))
   lclr = []
-  for pdx,pop in enumerate(list(dspkT.keys())):
+  for pdx,pop in enumerate(lpop):
     color = csm.to_rgba(pdx); lclr.append(color)
     plot(dspkT[pop],dspkID[pop],'o',color=color,markersize=msz)
   if tlim is not None:
@@ -495,10 +503,11 @@ def drawraster (dspkT,dspkID,tlim=None,msz=2):
   else:
     xlim((0,totalDur))
   xlabel('Time (ms)')
-  lclr.reverse(); lpop=list(dspkT.keys()); lpop.reverse()
+  #lclr.reverse(); 
   lpatch = [mpatches.Patch(color=c,label=s+' '+str(round(getrate(dspkT,dspkID,s,dnumc),2))+' Hz') for c,s in zip(lclr,lpop)]
   ax=gca()
   ax.legend(handles=lpatch,handlelength=1,loc='best')
+  ylim((0,sum([dnumc[x] for x in lpop])))
 
 #
 def drawcellVm (simConfig, ldrawpop=None,tlim=None, lclr=None):
@@ -630,6 +639,27 @@ def plotScoreLoss (actreward,ax=None,msz=3):
   ax.set_ylim((0,np.max([cumScore[-1],cumLoss[-1]])))
   ax.legend(('Score Point ('+str(cumScore[-1])+')','Lose Point ('+str(cumLoss[-1])+')'),loc='best')
   return cumScore[-1],cumLoss[-1]
+
+def getCumPerfCols (actreward):
+  # get cumulative performance arrays
+  action_times = np.array(actreward.time)
+  Hit_Missed = np.array(actreward.hit)
+  allMissed = np.where(Hit_Missed==-1,1,0)
+  cumMissed = np.cumsum(allMissed) #if a reward is -1, replace it with 1 else replace it with 0.  
+  cumScore = getCumScore(actreward)
+  #actreward['cumScoreRatio'] = cumScore/cumMissed # cumulative score/loss ratio
+  allproposed = actreward[(actreward.proposed!=-1)] # only care about cases when can suggest a proposed action
+  rewardingActions = np.where(allproposed.proposed-allproposed.action==0,1,0)
+  rewardingActions = np.cumsum(rewardingActions) # cumulative of rewarding action
+  cumActs = np.array(range(1,len(allproposed)+1))
+  #actreward['cumFollow'] = np.divide(rewardingActions,cumActs) # cumulative follow probability
+  allHit = np.where(Hit_Missed==1,1,0) 
+  allMissed = np.where(Hit_Missed==-1,1,0)
+  cumHits = np.cumsum(allHit) #cumulative hits evolving with time.
+  cumMissed = np.cumsum(allMissed) #if a reward is -1, replace it with 1 else replace it with 0.
+  #actreward['cumHitMissRatio'] = cumHits/cumMissed # cumulative hits/missed ratio
+  return cumHits, cumMissed, cumScore
+  
 
 def plotPerf (actreward,yl=(0,1)):
   # plot performance
@@ -1621,6 +1651,8 @@ if __name__ == '__main__':
   #plotSynWeightsPostNeuronID(pdf,25)
   #plotSynWeightsPostNeuronID(pdf,35)
   #plotSynWeightsPostNeuronID(pdf,45)
-  #fig=animInput(InputImages,gifpath()+'_input.mp4')
+  #fig=animInput(InputImages,gifpath()+'_input.mp4')  
+  #figure(); drawcellVm(simConfig,lclr=['r','g','b','c','m','y'])
+  pravgrates(dspkT,dspkID,dnumc)
   #drawraster(dspkT,dspkID)
   #figure(); drawcellVm(simConfig,lclr=['r','g','b','c','m','y'])
