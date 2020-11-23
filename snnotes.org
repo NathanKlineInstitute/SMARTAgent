@@ -22200,3 +22200,46 @@ python multistepSim.py sn.json 32 20 20nov20_A2_real_gcp_multi
 
 started ~16:51 ...
 
+* 20nov23
+** check output from 20nov20_A2_gcp__step_8_
+
+python -i simdat.py backupcfg/20nov20_A2_gcp__step_8_sim.json
+
+EV1 0.75 Hz
+EA 5.8 Hz
+EA2 9.27 Hz
+IA2 23.17 Hz
+EMDOWN 24.27 Hz
+EMUP 10.22 Hz
+IM 42.77 Hz
+stimModEV1 0.8 Hz
+
+hmm, definitely not working if the EMDOWN, EMUP rates are so different. how did that happen?
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/20nov23_20nov20_A2_gcp__step_8_perf.png]]
+
+clf(); drawraster(dspkT,dspkID); xlim((490e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/20nov23_20nov20_A2_gcp__step_8_rast.png]]
+
+binsz = 1000
+dnspk = {pop:getspikehist(dspkT[pop],dnumc[pop],binsz,totalDur) for pop in ['EMDOWN','EMUP']}
+for clr,pop in zip(['r','b'],['EMDOWN','EMUP']): plot(dnspk[pop][0],dnspk[pop][1],clr)
+
+savefig(gifpath()+'EMUPDOWN_rates.png') # [[./gif/20nov23_20nov20_A2_gcp__step_8_EMUPDOWN_rates.png]]
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False)
+savefig(gifpath()+'all_avg_weight.png') # [[./gif/20nov23_20nov20_A2_gcp__step_8_all_avg_weight.png]]
+
+EMUP weight changes look much smoother ... is there a bug?
+
+lfn = ['20nov19_A0_gcp_','20nov19_A1_gcp__step_0_']
+for i in range(9): lfn.append('20nov20_A2_gcp__step_' + str(i) + '_')
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0,0.4))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/20nov23_20nov20_A2_gcp__step_8_perf_all_steps_so_far.png]]
+so performance was increasing but right after new homplast rule was turned on performance started to decay
+that's either due to a bug or the rule itself ...
+
+stop the multistep gcp sim ... and fix before continuing ... 
+
