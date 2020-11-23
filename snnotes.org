@@ -22313,3 +22313,15 @@ try with eempopnorm again - since that preserves relative weights - but with low
 
 python multistepSim.py sn.json 32 20 20nov23_A2_gcp_multi
 
+** use eempopnorm on gcp, with lower max threshold
+
+        "name": "20nov23_A2_gcp_",
+        "EEMWghtThreshMin": 0.9,
+        "EEMWghtThreshMax": 1.31,
+    "simtype": {
+        "ResumeSim": 1,
+	"ResumeSimFromFile": "data/20nov19_A1_gcp__step_0_synWeights_final.pkl"
+    },
+
+python multistepSim.py sn.json 32 20 20nov23_A2_realgcp_multi
+
