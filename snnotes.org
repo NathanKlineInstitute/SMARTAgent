@@ -22243,3 +22243,73 @@ that's either due to a bug or the rule itself ...
 
 stop the multistep gcp sim ... and fix before continuing ... 
 
+** check output from cycle 20nov20_A2_cycle__step_6_
+
+python -i simdat.py backupcfg/20nov20_A2_cycle__step_6_sim.json
+
+EV1 0.66 Hz
+EV1DE 0.27 Hz
+EV1DNE 1.32 Hz
+EV1DN 3.55 Hz
+EV1DNW 0.34 Hz
+EV1DW 0.08 Hz
+EV1DSW 0.15 Hz
+EV1DS 1.83 Hz
+EV1DSE 0.87 Hz
+EA 2.63 Hz
+EA2 6.56 Hz
+IA2 14.72 Hz
+EMDOWN 18.85 Hz
+EMUP 19.53 Hz
+IM 24.12 Hz
+stimModEV1 0.74 Hz
+stimModEV1DE 0.27 Hz
+stimModEV1DNE 1.74 Hz
+stimModEV1DN 3.81 Hz
+stimModEV1DNW 0.38 Hz
+stimModEV1DW 0.08 Hz
+stimModEV1DSW 0.17 Hz
+stimModEV1DS 1.89 Hz
+stimModEV1DSE 0.93 Hz
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/20nov23_20nov20_A2_cycle__step_6_perf.png]]
+this one not as bad as the one on gcp ... but not very good - worse than before the homplast was turned on
+
+clf(); drawraster(dspkT,dspkID); xlim((490e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/20nov23_20nov20_A2_cycle__step_6_rast.png]]
+those rates are more similar ... 
+
+binsz = 1000
+dnspk = {pop:getspikehist(dspkT[pop],dnumc[pop],binsz,totalDur) for pop in ['EMDOWN','EMUP']}
+for clr,pop in zip(['r','b'],['EMDOWN','EMUP']): plot(dnspk[pop][0],dnspk[pop][1],clr)
+
+savefig(gifpath()+'EMUPDOWN_rates.png') # [[./gif/20nov23_20nov20_A2_cycle__step_6_EMUPDOWN_rates.png]]
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False)
+savefig(gifpath()+'all_avg_weight.png') # [[./gif/20nov23_20nov20_A2_cycle__step_6_all_avg_weight.png]]
+
+lfn = ['20nov17_A0_cycle_']
+for i in range(2): lfn.append('20nov17_A1_cycle__step_' + str(i) + '_')
+for i in range(9): lfn.append('20nov20_A2_cycle__step_' + str(i) + '_')
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0,0.435))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/20nov23_20nov20_A2_cycle__step_6_perf_all_steps_so_far.png]]
+
+same as the gcp sim this one starts to decrease in performance after homplast turned on ...
+
+** use eempopnorm on cycle, with lower max threshold
+
+try with eempopnorm again - since that preserves relative weights - but with lower max threshold ... of 1.4 ? 
+
+        "name": "20nov23_A2_cycle_",
+        "EEMWghtThreshMin": 0.9,
+        "EEMWghtThreshMax": 1.4,
+        "EEMPopNorm": 1,
+    "simtype": {
+        "ResumeSim": 1,
+        "ResumeSimFromFile": "data/20nov17_A1_cycle__step_1_synWeights_final.pkl"
+    },
+
+python multistepSim.py sn.json 32 20 20nov23_A2_gcp_multi
+
