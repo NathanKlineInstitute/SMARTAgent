@@ -22325,3 +22325,12 @@ python multistepSim.py sn.json 32 20 20nov23_A2_gcp_multi
 
 python multistepSim.py sn.json 32 20 20nov23_A2_realgcp_multi
 
+** noise help?
+
+        "name": "20nov23_B2_gcp_",
+    "simtype": {
+        "ResumeSim": 1,
+	"ResumeSimFromFile": "data/20nov19_A1_gcp__step_0_synWeights_final.pkl"
+    },
+with eempopnorm ... and reloading weights but add some noise ... to reduce sparsity of EM firing
+
