@@ -22304,7 +22304,7 @@ try with eempopnorm again - since that preserves relative weights - but with low
 
         "name": "20nov23_A2_cycle_",
         "EEMWghtThreshMin": 0.9,
-        "EEMWghtThreshMax": 1.4,
+        "EEMWghtThreshMax": 1.31,
         "EEMPopNorm": 1,
     "simtype": {
         "ResumeSim": 1,

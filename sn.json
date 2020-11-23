@@ -295,7 +295,7 @@
 	    }
 	},	
         "EEMWghtThreshMin": 0.9,
-        "EEMWghtThreshMax": 1.4,
+        "EEMWghtThreshMax": 1.31,
         "EEMPopNorm": 1,
 	"CellWNorm": {
 	    "On": 0,
