@@ -35,10 +35,10 @@
         "FlowWidth": 1,
         "UseFull": 1
     },
-    "verbose": 0,
+    "verbose": 1,
     "stayStepLim": 0,
     "simtype": {
-        "ResumeSim": 1,
+        "ResumeSim": 0,
 	"ResumeSimFromFile": "data/20nov19_A1_gcp__step_0_synWeights_final.pkl"
     },
     "sim": {
@@ -52,12 +52,12 @@
         "RLFakeUpRule": 0,
         "RLFakeDownRule": 0,
         "RLFakeStayRule": 0,
-        "name": "20nov23_B2_gcp_",
-        "doquit": 0,
-        "doplot": 1,
+        "name": "20nov24_C0_gcp_",
+        "doquit": 1,
+        "doplot": 0,
         "saveCellSecs": 0,
         "saveCellConns": 0,
-        "targettedRL": 1,
+        "targettedRL": 3,
         "tstepPerAction": 20,
         "saveWeights": 1,
         "saveAssignedFiringRates": 0,
@@ -103,14 +103,12 @@
 	    "IA2": 25,	    
 	    "EMDOWN":300,
 	    "EMUP":300,
-	    "EMSTAY":0,
 	    "IM":300,
 	    "IMUP": 0,
-	    "IMDOWN": 0,
-	    "IMSTAY": 0},
-	"ETypes": ["ER","EV1","EV1DE","EV1DNE","EV1DN","EV1DNW","EV1DW","EV1DSW","EV1DS","EV1DSE","EV4","EMT","EMDOWN","EMUP","EMSTAY","EA","EA2"],
-	"ITypes": ["IR","IV1","IV4","IMT","IM","ID","IMUP","IMDOWN","IMSTAY","IA","IA2"],
-	"EMotorPops": ["EMDOWN", "EMUP", "EMSTAY"],
+	    "IMDOWN": 0},
+	"ETypes": ["ER","EV1","EV1DE","EV1DNE","EV1DN","EV1DNW","EV1DW","EV1DSW","EV1DS","EV1DSE","EV4","EMT","EMDOWN","EMUP","EA","EA2"],
+	"ITypes": ["IR","IV1","IV4","IMT","IM","ID","IMUP","IMDOWN","IA","IA2"],
+	"EMotorPops": ["EMDOWN", "EMUP"],
 	"EVPops": ["EV1","EV1DE","EV1DNE","EV1DN","EV1DNW","EV1DW","EV1DSW","EV1DS","EV1DSE","EV4","EMT"],
         "EVDirPops": ["EV1DE","EV1DNE","EV1DN","EV1DNW","EV1DW","EV1DSW","EV1DS","EV1DSE"],
 	"IVDirPops": ["ID"],
@@ -122,22 +120,22 @@
             "IR":{"ER":5},
             "EV1":{"ER":3},
             "IV1":{"EV1":5,"ER":5},
-            "EV4":{"EV1":3,"EMDOWN":3,"EMUP":3,"EMSTAY":3},
+            "EV4":{"EV1":3,"EMDOWN":3,"EMUP":3},
             "IV4":{"EV4":5,"EV1":5},
-            "EMT":{"EV4":3,"EMDOWN":3,"EMUP":3,"EMSTAY":3},
+            "EMT":{"EV4":3,"EMDOWN":3,"EMUP":3},
             "IMT":{"EMT":5,"EV4":5}
         },
         "alltopolconvcons":{
-            "ER":{"IR":3,"EV1":3,"EMDOWN":3,"EMUP":3,"EMSTAY":3},
-            "EV1":{"IV1":3,"EV4":3,"EMDOWN":3,"EMUP":3,"EMSTAY":3},
-            "EV1DE":{"EMDOWN":3,"EMUP":3,"EMSTAY":3},
-            "EV1DNE":{"EMDOWN":3,"EMUP":3,"EMSTAY":3},
-            "EV1DN":{"EMDOWN":3,"EMUP":3,"EMSTAY":3},
-            "EV1DNW":{"EMDOWN":3,"EMUP":3,"EMSTAY":3},
-            "EV1DW":{"EMDOWN":3,"EMUP":3,"EMSTAY":3},
-            "EV1DSW":{"EMDOWN":3,"EMUP":3,"EMSTAY":3},
-            "EV1DS":{"EMDOWN":3,"EMUP":3,"EMSTAY":3},
-            "EV1DSE":{"EMDOWN":3,"EMUP":3,"EMSTAY":3},
+            "ER":{"IR":3,"EV1":3,"EMDOWN":3,"EMUP":3},
+            "EV1":{"IV1":3,"EV4":3,"EMDOWN":3,"EMUP":3},
+            "EV1DE":{"EMDOWN":3,"EMUP":3},
+            "EV1DNE":{"EMDOWN":3,"EMUP":3},
+            "EV1DN":{"EMDOWN":3,"EMUP":3},
+            "EV1DNW":{"EMDOWN":3,"EMUP":3},
+            "EV1DW":{"EMDOWN":3,"EMUP":3},
+            "EV1DSW":{"EMDOWN":3,"EMUP":3},
+            "EV1DS":{"EMDOWN":3,"EMUP":3},
+            "EV1DSE":{"EMDOWN":3,"EMUP":3},
             "IV1":{"IV4":5},
             "EV4":{"IV4":3,"EMT":3},
             "IV4":{"IMT":5},
@@ -196,7 +194,6 @@
 		"EA":{"AM":2.6,"NM":0.26,"p":0.25},
 		"EMDOWN":{"AM":1,"NM":0.0,"p":0.0},
 		"EMUP":{"AM":1,"NM":0.0,"p":0.0},
-		"EMSTAY":{"AM":1,"NM":0.0,"p":0.0}
 	    },
 	    "VD":{
 		"VL":{"AM":0,"NM":0,"p":0},
@@ -204,7 +201,6 @@
 		"EA":{"AM":2.6,"NM":0.26,"p":0.1},
 		"EMDOWN":{"AM":0.5,"NM":0.0,"p":0.08},
 		"EMUP":{"AM":0.5,"NM":0.0,"p":0.08},
-		"EMSTAY":{"AM":0.5,"NM":0.0,"p":0.08},
 		"ID": {"AM":10, "p":0.03}
 	    },
 	    "EM":{
@@ -272,9 +268,6 @@
 	    },
 	    "IMDOWN": {
 		"IMDOWN": {"GA":2.5, "p":0.15}
-	    },
-	    "IMSTAY": {
-		"IMSTAY": {"GA":2.5, "p":0.15}
 	    },
 	    "ER": {
 		"EV1": {"AM": 4.0, "NM": 0.6, "p":0.1}

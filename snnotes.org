@@ -22451,7 +22451,41 @@ right now population that contributed to the move gets rewarded or punished (whe
 but other population does not get impacted
 could revise the rule to also give opposite critic value to the other population
 
+        if dconf['sim']['targettedRL']:
+          if not noWinner: # if there's a clear winner in terms of firing rates
+            if UPactions==DOWNactions:
+              if dconf['verbose']: print('APPLY RL to both EMUP and EMDOWN')
+              for STDPmech in dSTDPmech['all']: STDPmech.reward_punish(float(critic))          
+            elif UPactions>DOWNactions: # UP WINS vs DOWN
+              if dconf['verbose']: print('APPLY RL to EMUP')
+              for STDPmech in dSTDPmech['EMUP']: STDPmech.reward_punish(float(critic))
+              if if dconf['sim']['targettedRL']==3: # opposite to pop that did not contribute
+                for STDPmech in dSTDPmech['EMDOWN']: STDPmech.reward_punish(float(-critic))
+            elif DOWNactions>UPactions: # DOWN WINS vs UP
+              if dconf['verbose']: print('APPLY RL to EMDOWN')
+              for STDPmech in dSTDPmech['EMDOWN']: STDPmech.reward_punish(float(critic))
+              if if dconf['sim']['targettedRL']==3: # opposite to pop that did not contribute
+                for STDPmech in dSTDPmech['EMUP']: STDPmech.reward_punish(float(-critic))              
+
+also, should it reward up/down if they're both 0??
+
+with 0 actions
+            if F_UPs[ts]>F_DOWNs[ts]: # UP WINS
+              actions.append(dconf['moves']['UP'])
+            elif F_DOWNs[ts]>F_UPs[ts]: # DOWN WINS
+              actions.append(dconf['moves']['DOWN'])
+            elif dconf['0rand'] and F_DOWNs[ts]==0 and F_UPs[ts]==0: # random move when 0 rate for both pops?
+              lmoves = list(dconf['moves'].values())
+              actions.append(lmoves[np.random.randint(0,len(lmoves))])
+            else:
+              actions.append(dconf['moves']['NOMOVE']) # No move
+              noWinner = True
+
 ** controls - shuffle learned weights then run
 
 that way will have similar firing rates
+
+** test after learning - test performance after learning turned off
+
+and compare to controls
 

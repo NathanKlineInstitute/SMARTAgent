@@ -61,7 +61,7 @@ cmat = dconf['net']['cmat'] # connection matrix (for classes, synapses, probabil
 dnumc = OrderedDict({ty:dconf['net']['allpops'][ty]*scale for ty in allpops}) # number of neurons of a given type
 
 def getpadding ():
-  # get padding-related parameters
+  # get padding-related parameters -- NB: not used
   dnumc_padx = OrderedDict({ty:dconf['net']['allpops'][ty]*0 for ty in allpops}) # a dictionary with zeros to keep number of padded neurons in one dimension
   dtopoldivcons = dconf['net']['alltopoldivcons']
   dtopolconvcons = dconf['net']['alltopolconvcons']
@@ -103,11 +103,8 @@ def getpadding ():
   return dnumc_padx, dtopoldivcons,dtopolconvcons,allpops_withconvtopology,allpops_withdivtopology
 
 dnumc_padx, dtopoldivcons,dtopolconvcons,allpops_withconvtopology,allpops_withdivtopology = getpadding()
-  
-if dnumc['EMSTAY']>0:
-  lrecpop = ['EMUP', 'EMDOWN','EMSTAY'] # which populations to record from
-else:
-  lrecpop = ['EMUP', 'EMDOWN'] # which populations to record from
+
+lrecpop = ['EMUP', 'EMDOWN'] # which populations to record from
   
 if cmat['VD']['VD']['p'] > 0.0 or \
    cmat['VD']['VL']['p'] > 0.0 or \
@@ -157,7 +154,7 @@ simConfig.saveFolder = 'data'
 # simConfig.backupCfg = ['sim.json', 'backupcfg/'+dconf['sim']['name']+'sim.json']
 simConfig.createNEURONObj = True  # create HOC objects when instantiating network
 simConfig.createPyStruct = True  # create Python structure (simulator-independent) when instantiating network
-simConfig.analysis['plotTraces'] = {'include': [(pop, 0) for pop in ['ER','IR','EV1','EV1DE','ID','IV1','EV4','IV4','EMT','IMT','EMDOWN','EMUP','EMSTAY','IM','IMUP','IMDOWN','EA','IA','EA2','IA2']]}
+simConfig.analysis['plotTraces'] = {'include': [(pop, 0) for pop in ['ER','IR','EV1','EV1DE','ID','IV1','EV4','IV4','EMT','IMT','EMDOWN','EMUP','IM','IMUP','IMDOWN','EA','IA','EA2','IA2']]}
 simConfig.analysis['plotRaster'] = {'popRates':'overlay','showFig':dconf['sim']['doplot']}
 #simConfig.analysis['plot2Dnet'] = True 
 #simConfig.analysis['plotConn'] = True           # plot connectivity matrix
@@ -1567,26 +1564,16 @@ def trainAgent (t):
       ts_end = t-tstepPerAction*(dconf['actionsPerPlay']-ts)
       F_UPs.append(getSpikesWithInterval([ts_end,ts_beg], sim.net.pops['EMUP'].cellGids))
       F_DOWNs.append(getSpikesWithInterval([ts_end,ts_beg], sim.net.pops['EMDOWN'].cellGids))
-      if dnumc['EMSTAY']>0:
-        F_STAYs.append(getSpikesWithInterval([ts_end,ts_beg], sim.net.pops['EMSTAY'].cellGids))
     sim.pc.allreduce(vec.from_python(F_UPs),1) #sum
     F_UPs = vec.to_python()
     sim.pc.allreduce(vec.from_python(F_DOWNs),1) #sum
     F_DOWNs = vec.to_python()
-    if dnumc['EMSTAY']>0:
-      sim.pc.allreduce(vec.from_python(F_STAYs),1) #sum
-      F_STAYs = vec.to_python()
     if sim.rank==0:
       if fid4 is None: fid4 = open(sim.MotorOutputsfilename,'w')
-      if dnumc['EMSTAY']>0:
-        print('t=',round(t,2),' U,D,S spikes:', F_UPs, F_DOWNs, F_STAYs)
-      else:
-        print('t=',round(t,2),' U,D spikes:', F_UPs, F_DOWNs)
+      print('t=',round(t,2),' U,D spikes:', F_UPs, F_DOWNs)
       fid4.write('%0.1f' % t)
       for ts in range(int(dconf['actionsPerPlay'])): fid4.write('\t%0.1f' % F_UPs[ts])
       for ts in range(int(dconf['actionsPerPlay'])): fid4.write('\t%0.1f' % F_DOWNs[ts])
-      if dnumc['EMSTAY']>0:
-        for ts in range(int(dconf['actionsPerPlay'])): fid4.write('\t%0.1f' % F_STAYs[ts])
       fid4.write('\n')
       actions = []
       if dconf['randmove']:
@@ -1609,27 +1596,16 @@ def trainAgent (t):
         sim.lastMove = actions[-1]
       else:
         for ts in range(int(dconf['actionsPerPlay'])):
-          if dnumc['EMSTAY']>0: 
-            if (F_UPs[ts]>F_DOWNs[ts]) and (F_UPs[ts]>F_STAYs[ts]): # UP WINS vs ALL
-              actions.append(dconf['moves']['UP'])
-            elif (F_DOWNs[ts]>F_UPs[ts]) and (F_DOWNs[ts]>F_STAYs[ts]): # DOWN WINS vs ALL
-              actions.append(dconf['moves']['DOWN'])
-            elif (F_STAYs[ts]>F_UPs[ts]) and (F_STAYs[ts]>F_DOWNs[ts]): # STAY WINS vs ALL
-              actions.append(dconf['moves']['NOMOVE']) # No move
-            else: 
-              actions.append(dconf['moves']['NOMOVE']) # No move but also no clear winner
-              noWinner = True
+          if F_UPs[ts]>F_DOWNs[ts]: # UP WINS
+            actions.append(dconf['moves']['UP'])
+          elif F_DOWNs[ts]>F_UPs[ts]: # DOWN WINS
+            actions.append(dconf['moves']['DOWN'])
+          elif dconf['0rand'] and F_DOWNs[ts]==0 and F_UPs[ts]==0: # random move when 0 rate for both pops?
+            lmoves = list(dconf['moves'].values())
+            actions.append(lmoves[np.random.randint(0,len(lmoves))])
           else:
-            if F_UPs[ts]>F_DOWNs[ts]: # UP WINS
-              actions.append(dconf['moves']['UP'])
-            elif F_DOWNs[ts]>F_UPs[ts]: # DOWN WINS
-              actions.append(dconf['moves']['DOWN'])
-            elif dconf['0rand'] and F_DOWNs[ts]==0 and F_UPs[ts]==0: # random move when 0 rate for both pops?
-              lmoves = list(dconf['moves'].values())
-              actions.append(lmoves[np.random.randint(0,len(lmoves))])
-            else:
-              actions.append(dconf['moves']['NOMOVE']) # No move
-              noWinner = True
+            actions.append(dconf['moves']['NOMOVE']) # No move
+            noWinner = True
   if sim.rank == 0:
     rewards, epCount, proposed_actions, total_hits, FollowTargetSign = sim.AIGame.playGame(actions, epCount, t)
     print('t=',round(t,2),'proposed,model action:', proposed_actions,actions)
@@ -1682,9 +1658,6 @@ def trainAgent (t):
     DOWNactions = np.sum(np.where(np.array(actions)==dconf['moves']['DOWN'],1,0))
     sim.pc.py_broadcast(UPactions,0) # broadcast UPactions
     sim.pc.py_broadcast(DOWNactions,0) # broadcast DOWNactions
-    if dnumc['EMSTAY']>0:
-      STAYactions = np.sum(np.where(np.array(actions)==dconf['moves']['NOMOVE'],1,0))
-      sim.pc.py_broadcast(STAYactions,0) # broadcast STAYactions
     if dconf['sim']['anticipatedRL']:
       print(proposed_actions)
       sim.pc.py_broadcast(proposed_actions,0) # used proposed actions to target/potentiate the pop representing anticipated action.      
@@ -1692,11 +1665,9 @@ def trainAgent (t):
     critic = sim.pc.py_broadcast(None, 0) # receive critic value from master node
     UPactions = sim.pc.py_broadcast(None, 0)
     DOWNactions = sim.pc.py_broadcast(None, 0)
-    if 'EMSTAY' in dconf['net']: STAYactions = sim.pc.broadcast(None, 0)
     if dconf['sim']['anticipatedRL']: proposed_actions = sim.pc.py_broadcast(None, 0)      
-    if dconf['verbose']:
-      if dnumc['EMSTAY']>0: print('UPactions: ', UPactions,'DOWNactions: ', DOWNactions, 'STAYactions: ', STAYactions)
-      else: print('UPactions: ', UPactions,'DOWNactions: ', DOWNactions)
+    if dconf['verbose']>1:
+      print('UPactions: ', UPactions,'DOWNactions: ', DOWNactions)
       
   if dconf['sim']['anticipatedRL']:
     cpaction = proposed_actions 
@@ -1707,59 +1678,31 @@ def trainAgent (t):
     elif cpaction==dconf['moves']['DOWN']:
       if dconf['verbose']: print('APPLY RL to EMDOWN')
       for STDPmech in dSTDPmech['EMDOWN']: STDPmech.reward_punish(float(anticipated_reward))
-    elif cpaction==dconf['moves']['NOMOVE'] and dnumc['EMSTAY']>0:
-      if dconf['verbose']: print('APPLY RL to EMSTAY')
-      for STDPmech in dSTDPmech['EMSTAY']: STDPmech.reward_punish(float(anticipated_reward))
     else:
       print('No anticipated action for the input!!!')
   else:
     if critic != 0: # if critic signal indicates punishment (-1) or reward (+1)
       if sim.rank==0: print('t=',round(t,2),'RLcritic:',critic)
-      if dnumc['EMSTAY']>0:
-        if dconf['sim']['targettedRL']:
-          if not noWinner: # if there's a clear winner in terms of firing rates
-            if UPactions>DOWNactions and UPactions>STAYactions: # UP WINS vs ALL
-              if dconf['verbose']: print('APPLY RL to EMUP')
-              for STDPmech in dSTDPmech['EMUP']: STDPmech.reward_punish(float(critic))
-            elif DOWNactions>UPactions and DOWNactions>STAYactions: # DOWN WINS vs ALL
-              if dconf['verbose']: print('APPLY RL to EMDOWN')
-              for STDPmech in dSTDPmech['EMDOWN']: STDPmech.reward_punish(float(critic))
-            elif STAYactions>UPactions and STAYactions>DOWNactions: # STAY WINS vs ALL
-              if dconf['verbose']: print('APPLY RL to EMSTAY')
-              for STDPmech in dSTDPmech['EMSTAY']: STDPmech.reward_punish(float(critic))
-            elif UPactions==DOWNactions and UPactions>STAYactions: # UP and DOWN TIED
-              if dconf['verbose']: print('APPLY RL to EMUP and EMDOWN')
-              for STDPmech in dSTDPmech['EMUP']: STDPmech.reward_punish(float(critic))
-              for STDPmech in dSTDPmech['EMDOWN']: STDPmech.reward_punish(float(critic))
-            elif UPactions==STAYactions and UPactions>DOWNactions: # UP and STAY TIED
-              if dconf['verbose']: print('APPLY RL to EMUP and EMSTAY')
-              for STDPmech in dSTDPmech['EMUP']: STDPmech.reward_punish(float(critic))
-              for STDPmech in dSTDPmech['EMSTAY']: STDPmech.reward_punish(float(critic))
-            elif DOWNactions==STAYactions and DOWNactions>UPactions: # DOWN and STAY TIED
-              if dconf['verbose']: print('APPLY RL to EMDOWN and EMSTAY')
-              for STDPmech in dSTDPmech['EMDOWN']: STDPmech.reward_punish(float(critic))
-              for STDPmech in dSTDPmech['EMSTAY']: STDPmech.reward_punish(float(critic))
-            elif DOWNactions==STAYactions and UPactions==STAYactions: # ALL actions TIED
-              if dconf['verbose']: print('APPLY RL to EMUP, EMDOWN and EMSTAY')
-              for STDPmech in dSTDPmech['all']: STDPmech.reward_punish(float(critic))      
-        else:
-          if dconf['verbose']: print('APPLY RL to EMUP, EMDOWN and EMSTAY')
-          for STDPmech in dSTDPmech['all']: STDPmech.reward_punish(float(critic))
+      if dconf['sim']['targettedRL']:
+        if not noWinner: # if there's a clear winner in terms of firing rates
+          if UPactions==DOWNactions:
+            if dconf['verbose']: print('APPLY RL to both EMUP and EMDOWN')
+            for STDPmech in dSTDPmech['all']: STDPmech.reward_punish(float(critic))          
+          elif UPactions>DOWNactions: # UP WINS vs DOWN
+            if dconf['verbose']: print('APPLY RL to EMUP')
+            for STDPmech in dSTDPmech['EMUP']: STDPmech.reward_punish(float(critic))
+            if dconf['sim']['targettedRL']==3: # opposite to pop that did not contribute
+              if dconf['verbose']: print('APPLY -RL to EMDOWN')
+              for STDPmech in dSTDPmech['EMDOWN']: STDPmech.reward_punish(float(-critic))
+          elif DOWNactions>UPactions: # DOWN WINS vs UP
+            if dconf['verbose']: print('APPLY RL to EMDOWN')
+            for STDPmech in dSTDPmech['EMDOWN']: STDPmech.reward_punish(float(critic))
+            if dconf['sim']['targettedRL']==3: # opposite to pop that did not contribute
+              if dconf['verbose']: print('APPLY -RL to EMUP')            
+              for STDPmech in dSTDPmech['EMUP']: STDPmech.reward_punish(float(-critic))              
       else:
-        if dconf['sim']['targettedRL']:
-          if not noWinner: # if there's a clear winner in terms of firing rates
-            if UPactions==DOWNactions:
-              if dconf['verbose']: print('APPLY RL to both EMUP and EMDOWN')
-              for STDPmech in dSTDPmech['all']: STDPmech.reward_punish(float(critic))          
-            elif UPactions>DOWNactions: # UP WINS vs DOWN
-              if dconf['verbose']: print('APPLY RL to EMUP')
-              for STDPmech in dSTDPmech['EMUP']: STDPmech.reward_punish(float(critic))
-            elif DOWNactions>UPactions: # DOWN WINS vs UP
-              if dconf['verbose']: print('APPLY RL to EMDOWN')
-              for STDPmech in dSTDPmech['EMDOWN']: STDPmech.reward_punish(float(critic))        
-        else:
-          if dconf['verbose']: print('APPLY RL to both EMUP and EMDOWN')
-          for STDPmech in dSTDPmech['all']: STDPmech.reward_punish(critic)
+        if dconf['verbose']: print('APPLY RL to both EMUP and EMDOWN')
+        for STDPmech in dSTDPmech['all']: STDPmech.reward_punish(critic)
   if sim.rank==0:
     # print('t=',round(t,2),' game rewards:', rewards) # only rank 0 has access to rewards      
     for action in actions: sim.allActions.append(action)
@@ -1797,7 +1740,6 @@ def trainAgent (t):
 def getAllSTDPObjects (sim):
   # get all the STDP objects from the simulation's cells
   Mpops = ['EMUP', 'EMDOWN']  
-  if dnumc['EMSTAY']>0: Mpops.append('EMSTAY')
   dSTDPmech = {'all':[]} # dictionary of STDP objects keyed by type (all, for EMUP, EMDOWN populations)
   for pop in Mpops: dSTDPmech[pop] = []
   if dconf['sim']['targettedRL']: dcell = {pop:[] for pop in Mpops} # SN: exptl  
