@@ -62,7 +62,17 @@ def savefinalweights (pdf, simstr):
   # save final weights to a (small) file
   pdfs = pdf[pdf.time==np.amax(pdf.time)]
   D = pdf2weightsdict(pdfs)
-  pickle.dump(D, open('data/'+simstr+'synWeights_final.pkl','wb'))  
+  pickle.dump(D, open('data/'+simstr+'synWeights_final.pkl','wb'))
+
+def shuffleweights (pdf):
+  # shuffle the weights
+  npwt = np.array(pdf.weight)
+  np.random.shuffle(npwt)
+  Ashuf = np.array([pdf.time,pdf.preid,pdf.postid,npwt]).T
+  pdfshuf = pd.DataFrame(Ashuf,columns=['time','preid','postid','weight'])
+  return pdfshuf
+  #D = pdf2weightsdict(pdfshuf);
+  #return D
 
 def getsimname (name=None):
   if name is None:

@@ -22417,33 +22417,62 @@ last step does not appear the best ...
 
 python -i simdat.py backupcfg/20nov23_A2_cycle__step_2_sim.json
 
+EV1 0.7 Hz
+EV1DE 0.24 Hz
+EV1DNE 0.91 Hz
+EV1DN 3.89 Hz
+EV1DNW 0.35 Hz
+EV1DW 0.13 Hz
+EV1DSW 0.33 Hz
+EV1DS 2.57 Hz
+EV1DSE 1.18 Hz
+EA 3.09 Hz
+EA2 8.39 Hz
+IA2 18.92 Hz
+EMDOWN 19.19 Hz
+EMUP 19.25 Hz
+IM 31.38 Hz
+stimModEV1 0.77 Hz
+stimModEV1DE 0.24 Hz
+stimModEV1DNE 1.15 Hz
+stimModEV1DN 4.18 Hz
+stimModEV1DNW 0.4 Hz
+stimModEV1DW 0.13 Hz
+stimModEV1DSW 0.39 Hz
+stimModEV1DS 2.69 Hz
+stimModEV1DSE 1.25 Hz
+
 ax=plotPerf(actreward,yl=(0,1))
-savefig(gifpath()+'perf.png') 
+savefig(gifpath()+'perf.png') # [[./gif/20nov24_20nov23_A2_cycle__step_2_perf.png]]
 
 clf(); drawraster(dspkT,dspkID); xlim((490e3,500e3))
-savefig(gifpath()+'rast.png') 
+savefig(gifpath()+'rast.png') # [[./gif/20nov24_20nov23_A2_cycle__step_2_rast.png]]
 
 binsz = 1000
 dnspk = {pop:getspikehist(dspkT[pop],dnumc[pop],binsz,totalDur) for pop in ['EMDOWN','EMUP']}
 for clr,pop in zip(['r','b'],['EMDOWN','EMUP']): plot(dnspk[pop][0],dnspk[pop][1],clr)
 
-savefig(gifpath()+'EMUPDOWN_rates.png') 
+savefig(gifpath()+'EMUPDOWN_rates.png') # [[./gif/20nov24_20nov23_A2_cycle__step_2_EMUPDOWN_rates.png]]
 
 clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False)
-savefig(gifpath()+'all_avg_weight.png') 
+savefig(gifpath()+'all_avg_weight.png') # [[./gif/20nov24_20nov23_A2_cycle__step_2_all_avg_weight.png]]
 
 lfn = ['20nov17_A0_cycle_']
 for i in range(3): lfn.append('20nov17_A1_cycle__step_' + str(i) + '_')
-for i in range(2): lfn.append('20nov23_A2_cycle__step_' + str(i) + '_')
+for i in range(3): lfn.append('20nov23_A2_cycle__step_' + str(i) + '_')
 pdac = getconcatactionreward(lfn)
 clf(); ax=plotPerf(pdac,yl=(0,0.47))
-savefig(gifpath()+'perf_all_steps_so_far.png') 
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/20nov24_20nov23_A2_cycle__step_2_perf_all_steps_so_far.png]]
 
 lpda = getindivactionreward(lfn)
 csm=cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
 lclr = [csm.to_rgba(float(i)/(len(lpda))) for i in range(len(lpda))]
 clf(); plotComparePerf(lpda,lclr,yl=(0,1),lleg=lfn)
-savefig(gifpath()+'perf_compareD.png') 
+savefig(gifpath()+'perf_compareD.png') # [[./gif/20nov24_20nov23_A2_cycle__step_2_perf_compareD.png]]
+
+latest step does not seem best ... 20nov17_A1_cycle__step_0_ still sees best ... 
+
+stopping this multistep sim for now ...
 
 ** adjust targetted rule and try it out (20nov24_C0_gcp_)
 
@@ -22493,7 +22522,48 @@ python multistepSim.py sn.json 32 20 20nov23_C0_gcp_multi
 
 that way will have similar firing rates
 
+take weights from 20nov17_A1_cycle__step_1_ and shuffle them to compare ... 
+
+python -i simdat.py backupcfg/20nov17_A1_cycle__step_1_sim.json
+
+pdf.columns # Index(['time', 'preid', 'postid', 'weight'], dtype='object')
+
+A = readweightsfile2pdf(dconf['simtype']['ResumeSimFromFile'])
+A.columns # Index(['time', 'preid', 'postid', 'weight'], dtype='object')
+
+len(A) # 279000
+so only 279 K plastic weights ... 
+
+npwt = np.array(A.weight)
+len(npwt) # 279000
+
+npwt[0],npwt[-1], mean(npwt) # (1.8478514639505095, 1.2779553633436187, 1.3947560822475773)
+
+np.random.shuffle(npwt)
+
+npwt[0],npwt[-1], mean(npwt) # (1.9610259314541767, 1.953392821125234, 1.3947560822475775)
+len(npwt) # 279000
+
+Ashuf = np.array([A.time,A.preid,A.postid,npwt]).T
+pdfshuf = pd.DataFrame(Ashuf,columns=['time','preid','postid','weight'])
+
+D = pdf2weightsdict(pdfshuf); 
+pickle.dump(D, open('data/20nov24_20nov17_A1_cycle__step_0_synWeights_final_shuffled.pkl','wb'))
+
 ** test after learning - test performance after learning turned off
 
 and compare to controls
+
+
+use these weights - 20nov17_A1_cycle__step_1_synWeights_final.pkl
+
+just set rlhebbwt to 0 ... 
+
+        "name": "20nov24_load_weight_test_cycle_D0_",
+    "simtype": {
+        "ResumeSim": 1,
+	"ResumeSimFromFile": "data/20nov17_A1_cycle__step_1_synWeights_final.pkl"
+    },
+
+./myrun 32 sn.json
 

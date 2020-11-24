@@ -38,8 +38,8 @@
     "verbose": 0,
     "stayStepLim": 0,
     "simtype": {
-        "ResumeSim": 0,
-	"ResumeSimFromFile": "data/20nov19_A1_gcp__step_0_synWeights_final.pkl"
+        "ResumeSim": 1,
+	"ResumeSimFromFile": "data/20nov17_A1_cycle__step_1_synWeights_final.pkl"
     },
     "sim": {
         "duration": 500000,
@@ -47,12 +47,12 @@
         "verbose": 0,
         "recordStep": 1.0,
         "recordWeightStepSize": 500,
-        "normalizeWeightStepSize": 500,
-	"normalizeWeightsAtStart": 1,
+        "normalizeWeightStepSize": 5000000000000000000000000000000000000000,
+	"normalizeWeightsAtStart": 0,
         "RLFakeUpRule": 0,
         "RLFakeDownRule": 0,
         "RLFakeStayRule": 0,
-        "name": "20nov24_C0_gcp_",
+        "name": "20nov24_load_weight_test_cycle_D0_",
         "doquit": 1,
         "doplot": 0,
         "saveCellSecs": 0,
@@ -377,7 +377,7 @@
             "RLlenhebb": 200,
             "RLlenanti": 200,
             "useRLexp": 1,
-            "RLhebbwt": 0.005,
+            "RLhebbwt": 0.0,
             "RLantiwt": 0,
             "hebbwt": 0.0,
             "antiwt": 0.0,
