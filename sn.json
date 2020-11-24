@@ -35,7 +35,7 @@
         "FlowWidth": 1,
         "UseFull": 1
     },
-    "verbose": 1,
+    "verbose": 0,
     "stayStepLim": 0,
     "simtype": {
         "ResumeSim": 0,
@@ -193,7 +193,7 @@
 		"VL":{"AM":4,"NM":0.6,"p":0},
 		"EA":{"AM":2.6,"NM":0.26,"p":0.25},
 		"EMDOWN":{"AM":1,"NM":0.0,"p":0.0},
-		"EMUP":{"AM":1,"NM":0.0,"p":0.0},
+		"EMUP":{"AM":1,"NM":0.0,"p":0.0}
 	    },
 	    "VD":{
 		"VL":{"AM":0,"NM":0,"p":0},

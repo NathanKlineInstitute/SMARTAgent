@@ -1549,7 +1549,6 @@ def trainAgent (t):
   """
   global NBsteps, epCount, proposed_actions, total_hits, fid4, tstepPerAction
   vec = h.Vector()
-  noWinner = False # no clear winner for the population firing rates (used below)
   if t<(tstepPerAction*dconf['actionsPerPlay']): # for the first time interval use randomly selected actions
     actions =[]
     for _ in range(int(dconf['actionsPerPlay'])):
@@ -1558,7 +1557,6 @@ def trainAgent (t):
   else: #the actions should be based on the activity of motor cortex (EMUP, EMDOWN)
     F_UPs = []
     F_DOWNs = []
-    F_STAYs = []
     for ts in range(int(dconf['actionsPerPlay'])):
       ts_beg = t-tstepPerAction*(dconf['actionsPerPlay']-ts-1) 
       ts_end = t-tstepPerAction*(dconf['actionsPerPlay']-ts)
@@ -1605,7 +1603,6 @@ def trainAgent (t):
             actions.append(lmoves[np.random.randint(0,len(lmoves))])
           else:
             actions.append(dconf['moves']['NOMOVE']) # No move
-            noWinner = True
   if sim.rank == 0:
     rewards, epCount, proposed_actions, total_hits, FollowTargetSign = sim.AIGame.playGame(actions, epCount, t)
     print('t=',round(t,2),'proposed,model action:', proposed_actions,actions)
@@ -1684,22 +1681,21 @@ def trainAgent (t):
     if critic != 0: # if critic signal indicates punishment (-1) or reward (+1)
       if sim.rank==0: print('t=',round(t,2),'RLcritic:',critic)
       if dconf['sim']['targettedRL']:
-        if not noWinner: # if there's a clear winner in terms of firing rates
-          if UPactions==DOWNactions:
-            if dconf['verbose']: print('APPLY RL to both EMUP and EMDOWN')
-            for STDPmech in dSTDPmech['all']: STDPmech.reward_punish(float(critic))          
-          elif UPactions>DOWNactions: # UP WINS vs DOWN
-            if dconf['verbose']: print('APPLY RL to EMUP')
-            for STDPmech in dSTDPmech['EMUP']: STDPmech.reward_punish(float(critic))
-            if dconf['sim']['targettedRL']==3: # opposite to pop that did not contribute
-              if dconf['verbose']: print('APPLY -RL to EMDOWN')
-              for STDPmech in dSTDPmech['EMDOWN']: STDPmech.reward_punish(float(-critic))
-          elif DOWNactions>UPactions: # DOWN WINS vs UP
-            if dconf['verbose']: print('APPLY RL to EMDOWN')
-            for STDPmech in dSTDPmech['EMDOWN']: STDPmech.reward_punish(float(critic))
-            if dconf['sim']['targettedRL']==3: # opposite to pop that did not contribute
-              if dconf['verbose']: print('APPLY -RL to EMUP')            
-              for STDPmech in dSTDPmech['EMUP']: STDPmech.reward_punish(float(-critic))              
+        if UPactions==DOWNactions and sum(F_UPs)>0 and sum(F_DOWNs)>0:
+          if dconf['verbose']: print('APPLY RL to both EMUP and EMDOWN')
+          for STDPmech in dSTDPmech['all']: STDPmech.reward_punish(float(critic))          
+        elif UPactions>DOWNactions: # UP WINS vs DOWN
+          if dconf['verbose']: print('APPLY RL to EMUP')
+          for STDPmech in dSTDPmech['EMUP']: STDPmech.reward_punish(float(critic))
+          if dconf['sim']['targettedRL']==3: # opposite to pop that did not contribute
+            if dconf['verbose']: print('APPLY -RL to EMDOWN')
+            for STDPmech in dSTDPmech['EMDOWN']: STDPmech.reward_punish(float(-critic))
+        elif DOWNactions>UPactions: # DOWN WINS vs UP
+          if dconf['verbose']: print('APPLY RL to EMDOWN')
+          for STDPmech in dSTDPmech['EMDOWN']: STDPmech.reward_punish(float(critic))
+          if dconf['sim']['targettedRL']==3: # opposite to pop that did not contribute
+            if dconf['verbose']: print('APPLY -RL to EMUP')            
+            for STDPmech in dSTDPmech['EMUP']: STDPmech.reward_punish(float(-critic))              
       else:
         if dconf['verbose']: print('APPLY RL to both EMUP and EMDOWN')
         for STDPmech in dSTDPmech['all']: STDPmech.reward_punish(critic)
