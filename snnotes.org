@@ -22298,7 +22298,7 @@ savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/20nov23_20nov20_A2_cycl
 
 same as the gcp sim this one starts to decrease in performance after homplast turned on ...
 
-** use eempopnorm on cycle, with lower max threshold
+** use eempopnorm on cycle, with lower max threshold (20nov23_A2_cycle_) -->> catches up hit/miss,score within 500 s
 
 try with eempopnorm again - since that preserves relative weights - but with lower max threshold ... of 1.4 ? 
 
@@ -22312,6 +22312,40 @@ try with eempopnorm again - since that preserves relative weights - but with low
     },
 
 python multistepSim.py sn.json 32 20 20nov23_A2_gcp_multi
+
+python -i simdat.py backupcfg/20nov23_A2_cycle__step_0_sim.json
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/20nov23_20nov23_A2_cycle__step_0_perf.png]]
+not bad, but takes time to build up to previous level of performance...
+
+clf(); drawraster(dspkT,dspkID); xlim((490e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/20nov23_20nov23_A2_cycle__step_0_rast.png]]
+
+binsz = 1000
+dnspk = {pop:getspikehist(dspkT[pop],dnumc[pop],binsz,totalDur) for pop in ['EMDOWN','EMUP']}
+for clr,pop in zip(['r','b'],['EMDOWN','EMUP']): plot(dnspk[pop][0],dnspk[pop][1],clr)
+
+savefig(gifpath()+'EMUPDOWN_rates.png') # [[./gif/20nov23_20nov23_A2_cycle__step_0_EMUPDOWN_rates.png]]
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False)
+savefig(gifpath()+'all_avg_weight.png') # [[./gif/20nov23_20nov23_A2_cycle__step_0_all_avg_weight.png]]
+
+lfn = ['20nov17_A0_cycle_']
+for i in range(2): lfn.append('20nov17_A1_cycle__step_' + str(i) + '_')
+i=0; lfn.append('20nov23_A2_cycle__step_' + str(i) + '_')
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0,0.47))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/20nov23_20nov23_A2_cycle__step_0_perf_all_steps_so_far.png]]
+seems like perf increasing in last 500 s of sim (new step with eempopnorm)?
+
+lpda = getindivactionreward(lfn)
+csm=cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+lclr = [csm.to_rgba(float(i)/(len(lpda))) for i in range(len(lpda))]
+clf(); plotComparePerf(lpda,lclr,yl=(0,1),lleg=lfn)
+savefig(gifpath()+'perf_compareD.png') # [[./gif/20nov23_20nov23_A2_cycle__step_0_perf_compareD.png]]
+so last step is better than where started (first step - dark blue), but not as good as previous step ... 
+question is, whether it will surpass the best step by continuing for a few more iterations ... 
 
 ** use eempopnorm on gcp, with lower max threshold
 
