@@ -152,7 +152,7 @@ def animActivityMaps (outpath='gif/'+dconf['sim']['name']+'actmap.mp4', framerat
   # plot activity in different layers as a function of input images  
   ioff()
   possible_pops = ['ER','EV1','EV4','EMT','IR','IV1','IV4','IMT','EV1DW','EV1DNW','EV1DN'\
-                   ,'EV1DNE','EV1DE','EV1DSW','EV1DS', 'EV1DSE','EMDOWN','EMUP','EMSTAY','IM']
+                   ,'EV1DNE','EV1DE','EV1DSW','EV1DS', 'EV1DSE','EMDOWN','EMUP','IM']
   possible_titles = ['Excit R', 'Excit V1', 'Excit V4', 'Excit MT', 'Inhib R', 'Inhib V1', 'Inhib V4', 'Inhib MT',\
                      'W','NW','N','NE','E','SW','S','SE','Excit M DOWN', 'Excit M UP', 'Excit M STAY', 'Inhib M']
   dtitle = {p:t for p,t in zip(possible_pops,possible_titles)}
@@ -368,7 +368,7 @@ def animDetectedMotionMaps (outpath, framerate=10, figsize=(7,3)):
   lfnimage = []
   lpop = ['ER', 'EV1', 'EV4', 'EMT', 'IR', 'IV1', 'IV4', 'IMT',\
           'EV1DW','EV1DNW', 'EV1DN', 'EV1DNE','EV1DE','EV1DSW', 'EV1DS', 'EV1DSE',\
-          'EMDOWN','EMUP','EMSTAY']  
+          'EMDOWN','EMUP']  
   dmaxSpk = OrderedDict({pop:np.max(dact[pop]) for pop in lpop})
   max_spks = np.max([dmaxSpk[p] for p in lpop])
   for pop in lpop:
@@ -703,13 +703,11 @@ def getactsel (dhist, actreward):
   # get action selected based on firing rates in dhist (no check for consistency with sim.py)
   actsel = []
   for i in range(len(dhist['EMDOWN'][1])):
-    dspk, uspk, sspk = dhist['EMDOWN'][1][i], dhist['EMUP'][1][i], dhist['EMSTAY'][1][i]
-    if dspk > uspk and dspk > sspk:
+    dspk, uspk = dhist['EMDOWN'][1][i], dhist['EMUP'][1][i]
+    if dspk > uspk:
       actsel.append(dconf['moves']['DOWN'])
-    elif uspk > dspk and uspk > sspk:
+    elif uspk > dspk:
       actsel.append(dconf['moves']['UP'])
-    elif sspk > uspk and sspk > dspk:
-      actsel.append(dconf['moves']['NOMOVE'])
     else: # dspk == uspk:
       actsel.append(dconf['moves']['NOMOVE'])
   return actsel  
@@ -750,7 +748,7 @@ def plotMeanNeuronWeight (pdf,postid,clr='k',ax=None,msz=1,xl=None):
   ax.set_ylabel('Average weight'); 
   return wts    
   
-def plotMeanWeights (pdf,ax=None,msz=1,xl=None,lpop=['EMDOWN','EMUP','EMSTAY'],lclr=['k','r','b','g'],plotindiv=True,fsz=15,prety=None):
+def plotMeanWeights (pdf,ax=None,msz=1,xl=None,lpop=['EMDOWN','EMUP'],lclr=['k','r','b','g'],plotindiv=True,fsz=15,prety=None):
   #plot mean weights of all plastic synaptic weights onto lpop
   if ax is None: ax = gca()
   utimes = np.unique(pdf.time)
@@ -812,7 +810,7 @@ def animSynWeights (pdf, outpath='gif/'+dconf['sim']['name']+'weightmap.mp4', fr
     if c_src in dstartidx:
       lsrc.append(c_src)
   print('Source Pops: ', lsrc)
-  possible_targs = ['EMDOWN', 'EMUP','EMSTAY']
+  possible_targs = ['EMDOWN', 'EMUP']
   ltarg = []
   for c_targ in possible_targs:
     if c_targ in dstartidx:
@@ -823,10 +821,7 @@ def animSynWeights (pdf, outpath='gif/'+dconf['sim']['name']+'weightmap.mp4', fr
   dimg = {}; dline = {}; 
   def getwts (tdx, src):
     t = utimes[tdx]
-    if 'EMSTAY' in dstartidx:
-      ltarg = ['EMDOWN', 'EMUP','EMSTAY']
-    else:
-      ltarg = ['EMDOWN', 'EMUP']
+    ltarg = ['EMDOWN', 'EMUP']
     lout = []
     for targ in ltarg:
       cpdf = pdf[(pdf.time==t) & (pdf.postid>=dstartidx[targ]) & (pdf.postid<=dendidx[targ]) & (pdf.preid>=dstartidx[src]) & (pdf.preid<=dendidx[src])]
@@ -838,10 +833,7 @@ def animSynWeights (pdf, outpath='gif/'+dconf['sim']['name']+'weightmap.mp4', fr
       lout.append(lwt)
     return lout[0], lout[1]    
   minR,maxR = np.min(actreward.reward),np.max(actreward.reward)
-  if 'EMSTAY' in dstartidx:
-    minW,maxW = np.min([np.min(popwts['EMDOWN']),np.min(popwts['EMUP']),np.min(popwts['EMSTAY'])]), np.max([np.max(popwts['EMDOWN']),np.max(popwts['EMUP']),np.max(popwts['EMSTAY'])])
-  else:
-    minW,maxW = np.min([np.min(popwts['EMDOWN']),np.min(popwts['EMUP'])]), np.max([np.max(popwts['EMDOWN']),np.max(popwts['EMUP'])])
+  minW,maxW = np.min([np.min(popwts['EMDOWN']),np.min(popwts['EMUP'])]), np.max([np.max(popwts['EMDOWN']),np.max(popwts['EMUP'])])
   t = utimes[0]
   dline[1], = f_ax1.plot([t,t],[minR,maxR],'r',linewidth=0.2); f_ax1.set_xticks([])
   dline[2], = f_ax2.plot([t,t],[minW,maxW],'r',linewidth=0.2); f_ax2.set_xticks([])  
@@ -892,7 +884,7 @@ def plotavgweights (pdf):
     if c_src in dstartidx:
       lsrc.append(c_src)
   print('Source Pops: ', lsrc)
-  possible_targs = ['EMDOWN', 'EMUP','EMSTAY']
+  possible_targs = ['EMDOWN', 'EMUP']
   ltrg = []
   for c_targ in possible_targs:
     if c_targ in dstartidx:
@@ -906,15 +898,9 @@ def plotavgweights (pdf):
       subplot(12,1,gdx)
       plot(utimes,davgw[src+'->EMDOWN'],'r-',linewidth=3);
       plot(utimes,davgw[src+'->EMUP'],'b-',linewidth=3);
-      if 'EMSTAY' in dstartidx:
-        plot(utimes,davgw[src+'->EMSTAY'],'g-',linewidth=3);
-        legend((src+'->EMDOWN',src+'->EMUP',src+'->EMSTAY'),loc='upper left')
-      else:
-        legend((src+'->EMDOWN',src+'->EMUP'),loc='upper left')
+      legend((src+'->EMDOWN',src+'->EMUP'),loc='upper left')
       plot(utimes,davgw[src+'->EMDOWN'],'ro',markersize=10);
       plot(utimes,davgw[src+'->EMUP'],'bo',markersize=10);
-      if 'EMSTAY' in dstartidx:
-        plot(utimes,davgw[src+'->EMSTAY'],'go',markersize=10);       
       xlim((0,simConfig['simConfig']['duration']))
       ylabel('RL weights') 
       gdx += 1
@@ -935,7 +921,7 @@ def plotavgweightsPerPostSynNeuron1(pdf):
     ylim((-1.1,1.1))
     ylabel('critic')
     title('sum of weights on to post-synaptic neurons')
-    for trg in ['EMDOWN', 'EMUP','EMSTAY']:
+    for trg in ['EMDOWN', 'EMUP']:
       wperPostID[src+'->'+trg] = arr = []
       tstep = 0
       for t in utimes:
@@ -956,11 +942,6 @@ def plotavgweightsPerPostSynNeuron1(pdf):
     #legend((src+'->EMUP'),loc='upper left')       
     xlim((0,simConfig['simConfig']['duration']))
     ylabel(src+'->EMUP weights')
-    subplot(4,1,4)
-    plot(utimes,np.array(wperPostID[src+'->EMSTAY']),'g-o',linewidth=3,markersize=5) 
-    #legend((src+'->EMUP'),loc='upper left')       
-    xlim((0,simConfig['simConfig']['duration']))
-    ylabel(src+'->EMSTAY weights') 
     gdx += 1
     xlabel('Time (ms)')  
   return wperPostID
@@ -980,7 +961,7 @@ def plotavgweightsPerPostSynNeuron2(pdf):
     ylabel('critic')
     colorbar
     title('sum of weights on to post-synaptic neurons')
-    for trg in ['EMDOWN', 'EMUP','EMSTAY']:
+    for trg in ['EMDOWN', 'EMUP']:
       wperPostID[src+'->'+trg] = arr = []
       tstep = 0
       for t in utimes:
@@ -1010,16 +991,6 @@ def plotavgweightsPerPostSynNeuron2(pdf):
     xlim((-1,b2[-1]-1))
     ylabel(src+'->EMUP weights') 
     xlabel('Time (ms)')
-    subplot(4,1,4)
-    imshow(np.transpose(np.array(wperPostID[src+'->EMSTAY'])),aspect = 'auto',cmap='hot', interpolation='None') 
-    b2 = gca().get_xticks()
-    gca().set_xticks(b2-1)
-    gca().set_xticklabels((100*b2).astype(int))
-    colorbar(orientation='horizontal',fraction=0.05)
-    #legend((src+'->EMUP'),loc='upper left')       
-    xlim((-1,b2[-1]-1))
-    ylabel(src+'->EMSTAY weights') 
-    xlabel('Time (ms)')
   
 def plotIndividualSynWeights(pdf):
   #plot 10% randomly selected connections
@@ -1030,7 +1001,7 @@ def plotIndividualSynWeights(pdf):
   postNeuronIDs = {}
   #gdx = 2   
   for src in ['EV1','EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE', 'EV4', 'EMT']:
-    for trg in ['EMDOWN','EMUP','EMSTAY']:
+    for trg in ['EMDOWN','EMUP']:
       allweights[src+'->'+trg] = arr = []
       preNeuronIDs[src+'->'+trg] = arr2 = []
       postNeuronIDs[src+'->'+trg] = arr3 = []
@@ -1629,7 +1600,7 @@ if __name__ == '__main__':
     except:
       pass
   print(stepNB)
-  allpossible_pops = ['ER','IR','EV1','EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE','IV1','EV4','IV4','EMT','IMT','EMDOWN','EMUP','EMSTAY','IM']
+  allpossible_pops = ['ER','IR','EV1','EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE','IV1','EV4','IV4','EMT','IMT','EMDOWN','EMUP','IM']
   lpop = []
   for pop_ind in range(len(allpossible_pops)):
     cpop = allpossible_pops[pop_ind]

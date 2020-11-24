@@ -22200,3 +22200,292 @@ python multistepSim.py sn.json 32 20 20nov20_A2_real_gcp_multi
 
 started ~16:51 ...
 
+* 20nov23
+** check output from 20nov20_A2_gcp__step_8_
+
+python -i simdat.py backupcfg/20nov20_A2_gcp__step_8_sim.json
+
+EV1 0.75 Hz
+EA 5.8 Hz
+EA2 9.27 Hz
+IA2 23.17 Hz
+EMDOWN 24.27 Hz
+EMUP 10.22 Hz
+IM 42.77 Hz
+stimModEV1 0.8 Hz
+
+hmm, definitely not working if the EMDOWN, EMUP rates are so different. how did that happen?
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/20nov23_20nov20_A2_gcp__step_8_perf.png]]
+
+clf(); drawraster(dspkT,dspkID); xlim((490e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/20nov23_20nov20_A2_gcp__step_8_rast.png]]
+
+binsz = 1000
+dnspk = {pop:getspikehist(dspkT[pop],dnumc[pop],binsz,totalDur) for pop in ['EMDOWN','EMUP']}
+for clr,pop in zip(['r','b'],['EMDOWN','EMUP']): plot(dnspk[pop][0],dnspk[pop][1],clr)
+
+savefig(gifpath()+'EMUPDOWN_rates.png') # [[./gif/20nov23_20nov20_A2_gcp__step_8_EMUPDOWN_rates.png]]
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False)
+savefig(gifpath()+'all_avg_weight.png') # [[./gif/20nov23_20nov20_A2_gcp__step_8_all_avg_weight.png]]
+
+EMUP weight changes look much smoother ... is there a bug?
+
+lfn = ['20nov19_A0_gcp_','20nov19_A1_gcp__step_0_']
+for i in range(9): lfn.append('20nov20_A2_gcp__step_' + str(i) + '_')
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0,0.4))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/20nov23_20nov20_A2_gcp__step_8_perf_all_steps_so_far.png]]
+so performance was increasing but right after new homplast rule was turned on performance started to decay
+that's either due to a bug or the rule itself ...
+
+stop the multistep gcp sim ... and fix before continuing ... 
+
+** check output from cycle 20nov20_A2_cycle__step_6_
+
+python -i simdat.py backupcfg/20nov20_A2_cycle__step_6_sim.json
+
+EV1 0.66 Hz
+EV1DE 0.27 Hz
+EV1DNE 1.32 Hz
+EV1DN 3.55 Hz
+EV1DNW 0.34 Hz
+EV1DW 0.08 Hz
+EV1DSW 0.15 Hz
+EV1DS 1.83 Hz
+EV1DSE 0.87 Hz
+EA 2.63 Hz
+EA2 6.56 Hz
+IA2 14.72 Hz
+EMDOWN 18.85 Hz
+EMUP 19.53 Hz
+IM 24.12 Hz
+stimModEV1 0.74 Hz
+stimModEV1DE 0.27 Hz
+stimModEV1DNE 1.74 Hz
+stimModEV1DN 3.81 Hz
+stimModEV1DNW 0.38 Hz
+stimModEV1DW 0.08 Hz
+stimModEV1DSW 0.17 Hz
+stimModEV1DS 1.89 Hz
+stimModEV1DSE 0.93 Hz
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/20nov23_20nov20_A2_cycle__step_6_perf.png]]
+this one not as bad as the one on gcp ... but not very good - worse than before the homplast was turned on
+
+clf(); drawraster(dspkT,dspkID); xlim((490e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/20nov23_20nov20_A2_cycle__step_6_rast.png]]
+those rates are more similar ... 
+
+binsz = 1000
+dnspk = {pop:getspikehist(dspkT[pop],dnumc[pop],binsz,totalDur) for pop in ['EMDOWN','EMUP']}
+for clr,pop in zip(['r','b'],['EMDOWN','EMUP']): plot(dnspk[pop][0],dnspk[pop][1],clr)
+
+savefig(gifpath()+'EMUPDOWN_rates.png') # [[./gif/20nov23_20nov20_A2_cycle__step_6_EMUPDOWN_rates.png]]
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False)
+savefig(gifpath()+'all_avg_weight.png') # [[./gif/20nov23_20nov20_A2_cycle__step_6_all_avg_weight.png]]
+
+lfn = ['20nov17_A0_cycle_']
+for i in range(2): lfn.append('20nov17_A1_cycle__step_' + str(i) + '_')
+for i in range(9): lfn.append('20nov20_A2_cycle__step_' + str(i) + '_')
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0,0.435))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/20nov23_20nov20_A2_cycle__step_6_perf_all_steps_so_far.png]]
+
+same as the gcp sim this one starts to decrease in performance after homplast turned on ...
+
+** use eempopnorm on cycle, with lower max threshold (20nov23_A2_cycle_) -->> catches up hit/miss,score within 500 s
+
+try with eempopnorm again - since that preserves relative weights - but with lower max threshold ... of 1.4 ? 
+
+        "name": "20nov23_A2_cycle_",
+        "EEMWghtThreshMin": 0.9,
+        "EEMWghtThreshMax": 1.31,
+        "EEMPopNorm": 1,
+    "simtype": {
+        "ResumeSim": 1,
+        "ResumeSimFromFile": "data/20nov17_A1_cycle__step_1_synWeights_final.pkl"
+    },
+
+python multistepSim.py sn.json 32 20 20nov23_A2_gcp_multi
+
+python -i simdat.py backupcfg/20nov23_A2_cycle__step_0_sim.json
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/20nov23_20nov23_A2_cycle__step_0_perf.png]]
+not bad, but takes time to build up to previous level of performance...
+
+clf(); drawraster(dspkT,dspkID); xlim((490e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/20nov23_20nov23_A2_cycle__step_0_rast.png]]
+
+binsz = 1000
+dnspk = {pop:getspikehist(dspkT[pop],dnumc[pop],binsz,totalDur) for pop in ['EMDOWN','EMUP']}
+for clr,pop in zip(['r','b'],['EMDOWN','EMUP']): plot(dnspk[pop][0],dnspk[pop][1],clr)
+
+savefig(gifpath()+'EMUPDOWN_rates.png') # [[./gif/20nov23_20nov23_A2_cycle__step_0_EMUPDOWN_rates.png]]
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False)
+savefig(gifpath()+'all_avg_weight.png') # [[./gif/20nov23_20nov23_A2_cycle__step_0_all_avg_weight.png]]
+
+lfn = ['20nov17_A0_cycle_']
+for i in range(2): lfn.append('20nov17_A1_cycle__step_' + str(i) + '_')
+i=0; lfn.append('20nov23_A2_cycle__step_' + str(i) + '_')
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0,0.47))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/20nov23_20nov23_A2_cycle__step_0_perf_all_steps_so_far.png]]
+seems like perf increasing in last 500 s of sim (new step with eempopnorm)?
+
+lpda = getindivactionreward(lfn)
+csm=cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+lclr = [csm.to_rgba(float(i)/(len(lpda))) for i in range(len(lpda))]
+clf(); plotComparePerf(lpda,lclr,yl=(0,1),lleg=lfn)
+savefig(gifpath()+'perf_compareD.png') # [[./gif/20nov23_20nov23_A2_cycle__step_0_perf_compareD.png]]
+so last step is better than where started (first step - dark blue), but not as good as previous step ... 
+question is, whether it will surpass the best step by continuing for a few more iterations ... 
+
+** use eempopnorm on gcp, with lower max threshold
+
+        "name": "20nov23_A2_gcp_",
+        "EEMWghtThreshMin": 0.9,
+        "EEMWghtThreshMax": 1.31,
+    "simtype": {
+        "ResumeSim": 1,
+	"ResumeSimFromFile": "data/20nov19_A1_gcp__step_0_synWeights_final.pkl"
+    },
+
+python multistepSim.py sn.json 32 20 20nov23_A2_realgcp_multi
+
+** noise help?
+
+        "name": "20nov23_B2_gcp_",
+    "simtype": {
+        "ResumeSim": 1,
+	"ResumeSimFromFile": "data/20nov19_A1_gcp__step_0_synWeights_final.pkl"
+    },
+with eempopnorm ... and reloading weights but add some noise ... to reduce sparsity of EM firing
+
+* 20nov24
+** check output from gcp 20nov23_A2_gcp__step_2_
+
+python -i simdat.py backupcfg/20nov23_A2_gcp__step_2_sim.json
+
+EV1 0.72 Hz
+EA 5.95 Hz
+EA2 10.25 Hz
+IA2 25.55 Hz
+EMDOWN 36.14 Hz
+EMUP 36.7 Hz
+IM 38.55 Hz
+stimModEV1 0.77 Hz
+
+rates were higher ... for this sim (w/o direction selective neurons) could set a lower max threshold 
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/20nov24_20nov23_A2_gcp__step_2_perf.png]]
+not terrible or good ... 
+
+clf(); drawraster(dspkT,dspkID); xlim((490e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/20nov23_20nov20_A2_gcp__step_8_rast.png]]
+
+binsz = 1000
+dnspk = {pop:getspikehist(dspkT[pop],dnumc[pop],binsz,totalDur) for pop in ['EMDOWN','EMUP']}
+for clr,pop in zip(['r','b'],['EMDOWN','EMUP']): plot(dnspk[pop][0],dnspk[pop][1],clr)
+
+savefig(gifpath()+'EMUPDOWN_rates.png') # [[./gif/20nov24_20nov23_A2_gcp__step_2_EMUPDOWN_rates.png]]
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False)
+savefig(gifpath()+'all_avg_weight.png') # [[./gif/20nov24_20nov23_A2_gcp__step_2_all_avg_weight.png]]
+
+lfn = ['20nov19_A0_gcp_','20nov19_A1_gcp__step_0_']
+for i in range(3): lfn.append('20nov23_A2_gcp__step_' + str(i) + '_')
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0,0.4))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/20nov24_20nov23_A2_gcp__step_2_perf_all_steps_so_far.png]]
+
+lpda = getindivactionreward(lfn)
+csm=cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+lclr = [csm.to_rgba(float(i)/(len(lpda))) for i in range(len(lpda))]
+clf(); plotComparePerf(lpda,lclr,yl=(0,1),lleg=lfn)
+savefig(gifpath()+'perf_compareD.png') # [[./gif/20nov24_20nov23_A2_gcp__step_2_perf_compareD.png]]
+last step does not appear the best ... 
+
+** check output from 20nov23_A2_cycle__step_2_
+
+python -i simdat.py backupcfg/20nov23_A2_cycle__step_2_sim.json
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') 
+
+clf(); drawraster(dspkT,dspkID); xlim((490e3,500e3))
+savefig(gifpath()+'rast.png') 
+
+binsz = 1000
+dnspk = {pop:getspikehist(dspkT[pop],dnumc[pop],binsz,totalDur) for pop in ['EMDOWN','EMUP']}
+for clr,pop in zip(['r','b'],['EMDOWN','EMUP']): plot(dnspk[pop][0],dnspk[pop][1],clr)
+
+savefig(gifpath()+'EMUPDOWN_rates.png') 
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False)
+savefig(gifpath()+'all_avg_weight.png') 
+
+lfn = ['20nov17_A0_cycle_']
+for i in range(3): lfn.append('20nov17_A1_cycle__step_' + str(i) + '_')
+for i in range(2): lfn.append('20nov23_A2_cycle__step_' + str(i) + '_')
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0,0.47))
+savefig(gifpath()+'perf_all_steps_so_far.png') 
+
+lpda = getindivactionreward(lfn)
+csm=cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+lclr = [csm.to_rgba(float(i)/(len(lpda))) for i in range(len(lpda))]
+clf(); plotComparePerf(lpda,lclr,yl=(0,1),lleg=lfn)
+savefig(gifpath()+'perf_compareD.png') 
+
+** adjust targetted rule
+
+right now population that contributed to the move gets rewarded or punished (when right or wrong move)
+but other population does not get impacted
+could revise the rule to also give opposite critic value to the other population
+
+        if dconf['sim']['targettedRL']:
+          if not noWinner: # if there's a clear winner in terms of firing rates
+            if UPactions==DOWNactions:
+              if dconf['verbose']: print('APPLY RL to both EMUP and EMDOWN')
+              for STDPmech in dSTDPmech['all']: STDPmech.reward_punish(float(critic))          
+            elif UPactions>DOWNactions: # UP WINS vs DOWN
+              if dconf['verbose']: print('APPLY RL to EMUP')
+              for STDPmech in dSTDPmech['EMUP']: STDPmech.reward_punish(float(critic))
+              if if dconf['sim']['targettedRL']==3: # opposite to pop that did not contribute
+                for STDPmech in dSTDPmech['EMDOWN']: STDPmech.reward_punish(float(-critic))
+            elif DOWNactions>UPactions: # DOWN WINS vs UP
+              if dconf['verbose']: print('APPLY RL to EMDOWN')
+              for STDPmech in dSTDPmech['EMDOWN']: STDPmech.reward_punish(float(critic))
+              if if dconf['sim']['targettedRL']==3: # opposite to pop that did not contribute
+                for STDPmech in dSTDPmech['EMUP']: STDPmech.reward_punish(float(-critic))              
+
+also, should it reward up/down if they're both 0??
+
+with 0 actions
+            if F_UPs[ts]>F_DOWNs[ts]: # UP WINS
+              actions.append(dconf['moves']['UP'])
+            elif F_DOWNs[ts]>F_UPs[ts]: # DOWN WINS
+              actions.append(dconf['moves']['DOWN'])
+            elif dconf['0rand'] and F_DOWNs[ts]==0 and F_UPs[ts]==0: # random move when 0 rate for both pops?
+              lmoves = list(dconf['moves'].values())
+              actions.append(lmoves[np.random.randint(0,len(lmoves))])
+            else:
+              actions.append(dconf['moves']['NOMOVE']) # No move
+              noWinner = True
+
+** controls - shuffle learned weights then run
+
+that way will have similar firing rates
+
+** test after learning - test performance after learning turned off
+
+and compare to controls
+
