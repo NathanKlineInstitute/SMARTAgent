@@ -22550,6 +22550,8 @@ pdfshuf = pd.DataFrame(Ashuf,columns=['time','preid','postid','weight'])
 D = pdf2weightsdict(pdfshuf); 
 pickle.dump(D, open('data/20nov24_20nov17_A1_cycle__step_0_synWeights_final_shuffled.pkl','wb'))
 
+ok, can use that as resume weights ... will run that later - once other sim finishes on cycle.
+
 ** test after learning - test performance after learning turned off
 
 and compare to controls
