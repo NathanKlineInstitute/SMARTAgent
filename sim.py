@@ -1681,19 +1681,20 @@ def trainAgent (t):
     if critic != 0: # if critic signal indicates punishment (-1) or reward (+1)
       if sim.rank==0: print('t=',round(t,2),'RLcritic:',critic)
       if dconf['sim']['targettedRL']:
-        if UPactions==DOWNactions and sum(F_UPs)>0 and sum(F_DOWNs)>0:
+        if UPactions==DOWNactions and \
+           sum(F_UPs)>0 and sum(F_DOWNs)>0: # same number of actions/spikes -> stay; only apply critic when > 0 spikes
           if dconf['verbose']: print('APPLY RL to both EMUP and EMDOWN')
           for STDPmech in dSTDPmech['all']: STDPmech.reward_punish(float(critic))          
         elif UPactions>DOWNactions: # UP WINS vs DOWN
           if dconf['verbose']: print('APPLY RL to EMUP')
           for STDPmech in dSTDPmech['EMUP']: STDPmech.reward_punish(float(critic))
-          if dconf['sim']['targettedRL']==3: # opposite to pop that did not contribute
+          if dconf['sim']['targettedRL']==3 and sum(F_DOWNs)>0: # opposite to pop that did not contribute
             if dconf['verbose']: print('APPLY -RL to EMDOWN')
             for STDPmech in dSTDPmech['EMDOWN']: STDPmech.reward_punish(float(-critic))
         elif DOWNactions>UPactions: # DOWN WINS vs UP
           if dconf['verbose']: print('APPLY RL to EMDOWN')
           for STDPmech in dSTDPmech['EMDOWN']: STDPmech.reward_punish(float(critic))
-          if dconf['sim']['targettedRL']==3: # opposite to pop that did not contribute
+          if dconf['sim']['targettedRL']==3 and sum(F_UPs)>0: # opposite to pop that did not contribute
             if dconf['verbose']: print('APPLY -RL to EMUP')            
             for STDPmech in dSTDPmech['EMUP']: STDPmech.reward_punish(float(-critic))              
       else:
