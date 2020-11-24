@@ -42,7 +42,7 @@
 	"ResumeSimFromFile": "data/20nov19_A1_gcp__step_0_synWeights_final.pkl"
     },
     "sim": {
-        "duration": 10000,
+        "duration": 500000,
         "dt": 0.6,
         "verbose": 0,
         "recordStep": 1.0,
@@ -83,14 +83,14 @@
 	    "ER":0,
 	    "IR":0,
 	    "EV1":6400,
-	    "EV1DE":0,
-	    "EV1DNE":0,
-	    "EV1DN":0,
-	    "EV1DNW":0,
-	    "EV1DW":0,
-	    "EV1DSW":0,
-	    "EV1DS":0,
-	    "EV1DSE":0,
+	    "EV1DE":400,
+	    "EV1DNE":400,
+	    "EV1DN":400,
+	    "EV1DNW":400,
+	    "EV1DW":400,
+	    "EV1DSW":400,
+	    "EV1DS":400,
+	    "EV1DSE":400,
 	    "ID": 0,
 	    "IV1":0,
 	    "EV4":0,
@@ -191,9 +191,9 @@
 	    "VL":{
 		"VD":{"AM":0,"NM":0,"p":0},		
 		"VL":{"AM":4,"NM":0.6,"p":0},
-		"EA":{"AM":2.6,"NM":0.26,"p":0.25},
-		"EMDOWN":{"AM":1,"NM":0.0,"p":0.0},
-		"EMUP":{"AM":1,"NM":0.0,"p":0.0}
+		"EA":{"AM":2.6,"NM":0.26,"p":0.1},
+		"EMDOWN":{"AM":1,"NM":0.0,"p":0.08},
+		"EMUP":{"AM":1,"NM":0.0,"p":0.08}
 	    },
 	    "VD":{
 		"VL":{"AM":0,"NM":0,"p":0},
@@ -286,7 +286,7 @@
 		"EV4": {"AM":0 , "NM":0, "p":0},
 		"IMT": {"AM":20, "p":0.0225}
 	    }
-	},		
+	},	
         "EEMWghtThreshMin": 0.9,
         "EEMWghtThreshMax": 1.31,
         "EEMPopNorm": 1,

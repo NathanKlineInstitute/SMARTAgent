@@ -22445,7 +22445,7 @@ lclr = [csm.to_rgba(float(i)/(len(lpda))) for i in range(len(lpda))]
 clf(); plotComparePerf(lpda,lclr,yl=(0,1),lleg=lfn)
 savefig(gifpath()+'perf_compareD.png') 
 
-** adjust targetted rule
+** adjust targetted rule and try it out (20nov24_C0_gcp_)
 
 right now population that contributed to the move gets rewarded or punished (when right or wrong move)
 but other population does not get impacted
@@ -22480,6 +22480,14 @@ with 0 actions
             else:
               actions.append(dconf['moves']['NOMOVE']) # No move
               noWinner = True
+
+ok, fixed that up ... with targetted RL only apply critic when there are spikes
+
+to use the addition to the rule specify targettedRL==3
+
+this is with the EV1DE, etc. direction selective neurons included
+
+python multistepSim.py sn.json 32 20 20nov23_C0_gcp_multi
 
 ** controls - shuffle learned weights then run
 
