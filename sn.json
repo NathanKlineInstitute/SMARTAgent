@@ -38,8 +38,8 @@
     "verbose": 0,
     "stayStepLim": 0,
     "simtype": {
-        "ResumeSim": 1,
-	"ResumeSimFromFile": "data/20nov17_A1_cycle__step_1_synWeights_final.pkl"
+        "ResumeSim": 0,
+	"ResumeSimFromFile": "data/20nov19_A1_gcp__step_0_synWeights_final.pkl"
     },
     "sim": {
         "duration": 500000,
@@ -47,12 +47,12 @@
         "verbose": 0,
         "recordStep": 1.0,
         "recordWeightStepSize": 500,
-        "normalizeWeightStepSize": 5000000000000000000000000000000000000000,
-	"normalizeWeightsAtStart": 0,
+        "normalizeWeightStepSize": 500,
+	"normalizeWeightsAtStart": 1,
         "RLFakeUpRule": 0,
         "RLFakeDownRule": 0,
         "RLFakeStayRule": 0,
-        "name": "20nov24_load_weight_test_cycle_D0_",
+        "name": "20nov24_C0_gcp_",
         "doquit": 1,
         "doplot": 0,
         "saveCellSecs": 0,
@@ -204,21 +204,21 @@
 		"ID": {"AM":10, "p":0.03}
 	    },
 	    "EM":{
-		"EM":{"AM":1.2,"NM":0.0,"p":0.1},
+		"EM":{"AM":1.3,"NM":0.0,"p":0.1},
 		"EA":{"AM":0,"NM":0,"p":0.0},
 		"IRecip": {"AM":20, "NM":0, "p":0.0625},
 		"IM":{"AM":10,"p":0.15}
 	    },
 	    "EA":{
 		"EA":{"AM":1.2,"NM":0.12,"p":0.0},
-		"EA2":{"AM":1.2,"NM":0.0,"p":0.15},
-		"EM":{"AM":1.2,"NM":0.0,"p":0.15},
+		"EA2":{"AM":1.3,"NM":0.0,"p":0.15},
+		"EM":{"AM":1.3,"NM":0.0,"p":0.15},
 		"IA":{"AM": 10, "p":0.1}
 	    },
 	    "EA2":{
 		"EA":{"AM":1.2,"NM":0.12,"p":0.0},
-		"EA2":{"AM":1.2,"NM":0.0,"p":0.15},
-		"EM":{"AM":1.2,"NM":0.0,"p":0.15},
+		"EA2":{"AM":1.3,"NM":0.0,"p":0.15},
+		"EM":{"AM":1.3,"NM":0.0,"p":0.15},
 		"IA2":{"AM": 10, "p":0.15}
 	    },	   	    
 	    "IR": {
@@ -287,8 +287,8 @@
 		"IMT": {"AM":20, "p":0.0225}
 	    }
 	},	
-        "EEMWghtThreshMin": 0.9,
-        "EEMWghtThreshMax": 1.31,
+        "EEMWghtThreshMin": 0.84,
+        "EEMWghtThreshMax": 1.25,
         "EEMPopNorm": 1,
 	"CellWNorm": {
 	    "On": 0,
@@ -377,7 +377,7 @@
             "RLlenhebb": 200,
             "RLlenanti": 200,
             "useRLexp": 1,
-            "RLhebbwt": 0.0,
+            "RLhebbwt": 0.0065,
             "RLantiwt": 0,
             "hebbwt": 0.0,
             "antiwt": 0.0,
@@ -410,11 +410,11 @@
     "Noise": {
         "I": {
             "Rate": 0,
-            "Weight": 0.01
+            "Weight": 0.1
         },
         "E": {
             "Rate": 0,
-            "Weight": 0.01
+            "Weight": 0.1
         }
     }
 }
