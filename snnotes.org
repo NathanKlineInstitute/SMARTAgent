@@ -22368,3 +22368,48 @@ python multistepSim.py sn.json 32 20 20nov23_A2_realgcp_multi
     },
 with eempopnorm ... and reloading weights but add some noise ... to reduce sparsity of EM firing
 
+* 20nov24
+** check output from gcp 20nov23_A2_gcp__step_2_
+
+python -i simdat.py backupcfg/20nov23_A2_gcp__step_2_sim.json
+
+EV1 0.72 Hz
+EA 5.95 Hz
+EA2 10.25 Hz
+IA2 25.55 Hz
+EMDOWN 36.14 Hz
+EMUP 36.7 Hz
+IM 38.55 Hz
+stimModEV1 0.77 Hz
+
+rates were higher ... for this sim (w/o direction selective neurons) could set a lower max threshold 
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/20nov24_20nov23_A2_gcp__step_2_perf.png]]
+not terrible or good ... 
+
+clf(); drawraster(dspkT,dspkID); xlim((490e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/20nov23_20nov20_A2_gcp__step_8_rast.png]]
+
+binsz = 1000
+dnspk = {pop:getspikehist(dspkT[pop],dnumc[pop],binsz,totalDur) for pop in ['EMDOWN','EMUP']}
+for clr,pop in zip(['r','b'],['EMDOWN','EMUP']): plot(dnspk[pop][0],dnspk[pop][1],clr)
+
+savefig(gifpath()+'EMUPDOWN_rates.png') # [[./gif/20nov24_20nov23_A2_gcp__step_2_EMUPDOWN_rates.png]]
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False)
+savefig(gifpath()+'all_avg_weight.png') # [[./gif/20nov24_20nov23_A2_gcp__step_2_all_avg_weight.png]]
+
+lfn = ['20nov19_A0_gcp_','20nov19_A1_gcp__step_0_']
+for i in range(3): lfn.append('20nov23_A2_gcp__step_' + str(i) + '_')
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0,0.4))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/20nov24_20nov23_A2_gcp__step_2_perf_all_steps_so_far.png]]
+
+lpda = getindivactionreward(lfn)
+csm=cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+lclr = [csm.to_rgba(float(i)/(len(lpda))) for i in range(len(lpda))]
+clf(); plotComparePerf(lpda,lclr,yl=(0,1),lleg=lfn)
+savefig(gifpath()+'perf_compareD.png') # [[./gif/20nov24_20nov23_A2_gcp__step_2_perf_compareD.png]]
+last step does not appear the best ... 
+
