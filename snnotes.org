@@ -22523,7 +22523,61 @@ of the time, the EMDOWN,EMUP are not firing at all ...
 
 readjust weights ... increase them a bit to 1.3 and the rlhebbwt too ...
 
+python multistepSim.py sn.json 32 20 20nov23_C0_gcp_multi
 
+check first step ...
+
+python -i simdat.py backupcfg/20nov24_C0_gcp__step_0_sim.json
+
+EV1 0.68 Hz
+EV1DE 0.26 Hz
+EV1DNE 1.02 Hz
+EV1DN 3.73 Hz
+EV1DNW 0.25 Hz
+EV1DW 0.21 Hz
+EV1DSW 0.26 Hz
+EV1DS 2.38 Hz
+EV1DSE 1.2 Hz
+EA 2.68 Hz
+EA2 6.67 Hz
+IA2 15.04 Hz
+EMDOWN 8.44 Hz
+EMUP 8.38 Hz
+IM 23.39 Hz
+stimModEV1 0.76 Hz
+stimModEV1DE 0.26 Hz
+stimModEV1DNE 1.29 Hz
+stimModEV1DN 4.01 Hz
+stimModEV1DNW 0.29 Hz
+stimModEV1DW 0.22 Hz
+stimModEV1DSW 0.33 Hz
+stimModEV1DS 2.48 Hz
+stimModEV1DSE 1.29 Hz
+
+overall, lower rates for EMDOWN,EMUP than other sims
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/20nov25_20nov24_C0_gcp__step_0_perf.png]]
+
+hit/miss perf may be better than 20nov17_A0_cycle_
+but fewer score ... need to run longer to see if improves more rapidly ... 
+
+clf(); drawraster(dspkT,dspkID); xlim((490e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/20nov25_20nov24_C0_gcp__step_0_rast.png]]
+
+binsz = 1000
+dnspk = {pop:getspikehist(dspkT[pop],dnumc[pop],binsz,totalDur) for pop in ['EMDOWN','EMUP']}
+for clr,pop in zip(['r','b'],['EMDOWN','EMUP']): plot(dnspk[pop][0],dnspk[pop][1],clr)
+
+savefig(gifpath()+'EMUPDOWN_rates.png') # [[./gif/20nov25_20nov24_C0_gcp__step_0_EMUPDOWN_rates.png]]
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False)
+savefig(gifpath()+'all_avg_weight.png') # [[./gif/20nov25_20nov24_C0_gcp__step_0_all_avg_weight.png]]
+weights going up much more slowly than before change to the targetted rule ... possibly due to 
+not applying critic when have 0 firing rates ... which combined with sparse
+firing rates means the reward from score usually does not get applied ... other reason weights
+do not go up as much is that whenever there's a good action from one pop and spikes from another pop,
+the other pop gets punishment signal...
 
 ** controls - shuffle learned weights then run
 
