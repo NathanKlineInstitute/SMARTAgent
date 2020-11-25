@@ -22613,6 +22613,22 @@ pickle.dump(D, open('data/20nov24_20nov17_A1_cycle__step_0_synWeights_final_shuf
 
 ok, can use that as resume weights ... will run that later - once other sim finishes on cycle.
 
+can use at command to schedule
+https://askubuntu.com/questions/339298/conveniently-schedule-a-command-to-run-later
+
+    "simtype": {
+        "ResumeSim": 1,
+	"ResumeSimFromFile": "data/20nov24_20nov17_A1_cycle__step_0_synWeights_final_shuffled.pkl"
+    },
+        "name": "20nov24_load_shuffle_weight_test_cycle_E0_",
+
+put command into myscript.sh:
+./myrun 32 sn.json
+
+then run this from terminal ... 
+
+at now + 1 hours -f ~/SMARTAgent/myscript.sh
+
 ** test after learning - test performance after learning turned off
 
 and compare to controls
