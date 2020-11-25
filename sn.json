@@ -42,7 +42,7 @@
 	"ResumeSimFromFile": "data/20nov24_20nov17_A1_cycle__step_0_synWeights_final_shuffled.pkl"
     },
     "sim": {
-        "duration": 500000,
+        "duration": 100000,
         "dt": 0.6,
         "verbose": 0,
         "recordStep": 1.0,
