@@ -42,7 +42,7 @@
 	"ResumeSimFromFile": "data/20nov24_20nov17_A1_cycle__step_0_synWeights_final_shuffled.pkl"
     },
     "sim": {
-        "duration": 100000,
+        "duration": 500000,
         "dt": 0.6,
         "verbose": 0,
         "recordStep": 1.0,
@@ -52,7 +52,7 @@
         "RLFakeUpRule": 0,
         "RLFakeDownRule": 0,
         "RLFakeStayRule": 0,
-        "name": "20nov24_load_shuffle_weight_test_cycle_E0_",
+        "name": "20nov25_load_shuffle_weight_test_cycle_E0_",
         "doquit": 1,
         "doplot": 0,
         "saveCellSecs": 0,

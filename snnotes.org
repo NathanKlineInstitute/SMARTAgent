@@ -22659,3 +22659,45 @@ right now puts the stop stuck down a bit too early ...
 
 could instead put limit at  ypos_Racket + 1 + self.racketH*0.5 >= self.maxYPixel ... 
 
+* 20nov25
+** compare sims (during learning, after learning, control with shuffled weights)
+
+python -i simdat.py backupcfg/20nov24_load_weight_test_cycle_D0_sim.json
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/20nov25_20nov24_load_weight_test_cycle_D0_perf.png]]
+not as good as during learning ... 
+
+clf(); drawraster(dspkT,dspkID); xlim((490e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/20nov25_20nov24_load_weight_test_cycle_D0_rast.png]]
+
+binsz = 1000
+dnspk = {pop:getspikehist(dspkT[pop],dnumc[pop],binsz,totalDur) for pop in ['EMDOWN','EMUP']}
+for clr,pop in zip(['r','b'],['EMDOWN','EMUP']): plot(dnspk[pop][0],dnspk[pop][1],clr)
+
+savefig(gifpath()+'EMUPDOWN_rates.png') # [[./gif/20nov25_20nov24_load_weight_test_cycle_D0_EMUPDOWN_rates.png]]
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False)
+ylim((1.579, 1.5835))
+savefig(gifpath()+'all_avg_weight.png') # [[./gif/20nov25_20nov24_load_weight_test_cycle_D0_all_avg_weight.png]]
+ok, weights stayed flat as intended ... 
+
+lfn = ['20nov17_A1_cycle__step_1_' , '20nov24_load_weight_test_cycle_D0_', '20nov24_load_shuffle_weight_test_cycle_E0_']
+
+lpda = getindivactionreward(lfn)
+csm=cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+lclr = [csm.to_rgba(float(i)/(len(lpda))) for i in range(len(lpda))]
+clf(); plotComparePerf(lpda,lclr,yl=(0,1),lleg=lfn)
+savefig(gifpath()+'perf_compareD.png') # [[./gif/20nov25_20nov24_load_weight_test_cycle_D0_perf_compareD.png]]
+
+for shuffle weights test only used 100 s since sim was doing so poorly ... need to run longer ... 
+
+for i in [1,2,3]: subplot(1,3,i); xlim((0,500e3))
+savefig(gifpath()+'perf_compareE.png') # [[./gif/20nov25_20nov24_load_weight_test_cycle_D0_perf_compareE.png]]
+
+need to run shuffled weight test longer to get accurate comparison ... reloaded weights w/o learning might
+converge on a similar value as sim with learning on ... 
+
+for now, will run shuffle sim for 500 s ... or could run sim with completely random moves ... 
+
+        "name": "20nov25_load_shuffle_weight_test_cycle_E0_",
