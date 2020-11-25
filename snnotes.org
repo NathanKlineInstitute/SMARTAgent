@@ -22701,3 +22701,85 @@ converge on a similar value as sim with learning on ...
 for now, will run shuffle sim for 500 s ... or could run sim with completely random moves ... 
 
         "name": "20nov25_load_shuffle_weight_test_cycle_E0_",
+** check output from 20nov24_C0_gcp__step_2_
+
+python -i simdat.py backupcfg/20nov24_C0_gcp__step_2_sim.json
+
+EV1 0.72 Hz
+EV1DE 0.19 Hz
+EV1DNE 0.93 Hz
+EV1DN 4.12 Hz
+EV1DNW 0.56 Hz
+EV1DW 0.18 Hz
+EV1DSW 0.44 Hz
+EV1DS 2.99 Hz
+EV1DSE 0.97 Hz
+EA 3.72 Hz
+EA2 12.1 Hz
+IA2 27.32 Hz
+EMDOWN 16.16 Hz
+EMUP 16.15 Hz
+IM 40.72 Hz
+stimModEV1 0.77 Hz
+stimModEV1DE 0.21 Hz
+stimModEV1DNE 1.18 Hz
+stimModEV1DN 4.5 Hz
+stimModEV1DNW 0.63 Hz
+stimModEV1DW 0.19 Hz
+stimModEV1DSW 0.53 Hz
+stimModEV1DS 3.13 Hz
+stimModEV1DSE 1.05 Hz
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/20nov25_20nov24_C0_gcp__step_2_perf.png]]
+
+hmm, that's pretty high hit/miss ratio, hovering ~0.8
+
+clf(); drawraster(dspkT,dspkID); xlim((490e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/20nov25_20nov24_C0_gcp__step_2_rast.png]]
+
+binsz = 1000
+dnspk = {pop:getspikehist(dspkT[pop],dnumc[pop],binsz,totalDur) for pop in ['EMDOWN','EMUP']}
+for clr,pop in zip(['r','b'],['EMDOWN','EMUP']): plot(dnspk[pop][0],dnspk[pop][1],clr)
+
+savefig(gifpath()+'EMUPDOWN_rates.png') # [[./gif/20nov25_20nov24_C0_gcp__step_2_EMUPDOWN_rates.png]]
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False)
+savefig(gifpath()+'all_avg_weight.png') # [[./gif/20nov25_20nov24_C0_gcp__step_2_all_avg_weight.png]]
+weights still moving slowly ... and they look like mirror images - as one goes up, other goes down - not perfectly
+but that could help produce different firing patterns/rates in the two populations ... 
+
+would be interesting to test the network's response to systematically arranged stimuli - vary ball direction and paddle
+position and see the EMUP,EMDOWN responses. 
+
+lfn = ['20nov24_C0_gcp__step_' + str(i) + '_' for i in range(3)]
+
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0,0.6))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/20nov25_20nov24_C0_gcp__step_2_perf_all_steps_so_far.png]]
+
+lpda = getindivactionreward(lfn)
+csm=cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+lclr = [csm.to_rgba(float(i)/(len(lpda))) for i in range(len(lpda))]
+clf(); plotComparePerf(lpda,lclr,yl=(0,1),lleg=lfn)
+savefig(gifpath()+'perf_compareD.png') # [[./gif/20nov25_20nov24_C0_gcp__step_2_perf_compareD.png]]
+
+should make at least one movie ... 
+
+updated actmap  ... ? with scores ... ? 
+
+fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
+close(); fig=animInput(InputImages,gifpath()+'_no_reward_input.mp4')
+
+ [[./gif/20nov25_20nov24_C0_gcp__step_2__with_reward_input.mp4]]
+[[./gif/20nov25_20nov24_C0_gcp__step_2__no_reward_input.mp4]]
+
+#lpop = ['EV1DNW', 'EV1DN', 'EV1DNE','EV1', 'EV1DW','EV1DE','EMUP','EV1DSW', 'EV1DS', 'EV1DSE', 'EMDOWN', ]
+
+lpop = [k for k in dnumc.keys() if dnumc[k] > 0 and k.count('stim')<1]
+['EV1', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW', 'EV1DSW', 'EV1DS', 'EV1DSE', 'EA', 'EA2', 'IA2', 'EMDOWN', 'EMUP', 'IM']
+  
+dact = getdActMap(totalDur, tstepPerAction, dspkT, dspkID, dnumc, dstartidx, lpop)
+
+fig, axs, plt = animActivityMaps(outpath=gifpath()+'actmap.mp4',lpop=lpop,nframe=100)
+
