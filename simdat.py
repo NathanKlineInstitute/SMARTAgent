@@ -199,9 +199,10 @@ def animActivityMaps (outpath='gif/'+dconf['sim']['name']+'actmap.mp4', framerat
     else:
       offidx=0
     if ldx==flowdx:
-      X, Y = np.meshgrid(np.arange(0, InputImages[0].shape[1], 1), np.arange(0,InputImages[0].shape[0],1))
+      flowrow,flowcol = int(np.sqrt(dnumc['EV1DE'])),int(np.sqrt(dnumc['EV1DE']))
+      X, Y = np.meshgrid(np.arange(0, flowcol, 1), np.arange(0,flowrow,1))
       ddat[ldx] = ax.quiver(X,Y,ldflow[0]['flow'][:,:,0],-ldflow[0]['flow'][:,:,1], pivot='mid', units='inches',width=0.022,scale=1/0.15)
-      ax.set_xlim((0,InputImages[0].shape[1])); ax.set_ylim((0,InputImages[0].shape[0]))
+      ax.set_xlim((0,flowcol)); ax.set_ylim((0,flowrow))
       ax.invert_yaxis()              
       continue
     else:
