@@ -39,7 +39,7 @@
     "stayStepLim": 0,
     "simtype": {
         "ResumeSim": 1,
-	"ResumeSimFromFile": "data/20nov26_20nov24_C0_gcp_cycle__step_2_synWeights_final_shuffled.pkl'"
+	"ResumeSimFromFile": "data/20nov26_20nov24_C0_gcp_cycle__step_2_synWeights_final_shuffled.pkl"
     },
     "sim": {
         "duration": 1000000,

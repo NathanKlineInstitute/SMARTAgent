@@ -23004,8 +23004,5 @@ pickle.dump(D, open('data/20nov26_20nov24_C0_gcp_cycle__step_2_synWeights_final_
 
 ./myrun 32 sn.json
 
-started ~17:23 ... on cycle ... 
-
-hmm, had trouble restoring the weights ... 
-
+started ~17:31 ... on cycle ... 
 
