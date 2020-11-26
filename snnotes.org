@@ -22783,3 +22783,12 @@ dact = getdActMap(totalDur, tstepPerAction, dspkT, dspkID, dnumc, dstartidx, lpo
 
 fig, axs, plt = animActivityMaps(outpath=gifpath()+'actmap.mp4',lpop=lpop,nframe=100)
 
+** check latest shuffled weight sim (20nov25_load_shuffle_weight_test_cycle_E0_)
+** run sim with randmove (other control for comparison; 20nov25_random_move_F0_)
+
+randmove = 1
+
+and again RLhebbwt is 0 ... 
+
+./myrun 32 sn.json
+

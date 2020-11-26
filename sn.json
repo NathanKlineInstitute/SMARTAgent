@@ -13,6 +13,7 @@
         3,
         4
     ],
+    "randmove": 1,
     "stochmove": 0,
     "0rand": 0,
     "movefctr": 1.0,
@@ -38,7 +39,7 @@
     "verbose": 0,
     "stayStepLim": 0,
     "simtype": {
-        "ResumeSim": 1,
+        "ResumeSim": 0,
 	"ResumeSimFromFile": "data/20nov24_20nov17_A1_cycle__step_0_synWeights_final_shuffled.pkl"
     },
     "sim": {
@@ -52,7 +53,7 @@
         "RLFakeUpRule": 0,
         "RLFakeDownRule": 0,
         "RLFakeStayRule": 0,
-        "name": "20nov25_load_shuffle_weight_test_cycle_E0_",
+        "name": "20nov25_random_move_F0_",
         "doquit": 1,
         "doplot": 0,
         "saveCellSecs": 0,
