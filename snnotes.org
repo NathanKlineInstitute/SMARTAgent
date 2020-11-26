@@ -22877,8 +22877,18 @@ for pda,fn in zip(lpda,lfn):
 20nov25_load_shuffle_weight_test_cycle_E0_ 16 150  5
 20nov25_random_move_F0_                    30 140  7
 
-fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward) 
+fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward) # [[./gif/20nov26_20nov25_random_move_F0__with_reward_input.mp4]]
 
 may as well run longer randmove - 1000 s ... and reduce number of neurons since they're
 not used anyway ... 
+
+** run longer sim with randmove (other control for comparison; 20nov26_random_move_G0_)
+
+randmove = 1
+
+and again RLhebbwt is 0 ... 
+
+fewer neurons so runs more quickly ... (neurons not used for decision making with randmove anyway)
+
+./myrun 32 sn.json
 
