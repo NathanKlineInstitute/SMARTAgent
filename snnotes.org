@@ -22784,6 +22784,52 @@ dact = getdActMap(totalDur, tstepPerAction, dspkT, dspkID, dnumc, dstartidx, lpo
 fig, axs, plt = animActivityMaps(outpath=gifpath()+'actmap.mp4',lpop=lpop,nframe=100)
 
 ** check latest shuffled weight sim (20nov25_load_shuffle_weight_test_cycle_E0_)
+
+python -i simdat.py backupcfg/20nov25_load_shuffle_weight_test_cycle_E0_sim.json
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/20nov25_20nov25_load_shuffle_weight_test_cycle_E0_perf.png]]
+good, over 500 s sim, shuffled weights sim displays much worse performance
+
+clf(); drawraster(dspkT,dspkID); xlim((490e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/20nov25_20nov25_load_shuffle_weight_test_cycle_E0_rast.png]]
+
+binsz = 1000
+dnspk = {pop:getspikehist(dspkT[pop],dnumc[pop],binsz,totalDur) for pop in ['EMDOWN','EMUP']}
+for clr,pop in zip(['r','b'],['EMDOWN','EMUP']): plot(dnspk[pop][0],dnspk[pop][1],clr)
+
+savefig(gifpath()+'EMUPDOWN_rates.png') # [[./gif/20nov25_20nov25_load_shuffle_weight_test_cycle_E0_EMUPDOWN_rates.png]]
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False)
+ylim((1.394,1.396))
+savefig(gifpath()+'all_avg_weight.png') # [[./gif/20nov25_20nov25_load_shuffle_weight_test_cycle_E0_all_avg_weight.png]]
+
+lfn = ['20nov17_A1_cycle__step_1_' , '20nov24_load_weight_test_cycle_D0_', '20nov25_load_shuffle_weight_test_cycle_E0_']
+
+lpda = getindivactionreward(lfn)
+csm=cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+lclr = [csm.to_rgba(float(i)/(len(lpda))) for i in range(len(lpda))]
+clf(); plotComparePerf(lpda,lclr,yl=(0,1),lleg=lfn)
+
+for i in [1,2,3]: subplot(1,3,i); xlim((100e3,500e3)); ylim((0,0.8))
+
+savefig(gifpath()+'perf_compareD.png') # [[./gif/20nov25_20nov25_load_shuffle_weight_test_cycle_E0_perf_compareD.png]]
+
+ok, so after training performance is retained, but not 100% ... in long run may converge ... 
+
+can make a movie of shuffled weight performance ... and also display total number of hits, scores, etc ... also note that it's not likely to be
+identical inputs; since all differences in model behavior can lead to wide divergence in opponent moves, etc.
+
+for pda,fn in zip(lpda,lfn):
+  cumHits, cumMissed, cumScore = getCumPerfCols(pda)    
+  print(fn,cumHits[-1],cumMissed[-1],cumScore[-1])
+
+20nov17_A1_cycle__step_1_                  55 98  23
+20nov24_load_weight_test_cycle_D0_         40 115 16
+20nov25_load_shuffle_weight_test_cycle_E0_ 16 150  5
+
+fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward) # [[./20nov25_20nov25_load_shuffle_weight_test_cycle_E0__with_reward_input.mp4]]
+
 ** run sim with randmove (other control for comparison; 20nov25_random_move_F0_)
 
 randmove = 1
