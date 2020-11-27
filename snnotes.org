@@ -23020,3 +23020,7 @@ pickle.dump(D, open('data/20nov26_20nov24_C0_gcp_cycle__step_2_synWeights_final_
 
 started ~17:31 ... on cycle ... 
 
+** actmap movie from 20nov24_C0_gcp__step_2_ ?
+
+python -i simdat.py backupcfg/20nov24_C0_gcp__step_2_sim.json
+
