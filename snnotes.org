@@ -23103,3 +23103,34 @@ dact = getdActMap(totalDur, tstepPerAction, dspkT, dspkID, dnumc, dstartidx, lpo
 
 fig, axs, plt = animActivityMaps(outpath=gifpath()+'actmap.mp4',lpop=lpop,nframe=100)
 
+** figure showing learning, after learning (weights fixed), control (random move), control (shuffled weights)
+
+python -i simdat.py backupcfg/20nov26_random_move_G0_sim.json
+
+lfn = ['20nov24_C0_gcp__step_1_', '20nov24_C0_gcp__step_2_']
+pdac = getconcatactionreward(lfn)
+lpda = [pdac]
+
+lfn = ['20nov26_C1_gcp_', '20nov26_load_shuffle_weight_test_C0_gcp__step_2_C1_', '20nov26_random_move_G0_']
+ltmp = getindivactionreward(lfn)
+for pda in ltmp: lpda.append(pda)
+
+lleg = ['During Learning', 'After Learning', 'Shuffle Weight', 'Random Move']
+
+csm=cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+lclr = [csm.to_rgba(float(i)/(len(lpda))) for i in range(len(lpda))]
+clf(); plotComparePerf(lpda,lclr,yl=(0,1),lleg=lleg,skipfollow=True)
+
+savefig(gifpath()+'perf_compareD.png') # [[./gif/20nov27_20nov26_random_move_G0_perf_compareD.png]]
+
+learning and continuation looks much better in this set of sims ... compared to controls ...
+
+for pda,name in zip(lpda,lleg):
+  cumHits, cumMissed, cumScore = getCumPerfCols(pda)    
+  print(name,cumHits[-1],cumMissed[-1],cumScore[-1])
+
+During Learning 127 171 50
+After Learning  112 173 56
+Shuffle Weight   24 309 12
+Random Move      42 292 13
+
