@@ -389,7 +389,7 @@ def setupNoiseStim ():
   # setup noisy NetStim sources (send random spikes)
   if ECellModel == 'IntFire4' or ECellModel == 'INTF7':
     lpoty = [x for x in EMotorPops]
-    lpoty.append('EA2')
+    #lpoty.append('EA2')
     for ty,sy in zip(["E","I"],["AMPA","GABA"]):
       Weight,Rate = dconf["Noise"][ty]["Weight"],dconf["Noise"][ty]["Rate"]
       weightIndex = 0

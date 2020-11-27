@@ -62,7 +62,17 @@ def savefinalweights (pdf, simstr):
   # save final weights to a (small) file
   pdfs = pdf[pdf.time==np.amax(pdf.time)]
   D = pdf2weightsdict(pdfs)
-  pickle.dump(D, open('data/'+simstr+'synWeights_final.pkl','wb'))  
+  pickle.dump(D, open('data/'+simstr+'synWeights_final.pkl','wb'))
+
+def shuffleweights (pdf):
+  # shuffle the weights
+  npwt = np.array(pdf.weight)
+  np.random.shuffle(npwt)
+  Ashuf = np.array([pdf.time,pdf.preid,pdf.postid,npwt]).T
+  pdfshuf = pd.DataFrame(Ashuf,columns=['time','preid','postid','weight'])
+  return pdfshuf
+  #D = pdf2weightsdict(pdfshuf);
+  #return D
 
 def getsimname (name=None):
   if name is None:
@@ -152,9 +162,10 @@ def animActivityMaps (outpath='gif/'+dconf['sim']['name']+'actmap.mp4', framerat
   # plot activity in different layers as a function of input images  
   ioff()
   possible_pops = ['ER','EV1','EV4','EMT','IR','IV1','IV4','IMT','EV1DW','EV1DNW','EV1DN'\
-                   ,'EV1DNE','EV1DE','EV1DSW','EV1DS', 'EV1DSE','EMDOWN','EMUP','IM']
+                   ,'EV1DNE','EV1DE','EV1DSW','EV1DS', 'EV1DSE','EMDOWN','EMUP','IM','EA','IA','EA2','IA2']
   possible_titles = ['Excit R', 'Excit V1', 'Excit V4', 'Excit MT', 'Inhib R', 'Inhib V1', 'Inhib V4', 'Inhib MT',\
-                     'W','NW','N','NE','E','SW','S','SE','Excit M DOWN', 'Excit M UP', 'Excit M STAY', 'Inhib M']
+                     'W','NW','N','NE','E','SW','S','SE','Excit M DOWN', 'Excit M UP', 'Excit M STAY', 'Inhib M',\
+                     'Excit A' , 'Inhib A', 'Excit A2', 'Inhib A2']
   dtitle = {p:t for p,t in zip(possible_pops,possible_titles)}
   ltitle = ['Input Images']
   lact = [InputImages]; lvmax = [255];
@@ -188,9 +199,10 @@ def animActivityMaps (outpath='gif/'+dconf['sim']['name']+'actmap.mp4', framerat
     else:
       offidx=0
     if ldx==flowdx:
-      X, Y = np.meshgrid(np.arange(0, InputImages[0].shape[1], 1), np.arange(0,InputImages[0].shape[0],1))
+      flowrow,flowcol = int(np.sqrt(dnumc['EV1DE'])),int(np.sqrt(dnumc['EV1DE']))
+      X, Y = np.meshgrid(np.arange(0, flowcol, 1), np.arange(0,flowrow,1))
       ddat[ldx] = ax.quiver(X,Y,ldflow[0]['flow'][:,:,0],-ldflow[0]['flow'][:,:,1], pivot='mid', units='inches',width=0.022,scale=1/0.15)
-      ax.set_xlim((0,InputImages[0].shape[1])); ax.set_ylim((0,InputImages[0].shape[0]))
+      ax.set_xlim((0,flowcol)); ax.set_ylim((0,flowrow))
       ax.invert_yaxis()              
       continue
     else:
@@ -677,14 +689,17 @@ def plotPerf (actreward,yl=(0,1)):
   ax.legend(handles=lpatch,handlelength=1)
   return ax
 
-def plotComparePerf (lpda, lclr, yl=(0,.55), lleg=None):
+def plotComparePerf (lpda, lclr, yl=(0,.55), lleg=None, skipfollow=False):
   # plot comparison of performance of list of action rewards dataframes in lpda
   # lclr is color to plot
   # lleg is optional legend
+  ngraph=3
+  if skipfollow: ngraph=2
   for pda,clr in zip(lpda,lclr):
-    plotFollowBall(pda,ax=subplot(1,3,1),cumulative=True,color=clr); ylim(yl)
-    plotHitMiss(pda,ax=subplot(1,3,2),lclr=[clr],asratio=True); ylim(yl)
-    plotScoreMiss(pda,ax=subplot(1,3,3),clr=clr,asratio=True); ylim(yl)
+    gdx=1
+    if not skipfollow: plotFollowBall(pda,ax=subplot(1,ngraph,gdx),cumulative=True,color=clr); ylim(yl); gdx+=1
+    plotHitMiss(pda,ax=subplot(1,ngraph,gdx),lclr=[clr],asratio=True); ylim(yl); gdx+=1
+    plotScoreMiss(pda,ax=subplot(1,ngraph,gdx),clr=clr,asratio=True); ylim(yl)
   if lleg is not None:
     lpatch = [mpatches.Patch(color=c,label=s) for c,s in zip(lclr,lleg)]
     ax=gca()
