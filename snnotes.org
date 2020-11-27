@@ -22892,6 +22892,20 @@ fewer neurons so runs more quickly ... (neurons not used for decision making wit
 
 ./myrun 32 sn.json
 
+python -i simdat.py backupcfg/20nov26_random_move_G0_sim.json
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/20nov26_20nov26_random_move_G0_perf.png]]
+
+ok, so over longer duration, it's clear randmove has much lower perf compared to the trained sims ... 
+will see exactly how it compares when they're done ... (running 1000 s for shuffled weights and
+for restore learned weights [keep them fixed]); can combine step 0,1 or 1,2 for learning to get 1000 s ... 
+
+cumHits, cumMissed, cumScore = getCumPerfCols(actreward) 
+print(simstr,cumHits[-1],cumMissed[-1],cumScore[-1]) # 20nov26_random_move_G0_ 42 292 13
+
+fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward) # [[./gif/20nov26_20nov26_random_move_G0__with_reward_input.mp4]]
+
 ** check output from 20nov24_C0_gcp__step_7_ -->> activity drops after a few steps
 
 python -i simdat.py backupcfg/20nov24_C0_gcp__step_7_sim.json
