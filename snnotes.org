@@ -23024,3 +23024,18 @@ started ~17:31 ... on cycle ...
 
 python -i simdat.py backupcfg/20nov24_C0_gcp__step_2_sim.json
 
+** perf from gcp sim w/o motion selective neurons (20nov19_A0_gcp_, 20nov19_A1_gcp__step_0_, etc)
+
+show steps 0,1,2 where improvement was occurring - before it dropped due to higher rates
+
+python -i simdat.py
+
+lfn = ['20nov19_A0_gcp_','20nov19_A1_gcp__step_0_']
+for i in range(3): lfn.append('20nov23_A2_gcp__step_' + str(i) + '_')
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0,0.4))
+xlim((25e3,1.5e6))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/20nov27_20nov16_A0_testPaddedImage_reduced_2obj_INTF7_perf_all_steps_so_far.png]]
+
+ok, shows improvement ... 
+
