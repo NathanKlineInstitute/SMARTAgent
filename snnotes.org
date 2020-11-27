@@ -23039,3 +23039,67 @@ savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/20nov27_20nov16_A0_test
 
 ok, shows improvement ... 
 
+* 20nov27
+** check output from 20nov26_C1_gcp_
+
+python -i simdat.py backupcfg/20nov26_C1_gcp_sim.json
+
+EV1 0.73 Hz
+EV1DE 0.18 Hz
+EV1DNE 0.62 Hz
+EV1DN 4.16 Hz
+EV1DNW 0.63 Hz
+EV1DW 0.12 Hz
+EV1DSW 0.42 Hz
+EV1DS 3.21 Hz
+EV1DSE 1.32 Hz
+EA 3.79 Hz
+EA2 12.52 Hz
+IA2 28.14 Hz
+EMDOWN 16.96 Hz
+EMUP 17.0 Hz
+IM 41.83 Hz
+stimModEV1 0.78 Hz
+stimModEV1DE 0.19 Hz
+stimModEV1DNE 0.75 Hz
+stimModEV1DN 4.51 Hz
+stimModEV1DNW 0.72 Hz
+stimModEV1DW 0.13 Hz
+stimModEV1DSW 0.52 Hz
+stimModEV1DS 3.37 Hz
+stimModEV1DSE 1.41 Hz
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/20nov27_20nov26_C1_gcp_perf.png]]
+looks very good ...
+
+clf(); drawraster(dspkT,dspkID); xlim((490e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/20nov27_20nov26_C1_gcp_rast.png]]
+
+binsz = 1000
+dnspk = {pop:getspikehist(dspkT[pop],dnumc[pop],binsz,totalDur) for pop in ['EMDOWN','EMUP']}
+for clr,pop in zip(['r','b'],['EMDOWN','EMUP']): plot(dnspk[pop][0],dnspk[pop][1],clr)
+
+savefig(gifpath()+'EMUPDOWN_rates.png') # [[./gif/20nov27_20nov26_C1_gcp_EMUPDOWN_rates.png]]
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False)
+ylim((1.33,1.38))
+savefig(gifpath()+'all_avg_weight.png') # [[./gif/20nov27_20nov26_C1_gcp_all_avg_weight.png]]
+ok, weights stay put as intended for this test
+
+will save the data on cycle for more analysis ... and comparison with controls ...
+
+cumHits, cumMissed, cumScore = getCumPerfCols(actreward) 
+print(simstr,cumHits[-1],cumMissed[-1],cumScore[-1]) # 20nov26_C1_gcp_ 112 173 56
+that's over 1000 s ... 
+
+fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
+close(); fig=animInput(InputImages,gifpath()+'_no_reward_input.mp4')
+
+lpop = [k for k in dnumc.keys() if dnumc[k] > 0 and k.count('stim')<1]
+['EV1', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW', 'EV1DSW', 'EV1DS', 'EV1DSE', 'EA', 'EA2', 'IA2', 'EMDOWN', 'EMUP', 'IM']
+  
+dact = getdActMap(totalDur, tstepPerAction, dspkT, dspkID, dnumc, dstartidx, lpop)
+
+fig, axs, plt = animActivityMaps(outpath=gifpath()+'actmap.mp4',lpop=lpop,nframe=100)
+
