@@ -23172,3 +23172,6 @@ fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward
 [[./gif/20nov30_20nov24_C0_gcp__step_2__with_reward_input.mp4]]
 
 python -i simdat.py backupcfg/20nov26_load_shuffle_weight_test_C0_gcp__step_2_C1_sim.json
+fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward,skipopp=True,framerate=50)
+[[./gif/20nov30_20nov26_load_shuffle_weight_test_C0_gcp__step_2_C1__with_reward_input.mp4]]
+
