@@ -45,11 +45,11 @@
     "verbose": 0,
     "stayStepLim": 0,
     "simtype": {
-        "ResumeSim": 0,
-        "ResumeSimFromFile": "data/20oct23_A0_cycle_synWeights_final.pkl"
+        "ResumeSim": 1,
+        "ResumeSimFromFile": "data/20nov27_A0_cycle_reduced_2obj_INTF7_synWeights_final.pkl"
     },
     "sim": {
-        "duration": 2000000,
+        "duration": 5000000,
         "dt": 0.6,
         "verbose": 0,
         "recordStep": 1.0,
@@ -59,9 +59,9 @@
         "RLFakeUpRule": 0,
         "RLFakeDownRule": 0,
         "RLFakeStayRule": 0,
-        "name": "20nov20_A0_cycle_reduced_2obj_INTF7_",
-        "doquit": 0,
-        "doplot": 1,
+        "name": "20nov28_A0_cycle_reduced_2obj_INTF7_",
+        "doquit": 1,
+        "doplot": 0,
         "saveCellSecs": 0,
         "saveCellConns": 0,
         "targettedRL": 1,
@@ -392,7 +392,7 @@
             "RLlenhebb": 100,
             "RLlenanti": 100,
             "useRLexp": 1,
-            "RLhebbwt": 0.005,
+            "RLhebbwt": 2,
             "RLantiwt": 0,
             "hebbwt": 0.0,
             "antiwt": 0.0,

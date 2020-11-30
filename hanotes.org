@@ -9685,4 +9685,274 @@ updated the code to include correct indices....
 
 
 
+- run 2000 sec sim in "20nov20_A0_cycle_reduced_2obj_INTF7_" with
+"EV1":48,
+"EA":4608,
+    "rewardcodes": {
+        "scorePoint": 0.0,
+        "losePoint":  -0.1,
+        "followTarget": 0.01,
+        "avoidTarget": -0.001,
+        "hitBall": 0.1
+    }
+
+...save 
+"20nov20_A0_cycle_reduced_2obj_INTF7_Raster.png",
+"20nov20_A0_cycle_reduced_2obj_INTF7_Perf.png"
+
+- run 2000 sec sim in "20nov20_A1_cycle_reduced_2obj_INTF7_" with
+"EV1":192,
+"EA":73728,
+    "rewardcodes": {
+        "scorePoint": 0.0,
+        "losePoint":  -0.1,
+        "followTarget": 0.1,
+        "avoidTarget": -0.01,
+        "hitBall": 0.2
+    }
+
+
+
+- run 200 sec sim in "20nov20_A0_falcor_reduced_2obj_INTF7_" with
+"EV1":192,
+"EA":73728,
+    "rewardcodes": {
+        "scorePoint": 0.0,
+        "losePoint":  -0.1,
+        "followTarget": 0.01,
+        "avoidTarget": -0.001,
+        "hitBall": 0.1
+    }
+
+
+-- on new mac, i installed macos big sur and then had issues using openai gym.
+
+the problem was with rendering.
+
+ImportError: Can't find framework /System/Library/Frameworks/OpenGL.framework.
+solution: install pyglet==1.5.11 (https://github.com/openai/gym/issues/2101)
+conda install -c conda-forge pyglet
+
+... issue resolved.
+
+-- new mac: 
+export DYLD_FALLBACK_LIBRARY_PATH=/lib:/usr/lib:/usr/bin/lib:/Users/haroonanwar/opt/anaconda3/lib/
+
+
+popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False)
+
+
+* 20nov23 
+
+-- run sim 
+ "duration": 500000,
+ "name": "20nov23_A0_cycle_reduced_2obj_INTF7_"
+
+"RLhebbwt": 0.5,
+
+"EV1":48,
+"EA":4608,
+    "rewardcodes": {
+        "scorePoint": 0.0,
+        "losePoint":  0.0,
+        "followTarget": 0.1,
+        "avoidTarget": -0.01,
+        "hitBall": 0.2
+    }
+
+saved 20nov23_A0_cycle_reduced_2obj_INTF7_Raster.png,
+20nov23_A0_cycle_reduced_2obj_INTF7_Perf.png,
+20nov23_A0_cycle_reduced_2obj_INTF7_Weights.png.
+
+-- run sim on newmac:
+"useSimulatedEnv":1,
+
+ "duration": 200000,
+ "name": "20nov23_A0_newmac_reduced_2obj_INTF7_"
+
+"RLhebbwt": 0.5,
+
+"EV1":48,
+"EA":4608,
+    "rewardcodes": {
+        "scorePoint": 0.0,
+        "losePoint":  0.0,
+        "followTarget": 0.1,
+        "avoidTarget": -0.01,
+        "hitBall": 0.2
+    }
+
+
+-- run sim 
+ "duration": 5000000,
+ "name": "20nov23_A1_cycle_reduced_2obj_INTF7_"
+
+"RLhebbwt": 0.5,
+
+"EV1":48,
+"EA":4608,
+    "rewardcodes": {
+        "scorePoint": 0.0,
+        "losePoint":  0.0,
+        "followTarget": 0.1,
+        "avoidTarget": -0.01,
+        "hitBall": 0.2
+    }
+
+saved 20nov23_A1_cycle_reduced_2obj_INTF7_Perf.png, 20nov23_A1_cycle_reduced_2obj_INTF7_Weights.png, 20nov23_A1_cycle_reduced_2obj_INTF7_Raster.png
+... Hit/Miss ratio increasing. Looks promising. resume the sim.
+
+
+
+
+-- run sim 
+ "duration": 500000,
+ "name": "20nov23_A0_falcor_reduced_2obj_INTF7_"
+
+"RLhebbwt": 0.5,
+
+"EV1":48,
+"EA":4608,
+    "rewardcodes": {
+        "scorePoint": 1.0,
+        "losePoint":  -0.1,
+        "followTarget": 0.1,
+        "avoidTarget": -0.01,
+        "hitBall": 0.5
+    }
+save 20nov23_A0_falcor_reduced_2obj_INTF7_raster.png,
+20nov23_A0_falcor_reduced_2obj_INTF7_perf.png,
+20nov23_A0_falcor_reduced_2obj_INTF7_weights.png
+
+
+-- run sim 
+ "duration": 2000000,
+ "name": "20nov23_A1_falcor_reduced_2obj_INTF7_"
+
+"RLhebbwt": 1,
+
+"EV1":48,
+"EA":4608,
+    "rewardcodes": {
+        "scorePoint": 1.0,
+        "losePoint":  -0.1,
+        "followTarget": 0.1,
+        "avoidTarget": -0.01,
+        "hitBall": 0.5
+    }
+Hit/miss ratio does not go beyond 0.3
+
+* 20nov24
+
+-- resume sim from  "20nov23_A1_cycle_reduced_2obj_INTF7_"
+ "duration": 5000000,
+ "name": "20nov24_A0_cycle_reduced_2obj_INTF7_"
+
+... Hit/Miss ratio seems to be saturating around 0.52 but will keep running.
+
+-- resume sim from  "20nov24_A0_cycle_reduced_2obj_INTF7_"
+ "duration": 2000000,
+ "name": "20nov25_A0_cycle_reduced_2obj_INTF7_"
+also change learning rate
+"hebbwt":2 (before it was 0.5)
+
+... went up quickly and then dropped. may be too much learning......
+
+-- run sim 
+ "duration": 2000000,
+ "name": "20nov25_A0_falcor_reduced_2obj_INTF7_"
+
+"RLhebbwt": 5,
+
+"EV1":48,
+"EA":4608,
+    "rewardcodes": {
+        "scorePoint": 0.0,
+        "losePoint":  0.0,
+        "followTarget": 0.1,
+        "avoidTarget": -0.01,
+        "hitBall": 0.2
+    }
+... looks nice... improving...
+
+-- resume sim from  "20nov24_A0_cycle_reduced_2obj_INTF7_"
+ "duration": 5000000,
+ "name": "20nov25_A1_cycle_reduced_2obj_INTF7_"
+also change learning rate
+"hebbwt":0.5 
+
+
+-- run sim 
+ "duration": 2000000,
+ "name": "20nov25_A0_falcor_reduced_2obj_INTF7_"
+
+"RLhebbwt": 5,
+
+"EV1":48,
+"EA":4608,
+    "rewardcodes": {
+        "scorePoint": 0.0,
+        "losePoint":  0.0,
+        "followTarget": 0.1,
+        "avoidTarget": -0.01,
+        "hitBall": 0.2
+
+
+* 20nov27 
+
+lfn = ['20nov23_A1_cycle_reduced_2obj_INTF7_','20nov24_A0_cycle_reduced_2obj_INTF7_','20nov25_A1_cycle_reduced_2obj_INTF7_']
+pdac = getconcatactionreward(lfn)
+plotPerf(pdac,yl=(0,0.5))
+
+saved as '20nov23_A1_20nov24_A0_20nov25_A1_cycle_reduced_2obj_INTF7_Perf.png' ... also as eps.--->USE THIS.
+
+fig = animInput(InputImages,gifpath()+'_input.mp4')
+saved inputanim to gif/20nov27_20nov25_A1cycle_reduced_2obj_INTF7__input.mp4.
+
+ drawraster(dspkT,dspkID)
+ saved as 20nov25_A1_cycle_reduced_2obj_INTF7_RasterFull.png
+>>> xlim((490e4,500e4))
+(4900000.0, 5000000.0)
+>>> xlim((499e4,500e4))
+(4990000.0, 5000000.0)
+>>> xlim((4995e4,500e4))
+(49950000.0, 5000000.0)
+>>> xlim((499.5e4,500e4))
+(4995000.0, 5000000.0)
+
+---------------
+lfn = ['20nov23_A1_cycle_reduced_2obj_INTF7_','20nov24_A0_cycle_reduced_2obj_INTF7_','20nov25_A0_cycle_reduced_2obj_INTF7_']
+pdac = getconcatactionreward(lfn)
+plotPerf(pdac,yl=(0,0.5))
+
+saved as '20nov23_A1_20nov24_A0_20nov25_A0_cycle_reduced_2obj_INTF7_Perf.png'
+
+
+-- resume sim from: "ResumeSimFromFile": "data/20nov25_A0_cycle_reduced_2obj_INTF7_synWeights_final.pkl"
+"duration": 5000,000
+"name": "20nov27_A0_cycle_reduced_2obj_INTF7_",
+"RLhebbwt": 2,
+
+
+-- resume sim from: "ResumeSimFromFile": "data/20nov27_A0_cycle_reduced_2obj_INTF7_synWeights_final.pkl"
+"duration": 5000,000
+"name": "20nov28_A0_cycle_reduced_2obj_INTF7_",
+"RLhebbwt": 2,
+
+
+* 20nov30
+
+python -i simdat.py backupcfg/20nov28_A0_cycle_reduced_2obj_INTF7_sim.json
+lfn = ['20nov23_A1_cycle_reduced_2obj_INTF7_','20nov24_A0_cycle_reduced_2obj_INTF7_','20nov25_A0_cycle_reduced_2obj_INTF7_','20nov27_A0_cycle_reduced_2obj_INTF7_','20nov28_A0_cycle_reduced_2obj_INTF7_']
+lpda = getindivactionreward(lfn)
+csm = cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+lclr = [csm.to_rgba(float(i)/len(lpda)) for i in range(len(lpda))]
+plotComparePerf(lpda,lclr,yl=(0,1),lleg=lfn)
+
+saved as "20nov23_A1_20nov24_A0_20nov25_A0_20nov27_A0_20nov28_A0_cycle_reduced_2obj_INTF7_Perf_compare.eps"
+
+pdac = getconcatactionreward(lfn)
+plotPerf(pdac,yl=(0,0.5))
+
+saved as "20nov23_A1_20nov24_A0_20nov25_A0_20nov27_A0_20nov28_A0_cycle_reduced_2obj_INTF7_Perf.eps"
 
