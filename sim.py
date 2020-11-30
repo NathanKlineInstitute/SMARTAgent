@@ -61,7 +61,7 @@ cmat = dconf['net']['cmat'] # connection matrix (for classes, synapses, probabil
 dnumc = OrderedDict({ty:dconf['net']['allpops'][ty]*scale for ty in allpops}) # number of neurons of a given type
 
 def getpadding ():
-  # get padding-related parameters
+  # get padding-related parameters -- NB: not used
   dnumc_padx = OrderedDict({ty:dconf['net']['allpops'][ty]*0 for ty in allpops}) # a dictionary with zeros to keep number of padded neurons in one dimension
   dtopoldivcons = dconf['net']['alltopoldivcons']
   dtopolconvcons = dconf['net']['alltopolconvcons']
@@ -103,11 +103,8 @@ def getpadding ():
   return dnumc_padx, dtopoldivcons,dtopolconvcons,allpops_withconvtopology,allpops_withdivtopology
 
 dnumc_padx, dtopoldivcons,dtopolconvcons,allpops_withconvtopology,allpops_withdivtopology = getpadding()
-  
-if dnumc['EMSTAY']>0:
-  lrecpop = ['EMUP', 'EMDOWN','EMSTAY'] # which populations to record from
-else:
-  lrecpop = ['EMUP', 'EMDOWN'] # which populations to record from
+
+lrecpop = ['EMUP', 'EMDOWN'] # which populations to record from
   
 if cmat['VD']['VD']['p'] > 0.0 or \
    cmat['VD']['VL']['p'] > 0.0 or \
@@ -157,7 +154,7 @@ simConfig.saveFolder = 'data'
 # simConfig.backupCfg = ['sim.json', 'backupcfg/'+dconf['sim']['name']+'sim.json']
 simConfig.createNEURONObj = True  # create HOC objects when instantiating network
 simConfig.createPyStruct = True  # create Python structure (simulator-independent) when instantiating network
-simConfig.analysis['plotTraces'] = {'include': [(pop, 0) for pop in ['ER','IR','EV1','EV1DE','ID','IV1','EV4','IV4','EMT','IMT','EMDOWN','EMUP','EMSTAY','IM','IMUP','IMDOWN','EA','IA','EA2','IA2']]}
+simConfig.analysis['plotTraces'] = {'include': [(pop, 0) for pop in ['ER','IR','EV1','EV1DE','ID','IV1','EV4','IV4','EMT','IMT','EMDOWN','EMUP','IM','IMUP','IMDOWN','EA','IA','EA2','IA2']]}
 simConfig.analysis['plotRaster'] = {'popRates':'overlay','showFig':dconf['sim']['doplot']}
 #simConfig.analysis['plot2Dnet'] = True 
 #simConfig.analysis['plotConn'] = True           # plot connectivity matrix
@@ -392,7 +389,7 @@ def setupNoiseStim ():
   # setup noisy NetStim sources (send random spikes)
   if ECellModel == 'IntFire4' or ECellModel == 'INTF7':
     lpoty = [x for x in EMotorPops]
-    lpoty.append('EA2')
+    #lpoty.append('EA2')
     for ty,sy in zip(["E","I"],["AMPA","GABA"]):
       Weight,Rate = dconf["Noise"][ty]["Weight"],dconf["Noise"][ty]["Rate"]
       weightIndex = 0
@@ -1476,40 +1473,47 @@ def initTargetW (sim,lpop,synType='AMPA'):
           cCellW+=conn['hObj'].weight[0]
       sim.dTargetW[cell.gid] = cCellW
 
-def getFiringRateWithInterval (trange = None, neuronal_pop = None):
+def getFiringRateWithInterval (trange, neuronal_pop):
   if len(neuronal_pop) < 1: return 0.0
   spkts = np.array(sim.simData['spkt'])
   spkids = np.array(sim.simData['spkid'])
   ctspkids = spkids[(spkts>=trange[0])&(spkts <= trange[1])]
-  pop_firingrates = {}
+  pop_firingrates = {cellid:0 for cellid in neuronal_pop}
   if len(spkts)>0:
     for cellid in neuronal_pop:
-      pop_firingrates[cellid] = 1000.0*len(np.where(ctspkids==cellid))/(trange[1]-trange[0])
+      pop_firingrates[cellid] = 1000.0*len(np.where(ctspkids==cellid)[0])/(trange[1]-trange[0])
   return pop_firingrates
 
-def getFiringRateWithIntervalAllNeurons (sim, trange, allpops):
+def getFiringRateWithIntervalAllNeurons (sim, trange, lpop):
   lgid = []
-  for pop in allpops:
+  for pop in lpop:
     for gid in sim.net.pops[pop].cellGids:
       lgid.append(gid)
-  sim.dFR = getFiringRateWithInterval(trange = trange, neuronal_pop = lgid)
+  sim.dFR = getFiringRateWithInterval(trange, lgid)
 
 def adjustTargetWBasedOnFiringRates (sim):
   dshift = dconf['net']['homPlast']['dshift'] # shift in weights to push within min,max firing rate bounds
+  dscale = dconf['net']['homPlast']['dscale'] # shift in weights to push within min,max firing rate bounds  
   for gid,cTargetW in sim.dTargetW.items():
     cTargetFRMin, cTargetFRMax = sim.dMINTargetFR[gid], sim.dMAXTargetFR[gid]
     if gid not in sim.dFR: continue
     cFR = sim.dFR[gid] # current cell firing rate
     if cFR>cTargetFRMax: # above max threshold firing rate
-      if dshift == 0.0:
-        sim.dTargetW[gid] *= cTargetFRMax / cFR
-      else:
+      #print('Target W DOWN',sim.rank,gid,'rate=',cFR,sim.dTargetW[gid],sim.dTargetW[gid] * (1.0 - dscale))
+      if dshift != 0.0:
         sim.dTargetW[gid] -= dshift
-    elif cFR<cTargetFRMin: # below min threshold firing rate
-      if dshift == 0:
-        sim.dTargetW[gid] *= cTargetFRMin / cFR 
+      elif dscale != 0.0:
+        sim.dTargetW[gid] *= (1.0 - dscale)
       else:
+        sim.dTargetW[gid] *= cTargetFRMax / cFR
+    elif cFR<cTargetFRMin: # below min threshold firing rate
+      #print('Target W UP',sim.rank,gid,'rate=',cFR,sim.dTargetW[gid],sim.dTargetW[gid] * (1.0 + dscale))
+      if dshift != 0.0:
         sim.dTargetW[gid] += dshift
+      elif dscale != 0.0:
+        sim.dTargetW[gid] *= (1.0 + dscale)
+      else:
+        sim.dTargetW[gid] *= cTargetFRMin / cFR 
   return sim.dTargetW
 
 def adjustWeightsBasedOnFiringRates (sim,lpop,synType='AMPA'):
@@ -1519,6 +1523,8 @@ def adjustWeightsBasedOnFiringRates (sim,lpop,synType='AMPA'):
   for pop in lpop:
     lcell = [c for c in sim.net.cells if c.gid in sim.net.pops[pop].cellGids] # this is the set of cells in a pop
     for cell in lcell:
+      cFR = sim.dFR[cell.gid]
+      if cFR >= sim.dMINTargetFR[cell.gid] and cFR <= sim.dMAXTargetFR[cell.gid]: continue # only change weights if firing rate outside bounds
       targetW = sim.dTargetW[cell.gid]
       cCellW = 0
       for conn in cell.conns:
@@ -1526,19 +1532,23 @@ def adjustWeightsBasedOnFiringRates (sim,lpop,synType='AMPA'):
           cCellW+=conn['hObj'].weight[0]
       if cCellW>0: # if no weight associated with the specific type of synapses, no need to asdjust weights.
         sfctr = targetW/cCellW
-        if sfctr>1: countScaleUps += 1
-        elif sfctr<1: countScaleDowns += 1
-        for conn in cell.conns:
-          if conn.synMech==synType and 'hSTDP' in conn:
-            conn['hObj'].weight[0] *= sfctr
-  print('CountScaleUps, CountScaleDowns: ', countScaleUps, countScaleDowns)
+        if sfctr>1:
+          countScaleUps += 1
+          #print('W UP',sim.rank,cell.gid,sfctr)
+        elif sfctr<1:
+          countScaleDowns += 1
+          #print('W DOWN',sim.rank,cell.gid,sfctr)
+        if sfctr != 1.0:
+          for conn in cell.conns:
+            if conn.synMech==synType and 'hSTDP' in conn:
+              conn['hObj'].weight[0] *= sfctr
+  print(sim.rank,'adjust W: UP=', countScaleUps, ', DOWN=', countScaleDowns)
 
 def trainAgent (t):
   """ training interface between simulation and game environment
   """
   global NBsteps, epCount, proposed_actions, total_hits, fid4, tstepPerAction
   vec = h.Vector()
-  noWinner = False # no clear winner for the population firing rates (used below)
   if t<(tstepPerAction*dconf['actionsPerPlay']): # for the first time interval use randomly selected actions
     actions =[]
     for _ in range(int(dconf['actionsPerPlay'])):
@@ -1547,32 +1557,21 @@ def trainAgent (t):
   else: #the actions should be based on the activity of motor cortex (EMUP, EMDOWN)
     F_UPs = []
     F_DOWNs = []
-    F_STAYs = []
     for ts in range(int(dconf['actionsPerPlay'])):
       ts_beg = t-tstepPerAction*(dconf['actionsPerPlay']-ts-1) 
       ts_end = t-tstepPerAction*(dconf['actionsPerPlay']-ts)
       F_UPs.append(getSpikesWithInterval([ts_end,ts_beg], sim.net.pops['EMUP'].cellGids))
       F_DOWNs.append(getSpikesWithInterval([ts_end,ts_beg], sim.net.pops['EMDOWN'].cellGids))
-      if dnumc['EMSTAY']>0:
-        F_STAYs.append(getSpikesWithInterval([ts_end,ts_beg], sim.net.pops['EMSTAY'].cellGids))
     sim.pc.allreduce(vec.from_python(F_UPs),1) #sum
     F_UPs = vec.to_python()
     sim.pc.allreduce(vec.from_python(F_DOWNs),1) #sum
     F_DOWNs = vec.to_python()
-    if dnumc['EMSTAY']>0:
-      sim.pc.allreduce(vec.from_python(F_STAYs),1) #sum
-      F_STAYs = vec.to_python()
     if sim.rank==0:
       if fid4 is None: fid4 = open(sim.MotorOutputsfilename,'w')
-      if dnumc['EMSTAY']>0:
-        print('t=',round(t,2),' U,D,S spikes:', F_UPs, F_DOWNs, F_STAYs)
-      else:
-        print('t=',round(t,2),' U,D spikes:', F_UPs, F_DOWNs)
+      print('t=',round(t,2),' U,D spikes:', F_UPs, F_DOWNs)
       fid4.write('%0.1f' % t)
       for ts in range(int(dconf['actionsPerPlay'])): fid4.write('\t%0.1f' % F_UPs[ts])
       for ts in range(int(dconf['actionsPerPlay'])): fid4.write('\t%0.1f' % F_DOWNs[ts])
-      if dnumc['EMSTAY']>0:
-        for ts in range(int(dconf['actionsPerPlay'])): fid4.write('\t%0.1f' % F_STAYs[ts])
       fid4.write('\n')
       actions = []
       if dconf['randmove']:
@@ -1595,27 +1594,15 @@ def trainAgent (t):
         sim.lastMove = actions[-1]
       else:
         for ts in range(int(dconf['actionsPerPlay'])):
-          if dnumc['EMSTAY']>0: 
-            if (F_UPs[ts]>F_DOWNs[ts]) and (F_UPs[ts]>F_STAYs[ts]): # UP WINS vs ALL
-              actions.append(dconf['moves']['UP'])
-            elif (F_DOWNs[ts]>F_UPs[ts]) and (F_DOWNs[ts]>F_STAYs[ts]): # DOWN WINS vs ALL
-              actions.append(dconf['moves']['DOWN'])
-            elif (F_STAYs[ts]>F_UPs[ts]) and (F_STAYs[ts]>F_DOWNs[ts]): # STAY WINS vs ALL
-              actions.append(dconf['moves']['NOMOVE']) # No move
-            else: 
-              actions.append(dconf['moves']['NOMOVE']) # No move but also no clear winner
-              noWinner = True
+          if F_UPs[ts]>F_DOWNs[ts]: # UP WINS
+            actions.append(dconf['moves']['UP'])
+          elif F_DOWNs[ts]>F_UPs[ts]: # DOWN WINS
+            actions.append(dconf['moves']['DOWN'])
+          elif dconf['0rand'] and F_DOWNs[ts]==0 and F_UPs[ts]==0: # random move when 0 rate for both pops?
+            lmoves = list(dconf['moves'].values())
+            actions.append(lmoves[np.random.randint(0,len(lmoves))])
           else:
-            if F_UPs[ts]>F_DOWNs[ts]: # UP WINS
-              actions.append(dconf['moves']['UP'])
-            elif F_DOWNs[ts]>F_UPs[ts]: # DOWN WINS
-              actions.append(dconf['moves']['DOWN'])
-            elif dconf['0rand'] and F_DOWNs[ts]==0 and F_UPs[ts]==0: # random move when 0 rate for both pops?
-              lmoves = list(dconf['moves'].values())
-              actions.append(lmoves[np.random.randint(0,len(lmoves))])
-            else:
-              actions.append(dconf['moves']['NOMOVE']) # No move
-              noWinner = True
+            actions.append(dconf['moves']['NOMOVE']) # No move
   if sim.rank == 0:
     rewards, epCount, proposed_actions, total_hits, FollowTargetSign = sim.AIGame.playGame(actions, epCount, t)
     print('t=',round(t,2),'proposed,model action:', proposed_actions,actions)
@@ -1668,9 +1655,6 @@ def trainAgent (t):
     DOWNactions = np.sum(np.where(np.array(actions)==dconf['moves']['DOWN'],1,0))
     sim.pc.py_broadcast(UPactions,0) # broadcast UPactions
     sim.pc.py_broadcast(DOWNactions,0) # broadcast DOWNactions
-    if dnumc['EMSTAY']>0:
-      STAYactions = np.sum(np.where(np.array(actions)==dconf['moves']['NOMOVE'],1,0))
-      sim.pc.py_broadcast(STAYactions,0) # broadcast STAYactions
     if dconf['sim']['anticipatedRL']:
       print(proposed_actions)
       sim.pc.py_broadcast(proposed_actions,0) # used proposed actions to target/potentiate the pop representing anticipated action.      
@@ -1678,11 +1662,9 @@ def trainAgent (t):
     critic = sim.pc.py_broadcast(None, 0) # receive critic value from master node
     UPactions = sim.pc.py_broadcast(None, 0)
     DOWNactions = sim.pc.py_broadcast(None, 0)
-    if 'EMSTAY' in dconf['net']: STAYactions = sim.pc.broadcast(None, 0)
     if dconf['sim']['anticipatedRL']: proposed_actions = sim.pc.py_broadcast(None, 0)      
-    if dconf['verbose']:
-      if dnumc['EMSTAY']>0: print('UPactions: ', UPactions,'DOWNactions: ', DOWNactions, 'STAYactions: ', STAYactions)
-      else: print('UPactions: ', UPactions,'DOWNactions: ', DOWNactions)
+    if dconf['verbose']>1:
+      print('UPactions: ', UPactions,'DOWNactions: ', DOWNactions)
       
   if dconf['sim']['anticipatedRL']:
     cpaction = proposed_actions 
@@ -1693,59 +1675,31 @@ def trainAgent (t):
     elif cpaction==dconf['moves']['DOWN']:
       if dconf['verbose']: print('APPLY RL to EMDOWN')
       for STDPmech in dSTDPmech['EMDOWN']: STDPmech.reward_punish(float(anticipated_reward))
-    elif cpaction==dconf['moves']['NOMOVE'] and dnumc['EMSTAY']>0:
-      if dconf['verbose']: print('APPLY RL to EMSTAY')
-      for STDPmech in dSTDPmech['EMSTAY']: STDPmech.reward_punish(float(anticipated_reward))
     else:
       print('No anticipated action for the input!!!')
   else:
     if critic != 0: # if critic signal indicates punishment (-1) or reward (+1)
       if sim.rank==0: print('t=',round(t,2),'RLcritic:',critic)
-      if dnumc['EMSTAY']>0:
-        if dconf['sim']['targettedRL']:
-          if not noWinner: # if there's a clear winner in terms of firing rates
-            if UPactions>DOWNactions and UPactions>STAYactions: # UP WINS vs ALL
-              if dconf['verbose']: print('APPLY RL to EMUP')
-              for STDPmech in dSTDPmech['EMUP']: STDPmech.reward_punish(float(critic))
-            elif DOWNactions>UPactions and DOWNactions>STAYactions: # DOWN WINS vs ALL
-              if dconf['verbose']: print('APPLY RL to EMDOWN')
-              for STDPmech in dSTDPmech['EMDOWN']: STDPmech.reward_punish(float(critic))
-            elif STAYactions>UPactions and STAYactions>DOWNactions: # STAY WINS vs ALL
-              if dconf['verbose']: print('APPLY RL to EMSTAY')
-              for STDPmech in dSTDPmech['EMSTAY']: STDPmech.reward_punish(float(critic))
-            elif UPactions==DOWNactions and UPactions>STAYactions: # UP and DOWN TIED
-              if dconf['verbose']: print('APPLY RL to EMUP and EMDOWN')
-              for STDPmech in dSTDPmech['EMUP']: STDPmech.reward_punish(float(critic))
-              for STDPmech in dSTDPmech['EMDOWN']: STDPmech.reward_punish(float(critic))
-            elif UPactions==STAYactions and UPactions>DOWNactions: # UP and STAY TIED
-              if dconf['verbose']: print('APPLY RL to EMUP and EMSTAY')
-              for STDPmech in dSTDPmech['EMUP']: STDPmech.reward_punish(float(critic))
-              for STDPmech in dSTDPmech['EMSTAY']: STDPmech.reward_punish(float(critic))
-            elif DOWNactions==STAYactions and DOWNactions>UPactions: # DOWN and STAY TIED
-              if dconf['verbose']: print('APPLY RL to EMDOWN and EMSTAY')
-              for STDPmech in dSTDPmech['EMDOWN']: STDPmech.reward_punish(float(critic))
-              for STDPmech in dSTDPmech['EMSTAY']: STDPmech.reward_punish(float(critic))
-            elif DOWNactions==STAYactions and UPactions==STAYactions: # ALL actions TIED
-              if dconf['verbose']: print('APPLY RL to EMUP, EMDOWN and EMSTAY')
-              for STDPmech in dSTDPmech['all']: STDPmech.reward_punish(float(critic))      
-        else:
-          if dconf['verbose']: print('APPLY RL to EMUP, EMDOWN and EMSTAY')
-          for STDPmech in dSTDPmech['all']: STDPmech.reward_punish(float(critic))
-      else:
-        if dconf['sim']['targettedRL']:
-          if not noWinner: # if there's a clear winner in terms of firing rates
-            if UPactions==DOWNactions:
-              if dconf['verbose']: print('APPLY RL to both EMUP and EMDOWN')
-              for STDPmech in dSTDPmech['all']: STDPmech.reward_punish(float(critic))          
-            elif UPactions>DOWNactions: # UP WINS vs DOWN
-              if dconf['verbose']: print('APPLY RL to EMUP')
-              for STDPmech in dSTDPmech['EMUP']: STDPmech.reward_punish(float(critic))
-            elif DOWNactions>UPactions: # DOWN WINS vs UP
-              if dconf['verbose']: print('APPLY RL to EMDOWN')
-              for STDPmech in dSTDPmech['EMDOWN']: STDPmech.reward_punish(float(critic))        
-        else:
+      if dconf['sim']['targettedRL']:
+        if UPactions==DOWNactions and \
+           sum(F_UPs)>0 and sum(F_DOWNs)>0: # same number of actions/spikes -> stay; only apply critic when > 0 spikes
           if dconf['verbose']: print('APPLY RL to both EMUP and EMDOWN')
-          for STDPmech in dSTDPmech['all']: STDPmech.reward_punish(critic)
+          for STDPmech in dSTDPmech['all']: STDPmech.reward_punish(float(critic))          
+        elif UPactions>DOWNactions: # UP WINS vs DOWN
+          if dconf['verbose']: print('APPLY RL to EMUP')
+          for STDPmech in dSTDPmech['EMUP']: STDPmech.reward_punish(float(critic))
+          if dconf['sim']['targettedRL']==3 and sum(F_DOWNs)>0: # opposite to pop that did not contribute
+            if dconf['verbose']: print('APPLY -RL to EMDOWN')
+            for STDPmech in dSTDPmech['EMDOWN']: STDPmech.reward_punish(float(-critic))
+        elif DOWNactions>UPactions: # DOWN WINS vs UP
+          if dconf['verbose']: print('APPLY RL to EMDOWN')
+          for STDPmech in dSTDPmech['EMDOWN']: STDPmech.reward_punish(float(critic))
+          if dconf['sim']['targettedRL']==3 and sum(F_UPs)>0: # opposite to pop that did not contribute
+            if dconf['verbose']: print('APPLY -RL to EMUP')            
+            for STDPmech in dSTDPmech['EMUP']: STDPmech.reward_punish(float(-critic))              
+      else:
+        if dconf['verbose']: print('APPLY RL to both EMUP and EMDOWN')
+        for STDPmech in dSTDPmech['all']: STDPmech.reward_punish(critic)
   if sim.rank==0:
     # print('t=',round(t,2),' game rewards:', rewards) # only rank 0 has access to rewards      
     for action in actions: sim.allActions.append(action)
@@ -1771,16 +1725,18 @@ def trainAgent (t):
     sim.pc.barrier()    
   if dconf['net']['homPlast']['On']:
     if NBsteps % dconf['net']['homPlast']['hsIntervalSteps'] == 0:
+      if sim.rank==0: print('adjustTargetWBasedOnFiringRates')
       hsInterval = tstepPerAction*dconf['actionsPerPlay']*dconf['net']['homPlast']['hsIntervalSteps']
-      getFiringRateWithIntervalAllNeurons(sim, [t,t-hsInterval], sim.dHPlastPops) # call this function at hsInterval
+      getFiringRateWithIntervalAllNeurons(sim, [t-hsInterval,t], sim.dHPlastPops) # call this function at hsInterval
       adjustTargetWBasedOnFiringRates(sim) # call this function at hsInterval
     if NBsteps % dconf['net']['homPlast']['updateIntervalSteps'] == 0:
+      if sim.rank==0: print('adjustWeightsBasedOnFiringRates')
       adjustWeightsBasedOnFiringRates(sim,sim.dHPlastPops,synType=dconf['net']['homPlast']['synType'])
+      sim.pc.barrier()
 
 def getAllSTDPObjects (sim):
   # get all the STDP objects from the simulation's cells
   Mpops = ['EMUP', 'EMDOWN']  
-  if dnumc['EMSTAY']>0: Mpops.append('EMSTAY')
   dSTDPmech = {'all':[]} # dictionary of STDP objects keyed by type (all, for EMUP, EMDOWN populations)
   for pop in Mpops: dSTDPmech[pop] = []
   if dconf['sim']['targettedRL']: dcell = {pop:[] for pop in Mpops} # SN: exptl  
@@ -1837,11 +1793,6 @@ sim.setupRecording()                  # setup variables to record for each cell 
 
 dSTDPmech = getAllSTDPObjects(sim) # get all the STDP objects up-front
 
-if dconf['net']['homPlast']['On']:
-  # call this once before the simulation
-  initTargetFR(sim,dconf['net']['homPlast']['mintargetFR'],dconf['net']['homPlast']['maxtargetFR']) 
-  initTargetW(sim,list(dconf['net']['homPlast']['mintargetFR'].keys()),synType=dconf['net']['homPlast']['synType']) # call this once before running the simulation.
-
 def updateSTDPWeights (sim, W):
   #this function assign weights stored in 'ResumeSimFromFile' to all connections by matching pre and post neuron ids  
   # get all the simulation's cells (on a given node)
@@ -1876,6 +1827,12 @@ if dconf['simtype']['ResumeSim']:
         sim.pc.barrier() # wait for other nodes
   except:
     print('Could not restore STDP weights from file.')
+
+if dconf['net']['homPlast']['On']:
+  # call this once before the simulation
+  initTargetFR(sim,dconf['net']['homPlast']['mintargetFR'],dconf['net']['homPlast']['maxtargetFR'])
+  # call this once before running the simulation.    
+  initTargetW(sim,list(dconf['net']['homPlast']['mintargetFR'].keys()),synType=dconf['net']['homPlast']['synType']) 
 
 def setdminID (sim, lpop):
   # setup min ID for each population in lpop

@@ -39,25 +39,25 @@
     "stayStepLim": 0,
     "simtype": {
         "ResumeSim": 1,
-        "ResumeSimFromFile": "data/20nov17_A0_cycle_synWeights_final.pkl"
+	"ResumeSimFromFile": "data/20nov26_20nov24_C0_gcp_cycle__step_2_synWeights_final_shuffled.pkl"
     },
     "sim": {
-        "duration": 500000,
+        "duration": 1000000,
         "dt": 0.6,
         "verbose": 0,
         "recordStep": 1.0,
-        "recordWeightStepSize": 500,
-        "normalizeWeightStepSize": 500,
+        "recordWeightStepSize": 5000,
+        "normalizeWeightStepSize": 5000000000000000000000000000000,
 	"normalizeWeightsAtStart": 0,
         "RLFakeUpRule": 0,
         "RLFakeDownRule": 0,
         "RLFakeStayRule": 0,
-        "name": "20nov17_A1_cycle_",
+        "name": "20nov26_load_shuffle_weight_test_C0_gcp__step_2_C1_",
         "doquit": 1,
         "doplot": 0,
         "saveCellSecs": 0,
         "saveCellConns": 0,
-        "targettedRL": 1,
+        "targettedRL": 3,
         "tstepPerAction": 20,
         "saveWeights": 1,
         "saveAssignedFiringRates": 0,
@@ -103,14 +103,12 @@
 	    "IA2": 25,	    
 	    "EMDOWN":300,
 	    "EMUP":300,
-	    "EMSTAY":0,
 	    "IM":300,
 	    "IMUP": 0,
-	    "IMDOWN": 0,
-	    "IMSTAY": 0},
-	"ETypes": ["ER","EV1","EV1DE","EV1DNE","EV1DN","EV1DNW","EV1DW","EV1DSW","EV1DS","EV1DSE","EV4","EMT","EMDOWN","EMUP","EMSTAY","EA","EA2"],
-	"ITypes": ["IR","IV1","IV4","IMT","IM","ID","IMUP","IMDOWN","IMSTAY","IA","IA2"],
-	"EMotorPops": ["EMDOWN", "EMUP", "EMSTAY"],
+	    "IMDOWN": 0},
+	"ETypes": ["ER","EV1","EV1DE","EV1DNE","EV1DN","EV1DNW","EV1DW","EV1DSW","EV1DS","EV1DSE","EV4","EMT","EMDOWN","EMUP","EA","EA2"],
+	"ITypes": ["IR","IV1","IV4","IMT","IM","ID","IMUP","IMDOWN","IA","IA2"],
+	"EMotorPops": ["EMDOWN", "EMUP"],
 	"EVPops": ["EV1","EV1DE","EV1DNE","EV1DN","EV1DNW","EV1DW","EV1DSW","EV1DS","EV1DSE","EV4","EMT"],
         "EVDirPops": ["EV1DE","EV1DNE","EV1DN","EV1DNW","EV1DW","EV1DSW","EV1DS","EV1DSE"],
 	"IVDirPops": ["ID"],
@@ -122,22 +120,22 @@
             "IR":{"ER":5},
             "EV1":{"ER":3},
             "IV1":{"EV1":5,"ER":5},
-            "EV4":{"EV1":3,"EMDOWN":3,"EMUP":3,"EMSTAY":3},
+            "EV4":{"EV1":3,"EMDOWN":3,"EMUP":3},
             "IV4":{"EV4":5,"EV1":5},
-            "EMT":{"EV4":3,"EMDOWN":3,"EMUP":3,"EMSTAY":3},
+            "EMT":{"EV4":3,"EMDOWN":3,"EMUP":3},
             "IMT":{"EMT":5,"EV4":5}
         },
         "alltopolconvcons":{
-            "ER":{"IR":3,"EV1":3,"EMDOWN":3,"EMUP":3,"EMSTAY":3},
-            "EV1":{"IV1":3,"EV4":3,"EMDOWN":3,"EMUP":3,"EMSTAY":3},
-            "EV1DE":{"EMDOWN":3,"EMUP":3,"EMSTAY":3},
-            "EV1DNE":{"EMDOWN":3,"EMUP":3,"EMSTAY":3},
-            "EV1DN":{"EMDOWN":3,"EMUP":3,"EMSTAY":3},
-            "EV1DNW":{"EMDOWN":3,"EMUP":3,"EMSTAY":3},
-            "EV1DW":{"EMDOWN":3,"EMUP":3,"EMSTAY":3},
-            "EV1DSW":{"EMDOWN":3,"EMUP":3,"EMSTAY":3},
-            "EV1DS":{"EMDOWN":3,"EMUP":3,"EMSTAY":3},
-            "EV1DSE":{"EMDOWN":3,"EMUP":3,"EMSTAY":3},
+            "ER":{"IR":3,"EV1":3,"EMDOWN":3,"EMUP":3},
+            "EV1":{"IV1":3,"EV4":3,"EMDOWN":3,"EMUP":3},
+            "EV1DE":{"EMDOWN":3,"EMUP":3},
+            "EV1DNE":{"EMDOWN":3,"EMUP":3},
+            "EV1DN":{"EMDOWN":3,"EMUP":3},
+            "EV1DNW":{"EMDOWN":3,"EMUP":3},
+            "EV1DW":{"EMDOWN":3,"EMUP":3},
+            "EV1DSW":{"EMDOWN":3,"EMUP":3},
+            "EV1DS":{"EMDOWN":3,"EMUP":3},
+            "EV1DSE":{"EMDOWN":3,"EMUP":3},
             "IV1":{"IV4":5},
             "EV4":{"IV4":3,"EMT":3},
             "IV4":{"IMT":5},
@@ -195,8 +193,7 @@
 		"VL":{"AM":4,"NM":0.6,"p":0},
 		"EA":{"AM":2.6,"NM":0.26,"p":0.1},
 		"EMDOWN":{"AM":1,"NM":0.0,"p":0.08},
-		"EMUP":{"AM":1,"NM":0.0,"p":0.08},
-		"EMSTAY":{"AM":1,"NM":0.0,"p":0.08}		
+		"EMUP":{"AM":1,"NM":0.0,"p":0.08}
 	    },
 	    "VD":{
 		"VL":{"AM":0,"NM":0,"p":0},
@@ -204,25 +201,24 @@
 		"EA":{"AM":2.6,"NM":0.26,"p":0.1},
 		"EMDOWN":{"AM":0.5,"NM":0.0,"p":0.08},
 		"EMUP":{"AM":0.5,"NM":0.0,"p":0.08},
-		"EMSTAY":{"AM":0.5,"NM":0.0,"p":0.08},
 		"ID": {"AM":10, "p":0.03}
 	    },
 	    "EM":{
-		"EM":{"AM":1.2,"NM":0.0,"p":0.1},
+		"EM":{"AM":1.3,"NM":0.0,"p":0.1},
 		"EA":{"AM":0,"NM":0,"p":0.0},
 		"IRecip": {"AM":20, "NM":0, "p":0.0625},
 		"IM":{"AM":10,"p":0.15}
 	    },
 	    "EA":{
 		"EA":{"AM":1.2,"NM":0.12,"p":0.0},
-		"EA2":{"AM":1.2,"NM":0.0,"p":0.15},
-		"EM":{"AM":1.2,"NM":0.0,"p":0.15},
+		"EA2":{"AM":1.3,"NM":0.0,"p":0.15},
+		"EM":{"AM":1.3,"NM":0.0,"p":0.15},
 		"IA":{"AM": 10, "p":0.1}
 	    },
 	    "EA2":{
 		"EA":{"AM":1.2,"NM":0.12,"p":0.0},
-		"EA2":{"AM":1.2,"NM":0.0,"p":0.15},
-		"EM":{"AM":1.2,"NM":0.0,"p":0.15},
+		"EA2":{"AM":1.3,"NM":0.0,"p":0.15},
+		"EM":{"AM":1.3,"NM":0.0,"p":0.15},
 		"IA2":{"AM": 10, "p":0.15}
 	    },	   	    
 	    "IR": {
@@ -273,9 +269,6 @@
 	    "IMDOWN": {
 		"IMDOWN": {"GA":2.5, "p":0.15}
 	    },
-	    "IMSTAY": {
-		"IMSTAY": {"GA":2.5, "p":0.15}
-	    },
 	    "ER": {
 		"EV1": {"AM": 4.0, "NM": 0.6, "p":0.1}
 	    },
@@ -295,7 +288,7 @@
 	    }
 	},	
         "EEMWghtThreshMin": 0.9,
-        "EEMWghtThreshMax": 4,
+        "EEMWghtThreshMax": 1.31,
         "EEMPopNorm": 1,
 	"CellWNorm": {
 	    "On": 0,
@@ -384,7 +377,7 @@
             "RLlenhebb": 200,
             "RLlenanti": 200,
             "useRLexp": 1,
-            "RLhebbwt": 0.005,
+            "RLhebbwt": 0.0,
             "RLantiwt": 0,
             "hebbwt": 0.0,
             "antiwt": 0.0,
@@ -417,7 +410,7 @@
     "Noise": {
         "I": {
             "Rate": 0,
-            "Weight": 0.01
+            "Weight": 0.1
         },
         "E": {
             "Rate": 0,

@@ -62,7 +62,17 @@ def savefinalweights (pdf, simstr):
   # save final weights to a (small) file
   pdfs = pdf[pdf.time==np.amax(pdf.time)]
   D = pdf2weightsdict(pdfs)
-  pickle.dump(D, open('data/'+simstr+'synWeights_final.pkl','wb'))  
+  pickle.dump(D, open('data/'+simstr+'synWeights_final.pkl','wb'))
+
+def shuffleweights (pdf):
+  # shuffle the weights
+  npwt = np.array(pdf.weight)
+  np.random.shuffle(npwt)
+  Ashuf = np.array([pdf.time,pdf.preid,pdf.postid,npwt]).T
+  pdfshuf = pd.DataFrame(Ashuf,columns=['time','preid','postid','weight'])
+  return pdfshuf
+  #D = pdf2weightsdict(pdfshuf);
+  #return D
 
 def getsimname (name=None):
   if name is None:
@@ -152,9 +162,10 @@ def animActivityMaps (outpath='gif/'+dconf['sim']['name']+'actmap.mp4', framerat
   # plot activity in different layers as a function of input images  
   ioff()
   possible_pops = ['ER','EV1','EV4','EMT','IR','IV1','IV4','IMT','EV1DW','EV1DNW','EV1DN'\
-                   ,'EV1DNE','EV1DE','EV1DSW','EV1DS', 'EV1DSE','EMDOWN','EMUP','EMSTAY','IM']
+                   ,'EV1DNE','EV1DE','EV1DSW','EV1DS', 'EV1DSE','EMDOWN','EMUP','IM','EA','IA','EA2','IA2']
   possible_titles = ['Excit R', 'Excit V1', 'Excit V4', 'Excit MT', 'Inhib R', 'Inhib V1', 'Inhib V4', 'Inhib MT',\
-                     'W','NW','N','NE','E','SW','S','SE','Excit M DOWN', 'Excit M UP', 'Excit M STAY', 'Inhib M']
+                     'W','NW','N','NE','E','SW','S','SE','Excit M DOWN', 'Excit M UP', 'Excit M STAY', 'Inhib M',\
+                     'Excit A' , 'Inhib A', 'Excit A2', 'Inhib A2']
   dtitle = {p:t for p,t in zip(possible_pops,possible_titles)}
   ltitle = ['Input Images']
   lact = [InputImages]; lvmax = [255];
@@ -188,9 +199,10 @@ def animActivityMaps (outpath='gif/'+dconf['sim']['name']+'actmap.mp4', framerat
     else:
       offidx=0
     if ldx==flowdx:
-      X, Y = np.meshgrid(np.arange(0, InputImages[0].shape[1], 1), np.arange(0,InputImages[0].shape[0],1))
+      flowrow,flowcol = int(np.sqrt(dnumc['EV1DE'])),int(np.sqrt(dnumc['EV1DE']))
+      X, Y = np.meshgrid(np.arange(0, flowcol, 1), np.arange(0,flowrow,1))
       ddat[ldx] = ax.quiver(X,Y,ldflow[0]['flow'][:,:,0],-ldflow[0]['flow'][:,:,1], pivot='mid', units='inches',width=0.022,scale=1/0.15)
-      ax.set_xlim((0,InputImages[0].shape[1])); ax.set_ylim((0,InputImages[0].shape[0]))
+      ax.set_xlim((0,flowcol)); ax.set_ylim((0,flowrow))
       ax.invert_yaxis()              
       continue
     else:
@@ -268,7 +280,8 @@ def viewInput (t, InputImages, ldflow, dhist, lpop = None, lclr = ['r','b'], twi
   
 
 #
-def animInput (InputImages, outpath, framerate=10, figsize=None, showflow=False, ldflow=None, dobjpos=None):
+def animInput (InputImages, outpath, framerate=10, figsize=None, showflow=False, ldflow=None, dobjpos=None,\
+               actreward=None, nframe=None):
   # animate the input images; showflow specifies whether to calculate/animate optical flow
   ioff()
   # plot input images and optionally optical flow
@@ -291,7 +304,7 @@ def animInput (InputImages, outpath, framerate=10, figsize=None, showflow=False,
     if ldx==0:
       pcm = ax.imshow( lact[idx][0,:,:], origin='upper', cmap='gray', vmin=0, vmax=lvmax[idx])
       ddat[ldx] = pcm
-      ax.set_ylabel(ltitle[idx])
+      # ax.set_ylabel(ltitle[idx])
       if dobjpos is not None:
         lobjx,lobjy = [objfctr*dobjpos[k][0,0] for k in dobjpos.keys()], [objfctr*dobjpos[k][0,1] for k in dobjpos.keys()]
         ddat['objpos'], = ax.plot(lobjx,lobjy,'ro')
@@ -301,8 +314,13 @@ def animInput (InputImages, outpath, framerate=10, figsize=None, showflow=False,
       ax.set_xlim((0,InputImages[0].shape[1])); ax.set_ylim((0,InputImages[0].shape[0]))
       ax.invert_yaxis()
     idx += 1
+  cumHits, cumMissed, cumScore = None,None,None
+  if actreward is not None:
+    cumHits, cumMissed, cumScore = getCumPerfCols(actreward)    
   def updatefig (t):
-    fig.suptitle('Time = ' + str(t*tstepPerAction) + ' ms')
+    stitle = 'Time = ' + str(t*tstepPerAction) + ' ms'
+    if cumHits is not None: stitle += '\nOpponent Points:'+str(cumMissed[t])+'   Model Points:'+str(cumScore[t]) + '   Model Hits:'+str(cumHits[t])
+    fig.suptitle(stitle)
     if t < 1: return fig # already rendered t=0 above
     print('frame t = ', str(t*tstepPerAction))    
     for ldx,ax in enumerate(lax):
@@ -315,7 +333,7 @@ def animInput (InputImages, outpath, framerate=10, figsize=None, showflow=False,
         ddat[ldx].set_UVC(ldflow[t]['flow'][:,:,0],-ldflow[t]['flow'][:,:,1])        
     return fig
   t1 = range(0,totalDur,tstepPerAction)
-  nframe = len(t1)
+  if nframe is None: nframe = len(t1)
   if showflow: nframe-=1
   ani = animation.FuncAnimation(fig, updatefig, interval=1, frames=nframe)
   writer = anim.getwriter(outpath, framerate=framerate)
@@ -362,7 +380,7 @@ def animDetectedMotionMaps (outpath, framerate=10, figsize=(7,3)):
   lfnimage = []
   lpop = ['ER', 'EV1', 'EV4', 'EMT', 'IR', 'IV1', 'IV4', 'IMT',\
           'EV1DW','EV1DNW', 'EV1DN', 'EV1DNE','EV1DE','EV1DSW', 'EV1DS', 'EV1DSE',\
-          'EMDOWN','EMUP','EMSTAY']  
+          'EMDOWN','EMUP']  
   dmaxSpk = OrderedDict({pop:np.max(dact[pop]) for pop in lpop})
   max_spks = np.max([dmaxSpk[p] for p in lpop])
   for pop in lpop:
@@ -483,11 +501,13 @@ def pravgrates(dspkT,dspkID,dnumc):
   for pop in dspkT.keys(): print(pop,round(getrate(dspkT,dspkID,pop,dnumc),2),'Hz')
 
 #
-def drawraster (dspkT,dspkID,tlim=None,msz=2):
+def drawraster (dspkT,dspkID,tlim=None,msz=2,skipstimMod=True):
   # draw raster (x-axis: time, y-axis: neuron ID)
+  lpop=list(dspkT.keys()); lpop.reverse()
+  lpop = [x for x in lpop if not skipstimMod or x.count('stimMod')==0]  
   csm=cm.ScalarMappable(cmap=cm.prism); csm.set_clim(0,len(dspkT.keys()))
   lclr = []
-  for pdx,pop in enumerate(list(dspkT.keys())):
+  for pdx,pop in enumerate(lpop):
     color = csm.to_rgba(pdx); lclr.append(color)
     plot(dspkT[pop],dspkID[pop],'o',color=color,markersize=msz)
   if tlim is not None:
@@ -495,10 +515,11 @@ def drawraster (dspkT,dspkID,tlim=None,msz=2):
   else:
     xlim((0,totalDur))
   xlabel('Time (ms)')
-  lclr.reverse(); lpop=list(dspkT.keys()); lpop.reverse()
+  #lclr.reverse(); 
   lpatch = [mpatches.Patch(color=c,label=s+' '+str(round(getrate(dspkT,dspkID,s,dnumc),2))+' Hz') for c,s in zip(lclr,lpop)]
   ax=gca()
   ax.legend(handles=lpatch,handlelength=1,loc='best')
+  ylim((0,sum([dnumc[x] for x in lpop])))
 
 #
 def drawcellVm (simConfig, ldrawpop=None,tlim=None, lclr=None):
@@ -631,6 +652,27 @@ def plotScoreLoss (actreward,ax=None,msz=3):
   ax.legend(('Score Point ('+str(cumScore[-1])+')','Lose Point ('+str(cumLoss[-1])+')'),loc='best')
   return cumScore[-1],cumLoss[-1]
 
+def getCumPerfCols (actreward):
+  # get cumulative performance arrays
+  action_times = np.array(actreward.time)
+  Hit_Missed = np.array(actreward.hit)
+  allMissed = np.where(Hit_Missed==-1,1,0)
+  cumMissed = np.cumsum(allMissed) #if a reward is -1, replace it with 1 else replace it with 0.  
+  cumScore = getCumScore(actreward)
+  #actreward['cumScoreRatio'] = cumScore/cumMissed # cumulative score/loss ratio
+  allproposed = actreward[(actreward.proposed!=-1)] # only care about cases when can suggest a proposed action
+  rewardingActions = np.where(allproposed.proposed-allproposed.action==0,1,0)
+  rewardingActions = np.cumsum(rewardingActions) # cumulative of rewarding action
+  cumActs = np.array(range(1,len(allproposed)+1))
+  #actreward['cumFollow'] = np.divide(rewardingActions,cumActs) # cumulative follow probability
+  allHit = np.where(Hit_Missed==1,1,0) 
+  allMissed = np.where(Hit_Missed==-1,1,0)
+  cumHits = np.cumsum(allHit) #cumulative hits evolving with time.
+  cumMissed = np.cumsum(allMissed) #if a reward is -1, replace it with 1 else replace it with 0.
+  #actreward['cumHitMissRatio'] = cumHits/cumMissed # cumulative hits/missed ratio
+  return cumHits, cumMissed, cumScore
+  
+
 def plotPerf (actreward,yl=(0,1)):
   # plot performance
   plotFollowBall(actreward,ax=subplot(1,1,1),cumulative=True,color='b');
@@ -647,14 +689,17 @@ def plotPerf (actreward,yl=(0,1)):
   ax.legend(handles=lpatch,handlelength=1)
   return ax
 
-def plotComparePerf (lpda, lclr, yl=(0,.55), lleg=None):
+def plotComparePerf (lpda, lclr, yl=(0,.55), lleg=None, skipfollow=False):
   # plot comparison of performance of list of action rewards dataframes in lpda
   # lclr is color to plot
   # lleg is optional legend
+  ngraph=3
+  if skipfollow: ngraph=2
   for pda,clr in zip(lpda,lclr):
-    plotFollowBall(pda,ax=subplot(1,3,1),cumulative=True,color=clr); ylim(yl)
-    plotHitMiss(pda,ax=subplot(1,3,2),lclr=[clr],asratio=True); ylim(yl)
-    plotScoreMiss(pda,ax=subplot(1,3,3),clr=clr,asratio=True); ylim(yl)
+    gdx=1
+    if not skipfollow: plotFollowBall(pda,ax=subplot(1,ngraph,gdx),cumulative=True,color=clr); ylim(yl); gdx+=1
+    plotHitMiss(pda,ax=subplot(1,ngraph,gdx),lclr=[clr],asratio=True); ylim(yl); gdx+=1
+    plotScoreMiss(pda,ax=subplot(1,ngraph,gdx),clr=clr,asratio=True); ylim(yl)
   if lleg is not None:
     lpatch = [mpatches.Patch(color=c,label=s) for c,s in zip(lclr,lleg)]
     ax=gca()
@@ -673,13 +718,11 @@ def getactsel (dhist, actreward):
   # get action selected based on firing rates in dhist (no check for consistency with sim.py)
   actsel = []
   for i in range(len(dhist['EMDOWN'][1])):
-    dspk, uspk, sspk = dhist['EMDOWN'][1][i], dhist['EMUP'][1][i], dhist['EMSTAY'][1][i]
-    if dspk > uspk and dspk > sspk:
+    dspk, uspk = dhist['EMDOWN'][1][i], dhist['EMUP'][1][i]
+    if dspk > uspk:
       actsel.append(dconf['moves']['DOWN'])
-    elif uspk > dspk and uspk > sspk:
+    elif uspk > dspk:
       actsel.append(dconf['moves']['UP'])
-    elif sspk > uspk and sspk > dspk:
-      actsel.append(dconf['moves']['NOMOVE'])
     else: # dspk == uspk:
       actsel.append(dconf['moves']['NOMOVE'])
   return actsel  
@@ -720,7 +763,7 @@ def plotMeanNeuronWeight (pdf,postid,clr='k',ax=None,msz=1,xl=None):
   ax.set_ylabel('Average weight'); 
   return wts    
   
-def plotMeanWeights (pdf,ax=None,msz=1,xl=None,lpop=['EMDOWN','EMUP','EMSTAY'],lclr=['k','r','b','g'],plotindiv=True,fsz=15,prety=None):
+def plotMeanWeights (pdf,ax=None,msz=1,xl=None,lpop=['EMDOWN','EMUP'],lclr=['k','r','b','g'],plotindiv=True,fsz=15,prety=None):
   #plot mean weights of all plastic synaptic weights onto lpop
   if ax is None: ax = gca()
   utimes = np.unique(pdf.time)
@@ -782,7 +825,7 @@ def animSynWeights (pdf, outpath='gif/'+dconf['sim']['name']+'weightmap.mp4', fr
     if c_src in dstartidx:
       lsrc.append(c_src)
   print('Source Pops: ', lsrc)
-  possible_targs = ['EMDOWN', 'EMUP','EMSTAY']
+  possible_targs = ['EMDOWN', 'EMUP']
   ltarg = []
   for c_targ in possible_targs:
     if c_targ in dstartidx:
@@ -793,10 +836,7 @@ def animSynWeights (pdf, outpath='gif/'+dconf['sim']['name']+'weightmap.mp4', fr
   dimg = {}; dline = {}; 
   def getwts (tdx, src):
     t = utimes[tdx]
-    if 'EMSTAY' in dstartidx:
-      ltarg = ['EMDOWN', 'EMUP','EMSTAY']
-    else:
-      ltarg = ['EMDOWN', 'EMUP']
+    ltarg = ['EMDOWN', 'EMUP']
     lout = []
     for targ in ltarg:
       cpdf = pdf[(pdf.time==t) & (pdf.postid>=dstartidx[targ]) & (pdf.postid<=dendidx[targ]) & (pdf.preid>=dstartidx[src]) & (pdf.preid<=dendidx[src])]
@@ -808,10 +848,7 @@ def animSynWeights (pdf, outpath='gif/'+dconf['sim']['name']+'weightmap.mp4', fr
       lout.append(lwt)
     return lout[0], lout[1]    
   minR,maxR = np.min(actreward.reward),np.max(actreward.reward)
-  if 'EMSTAY' in dstartidx:
-    minW,maxW = np.min([np.min(popwts['EMDOWN']),np.min(popwts['EMUP']),np.min(popwts['EMSTAY'])]), np.max([np.max(popwts['EMDOWN']),np.max(popwts['EMUP']),np.max(popwts['EMSTAY'])])
-  else:
-    minW,maxW = np.min([np.min(popwts['EMDOWN']),np.min(popwts['EMUP'])]), np.max([np.max(popwts['EMDOWN']),np.max(popwts['EMUP'])])
+  minW,maxW = np.min([np.min(popwts['EMDOWN']),np.min(popwts['EMUP'])]), np.max([np.max(popwts['EMDOWN']),np.max(popwts['EMUP'])])
   t = utimes[0]
   dline[1], = f_ax1.plot([t,t],[minR,maxR],'r',linewidth=0.2); f_ax1.set_xticks([])
   dline[2], = f_ax2.plot([t,t],[minW,maxW],'r',linewidth=0.2); f_ax2.set_xticks([])  
@@ -862,7 +899,7 @@ def plotavgweights (pdf):
     if c_src in dstartidx:
       lsrc.append(c_src)
   print('Source Pops: ', lsrc)
-  possible_targs = ['EMDOWN', 'EMUP','EMSTAY']
+  possible_targs = ['EMDOWN', 'EMUP']
   ltrg = []
   for c_targ in possible_targs:
     if c_targ in dstartidx:
@@ -876,15 +913,9 @@ def plotavgweights (pdf):
       subplot(12,1,gdx)
       plot(utimes,davgw[src+'->EMDOWN'],'r-',linewidth=3);
       plot(utimes,davgw[src+'->EMUP'],'b-',linewidth=3);
-      if 'EMSTAY' in dstartidx:
-        plot(utimes,davgw[src+'->EMSTAY'],'g-',linewidth=3);
-        legend((src+'->EMDOWN',src+'->EMUP',src+'->EMSTAY'),loc='upper left')
-      else:
-        legend((src+'->EMDOWN',src+'->EMUP'),loc='upper left')
+      legend((src+'->EMDOWN',src+'->EMUP'),loc='upper left')
       plot(utimes,davgw[src+'->EMDOWN'],'ro',markersize=10);
       plot(utimes,davgw[src+'->EMUP'],'bo',markersize=10);
-      if 'EMSTAY' in dstartidx:
-        plot(utimes,davgw[src+'->EMSTAY'],'go',markersize=10);       
       xlim((0,simConfig['simConfig']['duration']))
       ylabel('RL weights') 
       gdx += 1
@@ -905,7 +936,7 @@ def plotavgweightsPerPostSynNeuron1(pdf):
     ylim((-1.1,1.1))
     ylabel('critic')
     title('sum of weights on to post-synaptic neurons')
-    for trg in ['EMDOWN', 'EMUP','EMSTAY']:
+    for trg in ['EMDOWN', 'EMUP']:
       wperPostID[src+'->'+trg] = arr = []
       tstep = 0
       for t in utimes:
@@ -926,11 +957,6 @@ def plotavgweightsPerPostSynNeuron1(pdf):
     #legend((src+'->EMUP'),loc='upper left')       
     xlim((0,simConfig['simConfig']['duration']))
     ylabel(src+'->EMUP weights')
-    subplot(4,1,4)
-    plot(utimes,np.array(wperPostID[src+'->EMSTAY']),'g-o',linewidth=3,markersize=5) 
-    #legend((src+'->EMUP'),loc='upper left')       
-    xlim((0,simConfig['simConfig']['duration']))
-    ylabel(src+'->EMSTAY weights') 
     gdx += 1
     xlabel('Time (ms)')  
   return wperPostID
@@ -950,7 +976,7 @@ def plotavgweightsPerPostSynNeuron2(pdf):
     ylabel('critic')
     colorbar
     title('sum of weights on to post-synaptic neurons')
-    for trg in ['EMDOWN', 'EMUP','EMSTAY']:
+    for trg in ['EMDOWN', 'EMUP']:
       wperPostID[src+'->'+trg] = arr = []
       tstep = 0
       for t in utimes:
@@ -980,16 +1006,6 @@ def plotavgweightsPerPostSynNeuron2(pdf):
     xlim((-1,b2[-1]-1))
     ylabel(src+'->EMUP weights') 
     xlabel('Time (ms)')
-    subplot(4,1,4)
-    imshow(np.transpose(np.array(wperPostID[src+'->EMSTAY'])),aspect = 'auto',cmap='hot', interpolation='None') 
-    b2 = gca().get_xticks()
-    gca().set_xticks(b2-1)
-    gca().set_xticklabels((100*b2).astype(int))
-    colorbar(orientation='horizontal',fraction=0.05)
-    #legend((src+'->EMUP'),loc='upper left')       
-    xlim((-1,b2[-1]-1))
-    ylabel(src+'->EMSTAY weights') 
-    xlabel('Time (ms)')
   
 def plotIndividualSynWeights(pdf):
   #plot 10% randomly selected connections
@@ -1000,7 +1016,7 @@ def plotIndividualSynWeights(pdf):
   postNeuronIDs = {}
   #gdx = 2   
   for src in ['EV1','EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE', 'EV4', 'EMT']:
-    for trg in ['EMDOWN','EMUP','EMSTAY']:
+    for trg in ['EMDOWN','EMUP']:
       allweights[src+'->'+trg] = arr = []
       preNeuronIDs[src+'->'+trg] = arr2 = []
       postNeuronIDs[src+'->'+trg] = arr3 = []
@@ -1599,7 +1615,7 @@ if __name__ == '__main__':
     except:
       pass
   print(stepNB)
-  allpossible_pops = ['ER','IR','EV1','EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE','IV1','EV4','IV4','EMT','IMT','EMDOWN','EMUP','EMSTAY','IM']
+  allpossible_pops = ['ER','IR','EV1','EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE','IV1','EV4','IV4','EMT','IMT','EMDOWN','EMUP','IM']
   lpop = []
   for pop_ind in range(len(allpossible_pops)):
     cpop = allpossible_pops[pop_ind]
@@ -1621,6 +1637,8 @@ if __name__ == '__main__':
   #plotSynWeightsPostNeuronID(pdf,25)
   #plotSynWeightsPostNeuronID(pdf,35)
   #plotSynWeightsPostNeuronID(pdf,45)
-  #fig=animInput(InputImages,gifpath()+'_input.mp4')
+  #fig=animInput(InputImages,gifpath()+'_input.mp4')  
+  #figure(); drawcellVm(simConfig,lclr=['r','g','b','c','m','y'])
+  pravgrates(dspkT,dspkID,dnumc)
   #drawraster(dspkT,dspkID)
   #figure(); drawcellVm(simConfig,lclr=['r','g','b','c','m','y'])
