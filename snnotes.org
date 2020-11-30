@@ -23040,7 +23040,7 @@ savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/20nov27_20nov16_A0_test
 ok, shows improvement ... 
 
 * 20nov27
-** check output from 20nov26_C1_gcp_
+** check output from 20nov26_C1_gcp_ (this is sim that continued with weights fixed after learning)
 
 python -i simdat.py backupcfg/20nov26_C1_gcp_sim.json
 
@@ -23151,3 +23151,24 @@ close(); fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=
 [[./gif/20nov27_20nov26_load_shuffle_weight_test_C0_gcp__step_2_C1__no_reward_input.mp4]]
 [[./gif/20nov27_20nov26_load_shuffle_weight_test_C0_gcp__step_2_C1__with_reward_input.mp4]]
 
+* 20nov30
+** movies with reward but no opponent score -- and higher framerate for realtime
+
+to allow comparison between different versions performance relative to each other ... 
+
+also can make animation in real-time framerate of 50 frames / s (since 20 ms timestep)
+
+python -i simdat.py backupcfg/20nov26_C1_gcp_sim.json
+
+fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward,skipopp=True,framerate=50)
+[[./gif/20nov30_20nov26_C1_gcp__with_reward_input.mp4]]
+
+python -i simdat.py backupcfg/20nov26_random_move_G0_sim.json
+fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward,skipopp=True,framerate=50)
+[[./gif/20nov30_20nov26_random_move_G0__with_reward_input.mp4]]
+
+python -i simdat.py backupcfg/20nov24_C0_gcp__step_2_sim.json
+fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward,skipopp=True,framerate=50)
+[[./gif/20nov30_20nov24_C0_gcp__step_2__with_reward_input.mp4]]
+
+python -i simdat.py backupcfg/20nov26_load_shuffle_weight_test_C0_gcp__step_2_C1_sim.json

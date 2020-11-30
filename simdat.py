@@ -280,8 +280,8 @@ def viewInput (t, InputImages, ldflow, dhist, lpop = None, lclr = ['r','b'], twi
   
 
 #
-def animInput (InputImages, outpath, framerate=10, figsize=None, showflow=False, ldflow=None, dobjpos=None,\
-               actreward=None, nframe=None):
+def animInput (InputImages, outpath, framerate=50, figsize=None, showflow=False, ldflow=None, dobjpos=None,\
+               actreward=None, nframe=None, skipopp=False):
   # animate the input images; showflow specifies whether to calculate/animate optical flow
   ioff()
   # plot input images and optionally optical flow
@@ -319,7 +319,11 @@ def animInput (InputImages, outpath, framerate=10, figsize=None, showflow=False,
     cumHits, cumMissed, cumScore = getCumPerfCols(actreward)    
   def updatefig (t):
     stitle = 'Time = ' + str(t*tstepPerAction) + ' ms'
-    if cumHits is not None: stitle += '\nOpponent Points:'+str(cumMissed[t])+'   Model Points:'+str(cumScore[t]) + '   Model Hits:'+str(cumHits[t])
+    if cumHits is not None:
+      if skipopp:
+        stitle += '\nModel Points:'+str(cumScore[t]) + '   Model Hits:'+str(cumHits[t])
+      else:
+        stitle += '\nOpponent Points:'+str(cumMissed[t])+'   Model Points:'+str(cumScore[t]) + '   Model Hits:'+str(cumHits[t])        
     fig.suptitle(stitle)
     if t < 1: return fig # already rendered t=0 above
     print('frame t = ', str(t*tstepPerAction))    
