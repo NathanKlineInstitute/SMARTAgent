@@ -1140,6 +1140,21 @@ def plotSynWeightsPostNeuronID(pdf,postNeuronID):
     xlim((0,simConfig['simConfig']['duration']))
     pdx += 1        
 
+def getinputconnmap (simConfig, prety, postid, dnumc, dstartidx, synMech, asweight=False):
+  lcell = simConfig['net']['cells']
+  cell = lcell[postid]
+  nrow = ncol = int(np.sqrt(dnumc[prety]))
+  cmap = np.zeros((nrow,ncol))
+  for conn in cell['conns']:
+    if lcell[conn['preGid']]['tags']['cellType'] == prety and conn['synMech']==synMech:
+      x,y = gid2pos(dnumc[prety], dstartidx[prety], conn['preGid'])
+      if asweight:
+        cmap[y,x] = conn['weight']
+      else:
+        cmap[y,x] = 1
+  return cmap
+
+    
 #
 def getinputmap (pdf, t, prety, postid, poty, dnumc, dstartidx, dendidx, asweight=False):
   nrow = ncol = int(np.sqrt(dnumc[prety]))

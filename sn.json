@@ -39,10 +39,10 @@
     "stayStepLim": 0,
     "simtype": {
         "ResumeSim": 1,
-	"ResumeSimFromFile": "data/20nov26_20nov24_C0_gcp_cycle__step_2_synWeights_final_shuffled.pkl"
+	"ResumeSimFromFile": "data/20nov24_C0_gcp__step_2_synWeights_final.pkl"
     },
     "sim": {
-        "duration": 1000000,
+        "duration": 1000,
         "dt": 0.6,
         "verbose": 0,
         "recordStep": 1.0,
@@ -52,11 +52,11 @@
         "RLFakeUpRule": 0,
         "RLFakeDownRule": 0,
         "RLFakeStayRule": 0,
-        "name": "20nov26_load_shuffle_weight_test_C0_gcp__step_2_C1_",
+        "name": "20dec1_C1_cycle_",
         "doquit": 1,
         "doplot": 0,
         "saveCellSecs": 0,
-        "saveCellConns": 0,
+        "saveCellConns": 1,
         "targettedRL": 3,
         "tstepPerAction": 20,
         "saveWeights": 1,

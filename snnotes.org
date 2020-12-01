@@ -23175,3 +23175,94 @@ python -i simdat.py backupcfg/20nov26_load_shuffle_weight_test_C0_gcp__step_2_C1
 fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward,skipopp=True,framerate=50)
 [[./gif/20nov30_20nov26_load_shuffle_weight_test_C0_gcp__step_2_C1__with_reward_input.mp4]]
 
+* 20dec1
+** need to adjust getpopinputmap to use non plastic weights
+
+python -i simdat.py backupcfg/20nov26_C1_gcp_sim.json
+
+simConfig.keys() # dict_keys(['netpyne_version', 'netpyne_changeset', 'net', 'simConfig', 'simData'])
+simConfig['net'].keys() # dict_keys(['params', 'cells', 'pops'])
+len(simConfig['net']['cells']) # 23025
+simConfig['net']['cells'][0] 
+{gid: 0, tags: {cellType: 'EV1', cellModel: 'INTF7', pop: 'EV1', xnorm: 0.8282152698775253,
+ynorm: 0.27553096546895545, znorm: 0.09482398626980745, x: 82.82152698775252, y:
+27.553096546895546, z: 9.482398626980745}, conns: [], stims: [], params: {ahpwt: 1, tauahp: 400,
+RMP: -65, VTH: -40, refrac: 5, Vblock: -25, tauAM: 5.5, tauNM: 166, tauGA: 10, tauGA2: 20,
+tauAM2: 20, tauNM2: 166, tauRR: 1, RRWght: 0.25}, secs: None, secLists: None}
+
+conns not saved by default ... 
+
+cfg.saveCellSecs = bool(dconf['sim']['saveCellSecs']) # if False removes all data on cell sections prior to gathering from nodes
+cfg.saveCellConns = bool(dconf['sim']['saveCellConns']) # if False removes all data on cell connections prior to gathering from nodes
+
+so run again to get the connectivity saved ...
+        "name": "20dec1_C1_cycle_",
+        "saveCellConns": 1,
+        "duration": 1000,
+    "simtype": {
+        "ResumeSim": 1,
+	"ResumeSimFromFile": "data/20nov24_C0_gcp__step_2_synWeights_final.pkl"
+    },
+
+./myrun 32 sn.json
+
+python -i simdat.py backupcfg/20dec1_C1_cycle_sim.json
+
+lcell = simConfig['net']['cells']
+lcell[0]['tags']['cellType']
+
+lcell[dstartidx['EA']]['tags']['cellType'] # 'EA'
+cell = lcell[dstartidx['EA']]
+len(cell['conns']) # 1920
+cell['conns'][0] # {preGid: 288, sec: 'soma', loc: 0.5, synMech: 'AMPA', weight: 2.8408488267239065, delay: 3.630597109992384, weightIndex: 0, label: 'EV1->EA'}
+
+cmap = getinputconnmap(simConfig, 'EV1', dstartidx['EA'], dnumc, dstartidx, 'AMPA')
+imshow(cmap,cmap='gray',origin='upper'); 
+savefig(gifpath()+'cmap0.png') # [[./gif/20dec1_20dec1_C1_cycle_cmap0.png]]
+
+cmap = getinputconnmap(simConfig, 'EV1', dstartidx['EA'], dnumc, dstartidx, 'AMPA', asweight=True)
+imshow(cmap,cmap='gray',origin='upper'); 
+colorbar()
+savefig(gifpath()+'cmap1.png') 
+
+lcmap = [getinputconnmap(simConfig, 'EV1', idx, dnumc, dstartidx, 'AMPA', asweight=True) for idx in range(dstartidx['EA'],dendidx['EA']+1,1)]
+npmap = np.array(lcmap)
+lcmapEA = mean(npmap,axis=0)
+imshow(lcmapEA,cmap='gray',origin='upper'); 
+colorbar()
+savefig(gifpath()+'cmapEV1toEA.png') # [[./gif/20dec1_20dec1_C1_cycle_cmapEV1toEA.png]]
+
+np.min(lcmapEA) # 0.1956854546171613
+np.max(lcmapEA) # 0.32465289418770804
+np.mean(lcmapEA) # 0.2599121860767819
+
+summed across EA neurons, all of the space is covered 
+
+since there are 6400 EV1 neurons and 10% connectivity
+and 2800 EA ... that's 640 * 2800 synapses ... 
+640 * 2800 # 1792000
+~1.8 million synapses ... 
+
+lcmap = [getinputconnmap(simConfig, 'EV1DN', idx, dnumc, dstartidx, 'AMPA', asweight=True) for idx in range(dstartidx['EA'],dendidx['EA']+1,1)]
+npmap = np.array(lcmap)
+lcmapEA = mean(npmap,axis=0)
+imshow(lcmapEA,cmap='gray',origin='upper'); 
+colorbar()
+
+np.min(lcmapEA),np.max(lcmapEA),np.mean(lcmapEA) # (0.21032619053719823, 0.31009591697696376, 0.2600183613005337)
+ok, so whole space covered for EV1D neurons as well . . .
+
+savefig(gifpath()+'cmapEV1DNtoEA.png') # [[./gif/20dec1_20dec1_C1_cycle_cmapEV1DNtoEA.png]]
+
+dnumc['EV1DN'] * dconf['net']['cmat']['VD']['EA']['p'] * dnumc['EA'] # 112000.0
+so only 112K synapses for EV1DN ... 
+but ~900K synapses for all the direction selective neurons ... 
+
+and that's because have 20x20 for each pop of dir selective and 80x80 for EV1 ... 
+
+could have the synapse counts for location and direction selective roughly equivalent instead of ~1/2 ... 
+but direction selective neurons are more redundant with each other given that motion trajectories follow
+straight lines and only change after collisions (rarely)
+
+** smoother activity
+
