@@ -23266,3 +23266,9 @@ straight lines and only change after collisions (rarely)
 
 ** smoother activity
 
+via noise ... 
+
+        "name": "20dec1_A0_cycle_",
+
+noise not working properly when use NetStim ... when use NSLOC with INTF7 the noise does seem to work ...
+
