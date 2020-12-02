@@ -143,7 +143,6 @@ class simulatePong:
         tmp_bally2 = self.bally2 + yshift_ball
         self.ball_dy = -1*self.ball_dy
     elif self.ball_dy<0: # moving upwards
-      #print(tmp_b1y,self.court_top)
       if tmp_bally1<self.court_top: #if hit the top of the court, bounces back
         yshift_ball = self.ball_dy - tmp_bally1 + self.court_top
         tmp_bally1 = self.bally1 + yshift_ball
@@ -152,7 +151,7 @@ class simulatePong:
     else:
       yshift_ball = self.ball_dy
     # 4. check if the ball hits the racket
-    if self.ball_dx>0 and tmp_ballx2>=self.rightracketx1 and tmp_ballx2<=self.court_redge: # when ball moving towards the racket controlled by the model
+    if self.ball_dx>0 and tmp_ballx2>=self.rightracketx1 and tmp_ballx2<=self.court_redge and self.MissedTheBall==0: # when ball moving towards the racket controlled by the model
       if ((tmp_bally1>self.rightrackety1) and (tmp_bally1<self.rightrackety2)) or ((tmp_bally2>self.rightrackety1) and (tmp_bally2<self.rightrackety2)): 
         # if upper or lower edge of the ball is within the range of the racket
         xshift_ball = self.ball_dx + self.rightracketx1-tmp_ballx2
@@ -167,10 +166,9 @@ class simulatePong:
           self.MissedTheBall = 1
           print('Right player missed the ball')
           print('Scores: ', len(self.GamePoints),len(self.ModelPoints))
-          print(self.ballx1,self.ballx2,self.bally1,self.bally2,self.rightracketx1,self.rightracketx2,self.rightrackety1,self.rightrackety2,xshift_ball,yshift_ball)
           self.reward = -1
           self.scoreRecorded = 1 
-    elif self.ball_dx<0 and tmp_ballx1<=self.leftracketx2 and tmp_ballx1>=self.court_ledge: # when ball moving towards the racket controlled internally.
+    elif self.ball_dx<0 and tmp_ballx1<=self.leftracketx2 and tmp_ballx1>=self.court_ledge and self.MissedTheBall==0: # when ball moving towards the racket controlled internally.
       if ((tmp_bally1>self.leftrackety1) and (tmp_bally1<self.leftrackety2)) or ((tmp_bally2>self.leftrackety1) and (tmp_bally2<self.leftrackety2)):
         # if upper or lower edge of the ball is within the range of the racket
         xshift_ball = self.ball_dx + self.leftracketx2-tmp_ballx1
@@ -185,14 +183,12 @@ class simulatePong:
           self.MissedTheBall = 1
           print('Left player missed the ball')
           print('Scores: ', len(self.GamePoints),len(self.ModelPoints))
-          print(self.ballx1,self.ballx2,self.bally1,self.bally2,self.leftracketx1,self.leftracketx2,self.leftrackety1,self.leftrackety2,xshift_ball,yshift_ball)
           self.reward = 1
           self.scoreRecorded = 1
     else:
       xshift_ball = self.ball_dx
     TotalPoints = len(self.ModelPoints) + len(self.GamePoints)
     if self.MissedTheBall:     #reset the location of the ball as well as self.ball_dx and self.ball_dy
-      print(tmp_ballx1,tmp_ballx2)
       if tmp_ballx1<self.court_ledge or tmp_ballx2>self.court_redge:
         self.NewServe = 1
         xshift_ball = 0
@@ -234,8 +230,6 @@ class simulatePong:
     self.moveracket(yshift_racket) # this should be always based on Model/User
 
     xshift_ball, yshift_ball = self.getNextBallShift() # needs ball coords, both rackets' coordinates as well as boundaries.
-    print(self.MissedTheBall,self.NewServe,self.scoreRecorded, xshift_ball, yshift_ball)
-    #print(self.b1x,self.b2x,self.b1y,self.b2y)
     if self.NewServe==1:
       self.ballx1 = self.xpos_ball
       self.ballx2 = self.xpos_ball+self.ball_width
@@ -248,8 +242,11 @@ class simulatePong:
     self.moveball(xshift_ball=xshift_ball, yshift_ball=yshift_ball) # this should be computed internally  
     self.obs = self.obs.astype(np.uint8)
     self.im.set_data(self.obs.astype(np.uint8))
+    # self.ax.text(30, 20, str(len(self.GamePoints)), style='italic',color='white',size=20)
+    # self.ax.text(130, 20, str(len(self.ModelPoints)), style='italic',color='white',size=20)
     self.fig.canvas.draw_idle()
     plt.pause(0.1)
+    # plt.ion()
     return self.obs, self.reward, self.done
 
 

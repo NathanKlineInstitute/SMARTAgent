@@ -9999,4 +9999,6 @@ for _ in range(10000):
 the algorithm detects that the ball was missed. but does not reset the coordinates of the ball.
 
 
+--- simulatedPongFull bug fixed.
 
+-- could not update text in the game plotting.
