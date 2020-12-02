@@ -38,11 +38,11 @@
     "verbose": 0,
     "stayStepLim": 0,
     "simtype": {
-        "ResumeSim": 1,
-	"ResumeSimFromFile": "data/20nov26_20nov24_C0_gcp_cycle__step_2_synWeights_final_shuffled.pkl"
+        "ResumeSim": 0,
+	"ResumeSimFromFile": "data/20nov24_C0_gcp__step_2_synWeights_final.pkl"
     },
     "sim": {
-        "duration": 1000000,
+        "duration": 10000,
         "dt": 0.6,
         "verbose": 0,
         "recordStep": 1.0,
@@ -52,9 +52,9 @@
         "RLFakeUpRule": 0,
         "RLFakeDownRule": 0,
         "RLFakeStayRule": 0,
-        "name": "20nov26_load_shuffle_weight_test_C0_gcp__step_2_C1_",
-        "doquit": 1,
-        "doplot": 0,
+        "name": "20dec1_A0_cycle_",
+        "doquit": 0,
+        "doplot": 1,
         "saveCellSecs": 0,
         "saveCellConns": 0,
         "targettedRL": 3,
@@ -409,12 +409,12 @@
     },
     "Noise": {
         "I": {
-            "Rate": 0,
+            "Rate": 100,
             "Weight": 0.1
         },
         "E": {
-            "Rate": 0,
-            "Weight": 0.1
+            "Rate": 100,
+            "Weight": 1
         }
     }
 }
