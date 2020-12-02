@@ -9956,3 +9956,47 @@ plotPerf(pdac,yl=(0,0.5))
 
 saved as "20nov23_A1_20nov24_A0_20nov25_A0_20nov27_A0_20nov28_A0_cycle_reduced_2obj_INTF7_Perf.eps"
 
+-- resume sim from: "ResumeSimFromFile": "data/20nov28_A0_cycle_reduced_2obj_INTF7_synWeights_final.pkl"
+"duration": 5000,000
+"name": "20nov30_A0_cycle_reduced_2obj_INTF7_",
+"RLhebbwt": 2,
+
+
+-- run sim on falcor
+"duration": 5000,000
+"name": "20nov30_A0_falcor_reduced_2obj_INTF7_",
+"RLhebbwt": 20,
+
+
+* 20dec01
+
+-- resume sim from: "ResumeSimFromFile": "data/20nov30_A0_cycle_reduced_2obj_INTF7_synWeights_final.pkl"
+"duration": 5000,000
+"name": "20dec01_A0_cycle_reduced_2obj_INTF7_",
+"RLhebbwt": 2,
+
+--------
+
+import numpy as np
+import random
+from simulatePongFull import simulatePong
+pong = simulatePong()
+for _ in range(10000):
+  randaction = random.choice([3,4,1])
+  obs, reward, done = pong.step(randaction)
+
+# fig,ax = plt.subplots(1,1)
+# obs, reward, done = pong.step(1)
+# im = ax.imshow(obs.astype(np.uint8))
+for _ in range(10000):
+  randaction = random.choice([3,4,1])
+  obs, reward, done = pong.step(randaction)
+  # im.set_data(obs.astype(np.uint8))
+  # fig.canvas.draw_idle()
+  # plt.pause(0.1)
+  # print('reward,done',reward,done)
+
+the algorithm detects that the ball was missed. but does not reset the coordinates of the ball.
+
+
+
