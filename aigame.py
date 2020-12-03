@@ -295,9 +295,9 @@ class AIGame:
       MaxRate = self.dirSensitiveNeuronRate[1]
       for pop in self.ldirpop: self.dFiringRates[pop] = self.dirSensitiveNeuronRate[0] * np.ones(shape=(1,1)) # should have a single angle per direction selective neuron pop
       if self.useImagePadding:
-        court_motiondir = motiondir[:,self.courtXRng[0]+self.padPixelEachSide:self.courtXRng[1]+self.padPixelEachSide] # only motion direction of ball in the court
+        court_motiondir = motiondir[:,self.courtXRng[0]+1+self.padPixelEachSide:self.courtXRng[1]-1+self.padPixelEachSide] # only motion direction of ball in the court
       else:
-        court_motiondir = motiondir[:,self.courtXRng[0]:self.courtXRng[1]] # only motion direction of ball in the court
+        court_motiondir = motiondir[:,self.courtXRng[0]+1:self.courtXRng[1]-1] # only motion direction of ball in the court
       unique_angles = np.unique(np.floor(court_motiondir))
       print('angles:',unique_angles)
       for a in unique_angles:
