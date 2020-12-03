@@ -2,42 +2,45 @@ import numpy as np
 from conf import dconf
 import random
 from matplotlib import pyplot as plt
+
 class simulatePong:
-  def __init__ (self):
+  def __init__  (self):
+    self.createcourt()
+    self.obs = np.zeros(shape=(210,160,3)) # this is the image (observation) frame
+    self.createnewframe()
+    self.createball() # create ball
+    self.createrackets() # create rackets
+    # by default no reward
+    self.reward =0
+    self.done = 0
+    # points
+    self.GamePoints = 0
+    self.ModelPoints = 0
+    self.MissedTheBall = 0
+    self.NewServe = 0
+    self.scoreRecorded = 0
+    self.createFigure()
+
+  def createFigure (self):
+    self.fig,self.ax = plt.subplots(1,1)
+    self.im = self.ax.imshow(np.zeros(shape=(210,160,3)))
+    self.scoreleft = self.ax.text(30, 20, str(self.GamePoints), style='normal',color='orange',size=32)
+    self.scoreright = self.ax.text(130, 20, str(self.ModelPoints), style='normal',color='lightgreen',size=32)
+
+  def createcourt (self):
     self.court_top = 34
     self.court_bottom = 194
     self.court_redge = 159
-    self.court_ledge = 0
-    
-    self.ball_width = 2
-    self.ball_height = 4
-    self.racket_width = 4
-    self.racket_height = 16
+    self.court_ledge = 0    
 
-    # start ball from the middle
-    self.randomizeYpos = dconf['simulatedEnvParams']['random'] 
+  def createball (self):
+    # ball position
     self.ypos_ball = dconf['simulatedEnvParams']['yball']  # this corresponds to 0 index
-    self.xpos_ball = 20  # this corresponds to 1 index
-    self.xpos_racket = 140 # this is fixed
-    self.ypos_racket = dconf['simulatedEnvParams']['yracket'] # this can change
-    self.xpos_modelracket = 16 # this is fixed
-    self.ypos_modelracket = 80
-    self. possible_ball_ypos = [40,60,80,100,120]
-    self.possible_ball_dy = [0,1,2,3]
-    # create background
-    self.obs = np.zeros(shape=(210,160,3))
-    self.obs[self.court_top:self.court_bottom,:,0]=144
-    self.obs[self.court_top:self.court_bottom,:,1]=72
-    self.obs[self.court_top:self.court_bottom,:,2]=17
-    self.leftracketx1 = self.xpos_modelracket # change mr1 to leftracket
-    self.leftracketx2 = self.xpos_modelracket+self.racket_width
-    self.leftrackety1 = self.court_top+self.ypos_modelracket
-    self.leftrackety2 = self.court_top+self.ypos_modelracket+self.racket_height
-    self.obs[self.leftrackety1:self.leftrackety2,self.leftracketx1:self.leftracketx2,0]= 213
-    self.obs[self.leftrackety1:self.leftrackety2,self.leftracketx1:self.leftracketx2,1]= 130
-    self.obs[self.leftrackety1:self.leftrackety2,self.leftracketx1:self.leftracketx2,2]= 74
-
-    # create ball
+    self.xpos_ball = 20  # this corresponds to 1 index        
+    # start ball from the middle
+    self.randomizeYpos = dconf['simulatedEnvParams']['random']     
+    self.ball_width = 2
+    self.ball_height = 4    
     self.ballx1 = self.xpos_ball
     self.ballx2 = self.xpos_ball+self.ball_width
     self.bally1 = self.court_top+self.ypos_ball
@@ -45,34 +48,42 @@ class simulatePong:
     self.obs[self.bally1:self.bally2,self.ballx1:self.ballx2,0]=236
     self.obs[self.bally1:self.bally2,self.ballx1:self.ballx2,1]=236
     self.obs[self.bally1:self.bally2,self.ballx1:self.ballx2,2]=236
-    # create racket
+    # create ball speed or displacement
+    self.ball_dx = 5  # displacement in horizontal direction
+    self.ball_dy = 5  #displacement in vertical direction
+    self. possible_ball_ypos = [40,60,80,100,120]
+    self.possible_ball_dy = [0,1,2,3]    
+
+  def createrackets (self):
+    self.racket_width = 4
+    self.racket_height = 16
+    # racket positions
+    self.xpos_racket = 140 # this is fixed
+    self.ypos_racket = dconf['simulatedEnvParams']['yracket'] # this can change
+    self.xpos_modelracket = 16 # this is fixed
+    self.ypos_modelracket = 80    
+    # left racket
+    self.leftracketx1 = self.xpos_modelracket # change mr1 to leftracket
+    self.leftracketx2 = self.xpos_modelracket+self.racket_width
+    self.leftrackety1 = self.court_top+self.ypos_modelracket
+    self.leftrackety2 = self.court_top+self.ypos_modelracket+self.racket_height
+    self.obs[self.leftrackety1:self.leftrackety2,self.leftracketx1:self.leftracketx2,0]= 213
+    self.obs[self.leftrackety1:self.leftrackety2,self.leftracketx1:self.leftracketx2,1]= 130
+    self.obs[self.leftrackety1:self.leftrackety2,self.leftracketx1:self.leftracketx2,2]= 74
+    # right racket
     self.rightracketx1 = self.xpos_racket
     self.rightracketx2 = self.xpos_racket+self.racket_width
     self.rightrackety1 = self.court_top+self.ypos_racket
     self.rightrackety2 = self.court_top+self.ypos_racket+self.racket_height
     self.obs[self.rightrackety1:self.rightrackety2,self.rightracketx1:self.rightracketx2,0]= 92
     self.obs[self.rightrackety1:self.rightrackety2,self.rightracketx1:self.rightracketx2,1]= 186
-    self.obs[self.rightrackety1:self.rightrackety2,self.rightracketx1:self.rightracketx2,2]= 92
-    self.server = 'LRacket'
-    # create ball speed or displacement
-    self.ball_dx = 5  # displacement in horizontal direction
-    self.ball_dy = 5  #displacement in vertical direction
+    self.obs[self.rightrackety1:self.rightrackety2,self.rightracketx1:self.rightracketx2,2]= 92    
     # create racket speed or displacement
-    self.racket_dy = 5   # displacement of rackets. 
-    # by default no reward
-    self.reward =0
-    self.done = 0
-    # points
-    self.GamePoints = []
-    self.ModelPoints = []
-    self.MissedTheBall = 0
-    self.NewServe = 0
-    self.scoreRecorded = 0
-    self.fig,self.ax = plt.subplots(1,1)
-    self.im = self.ax.imshow(np.zeros(shape=(210,160,3)))
-
-  def createnewframe(self):
-    self.obs = np.zeros(shape=(210,160,3))
+    self.racket_dy = 5   # displacement of rackets.
+    self.server = 'LRacket' # which racket serving    
+    
+  def createnewframe (self):
+    self.obs.fill(0)
     self.obs[self.court_top:self.court_bottom,:,0]=144
     self.obs[self.court_top:self.court_bottom,:,1]=72
     self.obs[self.court_top:self.court_bottom,:,2]=17
@@ -80,7 +91,7 @@ class simulatePong:
     #self.obs[self.mr1y:self.mr2y,self.mr1x:self.mr2x,1]= 130
     #self.obs[self.mr1y:self.mr2y,self.mr1x:self.mr2x,2]= 74
 
-  def moveball(self,xshift_ball,yshift_ball):
+  def moveball (self,xshift_ball,yshift_ball):
     self.ballx1 = self.ballx1+xshift_ball
     self.ballx2 = self.ballx2+xshift_ball
     self.bally1 = self.bally1+yshift_ball
@@ -89,7 +100,7 @@ class simulatePong:
     self.obs[self.bally1:self.bally2,self.ballx1:self.ballx2,1]=236
     self.obs[self.bally1:self.bally2,self.ballx1:self.ballx2,2]=236
 
-  def moveracket(self,yshift_racket):
+  def moveracket (self,yshift_racket):
     self.rightrackety1 = self.rightrackety1+yshift_racket
     self.rightrackety2 = self.rightrackety2+yshift_racket
     if self.rightrackety1>self.court_bottom-8:
@@ -102,7 +113,7 @@ class simulatePong:
     self.obs[self.rightrackety1:self.rightrackety2,self.rightracketx1:self.rightracketx2,1]= 186
     self.obs[self.rightrackety1:self.rightrackety2,self.rightracketx1:self.rightracketx2,2]= 92
 
-  def movemodelracket(self,yshift_racket2):
+  def movemodelracket (self,yshift_racket2):
     self.leftrackety1 = self.leftrackety1+yshift_racket2
     self.leftrackety2 = self.leftrackety2+yshift_racket2
     if self.leftrackety1>self.court_bottom-8:
@@ -116,7 +127,7 @@ class simulatePong:
     self.obs[self.leftrackety1:self.leftrackety2,self.leftracketx1:self.leftracketx2,2]= 74
 
   # xshift_ball, yshift_ball = getNextBallShift()
-  def getNextBallShift(self):
+  def getNextBallShift (self):
     # ball position is defined by self.b1x, self.b2x, self.b1y and self.b2y
     # right racket position is defined by self.r1y, self.r2y, self.r1x and self.r2x. Both self.r1x and self.r2x are fixed.
     # left racket position is defined by self.mr1y, self.mr2y, self.mr1x and self.mr2x. Both self.mr1x and self.mr2x are fixed.
@@ -162,10 +173,10 @@ class simulatePong:
         self.ball_dx = -1*self.ball_dx
       else:
         if self.scoreRecorded==0:
-          self.GamePoints.append(1)
+          self.GamePoints += 1
           self.MissedTheBall = 1
           print('Right player missed the ball')
-          print('Scores: ', len(self.GamePoints),len(self.ModelPoints))
+          print('Scores: ', self.GamePoints,self.ModelPoints)
           self.reward = -1
           self.scoreRecorded = 1 
     elif self.ball_dx<0 and tmp_ballx1<=self.leftracketx2 and tmp_ballx1>=self.court_ledge and self.MissedTheBall==0: # when ball moving towards the racket controlled internally.
@@ -179,15 +190,15 @@ class simulatePong:
         self.ball_dx = -1*self.ball_dx
       else:
         if self.scoreRecorded==0:
-          self.ModelPoints.append(1)
+          self.ModelPoints += 1
           self.MissedTheBall = 1
           print('Left player missed the ball')
-          print('Scores: ', len(self.GamePoints),len(self.ModelPoints))
+          print('Scores: ', self.GamePoints,self.ModelPoints)
           self.reward = 1
           self.scoreRecorded = 1
     else:
       xshift_ball = self.ball_dx
-    TotalPoints = len(self.ModelPoints) + len(self.GamePoints)
+    TotalPoints = self.ModelPoints + self.GamePoints
     if self.MissedTheBall:     #reset the location of the ball as well as self.ball_dx and self.ball_dy
       if tmp_ballx1<self.court_ledge or tmp_ballx2>self.court_redge:
         self.NewServe = 1
@@ -207,8 +218,8 @@ class simulatePong:
           self.ball_dx = -5
     return xshift_ball, yshift_ball
 
-
-  def step(self,action):
+  def step (self,action):
+    # one step of game activity
     stepsize = self.racket_dy
     if action==3:
       yshift_racket=stepsize
@@ -228,29 +239,28 @@ class simulatePong:
       rand_yshift = 0
     self.movemodelracket(rand_yshift) # intead of random shift, yshift should be based on projection
     self.moveracket(yshift_racket) # this should be always based on Model/User
-
     xshift_ball, yshift_ball = self.getNextBallShift() # needs ball coords, both rackets' coordinates as well as boundaries.
     if self.NewServe==1:
       self.ballx1 = self.xpos_ball
       self.ballx2 = self.xpos_ball+self.ball_width
       self.bally1 = self.court_top+self.ypos_ball
       self.bally2 = self.court_top+self.ypos_ball+self.ball_height
-      if (len(self.GamePoints)>1 and len(self.GamePoints)%20==0) or (len(self.ModelPoints) and len(self.ModelPoints)%20==0):
+      if (self.GamePoints>1 and self.GamePoints%20==0) or (self.ModelPoints and self.ModelPoints%20==0):
         self.done = 1
       else:
         self.done = 0
     self.moveball(xshift_ball=xshift_ball, yshift_ball=yshift_ball) # this should be computed internally  
     self.obs = self.obs.astype(np.uint8)
     self.im.set_data(self.obs.astype(np.uint8))
-    # self.ax.text(30, 20, str(len(self.GamePoints)), style='italic',color='white',size=20)
-    # self.ax.text(130, 20, str(len(self.ModelPoints)), style='italic',color='white',size=20)
+    self.drawscore()        
     self.fig.canvas.draw_idle()
     plt.pause(0.1)
     # plt.ion()
     return self.obs, self.reward, self.done
 
-
-
+  def drawscore (self):
+    self.scoreleft.set_text(str(self.GamePoints))
+    self.scoreright.set_text(str(self.ModelPoints))
 
 #when the ball is moving in positive X dir then should be checked for hitting the Right racket.
 #If the ball hits the right racket: look at the angle and flip the angle.
@@ -261,3 +271,15 @@ class simulatePong:
 #If the ball hits the left racket: look at the angle and flip the angle.
 #else if the ball hits the left edge, reset the ball.
 #else if the ball hits the upper of lower edge, look at the angle and flip the angle.
+
+def testsim (nstep=10000):
+  # test the simulated pong with nstep
+  pong = simulatePong()
+  for i in range(nstep):
+    randaction = random.choice([3,4,1])
+    obs, reward, done = pong.step(randaction)
+    
+
+if __name__ == '__main__':
+  testsim()
+        
