@@ -10002,3 +10002,13 @@ the algorithm detects that the ball was missed. but does not reset the coordinat
 --- simulatedPongFull bug fixed.
 
 -- could not update text in the game plotting.
+
+* 20dec03
+--remove "useNeuronPad" and all associated functions from aigame.py.
+-- use simulatedPongFull instead of simulatedPong and test.
+
+-- on cycle run sim "20dec03_A0_cycle_reduced_2obj_INTF7_" for 500 sec with:
+"useSimulatedEnv": 1
+'EV1':40
+'EA':3200
+'targettedRL':3
