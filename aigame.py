@@ -34,7 +34,7 @@ useSimulatedEnv = False
 try:
   if 'useSimulatedEnv' in dconf: useSimulatedEnv = dconf['useSimulatedEnv']
   if useSimulatedEnv:
-    from simulatePong import simulatePong
+    from simulatePongFull import simulatePong
     pong = simulatePong()
   else:
     if 'frameskip' in dconf['env']:
@@ -80,9 +80,6 @@ class AIGame:
     self.dInputs = OrderedDict({pop:int((np.sqrt(dconf['net']['allpops'][pop])+self.dReceptiveField[pop]-1)**2) for pop in self.lratepop})
     #self.dFVec = OrderedDict({pop:h.Vector() for pop in self.lratepop}) # NEURON Vectors for firing rate calculations
     self.dFiringRates = OrderedDict({pop:np.zeros(dconf['net']['allpops'][pop]) for pop in self.lratepop})# python objects for firing rate calculations
-    if dconf['net']['useNeuronPad']:
-      for pop in self.dInputs.keys():
-        self.dFiringRates[pop] = np.zeros(self.dInputs[pop])
     self.dAngPeak = OrderedDict({'EV1DE': 0.0,'EV1DNE': 45.0, # receptive field peak angles for the direction selective populations
                                 'EV1DN': 90.0,'EV1DNW': 135.0,
                                 'EV1DW': 180.0,'EV1DSW': 225.0,
@@ -91,11 +88,7 @@ class AIGame:
     self.AngRFSigma2 = dconf['net']['AngRFSigma']**2 # angular receptive field (RF) sigma squared used for dir selective neuron RFs
     if self.AngRFSigma2 <= 0.0: self.AngRFSigma2=1.0
     self.EXPDir = dconf['net']['EXPDir']
-    if dconf['net']['useNeuronPad']:
-      self.input_dim = int(np.sqrt(self.dInputs[self.InputPop]))
-      self.objExtension = 'Vertical'  # this could be included in sim.json....
-    else:  
-      self.input_dim = int(np.sqrt(dconf['net']['allpops'][self.InputPop])) # input image XY plane width,height -- not used anywhere    
+    self.input_dim = int(np.sqrt(dconf['net']['allpops'][self.InputPop])) # input image XY plane width,height -- not used anywhere    
     self.locationNeuronRate = dconf['net']['LocMaxRate']
     if self.reducedNet:
       self.dirSensitiveNeuronDim = 20 #Assuming the downscaling factor is 8.
@@ -150,65 +143,6 @@ class AIGame:
     return np.amin(I)+0.1
     #return self.thresh
     #return threshold_otsu(I) 
-
-  def updateInputRatesWithPadding (self, dsum_Images):
-    # update input rates to retinal neurons
-    tmp_padded_Image = np.amin(dsum_Images)*np.ones(shape=(self.input_dim,self.input_dim))
-    padded_Image = np.amin(dsum_Images)*np.ones(shape=(self.input_dim,self.input_dim))
-    offset = int((self.dReceptiveField[self.InputPop]-1)/2)
-    tmp_padded_Image[offset:offset+dsum_Images.shape[0],offset:offset+dsum_Images.shape[1]]=dsum_Images
-    padded_Image[offset:offset+dsum_Images.shape[0],offset:offset+dsum_Images.shape[1]]=dsum_Images
-    # find the indices of padded pixels
-    paddingInds = []
-    for j in range(self.input_dim):
-      for i in range(offset):
-        paddingInds.append([i,j])
-        paddingInds.append([j,i])
-      for i in range(offset+dsum_Images.shape[0],self.input_dim):
-        paddingInds.append([i,j])
-        paddingInds.append([j,i])
-    if self.objExtension=='Horizontal':
-      for i in range(np.shape(paddingInds)[0]):
-        if paddingInds[i][1]<offset:
-          padded_Image[paddingInds[i][0],paddingInds[i][1]]=np.amax(tmp_padded_Image[paddingInds[i][0],paddingInds[i][1]:paddingInds[i][1]+offset+1])
-        elif paddingInds[i][1]>offset+19:
-          padded_Image[paddingInds[i][0],paddingInds[i][1]]=np.amax(tmp_padded_Image[paddingInds[i][0],paddingInds[i][1]-offset:paddingInds[i][1]])
-        else:
-          padded_Image[paddingInds[i][0],paddingInds[i][1]] = tmp_padded_Image[paddingInds[i][0],paddingInds[i][1]]
-    elif self.objExtension=='Vertical':
-      for i in range(np.shape(paddingInds)[0]):
-        if paddingInds[i][0]<offset:
-          padded_Image[paddingInds[i][0],paddingInds[i][1]]=np.amax(tmp_padded_Image[paddingInds[i][0]:paddingInds[i][0]+offset+1,paddingInds[i][1]])
-        elif paddingInds[i][0]>offset+19:
-          padded_Image[paddingInds[i][0],paddingInds[i][1]]=np.amax(tmp_padded_Image[paddingInds[i][0]-offset:paddingInds[i][0],paddingInds[i][1]])
-        else:
-          padded_Image[paddingInds[i][0],paddingInds[i][1]] = tmp_padded_Image[paddingInds[i][0],paddingInds[i][1]]
-    else:
-      for i in range(np.shape(paddingInds)[0]):
-        if (paddingInds[i][0]<offset+1) and (paddingInds[i][1]<offset+1):
-          padded_Image[paddingInds[i][0],paddingInds[i][1]]=np.amax(tmp_padded_Image[paddingInds[i][0]:paddingInds[i][0]+offset+1,paddingInds[i][1]:paddingInds[i][1]+offset+1])
-        elif (paddingInds[i][0]>offset+19) and (paddingInds[i][1]>offset+19):
-          padded_Image[paddingInds[i][0],paddingInds[i][1]]=np.amax(tmp_padded_Image[paddingInds[i][0]-offset:paddingInds[i][0],paddingInds[i][0]-offset:paddingInds[i][1]])
-        elif (paddingInds[i][0]<offset) and (paddingInds[i][1]>=offset):
-          padded_Image[paddingInds[i][0],paddingInds[i][1]]=np.amax(tmp_padded_Image[paddingInds[i][0]:paddingInds[i][0]+offset+1,paddingInds[i][1]-offset:paddingInds[i][1]])
-        elif (paddingInds[i][0]>offset+19) and (paddingInds[i][1]<=offset+19):
-          padded_Image[paddingInds[i][0],paddingInds[i][1]]=np.amax(tmp_padded_Image[paddingInds[i][0]-offset:paddingInds[i][0],paddingInds[i][1]:paddingInds[i][0]+offset+1])
-        elif (paddingInds[i][0]>offset) and (paddingInds[i][1]<offset):
-          padded_Image[paddingInds[i][0],paddingInds[i][1]]=np.amax(tmp_padded_Image[paddingInds[i][0],paddingInds[i][1]:paddingInds[i][1]+offset+1])
-        elif (paddingInds[i][0]<=offset+19) and (paddingInds[i][1]>offset+19):
-          padded_Image[paddingInds[i][0],paddingInds[i][1]]=np.amax(tmp_padded_Image[paddingInds[i][0],paddingInds[i][0]-offset:paddingInds[i][1]])
-        else:
-          padded_Image[paddingInds[i][0],paddingInds[i][1]] = tmp_padded_Image[paddingInds[i][0],paddingInds[i][1]]
-    if dconf['net']['useBinaryImage']:
-      self.binary_Image = binary_Image  = padded_Image > self.getThreshold(padded_Image)
-      fr_Images = self.locationNeuronRate*binary_Image
-    else:
-      padded_Image = padded_Image - np.amin(padded_Image)
-      padded_Image = (255.0/np.amax(padded_Image))*padded_Image # this will make sure that padded_Image spans 0-255
-      fr_Images = self.locationNeuronRate/(1+np.exp((np.multiply(-1,padded_Image)+123)/10))
-      #fr_Images = np.subtract(fr_Images,np.min(fr_Images)) #baseline firing rate subtraction. Instead all excitatory neurons are firing at 5Hz.
-      #print(np.amin(fr_Images),np.amax(fr_Images))
-    self.dFiringRates[self.InputPop] = np.reshape(fr_Images,self.dInputs[self.InputPop]) #400 for 20*20, 900 for 30*30, etc.
 
   def getNewCoords(self):
     if self.downsampshape[0]==8:
@@ -405,45 +339,6 @@ class AIGame:
         self.dFiringRates[pop]=np.reshape(self.dFiringRates[pop],dirSensitiveNeuronDim**2)
         #print(pop,np.amin(self.dFiringRates[pop]),np.amax(self.dFiringRates[pop]),np.mean(self.dFiringRates[pop]))
         #print(pop,self.dFiringRates[pop])
-    if dconf['sim']['saveAssignedFiringRates']:
-      frcopy = deepcopy(self.dFiringRates)
-      self.dAllFiringRates.append(frcopy)
-
-  def updateDirSensitiveRatesWithPadding (self):
-    # update firing rate of dir sensitive neurons using dirs (2D array with motion direction at each coordinate)
-    if len(self.ldflow) < 1: return
-    dflow = self.ldflow[-1]
-    motiondir = dflow['ang'] # angles in degrees, but thresholded for significant motion; negative value means not used
-    dAngPeak = self.dAngPeak
-    dirSensitiveNeuronDim = self.dirSensitiveNeuronDim + self.dReceptiveField['EV1DE']-1
-    offset = int((self.dReceptiveField['EV1DE']-1)/2)
-    padded_motiondir = np.multiply(-100,np.ones(shape=(dirSensitiveNeuronDim,dirSensitiveNeuronDim)))
-    padded_motiondir[offset:offset+motiondir.shape[0],offset:offset+motiondir.shape[1]]=motiondir
-    AngRFSigma2 = self.AngRFSigma2
-    MaxRate = self.dirSensitiveNeuronRate[1]
-    for pop in self.ldirpop: self.dFiringRates[pop] = self.dirSensitiveNeuronRate[0] * np.ones(shape=(dirSensitiveNeuronDim,dirSensitiveNeuronDim))
-    if self.EXPDir:
-      for y in range(padded_motiondir.shape[0]):
-        for x in range(padded_motiondir.shape[1]):
-          if padded_motiondir[y,x] >= 0.0: # make sure it's a valid angle
-            for pop in self.ldirpop:
-              fctr = np.exp(-1.0*(getangdiff(padded_motiondir[y][x],dAngPeak[pop])**2)/AngRFSigma2)
-              #print('updateDirRates',pop,x,y,fctr,dAngPeak[pop],padded_motiondir[y][x])
-              if MaxRate * fctr < self.FiringRateCutoff: fctr = 0
-              self.dFiringRates[pop][y,x] += MaxRate * fctr
-    else:
-      for y in range(padded_motiondir.shape[0]):
-        for x in range(padded_motiondir.shape[1]):
-          if padded_motiondir[y,x] >= 0.0: # make sure it's a valid angle
-            for pop in self.ldirpop:
-              if abs(getangdiff(padded_motiondir[y][x],dAngPeak[pop])) <= self.AngRFSigma:
-                self.dFiringRates[pop][y,x] = MaxRate
-              #print('updateDirRates',pop,x,y,fctr,dAngPeak[pop],padded_motiondir[y][x])
-    #print('padded_motiondir',padded_motiondir)
-    for pop in self.ldirpop:
-      self.dFiringRates[pop]=np.reshape(self.dFiringRates[pop],dirSensitiveNeuronDim**2)
-      #print(pop,np.amin(self.dFiringRates[pop]),np.amax(self.dFiringRates[pop]),np.mean(self.dFiringRates[pop]))
-      #print(pop,self.dFiringRates[pop])
     if dconf['sim']['saveAssignedFiringRates']:
       frcopy = deepcopy(self.dFiringRates)
       self.dAllFiringRates.append(frcopy)
@@ -691,6 +586,7 @@ class AIGame:
       # previously I assumed when current_ball_dir is 0 there is no way to find out if the ball hit the racket
       if current_ball_dir-self.last_ball_dir<0 and reward==0 and xpos_Ball2>courtXRng[1]-courtXRng[0]-40:
         ball_hits_racket = 1
+        print('Ball hits the racket')
       #print('Current_ball_dir',current_ball_dir,'Last ball dir',self.last_ball_dir,'current X pos Ball', xpos_Ball2,'last X pos Ball', xpos_Ball)
       #print(ball_hits_racket)
       self.last_ball_dir = current_ball_dir
@@ -731,10 +627,7 @@ class AIGame:
       self.ReducedImages.append(255.0 * self.binary_Image)
     else:
       self.ReducedImages.append(dsum_Images) # save the input image
-    if dconf['net']['useNeuronPad']==1:
-      self.updateInputRatesWithPadding(dsum_Images)
-    else:
-      self.updateInputRates(dsum_Images) # update input rates to retinal neurons
+    self.updateInputRates(dsum_Images) # update input rates to retinal neurons
     if self.intaction==1: #if only one frame used per play, then add the downsampled and scaled image from last_obs for direction computation 
       if len(lobs_gimage_ds)>0:
         dsum_Images = np.maximum(dsum_Images,lobs_gimage_ds)
@@ -745,10 +638,7 @@ class AIGame:
       elif dconf['DirectionDetectionAlgo']['CentroidTracker']:
         # compute the motion field using CetroidTracking
         self.computeAllObjectsMotionDirections(UseFull=dconf['DirectionDetectionAlgo']['UseFull']) 
-      if dconf['net']['useNeuronPad']==1:
-        self.updateDirSensitiveRatesWithPadding()
-      else:
-        self.updateDirSensitiveRates() # update motion sensitive neuron input rates
+      self.updateDirSensitiveRates() # update motion sensitive neuron input rates
 
     if done: # done means that 1 episode of the game finished, so the environment needs to be reset. 
       epCount.append(self.countAll)

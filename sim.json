@@ -4,9 +4,9 @@
         "savemp4": 0
     },
     "randmove":0,
-    "useSimulatedEnv": 0,
+    "useSimulatedEnv": 1,
     "simulatedEnvParams": {
-        "random":1,
+        "random":0,
         "yball":80,
         "yracket":40
     },
@@ -45,11 +45,11 @@
     "verbose": 0,
     "stayStepLim": 0,
     "simtype": {
-        "ResumeSim": 1,
+        "ResumeSim": 0,
         "ResumeSimFromFile": "data/20nov27_A0_cycle_reduced_2obj_INTF7_synWeights_final.pkl"
     },
     "sim": {
-        "duration": 5000000,
+        "duration": 5000,
         "dt": 0.6,
         "verbose": 0,
         "recordStep": 1.0,
@@ -59,7 +59,7 @@
         "RLFakeUpRule": 0,
         "RLFakeDownRule": 0,
         "RLFakeStayRule": 0,
-        "name": "20nov28_A0_cycle_reduced_2obj_INTF7_",
+        "name": "20dec03_A0_local_reduced_2obj_INTF7_",
         "doquit": 1,
         "doplot": 0,
         "saveCellSecs": 0,
@@ -191,7 +191,6 @@
             "FeedbackAtoLocN":0
         },	
     "useBinaryImage": 1,
-	"useNeuronPad": 0,
         "DirMinRate": 0.0,
         "DirMaxRate": 150.0,
         "LocMaxRate": 150.0,
