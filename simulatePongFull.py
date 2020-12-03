@@ -175,8 +175,8 @@ class simulatePong:
         if self.scoreRecorded==0:
           self.GamePoints += 1
           self.MissedTheBall = 1
-          print('Right player missed the ball')
-          print('Scores: ', self.GamePoints,self.ModelPoints)
+          #print('Right player missed the ball')
+          #print('Scores: ', self.GamePoints,self.ModelPoints)
           self.reward = -1
           self.scoreRecorded = 1 
     elif self.ball_dx<0 and tmp_ballx1<=self.leftracketx2 and tmp_ballx1>=self.court_ledge and self.MissedTheBall==0: # when ball moving towards the racket controlled internally.
@@ -192,8 +192,8 @@ class simulatePong:
         if self.scoreRecorded==0:
           self.ModelPoints += 1
           self.MissedTheBall = 1
-          print('Left player missed the ball')
-          print('Scores: ', self.GamePoints,self.ModelPoints)
+          #print('Left player missed the ball')
+          #print('Scores: ', self.GamePoints,self.ModelPoints)
           self.reward = 1
           self.scoreRecorded = 1
     else:
