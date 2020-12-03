@@ -10097,3 +10097,54 @@ stimModEV1DSE 12.81 Hz
 and run the sim in "20dec03_A2_cycle_reduced_2obj_INTF7_"
 
 ... look at IM and EM for this sim.....
+
+(base) hanwar@cycle:~/GamesProject/SMARTAgent$ python -i simdat.py backupcfg/20dec03_A2_cycle_reduced_2obj_INTF7_sim.json 
+reading  backupcfg/20dec03_A2_cycle_reduced_2obj_INTF7_sim.json
+-1
+lpop:  ['EV1', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW', 'EV1DSW', 'EV1DS', 'EV1DSE', 'EMDOWN', 'EMUP', 'IM']
+loading data from 20dec03_A2_cycle_reduced_2obj_INTF7_
+loading input images from data/20dec03_A2_cycle_reduced_2obj_INTF7_InputImages.txt
+loaded simulation data 20dec03_A2_cycle_reduced_2obj_INTF7_ on 20dec3_
+EV1 13.3 Hz --->
+EV1DE 42.92 Hz --->
+EV1DNE 2.76 Hz
+EV1DN 1.05 Hz
+EV1DNW 1.53 Hz
+EV1DW 30.05 Hz --->
+EV1DSW 3.48 Hz
+EV1DS 1.42 Hz
+EV1DSE 8.54 Hz
+EA 0.06 Hz
+EMDOWN 4.17 Hz
+EMUP 4.04 Hz
+IM 14.8 Hz
+stimModEV1 15.75 Hz
+stimModEV1DE 52.26 Hz
+stimModEV1DNE 2.92 Hz
+stimModEV1DN 1.05 Hz
+stimModEV1DNW 1.58 Hz
+stimModEV1DW 35.44 Hz
+stimModEV1DSW 3.54 Hz
+stimModEV1DS 1.42 Hz
+stimModEV1DSE 8.82 Hz
+
+-- how to run multistepSim???
+
+
+python multistepSim.py sn.json 32 20 20nov10_B1_cycle_multi
+
+32 is number of cores
+20 is number of steps.
+20nov10_B1_cycle_multi is output file name.
+
+
+-- using "name": "20dec03_B0_cycle_reduced_2obj_INTF7_"
+run multistep:
+
+python multistepSim.py sim.json 16 10 20dec3_B0_cycle_multi
+
+
+-- reduce the ball speed.
+
+    self.ball_dx = 3  # displacement in horizontal direction
+    self.ball_dy = 3  #displacement in vertical direction

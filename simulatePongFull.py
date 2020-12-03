@@ -49,8 +49,8 @@ class simulatePong:
     self.obs[self.bally1:self.bally2,self.ballx1:self.ballx2,1]=236
     self.obs[self.bally1:self.bally2,self.ballx1:self.ballx2,2]=236
     # create ball speed or displacement
-    self.ball_dx = 5  # displacement in horizontal direction
-    self.ball_dy = 5  #displacement in vertical direction
+    self.ball_dx = 3  # displacement in horizontal direction
+    self.ball_dy = 3  #displacement in vertical direction
     self. possible_ball_ypos = [40,60,80,100,120]
     self.possible_ball_dy = [0,1,2,3]    
 
