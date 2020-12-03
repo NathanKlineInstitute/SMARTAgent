@@ -92,36 +92,36 @@ class simulatePong:
     #self.obs[self.mr1y:self.mr2y,self.mr1x:self.mr2x,2]= 74
 
   def moveball (self,xshift_ball,yshift_ball):
-    self.ballx1 = self.ballx1+xshift_ball
-    self.ballx2 = self.ballx2+xshift_ball
-    self.bally1 = self.bally1+yshift_ball
-    self.bally2 = self.bally2+yshift_ball
+    self.ballx1 += xshift_ball
+    self.ballx2 += xshift_ball
+    self.bally1 += yshift_ball
+    self.bally2 += yshift_ball
     self.obs[self.bally1:self.bally2,self.ballx1:self.ballx2,0]=236
     self.obs[self.bally1:self.bally2,self.ballx1:self.ballx2,1]=236
     self.obs[self.bally1:self.bally2,self.ballx1:self.ballx2,2]=236
 
   def moveracket (self,yshift_racket):
-    self.rightrackety1 = self.rightrackety1+yshift_racket
-    self.rightrackety2 = self.rightrackety2+yshift_racket
-    if self.rightrackety1>self.court_bottom-8:
-      self.rightrackety1 = self.rightrackety1-yshift_racket
-      self.rightrackety2 = self.rightrackety2-yshift_racket
-    if self.rightrackety2<self.court_top+8:
-      self.rightrackety1 = self.rightrackety1-yshift_racket
-      self.rightrackety2 = self.rightrackety2-yshift_racket
+    self.rightrackety1 += yshift_racket
+    self.rightrackety2 += yshift_racket
+    if self.rightrackety1 > self.court_bottom - 8:
+      self.rightrackety1 -= yshift_racket
+      self.rightrackety2 -= yshift_racket
+    if self.rightrackety2 < self.court_top+8:
+      self.rightrackety1 -= yshift_racket
+      self.rightrackety2 -= yshift_racket
     self.obs[self.rightrackety1:self.rightrackety2,self.rightracketx1:self.rightracketx2,0]= 92
     self.obs[self.rightrackety1:self.rightrackety2,self.rightracketx1:self.rightracketx2,1]= 186
     self.obs[self.rightrackety1:self.rightrackety2,self.rightracketx1:self.rightracketx2,2]= 92
 
   def movemodelracket (self,yshift_racket2):
-    self.leftrackety1 = self.leftrackety1+yshift_racket2
-    self.leftrackety2 = self.leftrackety2+yshift_racket2
-    if self.leftrackety1>self.court_bottom-8:
-      self.leftrackety1 = self.leftrackety1-yshift_racket2
-      self.leftrackety2 = self.leftrackety2-yshift_racket2
-    if self.leftrackety2<self.court_top+8:
-      self.leftrackety1 = self.leftrackety1-yshift_racket2
-      self.leftrackety2 = self.leftrackety2-yshift_racket2
+    self.leftrackety1 += yshift_racket2
+    self.leftrackety2 += yshift_racket2
+    if self.leftrackety1 > self.court_bottom-8:
+      self.leftrackety1 -= yshift_racket2
+      self.leftrackety2 -= yshift_racket2
+    if self.leftrackety2 < self.court_top+8:
+      self.leftrackety1 -= yshift_racket2
+      self.leftrackety2 -= yshift_racket2
     self.obs[self.leftrackety1:self.leftrackety2,self.leftracketx1:self.leftracketx2,0]= 213
     self.obs[self.leftrackety1:self.leftrackety2,self.leftracketx1:self.leftracketx2,1]= 130
     self.obs[self.leftrackety1:self.leftrackety2,self.leftracketx1:self.leftracketx2,2]= 74
@@ -254,8 +254,8 @@ class simulatePong:
     self.im.set_data(self.obs.astype(np.uint8))
     self.drawscore()        
     self.fig.canvas.draw_idle()
-    plt.pause(0.1)
-    # plt.ion()
+    plt.pause(0.0001)
+    #plt.ion()
     return self.obs, self.reward, self.done
 
   def drawscore (self):
