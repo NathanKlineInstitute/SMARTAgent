@@ -103,10 +103,10 @@ class simulatePong:
   def moveracket (self,yshift_racket):
     self.rightrackety1 += yshift_racket
     self.rightrackety2 += yshift_racket
-    if self.rightrackety1 > self.court_bottom - 8:
+    if self.rightrackety1 > self.court_bottom - self.racket_height:
       self.rightrackety1 -= yshift_racket
       self.rightrackety2 -= yshift_racket
-    if self.rightrackety2 < self.court_top+8:
+    if self.rightrackety2 < self.court_top + self.racket_height:
       self.rightrackety1 -= yshift_racket
       self.rightrackety2 -= yshift_racket
     self.obs[self.rightrackety1:self.rightrackety2,self.rightracketx1:self.rightracketx2,0]= 92
@@ -116,10 +116,10 @@ class simulatePong:
   def movemodelracket (self,yshift_racket2):
     self.leftrackety1 += yshift_racket2
     self.leftrackety2 += yshift_racket2
-    if self.leftrackety1 > self.court_bottom-8:
+    if self.leftrackety1 > self.court_bottom - self.racket_height:
       self.leftrackety1 -= yshift_racket2
       self.leftrackety2 -= yshift_racket2
-    if self.leftrackety2 < self.court_top+8:
+    if self.leftrackety2 < self.court_top + self.racket_height:
       self.leftrackety1 -= yshift_racket2
       self.leftrackety2 -= yshift_racket2
     self.obs[self.leftrackety1:self.leftrackety2,self.leftracketx1:self.leftracketx2,0]= 213
