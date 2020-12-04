@@ -23307,3 +23307,6 @@ those firing rates over 20 s are too high ... try adjusting (cmat) weights first
 
 python multistepSim.py sn.json 32 20 20dec3_A0_nondirselective_gcp_multi
 
+at some point ball goes back and forth horizontally while model paddle holds still
+this seems to happen indefinitely, so will probably have to adjust some of the dynamics ...
+
