@@ -23272,3 +23272,38 @@ via noise ...
 
 noise not working properly when use NetStim ... when use NSLOC with INTF7 the noise does seem to work ...
 
+* 20dec3
+** new simulatePongFull.py 
+
+HA implemented own version of pong that does not have the momentum issues/problems
+interfaced with the model via:
+
+"useSimulatedEnv": 1,
+    "simulatedEnvParams": {
+        "random":0,
+        "yball":80,
+        "yracket":40
+    },
+
+also prevents rackets from going off-screen at all so do not need padding or avoidstuck rule
+
+** use new simulatedPongFull in simulation - on cycle (20dec3_A0_cycle_)
+
+        "name": "20dec3_A0_cycle_",
+
+python multistepSim.py sn.json 32 20 20dec3_A0_cycle_multi
+
+** other new simulatedPongFull sim on gcp (20dec3_A0_nodirselective_gcp_)
+
+use sim w/o the motion selective neurons ... 
+
+based on params from backupcfg/20nov19_A0_gcp_sim.json
+
+but will use the new full simulated Pong environment and targettedRL of 3
+
+        "name": "20dec3_A0_nodirselective_gcp_",
+
+those firing rates over 20 s are too high ... try adjusting (cmat) weights first ... 
+
+python multistepSim.py sn.json 32 20 20dec3_A0_nondirselective_gcp_multi
+

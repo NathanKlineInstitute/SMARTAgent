@@ -13,10 +13,16 @@
         3,
         4
     ],
+    "useSimulatedEnv": 1,
+    "simulatedEnvParams": {
+        "random":0,
+        "yball":80,
+        "yracket":40
+    },    
     "stochmove": 0,
     "0rand": 0,
     "movefctr": 1.0,
-    "avoidStuck": 1,
+    "avoidStuck": 0,
     "useImagePadding": 0,
     "rewardcodes": {
         "scorePoint": 1.0,
@@ -42,19 +48,19 @@
 	"ResumeSimFromFile": "data/20nov24_C0_gcp__step_2_synWeights_final.pkl"
     },
     "sim": {
-        "duration": 10000,
+        "duration": 500000,
         "dt": 0.6,
         "verbose": 0,
         "recordStep": 1.0,
-        "recordWeightStepSize": 5000,
-        "normalizeWeightStepSize": 5000000000000000000000000000000,
+        "recordWeightStepSize": 500,
+        "normalizeWeightStepSize": 500,
 	"normalizeWeightsAtStart": 0,
         "RLFakeUpRule": 0,
         "RLFakeDownRule": 0,
         "RLFakeStayRule": 0,
-        "name": "20dec1_A0_cycle_",
-        "doquit": 0,
-        "doplot": 1,
+        "name": "20dec3_A0_nodirselective_gcp_",
+        "doquit": 1,
+        "doplot": 0,
         "saveCellSecs": 0,
         "saveCellConns": 0,
         "targettedRL": 3,
@@ -83,14 +89,14 @@
 	    "ER":0,
 	    "IR":0,
 	    "EV1":6400,
-	    "EV1DE":400,
-	    "EV1DNE":400,
-	    "EV1DN":400,
-	    "EV1DNW":400,
-	    "EV1DW":400,
-	    "EV1DSW":400,
-	    "EV1DS":400,
-	    "EV1DSE":400,
+	    "EV1DE":0,
+	    "EV1DNE":0,
+	    "EV1DN":0,
+	    "EV1DNW":0,
+	    "EV1DW":0,
+	    "EV1DSW":0,
+	    "EV1DS":0,
+	    "EV1DSE":0,
 	    "ID": 0,
 	    "IV1":0,
 	    "EV4":0,
@@ -105,7 +111,7 @@
 	    "EMUP":300,
 	    "IM":300,
 	    "IMUP": 0,
-	    "IMDOWN": 0},
+	    "IMDOWN": 0},	    	
 	"ETypes": ["ER","EV1","EV1DE","EV1DNE","EV1DN","EV1DNW","EV1DW","EV1DSW","EV1DS","EV1DSE","EV4","EMT","EMDOWN","EMUP","EA","EA2"],
 	"ITypes": ["IR","IV1","IV4","IMT","IM","ID","IMUP","IMDOWN","IA","IA2"],
 	"EMotorPops": ["EMDOWN", "EMUP"],
@@ -191,7 +197,7 @@
 	    "VL":{
 		"VD":{"AM":0,"NM":0,"p":0},		
 		"VL":{"AM":4,"NM":0.6,"p":0},
-		"EA":{"AM":2.6,"NM":0.26,"p":0.1},
+		"EA":{"AM":2.6,"NM":0.26,"p":0.225},
 		"EMDOWN":{"AM":1,"NM":0.0,"p":0.08},
 		"EMUP":{"AM":1,"NM":0.0,"p":0.08}
 	    },
@@ -286,7 +292,7 @@
 		"EV4": {"AM":0 , "NM":0, "p":0},
 		"IMT": {"AM":20, "p":0.0225}
 	    }
-	},	
+	},		
         "EEMWghtThreshMin": 0.9,
         "EEMWghtThreshMax": 1.31,
         "EEMPopNorm": 1,
@@ -377,7 +383,7 @@
             "RLlenhebb": 200,
             "RLlenanti": 200,
             "useRLexp": 1,
-            "RLhebbwt": 0.0,
+            "RLhebbwt": 0.0065,
             "RLantiwt": 0,
             "hebbwt": 0.0,
             "antiwt": 0.0,
@@ -409,11 +415,11 @@
     },
     "Noise": {
         "I": {
-            "Rate": 100,
+            "Rate": 0,
             "Weight": 0.1
         },
         "E": {
-            "Rate": 100,
+            "Rate": 0,
             "Weight": 1
         }
     }
