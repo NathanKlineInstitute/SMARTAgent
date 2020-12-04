@@ -91,8 +91,8 @@ class simulatePong:
     self.ball_dx = 1  # displacement in horizontal direction
     self.ball_dy = 1  #displacement in vertical direction
     self. possible_ball_ypos = [40,60,80,100,120]
-    self.possible_ball_dy = [1,1,1,1,1]
-    self.possible_ball_dx = [1,1,1,1,1]
+    self.possible_ball_dy = [1,1,1,1,1,2,2,2,3,3]
+    self.possible_ball_dx = [1,1,1,1,1,2,2,2,3,3]
 
   def createrackets (self):
     self.racket_width = 4
@@ -119,7 +119,7 @@ class simulatePong:
     self.obs[self.rightrackety1:self.rightrackety2,self.rightracketx1:self.rightracketx2,1]= 186
     self.obs[self.rightrackety1:self.rightrackety2,self.rightracketx1:self.rightracketx2,2]= 92    
     # create racket speed or displacement
-    self.racket_dy = 1 # 5   # displacement of rackets.
+    self.racket_dy = 5   # displacement of rackets.
     self.server = 'LRacket' # which racket serving    
     
   def createnewframe (self):
@@ -309,13 +309,30 @@ class simulatePong:
     #randaction = random.randint(3,4)
     #if randaction==3: rand_yshift = stepsize
     #else: rand_yshift = -stepsize
-    #predY = self.predictBallRacketYIntercept(self.ballx1, self.bally1, self.ballx2, self.bally2)
+
+    #predY = self.predictBallRacketYIntercept() #(self.ballx1+self.ballx2)/2., (self.bally1+self.bally2)/2., \
+    #self.ballx2, self.bally2)
+
+    # this rule moves paddle only when it does not overlap with ball along vertical axis +/- wiggle
+    # when using wiggle of ~1/2 paddle height, it introduces oscillations in paddle
+    ballmidY = self.bally1 + 0.5 * self.ball_height
+    wiggle = 6
+    if ballmidY > self.leftrackety2 - wiggle:
+      rand_yshift = stepsize
+    elif ballmidY < self.leftrackety1 + wiggle:
+      rand_yshift = -stepsize
+    else:
+      rand_yshift = 0
+
+    """
     if (self.leftrackety1+0.5*self.racket_height)>(self.bally1+0.5*self.ball_height):
       rand_yshift = -stepsize
     elif (self.leftrackety1+0.5*self.racket_height)<(self.bally1+0.5*self.ball_height):
       rand_yshift = stepsize
     else:
       rand_yshift = 0
+    """
+      
     self.movemodelracket(rand_yshift) # intead of random shift, yshift should be based on projection
     self.moveracket(yshift_racket) # this should be always based on Model/User
     xshift_ball, yshift_ball = self.getNextBallShift() # needs ball coords, both rackets' coordinates as well as boundaries.
@@ -328,7 +345,7 @@ class simulatePong:
         self.done = 1
       else:
         self.done = 0
-    self.moveball(xshift_ball=xshift_ball, yshift_ball=yshift_ball) # this should be computed internally  
+    self.moveball(xshift_ball, yshift_ball) # this should be computed internally  
     self.obs = self.obs.astype(np.uint8)
     self.im.set_data(self.obs.astype(np.uint8))
     self.drawscore()        
