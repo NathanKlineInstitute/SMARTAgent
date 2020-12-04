@@ -23287,13 +23287,13 @@ interfaced with the model via:
 
 also prevents rackets from going off-screen at all so do not need padding or avoidstuck rule
 
-** use new simulatedPongFull in simulation - on cycle (20dec3_A0_cycle_)
+** use new simulatedPongFull in simulation - on cycle (20dec3_A0_cycle_) -->> stopped
 
         "name": "20dec3_A0_cycle_",
 
 python multistepSim.py sn.json 32 20 20dec3_A0_cycle_multi
 
-** other new simulatedPongFull sim on gcp (20dec3_A0_nodirselective_gcp_)
+** other new simulatedPongFull sim on gcp (20dec3_A0_nodirselective_gcp_) -->> stopped
 
 use sim w/o the motion selective neurons ... 
 
@@ -23309,4 +23309,56 @@ python multistepSim.py sn.json 32 20 20dec3_A0_nondirselective_gcp_multi
 
 at some point ball goes back and forth horizontally while model paddle holds still
 this seems to happen indefinitely, so will probably have to adjust some of the dynamics ...
+
+* 20dec4
+** adjusted simulatePongFull.py in development branch
+
+the paddles were oscillating around the target location so introduced wiggle term
+to prevent that
+
+also testing ability for right racket to get controlled by follow rule (with wiggle)
+
+now when ball hits a paddle its dy (y velocity) is picked randomly
+
+noticed that sometimes the ball goes through the paddle - so that means there's
+a bug in collision detection
+
+** revised rules 
+
+use simulated pong but could use the follow ball paradigm - that way would have same
+strategy used by model and game ... or have model reward driven by target location when
+ball moving toward right side and driven by follow ball when ball moving away from racket - that
+way model would not sit around doing nothing 1/2 the time
+
+also adjust the target tracking rule ... to avoid the oscillations; since the paddle movements
+are now bigger (5 pixels) in the simulated full pong ... otherwise paddle overshoots and then has to go
+in opposite direction
+
+        # targetY = ypos_Racket2 - predY # this is midpoint of racket with ball 
+        if ypos_Racket2 - self.racketH2 + self.wiggle > predY: # as long as racket overlaps with predY it's OK (to avoid oscillations)
+          proposed_action = dconf['moves']['UP'] #move up
+        elif ypos_Racket2 + self.racketH2 - wiggle < predY: # as long as racket overlaps with predY it's OK (to avoid oscillations)
+          proposed_action = dconf['moves']['DOWN'] #move down
+        else:
+          proposed_action = dconf['moves']['NOMOVE'] #no move
+
+** next sim on cycle - with adjusted rules
+
+so will use follow ball when ball moving away from racket, and when ball moving towards racket then
+use the target tracking rule
+
+predictBallRacketYIntercept <<-- that does not seem to work properly when ball will bounce
+on bottom of court ... 
+
+had
+          elif predY_nodeflection>160:
+            predY = predY_nodeflection-160     <<-- so if ball was going to hit at 170 it will instead be
+predicted to hit at 10 (top) ?? 
+
+should be:
+          elif predY_nodeflection>160:
+            predY = 160 - (predY_nodeflection-160)
+then if ball was going to hit right side at 170, it will instead be predicted to hit at 150 (10 above 160 instead of 10 below 160)
+
+also better if have less sparse firing in output populations ... there's often no movement at all 
 

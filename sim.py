@@ -1603,7 +1603,8 @@ def trainAgent (t):
             actions.append(dconf['moves']['NOMOVE']) # No move
   if sim.rank == 0:
     rewards, epCount, proposed_actions, total_hits, FollowTargetSign = sim.AIGame.playGame(actions, epCount, t)
-    print('t=',round(t,2),'proposed,model action:', proposed_actions,actions)
+    dback = {4:'UP',3:'DOWN',1:'STAY',-1:'NOP'}
+    print('t=',round(t,2),'proposed,model action:', [dback[x] for x in proposed_actions],[dback[x] for x in actions])
     if dconf['sim']['RLFakeUpRule']: # fake rule for testing reinforcing of up moves
       critic = np.sign(actions.count(dconf['moves']['UP']) - actions.count(dconf['moves']['DOWN']))          
       rewards = [critic for i in range(len(rewards))]

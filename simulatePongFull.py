@@ -77,7 +77,8 @@ class simulatePong:
     self.ypos_ball = dconf['simulatedEnvParams']['yball']  # this corresponds to 0 index
     self.xpos_ball = 20  # this corresponds to 1 index        
     # start ball from the middle
-    self.randomizeYpos = dconf['simulatedEnvParams']['random']     
+    self.randomizeYpos = dconf['simulatedEnvParams']['random']
+    self.wiggle = dconf['wiggle']
     self.ball_width = 2
     self.ball_height = 4    
     self.ballx1 = self.xpos_ball
@@ -188,13 +189,13 @@ class simulatePong:
     yshift_ball = self.ball_dy
     # 2. check if the ball hits upper edge or lower edge
     if self.ball_dy>0: # moving downwards
-      if tmp_bally2>self.court_bottom: # if hit the bottom of the court, bounces back
+      if tmp_bally2>=self.court_bottom: # if hit the bottom of the court, bounces back
         yshift_ball = self.ball_dy + self.court_bottom - tmp_bally2
         tmp_bally1 = self.bally1 + yshift_ball
         tmp_bally2 = self.bally2 + yshift_ball
         self.ball_dy = -1*self.ball_dy
     elif self.ball_dy<0: # moving upwards
-      if tmp_bally1<self.court_top: #if hit the top of the court, bounces back
+      if tmp_bally1<=self.court_top: #if hit the top of the court, bounces back
         yshift_ball = self.ball_dy - tmp_bally1 + self.court_top
         tmp_bally1 = self.bally1 + yshift_ball
         tmp_bally2 = self.bally2 + yshift_ball
@@ -308,11 +309,10 @@ class simulatePong:
       yshift_racket=0
     else: # invalid action means right paddle follows the ball (not done using learning neuronal network model)
      ballmidY = self.bally1 + 0.5 * self.ball_height
-     wiggle = 6
-     if ballmidY > self.rightrackety2 - wiggle:
-       yshift_racket = stepsize
-     elif ballmidY < self.rightrackety1 + wiggle:
-       yshift_racket = -stepsize
+     if ballmidY > self.rightrackety2 - self.wiggle: # if ball is below bottom of racket
+       yshift_racket = stepsize # down
+     elif ballmidY < self.rightrackety1 + self.wiggle: # if ball is above top of racket
+       yshift_racket = -stepsize # up
      else:
        yshift_racket = 0
       
@@ -321,13 +321,12 @@ class simulatePong:
     #predY = self.predictBallRacketYIntercept() #(self.ballx1+self.ballx2)/2., (self.bally1+self.bally2)/2., \
     #self.ballx2, self.bally2)
 
-    # this rule moves paddle only when it does not overlap with ball along vertical axis +/- wiggle
-    # when using wiggle of ~1/2 paddle height, it introduces oscillations in paddle as it tracks the ball
+    # this rule moves paddle only when it does not overlap with ball along vertical axis +/- self.wiggle
+    # when using self.wiggle of ~1/2 paddle height, it introduces oscillations in paddle as it tracks the ball
     ballmidY = self.bally1 + 0.5 * self.ball_height
-    wiggle = 6
-    if ballmidY > self.leftrackety2 - wiggle:
+    if ballmidY > self.leftrackety2 - self.wiggle:
       left_yshift = stepsize
-    elif ballmidY < self.leftrackety1 + wiggle:
+    elif ballmidY < self.leftrackety1 + self.wiggle:
       left_yshift = -stepsize
     else:
       left_yshift = 0
