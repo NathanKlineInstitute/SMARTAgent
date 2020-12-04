@@ -365,25 +365,26 @@ class AIGame:
 
   def predictBallRacketYIntercept(self, xpos1, ypos1, xpos2, ypos2):
     if ((xpos1==-1) or (xpos2==-1)):
-      predY = -1
+      return -1
     else:
       deltax = xpos2-xpos1
       if deltax<=0: # ball moving to the left
-        predY = -1
+        print('no pred ball moving left')
+        return -1
       else:
         if ypos1<0:
-          predY = -1
+          print('no pred ypos1 < 0')
+          return -1
         else:
           NB_intercept_steps = np.ceil((120.0 - xpos2)/deltax)
           deltay = ypos2-ypos1
           predY_nodeflection = ypos2 + (NB_intercept_steps*deltay)
           if predY_nodeflection<0:
-            predY = -1*predY_nodeflection
+            return -1*predY_nodeflection
           elif predY_nodeflection>160:
-            predY = 160 - (predY_nodeflection-160)
+            return 160 - (predY_nodeflection-160)
           else:
-            predY = predY_nodeflection
-    return predY
+            return predY_nodeflection
 
   def getPaddedImage(self,gs_obs,padding_dim,courtXRng,racketXRng):
     expected_racket_len = 16
@@ -527,13 +528,13 @@ class AIGame:
       else:
         # targetY = ypos_Racket2 - predY # this is midpoint of racket with ball 
         if ypos_Racket2 - self.racketH2 + self.wiggle > predY: # as long as racket overlaps with predY it's OK (to avoid oscillations)
-          print('pred UP, racketY', ypos_Racket2, 'predY:', predY, 'ball:', xpos_Ball2, ypos_Ball2)
+          #print('pred UP, racketY', ypos_Racket2, 'predY:', predY, 'ball:', xpos_Ball2, ypos_Ball2)
           proposed_action = dconf['moves']['UP'] #move up
         elif ypos_Racket2 + self.racketH2 - self.wiggle < predY: # as long as racket overlaps with predY it's OK (to avoid oscillations)
-          print('pred DOWN, racketY', ypos_Racket2, 'predY:', predY, 'ball:', xpos_Ball2, ypos_Ball2)          
+          #print('pred DOWN, racketY', ypos_Racket2, 'predY:', predY, 'ball:', xpos_Ball2, ypos_Ball2)          
           proposed_action = dconf['moves']['DOWN'] #move down
-        elif abs(ypos_Racket2 - predY) < 2:
-          print('pred STAY, racketY', ypos_Racket2, 'predY:', predY, 'ball:', xpos_Ball2, ypos_Ball2)                    
+        elif abs(ypos_Racket2 - predY) < 2 and xpos_Ball2 <= xpos_Racket:
+          #print('pred STAY, racketY', ypos_Racket2, 'predY:', predY, 'ball:', xpos_Ball2, ypos_Ball2)                    
           proposed_action = dconf['moves']['NOMOVE'] #no move
         YDist = abs(ypos_Racket - predY) # pre-move distance to predicted y intercept
         YDist2 = abs(ypos_Racket2 - predY) # post-move distance to predicted y intercept

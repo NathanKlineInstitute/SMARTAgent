@@ -23360,5 +23360,25 @@ should be:
             predY = 160 - (predY_nodeflection-160)
 then if ball was going to hit right side at 170, it will instead be predicted to hit at 150 (10 above 160 instead of 10 below 160)
 
-also better if have less sparse firing in output populations ... there's often no movement at all 
+hmm, still some bugs in y prediction ... and changes sign from UP to DOWN for one step right when ball gets close to racket
+some boundary condition may be off ... 
+
+also have ball ypos found to be < 0 when it is clearly not in the image ... leading to no predicted move sometimes ... 
+
+ t= 58905.0  U,D spikes: [0.0] [0.0]
+no pred ypos1 < 0
+t= 58905.0 proposed,model action: ['NOP'] ['STAY']
+t= 58924.8  U,D spikes: [0.0] [0.0]
+t= 58924.8 proposed,model action: ['DOWN'] ['STAY']
+t= 58924.8 RLcritic: -0.01
+t= 58944.6  U,D spikes: [0.0] [0.0]
+t= 58944.6 proposed,model action: ['DOWN'] ['STAY']
+t= 58944.6 RLcritic: -0.01
+t= 58964.4  U,D spikes: [0.0] [0.0]
+t= 58964.4 proposed,model action: ['DOWN'] ['STAY']
+t= 58964.4 RLcritic: -0.01
+t= 58984.2  U,D spikes: [0.0] [0.0]
+
+for when get this prediction code working better, would be better to have less sparse firing in output populations ... 
+there's often no movement at all 
 
