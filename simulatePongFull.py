@@ -3,8 +3,47 @@ from conf import dconf
 import random
 from matplotlib import pyplot as plt
 
+"""
+class ball:
+  def __init__ (self,x, y, width, height):
+    self.x = x
+    self.y = y
+    self.width = width
+    self.height = height
+    # these variables are for keeping track of our velocity on both the
+    # X and Y axis, since the ball can move in two dimensions
+    self.dy = 0
+    self.dx = 0
+  def collides (self,paddle):
+    #Expects a paddle as an argument and returns true or false, depending
+    #on whether their rectangles overlap.
+    # first, check to see if the left edge of either is farther to the right
+    # than the right edge of the other
+    if self.x > paddle.x + paddle.width or paddle.x > self.x + self.width:
+      return False
+    # then check to see if the bottom edge of either is higher than the top
+    # edge of the other
+    if self.y > paddle.y + paddle.height or paddle.y > self.y + self.height:
+      return False
+    # if the above aren't true, they're overlapping
+    return True
+  def reset(self):
+    # Places the ball in the middle of the screen, with no movement.
+    self.x = VIRTUAL_WIDTH / 2 - 2
+    self.y = VIRTUAL_HEIGHT / 2 - 2
+    self.dx = 0
+    self.dy = 0
+  def update(self, dt)
+    self.x = self.x + self.dx * dt
+    self.y = self.y + self.dy * dt
+  def render(self):
+    pass
+    #love.graphics.rectangle('fill', self.x, self.y, self.width, self.height)
+"""
+    
 class simulatePong:
-  def __init__  (self):
+  def __init__  (self, seed=1234):
+    random.seed(seed)
     self.createcourt()
     self.obs = np.zeros(shape=(210,160,3)) # this is the image (observation) frame
     self.createnewframe()
@@ -49,10 +88,11 @@ class simulatePong:
     self.obs[self.bally1:self.bally2,self.ballx1:self.ballx2,1]=236
     self.obs[self.bally1:self.bally2,self.ballx1:self.ballx2,2]=236
     # create ball speed or displacement
-    self.ball_dx = 3  # displacement in horizontal direction
-    self.ball_dy = 3  #displacement in vertical direction
+    self.ball_dx = 1  # displacement in horizontal direction
+    self.ball_dy = 1  #displacement in vertical direction
     self. possible_ball_ypos = [40,60,80,100,120]
-    self.possible_ball_dy = [0,1,2,3]    
+    self.possible_ball_dy = [1,1,1,1,1]
+    self.possible_ball_dx = [1,1,1,1,1]
 
   def createrackets (self):
     self.racket_width = 4
@@ -79,7 +119,7 @@ class simulatePong:
     self.obs[self.rightrackety1:self.rightrackety2,self.rightracketx1:self.rightracketx2,1]= 186
     self.obs[self.rightrackety1:self.rightrackety2,self.rightracketx1:self.rightracketx2,2]= 92    
     # create racket speed or displacement
-    self.racket_dy = 5   # displacement of rackets.
+    self.racket_dy = 1 # 5   # displacement of rackets.
     self.server = 'LRacket' # which racket serving    
     
   def createnewframe (self):
@@ -162,15 +202,22 @@ class simulatePong:
     else:
       yshift_ball = self.ball_dy
     # 4. check if the ball hits the racket
-    if self.ball_dx>0 and tmp_ballx2>=self.rightracketx1 and tmp_ballx2<=self.court_redge and self.MissedTheBall==0: # when ball moving towards the racket controlled by the model
+    # when ball moving towards the racket controlled by the model
+    if self.ball_dx>0 and tmp_ballx2>=self.rightracketx1 and tmp_ballx2<=self.court_redge and self.MissedTheBall==0: 
       if ((tmp_bally1>self.rightrackety1) and (tmp_bally1<self.rightrackety2)) or ((tmp_bally2>self.rightrackety1) and (tmp_bally2<self.rightrackety2)): 
         # if upper or lower edge of the ball is within the range of the racket
         xshift_ball = self.ball_dx + self.rightracketx1-tmp_ballx2
+        """
         if tmp_bally2>(self.rightrackety1 + 0.5*self.racket_height): # if the ball hits the lower half of the racket
           yshift_ball = 1 + self.ball_dy
         elif tmp_bally2<(self.rightrackety1 + 0.5*self.racket_height):
           yshift_ball = -1 + self.ball_dy
-        self.ball_dx = -1*self.ball_dx
+        """
+        if self.ball_dy < 0:
+          y_shift_ball = -random.choice(self.possible_ball_dy)
+        else:
+          y_shift_ball = random.choice(self.possible_ball_dy) 
+        self.ball_dx *= -1
       else:
         if self.scoreRecorded==0:
           self.GamePoints += 1
@@ -179,15 +226,22 @@ class simulatePong:
           #print('Scores: ', self.GamePoints,self.ModelPoints)
           self.reward = -1
           self.scoreRecorded = 1 
-    elif self.ball_dx<0 and tmp_ballx1<=self.leftracketx2 and tmp_ballx1>=self.court_ledge and self.MissedTheBall==0: # when ball moving towards the racket controlled internally.
+    elif self.ball_dx<0 and tmp_ballx1<=self.leftracketx2 and tmp_ballx1>=self.court_ledge and self.MissedTheBall==0:
+      # when ball moving towards the racket controlled internally.
       if ((tmp_bally1>self.leftrackety1) and (tmp_bally1<self.leftrackety2)) or ((tmp_bally2>self.leftrackety1) and (tmp_bally2<self.leftrackety2)):
         # if upper or lower edge of the ball is within the range of the racket
         xshift_ball = self.ball_dx + self.leftracketx2-tmp_ballx1
+        """
         if tmp_bally2>(self.leftrackety1 + 0.5*self.racket_height): # if the ball hits the lower half of the racket
           yshift_ball = 1 + self.ball_dy
         elif tmp_bally2<(self.leftrackety1 + 0.5*self.racket_height):
           yshift_ball = -1 + self.ball_dy
-        self.ball_dx = -1*self.ball_dx
+        """
+        if self.ball_dy < 0:
+          y_shift_ball = -random.choice(self.possible_ball_dy)
+        else:
+          y_shift_ball = random.choice(self.possible_ball_dy)           
+        self.ball_dx *= -1
       else:
         if self.scoreRecorded==0:
           self.ModelPoints += 1
@@ -213,11 +267,35 @@ class simulatePong:
           else:
             self.server = 'LRacket'
         if self.server=='LRacket':
-          self.ball_dx = 5
+          self.ball_dx = random.choice(self.possible_ball_dx)
         elif self.server=='RRacket':
-          self.ball_dx = -5
+          self.ball_dx = -random.choice(self.possible_ball_dx)
     return xshift_ball, yshift_ball
 
+  """
+  def predictBallRacketYIntercept(self, xpos1, ypos1, xpos2, ypos2):
+    if ((xpos1==-1) or (xpos2==-1)):
+      predY = -1
+    else:
+      deltax = xpos2-xpos1
+      if deltax<=0:
+        predY = -1
+      else:
+        if ypos1<0:
+          predY = -1
+        else:
+          NB_intercept_steps = np.ceil((120.0 - xpos2)/deltax)
+          deltay = ypos2-ypos1
+          predY_nodeflection = ypos2 + (NB_intercept_steps*deltay)
+          if predY_nodeflection<0:
+            predY = -1*predY_nodeflection
+          elif predY_nodeflection>160:
+            predY = predY_nodeflection-160
+          else:
+            predY = predY_nodeflection
+    return predY
+  """
+  
   def step (self,action):
     # one step of game activity
     stepsize = self.racket_dy
@@ -231,6 +309,7 @@ class simulatePong:
     #randaction = random.randint(3,4)
     #if randaction==3: rand_yshift = stepsize
     #else: rand_yshift = -stepsize
+    #predY = self.predictBallRacketYIntercept(self.ballx1, self.bally1, self.ballx2, self.bally2)
     if (self.leftrackety1+0.5*self.racket_height)>(self.bally1+0.5*self.ball_height):
       rand_yshift = -stepsize
     elif (self.leftrackety1+0.5*self.racket_height)<(self.bally1+0.5*self.ball_height):
