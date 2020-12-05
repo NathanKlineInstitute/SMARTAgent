@@ -178,6 +178,8 @@ class simulatePong:
     # 1. make a temp move
     self.reward = 0
     if self.ballx1>self.leftracketx2 and self.ballx2<self.rightracketx1 and self.NewServe:
+      # why need to set missedball==0 here? can't you set it after it's set to 1 at end of this function?
+      # and why does missedtheball need to persist outside of this function - it's only used within this function
       self.MissedTheBall = 0
       self.NewServe = 0
       self.scoreRecorded = 0
@@ -273,29 +275,25 @@ class simulatePong:
           self.ball_dx = -random.choice(self.possible_ball_dx)
     return xshift_ball, yshift_ball
 
-  """
+  # should finish adjusting this to work for the left racket/opponent as well . . . and use it
   def predictBallRacketYIntercept(self, xpos1, ypos1, xpos2, ypos2):
-    if ((xpos1==-1) or (xpos2==-1)):
-      predY = -1
+    if xpos1==-1 or xpos2==-1 or xpos1==xpos2 or ypos1<0:
+      return -1
     else:
       deltax = xpos2-xpos1
-      if deltax<=0:
-        predY = -1
+      if deltax<0: # ball moving to the left
+        NB_intercept_steps = np.ceil(float(xpos2)/abs(deltax)) # ball needs to get to 0
+      else: # ball moving to the right
+        NB_intercept_steps = np.ceil((120.0 - xpos2)/deltax) # ball needs to get to 120
+      deltay = ypos2-ypos1
+      predY_nodeflection = ypos2 + (NB_intercept_steps*deltay)
+      if predY_nodeflection<0:
+        predY = -1*predY_nodeflection
+      elif predY_nodeflection>160:
+        predY = predY_nodeflection-160
       else:
-        if ypos1<0:
-          predY = -1
-        else:
-          NB_intercept_steps = np.ceil((120.0 - xpos2)/deltax)
-          deltay = ypos2-ypos1
-          predY_nodeflection = ypos2 + (NB_intercept_steps*deltay)
-          if predY_nodeflection<0:
-            predY = -1*predY_nodeflection
-          elif predY_nodeflection>160:
-            predY = predY_nodeflection-160
-          else:
-            predY = predY_nodeflection
+        predY = predY_nodeflection
     return predY
-  """
   
   def step (self,action):
     # one step of game activity
@@ -357,7 +355,7 @@ class simulatePong:
     self.obs = self.obs.astype(np.uint8)
     self.im.set_data(self.obs)#.astype(np.uint8))
     self.drawscore()        
-    self.fig.canvas.draw_idle()
+    #self.fig.canvas.draw_idle()
     plt.pause(0.0001)
     #plt.ion()
     #print('simulatePongFull done = ', self.done, self.obs.shape)
