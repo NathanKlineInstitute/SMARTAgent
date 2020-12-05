@@ -23363,7 +23363,7 @@ then if ball was going to hit right side at 170, it will instead be predicted to
 hmm, still some bugs in y prediction ... and changes sign from UP to DOWN for one step right when ball gets close to racket
 some boundary condition may be off ... 
 
-also have ball ypos found to be < 0 when it is clearly not in the image ... leading to no predicted move sometimes ... 
+also have ball ypos found to be < 0 when it is clearly in the image/frame ... leading to no predicted move sometimes ... 
 
  t= 58905.0  U,D spikes: [0.0] [0.0]
 no pred ypos1 < 0
@@ -23378,6 +23378,22 @@ t= 58964.4  U,D spikes: [0.0] [0.0]
 t= 58964.4 proposed,model action: ['DOWN'] ['STAY']
 t= 58964.4 RLcritic: -0.01
 t= 58984.2  U,D spikes: [0.0] [0.0]
+
+problem caused by reaching score of 20 in simulatePongFull.py setting done state to 1
+
+      if (self.GamePoints>1 and self.GamePoints%20==0) or (self.ModelPoints and self.ModelPoints%20==0):
+        self.done = 1
+      else:
+        self.done = 0
+
+which then causes aigame.py to set last_obs to empty list ... which then causes no ability to examine
+ball motion from previous frame; then done stays at 1 in simulatePongFull.py until next point scored
+all of that is a bug ... 
+
+and here's another ... noticed that when ball passes above or below racket predicted move switches
+from up to down or vice versa ... 
+
+should allow hitting from top of paddle as well ... 
 
 for when get this prediction code working better, would be better to have less sparse firing in output populations ... 
 there's often no movement at all 

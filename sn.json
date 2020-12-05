@@ -108,9 +108,9 @@
             "IA": 0,
             "EA2": 0,
             "IA2": 0,
-            "EMDOWN": 100,
-            "EMUP": 100,
-            "IM": 100,
+            "EMDOWN": 16,
+            "EMUP": 16,
+            "IM": 16,
             "IMUP": 0,
             "IMDOWN": 0
         },

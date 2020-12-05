@@ -91,7 +91,7 @@ class simulatePong:
     # create ball speed or displacement
     self.ball_dx = 1  # displacement in horizontal direction
     self.ball_dy = 1  #displacement in vertical direction
-    self. possible_ball_ypos = [40,60,80,100,120]
+    self.possible_ball_ypos = [40,60,80,100,120]
     self.possible_ball_dy = [1,1,1,1,1,1,2,2,2,2,3,3,3]
     self.possible_ball_dx = [1,1,1,1,1,1,2,2,2,2,3,3,3]
 
@@ -205,7 +205,7 @@ class simulatePong:
     # 4. check if the ball hits the racket
     # when ball moving towards the racket controlled by the model
     if self.ball_dx>0 and tmp_ballx2>=self.rightracketx1 and tmp_ballx2<=self.court_redge and self.MissedTheBall==0: 
-      if ((tmp_bally1>self.rightrackety1) and (tmp_bally1<self.rightrackety2)) or ((tmp_bally2>self.rightrackety1) and (tmp_bally2<self.rightrackety2)): 
+      if ((tmp_bally1>=self.rightrackety1) and (tmp_bally1<=self.rightrackety2)) or ((tmp_bally2>=self.rightrackety1) and (tmp_bally2<=self.rightrackety2)): 
         # if upper or lower edge of the ball is within the range of the racket
         xshift_ball = self.ball_dx + self.rightracketx1-tmp_ballx2
         """
@@ -229,7 +229,7 @@ class simulatePong:
           self.scoreRecorded = 1 
     elif self.ball_dx<0 and tmp_ballx1<=self.leftracketx2 and tmp_ballx1>=self.court_ledge and self.MissedTheBall==0:
       # when ball moving towards the racket controlled internally.
-      if ((tmp_bally1>self.leftrackety1) and (tmp_bally1<self.leftrackety2)) or ((tmp_bally2>self.leftrackety1) and (tmp_bally2<self.leftrackety2)):
+      if ((tmp_bally1>=self.leftrackety1) and (tmp_bally1<=self.leftrackety2)) or ((tmp_bally2>=self.leftrackety1) and (tmp_bally2<=self.leftrackety2)):
         # if upper or lower edge of the ball is within the range of the racket
         xshift_ball = self.ball_dx + self.leftracketx2-tmp_ballx1
         """
@@ -348,22 +348,27 @@ class simulatePong:
       self.ballx2 = self.xpos_ball+self.ball_width
       self.bally1 = self.court_top+self.ypos_ball
       self.bally2 = self.court_top+self.ypos_ball+self.ball_height
-      if (self.GamePoints>1 and self.GamePoints%20==0) or (self.ModelPoints and self.ModelPoints%20==0):
-        self.done = 1
-      else:
-        self.done = 0
+      # NOTE: this should not get set to done and stay at done, not really using episodes here at all ... 
+      #if self.done == 0 and ((self.GamePoints>1 and self.GamePoints%20==0) or (self.ModelPoints and self.ModelPoints%20==0)):
+      #  self.done = 1
+      #else:
+      #  self.done = 0
     self.moveball(xshift_ball, yshift_ball) # this should be computed internally  
     self.obs = self.obs.astype(np.uint8)
-    self.im.set_data(self.obs.astype(np.uint8))
+    self.im.set_data(self.obs)#.astype(np.uint8))
     self.drawscore()        
     self.fig.canvas.draw_idle()
     plt.pause(0.0001)
     #plt.ion()
-    return self.obs, self.reward, self.done
+    #print('simulatePongFull done = ', self.done, self.obs.shape)
+    return self.obs, self.reward, self.done, None
 
   def drawscore (self):
     self.scoreleft.set_text(str(self.GamePoints))
     self.scoreright.set_text(str(self.ModelPoints))
+
+  def reset (self):
+    print('WARNING: empty reset')
 
 #when the ball is moving in positive X dir then should be checked for hitting the Right racket.
 #If the ball hits the right racket: look at the angle and flip the angle.
@@ -380,7 +385,7 @@ def testsim (nstep=10000):
   pong = simulatePong()
   for i in range(nstep):
     #randaction = random.choice([3,4,1])
-    obs, reward, done = pong.step(-1)#randaction)
+    obs, reward, done, info = pong.step(-1)#randaction)
     
 
 if __name__ == '__main__':
