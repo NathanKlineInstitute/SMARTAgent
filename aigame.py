@@ -364,16 +364,16 @@ class AIGame:
 
   def predictBallRacketYIntercept(self, xpos1, ypos1, xpos2, ypos2):
     # inputs are last and next x,y positions of ball 
-    if ((xpos1==-1) or (xpos2==-1)):
+    if xpos1==-1 or xpos2==-1:
       return -1
     else:
       deltax = xpos2-xpos1
       if deltax<=0: # ball moving to the left
-        print('no pred ball moving left')
+        #print('no pred ball moving left')
         return -1
       else:
         if ypos1<0:
-          print('no pred ypos1 < 0', xpos1, ypos1, xpos2, ypos2, np.shape(self.last_obs)[0])
+          #print('no pred ypos1 < 0', xpos1, ypos1, xpos2, ypos2, np.shape(self.last_obs)[0])
           return -1
         else:
           NB_intercept_steps = np.ceil((120.0 - xpos2)/deltax) # 120-xpos2 is total horiz distance remaining; deltax is dist per move
@@ -480,7 +480,7 @@ class AIGame:
       if xpos_Ball>=0 and ypos_Ball>=0:
         self.dObjPos['ball'].append([self.courtXRng[0]+xpos_Ball,ypos_Ball])
       else:
-        print('followTheBallRule: ball x,y:', xpos_Ball, ypos_Ball)
+        #print('followTheBallRule: ball x,y:', xpos_Ball, ypos_Ball)
         self.dObjPos['ball'].append([-1,-1])
       if xpos_Racket>=0 and ypos_Racket>=0:
         self.dObjPos['racket'].append([self.racketXRng[0]+xpos_Racket,ypos_Racket])
@@ -488,7 +488,7 @@ class AIGame:
         self.dObjPos['racket'].append([-1,-1])
       self.dObjPos['time'].append(simtime)
     else:
-      print('followTheBallRule: no last obs')
+      #print('followTheBallRule: no last obs')
       proposed_action = -1 #if there is no last_obs
       ypos_Ball = -1 #if there is no last_obs, no position of ball
       xpos_Ball = -1 #if there is no last_obs, no position of ball

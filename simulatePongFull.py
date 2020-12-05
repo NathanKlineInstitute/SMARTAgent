@@ -180,6 +180,7 @@ class simulatePong:
     if self.ballx1>self.leftracketx2 and self.ballx2<self.rightracketx1 and self.NewServe:
       # why need to set missedball==0 here? can't you set it after it's set to 1 at end of this function?
       # and why does missedtheball need to persist outside of this function - it's only used within this function
+      # answer: probably because ball can keep moving beyond rackets and do not want to count score twice ... 
       self.MissedTheBall = 0
       self.NewServe = 0
       self.scoreRecorded = 0
@@ -205,9 +206,9 @@ class simulatePong:
     else:
       yshift_ball = self.ball_dy
     # 4. check if the ball hits the racket
-    # when ball moving towards the racket controlled by the model
+    # when ball moving towards the (right) racket controlled by the model
     if self.ball_dx>0 and tmp_ballx2>=self.rightracketx1 and tmp_ballx2<=self.court_redge and self.MissedTheBall==0: 
-      if ((tmp_bally1>=self.rightrackety1) and (tmp_bally1<=self.rightrackety2)) or ((tmp_bally2>=self.rightrackety1) and (tmp_bally2<=self.rightrackety2)): 
+      if (tmp_bally1>=self.rightrackety1 and tmp_bally1<=self.rightrackety2) or (tmp_bally2>=self.rightrackety1 and tmp_bally2<=self.rightrackety2): 
         # if upper or lower edge of the ball is within the range of the racket
         xshift_ball = self.ball_dx + self.rightracketx1-tmp_ballx2
         """
@@ -230,8 +231,8 @@ class simulatePong:
           self.reward = -1
           self.scoreRecorded = 1 
     elif self.ball_dx<0 and tmp_ballx1<=self.leftracketx2 and tmp_ballx1>=self.court_ledge and self.MissedTheBall==0:
-      # when ball moving towards the racket controlled internally.
-      if ((tmp_bally1>=self.leftrackety1) and (tmp_bally1<=self.leftrackety2)) or ((tmp_bally2>=self.leftrackety1) and (tmp_bally2<=self.leftrackety2)):
+      # when ball moving towards the (left) racket controlled internally.
+      if (tmp_bally1>=self.leftrackety1 and tmp_bally1<=self.leftrackety2) or (tmp_bally2>=self.leftrackety1 and tmp_bally2<=self.leftrackety2):
         # if upper or lower edge of the ball is within the range of the racket
         xshift_ball = self.ball_dx + self.leftracketx2-tmp_ballx1
         """
