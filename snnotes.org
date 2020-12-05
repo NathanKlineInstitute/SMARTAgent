@@ -23388,7 +23388,7 @@ problem caused by reaching score of 20 in simulatePongFull.py setting done state
 
 which then causes aigame.py to set last_obs to empty list ... which then causes no ability to examine
 ball motion from previous frame; then done stays at 1 in simulatePongFull.py until next point scored
-all of that is a bug ... 
+all of that is a bug ... for now shutting of self.done being set to 1 in simulatePongFull.py
 
 and here's another ... noticed that when ball passes above or below racket predicted move switches
 from up to down or vice versa ... 
@@ -23397,4 +23397,19 @@ should allow hitting from top of paddle as well ...
 
 for when get this prediction code working better, would be better to have less sparse firing in output populations ... 
 there's often no movement at all 
+
+* 20dec5
+** meanwhile, try a multistep sim on cycle
+
+with previous params for network (with motion selective neurons) and the fixes mentioned above
+
+        "name": "20dec5_A0_cycle_",
+
+note these params:
+    "followOnlyTowards": 0,
+    "useRacketPredictedPos": 1,
+
+which means will follow ball when it's moving to the left and follow predicted target when ball is moving to the right
+
+python multistepSim.py sn.json 32 20 20dec5_A0_cycle_multi
 
