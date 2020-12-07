@@ -23413,3 +23413,54 @@ which means will follow ball when it's moving to the left and follow predicted t
 
 python multistepSim.py sn.json 32 20 20dec5_A0_cycle_multi
 
+* 20dec7
+** check output from 20dec5_A0_cycle__step_2_ -->> learned fast then dropped -->> not doing well, EMUP, EMDOWN weights diverged
+
+python -i simdat.py backupcfg/20dec5_A0_cycle__step_2_sim.json
+
+EV1 0.71 Hz
+EV1DE 0.16 Hz
+EV1DNE 1.4 Hz
+EV1DN 2.46 Hz
+EV1DNW 0.29 Hz
+EV1DW 0.08 Hz
+EV1DSW 0.7 Hz
+EV1DS 2.43 Hz
+EV1DSE 1.25 Hz
+EA 2.82 Hz
+EA2 9.53 Hz
+IA2 20.61 Hz
+EMDOWN 11.95 Hz
+EMUP 12.1 Hz
+IM 21.88 Hz
+stimModEV1 0.8 Hz
+stimModEV1DE 0.17 Hz
+stimModEV1DNE 1.51 Hz
+stimModEV1DN 2.61 Hz
+stimModEV1DNW 0.31 Hz
+stimModEV1DW 0.08 Hz
+stimModEV1DSW 0.73 Hz
+stimModEV1DS 2.46 Hz
+stimModEV1DSE 1.3 Hz
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/20dec7_20dec5_A0_cycle__step_2_perf.png]]
+does not seem to be doing so well ... 
+
+lfn = ['20dec5_A0_cycle__step_' + str(i) + '_' for i in range(3)]
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0,0.4))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/20dec7_20dec5_A0_cycle__step_2_perf_all_steps_so_far.png]]
+
+hit/miss ratio was going up then decayed ... no points scored at all ... 
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,simConfig['simConfig']['duration']),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False)
+savefig(gifpath()+'all_avg_weight.png') # [[./gif/20dec7_20dec5_A0_cycle__step_2_all_avg_weight.png]]
+weights diverged too much ...
+
+pdfc = getconcatweightpdf(lfn)
+clf(); popwts = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False)
+savefig(gifpath()+'all_steps_avg_weight.png') # [[./gif/20dec7_20dec5_A0_cycle__step_2_all_steps_avg_weight.png]]
+
+so targetted RL of 3 might be a problem that causes the weights to diverge too much . . . 
+
