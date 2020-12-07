@@ -608,10 +608,13 @@ class AIGame:
         done = False
       rewards.append(reward)
       if dconf["useRacketPredictedPos"]:
-        if proposed_target_action != -1: # use target when ball moving towards / available
-          proposed_actions.append(proposed_target_action)
-        elif not dconf['followOnlyTowards']: # when ball moving away
-          proposed_actions.append(proposed_follow_action)
+        if not dconf['followOnlyTowards']:
+          if proposed_target_action != -1: # use target when ball moving towards / available
+            proposed_actions.append(proposed_target_action)
+          else: # when ball moving away
+            proposed_actions.append(proposed_follow_action)
+        else: # when using follow only towards make sure to store the proposed action regardless of its value (-1 means ball moving away or off-screen)
+          proposed_actions.append(proposed_target_action)          
       else:      
         proposed_actions.append(proposed_follow_action)
       gray_Image = 255.0*rgb2gray(observation[courtYRng[0]:courtYRng[1],:,:]) # convert to grayscale; rgb2gray has 0-1 range so mul by 255
