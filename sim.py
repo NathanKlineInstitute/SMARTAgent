@@ -386,6 +386,7 @@ netParams.stimTargetParams['bkg->all'] = {
 """
 
 def setupNoiseStim ():
+  lnoisety = []
   # setup noisy NetStim sources (send random spikes)
   if ECellModel == 'IntFire4' or ECellModel == 'INTF7':
     lpoty = [x for x in EMotorPops]
@@ -396,8 +397,8 @@ def setupNoiseStim ():
       if ty == 'I': Weight *= cfg.IEGain
       if Weight > 0.0 and Rate > 0.0: # only create the netstims if rate,weight > 0
         for poty in lpoty:
-          stimty = 'stimNoise'+poty
-          netParams.popParams[stimty] = {'cellModel': 'NSLOC', 'numCells': dnumc[poty],'rate': Rate, 'noise': 1.00, 'start': 0}
+          stimty = 'stimNoise'+poty+'_'+sy
+          netParams.popParams[stimty] = {'cellModel': 'NetStim', 'numCells': dnumc[poty],'rate': Rate, 'noise': 1.0, 'start': 0}
           blist = [[i,i] for i in range(dnumc[poty])]
           netParams.connParams[stimty+'->'+poty] = {
             'preConds': {'pop':stimty},
@@ -406,6 +407,7 @@ def setupNoiseStim ():
             'delay': getInitDelay(),
             'connList':blist,
             'weightIndex':getWeightIndex(sy,ECellModel)}
+          lnoisety.append(stimty)
   else:
     # setup noise inputs
     for ty,sy in zip(["E","I"],["AMPA","GABA"]):
@@ -413,10 +415,12 @@ def setupNoiseStim ():
       if Weight > 0.0 and Rate > 0.0: # only create the netstims if rate,weight > 0
         netParams.stimSourceParams[ty+'Mbkg'] = {'type': 'NetStim', 'rate': Rate, 'noise': 1.0}
         netParams.stimTargetParams[ty+'Mbkg->all'] = {
-          'source': ty+'Mbkg', 'conds': {'cellType': EMotorPops}, 'weight': Weight, 'delay': 'max(1, normal(5,2))', 'synMech': sy
-        }
+          'source': ty+'Mbkg', 'conds': {'cellType': EMotorPops}, 'weight': Weight, 'delay': 'max(1, normal(5,2))', 'synMech': sy}
+        lnoisety.append(stimty)
+  return lnoisety
 
-setupNoiseStim()        
+sim.lnoisety = setupNoiseStim()
+for ty in sim.lnoisety: allpops.append(ty)
       
 ######################################################################################
 
@@ -1386,6 +1390,29 @@ proposed_actions = []
 total_hits = [] #numbertimes ball is hit by racket as ball changes its direction and player doesn't lose a score (assign 1). if player loses
 dSTDPmech = {} # dictionary of list of STDP mechanisms
 
+def InitializeNoiseRates ():
+  # initialize the noise firing rates for the primary visual neuron populations (location V1 and direction sensitive)
+  # based on image contents
+  if ECellModel == 'IntFire4' or ECellModel == 'INTF7':
+    #np.random.seed(1234)
+    for pop in sim.lnoisety:
+      if pop in sim.net.pops:
+        for cell in sim.net.cells:
+          if cell.gid in sim.net.pops[pop].cellGids:
+            cell.hPointp.interval = 10
+            cell.hPointp.start = 0 # np.random.uniform(0,1200) 
+  else:
+    if dnumc['ER']>0:
+      lratepop = ['ER', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW', 'EV1DSW', 'EV1DS', 'EV1DSE']
+    else:
+      lratepop = ['EV1', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW', 'EV1DSW', 'EV1DS', 'EV1DSE']    
+    for pop in lratepop:
+      lCell = [c for c in sim.net.cells if c.gid in sim.net.pops[pop].cellGids] # this is the set of cells
+      for cell in lCell:  
+        for stim in cell.stims:
+          if stim['source'] == 'stimMod':
+            stim['hObj'].interval = 1e12
+
 def InitializeInputRates ():
   # initialize the source firing rates for the primary visual neuron populations (location V1 and direction sensitive)
   # based on image contents
@@ -1845,6 +1872,7 @@ def setdminID (sim, lpop):
 setdminID(sim, allpops)
 tPerPlay = tstepPerAction*dconf['actionsPerPlay']
 InitializeInputRates()
+#InitializeNoiseRates()
 dsumWInit = getSumAdjustableWeights(sim) # get sum of adjustable weights at start of sim
 sim.runSimWithIntervalFunc(tPerPlay,trainAgent) # has periodic callback to adjust STDP weights based on RL signal
 if sim.rank==0 and fid4 is not None: fid4.close()

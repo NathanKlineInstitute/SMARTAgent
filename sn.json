@@ -33,7 +33,7 @@
         "hitBall": 0.5
     },
     "actionsPerPlay": 1,
-    "followOnlyTowards": 0,
+    "followOnlyTowards": 1,
     "useRacketPredictedPos": 1,
     "useFollowMoveOutput": 0,
     "DirectionDetectionAlgo": {
@@ -49,7 +49,7 @@
         "ResumeSimFromFile": "data/20nov24_C0_gcp__step_2_synWeights_final.pkl"
     },
     "sim": {
-        "duration": 500000,
+        "duration": 10000,
         "dt": 0.6,
         "verbose": 0,
         "recordStep": 1.0,
@@ -59,12 +59,12 @@
         "RLFakeUpRule": 0,
         "RLFakeDownRule": 0,
         "RLFakeStayRule": 0,
-        "name": "20dec5_A0_cycle_",
+        "name": "20dec7_A0_cycle_",
         "doquit": 1,
         "doplot": 0,
         "saveCellSecs": 0,
         "saveCellConns": 0,
-        "targettedRL": 3,
+        "targettedRL": 0,
         "tstepPerAction": 20,
         "saveWeights": 1,
         "saveAssignedFiringRates": 0,
@@ -315,8 +315,8 @@
         "DirMaxRate": 150.0,
         "LocMaxRate": 150.0,
         "FiringRateCutoff": 50.0,
-        "stimModVD": 35,
-        "stimModVL": 35,
+        "stimModVD": 0,
+        "stimModVL": 0,
         "cmat": {
             "VL": {
                 "VD": {
@@ -754,12 +754,12 @@
     },
     "Noise": {
         "I": {
-            "Rate": 0,
-            "Weight": 0.1
+            "Rate": 1000,
+            "Weight": 5
         },
         "E": {
-            "Rate": 0,
-            "Weight": 1
+            "Rate": 1000,
+            "Weight": 5
         }
     }
 }

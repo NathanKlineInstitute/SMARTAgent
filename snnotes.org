@@ -23464,3 +23464,10 @@ savefig(gifpath()+'all_steps_avg_weight.png') # [[./gif/20dec7_20dec5_A0_cycle__
 
 so targetted RL of 3 might be a problem that causes the weights to diverge too much . . . 
 
+** adjust sim on cycle (20dec7_A0_cycle_)
+
+add noise
+use onlyfollow
+targetted - use 0 or 1 ??
+
+./myrun 32 sn.json
