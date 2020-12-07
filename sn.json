@@ -315,8 +315,8 @@
         "DirMaxRate": 150.0,
         "LocMaxRate": 150.0,
         "FiringRateCutoff": 50.0,
-        "stimModVD": 0,
-        "stimModVL": 0,
+        "stimModVD": 26.25,
+        "stimModVL": 26.25,
         "cmat": {
             "VL": {
                 "VD": {
