@@ -730,7 +730,26 @@ def getactsel (dhist, actreward):
     else: # dspk == uspk:
       actsel.append(dconf['moves']['NOMOVE'])
   return actsel  
-  
+
+def getconcatweightpdf (lfn):
+  # concatenate the weights together so can look at cumulative rewards,actions,etc.
+  # lfn is a list of actionrewards filenames from the simulation
+  pdf = None
+  for fn in lfn:
+    try:
+      wtmp = readinweights(fn) # if RL was off, no weights saved
+    except:
+      try:
+        wtmp = readinweights(fn,final=True)
+      except:
+        print('could not load weights from', fn)
+    if pdf is None:
+      pdf = wtmp
+    else:
+      wtmp.time += np.amax(pdf.time)
+      pdf = pdf.append(wtmp)
+  return pdf
+
 def getconcatactionreward (lfn):
   # concatenate the actionreward data frames together so can look at cumulative rewards,actions,etc.
   # lfn is a list of actionrewards filenames from the simulation
