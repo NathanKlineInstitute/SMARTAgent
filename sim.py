@@ -1423,7 +1423,7 @@ def InitializeInputRates ():
         for cell in sim.net.cells:
           if cell.gid in sim.net.pops[pop].cellGids:
             cell.hPointp.interval = 1e12
-            cell.hPointp.start = np.random.uniform(0,1200) 
+            cell.hPointp.start = 0 # np.random.uniform(0,1200) 
   else:
     if dnumc['ER']>0:
       lratepop = ['ER', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW', 'EV1DSW', 'EV1DS', 'EV1DSE']
