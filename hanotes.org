@@ -10148,3 +10148,15 @@ python multistepSim.py sim.json 16 10 20dec3_B0_cycle_multi
 
     self.ball_dx = 3  # displacement in horizontal direction
     self.ball_dy = 3  #displacement in vertical direction
+
+* 20dec07 
+
+-- set "followOnlyTowards": 0 and     "wiggle": 6,
+
+-- Sam pointed out that once in a while hit-the-ball event goes undetected
+... should try to figure out the situation, where hit-the-ball event goes undetected...
+... meanwhile run the simulations.
+
+-- Sam also suggested that we should add noise to EM neurons, allowing better exploration of motor action space.
+
+-- run 5000sec sim "20dec07_A0_cycle_reduced_2obj_INTF7_" using fixed and improved simulatePongFull.

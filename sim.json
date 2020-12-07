@@ -20,6 +20,7 @@
         3,
         4
     ],
+    "wiggle": 6,
     "stochmove": 0,
     "0rand": 0,
     "movefctr": 1.0,
@@ -33,7 +34,7 @@
         "hitBall": 0.2
     },
     "actionsPerPlay": 1,
-    "followOnlyTowards": 1,
+    "followOnlyTowards": 0,
     "useRacketPredictedPos": 1,
     "useFollowMoveOutput": 0,
     "DirectionDetectionAlgo": {
@@ -49,7 +50,7 @@
         "ResumeSimFromFile": "data/20nov27_A0_cycle_reduced_2obj_INTF7_synWeights_final.pkl"
     },
     "sim": {
-        "duration": 500000,
+        "duration": 5000000,
         "dt": 0.6,
         "verbose": 0,
         "recordStep": 1.0,
@@ -59,14 +60,14 @@
         "RLFakeUpRule": 0,
         "RLFakeDownRule": 0,
         "RLFakeStayRule": 0,
-        "name": "20dec03_A2_cycle_reduced_2obj_INTF7_",
+        "name": "20dec07_A0_cycle_reduced_2obj_INTF7_",
         "doquit": 1,
         "doplot": 0,
         "saveCellSecs": 0,
         "saveCellConns": 0,
         "targettedRL": 3,
         "anticipatedRL": 0,
-        "tstepPerAction": 50,
+        "tstepPerAction": 20,
         "saveWeights": 1,
         "saveAssignedFiringRates": 0,
           "useReducedNetwork": 1,
