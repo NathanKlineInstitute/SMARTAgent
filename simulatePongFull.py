@@ -2,44 +2,6 @@ import numpy as np
 from conf import dconf
 import random
 from matplotlib import pyplot as plt
-
-"""
-class ball:
-  def __init__ (self,x, y, width, height):
-    self.x = x
-    self.y = y
-    self.width = width
-    self.height = height
-    # these variables are for keeping track of our velocity on both the
-    # X and Y axis, since the ball can move in two dimensions
-    self.dy = 0
-    self.dx = 0
-  def collides (self,paddle):
-    #Expects a paddle as an argument and returns true or false, depending
-    #on whether their rectangles overlap.
-    # first, check to see if the left edge of either is farther to the right
-    # than the right edge of the other
-    if self.x > paddle.x + paddle.width or paddle.x > self.x + self.width:
-      return False
-    # then check to see if the bottom edge of either is higher than the top
-    # edge of the other
-    if self.y > paddle.y + paddle.height or paddle.y > self.y + self.height:
-      return False
-    # if the above aren't true, they're overlapping
-    return True
-  def reset(self):
-    # Places the ball in the middle of the screen, with no movement.
-    self.x = VIRTUAL_WIDTH / 2 - 2
-    self.y = VIRTUAL_HEIGHT / 2 - 2
-    self.dx = 0
-    self.dy = 0
-  def update(self, dt)
-    self.x = self.x + self.dx * dt
-    self.y = self.y + self.dy * dt
-  def render(self):
-    pass
-    #love.graphics.rectangle('fill', self.x, self.y, self.width, self.height)
-"""
     
 class simulatePong:
   def __init__  (self, seed=1234):
@@ -53,8 +15,8 @@ class simulatePong:
     self.reward =0
     self.done = 0
     # points
-    self.GamePoints = 0
-    self.ModelPoints = 0
+    self.GamePoints = self.ModelPoints = 0
+    self.GameHits = self.ModelHits = 0
     self.MissedTheBall = 0
     self.NewServe = 0
     self.scoreRecorded = 0
@@ -63,8 +25,8 @@ class simulatePong:
   def createFigure (self):
     self.fig,self.ax = plt.subplots(1,1)
     self.im = self.ax.imshow(np.zeros(shape=(210,160,3)))
-    self.scoreleft = self.ax.text(30, 20, str(self.GamePoints), style='normal',color='orange',size=32)
-    self.scoreright = self.ax.text(130, 20, str(self.ModelPoints), style='normal',color='lightgreen',size=32)
+    self.scoreleft = self.ax.text(5, 20, str(self.GamePoints), style='normal',color='orange',size=32)
+    self.scoreright = self.ax.text(90, 20, str(self.ModelPoints), style='normal',color='lightgreen',size=32)
 
   def createcourt (self):
     self.court_top = 34
@@ -120,7 +82,7 @@ class simulatePong:
     self.obs[self.rightrackety1:self.rightrackety2,self.rightracketx1:self.rightracketx2,1]= 186
     self.obs[self.rightrackety1:self.rightrackety2,self.rightracketx1:self.rightracketx2,2]= 92    
     # create racket speed or displacement
-    self.racket_dy = 5   # displacement of rackets.
+    self.racket_dy = dconf['simulatedEnvParams']['racket_dy'] # displacement of rackets.
     self.server = 'LRacket' # which racket serving    
     
   def createnewframe (self):
@@ -220,26 +182,28 @@ class simulatePong:
         self.ball_dy = np.sign(self.ball_dy) * random.choice(self.possible_ball_dy)
         y_shift_ball = self.ball_dy
         self.ball_dx *= -1
+        self.ModelHits += 1
       elif right_racket_yshift < 0 and abs(tmp_bally2 - self.rightrackety1) <= 2:
         print('hit top R')
         xshift_ball = self.ball_dx + self.rightracketx1 - tmp_ballx2
         self.ball_dy = np.sign(self.ball_dy) * random.choice(self.possible_ball_dy) * 2        
         y_shift_ball = self.ball_dy
         self.ball_dx *= -1
+        self.ModelHits += 1        
       elif right_racket_yshift > 0 and abs(tmp_bally1 - self.rightrackety2) <= 2:
         print('hit bottom R')
         xshift_ball = self.ball_dx + self.rightracketx1 - tmp_ballx2
         self.ball_dy = np.sign(self.ball_dy) * random.choice(self.possible_ball_dy) * 2
         y_shift_ball = self.ball_dy
-        self.ball_dx *= -1 
+        self.ball_dx *= -1
+        self.ModelHits += 1        
       else:
         if self.scoreRecorded==0 and tmp_ballx1>self.rightracketx2:
           self.GamePoints += 1
           self.MissedTheBall = 1
-          #print('Scores: ', self.GamePoints,self.ModelPoints)
           if not dconf['simulatedEnvParams']['dodraw']:
             print('Right player missed the ball')
-            print('Scores: ', self.GamePoints,self.ModelPoints)
+            print('Scores: ', self.GamePoints,self.ModelPoints, 'Hits: ',self.GameHits,self.ModelHits)            
             print('Ball (projected):',tmp_ballx1,tmp_ballx2,tmp_bally1,tmp_bally2)
             print('Racket:',self.rightracketx1,self.rightracketx2,self.rightrackety1,self.rightrackety2)
           self.reward = -1
@@ -258,25 +222,28 @@ class simulatePong:
         self.ball_dy = np.sign(self.ball_dy) * random.choice(self.possible_ball_dy)
         y_shift_ball = self.ball_dy        
         self.ball_dx *= -1
+        self.GameHits += 1        
       elif left_racket_yshift < 0 and abs(tmp_bally2 - self.leftrackety1) <= 2:
         print('hit top L')
         xshift_ball = self.ball_dx + self.leftracketx2-tmp_ballx1
         self.ball_dy = np.sign(self.ball_dy) * random.choice(self.possible_ball_dy) * 2        
         y_shift_ball = self.ball_dy
         self.ball_dx *= -1
+        self.GameHits += 1                
       elif left_racket_yshift > 0 and abs(tmp_bally1 - self.leftrackety2) <= 2:
         print('hit bottom L')
         xshift_ball = self.ball_dx + self.leftracketx2-tmp_ballx1        
         self.ball_dy = np.sign(self.ball_dy) * random.choice(self.possible_ball_dy) * 2
         y_shift_ball = self.ball_dy
-        self.ball_dx *= -1         
+        self.ball_dx *= -1
+        self.GameHits += 1                
       else:
         if self.scoreRecorded==0 and tmp_ballx1<self.leftracketx1:
           self.ModelPoints += 1
           self.MissedTheBall = 1
           if not dconf['simulatedEnvParams']['dodraw']:
             print('Left player missed the ball')
-            print('Scores: ', self.GamePoints,self.ModelPoints)
+            print('Scores: ', self.GamePoints,self.ModelPoints, 'Hits: ',self.GameHits,self.ModelHits)
             print('Ball (projected):',tmp_ballx1,tmp_ballx2,tmp_bally1,tmp_bally2)
             print('Racket:',self.rightracketx1,self.rightracketx2,self.rightrackety1,self.rightrackety2)
           self.reward = 1
@@ -389,8 +356,8 @@ class simulatePong:
     return self.obs, self.reward, self.done, None
 
   def drawscore (self):
-    self.scoreleft.set_text(str(self.GamePoints))
-    self.scoreright.set_text(str(self.ModelPoints))
+    self.scoreleft.set_text(str(self.GamePoints)+', '+str(self.GameHits))
+    self.scoreright.set_text(str(self.ModelPoints)+', '+str(self.ModelHits))
 
   def reset (self):
     print('WARNING: empty reset')

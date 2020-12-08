@@ -1,7 +1,10 @@
 import json
 import sys
+import getpass
 
 fnjson = 'sim.json'
+
+if getpass.getuser().count('samn') > 0: fnjson = 'sn.json' # this is just temporary - for samn
 
 for i in range(len(sys.argv)):
   if sys.argv[i].endswith('.json'):

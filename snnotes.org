@@ -23604,3 +23604,42 @@ savefig('gif/20dc8_test_initial_time_a1.png') # [[./gif/20dc8_test_initial_time_
 
 ** last sim crashed at data save, rerun part 20dec8_A0_cycle_
 
+first test new collision detection rule that HA fixed ... 
+
+./myrun 32 sn.json
+
+EV1 0.48 Hz
+EV1DE 0.1 Hz
+EV1DNE 0.68 Hz
+EV1DN 3.38 Hz
+EV1DNW 0.24 Hz
+EV1DW 0.06 Hz
+EV1DSW 0.16 Hz
+EV1DS 3.38 Hz
+EV1DSE 0.78 Hz
+EA 1.49 Hz
+EA2 3.27 Hz
+IA2 7.6 Hz
+EMDOWN 6.89 Hz
+EMUP 6.86 Hz
+IM 86.91 Hz
+
+fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward) # [[./gif/20dec8_20dec8_A0_cycle__with_reward_input.mp4]]
+
+ok, looks good ... 
+
+can run longer sim now ... 
+
+will run for 500 s continuing from above 50 s sim... 
+
+    "simtype": {
+        "ResumeSim": 1,
+        "ResumeSimFromFile": "data/20dec8_A1_cycle_synWeights_final.pkl"
+    },
+
+        "name": "20dec8_A1_cycle_",
+
+./myrun 32 sn.json
+
+started ~13:55 ...
+
