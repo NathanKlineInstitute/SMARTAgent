@@ -233,16 +233,15 @@ class simulatePong:
         y_shift_ball = self.ball_dy
         self.ball_dx *= -1 
       else:
-        if self.scoreRecorded==0:
+        if self.scoreRecorded==0 and tmp_ballx1>self.rightracketx2:
           self.GamePoints += 1
           self.MissedTheBall = 1
-          print('Right player missed the ball')
-          print('Ball:',self.ballx1,self.ballx2,self.bally1,self.bally2)
-          print('Racket:',self.rightracketx1,self.rightracketx2,self.rightrackety1,self.rightrackety2)
           #print('Scores: ', self.GamePoints,self.ModelPoints)
           if not dconf['simulatedEnvParams']['dodraw']:
             print('Right player missed the ball')
             print('Scores: ', self.GamePoints,self.ModelPoints)
+            print('Ball (projected):',tmp_ballx1,tmp_ballx2,tmp_bally1,tmp_bally2)
+            print('Racket:',self.rightracketx1,self.rightracketx2,self.rightrackety1,self.rightrackety2)
           self.reward = -1
           self.scoreRecorded = 1 
     elif self.ball_dx<0 and tmp_ballx1<=self.leftracketx2 and tmp_ballx1>=self.court_ledge and self.MissedTheBall==0:
@@ -272,12 +271,14 @@ class simulatePong:
         y_shift_ball = self.ball_dy
         self.ball_dx *= -1         
       else:
-        if self.scoreRecorded==0:
+        if self.scoreRecorded==0 and tmp_ballx1<self.leftracketx1:
           self.ModelPoints += 1
           self.MissedTheBall = 1
           if not dconf['simulatedEnvParams']['dodraw']:
             print('Left player missed the ball')
             print('Scores: ', self.GamePoints,self.ModelPoints)
+            print('Ball (projected):',tmp_ballx1,tmp_ballx2,tmp_bally1,tmp_bally2)
+            print('Racket:',self.rightracketx1,self.rightracketx2,self.rightrackety1,self.rightrackety2)
           self.reward = 1
           self.scoreRecorded = 1
     else:
@@ -404,7 +405,7 @@ class simulatePong:
 #else if the ball hits the left edge, reset the ball.
 #else if the ball hits the upper of lower edge, look at the angle and flip the angle.
 
-def testsim (nstep=100000):
+def testsim (nstep=10000):
   # test the simulated pong with nstep
   pong = simulatePong()
   for i in range(nstep):

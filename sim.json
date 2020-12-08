@@ -8,7 +8,8 @@
     "simulatedEnvParams": {
         "random":0,
         "yball":80,
-        "yracket":40
+        "yracket":40,
+        "dodraw": 1
     },
     "moves": {
         "UP": 4,

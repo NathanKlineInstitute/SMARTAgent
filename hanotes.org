@@ -10253,3 +10253,20 @@ stimModEV1DSE 21.28 Hz
           print('Right player missed the ball')
           print('Ball:',self.ballx1,self.ballx2,self.bally1,self.bally2)
           print('Racket:',self.rightracketx1,self.rightracketx2,self.rightrackety1,self.rightrackety2)
+
+
+-- added conditions for declaring miss the ball:
+if self.scoreRecorded==0 and tmp_ballx1>self.rightracketx2: # for right racket
+
+if self.scoreRecorded==0 and tmp_ballx1<self.leftracketx1: # for left racket
+      
+... testing....
+
+import random
+from simulatePongFull import simulatePong
+pong = simulatePong()
+for _ in range(10000):
+  randaction = random.choice([3,4,1])
+  obs, reward, done, info = pong.step(randaction)
+
+  -- Hit the ball fixed.
