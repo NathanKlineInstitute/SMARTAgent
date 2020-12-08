@@ -2,44 +2,6 @@ import numpy as np
 from conf import dconf
 import random
 from matplotlib import pyplot as plt
-
-"""
-class ball:
-  def __init__ (self,x, y, width, height):
-    self.x = x
-    self.y = y
-    self.width = width
-    self.height = height
-    # these variables are for keeping track of our velocity on both the
-    # X and Y axis, since the ball can move in two dimensions
-    self.dy = 0
-    self.dx = 0
-  def collides (self,paddle):
-    #Expects a paddle as an argument and returns true or false, depending
-    #on whether their rectangles overlap.
-    # first, check to see if the left edge of either is farther to the right
-    # than the right edge of the other
-    if self.x > paddle.x + paddle.width or paddle.x > self.x + self.width:
-      return False
-    # then check to see if the bottom edge of either is higher than the top
-    # edge of the other
-    if self.y > paddle.y + paddle.height or paddle.y > self.y + self.height:
-      return False
-    # if the above aren't true, they're overlapping
-    return True
-  def reset(self):
-    # Places the ball in the middle of the screen, with no movement.
-    self.x = VIRTUAL_WIDTH / 2 - 2
-    self.y = VIRTUAL_HEIGHT / 2 - 2
-    self.dx = 0
-    self.dy = 0
-  def update(self, dt)
-    self.x = self.x + self.dx * dt
-    self.y = self.y + self.dy * dt
-  def render(self):
-    pass
-    #love.graphics.rectangle('fill', self.x, self.y, self.width, self.height)
-"""
     
 class simulatePong:
   def __init__  (self, seed=1234):
@@ -120,7 +82,7 @@ class simulatePong:
     self.obs[self.rightrackety1:self.rightrackety2,self.rightracketx1:self.rightracketx2,1]= 186
     self.obs[self.rightrackety1:self.rightrackety2,self.rightracketx1:self.rightracketx2,2]= 92    
     # create racket speed or displacement
-    self.racket_dy = 5   # displacement of rackets.
+    self.racket_dy = dconf['simulatedEnvParams']['racket_dy'] # displacement of rackets.
     self.server = 'LRacket' # which racket serving    
     
   def createnewframe (self):
