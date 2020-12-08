@@ -23584,5 +23584,23 @@ terminate called after throwing an instance of 'std::bad_alloc'
 hmm, so data was not saved ... probably crashed due to high rate of netstim inputs (1 kHz for each EM neuron)... 
 
 * 20dec8
+** avoid saving spikes from stimMod and noiseStim 
+
+	"recordStim": 0,
+
+in netpyne can adjust simConfig after sim initialized via sim.cfg (will have an effect on what's recorded as long as it's set before sim.setupRecording)
+sim.cfg.recordCellsSpikes array determines which gids to record from
+can also use population labels
+
+** initialtime in stdp.mod
+
+added initialization time global variable in stdp.mod to make sure synapses not tagged during network
+initialization transient; set to 1000 ms by default. checked and seems to work
+
+popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,np.amax(pdf.time)),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False)
+ylim((.5,.5013))
+savefig('gif/20dc8_test_initial_time_a0.png') # [[./gif/20dc8_test_initial_time_a0.png]]
+savefig('gif/20dc8_test_initial_time_a1.png') # [[./gif/20dc8_test_initial_time_a1.png]]
+
 ** last sim crashed at data save, rerun part 20dec8_A0_cycle_
 
