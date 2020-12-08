@@ -10269,4 +10269,65 @@ for _ in range(10000):
   randaction = random.choice([3,4,1])
   obs, reward, done, info = pong.step(randaction)
 
-  -- Hit the ball fixed.
+-- Hit the ball fixed.
+
+-- ran 500 sec sim in "20dec08_A0_cycle_reduced_2obj_INTF7_" without noise and..
+"targettedRL": 1,
+
+"tstepPerAction": 50,
+
+        "stimModVD": 27.5,
+        "stimModVL": 27.5,
+
+"RLhebbwt": 1,
+
+(base) hanwar@cycle:~/GamesProject/SMARTAgent$ python -i simdat.py backupcfg/20dec08_A0_cycle_reduced_2obj_INTF7_sim.json 
+reading  backupcfg/20dec08_A0_cycle_reduced_2obj_INTF7_sim.json
+-1
+lpop:  ['EV1', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW', 'EV1DSW', 'EV1DS', 'EV1DSE', 'EMDOWN', 'EMUP', 'IM']
+loading data from 20dec08_A0_cycle_reduced_2obj_INTF7_
+loading input images from data/20dec08_A0_cycle_reduced_2obj_INTF7_InputImages.txt
+loaded simulation data 20dec08_A0_cycle_reduced_2obj_INTF7_ on 20dec8_
+EV1 6.54 Hz
+EV1DE 0.81 Hz
+EV1DNE 8.12 Hz
+EV1DN 2.36 Hz
+EV1DNW 1.62 Hz
+EV1DW 0.45 Hz
+EV1DSW 6.38 Hz
+EV1DS 2.38 Hz
+EV1DSE 9.06 Hz
+EA 0.01 Hz
+EMDOWN 0.6 Hz
+EMUP 0.6 Hz
+IM 1.5 Hz
+stimModEV1 0.0 Hz
+stimModEV1DE 0.0 Hz
+stimModEV1DNE 0.0 Hz
+stimModEV1DN 0.0 Hz
+stimModEV1DNW 0.0 Hz
+stimModEV1DW 0.0 Hz
+stimModEV1DSW 0.0 Hz
+stimModEV1DS 0.0 Hz
+stimModEV1DSE 0.0 Hz
+
+stims are 0 because not recorded (set "recordStim":0 in sim.json).
+
+.... no good performance. (see 20dec08_A0_cycle_reduced_2obj_INTF7_Perf.png)
+.... diverging weights.....
+
+drawraster(dspkT,dspkID)
+xlim((4.5e5,5e5))
+save as 20dec08_A0_cycle_reduced_2obj_INTF7_Raster1.png
+
+ylim((3250,3500))
+
+-- start tuning the noise: start with Sam's values
+
+        "E": {
+            "Rate": 1000,
+            "Weight": 5
+        }
+
+ran 500 sec sim in "20dec08_A1_cycle_reduced_2obj_INTF7_"
+
