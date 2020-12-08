@@ -217,13 +217,21 @@ class simulatePong:
         elif tmp_bally2<(self.rightrackety1 + 0.5*self.racket_height):
           yshift_ball = -1 + self.ball_dy
         """
-        y_shift_ball = np.sign(self.ball_dy) * random.choice(self.possible_ball_dy)
+        self.ball_dy = np.sign(self.ball_dy) * random.choice(self.possible_ball_dy)
+        y_shift_ball = self.ball_dy
         self.ball_dx *= -1
-      elif right_racket_yshift < 0 and tmp_bally2 == self.rightrackety1:
-        print('hit top')
+      elif right_racket_yshift < 0 and abs(tmp_bally2 - self.rightrackety1) <= 2:
+        print('hit top R')
         xshift_ball = self.ball_dx + self.rightracketx1 - tmp_ballx2
-        y_shift_ball = np.sign(self.ball_dy) * random.choice(self.possible_ball_dy) * 2
+        self.ball_dy = np.sign(self.ball_dy) * random.choice(self.possible_ball_dy) * 2        
+        y_shift_ball = self.ball_dy
         self.ball_dx *= -1
+      elif right_racket_yshift > 0 and abs(tmp_bally1 - self.rightrackety2) <= 2:
+        print('hit bottom R')
+        xshift_ball = self.ball_dx + self.rightracketx1 - tmp_ballx2
+        self.ball_dy = np.sign(self.ball_dy) * random.choice(self.possible_ball_dy) * 2
+        y_shift_ball = self.ball_dy
+        self.ball_dx *= -1 
       else:
         if self.scoreRecorded==0:
           self.GamePoints += 1
@@ -244,8 +252,21 @@ class simulatePong:
         elif tmp_bally2<(self.leftrackety1 + 0.5*self.racket_height):
           yshift_ball = -1 + self.ball_dy
         """
-        y_shift_ball = np.sign(self.ball_dy) * random.choice(self.possible_ball_dy)
+        self.ball_dy = np.sign(self.ball_dy) * random.choice(self.possible_ball_dy)
+        y_shift_ball = self.ball_dy        
         self.ball_dx *= -1
+      elif left_racket_yshift < 0 and abs(tmp_bally2 - self.leftrackety1) <= 2:
+        print('hit top L')
+        xshift_ball = self.ball_dx + self.leftracketx2-tmp_ballx1
+        self.ball_dy = np.sign(self.ball_dy) * random.choice(self.possible_ball_dy) * 2        
+        y_shift_ball = self.ball_dy
+        self.ball_dx *= -1
+      elif left_racket_yshift > 0 and abs(tmp_bally1 - self.leftrackety2) <= 2:
+        print('hit bottom L')
+        xshift_ball = self.ball_dx + self.leftracketx2-tmp_ballx1        
+        self.ball_dy = np.sign(self.ball_dy) * random.choice(self.possible_ball_dy) * 2
+        y_shift_ball = self.ball_dy
+        self.ball_dx *= -1         
       else:
         if self.scoreRecorded==0:
           self.ModelPoints += 1
@@ -311,7 +332,7 @@ class simulatePong:
      ballmidY = self.bally1 + 0.5 * self.ball_height
      if ballmidY > self.rightrackety2 - self.wiggle: # if ball is below bottom of racket
        right_racket_yshift = stepsize # down
-     elif ballmidY < self.rightrackety1 + self.wiggle: # if ball is above top of racket
+     elif self.bally2 < self.rightrackety1 + self.wiggle: # if ball is above top of racket
        right_racket_yshift = -stepsize # up
      else:
        right_racket_yshift = 0
