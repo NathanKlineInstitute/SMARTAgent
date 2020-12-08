@@ -10314,13 +10314,14 @@ stimModEV1DSE 0.0 Hz
 stims are 0 because not recorded (set "recordStim":0 in sim.json).
 
 .... no good performance. (see 20dec08_A0_cycle_reduced_2obj_INTF7_Perf.png)
-.... diverging weights.....
+.... diverging weights..... (see 20dec08_A0_cycle_reduced_2obj_INTF7_MeanWeights.png)
 
 drawraster(dspkT,dspkID)
 xlim((4.5e5,5e5))
 save as 20dec08_A0_cycle_reduced_2obj_INTF7_Raster1.png
 
 ylim((3250,3500))
+save as 20dec08_A0_cycle_reduced_2obj_INTF7_Raster2.png
 
 -- start tuning the noise: start with Sam's values
 
@@ -10331,3 +10332,82 @@ ylim((3250,3500))
 
 ran 500 sec sim in "20dec08_A1_cycle_reduced_2obj_INTF7_"
 
+
+
+(base) hanwar@cycle:~/GamesProject/SMARTAgent$ python -i simdat.py backupcfg/20dec08_A1_cycle_reduced_2obj_INTF7_sim.json 
+reading  backupcfg/20dec08_A1_cycle_reduced_2obj_INTF7_sim.json
+-1
+lpop:  ['EV1', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW', 'EV1DSW', 'EV1DS', 'EV1DSE', 'EMDOWN', 'EMUP', 'IM']
+loading data from 20dec08_A1_cycle_reduced_2obj_INTF7_
+loading input images from data/20dec08_A1_cycle_reduced_2obj_INTF7_InputImages.txt
+loaded simulation data 20dec08_A1_cycle_reduced_2obj_INTF7_ on 20dec8_
+EV1 7.27 Hz
+EV1DE 1.16 Hz
+EV1DNE 9.12 Hz
+EV1DN 1.67 Hz
+EV1DNW 2.8 Hz
+EV1DW 0.43 Hz
+EV1DSW 6.46 Hz
+EV1DS 1.56 Hz
+EV1DSE 9.51 Hz
+EA 0.01 Hz
+EMDOWN 11.32 Hz
+EMUP 11.34 Hz
+IM 49.6 Hz
+
+.... better follow the ball but not good hit the ball performance. (see 20dec08_A1_cycle_reduced_2obj_INTF7_Perf.png)
+.... diverging weights..... (see 20dec08_A1_cycle_reduced_2obj_INTF7_MeanWeights.png)
+
+drawraster(dspkT,dspkID)
+xlim((4.5e5,5e5))
+save as 20dec08_A1_cycle_reduced_2obj_INTF7_Raster1.png
+
+ylim((3250,3500))
+xlim((4.99e5,5e5))
+save as 20dec08_A1_cycle_reduced_2obj_INTF7_Raster2.png
+
+
+-- ran 500 sec sim in "20dec08_A2_cycle_reduced_2obj_INTF7_"
+        "E": {
+            "Rate": 500,
+            "Weight": 5
+        }
+
+(base) hanwar@cycle:~/GamesProject/SMARTAgent$ python -i simdat.py backupcfg/20dec08_A2_cycle_reduced_2obj_INTF7_sim.json 
+reading  backupcfg/20dec08_A2_cycle_reduced_2obj_INTF7_sim.json
+-1
+lpop:  ['EV1', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW', 'EV1DSW', 'EV1DS', 'EV1DSE', 'EMDOWN', 'EMUP', 'IM']
+loading data from 20dec08_A2_cycle_reduced_2obj_INTF7_
+loading input images from data/20dec08_A2_cycle_reduced_2obj_INTF7_InputImages.txt
+loaded simulation data 20dec08_A2_cycle_reduced_2obj_INTF7_ on 20dec8_
+EV1 7.29 Hz
+EV1DE 1.41 Hz
+EV1DNE 8.31 Hz
+EV1DN 2.11 Hz
+EV1DNW 2.72 Hz
+EV1DW 0.45 Hz
+EV1DSW 8.35 Hz
+EV1DS 2.31 Hz
+EV1DSE 7.71 Hz
+EA 0.01 Hz
+EMDOWN 3.62 Hz
+EMUP 3.66 Hz
+IM 9.33 Hz
+
+drawraster(dspkT,dspkID)
+xlim((4.5e5,5e5))
+save as 20dec08_A2_cycle_reduced_2obj_INTF7_Raster1.png
+
+ylim((3250,3500))
+xlim((4.99e5,5e5))
+save as 20dec08_A2_cycle_reduced_2obj_INTF7_Raster2.png
+
+.... may have a potential. (see 20dec08_A2_cycle_reduced_2obj_INTF7_Perf.png)
+.... not too much diverging weights..... (see 20dec08_A2_cycle_reduced_2obj_INTF7_MeanWeights.png)
+
+-- run for 5000 sec "20dec08_A3_cycle_reduced_2obj_INTF7_"
+
+        "E": {
+            "Rate": 500,
+            "Weight": 5
+        }
