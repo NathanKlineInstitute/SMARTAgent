@@ -217,10 +217,7 @@ class simulatePong:
         elif tmp_bally2<(self.rightrackety1 + 0.5*self.racket_height):
           yshift_ball = -1 + self.ball_dy
         """
-        if self.ball_dy < 0:
-          y_shift_ball = -random.choice(self.possible_ball_dy)
-        else:
-          y_shift_ball = random.choice(self.possible_ball_dy) 
+        y_shift_ball = np.sign(self.ball_dy) * random.choice(self.possible_ball_dy)
         self.ball_dx *= -1
       else:
         if self.scoreRecorded==0:
@@ -242,10 +239,7 @@ class simulatePong:
         elif tmp_bally2<(self.leftrackety1 + 0.5*self.racket_height):
           yshift_ball = -1 + self.ball_dy
         """
-        if self.ball_dy < 0:
-          y_shift_ball = -random.choice(self.possible_ball_dy)
-        else:
-          y_shift_ball = random.choice(self.possible_ball_dy)           
+        y_shift_ball = np.sign(self.ball_dy) * random.choice(self.possible_ball_dy)
         self.ball_dx *= -1
       else:
         if self.scoreRecorded==0:
@@ -303,19 +297,19 @@ class simulatePong:
     stepsize = self.racket_dy
 
     if action==3:
-      yshift_racket = stepsize
+      right_racket_yshift = stepsize
     elif action==4:
-      yshift_racket = -stepsize
+      right_racket_yshift = -stepsize
     elif action==1:
-      yshift_racket=0
+      right_racket_yshift=0
     else: # invalid action means right paddle follows the ball (not done using learning neuronal network model)
      ballmidY = self.bally1 + 0.5 * self.ball_height
      if ballmidY > self.rightrackety2 - self.wiggle: # if ball is below bottom of racket
-       yshift_racket = stepsize # down
+       right_racket_yshift = stepsize # down
      elif ballmidY < self.rightrackety1 + self.wiggle: # if ball is above top of racket
-       yshift_racket = -stepsize # up
+       right_racket_yshift = -stepsize # up
      else:
-       yshift_racket = 0
+       right_racket_yshift = 0
       
     self.createnewframe()
 
@@ -326,23 +320,23 @@ class simulatePong:
     # when using self.wiggle of ~1/2 paddle height, it introduces oscillations in paddle as it tracks the ball
     ballmidY = self.bally1 + 0.5 * self.ball_height
     if ballmidY > self.leftrackety2 - self.wiggle:
-      left_yshift = stepsize
+      left_racket_yshift = stepsize
     elif ballmidY < self.leftrackety1 + self.wiggle:
-      left_yshift = -stepsize
+      left_racket_yshift = -stepsize
     else:
-      left_yshift = 0
+      left_racket_yshift = 0
 
     """
     if (self.leftrackety1+0.5*self.racket_height)>(self.bally1+0.5*self.ball_height):
-      left_yshift = -stepsize
+      left_racket_yshift = -stepsize
     elif (self.leftrackety1+0.5*self.racket_height)<(self.bally1+0.5*self.ball_height):
-      left_yshift = stepsize
+      left_racket_yshift = stepsize
     else:
-      left_yshift = 0
+      left_racket_yshift = 0
     """
       
-    self.movemodelracket(left_yshift) # intead of random shift, yshift should be based on projection
-    self.moveracket(yshift_racket) # this should be always based on Model/User
+    self.movemodelracket(left_racket_yshift) # intead of random shift, yshift should be based on projection
+    self.moveracket(right_racket_yshift) # this should be always based on Model/User
     xshift_ball, yshift_ball = self.getNextBallShift() # needs ball coords, both rackets' coordinates as well as boundaries.
     if self.NewServe==1:
       self.ballx1 = self.xpos_ball
