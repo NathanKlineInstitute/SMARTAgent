@@ -10160,3 +10160,96 @@ python multistepSim.py sim.json 16 10 20dec3_B0_cycle_multi
 -- Sam also suggested that we should add noise to EM neurons, allowing better exploration of motor action space.
 
 -- run 5000sec sim "20dec07_A0_cycle_reduced_2obj_INTF7_" using fixed and improved simulatePongFull.
+
+-- stopped:  python multistepSim.py sim.json 16 10 20dec3_B0_cycle_multi
+
+-- stop and rerun for 500 sec with "followOnlyTowards": 1 in sim "20dec07_A0_cycle_reduced_2obj_INTF7_"
+
+(base) hanwar@cycle:~/GamesProject/SMARTAgent$ python -i simdat.py backupcfg/20dec07_A0_cycle_reduced_2obj_INTF7_sim.json 
+reading  backupcfg/20dec07_A0_cycle_reduced_2obj_INTF7_sim.json
+-1
+lpop:  ['EV1', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW', 'EV1DSW', 'EV1DS', 'EV1DSE', 'EMDOWN', 'EMUP', 'IM']
+loading data from 20dec07_A0_cycle_reduced_2obj_INTF7_
+loading input images from data/20dec07_A0_cycle_reduced_2obj_INTF7_InputImages.txt
+loaded simulation data 20dec07_A0_cycle_reduced_2obj_INTF7_ on 20dec7_
+EV1 14.34 Hz
+EV1DE 3.92 Hz
+EV1DNE 24.07 Hz
+EV1DN 3.22 Hz
+EV1DNW 9.82 Hz
+EV1DW 2.31 Hz
+EV1DSW 15.18 Hz
+EV1DS 2.84 Hz
+EV1DSE 21.81 Hz
+EA 0.09 Hz
+EMDOWN 5.95 Hz
+EMUP 5.64 Hz
+IM 23.98 Hz
+stimModEV1 15.35 Hz
+stimModEV1DE 4.44 Hz
+stimModEV1DNE 28.32 Hz
+stimModEV1DN 3.27 Hz
+stimModEV1DNW 11.44 Hz
+stimModEV1DW 2.32 Hz
+stimModEV1DSW 16.98 Hz
+stimModEV1DS 2.89 Hz
+stimModEV1DSE 29.19 Hz
+>>> plotPerf(actreward)
+saved as "20dec07_A0_cycle_reduced_2obj_INTF7_Perf.png".... doesnt look too good.
+>>> plotMeanWeights(pdf,lpop=['EMDOWN','EMUP'],lclr=['r','g'],plotindiv=False)
+saved as "20dec07_A0_cycle_reduced_2obj_INTF7_MeanWeights.png"
+
+-- to compare it with real pong. run a sim "20dec07_A1_cycle_reduced_2obj_INTF7_" using real pong ("useSimulatedEnv": 0)
+useImagePadding:1
+EV1:48
+EA:4608
+
+(base) hanwar@cycle:~/GamesProject/SMARTAgent$ python -i simdat.py backupcfg/20dec07_A1_cycle_reduced_2obj_INTF7_sim.json 
+reading  backupcfg/20dec07_A1_cycle_reduced_2obj_INTF7_sim.json
+-1
+lpop:  ['EV1', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW', 'EV1DSW', 'EV1DS', 'EV1DSE', 'EMDOWN', 'EMUP', 'IM']
+loading data from 20dec07_A1_cycle_reduced_2obj_INTF7_
+loading input images from data/20dec07_A1_cycle_reduced_2obj_INTF7_InputImages.txt
+loaded simulation data 20dec07_A1_cycle_reduced_2obj_INTF7_ on 20dec7_
+EV1 10.03 Hz
+EV1DE 3.85 Hz
+EV1DNE 21.33 Hz
+EV1DN 1.38 Hz
+EV1DNW 9.82 Hz
+EV1DW 4.02 Hz
+EV1DSW 6.4 Hz
+EV1DS 1.71 Hz
+EV1DSE 17.43 Hz
+EA 0.06 Hz
+EMDOWN 6.09 Hz
+EMUP 6.1 Hz
+IM 29.75 Hz
+stimModEV1 11.35 Hz
+stimModEV1DE 4.31 Hz
+stimModEV1DNE 26.6 Hz
+stimModEV1DN 1.38 Hz
+stimModEV1DNW 13.29 Hz
+stimModEV1DW 5.08 Hz
+stimModEV1DSW 9.28 Hz
+stimModEV1DS 1.74 Hz
+stimModEV1DSE 21.28 Hz
+
+
+
+-- run sim for 5000 sec in "20dec07_A2_cycle_reduced_2obj_INTF7_"
+ "RLhebbwt": 1,
+  "targettedRL": 3
+
+-- run "20dec07_A3_cycle_reduced_2obj_INTF7_"
+ "RLhebbwt": 1,
+  "targettedRL": 1
+
+-- i ran using sn.json for 10 sec and didnt find the situation sam mentioned. all events were detected correctly.
+
+* 20dec08
+
+-- now running testsim for 100,000 actions to find situations where 
+
+          print('Right player missed the ball')
+          print('Ball:',self.ballx1,self.ballx2,self.bally1,self.bally2)
+          print('Racket:',self.rightracketx1,self.rightracketx2,self.rightrackety1,self.rightrackety2)

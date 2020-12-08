@@ -226,7 +226,9 @@ class simulatePong:
         if self.scoreRecorded==0:
           self.GamePoints += 1
           self.MissedTheBall = 1
-          #print('Right player missed the ball')
+          print('Right player missed the ball')
+          print('Ball:',self.ballx1,self.ballx2,self.bally1,self.bally2)
+          print('Racket:',self.rightracketx1,self.rightracketx2,self.rightrackety1,self.rightrackety2)
           #print('Scores: ', self.GamePoints,self.ModelPoints)
           self.reward = -1
           self.scoreRecorded = 1 
@@ -379,7 +381,7 @@ class simulatePong:
 #else if the ball hits the left edge, reset the ball.
 #else if the ball hits the upper of lower edge, look at the angle and flip the angle.
 
-def testsim (nstep=10000):
+def testsim (nstep=100000):
   # test the simulated pong with nstep
   pong = simulatePong()
   for i in range(nstep):
