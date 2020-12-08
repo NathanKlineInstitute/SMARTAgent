@@ -226,8 +226,9 @@ class simulatePong:
         if self.scoreRecorded==0:
           self.GamePoints += 1
           self.MissedTheBall = 1
-          #print('Right player missed the ball')
-          #print('Scores: ', self.GamePoints,self.ModelPoints)
+          if not dconf['simulatedEnvParams']['dodraw']:
+            print('Right player missed the ball')
+            print('Scores: ', self.GamePoints,self.ModelPoints)
           self.reward = -1
           self.scoreRecorded = 1 
     elif self.ball_dx<0 and tmp_ballx1<=self.leftracketx2 and tmp_ballx1>=self.court_ledge and self.MissedTheBall==0:
@@ -250,8 +251,9 @@ class simulatePong:
         if self.scoreRecorded==0:
           self.ModelPoints += 1
           self.MissedTheBall = 1
-          #print('Left player missed the ball')
-          #print('Scores: ', self.GamePoints,self.ModelPoints)
+          if not dconf['simulatedEnvParams']['dodraw']:
+            print('Left player missed the ball')
+            print('Scores: ', self.GamePoints,self.ModelPoints)
           self.reward = 1
           self.scoreRecorded = 1
     else:
@@ -354,12 +356,10 @@ class simulatePong:
       #  self.done = 0
     self.moveball(xshift_ball, yshift_ball) # this should be computed internally  
     self.obs = self.obs.astype(np.uint8)
-    self.im.set_data(self.obs)#.astype(np.uint8))
-    self.drawscore()        
-    #self.fig.canvas.draw_idle()
-    plt.pause(0.0001)
-    #plt.ion()
-    #print('simulatePongFull done = ', self.done, self.obs.shape)
+    if dconf['simulatedEnvParams']['dodraw']:
+      self.im.set_data(self.obs)#.astype(np.uint8))
+      self.drawscore()        
+      plt.pause(0.0001)
     return self.obs, self.reward, self.done, None
 
   def drawscore (self):
