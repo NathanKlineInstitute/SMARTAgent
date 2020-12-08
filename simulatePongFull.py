@@ -168,7 +168,7 @@ class simulatePong:
     self.obs[self.leftrackety1:self.leftrackety2,self.leftracketx1:self.leftracketx2,2]= 74
 
   # xshift_ball, yshift_ball = getNextBallShift()
-  def getNextBallShift (self):
+  def getNextBallShift (self, left_racket_yshift, right_racket_yshift)):
     # ball position is defined by self.b1x, self.b2x, self.b1y and self.b2y
     # right racket position is defined by self.r1y, self.r2y, self.r1x and self.r2x. Both self.r1x and self.r2x are fixed.
     # left racket position is defined by self.mr1y, self.mr2y, self.mr1x and self.mr2x. Both self.mr1x and self.mr2x are fixed.
@@ -218,6 +218,11 @@ class simulatePong:
           yshift_ball = -1 + self.ball_dy
         """
         y_shift_ball = np.sign(self.ball_dy) * random.choice(self.possible_ball_dy)
+        self.ball_dx *= -1
+      elif right_racket_yshift < 0 and tmp_bally2 == self.rightrackety1:
+        print('hit top')
+        xshift_ball = self.ball_dx + self.rightracketx1 - tmp_ballx2
+        y_shift_ball = np.sign(self.ball_dy) * random.choice(self.possible_ball_dy) * 2
         self.ball_dx *= -1
       else:
         if self.scoreRecorded==0:
@@ -337,7 +342,8 @@ class simulatePong:
       
     self.movemodelracket(left_racket_yshift) # intead of random shift, yshift should be based on projection
     self.moveracket(right_racket_yshift) # this should be always based on Model/User
-    xshift_ball, yshift_ball = self.getNextBallShift() # needs ball coords, both rackets' coordinates as well as boundaries.
+    # needs ball coords, both rackets' coordinates as well as boundaries.
+    xshift_ball, yshift_ball = self.getNextBallShift(left_racket_yshift, right_racket_yshift) 
     if self.NewServe==1:
       self.ballx1 = self.xpos_ball
       self.ballx2 = self.xpos_ball+self.ball_width
