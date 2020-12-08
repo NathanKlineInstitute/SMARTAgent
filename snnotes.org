@@ -23530,3 +23530,13 @@ so need to debug that problem ...
 
 and should have slightly higher EA2 rates ... 
 
+** changed rules to have dx,dy change each hit - might not keep that rule
+
+and top and bottom hits when paddles moving up and down increase the ball dy * 2
+
+still may have cases where ball seemingly passes through paddle ... 
+
+** meanwhile run a test (20dec7_C0_cycle_)
+
+./myrun 32 sn.json
+
