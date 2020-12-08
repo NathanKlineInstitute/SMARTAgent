@@ -271,7 +271,9 @@ class simulatePong:
     return xshift_ball, yshift_ball
 
   # should finish adjusting this to work for the left racket/opponent as well . . . and use it
-  def predictBallRacketYIntercept(self, xpos1, ypos1, xpos2, ypos2):
+  def predictBallRacketYIntercept (self):
+    xpos1, ypos1 = (self.ballx1+self.ballx2)/2.0, (self.bally1+self.bally2)/2.0
+    xpos2, ypos2 = xpos1 + self.ball_dx, ypos1 + self.ball_dy
     if xpos1==-1 or xpos2==-1 or xpos1==xpos2 or ypos1<0:
       return -1
     else:
@@ -311,18 +313,27 @@ class simulatePong:
       
     self.createnewframe()
 
-    #predY = self.predictBallRacketYIntercept() #(self.ballx1+self.ballx2)/2., (self.bally1+self.bally2)/2., \
-    #self.ballx2, self.bally2)
+    #predY = self.predictBallRacketYIntercept()
 
     # this rule moves paddle only when it does not overlap with ball along vertical axis +/- self.wiggle
     # when using self.wiggle of ~1/2 paddle height, it introduces oscillations in paddle as it tracks the ball
     ballmidY = self.bally1 + 0.5 * self.ball_height
-    if ballmidY > self.leftrackety2 - self.wiggle:
-      left_racket_yshift = stepsize
-    elif ballmidY < self.leftrackety1 + self.wiggle:
-      left_racket_yshift = -stepsize
-    else:
-      left_racket_yshift = 0
+
+    if self.ball_dx < 0:
+      #if self.yposx2 - self.racketH2 + self.wiggle > predY: # as long as racket overlaps with predY it's OK (to avoid oscillations)      
+      if ballmidY > self.leftrackety2 - self.wiggle:
+        left_racket_yshift = stepsize
+      elif ballmidY < self.leftrackety1 + self.wiggle:
+        left_racket_yshift = -stepsize
+      else:
+        left_racket_yshift = 0      
+    else:    
+      if ballmidY > self.leftrackety2 - self.wiggle:
+        left_racket_yshift = stepsize
+      elif ballmidY < self.leftrackety1 + self.wiggle:
+        left_racket_yshift = -stepsize
+      else:
+        left_racket_yshift = 0
 
     """
     if (self.leftrackety1+0.5*self.racket_height)>(self.bally1+0.5*self.ball_height):
