@@ -168,7 +168,7 @@ class simulatePong:
     self.obs[self.leftrackety1:self.leftrackety2,self.leftracketx1:self.leftracketx2,2]= 74
 
   # xshift_ball, yshift_ball = getNextBallShift()
-  def getNextBallShift (self, left_racket_yshift, right_racket_yshift)):
+  def getNextBallShift (self, left_racket_yshift, right_racket_yshift):
     # ball position is defined by self.b1x, self.b2x, self.b1y and self.b2y
     # right racket position is defined by self.r1y, self.r2y, self.r1x and self.r2x. Both self.r1x and self.r2x are fixed.
     # left racket position is defined by self.mr1y, self.mr2y, self.mr1x and self.mr2x. Both self.mr1x and self.mr2x are fixed.
