@@ -23471,3 +23471,62 @@ use onlyfollow
 targetted - use 0 or 1 ??
 
 ./myrun 32 sn.json
+
+EV1 0.44 Hz
+EV1DE 0.13 Hz
+EV1DNE 0.73 Hz
+EV1DN 3.04 Hz
+EV1DNW 0.33 Hz
+EV1DW 0.09 Hz
+EV1DSW 0.44 Hz
+EV1DS 3.02 Hz
+EV1DSE 0.95 Hz
+EA 1.19 Hz
+EA2 0.25 Hz
+IA2 0.52 Hz
+EMDOWN 6.17 Hz
+EMUP 6.15 Hz
+IM 80.69 Hz
+stimModEV1 0.81 Hz
+stimModEV1DE 0.19 Hz
+stimModEV1DNE 1.43 Hz
+stimModEV1DN 5.27 Hz
+stimModEV1DNW 0.59 Hz
+stimModEV1DW 0.12 Hz
+stimModEV1DSW 0.82 Hz
+stimModEV1DS 5.23 Hz
+stimModEV1DSE 1.85 Hz
+stimNoiseEMDOWN_AMPA 1000.08 Hz
+stimNoiseEMUP_AMPA 999.96 Hz
+stimNoiseEMDOWN_GABA 1000.11 Hz
+stimNoiseEMUP_GABA 999.86 Hz
+
+rates are ok ... EA2 somewhat low ... IM somewhat high
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/20dec7_20dec7_A0_cycle_perf.png]]
+
+hit rate pretty good ... at least starts that way ... 
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,np.amax(pdf.time)),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False)
+savefig(gifpath()+'all_steps_avg_weight.png') # [[./gif/20dec7_20dec7_A0_cycle_all_steps_avg_weight.png]]
+
+clf(); drawraster(dspkT,dspkID); xlim((90e3,100e3))
+savefig(gifpath()+'rast.png') # [[./gif/20dec7_20dec7_A0_cycle_rast.png]]
+
+binsz = 1000
+dnspk = {pop:getspikehist(dspkT[pop],dnumc[pop],binsz,totalDur) for pop in ['EMDOWN','EMUP']}
+for clr,pop in zip(['r','b'],['EMDOWN','EMUP']): plot(dnspk[pop][0],dnspk[pop][1],clr)
+
+savefig(gifpath()+'EMUPDOWN_rates.png') # [[./gif/20dec7_20dec7_A0_cycle_EMUPDOWN_rates.png]]
+
+fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward,framerate=50)
+[[./gif/20dec7_20dec7_A0_cycle__with_reward_input.mp4]]
+
+looks ok but looks like ball passes through right racket sometimes ... and only time model scored is when the
+ball went to fast for opponent to respond (randomly - not through model hitting ball)
+
+so need to debug that problem ... 
+
+and should have slightly higher EA2 rates ... 
+
