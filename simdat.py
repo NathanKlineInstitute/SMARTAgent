@@ -505,10 +505,10 @@ def pravgrates(dspkT,dspkID,dnumc):
   for pop in dspkT.keys(): print(pop,round(getrate(dspkT,dspkID,pop,dnumc),2),'Hz')
 
 #
-def drawraster (dspkT,dspkID,tlim=None,msz=2,skipstimMod=True):
+def drawraster (dspkT,dspkID,tlim=None,msz=2,skipstim=True):
   # draw raster (x-axis: time, y-axis: neuron ID)
   lpop=list(dspkT.keys()); lpop.reverse()
-  lpop = [x for x in lpop if not skipstimMod or x.count('stimMod')==0]  
+  lpop = [x for x in lpop if not skipstim or x.count('stim')==0]  
   csm=cm.ScalarMappable(cmap=cm.prism); csm.set_clim(0,len(dspkT.keys()))
   lclr = []
   for pdx,pop in enumerate(lpop):

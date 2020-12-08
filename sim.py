@@ -144,7 +144,7 @@ simConfig.dt = dconf['sim']['dt']                            # Internal integrat
 simConfig.hParams['celsius'] = 37 # make sure temperature is set. otherwise we're at squid temperature
 simConfig.verbose = dconf['sim']['verbose']                       # Show detailed messages
 simConfig.recordTraces = {'V_soma':{'sec':'soma','loc':0.5,'var':'v'}}  # Dict with traces to record
-simConfig.recordCellsSpikes = [-1]
+simConfig.recordCellsSpikes = [-1] # this means record from all neurons - including stim populations, if any
 simConfig.recordStep = dconf['sim']['recordStep'] # Step size in ms to save data (e.g. V traces, LFP, etc)
 simConfig.filename = 'data/'+dconf['sim']['name']+'simConfig'  # Set file output name
 simConfig.saveJson = False
@@ -1815,6 +1815,18 @@ sim.net.createPops()                      # instantiate network populations
 sim.net.createCells()                     # instantiate network cells based on defined populations
 sim.net.connectCells()                    # create connections between cells based on params
 sim.net.addStims()                      #instantiate netStim
+
+def setrecspikes ():
+  if dconf['sim']['recordStim']:
+    sim.cfg.recordCellsSpikes = [-1] # record from all spikes
+  else:
+    # make sure to record only from the neurons, not the stimuli - which requires a lot of storage/memory
+    sim.cfg.recordCellsSpikes = []
+    for pop in sim.net.pops.keys():
+      if pop.count('stim') > 0 or pop.count('Noise') > 0: continue
+      for gid in sim.net.pops[pop].cellGids: sim.cfg.recordCellsSpikes.append(gid)
+
+setrecspikes()
 sim.setupRecording()                  # setup variables to record for each cell (spikes, V traces, etc)
 
 dSTDPmech = getAllSTDPObjects(sim) # get all the STDP objects up-front
@@ -1876,7 +1888,7 @@ InitializeInputRates()
 dsumWInit = getSumAdjustableWeights(sim) # get sum of adjustable weights at start of sim
 sim.runSimWithIntervalFunc(tPerPlay,trainAgent) # has periodic callback to adjust STDP weights based on RL signal
 if sim.rank==0 and fid4 is not None: fid4.close()
-if ECellModel == 'INTF7' or ICellModel == 'INTF7': intf7.insertSpikes(sim, simConfig.recordStep)
+if ECellModel == 'INTF7' or ICellModel == 'INTF7': intf7.insertSpikes(sim, simConfig.recordStep)  
 sim.gatherData() # gather data from different nodes
 sim.saveData() # save data to disk
 
