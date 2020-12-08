@@ -15,8 +15,8 @@ class simulatePong:
     self.reward =0
     self.done = 0
     # points
-    self.GamePoints = 0
-    self.ModelPoints = 0
+    self.GamePoints = self.ModelPoints = 0
+    self.GameHits = self.ModelHits = 0
     self.MissedTheBall = 0
     self.NewServe = 0
     self.scoreRecorded = 0
@@ -182,26 +182,28 @@ class simulatePong:
         self.ball_dy = np.sign(self.ball_dy) * random.choice(self.possible_ball_dy)
         y_shift_ball = self.ball_dy
         self.ball_dx *= -1
+        self.ModelHits += 1
       elif right_racket_yshift < 0 and abs(tmp_bally2 - self.rightrackety1) <= 2:
         print('hit top R')
         xshift_ball = self.ball_dx + self.rightracketx1 - tmp_ballx2
         self.ball_dy = np.sign(self.ball_dy) * random.choice(self.possible_ball_dy) * 2        
         y_shift_ball = self.ball_dy
         self.ball_dx *= -1
+        self.ModelHits += 1        
       elif right_racket_yshift > 0 and abs(tmp_bally1 - self.rightrackety2) <= 2:
         print('hit bottom R')
         xshift_ball = self.ball_dx + self.rightracketx1 - tmp_ballx2
         self.ball_dy = np.sign(self.ball_dy) * random.choice(self.possible_ball_dy) * 2
         y_shift_ball = self.ball_dy
-        self.ball_dx *= -1 
+        self.ball_dx *= -1
+        self.ModelHits += 1        
       else:
         if self.scoreRecorded==0 and tmp_ballx1>self.rightracketx2:
           self.GamePoints += 1
           self.MissedTheBall = 1
-          #print('Scores: ', self.GamePoints,self.ModelPoints)
           if not dconf['simulatedEnvParams']['dodraw']:
             print('Right player missed the ball')
-            print('Scores: ', self.GamePoints,self.ModelPoints)
+            print('Scores: ', self.GamePoints,self.ModelPoints, 'Hits: ',self.GameHits,self.ModelHits)            
             print('Ball (projected):',tmp_ballx1,tmp_ballx2,tmp_bally1,tmp_bally2)
             print('Racket:',self.rightracketx1,self.rightracketx2,self.rightrackety1,self.rightrackety2)
           self.reward = -1
@@ -220,25 +222,28 @@ class simulatePong:
         self.ball_dy = np.sign(self.ball_dy) * random.choice(self.possible_ball_dy)
         y_shift_ball = self.ball_dy        
         self.ball_dx *= -1
+        self.GameHits += 1        
       elif left_racket_yshift < 0 and abs(tmp_bally2 - self.leftrackety1) <= 2:
         print('hit top L')
         xshift_ball = self.ball_dx + self.leftracketx2-tmp_ballx1
         self.ball_dy = np.sign(self.ball_dy) * random.choice(self.possible_ball_dy) * 2        
         y_shift_ball = self.ball_dy
         self.ball_dx *= -1
+        self.GameHits += 1                
       elif left_racket_yshift > 0 and abs(tmp_bally1 - self.leftrackety2) <= 2:
         print('hit bottom L')
         xshift_ball = self.ball_dx + self.leftracketx2-tmp_ballx1        
         self.ball_dy = np.sign(self.ball_dy) * random.choice(self.possible_ball_dy) * 2
         y_shift_ball = self.ball_dy
-        self.ball_dx *= -1         
+        self.ball_dx *= -1
+        self.GameHits += 1                
       else:
         if self.scoreRecorded==0 and tmp_ballx1<self.leftracketx1:
           self.ModelPoints += 1
           self.MissedTheBall = 1
           if not dconf['simulatedEnvParams']['dodraw']:
             print('Left player missed the ball')
-            print('Scores: ', self.GamePoints,self.ModelPoints)
+            print('Scores: ', self.GamePoints,self.ModelPoints, 'Hits: ',self.GameHits,self.ModelHits)
             print('Ball (projected):',tmp_ballx1,tmp_ballx2,tmp_bally1,tmp_bally2)
             print('Racket:',self.rightracketx1,self.rightracketx2,self.rightrackety1,self.rightrackety2)
           self.reward = 1
