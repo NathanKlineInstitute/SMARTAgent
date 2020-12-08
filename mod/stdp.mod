@@ -64,7 +64,8 @@ NEURON {
   RANGE newweight
   RANGE skip : Flag to skip 2nd set of conditions
   RANGE cumreward : cumulative reward magnitude so far
-  RANGE maxreward : max reward for scaling						   
+  RANGE maxreward : max reward for scaling
+  GLOBAL initialtime						     
   :RANGE NOSTDPTAG
 }			
 
@@ -111,12 +112,18 @@ PARAMETER {
   maxreward = 0
   : cumreward = 0				 
   :NOSTDPTAG = 0
+  initialtime = 1000 (ms) : initialization time before any weight changes possible				  
 }				      
 
 NET_RECEIVE (w) {
 		 :LOCAL deltaw
   deltaw = 0.0 : Default the weight change to 0.
   skip = 0
+  if (t < initialtime) {
+    VERBATIM		   
+    return;		   
+    ENDVERBATIM
+  }
     
   : if (verbose > 0)  { printf("t=%f (BEFORE) tlaspre=%f, tlastpost=%f, flag=%f, w=%f, deltaw=%f \n",t,tlastpre, tlastpost,flag,w,deltaw) }
 
