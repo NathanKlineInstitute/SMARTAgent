@@ -23715,7 +23715,7 @@ python multistepSim.py sn.json 32 20 20dec8_B0_nodirselective_gcp_multi
 started ~22:00 ...
 
 * 20dec9
-** check output from 20dec8_B0_nodirselective_gcp__step_1_
+** check output from 20dec8_B0_nodirselective_gcp__step_1_ and step_2 ... decent, not improving much
 
 python -i simdat.py backupcfg/20dec8_B0_nodirselective_gcp__step_1_sim.json
 
@@ -23763,6 +23763,27 @@ there might be a slight increase ...
 
 fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward) 
 [[./gif/20dec9_20dec8_B0_nodirselective_gcp__step_1__with_reward_input.mp4]]
+
+python -i simdat.py backupcfg/20dec8_B0_nodirselective_gcp__step_2_sim.json
+
+EV1 0.45 Hz
+EA 1.12 Hz
+EA2 2.23 Hz
+IA2 5.38 Hz
+EMDOWN 8.21 Hz
+EMUP 8.2 Hz
+IM 81.8 Hz
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/20dec9_20dec8_B0_nodirselective_gcp__step_2_perf.png]]
+looks similar to prior step
+
+lfn = ['20dec8_B0_nodirselective_gcp__step_' + str(i) + '_' for i in range(3)]
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0,0.7))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/20dec9_20dec8_B0_nodirselective_gcp__step_2_perf_all_steps_so_far.png]]
+
+may switch to targetted RL and/or reduce noise ... 
 
 ** check output from 20dec8_A2_cycle__step_1_
 
@@ -23841,3 +23862,23 @@ savefig(gifpath()+'all_avg_weight.png') # [[./gif/20dec9_20dec8_A2_cycle__step_0
 
 fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward) 
 [[./gif/20dec9_20dec8_A2_cycle__step_0__with_reward_input.mp4]]
+** adjust sim on gcp (20dec9_A0_nodirselective_gcp_)
+
+less noise?
+ok...HA using 500 Hz with weight of 5...can do same ... 
+
+rates after 10 s:
+EV1 0.88 Hz
+EA 8.42 Hz
+EA2 14.69 Hz
+IA2 34.9 Hz
+EMDOWN 5.61 Hz
+EMUP 5.66 Hz
+IM 40.38 Hz
+
+also will use targettedRL of 3 ... the noise might help prevent divergence of weights
+
+python multistepSim.py sn.json 32 20 20dec9_A0_nodirselective_gcp_multi
+
+started ~13:00 ... 
+
