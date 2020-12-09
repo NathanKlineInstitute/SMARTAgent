@@ -23700,3 +23700,17 @@ python multistepSim.py sn.json 32 20 20dec8_A2_cycle_multi
 
 started ~21:16 ...
 
+** sim on gcp (20dec8_B0_nodirselective_gcp_)
+
+no dir selective neurons?
+longer RL tau?
+slower racket speeds?
+
+will try w/o dir selective neurons first ... with cmat from VL -> EA at 0.2375 probability instead
+of 0.1; all other params same as 20dec8_A2_cycle_ 
+(has noise to EM, no targetted RL, intermediate rewards for predicted y location, 'simulated' pong)
+
+python multistepSim.py sn.json 32 20 20dec8_B0_nodirselective_gcp_multi
+
+started ~22:00 ...
+

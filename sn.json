@@ -47,7 +47,7 @@
     "verbose": 0,
     "stayStepLim": 0,
     "simtype": {
-        "ResumeSim": 1,
+        "ResumeSim": 0,
         "ResumeSimFromFile": "data/20dec8_A1_cycle_synWeights_final.pkl"
     },
     "sim": {
@@ -62,7 +62,7 @@
         "RLFakeUpRule": 0,
         "RLFakeDownRule": 0,
         "RLFakeStayRule": 0,
-        "name": "20dec8_A2_cycle_",
+        "name": "20dec8_B0_nodirselective_gcp_",
         "doquit": 1,
         "doplot": 0,
         "saveCellSecs": 0,
@@ -93,14 +93,14 @@
             "ER": 0,
             "IR": 0,
             "EV1": 6400,
-            "EV1DE": 400,
-            "EV1DNE": 400,
-            "EV1DN": 400,
-            "EV1DNW": 400,
-            "EV1DW": 400,
-            "EV1DSW": 400,
-            "EV1DS": 400,
-            "EV1DSE": 400,
+            "EV1DE": 0,
+            "EV1DNE": 0,
+            "EV1DN": 0,
+            "EV1DNW": 0,
+            "EV1DW": 0,
+            "EV1DSW": 0,
+            "EV1DS": 0,
+            "EV1DSE": 0,
             "ID": 0,
             "IV1": 0,
             "EV4": 0,
@@ -335,7 +335,7 @@
                 "EA": {
                     "AM": 2.6,
                     "NM": 0.26,
-                    "p": 0.1
+                    "p": 0.2375
                 },
                 "EMDOWN": {
                     "AM": 0.5,
