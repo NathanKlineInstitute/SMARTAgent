@@ -23602,7 +23602,7 @@ ylim((.5,.5013))
 savefig('gif/20dc8_test_initial_time_a0.png') # [[./gif/20dc8_test_initial_time_a0.png]]
 savefig('gif/20dc8_test_initial_time_a1.png') # [[./gif/20dc8_test_initial_time_a1.png]]
 
-** last sim crashed at data save, rerun part 20dec8_A0_cycle_
+** last sim crashed at data save, rerun part 20dec8_A0_cycle_ -->> seems to be improving
 
 first test new collision detection rule that HA fixed ... 
 
@@ -23642,4 +23642,61 @@ will run for 500 s continuing from above 50 s sim...
 ./myrun 32 sn.json
 
 started ~13:55 ...
+
+finished ~18:45 ... 
+
+so ~5 hours to run 500 s ... 
+
+EV1 0.46 Hz
+EV1DE 0.07 Hz
+EV1DNE 0.71 Hz
+EV1DN 3.43 Hz
+EV1DNW 0.19 Hz
+EV1DW 0.06 Hz
+EV1DSW 0.36 Hz
+EV1DS 3.38 Hz
+EV1DSE 0.64 Hz
+EA 1.27 Hz
+EA2 2.91 Hz
+IA2 6.84 Hz
+EMDOWN 7.09 Hz
+EMUP 7.08 Hz
+IM 90.11 Hz
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/20dec8_20dec8_A1_cycle_perf.png]]
+hit rate not bad, looks like increasing in steps ... score-rate bad ... but not much
+chance for the model to win against opponent
+also note that targetted RL is off
+
+popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,np.amax(pdf.time)),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False)
+savefig(gifpath()+'all_avg_weight.png') # [[./gif/20dec8_20dec8_A1_cycle_all_avg_weight.png]]
+
+clf(); drawraster(dspkT,dspkID); xlim((490e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/20dec8_20dec8_A1_cycle_rast.png]]
+xlim((499e3,500e3))
+savefig(gifpath()+'rastB.png') # [[./gif/20dec8_20dec8_A1_cycle_rastB.png]] 
+
+binsz = 1000
+dnspk = {pop:getspikehist(dspkT[pop],dnumc[pop],binsz,totalDur) for pop in ['EMDOWN','EMUP']}
+for clr,pop in zip(['r','b'],['EMDOWN','EMUP']): plot(dnspk[pop][0],dnspk[pop][1],clr)
+
+savefig(gifpath()+'EMUPDOWN_rates.png') # [[./gif/20dec8_20dec8_A1_cycle_EMUPDOWN_rates.png]]
+rates are decent throughout ...
+
+fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward) # [[./gif/20dec8_20dec8_A1_cycle__with_reward_input.mp4]]
+
+may as well continue this one ... can compare to another later with lower racket speed to see if get more points
+for model ... 
+
+
+name: 20dec8_A2_cycle_
+    "simtype": {
+        "ResumeSim": 1,
+        "ResumeSimFromFile": "data/20dec8_A1_cycle_synWeights_final.pkl"
+    },
+
+python multistepSim.py sn.json 32 20 20dec8_A2_cycle_multi
+
+started ~21:16 ...
 
