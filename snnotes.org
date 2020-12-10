@@ -23931,3 +23931,66 @@ python multistepSim.py sn.json 32 20 20dec9_A0_cycle_multi
 
 started ~13:23 ... 
 
+* 20dec10
+** check output from 20dec9_A0_nodirselective_gcp__step_3_
+
+python -i simdat.py backupcfg/20dec9_A0_nodirselective_gcp__step_3_sim.json
+
+EV1 0.77 Hz
+EA 6.57 Hz
+EA2 11.67 Hz
+IA2 29.08 Hz
+EMDOWN 3.08 Hz
+EMUP 3.07 Hz
+IM 36.18 Hz
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/20dec10_20dec9_A0_nodirselective_gcp__step_3_perf.png]]
+has peak ~0.8 but then drops to ~0.4 and stays there ... 
+
+lfn = ['20dec9_A0_nodirselective_gcp__step_' + str(i) + '_' for i in range(4)]
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0,1))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/20dec10_20dec9_A0_nodirselective_gcp__step_3_perf_all_steps_so_far.png]]
+mostly hovers around 0.4 - 0.5 ... 
+
+lpda = getindivactionreward(lfn)
+csm=cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+lclr = [csm.to_rgba(float(i)/(len(lpda))) for i in range(len(lpda))]
+clf(); plotComparePerf(lpda,lclr,yl=(0,1),lleg=lfn)
+savefig(gifpath()+'perf_compareD.png') # [[./gif/20dec10_20dec9_A0_nodirselective_gcp__step_3_perf_compareD.png]]
+step 1,2 are best, steps 0,3 are not as good ... 
+
+pdfc = getconcatweightpdf(lfn)
+clf(); popwts = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False)
+savefig(gifpath()+'all_steps_avg_weight.png')
+[[./gif/20dec10_20dec9_A0_nodirselective_gcp__step_3_all_steps_avg_weight.png]]
+
+so on average the weights are staying pretty flat with some minor positive slope
+sometimes EMUP and EMDOWN diverge, other times converge ... 
+
+can check raster of step 1 and make video to see behavior ... 
+
+python -i simdat.py backupcfg/20dec9_A0_nodirselective_gcp__step_1_sim.json
+
+EV1 0.78 Hz
+EA 6.79 Hz
+EA2 12.14 Hz
+IA2 30.23 Hz
+EMDOWN 3.18 Hz
+EMUP 3.15 Hz
+IM 36.31 Hz
+
+clf(); drawraster(dspkT,dspkID); xlim((490e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/20dec10_20dec9_A0_nodirselective_gcp__step_1_rast.png]]
+xlim((499e3,500e3))
+savefig(gifpath()+'rastB.png') # [[./gif/20dec10_20dec9_A0_nodirselective_gcp__step_1_rastB.png]]
+
+EMUP and EMDOWN less tightly synchronized due to the noise ... EA and EA2 still pretty tightly synchronized from EV1 ... 
+
+would the model perform bettwe with more EA2 neurons? right now most of the input to EM are the EA neurons (2800)
+compared to EA2 (only 100 neurons)
+
+fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward) 
+[[./gif/20dec10_20dec9_A0_nodirselective_gcp__step_1__with_reward_input.mp4]]
+
