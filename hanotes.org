@@ -10411,3 +10411,197 @@ save as 20dec08_A2_cycle_reduced_2obj_INTF7_Raster2.png
             "Rate": 500,
             "Weight": 5
         }
+
+* 20dec09
+
+-- run 500 sec sim on falcor "20dec09_A0_falcor_reduced_2obj_INTF7_"
+with 
+        "E": {
+            "Rate": 200,
+            "Weight": 5
+        }
+
+EV1 6.73 Hz
+EV1DE 1.12 Hz
+EV1DNE 8.49 Hz
+EV1DN 1.94 Hz
+EV1DNW 3.92 Hz
+EV1DW 0.57 Hz
+EV1DSW 5.9 Hz
+EV1DS 1.86 Hz
+EV1DSE 11.62 Hz
+EA 0.01 Hz
+EMDOWN 1.16 Hz
+EMUP 1.16 Hz
+IM 4.07 Hz
+
+... bad perf.
+
+-- run 500 sec sim on falcor "20dec09_A1_falcor_reduced_2obj_INTF7_"
+with 
+        "E": {
+            "Rate": 200,
+            "Weight": 10
+        }
+
+
+-- analysis of ...
+
+(base) hanwar@cycle:~/GamesProject/SMARTAgent$ python -i simdat.py backupcfg/20dec08_A3_cycle_reduced_2obj_INTF7_sim.json 
+reading  backupcfg/20dec08_A3_cycle_reduced_2obj_INTF7_sim.json
+-1
+lpop:  ['EV1', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW', 'EV1DSW', 'EV1DS', 'EV1DSE', 'EMDOWN', 'EMUP', 'IM']
+loading data from 20dec08_A3_cycle_reduced_2obj_INTF7_
+loading input images from data/20dec08_A3_cycle_reduced_2obj_INTF7_InputImages.txt
+loaded simulation data 20dec08_A3_cycle_reduced_2obj_INTF7_ on 20dec9_
+EV1 7.35 Hz
+EV1DE 1.08 Hz
+EV1DNE 9.23 Hz
+EV1DN 1.67 Hz
+EV1DNW 3.31 Hz
+EV1DW 0.53 Hz
+EV1DSW 6.28 Hz
+EV1DS 1.59 Hz
+EV1DSE 9.43 Hz
+EA 0.01 Hz
+EMDOWN 3.89 Hz
+EMUP 3.83 Hz
+IM 11.08 Hz
+
+.... 
+ plotPerf(actreward)
+saved as 20dec08_A3_cycle_reduced_2obj_INTF7_Perf.png
+
+....
+ plotMeanWeights(pdf,lpop=['EMDOWN','EMUP'],lclr=['r','g'],plotindiv=False)
+saved as 20dec08_A3_cycle_reduced_2obj_INTF7_MeanWeights.png
+
+... performance not improving... and perf is bad (Hit/miss ~ 0.35)
+
+
+--- run 500 sec sim.
+
+"name": "20dec09_A0_cycle_reduced_2obj_INTF7_",
+
+            "EMDOWN":300,
+            "EMUP":300,
+            "EMSTAY":0,
+            "IM":150,
+
+ue 3 times neurons in M.
+
+          "EA":{
+            "EM":{"AM":20,"NM":0.001,"p":0.2}, (increased from p=0.1)
+          },
+
+and reduce noise
+
+        "E": {
+            "Rate": 200,
+            "Weight": 5
+        }
+
+
+(base) hanwar@cycle:~/GamesProject/SMARTAgent$ python -i simdat.py backupcfg/20dec09_A0_cycle_reduced_2obj_INTF7_sim.json 
+reading  backupcfg/20dec09_A0_cycle_reduced_2obj_INTF7_sim.json
+-1
+lpop:  ['EV1', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW', 'EV1DSW', 'EV1DS', 'EV1DSE', 'EMDOWN', 'EMUP', 'IM']
+loading data from 20dec09_A0_cycle_reduced_2obj_INTF7_
+loading input images from data/20dec09_A0_cycle_reduced_2obj_INTF7_InputImages.txt
+loaded simulation data 20dec09_A0_cycle_reduced_2obj_INTF7_ on 20dec9_
+EV1 6.85 Hz
+EV1DE 1.55 Hz
+EV1DNE 9.93 Hz
+EV1DN 1.45 Hz
+EV1DNW 5.66 Hz
+EV1DW 0.91 Hz
+EV1DSW 5.04 Hz
+EV1DS 1.51 Hz
+EV1DSE 7.96 Hz
+EA 0.01 Hz
+EMDOWN 2.94 Hz
+EMUP 2.94 Hz
+IM 22.92 Hz
+
+
+ plotPerf(actreward)
+saved as 20dec09_A0_cycle_reduced_2obj_INTF7_Perf.png
+
+ plotMeanWeights(pdf,lpop=['EMDOWN','EMUP'],lclr=['r','g'],plotindiv=False)
+saved as 20dec09_A0_cycle_reduced_2obj_INTF7_MeanWeights.png
+
+
+-- python multistepSim.py sim.json 30 10 20dec09_A0_cycle_multi
+
+
+-- on falcor, analyzing 20dec09_A1_falcor_reduced_2obj_INTF7_
+
+dact = getdActMap (totalDur, tstepPerAction, dspkT, dspkID, dnumc, dstartidx,lpop = ['EMUP','EMDOWN'])
+
+--- run 500 sec sim (python multistepSim.py sim.json 30 5 20dec09_A0_falcor_multi)
+
+"name": "20dec09_A2_falcor_reduced_2obj_INTF7_",
+
+            "EMDOWN":300,
+            "EMUP":300,
+            "EMSTAY":0,
+            "IM":150,
+
+ue 3 times neurons in M.
+
+        "E": {
+            "Rate": 500,
+            "Weight": 5
+        }
+
+
+* 20dec10
+
+-- still running multistepSim.... but analyzing first few....
+
+lfn = ['20dec09_A0_cycle_reduced_2obj_INTF7_','20dec09_A1_cycle_reduced_2obj_INTF7__step_0_','20dec09_A1_cycle_reduced_2obj_INTF7__step_1_']
+lpda = getindivactionreward(lfn)
+csm = cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+lclr = [csm.to_rgba(float(i)/len(lpda)) for i in range(len(lpda))]
+plotComparePerf(lpda,lclr,yl=(0,1),lleg=lfn)
+
+saved a snapshot on desktop (will plot properly later with more steps)
+
+pdac = getconcatactionreward(lfn)
+plotPerf(pdac,yl=(0,1))
+
+saved a snapshot on desktop (will plot properly later with more steps)
+
+... SEEMS TO BE WORKING AS THE PERFORMANCE IS GETTING BETTER OVER STEPS.
+
+
+
+--- python multistepSim.py sim.json 30 5 20dec09_A0_falcor_multi didnt work on falcor.
+
+for some reason, it got stuck after __step_0
+
+looked at perf, and didnt look good.
+
+... it seems that higher connectivity will help.
+
+--- run 500 sec sim of falcor...
+
+"name": "20dec10_A0_falcor_reduced_2obj_INTF7_",
+
+            "EMDOWN":100,
+            "EMUP":100,
+            "EMSTAY":0,
+            "IM":50,
+
+ue 3 times neurons in M.
+
+          "EA":{
+            "EM":{"AM":20,"NM":0.001,"p":0.25}, (increased from p=0.1)
+          },
+
+and reduce noise
+
+        "E": {
+            "Rate": 100,
+            "Weight": 5
+        }

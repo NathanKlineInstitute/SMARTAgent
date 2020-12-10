@@ -9,7 +9,8 @@
         "random":0,
         "yball":80,
         "yracket":40,
-        "dodraw": 1
+        "racket_dy":5,
+        "dodraw": 0
     },
     "moves": {
         "UP": 4,
@@ -47,8 +48,8 @@
     "verbose": 0,
     "stayStepLim": 0,
     "simtype": {
-        "ResumeSim": 0,
-        "ResumeSimFromFile": "data/20nov27_A0_cycle_reduced_2obj_INTF7_synWeights_final.pkl"
+        "ResumeSim": 1,
+        "ResumeSimFromFile": "data/20dec09_A0_cycle_reduced_2obj_INTF7_synWeights_final.pkl"
     },
     "sim": {
         "duration": 500000,
@@ -62,7 +63,7 @@
         "RLFakeUpRule": 0,
         "RLFakeDownRule": 0,
         "RLFakeStayRule": 0,
-        "name": "20dec08_A0_cycle_reduced_2obj_INTF7_",
+        "name": "20dec09_A1_cycle_reduced_2obj_INTF7_",
         "doquit": 1,
         "doplot": 0,
         "saveCellSecs": 0,
@@ -113,10 +114,10 @@
         "IA":0,
         "EA2": 0,
 	    "IA2": 0,
-	    "EMDOWN":100,
-	    "EMUP":100,
+	    "EMDOWN":300,
+	    "EMUP":300,
 	    "EMSTAY":0,
-	    "IM":50,
+	    "IM":150,
 	    "IMUP": 0,
 	    "IMDOWN": 0,
 	    "IMSTAY": 0},
@@ -227,7 +228,7 @@
             "EA":{
             "EA":{"AM":1.2,"NM":0.12,"p":0.0},
             "EA2":{"AM":1.2,"NM":0.12,"p":0.2},
-            "EM":{"AM":20,"NM":0.001,"p":0.1},
+            "EM":{"AM":20,"NM":0.001,"p":0.2},
             "IA":{"AM":10, "p":0.1}
             },
             "EA2":{
@@ -430,7 +431,7 @@
             "Weight": 0.5e-05
         },
         "E": {
-            "Rate": 1000,
+            "Rate": 200,
             "Weight": 5
         }
     }
