@@ -24059,4 +24059,18 @@ that's ~same as negative feedback from EM -> IM -> EM
 ** bug found in hit detection for simulatePongFull so stopped sims on cycle and gcp
 ** check update
 
+looks ok
 
+** further reduced pong
+
+now ha working on further reduced version of pong - without opponent paddle and
+reduce number of pixels (reduced # of pixels for later)
+
+that way can improve hit performance to ~max before moving onto score
+and opponent racket location wont confuse model
+
+this will be a separate environment so can use environment with opponent if/when needed
+
+** adjust arch
+
+would more EA2 neurons help?
