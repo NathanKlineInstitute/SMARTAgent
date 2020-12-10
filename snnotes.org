@@ -24071,6 +24071,11 @@ and opponent racket location wont confuse model
 
 this will be a separate environment so can use environment with opponent if/when needed
 
-** adjust arch
+** adjust arch (20dec10_C0_cycle_)
 
 would more EA2 neurons help?
+ok...added some more...changed weights
+
+and now using the simple simulated pong (only 1 paddle)
+
+python multistepSim.py sn.json 32 20 20dec10_C0_cycle_multi

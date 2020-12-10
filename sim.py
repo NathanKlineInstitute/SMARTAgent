@@ -986,7 +986,8 @@ def connectEVToTarget (lpoty, useTopological):
       for poty in lpoty:
         if dnumc[poty] <= 0: continue
         suffix = 'M'      
-        if poty == 'EA': suffix = 'A'      
+        if poty == 'EA': suffix = 'A'
+        if poty == 'EA2': suffix = 'A2'
         if useTopological:
           try: div = dconf['net']['alltopoldivcons'][prety][poty]
           except: div = 3          
@@ -1033,7 +1034,7 @@ def connectEVToTarget (lpoty, useTopological):
           elif dSTDPparams[synmech]['STDPon'] and useSTDP:
             netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparams[synmech]}                           
 
-connectEVToTarget(['EA'], dconf['architectureVtoA']['useTopological']) # connect primary visual to visual association
+connectEVToTarget(['EA','EA2'], dconf['architectureVtoA']['useTopological']) # connect primary visual to visual association
 connectEVToTarget(EMotorPops, dconf['architectureVtoM']['useTopological']) # connect primary visual to motor
 
 # add connections from first to second visual association area

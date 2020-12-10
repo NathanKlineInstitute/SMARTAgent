@@ -24,8 +24,7 @@ class simplePong:
   def createFigure (self):
     self.fig,self.ax = plt.subplots(1,1)
     self.im = self.ax.imshow(np.zeros(shape=(210,160,3)))
-    self.scoreleft = self.ax.text(5, 20, str(self.TotalHits), style='normal',color='orange',size=32)
-    self.scoreright = self.ax.text(90, 20, str(self.TotalMissed), style='normal',color='lightgreen',size=32)
+    self.scorestr = self.ax.text(1, 20, 'M,H:0,0', style='normal', color='lightgreen', size=28)
 
   def createcourt (self):
     self.court_top = 34
@@ -235,8 +234,7 @@ class simplePong:
     return self.obs, self.reward
 
   def drawscore (self):
-    self.scoreleft.set_text(str(self.TotalHits))
-    self.scoreright.set_text(str(self.TotalMissed))
+    self.scorestr.set_text('M,H:'+str(self.TotalMissed)+','+str(self.TotalHits))
 
   def reset (self):
     print('WARNING: empty reset')
