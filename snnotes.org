@@ -24056,3 +24056,7 @@ and suppress their driving noise; that way if EM rates go up via learning, they'
 
 that's ~same as negative feedback from EM -> IM -> EM
 
+** bug found in hit detection for simulatePongFull so stopped sims on cycle and gcp
+** check update
+
+

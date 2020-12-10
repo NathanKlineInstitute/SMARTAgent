@@ -51,7 +51,7 @@
         "ResumeSimFromFile": "data/20dec7_A0_cycle_synWeights_final.pkl"
     },
     "sim": {
-        "duration": 500000,
+        "duration": 50000,
         "dt": 0.6,
         "verbose": 0,
         "recordStep": 1.0,
@@ -62,12 +62,12 @@
         "RLFakeUpRule": 0,
         "RLFakeDownRule": 0,
         "RLFakeStayRule": 0,
-        "name": "20dec9_A0_cycle_",
+        "name": "20dec10_A0_cycle_",
         "doquit": 1,
         "doplot": 0,
         "saveCellSecs": 0,
         "saveCellConns": 0,
-        "targettedRL": 3,
+        "targettedRL": 0,
         "tstepPerAction": 20,
         "saveWeights": 1,
         "saveAssignedFiringRates": 0,
@@ -318,8 +318,8 @@
         "DirMaxRate": 150.0,
         "LocMaxRate": 150.0,
         "FiringRateCutoff": 50.0,
-        "stimModVD": 35,
-        "stimModVL": 35,
+        "stimModVD": 26.25,
+        "stimModVL": 26.25,
         "cmat": {
             "VL": {
                 "VD": {
@@ -608,7 +608,7 @@
             }
         },
         "EEMWghtThreshMin": 0.9,
-        "EEMWghtThreshMax": 4.0,
+        "EEMWghtThreshMax": 3.0,
         "EEMPopNorm": 1,
         "CellWNorm": {
             "On": 0,
@@ -761,7 +761,7 @@
             "Weight": 5
         },
         "E": {
-            "Rate": 500,
+            "Rate": 1000,
             "Weight": 5
         }
     }
