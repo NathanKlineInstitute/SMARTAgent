@@ -23994,3 +23994,65 @@ compared to EA2 (only 100 neurons)
 fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward) 
 [[./gif/20dec10_20dec9_A0_nodirselective_gcp__step_1__with_reward_input.mp4]]
 
+** check output from 20dec9_A0_cycle__step_2_
+
+python -i simdat.py backupcfg/20dec9_A0_cycle__step_2_sim.json
+
+EV1 0.78 Hz
+EV1DE 0.09 Hz
+EV1DNE 1.05 Hz
+EV1DN 5.46 Hz
+EV1DNW 0.53 Hz
+EV1DW 0.05 Hz
+EV1DSW 0.74 Hz
+EV1DS 5.43 Hz
+EV1DSE 1.1 Hz
+EA 6.72 Hz
+EA2 24.71 Hz
+IA2 55.93 Hz
+EMDOWN 9.5 Hz
+EMUP 9.67 Hz
+IM 64.18 Hz
+
+ax=plotPerf(actreward,yl=(0,5))
+savefig(gifpath()+'perf.png') # [[./gif/20dec10_20dec9_A0_cycle__step_2_perf.png]]
+interesting, hit/miss ratio looks very high - greater than 1 for the first ~200 s of simulation
+then decays and remains ~0.5 ... is initial peak an artifact?
+
+lfn = ['20dec9_A0_cycle__step_' + str(i) + '_' for i in range(3)]
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0,1))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/20dec10_20dec9_A0_cycle__step_2_perf_all_steps_so_far.png]]
+ylim((0,1))
+savefig(gifpath()+'perf_all_steps_so_farB.png') # [[./gif/20dec10_20dec9_A0_cycle__step_2_perf_all_steps_so_farB.png]]
+
+lpda = getindivactionreward(lfn)
+csm=cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+lclr = [csm.to_rgba(float(i)/(len(lpda))) for i in range(len(lpda))]
+clf(); plotComparePerf(lpda,lclr,yl=(0,5),lleg=lfn)
+savefig(gifpath()+'perf_compareD.png') # [[./gif/20dec10_20dec9_A0_cycle__step_2_perf_compareD.png]]
+seems like an artifact due to early hits in model's favor ... especially since values decay towards ~0.5?
+clf(); plotComparePerf(lpda,lclr,yl=(0,2),lleg=lfn)
+savefig(gifpath()+'perf_compareDB.png') # [[./gif/20dec10_20dec9_A0_cycle__step_2_perf_compareDB.png]]
+
+pdfc = getconcatweightpdf(lfn)
+clf(); popwts = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False)
+savefig(gifpath()+'all_steps_avg_weight.png') # [[./gif/20dec10_20dec9_A0_cycle__step_2_all_steps_avg_weight.png]]
+weights going up more clearly in this sim (compared to one on gcp with no direction selective neurons)
+
+clf(); drawraster(dspkT,dspkID); xlim((490e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/20dec10_20dec9_A0_cycle__step_2_rast.png]]
+xlim((499e3,500e3))
+savefig(gifpath()+'rastB.png') # [[./gif/20dec10_20dec9_A0_cycle__step_2_rastB.png]]
+
+fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward) 
+[[./gif/20dec10_20dec9_A0_cycle__step_2__with_reward_input.mp4]]
+
+** adaptive noise?
+
+could have a population of neurons that are source of noise and provide feedback to them (or interneurons
+synapsing on them) from EM populations when EM populations firing fast then they'll activate interneurons 
+and suppress their driving noise; that way if EM rates go up via learning, they'll get less noise input
+
+that's ~same as negative feedback from EM -> IM -> EM
+
