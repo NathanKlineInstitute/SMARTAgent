@@ -101,7 +101,10 @@ class AIGame:
     # these are Pong-specific coordinate ranges; should later move out of this function into Pong-specific functions
     self.courtYRng = (34, 194) # court y range
     self.racket0XRng = (16, 20)
-    self.courtXRng = (20, 140) # court x range
+    if useSimulatedEnv:
+      self.courtXRng = (0, 140)
+    else:
+      self.courtXRng = (20, 140) # court x range
     self.racketXRng = (140, 144) # racket x range
     self.dObjPos = {'time':[], 'racket':[], 'ball':[]}
     self.last_obs = [] # previous observation

@@ -10609,3 +10609,5 @@ and reduce noise
 -- create simplePong without opponent racket.
 -- while using simplePong, make sure to either use 'scorePoint' or 'hitBall'. because hitBall is same as reward of 1.
 -- testing simplePong in sim.
+
+-- need to change the court dimensions.
