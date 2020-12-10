@@ -14,6 +14,7 @@ class simulatePong:
     # by default no reward
     self.reward =0
     self.done = 0
+    self.hit = 0
     # points
     self.GamePoints = self.ModelPoints = 0
     self.GameHits = self.ModelHits = 0
@@ -138,6 +139,7 @@ class simulatePong:
     # self.ball_dir = (1,1)
     # direction can be checked by looking at the sign of self.ball_dx and self.ball_dy
     # 1. make a temp move
+    self.hit = 0
     self.reward = 0
     if self.ballx1>self.leftracketx2 and self.ballx2<self.rightracketx1 and self.NewServe:
       # why need to set missedball==0 here? can't you set it after it's set to 1 at end of this function?
@@ -183,20 +185,23 @@ class simulatePong:
         y_shift_ball = self.ball_dy
         self.ball_dx *= -1
         self.ModelHits += 1
+        self.hit = 1
       elif right_racket_yshift < 0 and abs(tmp_bally2 - self.rightrackety1) <= 2:
         print('hit top R')
         xshift_ball = self.ball_dx + self.rightracketx1 - tmp_ballx2
         self.ball_dy = np.sign(self.ball_dy) * random.choice(self.possible_ball_dy) * 2        
         y_shift_ball = self.ball_dy
         self.ball_dx *= -1
-        self.ModelHits += 1        
+        self.ModelHits += 1
+        self.hit = 1        
       elif right_racket_yshift > 0 and abs(tmp_bally1 - self.rightrackety2) <= 2:
         print('hit bottom R')
         xshift_ball = self.ball_dx + self.rightracketx1 - tmp_ballx2
         self.ball_dy = np.sign(self.ball_dy) * random.choice(self.possible_ball_dy) * 2
         y_shift_ball = self.ball_dy
         self.ball_dx *= -1
-        self.ModelHits += 1        
+        self.ModelHits += 1
+        self.hit = 1        
       else:
         if self.scoreRecorded==0 and tmp_ballx1>self.rightracketx2:
           self.GamePoints += 1
@@ -353,7 +358,7 @@ class simulatePong:
       self.im.set_data(self.obs)#.astype(np.uint8))
       self.drawscore()        
       plt.pause(0.0001)
-    return self.obs, self.reward, self.done, None
+    return self.obs, self.reward, self.done, None, self.hit
 
   def drawscore (self):
     self.scoreleft.set_text(str(self.GamePoints)+', '+str(self.GameHits))
