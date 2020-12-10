@@ -18,7 +18,7 @@
         "random": 0,
         "yball": 80,
         "yracket": 40,
-	"dodraw": 0,
+	"dodraw": 1,
 	"racket_dy": 5
     },
     "wiggle": 6,
@@ -51,7 +51,7 @@
         "ResumeSimFromFile": "data/20dec7_A0_cycle_synWeights_final.pkl"
     },
     "sim": {
-        "duration": 50000,
+        "duration": 6000,
         "dt": 0.6,
         "verbose": 0,
         "recordStep": 1.0,
