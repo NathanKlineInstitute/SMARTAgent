@@ -34,8 +34,10 @@ useSimulatedEnv = False
 try:
   if 'useSimulatedEnv' in dconf: useSimulatedEnv = dconf['useSimulatedEnv']
   if useSimulatedEnv:
-    from simulatePongFull import simulatePong
-    env = simulatePong()
+    #from simulatePongFull import simulatePong
+    #env = simulatePong()
+    from simplePong import simplePong
+    env = simplePong()
   else:
     if 'frameskip' in dconf['env']:
       env = gym.make(dconf['env']['name'],frameskip=dconf['env']['frameskip'],repeat_action_probability=0.)
@@ -99,7 +101,10 @@ class AIGame:
     # these are Pong-specific coordinate ranges; should later move out of this function into Pong-specific functions
     self.courtYRng = (34, 194) # court y range
     self.racket0XRng = (16, 20)
-    self.courtXRng = (20, 140) # court x range
+    if useSimulatedEnv:
+      self.courtXRng = (0, 140)
+    else:
+      self.courtXRng = (20, 140) # court x range
     self.racketXRng = (140, 144) # racket x range
     self.dObjPos = {'time':[], 'racket':[], 'ball':[]}
     self.last_obs = [] # previous observation
@@ -591,7 +596,8 @@ class AIGame:
           stay_step += 1
         self.env.render() # Renders the game after the stay steps
       else:
-        observation, reward, done, info, hit = self.env.step(caction)
+        #observation, reward, done, info, hit = self.env.step(caction)
+        observation, reward = self.env.step(caction)
       #find position of ball after action
       proposed_target_action, FollowTargetSign, current_ball_dir, xpos_Ball2 = self.useRacketPredictedPos(observation)
       ball_hits_racket = 0
@@ -601,7 +607,8 @@ class AIGame:
           ball_hits_racket = 1
           print('Ball hits the racket')
       else:
-        if hit:
+        #if hit:
+        if reward==1:
           ball_hits_racket = 1
           print('Ball hits the racket')
       #print('Current_ball_dir',current_ball_dir,'Last ball dir',self.last_ball_dir,'current X pos Ball', xpos_Ball2,'last X pos Ball', xpos_Ball)
