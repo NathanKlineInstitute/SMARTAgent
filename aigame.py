@@ -594,8 +594,8 @@ class AIGame:
         observation, reward, done, info, hit = self.env.step(caction)
       #find position of ball after action
       proposed_target_action, FollowTargetSign, current_ball_dir, xpos_Ball2 = self.useRacketPredictedPos(observation)
+      ball_hits_racket = 0
       if not useSimulatedEnv:
-        ball_hits_racket = 0
         # previously I assumed when current_ball_dir is 0 there is no way to find out if the ball hit the racket
         if current_ball_dir-self.last_ball_dir<0 and reward==0 and xpos_Ball2>courtXRng[1]-courtXRng[0]-40:
           ball_hits_racket = 1
