@@ -24059,4 +24059,151 @@ that's ~same as negative feedback from EM -> IM -> EM
 ** bug found in hit detection for simulatePongFull so stopped sims on cycle and gcp
 ** check update
 
+looks ok
+
+** further reduced pong
+
+now ha working on further reduced version of pong - without opponent paddle and
+reduce number of pixels (reduced # of pixels for later)
+
+that way can improve hit performance to ~max before moving onto score
+and opponent racket location wont confuse model
+
+this will be a separate environment so can use environment with opponent if/when needed
+
+** adjust arch (20dec10_C0_cycle_)
+
+would more EA2 neurons help?
+ok...added some more...changed weights
+
+and now using the simple simulated pong (only 1 paddle)
+
+python multistepSim.py sn.json 32 20 20dec10_C0_cycle_multi
+
+started ~16:55 ...
+
+* 20dec11
+** check output from 20dec10_C0_cycle__step_1_
+
+python -i simdat.py backupcfg/20dec10_C0_cycle__step_1_sim.json
+
+EV1 0.45 Hz
+EV1DE 0.12 Hz
+EV1DNE 1.44 Hz
+EV1DN 3.67 Hz
+EV1DNW 0.34 Hz
+EV1DW 0.0 Hz
+EV1DSW 0.24 Hz
+EV1DS 3.69 Hz
+EV1DSE 1.74 Hz
+EA 0.93 Hz
+EA2 0.53 Hz
+IA2 3.52 Hz
+EMDOWN 1.52 Hz
+EMUP 1.52 Hz
+IM 8.32 Hz
+
+hmm, very low rates ... 
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/20dec11_20dec10_C0_cycle__step_1_perf.png]]
+
+lfn = ['20dec10_C0_cycle__step_' + str(i) + '_' for i in range(2)]
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0,2))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/20dec11_20dec10_C0_cycle__step_1_perf_all_steps_so_far.png]]
+ylim((0,1))
+savefig(gifpath()+'perf_all_steps_so_farB.png') # [[./gif/20dec11_20dec10_C0_cycle__step_1_perf_all_steps_so_farB.png]]
+
+lpda = getindivactionreward(lfn)
+csm=cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+lclr = [csm.to_rgba(float(i)/(len(lpda))) for i in range(len(lpda))]
+clf(); plotComparePerf(lpda,lclr,yl=(0,5),lleg=lfn)
+savefig(gifpath()+'perf_compareD.png') # [[./gif/20dec11_20dec10_C0_cycle__step_1_perf_compareD.png]]
+
+perf getting worse ... 
+
+pdfc = getconcatweightpdf(lfn)
+clf(); popwts = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False)
+savefig(gifpath()+'all_steps_avg_weight.png') # [[./gif/20dec11_20dec10_C0_cycle__step_1_all_steps_avg_weight.png]]
+
+hmm, forgot to turn on targetted RL to 3 ... this is w/o targetted RL 
+
+clf(); drawraster(dspkT,dspkID); xlim((490e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/20dec11_20dec10_C0_cycle__step_1_rast.png]]
+
+those rates look > 1.5 Hz for EMUP ... ??
+
+binsz = 1000
+dnspk = {pop:getspikehist(dspkT[pop],dnumc[pop],binsz,totalDur) for pop in ['EMDOWN','EMUP']}
+for clr,pop in zip(['r','b'],['EMDOWN','EMUP']): plot(dnspk[pop][0],dnspk[pop][1],clr)
+xlim((0,totalDur)); ylim((0,10))
+
+savefig(gifpath()+'EMUPDOWN_rates.png') # [[./gif/20dec11_20dec10_C0_cycle__step_1_EMUPDOWN_rates.png]]
+
+fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward,skipopp=True) 
+[[./gif/20dec11_20dec10_C0_cycle__step_1__with_reward_input.mp4]]
+
+python -i simdat.py backupcfg/20dec10_C0_cycle__step_2_sim.json
+
+EV1 0.45 Hz
+EV1DE 0.15 Hz
+EV1DNE 1.47 Hz
+EV1DN 3.68 Hz
+EV1DNW 0.26 Hz
+EV1DW 0.02 Hz
+EV1DSW 0.21 Hz
+EV1DS 3.71 Hz
+EV1DSE 1.54 Hz
+EA 0.87 Hz
+EA2 0.48 Hz
+IA2 3.0 Hz
+EMDOWN 1.57 Hz
+EMUP 1.58 Hz
+IM 8.3 Hz
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/20dec11_20dec10_C0_cycle__step_2_perf.png]]
+
+lfn = ['20dec10_C0_cycle__step_' + str(i) + '_' for i in range(3)]
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0,2))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/20dec11_20dec10_C0_cycle__step_2_perf_all_steps_so_far.png]]
+ylim((0,1))
+savefig(gifpath()+'perf_all_steps_so_farB.png') # [[./gif/20dec11_20dec10_C0_cycle__step_2_perf_all_steps_so_farB.png]]
+
+lpda = getindivactionreward(lfn)
+csm=cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+lclr = [csm.to_rgba(float(i)/(len(lpda))) for i in range(len(lpda))]
+clf(); plotComparePerf(lpda,lclr,yl=(0,5),lleg=lfn)
+savefig(gifpath()+'perf_compareD.png') # [[./gif/20dec11_20dec10_C0_cycle__step_2_perf_compareD.png]]
+
+does not look good ...
+
+fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward,skipopp=True) 
+[[./gif/20dec11_20dec10_C0_cycle__step_2__with_reward_input.mp4]]
+
+pdfc = getconcatweightpdf(lfn)
+clf(); popwts = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False)
+savefig(gifpath()+'all_steps_avg_weight.png') # [[./gif/20dec11_20dec10_C0_cycle__step_2_all_steps_avg_weight.png]]
+
+** adjusted sim a bit more (20dec11_A0_cycle_)
+
+most of the params are the same...if reduce noise have to raise internal weights, and then often
+leads to epileptic-like activity ...  
+
+this one does not use targetted RL ... so, may as well include RL from A -> A2, and recurrent A2 as well ...  ?
+
+python multistepSim.py sn.json 32 20 20dec11_A0_cycle_multi
+
+started ~16:38 ...
+
+** next sim on gcp (20dec11_B0_gcp_)
+
+same as one on cycle but targetted RL of 3
+and no plasticity for the A2 neurons (since does not work with targetted)
+
+python multistepSim.py sn.json 32 20 20dec11_B0_gcp_multi
+
+started ~16:42 ...
 

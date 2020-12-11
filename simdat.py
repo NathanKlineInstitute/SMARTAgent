@@ -320,10 +320,13 @@ def animInput (InputImages, outpath, framerate=50, figsize=None, showflow=False,
   def updatefig (t):
     stitle = 'Time = ' + str(t*tstepPerAction) + ' ms'
     if cumHits is not None:
-      if skipopp:
-        stitle += '\nModel Points:'+str(cumScore[t]) + '   Model Hits:'+str(cumHits[t])
+      if dconf['rewardcodes']['scorePoint'] > 0.0:      
+        if skipopp:
+          stitle += '\nModel Points:'+str(cumScore[t]) + '   Model Hits:'+str(cumHits[t])
+        else:
+          stitle += '\nOpponent Points:'+str(cumMissed[t])+'   Model Points:'+str(cumScore[t]) + '   Model Hits:'+str(cumHits[t])
       else:
-        stitle += '\nOpponent Points:'+str(cumMissed[t])+'   Model Points:'+str(cumScore[t]) + '   Model Hits:'+str(cumHits[t])        
+        stitle += '\nModel Hits:'+str(cumHits[t]) + '   Model Misses:'+str(cumMissed[t])
     fig.suptitle(stitle)
     if t < 1: return fig # already rendered t=0 above
     print('frame t = ', str(t*tstepPerAction))    
@@ -493,16 +496,20 @@ def getspikehist (spkT, numc, binsz, tmax):
   return tt,nspk
 
 #
-def getrate (dspkT,dspkID, pop, dnumc):
+def getrate (dspkT,dspkID, pop, dnumc, tlim=None):
   # get average firing rate for the population, over entire simulation
   nspk = len(dspkT[pop])
   ncell = dnumc[pop]
-  rate = 1e3*nspk/(totalDur*ncell)
-  return rate
+  if tlim is not None:
+    spkT = dspkT[pop]
+    nspk = len(spkT[(spkT>=tlim[0])&(spkT<=tlim[1])])
+    return 1e3*nspk/((tlim[1]-tlim[0])*ncell)
+  else:  
+    return 1e3*nspk/(totalDur*ncell)
 
-def pravgrates(dspkT,dspkID,dnumc):
+def pravgrates (dspkT,dspkID,dnumc,tlim=None):
   # print average firing rates over simulation duration
-  for pop in dspkT.keys(): print(pop,round(getrate(dspkT,dspkID,pop,dnumc),2),'Hz')
+  for pop in dspkT.keys(): print(pop,round(getrate(dspkT,dspkID,pop,dnumc,tlim=tlim),2),'Hz')
 
 #
 def drawraster (dspkT,dspkID,tlim=None,msz=2,skipstim=True):
@@ -1677,6 +1684,6 @@ if __name__ == '__main__':
   #plotSynWeightsPostNeuronID(pdf,45)
   #fig=animInput(InputImages,gifpath()+'_input.mp4')  
   #figure(); drawcellVm(simConfig,lclr=['r','g','b','c','m','y'])
-  pravgrates(dspkT,dspkID,dnumc)
+  pravgrates(dspkT,dspkID,dnumc,tlim=(250,totalDur))
   #drawraster(dspkT,dspkID)
   #figure(); drawcellVm(simConfig,lclr=['r','g','b','c','m','y'])
