@@ -10662,3 +10662,22 @@ duration: 50 sec
 EA:{EM:{AM:10,p:0.2}}
 
 --a bug fixed only related to reducedNetwork.
+
+
+-- run 20dec11_A0_falcor_reduced_2obj_INTF7_
+duration: 10 sec
+EA:{EM:{AM:10,p:0.2}}
+VD to EA: 16 (from 12)
+
+-- run 20dec11_A0_falcor_reduced_2obj_INTF7_
+duration: 10 sec
+EA:{EM:{AM:5,p:0.2}}
+VD to EA: 16 (from 12)
+
+-- set "EXPDir": 0 for reducedNet.
+the issue was using just 8 neurons to encode directions. It was activating neurons variably and therefore was not activating EA neurons uniformly.
+
+--debugged reducedNet when using EXPDir=0:
+
+              if abs(getangdiff(a,dAngPeak[pop])) <= self.AngRFSigma:
+                self.dFiringRates[pop][0] = MaxRate

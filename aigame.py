@@ -322,7 +322,8 @@ class AIGame:
               if MaxRate * fctr < self.FiringRateCutoff: fctr = 0
               self.dFiringRates[pop][0] += MaxRate * fctr
             else:
-              self.dFiringRates[pop][0] = MaxRate
+              if abs(getangdiff(a,dAngPeak[pop])) <= self.AngRFSigma:
+                self.dFiringRates[pop][0] = MaxRate
       print(self.dFiringRates)
     else:
       dirSensitiveNeuronDim = self.dirSensitiveNeuronDim
