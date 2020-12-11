@@ -21,7 +21,7 @@ if __name__ == '__main__':
       d['simtype']['ResumeSimFromFile'] = 'data/' + simstr + '_step_' + str(i-1) + '_synWeights_final.pkl'
     fnjson = d['sim']['name'] + '.json'
     fpout.writelines('./myrun ' + str(ncore) + ' ' + fnjson + '\n')
-    json.dump(d, open(fnjson,'w'), indent=4)
+    json.dump(d, open(fnjson,'w'), indent=2)
   fpout.close()
   os.chmod(outf,0o775)
   print('running ', outf)
