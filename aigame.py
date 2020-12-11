@@ -100,11 +100,11 @@ class AIGame:
     self.intaction = int(dconf['actionsPerPlay']) # integrate this many actions together before returning reward information to model
     # these are Pong-specific coordinate ranges; should later move out of this function into Pong-specific functions
     self.courtYRng = (34, 194) # court y range
-    self.racket0XRng = (16, 20)
     if useSimulatedEnv:
       self.courtXRng = (0, 140)
     else:
       self.courtXRng = (20, 140) # court x range
+      self.racket0XRng = (16, 20)
     self.racketXRng = (140, 144) # racket x range
     self.dObjPos = {'time':[], 'racket':[], 'ball':[]}
     self.last_obs = [] # previous observation
@@ -156,7 +156,10 @@ class AIGame:
         ds_racketXRng = (19, 20) # racket x range... when used in an image
         ds_racket0XRng = (4, 5)
       else:
-        ds_courtXRng = (3, 17) # court x range
+        if useSimulatedEnv:
+          ds_courtXRng = (0, 17)
+        else:
+          ds_courtXRng = (3, 17) # court x range
         ds_racketXRng = (17, 18) # racket x range... when used in an image
         ds_racket0XRng = (2, 3)
     elif self.downsampshape[0]==4:
@@ -165,7 +168,10 @@ class AIGame:
         ds_racketXRng = (39, 40) # racket x range... when used in an image
         ds_racket0XRng = (8, 9)  
       else:
-        ds_courtXRng = (5, 35) # court x range
+        if useSimulatedEnv:
+          ds_courtXRng = (0,35)
+        else:
+          ds_courtXRng = (5, 35) # court x range
         ds_racketXRng = (35, 36) # racket x range... when used in an image
         ds_racket0XRng = (4, 5)
     elif self.downsampshape[0]==2:
@@ -174,7 +180,10 @@ class AIGame:
         ds_racketXRng = (78, 80)
         ds_racket0XRng = (16, 18)  
       else:
-        ds_courtXRng = (10, 70) # court x range
+        if useSimulatedEnv:
+          ds_courtXRng = (0,70)
+        else:
+          ds_courtXRng = (10, 70) # court x range
         ds_racketXRng = (70, 72) # racket x range... when used in an image
         ds_racket0XRng = (8, 10)
     elif self.downsampshape[0]==1:

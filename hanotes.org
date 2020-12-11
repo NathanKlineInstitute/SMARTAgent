@@ -10611,3 +10611,54 @@ and reduce noise
 -- testing simplePong in sim.
 
 -- need to change the court dimensions.
+
+
+-- ran 500 sec sim
+
+(base) hanwar@cycle:~/GamesProject/SMARTAgent$ python -i simdat.py backupcfg/20dec10_B0_cycle_reduced_2obj_INTF7_sim.json 
+reading  backupcfg/20dec10_B0_cycle_reduced_2obj_INTF7_sim.json
+-1
+lpop:  ['EV1', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW', 'EV1DSW', 'EV1DS', 'EV1DSE', 'EMDOWN', 'EMUP', 'IM']
+loading data from 20dec10_B0_cycle_reduced_2obj_INTF7_
+loading input images from data/20dec10_B0_cycle_reduced_2obj_INTF7_InputImages.txt
+loaded simulation data 20dec10_B0_cycle_reduced_2obj_INTF7_ on 20dec10_
+EV1 6.48 Hz
+EV1DE 0.4 Hz
+EV1DNE 10.27 Hz
+EV1DN 1.6 Hz
+EV1DNW 4.9 Hz
+EV1DW 0.14 Hz
+EV1DSW 2.88 Hz
+EV1DS 2.09 Hz
+EV1DSE 11.06 Hz
+EA 0.01 Hz
+EMDOWN 1.9 Hz
+EMUP 1.92 Hz
+IM 20.05 Hz
+
+
+-- run multistep:
+
+ python multistepSim.py sim.json 30 10 20dec10_C0_cycle_multi
+
+ ... looking at step_0, too much synchrony. need to decrease strength from EA->EM and rerun.
+
+-- ran sim on falcor '20dec10_B0_falcor_reduced_2obj_INTF7_'
+duration: 1000 sec
+EA:{EM:{AM:20,p:0.3}}
+noise: rate:100, weight:5
+... should reduce weight from EA to EM and rerun.
+
+* 20dec11
+
+
+-- run 20dec11_A0_falcor_reduced_2obj_INTF7_
+duration: 100 sec
+EA:{EM:{AM:8,p:0.3}}
+noise: rate:100, weight:5
+
+-- run 20dec11_A0_cycle_reduced_2obj_INTF7_
+duration: 50 sec
+EA:{EM:{AM:10,p:0.2}}
+
+--a bug fixed only related to reducedNetwork.
