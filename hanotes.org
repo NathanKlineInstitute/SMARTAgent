@@ -10681,3 +10681,82 @@ the issue was using just 8 neurons to encode directions. It was activating neuro
 
               if abs(getangdiff(a,dAngPeak[pop])) <= self.AngRFSigma:
                 self.dFiringRates[pop][0] = MaxRate
+
+
+>>> len(dspkT['EV1DNE'][(dspkT['EV1DNE']>=6650)&(dspkT['EV1DNE']<6700)])
+2
+>>> len(dspkT['EV1'][(dspkT['EV1']>=6650)&(dspkT['EV1']<6700)])
+20
+>>> len(dspkT['EA'][(dspkT['EA']>=6650)&(dspkT['EA']<6700)])
+16
+
+
+>>> len(dspkT['EV1DNE'][(dspkT['EV1DNE']>=6700)&(dspkT['EV1DNE']<6750)])
+2
+>>> len(dspkT['EV1'][(dspkT['EV1']>=6700)&(dspkT['EV1']<6750)])
+16
+>>> len(dspkT['EA'][(dspkT['EA']>=6700)&(dspkT['EA']<6750)])
+13
+
+
+>>> len(dspkT['EV1'][(dspkT['EV1']>=6750)&(dspkT['EV1']<6800)])
+14
+>>> len(dspkT['EV1DNE'][(dspkT['EV1DNE']>=6750)&(dspkT['EV1DNE']<6800)])
+2
+>>> len(dspkT['EA'][(dspkT['EA']>=6750)&(dspkT['EA']<6800)])
+2
+
+
+
+>>> len(dspkT['EV1DNE'][(dspkT['EV1DNE']>=3850)&(dspkT['EV1DNE']<3900)])
+8
+>>> len(dspkT['EV1'][(dspkT['EV1']>=3850)&(dspkT['EV1']<3900)])
+9
+>>> len(dspkT['EA'][(dspkT['EA']>=3850)&(dspkT['EA']<3900)])
+480
+.... so this is the problem... why fewer spikes in EV1 and more spikes in EV1DNE?
+
+
+
+
+>>> len(dspkT['EV1DSE'][(dspkT['EV1DSE']>=7818)&(dspkT['EV1DSE']<7868)])
+0
+>>> len(dspkT['EV1DSE'][(dspkT['EV1DSE']>=7818+50)&(dspkT['EV1DSE']<7868+50)])
+6
+>>> len(dspkT['EV1DSE'][(dspkT['EV1DSE']>=7818+150)&(dspkT['EV1DSE']<7868+150)])
+5
+>>> len(dspkT['EV1DSE'][(dspkT['EV1DSE']>=7818+200)&(dspkT['EV1DSE']<7868+200)])
+4
+>>> len(dspkT['EV1DSE'][(dspkT['EV1DSE']>=7818+250)&(dspkT['EV1DSE']<7868+250)])
+2
+>>> len(dspkT['EV1DSE'][(dspkT['EV1DSE']>=7818+350)&(dspkT['EV1DSE']<7868+350)])
+2
+
+... THESES SHOULD BE STABLE
+
+to stablize firing rates of VD and VL, increased stimMod to 36.25
+        "stimModVD": 36.25,
+        "stimModVL": 36.25,
+and reduced the stimulation rates as
+        "DirMaxRate": 100.0,
+        "LocMaxRate": 100.0,
+also "EXPDir": 0,
+
+started using 
+"tstepPerAction": 20,
+
+changed strength of conns from VD and VL to EA
+
+"VL" to "EA":{"AM":12}
+"VD" to "EA":{"AM":12}.... this was already 12
+ and
+
+"EM":{"AM":8}... without noise this produces ~3Hz activity in M pops.
+therefore accordingly changed RL params...
+
+        "AMPA": {
+            "wbase": 5,
+            "wmax": 40,
+            ....
+... for now i will use multiStim to run without noise and see by tomorrow how are the results.
+

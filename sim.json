@@ -10,7 +10,7 @@
         "yball":80,
         "yracket":40,
         "racket_dy":5,
-        "dodraw": 1
+        "dodraw": 0
     },
     "moves": {
         "UP": 4,
@@ -49,7 +49,7 @@
     "stayStepLim": 0,
     "simtype": {
         "ResumeSim": 0,
-        "ResumeSimFromFile": "data/20dec09_A0_cycle_reduced_2obj_INTF7_synWeights_final.pkl"
+        "ResumeSimFromFile": "data/20dec10_B0_cycle_reduced_2obj_INTF7_synWeights_final.pkl"
     },
     "sim": {
         "duration": 10000,
@@ -57,20 +57,20 @@
         "verbose": 0,
         "recordStep": 1.0,
         "recordStim":0,
-        "recordWeightStepSize": 500,
+        "recordWeightStepSize": 1000,
         "normalizeWeightStepSize": 50000000000000000000000000,
 	"normalizeWeightsAtStart": 0,
         "RLFakeUpRule": 0,
         "RLFakeDownRule": 0,
         "RLFakeStayRule": 0,
-        "name": "20dec10_B0_cycle_reduced_2obj_INTF7_",
+        "name": "20dec11_A0_cycle_reduced_2obj_INTF7_",
         "doquit": 1,
         "doplot": 0,
         "saveCellSecs": 0,
         "saveCellConns": 0,
         "targettedRL": 1,
         "anticipatedRL": 0,
-        "tstepPerAction": 50,
+        "tstepPerAction": 20,
         "saveWeights": 1,
         "saveAssignedFiringRates": 0,
           "useReducedNetwork": 1,
@@ -129,7 +129,7 @@
 	"IVDirPops": ["ID"],
         "EVLocPops": ["EV1","EV4","EMT"],	
         "AngRFSigma": 22.5,
-	"EXPDir": 1,	
+	"EXPDir": 0,	
 	"VTopoI": 0,
         "alltopoldivcons":{
             "IR":{"ER":5},
@@ -196,16 +196,16 @@
         },	
     "useBinaryImage": 1,
         "DirMinRate": 0.0,
-        "DirMaxRate": 150.0,
-        "LocMaxRate": 150.0,
+        "DirMaxRate": 100.0,
+        "LocMaxRate": 100.0,
         "FiringRateCutoff" : 50.0,
-        "stimModVD": 27.5,
-        "stimModVL": 27.5,
+        "stimModVD": 36.25,
+        "stimModVL": 36.25,
 	"cmat": {
 	    "VL":{
             "VD":{"AM":0,"NM":0,"p":0},		
             "VL":{"AM":4,"NM":0.6,"p":0},
-            "EA":{"AM":8,"NM":0.36,"p":0.1},
+            "EA":{"AM":12,"NM":0.36,"p":0.1},
             "EMDOWN":{"AM":0.5,"NM":0.001,"p":0.08},
             "EMUP":{"AM":0.5,"NM":0.001,"p":0.08},
             "EMSTAY":{"AM":0.5,"NM":0.001,"p":0.08}		
@@ -228,7 +228,7 @@
             "EA":{
             "EA":{"AM":1.2,"NM":0.12,"p":0.0},
             "EA2":{"AM":1.2,"NM":0.12,"p":0.2},
-            "EM":{"AM":20,"NM":0.001,"p":0.2},
+            "EM":{"AM":8,"NM":0.001,"p":0.2},
             "IA":{"AM":10, "p":0.1}
             },
             "EA2":{
@@ -388,7 +388,7 @@
             "maxreward": 0.0 
         },	
         "AMPA": {
-            "wbase": 10,
+            "wbase": 5,
             "wmax": 40,
             "RLon": 1,
 	    "STDPon": 0,
@@ -431,8 +431,8 @@
             "Weight": 0.5e-05
         },
         "E": {
-            "Rate": 200,
-            "Weight": 5
+            "Rate": 100,
+            "Weight": 0
         }
     }
 }
