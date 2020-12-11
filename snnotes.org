@@ -24198,3 +24198,12 @@ python multistepSim.py sn.json 32 20 20dec11_A0_cycle_multi
 
 started ~16:38 ...
 
+** next sim on gcp (20dec11_B0_gcp_)
+
+same as one on cycle but targetted RL of 3
+and no plasticity for the A2 neurons (since does not work with targetted)
+
+python multistepSim.py sn.json 32 20 20dec11_B0_gcp_multi
+
+started ~16:42 ...
+
