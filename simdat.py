@@ -320,10 +320,13 @@ def animInput (InputImages, outpath, framerate=50, figsize=None, showflow=False,
   def updatefig (t):
     stitle = 'Time = ' + str(t*tstepPerAction) + ' ms'
     if cumHits is not None:
-      if skipopp:
-        stitle += '\nModel Points:'+str(cumScore[t]) + '   Model Hits:'+str(cumHits[t])
+      if dconf['rewardcodes']['scorePoint'] > 0.0:      
+        if skipopp:
+          stitle += '\nModel Points:'+str(cumScore[t]) + '   Model Hits:'+str(cumHits[t])
+        else:
+          stitle += '\nOpponent Points:'+str(cumMissed[t])+'   Model Points:'+str(cumScore[t]) + '   Model Hits:'+str(cumHits[t])
       else:
-        stitle += '\nOpponent Points:'+str(cumMissed[t])+'   Model Points:'+str(cumScore[t]) + '   Model Hits:'+str(cumHits[t])        
+        stitle += '\nModel Hits:'+str(cumHits[t]) + '   Model Misses:'+str(cumMissed[t])
     fig.suptitle(stitle)
     if t < 1: return fig # already rendered t=0 above
     print('frame t = ', str(t*tstepPerAction))    
