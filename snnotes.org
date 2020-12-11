@@ -24079,3 +24079,68 @@ ok...added some more...changed weights
 and now using the simple simulated pong (only 1 paddle)
 
 python multistepSim.py sn.json 32 20 20dec10_C0_cycle_multi
+
+started ~16:55 ...
+
+* 20dec11
+** check output from 20dec10_C0_cycle__step_1_
+
+python -i simdat.py backupcfg/20dec10_C0_cycle__step_1_sim.json
+
+EV1 0.45 Hz
+EV1DE 0.12 Hz
+EV1DNE 1.44 Hz
+EV1DN 3.67 Hz
+EV1DNW 0.34 Hz
+EV1DW 0.0 Hz
+EV1DSW 0.24 Hz
+EV1DS 3.69 Hz
+EV1DSE 1.74 Hz
+EA 0.93 Hz
+EA2 0.53 Hz
+IA2 3.52 Hz
+EMDOWN 1.52 Hz
+EMUP 1.52 Hz
+IM 8.32 Hz
+
+hmm, very low rates ... 
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/20dec11_20dec10_C0_cycle__step_1_perf.png]]
+
+lfn = ['20dec10_C0_cycle__step_' + str(i) + '_' for i in range(2)]
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0,2))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/20dec11_20dec10_C0_cycle__step_1_perf_all_steps_so_far.png]]
+ylim((0,1))
+savefig(gifpath()+'perf_all_steps_so_farB.png') # [[./gif/20dec11_20dec10_C0_cycle__step_1_perf_all_steps_so_farB.png]]
+
+lpda = getindivactionreward(lfn)
+csm=cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+lclr = [csm.to_rgba(float(i)/(len(lpda))) for i in range(len(lpda))]
+clf(); plotComparePerf(lpda,lclr,yl=(0,5),lleg=lfn)
+savefig(gifpath()+'perf_compareD.png') # [[./gif/20dec11_20dec10_C0_cycle__step_1_perf_compareD.png]]
+
+perf getting worse ... 
+
+pdfc = getconcatweightpdf(lfn)
+clf(); popwts = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False)
+savefig(gifpath()+'all_steps_avg_weight.png') # [[./gif/20dec11_20dec10_C0_cycle__step_1_all_steps_avg_weight.png]]
+
+hmm, forgot to turn on targetted RL to 3 ... this is w/o targetted RL 
+
+clf(); drawraster(dspkT,dspkID); xlim((490e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/20dec11_20dec10_C0_cycle__step_1_rast.png]]
+
+those rates look > 1.5 Hz for EMUP ... ??
+
+binsz = 1000
+dnspk = {pop:getspikehist(dspkT[pop],dnumc[pop],binsz,totalDur) for pop in ['EMDOWN','EMUP']}
+for clr,pop in zip(['r','b'],['EMDOWN','EMUP']): plot(dnspk[pop][0],dnspk[pop][1],clr)
+xlim((0,totalDur)); ylim((0,10))
+
+savefig(gifpath()+'EMUPDOWN_rates.png') # [[./gif/20dec11_20dec10_C0_cycle__step_1_EMUPDOWN_rates.png]]
+
+fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward,skipopp=True) 
+[[./gif/20dec11_20dec10_C0_cycle__step_1__with_reward_input.mp4]]
+
