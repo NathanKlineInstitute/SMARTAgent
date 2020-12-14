@@ -1717,13 +1717,13 @@ def trainAgent (t):
           for STDPmech in dSTDPmech['EMUP']: STDPmech.reward_punish(float(critic))
           if dconf['sim']['targettedRL']==3 and sum(F_DOWNs)>0: # opposite to pop that did not contribute
             if dconf['verbose']: print('APPLY -RL to EMDOWN')
-            for STDPmech in dSTDPmech['EMDOWN']: STDPmech.reward_punish(float(-critic))
+            for STDPmech in dSTDPmech['EMDOWN']: STDPmech.reward_punish(float(-dconf['sim']['targettedRLOppFctr']*critic))
         elif DOWNactions>UPactions: # DOWN WINS vs UP
           if dconf['verbose']: print('APPLY RL to EMDOWN')
           for STDPmech in dSTDPmech['EMDOWN']: STDPmech.reward_punish(float(critic))
           if dconf['sim']['targettedRL']==3 and sum(F_UPs)>0: # opposite to pop that did not contribute
             if dconf['verbose']: print('APPLY -RL to EMUP')            
-            for STDPmech in dSTDPmech['EMUP']: STDPmech.reward_punish(float(-critic))              
+            for STDPmech in dSTDPmech['EMUP']: STDPmech.reward_punish(float(-dconf['sim']['targettedRLOppFctr']*critic))
       else:
         if dconf['verbose']: print('APPLY RL to both EMUP and EMDOWN')
         for STDPmech in dSTDPmech['all']: STDPmech.reward_punish(critic)

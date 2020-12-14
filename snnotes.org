@@ -24207,3 +24207,87 @@ python multistepSim.py sn.json 32 20 20dec11_B0_gcp_multi
 
 started ~16:42 ...
 
+* 20dec14
+** check output from 20dec11_B0_gcp__step_11_
+
+python -i simdat.py backupcfg/20dec11_B0_gcp__step_11_sim.json
+
+EV1 0.45 Hz
+EV1DE 0.1 Hz
+EV1DNE 1.38 Hz
+EV1DN 3.91 Hz
+EV1DNW 0.35 Hz
+EV1DW 0.02 Hz
+EV1DSW 0.26 Hz
+EV1DS 3.92 Hz
+EV1DSE 1.51 Hz
+EA 0.95 Hz
+EA2 0.58 Hz
+IA2 3.82 Hz
+EMDOWN 1.75 Hz
+EMUP 1.27 Hz
+IM 8.71 Hz
+
+large diff in firing rates of EMDOWN and EMUP
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/20dec14_20dec11_B0_gcp__step_11_perf.png]]
+still at ~0.4 ... 
+
+lfn = ['20dec11_B0_gcp__step_' + str(i) + '_' for i in range(12)]
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0,0.5))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/20dec14_20dec11_B0_gcp__step_11_perf_all_steps_so_far.png]]
+stuck below 0.5 ... 
+
+lpda = getindivactionreward(lfn)
+csm=cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+lclr = [csm.to_rgba(float(i)/(len(lpda))) for i in range(len(lpda))]
+clf(); plotComparePerf(lpda,lclr,yl=(0,5),lleg=lfn)
+savefig(gifpath()+'perf_compareD.png') # [[./gif/20dec14_20dec11_B0_gcp__step_11_perf_compareD.png]]
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,np.amax(pdf.time)),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False)
+ylim((0.44,0.64))
+savefig(gifpath()+'all_avg_weight.png') # [[./gif/20dec14_20dec11_B0_gcp__step_11_all_avg_weight.png]]
+weights diverged too much ... and that's reflected in the higher EMDOWN vs EMUP firing rates ...
+so do not expect this targetted RL == 3 to work ... unless pull the weights back towards each other periodically ...
+or have opposite population weights change less than the increase to other population to reduce the counterbalancing ... 
+
+fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
+[[./gif/20dec14_20dec11_B0_gcp__step_11__with_reward_input.mp4]] 
+
+** adjust targetted==3 rule? (20dec14_A0_gcp_)
+
+      if dconf['sim']['targettedRL']:
+        if UPactions==DOWNactions and \
+           sum(F_UPs)>0 and sum(F_DOWNs)>0: # same number of actions/spikes -> stay; only apply critic when > 0 spikes
+          if dconf['verbose']: print('APPLY RL to both EMUP and EMDOWN')
+          for STDPmech in dSTDPmech['all']: STDPmech.reward_punish(float(critic))          
+        elif UPactions>DOWNactions: # UP WINS vs DOWN
+          if dconf['verbose']: print('APPLY RL to EMUP')
+          for STDPmech in dSTDPmech['EMUP']: STDPmech.reward_punish(float(critic))
+          if dconf['sim']['targettedRL']==3 and sum(F_DOWNs)>0: # opposite to pop that did not contribute
+            if dconf['verbose']: print('APPLY -RL to EMDOWN')
+            for STDPmech in dSTDPmech['EMDOWN']: STDPmech.reward_punish(float(-critic))
+        elif DOWNactions>UPactions: # DOWN WINS vs UP
+          if dconf['verbose']: print('APPLY RL to EMDOWN')
+          for STDPmech in dSTDPmech['EMDOWN']: STDPmech.reward_punish(float(critic))
+          if dconf['sim']['targettedRL']==3 and sum(F_UPs)>0: # opposite to pop that did not contribute
+            if dconf['verbose']: print('APPLY -RL to EMUP')            
+            for STDPmech in dSTDPmech['EMUP']: STDPmech.reward_punish(float(-critic))              
+
+could have reward/punish signal for other population with -factor * critic
+
+where factor btwn 0 and 1 (0 for targettedRL==1)
+
+could do that or just use targetted RL of 1 ... 
+
+will try 0.1 for the factor ...
+
+        "targettedRL": 3,
+	"targettedRLOppFctr": 0.5,
+
+python multistepSim.py sn.json 32 20 20dec14_A0_gcp_multi
+
+started ~10:20 ...
+
