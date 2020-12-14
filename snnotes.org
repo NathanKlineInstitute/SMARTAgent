@@ -24423,3 +24423,75 @@ python multistepSim.py sn.json 32 20 20dec14_B0_gcp_multi
 
 started ~15:58 ...
 
+** next sim on cycle - no targetted RL (20dec14_A0_cycle_)
+
+try with EIPlast (EM->IM and EA2->IA2), recurrent in EA2, feedback from EM -> EA2, and
+the usual feedforward ... 
+
+        "RLconns": {
+            "EIPlast": 1,
+            "Visual": 0,
+            "RecurrentDirNeurons": 0,
+            "RecurrentLocNeurons": 0,
+            "FeedForwardDirNtoA": 0,
+            "FeedForwardLocNtoA": 0,
+            "FeedForwardDirNtoA2": 0,
+            "FeedForwardLocNtoA2": 0,	    
+            "FeedForwardDirNtoM": 0,
+            "FeedForwardLocNtoM": 0,
+            "FeedForwardAtoM": 1,
+            "FeedForwardAtoA2": 1,
+            "FeedForwardA2toM": 1,
+            "FeedbackLocNeurons": 0,
+            "RecurrentMNeurons": 1,
+            "RecurrentANeurons": 0,
+            "RecurrentA2Neurons": 1,
+            "FeedbackAtoDirN": 0,
+            "FeedbackAtoLocN": 0,
+	    "FeedbackMtoA": 0,
+	    "FeedbackMtoA2": 1
+        },
+
+        "AMPAI": {
+            "wbase": 5,
+            "wmax": 20,
+            "RLon": 1,
+            "STDPon": 0,
+            "RLlenhebb": 250,
+            "RLlenanti": 250,
+            "useRLexp": 1,
+            "RLhebbwt": 0.05,
+            "RLantiwt": 0.0,
+            "hebbwt": 0,
+            "antiwt": 0,
+            "tauhebb": 10,
+            "tauanti": 10,
+            "RLwindhebb": 50,
+            "softthresh": 0,
+            "verbose": 0,
+            "maxreward": 0.0
+        },
+        "AMPA": {
+            "wbase": 0.16,
+            "wmax": 16,
+            "RLon": 1,
+            "STDPon": 0,
+            "RLlenhebb": 250,
+            "RLlenanti": 250,
+            "useRLexp": 1,
+            "RLhebbwt": 0.005,
+            "RLantiwt": 0,
+            "hebbwt": 0.0,
+            "antiwt": 0.0,
+            "tauhebb": 10,
+            "tauanti": 10,
+            "RLwindhebb": 50,
+            "softthresh": 0,
+            "verbose": 0,
+            "maxreward": 0.0
+        },
+
+python multistepSim.py sn.json 32 20 20dec14_A0_cycle_multi
+
+started ~16:48 ...
+

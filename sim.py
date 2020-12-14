@@ -116,10 +116,16 @@ if cmat['VD']['VD']['p'] > 0.0 or \
     lrecpop.append(pop)
   if dconf['net']['VisualFeedback'] and dnumc['ER']>0: lrecpop.append('ER')
 
-if dnumc['EA']>0 and (dconf['net']['RLconns']['RecurrentANeurons'] or dconf['net']['STDPconns']['RecurrentANeurons']):
+if dnumc['EA']>0 and (dconf['net']['RLconns']['RecurrentANeurons'] or \
+                      dconf['net']['STDPconns']['RecurrentANeurons'] or \
+                      dconf['net']['RLconns']['FeedbackMtoA'] or \
+                      dconf['net']['STDPconns']['FeedbackMtoA']):
   lrecpop.append('EA')
 
-if dnumc['EA2']>0 and (dconf['net']['RLconns']['RecurrentA2Neurons'] or dconf['net']['STDPconns']['RecurrentA2Neurons']):
+if dnumc['EA2']>0 and (dconf['net']['RLconns']['RecurrentA2Neurons'] or \
+                       dconf['net']['STDPconns']['RecurrentA2Neurons'] or \
+                       dconf['net']['RLconns']['FeedbackMtoA2'] or \
+                       dconf['net']['STDPconns']['FeedbackMtoA2']): 
   lrecpop.append('EA2')
   
 if dconf['net']['RLconns']['Visual'] or dconf['net']['STDPconns']['Visual']:
@@ -132,6 +138,8 @@ if dconf['net']['RLconns']['EIPlast'] or dconf['net']['STDPconns']['EIPlast']:
   lrecpop.append('IMUP')
   lrecpop.append('IMDOWN')
   lrecpop.append('IMSTAY')
+  lrecpop.append('IA')
+  lrecpop.append('IA2')
 
 # Network parameters
 netParams = specs.NetParams() #object of class NetParams to store the network parameters
@@ -1130,24 +1138,24 @@ if cmat['EM']['EM']['p'] > 0.0:
 if cmat['EM']['EA']['p'] > 0.0:
   for prety in EMotorPops:
     for poty in ['EA','EA2']:
-        for strty,synmech,weight in zip(['','n'],['AMPA', 'NMDA'],[cmat['EM']['EA']['AM']*cfg.EEGain, cmat['EM']['EA']['NM']*cfg.EEGain]):
+        for strty,synmech,weight in zip(['','n'],['AMPA', 'NMDA'],[cmat['EM'][poty]['AM']*cfg.EEGain, cmat['EM'][poty]['NM']*cfg.EEGain]):
           k = strty+prety+'->'+strty+poty
           netParams.connParams[k] = {
             'preConds': {'pop': prety},
             'postConds': {'pop': poty},
-            'convergence': prob2conv(cmat['EM']['EA']['p'], dnumc[prety]),
+            'convergence': prob2conv(cmat['EM'][poty]['p'], dnumc[prety]),
             'weight': getInitWeight(weight),
             'delay': getInitDelay(),
             'synMech': synmech,
             'sec':EExcitSec, 'loc':0.5,'weightIndex':getWeightIndex(synmech, ECellModel)
           }
           useRL = useSTDP = False
-          if poty in EVDirPops:
-            if dconf['net']['RLconns']['FeedbackMtoDirN']: useRL = True
-            if dconf['net']['STDPconns']['FeedbackMtoDirN']: useSTDP = True
-          if poty in EVLocPops:
-            if dconf['net']['RLconns']['FeedbackMtoLocN']: useRL = True
-            if dconf['net']['STDPconns']['FeedbackMtoLocN']: useSTDP = True            
+          if poty == 'EA':
+            if dconf['net']['RLconns']['FeedbackMtoA']: useRL = True
+            if dconf['net']['STDPconns']['FeedbackMtoA']: useSTDP = True
+          elif poty == 'EA2':
+            if dconf['net']['RLconns']['FeedbackMtoA2']: useRL = True
+            if dconf['net']['STDPconns']['FeedbackMtoA2']: useSTDP = True                          
           if useRL and dSTDPparamsRL[synmech]['RLon']: # only turn on plasticity when specified to do so
             netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL[synmech]}
           elif useSTDP and dSTDPparams[synmech]['STDPon']:
