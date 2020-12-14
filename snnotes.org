@@ -24291,3 +24291,101 @@ python multistepSim.py sn.json 32 20 20dec14_A0_gcp_multi
 
 started ~10:20 ...
 
+** check output from 20dec11_A0_cycle__step_3_
+
+python -i simdat.py backupcfg/20dec11_A0_cycle__step_3_sim.json
+
+EV1 0.46 Hz
+EV1DE 0.0 Hz
+EV1DNE 3.37 Hz
+EV1DN 3.13 Hz
+EV1DNW 0.0 Hz
+EV1DW 0.0 Hz
+EV1DSW 0.0 Hz
+EV1DS 3.62 Hz
+EV1DSE 0.06 Hz
+EA 0.59 Hz
+EA2 0.01 Hz
+IA2 0.03 Hz
+EMDOWN 1.16 Hz
+EMUP 1.12 Hz
+IM 6.35 Hz
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/20dec14_20dec11_A0_cycle__step_3_perf.png]]
+
+lfn = ['20dec11_A0_cycle__step_' + str(i) + '_' for i in range(4)]
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0,0.5))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/20dec14_20dec11_A0_cycle__step_3_perf_all_steps_so_far.png]]
+this seems to be improving, but slowly ... 
+
+lpda = getindivactionreward(lfn)
+csm=cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+lclr = [csm.to_rgba(float(i)/(len(lpda))) for i in range(len(lpda))]
+clf(); plotComparePerf(lpda,lclr,yl=(0,1),lleg=lfn)
+savefig(gifpath()+'perf_compareD.png') # [[./gif/20dec14_20dec11_A0_cycle__step_3_perf_compareD.png]]
+some small improvement from first and later steps, ... 
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,np.amax(pdf.time)),lpop=['EMDOWN','EMUP','EA2'],lclr=['r','b','g'],plotindiv=False)
+savefig(gifpath()+'all_avg_weight.png') # [[./gif/20dec14_20dec11_A0_cycle__step_3_all_avg_weight.png]]
+
+clf(); drawraster(dspkT,dspkID); xlim((490e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/20dec14_20dec11_A0_cycle__step_3_rast.png]]
+xlim((499e3,500e3))
+savefig(gifpath()+'rastB.png') # [[./gif/20dec14_20dec11_A0_cycle__step_3_rastB.png]]
+
+activity looks ok, including rates, but EA2 almost silent ... so not much benefit from having plasticity there ... 
+
+fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
+[[./gif/20dec14_20dec11_A0_cycle__step_3__with_reward_input.mp4]]
+
+looks ok but too shaky due to noise...
+
+python -i simdat.py backupcfg/20dec11_A0_cycle__step_4_sim.json
+
+EV1 0.45 Hz
+EV1DE 0.0 Hz
+EV1DNE 2.15 Hz
+EV1DN 3.1 Hz
+EV1DNW 0.0 Hz
+EV1DW 0.0 Hz
+EV1DSW 0.0 Hz
+EV1DS 3.59 Hz
+EV1DSE 1.16 Hz
+EA 0.52 Hz
+EA2 0.17 Hz
+IA2 2.17 Hz
+EMDOWN 1.24 Hz
+EMUP 1.21 Hz
+IM 8.26 Hz
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/20dec14_20dec11_A0_cycle__step_4_perf.png]]
+
+lfn = ['20dec11_A0_cycle__step_' + str(i) + '_' for i in range(5)]
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0,0.5))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/20dec14_20dec11_A0_cycle__step_4_perf_all_steps_so_far.png]]
+
+lpda = getindivactionreward(lfn)
+csm=cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+lclr = [csm.to_rgba(float(i)/(len(lpda))) for i in range(len(lpda))]
+clf(); plotComparePerf(lpda,lclr,yl=(0,1),lleg=lfn)
+savefig(gifpath()+'perf_compareD.png') # [[./gif/20dec14_20dec11_A0_cycle__step_4_perf_compareD.png]]
+
+clf(); popwts = plotMeanWeights(pdf,gca(),msz=6,xl=(0,np.amax(pdf.time)),lpop=['EMDOWN','EMUP','EA2'],lclr=['r','b','g'],plotindiv=False)
+savefig(gifpath()+'all_avg_weight.png') # [[./gif/20dec14_20dec11_A0_cycle__step_4_all_avg_weight.png]]
+
+clf(); drawraster(dspkT,dspkID); xlim((490e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/20dec14_20dec11_A0_cycle__step_4_rast.png]]
+xlim((499e3,500e3))
+savefig(gifpath()+'rastB.png') # [[./gif/20dec14_20dec11_A0_cycle__step_4_rastB.png]]
+note that those firing rates in raster incude the whole simulation but the ones printed from simdat.py are
+the last 1 s of simulation ... which has much lower average rates ... 
+
+fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
+[[./gif/20dec14_20dec11_A0_cycle__step_4__with_reward_input.mp4]]
+
+stopped this one for now ...
+
