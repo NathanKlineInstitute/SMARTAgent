@@ -135,11 +135,10 @@ if dconf['net']['RLconns']['Visual'] or dconf['net']['STDPconns']['Visual']:
 if dconf['net']['RLconns']['EIPlast'] or dconf['net']['STDPconns']['EIPlast']:
   lrecpop.append('IM')
   #lrecpop.append('ID')
-  lrecpop.append('IMUP')
-  lrecpop.append('IMDOWN')
-  lrecpop.append('IMSTAY')
-  lrecpop.append('IA')
-  lrecpop.append('IA2')
+  if dnumc['IMUP'] > 0: lrecpop.append('IMUP')
+  if dnumc['IMDOWN'] > 0: lrecpop.append('IMDOWN')
+  if dnumc['IA'] > 0: lrecpop.append('IA')
+  if dnumc['IA2'] > 0: lrecpop.append('IA2')
 
 # Network parameters
 netParams = specs.NetParams() #object of class NetParams to store the network parameters
