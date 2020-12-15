@@ -57,7 +57,7 @@
         "recordStep": 1.0,
 	"recordStim": 0,
         "recordWeightStepSize": 500,
-        "normalizeWeightStepSize": 500,
+        "normalizeWeightStepSize": 50000000000000000000000000000000000000,
         "normalizeWeightsAtStart": 0,
         "RLFakeUpRule": 0,
         "RLFakeDownRule": 0,
