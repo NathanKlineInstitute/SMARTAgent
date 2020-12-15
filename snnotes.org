@@ -24495,3 +24495,51 @@ python multistepSim.py sn.json 32 20 20dec14_A0_cycle_multi
 
 started ~16:48 ...
 
+* 20dec15
+** check output from 20dec14_B0_gcp__step_2_
+
+python -i simdat.py backupcfg/20dec14_B0_gcp__step_2_sim.json
+
+EV1 0.45 Hz
+EV1DE 0.1 Hz
+EV1DNE 1.27 Hz
+EV1DN 3.82 Hz
+EV1DNW 0.49 Hz
+EV1DW 0.01 Hz
+EV1DSW 0.24 Hz
+EV1DS 3.81 Hz
+EV1DSE 1.45 Hz
+EA 0.91 Hz
+EA2 0.51 Hz
+IA2 3.5 Hz
+EMDOWN 1.53 Hz
+EMUP 1.46 Hz
+IM 8.26 Hz
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/20dec15_20dec14_B0_gcp__step_2_perf.png]]
+
+lfn = ['20dec14_B0_gcp__step_' + str(i) + '_' for i in range(3)]
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0,0.5))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/20dec15_20dec14_B0_gcp__step_2_perf_all_steps_so_far.png]]
+does not seem to be improving ... 
+
+lpda = getindivactionreward(lfn)
+csm=cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+lclr = [csm.to_rgba(float(i)/(len(lpda))) for i in range(len(lpda))]
+clf(); plotComparePerf(lpda,lclr,yl=(0,5),lleg=lfn)
+savefig(gifpath()+'perf_compareD.png') # [[./gif/20dec15_20dec14_B0_gcp__step_2_perf_compareD.png]]
+
+pdfc = getconcatweightpdf(lfn)
+clf(); popwts = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False)
+savefig(gifpath()+'all_steps_avg_weight.png') # [[./gif/20dec15_20dec14_B0_gcp__step_2_all_steps_avg_weight.png]]
+less divergence than before ... note that this sim used targettedRL of 1 ... 
+and even that produced divergence of weights ... maybe down moves happen to be more important ... but performance
+does not seem to be increasing ...
+
+fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
+[[./gif/20dec15_20dec14_B0_gcp__step_2__with_reward_input.mp4]]
+
+so maybe noise is dominating network activity right now ... 
+
