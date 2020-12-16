@@ -24547,7 +24547,7 @@ so maybe noise is dominating network activity right now ...
 
 python multistepSim.py sn.json 32 20 20dec15_A0_cycle_multi
 
-** other sim on gcp (20dec15_A0_gcp_); lower noise, inc input to EA2, low internal weights
+** other sim on gcp (20dec15_A0_gcp_); lower noise, inc input to EA, low internal weights
 
 less noise ... 
 
