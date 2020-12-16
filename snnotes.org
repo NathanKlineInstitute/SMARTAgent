@@ -24559,3 +24559,7 @@ python multistepSim.py sn.json 32 20 20dec15_A0_gcp_multi
 
 started ~16:56 ...
 
+** other sim on cycle - same as on gcp but with targetted
+
+python multistepSim.py sn.json 32 20 20dec15_A0_cycle_multi
+
