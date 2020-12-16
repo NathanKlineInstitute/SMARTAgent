@@ -24547,7 +24547,7 @@ so maybe noise is dominating network activity right now ...
 
 python multistepSim.py sn.json 32 20 20dec15_A0_cycle_multi
 
-** other sim on gcp (20dec15_A0_gcp_); lower noise, inc input to EA, low internal weights
+** other sim on gcp (20dec15_A0_gcp_); lower noise, inc input to EA, low internal weights -->> stopped, no firing
 
 less noise ... 
 
@@ -24562,8 +24562,10 @@ started ~16:56 ...
 no firing - stopping
 
 
-
 ** other sim on cycle - same as on gcp but with targetted
 
 python multistepSim.py sn.json 32 20 20dec15_A0_cycle_multi
+
+* 20dec16
+** next sim on cycle (20dec16_A0_cycle_)
 
