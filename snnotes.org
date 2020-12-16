@@ -24561,11 +24561,12 @@ started ~16:56 ...
 
 no firing - stopping
 
-
 ** other sim on cycle - same as on gcp but with targetted
 
 python multistepSim.py sn.json 32 20 20dec15_A0_cycle_multi
 
 * 20dec16
 ** next sim on cycle (20dec16_A0_cycle_)
+** next sim on gcp (20dec16_A0_gcp_)
+
 

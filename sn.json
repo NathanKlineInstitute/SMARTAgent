@@ -51,7 +51,7 @@
         "ResumeSimFromFile": "data/20dec7_A0_cycle_synWeights_final.pkl"
     },
     "sim": {
-        "duration": 2000,
+        "duration": 5000,
         "dt": 0.6,
         "verbose": 0,
         "recordStep": 1.0,
@@ -62,7 +62,7 @@
         "RLFakeUpRule": 0,
         "RLFakeDownRule": 0,
         "RLFakeStayRule": 0,
-        "name": "20dec16_A0_cycle_",
+        "name": "20dec16_B0_gcp_",
         "doquit": 1,
         "doplot": 0,
         "saveCellSecs": 0,
@@ -291,7 +291,7 @@
             "FeedForwardA2toM": 0,
             "FeedbackLocNeurons": 0,
             "RecurrentMNeurons": 0,
-            "RecurrentANeurons": 0,
+            "RecurrentANeurons": 1,
             "RecurrentA2Neurons": 0,
             "FeedbackAtoDirN": 0,
             "FeedbackAtoLocN": 0,
@@ -315,13 +315,13 @@
             "FeedForwardA2toM": 1,
             "FeedbackLocNeurons": 0,
             "RecurrentMNeurons": 1,
-            "RecurrentANeurons": 1,
+            "RecurrentANeurons": 0,
             "RecurrentA2Neurons": 1,
             "FeedbackAtoDirN": 0,
             "FeedbackAtoLocN": 0,
-	    "FeedbackMtoA": 1,
+	    "FeedbackMtoA": 0,
 	    "FeedbackMtoA2": 1,
-	    "FeedbackA2toA": 1	    
+	    "FeedbackA2toA": 0
         },
         "useBinaryImage": 1,
         "useNeuronPad": 0,
@@ -334,29 +334,29 @@
         "cmat": {
             "VL":{"VD":{"AM": 0,"NM": 0, "p": 0},
                   "VL":{"AM": 4,"NM": 0.6,"p": 0},
-                  "EA":{"AM": 8.0,"NM": 0.3,"p": 0.1},
+                  "EA":{"AM": 6.0,"NM": 0.26,"p": 0.1},
 		  "EA2":{"AM": 0.4,"NM": 0.0,"p": 0.08},
                   "EMDOWN":{"AM": 0.4,"NM": 0.0,"p": 0.08},
                   "EMUP":{"AM": 0.4,"NM": 0.0,"p": 0.08}},
             "VD":{"VL":{"AM": 0,"NM": 0,"p": 0},
                   "VD":{"AM": 0,"NM": 0,"p": 0},
-                  "EA":{"AM": 8.0,"NM": 0.3,"p": 0.1},
+                  "EA":{"AM": 6.0,"NM": 0.26,"p": 0.1},
 		  "EA2":{"AM": 0.4,"NM": 0.0,"p": 0.08},
                   "EMDOWN":{"AM": 0.4,"NM": 0.0,"p": 0.08},
                   "EMUP":{"AM": 0.4,"NM": 0.0,"p": 0.08},
                   "ID":{"AM": 10,"p": 0.03}},
-            "EM":{"EM":{"AM": 0.7,"NM": 0.0,"p": 0.1},
-                  "EA":{"AM": 0.7,"NM": 0,"p": 0.1},
-                  "EA2":{"AM": 0.7,"NM": 0,"p": 0.1},
+            "EM":{"EM":{"AM": 0.8,"NM": 0.0,"p": 0.1},
+                  "EA":{"AM": 0.0,"NM": 0,"p": 0.05},
+                  "EA2":{"AM": 0.0,"NM": 0,"p": 0.05},
                   "IRecip":{"AM": 20,"NM": 0,"p": 0.0625},
                   "IM":{"AM": 10,"p": 0.15}},
-            "EA":{"EA":{"AM": 0.7,"NM": 0.0,"p": 0.01},
-                  "EA2":{"AM": 0.7,"NM": 0.0,"p": 0.15},
-                  "EM":{"AM": 0.7,"NM": 0.0,"p": 0.15},
-                  "IA":{"AM": 10,"p": 0.15}},
-            "EA2":{"EA":{"AM": 0.7,"NM": 0.0,"p": 0.01},
-                   "EA2":{"AM": 0.7,"NM": 0.0,"p": 0.15},
-                   "EM":{"AM": 0.7,"NM": 0.0,"p": 0.15},
+            "EA":{"EA":{"AM": 0.8,"NM": 0.0,"p": 0.005},
+                  "EA2":{"AM": 0.8,"NM": 0.0,"p": 0.1},
+                  "EM":{"AM": 0.8,"NM": 0.0,"p": 0.15},
+                  "IA":{"AM": 10,"p": 0.0324}},
+            "EA2":{"EA":{"AM": 0.0,"NM": 0.0,"p": 0.01},
+                   "EA2":{"AM": 0.8,"NM": 0.0,"p": 0.1},
+                   "EM":{"AM": 0.8,"NM": 0.0,"p": 0.1},
                    "IA2":{"AM": 10,"p": 0.15}},
             "IR":{"IR":{"GA": 2.5,"p": 0.15}},
             "IV1":{"EV1":{"GA": 5,"p": 0.1},
@@ -375,8 +375,8 @@
             "IM":{"EM":{"GA": 5,"p": 0.25},
                   "IM":{"GA": 2.5,"p": 0.1}},
             "IMRecip":{"EM": {"GA": 10,"p": 0.125}},
-            "IA":{"EA":{"GA": 5,"p": 0.25},
-                  "IA":{"GA": 2.5,"p": 0.1}},
+            "IA":{"EA":{"GA": 5,"p": 0.1},
+                  "IA":{"GA": 2.5,"p": 0.043}},
             "IA2":{"EA2":{"GA": 5,"p": 0.25},
                    "IA2":{"GA": 2.5,"p": 0.1}},
             "IMUP":{"IMUP":{"GA": 2.5,"p": 0.15}},
@@ -444,10 +444,10 @@
     },
     "STDP": {
         "AMPA": {
-            "wbase": 0.16,
+            "wbase": 0.005,
             "wmax": 16,
             "RLon": 0,
-            "STDPon": 0,
+            "STDPon": 1,
             "RLlenhebb": 200,
             "RLlenanti": 200,
             "useRLexp": 1,
@@ -502,7 +502,7 @@
             "maxreward": 0.0
         },
         "AMPA": {
-            "wbase": 0.16,
+            "wbase": 0.005,
             "wmax": 16,
             "RLon": 1,
             "STDPon": 0,
@@ -541,12 +541,12 @@
     },
     "Noise": {
         "I": {
-            "Rate": 0,
-            "Weight": 0.4
+            "Rate": 500,
+            "Weight": 5
         },
         "E": {
-            "Rate": 0,
-            "Weight": 0.4
+            "Rate": 500,
+            "Weight": 5
         }
     }
 }
