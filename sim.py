@@ -190,9 +190,11 @@ def getInitWeight (weight):
   """
   if cfg.weightVar == 0.0:
     return weight
+  elif weight <= 0.0:
+    return 0.0
   else:
     # print('uniform(%g,%g)' % (weight*(1.0-cfg.weightVar),weight*(1.0+cfg.weightVar)))
-    return 'uniform(%g,%g)' % (weight*(1.0-cfg.weightVar),weight*(1.0+cfg.weightVar))
+    return 'uniform(%g,%g)' % (max(0,weight*(1.0-cfg.weightVar)),weight*(1.0+cfg.weightVar))
 
 def getInitDelay ():
   if cfg.delayMin == cfg.delayMax:
@@ -481,6 +483,7 @@ for epop in EVPops:
     wAM, wNM = cmat['VL']['VL']['AM'], cmat['VL']['VL']['NM']
   for strty,synmech,weight in zip(['','n'],['AMPA', 'NMDA'],[wAM*cfg.EEGain, wNM*cfg.EEGain]):
     k = strty+prety+'->'+strty+poty
+    if weight <= 0.0: continue
     netParams.connParams[k] = {
       'preConds': {'pop': prety},
       'postConds': {'pop': poty},
@@ -762,6 +765,7 @@ if not dconf['sim']['useReducedNetwork']:
   for prety,poty,blist,prob,connCoords in zip(lprety,lpoty,lblist,lprob,lconnsCoords):  
     for strty,synmech,weight in zip(['','n'],['AMPA', 'NMDA'],[cmat[prety][poty]['AM']*cfg.EEGain, cmat[prety][poty]['NM']*cfg.EEGain]):
       k = strty+prety+'->'+strty+poty
+      if weight <= 0.0: continue        
       netParams.connParams[k] = {
             'preConds': {'pop': prety},
             'postConds': {'pop': poty},
@@ -1017,6 +1021,7 @@ def connectEVToTarget (lpoty, useTopological):
           prob = cmat['VL'][poty]['p']          
         for strty,synmech,weight in zip(['','n'],['AMPA', 'NMDA'],lsynw):        
           k = strty+prety+'->'+strty+poty
+          if weight <= 0.0: continue
           netParams.connParams[k] = {
             'preConds': {'pop': prety},
             'postConds': {'pop': poty},
@@ -1045,12 +1050,13 @@ connectEVToTarget(['EA','EA2'], dconf['architectureVtoA']['useTopological']) # c
 connectEVToTarget(EMotorPops, dconf['architectureVtoM']['useTopological']) # connect primary visual to motor
 
 # add connections from first to second visual association area
-# EA -> EA2
+# EA -> EA2 (feedforward)
 prety = 'EA'; poty = 'EA2'
 if dnumc[prety] > 0 and dnumc[poty] > 0:  
   lsynw = [cmat[prety][poty]['AM']*cfg.EEGain, cmat[prety][poty]['NM']*cfg.EEGain]
   for strty,synmech,weight in zip(['','n'],['AMPA', 'NMDA'],lsynw):
     k = strty+prety+'->'+strty+poty
+    if weight <= 0.0: continue    
     netParams.connParams[k] = {
       'preConds': {'pop': prety},
       'postConds': {'pop': poty},
@@ -1069,6 +1075,32 @@ if dnumc[prety] > 0 and dnumc[poty] > 0:
     elif dSTDPparams[synmech]['STDPon'] and useSTDP:
       netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparams[synmech]}
 
+# EA2 -> EA (feedback)
+prety = 'EA2'; poty = 'EA'
+if dnumc[prety] > 0 and dnumc[poty] > 0:  
+  lsynw = [cmat[prety][poty]['AM']*cfg.EEGain, cmat[prety][poty]['NM']*cfg.EEGain]
+  for strty,synmech,weight in zip(['','n'],['AMPA', 'NMDA'],lsynw):
+    k = strty+prety+'->'+strty+poty
+    if weight <= 0.0: continue
+    netParams.connParams[k] = {
+      'preConds': {'pop': prety},
+      'postConds': {'pop': poty},
+      'convergence': prob2conv(cmat[prety][poty]['p'], dnumc[prety]),
+      'weight': getInitWeight(weight),
+      'delay': getInitDelay(),
+      'synMech': synmech,
+      'sec':EExcitSec, 'loc':0.5,'weightIndex':getWeightIndex(synmech, ECellModel)
+    }
+    useRL = useSTDP = False
+    fbconnty = 'FeedbackA2toA'
+    if dconf['net']['RLconns'][fbconnty]: useRL = True
+    if dconf['net']['STDPconns'][fbconnty]: useSTDP = True          
+    if dSTDPparamsRL[synmech]['RLon'] and useRL: # only turn on plasticity when specified to do so
+      netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL[synmech]}
+    elif dSTDPparams[synmech]['STDPon'] and useSTDP:
+      netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparams[synmech]}
+
+      
 # Add connections from visual association areas to motor cortex, and reccurrent conn within visual association areas
 for prety,ffconnty,recconnty in zip(['EA', 'EA2'],['FeedForwardAtoM','FeedForwardA2toM'],['RecurrentANeurons','RecurrentA2Neurons']):
   if dnumc[prety] <= 0: continue
@@ -1077,6 +1109,7 @@ for prety,ffconnty,recconnty in zip(['EA', 'EA2'],['FeedForwardAtoM','FeedForwar
     if dnumc[poty] <= 0: continue
     for strty,synmech,weight in zip(['','n'],['AMPA', 'NMDA'],lsynw):
       k = strty+prety+'->'+strty+poty
+      if weight <= 0.0: continue              
       netParams.connParams[k] = {
         'preConds': {'pop': prety},
         'postConds': {'pop': poty},
@@ -1098,6 +1131,7 @@ for prety,ffconnty,recconnty in zip(['EA', 'EA2'],['FeedForwardAtoM','FeedForwar
   if cmat[prety][poty]['p'] > 0.0 and dnumc[poty]>0:
     for strty,synmech,weight in zip(['','n'],['AMPA', 'NMDA'],[cmat[prety][poty]['AM']*cfg.EEGain, cmat[prety][poty]['NM']*cfg.EEGain]):
       k = strty+prety+'->'+strty+poty
+      if weight <= 0.0: continue              
       netParams.connParams[k] = {
         'preConds': {'pop': prety},
         'postConds': {'pop': poty},
@@ -1119,6 +1153,7 @@ if cmat['EM']['EM']['p'] > 0.0:
       if prety==poty or dconf['net']['EEMRecProbCross']: # same types or allowing cross EM population connectivity
         for strty,synmech,weight in zip(['','n'],['AMPA', 'NMDA'],[cmat['EM']['EM']['AM']*cfg.EEGain, cmat['EM']['EM']['NM']*cfg.EEGain]):
           k = strty+prety+'->'+strty+poty
+          if weight <= 0.0: continue                  
           netParams.connParams[k] = {
             'preConds': {'pop': prety},
             'postConds': {'pop': poty},
@@ -1139,6 +1174,7 @@ if cmat['EM']['EA']['p'] > 0.0:
     for poty in ['EA','EA2']:
         for strty,synmech,weight in zip(['','n'],['AMPA', 'NMDA'],[cmat['EM'][poty]['AM']*cfg.EEGain, cmat['EM'][poty]['NM']*cfg.EEGain]):
           k = strty+prety+'->'+strty+poty
+          if weight <= 0.0: continue
           netParams.connParams[k] = {
             'preConds': {'pop': prety},
             'postConds': {'pop': poty},
