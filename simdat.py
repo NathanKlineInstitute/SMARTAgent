@@ -1684,6 +1684,10 @@ if __name__ == '__main__':
   #plotSynWeightsPostNeuronID(pdf,45)
   #fig=animInput(InputImages,gifpath()+'_input.mp4')  
   #figure(); drawcellVm(simConfig,lclr=['r','g','b','c','m','y'])
-  pravgrates(dspkT,dspkID,dnumc,tlim=(250,totalDur))
-  #drawraster(dspkT,dspkID)
-  #figure(); drawcellVm(simConfig,lclr=['r','g','b','c','m','y'])
+  if totalDur <= 10e3:
+    pravgrates(dspkT,dspkID,dnumc,tlim=(totalDur-1e3,totalDur))
+    drawraster(dspkT,dspkID)
+    figure(); drawcellVm(simConfig,lclr=['r','g','b','c','m','y'])    
+  else:
+    pravgrates(dspkT,dspkID,dnumc,tlim=(250,totalDur))    
+

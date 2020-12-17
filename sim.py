@@ -116,10 +116,16 @@ if cmat['VD']['VD']['p'] > 0.0 or \
     lrecpop.append(pop)
   if dconf['net']['VisualFeedback'] and dnumc['ER']>0: lrecpop.append('ER')
 
-if dnumc['EA']>0 and (dconf['net']['RLconns']['RecurrentANeurons'] or dconf['net']['STDPconns']['RecurrentANeurons']):
+if dnumc['EA']>0 and (dconf['net']['RLconns']['RecurrentANeurons'] or \
+                      dconf['net']['STDPconns']['RecurrentANeurons'] or \
+                      dconf['net']['RLconns']['FeedbackMtoA'] or \
+                      dconf['net']['STDPconns']['FeedbackMtoA']):
   lrecpop.append('EA')
 
-if dnumc['EA2']>0 and (dconf['net']['RLconns']['RecurrentA2Neurons'] or dconf['net']['STDPconns']['RecurrentA2Neurons']):
+if dnumc['EA2']>0 and (dconf['net']['RLconns']['RecurrentA2Neurons'] or \
+                       dconf['net']['STDPconns']['RecurrentA2Neurons'] or \
+                       dconf['net']['RLconns']['FeedbackMtoA2'] or \
+                       dconf['net']['STDPconns']['FeedbackMtoA2']): 
   lrecpop.append('EA2')
   
 if dconf['net']['RLconns']['Visual'] or dconf['net']['STDPconns']['Visual']:
@@ -129,9 +135,10 @@ if dconf['net']['RLconns']['Visual'] or dconf['net']['STDPconns']['Visual']:
 if dconf['net']['RLconns']['EIPlast'] or dconf['net']['STDPconns']['EIPlast']:
   lrecpop.append('IM')
   #lrecpop.append('ID')
-  lrecpop.append('IMUP')
-  lrecpop.append('IMDOWN')
-  lrecpop.append('IMSTAY')
+  if dnumc['IMUP'] > 0: lrecpop.append('IMUP')
+  if dnumc['IMDOWN'] > 0: lrecpop.append('IMDOWN')
+  if dnumc['IA'] > 0: lrecpop.append('IA')
+  if dnumc['IA2'] > 0: lrecpop.append('IA2')
 
 # Network parameters
 netParams = specs.NetParams() #object of class NetParams to store the network parameters
@@ -183,9 +190,11 @@ def getInitWeight (weight):
   """
   if cfg.weightVar == 0.0:
     return weight
+  elif weight <= 0.0:
+    return 0.0
   else:
     # print('uniform(%g,%g)' % (weight*(1.0-cfg.weightVar),weight*(1.0+cfg.weightVar)))
-    return 'uniform(%g,%g)' % (weight*(1.0-cfg.weightVar),weight*(1.0+cfg.weightVar))
+    return 'uniform(%g,%g)' % (max(0,weight*(1.0-cfg.weightVar)),weight*(1.0+cfg.weightVar))
 
 def getInitDelay ():
   if cfg.delayMin == cfg.delayMax:
@@ -474,6 +483,7 @@ for epop in EVPops:
     wAM, wNM = cmat['VL']['VL']['AM'], cmat['VL']['VL']['NM']
   for strty,synmech,weight in zip(['','n'],['AMPA', 'NMDA'],[wAM*cfg.EEGain, wNM*cfg.EEGain]):
     k = strty+prety+'->'+strty+poty
+    if weight <= 0.0: continue
     netParams.connParams[k] = {
       'preConds': {'pop': prety},
       'postConds': {'pop': poty},
@@ -755,6 +765,7 @@ if not dconf['sim']['useReducedNetwork']:
   for prety,poty,blist,prob,connCoords in zip(lprety,lpoty,lblist,lprob,lconnsCoords):  
     for strty,synmech,weight in zip(['','n'],['AMPA', 'NMDA'],[cmat[prety][poty]['AM']*cfg.EEGain, cmat[prety][poty]['NM']*cfg.EEGain]):
       k = strty+prety+'->'+strty+poty
+      if weight <= 0.0: continue        
       netParams.connParams[k] = {
             'preConds': {'pop': prety},
             'postConds': {'pop': poty},
@@ -1010,6 +1021,7 @@ def connectEVToTarget (lpoty, useTopological):
           prob = cmat['VL'][poty]['p']          
         for strty,synmech,weight in zip(['','n'],['AMPA', 'NMDA'],lsynw):        
           k = strty+prety+'->'+strty+poty
+          if weight <= 0.0: continue
           netParams.connParams[k] = {
             'preConds': {'pop': prety},
             'postConds': {'pop': poty},
@@ -1038,12 +1050,13 @@ connectEVToTarget(['EA','EA2'], dconf['architectureVtoA']['useTopological']) # c
 connectEVToTarget(EMotorPops, dconf['architectureVtoM']['useTopological']) # connect primary visual to motor
 
 # add connections from first to second visual association area
-# EA -> EA2
+# EA -> EA2 (feedforward)
 prety = 'EA'; poty = 'EA2'
 if dnumc[prety] > 0 and dnumc[poty] > 0:  
   lsynw = [cmat[prety][poty]['AM']*cfg.EEGain, cmat[prety][poty]['NM']*cfg.EEGain]
   for strty,synmech,weight in zip(['','n'],['AMPA', 'NMDA'],lsynw):
     k = strty+prety+'->'+strty+poty
+    if weight <= 0.0: continue    
     netParams.connParams[k] = {
       'preConds': {'pop': prety},
       'postConds': {'pop': poty},
@@ -1062,6 +1075,32 @@ if dnumc[prety] > 0 and dnumc[poty] > 0:
     elif dSTDPparams[synmech]['STDPon'] and useSTDP:
       netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparams[synmech]}
 
+# EA2 -> EA (feedback)
+prety = 'EA2'; poty = 'EA'
+if dnumc[prety] > 0 and dnumc[poty] > 0:  
+  lsynw = [cmat[prety][poty]['AM']*cfg.EEGain, cmat[prety][poty]['NM']*cfg.EEGain]
+  for strty,synmech,weight in zip(['','n'],['AMPA', 'NMDA'],lsynw):
+    k = strty+prety+'->'+strty+poty
+    if weight <= 0.0: continue
+    netParams.connParams[k] = {
+      'preConds': {'pop': prety},
+      'postConds': {'pop': poty},
+      'convergence': prob2conv(cmat[prety][poty]['p'], dnumc[prety]),
+      'weight': getInitWeight(weight),
+      'delay': getInitDelay(),
+      'synMech': synmech,
+      'sec':EExcitSec, 'loc':0.5,'weightIndex':getWeightIndex(synmech, ECellModel)
+    }
+    useRL = useSTDP = False
+    fbconnty = 'FeedbackA2toA'
+    if dconf['net']['RLconns'][fbconnty]: useRL = True
+    if dconf['net']['STDPconns'][fbconnty]: useSTDP = True          
+    if dSTDPparamsRL[synmech]['RLon'] and useRL: # only turn on plasticity when specified to do so
+      netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL[synmech]}
+    elif dSTDPparams[synmech]['STDPon'] and useSTDP:
+      netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparams[synmech]}
+
+      
 # Add connections from visual association areas to motor cortex, and reccurrent conn within visual association areas
 for prety,ffconnty,recconnty in zip(['EA', 'EA2'],['FeedForwardAtoM','FeedForwardA2toM'],['RecurrentANeurons','RecurrentA2Neurons']):
   if dnumc[prety] <= 0: continue
@@ -1070,6 +1109,7 @@ for prety,ffconnty,recconnty in zip(['EA', 'EA2'],['FeedForwardAtoM','FeedForwar
     if dnumc[poty] <= 0: continue
     for strty,synmech,weight in zip(['','n'],['AMPA', 'NMDA'],lsynw):
       k = strty+prety+'->'+strty+poty
+      if weight <= 0.0: continue              
       netParams.connParams[k] = {
         'preConds': {'pop': prety},
         'postConds': {'pop': poty},
@@ -1091,6 +1131,7 @@ for prety,ffconnty,recconnty in zip(['EA', 'EA2'],['FeedForwardAtoM','FeedForwar
   if cmat[prety][poty]['p'] > 0.0 and dnumc[poty]>0:
     for strty,synmech,weight in zip(['','n'],['AMPA', 'NMDA'],[cmat[prety][poty]['AM']*cfg.EEGain, cmat[prety][poty]['NM']*cfg.EEGain]):
       k = strty+prety+'->'+strty+poty
+      if weight <= 0.0: continue              
       netParams.connParams[k] = {
         'preConds': {'pop': prety},
         'postConds': {'pop': poty},
@@ -1112,6 +1153,7 @@ if cmat['EM']['EM']['p'] > 0.0:
       if prety==poty or dconf['net']['EEMRecProbCross']: # same types or allowing cross EM population connectivity
         for strty,synmech,weight in zip(['','n'],['AMPA', 'NMDA'],[cmat['EM']['EM']['AM']*cfg.EEGain, cmat['EM']['EM']['NM']*cfg.EEGain]):
           k = strty+prety+'->'+strty+poty
+          if weight <= 0.0: continue                  
           netParams.connParams[k] = {
             'preConds': {'pop': prety},
             'postConds': {'pop': poty},
@@ -1130,24 +1172,25 @@ if cmat['EM']['EM']['p'] > 0.0:
 if cmat['EM']['EA']['p'] > 0.0:
   for prety in EMotorPops:
     for poty in ['EA','EA2']:
-        for strty,synmech,weight in zip(['','n'],['AMPA', 'NMDA'],[cmat['EM']['EA']['AM']*cfg.EEGain, cmat['EM']['EA']['NM']*cfg.EEGain]):
+        for strty,synmech,weight in zip(['','n'],['AMPA', 'NMDA'],[cmat['EM'][poty]['AM']*cfg.EEGain, cmat['EM'][poty]['NM']*cfg.EEGain]):
           k = strty+prety+'->'+strty+poty
+          if weight <= 0.0: continue
           netParams.connParams[k] = {
             'preConds': {'pop': prety},
             'postConds': {'pop': poty},
-            'convergence': prob2conv(cmat['EM']['EA']['p'], dnumc[prety]),
+            'convergence': prob2conv(cmat['EM'][poty]['p'], dnumc[prety]),
             'weight': getInitWeight(weight),
             'delay': getInitDelay(),
             'synMech': synmech,
             'sec':EExcitSec, 'loc':0.5,'weightIndex':getWeightIndex(synmech, ECellModel)
           }
           useRL = useSTDP = False
-          if poty in EVDirPops:
-            if dconf['net']['RLconns']['FeedbackMtoDirN']: useRL = True
-            if dconf['net']['STDPconns']['FeedbackMtoDirN']: useSTDP = True
-          if poty in EVLocPops:
-            if dconf['net']['RLconns']['FeedbackMtoLocN']: useRL = True
-            if dconf['net']['STDPconns']['FeedbackMtoLocN']: useSTDP = True            
+          if poty == 'EA':
+            if dconf['net']['RLconns']['FeedbackMtoA']: useRL = True
+            if dconf['net']['STDPconns']['FeedbackMtoA']: useSTDP = True
+          elif poty == 'EA2':
+            if dconf['net']['RLconns']['FeedbackMtoA2']: useRL = True
+            if dconf['net']['STDPconns']['FeedbackMtoA2']: useSTDP = True                          
           if useRL and dSTDPparamsRL[synmech]['RLon']: # only turn on plasticity when specified to do so
             netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL[synmech]}
           elif useSTDP and dSTDPparams[synmech]['STDPon']:
@@ -1717,13 +1760,13 @@ def trainAgent (t):
           for STDPmech in dSTDPmech['EMUP']: STDPmech.reward_punish(float(critic))
           if dconf['sim']['targettedRL']==3 and sum(F_DOWNs)>0: # opposite to pop that did not contribute
             if dconf['verbose']: print('APPLY -RL to EMDOWN')
-            for STDPmech in dSTDPmech['EMDOWN']: STDPmech.reward_punish(float(-critic))
+            for STDPmech in dSTDPmech['EMDOWN']: STDPmech.reward_punish(float(-dconf['sim']['targettedRLOppFctr']*critic))
         elif DOWNactions>UPactions: # DOWN WINS vs UP
           if dconf['verbose']: print('APPLY RL to EMDOWN')
           for STDPmech in dSTDPmech['EMDOWN']: STDPmech.reward_punish(float(critic))
           if dconf['sim']['targettedRL']==3 and sum(F_UPs)>0: # opposite to pop that did not contribute
             if dconf['verbose']: print('APPLY -RL to EMUP')            
-            for STDPmech in dSTDPmech['EMUP']: STDPmech.reward_punish(float(-critic))              
+            for STDPmech in dSTDPmech['EMUP']: STDPmech.reward_punish(float(-dconf['sim']['targettedRLOppFctr']*critic))
       else:
         if dconf['verbose']: print('APPLY RL to both EMUP and EMDOWN')
         for STDPmech in dSTDPmech['all']: STDPmech.reward_punish(critic)
