@@ -24569,4 +24569,5 @@ python multistepSim.py sn.json 32 20 20dec15_A0_cycle_multi
 ** next sim on cycle (20dec16_A0_cycle_)
 ** next sim on gcp (20dec16_A0_gcp_)
 
+python multistepSim.py sn.json 48 20 20dec15_B0_gcp_multi
 
