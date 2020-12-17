@@ -24571,3 +24571,17 @@ python multistepSim.py sn.json 32 20 20dec15_A0_cycle_multi
 
 python multistepSim.py sn.json 48 20 20dec15_B0_gcp_multi
 
+never ran - was in middle of tuning
+
+* 20dec17
+** next sim on gcp - still tuning (20dec17_A0_gcp_)
+
+reduced the number of neurons, changed weights and connections, added some STDP plasticity,
+reduced, have feedback connections with plasticity (different depending on population), I->I
+weights reduced to allow them to regulate the forward/backward propagating bursts, in case they
+occur; not using targetted for this sim ... 
+
+python multistepSim.py sn.json 32 20 20dec17_A0_gcp_multi
+
+started ~13:40 ...
+
