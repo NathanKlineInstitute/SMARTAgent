@@ -24585,3 +24585,25 @@ python multistepSim.py sn.json 32 20 20dec17_A0_gcp_multi
 
 started ~13:40 ...
 
+slow to run ... only up to ~270 s at 21:30 ... hit/miss is ~31/64 ... 
+but EM firing rates seem too high -- ~300 spikes per 20 ms ... and that's for only
+100 EM neurons ... took ~100 s before activity levels stayed persistently overactivated
+
+need to tune net further ... 
+
+** tuning net further on gcp (20dec17_D0_gcp_)
+
+restored most of network size but reduced conn weights and prob in feedback dir
+also increased number of IA interneurons ...
+
+adjusted connectivity for E->I and I->E to have same conv for EA,EA2,EM, (for example EA->IA and IA->EA
+have same number of inputs as EM->IM and IM->EM); only using RL for plasticity (no standard STDP)
+
+still see some bursty behavior ... will see if gets too high over time ... 
+
+trying with 250 s sims in multistep ...
+
+python multistepSim.py sn.json 32 20 20dec17_D0_gcp_multi
+
+started ~23:49 ...
+
