@@ -10760,3 +10760,721 @@ therefore accordingly changed RL params...
             ....
 ... for now i will use multiStim to run without noise and see by tomorrow how are the results.
 
+-- run multistep:
+
+ python multistepSim.py sim.json 30 10 20dec11_C0_cycle_multi
+ 
+* 20dec15
+
+-- analyzing 
+
+(base) hanwar@cycle:~/GamesProject/SMARTAgent$ python -i simdat.py backupcfg/20dec11_A0_cycle_reduced_2obj_INTF7__step_0_sim.json 
+reading  backupcfg/20dec11_A0_cycle_reduced_2obj_INTF7__step_0_sim.json
+-1
+lpop:  ['EV1', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW', 'EV1DSW', 'EV1DS', 'EV1DSE', 'EMDOWN', 'EMUP', 'IM']
+loading data from 20dec11_A0_cycle_reduced_2obj_INTF7__step_0_
+loading input images from data/20dec11_A0_cycle_reduced_2obj_INTF7__step_0_InputImages.txt
+loaded simulation data 20dec11_A0_cycle_reduced_2obj_INTF7__step_0_ on 20dec15_
+EV1 10.49 Hz
+EV1DE 3.92 Hz
+EV1DNE 21.33 Hz
+EV1DN 8.41 Hz
+EV1DNW 14.8 Hz
+EV1DW 0.8 Hz
+EV1DSW 7.56 Hz
+EV1DS 8.3 Hz
+EV1DSE 27.55 Hz
+EA 0.29 Hz
+EMDOWN 16.14 Hz
+EMUP 15.25 Hz
+IM 92.36 Hz
+
+.... firing rate already too high.
+
+ lfn = ['20dec11_A0_cycle_reduced_2obj_INTF7__step_0_','20dec11_A0_cycle_reduced_2obj_INTF7__step_1_',...
+ ...'20dec11_A0_cycle_reduced_2obj_INTF7__step_2_','20dec11_A0_cycle_reduced_2obj_INTF7__step_3_',...
+ ...'20dec11_A0_cycle_reduced_2obj_INTF7__step_4_','20dec11_A0_cycle_reduced_2obj_INTF7__step_5_',...
+ ...'20dec11_A0_cycle_reduced_2obj_INTF7__step_6_','20dec11_A0_cycle_reduced_2obj_INTF7__step_7_',...
+ ...'20dec11_A0_cycle_reduced_2obj_INTF7__step_8_','20dec11_A0_cycle_reduced_2obj_INTF7__step_9_']
+
+pdac = getconcatactionreward(lfn)
+lpda = getindivactionreward(lfn)
+csm = cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+lclr = [csm.to_rgba(float(i)/len(lpda)) for i in range(len(lpda))]
+
+plotComparePerf(lpda,lclr,yl=(0,2),lleg=lfn)
+and save as "20dec11_A0_cycle_reduced_2obj_INTF7_comparePerf_step0to9.png"
+
+plotPerf(pdac)
+save as "20dec11_A0_cycle_reduced_2obj_INTF7_Perf_step0to9.png"
+
+... also save all videos of input images.
+20dec15_20dec11_A0_cycle_reduced_2obj_INTF7__step_0__with_reward_input.mp4 (86 hits,89 misses)
+20dec15_20dec11_A0_cycle_reduced_2obj_INTF7__step_1__with_reward_input.mp4 (81 hits, 110 misses)
+20dec15_20dec11_A0_cycle_reduced_2obj_INTF7__step_2__with_reward_input.mp4 (55 hits, 65 misses)
+20dec15_20dec11_A0_cycle_reduced_2obj_INTF7__step_3__with_reward_input.mp4 (40 hits, 66 misses)
+20dec15_20dec11_A0_cycle_reduced_2obj_INTF7__step_4__with_reward_input.mp4 (45 hits, 46 misses)
+20dec15_20dec11_A0_cycle_reduced_2obj_INTF7__step_5__with_reward_input.mp4 (72 hits, 78 misses)
+20dec15_20dec11_A0_cycle_reduced_2obj_INTF7__step_6__with_reward_input.mp4 (62 hits, 84 misses)
+20dec15_20dec11_A0_cycle_reduced_2obj_INTF7__step_7__with_reward_input.mp4 (71, 86)
+20dec15_20dec11_A0_cycle_reduced_2obj_INTF7__step_8__with_reward_input.mp4 (70, 86)
+20dec15_20dec11_A0_cycle_reduced_2obj_INTF7__step_9__with_reward_input.mp4 (62, 109)
+
+-- rerun multistep with smaller hebbwt.
+ "name": "20dec15_A0_cycle_reduced_2obj_INTF7_"
+RLhebbwt:0.2 (1 was used for 20dec11_A0_cycle.....)
+
+-- ran sim on falcor "20dec15_A0_falcor_reduced_2obj_INTF7_"
+perf is ~1.25
+
+* 20dec16
+
+-- resume sim on falcor "20dec16_A0_falcor_reduced_2obj_INTF7_"
+... forgot to change the name of the sim and it recorded everything in "20dec15_A0_falcor_reduced_2obj_INTF7_"
+
+-- run 5000
+
+"name": "20dec16_A0_cycle_reduced_2obj_INTF7_",
+"targetedRL":0
+
+ mpiexec -n 14 nrniv -python -mpi sim.py
+
+
+-- run 5000
+
+"name": "20dec16_B0_cycle_reduced_2obj_INTF7_",
+"targetedRL":3
+
+ mpiexec -n 14 nrniv -python -mpi sim.py
+
+ NEED TO COMPARE targettedRL = {0,1,3}
+
+-- setting up gcp.
+
+- search setting up chrome remote desktop on mac
+- installed Chrome on mac.
+- launch Chrome and enter remotedesktop.google.com/access.
+- logged in using gmail account and downloaded "chrome remote desktop" app.
+- installed "chrome remote desktop"
+
+
+
+creating new vm instance
+-- hanwar-vm-in1
+
+* 20dec17
+
+-- run 500 sec sim on falcor with smaller weight change and targettedRL of 1.
+"name":"20dec17_A0_falcor_reduced_"
+"targettedRL":1
+"followOnlyTowards":1
+"useRacketPredictedPos":1
+"RLhebbwt":0.2
+
+...looked at output on 20dec18. nothing special to pursue it further.
+
+-- analysis for targettedRL=1
+....multiStim using RLhebbwt of 0.2......
+
+
+ lfn = ['20dec15_A0_cycle_reduced_2obj_INTF7__step_0_','20dec15_A0_cycle_reduced_2obj_INTF7__step_1_','20dec15_A0_cycle_reduced_2obj_INTF7__step_2_','20dec15_A0_cycle_reduced_2obj_INTF7__step_3_','20dec15_A0_cycle_reduced_2obj_INTF7__step_4_']
+>>> lpda = getindivactionreward(lfn)
+>>> pdac = getconcatactionreward(lfn)
+lclr = [csm.to_rgba(float(i)/len(lpda)) for i in range(len(lpda))]
+>>> plotComparePerf(lpda,lclr,yl=(0,2),lleg=lfn)
+saved as "20dec15_A0_cycle_reduced_2obj_INTF7_comparePerf_step0to4.png"
+>>> plotPerf(pdac)
+20dec15_A0_cycle_reduced_2obj_INTF7_Perf_step0to4.png
+
+... performance peaked in _step2 and then decreased..... WHY?
+
+-- analyzing for targettedRL=0
+
+loading data from 20dec16_A0_cycle_reduced_2obj_INTF7_
+loading input images from data/20dec16_A0_cycle_reduced_2obj_INTF7_InputImages.txt
+loaded simulation data 20dec16_A0_cycle_reduced_2obj_INTF7_ on 20dec17_
+EV1 10.33 Hz
+EV1DE 3.58 Hz
+EV1DNE 25.66 Hz
+EV1DN 9.12 Hz
+EV1DNW 7.35 Hz
+EV1DW 0.6 Hz
+EV1DSW 4.0 Hz
+EV1DS 9.97 Hz
+EV1DSE 29.18 Hz
+EA 0.26 Hz
+EMDOWN 6.48 Hz
+EMUP 6.4 Hz
+IM 39.15 Hz
+stimModEV1 0.0 Hz
+
+ plotPerf(actreward) .... ~ 0.4
+
+ save as "20dec16_A0_cycle_reduced_2obj_INTF7_Perf.png"
+
+
+-- analyzing for targettedRL=3
+
+ (base) hanwar@cycle:~/GamesProject/SMARTAgent$ python -i simdat.py backupcfg/20dec16_B0_cycle_reduced_2obj_INTF7_sim.json 
+reading  backupcfg/20dec16_B0_cycle_reduced_2obj_INTF7_sim.json
+-1
+lpop:  ['EV1', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW', 'EV1DSW', 'EV1DS', 'EV1DSE', 'EMDOWN', 'EMUP', 'IM']
+loading data from 20dec16_B0_cycle_reduced_2obj_INTF7_
+loading input images from data/20dec16_B0_cycle_reduced_2obj_INTF7_InputImages.txt
+loaded simulation data 20dec16_B0_cycle_reduced_2obj_INTF7_ on 20dec17_
+EV1 10.41 Hz
+EV1DE 3.73 Hz
+EV1DNE 22.3 Hz
+EV1DN 8.98 Hz
+EV1DNW 11.2 Hz
+EV1DW 0.79 Hz
+EV1DSW 8.69 Hz
+EV1DS 8.7 Hz
+EV1DSE 27.59 Hz
+EA 0.27 Hz
+EMDOWN 4.71 Hz
+EMUP 4.62 Hz
+IM 32.88 Hz
+
+ plotPerf(actreward) .... ~0.73
+
+ saved as "20dec16_B0_cycle_reduced_2obj_INTF7_Perf.png"
+
+ ... should resume sims so that can compare for exactly same parameters except different targetted RL.
+
+ -- resume from "20dec16_B0_cycle_reduced_2obj_INTF7_" using multistepSim (targettedRL=3)
+ "name": "20dec17_B0_cycle_reduced_2obj_INTF7_"
+
+  python multistepSim.py sim.json 14 4 20dec17_A0_cycle_multi
+
+-- resume from "20dec16_A0_cycle_reduced_2obj_INTF7_" using multistepSim (targettedRL=0)
+ "name": "20dec17_A0_cycle_reduced_2obj_INTF7_"
+
+ python multistepSim.py sim.json 14 4 20dec17_A1_cycle_multi
+
+--run multistep sim for 500 sec.
+
+"followOnlyTowards": 1
+ "name": "20dec17_C0_cycle_reduced_2obj_INTF7_"
+ "targettedRL": 1,
+
+  python multistepSim.py sim.json 30 5 20dec17_C0_cycle_multi
+
+-- downloaded data from multistepSim with prefix "20dec11_A0_cycle_reduced_2obj_INTF7__step_" for working on analysis.
+
+-- to understand the circuit, must understand the input first. so probably some analysis on input space...
+
+find time points when xpos of the ball is 0. 
+courtWallPixels = np.resize(InputImages[:,:,0],(InputImages.shape[0],InputImages.shape[1]))
+tpnts_ypos = []
+for tpnts in range(courtWallPixels.shape[0]):
+  ypos = np.where(courtWallPixels[tpnts,:]>83.4)
+  if len(tpnts_ypos)==0 and len(ypos[0])>0:
+    tpnts_ypos.append([tpnts,ypos[0][0]])
+  elif len(tpnts_ypos)>0 and len(ypos[0])>0 and tpnts-tpnts_ypos[-1][0]>20: 
+    tpnts_ypos.append([tpnts,ypos[0][0]])
+nb_patterns = np.array(tpnts_ypos).shape[0]
+seqL = 60
+seqNB = 3
+def getPattern(seqNB,seqL):
+  seq_beg_t = tpnts_ypos[seqNB][0]
+  seq_end_t = tpnts_ypos[seqNB][0] + seqL
+  seqImage = np.sum(InputImages[seq_beg_t:seq_end_t,:,0:17],0)
+  return seqImage
+
+plt.imshow(getPattern(0,60))
+
+patterns_pts = []
+for ptn in range(nb_patterns):
+  patterns_pts.append([tpnts_ypos[ptn][0]])
+
+* 20dec18
+
+-- run 500 sec sim on falcor.
+"name":"20dec18_A0_falcor_reduced_"
+"followOnlyTowards":0
+"useRacketPredictedPos":0
+"useFollowMoveOutput":1
+
+-- worked on analysis .
+* 20dec21
+
+-- analyzing multistepSim for RL = 0,1,3.
+
+Case 1: RL = 0
+
+backupcfg/20dec16_A0_cycle_reduced_2obj_INTF7_sim.json
+backupcfg/20dec17_A0_cycle_reduced_2obj_INTF7__step_0_sim.json
+backupcfg/20dec17_A0_cycle_reduced_2obj_INTF7__step_1_sim.json
+backupcfg/20dec17_A0_cycle_reduced_2obj_INTF7__step_2_sim.json
+backupcfg/20dec17_A0_cycle_reduced_2obj_INTF7__step_3_sim.json
+
+lfn = ['20dec16_A0_cycle_reduced_2obj_INTF7_','20dec17_A0_cycle_reduced_2obj_INTF7__step_0_','20dec17_A0_cycle_reduced_2obj_INTF7__step_1_','20dec17_A0_cycle_reduced_2obj_INTF7__step_2_','20dec17_A0_cycle_reduced_2obj_INTF7__step_3_']
+pdac = getconcatactionreward(lfn)
+plotPerf(pdac)
+saved as 20dec21_20dec16_A0_20dec17_A0_reduced_RL0_Perf.png and 20dec21_20dec16_A0_20dec17_A0_reduced_RL0_Perf.eps
+
+lpda = getindivactionreward(lfn)
+csm = cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+lclr = [csm.to_rgba(float(i)/len(lpda)) for i in range(len(lpda))]
+plotComparePerf(lpda,lclr,yl=(0,2),lleg=lfn)
+saved as 20dec21_20dec16_A0_20dec17_A0_reduced_RL0_comparePerf.png and 20dec21_20dec16_A0_20dec17_A0_reduced_RL0_comparePerf.eps
+
+pdfc = getconcatweightpdf(lfn)
+plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False)
+saved as 20dec21_20dec16_A0_20dec17_A0_reduced_RL0_meanWeights.png and 20dec21_20dec16_A0_20dec17_A0_reduced_RL0_meanWeights.eps
+
+-------------------------------------------------------
+(base) hanwar@cycle:~/GamesProject/SMARTAgent$ python -i simdat.py backupcfg/20dec16_A0_cycle_reduced_2obj_INTF7_sim.json 
+reading  backupcfg/20dec16_A0_cycle_reduced_2obj_INTF7_sim.json
+-1
+lpop:  ['EV1', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW', 'EV1DSW', 'EV1DS', 'EV1DSE', 'EMDOWN', 'EMUP', 'IM']
+loading data from 20dec16_A0_cycle_reduced_2obj_INTF7_
+loading input images from data/20dec16_A0_cycle_reduced_2obj_INTF7_InputImages.txt
+loaded simulation data 20dec16_A0_cycle_reduced_2obj_INTF7_ on 20dec21_
+EV1 10.33 Hz
+EV1DE 3.58 Hz
+EV1DNE 25.66 Hz
+EV1DN 9.12 Hz
+EV1DNW 7.35 Hz
+EV1DW 0.6 Hz
+EV1DSW 4.0 Hz
+EV1DS 9.97 Hz
+EV1DSE 29.18 Hz
+EA 0.26 Hz
+EMDOWN 6.48 Hz
+EMUP 6.4 Hz
+IM 39.15 Hz
+
+drawraster(dspkT,dspkID)
+(495000, 497000)
+saved as 20dec21_20dec16_A0_reduced_RL0_raster.png
+
+
+(base) hanwar@cycle:~/GamesProject/SMARTAgent$ python -i simdat.py backupcfg/20dec17_A0_cycle_reduced_2obj_INTF7__step_0_sim.json 
+reading  backupcfg/20dec17_A0_cycle_reduced_2obj_INTF7__step_0_sim.json
+-1
+lpop:  ['EV1', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW', 'EV1DSW', 'EV1DS', 'EV1DSE', 'EMDOWN', 'EMUP', 'IM']
+loading data from 20dec17_A0_cycle_reduced_2obj_INTF7__step_0_
+loading input images from data/20dec17_A0_cycle_reduced_2obj_INTF7__step_0_InputImages.txt
+loaded simulation data 20dec17_A0_cycle_reduced_2obj_INTF7__step_0_ on 20dec21_
+EV1 10.39 Hz
+EV1DE 3.94 Hz
+EV1DNE 23.83 Hz
+EV1DN 8.04 Hz
+EV1DNW 9.73 Hz
+EV1DW 1.62 Hz
+EV1DSW 4.73 Hz
+EV1DS 9.39 Hz
+EV1DSE 28.85 Hz
+EA 0.27 Hz
+EMDOWN 15.22 Hz
+EMUP 15.12 Hz
+IM 88.66 Hz
+
+drawraster(dspkT,dspkID)
+(495000, 497000)
+saved as 20dec21_20dec17_A0_step0_reduced_RL0_raster.png
+
+(base) hanwar@cycle:~/GamesProject/SMARTAgent$ python -i simdat.py backupcfg/20dec17_A0_cycle_reduced_2obj_INTF7__step_1_sim.json 
+reading  backupcfg/20dec17_A0_cycle_reduced_2obj_INTF7__step_1_sim.json
+-1
+lpop:  ['EV1', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW', 'EV1DSW', 'EV1DS', 'EV1DSE', 'EMDOWN', 'EMUP', 'IM']
+loading data from 20dec17_A0_cycle_reduced_2obj_INTF7__step_1_
+loading input images from data/20dec17_A0_cycle_reduced_2obj_INTF7__step_1_InputImages.txt
+loaded simulation data 20dec17_A0_cycle_reduced_2obj_INTF7__step_1_ on 20dec21_
+EV1 10.41 Hz
+EV1DE 3.41 Hz
+EV1DNE 25.81 Hz
+EV1DN 7.06 Hz
+EV1DNW 11.53 Hz
+EV1DW 1.09 Hz
+EV1DSW 4.52 Hz
+EV1DS 7.77 Hz
+EV1DSE 29.09 Hz
+EA 0.27 Hz
+EMDOWN 31.01 Hz
+EMUP 31.01 Hz
+IM 171.37 Hz
+
+drawraster(dspkT,dspkID)
+(496000, 497000)
+saved as 20dec21_20dec17_A0_step1_reduced_RL0_raster.png
+
+(base) hanwar@cycle:~/GamesProject/SMARTAgent$ python -i simdat.py backupcfg/20dec17_A0_cycle_reduced_2obj_INTF7__step_2_sim.json 
+reading  backupcfg/20dec17_A0_cycle_reduced_2obj_INTF7__step_2_sim.json
+-1
+lpop:  ['EV1', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW', 'EV1DSW', 'EV1DS', 'EV1DSE', 'EMDOWN', 'EMUP', 'IM']
+loading data from 20dec17_A0_cycle_reduced_2obj_INTF7__step_2_
+loading input images from data/20dec17_A0_cycle_reduced_2obj_INTF7__step_2_InputImages.txt
+loaded simulation data 20dec17_A0_cycle_reduced_2obj_INTF7__step_2_ on 20dec21_
+EV1 10.41 Hz
+EV1DE 1.82 Hz
+EV1DNE 27.07 Hz
+EV1DN 7.19 Hz
+EV1DNW 11.77 Hz
+EV1DW 0.41 Hz
+EV1DSW 5.82 Hz
+EV1DS 7.27 Hz
+EV1DSE 29.19 Hz
+EA 0.28 Hz
+EMDOWN 42.57 Hz
+EMUP 42.49 Hz
+IM 199.69 Hz
+
+drawraster(dspkT,dspkID)
+(496000, 497000)
+saved as 20dec21_20dec17_A0_step2_reduced_RL0_raster.png
+
+(base) hanwar@cycle:~/GamesProject/SMARTAgent$ python -i simdat.py backupcfg/20dec17_A0_cycle_reduced_2obj_INTF7__step_3_sim.json 
+reading  backupcfg/20dec17_A0_cycle_reduced_2obj_INTF7__step_3_sim.json
+-1
+lpop:  ['EV1', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW', 'EV1DSW', 'EV1DS', 'EV1DSE', 'EMDOWN', 'EMUP', 'IM']
+loading data from 20dec17_A0_cycle_reduced_2obj_INTF7__step_3_
+loading input images from data/20dec17_A0_cycle_reduced_2obj_INTF7__step_3_InputImages.txt
+loaded simulation data 20dec17_A0_cycle_reduced_2obj_INTF7__step_3_ on 20dec21_
+EV1 10.37 Hz
+EV1DE 3.42 Hz
+EV1DNE 26.76 Hz
+EV1DN 6.6 Hz
+EV1DNW 7.81 Hz
+EV1DW 0.93 Hz
+EV1DSW 3.35 Hz
+EV1DS 6.94 Hz
+EV1DSE 33.73 Hz
+EA 0.27 Hz
+EMDOWN 52.35 Hz
+EMUP 52.25 Hz
+IM 221.15 Hz
+
+drawraster(dspkT,dspkID)
+(496000, 497000)
+saved as 20dec21_20dec17_A0_step3_reduced_RL0_raster.png
+
+
+--------------------------------------------------
+
+CONCLUSION: After learning too high firing rates. probably hypersynchrony. performance does not increase.
+
+.... should reduce weight from EA to EM and hebbwt and rerun.
+
+cp backupcfg/20dec16_A0_cycle_reduced_2obj_INTF7_sim.json sim.json
+"name": "20dec21_A0_cycle_reduced_2obj_INTF7_",
+EA to EM: 5 (was 8 before)
+"RLhebbwt": 0.1
+"targettedRLOppFctr": 0.5
+            "FeedbackMtoA": 0,
+            "FeedbackMtoA2": 0,
+            "FeedbackA2toA": 0
+
+
+make some adjustments in sim.json according to sn.json
+
+e.g. now sn.json includes
+
+"targettedRLOppFctr": 0.5
+
+sn.json also includes
+
+            "FeedbackMtoA": 1,
+            "FeedbackMtoA2": 1,
+            "FeedbackA2toA": 1
+
+python multistepSim.py sim.json 14 5 20dec21_A0_cycle_multi
+
+
+Case 2: RL = 3
+
+backupcfg/20dec16_B0_cycle_reduced_2obj_INTF7_sim.json
+backupcfg/20dec17_B0_cycle_reduced_2obj_INTF7__step_0_sim.json
+backupcfg/20dec17_B0_cycle_reduced_2obj_INTF7__step_1_sim.json
+backupcfg/20dec17_B0_cycle_reduced_2obj_INTF7__step_2_sim.json
+backupcfg/20dec17_B0_cycle_reduced_2obj_INTF7__step_3_sim.json
+
+lfn = ['20dec16_B0_cycle_reduced_2obj_INTF7_','20dec17_B0_cycle_reduced_2obj_INTF7__step_0_','20dec17_B0_cycle_reduced_2obj_INTF7__step_1_','20dec17_B0_cycle_reduced_2obj_INTF7__step_2_','20dec17_B0_cycle_reduced_2obj_INTF7__step_3_']
+
+pdac = getconcatactionreward(lfn)
+plotPerf(pdac)
+saved as 20dec21_20dec16_B0_20dec17_B0_reduced_RL3_Perf.png and 20dec21_20dec16_B0_20dec17_B0_reduced_RL3_Perf.eps
+
+lpda = getindivactionreward(lfn)
+csm = cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+lclr = [csm.to_rgba(float(i)/len(lpda)) for i in range(len(lpda))]
+plotComparePerf(lpda,lclr,yl=(0,2),lleg=lfn)
+saved as 20dec21_20dec16_B0_20dec17_B0_reduced_RL3_comparePerf.png and 20dec21_20dec16_B0_20dec17_B0_reduced_RL3_comparePerf.eps
+
+pdfc = getconcatweightpdf(lfn)
+plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False)
+saved as 20dec21_20dec16_B0_20dec17_B0_reduced_RL3_meanWeights.png and 20dec21_20dec16_B0_20dec17_B0_reduced_RL3_meanWeights.eps
+
+---------------------------------------------------------------
+
+(base) hanwar@cycle:~/GamesProject/SMARTAgent$ python -i simdat.py backupcfg/20dec16_B0_cycle_reduced_2obj_INTF7_sim.json 
+reading  backupcfg/20dec16_B0_cycle_reduced_2obj_INTF7_sim.json
+-1
+lpop:  ['EV1', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW', 'EV1DSW', 'EV1DS', 'EV1DSE', 'EMDOWN', 'EMUP', 'IM']
+loading data from 20dec16_B0_cycle_reduced_2obj_INTF7_
+loading input images from data/20dec16_B0_cycle_reduced_2obj_INTF7_InputImages.txt
+loaded simulation data 20dec16_B0_cycle_reduced_2obj_INTF7_ on 20dec21_
+EV1 10.41 Hz
+EV1DE 3.73 Hz
+EV1DNE 22.3 Hz
+EV1DN 8.98 Hz
+EV1DNW 11.2 Hz
+EV1DW 0.79 Hz
+EV1DSW 8.69 Hz
+EV1DS 8.7 Hz
+EV1DSE 27.59 Hz
+EA 0.27 Hz
+EMDOWN 4.71 Hz
+EMUP 4.62 Hz
+IM 32.88 Hz
+
+drawraster(dspkT,dspkID)
+xlim((495000,497000))
+saved as 20dec21_20dec16_B0_reduced_RL3_raster.png
+
+(base) hanwar@cycle:~/GamesProject/SMARTAgent$ python -i simdat.py backupcfg/20dec17_B0_cycle_reduced_2obj_INTF7__step_0_sim.json 
+reading  backupcfg/20dec17_B0_cycle_reduced_2obj_INTF7__step_0_sim.json
+-1
+lpop:  ['EV1', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW', 'EV1DSW', 'EV1DS', 'EV1DSE', 'EMDOWN', 'EMUP', 'IM']
+loading data from 20dec17_B0_cycle_reduced_2obj_INTF7__step_0_
+loading input images from data/20dec17_B0_cycle_reduced_2obj_INTF7__step_0_InputImages.txt
+loaded simulation data 20dec17_B0_cycle_reduced_2obj_INTF7__step_0_ on 20dec21_
+EV1 10.41 Hz
+EV1DE 3.38 Hz
+EV1DNE 20.16 Hz
+EV1DN 8.88 Hz
+EV1DNW 13.62 Hz
+EV1DW 0.63 Hz
+EV1DSW 10.74 Hz
+EV1DS 8.76 Hz
+EV1DSE 26.73 Hz
+EA 0.28 Hz
+EMDOWN 5.91 Hz
+EMUP 5.77 Hz
+IM 40.41 Hz
+
+drawraster(dspkT,dspkID)
+xlim((495000,497000))
+saved as 20dec21_20dec17_B0_step0_reduced_RL3_raster.png
+
+(base) hanwar@cycle:~/GamesProject/SMARTAgent$ python -i simdat.py backupcfg/20dec17_B0_cycle_reduced_2obj_INTF7__step_1_sim.json 
+reading  backupcfg/20dec17_B0_cycle_reduced_2obj_INTF7__step_1_sim.json
+-1
+lpop:  ['EV1', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW', 'EV1DSW', 'EV1DS', 'EV1DSE', 'EMDOWN', 'EMUP', 'IM']
+loading data from 20dec17_B0_cycle_reduced_2obj_INTF7__step_1_
+loading input images from data/20dec17_B0_cycle_reduced_2obj_INTF7__step_1_InputImages.txt
+loaded simulation data 20dec17_B0_cycle_reduced_2obj_INTF7__step_1_ on 20dec21_
+EV1 10.42 Hz
+EV1DE 3.57 Hz
+EV1DNE 19.05 Hz
+EV1DN 9.86 Hz
+EV1DNW 13.22 Hz
+EV1DW 2.06 Hz
+EV1DSW 10.45 Hz
+EV1DS 10.29 Hz
+EV1DSE 24.59 Hz
+EA 0.29 Hz
+EMDOWN 7.15 Hz
+EMUP 6.78 Hz
+IM 48.77 Hz
+
+drawraster(dspkT,dspkID)
+xlim((495000,497000))
+saved as 20dec21_20dec17_B0_step1_reduced_RL3_raster.png
+
+(base) hanwar@cycle:~/GamesProject/SMARTAgent$ python -i simdat.py backupcfg/20dec17_B0_cycle_reduced_2obj_INTF7__step_2_sim.json 
+reading  backupcfg/20dec17_B0_cycle_reduced_2obj_INTF7__step_2_sim.json
+-1
+lpop:  ['EV1', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW', 'EV1DSW', 'EV1DS', 'EV1DSE', 'EMDOWN', 'EMUP', 'IM']
+loading data from 20dec17_B0_cycle_reduced_2obj_INTF7__step_2_
+loading input images from data/20dec17_B0_cycle_reduced_2obj_INTF7__step_2_InputImages.txt
+loaded simulation data 20dec17_B0_cycle_reduced_2obj_INTF7__step_2_ on 20dec21_
+EV1 10.43 Hz
+EV1DE 3.95 Hz
+EV1DNE 25.88 Hz
+EV1DN 5.6 Hz
+EV1DNW 11.77 Hz
+EV1DW 1.47 Hz
+EV1DSW 9.04 Hz
+EV1DS 5.92 Hz
+EV1DSE 28.22 Hz
+EA 0.29 Hz
+EMDOWN 8.75 Hz
+EMUP 8.4 Hz
+IM 60.76 Hz
+
+drawraster(dspkT,dspkID)
+xlim((495000,497000))
+saved as 20dec21_20dec17_B0_step2_reduced_RL3_raster.png
+
+(base) hanwar@cycle:~/GamesProject/SMARTAgent$ python -i simdat.py backupcfg/20dec17_B0_cycle_reduced_2obj_INTF7__step_3_sim.json 
+reading  backupcfg/20dec17_B0_cycle_reduced_2obj_INTF7__step_3_sim.json
+-1
+lpop:  ['EV1', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW', 'EV1DSW', 'EV1DS', 'EV1DSE', 'EMDOWN', 'EMUP', 'IM']
+loading data from 20dec17_B0_cycle_reduced_2obj_INTF7__step_3_
+loading input images from data/20dec17_B0_cycle_reduced_2obj_INTF7__step_3_InputImages.txt
+loaded simulation data 20dec17_B0_cycle_reduced_2obj_INTF7__step_3_ on 20dec21_
+EV1 10.41 Hz
+EV1DE 2.7 Hz
+EV1DNE 26.56 Hz
+EV1DN 5.51 Hz
+EV1DNW 10.42 Hz
+EV1DW 1.11 Hz
+EV1DSW 9.9 Hz
+EV1DS 6.08 Hz
+EV1DSE 28.53 Hz
+EA 0.29 Hz
+EMDOWN 9.71 Hz
+EMUP 10.28 Hz
+IM 72.39 Hz
+
+drawraster(dspkT,dspkID)
+xlim((496000,497000))
+saved as 20dec21_20dec17_B0_step2_reduced_RL3_raster.png
+---------------------------------------------------------------
+
+CONCLUSION: After learning a little bit high firing rates. moving towards hypersynchrony probably. performance good (not best though).
+
+.... this sim was run using "targettedRLOppFctr": 1. could try with "targettedRLOppFctr": 0.5
+
+But may be later.
+.... for now will reduce weight from EA to EM and hebbwt and rerun.
+
+nano sim.json
+"name": "20dec21_B0_cycle_reduced_2obj_INTF7_",
+"targettedRL": 3,
+"targettedRLOppFctr": 0.5
+EA to EM: 5 (was 8 before)
+"RLhebbwt": 0.1
+
+            "FeedbackMtoA": 0,
+            "FeedbackMtoA2": 0,
+            "FeedbackA2toA": 0
+
+
+python multistepSim.py sim.json 14 5 20dec21_B0_cycle_multi
+
+Case 3: RL = 1
+
+backupcfg/20dec15_A0_cycle_reduced_2obj_INTF7__step_0_sim.json
+backupcfg/20dec15_A0_cycle_reduced_2obj_INTF7__step_1_sim.json
+backupcfg/20dec15_A0_cycle_reduced_2obj_INTF7__step_2_sim.json
+backupcfg/20dec15_A0_cycle_reduced_2obj_INTF7__step_3_sim.json
+backupcfg/20dec15_A0_cycle_reduced_2obj_INTF7__step_4_sim.json
+
+lfn = ['20dec15_A0_cycle_reduced_2obj_INTF7__step_0_','20dec15_A0_cycle_reduced_2obj_INTF7__step_1_','20dec15_A0_cycle_reduced_2obj_INTF7__step_2_','20dec15_A0_cycle_reduced_2obj_INTF7__step_3_','20dec15_A0_cycle_reduced_2obj_INTF7__step_4_']
+
+lpda = getindivactionreward(lfn)
+csm = cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+lclr = [csm.to_rgba(float(i)/len(lpda)) for i in range(len(lpda))]
+plotComparePerf(lpda,lclr,yl=(0,2),lleg=lfn)
+saved as 20dec21_20dec15_A0_reduced_RL1_comparePerf.png and 20dec21_20dec15_A0_reduced_RL1_comparePerf.eps
+
+pdac = getconcatactionreward(lfn)
+plotPerf(pdac)
+saved as 20dec21_20dec15_A0_reduced_RL1_Perf.png and 20dec21_20dec15_A0_reduced_RL1_Perf.eps
+
+pdfc = getconcatweightpdf(lfn)
+plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False)
+saved as 20dec21_20dec15_A0_reduced_RL1_meanWeights.png
+
+---------------------------------------------------------
+
+(base) hanwar@cycle:~/GamesProject/SMARTAgent$ python -i simdat.py backupcfg/20dec15_A0_cycle_reduced_2obj_INTF7__step_0_sim.json 
+reading  backupcfg/20dec15_A0_cycle_reduced_2obj_INTF7__step_0_sim.json
+-1
+lpop:  ['EV1', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW', 'EV1DSW', 'EV1DS', 'EV1DSE', 'EMDOWN', 'EMUP', 'IM']
+loading data from 20dec15_A0_cycle_reduced_2obj_INTF7__step_0_
+loading input images from data/20dec15_A0_cycle_reduced_2obj_INTF7__step_0_InputImages.txt
+loaded simulation data 20dec15_A0_cycle_reduced_2obj_INTF7__step_0_ on 20dec21_
+EV1 10.37 Hz
+EV1DE 2.88 Hz
+EV1DNE 25.21 Hz
+EV1DN 5.71 Hz
+EV1DNW 10.75 Hz
+EV1DW 0.75 Hz
+EV1DSW 9.22 Hz
+EV1DS 6.72 Hz
+EV1DSE 29.77 Hz
+EA 0.27 Hz
+EMDOWN 5.7 Hz
+EMUP 5.75 Hz
+IM 36.38 Hz
+
+---------------------------------------------------------
+
+CONCLUSION:
+not very good performance. not sure why?
+
+
+
+Case 4: RL = 1 and "followOnlyTowards": 1
+
+backupcfg/20dec17_C0_cycle_reduced_2obj_INTF7__step_0_sim.json
+backupcfg/20dec17_C0_cycle_reduced_2obj_INTF7__step_1_sim.json
+backupcfg/20dec17_C0_cycle_reduced_2obj_INTF7__step_2_sim.json
+backupcfg/20dec17_C0_cycle_reduced_2obj_INTF7__step_3_sim.json
+backupcfg/20dec17_C0_cycle_reduced_2obj_INTF7__step_4_sim.json
+
+lfn = ['20dec17_C0_cycle_reduced_2obj_INTF7__step_0_','20dec17_C0_cycle_reduced_2obj_INTF7__step_1_','20dec17_C0_cycle_reduced_2obj_INTF7__step_2_','20dec17_C0_cycle_reduced_2obj_INTF7__step_3_','20dec17_C0_cycle_reduced_2obj_INTF7__step_4_']
+
+lpda = getindivactionreward(lfn)
+csm = cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+lclr = [csm.to_rgba(float(i)/len(lpda)) for i in range(len(lpda))]
+plotComparePerf(lpda,lclr,yl=(0,2),lleg=lfn)
+saved as 20dec21_20dec17_C0_reduced_RL1follow_comparePerf.png .... no clear trend. looks boring and not very good perf.
+
+pdfc = getconcatweightpdf(lfn)
+plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False)
+saved as 20dec21_20dec17_C0_reduced_RL1follow_meanWeights.png
+
+pdac = getconcatactionreward(lfn)
+plotPerf(pdac)
+saved as 20dec21_20dec17_C0_reduced_RL1follow_Perf.png ... not interesting so may be should not pursue
+
+-------------------------------------------------------------
+
+(base) hanwar@cycle:~/GamesProject/SMARTAgent$ python -i simdat.py backupcfg/20dec17_C0_cycle_reduced_2obj_INTF7__step_0_sim.json 
+reading  backupcfg/20dec17_C0_cycle_reduced_2obj_INTF7__step_0_sim.json
+-1
+lpop:  ['EV1', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW', 'EV1DSW', 'EV1DS', 'EV1DSE', 'EMDOWN', 'EMUP', 'IM']
+loading data from 20dec17_C0_cycle_reduced_2obj_INTF7__step_0_
+loading input images from data/20dec17_C0_cycle_reduced_2obj_INTF7__step_0_InputImages.txt
+loaded simulation data 20dec17_C0_cycle_reduced_2obj_INTF7__step_0_ on 20dec21_
+EV1 10.41 Hz
+EV1DE 3.56 Hz
+EV1DNE 24.14 Hz
+EV1DN 8.7 Hz
+EV1DNW 9.42 Hz
+EV1DW 0.42 Hz
+EV1DSW 6.26 Hz
+EV1DS 9.24 Hz
+EV1DSE 29.05 Hz
+EA 0.27 Hz
+EMDOWN 5.35 Hz
+EMUP 5.52 Hz
+IM 35.64 Hz
+
+
+--------------------------------------------------------------
+CONCLUSION: Not worth pursuing......
+
+resume
+
+ "name": "20dec21_D0_cycle_reduced_2obj_INTF7_",
+"targettedRL": 1,
+"targettedRLOppFctr": 0.5
+EA to EM: 5 (was 8 before)
+"RLhebbwt": 0.1
+
+            "FeedbackMtoA": 0,
+            "FeedbackMtoA2": 0,
+            "FeedbackA2toA": 0
+
+python multistepSim.py sim.json 32 5 20dec21_D0_cycle_multi
+
+
+-- need to see how firing rates evolve over time.
+binsz = 20 - 1000 ms.

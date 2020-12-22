@@ -52,7 +52,7 @@
         "ResumeSimFromFile": "data/20dec10_B0_cycle_reduced_2obj_INTF7_synWeights_final.pkl"
     },
     "sim": {
-        "duration": 10000,
+        "duration": 500000,
         "dt": 0.6,
         "verbose": 0,
         "recordStep": 1.0,
@@ -63,12 +63,13 @@
         "RLFakeUpRule": 0,
         "RLFakeDownRule": 0,
         "RLFakeStayRule": 0,
-        "name": "20dec11_A0_cycle_reduced_2obj_INTF7_",
+        "name": "20dec21_D0_cycle_reduced_2obj_INTF7_",
         "doquit": 1,
         "doplot": 0,
         "saveCellSecs": 0,
         "saveCellConns": 0,
         "targettedRL": 1,
+        "targettedRLOppFctr":0.5,
         "anticipatedRL": 0,
         "tstepPerAction": 20,
         "saveWeights": 1,
@@ -173,7 +174,10 @@
             "RecurrentANeurons":0,
             "RecurrentA2Neurons":0,	    
             "FeedbackAtoDirN":0,
-            "FeedbackAtoLocN":0
+            "FeedbackAtoLocN":0,
+            "FeedbackMtoA":0,
+            "FeedbackMtoA2":0,
+            "FeedbackA2toA":0
         },		
         "RLconns":{
 	    "EIPlast":0,
@@ -192,7 +196,10 @@
             "RecurrentANeurons":0,
             "RecurrentA2Neurons":0,
             "FeedbackAtoDirN":0,
-            "FeedbackAtoLocN":0
+            "FeedbackAtoLocN":0,
+            "FeedbackMtoA":0,
+            "FeedbackMtoA2":0,
+            "FeedbackA2toA":0
         },	
     "useBinaryImage": 1,
         "DirMinRate": 0.0,
@@ -228,7 +235,7 @@
             "EA":{
             "EA":{"AM":1.2,"NM":0.12,"p":0.0},
             "EA2":{"AM":1.2,"NM":0.12,"p":0.2},
-            "EM":{"AM":8,"NM":0.001,"p":0.2},
+            "EM":{"AM":5,"NM":0.001,"p":0.2},
             "IA":{"AM":10, "p":0.1}
             },
             "EA2":{
@@ -395,7 +402,7 @@
             "RLlenhebb": 100,
             "RLlenanti": 100,
             "useRLexp": 1,
-            "RLhebbwt": 1,
+            "RLhebbwt": 0.1,
             "RLantiwt": 0,
             "hebbwt": 0.0,
             "antiwt": 0.0,
