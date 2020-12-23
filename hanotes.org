@@ -11478,3 +11478,213 @@ python multistepSim.py sim.json 32 5 20dec21_D0_cycle_multi
 
 -- need to see how firing rates evolve over time.
 binsz = 20 - 1000 ms.
+
+-- running 500 sec sim using simFull.json.
+named: 20dec21_A0_full_falcor_
+
+* 20dec22
+
+-- analyzing full model:
+python -i simdat.py backupcfg/20dec21_A0_full_falcor_sim.json
+
+EV1 0.36 Hz
+EV1D 0.04 - 1.65 Hz
+EA 1.29 Hz
+IA 20 Hz
+EA2 1.26 Hz
+IA2 5.33 Hz
+EMDOWN 3.18 Hz
+EMUP 3.17 Hz
+IM 5.84 Hz
+
+Hit/Miss ratio ~ 0.2
+
+looking at raster plot "20dec22_20dec21_A0_full_falcor_raster.png", 
+...I noticed that EA2 gets activated only when the EA neurons are firing higher 
+...(i.e. when EA neurons are driven by ball direction neurons and racket direction neurons.)
+... this is a problem because if the racket didnt move, no action will be generated (most of the times except some random instances.)
+
+therefore should increase EA to EA2 strength (change from 1.75 to 2.75) and rerun.
+
+not enough so increase more.... change to 4.75 and rerun.
+
+EA to EA2: 2.75
+EA to EM: 2.75
+EA2 to EM: 2.75
+
+again...
+
+
+EA to EA2: 3.25
+EA to EM: 2.75
+EA2 to EM: 2.75
+noise conductance: 0
+
+again...
+
+EA to EA2: 3.75
+EA to EM: 2.75
+EA2 to EM: 2.75
+noise conductance: 0
+DirMaxRate: 100
+LocMaxRate: 100
+-- to compare full model with sam's 
+
+https://console.cloud.google.com/storage/browser/samn_data2/SMARTAgent/gif?pageState=(%22StorageObjectListTable%22:(%22f%22:%22%255B%255D%22))&project=ecas2-nsf1904444&prefix=&forceOnObjectsSortingFiltering=false
+
+
+* 20dec23 
+
+-- analyzing reducedModel with RL=1, simulated in 20dec21_D0_cycle_multi (other cases with RL = 0 and RL = 3 are still running)
+
+backupcfg/20dec21_D0_cycle_reduced_2obj_INTF7__step_0_sim.json
+backupcfg/20dec21_D0_cycle_reduced_2obj_INTF7__step_1_sim.json
+backupcfg/20dec21_D0_cycle_reduced_2obj_INTF7__step_2_sim.json
+backupcfg/20dec21_D0_cycle_reduced_2obj_INTF7__step_3_sim.json
+backupcfg/20dec21_D0_cycle_reduced_2obj_INTF7__step_4_sim.json
+
+>>> lpda = getindivactionreward(lfn)
+>>> csm = cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+>>> lclr = [csm.to_rgba(float(i)/len(lpda)) for i in range(len(lpda))]
+>>> plotComparePerf(lpda,lclr,yl=(0,2),lleg=lfn)
+saved as 20dec23_20dec21_D0_reduced_RL1_comparePerf.png .... increasing but very slow. may or may not become better.
+
+>>> pdac = getconcatactionreward(lfn)
+>>> plotPerf(pdac)
+saved as 20dec23_20dec21_D0_reduced_RL1_Perf.png .... increasing but very slow (hit/miss ~0.45). may or may not become better.
+
+>>> pdfc = getconcatweightpdf(lfn)
+>>> plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False)
+saved as saved as 20dec23_20dec21_D0_reduced_RL1_meanWeights.png
+
+--------------------------------------------------------------
+
+(base) hanwar@cycle:~/GamesProject/SMARTAgent$ python -i simdat.py backupcfg/20dec21_D0_cycle_reduced_2obj_INTF7__step_0_sim.json 
+reading  backupcfg/20dec21_D0_cycle_reduced_2obj_INTF7__step_0_sim.json
+-1
+lpop:  ['EV1', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW', 'EV1DSW', 'EV1DS', 'EV1DSE', 'EMDOWN', 'EMUP', 'IM']
+loading data from 20dec21_D0_cycle_reduced_2obj_INTF7__step_0_
+loading input images from data/20dec21_D0_cycle_reduced_2obj_INTF7__step_0_InputImages.txt
+loaded simulation data 20dec21_D0_cycle_reduced_2obj_INTF7__step_0_ on 20dec23_
+EV1 9.87 Hz
+EV1DE 2.86 Hz
+EV1DNE 26.5 Hz
+EV1DN 6.73 Hz
+EV1DNW 8.95 Hz
+EV1DW 0.59 Hz
+EV1DSW 5.9 Hz
+EV1DS 7.51 Hz
+EV1DSE 30.5 Hz
+EA 0.2 Hz
+EMDOWN 0.49 Hz
+EMUP 0.49 Hz
+IM 3.57 Hz
+
+
+(base) hanwar@cycle:~/GamesProject/SMARTAgent$ python -i simdat.py backupcfg/20dec21_D0_cycle_reduced_2obj_INTF7__step_1_sim.json 
+reading  backupcfg/20dec21_D0_cycle_reduced_2obj_INTF7__step_1_sim.json
+-1
+lpop:  ['EV1', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW', 'EV1DSW', 'EV1DS', 'EV1DSE', 'EMDOWN', 'EMUP', 'IM']
+loading data from 20dec21_D0_cycle_reduced_2obj_INTF7__step_1_
+^C
+loading input images from data/20dec21_D0_cycle_reduced_2obj_INTF7__step_1_InputImages.txt
+loaded simulation data 20dec21_D0_cycle_reduced_2obj_INTF7__step_1_ on 20dec23_
+EV1 10.1 Hz
+EV1DE 2.17 Hz
+EV1DNE 24.93 Hz
+EV1DN 10.19 Hz
+EV1DNW 9.02 Hz
+EV1DW 0.94 Hz
+EV1DSW 5.54 Hz
+EV1DS 10.09 Hz
+EV1DSE 27.76 Hz
+EA 0.22 Hz
+EMDOWN 0.5 Hz
+EMUP 0.49 Hz
+IM 4.35 Hz
+
+(base) hanwar@cycle:~/GamesProject/SMARTAgent$ python -i simdat.py backupcfg/20dec21_D0_cycle_reduced_2obj_INTF7__step_2_sim.json 
+reading  backupcfg/20dec21_D0_cycle_reduced_2obj_INTF7__step_2_sim.json
+-1
+lpop:  ['EV1', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW', 'EV1DSW', 'EV1DS', 'EV1DSE', 'EMDOWN', 'EMUP', 'IM']
+loading data from 20dec21_D0_cycle_reduced_2obj_INTF7__step_2_
+loading input images from data/20dec21_D0_cycle_reduced_2obj_INTF7__step_2_InputImages.txt
+loaded simulation data 20dec21_D0_cycle_reduced_2obj_INTF7__step_2_ on 20dec23_
+EV1 10.12 Hz
+EV1DE 1.61 Hz
+EV1DNE 26.55 Hz
+EV1DN 9.68 Hz
+EV1DNW 6.81 Hz
+EV1DW 0.05 Hz
+EV1DSW 3.69 Hz
+EV1DS 11.08 Hz
+EV1DSE 29.9 Hz
+EA 0.22 Hz
+EMDOWN 0.6 Hz
+EMUP 0.58 Hz
+IM 5.15 Hz
+
+
+(base) hanwar@cycle:~/GamesProject/SMARTAgent$ python -i simdat.py backupcfg/20dec21_D0_cycle_reduced_2obj_INTF7__step_3_sim.json 
+reading  backupcfg/20dec21_D0_cycle_reduced_2obj_INTF7__step_3_sim.json
+-1
+lpop:  ['EV1', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW', 'EV1DSW', 'EV1DS', 'EV1DSE', 'EMDOWN', 'EMUP', 'IM']
+loading data from 20dec21_D0_cycle_reduced_2obj_INTF7__step_3_
+loading input images from data/20dec21_D0_cycle_reduced_2obj_INTF7__step_3_InputImages.txt
+loaded simulation data 20dec21_D0_cycle_reduced_2obj_INTF7__step_3_ on 20dec23_
+EV1 10.18 Hz
+EV1DE 2.5 Hz
+EV1DNE 25.07 Hz
+EV1DN 8.14 Hz
+EV1DNW 9.39 Hz
+EV1DW 0.27 Hz
+EV1DSW 6.73 Hz
+EV1DS 8.96 Hz
+EV1DSE 29.4 Hz
+EA 0.23 Hz
+EMDOWN 0.67 Hz
+EMUP 0.66 Hz
+IM 6.0 Hz
+
+(base) hanwar@cycle:~/GamesProject/SMARTAgent$ python -i simdat.py backupcfg/20dec21_D0_cycle_reduced_2obj_INTF7__step_4_sim.json 
+reading  backupcfg/20dec21_D0_cycle_reduced_2obj_INTF7__step_4_sim.json
+-1
+lpop:  ['EV1', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW', 'EV1DSW', 'EV1DS', 'EV1DSE', 'EMDOWN', 'EMUP', 'IM']
+loading data from 20dec21_D0_cycle_reduced_2obj_INTF7__step_4_
+loading input images from data/20dec21_D0_cycle_reduced_2obj_INTF7__step_4_InputImages.txt
+loaded simulation data 20dec21_D0_cycle_reduced_2obj_INTF7__step_4_ on 20dec23_
+EV1 10.31 Hz
+EV1DE 2.68 Hz
+EV1DNE 25.32 Hz
+EV1DN 6.75 Hz
+EV1DNW 9.74 Hz
+EV1DW 0.61 Hz
+EV1DSW 6.43 Hz
+EV1DS 7.17 Hz
+EV1DSE 31.9 Hz
+EA 0.25 Hz
+EMDOWN 0.94 Hz
+EMUP 0.96 Hz
+IM 8.14 Hz
+
+---------------------------------------------------------------
+
+CONCLUSION: Firing rates are too low, performance is also low compared to earlier sims.
+although perf is increasing its very slow. based on low firing rate, not sure if it will keep increasing or not. It may or may not.
+
+Therefore decided to increase the weight from EA to EM to 7.5, a little smaller than before and keeping the larning slow.
+
+-- rerunning multistepSim with RL=1.
+
+"name": "20dec23_D0_cycle_reduced_2obj_INTF7_"
+"targettedRL": 1,
+"targettedRLOppFctr": 0.5
+EA to EM: 7.5 (was 8 before, after that 5: 5 gave too low firing rate)
+"RLhebbwt": 0.1
+
+            "FeedbackMtoA": 0,
+            "FeedbackMtoA2": 0,
+            "FeedbackA2toA": 0
+
+python multistepSim.py sim.json 32 5 20dec23_D0_cycle_multi
+
