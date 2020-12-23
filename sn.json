@@ -62,7 +62,7 @@
         "RLFakeUpRule": 0,
         "RLFakeDownRule": 0,
         "RLFakeStayRule": 0,
-        "name": "20dec18_A0_gcp_",
+        "name": "20dec23_A0_gcp_",
         "doquit": 1,
         "doplot": 0,
         "saveCellSecs": 0,
@@ -82,6 +82,36 @@
         "useProbabilistic": 1,
         "useTopological": 0
     },
+    "cell": {
+	"E": {"ahpwt": 1,
+	      "tauahp":400,
+	      "RMP":-65,
+	      "VTH":-40,
+	      "refrac":5,
+	      "Vblock":-25,
+	      "tauAM":5.5,
+	      "tauNM":166,
+	      "tauGA":10,
+	      "tauGA2":20,
+	      "tauAM2":20,
+	      "tauNM2":166,
+	      "tauRR":1,
+	      "RRWght":0.25},
+	"I": {"ahpwt":0.5,
+              "tauahp":50,
+              "RMP": -63,
+              "VTH": -40,
+              "refrac":  2.5,
+              "Vblock": -10,
+              "tauAM": 5.5,
+              "tauNM": 166,
+              "tauGA": 10,
+              "tauGA2": 20,
+              "tauAM2": 20,
+              "tauNM2": 166,            
+              "tauRR": 1,
+              "RRWght": 0.25}
+    }
     "net": {
         "EEGain": 1.0,
         "EIGain": 1.0,
@@ -559,13 +589,23 @@
         }
     },
     "Noise": {
-        "I": {
-            "Rate": 0,
-            "Weight": 0
-        },
-        "E": {
-            "Rate": 100,
-            "Weight": 2.5
-        }
+	"EMDOWN": {"AM": {"w":0, "rate":0},
+		   "NM": {"w":0, "rate":0},
+		   "GA": {"w":0, "rate":0},
+		   "AM2": {"w": 0, "rate": 0},
+		   "NM2": {"w": 0, "rate": 0},
+		   "GA2": {"w": 0, "rate": 0}},
+	"EMUP": {"AM": {"w":0, "rate":0},
+		 "NM": {"w":0, "rate":0},
+		 "GA": {"w":0, "rate":0},
+		 "AM2": {"w": 0, "rate": 0},
+		 "NM2": {"w": 0, "rate": 0},
+		 "GA2": {"w": 0, "rate": 0}},	
+	"IM": {"AM": {"w":0, "rate":0},
+	       "NM": {"w":0, "rate":0},
+	       "GA": {"w":0, "rate":0},
+	       "AM2": {"w": 0, "rate": 0},
+	       "NM2": {"w": 0, "rate": 0},
+	       "GA2": {"w": 0, "rate": 0}},
     }
 }

@@ -24676,3 +24676,10 @@ adjustments
 
 ...
 
+* 20dec23
+** adjusting model - can use noise/other params from varm2d paper
+
+http://it.neurosim.downstate.edu/pdfs/neymotin2013neco.pdf
+
+table 4 shows firing rates were pretty low even after training - though training was shorter
+

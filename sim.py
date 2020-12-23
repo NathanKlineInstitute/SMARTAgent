@@ -396,16 +396,15 @@ netParams.stimTargetParams['bkg->all'] = {
 
 def setupNoiseStim ():
   lnoisety = []
+  dnoise = dconf['noise']
   # setup noisy NetStim sources (send random spikes)
   if ECellModel == 'IntFire4' or ECellModel == 'INTF7':
-    lpoty = [x for x in EMotorPops]
-    #lpoty.append('EA2')
-    for ty,sy in zip(["E","I"],["AMPA","GABA"]):
-      Weight,Rate = dconf["Noise"][ty]["Weight"],dconf["Noise"][ty]["Rate"]
-      if ty == 'E': Weight *= cfg.EEGain
-      if ty == 'I': Weight *= cfg.IEGain
-      if Weight > 0.0 and Rate > 0.0: # only create the netstims if rate,weight > 0
-        for poty in lpoty:
+    lpoty = dnoise.keys()
+    for ty in lpoty:
+      lsy = dnoise[ty].keys()
+      for sy in lsy:
+        Weight,Rate = dnoise[ty][sy]['w'],dnoise[ty][sy]['rate']
+        if Weight > 0.0 and Rate > 0.0: # only create the netstims if rate,weight > 0
           stimty = 'stimNoise'+poty+'_'+sy
           netParams.popParams[stimty] = {'cellModel': 'NetStim', 'numCells': dnumc[poty],'rate': Rate, 'noise': 1.0, 'start': 0}
           blist = [[i,i] for i in range(dnumc[poty])]
@@ -419,13 +418,17 @@ def setupNoiseStim ():
           lnoisety.append(stimty)
   else:
     # setup noise inputs
-    for ty,sy in zip(["E","I"],["AMPA","GABA"]):
-      Weight,Rate = dconf["Noise"][ty]["Weight"],dconf["Noise"][ty]["Rate"]
-      if Weight > 0.0 and Rate > 0.0: # only create the netstims if rate,weight > 0
-        netParams.stimSourceParams[ty+'Mbkg'] = {'type': 'NetStim', 'rate': Rate, 'noise': 1.0}
-        netParams.stimTargetParams[ty+'Mbkg->all'] = {
-          'source': ty+'Mbkg', 'conds': {'cellType': EMotorPops}, 'weight': Weight, 'delay': 'max(1, normal(5,2))', 'synMech': sy}
-        lnoisety.append(stimty)
+    lpoty = dnoise.keys()
+    for ty in lpoty:
+      lsy = dnoise[ty].keys()
+      for sy in lsy:
+        Weight,Rate = dnoise[ty][sy]['w'],dnoise[ty][sy]['rate']
+        if Weight > 0.0 and Rate > 0.0: # only create the netstims if rate,weight > 0
+          stimty = ty+'Mbkg'+sy
+          netParams.stimSourceParams[stimty] = {'type': 'NetStim', 'rate': Rate, 'noise': 1.0}
+          netParams.stimTargetParams[ty+'Mbkg->all'] = {
+            'source': ty+'Mbkg', 'conds': {'cellType': EMotorPops}, 'weight': Weight, 'delay': 'max(1, normal(5,2))', 'synMech': sy}
+          # lnoisety.append(ty+'Mbkg'+sy)
   return lnoisety
 
 sim.lnoisety = setupNoiseStim()
