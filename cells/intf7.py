@@ -12,40 +12,18 @@ class INTF7E ():
   dparam = dconf['cell']['E']
   def __init__ (self):
     cell = self.intf = h.INTF7()
-    cell.ahpwt=1
-    cell.tauahp=400
-    cell.RMP= -65
-    cell.VTH= -40 
-    cell.refrac=  5
-    cell.Vblock= -25
-    cell.tauAM = 5.5
-    cell.tauNM = 166
-    cell.tauGA  = 10
-    cell.tauGA2 = 20
-    cell.tauAM2 = 20
-    cell.tauNM2 = 166
-    cell.tauRR = 1
-    cell.RRWght = .25
 
 class INTF7I ():
   # parameters for fast-spiking interneurons
   dparam = dconf['cell']['I']  
   def __init__ (self):
     cell = self.intf = h.INTF7()
-    cell.ahpwt=0.5
-    cell.refrac= 2.5
-    cell.tauahp=50
-    cell.Vblock=-10    
-    cell.RMP = -63
-    cell.VTH= -40
-    cell.tauAM = 5.5
-    cell.tauNM = 166
-    cell.tauGA  = 10
-    cell.tauGA2 = 20
-    cell.tauAM2 = 20
-    cell.tauNM2 = 166
-    cell.tauRR = 1
-    cell.RRWght = 0.25
+
+class INTF7IL ():
+  # parameters for low-threshold firing interneurons
+  dparam = dconf['cell']['IL']  
+  def __init__ (self):
+    cell = self.intf = h.INTF7()
     
 def insertSpikes (sim, dt, spkht=50):
   # inserts spikes into voltage traces (paste-on); depends on NetPyNE simulation data format
