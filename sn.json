@@ -51,7 +51,7 @@
         "ResumeSimFromFile": "data/20dec7_A0_cycle_synWeights_final.pkl"
     },
     "sim": {
-        "duration": 10000,
+        "duration": 3000,
         "dt": 0.6,
         "verbose": 0,
         "recordStep": 1.0,
@@ -89,29 +89,29 @@
 	      "VTH":-40,
 	      "refrac":5,
 	      "Vblock":-25,
-	      "tauAM":5.5,
-	      "tauNM":166,
+	      "tauAM":10,
+	      "tauNM":300,
 	      "tauGA":10,
 	      "tauGA2":20,
 	      "tauAM2":20,
-	      "tauNM2":166,
-	      "tauRR":1,
-	      "RRWght":0.25},
+	      "tauNM2":300,
+	      "tauRR":8,
+	      "RRWght":0.75},
 	"I": {"ahpwt":0.5,
               "tauahp":50,
               "RMP": -63,
               "VTH": -40,
               "refrac":  2.5,
               "Vblock": -10,
-              "tauAM": 5.5,
-              "tauNM": 166,
+              "tauAM": 10,
+              "tauNM": 300,
               "tauGA": 10,
               "tauGA2": 20,
               "tauAM2": 20,
-              "tauNM2": 166,            
-              "tauRR": 1,
+              "tauNM2": 300,            
+              "tauRR": 1.5,
               "RRWght": 0.25}
-    }
+    },
     "net": {
         "EEGain": 1.0,
         "EIGain": 1.0,
@@ -469,8 +469,10 @@
         "EEMRecProbCross": 1,
         "VisualFeedback": 0,
         "weightVar": 0.5,
-        "delayMin": 2,
-        "delayMax": 4
+        "delayMinSoma": 1.8,
+        "delayMaxSoma": 2.2,	
+        "delayMinDend": 3,
+        "delayMaxDend": 5
     },
     "STDP": {
         "AMPAI": {
@@ -588,24 +590,24 @@
             "verbose": 0
         }
     },
-    "Noise": {
+    "noise": {
 	"EMDOWN": {"AM": {"w":0, "rate":0},
 		   "NM": {"w":0, "rate":0},
-		   "GA": {"w":0, "rate":0},
-		   "AM2": {"w": 0, "rate": 0},
+		   "GA": {"w":1.875, "rate":100},
+		   "AM2": {"w": 3.938, "rate": 200},
 		   "NM2": {"w": 0, "rate": 0},
-		   "GA2": {"w": 0, "rate": 0}},
+		   "GA2": {"w": 1.875, "rate": 100}},
 	"EMUP": {"AM": {"w":0, "rate":0},
 		 "NM": {"w":0, "rate":0},
-		 "GA": {"w":0, "rate":0},
-		 "AM2": {"w": 0, "rate": 0},
+		 "GA": {"w":1.875, "rate":100},
+		 "AM2": {"w": 3.938, "rate": 200},
 		 "NM2": {"w": 0, "rate": 0},
-		 "GA2": {"w": 0, "rate": 0}},	
-	"IM": {"AM": {"w":0, "rate":0},
+		 "GA2": {"w": 1.875, "rate": 100}},
+	"IM": {"AM": {"w":1.875, "rate":100},
 	       "NM": {"w":0, "rate":0},
 	       "GA": {"w":0, "rate":0},
-	       "AM2": {"w": 0, "rate": 0},
+	       "AM2": {"w": 4.125, "rate": 200},
 	       "NM2": {"w": 0, "rate": 0},
-	       "GA2": {"w": 0, "rate": 0}},
+	       "GA2": {"w": 1.875, "rate": 100}}
     }
 }

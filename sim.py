@@ -180,8 +180,10 @@ cfg.saveCellConns = bool(dconf['sim']['saveCellConns']) # if False removes all d
 
 # weight variance -- check if need to vary the initial weights (note, they're over-written if resumeSim==1)
 cfg.weightVar = dconf['net']['weightVar']
-cfg.delayMin = dconf['net']['delayMin']
-cfg.delayMax = dconf['net']['delayMax']
+cfg.delayMinDend = dconf['net']['delayMinDend']
+cfg.delayMaxDend = dconf['net']['delayMaxDend']
+cfg.delayMinSoma = dconf['net']['delayMinSoma']
+cfg.delayMaxSoma = dconf['net']['delayMaxSoma']
 
 def getInitWeight (weight):
   """get initial weight for a connection
@@ -196,15 +198,24 @@ def getInitWeight (weight):
     # print('uniform(%g,%g)' % (weight*(1.0-cfg.weightVar),weight*(1.0+cfg.weightVar)))
     return 'uniform(%g,%g)' % (max(0,weight*(1.0-cfg.weightVar)),weight*(1.0+cfg.weightVar))
 
-def getInitDelay ():
-  if cfg.delayMin == cfg.delayMax:
-    return cfg.delayMin
+def getInitDelay (cmp='Dend'):
+  a,b = float(dconf['net']['delayMin'+cmp]), float(dconf['net']['delayMax'+cmp])
+  if a==b:
+    return a
   else:
-    return 'uniform(%g,%g)' % (cfg.delayMin, cfg.delayMax)
-
-
+    return 'uniform(%g,%g)' % (a,b)
+  
 ECellModel = dconf['net']['ECellModel']
 ICellModel = dconf['net']['ICellModel']
+
+def getComp (sy):
+  if ECellModel == 'INTF7' or ICellModel == 'INTF7':
+    if sy.count('2') > 0:
+      return 'Dend'
+    return 'Soma'
+  else:
+    if sy.count('AM') or sy.count('NM'): return 'Dend'
+    return 'Soma'
 
 #Population parameters
 for ty in allpops:
@@ -400,10 +411,10 @@ def setupNoiseStim ():
   # setup noisy NetStim sources (send random spikes)
   if ECellModel == 'IntFire4' or ECellModel == 'INTF7':
     lpoty = dnoise.keys()
-    for ty in lpoty:
-      lsy = dnoise[ty].keys()
+    for poty in lpoty:
+      lsy = dnoise[poty].keys()
       for sy in lsy:
-        Weight,Rate = dnoise[ty][sy]['w'],dnoise[ty][sy]['rate']
+        Weight,Rate = dnoise[poty][sy]['w'],dnoise[poty][sy]['rate']
         if Weight > 0.0 and Rate > 0.0: # only create the netstims if rate,weight > 0
           stimty = 'stimNoise'+poty+'_'+sy
           netParams.popParams[stimty] = {'cellModel': 'NetStim', 'numCells': dnumc[poty],'rate': Rate, 'noise': 1.0, 'start': 0}
@@ -419,15 +430,15 @@ def setupNoiseStim ():
   else:
     # setup noise inputs
     lpoty = dnoise.keys()
-    for ty in lpoty:
-      lsy = dnoise[ty].keys()
+    for poty in lpoty:
+      lsy = dnoise[poty].keys()
       for sy in lsy:
-        Weight,Rate = dnoise[ty][sy]['w'],dnoise[ty][sy]['rate']
+        Weight,Rate = dnoise[poty][sy]['w'],dnoise[poty][sy]['rate']
         if Weight > 0.0 and Rate > 0.0: # only create the netstims if rate,weight > 0
-          stimty = ty+'Mbkg'+sy
+          stimty = poty+'Mbkg'+sy
           netParams.stimSourceParams[stimty] = {'type': 'NetStim', 'rate': Rate, 'noise': 1.0}
-          netParams.stimTargetParams[ty+'Mbkg->all'] = {
-            'source': ty+'Mbkg', 'conds': {'cellType': EMotorPops}, 'weight': Weight, 'delay': 'max(1, normal(5,2))', 'synMech': sy}
+          netParams.stimTargetParams[poty+'Mbkg->all'] = {
+            'source': stimty, 'conds': {'cellType': EMotorPops}, 'weight': Weight, 'delay': 'max(1, normal(5,2))', 'synMech': sy}
           # lnoisety.append(ty+'Mbkg'+sy)
   return lnoisety
 
