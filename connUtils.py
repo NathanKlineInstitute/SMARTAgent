@@ -12,6 +12,18 @@ def prob2conv (prob, npre):
   # probability to convergence; prob is connection probability, npre is number of presynaptic neurons
   return int(0.5 + prob * npre)
 
+def conv2prob (conv, npre):
+  # convergence to connection probability
+  return conv / npre
+
+def getconv (cmat, prety, poty, npre):
+  # get convergence value from cmat dictionary (uses convergence if specified directly, otherwise uses p to calculate)
+  if 'conv' in cmat[prety][poty]:
+    return cmat[prety][poty]['conv']
+  elif 'p' in cmat[prety][poty]:
+    return prob2conv(cmat[prety][poty]['p'], npre)
+  return 0
+
 def connectOnePreNtoOneMNeuron (NBNeurons,offset_pre,offset_post):
   #this method is used to generate list of connections between preSynNeurons and motor neurons.
   blist = []

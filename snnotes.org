@@ -24683,3 +24683,26 @@ http://it.neurosim.downstate.edu/pdfs/neymotin2013neco.pdf
 
 table 4 shows firing rates were pretty low even after training - though training was shorter
 
+so now including noise to all populations except for EV1 and EV1DX
+
+* 20dec24
+** changes from adjusting general model 
+
+also setup to use AM2, NM2 for all E -> X connections
+included LTS populations that target "dends" and use GA2 synapse
+while original FS interneurons target "soma" and use GA synapse
+there's a longer delay to "dend" (3-5 ms), and shorter delays to soma (1.8-2.2 ms)
+all synapses with 2 are meant to simulate dend (longer delay and time constant)
+adjusted the time constants to match the varm2d paper - longer for NM2
+lengthened the tauRR to 8 ms for E and 1.5 ms for I neurons
+
+new LTS interneuron populations: IAL, IA2L, IML
+~31.25% of the interneurons in an area are LTS and remaining interneurons are FS
+
+should also adjust to use conv instead of pmat ... otherwise more difficult to calibrate
+to get similar number of inputs to each neuron 
+
+in old models had used NMAMR of 0.1 (10% of AMPA weight); could use separate NetCon
+for that or have an adjustment for that inside of the intf7.mod to avoid extra NetCons ... 
+hmm, problem with that is noise inputs will also activate NMDA ... 
+
