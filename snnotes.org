@@ -24706,3 +24706,27 @@ in old models had used NMAMR of 0.1 (10% of AMPA weight); could use separate Net
 for that or have an adjustment for that inside of the intf7.mod to avoid extra NetCons ... 
 hmm, problem with that is noise inputs will also activate NMDA ... 
 
+got decently low rates, with some noise and lowered the connectivity so that convergence
+would be lower. EA has some oversynchrony but other populations not much. this could give
+the model room to improve. 
+
+check params in 
+20dec24_A0_gcp_sim.json
+20dec24_B0_gcp_sim.json
+20dec24_C0_gcp_sim.json
+
+also adjusted VD,VL->EA,EA2 weights to have 0 variability to make sure
+no information lost, which could be important given the now lower 
+convergence onto EA,EA2
+
+increased tstepPerAction from 20 to 50 ... and RLlenhebb to 500 ... 
+
+** multistep on gcp (20dec24_D0_gcp_)
+
+not using targetted ... has RL plasticity in most of the pathways
+each step will run for 500 s ... 
+
+python multistepSim.py sn.json 32 20 20dec24_D0_gcp_multi
+
+started ~15:26 ...
+

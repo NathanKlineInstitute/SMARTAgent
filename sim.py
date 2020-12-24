@@ -556,7 +556,6 @@ netParams.connParams['EMT->IMT'] = {
         'weight': cmat['EMT']['IMT']['AM2'] * cfg.EIGain,
         'delay': getInitDelay('Dend'),
         'synMech': 'AMPA', 'sec':'soma', 'loc':0.5,'weightIndex':getWeightIndex('AM2', ICellModel)}
-
 if VTopoI and dconf['sim']['useReducedNetwork']==0: 
   netParams.connParams['EMT->IMT']['connList'] = blistEMTtoIMT
   sim.topologicalConns['EMT->IMT'] = {'blist':blistEMTtoIMT, 'coords':connCoordsEMTtoIMT}
@@ -565,41 +564,47 @@ else:
 
 for prety,poty in zip(['EA','EA','EA2','EA2'],['IA','IAL','IA2','IA2L']):
   if dnumc[prety] <= 0 or dnumc[poty] <= 0: continue
-  k = prety+'->'+poty
-  netParams.connParams[k] = {
-    'preConds': {'pop': prety},
-    'postConds': {'pop': poty},
-    'convergence': getconv(cmat, prety, poty, dnumc[prety]),
-    'weight': cmat[prety][poty]['AM2'] * cfg.EIGain,
-    'delay': getInitDelay('Dend'),
-    'synMech': 'AMPA', 'sec':'soma', 'loc':0.5,'weightIndex':getWeightIndex('AM2', ICellModel)}
-  if dconf['net']['RLconns']['EIPlast'] and dSTDPparamsRL['AMPAI']['RLon']: # only turn on plasticity when specified to do so
-    netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL['AMPAI']}
-    netParams.connParams[k]['weight'] = getInitWeight(cmat[prety][poty]['AM2'] * cfg.EIGain)
-  elif dconf['net']['STDPconns']['EIPlast'] and dSTDPparams['AMPAI']['STDPon']:
-    netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparams['AMPAI']}
-    netParams.connParams[k]['weight'] = getInitWeight(cmat[prety][poty]['AM2'] * cfg.EIGain)    
-
-for prety in EMotorPops:
-  if dnumc[prety] <= 0: continue
-  for poty in ['IM', 'IML']:
-    if dnumc[poty] <= 0: continue    
-    k = prety+'->'+poty
+  for sy in ['AM2','NM2']:
+    if sy not in cmat[prety][poty]: continue
+    k = prety+'->'+poty+sy
     netParams.connParams[k] = {
       'preConds': {'pop': prety},
       'postConds': {'pop': poty},
-      'convergence': getconv(cmat, 'EM', poty, dnumc[prety]),
-      'weight': cmat['EM'][poty]['AM2'] * cfg.EIGain,
+      'convergence': getconv(cmat, prety, poty, dnumc[prety]),
+      'weight': cmat[prety][poty][sy] * cfg.EIGain,
       'delay': getInitDelay('Dend'),
-      'synMech': 'AMPA', 'sec':'soma', 'loc':0.5, 'weightIndex':getWeightIndex('AM2', ICellModel)}
-    if dconf['net']['RLconns']['EIPlast'] and dSTDPparamsRL['AMPAI']['RLon']: # only turn on plasticity when specified to do so
-      netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL['AMPAI']}
-      netParams.connParams[k]['weight'] = getInitWeight(cmat['EM']['IM']['AM2'] * cfg.EIGain)
-    elif dconf['net']['STDPconns']['EIPlast'] and dSTDPparams['AMPAI']['STDPon']:
-      netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparams['AMPAI']}
-      netParams.connParams[k]['weight'] = getInitWeight(cmat['EM']['IM']['AM2'] * cfg.EIGain)    
-
-# reciprocal inhibition - only active when all relevant populations created
+      'synMech': sy, 'sec':'soma', 'loc':0.5,'weightIndex':getWeightIndex(sy, ICellModel)}
+    if sy.count('AM') > 0:
+      if dconf['net']['RLconns']['EIPlast'] and dSTDPparamsRL['AMPAI']['RLon']: # only turn on plasticity when specified to do so
+        netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL['AMPAI']}
+        netParams.connParams[k]['weight'] = getInitWeight(cmat[prety][poty]['AM2'] * cfg.EIGain)
+      elif dconf['net']['STDPconns']['EIPlast'] and dSTDPparams['AMPAI']['STDPon']:
+        netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparams['AMPAI']}
+        netParams.connParams[k]['weight'] = getInitWeight(cmat[prety][poty]['AM2'] * cfg.EIGain)    
+ 
+for prety in EMotorPops:
+  if dnumc[prety] <= 0: continue
+  for poty in ['IM', 'IML']:
+    if dnumc[poty] <= 0: continue
+    for sy in ['AM2','NM2']:
+      if sy not in cmat['EM'][poty]: continue
+      k = prety+'->'+poty+sy
+      netParams.connParams[k] = {
+        'preConds': {'pop': prety},
+        'postConds': {'pop': poty},
+        'convergence': getconv(cmat, 'EM', poty, dnumc[prety]),
+        'weight': cmat['EM'][poty][sy] * cfg.EIGain,
+        'delay': getInitDelay('Dend'),
+        'synMech': sy, 'sec':'soma', 'loc':0.5, 'weightIndex':getWeightIndex(sy, ICellModel)}
+      if sy.count('AM') > 0:
+        if dconf['net']['RLconns']['EIPlast'] and dSTDPparamsRL['AMPAI']['RLon']: # only turn on plasticity when specified to do so
+          netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL['AMPAI']}
+          netParams.connParams[k]['weight'] = getInitWeight(cmat['EM']['IM']['AM2'] * cfg.EIGain)
+        elif dconf['net']['STDPconns']['EIPlast'] and dSTDPparams['AMPAI']['STDPon']:
+          netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparams['AMPAI']}
+          netParams.connParams[k]['weight'] = getInitWeight(cmat['EM']['IM']['AM2'] * cfg.EIGain)    
+   
+# reciprocal inhibition - only active when all relevant populations created - not usually used
 for prety in EMotorPops:
   for epoty in EMotorPops:
     if epoty == prety: continue # no self inhib here
@@ -959,10 +964,14 @@ def connectEVToTarget (lpoty, useTopological):
         for strty,synmech,weight in zip(['','n'],['AM2', 'NM2'],lsynw):        
           k = strty+prety+'->'+strty+poty
           if weight <= 0.0: continue
+          if poty == 'EA' or poty == 'EA2':
+            wtval = weight # make sure EA,EA2 get enough input
+          else:
+            wtval = getInitWeight(weight)
           netParams.connParams[k] = {
             'preConds': {'pop': prety},
             'postConds': {'pop': poty},
-            'weight': getInitWeight(weight),
+            'weight': wtval,
             'delay': getInitDelay('Dend'),
             'synMech': synmech,
             'sec':EExcitSec, 'loc':0.5,'weightIndex':getWeightIndex(synmech, ECellModel)
