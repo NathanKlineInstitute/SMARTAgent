@@ -225,7 +225,8 @@ for ty in allpops:
 
 def makeECellModel (ECellModel):
   # create rules for excitatory neuron models
-  EExcitSec = 'dend' # section where excitatory synapses placed  
+  EExcitSec = 'dend' # section where excitatory synapses placed
+  PlastWeightIndex = 0 # NetCon weight index where plasticity occurs
   if ECellModel == 'Mainen':    
     netParams.importCellParams(label='PYR_Mainen_rule', conds={'cellType': ETypes}, fileName='cells/mainen.py', cellName='PYR2')
     netParams.cellParams['PYR_Mainen_rule']['secs']['soma']['threshold'] = 0.0
@@ -253,6 +254,7 @@ def makeECellModel (ECellModel):
     for ty in ETypes:
       netParams.popParams[ty] = {'cellType':ty, 'cellModel': 'INTF7', 'numCells': dnumc[ty]} # pop of IntFire4
       for k,v in intf7.INTF7E.dparam.items(): netParams.popParams[ty][k] = v
+    PlastWeightIndex = intf7.dsyn['AM2']
   elif ECellModel == 'Friesen':
     cellRule = netParams.importCellParams(label='PYR_Friesen_rule', conds={'cellType': ETypes, 'cellModel': 'Friesen'},
                 fileName='cells/friesen.py', cellName='MakeRSFCELL')
@@ -261,9 +263,8 @@ def makeECellModel (ECellModel):
   elif ECellModel == 'HH':
     EExcitSec = 'soma'
     netParams.importCellParams(label='HHE_rule', conds={'cellType': ETypes}, fileName='cells/hht.py', cellName='HHE')
-    netParams.cellParams['HHE_rule']['secs']['soma']['threshold'] = -10.0
-    
-  return EExcitSec
+    netParams.cellParams['HHE_rule']['secs']['soma']['threshold'] = -10.0    
+  return EExcitSec,PlastWeightIndex
 
 def makeICellModel (ICellModel):
   # create rules for inhibitory neuron models
@@ -301,7 +302,8 @@ def makeICellModel (ICellModel):
     netParams.importCellParams(label='HHI_rule', conds={'cellType': ITypes}, fileName='cells/hht.py', cellName='HHI')
     netParams.cellParams['HHI_rule']['secs']['soma']['threshold'] = -10.0
       
-EExcitSec = makeECellModel(ECellModel)
+EExcitSec,PlastWeightIndex = makeECellModel(ECellModel)
+print('EExcitSec,PlastWeightIndex:',EExcitSec,PlastWeightIndex)
 makeICellModel(ICellModel)
   
 ## Synaptic mechanism parameters
@@ -1158,7 +1160,7 @@ def getSumAdjustableWeights (sim):
     W = N = 0.0
     for conn in cell.conns:
       if 'hSTDP' in conn:
-        W += float(conn['hObj'].weight[0])
+        W += float(conn['hObj'].weight[PlastWeightIndex])
         N += 1
     if N > 0:
       dout[cell.gid] = W / N
@@ -1172,7 +1174,7 @@ def sumAdjustableWeightsPop (sim, popname):
   for cell in lcell:
     for conn in cell.conns:
       if 'hSTDP' in conn:
-        W += float(conn['hObj'].weight[0])
+        W += float(conn['hObj'].weight[PlastWeightIndex])
         N += 1
   return W, N
   
@@ -1183,7 +1185,7 @@ def recordAdjustableWeightsPop (sim, t, popname):
     for conn in cell.conns:
       if 'hSTDP' in conn:
         #hstdp = conn.get('hSTDP')
-        lsynweights.append([t,conn.preGid,cell.gid,float(conn['hObj'].weight[0])])#,hstdp.cumreward])
+        lsynweights.append([t,conn.preGid,cell.gid,float(conn['hObj'].weight[PlastWeightIndex])])#,hstdp.cumreward])
   return len(lcell)
                     
 def recordAdjustableWeights (sim, t, lpop):
@@ -1202,9 +1204,9 @@ def recordWeights (sim, t):
     for conn in cell.conns:
       if 'hSTDP' in conn:
         if conn.plast.params.RLon ==1:
-          sim.allRLWeights[-1].append(float(conn['hObj'].weight[0])) # save weight only for Rl-STDP conns
+          sim.allRLWeights[-1].append(float(conn['hObj'].weight[PlastWeightIndex])) # save weight only for Rl-STDP conns
         else:
-          sim.allNonRLWeights[-1].append(float(conn['hObj'].weight[0])) # save weight only for nonRL-STDP conns
+          sim.allNonRLWeights[-1].append(float(conn['hObj'].weight[PlastWeightIndex])) # save weight only for nonRL-STDP conns
     
 def saveWeights(sim, downSampleCells):
   ''' Save the weights for each plastic synapse '''
@@ -1275,7 +1277,7 @@ def mulAdjustableWeights (sim, dfctr):
     for cell in lcell:
       for conn in cell.conns:
         if 'hSTDP' in conn:    
-          conn['hObj'].weight[0] *= dfctr[pop] 
+          conn['hObj'].weight[PlastWeightIndex] *= dfctr[pop] 
 
 def normalizeAdjustableWeights (sim, t, lpop):
   # normalize the STDP/RL weights during the simulation - called in trainAgent
@@ -1301,7 +1303,7 @@ def normalizeAdjustableWeights (sim, t, lpop):
           if dochange:
             for conn in cell.conns:
               if 'hSTDP' in conn:
-                conn['hObj'].weight[0] *= fctrB
+                conn['hObj'].weight[PlastWeightIndex] *= fctrB
   else:
     davg = getAverageAdjustableWeights(sim, lpop)
     try:
@@ -1485,7 +1487,7 @@ def initTargetW (sim,lpop,synType='AMPA'):
       cCellW = 0
       for conn in cell.conns:
         if conn.synMech==synType and 'hSTDP' in conn:
-          cCellW+=conn['hObj'].weight[0]
+          cCellW+=conn['hObj'].weight[PlastWeightIndex]
       sim.dTargetW[cell.gid] = cCellW
 
 def getFiringRateWithInterval (trange, neuronal_pop):
@@ -1544,7 +1546,7 @@ def adjustWeightsBasedOnFiringRates (sim,lpop,synType='AMPA'):
       cCellW = 0
       for conn in cell.conns:
         if conn.synMech==synType and 'hSTDP' in conn: # to make sure that only specific type of synapses are counted towards the sum.
-          cCellW+=conn['hObj'].weight[0]
+          cCellW+=conn['hObj'].weight[PlastWeightIndex]
       if cCellW>0: # if no weight associated with the specific type of synapses, no need to asdjust weights.
         sfctr = targetW/cCellW
         if sfctr>1:
@@ -1556,7 +1558,7 @@ def adjustWeightsBasedOnFiringRates (sim,lpop,synType='AMPA'):
         if sfctr != 1.0:
           for conn in cell.conns:
             if conn.synMech==synType and 'hSTDP' in conn:
-              conn['hObj'].weight[0] *= sfctr
+              conn['hObj'].weight[PlastWeightIndex] *= sfctr
   print(sim.rank,'adjust W: UP=', countScaleUps, ', DOWN=', countScaleDowns)
 
 def trainAgent (t):
@@ -1835,7 +1837,7 @@ def updateSTDPWeights (sim, W):
       #find weight for the STDP connection between preID and postID
       for idx in cConnW.index:
         cW = cConnW.at[idx,'weight']
-        conn['hObj'].weight[0] = cW
+        conn['hObj'].weight[PlastWeightIndex] = cW
         hSTDP = conn.get('hSTDP')
         #hSTDP.cumreward = cConnW.at[idx,'cumreward']
         if dconf['verbose'] > 1: print('weight updated:', cW)
