@@ -303,6 +303,7 @@ def makeICellModel (ICellModel):
     netParams.cellParams['HHI_rule']['secs']['soma']['threshold'] = -10.0
       
 EExcitSec,PlastWeightIndex = makeECellModel(ECellModel)
+print('EExcitSec,PlastWeightIndex:',EExcitSec,PlastWeightIndex)
 makeICellModel(ICellModel)
   
 ## Synaptic mechanism parameters
