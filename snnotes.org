@@ -24812,3 +24812,13 @@ python multistepSim.py sn.json 32 20 20dec28_A0_gcp_multi
 
 started ~11:21 ...
 
+hmm, stdp.mod weight array only uses weight[0]
+
+h.setpointer(singlesyn._ref_weight[0],'synweight',stdpmech) # Point the STDP mechanism to the connection weight
+
+so would have to adjust the setpointer call to use the right weight index too ... ?
+
+already have the fix to use weightIndex in /home/samnemo/netpyne/netpyne/cell/pointCell.py
+h.setpointer(netcon._ref_weight[weightIndex], 'synweight', plastMech) # Associate the STDP adjuster with this weight
+so should work ... 
+
