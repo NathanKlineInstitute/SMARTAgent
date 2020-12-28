@@ -11688,3 +11688,230 @@ EA to EM: 7.5 (was 8 before, after that 5: 5 gave too low firing rate)
 
 python multistepSim.py sim.json 32 5 20dec23_D0_cycle_multi
 
+
+-- looking at raster of 20dec22_A0_full_falcor....
+EA(1.42Hz)->IA(43.48Hz)....too strong.
+EA(1.42Hz)->EA2(14.92Hz).... too strong. 
+exct drive to EM neurons high too.....
+take a snapshot of raster... saved on my desktop
+
+-- run 5 sec sim in "20dec23_A0_full_falcor"
+EA(3.81Hz)->IA(32.04Hz):10 (10 in 20dec22_A0_full_falcor)
+EA(3.81Hz)->EA2(14.86Hz): 3.75(3.75 in 20dec22_A0_full_falcor)
+EA2(14.86Hz)->IA2(39.29Hz):10 (10 in 20dec22_A0_full_falcor)
+raster between 1000 and 1400 ms saved on Desktop as "20dec23_A0_full_falcor_raster1"
+raster between 1100 and 1140 ms (ylim:(9000,15000))saved on Desktop as "20dec23_A0_full_falcor_raster2"
+
+-- run 5 sec sim in "20dec23_A1_full_falcor"
+EA(6.41Hz)->IA(41.45Hz):5 (10 in 20dec22_A0_full_falcor)
+EA(6.41Hz)->EA2(18.33Hz): 2.0(3.75 in 20dec22_A0_full_falcor)
+EA2(18.33Hz)->IA2(46.4Hz):5 (10 in 20dec22_A0_full_falcor)
+raster between 1000 and 1400 ms saved on Desktop as "20dec23_A1_full_falcor_raster1"
+raster between 1150 and 1175 ms saved on Desktop as  "20dec23_A1_full_falcor_raster2"
+
+-- run 5 sec sim in "20dec23_A2_full_falcor"
+EA(6.14 Hz)->IA(27.24 Hz):2.5
+EA(6.14 Hz)->EA2(6.7 Hz): 1.0
+EA2(6.7 Hz)->IA2(15.36 Hz):2.5
+raster between 1000 and 1400 ms saved on Desktop as "20dec23_A2_full_falcor_raster1"
+and "20dec23_A2_full_falcor_raster2"
+
+-- run 5 sec sim in "20dec23_A3_full_falcor"
+EA( 3.68 Hz)->IA( 13.35 Hz):1.5
+EA( 3.68 Hz)->EA2( 9.88 Hz): 2.0 ...should reduce
+EA2(9.88 Hz)->IA2(21.73 Hz):1.5 
+VL -> EA: 2.5 (was 5 before)
+several rasters saved as
+"20dec23_A3_full_falcor_raster1"
+"20dec23_A3_full_falcor_raster2"
+"20dec23_A3_full_falcor_raster3"
+"20dec23_A3_full_falcor_raster4"
+
+-- run 5 sec sim in "20dec23_A4_full_falcor"
+EA->IA:1.5
+EA->EA2: 2.0 ...should reduce
+EA2->IA2:1.5 
+VL -> EA: 5
+VD -> EA: 2.5  
+didnt save plots because not enough inputs to drive EA.
+
+-- run 5 sec sim in "20dec24_A0_full_falcor"
+EA(9.94 Hz)->IA(63.89 Hz):1.5
+EA(9.94 Hz)->EA2(28.7Hz): 2.0 ...should reduce
+EA2(28.7Hz)->IA2(73.55Hz):1.5 
+VL(0.3Hz) -> EA: 10
+VD (1.68Hz - 4.55 Hz)-> EA: 2.5  
+
+-- run 5 sec sim in "20dec24_A1_full_falcor"
+EA(4.87Hz)->IA(15.76Hz):1.5
+EA()->EA2(28.7Hz): 2.0 ...should reduce
+EA2(10.71Hz)->IA2(25.3Hz):1.5 
+VL(0.5 Hz) -> EA: 7
+VD (0.2Hz - 3.12 Hz)-> EA: 2.5 .... the range is low because less movements. 
+
+
+may be turn off VD to see what level of conductance is required to activate EA just by VL
+
+
+--run 5 sec sim in "20dec24_A2_full_falcor"
+
+EA->IA:1.5
+EA->EA2: 2.0 ...should reduce
+EA2->IA2:1.5 
+VL -> EA: 8
+VD -> EA: 0  
+
+
+--run 5 sec sim in "20dec24_A2_full_falcor"...over writing
+
+EA->IA:1.5
+EA->EA2: 2.0 ...should reduce
+EA2->IA2:1.5 
+VL -> EA: 7
+VD -> EA: 0  
+
+
+--run 5 sec sim in "20dec24_A3_full_falcor"
+
+EA->IA:1.5
+EA->EA2: 2.0 ...should reduce
+EA2->IA2:1.5 
+VL -> EA: 8
+VD -> EA: 0  
+saved rasters as:
+20dec24_A3_full_falcor_raster1.png
+20dec24_A3_full_falcor_raster2.png
+
+This (VL->EA:8) seems to be a good number to pass information to EA without interuption.
+firing rate of EA: 4.68Hz is not bad. but try to reduce it by playing with stimModVD.
+
+--run 5 sec sim in "20dec24_A4_full_falcor"
+EA->IA:1.5
+EA->EA2: 1.75
+EA2->IA2:1.5 
+VL -> EA: 8
+VD -> EA: 0 
+stimModVL: 35 (was 35 before)
+EA->EM:2
+EA2->EM:2
+
+--run 5 sec sim in "20dec24_A5_full_falcor"
+EA->IA:1.5
+EA->EA2: 1.75
+EA2->IA2:1.5 
+VL -> EA: 8
+VD -> EA: 0 
+stimModVL: 35 (was 35 before)
+EA->EM:2
+EA2->EM:2
+add noise: g of 1
+
+... not much different than before.
+
+--run 5 sec sim in "20dec24_A6_full_falcor"
+EA->IA:1.5
+EA->EA2: 1.75
+EA2->IA2:1.5 
+VL -> EA: 8
+VD -> EA: 0 
+stimModVL: 35 (was 35 before)
+EA->EM:2
+EA2->EM:2
+add noise: g of 2.5
+
+
+--run 5 sec sim in "20dec24_A7_full_falcor"
+EA->IA:1.5
+EA->EA2: 1.75
+EA2->IA2:1.5 
+VL -> EA: 8
+VD -> EA: 0 
+stimModVL: 35 (was 35 before)
+EA->EM:2
+EA2->EM:2
+add noise: g of 5
+
+
+
+--run 5 sec sim in "20dec24_A8_full_falcor"
+EA->IA:1.5
+EA->EA2: 1.75
+EA2->IA2:1.5 
+VL -> EA: 8
+VD -> EA: 2.5
+stimModVL: 35 (was 35 before)
+EA->EM:2
+EA2->EM:2
+add noise: g of 5
+
+--run 500 sec sim in "20dec24_A8long_full_falcor"
+Hitt/Miss ration ~0.41 and rising.
+
+--run 500 sec sim in "20dec25_A8long_fullRL1_falcor"
+Hitt/Miss ration dropped to ~0.2
+P(follow) also dropped to 0.26
+
+--run 500 sec sim in "20dec27_A8long_fullRL1_falcor"
+with "RLhebbwt": 0.002,
+Hitt/Miss ration flat at ~0.36
+
+-- for reduced model
+
+-- targettedRL:3
+cp backupcfg/20dec21_B0_cycle_reduced_2obj_INTF7__step_0_sim.json sim.json
+nano sim.json
+"name": "20dec24_B0_cycle_reduced_2obj_INTF7__step_0_",
+EA to EM conn: 7.5 (5 didnt work)
+RLhebbwt = 0.1
+RLlenhebb = 100
+tauhebb = 10
+no noise.
+ python multistepSim.py sim.json 20 5 20dec24_B0_cycle_multi
+
+cycle rebooted.... sims terminated.
+
+"name": "20dec27_B0_cycle_reduced_2obj_INTF7_"
+python multistepSim.py sim.json 20 5 20dec27_B0_cycle_multi
+
+-- targettedRL = 1
+(base) hanwar@cycle:~/GamesProject/SMARTAgent$ cp backupcfg/20dec24_D0_cycle_reduced_2obj_INTF7__step_0_sim.json sim.json
+(base) hanwar@cycle:~/GamesProject/SMARTAgent$ nano sim.json
+"name": "20dec24_D0_cycle_reduced_2obj_INTF7__step_0_"
+EA to EM conn: 7.5
+RLhebbwt = 0.2
+RLlenhebb = 100
+tauhebb = 10
+no noise.
+
+ python multistepSim.py sim.json 20 5 20dec24_D0_cycle_multi
+
+cycle rebooted.... sims terminated.
+
+"name": "20dec27_D0_cycle_reduced_2obj_INTF7_"
+python multistepSim.py sim.json 20 5 20dec27_D0_cycle_multi
+
+
+ -- targettedRL = 0
+nano sim.json
+ "name": "20dec24_A0_cycle_reduced_2obj_INTF7__step_0_",
+"targettedRL": 0,
+EA to EM conn: 7.5
+RLhebbwt = 0.1
+RLlenhebb = 100
+tauhebb = 10
+no noise.
+
+python multistepSim.py sim.json 20 5 20dec24_A0_cycle_multi
+
+cycle rebooted.... sims terminated.
+
+"name": "20dec27_A0_cycle_reduced_2obj_INTF7_"
+python multistepSim.py sim.json 20 5 20dec27_A0_cycle_multi
+
+* 20dec28 
+
+-- resume simFull on falcor with RL = 0 and named "20dec28_A8long_full_falcor_"
+... resumed from 20dec24_A8long_full_falcor_..
+... this is still the previous model... Sam has a new model with more types of synapses.
+
+-- adapting sim.json and simFull.json for new model......
