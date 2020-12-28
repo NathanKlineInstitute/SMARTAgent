@@ -24806,3 +24806,9 @@ which is where AM2 is located for the intf7 cells ...
 
 so, will adjust code, throw out the data and rerun ... 
 
+** restart the multistep sim with weightIndex fix (20dec28_A0_gcp_)
+
+python multistepSim.py sn.json 32 20 20dec28_A0_gcp_multi
+
+started ~11:21 ...
+
