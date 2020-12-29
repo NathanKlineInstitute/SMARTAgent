@@ -24806,7 +24806,7 @@ which is where AM2 is located for the intf7 cells ...
 
 so, will adjust code, throw out the data and rerun ... 
 
-** restart the multistep sim with weightIndex fix (20dec28_A0_gcp_)
+** restart the multistep sim with weightIndex fix (20dec28_A0_gcp_) -->> found a few bugs
 
 python multistepSim.py sn.json 32 20 20dec28_A0_gcp_multi
 
@@ -24821,4 +24821,110 @@ so would have to adjust the setpointer call to use the right weight index too ..
 already have the fix to use weightIndex in /home/samnemo/netpyne/netpyne/cell/pointCell.py
 h.setpointer(netcon._ref_weight[weightIndex], 'synweight', plastMech) # Associate the STDP adjuster with this weight
 so should work ... 
+
+** check 20dec28_A0_gcp__step_1_sim.json
+
+python -i simdat.py backupcfg/20dec28_A0_gcp__step_1_sim.json
+
+EV1 0.02 Hz
+EV1DE 0.18 Hz
+EV1DNE 0.28 Hz
+EV1DN 0.5 Hz
+EV1DNW 0.16 Hz
+EV1DW 0.03 Hz
+EV1DSW 0.11 Hz
+EV1DS 0.5 Hz
+EV1DSE 0.42 Hz
+EA 2.34 Hz
+IA 61.03 Hz
+IAL 80.05 Hz
+EA2 0.06 Hz
+IA2 1.18 Hz
+IA2L 1.64 Hz
+EMDOWN 0.06 Hz
+EMUP 0.05 Hz
+IM 1.18 Hz
+IML 1.98 Hz
+
+EMDOWN,EMUP rates way too low ... 
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/20dec29_20dec28_A0_gcp__step_1_perf.png]]
+improving then dropped off?
+
+lfn = ['20dec28_A0_gcp__step_' + str(i) + '_' for i in range(2)]
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0,0.75))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/20dec29_20dec28_A0_gcp__step_1_perf_all_steps_so_far.png]]
+
+clf(); drawraster(dspkT,dspkID); xlim((490e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/20dec29_20dec28_A0_gcp__step_1_rast.png]]
+xlim((499e3,500e3))
+savefig(gifpath()+'rastB.png') # [[./gif/20dec29_20dec28_A0_gcp__step_1_rastB.png]]
+
+lfn = ['20dec28_A0_gcp__step_0_', '20dec28_A0_gcp__step_1_']
+pdfc = getconcatweightpdf(lfn)
+subplot(1,2,1); popwtsE = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP','EA','EA2'],lclr=['r','b','g','c'],plotindiv=False)
+subplot(1,2,2); popwtsI = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['IA','IM','IA2','IAL','IML','IA2L'],lclr=['r','b','g','c','m','y'],plotindiv=False)
+savefig(gifpath()+'all_steps_avg_weight.png') # [[./gif/20dec29_20dec28_A0_gcp__step_1_all_steps_avg_weight.png]]
+
+weights are increasing ... 
+two problems: 1. excitatory weights drop down at t=500 s at the reload. must be a bug.
+2. IA weights increase too much? leading to low EA rates and low rates elsewhere?
+
+ylim((0,4))
+savefig(gifpath()+'all_steps_avg_weightB.png') # [[./gif/20dec29_20dec28_A0_gcp__step_1_all_steps_avg_weightB.png]]
+also, some of the I weights are not starting at right value ... ? IML starts too high - supposed to be ~0.98 average
+but is closer to 1.95 (value of IM)  <<-- ok, fixed that...mistake in code:
+from
+          netParams.connParams[k]['weight'] = getInitWeight(cmat['EM']['IM']['AM2'] * cfg.EIGain)
+to
+          netParams.connParams[k]['weight'] = getInitWeight(cmat['EM'][poty]['AM2'] * cfg.EIGain)
+
+but what is the issue with the reload? why only weights to E neurons drop to very low values after reload
+and not the interneurons??
+
+** debug multistep weight reload with short sim 
+
+python multistepSim.py sn.json 32 2 20dec28_B0_gcp_multi
+
+python -i simdat.py backupcfg/20dec28_B0_gcp__step_1_sim.json
+
+lfn = ['20dec28_B0_gcp__step_0_', '20dec28_B0_gcp__step_1_']
+pdfc = getconcatweightpdf(lfn)
+subplot(1,2,1); popwtsE = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP','EA','EA2'],lclr=['r','b','g','c'],plotindiv=False)
+subplot(1,2,2); popwtsI = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['IA','IM','IA2','IAL','IML','IA2L'],lclr=['r','b','g','c','m','y'],plotindiv=False)
+savefig(gifpath()+'all_steps_avg_weight.png') # 
+[[./gif/20dec29_20dec28_B0_gcp__step_1_all_steps_avg_weight.png]]
+
+here's other bug
+should change
+  dSTDPparamsRL['AM2']=dSTDPparamsRL['AMPA']; dSTDPparamsRL['NM2']=dSTDPparamsRL['AMPA']
+  dSTDPparams['AM2']=dSTDPparams['AMPA']; dSTDPparams['NM2']=dSTDPparams['AMPA']    
+to
+  dSTDPparamsRL['AM2']=dSTDPparamsRL['AMPA']; dSTDPparamsRL['NM2']=dSTDPparamsRL['NMDA']
+  dSTDPparams['AM2']=dSTDPparams['AMPA']; dSTDPparams['NM2']=dSTDPparams['NMDA']  
+(had accidentally set NMDA plasticity [which should be off] to AMPA [which is on])
+
+python multistepSim.py sn.json 32 2 20dec28_C0_gcp_multi
+
+python -i simdat.py backupcfg/20dec28_C0_gcp__step_1_sim.json
+
+lfn = ['20dec28_C0_gcp__step_0_', '20dec28_C0_gcp__step_1_']
+pdfc = getconcatweightpdf(lfn)
+subplot(1,2,1); popwtsE = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP','EA','EA2'],lclr=['r','b','g','c'],plotindiv=False)
+subplot(1,2,2); popwtsI = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['IA','IM','IA2','IAL','IML','IA2L'],lclr=['r','b','g','c','m','y'],plotindiv=False)
+savefig(gifpath()+'all_steps_avg_weight.png') # 
+[[./gif/20dec29_20dec28_C0_gcp__step_1_all_steps_avg_weight.png]]
+ok, this time no drop in AM weights after restart (at 3 s)
+(bug caused ampa weights to get set to NMDA weights on the reload)
+
+** multistep sim on gcp (after weight reload fix and IML wt fix; 20dec28_D0_gcp_)
+
+also, set the EI plast weight increases to be a little lower than before (0.02 same as increases for E->E)
+[previously had EI weight increases at 0.05, but then looked like weights to IA increased too much)
+
+python multistepSim.py sn.json 32 20 20dec28_D0_gcp_multi
+
+started ~23:30 ...
 
