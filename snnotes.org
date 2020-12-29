@@ -24928,3 +24928,130 @@ python multistepSim.py sn.json 32 20 20dec28_D0_gcp_multi
 
 started ~23:30 ...
 
+* 20dec29
+** check output from 20dec28_D0_gcp__step_2_
+
+python -i simdat.py backupcfg/20dec28_D0_gcp__step_2_sim.json
+
+EV1 0.02 Hz
+EV1DE 0.08 Hz
+EV1DNE 0.24 Hz
+EV1DN 0.57 Hz
+EV1DNW 0.16 Hz
+EV1DW 0.03 Hz
+EV1DSW 0.07 Hz
+EV1DS 0.57 Hz
+EV1DSE 0.34 Hz
+EA 2.83 Hz
+IA 64.96 Hz
+IAL 82.81 Hz
+EA2 0.43 Hz
+IA2 1.71 Hz
+IA2L 2.61 Hz
+EMDOWN 0.5 Hz
+EMUP 0.48 Hz
+IM 3.37 Hz
+IML 5.4 Hz
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/20dec29_20dec28_D0_gcp__step_2_perf.png]]
+
+this looks strange - why no perf value from beginning? no hits or misses early on??
+
+lfn = ['20dec28_D0_gcp__step_' + str(i) + '_' for i in range(3)]
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0,0.75))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/20dec29_20dec28_D0_gcp__step_2_perf_all_steps_so_far.png]]
+
+perf increasing slowly
+
+clf(); drawraster(dspkT,dspkID); xlim((490e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/20dec29_20dec28_D0_gcp__step_2_rast.png]]
+
+pdfc = getconcatweightpdf(lfn)
+subplot(1,2,1); popwtsE = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP','EA','EA2'],lclr=['r','b','g','c'],plotindiv=False)
+subplot(1,2,2); popwtsI = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['IA','IM','IA2','IAL','IML','IA2L'],lclr=['r','b','g','c','m','y'],plotindiv=False)
+savefig(gifpath()+'all_steps_avg_weight.png') # [[./gif/20dec29_20dec28_D0_gcp__step_2_all_steps_avg_weight.png]]
+
+weights going up properly ... at least no bug
+
+fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
+[[./gif/20dec29_20dec28_D0_gcp__step_2__with_reward_input.mp4]]
+
+next step finished ... see if improved further ...
+
+python -i simdat.py backupcfg/20dec28_D0_gcp__step_3_sim.json
+
+EV1 0.02 Hz
+EV1DE 0.09 Hz
+EV1DNE 0.34 Hz
+EV1DN 0.61 Hz
+EV1DNW 0.11 Hz
+EV1DW 0.03 Hz
+EV1DSW 0.09 Hz
+EV1DS 0.65 Hz
+EV1DSE 0.36 Hz
+EA 2.96 Hz
+IA 88.06 Hz
+IAL 111.99 Hz
+EA2 0.73 Hz
+IA2 2.96 Hz
+IA2L 5.73 Hz
+EMDOWN 0.96 Hz
+EMUP 0.94 Hz
+IM 12.17 Hz
+IML 18.5 Hz
+
+firing rates are up ... still reasonable ... 
+
+ax=plotPerf(actreward,yl=(0,3))
+savefig(gifpath()+'perf.png') # [[./gif/20dec29_20dec28_D0_gcp__step_3_perf.png]]
+pretty good ... note that early part of sim is before any misses, that's why hit/miss ratio is not defined
+
+lfn = ['20dec28_D0_gcp__step_' + str(i) + '_' for i in range(4)]
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0,0.5))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/20dec29_20dec28_D0_gcp__step_3_perf_all_steps_so_far.png]]
+
+perf still may be increasing slowly ...
+
+lpda = getindivactionreward(lfn)
+csm=cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+lclr = [csm.to_rgba(float(i)/(len(lpda))) for i in range(len(lpda))]
+clf(); plotComparePerf(lpda,lclr,yl=(0,5),lleg=lfn)
+savefig(gifpath()+'perf_compareD.png') # [[./gif/20dec29_20dec28_D0_gcp__step_3_perf_compareD.png]]
+
+clf(); drawraster(dspkT,dspkID); xlim((490e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/20dec29_20dec28_D0_gcp__step_3_rast.png]]
+are these firing patterns already overly synchronized?
+
+pdfc = getconcatweightpdf(lfn)
+subplot(1,2,1); popwtsE = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP','EA','EA2'],lclr=['r','b','g','c'],plotindiv=False)
+subplot(1,2,2); popwtsI = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['IA','IM','IA2','IAL','IML','IA2L'],lclr=['r','b','g','c','m','y'],plotindiv=False)
+savefig(gifpath()+'all_steps_avg_weight.png') # [[./gif/20dec29_20dec28_D0_gcp__step_3_all_steps_avg_weight.png]]
+
+any dep blockade?
+
+clf(); subplot(2,1,1); 
+drawcellVm(simConfig,tlim=(490e3,500e3),ldrawpop=['EMDOWN','EMUP','EA','EA2'],lclr=['r','g','b','c'])
+subplot(2,1,2);
+drawcellVm(simConfig,tlim=(490e3,500e3),ldrawpop=['IA','IM','IA2','IAL','IML','IA2L'],lclr=['r','g','b','c','m','y'])
+savefig(gifpath()+'Vm.png') # [[./gif/20dec29_20dec28_D0_gcp__step_3_Vm.png]]
+yeah, looks like dep blockade emerging in some of the interneuron populations (once in a while)
+so may have to reduce rate of learning for E -> I
+
+fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
+[[./gif/20dec29_20dec28_D0_gcp__step_3__with_reward_input.mp4]]
+
+binsz = 1000
+dnspk = {pop:getspikehist(dspkT[pop],dnumc[pop],binsz,totalDur) for pop in ['EMDOWN','EMUP','IM','IML']}
+for clr,pop in zip(['r','b','g','c'],['EMDOWN','EMUP','IM','IML']): plot(dnspk[pop][0],dnspk[pop][1],clr)
+xlim((0,totalDur)); ylim((0,10))
+
+savefig(gifpath()+'firing_rates.png') # [[./gif/20dec29_20dec28_D0_gcp__step_3_firing_rates.png]]
+
+rates going up for E and I, but much higher for I ... 
+
+can let one more step finish but probably should reduce the RLhebbwt for AMPAI (E->I)
+otherwise I will go into dep blockade and the circuit will malfunction ...
+
