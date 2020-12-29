@@ -24806,7 +24806,7 @@ which is where AM2 is located for the intf7 cells ...
 
 so, will adjust code, throw out the data and rerun ... 
 
-** restart the multistep sim with weightIndex fix (20dec28_A0_gcp_)
+** restart the multistep sim with weightIndex fix (20dec28_A0_gcp_) -->> found a few bugs
 
 python multistepSim.py sn.json 32 20 20dec28_A0_gcp_multi
 
@@ -24883,4 +24883,39 @@ to
 
 but what is the issue with the reload? why only weights to E neurons drop to very low values after reload
 and not the interneurons??
+
+** debug multistep weight reload with short sim 
+
+python multistepSim.py sn.json 32 2 20dec28_B0_gcp_multi
+
+python -i simdat.py backupcfg/20dec28_B0_gcp__step_1_sim.json
+
+lfn = ['20dec28_B0_gcp__step_0_', '20dec28_B0_gcp__step_1_']
+pdfc = getconcatweightpdf(lfn)
+subplot(1,2,1); popwtsE = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP','EA','EA2'],lclr=['r','b','g','c'],plotindiv=False)
+subplot(1,2,2); popwtsI = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['IA','IM','IA2','IAL','IML','IA2L'],lclr=['r','b','g','c','m','y'],plotindiv=False)
+savefig(gifpath()+'all_steps_avg_weight.png') # 
+[[./gif/20dec29_20dec28_B0_gcp__step_1_all_steps_avg_weight.png]]
+
+here's other bug
+should change
+  dSTDPparamsRL['AM2']=dSTDPparamsRL['AMPA']; dSTDPparamsRL['NM2']=dSTDPparamsRL['AMPA']
+  dSTDPparams['AM2']=dSTDPparams['AMPA']; dSTDPparams['NM2']=dSTDPparams['AMPA']    
+to
+  dSTDPparamsRL['AM2']=dSTDPparamsRL['AMPA']; dSTDPparamsRL['NM2']=dSTDPparamsRL['NMDA']
+  dSTDPparams['AM2']=dSTDPparams['AMPA']; dSTDPparams['NM2']=dSTDPparams['NMDA']  
+(had accidentally set NMDA plasticity [which should be off] to AMPA [which is on])
+
+python multistepSim.py sn.json 32 2 20dec28_C0_gcp_multi
+
+python -i simdat.py backupcfg/20dec28_C0_gcp__step_1_sim.json
+
+lfn = ['20dec28_C0_gcp__step_0_', '20dec28_C0_gcp__step_1_']
+pdfc = getconcatweightpdf(lfn)
+subplot(1,2,1); popwtsE = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP','EA','EA2'],lclr=['r','b','g','c'],plotindiv=False)
+subplot(1,2,2); popwtsI = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['IA','IM','IA2','IAL','IML','IA2L'],lclr=['r','b','g','c','m','y'],plotindiv=False)
+savefig(gifpath()+'all_steps_avg_weight.png') # 
+[[./gif/20dec29_20dec28_C0_gcp__step_1_all_steps_avg_weight.png]]
+ok, this time no drop in AM weights after restart (at 3 s)
+(bug caused ampa weights to get set to NMDA weights on the reload)
 
