@@ -25216,3 +25216,9 @@ python multistepSim.py sn.json 32 20 20dec30_A0_gcp_multi
 
 started ~10:45 ...
 
+** smaller network? 20dec30_B0_gcp_
+
+python multistepSim.py sn.json 30 20 20dec30_B0_gcp_multi
+
+started ~11:28 ...
+
