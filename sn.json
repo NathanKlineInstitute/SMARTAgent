@@ -31,7 +31,7 @@
         "scorePoint": 0.0,
         "losePoint": 0.0,
         "followTarget": 0.1,
-        "avoidTarget": -0.1,
+        "avoidTarget": -0.05,
         "hitBall": 1.0
     },
     "actionsPerPlay": 1,
@@ -62,7 +62,7 @@
         "RLFakeUpRule": 0,
         "RLFakeDownRule": 0,
         "RLFakeStayRule": 0,
-        "name": "20dec29_A0_gcp_",
+        "name": "20dec30_A0_gcp_",
         "doquit": 1,
         "doplot": 0,
         "saveCellSecs": 0,

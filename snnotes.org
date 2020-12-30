@@ -25142,3 +25142,77 @@ python multistepSim.py sn.json 32 20 20dec29_A0_gcp_multi
 
 started ~22:23 ...
 
+* 20dec30
+** check output from 20dec29_A0_gcp__step_2_ -->> average weights decreasing; needs readjustment
+
+python -i simdat.py backupcfg/20dec29_A0_gcp__step_2_sim.json
+
+EV1 0.02 Hz
+EV1DE 0.09 Hz
+EV1DNE 0.35 Hz
+EV1DN 0.57 Hz
+EV1DNW 0.13 Hz
+EV1DW 0.03 Hz
+EV1DSW 0.12 Hz
+EV1DS 0.58 Hz
+EV1DSE 0.34 Hz
+EA 4.58 Hz
+IA 17.54 Hz
+IAL 5.58 Hz
+EA2 0.34 Hz
+IA2 1.44 Hz
+IA2L 1.99 Hz
+EMDOWN 0.36 Hz
+EMUP 0.36 Hz
+IM 1.9 Hz
+IML 2.57 Hz
+
+ax=plotPerf(actreward,yl=(0,0.6))
+savefig(gifpath()+'perf.png') # [[./gif/20dec30_20dec29_A0_gcp__step_2_perf.png]]
+
+lfn = ['20dec29_A0_gcp__step_' + str(i) + '_' for i in range(3)]
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0,0.5))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/20dec30_20dec29_A0_gcp__step_2_perf_all_steps_so_far.png]]
+not much improvement so far ... 
+
+lpda = getindivactionreward(lfn)
+csm=cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+lclr = [csm.to_rgba(float(i)/(len(lpda))) for i in range(len(lpda))]
+clf(); plotComparePerf(lpda,lclr,yl=(0,1),lleg=lfn,skipscore=True,skipfollow=True)
+savefig(gifpath()+'perf_compareD.png') # [[./gif/20dec30_20dec29_A0_gcp__step_2_perf_compareD.png]]
+
+clf(); drawraster(dspkT,dspkID); xlim((490e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/20dec30_20dec29_A0_gcp__step_2_rast.png]]
+
+clf(); pdfc = getconcatweightpdf(lfn)
+subplot(1,2,1); popwtsE = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP','EA','EA2'],lclr=['r','b','g','c'],plotindiv=False)
+subplot(1,2,2); popwtsI = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['IA','IM','IA2','IAL','IML','IA2L'],lclr=['r','b','g','c','m','y'],plotindiv=False)
+savefig(gifpath()+'all_steps_avg_weight.png') # [[./gif/20dec30_20dec29_A0_gcp__step_2_all_steps_avg_weight.png]]
+savefig(gifpath()+'all_steps_avg_weightB.png') # [[./gif/20dec30_20dec29_A0_gcp__step_2_all_steps_avg_weightB.png]]
+hmm, now the weights are all decreasing, so it's unlikely to work ... decreasing weights probably caused by equal reward/punish signal ... 
+
+clf(); subplot(2,1,1); 
+drawcellVm(simConfig,tlim=(490e3,500e3),ldrawpop=['EMDOWN','EMUP','EA','EA2'],lclr=['r','g','b','c'])
+subplot(2,1,2);
+drawcellVm(simConfig,tlim=(490e3,500e3),ldrawpop=['IA','IM','IA2','IAL','IML','IA2L'],lclr=['r','g','b','c','m','y'])
+savefig(gifpath()+'Vm.png') # [[./gif/20dec30_20dec29_A0_gcp__step_2_Vm.png]]
+
+binsz = 1000
+dnspk = {pop:getspikehist(dspkT[pop],dnumc[pop],binsz,totalDur) for pop in ['EMDOWN','EMUP','IM','IML']}
+for clr,pop in zip(['r','b','g','c'],['EMDOWN','EMUP','IM','IML']): plot(dnspk[pop][0],dnspk[pop][1],clr)
+xlim((0,totalDur)); ylim((0,10))
+
+savefig(gifpath()+'firing_rates.png') # [[./gif/20dec30_20dec29_A0_gcp__step_2_firing_rates.png]]
+
+fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
+[[./gif/20dec30_20dec29_A0_gcp__step_2__with_reward_input.mp4]]
+
+** readjust rewards (20dec30_A0_gcp_)
+
+cut the avoidTarget punishment value from -0.1 to -0.05
+
+python multistepSim.py sn.json 32 20 20dec30_A0_gcp_multi
+
+started ~10:45 ...
+
