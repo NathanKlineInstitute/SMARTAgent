@@ -24929,7 +24929,7 @@ python multistepSim.py sn.json 32 20 20dec28_D0_gcp_multi
 started ~23:30 ...
 
 * 20dec29
-** check output from 20dec28_D0_gcp__step_2_
+** check output from 20dec28_D0_gcp__step_2_ through 4 -->> improving but rates inc too much (interneurons stop keeping up) 
 
 python -i simdat.py backupcfg/20dec28_D0_gcp__step_2_sim.json
 
@@ -25054,4 +25054,91 @@ rates going up for E and I, but much higher for I ...
 
 can let one more step finish but probably should reduce the RLhebbwt for AMPAI (E->I)
 otherwise I will go into dep blockade and the circuit will malfunction ...
+
+python -i simdat.py backupcfg/20dec28_D0_gcp__step_4_sim.json
+
+EV1 0.02 Hz
+EV1DE 0.05 Hz
+EV1DNE 0.25 Hz
+EV1DN 0.55 Hz
+EV1DNW 0.16 Hz
+EV1DW 0.02 Hz
+EV1DSW 0.1 Hz
+EV1DS 0.61 Hz
+EV1DSE 0.28 Hz
+EA 11.29 Hz
+IA 95.21 Hz
+IAL 126.68 Hz
+EA2 8.9 Hz
+IA2 31.7 Hz
+IA2L 47.36 Hz
+EMDOWN 35.62 Hz
+EMUP 35.47 Hz
+IM 40.31 Hz
+IML 53.63 Hz
+
+rates have gotten too high for EM neurons ... and IM,IML are barely keeping up, probably
+due to depolarization blockade; so will have to adjust params and restart
+
+ax=plotPerf(actreward,yl=(0,3))
+savefig(gifpath()+'perf.png') # [[./gif/20dec29_20dec28_D0_gcp__step_4_perf.png]]
+
+lfn = ['20dec28_D0_gcp__step_' + str(i) + '_' for i in range(5)]
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0,0.5))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/20dec30_20dec28_D0_gcp__step_4_perf_all_steps_so_far.png]]
+
+lpda = getindivactionreward(lfn)
+csm=cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+lclr = [csm.to_rgba(float(i)/(len(lpda))) for i in range(len(lpda))]
+clf(); plotComparePerf(lpda,lclr,yl=(0,5),lleg=lfn)
+savefig(gifpath()+'perf_compareD.png') # [[./gif/20dec30_20dec28_D0_gcp__step_4_perf_compareD.png]]
+
+clf(); drawraster(dspkT,dspkID); xlim((490e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/20dec30_20dec28_D0_gcp__step_4_rast.png]]
+
+clf(); pdfc = getconcatweightpdf(lfn)
+subplot(1,2,1); popwtsE = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP','EA','EA2'],lclr=['r','b','g','c'],plotindiv=False)
+subplot(1,2,2); popwtsI = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['IA','IM','IA2','IAL','IML','IA2L'],lclr=['r','b','g','c','m','y'],plotindiv=False)
+savefig(gifpath()+'all_steps_avg_weight.png') # [[./gif/20dec30_20dec28_D0_gcp__step_4_all_steps_avg_weight.png]]
+
+clf(); subplot(2,1,1); 
+drawcellVm(simConfig,tlim=(490e3,500e3),ldrawpop=['EMDOWN','EMUP','EA','EA2'],lclr=['r','g','b','c'])
+subplot(2,1,2);
+drawcellVm(simConfig,tlim=(490e3,500e3),ldrawpop=['IA','IM','IA2','IAL','IML','IA2L'],lclr=['r','g','b','c','m','y'])
+savefig(gifpath()+'Vm.png') # [[./gif/20dec30_20dec28_D0_gcp__step_4_Vm.png]]
+
+fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
+[[./gif/20dec29_20dec28_D0_gcp__step_4__with_reward_input.mp4]]
+
+binsz = 1000
+dnspk = {pop:getspikehist(dspkT[pop],dnumc[pop],binsz,totalDur) for pop in ['EMDOWN','EMUP','IM','IML']}
+for clr,pop in zip(['r','b','g','c'],['EMDOWN','EMUP','IM','IML']): plot(dnspk[pop][0],dnspk[pop][1],clr)
+xlim((0,totalDur)); ylim((0,175))
+
+savefig(gifpath()+'firing_rates.png') # [[./gif/20dec29_20dec28_D0_gcp__step_4_firing_rates.png]]
+
+** next sim on gcp to fix problems of previous (20dec29_A0_gcp_)
+
+change reward codes to have more punishment...
+
+    "rewardcodes": {
+        "scorePoint": 0.0,
+        "losePoint": 0.0,
+        "followTarget": 0.1,
+        "avoidTarget": -0.1,
+        "hitBall": 1.0
+    },
+
+
+avoidTarget from -0.01 to -0.1
+since there's noise driving firing symmetric punishment might not suppress activity too much ... 
+
+reduce RLhebbwt for AMPAI to 0.0001 (that's AMPA to interneurons) and RLhebbwt for AMPA to 0.001 (that's AMPA to E neurons)
+also reduce wmax for AMPAI to 9 and wmax for AMPA to 4.5 ... even 4.5 is pretty high and probably would lead to epileptic
+activity, but will take a while to get there so can see how dynamics/perf progress meanwhile ... 
+
+python multistepSim.py sn.json 32 20 20dec29_A0_gcp_multi
+
+started ~22:23 ...
 
