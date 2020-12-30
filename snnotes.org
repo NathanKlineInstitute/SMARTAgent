@@ -25222,3 +25222,40 @@ python multistepSim.py sn.json 30 20 20dec30_B0_gcp_multi
 
 started ~11:28 ...
 
+python -i simdat.py backupcfg/20dec30_B0_gcp__step_0_sim.json
+
+EV1 0.02 Hz
+EV1DE 0.04 Hz
+EV1DNE 0.32 Hz
+EV1DN 0.61 Hz
+EV1DNW 0.08 Hz
+EV1DW 0.0 Hz
+EV1DSW 0.09 Hz
+EV1DS 0.62 Hz
+EV1DSE 0.44 Hz
+EA 4.55 Hz
+IA 17.35 Hz
+IAL 5.8 Hz
+EA2 0.34 Hz
+IA2 1.43 Hz
+IA2L 1.99 Hz
+EMDOWN 0.36 Hz
+EMUP 0.36 Hz
+IM 1.9 Hz
+IML 2.58 Hz
+
+ax=plotPerf(actreward,yl=(0,0.6))
+savefig(gifpath()+'perf.png') # [[./gif/20dec30_20dec30_B0_gcp__step_0_perf.png]]
+
+clf(); drawraster(dspkT,dspkID); xlim((490e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/20dec30_20dec30_B0_gcp__step_0_rast.png]]
+
+subplot(1,2,1); popwtsE = plotMeanWeights(pdf,gca(),msz=6,xl=(0,np.amax(pdf.time)),lpop=['EMDOWN','EMUP','EA','EA2'],lclr=['r','b','g','c'],plotindiv=False)
+subplot(1,2,2); popwtsI = plotMeanWeights(pdf,gca(),msz=6,xl=(0,np.amax(pdf.time)),lpop=['IA','IM','IA2','IAL','IML','IA2L'],lclr=['r','b','g','c','m','y'],plotindiv=False)
+savefig(gifpath()+'avg_weight.png') # [[./gif/20dec30_20dec30_B0_gcp__step_0_avg_weight.png]]
+weights are now going (slowly)
+savefig(gifpath()+'avg_weightB.png') # [[./gif/20dec30_20dec30_B0_gcp__step_0_avg_weightB.png]]
+
+fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
+[[./gif/20dec30_20dec30_B0_gcp__step_0__with_reward_input.mp4]]
+
