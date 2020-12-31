@@ -329,8 +329,8 @@ def readSTDPParams ():
     dSTDPparams[sy] = dconf['STDP'][sy]
     for k in dSTDPparams[sy].keys():
       if k.count('wt') or k.count('wbase') or k.count('wmax'): dSTDPparams[sy][k] *= gain
-  dSTDPparamsRL['AM2']=dSTDPparamsRL['AMPA']; dSTDPparamsRL['NM2']=dSTDPparamsRL['AMPA']
-  dSTDPparams['AM2']=dSTDPparams['AMPA']; dSTDPparams['NM2']=dSTDPparams['AMPA']    
+  dSTDPparamsRL['AM2']=dSTDPparamsRL['AMPA']; dSTDPparamsRL['NM2']=dSTDPparamsRL['NMDA']
+  dSTDPparams['AM2']=dSTDPparams['AMPA']; dSTDPparams['NM2']=dSTDPparams['NMDA']    
   return dSTDPparamsRL, dSTDPparams
   
 dSTDPparamsRL, dSTDPparams = readSTDPParams()
@@ -601,10 +601,10 @@ for prety in EMotorPops:
       if sy.count('AM') > 0:
         if dconf['net']['RLconns']['EIPlast'] and dSTDPparamsRL['AMPAI']['RLon']: # only turn on plasticity when specified to do so
           netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL['AMPAI']}
-          netParams.connParams[k]['weight'] = getInitWeight(cmat['EM']['IM']['AM2'] * cfg.EIGain)
+          netParams.connParams[k]['weight'] = getInitWeight(cmat['EM'][poty]['AM2'] * cfg.EIGain)
         elif dconf['net']['STDPconns']['EIPlast'] and dSTDPparams['AMPAI']['STDPon']:
           netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparams['AMPAI']}
-          netParams.connParams[k]['weight'] = getInitWeight(cmat['EM']['IM']['AM2'] * cfg.EIGain)    
+          netParams.connParams[k]['weight'] = getInitWeight(cmat['EM'][poty]['AM2'] * cfg.EIGain)    
    
 # reciprocal inhibition - only active when all relevant populations created - not usually used
 for prety in EMotorPops:
@@ -1180,7 +1180,7 @@ def sumAdjustableWeightsPop (sim, popname):
   
 def recordAdjustableWeightsPop (sim, t, popname):
   # record the plastic weights for specified popname
-  lcell = [c for c in sim.net.cells if c.gid in sim.net.pops[popname].cellGids] # this is the set of MR cells
+  lcell = [c for c in sim.net.cells if c.gid in sim.net.pops[popname].cellGids] # this is the set of popname cells
   for cell in lcell:
     for conn in cell.conns:
       if 'hSTDP' in conn:
@@ -1838,7 +1838,7 @@ def updateSTDPWeights (sim, W):
       for idx in cConnW.index:
         cW = cConnW.at[idx,'weight']
         conn['hObj'].weight[PlastWeightIndex] = cW
-        hSTDP = conn.get('hSTDP')
+        #hSTDP = conn.get('hSTDP')
         #hSTDP.cumreward = cConnW.at[idx,'cumreward']
         if dconf['verbose'] > 1: print('weight updated:', cW)
         
@@ -1847,9 +1847,9 @@ if dconf['simtype']['ResumeSim']:
   try:
     from simdat import readweightsfile2pdf
     A = readweightsfile2pdf(dconf['simtype']['ResumeSimFromFile'])
-    updateSTDPWeights(sim, A[A.time == max(A.time)]) # take the latest weights saved
-    if sim.rank==0: print('Updated STDP weights')
+    updateSTDPWeights(sim, A[A.time == max(A.time)]) # take the latest weights saved    
     sim.pc.barrier() # wait for other nodes
+    if sim.rank==0: print('Updated STDP weights')    
     if 'normalizeWeightsAtStart' in dconf['sim']:
       if dconf['sim']['normalizeWeightsAtStart']:
         normalizeAdjustableWeights(sim, 0, lrecpop)
