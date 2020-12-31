@@ -25325,7 +25325,59 @@ savefig(gifpath()+'firing_rates.png') # [[./gif/20dec31_20dec30_B0_gcp__step_5_f
 fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
 [[./gif/20dec31_20dec30_B0_gcp__step_5__with_reward_input.mp4]]
 
-** check output from 20dec30_A0_gcp__step_1_
+python -i simdat.py backupcfg/20dec30_B0_gcp__step_6_sim.json
+
+EV1 0.02 Hz
+EV1DE 0.1 Hz
+EV1DNE 0.32 Hz
+EV1DN 0.49 Hz
+EV1DNW 0.13 Hz
+EV1DW 0.02 Hz
+EV1DSW 0.1 Hz
+EV1DS 0.51 Hz
+EV1DSE 0.47 Hz
+EA 4.39 Hz
+IA 16.85 Hz
+IAL 5.6 Hz
+EA2 0.34 Hz
+IA2 1.44 Hz
+IA2L 2.0 Hz
+EMDOWN 0.36 Hz
+EMUP 0.35 Hz
+IM 1.91 Hz
+IML 2.58 Hz
+
+rates similar ... 
+
+ax=plotPerf(actreward,yl=(0,0.7))
+savefig(gifpath()+'perf.png') # [[./gif/20dec31_20dec30_B0_gcp__step_6_perf.png]]
+
+perf looks better ... ? 
+
+lfn = ['20dec30_B0_gcp__step_' + str(i) + '_' for i in range(7)]
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0,1.25))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/20dec31_20dec30_B0_gcp__step_6_perf_all_steps_so_far.png]]
+
+lpda = getindivactionreward(lfn)
+csm=cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+lclr = [csm.to_rgba(float(i)/(len(lpda))) for i in range(len(lpda))]
+clf(); plotComparePerf(lpda,lclr,yl=(0,1),lleg=lfn,skipscore=True,skipfollow=True)
+savefig(gifpath()+'perf_compareD.png') # [[./gif/20dec31_20dec30_B0_gcp__step_6_perf_compareD.png]]
+
+similar to first step ... 
+
+
+clf(); pdfc = getconcatweightpdf(lfn)
+subplot(1,2,1); popwtsE = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP','EA','EA2'],lclr=['r','b','g','c'],plotindiv=False)
+subplot(1,2,2); popwtsI = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['IA','IM','IA2','IAL','IML','IA2L'],lclr=['r','b','g','c','m','y'],plotindiv=False)
+savefig(gifpath()+'all_steps_avg_weight.png') # [[./gif/20dec31_20dec30_B0_gcp__step_6_all_steps_avg_weight.png]]
+weights still rising 
+
+fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
+[[./gif/20dec31_20dec30_B0_gcp__step_6__with_reward_input.mp4]]
+
+** check output from 20dec30_A0_gcp__step_1_ and step 2
 
 python -i simdat.py backupcfg/20dec30_A0_gcp__step_1_sim.json
 
@@ -25391,4 +25443,111 @@ savefig(gifpath()+'firing_rates.png') # [[./gif/20dec31_20dec30_A0_gcp__step_1_f
 
 fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
 [[./gif/20dec31_20dec30_A0_gcp__step_1__with_reward_input.mp4]]
+
+python -i simdat.py backupcfg/20dec30_A0_gcp__step_2_sim.json
+
+EV1 0.02 Hz
+EV1DE 0.12 Hz
+EV1DNE 0.27 Hz
+EV1DN 0.5 Hz
+EV1DNW 0.21 Hz
+EV1DW 0.03 Hz
+EV1DSW 0.16 Hz
+EV1DS 0.52 Hz
+EV1DSE 0.38 Hz
+EA 4.54 Hz
+IA 17.8 Hz
+IAL 5.87 Hz
+EA2 0.36 Hz
+IA2 1.46 Hz
+IA2L 2.02 Hz
+EMDOWN 0.38 Hz
+EMUP 0.38 Hz
+IM 2.0 Hz
+IML 2.65 Hz
+
+rates barely changed ... 
+
+ax=plotPerf(actreward,yl=(0,0.75))
+savefig(gifpath()+'perf.png') # [[./gif/20dec31_20dec30_A0_gcp__step_2_perf.png]]
+
+lfn = ['20dec30_A0_gcp__step_' + str(i) + '_' for i in range(3)]
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0,0.6))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/20dec31_20dec30_A0_gcp__step_2_perf_all_steps_so_far.png]]
+
+improving??
+
+lpda = getindivactionreward(lfn)
+csm=cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+lclr = [csm.to_rgba(float(i)/(len(lpda))) for i in range(len(lpda))]
+clf(); plotComparePerf(lpda,lclr,yl=(0,1),lleg=lfn,skipscore=True,skipfollow=True)
+savefig(gifpath()+'perf_compareD.png') # [[./gif/20dec31_20dec30_A0_gcp__step_2_perf_compareD.png]]
+
+does seem to have improved a little ... 
+
+clf(); pdfc = getconcatweightpdf(lfn)
+subplot(1,2,1); popwtsE = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP','EA','EA2'],lclr=['r','b','g','c'],plotindiv=False)
+subplot(1,2,2); popwtsI = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['IA','IM','IA2','IAL','IML','IA2L'],lclr=['r','b','g','c','m','y'],plotindiv=False)
+savefig(gifpath()+'all_steps_avg_weight.png') # [[./gif/20dec31_20dec30_A0_gcp__step_2_all_steps_avg_weight.png]]
+weights rising ... (had deleted files from server so that's why first 1000 s not shown)
+
+binsz = 1000
+dnspk = {pop:getspikehist(dspkT[pop],dnumc[pop],binsz,totalDur) for pop in ['EMDOWN','EMUP','IM','IML']}
+for clr,pop in zip(['r','b','g','c'],['EMDOWN','EMUP','IM','IML']): plot(dnspk[pop][0],dnspk[pop][1],clr)
+xlim((0,totalDur)); ylim((0,8))
+
+savefig(gifpath()+'firing_rates.png') # [[./gif/20dec31_20dec30_A0_gcp__step_2_firing_rates.png]]
+
+fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
+[[./gif/20dec31_20dec30_A0_gcp__step_2__with_reward_input.mp4]]
+
+** new (optional) rule to allow both targetted and non-targetted RL at same time (targettedRL == 4)
+
+same rule as targettedRL == 3 but also when using this rule allow RL at non EM synapses with a discount factor (targettedRLDscntFctr)
+and the opposite motor population still uses minus targettedRLOppFctr
+
+** next sim on gcp (targettedRL==4; targetted with non-targetted combined) 20dec31_TARG4_gcp_
+
+        "targettedRL": 4,
+	"targettedRLOppFctr": 0.5,
+	"targettedRLDscntFctr": 0.5,	
+
+have these reward codes:
+        "followTarget": 0.1,
+        "avoidTarget": -0.01,
+        "hitBall": 1.0
+
+have the EA back to 1400 ... 
+            "EA": 1400,
+            "IA": 481,
+	    "IAL": 219,
+
+and the noise on ... 
+
+AMPA and AMPAI RLhebbwt are still small ... 
+
+python multistepSim.py sn.json 30 20 20dec31_TARG4_gcp_multi
+
+started ~16:27 ...
+
+** next sim on gcp (targettedRL==0; non-targetted) 20dec31_TARG0_gcp_
+
+        "targettedRL": 0,
+
+have these reward codes:
+        "followTarget": 0.1,
+        "avoidTarget": -0.01,
+        "hitBall": 1.0
+
+have the EA back to 1400 ... 
+            "EA": 1400,
+            "IA": 481,
+	    "IAL": 219,
+
+and the noise on ... 
+
+AMPA and AMPAI RLhebbwt are still small ... 
+
+python multistepSim.py sn.json 30 20 20dec31_TARG0_gcp_multi
 

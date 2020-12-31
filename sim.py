@@ -1702,19 +1702,27 @@ def trainAgent (t):
         if UPactions==DOWNactions and \
            sum(F_UPs)>0 and sum(F_DOWNs)>0: # same number of actions/spikes -> stay; only apply critic when > 0 spikes
           if dconf['verbose']: print('APPLY RL to both EMUP and EMDOWN')
-          for STDPmech in dSTDPmech['all']: STDPmech.reward_punish(float(critic))          
+          if dconf['sim']['targettedRL']>=4:
+            for STDPmech in dSTDPmech['EM']: STDPmech.reward_punish(float(critic)) # EM populations get reward/punishment on a tie            
+            for STDPmech in dSTDPmech['nonEM']: STDPmech.reward_punish(float(dconf['sim']['targettedRLDscntFctr']*critic)) # but non-EM get less than EM
+          else: # usual targetted RL (==1 or ==3)
+            for STDPmech in dSTDPmech['all']: STDPmech.reward_punish(float(critic))          
         elif UPactions>DOWNactions: # UP WINS vs DOWN
           if dconf['verbose']: print('APPLY RL to EMUP')
           for STDPmech in dSTDPmech['EMUP']: STDPmech.reward_punish(float(critic))
-          if dconf['sim']['targettedRL']==3 and sum(F_DOWNs)>0: # opposite to pop that did not contribute
+          if dconf['sim']['targettedRL']>=3 and sum(F_DOWNs)>0: # opposite to pop that did not contribute
             if dconf['verbose']: print('APPLY -RL to EMDOWN')
             for STDPmech in dSTDPmech['EMDOWN']: STDPmech.reward_punish(float(-dconf['sim']['targettedRLOppFctr']*critic))
+          if dconf['sim']['targettedRL']>=4: # apply to non-EM with a discount factor
+            for STDPmech in dSTDPmech['nonEM']: STDPmech.reward_punish(float(dconf['sim']['targettedRLDscntFctr']*critic))
         elif DOWNactions>UPactions: # DOWN WINS vs UP
           if dconf['verbose']: print('APPLY RL to EMDOWN')
           for STDPmech in dSTDPmech['EMDOWN']: STDPmech.reward_punish(float(critic))
-          if dconf['sim']['targettedRL']==3 and sum(F_UPs)>0: # opposite to pop that did not contribute
+          if dconf['sim']['targettedRL']>=3 and sum(F_UPs)>0: # opposite to pop that did not contribute
             if dconf['verbose']: print('APPLY -RL to EMUP')            
             for STDPmech in dSTDPmech['EMUP']: STDPmech.reward_punish(float(-dconf['sim']['targettedRLOppFctr']*critic))
+          if dconf['sim']['targettedRL']>=4: # apply to non-EM with a discount factor
+            for STDPmech in dSTDPmech['nonEM']: STDPmech.reward_punish(float(dconf['sim']['targettedRLDscntFctr']*critic))            
       else:
         if dconf['verbose']: print('APPLY RL to both EMUP and EMDOWN')
         for STDPmech in dSTDPmech['all']: STDPmech.reward_punish(critic)
@@ -1757,21 +1765,31 @@ def getAllSTDPObjects (sim):
   Mpops = ['EMUP', 'EMDOWN']  
   dSTDPmech = {'all':[]} # dictionary of STDP objects keyed by type (all, for EMUP, EMDOWN populations)
   for pop in Mpops: dSTDPmech[pop] = []
-  if dconf['sim']['targettedRL']: dcell = {pop:[] for pop in Mpops} # SN: exptl  
+  if dconf['sim']['targettedRL']:
+    # dcell = {pop:[] for pop in Mpops} # SN: exptl
+    if dconf['sim']['targettedRL']>=4:
+      dSTDPmech['nonEM'] = [] # not post-synapse of an EM neuron (only used for targetted RL when RL plasticity at non-EM neurons)
+      dSTDPmech['EM'] = [] # post-synapse of an EM neuron (EMDOWN or EMUP, etc.)
   for cell in sim.net.cells:
     #if cell.gid in sim.net.pops['EMDOWN'].cellGids and cell.gid==sim.simData['dminID']['EMDOWN']: print(cell.conns)
     for conn in cell.conns:
       STDPmech = conn.get('hSTDP')  # check if the connection has a NEURON STDP mechanism object
       if STDPmech:
         dSTDPmech['all'].append(STDPmech)
+        isEM = False
         for pop in Mpops:
           if cell.gid in sim.net.pops[pop].cellGids:
             dSTDPmech[pop].append(STDPmech)
-            if dconf['sim']['targettedRL']: dcell[pop].append(conn.preGid) # SN: exptl presynaptic ID
+            isEM = True
+            if dconf['sim']['targettedRL']>=4: dSTDPmech['EM'].append(STDPmech) # any EM
+            # if dconf['sim']['targettedRL']: dcell[pop].append(conn.preGid) # SN: exptl presynaptic ID
+        if dconf['sim']['targettedRL']>=4:
+          if not isEM: dSTDPmech['nonEM'].append(STDPmech)
   # SN: exptl
   #if 'hSTDP' not in conn: continue
   #cpreID = conn.preGid  #find preID
   #if type(cpreID) != int: continue
+  """
   if dconf['sim']['targettedRL'] > 1:
     for pop in Mpops: dcell[pop] = np.unique(dcell[pop])
     nhost = sim.pc.nhost()
@@ -1786,6 +1804,7 @@ def getAllSTDPObjects (sim):
               if STDPmech:
                 if STDPmech not in dSTDPmech[pop]:
                   dSTDPmech[pop].append(STDPmech)
+  """
   # SN: exptl
   return dSTDPmech
         
