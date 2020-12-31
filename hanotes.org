@@ -11915,3 +11915,257 @@ python multistepSim.py sim.json 20 5 20dec27_A0_cycle_multi
 ... this is still the previous model... Sam has a new model with more types of synapses.
 
 -- adapting sim.json and simFull.json for new model......
+
+
+cp simFull.json simFull_backup.json 
+cp sim.json sim_backup.json
+
+-- create a new file simReduced.py to be used with simReduced.json..... this is for reduced model.
+... this doesnt seem to be an easy fix. looks more confusing.....
+
+-- i will keep working with sim.py.
+-- and 2 model parameter files. simFull.json (for full model) and simReduced.json (for reduced model).
+
+* 20dec29 
+
+-- sam found a couple of bugs in the new model and he fixed last night.
+
+-- i will start again modifying my scripts with goals:
+1. Should be able to run sim.py using simReduced.json where simReduced.json should reproduce results as with model before dec 25.
+2. Should be able to run sim.py using simFull.py where simFull.py is based on sn.json on dec29.
+3. shoule be able to extend reduced model in sim.json.
+
+-- sim.json -- still same file as i used to run reducedModel on cycle.
+
+-- updated simFull.json based on (exactly same as) sn.json.
+
+-- copied sn.json into simReduced.json and started modifying for reduced model.
+set w for all noise to 0.
+copied RL params from sim.json to simReduced.json
+copied STDP params from sim.json to simReduced.json + for AMPAI remained same as in sn.json.
+
+unclear:
+before i was using
+
+    "delayMin": 2,
+    "delayMax": 5,
+
+and now sam is using
+
+        "delayMinSoma": 1.8,
+        "delayMaxSoma": 2.2,	
+        "delayMinDend": 3,
+        "delayMaxDend": 5
+
+WHAT DOES THIS MEAN?
+
+Adjust INTF7E as
+
+  dparam = {"ahpwt":1,
+            "tauahp":400,
+            "RMP": -65,
+            "VTH": -40,
+            "refrac":  5,
+            "Vblock": -25,
+            "tauAM": 5.5,
+            "tauNM": 166,
+            "tauGA": 10,
+            "tauGA2": 20,
+            "tauAM2": 20,
+            "tauNM2": 166,
+            "tauRR": 1,
+            "RRWght": 0.25}  
+
+
+
+Adjust INTF7I as
+
+  dparam = {"ahpwt":0.5,
+            "tauahp":50,
+            "RMP": -63,
+            "VTH": -40,
+            "refrac":  2.5,
+            "Vblock": -10,
+            "tauAM": 5.5,
+            "tauNM": 166,
+            "tauGA": 10,
+            "tauGA2": 20,
+            "tauAM2": 20,
+            "tauNM2": 166,            
+            "tauRR": 1,
+            "RRWght": 0.25}    
+
+
+updated cmat:
+before was using AM and now AM2... so WHAT IS THE DIFFERENCE BETWEEN AM AND AM2?
+only active syns are
+VL -> EA {"AM2": 12,"NM2": 0.36, "conv": 0}
+VD -> EA {"AM2": 12,"NM2": 0.36, "conv": 0}
+EA -> EM {"AM2": 7.5,"NM2": 0.001, "p": 0.2}
+EM -> IM {"AM2": 10,"NM2":0,"p": 0.125}
+IM - > EM {"GA": 5.0, "p":0.25}
+
+
+
+-- analyzing reduced model using sim.json and old model.
+
+(base) hanwar@cycle:~/GamesProject/SMARTAgent$ python -i simdat.py backupcfg/20dec27_B0_cycle_reduced_2obj_INTF7__step_0_sim.json 
+reading  backupcfg/20dec27_B0_cycle_reduced_2obj_INTF7__step_0_sim.json
+-1
+lpop:  ['EV1', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW', 'EV1DSW', 'EV1DS', 'EV1DSE', 'EMDOWN', 'EMUP', 'IM']
+loading data from 20dec27_B0_cycle_reduced_2obj_INTF7__step_0_
+loading input images from data/20dec27_B0_cycle_reduced_2obj_INTF7__step_0_InputImages.txt
+loaded simulation data 20dec27_B0_cycle_reduced_2obj_INTF7__step_0_ on 20dec29_
+EV1 10.32 Hz
+EV1DE 2.84 Hz
+EV1DNE 23.65 Hz
+EV1DN 9.43 Hz
+EV1DNW 11.14 Hz
+EV1DW 0.96 Hz
+EV1DSW 7.84 Hz
+EV1DS 10.08 Hz
+EV1DSE 25.45 Hz
+EA 0.26 Hz
+EMDOWN 3.75 Hz
+EMUP 3.7 Hz
+IM 24.07 Hz
+
+>>> lfn = ['20dec27_B0_cycle_reduced_2obj_INTF7__step_0_','20dec27_B0_cycle_reduced_2obj_INTF7__step_1_','20dec27_B0_cycle_reduced_2obj_INTF7__step_2_','20dec27_B0_cycle_reduced_2obj_INTF7__step_3_','20dec27_B0_cycle_reduced_2obj_INTF7__step_4_']
+>>> pdac = getconcatactionreward(lfn)
+>>> plotPerf(pdac)
+
+saved as 20dec29_20dec27_B0_reduced_RL3_Perf.png
+
+
+lpda = getindivactionreward(lfn)
+
+>>> csm = cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+>>> lclr = [csm.to_rgba(float(i)/len(lpda)) for i in range(len(lpda))]
+>>> plotComparePerf(lpda,lclr,yl=(0,2),lleg=lfn)
+
+saved as 20dec29_20dec27_B0_reduced_RL3_comparePerf.png
+
+resume 5 more steps....
+
+cp backupcfg/20dec27_B0_cycle_reduced_2obj_INTF7__step_0_sim.json sim.json
+nano sim.json
+  "simtype": {
+    "ResumeSim": 1,
+    "ResumeSimFromFile": "data/20dec27_B0_cycle_reduced_2obj_INTF7__step_4_synWeights_final.pkl"
+  },
+
+"name": "20dec30_B0_cycle_reduced_2obj_INTF7_",
+
+ python multistepSim.py sim.json 20 5 20dec30_B0_cycle_multi
+------------------------------------------------
+
+(base) hanwar@cycle:~/GamesProject/SMARTAgent$ python -i simdat.py backupcfg/20dec27_D0_cycle_reduced_2obj_INTF7__step_0_sim.json 
+reading  backupcfg/20dec27_D0_cycle_reduced_2obj_INTF7__step_0_sim.json
+-1
+lpop:  ['EV1', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW', 'EV1DSW', 'EV1DS', 'EV1DSE', 'EMDOWN', 'EMUP', 'IM']
+loading data from 20dec27_D0_cycle_reduced_2obj_INTF7__step_0_
+loading input images from data/20dec27_D0_cycle_reduced_2obj_INTF7__step_0_InputImages.txt
+loaded simulation data 20dec27_D0_cycle_reduced_2obj_INTF7__step_0_ on 20dec29_
+EV1 10.29 Hz
+EV1DE 2.87 Hz
+EV1DNE 25.73 Hz
+EV1DN 7.28 Hz
+EV1DNW 10.24 Hz
+EV1DW 0.55 Hz
+EV1DSW 5.7 Hz
+EV1DS 8.82 Hz
+EV1DSE 28.79 Hz
+EA 0.25 Hz
+EMDOWN 3.19 Hz
+EMUP 3.16 Hz
+IM 23.03 Hz
+
+>>> lfn = ['20dec27_D0_cycle_reduced_2obj_INTF7__step_0_','20dec27_D0_cycle_reduced_2obj_INTF7__step_1_','20dec27_D0_cycle_reduced_2obj_INTF7__step_2_','20dec27_D0_cycle_reduced_2obj_INTF7__step_3_','20dec27_D0_cycle_reduced_2obj_INTF7__step_4_']
+>>> pdac = getconcatactionreward(lfn)
+>>> lpda = getindivactionreward(lfn)
+>>> csm = cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+>>> lclr = [csm.to_rgba(float(i)/len(lpda)) for i in range(len(lpda))]
+>>> plotComparePerf(lpda,lclr,yl=(0,2),lleg=lfn)
+
+saved as 20dec29_20dec27_D0_reduced_RL1_comparePerf.png
+
+>>> plotPerf(pdac)
+
+saved as 20dec29_20dec27_D0_reduced_RL1_Perf.png
+
+>>> pdfc = getconcatweightpdf(lfn)
+>>> plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False)
+saved as 20dec29_20dec27_D0_reduced_RL1_meanWeights.png
+
+resume 5 more steps....
+
+cp backupcfg/20dec27_D0_cycle_reduced_2obj_INTF7__step_0_sim.json sim.json
+nano sim.json
+  "simtype": {
+    "ResumeSim": 1,
+    "ResumeSimFromFile": "data/20dec27_D0_cycle_reduced_2obj_INTF7__step_4_synWeights_final.pkl"
+  },
+
+ "name": "20dec30_D0_cycle_reduced_2obj_INTF7_",
+
+ python multistepSim.py sim.json 20 5 20dec30_D0_cycle_multi
+
+---------------------------------------------------------------
+(base) hanwar@cycle:~/GamesProject/SMARTAgent$ python -i simdat.py backupcfg/20dec27_A0_cycle_reduced_2obj_INTF7__step_0_sim.json 
+reading  backupcfg/20dec27_A0_cycle_reduced_2obj_INTF7__step_0_sim.json
+-1
+lpop:  ['EV1', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW', 'EV1DSW', 'EV1DS', 'EV1DSE', 'EMDOWN', 'EMUP', 'IM']
+loading data from 20dec27_A0_cycle_reduced_2obj_INTF7__step_0_
+loading input images from data/20dec27_A0_cycle_reduced_2obj_INTF7__step_0_InputImages.txt
+loaded simulation data 20dec27_A0_cycle_reduced_2obj_INTF7__step_0_ on 20dec30_
+EV1 10.3 Hz
+EV1DE 3.39 Hz
+EV1DNE 26.43 Hz
+EV1DN 6.82 Hz
+EV1DNW 10.29 Hz
+EV1DW 0.59 Hz
+EV1DSW 5.16 Hz
+EV1DS 7.58 Hz
+EV1DSE 29.84 Hz
+EA 0.25 Hz
+EMDOWN 3.75 Hz
+EMUP 3.73 Hz
+IM 23.92 Hz
+
+>>> lfn = ['20dec27_A0_cycle_reduced_2obj_INTF7__step_0_','20dec27_A0_cycle_reduced_2obj_INTF7__step_1_','20dec27_A0_cycle_reduced_2obj_INTF7__step_2_','20dec27_A0_cycle_reduced_2obj_INTF7__step_3_','20dec27_A0_cycle_reduced_2obj_INTF7__step_4_']
+>>> pdac = getconcatactionreward(lfn)
+
+
+>>> lpda = getindivactionreward(lfn)
+>>> csm = cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+>>> lclr = [csm.to_rgba(float(i)/len(lpda)) for i in range(len(lpda))]
+>>> plotComparePerf(lpda,lclr,yl=(0,2),lleg=lfn)
+saved as 20dec29_20dec27_A0_reduced_RL0_comparePerf.png
+
+>>> pdfc = getconcatweightpdf(lfn)
+>>> plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False)
+saved as 20dec29_20dec27_A0_reduced_RL0_meanWeights.png
+
+resume 5 more steps....
+
+cp backupcfg/20dec27_A0_cycle_reduced_2obj_INTF7__step_0_sim.json sim.json
+nano sim.json
+
+  "simtype": {
+    "ResumeSim": 1,
+    "ResumeSimFromFile": "data/20dec27_A0_cycle_reduced_2obj_INTF7__step_4_synWeights_final.pkl"
+  },
+
+ "name": "20dec30_A0_cycle_reduced_2obj_INTF7_",
+
+ python multistepSim.py sim.json 20 5 20dec30_A0_cycle_multi
+
+ ---------------------------------
+
+ -- analyzing full model using simFull.json and old model.
+
+ resumed from data/20dec24_A8long_full_falcor_synWeights_final.pkl
+
+could not save the output... segmentation fault.
+
+rerunning the sim.
