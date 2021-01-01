@@ -25553,3 +25553,17 @@ python multistepSim.py sn.json 30 20 20dec31_TARG0_gcp_multi
 
 started ~16:29 ...
 
+** compare targ4 and targ0
+
+python -i simdat.py backupcfg/20dec31_TARG4_gcp__step_0_sim.json
+
+lfn = ['20dec31_TARG4_gcp__step_0_', '20dec31_TARG0_gcp__step_0_']
+lpda = getindivactionreward(lfn)
+csm=cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+lclr = [csm.to_rgba(float(i)/(len(lpda))) for i in range(len(lpda))]
+clf(); plotComparePerf(lpda,lclr,yl=(0,1),lleg=lfn,skipscore=True,skipfollow=True)
+savefig(gifpath()+'perf_compareT0T4.png') # [[./gif/21jan1_20dec31_TARG4_gcp__step_0_perf_compareT0T4.png]]
+
+targ4 doing better than targ0
+will targ4 do better than targ3?
+
