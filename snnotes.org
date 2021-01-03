@@ -25672,5 +25672,15 @@ subplot(1,2,1); popwtsE = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.ti
 subplot(1,2,2); popwtsI = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['IA','IM','IA2','IAL','IML','IA2L'],lclr=['r','b','g','c','m','y'],plotindiv=False)
 savefig(gifpath()+'all_steps_avg_weight.png') # [[./gif/21jan3_20dec31_TARG4_gcp__step_6_all_steps_avg_weight.png]]
 
-** next sim on gcp
+** next sims on gcp -- higher conv
+
+conv onto EA is probably too low - only 22 ... previously had ~10% from VL -> EA and same for VD -> EA
+
+ok, increasing conv onto EA, EM, EA2, while reducing the weights, and retrying the two sets (targettedRL==0, targettedRL==4)
+
+also have lower RLhebbwt for EIPlast compared to E->E... 
+
+21jan2_TARG0_gcp_
+
+python multistepSim.py sn.json 30 20 21jan2_TARG0_gcp_multi
 
