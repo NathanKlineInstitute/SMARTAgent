@@ -25684,3 +25684,13 @@ also have lower RLhebbwt for EIPlast compared to E->E...
 
 python multistepSim.py sn.json 30 20 21jan2_TARG0_gcp_multi
 
+started ~23:08 ...
+
+and another with the targettedRL==4
+
+21jan2_TARG4_gcp_
+
+python multistepSim.py sn.json 30 20 21jan2_TARG4_gcp_multi
+
+started ~23:09 ...
+
