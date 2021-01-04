@@ -12169,3 +12169,66 @@ nano sim.json
 could not save the output... segmentation fault.
 
 rerunning the sim.
+
+
+-----
+
+cleaning disk space from cycle
+
+20dec07_A0_cycle_reduced_2obj_INTF7_Perf.png .... not good so remove data associated with it.
+20dec08_A0_cycle_reduced_2obj_INTF7_Perf.png .... not good so remove data associated with it.
+20dec09_A0_cycle_reduced_2obj_INTF7_Perf.png .... not good so remove data associated with it.
+
+20dec09_A1_falcor_reduced_2obj_INTF7_ looks good.... look at the perf plot.
+20dec11_A0_cycle_reduced_2obj_INTF7_ 0 to 9 steps look good.....
+
+
+remove data associated with 20dec16_A0_cycle_reduced_2obj_INTF7_
+
+
+---------
+
+best to plot all and then remove if not good.....
+
+python -i simdat.py backupcfg/20dec09_A1_cycle_reduced_2obj_INTF7__step_0_sim.json
+
+rm data/20dec09_A1_cycle_reduced_2obj_INTF7__step_*
+
+
+GOOD SIMS:
+
+"20dec11_A0_cycle_reduced_2obj_INTF7_comparePerf_step0to9.png"
+"20dec11_A0_cycle_reduced_2obj_INTF7_Perf_step0to9.png"
+
+"20dec15_A0_cycle_reduced_2obj_INTF7_Perf_step0to4.png"
+"20dec15_A0_cycle_reduced_2obj_INTF7_comparePerf_step0to4.png"
+
+
+... finally i decided to delete *MotionFields.pkl 
+
+-- did more steps increased the performance?
+
+sims were stopped while running STEP2
+
+^C(base) hanwar@cycle:~/GamesProject/SMARTAgentls backupcfg/20dec30_*
+backupcfg/20dec30_A0_cycle_reduced_2obj_INTF7__step_0_sim.json  backupcfg/20dec30_B0_cycle_reduced_2obj_INTF7__step_1_sim.json
+backupcfg/20dec30_A0_cycle_reduced_2obj_INTF7__step_1_sim.json  backupcfg/20dec30_B0_cycle_reduced_2obj_INTF7__step_2_sim.json
+backupcfg/20dec30_A0_cycle_reduced_2obj_INTF7__step_2_sim.json  backupcfg/20dec30_D0_cycle_reduced_2obj_INTF7__step_0_sim.json
+backupcfg/20dec30_A0_cycle_reduced_2obj_INTF7__step_3_sim.json  backupcfg/20dec30_D0_cycle_reduced_2obj_INTF7__step_1_sim.json
+backupcfg/20dec30_B0_cycle_reduced_2obj_INTF7__step_0_sim.json  backupcfg/20dec30_D0_cycle_reduced_2obj_INTF7__step_2_sim.json
+
+only step0 and step1 are working......
+
+do i need to run more? or should i do controls for now.
+
+>>> lfn = ['20dec27_D0_cycle_reduced_2obj_INTF7__step_0_','20dec27_D0_cycle_reduced_2obj_INTF7__step_1_','20dec27_D0_cycle_reduced_2obj_INTF7__step_2_','20dec27_D0_cycle_reduced_2obj_INTF7__step_3_','20dec27_D0_cycle_reduced_2obj_INTF7__step_4_','20dec30_D0_cycle_reduced_2obj_INTF7__step_0_']
+>>> pdac = getconcatactionreward(lfn)
+>>> lpda = getindivactionreward(lfn)
+>>> pdfc = getconcatweightpdf(lfn)
+
+it may go up if i keep running....
+
+
+... restarted multistep sims that were terminated over weekend.
+
+... also restarted sims on falcor 
