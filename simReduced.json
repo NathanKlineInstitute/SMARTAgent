@@ -572,7 +572,7 @@
         "AMPAI": {
             "wbase": 0.0,
             "wmax": 0.1,
-            "RLon": 1,
+            "RLon": 0,
             "STDPon": 0,
             "RLlenhebb": 2000,
             "RLlenanti": 2000,
