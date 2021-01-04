@@ -55,6 +55,8 @@ def ensureDefaults (dconf):
   for k in ['anticipatedRL', 'RLFakeUpRule', 'RLFakeDownRule', 'RLFakeStayRule', 'doplot', 'saveCellSecs', 'saveCellConns']:
     checkDefVal(dconf['sim'], k, 0)
   checkDefVal(dconf['sim'], 'targettedRL', 1)
+  checkDefVal(dconf['sim'], 'targettedRLOppFctr', 0.5)
+  checkDefVal(dconf['sim'], 'targettedRLDscntFctr', 0.5)
   if 'alltopoldivcons' not in dconf['net']:
     dconf['net']['alltopoldivcons'] = {
       "IR":{"ER":5},
