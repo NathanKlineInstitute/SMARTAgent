@@ -25694,3 +25694,14 @@ python multistepSim.py sn.json 30 20 21jan2_TARG4_gcp_multi
 
 started ~23:09 ...
 
+* 21jan5
+** some more tuning (21jan5_TARG0_gcp_)
+
+smaller net ... fewer EA neurons, intermediate conv and weights
+
+python multistepSim.py sn.json 30 20 21jan5_TARG0_gcp_multi
+
+started ~16:33
+
+** compare with targettedRL==4 (21jan5_TARG4_gcp_)
+
