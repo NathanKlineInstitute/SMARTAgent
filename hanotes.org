@@ -12282,3 +12282,123 @@ RLconns:
         },
 
 -- testing full model with Feedforward connections and RL = 3 only betweem A and M areas.
+
+
+-- make these changes in simFull.json on falcor....
+
+"EXPDir": 0
+"stimModVD":20
+"stimModVL":20 (because there is no inhibition, so should use lower input weights)
+VL to EA = 3 produces sparse activity in EA
+VD to EA ... still fixing
+VD to EA conv reducing from 320 to 40 to make sure similar effect of VD and VL on EA
+
+EA to EA2 ... 4.5 and conv = 250
+produced very low firing in EA2 (remember that racket is not moving so less input from EV1D)
+
+EA to EM ... 2.5 and conv = 250
+EA2 to EM .... 2.5 and conv = 250
+2.5 produced too high firing rates in EM and intermittent movements.
+
+reduce EM to IM and IML
+
+
+----
+EA - EA2:reduce from 4.5 to 3.
+EA - EM: increase from 1.5 to 3
+EA2 - EM: turn it off for now i.e. 0
+
+---
+EA - EA2:reduce from 4.5 to 3. ---- ~17Hz so reduce
+EA - EM: increase from 1.5 to 3
+EA2 - EM: turn it off for now i.e. 0
+also turn off inhibition
+IM - EM: from 9 to 0
+IM - IM: from 4.5 to 0
+IM - IML: from 4.5 to 0
+
+IML - EM: from 2.5 to 0
+IML - IM: from 2.25 to 0
+IML - IML: from 4.5 to 0
+
+---
+EA - EA2:reduce from 3 to 1. ----
+EA - EM: increase from 1.5 to 3
+EA2 - EM: turn it off for now i.e. 0
+also turn off inhibition
+IM - EM: from 9 to 0
+IM - IM: from 4.5 to 0
+IM - IML: from 4.5 to 0
+
+IML - EM: from 2.5 to 0
+IML - IM: from 2.25 to 0
+IML - IML: from 4.5 to 0
+
+
+---
+EA - EA2:reduce from 3 to 1 to 0.5 ---- 0.04 Hz
+EA - EM: increase from 1.5 to 3 to 4.5
+EA2 - EM: turn it off for now i.e. 0
+also turn off inhibition
+IM - EM: from 9 to 0
+IM - IM: from 4.5 to 0
+IM - IML: from 4.5 to 0
+
+IML - EM: from 2.5 to 0
+IML - IM: from 2.25 to 0
+IML - IML: from 4.5 to 0
+
+---
+EA - EA2:reduce from 3 to 1 to 0.5 ---- too low firing rate ~0.04 Hz
+EA - EM: increase from 1.5 to 3 to 4.5 to 6
+EA2 - EM: turn it off for now i.e. 0
+also turn off inhibition
+IM - EM: from 9 to 0
+IM - IM: from 4.5 to 0
+IM - IML: from 4.5 to 0
+
+IML - EM: from 2.5 to 0
+IML - IM: from 2.25 to 0
+IML - IML: from 4.5 to 0
+
+---
+EA - EA2:reduce from 3 to 1 to 0.5 to 0.85 ---- 
+EA - EM: increase from 1.5 to 3 to 4.5 to 6
+EA2 - EM: turn it off for now i.e. 0
+also turn off inhibition
+IM - EM: from 9 to 0
+IM - IM: from 4.5 to 0
+IM - IML: from 4.5 to 0
+
+IML - EM: from 2.5 to 0
+IML - IM: from 2.25 to 0
+IML - IML: from 4.5 to 0
+
+-----
+EA - EA2:reduce from 3 to 1 to 0.5 to 0.85 ---- 
+EA - EM: increase from 1.5 to 3 to 4.5 to 6
+EA2 - EM: turn it off for now i.e. 0
+also turn off inhibition
+IM - EM: from 9 to 0
+IM - IM: from 4.5 to 0
+IM - IML: from 4.5 to 0
+
+IML - EM: from 2.5 to 0
+IML - IM: from 2.25 to 0
+IML - IML: from 4.5 to 0
+
+
+----
+
+to adjust FF conn weights for EA and EA2, i drove EM with noise.
+
+w = 10, rate = 100
+
+EA is 1.3 Hz 
+EA2 is 0.14 Hz and very sparse.
+
+
+-- looking at output of 21jan4_falcor_RL3_sim.json
+looks like learning rate is too low.
+change RLhebbwt from 0.001 to 0.1
+run 250 sec sim in 21jan5_falcor_RL3_
