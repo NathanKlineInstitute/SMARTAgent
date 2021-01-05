@@ -700,17 +700,18 @@ def plotPerf (actreward,yl=(0,1)):
   ax.legend(handles=lpatch,handlelength=1)
   return ax
 
-def plotComparePerf (lpda, lclr, yl=(0,.55), lleg=None, skipfollow=False):
+def plotComparePerf (lpda, lclr, yl=(0,.55), lleg=None, skipfollow=False, skipscore=False):
   # plot comparison of performance of list of action rewards dataframes in lpda
   # lclr is color to plot
   # lleg is optional legend
   ngraph=3
-  if skipfollow: ngraph=2
+  if skipfollow: ngraph-=1
+  if skipscore: ngraph-=1
   for pda,clr in zip(lpda,lclr):
     gdx=1
     if not skipfollow: plotFollowBall(pda,ax=subplot(1,ngraph,gdx),cumulative=True,color=clr); ylim(yl); gdx+=1
     plotHitMiss(pda,ax=subplot(1,ngraph,gdx),lclr=[clr],asratio=True); ylim(yl); gdx+=1
-    plotScoreMiss(pda,ax=subplot(1,ngraph,gdx),clr=clr,asratio=True); ylim(yl)
+    if not skipscore: plotScoreMiss(pda,ax=subplot(1,ngraph,gdx),clr=clr,asratio=True); ylim(yl);
   if lleg is not None:
     lpatch = [mpatches.Patch(color=c,label=s) for c,s in zip(lclr,lleg)]
     ax=gca()
