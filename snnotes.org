@@ -25795,3 +25795,15 @@ savefig(gifpath()+'all_steps_avg_weight.png') # [[./gif/21jan6_21jan5_TARG4_gcp_
 fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
 [[./gif/21jan6_21jan5_TARG4_gcp__step_2__with_reward_input.mp4]]
 
+** next test 21jan6_TARG0_gcp_
+
+try same but with EIPlast turned off ... 
+
+*** TARG0
+
+python multistepSim.py sn.json 30 20 21jan6_TARG0_gcp_multi
+
+started ~16:45
+
+*** TARG4
+
