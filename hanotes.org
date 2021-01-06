@@ -12402,3 +12402,258 @@ EA2 is 0.14 Hz and very sparse.
 looks like learning rate is too low.
 change RLhebbwt from 0.001 to 0.1
 run 250 sec sim in 21jan5_falcor_RL3_
+EMDOWN-AM2: w=7, rate=100
+EMUP-AM2: w=7, rate=100
+
+-- run 50 sec sim in 21jan5_falcor_RL3_A0_
+noise:
+EMDOWN-AM2: w=5, rate=200 (2.21Hz)
+EMUP-AM2: w=5, rate=200 (2.18Hz)
+
+
+-- run 50 sec sim in 21jan5_falcor_RL3_A1_
+noise:
+EA to EM- AM2:10
+EA2 to EM- AM2:10
+EMDOWN-AM2: w=2, rate=200 (0.21Hz)
+EMUP-AM2: w=2, rate=200 (0.22Hz)
+
+
+-- run 50 sec sim in 21jan5_falcor_RL3_A2_
+noise:
+EA to EM- AM2:11
+EA2 to EM- AM2:11
+EMDOWN-AM2: w=2, rate=200 (0.42Hz)
+EMUP-AM2: w=2, rate=200 (0.41Hz)
+
+
+-- run 50 sec sim in 21jan5_falcor_RL3_A3_
+    "followTarget": 0.02,
+        "avoidTarget": -0.01,
+        "hitBall": 0.2
+
+noise:
+EA to EM- AM2:12
+EA2 to EM- AM2:12
+EMDOWN-AM2: w=2, rate=200 (0.6 Hz)
+EMUP-AM2: w=2, rate=200 (0.58 Hz)
+
+weights dont change much.....
+
+-- run 50 sec sim in 21jan5_falcor_RL3_A4_
+followTarget:0.1
+avoidTarget:-0.01
+hitBall:0.5
+
+noise:
+EA to EM- AM2:12
+EA2 to EM- AM2:12
+EMDOWN-AM2: w=2, rate=200 (0.69Hz)
+EMUP-AM2: w=2, rate=200 (0.68Hz)
+
+RLhebbwt = 0.1
+
+-- run 50 sec sim in 21jan5_falcor_RL3_A5_
+followTarget:0.1
+avoidTarget:-0.01
+hitBall:0.5
+
+noise:
+EA to EM- AM2:12
+EA2 to EM- AM2:12
+EMDOWN-AM2: w=2, rate=200 (0.78 Hz)
+EMUP-AM2: w=2, rate=200 (0.78 Hz)
+
+RLhebbwt = 0.5
+
+...possibly could be run for longer duration.
+
+-- run 500 sec sim in 21jan5_falcor_RL3_A6_
+followTarget:0.1
+avoidTarget:-0.01
+hitBall:0.5
+
+noise:
+EA to EM- AM2:12
+EA2 to EM- AM2:12
+EMDOWN-AM2: w=2, rate=200 (0.78 Hz)
+EMUP-AM2: w=2, rate=200 (0.78 Hz)
+
+RLhebbwt = 0.5
+
+...perf ~0.6 and increasing.
+...average weight diverging... not a problem yet.....may be it is.
+... firing rates look decent.
+EMUP and EMDOWN = 1.11 Hz.
+EA = 0.18 Hz.
+EA2 = 0.17 Hz.
+EV1 = 0.15 Hz.
+.....
+
+resume sim as 21jan5_falcor_RL3_A6__step_1_
+...perf ~ 0.63 and may increase further.
+EMUP and EMDOWN = 1.53 and 1.54 Hz.
+EA = 0.19 Hz.
+EA2 = 0.18 Hz.
+EV1 = 0.15 Hz.
+
+resume sim as 21jan5_falcor_RL3_A6__step_2_
+perf peaked at 0.54 and then dropped to ~ 0.44
+firing rates all good but learning dropped.
+give one more chance.....
+
+resume sim as 21jan5_falcor_RL3_A6__step_3_
+perf = 0.56
+
+-- run 21jan5_falcor_RL1_A6__step_0_
+saved perf as 21jan5_falcor_RL1_A6__step_0_perf.png
+saved raster as 21jan5_falcor_RL1_A6__step_0_raster.png
+saved mean weights as 21jan5_falcor_RL1_A6__step_0_meanWeights.png
+
+resume sim as 21jan5_falcor_RL1_A6__step_1_ (on jan6)
+
+-- run 21jan5_falcor_RL0_A6__step_0_
+saved perf as 21jan5_falcor_RL0_A6__step_0_perf.png
+saved raster as 21jan5_falcor_RL0_A6__step_0_raster.png
+saved mean weights as 21jan5_falcor_RL0_A6__step_0_meanWeights.png
+
+resume sim as 21jan5_falcor_RL0_A6__step_1_ (on jan6)
+
+ONE POSSIBILITY: test different RL parameters.
+
+-- run 21jan5_falcor_RL3_B6__step_0_
+            "RLlenhebb": 100, (changed from 500)
+            "RLlenanti": 100, (changed from 500)
+
+saved perf as 21jan5_falcor_RL3_B6__step_0_perf.png
+saved raster as 21jan5_falcor_RL3_B6__step_0_raster.png
+saved mean weights as 21jan5_falcor_RL3_B6__step_0_meanWeights.png
+
+may need to increase RLhebbwt but will do in seperate set of sims.
+
+resume sim as 21jan5_falcor_RL3_B6__step_1_ (on jan6)
+
+
+ANOTHER POSSIBILITY: reduce or remove noise.
+
+-- run 21jan5_falcor_RL3_C6__step_0_ (on jan 6)
+            "RLlenhebb": 100, (changed from 500)
+            "RLlenanti": 100, (changed from 500)
+noise:  EMDOWN-AM2: w=1, rate=200
+        EMUP-AM2: w=1, rate=200
+RLhebbwt: 1 (was 0.5 in 21jan5_falcor_RL3_B6__step_0_ and 21jan5_falcor_RL3_A6__step_1_)
+
+
+
+ANALYSIS ON CYCLE SIMS:
+
+A is for RL = 0
+B is for RL = 3
+D is for RL = 1
+
+-----------------------------------------------------------------
+RL = 0
+
+>>> lfn = [ '20dec27_A0_cycle_reduced_2obj_INTF7__step_0_',
+            '20dec27_A0_cycle_reduced_2obj_INTF7__step_1_',
+            '20dec27_A0_cycle_reduced_2obj_INTF7__step_2_',
+            '20dec27_A0_cycle_reduced_2obj_INTF7__step_3_',
+            '20dec27_A0_cycle_reduced_2obj_INTF7__step_4_',
+            '20dec30_A0_cycle_reduced_2obj_INTF7__step_0_',
+            '20dec30_A0_cycle_reduced_2obj_INTF7__step_1_',
+            '20dec30_A0_cycle_reduced_2obj_INTF7__step_2_',
+            '20dec30_A0_cycle_reduced_2obj_INTF7__step_3_',
+            '20dec30_A0_cycle_reduced_2obj_INTF7__step_4_']
+>>> pdac = getconcatactionreward(lfn)
+>>> plotPerf(pdac)
+saved as 21jan06_20dec27_A0_5steps_20dec30_A0_5steps_perf.png
+
+>>> lpda = getindivactionreward(lfn)
+>>> csm = cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+>>> lclr = [csm.to_rgba(float(i)/len(lpda)) for i in range(len(lpda))]
+>>> plotComparePerf(lpda,lclr,yl=(0,2),lleg=lfn)
+saved as 21jan06_20dec27_A0_5steps_20dec30_A0_5steps_comparePerf.png
+
+>>> pdfc = getconcatweightpdf(lfn)
+>>> plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False)
+saved as 21jan06_20dec27_A0_5steps_20dec30_A0_5steps_meanWeights.png
+
+
+CONTROL for RL = 0 (chose sim "20dec30_A0_cycle_reduced_2obj_INTF7__step_0_" with highest perf ~ 0.8 decaying to 0.55)
+
+(base) hanwar@cycle:~/GamesProject/SMARTAgent$ cp backupcfg/20dec30_A0_cycle_reduced_2obj_INTF7__step_1_sim.json sim.json
+
+"ResumeSim": 1,
+"ResumeSimFromFile": "data/20dec30_A0_cycle_reduced_2obj_INTF7__step_0_synWeights_final.pkl"
+"name": "21jan06_A0_cycle_reduced_2obj_INTF7__trial_0_"
+RLconns:  change from "FeedForwardAtoM": 1 to "FeedForwardAtoM": 0
+just to be sure also turn off RLon of AMPA in RL
+
+mpiexec -n 20 nrniv -python -mpi sim.py sim.json
+
+-------------------------------------------------------------------------------
+RL = 3
+
+>>> lfn = ['20dec27_B0_cycle_reduced_2obj_INTF7__step_0_','20dec27_B0_cycle_reduced_2obj_INTF7__step_1_','20dec27_B0_cycle_reduced_2obj_INTF7__step_2_','20dec27_B0_cycle_reduced_2obj_INTF7__step_3_','20dec27_B0_cycle_reduced_2obj_INTF7__step_4_','20dec30_B0_cycle_reduced_2obj_INTF7__step_0_','20dec30_B0_cycle_reduced_2obj_INTF7__step_1_','20dec30_B0_cycle_reduced_2obj_INTF7__step_2_','20dec30_B0_cycle_reduced_2obj_INTF7__step_3_','20dec30_B0_cycle_reduced_2obj_INTF7__step_4_']
+>>> pdac = getconcatactionreward(lfn)
+>>> plotPerf(pdac)
+saved as 21jan06_20dec27_B0_5steps_20dec30_B0_5steps_perf.png
+
+>>> lpda = getindivactionreward(lfn)
+>>> csm = cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+>>> lclr = [csm.to_rgba(float(i)/len(lpda)) for i in range(len(lpda))]
+>>> plotComparePerf(lpda,lclr,yl=(0,2),lleg=lfn)
+saved as 21jan06_20dec27_B0_5steps_20dec30_B0_5steps_comparePerf.png
+
+>>> pdfc = getconcatweightpdf(lfn)
+>>> plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False)
+saved as 21jan06_20dec27_B0_5steps_20dec30_B0_5steps_meanWeights.png
+
+CONTROL for RL = 3 (chose sim "20dec27_B0_cycle_reduced_2obj_INTF7__step_4_" with highest perf ~ 0.8)
+
+(base) hanwar@cycle:~/GamesProject/SMARTAgent$ cp backupcfg/20dec30_B0_cycle_reduced_2obj_INTF7__step_0_sim.json sim.json
+
+"ResumeSim": 1,
+"ResumeSimFromFile": "data/20dec27_B0_cycle_reduced_2obj_INTF7__step_4_synWeights_final.pkl"
+"name": "21jan06_B0_cycle_reduced_2obj_INTF7__trial_0_",
+RLconns:  change from "FeedForwardAtoM": 1 to "FeedForwardAtoM": 0
+just to be sure also turn off RLon of AMPA in RL
+
+mpiexec -n 20 nrniv -python -mpi sim.py sim.json
+
+-------------------------------------------------------------------------------
+
+RL = 1
+
+>>> lfn = ['20dec27_D0_cycle_reduced_2obj_INTF7__step_0_','20dec27_D0_cycle_reduced_2obj_INTF7__step_1_','20dec27_D0_cycle_reduced_2obj_INTF7__step_2_','20dec27_D0_cycle_reduced_2obj_INTF7__step_3_','20dec27_D0_cycle_reduced_2obj_INTF7__step_4_','20dec30_D0_cycle_reduced_2obj_INTF7__step_0_','20dec30_D0_cycle_reduced_2obj_INTF7__step_1_','20dec30_D0_cycle_reduced_2obj_INTF7__step_2_','20dec30_D0_cycle_reduced_2obj_INTF7__step_3_','20dec30_D0_cycle_reduced_2obj_INTF7__step_4_']
+>>> pdac = getconcatactionreward(lfn)
+>>> plotPerf(pdac)
+saved as 21jan06_20dec27_D0_5steps_20dec30_D0_5steps_perf.png
+
+>>> lpda = getindivactionreward(lfn)
+>>> csm = cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+>>> lclr = [csm.to_rgba(float(i)/len(lpda)) for i in range(len(lpda))]
+>>> plotComparePerf(lpda,lclr,yl=(0,2),lleg=lfn)
+saved as 21jan06_20dec27_D0_5steps_20dec30_D0_5steps_comparePerf.png
+
+
+>>> pdfc = getconcatweightpdf(lfn)
+>>> plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False)
+saved as 21jan06_20dec27_D0_5steps_20dec30_D0_5steps_meanWeights.png
+
+... now run control using 20dec27_D0_cycle_reduced_2obj_INTF7__step_4_
+
+CONTROL for RL = 1 (chose sim "20dec27_D0_cycle_reduced_2obj_INTF7__step_4_" with highest perf ~ 1)
+
+(base) hanwar@cycle:~/GamesProject/SMARTAgent$ cp backupcfg/20dec30_D0_cycle_reduced_2obj_INTF7__step_0_sim.json sim.json
+
+    "ResumeSim": 1,
+    "ResumeSimFromFile": "data/20dec27_D0_cycle_reduced_2obj_INTF7__step_4_synWeights_final.pkl"
+ "name": "21jan06_D0_cycle_reduced_2obj_INTF7__trial_0_",
+ RLconns:  change from "FeedForwardAtoM": 1 to "FeedForwardAtoM": 0
+just to be sure also turn off RLon of AMPA in RL
+
+mpiexec -n 20 nrniv -python -mpi sim.py sim.json
+
+
+-- run basic control (once the control sims after learning are done)
