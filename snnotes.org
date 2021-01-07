@@ -25900,3 +25900,46 @@ savefig(gifpath()+'all_steps_avg_weight.png') # [[./gif/21jan7_21jan6_TARG4_gcp_
 fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
 [[./gif/21jan7_21jan6_TARG4_gcp__step_3__with_reward_input.mp4]]
 
+*** TARG4 step 4
+
+python -i simdat.py backupcfg/21jan6_TARG4_gcp__step_4_sim.json
+
+EV1 0.02 Hz
+EA 1.8 Hz
+IA 4.37 Hz
+IAL 0.25 Hz
+EA2 0.12 Hz
+IA2 1.21 Hz
+IA2L 1.76 Hz
+EMDOWN 0.22 Hz
+EMUP 0.22 Hz
+IM 1.43 Hz
+IML 2.14 Hz
+
+rates barely changed from previous step ...
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/21jan7_21jan6_TARG4_gcp__step_4_perf.png]]
+perf still looks ok - thought not consistent
+
+lfn = ['21jan6_TARG4_gcp__step_' + str(i) + '_' for i in range(5)]
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0,0.6))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/21jan7_21jan6_TARG4_gcp__step_4_perf_all_steps_so_far.png]]
+
+lpda = getindivactionreward(lfn)
+csm=cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+lclr = [csm.to_rgba(float(i)/(len(lpda))) for i in range(len(lpda))]
+clf(); plotComparePerf(lpda,lclr,yl=(0,1),lleg=lfn,skipscore=True,skipfollow=True)
+savefig(gifpath()+'perf_compareD.png') # [[./gif/21jan7_21jan6_TARG4_gcp__step_4_perf_compareD.png]]
+still looks ok overall
+
+clf(); drawraster(dspkT,dspkID); xlim((490e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/21jan7_21jan6_TARG4_gcp__step_4_rast.png]]
+
+clf(); pdfc = getconcatweightpdf(lfn)
+popwtsE = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP','EA','EA2'],lclr=['r','b','g','c'],plotindiv=False)
+savefig(gifpath()+'all_steps_avg_weight.png') # [[./gif/21jan7_21jan6_TARG4_gcp__step_4_all_steps_avg_weight.png]]
+
+fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
+[[./gif/21jan7_21jan6_TARG4_gcp__step_4__with_reward_input.mp4]]
