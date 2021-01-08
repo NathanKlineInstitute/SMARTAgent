@@ -12505,12 +12505,36 @@ give one more chance.....
 resume sim as 21jan5_falcor_RL3_A6__step_3_
 perf = 0.56
 
+resume sim as 21jan5_falcor_RL3_A6__step_4_ (on jan6)
+
+... analyzing "21jan5_falcor_RL3_A6__step_4_" (on jan7)
+saved perf as 21jan5_falcor_RL3_A6__step_4_perf.png...perf remains 0.6 for quite some time before dropping to 0.58...
+
+resume sim as 21jan5_falcor_RL3_A6__step_5_ (on jan7)
+saved perf as 21jan5_falcor_RL3_A6__step_5_perf.png...perf remains 0.7 for quite some time before dropping to 0.63...
+
+resume sim as 21jan5_falcor_RL3_A6__step_6_ (on jan7)
+saved perf as 21jan5_falcor_RL3_A6__step_6_perf.png...perf dropped to 0.58 again.
+
+resume sim as 21jan5_falcor_RL3_A6__step_7_ (on jan7)
+saved perf as 21jan5_falcor_RL3_A6__step_7_perf.png...sustained at 0.57 again. (saved on jan8)
+saved perf as 21jan5_falcor_RL3_A6__step_7_meanWeights.png (saved on jan8)
+
+no need to pursue further...... may be use same weights as in A6 with higher convergence in (21jan8_falcor_RL3_F6__step_0_).
+
+--------------------------------------------------------
 -- run 21jan5_falcor_RL1_A6__step_0_
 saved perf as 21jan5_falcor_RL1_A6__step_0_perf.png
 saved raster as 21jan5_falcor_RL1_A6__step_0_raster.png
 saved mean weights as 21jan5_falcor_RL1_A6__step_0_meanWeights.png
 
 resume sim as 21jan5_falcor_RL1_A6__step_1_ (on jan6)
+saved perf as 21jan5_falcor_RL1_A6__step_1_perf.png ....performance dropped (BAD).
+saved perf as 21jan5_falcor_RL1_A6__step_1_meanWeights.png ....mean weights start to diverge (BAD)
+
+dont resume further ......
+
+-----------------------------------------------------------------
 
 -- run 21jan5_falcor_RL0_A6__step_0_
 saved perf as 21jan5_falcor_RL0_A6__step_0_perf.png
@@ -12518,7 +12542,12 @@ saved raster as 21jan5_falcor_RL0_A6__step_0_raster.png
 saved mean weights as 21jan5_falcor_RL0_A6__step_0_meanWeights.png
 
 resume sim as 21jan5_falcor_RL0_A6__step_1_ (on jan6)
+saved perf as 21jan5_falcor_RL0_A6__step_1_perf.png .... (BAD).
+saved perf as 21jan5_falcor_RL0_A6__step_1_meanWeights.png
 
+dont resume further......
+
+------------------------------------------------
 ONE POSSIBILITY: test different RL parameters.
 
 -- run 21jan5_falcor_RL3_B6__step_0_
@@ -12533,7 +12562,18 @@ may need to increase RLhebbwt but will do in seperate set of sims.
 
 resume sim as 21jan5_falcor_RL3_B6__step_1_ (on jan6)
 
+saved perf as 21jan5_falcor_RL3_B6__step_1_perf.png
+saved raster as 21jan5_falcor_RL3_B6__step_1_raster.png
+saved mean weights as 21jan5_falcor_RL3_B6__step_1_meanWeights.png
 
+resume sim as 21jan5_falcor_RL3_B6__step_2_ (on jan6)
+
+.... analyzing 21jan5_falcor_RL3_B6__step_2_ (on jan7)
+saved perf as 21jan5_falcor_RL3_B6__step_2_perf.png ..... perf flat around 0.4
+
+not sure if this will improve.... may be should not pursue this further (jan 7)
+
+---------------------------------------------------
 ANOTHER POSSIBILITY: reduce or remove noise.
 
 -- run 21jan5_falcor_RL3_C6__step_0_ (on jan 6)
@@ -12542,9 +12582,57 @@ ANOTHER POSSIBILITY: reduce or remove noise.
 noise:  EMDOWN-AM2: w=1, rate=200
         EMUP-AM2: w=1, rate=200
 RLhebbwt: 1 (was 0.5 in 21jan5_falcor_RL3_B6__step_0_ and 21jan5_falcor_RL3_A6__step_1_)
+... not good performance... dont pursue....
+
+---------------------------------------------------
+
+-- run 21jan5_falcor_RL3_D6__step_0_ (on jan 6)
+"RLlenhebb": 100, (changed from 500)
+            "RLlenanti": 100, (changed from 500)
+noise:  EMDOWN-AM2: w=2, rate=200
+        EMUP-AM2: w=2, rate=200
+RLhebbwt: 1 (was 0.5 in 21jan5_falcor_RL3_B6__step_0_ and 21jan5_falcor_RL3_A6__step_1_)
+
+...... analyzing 21jan5_falcor_RL3_D6__step_0_ (on jan 7)
+saved performance as 21jan5_falcor_RL3_D6__step_0_perf.png ~0.4
+
+--------------------------------------------------
+
+-- run 21jan5_falcor_RL3_E6__step_0_ (on jan 6)
+"RLlenhebb": 100, (changed from 500)
+            "RLlenanti": 100, (changed from 500)
+noise:  EMDOWN-AM2: w=2, rate=200
+        EMUP-AM2: w=2, rate=200
+RLhebbwt: 2 
+
+...... analyzing 21jan5_falcor_RL3_E6__step_0_ (on jan 7)
+saved performance as 21jan5_falcor_RL3_E6__step_0_perf.png ~0.54
+
+..... resume 21jan5_falcor_RL3_E6__step_1_ (on jan 7)
+saved performance as 21jan5_falcor_RL3_E6__step_1_perf.png ~0.7
+
+..... resume 21jan5_falcor_RL3_E6__step_2_ (on jan 7)
+saved performance as 21jan5_falcor_RL3_E6__step_2_perf.png .... perf dropped to ~0.62
+
+..... resume 21jan5_falcor_RL3_E6__step_3_ (on jan 7)
+saved performance as 21jan5_falcor_RL3_E6__step_3_perf.png .... .... perf stays around 0.8 for quite sometime before dropping to 0.67 at the end.
+
+..... resume 21jan5_falcor_RL3_E6__step_4_ (on jan 8)
 
 
+.... run resume 21jan5_falcor_RL3_E6__step_1long_ for 2500 sec (on jan7) 
 
+-----------------------------------------------
+cp backupcfg/21jan5_falcor_RL3_A6__step_1_sim.json simFull.json
+ResumeSim: 0
+name: 21jan8_falcor_RL3_F6__step_0_
+EA to EM: change 'conv' from 30 to 300...AM2 still 12 (probably will need to readjust)
+EA2 to EM: change 'conv' from 30 to 300 ... AM2 still 12 (probably will need to change)
+
+-- run 21jan8_falcor_RL3_F6__step_0_ (on jan8)
+
+
+-----------------------------------------------
 ANALYSIS ON CYCLE SIMS:
 
 A is for RL = 0
@@ -12586,10 +12674,29 @@ CONTROL for RL = 0 (chose sim "20dec30_A0_cycle_reduced_2obj_INTF7__step_0_" wit
 "ResumeSim": 1,
 "ResumeSimFromFile": "data/20dec30_A0_cycle_reduced_2obj_INTF7__step_0_synWeights_final.pkl"
 "name": "21jan06_A0_cycle_reduced_2obj_INTF7__trial_0_"
-RLconns:  change from "FeedForwardAtoM": 1 to "FeedForwardAtoM": 0
-just to be sure also turn off RLon of AMPA in RL
+RLhebbwt = 0
 
 mpiexec -n 20 nrniv -python -mpi sim.py sim.json
+
+perf and weights are saved as
+
+21jan07_21jan06_A0_cycle_reduced_2obj_INTF7__trial_0__meanWeights.png
+21jan07_21jan06_A0_cycle_reduced_2obj_INTF7__trial_0__perf.png
+
+.............
+
+(base) hanwar@cycle:~/GamesProject/SMARTAgent$ cp backupcfg/21jan06_A0_cycle_reduced_2obj_INTF7__trial_0_sim.json sim.json
+    "ResumeSim": 1,
+    "ResumeSimFromFile": "data/20dec30_A0_cycle_reduced_2obj_INTF7__step_4_synWeights_final.pkl"
+    "name": "21jan06_A0_cycle_reduced_2obj_INTF7__trial_1_"
+mpiexec -n 20 nrniv -python -mpi sim.py sim.json (run on jan7)
+
+--analyzing on jan8
+
+perf and weights are saved as 
+
+21jan07_21jan06_A0_cycle_reduced_2obj_INTF7__trial_1__perf.png (on jan8)
+21jan07_21jan06_A0_cycle_reduced_2obj_INTF7__trial_1__meanWeights.png (on jan8)
 
 -------------------------------------------------------------------------------
 RL = 3
@@ -12616,11 +12723,37 @@ CONTROL for RL = 3 (chose sim "20dec27_B0_cycle_reduced_2obj_INTF7__step_4_" wit
 "ResumeSim": 1,
 "ResumeSimFromFile": "data/20dec27_B0_cycle_reduced_2obj_INTF7__step_4_synWeights_final.pkl"
 "name": "21jan06_B0_cycle_reduced_2obj_INTF7__trial_0_",
-RLconns:  change from "FeedForwardAtoM": 1 to "FeedForwardAtoM": 0
-just to be sure also turn off RLon of AMPA in RL
+RLhebbwt = 0
 
 mpiexec -n 20 nrniv -python -mpi sim.py sim.json
 
+perf and weights are saved as
+
+21jan07_21jan06_B0_cycle_reduced_2obj_INTF7__trial_0__meanWeights.png
+21jan07_21jan06_B0_cycle_reduced_2obj_INTF7__trial_0__perf.png
+
+fig = animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
+
+saved animation to gif/21jan8_21jan06_B0_cycle_reduced_2obj_INTF7__trial_0__with_reward_input.mp4  (at the end of learning step 4)
+saved animation to gif/21jan8_20dec27_B0_cycle_reduced_2obj_INTF7__step_4__with_reward_input.mp4 (during the learning step 4)
+.........................................
+
+    "ResumeSim": 1,
+    "ResumeSimFromFile": "data/20dec27_B0_cycle_reduced_2obj_INTF7__step_2_synWeights_final.pkl"
+
+"name": "21jan06_B0_cycle_reduced_2obj_INTF7__trial_1_",
+
+mpiexec -n 20 nrniv -python -mpi sim.py sim.json (run on jan 7)
+
+--analyzing on jan8
+
+perf and weights are saved as 
+
+21jan07_21jan06_B0_cycle_reduced_2obj_INTF7__trial_1__meanWeights.png
+21jan07_21jan06_B0_cycle_reduced_2obj_INTF7__trial_1__perf.png
+
+saved animation to gif/21jan8_21jan06_B0_cycle_reduced_2obj_INTF7__trial_1__with_reward_input.mp4 (at the end of learning step 2)
+saved animation to gif/21jan8_20dec27_B0_cycle_reduced_2obj_INTF7__step_2__with_reward_input.mp4 (during the learning step 2)
 -------------------------------------------------------------------------------
 
 RL = 1
@@ -12650,10 +12783,140 @@ CONTROL for RL = 1 (chose sim "20dec27_D0_cycle_reduced_2obj_INTF7__step_4_" wit
     "ResumeSim": 1,
     "ResumeSimFromFile": "data/20dec27_D0_cycle_reduced_2obj_INTF7__step_4_synWeights_final.pkl"
  "name": "21jan06_D0_cycle_reduced_2obj_INTF7__trial_0_",
- RLconns:  change from "FeedForwardAtoM": 1 to "FeedForwardAtoM": 0
-just to be sure also turn off RLon of AMPA in RL
+RLhebbwt = 0
 
 mpiexec -n 20 nrniv -python -mpi sim.py sim.json
 
+perf and weights are saved as
 
--- run basic control (once the control sims after learning are done)
+21jan07_21jan06_D0_cycle_reduced_2obj_INTF7__trial_0__meanWeights.png
+21jan07_21jan06_D0_cycle_reduced_2obj_INTF7__trial_0__perf.png
+
+.................................
+
+(base) hanwar@cycle:~/GamesProject/SMARTAgent$ cp backupcfg/20dec30_D0_cycle_reduced_2obj_INTF7__step_0_sim.json sim.json
+
+    "ResumeSim": 1,
+    "ResumeSimFromFile": "data/20dec27_D0_cycle_reduced_2obj_INTF7__step_2_synWeights_final.pkl"
+    "name": "21jan06_D0_cycle_reduced_2obj_INTF7__trial_1_",
+mpiexec -n 20 nrniv -python -mpi sim.py sim.json (run on jan 7)
+
+
+
+
+---------------------------------------------------------
+
+-- run basic control 
+resume = 0
+"name": "21jan06_R0_cycle_reduced_2obj_INTF7__trial_0_",
+
+perf and weights are saved as
+
+21jan07_21jan06_R0_cycle_reduced_2obj_INTF7__trial_0__meanWeights.png
+21jan07_21jan06_R0_cycle_reduced_2obj_INTF7__trial_0__perf.png
+
+--------------------------------------------------------
+
+IMPORTANT (RELATED TO REDUCED MODEL):
+
+Since i was running the reduced model using scripts from before the recent update 
+......(AM was changed to AM2 etc and more details included in the model)
+
+so i am making a backup on cycle just in case, if i cant reproduce my results while using new scripts......
+/home/hanwar/GamesProject/SMARTAgent_BACKUP
+
+....copy all figures to personal computer....
+(base) AnwarHaroons-MacBook-Pro:SMARTAgent anwarharoon$ scp hanwar@10.76.252.198:/home/hanwar/GamesProject/SMARTAgent/*.png figs_cycle_21Jan8/.
+.... copy all movies to personal computer....
+(base) AnwarHaroons-MacBook-Pro:videos anwarharoon$ scp hanwar@10.76.252.198:/home/hanwar/GamesProject/SMARTAgent/gif/*.mp4 .
+
+(base) hanwar@cycle:~/GamesProject/SMARTAgent$ git stash
+Saved working directory and index state WIP on master: 0aec41c use simFull.json for more general architecture
+(base) hanwar@cycle:~/GamesProject/SMARTAgent$ git pull
+remote: Enumerating objects: 181, done.
+remote: Counting objects: 100% (181/181), done.
+remote: Compressing objects: 100% (120/120), done.
+remote: Total 181 (delta 123), reused 112 (delta 61), pack-reused 0
+Receiving objects: 100% (181/181), 530.67 KiB | 2.59 MiB/s, done.
+Resolving deltas: 100% (123/123), completed with 4 local objects.
+From github.com:NathanKlineInstitute/SMARTAgent
+   0aec41c..2850c3e  master      -> origin/master
+   d4aeacb..d691696  development -> origin/development
+Updating 0aec41c..2850c3e
+Fast-forward
+ cells/intf7.py  |   65 +-----
+ conf.py         |    2 +
+ connUtils.py    |   14 +-
+ hanotes.org     | 1181 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ sim.json        | 1226 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-----------------------------------
+ sim.py          |  603 +++++++++++++++++++++++-------------------------
+ simFull.json    |  328 +++++++++++++++++---------
+ simReduced.json |  691 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ simdat.py       |    7 +-
+ sn.json         |  282 ++++++++++++++++-------
+ snnotes.org     | 1356 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 11 files changed, 4760 insertions(+), 995 deletions(-)
+ create mode 100644 simReduced.json
+---------------------------------------------------------
+sam was using these RLconns in sn.json:
+
+        "RLconns": {
+            "EIPlast": 0,
+            "Visual": 0,
+            "RecurrentDirNeurons": 0,
+            "RecurrentLocNeurons": 0,
+            "FeedForwardDirNtoA": 0,
+            "FeedForwardLocNtoA": 0,
+            "FeedForwardDirNtoA2": 0,
+            "FeedForwardLocNtoA2": 0,       
+            "FeedForwardDirNtoM": 0,
+            "FeedForwardLocNtoM": 0,
+            "FeedForwardAtoM": 1,
+            "FeedForwardAtoA2": 1,
+            "FeedForwardA2toM": 1,
+            "FeedbackLocNeurons": 0,
+            "RecurrentMNeurons": 1,
+            "RecurrentANeurons": 1,
+            "RecurrentA2Neurons": 1,
+            "FeedbackAtoDirN": 0,
+            "FeedbackAtoLocN": 0,
+            "FeedbackMtoA": 1,
+            "FeedbackMtoA2": 1,
+            "FeedbackA2toA": 1
+        },
+
+---------------------------------------------------------
+
+::::::EXPLORE NEW FULL MODEL ON CYCLE NOW:::::::
+(base) hanwar@cycle:~/GamesProject/SMARTAgent$ cp sn.json simFull.json
+
+"name": "21jan8_TARG4_cycle_RL3_"
+"targettedRL": 3,
+
+            "FeedForwardAtoM": 1,
+            "FeedForwardAtoA2": 0,    (was 1 in sn.json)
+            "FeedForwardA2toM": 1,
+            "FeedbackLocNeurons": 0,
+            "RecurrentMNeurons": 1,
+            "RecurrentANeurons": 0,   (was 1 in sn.json)
+            "RecurrentA2Neurons": 0,  (was 1 in sn.json)
+            "FeedbackAtoDirN": 0,
+            "FeedbackAtoLocN": 0,
+            "FeedbackMtoA": 1,
+            "FeedbackMtoA2": 1,
+            "FeedbackA2toA": 0        (was 1 in sn.json)
+
+there were 9 conn types under RL before (in sn.json).
+Now there are only 5 conn types (only between A and M and within M) under RL.
+
+-- start a multistepsim....
+(base) hanwar@cycle:~/GamesProject/SMARTAgent$ python multistepSim.py simFull.json 30 5 21jan8_RL3_cycle_multi
+
+-- start another multistepsim....
+"name": "21jan8_TARG4_cycle_RL1_"
+"targettedRL": 1,
+(base) hanwar@cycle:~/GamesProject/SMARTAgent$ python multistepSim.py simFull.json 20 5 21jan8_RL1_cycle_multi
+
+-- start another multistepsim.....
+"name": "21jan8_TARG4_cycle_"
+(base) hanwar@cycle:~/GamesProject/SMARTAgent$ python multistepSim.py sn.json 20 5 21jan8_RL4_cycle_multi
