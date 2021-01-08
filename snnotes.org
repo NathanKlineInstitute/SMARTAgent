@@ -25694,3 +25694,341 @@ python multistepSim.py sn.json 30 20 21jan2_TARG4_gcp_multi
 
 started ~23:09 ...
 
+* 21jan5
+** some more tuning (21jan5_TARG0_gcp_)
+
+smaller net ... fewer EA neurons, intermediate conv and weights
+
+python multistepSim.py sn.json 30 20 21jan5_TARG0_gcp_multi
+
+started ~16:33
+
+** compare with targettedRL==4 (21jan5_TARG4_gcp_)
+
+python multistepSim.py sn.json 30 20 21jan5_TARG4_gcp_multi
+
+started ~16:34 ...
+
+* 21jan6
+** check output on gcp -- no better
+*** TARG0 step 2
+
+python -i simdat.py backupcfg/21jan5_TARG0_gcp__step_2_sim.json
+
+EV1 0.02 Hz
+EA 1.83 Hz
+IA 4.78 Hz
+IAL 0.25 Hz
+EA2 0.13 Hz
+IA2 1.22 Hz
+IA2L 1.75 Hz
+EMDOWN 0.23 Hz
+EMUP 0.23 Hz
+IM 1.45 Hz
+IML 2.15 Hz
+
+why are the rates so low??
+
+ax=plotPerf(actreward,yl=(0,0.75))
+savefig(gifpath()+'perf.png') # [[./gif/21jan6_21jan5_TARG0_gcp__step_2_perf.png]]
+
+lfn = ['21jan5_TARG0_gcp__step_' + str(i) + '_' for i in range(3)]
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0,0.6))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/21jan6_21jan5_TARG0_gcp__step_2_perf_all_steps_so_far.png]]
+
+lpda = getindivactionreward(lfn)
+csm=cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+lclr = [csm.to_rgba(float(i)/(len(lpda))) for i in range(len(lpda))]
+clf(); plotComparePerf(lpda,lclr,yl=(0,1),lleg=lfn,skipscore=True,skipfollow=True)
+savefig(gifpath()+'perf_compareD.png') # [[./gif/21jan6_21jan5_TARG0_gcp__step_2_perf_compareD.png]]
+
+clf(); drawraster(dspkT,dspkID); xlim((490e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/21jan6_21jan5_TARG0_gcp__step_2_rast.png]]
+
+clf(); pdfc = getconcatweightpdf(lfn)
+subplot(1,2,1); popwtsE = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP','EA','EA2'],lclr=['r','b','g','c'],plotindiv=False)
+subplot(1,2,2); popwtsI = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['IA','IM','IA2','IAL','IML','IA2L'],lclr=['r','b','g','c','m','y'],plotindiv=False)
+savefig(gifpath()+'all_steps_avg_weight.png') # [[./gif/21jan6_21jan5_TARG0_gcp__step_2_all_steps_avg_weight.png]]
+
+lack of increase in rates/may be due to EIplast ... could turn that off or lower it further ... 
+
+*** TARG4 step 2
+
+python -i simdat.py backupcfg/21jan5_TARG4_gcp__step_2_sim.json
+
+EV1 0.02 Hz
+EA 1.79 Hz
+IA 4.57 Hz
+IAL 0.25 Hz
+EA2 0.12 Hz
+IA2 1.21 Hz
+IA2L 1.74 Hz
+EMDOWN 0.21 Hz
+EMUP 0.21 Hz
+IM 1.43 Hz
+IML 2.13 Hz
+
+ax=plotPerf(actreward,yl=(0,0.75))
+savefig(gifpath()+'perf.png') # [[./gif/21jan6_21jan5_TARG4_gcp__step_2_perf.png]]
+this one better than targ0
+
+lfn = ['21jan5_TARG4_gcp__step_' + str(i) + '_' for i in range(3)]
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0,0.6))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/21jan6_21jan5_TARG4_gcp__step_2_perf_all_steps_so_far.png]]
+
+lpda = getindivactionreward(lfn)
+csm=cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+lclr = [csm.to_rgba(float(i)/(len(lpda))) for i in range(len(lpda))]
+clf(); plotComparePerf(lpda,lclr,yl=(0,1),lleg=lfn,skipscore=True,skipfollow=True)
+savefig(gifpath()+'perf_compareD.png') # [[./gif/21jan6_21jan5_TARG4_gcp__step_2_perf_compareD.png]]
+
+clf(); drawraster(dspkT,dspkID); xlim((490e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/21jan6_21jan5_TARG4_gcp__step_2_rast.png]]
+
+clf(); pdfc = getconcatweightpdf(lfn)
+subplot(1,2,1); popwtsE = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP','EA','EA2'],lclr=['r','b','g','c'],plotindiv=False)
+subplot(1,2,2); popwtsI = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['IA','IM','IA2','IAL','IML','IA2L'],lclr=['r','b','g','c','m','y'],plotindiv=False)
+savefig(gifpath()+'all_steps_avg_weight.png') # [[./gif/21jan6_21jan5_TARG4_gcp__step_2_all_steps_avg_weight.png]]
+
+fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
+[[./gif/21jan6_21jan5_TARG4_gcp__step_2__with_reward_input.mp4]]
+
+** next test 21jan6_TARG0_gcp_
+
+try same but with EIPlast turned off ... 
+
+*** TARG0
+
+python multistepSim.py sn.json 30 20 21jan6_TARG0_gcp_multi
+
+started ~16:45
+
+*** TARG4
+
+python multistepSim.py sn.json 30 20 21jan6_TARG4_gcp_multi
+
+started ~16:46
+
+* 21jan7
+** check output on gcp -->> ?
+*** TARG0 step 3
+
+python -i simdat.py backupcfg/21jan6_TARG0_gcp__step_3_sim.json
+
+EV1 0.02 Hz
+EA 1.88 Hz
+IA 4.54 Hz
+IAL 0.28 Hz
+EA2 0.13 Hz
+IA2 1.23 Hz
+IA2L 1.79 Hz
+EMDOWN 0.25 Hz
+EMUP 0.24 Hz
+IM 1.47 Hz
+IML 2.19 Hz
+
+still very low rates ... 
+
+ax=plotPerf(actreward,yl=(0,0.75))
+savefig(gifpath()+'perf.png') # [[./gif/21jan7_21jan6_TARG0_gcp__step_3_perf.png]]
+
+lfn = ['21jan6_TARG0_gcp__step_' + str(i) + '_' for i in range(4)]
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0,0.6))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/21jan7_21jan6_TARG0_gcp__step_3_perf_all_steps_so_far.png]]
+
+lpda = getindivactionreward(lfn)
+csm=cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+lclr = [csm.to_rgba(float(i)/(len(lpda))) for i in range(len(lpda))]
+clf(); plotComparePerf(lpda,lclr,yl=(0,1),lleg=lfn,skipscore=True,skipfollow=True)
+savefig(gifpath()+'perf_compareD.png') # [[./gif/21jan7_21jan6_TARG0_gcp__step_3_perf_compareD.png]]
+
+clf(); drawraster(dspkT,dspkID); xlim((490e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/21jan7_21jan6_TARG0_gcp__step_3_rast.png]][[
+
+clf(); pdfc = getconcatweightpdf(lfn)
+popwtsE = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP','EA','EA2'],lclr=['r','b','g','c'],plotindiv=False)
+savefig(gifpath()+'all_steps_avg_weight.png') # [[./gif/21jan7_21jan6_TARG0_gcp__step_3_all_steps_avg_weight.png]]
+
+pretty slow rise in weights ... 
+
+fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
+[[./gif/21jan7_21jan6_TARG0_gcp__step_3__with_reward_input.mp4]]
+
+*** TARG4 step 3
+
+python -i simdat.py backupcfg/21jan6_TARG4_gcp__step_3_sim.json
+
+EV1 0.02 Hz
+EA 1.78 Hz
+IA 4.31 Hz
+IAL 0.24 Hz
+EA2 0.12 Hz
+IA2 1.21 Hz
+IA2L 1.74 Hz
+EMDOWN 0.22 Hz
+EMUP 0.22 Hz
+IM 1.43 Hz
+IML 2.13 Hz
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/21jan7_21jan6_TARG4_gcp__step_3_perf.png]]
+hmm, that looks better ... 
+
+lfn = ['21jan6_TARG4_gcp__step_' + str(i) + '_' for i in range(4)]
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0,0.6))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/21jan7_21jan6_TARG4_gcp__step_3_perf_all_steps_so_far.png]]
+
+lpda = getindivactionreward(lfn)
+csm=cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+lclr = [csm.to_rgba(float(i)/(len(lpda))) for i in range(len(lpda))]
+clf(); plotComparePerf(lpda,lclr,yl=(0,1),lleg=lfn,skipscore=True,skipfollow=True)
+savefig(gifpath()+'perf_compareD.png') # [[./gif/21jan7_21jan6_TARG4_gcp__step_3_perf_compareD.png]]
+last step looks pretty good ... 
+
+clf(); drawraster(dspkT,dspkID); xlim((490e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/21jan7_21jan6_TARG4_gcp__step_3_rast.png]]
+... despite the low firing rates and noise
+
+clf(); pdfc = getconcatweightpdf(lfn)
+popwtsE = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP','EA','EA2'],lclr=['r','b','g','c'],plotindiv=False)
+savefig(gifpath()+'all_steps_avg_weight.png') # [[./gif/21jan7_21jan6_TARG4_gcp__step_3_all_steps_avg_weight.png]]
+
+fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
+[[./gif/21jan7_21jan6_TARG4_gcp__step_3__with_reward_input.mp4]]
+
+*** TARG4 step 4
+
+python -i simdat.py backupcfg/21jan6_TARG4_gcp__step_4_sim.json
+
+EV1 0.02 Hz
+EA 1.8 Hz
+IA 4.37 Hz
+IAL 0.25 Hz
+EA2 0.12 Hz
+IA2 1.21 Hz
+IA2L 1.76 Hz
+EMDOWN 0.22 Hz
+EMUP 0.22 Hz
+IM 1.43 Hz
+IML 2.14 Hz
+
+rates barely changed from previous step ...
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/21jan7_21jan6_TARG4_gcp__step_4_perf.png]]
+perf still looks ok - thought not consistent
+
+lfn = ['21jan6_TARG4_gcp__step_' + str(i) + '_' for i in range(5)]
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0,0.6))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/21jan7_21jan6_TARG4_gcp__step_4_perf_all_steps_so_far.png]]
+
+lpda = getindivactionreward(lfn)
+csm=cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+lclr = [csm.to_rgba(float(i)/(len(lpda))) for i in range(len(lpda))]
+clf(); plotComparePerf(lpda,lclr,yl=(0,1),lleg=lfn,skipscore=True,skipfollow=True)
+savefig(gifpath()+'perf_compareD.png') # [[./gif/21jan7_21jan6_TARG4_gcp__step_4_perf_compareD.png]]
+still looks ok overall
+
+clf(); drawraster(dspkT,dspkID); xlim((490e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/21jan7_21jan6_TARG4_gcp__step_4_rast.png]]
+
+clf(); pdfc = getconcatweightpdf(lfn)
+popwtsE = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP','EA','EA2'],lclr=['r','b','g','c'],plotindiv=False)
+savefig(gifpath()+'all_steps_avg_weight.png') # [[./gif/21jan7_21jan6_TARG4_gcp__step_4_all_steps_avg_weight.png]]
+
+fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
+[[./gif/21jan7_21jan6_TARG4_gcp__step_4__with_reward_input.mp4]]
+
+* 21jan8
+** check output on gcp -->> ?
+*** TARG0 step 8
+
+python -i simdat.py backupcfg/21jan6_TARG0_gcp__step_8_sim.json
+
+EV1 0.02 Hz
+EA 2.11 Hz
+IA 5.07 Hz
+IAL 0.49 Hz
+EA2 0.26 Hz
+IA2 1.39 Hz
+IA2L 2.04 Hz
+EMDOWN 0.35 Hz
+EMUP 0.35 Hz
+IM 1.68 Hz
+IML 2.46 Hz
+
+firing rates up a bit...
+
+ax=plotPerf(actreward,yl=(0,0.75))
+savefig(gifpath()+'perf.png') # [[./gif/21jan8_21jan6_TARG0_gcp__step_8_perf.png]]
+
+lfn = ['21jan6_TARG0_gcp__step_' + str(i) + '_' for i in range(9)]
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0,0.6))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/21jan8_21jan6_TARG0_gcp__step_8_perf_all_steps_so_far.png]]
+this one not improving ... 
+
+lpda = getindivactionreward(lfn)
+csm=cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+lclr = [csm.to_rgba(float(i)/(len(lpda))) for i in range(len(lpda))]
+clf(); plotComparePerf(lpda,lclr,yl=(0,1),lleg=lfn,skipscore=True,skipfollow=True)
+savefig(gifpath()+'perf_compareD.png') # [[./gif/21jan8_21jan6_TARG0_gcp__step_8_perf_compareD.png]]
+step 6 is best ... 
+
+clf(); drawraster(dspkT,dspkID); xlim((490e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/21jan8_21jan6_TARG0_gcp__step_8_rast.png]]
+
+clf(); pdfc = getconcatweightpdf(lfn)
+popwtsE = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP','EA','EA2'],lclr=['r','b','g','c'],plotindiv=False)
+savefig(gifpath()+'all_steps_avg_weight.png') # [[./gif/21jan8_21jan6_TARG0_gcp__step_8_all_steps_avg_weight.png]]
+
+fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
+[[./gif/21jan8_21jan6_TARG0_gcp__step_8__with_reward_input.mp4]]
+
+*** TARG4 step 8
+
+python -i simdat.py backupcfg/21jan6_TARG4_gcp__step_8_sim.json
+
+EV1 0.02 Hz
+EA 1.91 Hz
+IA 4.62 Hz
+IAL 0.31 Hz
+EA2 0.15 Hz
+IA2 1.25 Hz
+IA2L 1.83 Hz
+EMDOWN 0.24 Hz
+EMUP 0.24 Hz
+IM 1.47 Hz
+IML 2.18 Hz
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/21jan8_21jan6_TARG4_gcp__step_8_perf.png]]
+not bad ... 
+
+lfn = ['21jan6_TARG4_gcp__step_' + str(i) + '_' for i in range(9)]
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0,0.6))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/21jan8_21jan6_TARG4_gcp__step_8_perf_all_steps_so_far.png]]
+this looks like it's rising...
+
+lpda = getindivactionreward(lfn)
+csm=cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+lclr = [csm.to_rgba(float(i)/(len(lpda))) for i in range(len(lpda))]
+clf(); plotComparePerf(lpda,lclr,yl=(0,1),lleg=lfn,skipscore=True,skipfollow=True)
+savefig(gifpath()+'perf_compareD.png') # [[./gif/21jan8_21jan6_TARG4_gcp__step_8_perf_compareD.png]]
+step 3 still may be best ... but there's some trend to better perf
+
+clf(); drawraster(dspkT,dspkID); xlim((490e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/21jan8_21jan6_TARG4_gcp__step_8_rast.png]]
+
+clf(); pdfc = getconcatweightpdf(lfn)
+popwtsE = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP','EA','EA2'],lclr=['r','b','g','c'],plotindiv=False)
+savefig(gifpath()+'all_steps_avg_weight.png') # [[./gif/21jan8_21jan6_TARG4_gcp__step_8_all_steps_avg_weight.png]]
+
+fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
+[[./gif/21jan8_21jan6_TARG4_gcp__step_8__with_reward_input.mp4]]
