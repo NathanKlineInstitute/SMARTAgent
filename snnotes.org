@@ -26135,3 +26135,13 @@ python multistepSim.py sn.json 30 20 21jan11_TARG4_gcp_multi
 
 started ~10:54 ...
 
+** other sim (21jan11_TARG4_B_gcp_) ; lower the targettedRLDscntFctr for continuation
+
+also reduce the amount that EA changes by and continue ?
+
+change targettedRLDscntFctr from 0.5 to 0.05
+
+python multistepSim.py sn.json 30 20 21jan11_TARG4_B_gcp_multi
+
+started ~16:47 ...
+
