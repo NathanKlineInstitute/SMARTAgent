@@ -47,8 +47,8 @@
     "verbose": 0,
     "stayStepLim": 0,
     "simtype": {
-        "ResumeSim": 0,
-        "ResumeSimFromFile": "data/20dec7_A0_cycle_synWeights_final.pkl"
+        "ResumeSim": 1,
+        "ResumeSimFromFile": "data/21jan6_TARG4_gcp__step_19_synWeights_final.pkl"
     },
     "sim": {
         "duration": 500000,
@@ -62,7 +62,7 @@
         "RLFakeUpRule": 0,
         "RLFakeDownRule": 0,
         "RLFakeStayRule": 0,
-        "name": "21jan6_TARG4_gcp_",
+        "name": "21jan11_TARG4_gcp_",
         "doquit": 1,
         "doplot": 0,
         "saveCellSecs": 0,
