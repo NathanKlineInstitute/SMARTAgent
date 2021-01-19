@@ -12618,10 +12618,16 @@ saved performance as 21jan5_falcor_RL3_E6__step_2_perf.png .... perf dropped to 
 saved performance as 21jan5_falcor_RL3_E6__step_3_perf.png .... .... perf stays around 0.8 for quite sometime before dropping to 0.67 at the end.
 
 ..... resume 21jan5_falcor_RL3_E6__step_4_ (on jan 8)
-
+saved performance as 21jan5_falcor_RL3_E6__step_3_perf.png ....dropped  to ~ 0.57
 
 .... run resume 21jan5_falcor_RL3_E6__step_1long_ for 2500 sec (on jan7) 
 
+.... analyzing all 5 steps on Jan11.
+lfn = ['21jan5_falcor_RL3_E6__step_0_','21jan5_falcor_RL3_E6__step_1_','21jan5_falcor_RL3_E6__step_2_','21jan5_falcor_RL3_E6__step_3_','21jan5_falcor_RL3_E6__step_4_']
+pdac = getconcatactionreward(lfn)
+saved performance as 21jan11_21jan5_falcor_RL3_E6_allsteps_perf.png ....0.62 to 0.64 (GOOD to pursue further)
+saved performance as 21jan11_21jan5_falcor_RL3_E6_allsteps_compareperf.png
+saved mean weights as 
 -----------------------------------------------
 cp backupcfg/21jan5_falcor_RL3_A6__step_1_sim.json simFull.json
 ResumeSim: 0
@@ -12629,9 +12635,57 @@ name: 21jan8_falcor_RL3_F6__step_0_
 EA to EM: change 'conv' from 30 to 300...AM2 still 12 (probably will need to readjust)
 EA2 to EM: change 'conv' from 30 to 300 ... AM2 still 12 (probably will need to change)
 
--- run 21jan8_falcor_RL3_F6__step_0_ (on jan8)
+-- run 21jan8_falcor_RL3_F6__step_0_ (on jan8) ... too high firing rates and not great perf.
 
+-- run 21jan11_falcor_RL3_F6__step_0_
+EA to EM: reduce AM2 from 12 to 8
+EA to EM: reduce AM2 from 12 to 8
+change wbase from 5 to 2.
+saved performance as 21jan11_falcor_RL3_F6__step_0_perf.png (Jan12) perf ~ 0.8 (GOOD PERFORMANCE..pursue further)
+saced meanweights as 21jan11_falcor_RL3_F6__step_0_meanweights.png (Jan12)
+saved animinput as gif/21jan12_21jan11_falcor_RL3_F6__step_0__with_reward_input.mp4
 
+-- resume 21jan11_falcor_RL3_F6__step_1_ (Jan12)
+saved performance as 21jan11_falcor_RL3_F6__step_1_perf.png (Jan13) perf dropped to ~ 0.65 (GOOD PERFORMANCE..pursue further)
+saved meanweights as 21jan11_falcor_RL3_F6__step_1_meanweights.png (Jan13)
+saved animinput as gif/21jan13_21jan11_falcor_RL3_F6__step_1__with_reward_input.mp4
+
+-- resume 21jan11_falcor_RL3_F6__step_2_ (Jan13)
+only problem is firing rates of M quite high ~ 27Hz
+saved performance as 21jan11_falcor_RL3_F6__step_2_perf.png (Jan14) perf dropped to ~ 0.72 (GOOD PERFORMANCE..pursue further)
+saved meanweights as 21jan11_falcor_RL3_F6__step_2_meanweights.png (Jan14)
+saved animinput as gif/21jan14_21jan11_falcor_RL3_F6__step_2__with_reward_input.mp4
+
+-- resume 21jan11_falcor_RL3_F6__step_3_ (Jan14)
+only problem is firing rates of M quite high ~ 28Hz
+saved performance as 21jan11_falcor_RL3_F6__step_3_perf.png (Jan15) perf dropped to ~ 0.66 (GOOD PERFORMANCE..pursue further)
+saved meanweights as 21jan11_falcor_RL3_F6__step_3_meanweights.png (Jan15)
+saved animinput as gif/21jan15_21jan11_falcor_RL3_F6__step_3__with_reward_input.mp4
+
+-- resume 21jan11_falcor_RL3_F6__step_4_ (Jan15)
+saved performance as 21jan11_falcor_RL3_F6__step_4_perf.png (Jan16) perf ~ 0.73 and increasing (GOOD PERFORMANCE..pursue further)
+saved meanweights as 21jan11_falcor_RL3_F6__step_4_meanweights.png (Jan16)
+saved animinput as gif/21jan16_21jan11_falcor_RL3_F6__step_4__with_reward_input.mp4
+
+-- resume 21jan11_falcor_RL3_F6__step_5_ (Jan16)
+-------------------------------------------------
+-- run 21jan12_falcor_RL3_G6__step_0_ (Jan12)
+EA to EM: reduce AM2 to 7
+EA to EM: reduce AM2 to 7
+saved performance as 21jan12_falcor_RL3_G6__step_0_perf.png (Jan13)...0.52 (may improve)
+
+-- resume 21jan12_falcor_RL3_G6__step_1_ (Jan13)
+saved performance as 21jan12_falcor_RL3_G6__step_1_perf.png (Jan14)...0.57 (may improve)
+.... too high firing rates.....EM ~25Hz.
+
+-- resume 21jan12_falcor_RL3_G6__step_2_ (Jan14)
+saved performance as 21jan12_falcor_RL3_G6__step_2_perf.png (Jan15)...drops to ~ 0.88 (EXCELLENT)
+.... too high firing rates.....EM ~26Hz.
+saved animinput as gif/21jan15_21jan12_falcor_RL3_G6__step_2__with_reward_input.mp4
+
+-- resume 21jan12_falcor_RL3_G6__step_3_ (Jan15)
+
+-- resume 21jan12_falcor_RL3_G6__step_4_ (Jan16)
 -----------------------------------------------
 ANALYSIS ON CYCLE SIMS:
 
@@ -12920,3 +12974,428 @@ Now there are only 5 conn types (only between A and M and within M) under RL.
 -- start another multistepsim.....
 "name": "21jan8_TARG4_cycle_"
 (base) hanwar@cycle:~/GamesProject/SMARTAgent$ python multistepSim.py sn.json 20 5 21jan8_RL4_cycle_multi
+
+* 2021jan11
+
+-- analyzing multistepsims from jan8 on cycle.
+
+RL3:
+
+>>> lfn =['21jan8_TARG4_cycle_RL3__step_0_',
+          '21jan8_TARG4_cycle_RL3__step_1_',
+          '21jan8_TARG4_cycle_RL3__step_2_',
+          '21jan8_TARG4_cycle_RL3__step_3_',
+          '21jan8_TARG4_cycle_RL3__step_4_']
+>>> pdac = getconcatactionreward(lfn)
+saved as 21jan11_21jan8_TARG4_cycle_RL3_steps0to4_perf.png .... flat at ~0.37
+
+>>> lpda = getindivactionreward(lfn)
+saved as 21jan11_21jan8_TARG4_cycle_RL3_steps0to4_compareperf.png
+
+>>> pdfc = getconcatweightpdf(lfn)
+saved as 21jan11_21jan8_TARG4_cycle_RL3_steps0to4_EM_meanweights.png
+saved as 21jan11_21jan8_TARG4_cycle_RL3_steps0to4_EAandEA2_meanweights.png....decreasing...thought these weights should be fixed.
+
+... should rerun with fixed EA and EA2 conn weights.....
+
+ cp backupcfg/21jan8_TARG4_cycle_RL3__step_0_sim.json simFull.json
+
+"name": "21jan11_TARG4_cycle_RL3__step_0_",
+      "FeedbackMtoA": 0,
+      "FeedbackMtoA2": 0,
+
+ python multistepSim.py simFull.json 20 5 21jan11_RL3_cycle_multi
+
+....analyzing (Jan12):
+
+(base) hanwar@cycle:~/GamesProject/SMARTAgent$ python -i simdat.py backupcfg/21jan11_TARG4_cycle_RL3__step_0__step_0_sim.json 
+reading  backupcfg/21jan11_TARG4_cycle_RL3__step_0__step_0_sim.json
+-1
+lpop:  ['EV1', 'EMDOWN', 'EMUP', 'IM']
+loading data from 21jan11_TARG4_cycle_RL3__step_0__step_0_
+loading input images from data/21jan11_TARG4_cycle_RL3__step_0__step_0_InputImages.txt
+loaded simulation data 21jan11_TARG4_cycle_RL3__step_0__step_0_ on 21jan12_
+EV1 0.02 Hz
+EA 1.74 Hz
+IA 4.23 Hz
+IAL 0.23 Hz
+EA2 0.11 Hz
+IA2 1.21 Hz
+IA2L 1.72 Hz
+EMDOWN 0.2 Hz
+EMUP 0.2 Hz
+IM 1.41 Hz
+IML 2.11 Hz
+
+>>> lfn =['21jan11_TARG4_cycle_RL3__step_0__step_0_','21jan11_TARG4_cycle_RL3__step_0__step_1_','21jan11_TARG4_cycle_RL3__step_0__step_2_','21jan11_TARG4_cycle_RL3__step_0__step_3_', '21jan11_TARG4_cycle_RL3__step_0__step_4_']
+>>> pdac = getconcatactionreward(lfn)
+>>> plotPerf(pdac)
+performance saved as 21jan12_21jan11_TARG4_cycle_RL3_steps0to4_perf.png (~0.32 BAD)
+
+>>> lpda = getindivactionreward(lfn)
+>>> csm = cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+>>> lclr = [csm.to_rgba(float(i)/len(lpda)) for i in range(len(lpda))]
+>>> plotComparePerf(lpda,lclr,yl=(0,2),lleg=lfn)
+performance saved as 21jan12_21jan11_TARG4_cycle_RL3_steps0to4_compareperf.png (all BAD)
+
+--------------------------------
+RL1:
+
+>>> lfn =['21jan8_TARG4_cycle_RL1__step_0_',
+          '21jan8_TARG4_cycle_RL1__step_1_',
+          '21jan8_TARG4_cycle_RL1__step_2_',
+          '21jan8_TARG4_cycle_RL1__step_3_',
+          '21jan8_TARG4_cycle_RL1__step_4_']
+>>> pdac = getconcatactionreward(lfn)
+saved as 21jan11_21jan8_TARG4_cycle_RL1_steps0to4_perf.png .... flat at ~0.4
+
+>>> lpda = getindivactionreward(lfn)
+saved as 21jan11_21jan8_TARG4_cycle_RL1_steps0to4_compareperf.png
+
+>>> pdfc = getconcatweightpdf(lfn)
+saved as 21jan11_21jan8_TARG4_cycle_RL1_steps0to4_EM_meanweights.png
+saved as 21jan11_21jan8_TARG4_cycle_RL1_steps0to4_EAandEA2_meanweights.png
+
+... should rerun with fixed EA and EA2 conn weights.....
+
+cp backupcfg/21jan8_TARG4_cycle_RL1__step_0_sim.json simFull.json
+
+"name": "21jan11_TARG4_cycle_RL1__step_0_",
+      "FeedbackMtoA": 0,
+      "FeedbackMtoA2": 0,
+
+>>> lfn =['21jan11_TARG4_cycle_RL1__step_0__step_0_','21jan11_TARG4_cycle_RL1__step_0__step_1_','21jan11_TARG4_cycle_RL1__step_0__step_2_','21jan11_TARG4_cycle_RL1__step_0__step_3_', '21jan11_TARG4_cycle_RL1__step_0__step_4_']
+>>> pdac = getconcatactionreward(lfn)
+>>> plotPerf(pdac)
+<matplotlib.axes._subplots.AxesSubplot object at 0x7f670445a590>
+performance saved as 21jan12_21jan11_TARG4_cycle_RL1_steps0to4_perf.png (~0.36 BAD)
+
+>>> lpda = getindivactionreward(lfn)
+>>> plotComparePerf(lpda,lclr,yl=(0,2),lleg=lfn)
+performance saved as 21jan12_21jan11_TARG4_cycle_RL1_steps0to4_compareperf.png (only last step (step_4 is good in the beginning))
+
+-------------
+RL0:
+
+basically same story... so didnt save any plots.
+
+... should rerun with fixed EA and EA2 conn weights.....
+
+
+
+------------------------------------------------
+analyzing sam's simulations from gcp.
+
+(base) hanwar@cycle:/home/samn/SMARTAgent$ python -i simdat.py backupcfg/21jan6_TARG4_gcp__step_0_sim.json 
+reading  backupcfg/21jan6_TARG4_gcp__step_0_sim.json
+-1
+lpop:  ['EV1', 'EMDOWN', 'EMUP', 'IM']
+loading data from 21jan6_TARG4_gcp__step_0_
+loading input images from data/21jan6_TARG4_gcp__step_0_InputImages.txt
+loaded simulation data 21jan6_TARG4_gcp__step_0_ on 21jan11_
+EV1 0.02 Hz
+EA 1.74 Hz
+IA 4.24 Hz
+IAL 0.23 Hz
+EA2 0.11 Hz
+IA2 1.2 Hz
+IA2L 1.72 Hz
+EMDOWN 0.2 Hz
+EMUP 0.2 Hz
+IM 1.41 Hz
+IML 2.11 Hz
+
+
+>>> lfn =['21jan6_TARG4_gcp__step_0_','21jan6_TARG4_gcp__step_1_','21jan6_TARG4_gcp__step_2_','21jan6_TARG4_gcp__step_3_', '21jan6_TARG4_gcp__step_4_','21jan6_TARG4_gcp__step_5_','21jan6_TARG4_gcp__step_6_','21jan6_TARG4_gcp__step_7_','21jan6_TARG4_gcp__step_8_','21jan6_TARG4_gcp__step_9_','21jan6_TARG4_gcp__step_10_','21jan6_TARG4_gcp__step_11_','21jan6_TARG4_gcp__step_12_','21jan6_TARG4_gcp__step_13_','21jan6_TARG4_gcp__step_14_','21jan6_TARG4_gcp__step_15_','21jan6_TARG4_gcp__step_16_','21jan6_TARG4_gcp__step_17_','21jan6_TARG4_gcp__step_18_','21jan6_TARG4_gcp__step_19_']
+>>> len(lfn)
+20
+>>> pdac = getconcatactionreward(lfn)
+performance saved as 21jan11_21jan6_TARG4_gcp_steps0to19_perf.png ....flat at ~ 0.42
+
+
+>>> lpda = getindivactionreward(lfn)
+>>> csm = cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+>>> lclr = [csm.to_rgba(float(i)/len(lpda)) for i in range(len(lpda))]
+>>> plotComparePerf(lpda,lclr,yl=(0,2),lleg=lfn)
+performance comparison for steps saved as 21jan11_21jan6_TARG4_gcp_steps0to19_compareperf.png
+
+
+
+EM mean weights saved as 21jan11_21jan6_TARG4_gcp_steps0to19_EM_meanweights.png
+... may be M is primarily driven by noise. 
+... test that by running sim with weights from 21jan6_TARG4_gcp__step_19_ and reducing or turning off noise (may be both).
+
+
+"ResumeSimFromFile": "data/21jan6_TARG4_gcp__step_19_synWeights_final.pkl"
+"name": "21jan11_TARG4_gcp_cycle__step_19_NoNoise_" ---->check this in the morning.
+(Jan12): nothing to pursue further.
+--------------------------------------------------
+
+(Jan12): run control for the best step of sim Sam had on gcp.
+
+(base) hanwar@cycle:~/GamesProject/SMARTAgent$ cp /home/samn/SMARTAgent/backupcfg/21jan11_TARG4_gcp__step_3_sim.json simFull.json
+
+in simFull.json
+
+    "ResumeSim": 1,
+    "ResumeSimFromFile": "/home/samn/SMARTAgent/data/21jan11_TARG4_gcp__step_3_synWeights_final.pkl"
+
+"name": "21jan11_TARG4_gcp__step_3_RLhebbwt_0_",
+RL: 
+AMPAI: "RLhebbwt": 0.0, (was 0.001 during training)
+AMPA: "RLhebbwt": 0.0, (was 0.01 during training)
+NMDA: "RLhebbwt": 0.0 (was 4e-06 during training)
+
+ mpiexec -n 30 nrniv -python -mpi sim.py simFull.json
+
+ ----------
+(Jan12): run control for another best step of sim Sam had on gcp.
+
+ (base) hanwar@cycle:~/GamesProject/SMARTAgent$ cp /home/samn/SMARTAgent/backupcfg/21jan11_TARG4_B_gcp__step_3_sim.json simFull.json
+
+     "ResumeSim": 1,
+    "ResumeSimFromFile": "/home/samn/SMARTAgent/data/21jan11_TARG4_B_gcp__step_2_synWeights_final.pkl"
+
+    "name": "21jan11_TARG4_B_gcp__step_3_RLhebbwt_0_",
+RL:
+AMPAI: "RLhebbwt": 0.0, (was 0.001 during training)
+AMPA: "RLhebbwt": 0.0, (was 0.01 during training)
+NMDA: "RLhebbwt": 0.0 (was 4e-06 during training)
+
+(base) hanwar@cycle:~/GamesProject/SMARTAgent$ mpiexec -n 30 nrniv -python -mpi sim.py simFull.json
+
+saving data failed for 500 sec sim.
+
+.... so ran 300 sec sim.
+
+ python -i simdat.py backupcfg/21jan11_TARG4_gcp__step_3_RLhebbwt_0_sim.json
+
+(Jan13)........
+(base) hanwar@cycle:~/GamesProject/SMARTAgent$ cp /home/samn/SMARTAgent/backupcfg/21jan11_TARG4_gcp__step_2_sim.json simFull.json
+duration: 300 sec.
+    "ResumeSim": 1,
+    "ResumeSimFromFile": "/home/samn/SMARTAgent/data/21jan11_TARG4_gcp__step_2_synWeights_final.pkl"
+    "name": "21jan11_TARG4_gcp__step_2_RLhebbwt_0_"
+
+    set all RLhebbwt to 0.
+
+ mpiexec -n 30 nrniv -python -mpi sim.py simFull.json
+
+
+
+ (Jan13):
+
+     "ResumeSim": 1,
+    "ResumeSimFromFile": "/home/samn/SMARTAgent/data/21jan11_TARG4_gcp__step_1_synWeights_final.pkl"
+"name": "21jan11_TARG4_gcp__step_1_RLhebbwt_0_",
+
+
+-----------------------------
+
+(base) hanwar@cycle:~/GamesProject/SMARTAgent$ python -i simdat.py backupcfg/21jan11_TARG4_B_gcp__step_3_RLhebbwt_0_sim.json 
+reading  backupcfg/21jan11_TARG4_B_gcp__step_3_RLhebbwt_0_sim.json
+-1
+lpop:  ['EV1', 'EMDOWN', 'EMUP', 'IM']
+loading data from 21jan11_TARG4_B_gcp__step_3_RLhebbwt_0_
+loading input images from data/21jan11_TARG4_B_gcp__step_3_RLhebbwt_0_InputImages.txt
+loaded simulation data 21jan11_TARG4_B_gcp__step_3_RLhebbwt_0_ on 21jan12_
+EV1 0.02 Hz
+EA 2.47 Hz
+IA 6.0 Hz
+IAL 0.82 Hz
+EA2 0.46 Hz
+IA2 1.65 Hz
+IA2L 2.38 Hz
+EMDOWN 0.46 Hz
+EMUP 0.46 Hz
+IM 1.94 Hz
+IML 2.75 Hz
+
+Use this figure to evaluate controls:
+
+file:///home/samn/SMARTAgent/gif/21jan12_21jan11_TARG4_B_gcp__step_3_perf_compareD.png
+
+CONTROLS: 
+performance saved as 21jan12_21jan11_TARG4_B_gcp__step_3_RLhebbwt_0__perf.png (300 sec)
+
+-- run 21jan11_TARG4_gcp__step_1_RLhebbwt_0_ (Jan13)(500 sec)
+performance saved as 21jan14_21jan11_TARG4_gcp__step_1_RLhebbwt_0_perf.png (Jan14) (EXCELLENT)
+
+-- run 21jan11_TARG4_gcp__step_0_RLhebbwt_0_ (Jan14) (500 sec)
+performance saved as 21jan14_21jan11_TARG4_gcp__step_0_RLhebbwt_0_perf.png (Jan14) (NOT GOOD.. perf ~ = 0.42)
+
+...start all from the beginning....
+
+--(Jan14) run control for step_0_:
+use this /home/samn/SMARTAgent/data/21jan6_TARG4_gcp__step_0_synWeights_final.pkl
+
+cp /home/samn/SMARTAgent/backupcfg/21jan6_TARG4_gcp__step_1_sim.json simFull.json 
+
+"ResumeSim": 1, (Jan14)
+"ResumeSimFromFile": "/home/samn/SMARTAgent/data/21jan6_TARG4_gcp__step_0_synWeights_final.pkl"
+"name": "21jan14_21jan6_TARG4_gcp__step_0_RLhebbwt_0_"
+performance saved as 21jan14_21jan6_TARG4_gcp__step_0_RLhebbwt_0_perf.png (VERY GOOD)
+
+
+"ResumeSim": 1, (Jan14)
+"ResumeSimFromFile": "/home/samn/SMARTAgent/data/21jan6_TARG4_gcp__step_1_synWeights_final.pkl"
+ "name": "21jan14_21jan6_TARG4_gcp__step_1_RLhebbwt_0_",
+performance saved as 21jan14_21jan6_TARG4_gcp__step_1_RLhebbwt_0_perf.png (NOT GOOD)
+
+
+"ResumeSim": 1, (Jan14)
+"ResumeSimFromFile": "/home/samn/SMARTAgent/data/21jan6_TARG4_gcp__step_2_synWeights_final.pkl"
+"name": "21jan14_21jan6_TARG4_gcp__step_2_RLhebbwt_0_",
+performance saved as 21jan14_21jan6_TARG4_gcp__step_2_RLhebbwt_0_perf.png (NOT GOOD)
+
+
+
+"ResumeSim": 1, (Jan14)
+"ResumeSimFromFile": "/home/samn/SMARTAgent/data/21jan6_TARG4_gcp__step_3_synWeights_final.pkl"
+"name": "21jan14_21jan6_TARG4_gcp__step_3_RLhebbwt_0_",
+performance saved as 21jan14_21jan6_TARG4_gcp__step_3_RLhebbwt_0_perf.png (Jan15) (NOT GOOD)
+
+"ResumeSim": 1, (Jan14)
+"ResumeSimFromFile": "/home/samn/SMARTAgent/data/21jan6_TARG4_gcp__step_4_synWeights_final.pkl"
+"name": "21jan14_21jan6_TARG4_gcp__step_4_RLhebbwt_0_"
+performance saved as 21jan14_21jan6_TARG4_gcp__step_4_RLhebbwt_0_perf.png (Jan15) (NOT GOOD)
+
+
+"ResumeSim": 1, (Jan14)
+"ResumeSimFromFile": "/home/samn/SMARTAgent/data/21jan6_TARG4_gcp__step_5_synWeights_final.pkl"
+"name": "21jan14_21jan6_TARG4_gcp__step_5_RLhebbwt_0_"
+performance saved as 21jan14_21jan6_TARG4_gcp__step_5_RLhebbwt_0_perf.png (Jan15) (NOT GOOD)
+
+
+"ResumeSim": 1, (Jan15)
+"ResumeSimFromFile": "/home/samn/SMARTAgent/data/21jan6_TARG4_gcp__step_6_synWeights_final.pkl"
+"name": "21jan14_21jan6_TARG4_gcp__step_6_RLhebbwt_0_",
+performance saved as 21jan14_21jan6_TARG4_gcp__step_6_RLhebbwt_0_perf.png (Jan15) (NOT GOOD)
+
+
+"ResumeSim": 1, (Jan15)
+"ResumeSimFromFile": "/home/samn/SMARTAgent/data/21jan6_TARG4_gcp__step_7_synWeights_final.pkl"
+"name": "21jan14_21jan6_TARG4_gcp__step_7_RLhebbwt_0_",
+performance saved as 21jan14_21jan6_TARG4_gcp__step_7_RLhebbwt_0_perf.png (NOT GREAT BUT OK)
+
+"ResumeSim": 1, (Jan15)
+"ResumeSimFromFile": "/home/samn/SMARTAgent/data/21jan6_TARG4_gcp__step_8_synWeights_final.pkl"
+"name": "21jan14_21jan6_TARG4_gcp__step_8_RLhebbwt_0_",
+performance saved as 21jan14_21jan6_TARG4_gcp__step_8_RLhebbwt_0_perf.png (Not good)
+
+
+"ResumeSim": 1, (Jan15)
+"ResumeSimFromFile": "/home/samn/SMARTAgent/data/21jan6_TARG4_gcp__step_9_synWeights_final.pkl"
+"name": "21jan14_21jan6_TARG4_gcp__step_9_RLhebbwt_0_",
+performance saved as 21jan14_21jan6_TARG4_gcp__step_9_RLhebbwt_0_perf.png (Not good)
+
+
+"ResumeSim": 1, (Jan15)
+"ResumeSimFromFile": "/home/samn/SMARTAgent/data/21jan6_TARG4_gcp__step_10_synWeights_final.pkl"
+"name": "21jan14_21jan6_TARG4_gcp__step_10_RLhebbwt_0_",
+performance saved as 21jan14_21jan6_TARG4_gcp__step_10_RLhebbwt_0_perf.png ....(not great but good)
+
+
+"ResumeSim": 1, (Jan15)
+"ResumeSimFromFile": "/home/samn/SMARTAgent/data/21jan6_TARG4_gcp__step_11_synWeights_final.pkl"
+"name": "21jan14_21jan6_TARG4_gcp__step_11_RLhebbwt_0_",
+performance saved as 21jan14_21jan6_TARG4_gcp__step_11_RLhebbwt_0_perf.png ....(not great but good)
+
+
+"ResumeSim": 1, (Jan15)
+"ResumeSimFromFile": "/home/samn/SMARTAgent/data/21jan6_TARG4_gcp__step_12_synWeights_final.pkl"
+"name": "21jan14_21jan6_TARG4_gcp__step_12_RLhebbwt_0_",
+(Jan16): performance saved as 21jan14_21jan6_TARG4_gcp__step_12_RLhebbwt_0_perf.png (not good).
+
+
+"ResumeSim": 1, (Jan15)
+"ResumeSimFromFile": "/home/samn/SMARTAgent/data/21jan6_TARG4_gcp__step_13_synWeights_final.pkl"
+"name": "21jan14_21jan6_TARG4_gcp__step_13_RLhebbwt_0_",
+(Jan16): performance saved as 21jan14_21jan6_TARG4_gcp__step_13_RLhebbwt_0_perf.png (bad)
+
+
+"ResumeSim": 1, (Jan15)
+"ResumeSimFromFile": "/home/samn/SMARTAgent/data/21jan6_TARG4_gcp__step_14_synWeights_final.pkl"
+"name": "21jan14_21jan6_TARG4_gcp__step_14_RLhebbwt_0_",
+(Jan16) performance saved as 21jan14_21jan6_TARG4_gcp__step_14_RLhebbwt_0_perf.png (not good)
+
+"ResumeSim": 1, (Jan15)
+"ResumeSimFromFile": "/home/samn/SMARTAgent/data/21jan6_TARG4_gcp__step_15_synWeights_final.pkl"
+"name": "21jan14_21jan6_TARG4_gcp__step_15_RLhebbwt_0_",
+(Jan16) performance saved as 21jan14_21jan6_TARG4_gcp__step_15_RLhebbwt_0_perf.png (not good)
+
+"ResumeSim": 1, (Jan16)
+"ResumeSimFromFile": "/home/samn/SMARTAgent/data/21jan6_TARG4_gcp__step_16_synWeights_final.pkl"
+"name": "21jan14_21jan6_TARG4_gcp__step_16_RLhebbwt_0_",
+waiting to finish......
+
+"ResumeSim": 1, (Jan16)
+"ResumeSimFromFile": "/home/samn/SMARTAgent/data/21jan6_TARG4_gcp__step_17_synWeights_final.pkl"
+"name": "21jan14_21jan6_TARG4_gcp__step_17_RLhebbwt_0_",
+waiting to finish......
+
+"ResumeSim": 1, (Jan16)
+"ResumeSimFromFile": "/home/samn/SMARTAgent/data/21jan6_TARG4_gcp__step_18_synWeights_final.pkl"
+"name": "21jan14_21jan6_TARG4_gcp__step_18_RLhebbwt_0_"
+waiting to finish......
+
+"ResumeSim": 1, (Jan16)
+"ResumeSimFromFile": "/home/samn/SMARTAgent/data/21jan6_TARG4_gcp__step_19_synWeights_final.pkl"
+"name": "21jan14_21jan6_TARG4_gcp__step_19_RLhebbwt_0_"
+waiting to finish......
+
+-----------------------
+
+(base) hanwar@cycle:~/GamesProject/SMARTAgent$ cp backupcfg/21jan11_TARG4_B_gcp__step_3_RLhebbwt_0_sim.json simFull.json 
+
+    "ResumeSim": 1,
+    "ResumeSimFromFile": "/home/samn/SMARTAgent/data/21jan11_TARG4_B_gcp__step_2_synWeights_final.pkl"
+
+ "name": "21jan11_TARG4_B_gcp__step_2_RLhebbwt_0_",
+
+(base) hanwar@cycle:~/GamesProject/SMARTAgent$ mpiexec -n 30 nrniv -python -mpi sim.py simFull.json
+
+
+(Jan13): saved comparing performances using different weight matrices: 21jan12_21jan11_TARG4_B_gcp__steps_2and3_RLhebbwt_0__compareperf.png
+
+(Jan13): (base) hanwar@cycle:~/GamesProject/SMARTAgent$ cp backupcfg/21jan11_TARG4_B_gcp__step_2_RLhebbwt_0_sim.json simFull.json
+    "ResumeSim": 1,
+    "ResumeSimFromFile": "/home/samn/SMARTAgent/data/21jan11_TARG4_B_gcp__step_1_synWeights_final.pkl"
+     "name": "21jan11_TARG4_B_gcp__step_1_RLhebbwt_0_"
+
+(Jan13): (base) hanwar@cycle:~/GamesProject/SMARTAgent$ mpiexec -n 30 nrniv -python -mpi sim.py simFull.json
+
+(Jan13): saved comparing performances using different weight matrices: 21jan12_21jan11_TARG4_B_gcp__steps_1and2and3_RLhebbwt_0__compareperf.png
+
+(Jan13): (base) hanwar@cycle:~/GamesProject/SMARTAgent$ cp backupcfg/21jan11_TARG4_B_gcp__step_1_RLhebbwt_0_sim.json simFull.json
+
+    "ResumeSim": 1,
+    "ResumeSimFromFile": "/home/samn/SMARTAgent/data/21jan11_TARG4_B_gcp__step_0_synWeights_final.pkl"
+    "name": "21jan11_TARG4_B_gcp__step_0_RLhebbwt_0_",
+
+(Jan13): (base) hanwar@cycle:~/GamesProject/SMARTAgent$ mpiexec -n 30 nrniv -python -mpi sim.py simFull.json
+
+
+(Jan13): (base) hanwar@cycle:~/GamesProject/SMARTAgent$ cp backupcfg/21jan11_TARG4_B_gcp__step_1_RLhebbwt_0_sim.json simFull.json
+
+    "ResumeSim": 1,
+    "ResumeSimFromFile": "/home/samn/SMARTAgent/data/21jan11_TARG4_B_gcp__step_4_synWeights_final.pkl"
+    "name": "21jan11_TARG4_B_gcp__step_4_RLhebbwt_0_",
+
+(Jan13): (base) hanwar@cycle:~/GamesProject/SMARTAgent$ mpiexec -n 30 nrniv -python -mpi sim.py simFull.json
+
+(Jan14):
+>>> lfn =['21jan11_TARG4_B_gcp__step_0_RLhebbwt_0_',
+          '21jan11_TARG4_B_gcp__step_1_RLhebbwt_0_',
+          '21jan11_TARG4_B_gcp__step_2_RLhebbwt_0_',
+          '21jan11_TARG4_B_gcp__step_3_RLhebbwt_0_',
+          '21jan11_TARG4_B_gcp__step_4_RLhebbwt_0_']
+>>> lpda = getindivactionreward(lfn)
+plotComparePerf(lpda,lclr=['r','b','g','c','m'],yl=(0,2),lleg=lfn)
+
+comparing controls: 21jan14_21jan11_TARG4_B_gcp__steps_0to4_RLhebbwt_0__compareperf.png
+
+21jan14_21jan11_TARG4_B_gcp__steps_0to4_RLhebbwt_0__meanweights.png (shows that sim '21jan11_TARG4_B_gcp__step_4_RLhebbwt_0_' didn't upload weights properly)
+
+on checking the dir /home/samn/SMARTAgent/data/, I realized there was no step_4..... thats why it used initial weight values.
+-------------------------------------------
