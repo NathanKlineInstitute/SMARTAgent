@@ -12667,7 +12667,19 @@ saved performance as 21jan11_falcor_RL3_F6__step_4_perf.png (Jan16) perf ~ 0.73 
 saved meanweights as 21jan11_falcor_RL3_F6__step_4_meanweights.png (Jan16)
 saved animinput as gif/21jan16_21jan11_falcor_RL3_F6__step_4__with_reward_input.mp4
 
--- resume 21jan11_falcor_RL3_F6__step_5_ (Jan16)
+-- resume 21jan11_falcor_RL3_F6__step_5_ (Jan16)....restarted on (Jan19)
+saved performance as 21jan11_falcor_RL3_F6__step_5_perf.png (Jan20) perf ~0.88 (Excellent performance)
+saved meanweights as 21jan11_falcor_RL3_F6__step_5_meanweights.png (Jan20)
+saved animinput as gif/21jan20_21jan11_falcor_RL3_F6__step_5__with_reward_input.mp4
+
+-- resume 21jan11_falcor_RL3_F6__step_6_ (Jan20)
+saved performance as 21jan11_falcor_RL3_F6__step_6_perf.png (Jan21) perf ~0.8 (Good performance)
+saved meanweights as 21jan11_falcor_RL3_F6__step_6_meanweights.png (Jan21)
+saved animinput as gif/21jan21_21jan11_falcor_RL3_F6__step_5__with_reward_input.mp4
+
+-- resume 21jan11_falcor_RL3_F6__step_7_ (Jan21)
+
+
 -------------------------------------------------
 -- run 21jan12_falcor_RL3_G6__step_0_ (Jan12)
 EA to EM: reduce AM2 to 7
@@ -12685,7 +12697,9 @@ saved animinput as gif/21jan15_21jan12_falcor_RL3_G6__step_2__with_reward_input.
 
 -- resume 21jan12_falcor_RL3_G6__step_3_ (Jan15)
 
--- resume 21jan12_falcor_RL3_G6__step_4_ (Jan16)
+-- resume 21jan12_falcor_RL3_G6__step_4_ (Jan16)...restarted on (Jan19)
+sim got terminated.... abandoning......
+
 -----------------------------------------------
 ANALYSIS ON CYCLE SIMS:
 
@@ -13211,12 +13225,17 @@ EMUP 0.46 Hz
 IM 1.94 Hz
 IML 2.75 Hz
 
-Use this figure to evaluate controls:
 
-file:///home/samn/SMARTAgent/gif/21jan12_21jan11_TARG4_B_gcp__step_3_perf_compareD.png
+
+This doesnt seem to be great: file:///home/samn/SMARTAgent/gif/21jan12_21jan11_TARG4_B_gcp__step_3_perf_compareD.png
 
 CONTROLS: 
 performance saved as 21jan12_21jan11_TARG4_B_gcp__step_3_RLhebbwt_0__perf.png (300 sec)
+
+
+---------------------------------------------------------
+Use this figure to evaluate controls:
+file:///home/samn/SMARTAgent/gif/21jan12_21jan11_TARG4_gcp__step_3_perf_compareD.png
 
 -- run 21jan11_TARG4_gcp__step_1_RLhebbwt_0_ (Jan13)(500 sec)
 performance saved as 21jan14_21jan11_TARG4_gcp__step_1_RLhebbwt_0_perf.png (Jan14) (EXCELLENT)
@@ -13327,23 +13346,210 @@ performance saved as 21jan14_21jan6_TARG4_gcp__step_11_RLhebbwt_0_perf.png ....(
 "ResumeSim": 1, (Jan16)
 "ResumeSimFromFile": "/home/samn/SMARTAgent/data/21jan6_TARG4_gcp__step_16_synWeights_final.pkl"
 "name": "21jan14_21jan6_TARG4_gcp__step_16_RLhebbwt_0_",
-waiting to finish......
+(Jan19) performance saved as 21jan14_21jan6_TARG4_gcp__step_16_RLhebbwt_0_perf.png (bad)
 
 "ResumeSim": 1, (Jan16)
 "ResumeSimFromFile": "/home/samn/SMARTAgent/data/21jan6_TARG4_gcp__step_17_synWeights_final.pkl"
 "name": "21jan14_21jan6_TARG4_gcp__step_17_RLhebbwt_0_",
-waiting to finish......
+(Jan19) performance saved as 21jan14_21jan6_TARG4_gcp__step_17_RLhebbwt_0_perf.png (bad)
 
 "ResumeSim": 1, (Jan16)
 "ResumeSimFromFile": "/home/samn/SMARTAgent/data/21jan6_TARG4_gcp__step_18_synWeights_final.pkl"
 "name": "21jan14_21jan6_TARG4_gcp__step_18_RLhebbwt_0_"
-waiting to finish......
+(Jan19) performance saved as 21jan14_21jan6_TARG4_gcp__step_18_RLhebbwt_0_perf.png (bad)
 
 "ResumeSim": 1, (Jan16)
 "ResumeSimFromFile": "/home/samn/SMARTAgent/data/21jan6_TARG4_gcp__step_19_synWeights_final.pkl"
 "name": "21jan14_21jan6_TARG4_gcp__step_19_RLhebbwt_0_"
-waiting to finish......
+(Jan19) performance saved as 21jan14_21jan6_TARG4_gcp__step_19_RLhebbwt_0_perf.png (OK. perf stays above ~0.6)
 
+
+-- analyzing all controls: (Jan19)
+
+>>> lfn =['21jan14_21jan6_TARG4_gcp__step_0_RLhebbwt_0_',
+          '21jan14_21jan6_TARG4_gcp__step_1_RLhebbwt_0_',
+          '21jan14_21jan6_TARG4_gcp__step_2_RLhebbwt_0_',
+          '21jan14_21jan6_TARG4_gcp__step_3_RLhebbwt_0_',
+          '21jan14_21jan6_TARG4_gcp__step_4_RLhebbwt_0_',
+          '21jan14_21jan6_TARG4_gcp__step_5_RLhebbwt_0_',
+          '21jan14_21jan6_TARG4_gcp__step_6_RLhebbwt_0_',
+          '21jan14_21jan6_TARG4_gcp__step_7_RLhebbwt_0_',
+          '21jan14_21jan6_TARG4_gcp__step_8_RLhebbwt_0_',
+          '21jan14_21jan6_TARG4_gcp__step_9_RLhebbwt_0_',
+          '21jan14_21jan6_TARG4_gcp__step_10_RLhebbwt_0_',
+          '21jan14_21jan6_TARG4_gcp__step_11_RLhebbwt_0_',
+          '21jan14_21jan6_TARG4_gcp__step_12_RLhebbwt_0_',
+          '21jan14_21jan6_TARG4_gcp__step_13_RLhebbwt_0_',
+          '21jan14_21jan6_TARG4_gcp__step_14_RLhebbwt_0_',
+          '21jan14_21jan6_TARG4_gcp__step_15_RLhebbwt_0_',
+          '21jan14_21jan6_TARG4_gcp__step_16_RLhebbwt_0_',
+          '21jan14_21jan6_TARG4_gcp__step_17_RLhebbwt_0_',
+          '21jan14_21jan6_TARG4_gcp__step_18_RLhebbwt_0_',
+          '21jan14_21jan6_TARG4_gcp__step_19_RLhebbwt_0_',
+          '21jan11_TARG4_gcp__step_0_RLhebbwt_0_',
+          '21jan11_TARG4_gcp__step_1_RLhebbwt_0_',
+          '21jan11_TARG4_gcp__step_2_RLhebbwt_0_',
+          '21jan11_TARG4_gcp__step_3_RLhebbwt_0_']
+>>> lpda = getindivactionreward(lfn)
+pdfc = getconcatweightpdf(lfn)
+ plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMUP','EMDOWN'],lclr=['r','b'],plotindiv=False)
+21jan19_TARG4_gcp__AllStepsControls_RLhebbwt_0__meanweights.png (EMDOWN is always higher than EMUP weights on average)
+
+-- based on the best controls: test some more initial positions for the ball....
+
+good ones are....
+
+21jan14_21jan6_TARG4_gcp__step_0_RLhebbwt_0_ (2nd best)
+
+21jan14_21jan6_TARG4_gcp__step_7_RLhebbwt_0_ (may be)
+21jan14_21jan6_TARG4_gcp__step_10_RLhebbwt_0_ (may be)
+21jan14_21jan6_TARG4_gcp__step_11_RLhebbwt_0_
+21jan14_21jan6_TARG4_gcp__step_12_RLhebbwt_0_ (may be)
+21jan14_21jan6_TARG4_gcp__step_19_RLhebbwt_0_
+
+21jan11_TARG4_gcp__step_1_RLhebbwt_0_ (Best) --- DONE for 5 other positions
+
+...start with best
+cp backupcfg/21jan11_TARG4_gcp__step_1_RLhebbwt_0_sim.json simFull.json
+
+original was 
+    "yball": 80,
+    "yracket": 40,
+
+-- run sim 21jan19_21jan11_TARG4_gcp__step_1_RLhebbwt_0_p1_ (Jan19)
+
+    "yball": 100,
+    "yracket": 20,
+    "name": "21jan19_21jan11_TARG4_gcp__step_1_RLhebbwt_0_p1_",
+
+-- 21jan19_21jan11_TARG4_gcp__step_1_RLhebbwt_0_p2_ (Jan19)
+
+    "yball": 120,
+    "yracket": 10,
+    "name": "21jan19_21jan11_TARG4_gcp__step_1_RLhebbwt_0_p2_",
+
+-- 21jan19_21jan11_TARG4_gcp__step_1_RLhebbwt_0_p3_ (Jan19)
+
+    "yball": 10,
+    "yracket": 120,
+    "name": "21jan19_21jan11_TARG4_gcp__step_1_RLhebbwt_0_p3_",
+
+-- 21jan19_21jan11_TARG4_gcp__step_1_RLhebbwt_0_p4_ (Jan19)
+
+    "yball": 20,
+    "yracket": 100,
+    "name": "21jan19_21jan11_TARG4_gcp__step_1_RLhebbwt_0_p4_",
+
+-- 21jan19_21jan11_TARG4_gcp__step_1_RLhebbwt_0_p5_ (Jan19)
+
+    "yball": 40,
+    "yracket": 80,
+    "name": "21jan19_21jan11_TARG4_gcp__step_1_RLhebbwt_0_p5_",
+
+
+
+lfn =['21jan19_21jan11_TARG4_gcp__step_1_RLhebbwt_0_p1_',
+      '21jan19_21jan11_TARG4_gcp__step_1_RLhebbwt_0_p2_',
+      '21jan19_21jan11_TARG4_gcp__step_1_RLhebbwt_0_p3_',
+      '21jan19_21jan11_TARG4_gcp__step_1_RLhebbwt_0_p4_',
+      '21jan19_21jan11_TARG4_gcp__step_1_RLhebbwt_0_p5_',
+      '21jan11_TARG4_gcp__step_1_RLhebbwt_0_']
+>>> lpda = getindivactionreward(lfn)
+>>> csm = cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+>>> lclr = [csm.to_rgba(float(i)/len(lpda)) for i in range(len(lpda))]
+>>> plotComparePerf(lpda,lclr,yl=(0,2),lleg=lfn,skipscore=True,skipfollow=True)
+
+performance saved as 21jan19_21jan11_TARG4_gcp__step_1_RLhebbwt_0_5positions_perf.png (performance dropped when position changed.)
+
+-----------------------
+.....now try second best.....
+
+cp backupcfg/21jan14_21jan6_TARG4_gcp__step_0_RLhebbwt_0_sim.json simFull.json
+
+original was 
+    "yball": 80,
+    "yracket": 40,
+
+-- run sim 21jan20_21jan6_TARG4_gcp__step_0_RLhebbwt_0_p1_ (Jan20)
+
+    "yball": 100,
+    "yracket": 20,
+    "name": "21jan20_21jan6_TARG4_gcp__step_0_RLhebbwt_0_p1_",
+
+-- run sim 21jan20_21jan6_TARG4_gcp__step_0_RLhebbwt_0_p2_ (Jan20)
+
+    "yball": 120,
+    "yracket": 10,
+    "name": "21jan20_21jan6_TARG4_gcp__step_0_RLhebbwt_0_p2_",
+
+-- run sim 21jan20_21jan6_TARG4_gcp__step_0_RLhebbwt_0_p3_ (Jan20)
+
+    "yball": 10,
+    "yracket": 120,
+    "name": "21jan20_21jan6_TARG4_gcp__step_0_RLhebbwt_0_p3_",
+
+
+-- run sim 21jan20_21jan6_TARG4_gcp__step_0_RLhebbwt_0_p4_ (Jan20)
+
+    "yball": 20,
+    "yracket": 100,
+    "name": "21jan20_21jan6_TARG4_gcp__step_0_RLhebbwt_0_p4_",
+
+-- run sim "21jan20_21jan6_TARG4_gcp__step_0_RLhebbwt_0_p5_ (Jan20)
+
+    "yball": 40,
+    "yracket": 80,
+    "name": ""21jan20_21jan6_TARG4_gcp__step_0_RLhebbwt_0_p5_",
+
+
+>>> lfn =['21jan20_21jan6_TARG4_gcp__step_0_RLhebbwt_0_p1_','21jan20_21jan6_TARG4_gcp__step_0_RLhebbwt_0_p2_','21jan20_21jan6_TARG4_gcp__step_0_RLhebbwt_0_p3_','21jan20_21jan6_TARG4_gcp__step_0_RLhebbwt_0_p4_','21jan20_21jan6_TARG4_gcp__step_0_RLhebbwt_0_p5_','21jan14_21jan6_TARG4_gcp__step_0_RLhebbwt_0_']
+>>> lpda = getindivactionreward(lfn)
+>>> csm = cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+>>> lclr = [csm.to_rgba(float(i)/len(lpda)) for i in range(len(lpda))]
+>>> plotComparePerf(lpda,lclr,yl=(0,2),lleg=lfn,skipscore=True,skipfollow=True)
+
+saved perf as 21jan20_21jan6_TARG4_gcp__step_0_RLhebbwt_0_5positions_perf.png
+
+-----------------------
+.....now try with initial weights.....
+
+-- run sim  21jan21_TARG4_gcp_RLhebbwt_0_p0_
+    "yball": 80,
+    "yracket": 40,
+    "ResumeSim": 0
+    "name": "21jan21_TARG4_gcp_RLhebbwt_0_p0_",
+
+-- run sim 21jan21_TARG4_gcp_RLhebbwt_0_p1_
+    "yball": 100,
+    "yracket": 20,
+    "ResumeSim": 0
+    "name": "21jan21_TARG4_gcp_RLhebbwt_0_p1_",
+
+-- run sim 21jan21_TARG4_gcp_RLhebbwt_0_p2_
+    "yball": 120,
+    "yracket": 10,
+    "ResumeSim": 0
+    "name": "21jan21_TARG4_gcp_RLhebbwt_0_p2_",
+
+-- run sim 21jan21_TARG4_gcp_RLhebbwt_0_p3_
+    "yball": 10,
+    "yracket": 120,
+    "ResumeSim": 0
+    "name": "21jan21_TARG4_gcp_RLhebbwt_0_p3_",
+
+-- run sim 21jan21_TARG4_gcp_RLhebbwt_0_p4_
+    "yball": 20,
+    "yracket": 100,
+    "ResumeSim": 0
+    "name": "21jan21_TARG4_gcp_RLhebbwt_0_p4_",
+
+-- run sim 21jan21_TARG4_gcp_RLhebbwt_0_p5_
+    "yball": 40,
+    "yracket": 80,
+    "ResumeSim": 0
+    "name": "21jan21_TARG4_gcp_RLhebbwt_0_p5_",
+
+    
 -----------------------
 
 (base) hanwar@cycle:~/GamesProject/SMARTAgent$ cp backupcfg/21jan11_TARG4_B_gcp__step_3_RLhebbwt_0_sim.json simFull.json 
