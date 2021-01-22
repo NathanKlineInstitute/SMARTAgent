@@ -12989,7 +12989,7 @@ Now there are only 5 conn types (only between A and M and within M) under RL.
 "name": "21jan8_TARG4_cycle_"
 (base) hanwar@cycle:~/GamesProject/SMARTAgent$ python multistepSim.py sn.json 20 5 21jan8_RL4_cycle_multi
 
-* 2021jan11
+* DONE 2021jan11
 
 -- analyzing multistepsims from jan8 on cycle.
 
@@ -13605,3 +13605,54 @@ comparing controls: 21jan14_21jan11_TARG4_B_gcp__steps_0to4_RLhebbwt_0__comparep
 
 on checking the dir /home/samn/SMARTAgent/data/, I realized there was no step_4..... thats why it used initial weight values.
 -------------------------------------------
+
+-- analyzing performance se1quence wise.....
+
+.... testing an example for full model
+
+>>> lfn = ['21jan14_21jan6_TARG4_gcp__step_0_RLhebbwt_0_']
+>>> pdimg = getconcatactioninputs (lfn)
+loading input images from data/21jan14_21jan6_TARG4_gcp__step_0_RLhebbwt_0_InputImages.txt
+>>> pda = getconcatactionreward(lfn)
+>>> lSimilarSeqs, seqs2plot, seqBegs, seqEnds_wrtRewards = breakdownPerformance(pdimg,pda,cend=69,sthresh=1)
+>>> displayPerformaceBreakdown(pdimg, pda, seqs2plot[0:18], lSimilarSeqs,seqBegs,seqEnds_wrtRewards)
+
+.... testing an example for reduced model
+
+lfn = ['20dec17_B0_cycle_reduced_2obj_INTF7__step_0_','20dec17_B0_cycle_reduced_2obj_INTF7__step_1_','20dec17_B0_cycle_reduced_2obj_INTF7__step_2_','20dec17_B0_cycle_reduced_2obj_INTF7__step_3_']
+pdimg = getconcatactioninputs (lfn)
+pda = getconcatactionreward(lfn)
+
+lSimilarSeqs, seqs2plot, seqBegs, seqEnds_wrtRewards = breakdownPerformance(pdimg,pda,cend=16, sthresh=2)
+displayPerformaceBreakdown(pdimg, pda, seqs2plot[0:18], lSimilarSeqs,seqBegs,seqEnds_wrtRewards)
+
+-------
+# ADDITIONAL ANALYSIS
+
+# plot performance as a function of repeats
+# e.g. seq 1 repeated 20 times. gave 10 succesess and 10 failures (ratio = 0.5)
+# seq 2 repeated 20 times, gave 5 successes and 15 failures. (ratio = 0.3)
+
+actreward = pda
+repsVsPerf = []
+for reps in lSimilarSeqs:
+  hits = 0
+  misses = 0
+  if len(reps)>0:
+    for rep in reps:
+      if list(actreward['hit'])[seqEnds_wrtRewards[rep]]>0:
+        hits+=1
+      elif list(actreward['hit'])[seqEnds_wrtRewards[rep]]<0:
+        misses+=1
+      else:
+        print(reps)
+        print('something wrong')
+    repsVsPerf.append([len(reps),hits,misses])
+
+repsVsPerf = np.array(repsVsPerf)
+plt.plot(repsVsPerf[:,0],np.divide(repsVsPerf[:,1],repsVsPerf[:,2]),'o')
+xlabel('# of repeats (ball trajectory)')
+ylabel('Hit/Miss')
+
+# should incorporate this in simdat.py
+-----------

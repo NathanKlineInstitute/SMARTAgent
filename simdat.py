@@ -1566,6 +1566,108 @@ def plotConns(prepop,postpop):
     ax.set_zticklabels([postpop,prepop])
   plt.show()
 
+
+def breakdownPerformance(InputImages,actreward,cend,sthresh):
+  cend1= cend   # 16
+  cend2= cend+1       # 17
+  ballThresh = 250 # its 255
+  potential_seqEnds = []
+  potential_seqBegs = []  
+  for p in range(InputImages.shape[1]):
+    targetPixel = [p,0] # choose a pixel as a start of sequence.... 0 for reduced
+    possible_Inputs = []
+    for ind in range(InputImages.shape[0]): # parse all inputs to find indices where the pixel has a ball
+      if InputImages[ind,targetPixel[0],targetPixel[1]]>ballThresh:
+        possible_Inputs.append(ind)
+    if len(possible_Inputs)>1: # new addition
+      diff = np.subtract(possible_Inputs[1:],possible_Inputs[0:-1]) # since many inputs belong to the same input, choose a unique
+      potential_seqBegs_Inds = np.add(np.where(diff>20),1)
+      potential_seqBegs.append(possible_Inputs[0])
+      for ind in range(len(potential_seqBegs_Inds[0])):
+        potential_seqBegs.append(possible_Inputs[potential_seqBegs_Inds[0][ind]])
+  potential_seqBegs = np.sort(potential_seqBegs)
+  diffB = np.subtract(potential_seqBegs[1:],potential_seqBegs[0:-1])
+  potential_seqBegs_Inds = np.where(diffB>16)[0]
+  seqBegs =[potential_seqBegs[0]]
+  for ids in potential_seqBegs_Inds:
+    seqBegs.append(potential_seqBegs[ids])
+  seqEnds = []  
+  for seqBeg in seqBegs:
+    ball_near_player = 0
+    cInd = seqBeg
+    while ball_near_player==0:
+      cInd+=1
+      if np.sum(InputImages[cInd,:,cend1:cend2])>ballThresh:
+        ball_near_player = 1
+        seqEnds.append(cInd)
+  summed_Seqs = np.zeros((len(seqBegs),InputImages.shape[1],InputImages.shape[2]))
+  for inds in range(len(seqBegs)):
+    summed_Seqs[inds,:,:]=np.sum(InputImages[seqBegs[inds]:seqEnds[inds]+1,:,:],0)
+  # now find similar sequences
+  corrs_all = np.zeros((summed_Seqs.shape[0],summed_Seqs.shape[0]))
+  pvals_all = np.zeros((summed_Seqs.shape[0],summed_Seqs.shape[0]))
+  for i in range(summed_Seqs.shape[0]):
+    x = summed_Seqs[i,:,0:cend2]
+    for j in range(i,summed_Seqs.shape[0]):
+      y = summed_Seqs[j,:,0:cend2]
+      corr, p_value = pearsonr(x.flat, y.flat)
+      corrs_all[i,j]=corr
+      pvals_all[i,j]=p_value
+  lSimilarSeqs = []
+  NBoccur = np.zeros((1,summed_Seqs.shape[0]))
+  for i in range(summed_Seqs.shape[0]):
+    alreadyExists = 0
+    for seqs in lSimilarSeqs:
+      if i in seqs: alreadyExists=1
+    if alreadyExists==0:
+      lseqs = list(np.where(corrs_all[i,:]>0.9)[0])
+    else:
+      lseqs = []
+    lSimilarSeqs.append(lseqs)
+    NBoccur[0,i] = len(lseqs)
+  seqEnds_wrtRewards = []  
+  for seqEnd in seqEnds:
+    encounter_Reward = 0
+    cInd = seqEnd
+    while encounter_Reward==0:
+      cInd+=1
+      if list(actreward['hit'])[cInd]!=0:
+        encounter_Reward = 1
+        seqEnds_wrtRewards.append(cInd)
+  seqs2plot = np.where(NBoccur[0]>sthresh)[0]
+  return lSimilarSeqs, seqs2plot, seqBegs, seqEnds_wrtRewards
+
+def displayPerformaceBreakdown(InputImages, actreward, seqs2plot, lSimilarSeqs, seqBegs, seqEnds_wrtRewards):
+  fig, axs = plt.subplots(6, 6, figsize=(14,12));
+  lax = axs.ravel()
+  i = 0
+  for seqNB in seqs2plot:
+    totalRepeats = len(lSimilarSeqs[seqNB])
+    Scores = []
+    totalInput = np.zeros((InputImages[0].shape[0],InputImages[0].shape[1]))   
+    for rep in lSimilarSeqs[seqNB]:
+      cInput = np.sum(InputImages[seqBegs[rep]:seqEnds_wrtRewards[rep]+1,:,:],0)
+      totalInput = np.add(totalInput,cInput)
+      Scores.append(list(actreward['hit'])[seqEnds_wrtRewards[rep]])
+    lax[i].imshow(totalInput)
+    lax[i].axis('off')
+    i+=1
+    lax[i].plot(Scores,'b-o')
+    lax[i].set_ylim((-1.1,1.1))
+    i+=1
+
+def getconcatactioninputs (lfn):
+  # concatenate the InputImages data frames together so can look at repeated input patterns.
+  # lfn is a list of actionrewards filenames from the simulation
+  pdimg = None
+  for fn in lfn:
+    cfInputImages = loadInputImages(fn) 
+    if pdimg is None:
+      pdimg = cfInputImages
+    else:
+      pdimg = np.concatenate((pdimg,cfInputImages),axis=0)
+  return pdimg
+
 """
 current_time_stepNB = 0
 cumRewardActions = []
