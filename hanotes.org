@@ -12675,10 +12675,13 @@ saved animinput as gif/21jan20_21jan11_falcor_RL3_F6__step_5__with_reward_input.
 -- resume 21jan11_falcor_RL3_F6__step_6_ (Jan20)
 saved performance as 21jan11_falcor_RL3_F6__step_6_perf.png (Jan21) perf ~0.8 (Good performance)
 saved meanweights as 21jan11_falcor_RL3_F6__step_6_meanweights.png (Jan21)
-saved animinput as gif/21jan21_21jan11_falcor_RL3_F6__step_5__with_reward_input.mp4
+saved animinput as gif/21jan21_21jan11_falcor_RL3_F6__step_6__with_reward_input.mp4
 
 -- resume 21jan11_falcor_RL3_F6__step_7_ (Jan21)
 
+saved performance as 21jan11_falcor_RL3_F6__step_7_perf.png (Jan22) performance dropped to ~0.6 (OK performance)
+saved meanweights as 21jan11_falcor_RL3_F6__step_7_meanweights.png (Jan22)
+saved animinput as gif/21jan22_21jan11_falcor_RL3_F6__step_7__with_reward_input.mp4
 
 -------------------------------------------------
 -- run 21jan12_falcor_RL3_G6__step_0_ (Jan12)
@@ -13549,7 +13552,224 @@ saved perf as 21jan20_21jan6_TARG4_gcp__step_0_RLhebbwt_0_5positions_perf.png
     "ResumeSim": 0
     "name": "21jan21_TARG4_gcp_RLhebbwt_0_p5_",
 
-    
+>>> lfn =['21jan21_TARG4_gcp_RLhebbwt_0_p1_','21jan21_TARG4_gcp_RLhebbwt_0_p2_','21jan21_TARG4_gcp_RLhebbwt_0_p3_','21jan21_TARG4_gcp_RLhebbwt_0_p4_','21jan21_TARG4_gcp_RLhebbwt_0_p5_','21jan21_TARG4_gcp_RLhebbwt_0_p0_']
+>>> lpda = getindivactionreward(lfn)
+>>> csm = cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+>>> lclr = [csm.to_rgba(float(i)/len(lpda)) for i in range(len(lpda))]
+>>> plotComparePerf(lpda,lclr,yl=(0,2),lleg=lfn,skipscore=True,skipfollow=True)
+Saved performance comparison for 5 different initial positions in 21jan21_TARG4_gcp_RLhebbwt_0_5positions_perf.png (Jan22)
+
+--(Jan22) analyze performance (input sequence/ ball trajectory wise)
+
+>>> lfn0 =['21jan21_TARG4_gcp_RLhebbwt_0_p1_',
+            '21jan21_TARG4_gcp_RLhebbwt_0_p2_',
+            '21jan21_TARG4_gcp_RLhebbwt_0_p3_',
+            '21jan21_TARG4_gcp_RLhebbwt_0_p4_',
+            '21jan21_TARG4_gcp_RLhebbwt_0_p5_',
+            '21jan21_TARG4_gcp_RLhebbwt_0_p0_']
+
+>>> pdimg0 = getconcatactioninputs(lfn0)
+loading input images from data/21jan21_TARG4_gcp_RLhebbwt_0_p1_InputImages.txt
+loading input images from data/21jan21_TARG4_gcp_RLhebbwt_0_p2_InputImages.txt
+loading input images from data/21jan21_TARG4_gcp_RLhebbwt_0_p3_InputImages.txt
+loading input images from data/21jan21_TARG4_gcp_RLhebbwt_0_p4_InputImages.txt
+loading input images from data/21jan21_TARG4_gcp_RLhebbwt_0_p5_InputImages.txt
+loading input images from data/21jan21_TARG4_gcp_RLhebbwt_0_p0_InputImages.txt
+
+>>> pda0 = getconcatactionreward(lfn0)
+
+>>> lSimilarSeqs0, seqs2plot0, seqBegs0, seqEnds_wrtRewards0 = breakdownPerformance(pdimg0,pda0,cend=69,sthresh=2)
+
+>>> len(seqs2plot0)
+35
+
+>>> displayPerformaceBreakdown(pdimg0,pda0,seqs2plot0[0:18],lSimilarSeqs0,seqBegs0,seqEnds_wrtRewards0)
+saved as 21jan21_TARG4_gcp_RLhebbwt_0_5positions_seqbasedperf0.png
+>>> displayPerformaceBreakdown(pdimg0,pda0,seqs2plot0[18:36],lSimilarSeqs0,seqBegs0,seqEnds_wrtRewards0)
+saved as 21jan21_TARG4_gcp_RLhebbwt_0_5positions_seqbasedperf1.png
+
+>>> repsVsPerf0 = []
+>>> for reps in lSimilarSeqs0:
+...   hits = 0
+...   misses = 0
+...   if len(reps)>0:
+...     for rep in reps:
+...       if list(pda0['hit'])[seqEnds_wrtRewards0[rep]]>0:
+...         hits+=1
+...       elif list(pda0['hit'])[seqEnds_wrtRewards0[rep]]<0:
+...         misses+=1
+...       else:
+...         print('something wrong')
+...     repsVsPerf0.append([len(reps),hits,misses])    
+
+
+>>> repsVsPerf0 = np.array(repsVsPerf0)
+>>> plt.plot(repsVsPerf0[:,0],np.divide(repsVsPerf0[:,1],repsVsPerf0[:,0]),'bo')
+[<matplotlib.lines.Line2D object at 0x7f9518c97790>]
+>>> xlabel('# of repeats [ball trajectory]')
+Text(0.5,19.5222,'# of repeats [ball trajectory]')
+>>> ylabel('Hits/[Hits+Miss]')
+Text(38.3472,0.5,'Hits/[Hits+Miss]')
+
+saved as 21jan21_TARG4_gcp_RLhebbwt_0_5positions_repsVsPerf.png
+
+>>> lfn1 =['21jan20_21jan6_TARG4_gcp__step_0_RLhebbwt_0_p1_',
+          '21jan20_21jan6_TARG4_gcp__step_0_RLhebbwt_0_p2_',
+          '21jan20_21jan6_TARG4_gcp__step_0_RLhebbwt_0_p3_',
+          '21jan20_21jan6_TARG4_gcp__step_0_RLhebbwt_0_p4_',
+          '21jan20_21jan6_TARG4_gcp__step_0_RLhebbwt_0_p5_',
+          '21jan14_21jan6_TARG4_gcp__step_0_RLhebbwt_0_']
+
+>>> pdimg1 = getconcatactioninputs(lfn1)
+loading input images from data/21jan20_21jan6_TARG4_gcp__step_0_RLhebbwt_0_p1_InputImages.txt
+loading input images from data/21jan20_21jan6_TARG4_gcp__step_0_RLhebbwt_0_p2_InputImages.txt
+loading input images from data/21jan20_21jan6_TARG4_gcp__step_0_RLhebbwt_0_p3_InputImages.txt
+loading input images from data/21jan20_21jan6_TARG4_gcp__step_0_RLhebbwt_0_p4_InputImages.txt
+loading input images from data/21jan20_21jan6_TARG4_gcp__step_0_RLhebbwt_0_p5_InputImages.txt
+loading input images from data/21jan14_21jan6_TARG4_gcp__step_0_RLhebbwt_0_InputImages.txt
+
+>>> pda1 = getconcatactionreward(lfn1)
+
+>>> lSimilarSeqs1, seqs2plot1, seqBegs1, seqEnds_wrtRewards1 = breakdownPerformance(pdimg1,pda1,cend=69,sthresh=2)
+>>> len(seqs2plot1)
+31
+
+>>> displayPerformaceBreakdown(pdimg1,pda1,seqs2plot1[0:18],lSimilarSeqs1,seqBegs1,seqEnds_wrtRewards1)
+saved as 21jan20_21jan6_TARG4_gcp__step_0_RLhebbwt_0_5positions_seqbasedperf0.png
+
+>>> displayPerformaceBreakdown(pdimg1,pda1,seqs2plot1[18:32],lSimilarSeqs1,seqBegs1,seqEnds_wrtRewards1)
+saved as 21jan20_21jan6_TARG4_gcp__step_0_RLhebbwt_0_5positions_seqbasedperf1.png
+
+>>> repsVsPerf1 = []
+>>> for reps in lSimilarSeqs1:
+...   hits = 0
+...   misses = 0
+...   if len(reps)>0:
+...     for rep in reps:
+...       if list(pda1['hit'])[seqEnds_wrtRewards1[rep]]>0:
+...         hits+=1
+...       elif list(pda1['hit'])[seqEnds_wrtRewards1[rep]]<0:
+...         misses+=1
+...       else:
+...         print('something wrong')
+...     repsVsPerf1.append([len(reps),hits,misses])    
+... 
+>>> repsVsPerf1 = np.array(repsVsPerf1)
+>>> plt.plot(repsVsPerf1[:,0],np.divide(repsVsPerf1[:,1],repsVsPerf1[:,0]),'bo')
+[<matplotlib.lines.Line2D object at 0x7f9535c17510>]
+>>> xlabel('# of repeats [ball trajectory]')
+Text(0.5,19.5222,'# of repeats [ball trajectory]')
+>>> ylabel('Hits/[Hits+Miss]')
+Text(38.3472,0.5,'Hits/[Hits+Miss]')
+
+saved as 21jan20_21jan6_TARG4_gcp__step_0_RLhebbwt_0_5positions_repVsPerf.png
+
+>>> lfn2 =['21jan19_21jan11_TARG4_gcp__step_1_RLhebbwt_0_p1_',
+          '21jan19_21jan11_TARG4_gcp__step_1_RLhebbwt_0_p2_',
+          '21jan19_21jan11_TARG4_gcp__step_1_RLhebbwt_0_p3_',
+          '21jan19_21jan11_TARG4_gcp__step_1_RLhebbwt_0_p4_',
+          '21jan19_21jan11_TARG4_gcp__step_1_RLhebbwt_0_p5_',
+          '21jan11_TARG4_gcp__step_1_RLhebbwt_0_']
+
+>>> pdimg2 = getconcatactioninputs(lfn2)
+loading input images from data/21jan19_21jan11_TARG4_gcp__step_1_RLhebbwt_0_p1_InputImages.txt
+loading input images from data/21jan19_21jan11_TARG4_gcp__step_1_RLhebbwt_0_p2_InputImages.txt
+loading input images from data/21jan19_21jan11_TARG4_gcp__step_1_RLhebbwt_0_p3_InputImages.txt
+loading input images from data/21jan19_21jan11_TARG4_gcp__step_1_RLhebbwt_0_p4_InputImages.txt
+loading input images from data/21jan19_21jan11_TARG4_gcp__step_1_RLhebbwt_0_p5_InputImages.txt
+loading input images from data/21jan11_TARG4_gcp__step_1_RLhebbwt_0_InputImages.txt
+
+>>> pda2 = getconcatactionreward(lfn2)
+
+>>> lSimilarSeqs2, seqs2plot2, seqBegs2, seqEnds_wrtRewards2 = breakdownPerformance(pdimg2,pda2,cend=69,sthresh=2)
+>>> len(seqs2plot2)
+
+>>> displayPerformaceBreakdown(pdimg2,pda2,seqs2plot2[0:18],lSimilarSeqs2,seqBegs2,seqEnds_wrtRewards2)
+saved as 21jan19_21jan11_TARG4_gcp__step_1_RLhebbwt_0_5positions_seqbasedperf0.png
+>>> displayPerformaceBreakdown(pdimg2,pda2,seqs2plot2[18:34],lSimilarSeqs2,seqBegs2,seqEnds_wrtRewards2)
+saved as 21jan19_21jan11_TARG4_gcp__step_1_RLhebbwt_0_5positions_seqbasedperf1.png
+
+>>> repsVsPerf2 = []
+>>> for reps in lSimilarSeqs2:
+...   hits = 0
+...   misses = 0
+...   if len(reps)>0:
+...     for rep in reps:
+...       if list(pda2['hit'])[seqEnds_wrtRewards2[rep]]>0:
+...         hits+=1
+...       elif list(pda2['hit'])[seqEnds_wrtRewards2[rep]]<0:
+...         misses+=1
+...       else:
+...         print('something wrong')
+...     repsVsPerf2.append([len(reps),hits,misses])    
+... 
+>>> repsVsPerf2 = np.array(repsVsPerf2)
+
+saved as 21jan19_21jan11_TARG4_gcp__step_1_RLhebbwt_0_5positions_repsVsPerf.png
+
+>>> lfnT = ['21jan6_TARG4_gcp__step_0_','21jan6_TARG4_gcp__step_1_','21jan6_TARG4_gcp__step_2_','21jan6_TARG4_gcp__step_3_','21jan6_TARG4_gcp__step_4_','21jan6_TARG4_gcp__step_5_','21jan6_TARG4_gcp__step_6_','21jan6_TARG4_gcp__step_7_','21jan6_TARG4_gcp__step_8_','21jan6_TARG4_gcp__step_9_','21jan6_TARG4_gcp__step_10_','21jan6_TARG4_gcp__step_11_','21jan6_TARG4_gcp__step_12_','21jan6_TARG4_gcp__step_13_','21jan6_TARG4_gcp__step_14_','21jan6_TARG4_gcp__step_15_','21jan6_TARG4_gcp__step_16_','21jan6_TARG4_gcp__step_17_','21jan6_TARG4_gcp__step_18_','21jan6_TARG4_gcp__step_19_','21jan11_TARG4_gcp__step_0_','21jan11_TARG4_gcp__step_1_','21jan11_TARG4_gcp__step_2_']
+>>> pdimgT = getconcatactioninputs(lfnT)
+loading input images from data/21jan6_TARG4_gcp__step_0_InputImages.txt
+loading input images from data/21jan6_TARG4_gcp__step_1_InputImages.txt
+loading input images from data/21jan6_TARG4_gcp__step_2_InputImages.txt
+loading input images from data/21jan6_TARG4_gcp__step_3_InputImages.txt
+loading input images from data/21jan6_TARG4_gcp__step_4_InputImages.txt
+loading input images from data/21jan6_TARG4_gcp__step_5_InputImages.txt
+loading input images from data/21jan6_TARG4_gcp__step_6_InputImages.txt
+loading input images from data/21jan6_TARG4_gcp__step_7_InputImages.txt
+loading input images from data/21jan6_TARG4_gcp__step_8_InputImages.txt
+loading input images from data/21jan6_TARG4_gcp__step_9_InputImages.txt
+loading input images from data/21jan6_TARG4_gcp__step_10_InputImages.txt
+loading input images from data/21jan6_TARG4_gcp__step_11_InputImages.txt
+loading input images from data/21jan6_TARG4_gcp__step_12_InputImages.txt
+loading input images from data/21jan6_TARG4_gcp__step_13_InputImages.txt
+loading input images from data/21jan6_TARG4_gcp__step_14_InputImages.txt
+loading input images from data/21jan6_TARG4_gcp__step_15_InputImages.txt
+loading input images from data/21jan6_TARG4_gcp__step_16_InputImages.txt
+loading input images from data/21jan6_TARG4_gcp__step_17_InputImages.txt
+loading input images from data/21jan6_TARG4_gcp__step_18_InputImages.txt
+loading input images from data/21jan6_TARG4_gcp__step_19_InputImages.txt
+loading input images from data/21jan11_TARG4_gcp__step_0_InputImages.txt
+loading input images from data/21jan11_TARG4_gcp__step_1_InputImages.txt
+loading input images from data/21jan11_TARG4_gcp__step_2_InputImages.txt
+
+>>> pdaT = getconcatactionreward(lfnT)
+>>> lSimilarSeqsT, seqs2plotT, seqBegsT, seqEnds_wrtRewardsT = breakdownPerformance(pdimgT,pdaT,cend=69,sthresh=5)
+>>> len(seqs2plotT)
+43
+
+saved as 21jan22_21jan6_TARG4_gcp__allsteps_seqbasedperf0.png
+>>> repsVsPerfT = []
+>>> for reps in lSimilarSeqsT:
+...   hits = 0
+...   misses = 0
+...   if len(reps)>0:
+...     for rep in reps:
+...       if list(pdaT['hit'])[seqEnds_wrtRewardsT[rep]]>0:
+...         hits+=1
+...       elif list(pdaT['hit'])[seqEnds_wrtRewardsT[rep]]<0:
+...         misses+=1
+...       else:
+...         print('something wrong')
+...     repsVsPerfT.append([len(reps),hits,misses])    
+... 
+>>> repsVsPerfT = np.array(repsVsPerfT)
+
+>>> plt.plot(repsVsPerfT[:,0],np.divide(repsVsPerfT[:,1],repsVsPerfT[:,0]),'bo')
+[<matplotlib.lines.Line2D object at 0x7f95192cad50>]
+>>> ylabel('Hits/[Hits+Miss]')
+Text(38.3472,0.5,'Hits/[Hits+Miss]')
+>>> xlabel('# of repeats [ball trajectory]')
+Text(0.5,19.5222,'# of repeats [ball trajectory]')
+>>> plt.plot(repsVsPerf0[:,0],np.divide(repsVsPerf0[:,1],repsVsPerf0[:,0]),'ro')
+[<matplotlib.lines.Line2D object at 0x7f951b69c190>]
+>>> plt.plot(repsVsPerf1[:,0],np.divide(repsVsPerf1[:,1],repsVsPerf1[:,0]),'go')
+[<matplotlib.lines.Line2D object at 0x7f95192afb90>]
+>>> plt.plot(repsVsPerf2[:,0],np.divide(repsVsPerf2[:,1],repsVsPerf2[:,0]),'co')
+[<matplotlib.lines.Line2D object at 0x7f9519033cd0>]
+>>> legend(['During Learning','Before Learning','After Learning: WT1','After Learning: WT2'])
+
+saved as 21jan22_repsVsPerfSummary.png
 -----------------------
 
 (base) hanwar@cycle:~/GamesProject/SMARTAgent$ cp backupcfg/21jan11_TARG4_B_gcp__step_3_RLhebbwt_0_sim.json simFull.json 
