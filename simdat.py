@@ -1629,7 +1629,7 @@ def breakdownPerformance(InputImages,actreward,cend,sthresh):
   p = np.unique(p)
   diff = np.subtract(p[1:],p[0:-1])
   potential_frames = np.add(np.where(diff>20),1)
-  potential_seqBegs=[0]
+  potential_seqBegs=[p[0]]
   for ind in potential_frames[0]:
     potential_seqBegs.append(p[ind])
   potential_seqBegs = np.sort(potential_seqBegs)
@@ -1648,6 +1648,9 @@ def breakdownPerformance(InputImages,actreward,cend,sthresh):
         seqEnds.append(cInds)
         ball_near_player = 1
   summed_Seqs = np.zeros((len(seqBegs),InputImages.shape[1],InputImages.shape[2]))
+  print(seqBegs)
+  print(seqEnds)
+  print(InputImages.shape)
   for inds in range(len(seqBegs)):
     summed_Seqs[inds,:,:]=np.sum(InputImages[seqBegs[inds]:seqEnds[inds]+1,:,:],0)
   # now find similar sequences
