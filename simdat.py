@@ -1645,7 +1645,7 @@ def breakdownPerformance(InputImages,actreward,cend,sthresh):
     while ball_near_player==0 and cInds+1<len(actreward.time):
       cInds+=1
       if list(actreward['hit'])[cInds]!=0:
-        seqEnds.append(cInd)
+        seqEnds.append(cInds)
         ball_near_player = 1
   summed_Seqs = np.zeros((len(seqBegs),InputImages.shape[1],InputImages.shape[2]))
   for inds in range(len(seqBegs)):
