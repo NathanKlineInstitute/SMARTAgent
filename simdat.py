@@ -1648,10 +1648,7 @@ def breakdownPerformance(InputImages,actreward,cend,sthresh):
         seqEnds.append(cInds)
         ball_near_player = 1
   summed_Seqs = np.zeros((len(seqBegs),InputImages.shape[1],InputImages.shape[2]))
-  print(seqBegs)
-  print(seqEnds)
-  print(InputImages.shape)
-  for inds in range(len(seqBegs)):
+  for inds in range(len(seqEnds)):
     summed_Seqs[inds,:,:]=np.sum(InputImages[seqBegs[inds]:seqEnds[inds]+1,:,:],0)
   # now find similar sequences
   corrs_all = np.zeros((summed_Seqs.shape[0],summed_Seqs.shape[0]))
