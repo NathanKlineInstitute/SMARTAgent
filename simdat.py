@@ -1674,7 +1674,7 @@ def breakdownPerformance(InputImages,actreward,cend,sthresh):
     NBoccur[0,i] = len(lseqs)  
   seqs2plot = np.where(NBoccur[0]>sthresh)[0]
   if len(seqBegs)>len(seqEnds):
-    seqBegs = seqBegs[1:len(seqEnds)]
+    seqBegs = seqBegs[0:len(seqEnds)]
   return lSimilarSeqs, seqs2plot, seqBegs, seqEnds
 
 def displayPerformaceBreakdown(InputImages, actreward, seqs2plot, lSimilarSeqs, seqBegs, seqEnds_wrtRewards):
