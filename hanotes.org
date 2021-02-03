@@ -15274,3 +15274,13 @@ def getRewardsPerSeq(actreward, seqBegs, seqEnds_wrtRewards):
     rewards.append(cseqRewards)
     hitsMiss.append(cseqHitMiss)
   return rewards,hitsMiss
+
+
+-- There is a bug in function 
+breakdownPerformance(InputImages,actreward,cend,sthresh)
+
+-- hopefully bug is fixed now.....
+use breakdownPerformance function as 
+
+lSimilarSeqs, seqs2plot, seqBegs, seqEnds = breakdownPerformance(InputImages,actreward,cend = 69 ,sthresh = 5)
+
