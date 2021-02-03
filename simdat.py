@@ -92,6 +92,16 @@ def generateActivityMap(t1, t2, spkT, spkID, numc, startidx):
         Nact[t][i][j] = len(cbinSpikes)
   return Nact
 
+def generateActivityMap1D(t1, t2, spkT, spkID, numc, startidx):
+  Nact = np.zeros(shape=(len(t1),numc)) # Nact is 2D array of number of spikes, indexed by: time, cellID
+  for i in range(numc):
+    cNeuronID = i + startidx
+    cNeuron_spkT = spkT[spkID==cNeuronID]
+    for t in range(len(t1)):
+      cbinSpikes = cNeuron_spkT[(cNeuron_spkT>t1[t]) & (cNeuron_spkT<=t2[t])]
+      Nact[t][i] = len(cbinSpikes)
+  return Nact
+
 def getdActMap (totalDur, tstepPerAction, dspkT, dspkID, dnumc, dstartidx,lpop = allpossible_pops):
   t1 = range(0,totalDur,tstepPerAction)
   t2 = range(tstepPerAction,totalDur+tstepPerAction,tstepPerAction)
@@ -100,7 +110,47 @@ def getdActMap (totalDur, tstepPerAction, dspkT, dspkID, dnumc, dstartidx,lpop =
     if pop in dnumc and dnumc[pop] > 0:
       dact[pop] = generateActivityMap(t1, t2, dspkT[pop], dspkID[pop], dnumc[pop], dstartidx[pop])
   return dact
-  
+
+def getdActMap1D (totalDur, tstepPerAction, dspkT, dspkID, dnumc, dstartidx,lpop = allpossible_pops):
+  t1 = range(0,totalDur,tstepPerAction)
+  t2 = range(tstepPerAction,totalDur+tstepPerAction,tstepPerAction)
+  dact = {}
+  for pop in lpop:
+    if pop in dnumc and dnumc[pop] > 0:
+      dact[pop] = generateActivityMap1D(t1, t2, dspkT[pop], dspkID[pop], dnumc[pop], dstartidx[pop])
+  return dact
+
+def getCumActivityMapForInput(t1,t2,dact1D,lpop):
+  dCumAct = {}
+  dStepAct = {}
+  for pop in lpop:
+    dCumAct[pop] = []
+    dStepAct[pop] = []
+    for i in range(len(t1)):
+      cPopAct = list(np.sum(dact1D[pop][t1[i]:t2[i]+1,:],0))
+      cPopStepAct = list(dact1D[pop][t1[i]:t2[i]+1,:])
+      dCumAct[pop].append(cPopAct)
+      dStepAct[pop].append(cPopStepAct)
+  return dCumAct, dStepAct
+
+def getRewardsPerSeq(actreward, seqBegs, seqEnds_wrtRewards):
+  rewards = []
+  hitsMiss = []
+  for seq in range(len(seqBegs)): 
+    cseqRewards = []
+    cseqHitMiss = []
+    begs = seqBegs[seq]
+    ends = seqEnds_wrtRewards[seq]
+    for i in range(begs,ends+1):
+      cseqRewards.append(actreward.reward[i])
+      if i==ends:
+        cseqHitMiss.append(actreward.hit[i])
+      else:
+        cseqHitMiss.append(0)
+    rewards.append(cseqRewards)
+    hitsMiss.append(cseqHitMiss)
+  return rewards,hitsMiss
+
 def loadsimdat (name=None,getactmap=True,lpop = allpossible_pops): # load simulation data
   global totalDur, tstepPerAction
   name = getsimname(name)
@@ -1630,10 +1680,11 @@ def breakdownPerformance(InputImages,actreward,cend,sthresh):
     encounter_Reward = 0
     cInd = seqEnd
     while encounter_Reward==0:
-      cInd+=1
+      # cInd+=1
       if list(actreward['hit'])[cInd]!=0:
         encounter_Reward = 1
         seqEnds_wrtRewards.append(cInd)
+      cInd+=1
   seqs2plot = np.where(NBoccur[0]>sthresh)[0]
   return lSimilarSeqs, seqs2plot, seqBegs, seqEnds_wrtRewards
 

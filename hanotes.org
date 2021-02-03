@@ -12683,6 +12683,114 @@ saved performance as 21jan11_falcor_RL3_F6__step_7_perf.png (Jan22) performance 
 saved meanweights as 21jan11_falcor_RL3_F6__step_7_meanweights.png (Jan22)
 saved animinput as gif/21jan22_21jan11_falcor_RL3_F6__step_7__with_reward_input.mp4
 
+-- resume 21jan11_falcor_RL3_F6__step_8_ (Jan22)
+
+saved cummulative performance as 21jan26_21jan11_falcor_RL3_F6__steps_0_to8_perf.png (performance = 0.73....so far best)
+saved individual performances as 21jan26_21jan11_falcor_RL3_F6__steps_0_to8_compareperf.png (performances are in range of 0.6 to 0.89....so far best)
+
+-- resume 21jan11_falcor_RL3_F6__step_9_ (Jan27)...just for completing 10 steps.
+
+
+.....now try with initial weights.....
+
+-- run sim  21jan27_21jan11_falcor_F6_RLhebbwt_0_p0_
+    "yball": 80,
+    "yracket": 40,
+    "ResumeSim": 0
+    "name": "21jan27_21jan11_falcor_F6_RLhebbwt_0_p0_",
+
+-- run sim 21jan27_21jan11_falcor_F6_RLhebbwt_0_p1_
+    "yball": 100,
+    "yracket": 20,
+    "ResumeSim": 0
+    "name": "21jan27_21jan11_falcor_F6_RLhebbwt_0_p1_",
+
+-- run sim 21jan27_21jan11_falcor_F6_RLhebbwt_0_p2_
+    "yball": 120,
+    "yracket": 10,
+    "ResumeSim": 0
+    "name": "21jan27_21jan11_falcor_F6_RLhebbwt_0_p2_",
+
+-- run sim 21jan27_21jan11_falcor_F6_RLhebbwt_0_p3_
+    "yball": 10,
+    "yracket": 120,
+    "ResumeSim": 0
+    "name": "21jan27_21jan11_falcor_F6_RLhebbwt_0_p3_",
+
+.....start here on Jan28
+
+-- run sim 21jan27_21jan11_falcor_F6_RLhebbwt_0_p4_
+    "yball": 20,
+    "yracket": 100,
+    "ResumeSim": 0
+    "name": "21jan27_21jan11_falcor_F6_RLhebbwt_0_p4_",
+
+-- run sim 21jan27_21jan11_falcor_F6_RLhebbwt_0_p5_
+    "yball": 40,
+    "yracket": 80,
+    "ResumeSim": 0
+    "name": "21jan27_21jan11_falcor_F6_RLhebbwt_0_p5_",
+
+...now for each weight snapshot after training, run 6 positions.
+
+-- run sim  21jan27_21jan11_falcor_F6__step_0_RLhebbwt_0_p0_
+    "yball": 80,
+    "yracket": 40,
+    "ResumeSim": 1
+    "ResumeSimFromFile": "data/21jan11_falcor_RL3_F6__step_0_synWeights_final.pkl"
+    "name": "21jan27_21jan11_falcor_F6__step_0_RLhebbwt_0_p0_",
+
+
+-- run sim  21jan27_21jan11_falcor_F6__step_1_RLhebbwt_0_p0_
+    "yball": 80,
+    "yracket": 40,
+    "ResumeSim": 1
+    "ResumeSimFromFile": "data/21jan11_falcor_RL3_F6__step_1_synWeights_final.pkl"
+    "name": "21jan27_21jan11_falcor_F6__step_1_RLhebbwt_0_p0_",
+
+-- run sim  21jan27_21jan11_falcor_F6__step_2_RLhebbwt_0_p0_ (Feb1)
+    "yball": 80,
+    "yracket": 40,
+    "ResumeSim": 1
+    "ResumeSimFromFile": "data/21jan11_falcor_RL3_F6__step_2_synWeights_final.pkl"
+    "name": "21jan27_21jan11_falcor_F6__step_2_RLhebbwt_0_p0_",
+
+
+-- run sim  21jan27_21jan11_falcor_F6__step_3_RLhebbwt_0_p0_ (Feb1)
+    "yball": 80,
+    "yracket": 40,
+    "ResumeSim": 1
+    "ResumeSimFromFile": "data/21jan11_falcor_RL3_F6__step_3_synWeights_final.pkl"
+    "name": "21jan27_21jan11_falcor_F6__step_3_RLhebbwt_0_p0_",
+
+-- run sim  21jan27_21jan11_falcor_F6__step_4_RLhebbwt_0_p0_ (Feb2)
+    "yball": 80,
+    "yracket": 40,
+    "ResumeSim": 1
+    "ResumeSimFromFile": "data/21jan11_falcor_RL3_F6__step_4_synWeights_final.pkl"
+    "name": "21jan27_21jan11_falcor_F6__step_4_RLhebbwt_0_p0_",
+
+-- run sim  21jan27_21jan11_falcor_F6__step_5_RLhebbwt_0_p0_ (Feb2)
+    "yball": 80,
+    "yracket": 40,
+    "ResumeSim": 1
+    "ResumeSimFromFile": "data/21jan11_falcor_RL3_F6__step_5_synWeights_final.pkl"
+    "name": "21jan27_21jan11_falcor_F6__step_5_RLhebbwt_0_p0_",
+
+-- run sim  21jan27_21jan11_falcor_F6__step_6_RLhebbwt_0_p0_ (Feb3)
+    "yball": 80,
+    "yracket": 40,
+    "ResumeSim": 1
+    "ResumeSimFromFile": "data/21jan11_falcor_RL3_F6__step_6_synWeights_final.pkl"
+    "name": "21jan27_21jan11_falcor_F6__step_6_RLhebbwt_0_p0_",
+
+-- run sim  21jan27_21jan11_falcor_F6__step_7_RLhebbwt_0_p0_ (Feb3)
+    "yball": 80,
+    "yracket": 40,
+    "ResumeSim": 1
+    "ResumeSimFromFile": "data/21jan11_falcor_RL3_F6__step_7_synWeights_final.pkl"
+    "name": "21jan27_21jan11_falcor_F6__step_7_RLhebbwt_0_p0_",
+
 -------------------------------------------------
 -- run 21jan12_falcor_RL3_G6__step_0_ (Jan12)
 EA to EM: reduce AM2 to 7
@@ -13876,3 +13984,1293 @@ ylabel('Hit/Miss')
 
 # should incorporate this in simdat.py
 -----------
+
+
+-- (2021 Jan22)
+"name": "21jan22_cycle_21jan11_falcor_RL3_F6_", same as 
+
+(base) hanwar@cycle:~/GamesProject/SMARTAgent$ python multistepSim.py simFullHA.json 40 10 21jan22_RL3_cycle_multi
+
+run on falcor.......
+21jan11_falcor_RL3_F6__step_0_synWeights_final.pkl
+21jan11_falcor_RL3_F6__step_1_synWeights_final.pkl
+21jan11_falcor_RL3_F6__step_2_synWeights_final.pkl
+21jan11_falcor_RL3_F6__step_3_synWeights_final.pkl
+21jan11_falcor_RL3_F6__step_4_synWeights_final.pkl
+21jan11_falcor_RL3_F6__step_5_synWeights_final.pkl
+21jan11_falcor_RL3_F6__step_6_synWeights_final.pkl
+21jan11_falcor_RL3_F6__step_7_synWeights_final.pkl
+
+
+
+... analyzing sims output on (Jan25)
+
+>>> lfn = ['21jan22_cycle_21jan11_falcor_RL3_F6__step_0_',
+            '21jan22_cycle_21jan11_falcor_RL3_F6__step_1_',
+            '21jan22_cycle_21jan11_falcor_RL3_F6__step_2_',
+            '21jan22_cycle_21jan11_falcor_RL3_F6__step_3_',
+            '21jan22_cycle_21jan11_falcor_RL3_F6__step_4_',
+            '21jan22_cycle_21jan11_falcor_RL3_F6__step_5_',
+            '21jan22_cycle_21jan11_falcor_RL3_F6__step_6_',
+            '21jan22_cycle_21jan11_falcor_RL3_F6__step_7_',
+            '21jan22_cycle_21jan11_falcor_RL3_F6__step_8_',
+            '21jan22_cycle_21jan11_falcor_RL3_F6__step_9_']
+>>> pda = getconcatactionreward(lfn)
+>>> plotPerf(pda)
+saved perf as 21jan22_cycle_21jan11_falcor_RL3__steps0to9_Perf.png (Jan25)
+
+>>> csm = cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+>>> lclr = [csm.to_rgba(float(i)/len(lpda)) for i in range(len(lpda))]
+>>> plotComparePerf(lpda,lclr,yl=(0,2),lleg=lfn,skipscore=True,skipfollow=True)
+saved perf as 21jan22_cycle_21jan11_falcor_RL3__steps0to9_comparePerf.png (Jan25)
+
+WHY THE PERFORMANCE OF SIMS ON FALCOR IS BETTER THAN PERFORMANCE OF SIMS ON CYCLE..
+....COMPARE THE PARAMS.....and sim.py.
+
+NOTE: copied all files from SMARTAgent/* to SMARTAgent_backupfor21jan11_falcor_RL3_F6/ just in case need to replicate the results.
+
+>>> pdfc = getconcatweightpdf(lfn)
+
+saved meanweights as 21jan22_cycle_21jan11_falcor_RL3__steps0to4_meanweights.png (Jan25)
+saved meanweights as 21jan22_cycle_21jan11_falcor_RL3__steps5to9_meanweights.png (Jan25)
+
+>>> pdimg = getconcatactioninputs(lfn)
+loading input images from data/21jan22_cycle_21jan11_falcor_RL3_F6__step_0_InputImages.txt
+loading input images from data/21jan22_cycle_21jan11_falcor_RL3_F6__step_1_InputImages.txt
+loading input images from data/21jan22_cycle_21jan11_falcor_RL3_F6__step_2_InputImages.txt
+loading input images from data/21jan22_cycle_21jan11_falcor_RL3_F6__step_3_InputImages.txt
+loading input images from data/21jan22_cycle_21jan11_falcor_RL3_F6__step_4_InputImages.txt
+loading input images from data/21jan22_cycle_21jan11_falcor_RL3_F6__step_5_InputImages.txt
+loading input images from data/21jan22_cycle_21jan11_falcor_RL3_F6__step_6_InputImages.txt
+loading input images from data/21jan22_cycle_21jan11_falcor_RL3_F6__step_7_InputImages.txt
+loading input images from data/21jan22_cycle_21jan11_falcor_RL3_F6__step_8_InputImages.txt
+loading input images from data/21jan22_cycle_21jan11_falcor_RL3_F6__step_9_InputImages.txt
+
+>>> pda = getconcatactionreward(lfn)
+>>> lSimilarSeqs, seqs2plot, seqBegs, seqEnds_wrtRewards = breakdownPerformance(pdimg,pda,cend=69,sthresh=5) 
+
+>>> displayPerformaceBreakdown(pdimg,pda,seqs2plot[0:18],lSimilarSeqs,seqBegs,seqEnds_wrtRewards)
+>>> displayPerformaceBreakdown(pdimg,pda,seqs2plot[18:36],lSimilarSeqs,seqBegs,seqEnds_wrtRewards)
+>>> displayPerformaceBreakdown(pdimg,pda,seqs2plot[36:],lSimilarSeqs,seqBegs,seqEnds_wrtRewards)
+
+......
+
+>>> lpda = getindivactionreward(lfn)
+>>> plt.plot(lpda[0]['time'],np.cumsum(lpda[0]['hit']))
+[<matplotlib.lines.Line2D object at 0x7ff620662310>]
+>>> plt.plot(lpda[1]['time'],np.cumsum(lpda[1]['hit']))
+[<matplotlib.lines.Line2D object at 0x7ff3976cf110>]
+>>> plt.plot(lpda[2]['time'],np.cumsum(lpda[2]['hit']))
+[<matplotlib.lines.Line2D object at 0x7ffa475c4350>]
+>>> plt.plot(lpda[3]['time'],np.cumsum(lpda[3]['hit']))
+[<matplotlib.lines.Line2D object at 0x7ffa475cf950>]
+>>> plt.plot(lpda[4]['time'],np.cumsum(lpda[4]['hit']))
+[<matplotlib.lines.Line2D object at 0x7ff620662950>]
+>>> plt.plot(lpda[5]['time'],np.cumsum(lpda[5]['hit']))
+[<matplotlib.lines.Line2D object at 0x7ffa475cf8d0>]
+>>> plt.plot(lpda[6]['time'],np.cumsum(lpda[6]['hit']))
+[<matplotlib.lines.Line2D object at 0x7ffa48dc9cd0>]
+>>> plt.plot(lpda[7]['time'],np.cumsum(lpda[7]['hit']))
+[<matplotlib.lines.Line2D object at 0x7ffa475ade90>]
+>>> plt.plot(lpda[8]['time'],np.cumsum(lpda[8]['hit']))
+[<matplotlib.lines.Line2D object at 0x7ffa475d5c90>]
+>>> plt.plot(lpda[9]['time'],np.cumsum(lpda[9]['hit']))
+[<matplotlib.lines.Line2D object at 0x7ffa48dc4590>]
+
+saved as 21jan22_cycle_21jan11_falcor_RL3__cumHitMissed.png
+
+... may be need to quantify: 
+how many times the racket made a correct move which resulted in a HIT.
+how many times the racket made a wrong move which resulted in a MISS.
+
+hit_seq_vs_good_bad_moves = []
+
+for cSeqs in lSimilarSeqs:
+  cData = []
+  if len(cSeqs)>0:
+    for cSeq in cSeqs:
+      cRewards = list(pda['reward'])[seqBegs[cSeq]:seqEnds_wrtRewards[cSeq]]
+      finalReward = list(pda['hit'])[seqEnds_wrtRewards[cSeq]]
+      cGoodMoves = len(np.where(np.array(cRewards)==0.1)[0])
+      cBadMoves = len(np.where(np.array(cRewards)==-0.01)[0])
+      cData.append([cSeq,cGoodMoves,cBadMoves,finalReward])
+    hit_seq_vs_good_bad_moves.append(cData)
+
+.....
+
+
+good_bad_moves = []
+
+for cSeqs in lSimilarSeqs:
+  if len(cSeqs)>0:
+    for cSeq in cSeqs:
+      cRewards = list(pda['reward'])[seqBegs[cSeq]:seqEnds_wrtRewards[cSeq]]
+      finalReward = list(pda['hit'])[seqEnds_wrtRewards[cSeq]]
+      cGoodMoves = len(np.where(np.array(cRewards)==0.1)[0])
+      cBadMoves = len(np.where(np.array(cRewards)==-0.01)[0])
+      good_bad_moves.append([cGoodMoves,cBadMoves,finalReward])
+    
+------------------------------------
+-- resume for more steps (Jan25)
+        "ResumeSim": 1,
+        "ResumeSimFromFile": "data/21jan22_cycle_21jan11_falcor_RL3_F6__step_9_synWeights_final.pkl"
+
+"name": "21jan25_cycle_21jan11_falcor_RL3_F6_",
+"targettedRL": 3
+
+(base) hanwar@cycle:~/GamesProject/SMARTAgent$ python multistepSim.py simFullHA.json 40 10 21jan25_RL3_cycle_multi
+...something wrong went here and the simulations failed.
+
+
+-- (2021 Jan22)
+"name": "21jan22_cycle_21jan11_falcor_RL1_F6_",
+(base) hanwar@cycle:~/GamesProject/SMARTAgent$ python multistepSim.py simFullHA.json 20 10 21jan22_RL1_cycle_multi
+
+>>> lfn2 = ['21jan22_cycle_21jan11_falcor_RL1_F6__step_5_','21jan22_cycle_21jan11_falcor_RL1_F6__step_6_','21jan22_cycle_21jan11_falcor_RL1_F6__step_7_','21jan22_cycle_21jan11_falcor_RL1_F6__step_8_','21jan22_cycle_21jan11_falcor_RL1_F6__step_9_']
+>>> lfn1 = ['21jan22_cycle_21jan11_falcor_RL1_F6__step_0_','21jan22_cycle_21jan11_falcor_RL1_F6__step_1_','21jan22_cycle_21jan11_falcor_RL1_F6__step_2_','21jan22_cycle_21jan11_falcor_RL1_F6__step_3_','21jan22_cycle_21jan11_falcor_RL1_F6__step_4_']
+>>> lfn = lfn1+lfn2
+>>> lfn
+['21jan22_cycle_21jan11_falcor_RL1_F6__step_0_', '21jan22_cycle_21jan11_falcor_RL1_F6__step_1_', '21jan22_cycle_21jan11_falcor_RL1_F6__step_2_', '21jan22_cycle_21jan11_falcor_RL1_F6__step_3_', '21jan22_cycle_21jan11_falcor_RL1_F6__step_4_', '21jan22_cycle_21jan11_falcor_RL1_F6__step_5_', '21jan22_cycle_21jan11_falcor_RL1_F6__step_6_', '21jan22_cycle_21jan11_falcor_RL1_F6__step_7_', '21jan22_cycle_21jan11_falcor_RL1_F6__step_8_', '21jan22_cycle_21jan11_falcor_RL1_F6__step_9_']
+
+.... some problem occured with saving _step_6 so step_7 was repeat of step_0
+
+(base) hanwar@cycle:~/GamesProject/SMARTAgent$ cp backupcfg/21jan22_cycle_21jan11_falcor_RL1_F6__step_6_sim.json simFullHA.json 
+ "name": "21jan27_cycle_21jan11_falcor_RL1_F6_",
+ (base) hanwar@cycle:~/GamesProject/SMARTAgent$ python multistepSim.py simFullHA.json 20 4 21jan27_RL1_cycle_multi
+
+-----------------------------------------------------
+-- starting a new multistep sim..... (Jan27)
+    "losePoint": -0.05, (included this instead of 0)
+    "followTarget": 0.1,
+    "avoidTarget": -0.01,
+    "hitBall": 0.5
+
+"name": "21jan27_cycle_RL3_F7_",
+
+    "AMPA": {
+      "wbase": 2,
+      "wmax": 30, ---(increased from 20 to 30)
+
+ python multistepSim.py simFullHA.json 30 10 21jan27_RL3_cycle_multi
+sims COMPLETE
+-----
+
+preparing figures for the paper....
+
+Figure 1: (for simFullHA.json)
+
+python -i simdat.py backupcfg/21jan22_cycle_21jan11_falcor_RL3_F6__step_0_sim.json
+>>> lfn1 = ['21jan22_cycle_21jan11_falcor_RL3_F6__step_0_','21jan22_cycle_21jan11_falcor_RL3_F6__step_1_','21jan22_cycle_21jan11_falcor_RL3_F6__step_2_','21jan22_cycle_21jan11_falcor_RL3_F6__step_3_','21jan22_cycle_21jan11_falcor_RL3_F6__step_4_']
+>>> lfn2 = ['21jan22_cycle_21jan11_falcor_RL3_F6__step_5_','21jan22_cycle_21jan11_falcor_RL3_F6__step_6_','21jan22_cycle_21jan11_falcor_RL3_F6__step_7_','21jan22_cycle_21jan11_falcor_RL3_F6__step_8_','21jan22_cycle_21jan11_falcor_RL3_F6__step_9_']
+>>> lfn = lfn1+lfn2
+
+Figure 1a. 
+
+>>> lpda = getindivactionreward(lfn)
+>>> csm = cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+>>> lclr = [csm.to_rgba(float(i)/len(lpda)) for i in range(len(lpda))]
+>>> plotComparePerf(lpda,lclr=yl=(0,2),lleg=['step_0','step_1','step_2','step_3','step_4','step_5','step_6','step_8','step_9'],skipscore=True,skipfollow=True)
+save as 21jan27_Figure1a.eps
+save as 21jan27_Figure1a.png
+
+
+... for weights
+
+w0_all = readinweights(lfn[0],final=False)
+
+w0_t0 = w0_all[w0_all.time==np.min(w0_all.time)]
+w0 = readinweights(lfn[0],final=True)
+w1 = readinweights(lfn[1],final=True)
+w2 = readinweights(lfn[2],final=True)
+w3 = readinweights(lfn[3],final=True)
+w4 = readinweights(lfn[4],final=True)
+w5 = readinweights(lfn[5],final=True)
+w6 = readinweights(lfn[6],final=True)
+w7 = readinweights(lfn[7],final=True)
+w8 = readinweights(lfn[8],final=True)
+w9 = readinweights(lfn[9],final=True)
+
+>>> h0_t0 = np.histogram(w0_t0.weight,bins=range(21))
+>>> h0 = np.histogram(w0.weight,bins=range(21))
+>>> h1 = np.histogram(w1.weight,bins=range(21))
+>>> h2 = np.histogram(w2.weight,bins=range(21))
+>>> h3 = np.histogram(w3.weight,bins=range(21))
+>>> h4 = np.histogram(w4.weight,bins=range(21))
+>>> h5 = np.histogram(w5.weight,bins=range(21))
+>>> h6 = np.histogram(w6.weight,bins=range(21))
+>>> h7 = np.histogram(w7.weight,bins=range(21))
+>>> h8 = np.histogram(w8.weight,bins=range(21))
+>>> h9 = np.histogram(w9.weight,bins=range(21))
+
+plt.plot(100*np.cumsum(np.divide(h0_t0[0],np.sum(h0_t0[0]))),'k')
+
+>>> plt.plot(100*np.cumsum(np.divide(h0[0],np.sum(h0[0]))),color=lclr[0])
+[<matplotlib.lines.Line2D object at 0x7f9afd871890>]
+>>> plt.plot(100*np.cumsum(np.divide(h1[0],np.sum(h1[0]))),color=lclr[1])
+[<matplotlib.lines.Line2D object at 0x7f9af92a5c90>]
+>>> plt.plot(100*np.cumsum(np.divide(h2[0],np.sum(h2[0]))),color=lclr[2])
+[<matplotlib.lines.Line2D object at 0x7f9af7703a50>]
+>>> plt.plot(100*np.cumsum(np.divide(h3[0],np.sum(h3[0]))),color=lclr[3])
+[<matplotlib.lines.Line2D object at 0x7f9a9bfcbd90>]
+>>> plt.plot(100*np.cumsum(np.divide(h4[0],np.sum(h4[0]))),color=lclr[4])
+[<matplotlib.lines.Line2D object at 0x7f9af77031d0>]
+>>> plt.plot(100*np.cumsum(np.divide(h5[0],np.sum(h5[0]))),color=lclr[5])
+[<matplotlib.lines.Line2D object at 0x7f9a9bfac850>]
+>>> plt.plot(100*np.cumsum(np.divide(h6[0],np.sum(h6[0]))),color=lclr[6])
+[<matplotlib.lines.Line2D object at 0x7f9af84763d0>]
+>>> plt.plot(100*np.cumsum(np.divide(h7[0],np.sum(h7[0]))),color=lclr[7])
+[<matplotlib.lines.Line2D object at 0x7f9af84762d0>]
+>>> plt.plot(100*np.cumsum(np.divide(h8[0],np.sum(h8[0]))),color=lclr[8])
+[<matplotlib.lines.Line2D object at 0x7f9a9bfacd50>]
+>>> plt.plot(100*np.cumsum(np.divide(h9[0],np.sum(h9[0]))),color=lclr[9])
+[<matplotlib.lines.Line2D object at 0x7f9af7703dd0>]
+
+....didnt save these plots because didnt show anything useful.....
+
+... (may be:)
+
+totalInputW0 = []
+for postid in np.unique(w0.postid):
+  totalInputW0.append([postid,np.sum(w0[w0.postid==postid].weight)])
+
+
+
+>>> diff0 = np.subtract(w0,w0_t0)
+>>> diff1 = np.subtract(w1,w0)
+>>> diff2 = np.subtract(w2,w1)
+>>> diff3 = np.subtract(w3,w2)
+>>> diff4 = np.subtract(w4,w3)
+
+>>> h0 = np.histogram(diff0[:,3])
+>>> h1 = np.histogram(np.array(diff1)[:,3])
+>>> h2 = np.histogram(np.array(diff2)[:,3])
+>>> h3 = np.histogram(np.array(diff3)[:,3])
+>>> h4 = np.histogram(np.array(diff4)[:,3])
+
+.... some potential plots for analysis....
+1. Distribution of deltaW, deltaW_post and deltaFR with training.
+2. Distribution of W, W_post and FR with training.
+3. Variance of each W, W_post across training
+4. Variance of each neuron FR.
+
+... since "recordWeightStepSize": 200, for now look at firing rates in windows of 200 sec. 
+
+
+tpnts = np.unique(w0_all)
+neuronID_EMUP = np.unique(dspkID['EMUP'])
+neuronID_EMDOWN = np.unique(dspkID['EMDOWN'])
+
+# at each time point find NBspikes for each M neuron in preceeding interval.
+
+# Distribution of firing rates across training.
+
+fr_EMUP = np.zeros(shape=(len(tpnts),dnumc['EMUP']))
+fr_EMDOWN = np.zeros(shape=(len(tpnts),dnumc['EMDOWN']))
+for tind in range(len(tpnts)):
+  if tind==0: 
+    t0 = 0
+  else:
+    t0 = tpnts[tind-1]
+  tC = tpnts[tind]
+  counter1 = 0
+  for neuronID in neuronID_EMUP:
+    cInds = np.where((dspkT['EMUP']>t0)&(dspkT['EMUP']<=tC)&(dspkID['EMUP']==neuronID))
+    fr_EMUP[tind,counter1] = len(cInds[0])
+    counter1+=1
+  counter2 = 0
+  for neuronID in neuronID_EMDOWN:
+    cInds = np.where((dspkT['EMDOWN']>t0)&(dspkT['EMDOWN']<=tC)&(dspkID['EMDOWN']==neuronID))
+    fr_EMDOWN[tind,counter2] = len(cInds[0])
+    counter2+=1
+
+# distribution of deltaFR
+
+deltaFR_EMDOWN = np.subtract(fr_EMDOWN[2:,:],fr_EMDOWN[1:-1,:])
+deltaFR_EMUP = np.subtract(fr_EMUP[2:,:],fr_EMUP[1:-1,:])
+
+# variance of firing rates of each neuron across training
+
+fr_EMUPvar = np.var(fr_EMUP,0)
+fr_EMDOWNvar = np.var(fr_EMDOWN,0)
+
+# correlation 
+fr_EMUPcorrs = np.corrcoef(fr_EMUP.T)
+fr_EMDOWNcorrs = np.corrcoef(fr_EMDOWN.T)
+
+fr_EMUPcorrs_l = []
+fr_EMDOWNcorrs_l = []
+for i in range(fr_EMUPcorrs.shape[0]):
+  for j in range(i+1,fr_EMUPcorrs.shape[0]):
+    fr_EMUPcorrs_l.append(fr_EMUPcorrs[i,j])
+    fr_EMDOWNcorrs_l.append(fr_EMDOWNcorrs[i,j])
+
+
+
+----------
+
+(base) hanwar@cycle:~/GamesProject/SMARTAgent$ python -i simdat.py backupcfg/21jan6_TARG4_gcp__step_0_sim.json
+
+>>> tpnts = np.unique(pdf.time)
+>>> tpnts.shape
+(50,)
+
+
+# load performance of sims at the end of each repeat of Training
+
+>>> lfnT = ['21jan6_TARG4_gcp__step_0_',
+            '21jan6_TARG4_gcp__step_1_',
+            '21jan6_TARG4_gcp__step_2_',
+            '21jan6_TARG4_gcp__step_3_',
+            '21jan6_TARG4_gcp__step_4_',
+            '21jan6_TARG4_gcp__step_5_',
+            '21jan6_TARG4_gcp__step_6_',
+            '21jan6_TARG4_gcp__step_7_',
+            '21jan6_TARG4_gcp__step_8_',
+            '21jan6_TARG4_gcp__step_9_',
+            '21jan6_TARG4_gcp__step_10_',
+            '21jan6_TARG4_gcp__step_11_',
+            '21jan6_TARG4_gcp__step_12_',
+            '21jan6_TARG4_gcp__step_13_',
+            '21jan6_TARG4_gcp__step_14_',
+            '21jan6_TARG4_gcp__step_15_',
+            '21jan6_TARG4_gcp__step_16_',
+            '21jan6_TARG4_gcp__step_17_',
+            '21jan6_TARG4_gcp__step_18_',
+            '21jan6_TARG4_gcp__step_19_',
+            '21jan11_TARG4_gcp__step_0_',
+            '21jan11_TARG4_gcp__step_1_',
+            '21jan11_TARG4_gcp__step_2_']
+
+lpdaT = getindivactionreward(lfnT)
+
+>>> hitVsMiss = []
+>>> for i in range(len(lpdaT)):
+...   hit = len(np.where(lpdaT[i]['hit']==1)[0])
+...   miss = len(np.where(lpdaT[i]['hit']==-1)[0])
+...   hitVsMiss.append([hit,miss])
+
+>>> hitVsMiss = np.array(hitVsMiss)
+
+# load performance of sims After Training
+
+>>> lfnAT = ['21jan14_21jan6_TARG4_gcp__step_0_RLhebbwt_0_',
+            '21jan14_21jan6_TARG4_gcp__step_1_RLhebbwt_0_',
+            '21jan14_21jan6_TARG4_gcp__step_2_RLhebbwt_0_',
+            '21jan14_21jan6_TARG4_gcp__step_3_RLhebbwt_0_',
+            '21jan14_21jan6_TARG4_gcp__step_4_RLhebbwt_0_',
+            '21jan14_21jan6_TARG4_gcp__step_5_RLhebbwt_0_',
+            '21jan14_21jan6_TARG4_gcp__step_6_RLhebbwt_0_',
+            '21jan14_21jan6_TARG4_gcp__step_7_RLhebbwt_0_',
+            '21jan14_21jan6_TARG4_gcp__step_8_RLhebbwt_0_',
+            '21jan14_21jan6_TARG4_gcp__step_9_RLhebbwt_0_',
+            '21jan14_21jan6_TARG4_gcp__step_10_RLhebbwt_0_',
+            '21jan14_21jan6_TARG4_gcp__step_11_RLhebbwt_0_',
+            '21jan14_21jan6_TARG4_gcp__step_12_RLhebbwt_0_',
+            '21jan14_21jan6_TARG4_gcp__step_13_RLhebbwt_0_',
+            '21jan14_21jan6_TARG4_gcp__step_14_RLhebbwt_0_',
+            '21jan14_21jan6_TARG4_gcp__step_15_RLhebbwt_0_',
+            '21jan14_21jan6_TARG4_gcp__step_16_RLhebbwt_0_',
+            '21jan14_21jan6_TARG4_gcp__step_17_RLhebbwt_0_',
+            '21jan14_21jan6_TARG4_gcp__step_18_RLhebbwt_0_',
+            '21jan14_21jan6_TARG4_gcp__step_19_RLhebbwt_0_',
+            '21jan11_TARG4_gcp__step_0_RLhebbwt_0_',
+            '21jan11_TARG4_gcp__step_1_RLhebbwt_0_',
+            '21jan11_TARG4_gcp__step_2_RLhebbwt_0_']
+
+>>> lpdaAT = getindivactionreward(lfnAT)
+
+>>> hitVsMissAT = []
+>>> for i in range(len(lpdaAT)):
+...   hit = len(np.where(lpdaAT[i]['hit']==1)[0])
+...   miss = len(np.where(lpdaAT[i]['hit']==-1)[0])
+...   hitVsMissAT.append([hit,miss])
+... 
+>>> hitVsMissAT = np.array(hitVsMissAT)
+
+# load performance after training for repeated positions
+>>> lfnAT0 = ['21jan14_21jan6_TARG4_gcp__step_0_RLhebbwt_0_','21jan20_21jan6_TARG4_gcp__step_0_RLhebbwt_0_p1_','21jan20_21jan6_TARG4_gcp__step_0_RLhebbwt_0_p2_','21jan20_21jan6_TARG4_gcp__step_0_RLhebbwt_0_p3_','21jan20_21jan6_TARG4_gcp__step_0_RLhebbwt_0_p4_','21jan20_21jan6_TARG4_gcp__step_0_RLhebbwt_0_p5_']
+>>> lpdaAT0 = getindivactionreward(lfnAT0)
+
+>>> hitVsMissAT0 = []
+>>> for i in range(len(lpdaAT0)):
+...   hit = len(np.where(lpdaAT0[i]['hit']==1)[0])
+...   miss = len(np.where(lpdaAT0[i]['hit']==-1)[0])
+...   hitVsMissAT0.append([hit,miss])
+... 
+>>> hitVsMissAT0 = np.array(hitVsMissAT0)
+
+
+>>> lfnAT21 = ['21jan11_TARG4_gcp__step_1_RLhebbwt_0_','21jan19_21jan11_TARG4_gcp__step_1_RLhebbwt_0_p1_','21jan19_21jan11_TARG4_gcp__step_1_RLhebbwt_0_p2_','21jan19_21jan11_TARG4_gcp__step_1_RLhebbwt_0_p3_','21jan19_21jan11_TARG4_gcp__step_1_RLhebbwt_0_p4_','21jan19_21jan11_TARG4_gcp__step_1_RLhebbwt_0_p5_']
+>>> lpdaAT21 = getindivactionreward(lfnAT21)
+
+>>> hitVsMissAT21 = []
+>>> for i in range(len(lpdaAT21)):
+...   hit = len(np.where(lpdaAT21[i]['hit']==1)[0])
+...   miss = len(np.where(lpdaAT21[i]['hit']==-1)[0])
+...   hitVsMissAT21.append([hit,miss])
+... 
+>>> hitVsMissAT21 = np.array(hitVsMissAT21)
+
+
+# load performance of sims before Training
+
+>>> lfnBT = ['21jan21_TARG4_gcp_RLhebbwt_0_p0_',
+            '21jan21_TARG4_gcp_RLhebbwt_0_p1_',
+            '21jan21_TARG4_gcp_RLhebbwt_0_p2_',
+            '21jan21_TARG4_gcp_RLhebbwt_0_p3_',
+            '21jan21_TARG4_gcp_RLhebbwt_0_p4_',
+            '21jan21_TARG4_gcp_RLhebbwt_0_p5_']
+
+>>> lpdaBT = getindivactionreward(lfnBT)
+>>> hitVsMissBT = []
+>>> for i in range(len(lpdaBT)):
+...   hit = len(np.where(lpdaBT[i]['hit']==1)[0])
+...   miss = len(np.where(lpdaBT[i]['hit']==-1)[0])
+...   hitVsMissBT.append([hit,miss])
+... 
+>>> hitVsMissBT = np.array(hitVsMissBT)
+
+
+bline = (hitVsMissBT[0,0]/hitVsMissBT[0,1])*np.ones(shape=(23,))
+>>> plt.plot(bline,'g--')
+>>> plt.plot(np.divide(hitVsMiss[:,0],hitVsMiss[:,1]),'b-o')
+[<matplotlib.lines.Line2D object at 0x7fb6c5e5c950>]
+>>> plt.plot(np.divide(hitVsMissAT[:,0],hitVsMissAT[:,1]),'r--o')
+[<matplotlib.lines.Line2D object at 0x7fb6c6c9dfd0>]
+
+>>> plt.legend(('Before training','During Training', 'After Training'))
+<matplotlib.legend.Legend object at 0x7fb6c6540450>
+>>> xlabel('# of repeats')
+Text(0.5,19.5222,'# of repeats')
+>>> ylabel('Hit/Miss')
+Text(38.3472,0.5,'Hit/Miss')
+ 
+saved as 21jan28_PerformanceSummaryFigure1_FullSam.png
+
+>>> w0_BT = readinweights(lfnBT[0],final=False)
+w0_BT0 = w0_BT[(w0_BT.time==np.amin(w0_BT.time))]
+
+>>> w0 = readinweights(lfnT[0],final=True)
+>>> w1 = readinweights(lfnT[1],final=True)
+>>> w2 = readinweights(lfnT[2],final=True)
+>>> w3 = readinweights(lfnT[3],final=True)
+>>> w4 = readinweights(lfnT[4],final=True)
+>>> w5 = readinweights(lfnT[5],final=True)
+>>> w6 = readinweights(lfnT[6],final=True)
+>>> w7 = readinweights(lfnT[7],final=True)
+>>> w8 = readinweights(lfnT[8],final=True)
+>>> w9 = readinweights(lfnT[9],final=True)
+>>> w10 = readinweights(lfnT[10],final=True)
+>>> w11 = readinweights(lfnT[11],final=True)
+>>> w12 = readinweights(lfnT[12],final=True)
+>>> w13 = readinweights(lfnT[13],final=True)
+>>> w14 = readinweights(lfnT[14],final=True)
+>>> w15 = readinweights(lfnT[15],final=True)
+>>> w16 = readinweights(lfnT[16],final=True)
+>>> w17 = readinweights(lfnT[17],final=True)
+>>> w18 = readinweights(lfnT[18],final=True)
+>>> w19 = readinweights(lfnT[19],final=True)
+>>> w20 = readinweights(lfnT[20],final=True)
+>>> w21 = readinweights(lfnT[21],final=True)
+>>> w22 = readinweights(lfnT[22],final=True)
+
+>>> w0_BT0_EMUP = w0_BT0[(w0_BT0.postid>=dstartidx['EMUP'])&(w0_BT0.postid<=dendidx['EMUP'])]
+>>> w0_BT0_EMDOWN = w0_BT0[(w0_BT0.postid>=dstartidx['EMDOWN'])&(w0_BT0.postid<=dendidx['EMDOWN'])]
+>>> w0_BT0_EA = w0_BT0[(w0_BT0.postid>=dstartidx['EA'])&(w0_BT0.postid<=dendidx['EA'])]
+>>> w0_BT0_EA2 = w0_BT0[(w0_BT0.postid>=dstartidx['EA2'])&(w0_BT0.postid<=dendidx['EA2'])]
+
+
+w0_EMUP = w0[(w0.postid>=dstartidx['EMUP'])&(w0.postid<=dendidx['EMUP'])]
+w0_EMDOWN = w0[(w0.postid>=dstartidx['EMDOWN'])&(w0.postid<=dendidx['EMDOWN'])]
+w0_EA = w0[(w0.postid>=dstartidx['EA'])&(w0.postid<=dendidx['EA'])]
+w0_EA2 = w0[(w0.postid>=dstartidx['EA2'])&(w0.postid<=dendidx['EA2'])]
+
+>>> w1_EMUP = w1[(w1.postid>=dstartidx['EMUP'])&(w1.postid<=dendidx['EMUP'])]
+>>> w1_EMDOWN = w1[(w1.postid>=dstartidx['EMDOWN'])&(w1.postid<=dendidx['EMDOWN'])]
+>>> w1_EA = w1[(w1.postid>=dstartidx['EA'])&(w1.postid<=dendidx['EA'])]
+>>> w1_EA2 = w1[(w1.postid>=dstartidx['EA2'])&(w1.postid<=dendidx['EA2'])]
+
+>>> w2_EMUP = w2[(w2.postid>=dstartidx['EMUP'])&(w2.postid<=dendidx['EMUP'])]
+>>> w2_EMDOWN = w2[(w2.postid>=dstartidx['EMDOWN'])&(w2.postid<=dendidx['EMDOWN'])]
+>>> w2_EA = w2[(w2.postid>=dstartidx['EA'])&(w2.postid<=dendidx['EA'])]
+>>> w2_EA2 = w2[(w2.postid>=dstartidx['EA2'])&(w2.postid<=dendidx['EA2'])]
+
+>>> w3_EMUP = w3[(w3.postid>=dstartidx['EMUP'])&(w3.postid<=dendidx['EMUP'])]
+>>> w3_EMDOWN = w3[(w3.postid>=dstartidx['EMDOWN'])&(w3.postid<=dendidx['EMDOWN'])]
+>>> w3_EA = w3[(w3.postid>=dstartidx['EA'])&(w3.postid<=dendidx['EA'])]
+>>> w3_EA2 = w3[(w3.postid>=dstartidx['EA2'])&(w3.postid<=dendidx['EA2'])]
+
+>>> w4_EMUP = w4[(w4.postid>=dstartidx['EMUP'])&(w4.postid<=dendidx['EMUP'])]
+>>> w4_EMDOWN = w4[(w4.postid>=dstartidx['EMDOWN'])&(w4.postid<=dendidx['EMDOWN'])]
+>>> w4_EA = w4[(w4.postid>=dstartidx['EA'])&(w4.postid<=dendidx['EA'])]
+>>> w4_EA2 = w4[(w4.postid>=dstartidx['EA2'])&(w4.postid<=dendidx['EA2'])]
+
+>>> w5_EMUP = w5[(w5.postid>=dstartidx['EMUP'])&(w5.postid<=dendidx['EMUP'])]
+>>> w5_EMDOWN = w5[(w5.postid>=dstartidx['EMDOWN'])&(w5.postid<=dendidx['EMDOWN'])]
+>>> w5_EA = w5[(w5.postid>=dstartidx['EA'])&(w5.postid<=dendidx['EA'])]
+>>> w5_EA2 = w5[(w5.postid>=dstartidx['EA2'])&(w5.postid<=dendidx['EA2'])]
+
+>>> w6_EMUP = w6[(w6.postid>=dstartidx['EMUP'])&(w6.postid<=dendidx['EMUP'])]
+>>> w6_EMDOWN = w6[(w6.postid>=dstartidx['EMDOWN'])&(w6.postid<=dendidx['EMDOWN'])]
+>>> w6_EA = w6[(w6.postid>=dstartidx['EA'])&(w6.postid<=dendidx['EA'])]
+>>> w6_EA2 = w6[(w6.postid>=dstartidx['EA2'])&(w6.postid<=dendidx['EA2'])]
+
+>>> w7_EMUP = w7[(w7.postid>=dstartidx['EMUP'])&(w7.postid<=dendidx['EMUP'])]
+>>> w7_EMDOWN = w7[(w7.postid>=dstartidx['EMDOWN'])&(w7.postid<=dendidx['EMDOWN'])]
+>>> w7_EA = w7[(w7.postid>=dstartidx['EA'])&(w7.postid<=dendidx['EA'])]
+>>> w7_EA2 = w7[(w7.postid>=dstartidx['EA2'])&(w7.postid<=dendidx['EA2'])]
+
+>>> w8_EMUP = w8[(w8.postid>=dstartidx['EMUP'])&(w8.postid<=dendidx['EMUP'])]
+>>> w8_EMDOWN = w8[(w8.postid>=dstartidx['EMDOWN'])&(w8.postid<=dendidx['EMDOWN'])]
+>>> w8_EA = w8[(w8.postid>=dstartidx['EA'])&(w8.postid<=dendidx['EA'])]
+>>> w8_EA2 = w8[(w8.postid>=dstartidx['EA2'])&(w8.postid<=dendidx['EA2'])]
+
+>>> w9_EMUP = w9[(w9.postid>=dstartidx['EMUP'])&(w9.postid<=dendidx['EMUP'])]
+>>> w9_EMDOWN = w9[(w9.postid>=dstartidx['EMDOWN'])&(w9.postid<=dendidx['EMDOWN'])]
+>>> w9_EA = w9[(w9.postid>=dstartidx['EA'])&(w9.postid<=dendidx['EA'])]
+>>> w9_EA2 = w9[(w9.postid>=dstartidx['EA2'])&(w9.postid<=dendidx['EA2'])]
+
+>>> w10_EMUP = w10[(w10.postid>=dstartidx['EMUP'])&(w10.postid<=dendidx['EMUP'])]
+>>> w10_EMDOWN = w10[(w10.postid>=dstartidx['EMDOWN'])&(w10.postid<=dendidx['EMDOWN'])]
+>>> w10_EA = w10[(w10.postid>=dstartidx['EA'])&(w10.postid<=dendidx['EA'])]
+>>> w10_EA2 = w10[(w10.postid>=dstartidx['EA2'])&(w10.postid<=dendidx['EA2'])]
+
+>>> w11_EMUP = w11[(w11.postid>=dstartidx['EMUP'])&(w11.postid<=dendidx['EMUP'])]
+>>> w11_EMDOWN = w11[(w11.postid>=dstartidx['EMDOWN'])&(w11.postid<=dendidx['EMDOWN'])]
+>>> w11_EA = w11[(w11.postid>=dstartidx['EA'])&(w11.postid<=dendidx['EA'])]
+>>> w11_EA2 = w11[(w11.postid>=dstartidx['EA2'])&(w11.postid<=dendidx['EA2'])]
+
+>>> w12_EMUP = w12[(w12.postid>=dstartidx['EMUP'])&(w12.postid<=dendidx['EMUP'])]
+>>> w12_EMDOWN = w12[(w12.postid>=dstartidx['EMDOWN'])&(w12.postid<=dendidx['EMDOWN'])]
+>>> w12_EA = w12[(w12.postid>=dstartidx['EA'])&(w12.postid<=dendidx['EA'])]
+>>> w12_EA2 = w12[(w12.postid>=dstartidx['EA2'])&(w12.postid<=dendidx['EA2'])]
+
+>>> w13_EMUP = w13[(w13.postid>=dstartidx['EMUP'])&(w13.postid<=dendidx['EMUP'])]
+>>> w13_EMDOWN = w13[(w13.postid>=dstartidx['EMDOWN'])&(w13.postid<=dendidx['EMDOWN'])]
+>>> w13_EA = w13[(w13.postid>=dstartidx['EA'])&(w13.postid<=dendidx['EA'])]
+>>> w13_EA2 = w13[(w13.postid>=dstartidx['EA2'])&(w13.postid<=dendidx['EA2'])]
+
+>>> w14_EMUP = w14[(w14.postid>=dstartidx['EMUP'])&(w14.postid<=dendidx['EMUP'])]
+>>> w14_EMDOWN = w14[(w14.postid>=dstartidx['EMDOWN'])&(w14.postid<=dendidx['EMDOWN'])]
+>>> w14_EA = w14[(w14.postid>=dstartidx['EA'])&(w14.postid<=dendidx['EA'])]
+>>> w14_EA2 = w14[(w14.postid>=dstartidx['EA2'])&(w14.postid<=dendidx['EA2'])]
+
+>>> w15_EMUP = w15[(w15.postid>=dstartidx['EMUP'])&(w15.postid<=dendidx['EMUP'])]
+>>> w15_EMDOWN = w15[(w15.postid>=dstartidx['EMDOWN'])&(w15.postid<=dendidx['EMDOWN'])]
+>>> w15_EA = w15[(w15.postid>=dstartidx['EA'])&(w15.postid<=dendidx['EA'])]
+>>> w15_EA2 = w15[(w15.postid>=dstartidx['EA2'])&(w15.postid<=dendidx['EA2'])]
+
+>>> w16_EMUP = w16[(w16.postid>=dstartidx['EMUP'])&(w16.postid<=dendidx['EMUP'])]
+>>> w16_EMDOWN = w16[(w16.postid>=dstartidx['EMDOWN'])&(w16.postid<=dendidx['EMDOWN'])]
+>>> w16_EA = w16[(w16.postid>=dstartidx['EA'])&(w16.postid<=dendidx['EA'])]
+>>> w16_EA2 = w16[(w16.postid>=dstartidx['EA2'])&(w16.postid<=dendidx['EA2'])]
+
+>>> w17_EMUP = w17[(w17.postid>=dstartidx['EMUP'])&(w17.postid<=dendidx['EMUP'])]
+>>> w17_EMDOWN = w17[(w17.postid>=dstartidx['EMDOWN'])&(w17.postid<=dendidx['EMDOWN'])]
+>>> w17_EA = w17[(w17.postid>=dstartidx['EA'])&(w17.postid<=dendidx['EA'])]
+>>> w17_EA2 = w17[(w17.postid>=dstartidx['EA2'])&(w17.postid<=dendidx['EA2'])]
+
+>>> w18_EMUP = w18[(w18.postid>=dstartidx['EMUP'])&(w18.postid<=dendidx['EMUP'])]
+>>> w18_EMDOWN = w18[(w18.postid>=dstartidx['EMDOWN'])&(w18.postid<=dendidx['EMDOWN'])]
+>>> w18_EA = w18[(w18.postid>=dstartidx['EA'])&(w18.postid<=dendidx['EA'])]
+>>> w18_EA2 = w18[(w18.postid>=dstartidx['EA2'])&(w18.postid<=dendidx['EA2'])]
+
+>>> w19_EMUP = w19[(w19.postid>=dstartidx['EMUP'])&(w19.postid<=dendidx['EMUP'])]
+>>> w19_EMDOWN = w19[(w19.postid>=dstartidx['EMDOWN'])&(w19.postid<=dendidx['EMDOWN'])]
+>>> w19_EA = w19[(w19.postid>=dstartidx['EA'])&(w19.postid<=dendidx['EA'])]
+>>> w19_EA2 = w19[(w19.postid>=dstartidx['EA2'])&(w19.postid<=dendidx['EA2'])]
+
+>>> w20_EMUP = w20[(w20.postid>=dstartidx['EMUP'])&(w20.postid<=dendidx['EMUP'])]
+>>> w20_EMDOWN = w20[(w20.postid>=dstartidx['EMDOWN'])&(w20.postid<=dendidx['EMDOWN'])]
+>>> w20_EA = w20[(w20.postid>=dstartidx['EA'])&(w20.postid<=dendidx['EA'])]
+>>> w20_EA2 = w20[(w20.postid>=dstartidx['EA2'])&(w20.postid<=dendidx['EA2'])]
+
+>>> w21_EMUP = w21[(w21.postid>=dstartidx['EMUP'])&(w21.postid<=dendidx['EMUP'])]
+>>> w21_EMDOWN = w21[(w21.postid>=dstartidx['EMDOWN'])&(w21.postid<=dendidx['EMDOWN'])]
+>>> w21_EA = w21[(w21.postid>=dstartidx['EA'])&(w21.postid<=dendidx['EA'])]
+>>> w21_EA2 = w21[(w21.postid>=dstartidx['EA2'])&(w21.postid<=dendidx['EA2'])]
+
+>>> w22_EMUP = w22[(w22.postid>=dstartidx['EMUP'])&(w22.postid<=dendidx['EMUP'])]
+>>> w22_EMDOWN = w22[(w22.postid>=dstartidx['EMDOWN'])&(w22.postid<=dendidx['EMDOWN'])]
+>>> w22_EA = w22[(w22.postid>=dstartidx['EA'])&(w22.postid<=dendidx['EA'])]
+>>> w22_EA2 = w22[(w22.postid>=dstartidx['EA2'])&(w22.postid<=dendidx['EA2'])]
+
+# check if these weights change....
+>>> w22_IA = w22[(w22.postid>=dstartidx['IA'])&(w22.postid<=dendidx['IA'])]
+>>> w22_IAL = w22[(w22.postid>=dstartidx['IAL'])&(w22.postid<=dendidx['IAL'])]
+>>> w22_IA2 = w22[(w22.postid>=dstartidx['IA2'])&(w22.postid<=dendidx['IA2'])]
+>>> w22_IA2L = w22[(w22.postid>=dstartidx['IA2L'])&(w22.postid<=dendidx['IA2L'])]
+>>> w22_IM = w22[(w22.postid>=dstartidx['IM'])&(w22.postid<=dendidx['IM'])]
+>>> w22_IML = w22[(w22.postid>=dstartidx['IML'])&(w22.postid<=dendidx['IML'])]
+>>> w0_IML = w0[(w0.postid>=dstartidx['IML'])&(w0.postid<=dendidx['IML'])]
+>>> w0_IM = w0[(w0.postid>=dstartidx['IM'])&(w0.postid<=dendidx['IM'])]
+>>> w0_IA = w0[(w0.postid>=dstartidx['IA'])&(w0.postid<=dendidx['IA'])]
+>>> w0_IA2 = w0[(w0.postid>=dstartidx['IA2'])&(w0.postid<=dendidx['IA2'])]
+>>> w0_IA2L = w0[(w0.postid>=dstartidx['IA2L'])&(w0.postid<=dendidx['IA2L'])]
+>>> w0_IAL = w0[(w0.postid>=dstartidx['IAL'])&(w0.postid<=dendidx['IAL'])]
+# these are empty.... Inhibitiory connections are not plastic.
+
+
+>>> EA_boxwghts = [] # compute median, 25 percentile and 75 percentile 
+>>> EA_boxwghts.append(list(np.percentile(w0_EA['weight'],[25,50,75])))
+>>> EA_boxwghts.append(list(np.percentile(w1_EA['weight'],[25,50,75])))
+>>> EA_boxwghts.append(list(np.percentile(w2_EA['weight'],[25,50,75])))
+>>> EA_boxwghts.append(list(np.percentile(w3_EA['weight'],[25,50,75])))
+>>> EA_boxwghts.append(list(np.percentile(w4_EA['weight'],[25,50,75])))
+>>> EA_boxwghts.append(list(np.percentile(w5_EA['weight'],[25,50,75])))
+>>> EA_boxwghts.append(list(np.percentile(w6_EA['weight'],[25,50,75])))
+>>> EA_boxwghts.append(list(np.percentile(w7_EA['weight'],[25,50,75])))
+>>> EA_boxwghts.append(list(np.percentile(w8_EA['weight'],[25,50,75])))
+>>> EA_boxwghts.append(list(np.percentile(w9_EA['weight'],[25,50,75])))
+>>> EA_boxwghts.append(list(np.percentile(w10_EA['weight'],[25,50,75])))
+>>> EA_boxwghts.append(list(np.percentile(w11_EA['weight'],[25,50,75])))
+>>> EA_boxwghts.append(list(np.percentile(w12_EA['weight'],[25,50,75])))
+>>> EA_boxwghts.append(list(np.percentile(w13_EA['weight'],[25,50,75])))
+>>> EA_boxwghts.append(list(np.percentile(w14_EA['weight'],[25,50,75])))
+>>> EA_boxwghts.append(list(np.percentile(w15_EA['weight'],[25,50,75])))
+>>> EA_boxwghts.append(list(np.percentile(w16_EA['weight'],[25,50,75])))
+>>> EA_boxwghts.append(list(np.percentile(w17_EA['weight'],[25,50,75])))
+>>> EA_boxwghts.append(list(np.percentile(w18_EA['weight'],[25,50,75])))
+>>> EA_boxwghts.append(list(np.percentile(w19_EA['weight'],[25,50,75])))
+>>> EA_boxwghts.append(list(np.percentile(w20_EA['weight'],[25,50,75])))
+>>> EA_boxwghts.append(list(np.percentile(w21_EA['weight'],[25,50,75])))
+>>> EA_boxwghts.append(list(np.percentile(w22_EA['weight'],[25,50,75])))
+
+
+>>> plt.plot(EA_boxwghts[:,1],'-o',color='C0')
+[<matplotlib.lines.Line2D object at 0x7fb6c63ac090>]
+>>> plt.plot(EA_boxwghts[:,0],'--',color='C0')
+[<matplotlib.lines.Line2D object at 0x7fb6e55a3110>]
+>>> plt.plot(EA_boxwghts[:,2],'--',color='C0')
+[<matplotlib.lines.Line2D object at 0x7fb6e4ef3150>]
+>>> plt.legend(('Median','25/75 percentile'))
+<matplotlib.legend.Legend object at 0x7fb6c63a4f90>
+>>> xlabel('# of repeats')
+Text(0.5,19.5222,'# of repeats')
+>>> ylabel('EA weights')
+
+... saved as 21jan28_EAweightsFigure1_FullSam.png
+
+
+>>> plt.plot(EA2_boxwghts[:,0],'--',color='C1')
+[<matplotlib.lines.Line2D object at 0x7fb6c56be590>]
+>>> plt.plot(EA2_boxwghts[:,2],'--',color='C1')
+[<matplotlib.lines.Line2D object at 0x7fb6e55a3ed0>]
+>>> plt.legend(('Median','25/75 percentile'))
+<matplotlib.legend.Legend object at 0x7fb6e219e610>
+>>> ylabel('EA2 weights')
+Text(38.4722,0.5,'EA2 weights')
+>>> xlabel('# of repeats')
+Text(0.5,19.5222,'# of repeats')
+
+... saved as 21jan28_EA2weightsFigure1_FullSam.png
+
+>>> plt.plot(EMUP_boxwghts[:,1],'-o',color='C2')
+[<matplotlib.lines.Line2D object at 0x7fb6e273bed0>]
+>>> plt.plot(EMUP_boxwghts[:,0],'--',color='C2')
+[<matplotlib.lines.Line2D object at 0x7fb6c588f4d0>]
+>>> plt.plot(EMDOWN_boxwghts[:,1],'-o',color='C3')
+[<matplotlib.lines.Line2D object at 0x7fb6c77a6990>]
+>>> plt.plot(EMDOWN_boxwghts[:,0],'--',color='C3')
+[<matplotlib.lines.Line2D object at 0x7fb6c692a7d0>]
+>>> plt.plot(EMUP_boxwghts[:,2],'--',color='C2')
+[<matplotlib.lines.Line2D object at 0x7fb6e299efd0>]
+>>> plt.plot(EMDOWN_boxwghts[:,2],'--',color='C3')
+[<matplotlib.lines.Line2D object at 0x7fb6e28d7f50>]
+>>> plt.legend(('EMUP - Median','EMUP - 25/75 percentile','EMDOWN - Median','EMDOWN - 25/75 percentile'))
+<matplotlib.legend.Legend object at 0x7fb6e299eb10>
+>>> ylim((0.35,0.85))
+(0.35, 0.85)
+>>> ylabel('EM weights')
+Text(38.4722,0.5,'EM weights')
+>>> xlabel('# of repeats')
+Text(0.5,19.5222,'# of repeats')
+
+... saved as 21jan28_EMweightsFigure1_FullSam.png
+
+
+# dig deep into weights w0 and w21
+
+# recurrent conns
+>>> w0_BT0_EMUP_rec = w0_BT0_EMUP[(w0_BT0_EMUP.preid>=dstartidx['EMUP'])&(w0_BT0_EMUP.preid<=dendidx['EMUP'])]
+>>> w0_BT0_EMDOWN_rec = w0_BT0_EMDOWN[(w0_BT0_EMDOWN.preid>=dstartidx['EMDOWN'])&(w0_BT0_EMDOWN.preid<=dendidx['EMDOWN'])]
+
+>>> w0_EMUP_rec = w0_EMUP[(w0_EMUP.preid>=dstartidx['EMUP'])&(w0_EMUP.preid<=dendidx['EMUP'])]
+>>> w0_EMDOWN_rec = w0_EMDOWN[(w0_EMDOWN.preid>=dstartidx['EMDOWN'])&(w0_EMDOWN.preid<=dendidx['EMDOWN'])]
+
+>>> w21_EMUP_rec = w21_EMUP[(w21_EMUP.preid>=dstartidx['EMUP'])&(w21_EMUP.preid<=dendidx['EMUP'])]
+>>> w21_EMDOWN_rec = w21_EMDOWN[(w21_EMDOWN.preid>=dstartidx['EMDOWN'])&(w21_EMDOWN.preid<=dendidx['EMDOWN'])]
+
+# feedback conns to EA and EA2
+
+>>> w0_BT0_EA_EMUP = w0_BT0_EA[(w0_BT0_EA.preid>=dstartidx['EMUP'])&(w0_BT0_EA.preid<=dendidx['EMUP'])]
+>>> w0_BT0_EA_EMDOWN = w0_BT0_EA[(w0_BT0_EA.preid>=dstartidx['EMDOWN'])&(w0_BT0_EA.preid<=dendidx['EMDOWN'])]
+
+>>> w0_BT0_EA2_EMUP = w0_BT0_EA2[(w0_BT0_EA2.preid>=dstartidx['EMUP'])&(w0_BT0_EA2.preid<=dendidx['EMUP'])]
+>>> w0_BT0_EA2_EMDOWN = w0_BT0_EA2[(w0_BT0_EA2.preid>=dstartidx['EMDOWN'])&(w0_BT0_EA2.preid<=dendidx['EMDOWN'])]
+
+>>> w0_EA_EMUP = w0_EA[(w0_EA.preid>=dstartidx['EMUP'])&(w0_EA.preid<=dendidx['EMUP'])]
+>>> w0_EA2_EMUP = w0_EA2[(w0_EA2.preid>=dstartidx['EMUP'])&(w0_EA2.preid<=dendidx['EMUP'])]
+
+>>> w0_EA_EMDOWN = w0_EA[(w0_EA.preid>=dstartidx['EMDOWN'])&(w0_EA.preid<=dendidx['EMDOWN'])]
+>>> w0_EA2_EMDOWN = w0_EA2[(w0_EA2.preid>=dstartidx['EMDOWN'])&(w0_EA2.preid<=dendidx['EMDOWN'])]
+
+>>> w21_EA_EMUP = w21_EA[(w21_EA.preid>=dstartidx['EMUP'])&(w21_EA.preid<=dendidx['EMUP'])]
+>>> w21_EA2_EMUP = w21_EA2[(w21_EA2.preid>=dstartidx['EMUP'])&(w21_EA2.preid<=dendidx['EMUP'])]
+
+>>> w21_EA_EMDOWN = w21_EA[(w21_EA.preid>=dstartidx['EMDOWN'])&(w21_EA.preid<=dendidx['EMDOWN'])]
+>>> w21_EA2_EMDOWN = w21_EA2[(w21_EA2.preid>=dstartidx['EMDOWN'])&(w21_EA2.preid<=dendidx['EMDOWN'])]
+
+# FF excitatory conns
+>>> w0_BT0_EMUP_fromEA = w0_BT0_EMUP[(w0_BT0_EMUP.preid>=dstartidx['EA'])&(w0_BT0_EMUP.preid<=dendidx['EA'])]
+>>> w0_BT0_EMUP_fromEA2 = w0_BT0_EMUP[(w0_BT0_EMUP.preid>=dstartidx['EA2'])&(w0_BT0_EMUP.preid<=dendidx['EA2'])]
+
+>>> w0_BT0_EMDOWN_fromEA = w0_BT0_EMDOWN[(w0_BT0_EMDOWN.preid>=dstartidx['EA'])&(w0_BT0_EMDOWN.preid<=dendidx['EA'])]
+>>> w0_BT0_EMDOWN_fromEA2 = w0_BT0_EMDOWN[(w0_BT0_EMDOWN.preid>=dstartidx['EA2'])&(w0_BT0_EMDOWN.preid<=dendidx['EA2'])]
+
+>>> w0_EMUP_fromEA = w0_EMUP[(w0_EMUP.preid>=dstartidx['EA'])&(w0_EMUP.preid<=dendidx['EA'])]
+>>> w0_EMUP_fromEA2 = w0_EMUP[(w0_EMUP.preid>=dstartidx['EA2'])&(w0_EMUP.preid<=dendidx['EA2'])]
+
+>>> w0_EMDOWN_fromEA = w0_EMDOWN[(w0_EMDOWN.preid>=dstartidx['EA'])&(w0_EMDOWN.preid<=dendidx['EA'])]
+>>> w0_EMDOWN_fromEA2 = w0_EMDOWN[(w0_EMDOWN.preid>=dstartidx['EA2'])&(w0_EMDOWN.preid<=dendidx['EA2'])]
+
+>>> w21_EMUP_fromEA = w21_EMUP[(w21_EMUP.preid>=dstartidx['EA'])&(w21_EMUP.preid<=dendidx['EA'])]
+>>> w21_EMUP_fromEA2 = w21_EMUP[(w21_EMUP.preid>=dstartidx['EA2'])&(w21_EMUP.preid<=dendidx['EA2'])]
+
+>>> w21_EMDOWN_fromEA = w21_EMDOWN[(w21_EMDOWN.preid>=dstartidx['EA'])&(w21_EMDOWN.preid<=dendidx['EA'])]
+>>> w21_EMDOWN_fromEA2 = w21_EMDOWN[(w21_EMDOWN.preid>=dstartidx['EA2'])&(w21_EMDOWN.preid<=dendidx['EA2'])]
+
+#######
+
+w0_BT0_EMUP_fromEMDOWN = w0_BT0_EMUP[(w0_BT0_EMUP.preid>=dstartidx['EMDOWN'])&(w0_BT0_EMUP.preid<=dendidx['EMDOWN'])]
+w0_BT0_EMDOWN_fromEMUP = w0_BT0_EMDOWN[(w0_BT0_EMDOWN.preid>=dstartidx['EMUP'])&(w0_BT0_EMDOWN.preid<=dendidx['EMUP'])]
+
+w0_EMUP_fromEMDOWN = w0_EMUP[(w0_EMUP.preid>=dstartidx['EMDOWN'])&(w0_EMUP.preid<=dendidx['EMDOWN'])]
+w0_EMDOWN_fromEMUP = w0_EMDOWN[(w0_EMDOWN.preid>=dstartidx['EMUP'])&(w0_EMDOWN.preid<=dendidx['EMUP'])]
+
+w21_EMUP_fromEMDOWN = w21_EMUP[(w21_EMUP.preid>=dstartidx['EMDOWN'])&(w21_EMUP.preid<=dendidx['EMDOWN'])]
+w21_EMDOWN_fromEMUP = w21_EMDOWN[(w21_EMDOWN.preid>=dstartidx['EMUP'])&(w21_EMDOWN.preid<=dendidx['EMUP'])]
+
+#  r1 = np.reshape(np.array(w0_EMDOWN_rec['weight']),(180,100))
+>>> w0_EMUP_rec['weight'].shape
+(18000,)
+>>> w0_EMDOWN_rec['weight'].shape
+(18000,)
+>>> w0_EMUP_fromEA['weight'].shape
+(30000,)
+>>> w0_EMUP_fromEA2['weight'].shape
+(18000,)
+>>> w0_EMDOWN_fromEA2['weight'].shape
+(18000,)
+>>> w0_EMDOWN_fromEA['weight'].shape
+(30000,)
+>>> w0_EMDOWN_fromEMUP['weight'].shape
+(18000,)
+>>> w0_EMUP_fromEMDOWN['weight'].shape
+(18000,)
+
+#
+>>> EMUPneuronIDs = np.unique(w0_BT0_EMUP_rec['postid'])
+>>> EMDOWNneuronIDs = np.unique(w0_BT0_EMDOWN_rec['postid'])
+
+>>> EAneuronIDs = np.unique(w0_BT0_EA['postid'])
+>>> EA2neuronIDs = np.unique(w0_BT0_EA2['postid'])
+
+
+>>> EMUPrecW_t0 = np.zeros((dnumc['EMUP'],))
+>>> EMUPrecW_t1 = np.zeros((dnumc['EMUP'],))
+>>> EMUPrecW_t21 = np.zeros((dnumc['EMUP'],))
+>>> EMUPW_EA_t0 = np.zeros((dnumc['EMUP'],))
+>>> EMUPW_EA_t1 = np.zeros((dnumc['EMUP'],))
+>>> EMUPW_EA_t21 = np.zeros((dnumc['EMUP'],))
+>>> EMUPW_EA2_t0 = np.zeros((dnumc['EMUP'],))
+>>> EMUPW_EA2_t1 = np.zeros((dnumc['EMUP'],))
+>>> EMUPW_EA2_t21 = np.zeros((dnumc['EMUP'],))
+
+>>> EMDOWNrecW_t0 = np.zeros((dnumc['EMDOWN'],))
+>>> EMDOWNrecW_t1 = np.zeros((dnumc['EMDOWN'],))
+>>> EMDOWNrecW_t21 = np.zeros((dnumc['EMDOWN'],))
+>>> EMDOWNW_EA_t0 = np.zeros((dnumc['EMDOWN'],))
+>>> EMDOWNW_EA_t1 = np.zeros((dnumc['EMDOWN'],))
+>>> EMDOWNW_EA_t21 = np.zeros((dnumc['EMDOWN'],))
+>>> EMDOWNW_EA2_t0 = np.zeros((dnumc['EMDOWN'],))
+>>> EMDOWNW_EA2_t1 = np.zeros((dnumc['EMDOWN'],))
+>>> EMDOWNW_EA2_t21 = np.zeros((dnumc['EMDOWN'],))
+
+>>> counter = 0
+>>> EMDOWNneuronIDs = np.unique(w0_BT0_EMDOWN_rec['postid'])
+>>> for cID in EMUPneuronIDs:
+...   EMUPrecW_t0[counter]=np.sum(w0_BT0_EMUP_rec[w0_BT0_EMUP_rec.postid==cID]['weight'])
+...   EMUPrecW_t1[counter]=np.sum(w0_EMUP_rec[w0_EMUP_rec.postid==cID]['weight'])
+...   EMUPrecW_t21[counter]=np.sum(w21_EMUP_rec[w21_EMUP_rec.postid==cID]['weight'])
+...   EMUPW_EA_t0[counter]=np.sum(w0_BT0_EMUP_fromEA[w0_BT0_EMUP_fromEA.postid==cID]['weight'])
+...   EMUPW_EA_t1[counter]=np.sum(w0_EMUP_fromEA[w0_EMUP_fromEA.postid==cID]['weight'])
+...   EMUPW_EA_t21[counter]=np.sum(w21_EMUP_fromEA[w21_EMUP_fromEA.postid==cID]['weight'])
+...   EMUPW_EA2_t0[counter]=np.sum(w0_BT0_EMUP_fromEA2[w0_BT0_EMUP_fromEA2.postid==cID]['weight'])
+...   EMUPW_EA2_t1[counter]=np.sum(w0_EMUP_fromEA2[w0_EMUP_fromEA2.postid==cID]['weight'])
+...   EMUPW_EA2_t21[counter]=np.sum(w21_EMUP_fromEA2[w21_EMUP_fromEA2.postid==cID]['weight'])
+...   counter+=1
+... 
+>>> counter = 0
+>>> for cID in EMDOWNneuronIDs:
+...   EMDOWNrecW_t0[counter]=np.sum(w0_BT0_EMDOWN_rec[w0_BT0_EMDOWN_rec.postid==cID]['weight'])
+...   EMDOWNrecW_t1[counter]=np.sum(w0_EMDOWN_rec[w0_EMDOWN_rec.postid==cID]['weight'])
+...   EMDOWNrecW_t21[counter]=np.sum(w21_EMDOWN_rec[w21_EMDOWN_rec.postid==cID]['weight'])
+...   EMDOWNW_EA_t0[counter]=np.sum(w0_BT0_EMDOWN_fromEA[w0_BT0_EMDOWN_fromEA.postid==cID]['weight'])
+...   EMDOWNW_EA_t1[counter]=np.sum(w0_EMDOWN_fromEA[w0_EMDOWN_fromEA.postid==cID]['weight'])
+...   EMDOWNW_EA_t21[counter]=np.sum(w21_EMDOWN_fromEA[w21_EMDOWN_fromEA.postid==cID]['weight'])
+...   EMDOWNW_EA2_t0[counter]=np.sum(w0_BT0_EMDOWN_fromEA2[w0_BT0_EMDOWN_fromEA2.postid==cID]['weight'])
+...   EMDOWNW_EA2_t1[counter]=np.sum(w0_EMDOWN_fromEA2[w0_EMDOWN_fromEA2.postid==cID]['weight'])
+...   EMDOWNW_EA2_t21[counter]=np.sum(w21_EMDOWN_fromEA2[w21_EMDOWN_fromEA2.postid==cID]['weight'])
+...   counter+=1
+
+
+>>> vmin1 = np.amin([np.amin(EMUPrecW_t0),np.amin(EMUPrecW_t1),np.amin(EMUPrecW_t21),np.amin(EMDOWNrecW_t0),np.amin(EMDOWNrecW_t1),np.amin(EMDOWNrecW_t21)])
+>>> vmax1 = np.amax([np.amax(EMUPrecW_t0),np.amax(EMUPrecW_t1),np.amax(EMUPrecW_t21),np.amax(EMDOWNrecW_t0),np.amax(EMDOWNrecW_t1),np.amax(EMDOWNrecW_t21)])
+
+>>> vmin2 = np.amin([np.amin(EMUPW_EA_t0),np.amin(EMUPW_EA_t1),np.amin(EMUPW_EA_t21),np.amin(EMDOWNW_EA_t0),np.amin(EMDOWNW_EA_t1),np.amin(EMDOWNW_EA_t21)])
+>>> vmax2 = np.amax([np.amax(EMUPW_EA_t0),np.amax(EMUPW_EA_t1),np.amax(EMUPW_EA_t21),np.amax(EMDOWNW_EA_t0),np.amax(EMDOWNW_EA_t1),np.amax(EMDOWNW_EA_t21)])
+
+>>> vmin3 = np.amin([np.amin(EMUPW_EA2_t0),np.amin(EMUPW_EA2_t1),np.amin(EMUPW_EA2_t21),np.amin(EMDOWNW_EA2_t0),np.amin(EMDOWNW_EA2_t1),np.amin(EMDOWNW_EA2_t21)])
+>>> vmax3 = np.amax([np.amax(EMUPW_EA2_t0),np.amax(EMUPW_EA2_t1),np.amax(EMUPW_EA2_t21),np.amax(EMDOWNW_EA2_t0),np.amax(EMDOWNW_EA2_t1),np.amax(EMDOWNW_EA2_t21)])
+
+# plotting recurrent conns
+
+>>> fig,axs = plt.subplots(2,3,figsize=(4,3))
+>>> lax = axs.ravel()
+>>> p0 = lax[0].imshow(np.reshape(EMUPrecW_t0,(20,15)),vmin=vmin1,vmax=vmax1,cmap='jet')
+>>> p1 = lax[1].imshow(np.reshape(EMUPrecW_t1,(20,15)),vmin=vmin1,vmax=vmax1,cmap='jet')
+>>> p2 = lax[2].imshow(np.reshape(EMUPrecW_t21,(20,15)),vmin=vmin1,vmax=vmax1,cmap='jet')
+>>> p3 = lax[3].imshow(np.reshape(EMDOWNrecW_t0,(20,15)),vmin=vmin1,vmax=vmax1,cmap='jet')
+>>> p4 = lax[5].imshow(np.reshape(EMDOWNrecW_t21,(20,15)),vmin=vmin1,vmax=vmax1,cmap='jet')
+>>> p4 = lax[4].imshow(np.reshape(EMDOWNrecW_t1,(20,15)),vmin=vmin1,vmax=vmax1,cmap='jet')
+>>> p5 = lax[5].imshow(np.reshape(EMDOWNrecW_t21,(20,15)),vmin=vmin1,vmax=vmax1,cmap='jet')
+>>> lax[0].set_xticks([])
+>>> lax[1].set_xticks([])
+>>> lax[2].set_xticks([])
+>>> lax[3].set_xticks([])
+>>> lax[4].set_xticks([])
+>>> lax[5].set_xticks([])
+>>> lax[0].set_yticks([])
+>>> lax[1].set_yticks([])
+>>> lax[2].set_yticks([])
+>>> lax[3].set_yticks([])
+>>> lax[4].set_yticks([])
+>>> lax[5].set_yticks([])
+>>> lax[0].set_ylabel('EMUP-recurrent',fontsize=8)
+>>> lax[3].set_ylabel('EMDOWN-recurrent',fontsize=8)
+>>> lax[0].set_title('Initial',fontsize=8)
+>>> lax[1].set_title('After T0',fontsize=8)
+>>> lax[2].set_title('After T21',fontsize=8)
+
+>>> cbaxes = fig.add_axes([0.9,0.4,0.01,0.4])
+>>> plt.colorbar(p5,cax=cbaxes)
+
+saved as:
+21jan28_EMrecurweightsFigure2a_FullSam.eps
+21jan28_EMrecurweightsFigure2a_FullSam.png
+
+
+# EA to EM weights
+
+>>> fig,axs = plt.subplots(2,3,figsize=(4,3))
+>>> lax = axs.ravel()
+>>> p0 = lax[0].imshow(np.reshape(EMUPW_EA_t0,(20,15)),vmin=vmin2,vmax=vmax2,cmap='jet')
+>>> p1 = lax[1].imshow(np.reshape(EMUPW_EA_t1,(20,15)),vmin=vmin2,vmax=vmax2,cmap='jet')
+>>> p2 = lax[2].imshow(np.reshape(EMUPW_EA_t21,(20,15)),vmin=vmin2,vmax=vmax2,cmap='jet')
+>>> p3 = lax[3].imshow(np.reshape(EMDOWNW_EA_t0,(20,15)),vmin=vmin2,vmax=vmax2,cmap='jet')
+>>> p4 = lax[4].imshow(np.reshape(EMDOWNW_EA_t1,(20,15)),vmin=vmin2,vmax=vmax2,cmap='jet')
+>>> p5 = lax[5].imshow(np.reshape(EMDOWNW_EA_t21,(20,15)),vmin=vmin2,vmax=vmax2,cmap='jet')
+>>> for i in range(6):
+...   lax[i].set_xticks([])
+...   lax[i].set_yticks([])
+
+>>> lax[0].set_ylabel('EA->EMUP',fontsize=8)
+>>> lax[3].set_ylabel('EA->EMDOWN',fontsize=8)
+>>> lax[0].set_title('Initial',fontsize=8)
+>>> lax[1].set_title('After T0',fontsize=8)
+>>> lax[2].set_title('After T21',fontsize=8)
+>>> cbaxes = fig.add_axes([0.9,0.4,0.01,0.4])
+>>> plt.colorbar(p5,cax=cbaxes)
+
+saved as:
+21jan28_EAtoEMweightsFigure2b_FullSam.eps
+21jan28_EAtoEMweightsFigure2b_FullSam.png
+
+
+# EA2 to EM weights
+
+>>> fig,axs = plt.subplots(2,3,figsize=(4,3))
+>>> lax = axs.ravel()
+>>> p0 = lax[0].imshow(np.reshape(EMUPW_EA2_t0,(20,15)),vmin=vmin2,vmax=vmax2,cmap='jet')
+>>> fig,axs = plt.subplots(2,3,figsize=(4,3))
+>>> lax = axs.ravel()
+>>> p0 = lax[0].imshow(np.reshape(EMUPW_EA2_t0,(20,15)),vmin=vmin3,vmax=vmax3,cmap='jet')
+>>> p1 = lax[1].imshow(np.reshape(EMUPW_EA2_t1,(20,15)),vmin=vmin3,vmax=vmax3,cmap='jet')
+>>> p2 = lax[2].imshow(np.reshape(EMUPW_EA2_t21,(20,15)),vmin=vmin3,vmax=vmax3,cmap='jet')
+>>> p3 = lax[3].imshow(np.reshape(EMDOWNW_EA2_t0,(20,15)),vmin=vmin3,vmax=vmax3,cmap='jet')
+>>> p4 = lax[4].imshow(np.reshape(EMDOWNW_EA2_t1,(20,15)),vmin=vmin3,vmax=vmax3,cmap='jet')
+>>> p5 = lax[5].imshow(np.reshape(EMDOWNW_EA2_t21,(20,15)),vmin=vmin3,vmax=vmax3,cmap='jet')
+>>> for i in range(6):
+...   lax[i].set_xticks([])
+...   lax[i].set_yticks([])
+>>> lax[0].set_ylabel('EA2->EMUP',fontsize=8)
+>>> lax[3].set_ylabel('EA2->EMDOWN',fontsize=8)
+>>> lax[0].set_title('Initial',fontsize=8)
+>>> lax[1].set_title('After T0',fontsize=8)
+>>> lax[2].set_title('After T21',fontsize=8)
+>>> cbaxes = fig.add_axes([0.9,0.4,0.01,0.4])
+>>> plt.colorbar(p5,cax=cbaxes)
+
+
+saved as: 
+21jan28_EA2toEMweightsFigure2c_FullSam.eps
+21jan28_EA2toEMweightsFigure2c_FullSam.png
+
+
+# total input weights to EM
+
+>>> EMUP_t0 = np.add(EMUPrecW_t0,EMUPW_EA_t0,EMUPW_EA2_t0)
+>>> EMUP_t1 = np.add(EMUPrecW_t1,EMUPW_EA_t1,EMUPW_EA2_t1)
+>>> EMUP_t21 = np.add(EMUPrecW_t21,EMUPW_EA_t21,EMUPW_EA2_t21)
+>>> EMDOWN_t0 = np.add(EMDOWNrecW_t0,EMDOWNW_EA_t0,EMDOWNW_EA2_t0)
+>>> EMDOWN_t1 = np.add(EMDOWNrecW_t1,EMDOWNW_EA_t1,EMDOWNW_EA2_t1)
+>>> EMDOWN_t21 = np.add(EMDOWNrecW_t21,EMDOWNW_EA_t21,EMDOWNW_EA2_t21)
+
+>>> vmin4 = np.amin([np.amin(EMUP_t0),np.amin(EMUP_t1),np.amin(EMUP_t21),np.amin(EMDOWN_t0),np.amin(EMDOWN_t1),np.amin(EMDOWN_t21)])
+>>> vmax4 = np.amax([np.amax(EMUP_t0),np.amax(EMUP_t1),np.amax(EMUP_t21),np.amax(EMDOWN_t0),np.amax(EMDOWN_t1),np.amax(EMDOWN_t21)])
+
+>>> fig,axs = plt.subplots(2,3,figsize=(4,3))
+>>> lax = axs.ravel()
+>>> p0 = lax[0].imshow(np.reshape(EMUP_t0,(20,15)),vmin=vmin4,vmax=vmax4,cmap='jet')
+>>> p1 = lax[1].imshow(np.reshape(EMUP_t1,(20,15)),vmin=vmin4,vmax=vmax4,cmap='jet')
+>>> p2 = lax[2].imshow(np.reshape(EMUP_t21,(20,15)),vmin=vmin4,vmax=vmax4,cmap='jet')
+>>> p3 = lax[3].imshow(np.reshape(EMDOWN_t0,(20,15)),vmin=vmin4,vmax=vmax4,cmap='jet')
+>>> p4 = lax[4].imshow(np.reshape(EMDOWN_t1,(20,15)),vmin=vmin4,vmax=vmax4,cmap='jet')
+>>> p5 = lax[5].imshow(np.reshape(EMDOWN_t21,(20,15)),vmin=vmin4,vmax=vmax4,cmap='jet')
+>>> for i in range(6):
+...   lax[i].set_xticks([])
+...   lax[i].set_yticks([])
+>>> lax[0].set_ylabel('[EA,EA2,EMUP]->EMUP',fontsize=8)
+>>> lax[3].set_ylabel('[EA,EA2,EMDOWN]->EMDOWN',fontsize=8)
+>>> lax[0].set_title('Initial',fontsize=8)
+>>> lax[1].set_title('After T0',fontsize=8)
+>>> lax[2].set_title('After T21',fontsize=8)
+>>> cbaxes = fig.add_axes([0.9,0.4,0.01,0.4])
+>>> plt.colorbar(p5,cax=cbaxes)
+
+saved as:
+21jan28_EMweightsFigure2d_FullSam.png
+21jan28_EMweightsFigure2d_FullSam.eps
+
+>>> EMUPW_EMDOWN_t0 = np.zeros((dnumc['EMUP'],))
+>>> EMUPW_EMDOWN_t1 = np.zeros((dnumc['EMUP'],))
+>>> EMUPW_EMDOWN_t21 = np.zeros((dnumc['EMUP'],))
+>>> EMDOWNW_EMUP_t0 = np.zeros((dnumc['EMDOWN'],))
+>>> EMDOWNW_EMUP_t1 = np.zeros((dnumc['EMDOWN'],))
+>>> EMDOWNW_EMUP_t21 = np.zeros((dnumc['EMDOWN'],))
+
+>>> counter = 0
+>>> for cID in EMUPneuronIDs:
+...   EMUPW_EMDOWN_t0[counter]=np.sum(w0_BT0_EMUP_fromEMDOWN[w0_BT0_EMUP_fromEMDOWN.postid==cID]['weight'])
+...   EMUPW_EMDOWN_t1[counter]=np.sum(w0_EMUP_fromEMDOWN[w0_EMUP_fromEMDOWN.postid==cID]['weight'])
+...   EMUPW_EMDOWN_t21[counter]=np.sum(w21_EMUP_fromEMDOWN[w21_EMUP_fromEMDOWN.postid==cID]['weight'])
+...   counter+=1
+... 
+>>> counter = 0
+>>> for cID in EMDOWNneuronIDs:
+...   EMDOWNW_EMUP_t0[counter]=np.sum(w0_BT0_EMDOWN_fromEMUP[w0_BT0_EMDOWN_fromEMUP.postid==cID]['weight'])
+...   EMDOWNW_EMUP_t1[counter]=np.sum(w0_EMDOWN_fromEMUP[w0_EMDOWN_fromEMUP.postid==cID]['weight'])
+...   EMDOWNW_EMUP_t21[counter]=np.sum(w21_EMDOWN_fromEMUP[w21_EMDOWN_fromEMUP.postid==cID]['weight'])
+...   counter+=1
+
+>>> vmin5 = np.amin([np.amin(EMUPW_EMDOWN_t0),np.amin(EMUPW_EMDOWN_t1),np.amin(EMUPW_EMDOWN_t21),np.amin(EMDOWNW_EMUP_t0),np.amin(EMDOWNW_EMUP_t1),np.amin(EMDOWNW_EMUP_t21)])
+>>> vmax5 = np.amax([np.amax(EMUPW_EMDOWN_t0),np.amax(EMUPW_EMDOWN_t1),np.amax(EMUPW_EMDOWN_t21),np.amax(EMDOWNW_EMUP_t0),np.amax(EMDOWNW_EMUP_t1),np.amax(EMDOWNW_EMUP_t21)])
+
+>>> fig,axs = plt.subplots(2,3,figsize=(4,3))
+>>> lax = axs.ravel()
+>>> p0 = lax[0].imshow(np.reshape(EMUPW_EMDOWN_t0,(20,15)),vmin=vmin5,vmax=vmax5,cmap='jet')
+>>> p1 = lax[1].imshow(np.reshape(EMUPW_EMDOWN_t1,(20,15)),vmin=vmin5,vmax=vmax5,cmap='jet')
+>>> p2 = lax[2].imshow(np.reshape(EMUPW_EMDOWN_t21,(20,15)),vmin=vmin5,vmax=vmax5,cmap='jet')
+>>> p3 = lax[3].imshow(np.reshape(EMDOWNW_EMUP_t0,(20,15)),vmin=vmin5,vmax=vmax5,cmap='jet')
+>>> p4 = lax[4].imshow(np.reshape(EMDOWNW_EMUP_t1,(20,15)),vmin=vmin5,vmax=vmax5,cmap='jet')
+>>> p5 = lax[5].imshow(np.reshape(EMDOWNW_EMUP_t21,(20,15)),vmin=vmin5,vmax=vmax5,cmap='jet')
+>>> for i in range(6):
+...   lax[i].set_xticks([])
+...   lax[i].set_yticks([])
+
+>>> lax[0].set_ylabel('EMDOWN->EMUP',fontsize=8)
+>>> lax[3].set_ylabel('EMUP->EMDOWN',fontsize=8)
+>>> lax[0].set_title('Initial',fontsize=8)
+>>> lax[1].set_title('After T0',fontsize=8)
+>>> lax[2].set_title('After T21',fontsize=8)
+>>> cbaxes = fig.add_axes([0.9,0.4,0.01,0.4])
+>>> plt.colorbar(p5,cax=cbaxes)
+
+saved as: 
+21jan28_EMcrossweightsFigure2e_FullSam.png
+21jan28_EMcrossweightsFigure2e_FullSam.eps
+
+
+>>> w0_BT0_EA_EMUP = w0_BT0_EA[(w0_BT0_EA.preid>=dstartidx['EMUP'])&(w0_BT0_EA.preid<=dendidx['EMUP'])]
+>>> w0_BT0_EA_EMDOWN = w0_BT0_EA[(w0_BT0_EA.preid>=dstartidx['EMDOWN'])&(w0_BT0_EA.preid<=dendidx['EMDOWN'])]
+
+>>> w0_BT0_EA2_EMUP = w0_BT0_EA2[(w0_BT0_EA2.preid>=dstartidx['EMUP'])&(w0_BT0_EA2.preid<=dendidx['EMUP'])]
+>>> w0_BT0_EA2_EMDOWN = w0_BT0_EA2[(w0_BT0_EA2.preid>=dstartidx['EMDOWN'])&(w0_BT0_EA2.preid<=dendidx['EMDOWN'])]
+
+>>> w0_EA_EMUP = w0_EA[(w0_EA.preid>=dstartidx['EMUP'])&(w0_EA.preid<=dendidx['EMUP'])]
+>>> w0_EA2_EMUP = w0_EA2[(w0_EA2.preid>=dstartidx['EMUP'])&(w0_EA2.preid<=dendidx['EMUP'])]
+
+>>> w0_EA_EMDOWN = w0_EA[(w0_EA.preid>=dstartidx['EMDOWN'])&(w0_EA.preid<=dendidx['EMDOWN'])]
+>>> w0_EA2_EMDOWN = w0_EA2[(w0_EA2.preid>=dstartidx['EMDOWN'])&(w0_EA2.preid<=dendidx['EMDOWN'])]
+
+>>> w21_EA_EMUP = w21_EA[(w21_EA.preid>=dstartidx['EMUP'])&(w21_EA.preid<=dendidx['EMUP'])]
+>>> w21_EA2_EMUP = w21_EA2[(w21_EA2.preid>=dstartidx['EMUP'])&(w21_EA2.preid<=dendidx['EMUP'])]
+
+>>> w21_EA_EMDOWN = w21_EA[(w21_EA.preid>=dstartidx['EMDOWN'])&(w21_EA.preid<=dendidx['EMDOWN'])]
+>>> w21_EA2_EMDOWN = w21_EA2[(w21_EA2.preid>=dstartidx['EMDOWN'])&(w21_EA2.preid<=dendidx['EMDOWN'])]
+
+
+
+>>> EAW_EMDOWN_t0 = np.zeros((dnumc['EA'],))
+>>> EAW_EMDOWN_t1 = np.zeros((dnumc['EA'],))
+>>> EAW_EMDOWN_t21 = np.zeros((dnumc['EA'],))
+>>> EA2W_EMDOWN_t0 = np.zeros((dnumc['EA2'],))
+>>> EA2W_EMDOWN_t1 = np.zeros((dnumc['EA2'],))
+>>> EA2W_EMDOWN_t21 = np.zeros((dnumc['EA2'],))
+>>> counter = 0
+>>> for cID in EAneuronIDs:
+...   EAW_EMUP_t0[counter]=np.sum(w0_BT0_EA_EMUP[w0_BT0_EA_EMUP.postid==cID]['weight'])
+...   EAW_EMUP_t1[counter]=np.sum(w0_EA_EMUP[w0_EA_EMUP.postid==cID]['weight'])
+...   EAW_EMUP_t21[counter]=np.sum(w21_EA_EMUP[w21_EA_EMUP.postid==cID]['weight'])
+...   EAW_EMDOWN_t0[counter]=np.sum(w0_BT0_EA_EMDOWN[w0_BT0_EA_EMDOWN.postid==cID]['weight'])
+...   EAW_EMDOWN_t1[counter]=np.sum(w0_EA_EMDOWN[w0_EA_EMDOWN.postid==cID]['weight'])
+...   EAW_EMDOWN_t21[counter]=np.sum(w21_EA_EMDOWN[w21_EA_EMDOWN.postid==cID]['weight'])
+...   counter+=1
+>>> counter = 0
+>>> for cID in EA2neuronIDs:
+...   EA2W_EMUP_t0[counter]=np.sum(w0_BT0_EA2_EMUP[w0_BT0_EA2_EMUP.postid==cID]['weight'])
+...   EA2W_EMUP_t1[counter]=np.sum(w0_EA2_EMUP[w0_EA2_EMUP.postid==cID]['weight'])
+...   EA2W_EMUP_t21[counter]=np.sum(w21_EA2_EMUP[w21_EA2_EMUP.postid==cID]['weight'])
+...   EA2W_EMDOWN_t0[counter]=np.sum(w0_BT0_EA2_EMDOWN[w0_BT0_EA2_EMDOWN.postid==cID]['weight'])
+...   EA2W_EMDOWN_t1[counter]=np.sum(w0_EA2_EMDOWN[w0_EA2_EMDOWN.postid==cID]['weight'])
+...   EA2W_EMDOWN_t21[counter]=np.sum(w21_EA2_EMDOWN[w21_EA2_EMDOWN.postid==cID]['weight'])
+...   counter+=1
+
+>>> vmin6 = np.amin([np.amin(EAW_EMUP_t0),np.amin(EAW_EMUP_t1),np.amin(EAW_EMUP_t21),np.amin(EAW_EMDOWN_t0),np.amin(EAW_EMDOWN_t1),np.amin(EAW_EMDOWN_t21)])
+>>> vmax6 = np.amax([np.amax(EAW_EMUP_t0),np.amax(EAW_EMUP_t1),np.amax(EAW_EMUP_t21),np.amax(EAW_EMDOWN_t0),np.amax(EAW_EMDOWN_t1),np.amax(EAW_EMDOWN_t21)])
+
+>>> vmin7 = np.amin([np.amin(EA2W_EMUP_t0),np.amin(EA2W_EMUP_t1),np.amin(EA2W_EMUP_t21),np.amin(EA2W_EMDOWN_t0),np.amin(EA2W_EMDOWN_t1),np.amin(EA2W_EMDOWN_t21)])
+>>> vmax7 = np.amax([np.amax(EA2W_EMUP_t0),np.amax(EA2W_EMUP_t1),np.amax(EA2W_EMUP_t21),np.amax(EA2W_EMDOWN_t0),np.amax(EA2W_EMDOWN_t1),np.amax(EA2W_EMDOWN_t21)])
+
+>>> fig, axs = plt.subplots(2,3,figsize=(4,3))
+>>> lax = axs.ravel()
+>>> p0 = lax[0].imshow(np.reshape(EAW_EMUP_t0,(30,20)),vmin=vmin6,vmax=vmax6,cmap='jet')
+>>> p1 = lax[1].imshow(np.reshape(EAW_EMUP_t1,(30,20)),vmin=vmin6,vmax=vmax6,cmap='jet')
+>>> p2 = lax[2].imshow(np.reshape(EAW_EMUP_t21,(30,20)),vmin=vmin6,vmax=vmax6,cmap='jet')
+>>> p3 = lax[3].imshow(np.reshape(EAW_EMDOWN_t0,(30,20)),vmin=vmin6,vmax=vmax6,cmap='jet')
+>>> p4 = lax[4].imshow(np.reshape(EAW_EMDOWN_t1,(30,20)),vmin=vmin6,vmax=vmax6,cmap='jet')
+>>> p5 = lax[5].imshow(np.reshape(EAW_EMDOWN_t21,(30,20)),vmin=vmin6,vmax=vmax6,cmap='jet')
+>>> for i in range(6):
+...   lax[i].set_xticks([])
+...   lax[i].set_yticks([])
+... 
+
+
+>>> lax[0].set_ylabel('EM->EA',fontsize=8)
+>>> lax[0].set_ylabel('EMUP->EA',fontsize=8)
+>>> lax[3].set_ylabel('EMDOWN->EA',fontsize=8)
+>>> lax[0].set_title('Initial',fontsize=8)
+>>> lax[1].set_title('After T0',fontsize=8)
+>>> lax[2].set_title('After T21',fontsize=8)
+>>> cbaxes = fig.add_axes([0.9,0.4,0.01,0.4])
+>>> plt.colorbar(p5,cax=cbaxes)
+
+saved as: 
+21jan28_EMfeedbackFigure2f_FullSam.png
+21jan28_EMfeedbackFigure2f_FullSam.eps
+
+
+>>> fig, axs = plt.subplots(2,3,figsize=(4,3))
+>>> lax = axs.ravel()
+>>> p0 = lax[0].imshow(np.reshape(EA2W_EMUP_t0,(20,15)),vmin=vmin7,vmax=vmax7,cmap='jet')
+>>> p1 = lax[1].imshow(np.reshape(EA2W_EMUP_t1,(20,15)),vmin=vmin7,vmax=vmax7,cmap='jet')
+>>> p2 = lax[2].imshow(np.reshape(EA2W_EMUP_t21,(20,15)),vmin=vmin7,vmax=vmax7,cmap='jet')
+>>> p3 = lax[3].imshow(np.reshape(EA2W_EMDOWN_t0,(20,15)),vmin=vmin7,vmax=vmax7,cmap='jet')
+>>> p4 = lax[4].imshow(np.reshape(EA2W_EMDOWN_t1,(20,15)),vmin=vmin7,vmax=vmax7,cmap='jet')
+>>> p5 = lax[5].imshow(np.reshape(EA2W_EMDOWN_t21,(20,15)),vmin=vmin7,vmax=vmax7,cmap='jet')
+>>> for i in range(6):
+...   lax[i].set_yticks([])
+...   lax[i].set_xticks([])
+
+>>> lax[0].set_ylabel('EM->EA2',fontsize=8)
+Text(50.6577,0.5,'EM->EA2')
+>>> lax[0].set_ylabel('EMUP->EA2',fontsize=8)
+Text(50.6577,0.5,'EMUP->EA2')
+>>> lax[3].set_ylabel('EMDOWN->EA2',fontsize=8)
+Text(50.6577,0.5,'EMDOWN->EA2')
+>>> lax[0].set_title('Initial',fontsize=8)
+Text(0.5,1,'Initial')
+>>> lax[1].set_title('After T0',fontsize=8)
+Text(0.5,1,'After T0')
+>>> lax[2].set_title('After T21',fontsize=8)
+Text(0.5,1,'After T21')
+>>> cbaxes = fig.add_axes([0.9,0.4,0.01,0.4])
+>>> plt.colorbar(p5,cax=cbaxes)
+
+saved as:
+21jan28_EMfeedbackFigure2g_FullSam.png
+21jan28_EMfeedbackFigure2g_FullSam.eps
+
+----------
+# EMUP rec conns
+>>> r0_t0 = np.reshape(np.array(w0_BT0_EMUP_rec['weight']),(180,100))
+>>> r0_t1 = np.reshape(np.array(w0_EMUP_rec['weight']),(180,100))
+>>> r0_t21 = np.reshape(np.array(w21_EMUP_rec['weight']),(180,100))
+
+# EMDOWN rec conns
+>>> l0_t0 = np.reshape(np.array(w0_BT0_EMDOWN_rec['weight']),(180,100))
+>>> l0_t1 = np.reshape(np.array(w0_EMDOWN_rec['weight']),(180,100))
+>>> l0_t21 = np.reshape(np.array(w21_EMDOWN_rec['weight']),(180,100))
+
+# cross EMUP to EMDOWN
+>>> clr0_t0 = np.reshape(np.array(w0_BT0_EMDOWN_fromEMUP['weight']),(180,100))
+>>> clr0_t1 = np.reshape(np.array(w0_EMDOWN_fromEMUP['weight']),(180,100))
+>>> clr0_t21 = np.reshape(np.array(w21_EMDOWN_fromEMUP['weight']),(180,100))
+
+# cross EMDOWN to EMUP
+>>> crl0_t0 = np.reshape(np.array(w0_BT0_EMUP_fromEMDOWN['weight']),(180,100))
+>>> crl0_t1 = np.reshape(np.array(w0_EMUP_fromEMDOWN['weight']),(180,100))
+>>> crl0_t21 = np.reshape(np.array(w21_EMUP_fromEMDOWN['weight']),(180,100))
+
+
+# feedforward EA to EM
+>>> fr0_t0 = np.reshape(np.array(w0_BT0_EMUP_fromEA['weight']),(200,150))
+>>> fr0_t1 = np.reshape(np.array(w0_EMUP_fromEA['weight']),(200,150))
+>>> fr21_t1 = np.reshape(np.array(w21_EMUP_fromEA['weight']),(200,150))
+
+>>> fl0_t0 = np.reshape(np.array(w0_BT0_EMDOWN_fromEA['weight']),(200,150))
+>>> fl0_t1 = np.reshape(np.array(w0_EMDOWN_fromEA['weight']),(200,150))
+>>> fl0_t21 = np.reshape(np.array(w21_EMDOWN_fromEA['weight']),(200,150))
+
+# feedforward EA2 to EM
+>>> fr1_t0 = np.reshape(np.array(w0_BT0_EMUP_fromEA2['weight']),(180,100))
+>>> fr1_t1 = np.reshape(np.array(w0_EMUP_fromEA2['weight']),(180,100))
+>>> fr1_t21 = np.reshape(np.array(w21_EMUP_fromEA2['weight']),(180,100))
+
+>>> fl1_t0 = np.reshape(np.array(w0_BT0_EMDOWN_fromEA2['weight']),(180,100))
+>>> fl1_t1 = np.reshape(np.array(w0_EMDOWN_fromEA2['weight']),(180,100))
+>>> fl1_t21 = np.reshape(np.array(w21_EMDOWN_fromEA2['weight']),(180,100))
+
+
+# should plot as total input weights to postsynaptic pop. 
+# e.g. 300 (20x15) for EMUP and EMDOWN
+# 600 (30x20) for EA
+# 300 (20x15) for EA2.
+
+>>> fig, axs = plt.subplots(1,3,figsize=(8,3))
+>>> lax = axs.ravel()
+>>> p1 = lax[0].imshow(fr1_t0,vmin=np.amin(fr1_t21),vmax=np.amax(fr1_t21),cmap='jet')
+>>> p2 = lax[1].imshow(fr1_t1,vmin=np.amin(fr1_t21),vmax=np.amax(fr1_t21),cmap='jet')
+>>> p3 = lax[2].imshow(fr1_t21,vmin=np.amin(fr1_t21),vmax=np.amax(fr1_t21),cmap='jet')
+cbaxes = fig.add_axes([0.95, 0.4, 0.01, 0.2])
+plt.colorbar(p3, cax = cbaxes)
+
+
+
+--------------
+(base) hanwar@cycle:~/GamesProject/SMARTAgent$ cp backupcfg/21jan6_TARG4_gcp__step_0_sim.json simFull.json
+nano simFull.json
+"name": "21jan30_TARG4_L1_cycle__step_0_",
+RL: AMPA: RLhebbwt: 0.1 (change from 0.01 to 0.1)
+(base) hanwar@cycle:~/GamesProject/SMARTAgent$ python multistepSim.py simFull.json 30 20 21jan30_RL4_L1_cycle_multi
+
+UNSUCCESSFUL IN SAVING OUTPUT
+----------------
+nano simFull.json
+"name": "21jan30_TARG4_L2_cycle__step_0_",
+RL: AMPA: RLhebbwt: 0.5 (change from 0.01 to 0.5)
+(base) hanwar@cycle:~/GamesProject/SMARTAgent$ python multistepSim.py simFull.json 30 20 21jan30_RL4_L2_cycle_multi
+
+UNSUCCESSFUL IN SAVING OUTPUT
+-----------------
+
+"name": "21feb1_TARG4_L1_cycle_",
+"RLhebbwt": 0.02,
+python multistepSim.py simFull.json 30 20 21feb1_RL4_L1_cycle_multi
+
+-----------------
+
+"name": "21feb1_TARG4_L2_cycle_",
+"RLhebbwt": 0.05
+
+------------------
+
+* 21feb2 
+
+- for any input sequence Iseq, measure firing rate of each M neuron in EMUP and EMDOWN populations.
+- see how those firing rate matrices evolve with repeated occurances.
+- this could be done in 2 ways 1) with fixed weight and 2) with evolving weights.
+- lets do that for the fixed weight first.....
+
+... using Initital weights i.e. before training.
+
+python -i simdat.py backupcfg/21jan21_TARG4_gcp_RLhebbwt_0_p0_sim.json
+
+...... so one challenge is to find out exact time bins for input presentation.
+
+use dt of 49.8 ms..... (not accurate but good approximation)
+
+tpnts = range(0,totalDur,tstepPerAction)
+
+# find input sequences.
+lSimilarSeqs, seqs2plot, seqBegs, seqEnds_wrtRewards = breakdownPerformance(InputImages,actreward,cend=69,sthresh=5)
+
+# find activity vectors for pops.
+>>> dact1D = getdActMap1D(totalDur,tstepPerAction,dspkT, dspkID, dnumc, dstartidx, lpop = ['EMUP', 'EMDOWN'])
+
+
+
+# sort and extract cummulative activity of each neuron in Motor pop across steps for any input sequence.....
+
+  # spkT = dspkT[pop]
+  # spkID = dspkID[pop]
+  # startidx = dstartidx[pop]
+  # NBneurons = dnumc[pop]
+
+def getCumActivityMapForInput(t1,t2,dact1D,lpop):
+  dCumAct = {}
+  dStepAct = {}
+  for pop in lpop:
+    dCumAct[pop] = []
+    dStepAct[pop] = []
+    for i in range(len(t1)):
+      cPopAct = list(np.sum(dact1D[pop][t1[i]:t2[i]+1,:],0))
+      cPopStepAct = list(dact1D[pop][t1[i]:t2[i]+1,:])
+      dCumAct[pop].append(cPopAct)
+      dStepAct[pop].append(cPopStepAct)
+  return dCumAct, dStepAct
+
+# find stepwise and cummulative activity of all neurons for all sequences.
+dCumAct, dStepAct = getCumActivityMapForInput(seqBegs,seqEnds_wrtRewards,dact1D,lpop=['EMUP','EMDOWN'])
+
+# find stepwise rewards (reward) and hit.miss for all sequences.
+
+
+def getRewardsPerSeq(actreward, seqBegs, seqEnds_wrtRewards):
+  rewards = []
+  hitsMiss = []
+  for seq in range(len(seqBegs)): 
+    cseqRewards = []
+    cseqHitMiss = []
+    begs = seqBegs[seq]
+    ends = seqEnds_wrtRewards[seq]
+    for i in range(begs,ends+1):
+      cseqRewards.append(actreward.reward[i])
+      if i==ends:
+        cseqHitMiss.append(actreward.hit[i])
+      else:
+        cseqHitMiss.append(0)
+    rewards.append(cseqRewards)
+    hitsMiss.append(cseqHitMiss)
+  return rewards,hitsMiss
