@@ -143,10 +143,7 @@ def getRewardsPerSeq(actreward, seqBegs, seqEnds_wrtRewards):
     ends = seqEnds_wrtRewards[seq]
     for i in range(begs,ends+1):
       cseqRewards.append(actreward.reward[i])
-      if i==ends:
-        cseqHitMiss.append(actreward.hit[i])
-      else:
-        cseqHitMiss.append(0)
+      cseqHitMiss.append(actreward.hit[i])
     rewards.append(cseqRewards)
     hitsMiss.append(cseqHitMiss)
   return rewards,hitsMiss
@@ -1639,14 +1636,22 @@ def breakdownPerformance(InputImages,actreward,cend,sthresh):
   for ids in potential_seqBegs_Inds:
     seqBegs.append(potential_seqBegs[ids])
   seqEnds = []
+  IncompleteSeqs = []
   for seqBeg in seqBegs:
     ball_near_player = 0
     cInds = seqBeg
     while ball_near_player==0 and cInds+1<len(actreward.time):
       cInds+=1
-      if list(actreward['hit'])[cInds]!=0:
-        seqEnds.append(cInds)
+      if cInds in seqBegs:
+        IncompleteSeqs.append(cInds)
         ball_near_player = 1
+      else:
+        if list(actreward['hit'])[cInds]!=0:
+          seqEnds.append(cInds)
+          ball_near_player = 1
+  if len(IncompleteSeqs)>0:
+    for i in range(len(IncompleteSeqs),0,-1)
+      seqBegs.pop(IncompleteSeqs[i-1])
   summed_Seqs = np.zeros((len(seqBegs),InputImages.shape[1],InputImages.shape[2]))
   for inds in range(len(seqEnds)):
     summed_Seqs[inds,:,:]=np.sum(InputImages[seqBegs[inds]:seqEnds[inds]+1,:,:],0)

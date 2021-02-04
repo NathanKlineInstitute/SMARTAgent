@@ -12791,6 +12791,19 @@ saved individual performances as 21jan26_21jan11_falcor_RL3_F6__steps_0_to8_comp
     "ResumeSimFromFile": "data/21jan11_falcor_RL3_F6__step_7_synWeights_final.pkl"
     "name": "21jan27_21jan11_falcor_F6__step_7_RLhebbwt_0_p0_",
 
+-- run sim  21jan27_21jan11_falcor_F6__step_8_RLhebbwt_0_p0_ (Feb4)
+    "yball": 80,
+    "yracket": 40,
+    "ResumeSim": 1
+    "ResumeSimFromFile": "data/21jan11_falcor_RL3_F6__step_8_synWeights_final.pkl"
+    "name": "21jan27_21jan11_falcor_F6__step_8_RLhebbwt_0_p0_",
+
+-- run sim  21jan27_21jan11_falcor_F6__step_9_RLhebbwt_0_p0_ (Feb4)
+    "yball": 80,
+    "yracket": 40,
+    "ResumeSim": 1
+    "ResumeSimFromFile": "data/21jan11_falcor_RL3_F6__step_9_synWeights_final.pkl"
+    "name": "21jan27_21jan11_falcor_F6__step_9_RLhebbwt_0_p0_",
 -------------------------------------------------
 -- run 21jan12_falcor_RL3_G6__step_0_ (Jan12)
 EA to EM: reduce AM2 to 7
@@ -15281,6 +15294,76 @@ breakdownPerformance(InputImages,actreward,cend,sthresh)
 
 -- hopefully bug is fixed now.....
 use breakdownPerformance function as 
+.......
 
+# find input sequences.
 lSimilarSeqs, seqs2plot, seqBegs, seqEnds = breakdownPerformance(InputImages,actreward,cend = 69 ,sthresh = 5)
 
+# find activity vectors for pops.
+dact1D = getdActMap1D(totalDur,tstepPerAction,dspkT, dspkID, dnumc, dstartidx, lpop = ['EMUP', 'EMDOWN'])
+
+# find stepwise and cummulative activity of all neurons for all sequences.
+dCumAct, dStepAct = getCumActivityMapForInput(seqBegs,seqEnds,dact1D,lpop=['EMUP','EMDOWN'])
+
+# find stepwise rewards (reward) and hit.miss for all sequences.
+rewards, hitsMiss =  getRewardsPerSeq(actreward, seqBegs, seqEnds)
+
+----
+# so far can parse and split activity based on single run......
+
+# should be able to do that for multiple runs......
+
+... try here....
+
+>>> lfnBT = ['21jan21_TARG4_gcp_RLhebbwt_0_p0_',
+              '21jan21_TARG4_gcp_RLhebbwt_0_p1_',
+              '21jan21_TARG4_gcp_RLhebbwt_0_p2_',
+              '21jan21_TARG4_gcp_RLhebbwt_0_p3_',
+              '21jan21_TARG4_gcp_RLhebbwt_0_p4_']
+
+
+# loading all input images....
+>>> II_allBT = getconcatactioninputs (lfnBT)
+loading input images from data/21jan21_TARG4_gcp_RLhebbwt_0_p0_InputImages.txt
+loading input images from data/21jan21_TARG4_gcp_RLhebbwt_0_p1_InputImages.txt
+loading input images from data/21jan21_TARG4_gcp_RLhebbwt_0_p2_InputImages.txt
+loading input images from data/21jan21_TARG4_gcp_RLhebbwt_0_p3_InputImages.txt
+loading input images from data/21jan21_TARG4_gcp_RLhebbwt_0_p4_InputImages.txt
+
+# loading all actrewards
+>>> actrewards_allBT = getconcatactionreward(lfnBT)
+
+# find input sequences across multiple steps
+>>> lSimilarSeqs, seqs2plot, seqBegs, seqEnds = breakdownPerformance(II_allBT, actrewards_allBT, cend = 69, sthresh = 5)
+
+>>> len(seqBegs)
+388
+>>> len(seqEnds)
+388
+>>> len(seqs2plot)
+20
+>>> lSimilarSeqs[seqs2plot[0]]
+[0, 18, 40, 95, 99, 111, 114, 120, 125, 198, 227, 233, 253, 257, 307, 346, 360, 376]
+
+>>> plt.imshow(np.sum(II_allBT[seqBegs[18]:seqEnds[18]+1,:,:],0))
+>>> plt.imshow(np.sum(II_allBT[seqBegs[40]:seqEnds[40]+1,:,:],0))
+>>> plt.imshow(np.sum(II_allBT[seqBegs[95]:seqEnds[95]+1,:,:],0))
+>>> plt.imshow(np.sum(II_allBT[seqBegs[99]:seqEnds[99]+1,:,:],0))
+>>> plt.imshow(np.sum(II_allBT[seqBegs[111]:seqEnds[111]+1,:,:],0))
+>>> plt.imshow(np.sum(II_allBT[seqBegs[114]:seqEnds[114]+1,:,:],0))
+>>> plt.imshow(np.sum(II_allBT[seqBegs[120]:seqEnds[120]+1,:,:],0))
+>>> plt.imshow(np.sum(II_allBT[seqBegs[125]:seqEnds[125]+1,:,:],0))
+>>> plt.imshow(np.sum(II_allBT[seqBegs[198]:seqEnds[198]+1,:,:],0))
+>>> plt.imshow(np.sum(II_allBT[seqBegs[227]:seqEnds[227]+1,:,:],0))
+>>> plt.imshow(np.sum(II_allBT[seqBegs[233]:seqEnds[233]+1,:,:],0))
+>>> plt.imshow(np.sum(II_allBT[seqBegs[253]:seqEnds[253]+1,:,:],0))
+>>> plt.imshow(np.sum(II_allBT[seqBegs[257]:seqEnds[257]+1,:,:],0))
+>>> plt.imshow(np.sum(II_allBT[seqBegs[307]:seqEnds[307]+1,:,:],0))
+>>> plt.imshow(np.sum(II_allBT[seqBegs[346]:seqEnds[346]+1,:,:],0))
+>>> plt.imshow(np.sum(II_allBT[seqBegs[360]:seqEnds[360]+1,:,:],0))
+>>> plt.imshow(np.sum(II_allBT[seqBegs[376]:seqEnds[376]+1,:,:],0))
+
+... noticed a problem due to incomplete seq 
+(seq remains incomplete when a step of sim ends before rewarding +1 or -1 for hit or miss)
+
+... check if the fix works...
