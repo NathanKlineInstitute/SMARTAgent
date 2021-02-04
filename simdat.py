@@ -136,16 +136,9 @@ def getCumActivityMapForInput(t1,t2,dact1D,lpop):
 def getRewardsPerSeq(actreward, seqBegs, seqEnds_wrtRewards):
   rewards = []
   hitsMiss = []
-  for seq in range(len(seqBegs)): 
-    cseqRewards = []
-    cseqHitMiss = []
-    begs = seqBegs[seq]
-    ends = seqEnds_wrtRewards[seq]
-    for i in range(begs,ends+1):
-      cseqRewards.append(actreward.reward[i])
-      cseqHitMiss.append(actreward.hit[i])
-    rewards.append(cseqRewards)
-    hitsMiss.append(cseqHitMiss)
+  for i in range(len(seqBegs)): 
+    rewards.append(list(actreward.reward)[seqBegs[i]:seqEnds[i]+1])
+    hitsMiss.append(list(actreward.hit)[seqBegs[i]:seqEnds[i]+1])
   return rewards,hitsMiss
 
 def loadsimdat (name=None,getactmap=True,lpop = allpossible_pops): # load simulation data
@@ -818,6 +811,34 @@ def getconcatactionreward (lfn):
       acl.time += np.amax(pda.time)
       pda = pda.append(acl)
   return pda
+
+def getconcatactivity(lfn, lpop = allpossible_pops): 
+  # CAUTION: this function assumes that the simConfig['simData']['spkid'] are preserved across the steps                                                                                                           
+  spkIDs = []                                                                                                                                                     
+  spkTs = []
+  t_lastSim = 0
+  for fn in lfn:
+    conf.dconf = conf.readconf('backupcfg/'+fn+'sim.json')
+    simConfig = pickle.load(open('data/'+fn+'simConfig.pkl','rb'))
+    spkT = np.add(simConfig['simData']['spkt'],t_lastSim)
+    spkID = np.array(simConfig['simData']['spkid'])
+    for i in range(len(spkT)):
+      spkTs.append(spkT[i])
+      spkIDs.append(spkID[i])
+    totalDur = int(dconf['sim']['duration'])
+    t_lastSim = t_lastSim + totalDur
+  dstartidx, dendidx = {},{}
+  for p in lpop:
+    dstartidx[p] = simConfig['net']['pops'][p]['cellGids'][0]
+    dendidx[p] = simConfig['net']['pops'][p]['cellGids'][-1]
+  dspkID,dspkT = {},{}
+  spkIDs = np.array(spkIDs)
+  spkTs = np.array(spkTs)
+  for pop in lpop:
+    dspkID[pop] = spkIDs[(spkIDs>=dstartidx[pop])&(spkIDs<=dendidx[pop])]
+    dspkT[pop] = spkTs[(spkIDs>=dstartidx[pop])&(spkIDs<=dendidx[pop])]
+  return dspkID, dspkT, t_lastSim
+
 
 def getindivactionreward (lfn):
   # get the individual actionreward data frames separately so can compare cumulative rewards,actions,etc.
@@ -1614,7 +1635,7 @@ def plotConns(prepop,postpop):
   plt.show()
 
 
-def breakdownPerformance(InputImages,actreward,cend,sthresh):
+def breakdownPerformance(InputImages,actreward,cend,sthresh,nbframeThresh):
   cend1= cend   # 16
   cend2= cend+1       # 17
   ballThresh = 250 # its 255
@@ -1625,16 +1646,11 @@ def breakdownPerformance(InputImages,actreward,cend,sthresh):
   p = list(p0)+list(p1)
   p = np.unique(p)
   diff = np.subtract(p[1:],p[0:-1])
-  potential_frames = np.add(np.where(diff>20),1)
-  potential_seqBegs=[p[0]]
+  potential_frames = np.add(np.where(diff>nbframeThresh),1) # was 20 here ...for reduced model
+  seqBegs=[p[0]]
   for ind in potential_frames[0]:
-    potential_seqBegs.append(p[ind])
-  potential_seqBegs = np.sort(potential_seqBegs)
-  diffB = np.subtract(potential_seqBegs[1:],potential_seqBegs[0:-1])
-  potential_seqBegs_Inds = np.add(np.where(diffB>16),1)[0]
-  seqBegs =[potential_seqBegs[0]]
-  for ids in potential_seqBegs_Inds:
-    seqBegs.append(potential_seqBegs[ids])
+    seqBegs.append(p[ind])
+  seqBegs = list(np.sort(seqBegs))
   seqEnds = []
   IncompleteSeqs = []
   for seqBeg in seqBegs:
@@ -1643,15 +1659,15 @@ def breakdownPerformance(InputImages,actreward,cend,sthresh):
     while ball_near_player==0 and cInds+1<len(actreward.time):
       cInds+=1
       if cInds in seqBegs:
-        IncompleteSeqs.append(cInds)
+        IncompleteSeqs.append(seqBeg)
         ball_near_player = 1
       else:
         if list(actreward['hit'])[cInds]!=0:
           seqEnds.append(cInds)
           ball_near_player = 1
   if len(IncompleteSeqs)>0:
-    for i in range(len(IncompleteSeqs),0,-1):
-      seqBegs.pop(IncompleteSeqs[i-1])
+    for ind in IncompleteSeqs:
+      seqBegs.remove(ind)
   summed_Seqs = np.zeros((len(seqBegs),InputImages.shape[1],InputImages.shape[2]))
   for inds in range(len(seqEnds)):
     summed_Seqs[inds,:,:]=np.sum(InputImages[seqBegs[inds]:seqEnds[inds]+1,:,:],0)
