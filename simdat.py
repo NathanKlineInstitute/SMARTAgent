@@ -1650,7 +1650,7 @@ def breakdownPerformance(InputImages,actreward,cend,sthresh):
           seqEnds.append(cInds)
           ball_near_player = 1
   if len(IncompleteSeqs)>0:
-    for i in range(len(IncompleteSeqs),0,-1)
+    for i in range(len(IncompleteSeqs),0,-1):
       seqBegs.pop(IncompleteSeqs[i-1])
   summed_Seqs = np.zeros((len(seqBegs),InputImages.shape[1],InputImages.shape[2]))
   for inds in range(len(seqEnds)):
