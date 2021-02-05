@@ -133,7 +133,7 @@ def getCumActivityMapForInput(t1,t2,dact1D,lpop):
       dStepAct[pop].append(cPopStepAct)
   return dCumAct, dStepAct
 
-def getRewardsPerSeq(actreward, seqBegs, seqEnds_wrtRewards):
+def getRewardsPerSeq(actreward, seqBegs, seqEnds):
   rewards = []
   hitsMiss = []
   for i in range(len(seqBegs)): 

@@ -15405,3 +15405,24 @@ dact1D = getdActMap1D(totalDur,tstepPerAction,dspkT, dspkID, dnumc, dstartidx, l
 # find stepwise and cummulative activity of all neurons for all sequences.
 dCumAct, dStepAct = getCumActivityMapForInput(seqBegs,seqEnds,dact1D,lpop=['EMUP','EMDOWN'])
 
+-----------------
+...testing all analysis functions.....
+
+>>> lfnBT = ['21jan21_TARG4_gcp_RLhebbwt_0_p0_','21jan21_TARG4_gcp_RLhebbwt_0_p1_','21jan21_TARG4_gcp_RLhebbwt_0_p2_','21jan21_TARG4_gcp_RLhebbwt_0_p3_','21jan21_TARG4_gcp_RLhebbwt_0_p4_']
+# loading all input images....
+>>> II_allBT = getconcatactioninputs(lfnBT)
+loading input images from data/21jan21_TARG4_gcp_RLhebbwt_0_p0_InputImages.txt
+loading input images from data/21jan21_TARG4_gcp_RLhebbwt_0_p1_InputImages.txt
+loading input images from data/21jan21_TARG4_gcp_RLhebbwt_0_p2_InputImages.txt
+loading input images from data/21jan21_TARG4_gcp_RLhebbwt_0_p3_InputImages.txt
+loading input images from data/21jan21_TARG4_gcp_RLhebbwt_0_p4_InputImages.txt
+# loading all actrewards
+>>> actrewards_allBT = getconcatactionreward(lfnBT)
+# find input sequences across multiple steps
+>>> lSimilarSeqs_allBT, seqs2plot_allBT, seqsBegs_allBT, seqsEnds_allBT = breakdownPerformance(II_allBT,actrewards_allBT,cend=69,sthresh = 5, nbframeThresh=5)
+# concatenate the activity
+>>> dspkID_allBT, dspkT_allBT, totalDur_allBT = getconcatactivity(lfnBT,lpop=['EMUP','EMDOWN']) # probably OK to use dnumc, dstartidx globally, (be careful when using different set of sims...not sure if makes sense).
+# find activity vectors for pops.
+>>> dact1D_allBT = getdActMap1D(totalDur_allBT, tstepPerAction,dspkT_allBT,dspkID_allBT,dnumc,dstartidx,lpop=['EMUP','EMDOWN'])
+# find stepwise and cummulative activity of all neurons for all sequences.
+>>> dCumAct_allBT, dStepAct_allBT = getCumActivityMapForInput(seqsBegs_allBT,seqsEnds_allBT,dact1D_allBT,lpop=['EMUP','EMDOWN'])
