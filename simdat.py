@@ -1762,7 +1762,7 @@ def plotSeqPerf(lSimilarSeqs,seqs2plot,seqsBegs,seqsEnds,InputImages,dCumAct,hit
     lax[2].set_axis_off()
   else:
     tr = 2
-  if np.cumsum(miss)==0:
+  if np.sum(miss)==0:
     lax[tr].plot(np.cumsum(hits),'k-o')
     lax[tr].set_xlabel('# of repeats')
     lax[tr].set_ylabel('Hits')

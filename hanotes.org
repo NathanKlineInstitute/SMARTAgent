@@ -15664,3 +15664,30 @@ RL: AMPA:
 (base) hanwar@cycle:~/GamesProject/SMARTAgent$ python multistepSim.py simFullHA.json 30 20 21feb5_RL3_B0_cycle_multi
 
 
+-- Repeating the analysis (Feb10,2021)
+
+# load performance of full sims (sam's model on gcp) before Training
+... note that the sims before training were run on cycle...
+... note that the sims after training were also run on cycle....
+... but the training sims were run on gcp....
+
+>>> lfnBT = ['21jan21_TARG4_gcp_RLhebbwt_0_p0_','21jan21_TARG4_gcp_RLhebbwt_0_p1_','21jan21_TARG4_gcp_RLhebbwt_0_p2_','21jan21_TARG4_gcp_RLhebbwt_0_p3_','21jan21_TARG4_gcp_RLhebbwt_0_p4_','21jan21_TARG4_gcp_RLhebbwt_0_p5_']
+>>> II_allBT = getconcatactioninputs(lfnBT)
+loading input images from data/21jan21_TARG4_gcp_RLhebbwt_0_p0_InputImages.txt
+loading input images from data/21jan21_TARG4_gcp_RLhebbwt_0_p1_InputImages.txt
+loading input images from data/21jan21_TARG4_gcp_RLhebbwt_0_p2_InputImages.txt
+loading input images from data/21jan21_TARG4_gcp_RLhebbwt_0_p3_InputImages.txt
+loading input images from data/21jan21_TARG4_gcp_RLhebbwt_0_p4_InputImages.txt
+loading input images from data/21jan21_TARG4_gcp_RLhebbwt_0_p5_InputImages.txt
+
+>>> actrewards_allBT = getconcatactionreward(lfnBT)
+
+>>> lSimilarSeqs_allBT, seqs2plot_allBT, seqsBegs_allBT, seqsEnds_allBT = breakdownPerformance(II_allBT,actrewards_allBT,cend=69,sthresh=5,nbframeThresh=5)
+
+>>> dspkID_allBT, dspkT_allBT, totalDur_allBT = getconcatactivity(lfnBT,lpop=['EA','EA2','EMUP','EMDOWN'])
+
+>>> dact1D_allBT = getdActMap1D(totalDur_allBT, tstepPerAction, dspkT_allBT, dspkID_allBT, dnumc, dstartidx, lpop = ['EA','EA2','EMUP','EMDOWN'])
+
+>>> dCumAct_allBT, dStepAct_allBT = getCumActivityMapForInput(seqsBegs_allBT, seqsEnds_allBT, dact1D_allBT, lpop = ['EA','EA2','EMUP','EMDOWN'])
+
+>>> rewards_allBT, hitsMiss_allBT = getRewardsPerSeq(actrewards_allBT, seqsBegs_allBT, seqsEnds_allBT)
