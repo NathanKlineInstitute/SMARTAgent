@@ -12804,6 +12804,18 @@ saved individual performances as 21jan26_21jan11_falcor_RL3_F6__steps_0_to8_comp
     "ResumeSim": 1
     "ResumeSimFromFile": "data/21jan11_falcor_RL3_F6__step_9_synWeights_final.pkl"
     "name": "21jan27_21jan11_falcor_F6__step_9_RLhebbwt_0_p0_",
+
+-- run sim 21jan27_21jan11_falcor_F6__step_9_RLhebbwt_0_p1_ (Feb5)
+duration: 2000 sec (instead of 500)
+    "yball": 100,
+    "yracket": 20,
+    "ResumeSim": 0
+
+-- run sim 21jan27_21jan11_falcor_F6__step_8_RLhebbwt_0_p1_ (Feb5)
+duration: 2000 sec (instead of 500)
+    "yball": 100,
+    "yracket": 20,
+    "ResumeSim": 0
 -------------------------------------------------
 -- run 21jan12_falcor_RL3_G6__step_0_ (Jan12)
 EA to EM: reduce AM2 to 7
@@ -15426,3 +15438,229 @@ loading input images from data/21jan21_TARG4_gcp_RLhebbwt_0_p4_InputImages.txt
 >>> dact1D_allBT = getdActMap1D(totalDur_allBT, tstepPerAction,dspkT_allBT,dspkID_allBT,dnumc,dstartidx,lpop=['EMUP','EMDOWN'])
 # find stepwise and cummulative activity of all neurons for all sequences.
 >>> dCumAct_allBT, dStepAct_allBT = getCumActivityMapForInput(seqsBegs_allBT,seqsEnds_allBT,dact1D_allBT,lpop=['EMUP','EMDOWN'])
+# find rewards and hit/miss points for all sequences.
+>>> rewards_allBT, hitsMiss_allBT = getRewardsPerSeq(actrewards_allBT,seqsBegs_allBT, seqsEnds_allBT)
+
+...these are before training
+>>> D1 = np.array(dCumAct_allBT['EMDOWN'])
+>>> U1 = np.array(dCumAct_allBT['EMUP'])
+
+
+>>> plt.plot(np.sum(U1[lSimilarSeqs_allBT[seqs2plot_allBT[0]],:],1),'-o')
+[<matplotlib.lines.Line2D object at 0x7f6850cdf710>]
+>>> plt.plot(np.sum(D1[lSimilarSeqs_allBT[seqs2plot_allBT[0]],:],1),'r-o')
+[<matplotlib.lines.Line2D object at 0x7f6850cb3090>]
+>>> plt.plot(np.sum(U1[lSimilarSeqs_allBT[seqs2plot_allBT[1]],:],1),'-o')
+[<matplotlib.lines.Line2D object at 0x7f6850af2290>]
+>>> plt.plot(np.sum(D1[lSimilarSeqs_allBT[seqs2plot_allBT[1]],:],1),'r-o')
+
+
+--------
+
+>>> lfnT
+['21jan6_TARG4_gcp__step_0_', '21jan6_TARG4_gcp__step_1_', '21jan6_TARG4_gcp__step_2_', '21jan6_TARG4_gcp__step_3_', '21jan6_TARG4_gcp__step_4_', '21jan6_TARG4_gcp__step_5_', '21jan6_TARG4_gcp__step_6_', '21jan6_TARG4_gcp__step_7_', '21jan6_TARG4_gcp__step_8_', '21jan6_TARG4_gcp__step_9_', '21jan6_TARG4_gcp__step_10_', '21jan6_TARG4_gcp__step_11_', '21jan6_TARG4_gcp__step_12_', '21jan6_TARG4_gcp__step_13_', '21jan6_TARG4_gcp__step_14_', '21jan6_TARG4_gcp__step_15_', '21jan6_TARG4_gcp__step_16_', '21jan6_TARG4_gcp__step_17_', '21jan6_TARG4_gcp__step_18_', '21jan6_TARG4_gcp__step_19_', '21jan11_TARG4_gcp__step_0_', '21jan11_TARG4_gcp__step_1_', '21jan11_TARG4_gcp__step_2_']
+
+>>> II_allT = getconcatactioninputs(lfnT)
+loading input images from data/21jan6_TARG4_gcp__step_0_InputImages.txt
+loading input images from data/21jan6_TARG4_gcp__step_1_InputImages.txt
+loading input images from data/21jan6_TARG4_gcp__step_2_InputImages.txt
+loading input images from data/21jan6_TARG4_gcp__step_3_InputImages.txt
+loading input images from data/21jan6_TARG4_gcp__step_4_InputImages.txt
+loading input images from data/21jan6_TARG4_gcp__step_5_InputImages.txt
+loading input images from data/21jan6_TARG4_gcp__step_6_InputImages.txt
+loading input images from data/21jan6_TARG4_gcp__step_7_InputImages.txt
+loading input images from data/21jan6_TARG4_gcp__step_8_InputImages.txt
+loading input images from data/21jan6_TARG4_gcp__step_9_InputImages.txt
+loading input images from data/21jan6_TARG4_gcp__step_10_InputImages.txt
+loading input images from data/21jan6_TARG4_gcp__step_11_InputImages.txt
+loading input images from data/21jan6_TARG4_gcp__step_12_InputImages.txt
+loading input images from data/21jan6_TARG4_gcp__step_13_InputImages.txt
+loading input images from data/21jan6_TARG4_gcp__step_14_InputImages.txt
+loading input images from data/21jan6_TARG4_gcp__step_15_InputImages.txt
+loading input images from data/21jan6_TARG4_gcp__step_16_InputImages.txt
+loading input images from data/21jan6_TARG4_gcp__step_17_InputImages.txt
+loading input images from data/21jan6_TARG4_gcp__step_18_InputImages.txt
+loading input images from data/21jan6_TARG4_gcp__step_19_InputImages.txt
+loading input images from data/21jan11_TARG4_gcp__step_0_InputImages.txt
+loading input images from data/21jan11_TARG4_gcp__step_1_InputImages.txt
+loading input images from data/21jan11_TARG4_gcp__step_2_InputImages.txt
+
+>>> actrewards_allT = getconcatactionreward(lfnT)
+>>> lSimilarSeqs_allT, seqs2plot_allT, seqsBegs_allT, seqsEnds_allT = breakdownPerformance(II_allT,actrewards_allT,cend=69,sthresh = 5, nbframeThresh=5)
+>>> dspkID_allT, dspkT_allT, totalDur_allT = getconcatactivity(lfnT,lpop=['EMUP','EMDOWN'])
+>>> dact1D_allT = getdActMap1D(totalDur_allT, tstepPerAction, dspkT_allT, dspkID_allT, dnumc, dstartidx, lpop = ['EMUP','EMDOWN'])
+>>> dCumAct_allT, dStepAct_allT = getCumActivityMapForInput(seqsBegs_allT, seqsEnds_allT, dact1D_allT, lpop = ['EMUP','EMDOWN'])
+>>> rewards_allT, hitsMiss_allT = getRewardsPerSeq(actrewards_allT, seqsBegs_allT, seqsEnds_allT)
+
+... for now plot on commandline--- later can make a function....
+
+>>> len(seqs2plot_allT)
+46
+... there are 46 input sequences that repeated for more than 5 times.
+
+>>> s1 = lSimilarSeqs_allT[seqs2plot_allT[0]] # first sequence rep indices.
+>>> s1
+[0, 33, 41, 47, 61, 73, 93, 115, 120, 144, 150, 168, 197, 214, 231, 250, 254, 267, 278, 297, 321, 342, 358, 386, 405, 415, 421, 433, 451, 473, 493, 502, 538, 577, 582, 626, 642, 651, 668, 687, 692, 698, 707, 722, 740, 770, 796, 813, 838, 844, 872, 893, 897, 909, 918, 924, 936, 955, 980, 986, 995, 1001, 1002, 1021, 1038, 1043, 1049, 1079, 1097, 1101, 1124, 1144, 1145, 1163, 1188, 1193, 1212, 1216, 1235, 1260, 1280, 1289, 1332, 1337, 1357, 1363, 1380, 1405, 1425, 1440, 1475, 1487, 1508, 1509, 1552, 1558, 1567, 1579, 1596, 1600, 1620, 1626]
+
+>>> len(s1)
+102
+... first seq repeated 102 times.
+
+# show the input pattern
+>>> plt.imshow(np.sum(II_allT[seqsBegs_allT[s1[0]]:seqsEnds_allT[s1[0]]],0)) # first instance of input sequence s1
+
+# show the evolution of cummulative activity with repeated input sequences
+>>> s1_cumact_up = np.array(dCumAct_allT['EMUP'])[s1,:] # EMUP activity of 300 neurons for all instrances of sequence s1
+goodInds = np.where(s1_cumact_up[:,0]<np.mean(s1_cumact_up[:,0])+2*np.std(s1_cumact_up[:,0])) # these repeats occured at the beginning of steps (so high activity)
+>>> plt.plot(np.sum(s1_cumact_up[goodInds,:],1),'b-o')
+>>> plt.plot(np.sum(s1_cumact_down[goodInds,:],1),'r-o')
+
+# show the evolution of hit/miss
+cHitsMiss = []
+>>> for i in range(len(s1)):
+      if i in goodInds:
+...     cHitsMiss.append(hitsMiss_allT[s1[i]][-1])
+
+cHitsMiss = np.array(cHitsMiss)
+chits = np.where(cHitsMiss==1,cHitsMiss,0)
+miss = np.where(cHitsMiss==-1,-1*cHitsMiss,0)
+>>> plt.plot(np.divide(np.cumsum(hits),np.cumsum(miss)),'-o')
+
+
+
+..... how to show it.....
+
+def plotSeqPerf(lSimilarSeqs,seqs2plot,seqsBegs,seqsEnds,InputImages,dCumAct,hitsMiss,seqNB):
+  fig,axs = plt.subplots(3,1,figsize=(4,6))                                                                                                                             
+  lax = axs.ravel()                            
+  i = seqNB                                                                                                                           
+  cseqInds = lSimilarSeqs[seqs2plot[i]]                                                                                                                       
+  cseqInput = np.zeros(shape=(len(cseqInds),InputImages.shape[1],InputImages.shape[2]))                                                                                         
+  for j in range(len(cseqInds)):                                                                                                                                        
+    cseqInput[j,:,:] = np.sum(InputImages[seqsBegs[cseqInds[j]]:seqsEnds[cseqInds[j]],:,:],0)
+  lax[0].imshow(np.sum(cseqInput,0))                                                                                                                                  
+  lax[0].set_xticks([])                                                                                                                                               
+  lax[0].set_yticks([])                                                                                                                                               
+  cseq_cumact_up = np.array(dCumAct['EMUP'])[cseqInds,:]                                                                                                           
+  cseq_cumact_down = np.array(dCumAct['EMDOWN'])[cseqInds,:]                                                                                                       
+  goodInds = np.where(cseq_cumact_up[:,0]<np.mean(cseq_cumact_up[:,0])+2*np.std(cseq_cumact_up[:,0]))[0]                                                                
+  lax[1].plot(np.sum(cseq_cumact_up[goodInds,:],1),'b-o')                                                                                                          
+  lax[1].plot(np.sum(cseq_cumact_down[goodInds,:],1),'r-o')
+  lax[1].legend(('EMUP','EMDOWN'))                                                                                                        
+  cHitsMiss = []                                                                                                                                                        
+  for k in range(len(cseqInds)):                                                                                                                                        
+    if k in goodInds:                                                                                                                                                   
+      cHitsMiss.append(hitsMiss[cseqInds[k]][-1])                                                                                                                  
+  cHitsMiss = np.array(cHitsMiss)                                                                                                                                       
+  hits = np.where(cHitsMiss==1,cHitsMiss,0)                                                                                                                             
+  miss = np.where(cHitsMiss==-1,-1*cHitsMiss,0)                                                                                                                         
+  lax[2].plot(np.divide(np.cumsum(hits),np.cumsum(miss)),'k-o')                                                                                                    
+  lax[2].set_ylim((0,2))
+  lax[2].xlabel('# of repeats')
+  lax[2].ylabel('Hits/Miss')                                                                                                                                           
+
+
+
+>>> def plotSeqPerf(lSimilarSeqs,seqs2plot,seqsBegs,seqsEnds,InputImages,dCumAct,hitsMiss,seqNB,plotact=False):
+...   if plotact:
+        fig,axs = plt.subplots(2,2,figsize=(6,6))
+      else:
+        fig,axs = plt.subplots(2,1,figsize=(4,6))
+...   lax=axs.ravel()
+...   cseqInds = lSimilarSeqs[seqs2plot[seqNB]]
+...   cseqInput = np.zeros(shape=(len(cseqInds),InputImages.shape[1],InputImages.shape[2]))
+...   for j in range(len(cseqInds)):
+...     cseqInput[j,:,:] = np.sum(InputImages[seqsBegs[cseqInds[j]]:seqsEnds[cseqInds[j]],:,:],0)
+...   lax[0].imshow(np.sum(cseqInput,0))
+...   lax[0].set_yticks([])
+...   lax[0].set_xticks([])
+...   cseq_cumact_up = np.array(dCumAct['EMUP'])[cseqInds,:]
+...   cseq_cumact_down = np.array(dCumAct['EMDOWN'])[cseqInds,:]
+...   goodInds = np.where(cseq_cumact_up[:,0]<np.mean(cseq_cumact_up[:,0])+2*np.std(cseq_cumact_up[:,0]))[0]
+      if plotact:
+...     lax[1].plot(np.sum(cseq_cumact_up[goodInds,:],1),'b-o')
+...     lax[1].plot(np.sum(cseq_cumact_down[goodInds,:],1),'r-o')
+...     lax[1].legend(('EMUP','EMDOWN'))
+...     lax[1].set_ylabel('# of spikes')
+...   cHitsMiss = []
+...   for j in range(len(cseqInds)):
+...     if j in goodInds:
+...       cHitsMiss.append(hitsMiss[cseqInds[j]][-1])
+...   cHitsMiss = np.array(cHitsMiss)
+...   hits = np.where(cHitsMiss==1,cHitsMiss,0)
+...   miss = np.where(cHitsMiss==-1,-1*cHitsMiss,0)
+      if plotact:
+        tr = 3
+        lax[2].set_axis_off()
+      else:
+        tr = 2
+      if np.cumsum(miss)==0:
+        lax[tr].plot(np.cumsum(hits),'k-o')
+...     lax[tr].set_xlabel('# of repeats')
+...     lax[tr].set_ylabel('Hits')
+...     lax[tr].set_ylim((0,np.sum(hits)))
+      else:
+...     lax[tr].plot(np.divide(np.cumsum(hits),np.cumsum(miss)),'k-o')
+...     lax[tr].set_xlabel('# of repeats')
+...     lax[tr].set_ylabel('Hits/Miss')
+...     lax[tr].set_ylim((0,2))
+...     
+
+plotSeqPerf(lSimilarSeqs_allT,seqs2plot_allT,seqsBegs_allT,seqsEnds_allT,II_allT,dCumAct_allT,hitsMiss_allT,45)
+
+... there are 45 unique sequences.
+... i should find... Hit/Miss ratio for each sequence
+
+-- SUMMARY PLOTS
+
+>>> all_hits_miss = []
+>>> for i in range(len(seqs2plot_allT)):
+...   cseqInds = lSimilarSeqs_allT[seqs2plot_allT[i]]
+...   cHitsMiss = []
+...   cseq_cumact_up = np.array(dCumAct_allT['EMUP'])[cseqInds,:]
+...   goodInds = np.where(cseq_cumact_up[:,0]<np.mean(cseq_cumact_up[:,0])+2*np.std(cseq_cumact_up[:,0]))[0]
+...   for j in range(len(cseqInds)):
+...     if j in goodInds:
+...       cHitsMiss.append(hitsMiss_allT[cseqInds[j]][-1])
+...   cHitsMiss = np.array(cHitsMiss)
+...   hits = np.where(cHitsMiss==1,cHitsMiss,0)
+...   miss = np.where(cHitsMiss==-1,-1*cHitsMiss,0)
+...   all_hits_miss.append([np.cumsum(hits)[-1],np.cumsum(miss)[-1]])
+
+>>> all_hits_miss = np.array(all_hits_miss)
+
+>>> plt.plot(np.sum(all_hits_miss,1),all_hits_miss[:,0],'o')
+[<matplotlib.lines.Line2D object at 0x7f6851fa1d90>]
+>>> plt.plot(np.sum(all_hits_miss,1),all_hits_miss[:,1],'ro')
+[<matplotlib.lines.Line2D object at 0x7f684deed410>]
+
+
+--- TO COMPARE with BEFORE Training
+
+>>> lfnBT
+['21jan21_TARG4_gcp_RLhebbwt_0_p0_', '21jan21_TARG4_gcp_RLhebbwt_0_p1_', '21jan21_TARG4_gcp_RLhebbwt_0_p2_', '21jan21_TARG4_gcp_RLhebbwt_0_p3_', '21jan21_TARG4_gcp_RLhebbwt_0_p4_']
+
+
+-- POTENTIAL ERROR:
+ plotSeqPerf(lSimilarSeqs_allBT,seqs2plot_allBT,seqsBegs_allBT,seqsEnds_allBT,II_allBT,dCumAct_allBT,hitsMiss_allBT,8)
+>>> plotSeqPerf(lSimilarSeqs_allBT,seqs2plot_allBT,seqsBegs_allBT,seqsEnds_allBT,II_allBT,dCumAct_allBT,hitsMiss_allBT,17)
+
+-- run simFullHA with modifications (Feb5)
+
+(base) hanwar@cycle:~/GamesProject/SMARTAgent$ cp backupcfg/21jan22_cycle_21jan11_falcor_RL3_F6__step_0_sim.json simFullHA.json
+"name": "21feb5_cycle_RL3_A0_",
+RL: AMPA: 
+  RLhebbwt: 0.1 (reduced from 0.5)
+  RLlenhebb: 100
+  RLlenanti: 100
+(base) hanwar@cycle:~/GamesProject/SMARTAgent$ python multistepSim.py simFullHA.json 30 20 21feb5_RL3_A0_cycle_multi
+
+-- run simFullHA with another modifications (Feb5)
+
+ "name": "21feb5_cycle_RL3_B0_"
+   RLlenhebb: 50
+  RLlenanti: 50
+  RLwindhebb: 25 (reduced from 50)
+(base) hanwar@cycle:~/GamesProject/SMARTAgent$ python multistepSim.py simFullHA.json 30 20 21feb5_RL3_B0_cycle_multi
+
+

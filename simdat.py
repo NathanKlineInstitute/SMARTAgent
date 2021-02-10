@@ -1729,6 +1729,66 @@ def getconcatactioninputs (lfn):
       pdimg = np.concatenate((pdimg,cfInputImages),axis=0)
   return pdimg
 
+def plotSeqPerf(lSimilarSeqs,seqs2plot,seqsBegs,seqsEnds,InputImages,dCumAct,hitsMiss,seqNB,plotact=False):
+  if plotact:
+    fig,axs = plt.subplots(2,2,figsize=(6,6))
+  else:
+    fig,axs = plt.subplots(2,1,figsize=(4,6))
+  lax=axs.ravel()
+  cseqInds = lSimilarSeqs[seqs2plot[seqNB]]
+  cseqInput = np.zeros(shape=(len(cseqInds),InputImages.shape[1],InputImages.shape[2]))
+  for j in range(len(cseqInds)):
+    cseqInput[j,:,:] = np.sum(InputImages[seqsBegs[cseqInds[j]]:seqsEnds[cseqInds[j]],:,:],0)
+    lax[0].imshow(np.sum(cseqInput,0))
+    lax[0].set_yticks([])
+    lax[0].set_xticks([])
+    cseq_cumact_up = np.array(dCumAct['EMUP'])[cseqInds,:]
+    cseq_cumact_down = np.array(dCumAct['EMDOWN'])[cseqInds,:]
+    goodInds = np.where(cseq_cumact_up[:,0]<np.mean(cseq_cumact_up[:,0])+2*np.std(cseq_cumact_up[:,0]))[0]
+  if plotact:
+    lax[1].plot(np.sum(cseq_cumact_up[goodInds,:],1),'b-o')
+    lax[1].plot(np.sum(cseq_cumact_down[goodInds,:],1),'r-o')
+    lax[1].legend(('EMUP','EMDOWN'))
+    lax[1].set_ylabel('# of spikes')
+  cHitsMiss = []
+  for j in range(len(cseqInds)):
+    if j in goodInds:
+      cHitsMiss.append(hitsMiss[cseqInds[j]][-1])
+  cHitsMiss = np.array(cHitsMiss)
+  hits = np.where(cHitsMiss==1,cHitsMiss,0)
+  miss = np.where(cHitsMiss==-1,-1*cHitsMiss,0)
+  if plotact:
+    tr = 3
+    lax[2].set_axis_off()
+  else:
+    tr = 2
+  if np.cumsum(miss)==0:
+    lax[tr].plot(np.cumsum(hits),'k-o')
+    lax[tr].set_xlabel('# of repeats')
+    lax[tr].set_ylabel('Hits')
+    lax[tr].set_ylim((0,np.sum(hits)))
+  else:
+    lax[tr].plot(np.divide(np.cumsum(hits),np.cumsum(miss)),'k-o')
+    lax[tr].set_xlabel('# of repeats')
+    lax[tr].set_ylabel('Hits/Miss')
+    lax[tr].set_ylim((0,2))
+
+def gethitmissallseqs(lSimilarSeqs,seqs2plot,dCumAct,hitsMiss):
+  all_hits_miss = []
+  for i in range(len(seqs2plot)):
+    cseqInds = lSimilarSeqs[seqs2plot[i]]
+    cHitsMiss = []
+    cseq_cumact_up = np.array(dCumAct['EMUP'])[cseqInds,:]
+    goodInds = np.where(cseq_cumact_up[:,0]<np.mean(cseq_cumact_up[:,0])+2*np.std(cseq_cumact_up[:,0]))[0]
+    for j in range(len(cseqInds)):
+      if j in goodInds:
+        cHitsMiss.append(hitsMiss[cseqInds[j]][-1])
+    cHitsMiss = np.array(cHitsMiss)
+    hits = np.where(cHitsMiss==1,cHitsMiss,0)
+    miss = np.where(cHitsMiss==-1,-1*cHitsMiss,0)
+    all_hits_miss.append([np.cumsum(hits)[-1],np.cumsum(miss)[-1]])
+  return all_hits_miss
+
 """
 current_time_stepNB = 0
 cumRewardActions = []
