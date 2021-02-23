@@ -8,6 +8,7 @@ import os
 import sys
 import anim
 import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import animation
 import matplotlib.gridspec as gridspec
 import matplotlib.patches as mpatches
@@ -15,6 +16,8 @@ from collections import OrderedDict
 from imgutils import getoptflow, getoptflowframes
 from connUtils import gid2pos
 from utils import getdatestr
+from scipy.stats import pearsonr
+
 rcParams['agg.path.chunksize'] = 100000000000 # for plots of long activity 
 ion()
 
@@ -22,7 +25,7 @@ rcParams['font.size'] = 12
 tl=tight_layout
 stepNB = -1
 totalDur = int(dconf['sim']['duration']) # total simulation duration
-allpossible_pops = ['ER','IR','EV1','EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE','IV1','EV4','IV4','EMT','IMT','EMDOWN','EMUP','EMSTAY','IM']
+allpossible_pops = list(dconf['net']['allpops'].keys())
 
 def pdf2weightsdict (pdf):
   # convert the pandas dataframe with synaptic weights into a dictionary
@@ -43,23 +46,37 @@ def readweightsfile2pdf (fn):
   for preID in D.keys():
     for poID in D[preID].keys():
       for row in D[preID][poID]:
-        A.append([row[0], preID, poID, row[1]])
-  return pd.DataFrame(A,columns=['time','preid','postid','weight'])
+        A.append([row[0], preID, poID, row[1]]) # A.append([row[0], preID, poID, row[1], row[2]])
+  return pd.DataFrame(A,columns=['time','preid','postid','weight']) # ,(['cumreward'])
 
 #
-def readinweights (name):
+def readinweights (name,final=False):
   # read the synaptic plasticity weights associated with sim name into a pandas dataframe
-  return readweightsfile2pdf('data/'+name+'synWeights.pkl')
+  if final:
+    fn = 'data/'+name+'synWeights_final.pkl'
+  else:
+    fn = 'data/'+name+'synWeights.pkl'
+  return readweightsfile2pdf(fn)
 
 def savefinalweights (pdf, simstr):
   # save final weights to a (small) file
   pdfs = pdf[pdf.time==np.amax(pdf.time)]
   D = pdf2weightsdict(pdfs)
-  pickle.dump(D, open('data/'+simstr+'synWeights_final.pkl','wb'))  
+  pickle.dump(D, open('data/'+simstr+'synWeights_final.pkl','wb'))
+
+def shuffleweights (pdf):
+  # shuffle the weights
+  npwt = np.array(pdf.weight)
+  np.random.shuffle(npwt)
+  Ashuf = np.array([pdf.time,pdf.preid,pdf.postid,npwt]).T
+  pdfshuf = pd.DataFrame(Ashuf,columns=['time','preid','postid','weight'])
+  return pdfshuf
+  #D = pdf2weightsdict(pdfshuf);
+  #return D
 
 def getsimname (name=None):
   if name is None:
-    if stepNB is -1: name = dconf['sim']['name']
+    if stepNB == -1: name = dconf['sim']['name']
     elif stepNB > -1: name = dconf['sim']['name'] + '_step_' + str(stepNB) + '_'
   return name
 
@@ -75,6 +92,16 @@ def generateActivityMap(t1, t2, spkT, spkID, numc, startidx):
         Nact[t][i][j] = len(cbinSpikes)
   return Nact
 
+def generateActivityMap1D(t1, t2, spkT, spkID, numc, startidx):
+  Nact = np.zeros(shape=(len(t1),numc)) # Nact is 2D array of number of spikes, indexed by: time, cellID
+  for i in range(numc):
+    cNeuronID = i + startidx
+    cNeuron_spkT = spkT[spkID==cNeuronID]
+    for t in range(len(t1)):
+      cbinSpikes = cNeuron_spkT[(cNeuron_spkT>t1[t]) & (cNeuron_spkT<=t2[t])]
+      Nact[t][i] = len(cbinSpikes)
+  return Nact
+
 def getdActMap (totalDur, tstepPerAction, dspkT, dspkID, dnumc, dstartidx,lpop = allpossible_pops):
   t1 = range(0,totalDur,tstepPerAction)
   t2 = range(tstepPerAction,totalDur+tstepPerAction,tstepPerAction)
@@ -83,7 +110,37 @@ def getdActMap (totalDur, tstepPerAction, dspkT, dspkID, dnumc, dstartidx,lpop =
     if pop in dnumc and dnumc[pop] > 0:
       dact[pop] = generateActivityMap(t1, t2, dspkT[pop], dspkID[pop], dnumc[pop], dstartidx[pop])
   return dact
-  
+
+def getdActMap1D (totalDur, tstepPerAction, dspkT, dspkID, dnumc, dstartidx,lpop = allpossible_pops):
+  t1 = range(0,totalDur,tstepPerAction)
+  t2 = range(tstepPerAction,totalDur+tstepPerAction,tstepPerAction)
+  dact = {}
+  for pop in lpop:
+    if pop in dnumc and dnumc[pop] > 0:
+      dact[pop] = generateActivityMap1D(t1, t2, dspkT[pop], dspkID[pop], dnumc[pop], dstartidx[pop])
+  return dact
+
+def getCumActivityMapForInput(t1,t2,dact1D,lpop):
+  dCumAct = {}
+  dStepAct = {}
+  for pop in lpop:
+    dCumAct[pop] = []
+    dStepAct[pop] = []
+    for i in range(len(t1)):
+      cPopAct = list(np.sum(dact1D[pop][t1[i]:t2[i]+1,:],0))
+      cPopStepAct = list(dact1D[pop][t1[i]:t2[i]+1,:])
+      dCumAct[pop].append(cPopAct)
+      dStepAct[pop].append(cPopStepAct)
+  return dCumAct, dStepAct
+
+def getRewardsPerSeq(actreward, seqBegs, seqEnds):
+  rewards = []
+  hitsMiss = []
+  for i in range(len(seqBegs)): 
+    rewards.append(list(actreward.reward)[seqBegs[i]:seqEnds[i]+1])
+    hitsMiss.append(list(actreward.hit)[seqBegs[i]:seqEnds[i]+1])
+  return rewards,hitsMiss
+
 def loadsimdat (name=None,getactmap=True,lpop = allpossible_pops): # load simulation data
   global totalDur, tstepPerAction
   name = getsimname(name)
@@ -96,9 +153,18 @@ def loadsimdat (name=None,getactmap=True,lpop = allpossible_pops): # load simula
       dstartidx[p] = simConfig['net']['pops'][p]['cellGids'][0]
       dendidx[p] = simConfig['net']['pops'][p]['cellGids'][-1]
   pdf=None
-  try: pdf = readinweights(name) # if RL was off, no weights saved
-  except: pass
-  actreward = pd.DataFrame(np.loadtxt('data/'+name+'ActionsRewards.txt'),columns=['time','action','reward','proposed','hit'])
+  try:
+    pdf = readinweights(name) # if RL was off, no weights saved
+  except:
+    try:
+      pdf = readinweights(name,final=True)
+    except:
+      pass
+  actreward=None
+  try:
+    actreward = pd.DataFrame(np.loadtxt('data/'+name+'ActionsRewards.txt'),columns=['time','action','reward','proposed','hit','followtargetsign'])
+  except:
+    pass
   dnumc = {}
   for p in simConfig['net']['pops'].keys():
     if p in dstartidx:
@@ -113,8 +179,14 @@ def loadsimdat (name=None,getactmap=True,lpop = allpossible_pops): # load simula
       dspkID[pop] = spkID[(spkID >= dstartidx[pop]) & (spkID <= dendidx[pop])]
       dspkT[pop] = spkT[(spkID >= dstartidx[pop]) & (spkID <= dendidx[pop])]
   InputImages=ldflow=None
-  InputImages = loadInputImages(dconf['sim']['name'])
-  ldflow = loadMotionFields(dconf['sim']['name'])
+  try:
+    InputImages = loadInputImages(dconf['sim']['name'])
+  except:
+    pass
+  try:
+    ldflow = loadMotionFields(dconf['sim']['name'])
+  except:
+    pass
   totalDur = int(dconf['sim']['duration'])
   tstepPerAction = dconf['sim']['tstepPerAction'] # time step per action (in ms)  
   dact = None
@@ -126,13 +198,14 @@ def loadsimdat (name=None,getactmap=True,lpop = allpossible_pops): # load simula
 
 #
 def animActivityMaps (outpath='gif/'+dconf['sim']['name']+'actmap.mp4', framerate=10, figsize=(18,10), dobjpos=None,\
-                      lpop=allpossible_pops):
+                      lpop=allpossible_pops, nframe=None):
   # plot activity in different layers as a function of input images  
   ioff()
   possible_pops = ['ER','EV1','EV4','EMT','IR','IV1','IV4','IMT','EV1DW','EV1DNW','EV1DN'\
-                   ,'EV1DNE','EV1DE','EV1DSW','EV1DS', 'EV1DSE','EMDOWN','EMUP','EMSTAY','IM']
+                   ,'EV1DNE','EV1DE','EV1DSW','EV1DS', 'EV1DSE','EMDOWN','EMUP','IM','EA','IA','EA2','IA2']
   possible_titles = ['Excit R', 'Excit V1', 'Excit V4', 'Excit MT', 'Inhib R', 'Inhib V1', 'Inhib V4', 'Inhib MT',\
-                     'W','NW','N','NE','E','SW','S','SE','Excit M DOWN', 'Excit M UP', 'Excit M STAY', 'Inhib M']
+                     'W','NW','N','NE','E','SW','S','SE','Excit M DOWN', 'Excit M UP', 'Excit M STAY', 'Inhib M',\
+                     'Excit A' , 'Inhib A', 'Excit A2', 'Inhib A2']
   dtitle = {p:t for p,t in zip(possible_pops,possible_titles)}
   ltitle = ['Input Images']
   lact = [InputImages]; lvmax = [255];
@@ -166,9 +239,10 @@ def animActivityMaps (outpath='gif/'+dconf['sim']['name']+'actmap.mp4', framerat
     else:
       offidx=0
     if ldx==flowdx:
-      X, Y = np.meshgrid(np.arange(0, InputImages[0].shape[1], 1), np.arange(0,InputImages[0].shape[0],1))
-      ddat[ldx] = ax.quiver(X,Y,ldflow[0]['thflow'][:,:,0],-ldflow[0]['thflow'][:,:,1], pivot='mid', units='inches',width=0.022,scale=1/0.15)
-      ax.set_xlim((0,InputImages[0].shape[1])); ax.set_ylim((0,InputImages[0].shape[0]))
+      flowrow,flowcol = int(np.sqrt(dnumc['EV1DE'])),int(np.sqrt(dnumc['EV1DE']))
+      X, Y = np.meshgrid(np.arange(0, flowcol, 1), np.arange(0,flowrow,1))
+      ddat[ldx] = ax.quiver(X,Y,ldflow[0]['flow'][:,:,0],-ldflow[0]['flow'][:,:,1], pivot='mid', units='inches',width=0.022,scale=1/0.15)
+      ax.set_xlim((0,flowcol)); ax.set_ylim((0,flowrow))
       ax.invert_yaxis()              
       continue
     else:
@@ -192,7 +266,7 @@ def animActivityMaps (outpath='gif/'+dconf['sim']['name']+'actmap.mp4', framerat
       else:
         offidx=0
       if ldx == flowdx:
-        ddat[ldx].set_UVC(ldflow[t+offidx]['thflow'][:,:,0],-ldflow[t]['thflow'][:,:,1])        
+        ddat[ldx].set_UVC(ldflow[t+offidx]['flow'][:,:,0],-ldflow[t+offidx]['flow'][:,:,1])        
       else:
         ddat[ldx].set_data(lact[idx][t+offidx,:,:])
         if ldx==0 and dobjpos is not None:
@@ -201,14 +275,53 @@ def animActivityMaps (outpath='gif/'+dconf['sim']['name']+'actmap.mp4', framerat
         idx += 1
     return fig
   t1 = range(0,totalDur,tstepPerAction)
-  ani = animation.FuncAnimation(fig, updatefig, interval=1, frames=len(t1)-1)
+  if nframe is None: nframe = len(t1) - 1
+  ani = animation.FuncAnimation(fig, updatefig, interval=1, frames=nframe)
   writer = anim.getwriter(outpath, framerate=framerate)
   ani.save(outpath, writer=writer); print('saved animation to', outpath)
   ion()
   return fig, axs, plt
 
+def viewInput (t, InputImages, ldflow, dhist, lpop = None, lclr = ['r','b'], twin=100, dobjpos = None):
+  ax = subplot(2,2,1)
+  tdx = int(t / tstepPerAction)
+  imshow( InputImages[tdx][:,:], origin='upper', cmap='gray'); colorbar()
+  ax.set_title('t = ' + str(t))
+  objfctr = 1.0/8
+  if dconf['DirectionDetectionAlgo']['UseFull']: objfctr=1/8.
+  minobjt = dobjpos['time'][0]
+  objofftdx = int(minobjt/tstepPerAction)
+  def drobjpos (ax, tdx):  
+    if dobjpos is not None and tdx - objofftdx >= 0:
+      lobjx,lobjy = [objfctr*dobjpos[k][tdx-objofftdx][0] for k in ['ball','racket']], [objfctr*dobjpos[k][tdx-objofftdx][1] for k in ['ball','racket']]
+      #print('lobjx:',lobjx,'lobjy:',lobjy)
+      for k in ['ball','racket']:
+        print('t=',tstepPerAction*(tdx),k,'x=',objfctr*dobjpos[k][tdx-objofftdx][0],'y=',objfctr*dobjpos[k][tdx-objofftdx][1])
+      ax.plot(lobjx,lobjy,'ro')
+  drobjpos(ax, tdx)
+  ax = subplot(2,2,2)
+  tdx += 1
+  imshow( InputImages[tdx][:,:], origin='upper', cmap='gray'); colorbar();
+  ax.set_title('t = ' + str(t+tstepPerAction))
+  drobjpos(ax,tdx)
+  tdx -= 1
+  ax = subplot(2,2,3)
+  ax.set_title('Motion, t = ' + str(t))
+  X, Y = np.meshgrid(np.arange(0, InputImages[0].shape[1], 1), np.arange(0,InputImages[0].shape[0],1))
+  ax.quiver(X,Y,ldflow[tdx]['flow'][:,:,0],-ldflow[tdx]['flow'][:,:,1], pivot='mid', units='inches',width=0.01,scale=1/0.9)
+  ax.set_xlim((0,InputImages[0].shape[1])); ax.set_ylim((0,InputImages[0].shape[0]))
+  ax.invert_yaxis()
+  ax = subplot(2,2,4)
+  for pop,clr in zip(lpop,lclr): ax.plot(dhist[pop][0],dhist[pop][1],clr)
+  lpatch = [mpatches.Patch(color=c,label=s) for c,s in zip(lclr,lpop)]
+  ax=gca(); ax.legend(handles=lpatch,handlelength=1)
+  ax.set_xlim(tdx*tstepPerAction - twin, tdx*tstepPerAction + twin)
+  xlabel('Time (ms)'); ylabel('Spikes')
+  
+
 #
-def animInput (InputImages, outpath, framerate=10, figsize=None, showflow=False, ldflow=None, dobjpos=None):
+def animInput (InputImages, outpath, framerate=50, figsize=None, showflow=False, ldflow=None, dobjpos=None,\
+               actreward=None, nframe=None, skipopp=False):
   # animate the input images; showflow specifies whether to calculate/animate optical flow
   ioff()
   # plot input images and optionally optical flow
@@ -231,18 +344,30 @@ def animInput (InputImages, outpath, framerate=10, figsize=None, showflow=False,
     if ldx==0:
       pcm = ax.imshow( lact[idx][0,:,:], origin='upper', cmap='gray', vmin=0, vmax=lvmax[idx])
       ddat[ldx] = pcm
-      ax.set_ylabel(ltitle[idx])
+      # ax.set_ylabel(ltitle[idx])
       if dobjpos is not None:
         lobjx,lobjy = [objfctr*dobjpos[k][0,0] for k in dobjpos.keys()], [objfctr*dobjpos[k][0,1] for k in dobjpos.keys()]
         ddat['objpos'], = ax.plot(lobjx,lobjy,'ro')
     else:
       X, Y = np.meshgrid(np.arange(0, InputImages[0].shape[1], 1), np.arange(0,InputImages[0].shape[0],1))
-      ddat[ldx] = ax.quiver(X,Y,ldflow[0]['thflow'][:,:,0],-ldflow[0]['thflow'][:,:,1], pivot='mid', units='inches',width=0.01,scale=1/0.3)
+      ddat[ldx] = ax.quiver(X,Y,ldflow[0]['flow'][:,:,0],-ldflow[0]['flow'][:,:,1], pivot='mid', units='inches',width=0.01,scale=1/0.3)
       ax.set_xlim((0,InputImages[0].shape[1])); ax.set_ylim((0,InputImages[0].shape[0]))
       ax.invert_yaxis()
     idx += 1
+  cumHits, cumMissed, cumScore = None,None,None
+  if actreward is not None:
+    cumHits, cumMissed, cumScore = getCumPerfCols(actreward)    
   def updatefig (t):
-    fig.suptitle('Time = ' + str(t*tstepPerAction) + ' ms')
+    stitle = 'Time = ' + str(t*tstepPerAction) + ' ms'
+    if cumHits is not None:
+      if dconf['rewardcodes']['scorePoint'] > 0.0:      
+        if skipopp:
+          stitle += '\nModel Points:'+str(cumScore[t]) + '   Model Hits:'+str(cumHits[t])
+        else:
+          stitle += '\nOpponent Points:'+str(cumMissed[t])+'   Model Points:'+str(cumScore[t]) + '   Model Hits:'+str(cumHits[t])
+      else:
+        stitle += '\nModel Hits:'+str(cumHits[t]) + '   Model Misses:'+str(cumMissed[t])
+    fig.suptitle(stitle)
     if t < 1: return fig # already rendered t=0 above
     print('frame t = ', str(t*tstepPerAction))    
     for ldx,ax in enumerate(lax):
@@ -252,10 +377,10 @@ def animInput (InputImages, outpath, framerate=10, figsize=None, showflow=False,
           lobjx,lobjy = [objfctr*dobjpos[k][t,0] for k in dobjpos.keys()], [objfctr*dobjpos[k][t,1] for k in dobjpos.keys()]
           ddat['objpos'].set_data(lobjx,lobjy)
       else:
-        ddat[ldx].set_UVC(ldflow[t-1]['thflow'][:,:,0],-ldflow[t]['thflow'][:,:,1])        
+        ddat[ldx].set_UVC(ldflow[t]['flow'][:,:,0],-ldflow[t]['flow'][:,:,1])        
     return fig
   t1 = range(0,totalDur,tstepPerAction)
-  nframe = len(t1)
+  if nframe is None: nframe = len(t1)
   if showflow: nframe-=1
   ani = animation.FuncAnimation(fig, updatefig, interval=1, frames=nframe)
   writer = anim.getwriter(outpath, framerate=framerate)
@@ -302,7 +427,7 @@ def animDetectedMotionMaps (outpath, framerate=10, figsize=(7,3)):
   lfnimage = []
   lpop = ['ER', 'EV1', 'EV4', 'EMT', 'IR', 'IV1', 'IV4', 'IMT',\
           'EV1DW','EV1DNW', 'EV1DN', 'EV1DNE','EV1DE','EV1DSW', 'EV1DS', 'EV1DSE',\
-          'EMDOWN','EMUP','EMSTAY']  
+          'EMDOWN','EMUP']  
   dmaxSpk = OrderedDict({pop:np.max(dact[pop]) for pop in lpop})
   max_spks = np.max([dmaxSpk[p] for p in lpop])
   for pop in lpop:
@@ -318,7 +443,7 @@ def animDetectedMotionMaps (outpath, framerate=10, figsize=(7,3)):
       ddat[ldx] = pcm            
     elif ldx == 1:
       X, Y = np.meshgrid(np.arange(0, InputImages[0].shape[1], 1), np.arange(0,InputImages[0].shape[0],1))
-      ddat[ldx] = ax.quiver(X,Y,ldflow[0]['thflow'][:,:,0],-ldflow[0]['thflow'][:,:,1], pivot='mid', units='inches',width=0.022,scale=1/0.15)
+      ddat[ldx] = ax.quiver(X,Y,ldflow[0]['flow'][:,:,0],-ldflow[0]['flow'][:,:,1], pivot='mid', units='inches',width=0.022,scale=1/0.15)
       ax.set_xlim((0,InputImages[0].shape[1])); ax.set_ylim((0,InputImages[0].shape[0]))
       ax.invert_yaxis()                    
     elif ldx == 2:
@@ -339,7 +464,7 @@ def animDetectedMotionMaps (outpath, framerate=10, figsize=(7,3)):
       if ldx == 0:
         ddat[ldx].set_data(lact[0][t+offidx,:,:])
       elif ldx == 1:
-        ddat[ldx].set_UVC(ldflow[t+offidx]['thflow'][:,:,0],-ldflow[t]['thflow'][:,:,1])        
+        ddat[ldx].set_UVC(ldflow[t+offidx]['flow'][:,:,0],-ldflow[t]['flow'][:,:,1])        
       else:
         ddat[ldx].set_UVC(maxdirX[t+offidx,:,:],maxdirY[t+offidx,:,:])
     return fig
@@ -358,31 +483,82 @@ def loadInputImages (name=None):
   for x in range(NB_Images):
     fp = x*Input_Images.shape[1]
     # 20 is sqrt of 400 (20x20 pixels). what is 400? number of ER neurons? or getting rid of counter @ top of screen?
-    New_InputImages.append(Input_Images[fp:fp+20,:])
+    New_InputImages.append(Input_Images[fp:fp+Input_Images.shape[1],:])
   return np.array(New_InputImages)
 
 def loadMotionFields (name=None): return pickle.load(open('data/'+getsimname(name)+'MotionFields.pkl','rb'))
 
 def loadObjPos (name=None): return pickle.load(open('data/'+getsimname(name)+'objpos.pkl','rb'))
 
+def ObjPos2pd (dobjpos):
+  # convert object pos dictionary to pandas dataframe (for selection)
+  ballX,ballY = dobjpos['ball'][:,0],dobjpos['ball'][:,1]
+  racketX,racketY = dobjpos['racket'][:,0],dobjpos['racket'][:,1]
+  if 'time' in dobjpos:
+    time = dobjpos['time']
+  else:
+    time = np.linspace(0,totalDur,len(dobjpos['ball']))
+  pdpos = pd.DataFrame(np.array([time, ballX, ballY, racketX, racketY]).T,columns=['time','ballX','ballY','racketX','racketY'])
+  return pdpos
+
+def getdistvstimecorr (pdpos, ballxmin=137, ballxmax=141, minN=2):
+  # get distance vs time
+  pdposs = pdpos[(pdpos.ballY>-1.0) & (pdpos.ballX>ballxmin) & (pdpos.ballX<ballxmax)]
+  lbally = np.unique(pdposs.ballY)
+  dout = {}
+  lr,ly,lN,lpval = [],[],[],[]
+  for y in lbally:
+    dout[y] = {}
+    pdposss = pdposs[(pdposs.ballY==y)]
+    dist = np.sqrt((pdposss.ballY - pdposss.racketY)**2)
+    #plot(pdposss.time, dist)
+    dout[y]['time'] = pdposss.time
+    dout[y]['dist'] = dist
+    dout[y]['rackety'] = pdposss.racketY
+    r,p=0,0
+    if len(pdposss.time) > 1: r,p = pearsonr(pdposss.time, dist)
+    if len(dist) >= minN:
+      lpval.append(p)
+      lr.append(r)
+      ly.append(y)
+      lN.append(len(dist))
+  dout['lbally'] = ly
+  dout['lr'] = lr
+  dout['lpval'] = lpval
+  dout['lN'] = lN
+  return dout
+
+
+def getspikehist (spkT, numc, binsz, tmax):
+  tt = np.arange(0,tmax,binsz)
+  nspk = [len(spkT[(spkT>=tstart) & (spkT<tstart+binsz)]) for tstart in tt]
+  nspk = [1e3*x/(binsz*numc) for x in nspk]
+  return tt,nspk
+
 #
-def getrate (dspkT,dspkID, pop, dnumc):
+def getrate (dspkT,dspkID, pop, dnumc, tlim=None):
   # get average firing rate for the population, over entire simulation
   nspk = len(dspkT[pop])
   ncell = dnumc[pop]
-  rate = 1e3*nspk/(totalDur*ncell)
-  return rate
+  if tlim is not None:
+    spkT = dspkT[pop]
+    nspk = len(spkT[(spkT>=tlim[0])&(spkT<=tlim[1])])
+    return 1e3*nspk/((tlim[1]-tlim[0])*ncell)
+  else:  
+    return 1e3*nspk/(totalDur*ncell)
 
-def pravgrates(dspkT,dspkID,dnumc):
+def pravgrates (dspkT,dspkID,dnumc,tlim=None):
   # print average firing rates over simulation duration
-  for pop in dspkT.keys(): print(pop,round(getrate(dspkT,dspkID,pop,dnumc),2),'Hz')
+  for pop in dspkT.keys(): print(pop,round(getrate(dspkT,dspkID,pop,dnumc,tlim=tlim),2),'Hz')
 
 #
-def drawraster (dspkT,dspkID,tlim=None,msz=2):
+def drawraster (dspkT,dspkID,tlim=None,msz=2,skipstim=True):
   # draw raster (x-axis: time, y-axis: neuron ID)
+  lpop=list(dspkT.keys()); lpop.reverse()
+  lpop = [x for x in lpop if not skipstim or x.count('stim')==0]  
   csm=cm.ScalarMappable(cmap=cm.prism); csm.set_clim(0,len(dspkT.keys()))
   lclr = []
-  for pdx,pop in enumerate(list(dspkT.keys())):
+  for pdx,pop in enumerate(lpop):
     color = csm.to_rgba(pdx); lclr.append(color)
     plot(dspkT[pop],dspkID[pop],'o',color=color,markersize=msz)
   if tlim is not None:
@@ -390,20 +566,22 @@ def drawraster (dspkT,dspkID,tlim=None,msz=2):
   else:
     xlim((0,totalDur))
   xlabel('Time (ms)')
-  lclr.reverse(); lpop=list(dspkT.keys()); lpop.reverse()
+  #lclr.reverse(); 
   lpatch = [mpatches.Patch(color=c,label=s+' '+str(round(getrate(dspkT,dspkID,s,dnumc),2))+' Hz') for c,s in zip(lclr,lpop)]
   ax=gca()
   ax.legend(handles=lpatch,handlelength=1,loc='best')
+  ylim((0,sum([dnumc[x] for x in lpop])))
 
 #
-def drawcellVm (simConfig, ldrawpop=None,tlim=None):
+def drawcellVm (simConfig, ldrawpop=None,tlim=None, lclr=None):
   csm=cm.ScalarMappable(cmap=cm.prism); csm.set_clim(0,len(dspkT.keys()))
   if tlim is not None:
     dt = simConfig['simData']['t'][1]-simConfig['simData']['t'][0]    
     sidx,eidx = int(0.5+tlim[0]/dt),int(0.5+tlim[1]/dt)
   dclr = OrderedDict(); lpop = []
   for kdx,k in enumerate(list(simConfig['simData']['V_soma'].keys())):  
-    color = csm.to_rgba(kdx); 
+    color = csm.to_rgba(kdx);
+    if lclr is not None and kdx < len(lclr): color = lclr[kdx]
     cty = simConfig['net']['cells'][int(k.split('_')[1])]['tags']['cellType']
     if ldrawpop is not None and cty not in ldrawpop: continue
     dclr[kdx]=color
@@ -422,7 +600,7 @@ def drawcellVm (simConfig, ldrawpop=None,tlim=None):
   if tlim is not None: ax.set_xlim(tlim)
   
 #  
-def plotFollowBall (actreward, ax=None,cumulative=True,msz=3,binsz=1e3,color='r'):
+def plotFollowBall (actreward, ax=None,cumulative=True,msz=3,binsz=1e3,color='r',pun=False):
   # plot probability of model racket following target(predicted ball y intercept) vs time
   # when cumulative == True, plots cumulative probability; otherwise bins probabilities over binsz interval
   # not a good way to plot probabilities over time when uneven sampling - could resample to uniform intervals ...
@@ -431,16 +609,21 @@ def plotFollowBall (actreward, ax=None,cumulative=True,msz=3,binsz=1e3,color='r'
   if ax is None: ax = gca()
   ax.plot([0,np.amax(actreward.time)],[0.5,0.5],'--',color='gray')    
   allproposed = actreward[(actreward.proposed!=-1)] # only care about cases when can suggest a proposed action
-  rewardingActions = np.where(allproposed.proposed-allproposed.action==0,1,0)
+  if dconf['useFollowMoveOutput']:
+    val = 1
+    if pun: val = -1
+    rewardingActions = np.where(allproposed.followtargetsign==val,1,0)
+  else:
+    rewardingActions = np.where(allproposed.proposed-allproposed.action==0,1,0)
   if cumulative:
     rewardingActions = np.cumsum(rewardingActions) # cumulative of rewarding action
     cumActs = np.array(range(1,len(allproposed)+1))
     aout = np.divide(rewardingActions,cumActs)
-    ax.plot(allproposed.time,aout,color+'.',markersize=msz)
+    ax.plot(allproposed.time,aout,'.',color=color,markersize=msz)
   else:
     nbin = int(binsz / (np.array(actreward.time)[1]-np.array(actreward.time)[0]))
     aout = avgfollow = [mean(rewardingActions[sidx:sidx+nbin]) for sidx in arange(0,len(rewardingActions),nbin)]
-    ax.plot(np.linspace(0,np.amax(actreward.time),len(avgfollow)), avgfollow, color,linewidth=msz)
+    ax.plot(np.linspace(0,np.amax(actreward.time),len(avgfollow)), avgfollow, color=color,linewidth=msz)
   ax.set_xlim((0,np.amax(actreward.time)))
   ax.set_ylim((0,1))
   ax.set_xlabel('Time (ms)'); ax.set_ylabel('p(Follow Target)')
@@ -454,7 +637,7 @@ def getCumScore (actreward):
   return np.cumsum(allScore) #cumulative score evolving with time.  
 
 #  
-def plotHitMiss (actreward,ax=None,msz=3,asratio=False,lclr=['r','g','b']):
+def plotHitMiss (actreward,ax=None,msz=3,asratio=False,asbin=False,binsz=10e3,lclr=['r','g','b']):
   if ax is None: ax = gca()
   action_times = np.array(actreward.time)
   Hit_Missed = np.array(actreward.hit)
@@ -462,14 +645,22 @@ def plotHitMiss (actreward,ax=None,msz=3,asratio=False,lclr=['r','g','b']):
   allMissed = np.where(Hit_Missed==-1,1,0)
   cumHits = np.cumsum(allHit) #cumulative hits evolving with time.
   cumMissed = np.cumsum(allMissed) #if a reward is -1, replace it with 1 else replace it with 0.
-  if asratio:
-    ax.plot(action_times,cumHits/cumMissed,lclr[0]+'-o',markersize=msz)
+  if asbin:
+    nbin = int(binsz / (np.array(actreward.time)[1]-np.array(actreward.time)[0]))
+    avgHit = np.array([sum(allHit[sidx:sidx+nbin]) for sidx in arange(0,len(allHit),nbin)])
+    avgMiss = np.array([sum(allMissed[sidx:sidx+nbin]) for sidx in arange(0,len(allMissed),nbin)])
+    score = avgHit / (avgHit + avgMiss)
+    ax.plot(np.linspace(0,np.amax(actreward.time),len(score)), score, color=lclr[0],linewidth=msz)
+    ax.set_ylabel('Hit/(Hit+Miss) ('+str(round(score[-1],2))+')')    
+    return score
+  elif asratio:
+    ax.plot(action_times,cumHits/cumMissed,'-o',color=lclr[0],markersize=msz)
     ax.set_xlim((0,np.max(action_times)))
     ax.set_ylabel('Hit/Miss ('+str(round(cumHits[-1]/cumMissed[-1],2))+')')
     return cumHits[-1]/cumMissed[-1]
   else:
-    ax.plot(action_times,cumHits,lclr[0]+'-o',markersize=msz)
-    ax.plot(action_times,cumMissed,lclr[1]+'-o',markersize=msz)
+    ax.plot(action_times,cumHits,'-o',color=lclr[0],markersize=msz)
+    ax.plot(action_times,cumMissed,'-o',color=lclr[1],markersize=msz)
     ax.set_xlim((0,np.max(action_times)))
     ax.set_ylim((0,np.max([cumHits[-1],cumMissed[-1]])))    
     ax.set_ylabel('Hit Ball ('+str(cumHits[-1])+')','Miss Ball ('+str(cumMissed[-1])+')')
@@ -484,12 +675,12 @@ def plotScoreMiss (actreward,ax=None,msz=3,asratio=False,clr='r'):
   cumMissed = np.cumsum(allMissed) #if a reward is -1, replace it with 1 else replace it with 0.
   cumScore = getCumScore(actreward)
   if asratio:
-    ax.plot(action_times,cumScore/cumMissed,clr+'-o',markersize=msz)
+    ax.plot(action_times,cumScore/cumMissed,'-o',color=clr,markersize=msz)
     ax.set_xlim((0,np.max(action_times)))
     ax.set_ylabel('Score/Miss ('+str(round(cumScore[-1]/cumMissed[-1],2))+')')
     return cumScore[-1]/cumMissed[-1]
   else:
-    ax.plot(action_times,cumScore,clr+'-o',markersize=msz)
+    ax.plot(action_times,cumScore,'-o',color=clr,markersize=msz)
     ax.set_xlim((0,np.max(action_times)))
     ax.set_ylim((0,cumMissed[-1]))
     ax.set_ylabel('Score ('+str(cumScore[-1])+')')
@@ -511,7 +702,62 @@ def plotScoreLoss (actreward,ax=None,msz=3):
   ax.set_ylim((0,np.max([cumScore[-1],cumLoss[-1]])))
   ax.legend(('Score Point ('+str(cumScore[-1])+')','Lose Point ('+str(cumLoss[-1])+')'),loc='best')
   return cumScore[-1],cumLoss[-1]
+
+def getCumPerfCols (actreward):
+  # get cumulative performance arrays
+  action_times = np.array(actreward.time)
+  Hit_Missed = np.array(actreward.hit)
+  allMissed = np.where(Hit_Missed==-1,1,0)
+  cumMissed = np.cumsum(allMissed) #if a reward is -1, replace it with 1 else replace it with 0.  
+  cumScore = getCumScore(actreward)
+  #actreward['cumScoreRatio'] = cumScore/cumMissed # cumulative score/loss ratio
+  allproposed = actreward[(actreward.proposed!=-1)] # only care about cases when can suggest a proposed action
+  rewardingActions = np.where(allproposed.proposed-allproposed.action==0,1,0)
+  rewardingActions = np.cumsum(rewardingActions) # cumulative of rewarding action
+  cumActs = np.array(range(1,len(allproposed)+1))
+  #actreward['cumFollow'] = np.divide(rewardingActions,cumActs) # cumulative follow probability
+  allHit = np.where(Hit_Missed==1,1,0) 
+  allMissed = np.where(Hit_Missed==-1,1,0)
+  cumHits = np.cumsum(allHit) #cumulative hits evolving with time.
+  cumMissed = np.cumsum(allMissed) #if a reward is -1, replace it with 1 else replace it with 0.
+  #actreward['cumHitMissRatio'] = cumHits/cumMissed # cumulative hits/missed ratio
+  return cumHits, cumMissed, cumScore
   
+
+def plotPerf (actreward,yl=(0,1)):
+  # plot performance
+  plotFollowBall(actreward,ax=subplot(1,1,1),cumulative=True,color='b');
+  if dconf['useFollowMoveOutput']: plotFollowBall(actreward,ax=subplot(1,1,1),cumulative=True,color='m',pun=True);    
+  plotHitMiss(actreward,ax=subplot(1,1,1),lclr=['g'],asratio=True); 
+  plotScoreMiss(actreward,ax=subplot(1,1,1),clr='r',asratio=True);
+  ylim(yl)
+  ylabel('Performance')
+  if dconf['useFollowMoveOutput']:
+    lpatch = [mpatches.Patch(color=c,label=s) for c,s in zip(['b','m','g','r'],['Follow','Avoid','Hit/Miss','Score/Miss'])]
+  else:
+    lpatch = [mpatches.Patch(color=c,label=s) for c,s in zip(['b','g','r'],['Follow','Hit/Miss','Score/Miss'])]    
+  ax=gca()
+  ax.legend(handles=lpatch,handlelength=1)
+  return ax
+
+def plotComparePerf (lpda, lclr, yl=(0,.55), lleg=None, skipfollow=False, skipscore=False):
+  # plot comparison of performance of list of action rewards dataframes in lpda
+  # lclr is color to plot
+  # lleg is optional legend
+  ngraph=3
+  if skipfollow: ngraph-=1
+  if skipscore: ngraph-=1
+  for pda,clr in zip(lpda,lclr):
+    gdx=1
+    if not skipfollow: plotFollowBall(pda,ax=subplot(1,ngraph,gdx),cumulative=True,color=clr); ylim(yl); gdx+=1
+    plotHitMiss(pda,ax=subplot(1,ngraph,gdx),lclr=[clr],asratio=True); ylim(yl); gdx+=1
+    if not skipscore: plotScoreMiss(pda,ax=subplot(1,ngraph,gdx),clr=clr,asratio=True); ylim(yl);
+  if lleg is not None:
+    lpatch = [mpatches.Patch(color=c,label=s) for c,s in zip(lclr,lleg)]
+    ax=gca()
+    ax.legend(handles=lpatch,handlelength=1)
+  
+
 #
 def plotRewards (actreward,ax=None,msz=3,xl=None):
   if ax is None: ax = gca()  
@@ -520,12 +766,45 @@ def plotRewards (actreward,ax=None,msz=3,xl=None):
   ax.set_ylim((np.min(actreward.reward),np.max(actreward.reward)))
   ax.set_ylabel('Rewards'); #f_ax1.set_xlabel('Time (ms)')
 
+def getactsel (dhist, actreward):
+  # get action selected based on firing rates in dhist (no check for consistency with sim.py)
+  actsel = []
+  for i in range(len(dhist['EMDOWN'][1])):
+    dspk, uspk = dhist['EMDOWN'][1][i], dhist['EMUP'][1][i]
+    if dspk > uspk:
+      actsel.append(dconf['moves']['DOWN'])
+    elif uspk > dspk:
+      actsel.append(dconf['moves']['UP'])
+    else: # dspk == uspk:
+      actsel.append(dconf['moves']['NOMOVE'])
+  return actsel  
+
+def getconcatweightpdf (lfn):
+  # concatenate the weights together so can look at cumulative rewards,actions,etc.
+  # lfn is a list of actionrewards filenames from the simulation
+  pdf = None
+  for fn in lfn:
+    try:
+      wtmp = readinweights(fn) # if RL was off, no weights saved
+    except:
+      try:
+        wtmp = readinweights(fn,final=True)
+      except:
+        print('could not load weights from', fn)
+    if pdf is None:
+      pdf = wtmp
+    else:
+      wtmp.time += np.amax(pdf.time)
+      pdf = pdf.append(wtmp)
+  return pdf
+
 def getconcatactionreward (lfn):
   # concatenate the actionreward data frames together so can look at cumulative rewards,actions,etc.
   # lfn is a list of actionrewards filenames from the simulation
   pda = None
   for fn in lfn:
-    acl = pd.DataFrame(np.loadtxt(fn),columns=['time','action','reward','proposed','hit'])
+    if not fn.endswith('ActionsRewards.txt'): fn = 'data/'+fn+'ActionsRewards.txt'
+    acl = pd.DataFrame(np.loadtxt(fn),columns=['time','action','reward','proposed','hit','followtargetsign'])
     if pda is None:
       pda = acl
     else:
@@ -533,10 +812,41 @@ def getconcatactionreward (lfn):
       pda = pda.append(acl)
   return pda
 
+def getconcatactivity(lfn, lpop = allpossible_pops): 
+  # CAUTION: this function assumes that the simConfig['simData']['spkid'] are preserved across the steps                                                                                                           
+  spkIDs = []                                                                                                                                                     
+  spkTs = []
+  t_lastSim = 0
+  for fn in lfn:
+    conf.dconf = conf.readconf('backupcfg/'+fn+'sim.json')
+    simConfig = pickle.load(open('data/'+fn+'simConfig.pkl','rb'))
+    spkT = np.add(simConfig['simData']['spkt'],t_lastSim)
+    spkID = np.array(simConfig['simData']['spkid'])
+    for i in range(len(spkT)):
+      spkTs.append(spkT[i])
+      spkIDs.append(spkID[i])
+    totalDur = int(dconf['sim']['duration'])
+    t_lastSim = t_lastSim + totalDur
+  dstartidx, dendidx = {},{}
+  for p in lpop:
+    dstartidx[p] = simConfig['net']['pops'][p]['cellGids'][0]
+    dendidx[p] = simConfig['net']['pops'][p]['cellGids'][-1]
+  dspkID,dspkT = {},{}
+  spkIDs = np.array(spkIDs)
+  spkTs = np.array(spkTs)
+  for pop in lpop:
+    dspkID[pop] = spkIDs[(spkIDs>=dstartidx[pop])&(spkIDs<=dendidx[pop])]
+    dspkT[pop] = spkTs[(spkIDs>=dstartidx[pop])&(spkIDs<=dendidx[pop])]
+  return dspkID, dspkT, t_lastSim
+
+
 def getindivactionreward (lfn):
   # get the individual actionreward data frames separately so can compare cumulative rewards,actions,etc.
-  # lfn is a list of actionrewards filenames from the simulation
-  return [pd.DataFrame(np.loadtxt(fn),columns=['time','action','reward','proposed','hit']) for fn in lfn]
+  # lfn is a list of actionrewards filenames from the simulation or list of simulation names
+  if lfn[0].endswith('ActionsRewards.txt'): 
+    return [pd.DataFrame(np.loadtxt(fn),columns=['time','action','reward','proposed','hit','followtargetsign']) for fn in lfn]
+  else:
+    return [pd.DataFrame(np.loadtxt('data/'+fn+'ActionsRewards.txt'),columns=['time','action','reward','proposed','hit','followtargetsign']) for fn in lfn]    
 
 def plotMeanNeuronWeight (pdf,postid,clr='k',ax=None,msz=1,xl=None):
   if ax is None: ax = gca()
@@ -552,7 +862,7 @@ def plotMeanNeuronWeight (pdf,postid,clr='k',ax=None,msz=1,xl=None):
   ax.set_ylabel('Average weight'); 
   return wts    
   
-def plotMeanWeights (pdf,ax=None,msz=1,xl=None,lpop=['EMDOWN','EMUP','EMSTAY'],lclr=['r','b','g'],plotindiv=True):
+def plotMeanWeights (pdf,ax=None,msz=1,xl=None,lpop=['EMDOWN','EMUP'],lclr=['k','r','b','g'],plotindiv=True,fsz=15,prety=None):
   #plot mean weights of all plastic synaptic weights onto lpop
   if ax is None: ax = gca()
   utimes = np.unique(pdf.time)
@@ -567,13 +877,16 @@ def plotMeanWeights (pdf,ax=None,msz=1,xl=None,lpop=['EMDOWN','EMUP','EMSTAY'],l
           mnw=min(mnw, min(lwt))
           mxw=max(mxw, max(lwt))    
       pdfs = pdf[(pdf.postid>=dstartidx[pop]) & (pdf.postid<=dendidx[pop])]
+      if prety is not None:
+        pdfs = pdfs[(pdfs.preid>=dstartidx[prety]) & (pdfs.preid<=dendidx[prety])]
       popwts[pop] = [np.mean(pdfs[(pdfs.time==t)].weight) for t in utimes] #wts of connections onto pop
       ax.plot(utimes,popwts[pop],clr+'-o',markersize=msz)
       mnw=min(mnw, np.amin(popwts[pop]))
       mxw=max(mxw, np.amax(popwts[pop]))            
   if xl is not None: ax.set_xlim(xl)
   ax.set_ylim((mnw,mxw))
-  ax.set_ylabel('Average weight'); 
+  ax.set_ylabel('Average weight',fontsize=fsz);
+  ax.set_xlabel('Time (ms)',fontsize=fsz);
   ax.legend(handles=[mpatches.Patch(color=c,label=s) for c,s in zip(lclr,lpop)],handlelength=1,loc='best')
   return popwts
 
@@ -611,7 +924,7 @@ def animSynWeights (pdf, outpath='gif/'+dconf['sim']['name']+'weightmap.mp4', fr
     if c_src in dstartidx:
       lsrc.append(c_src)
   print('Source Pops: ', lsrc)
-  possible_targs = ['EMDOWN', 'EMUP','EMSTAY']
+  possible_targs = ['EMDOWN', 'EMUP']
   ltarg = []
   for c_targ in possible_targs:
     if c_targ in dstartidx:
@@ -622,10 +935,7 @@ def animSynWeights (pdf, outpath='gif/'+dconf['sim']['name']+'weightmap.mp4', fr
   dimg = {}; dline = {}; 
   def getwts (tdx, src):
     t = utimes[tdx]
-    if 'EMSTAY' in dstartidx:
-      ltarg = ['EMDOWN', 'EMUP','EMSTAY']
-    else:
-      ltarg = ['EMDOWN', 'EMUP']
+    ltarg = ['EMDOWN', 'EMUP']
     lout = []
     for targ in ltarg:
       cpdf = pdf[(pdf.time==t) & (pdf.postid>=dstartidx[targ]) & (pdf.postid<=dendidx[targ]) & (pdf.preid>=dstartidx[src]) & (pdf.preid<=dendidx[src])]
@@ -637,10 +947,7 @@ def animSynWeights (pdf, outpath='gif/'+dconf['sim']['name']+'weightmap.mp4', fr
       lout.append(lwt)
     return lout[0], lout[1]    
   minR,maxR = np.min(actreward.reward),np.max(actreward.reward)
-  if 'EMSTAY' in dstartidx:
-    minW,maxW = np.min([np.min(popwts['EMDOWN']),np.min(popwts['EMUP']),np.min(popwts['EMSTAY'])]), np.max([np.max(popwts['EMDOWN']),np.max(popwts['EMUP']),np.max(popwts['EMSTAY'])])
-  else:
-    minW,maxW = np.min([np.min(popwts['EMDOWN']),np.min(popwts['EMUP'])]), np.max([np.max(popwts['EMDOWN']),np.max(popwts['EMUP'])])
+  minW,maxW = np.min([np.min(popwts['EMDOWN']),np.min(popwts['EMUP'])]), np.max([np.max(popwts['EMDOWN']),np.max(popwts['EMUP'])])
   t = utimes[0]
   dline[1], = f_ax1.plot([t,t],[minR,maxR],'r',linewidth=0.2); f_ax1.set_xticks([])
   dline[2], = f_ax2.plot([t,t],[minW,maxW],'r',linewidth=0.2); f_ax2.set_xticks([])  
@@ -691,7 +998,7 @@ def plotavgweights (pdf):
     if c_src in dstartidx:
       lsrc.append(c_src)
   print('Source Pops: ', lsrc)
-  possible_targs = ['EMDOWN', 'EMUP','EMSTAY']
+  possible_targs = ['EMDOWN', 'EMUP']
   ltrg = []
   for c_targ in possible_targs:
     if c_targ in dstartidx:
@@ -705,15 +1012,9 @@ def plotavgweights (pdf):
       subplot(12,1,gdx)
       plot(utimes,davgw[src+'->EMDOWN'],'r-',linewidth=3);
       plot(utimes,davgw[src+'->EMUP'],'b-',linewidth=3);
-      if 'EMSTAY' in dstartidx:
-        plot(utimes,davgw[src+'->EMSTAY'],'g-',linewidth=3);
-        legend((src+'->EMDOWN',src+'->EMUP',src+'->EMSTAY'),loc='upper left')
-      else:
-        legend((src+'->EMDOWN',src+'->EMUP'),loc='upper left')
+      legend((src+'->EMDOWN',src+'->EMUP'),loc='upper left')
       plot(utimes,davgw[src+'->EMDOWN'],'ro',markersize=10);
       plot(utimes,davgw[src+'->EMUP'],'bo',markersize=10);
-      if 'EMSTAY' in dstartidx:
-        plot(utimes,davgw[src+'->EMSTAY'],'go',markersize=10);       
       xlim((0,simConfig['simConfig']['duration']))
       ylabel('RL weights') 
       gdx += 1
@@ -734,7 +1035,7 @@ def plotavgweightsPerPostSynNeuron1(pdf):
     ylim((-1.1,1.1))
     ylabel('critic')
     title('sum of weights on to post-synaptic neurons')
-    for trg in ['EMDOWN', 'EMUP','EMSTAY']:
+    for trg in ['EMDOWN', 'EMUP']:
       wperPostID[src+'->'+trg] = arr = []
       tstep = 0
       for t in utimes:
@@ -755,11 +1056,6 @@ def plotavgweightsPerPostSynNeuron1(pdf):
     #legend((src+'->EMUP'),loc='upper left')       
     xlim((0,simConfig['simConfig']['duration']))
     ylabel(src+'->EMUP weights')
-    subplot(4,1,4)
-    plot(utimes,np.array(wperPostID[src+'->EMSTAY']),'g-o',linewidth=3,markersize=5) 
-    #legend((src+'->EMUP'),loc='upper left')       
-    xlim((0,simConfig['simConfig']['duration']))
-    ylabel(src+'->EMSTAY weights') 
     gdx += 1
     xlabel('Time (ms)')  
   return wperPostID
@@ -779,7 +1075,7 @@ def plotavgweightsPerPostSynNeuron2(pdf):
     ylabel('critic')
     colorbar
     title('sum of weights on to post-synaptic neurons')
-    for trg in ['EMDOWN', 'EMUP','EMSTAY']:
+    for trg in ['EMDOWN', 'EMUP']:
       wperPostID[src+'->'+trg] = arr = []
       tstep = 0
       for t in utimes:
@@ -809,16 +1105,6 @@ def plotavgweightsPerPostSynNeuron2(pdf):
     xlim((-1,b2[-1]-1))
     ylabel(src+'->EMUP weights') 
     xlabel('Time (ms)')
-    subplot(4,1,4)
-    imshow(np.transpose(np.array(wperPostID[src+'->EMSTAY'])),aspect = 'auto',cmap='hot', interpolation='None') 
-    b2 = gca().get_xticks()
-    gca().set_xticks(b2-1)
-    gca().set_xticklabels((100*b2).astype(int))
-    colorbar(orientation='horizontal',fraction=0.05)
-    #legend((src+'->EMUP'),loc='upper left')       
-    xlim((-1,b2[-1]-1))
-    ylabel(src+'->EMSTAY weights') 
-    xlabel('Time (ms)')
   
 def plotIndividualSynWeights(pdf):
   #plot 10% randomly selected connections
@@ -829,7 +1115,7 @@ def plotIndividualSynWeights(pdf):
   postNeuronIDs = {}
   #gdx = 2   
   for src in ['EV1','EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE', 'EV4', 'EMT']:
-    for trg in ['EMDOWN','EMUP','EMSTAY']:
+    for trg in ['EMDOWN','EMUP']:
       allweights[src+'->'+trg] = arr = []
       preNeuronIDs[src+'->'+trg] = arr2 = []
       postNeuronIDs[src+'->'+trg] = arr3 = []
@@ -949,11 +1235,26 @@ def plotSynWeightsPostNeuronID(pdf,postNeuronID):
     xlim((0,simConfig['simConfig']['duration']))
     pdx += 1        
 
+def getinputconnmap (simConfig, prety, postid, dnumc, dstartidx, synMech, asweight=False):
+  lcell = simConfig['net']['cells']
+  cell = lcell[postid]
+  nrow = ncol = int(np.sqrt(dnumc[prety]))
+  cmap = np.zeros((nrow,ncol))
+  for conn in cell['conns']:
+    if lcell[conn['preGid']]['tags']['cellType'] == prety and conn['synMech']==synMech:
+      x,y = gid2pos(dnumc[prety], dstartidx[prety], conn['preGid'])
+      if asweight:
+        cmap[y,x] = conn['weight']
+      else:
+        cmap[y,x] = 1
+  return cmap
+
+    
 #
 def getinputmap (pdf, t, prety, postid, poty, dnumc, dstartidx, dendidx, asweight=False):
-  nrow = ncol = int(np.sqrt(dnumc[poty]))
+  nrow = ncol = int(np.sqrt(dnumc[prety]))
   rfmap = np.zeros((nrow,ncol))
-  pdfs = pdf[(pdf.postid==postid) & (pdf.preid>dstartidx[prety]) & (pdf.preid<=dendidx[prety]) & (pdf.time==t)]
+  pdfs = pdf[(pdf.postid==postid) & (pdf.preid>=dstartidx[prety]) & (pdf.preid<=dendidx[prety]) & (pdf.time==t)]
   if len(pdfs) < 1: return rfmap
   if not asweight:
     for idx in pdfs.index:
@@ -1040,7 +1341,541 @@ def plotallrecurrentmaps (pdf, t, dnumc, dstartidx, dendidx, lnety = ['EV1DNW', 
     title(nety+'->'+nety+str(postid));
     colorbar()
   return drfmap
-      
+
+def getpopinputmap (pdf, t, dnumc, dstartidx, dendidx, poty, asweight=True):
+  # get integrated RF for a population
+  pdfs = pdf[(pdf.time==t) & (pdf.postid>=dstartidx[poty]) & (pdf.postid<=dendidx[poty])]
+  ddrfmap = {}
+  for idx in range(dstartidx[poty],dendidx[poty]+1,1):
+    print(idx)
+    ddrfmap[idx] = getallinputmaps(pdfs, np.amax(pdfs.time), idx, poty, dnumc, dstartidx, dendidx, asweight=asweight)
+  dout = {}
+  for idx in range(dstartidx[poty],dendidx[poty]+1,1):
+    drfmap = ddrfmap[idx]
+    for k in drfmap.keys():
+      if k not in dout:
+        dout[k] = drfmap[k]
+      else:
+        dout[k] += drfmap[k]
+  return dout  
+
+def analyzeRepeatedInputSequences(dact, InputImages, targetPixel=(10,10),nbseq=14,targetCorr=0.9):
+  midInds = np.where(InputImages[:,targetPixel[0],targetPixel[1]]>250)
+  repSeqInds = []
+  for i in range(len(midInds[0])-1):
+    if midInds[0][i+1]-midInds[0][i]<5:
+      repSeqInds.append(i+1)
+  uniqueSeqStartInds = []
+  for i in range(len(midInds[0])):
+    if i not in repSeqInds:
+      uniqueSeqStartInds.append(midInds[0][i])
+  # for each midInd, find 14 (13 could be enough but i am not sure) consecutive Images to see the trajectory.
+  ImgH, ImgW = InputImages.shape[1],InputImages.shape[2]
+  lmotorpop = [pop for pop in dconf['net']['EMotorPops'] if dconf['net']['allpops'][pop]>0] 
+  seqInputs = np.zeros((len(uniqueSeqStartInds),nbseq,ImgH,ImgW),dtype=float)
+  seqActions = np.zeros((len(uniqueSeqStartInds),nbseq),dtype=float)
+  seqPropActions = np.zeros((len(uniqueSeqStartInds),nbseq),dtype=float)
+  seqRewards = np.zeros((len(uniqueSeqStartInds),nbseq),dtype=float)
+  seqHitMiss = np.zeros((len(uniqueSeqStartInds),nbseq),dtype=float)
+  dseqOutputs = {pop:np.zeros((len(uniqueSeqStartInds),nbseq,dact[pop].shape[1],dact[pop].shape[2]),dtype=float) for pop in lmotorpop}
+  for i in range(len(uniqueSeqStartInds)):
+    cSeqStartInd = uniqueSeqStartInds[i]
+    for j in range(nbseq):
+      seqInputs[i,j,:,:] = InputImages[cSeqStartInd+j,:,:]
+      seqActions[i,j] = actreward['action'][cSeqStartInd+j]
+      seqRewards[i,j] = actreward['reward'][cSeqStartInd+j]
+      seqPropActions[i,j] = actreward['proposed'][cSeqStartInd+j]
+      seqHitMiss[i,j] = actreward['hit'][cSeqStartInd+j]
+      for pop in dseqOutputs.keys():
+        dseqOutputs[pop][i,j,:,:]=dact[pop][cSeqStartInd+j,:,:]
+  # now i have all inputs, outputs, actions and proposed etc for all inputs where the ball starts in the middle of the screen.
+  # But i need to pick up the sequences which are exactly like one another.  
+  x = np.sum(seqInputs,axis=1)[0,:,:] #3:17
+  goodInds = []
+  for j in range(seqInputs.shape[0]):
+    y = np.sum(seqInputs,axis=1)[j,:,:]
+    corr, p_value = pearsonr(x.flat, y.flat)
+    if corr>targetCorr:
+      goodInds.append(j)
+  # for comparison only use correlated sequences...
+  seqInputs4comp = seqInputs[goodInds,:,:,:]
+  seqActions4comp = seqActions[goodInds,:]
+  seqRewards4comp = seqRewards[goodInds,:]
+  seqPropActions4comp = seqPropActions[goodInds,:]
+  seqHitMiss4comp = seqHitMiss[goodInds,:]
+  dseqOutputs4comp = {pop:dseqOutputs[pop][goodInds,:,:,:] for pop in dseqOutputs.keys()}
+  summedInputSequences = np.sum(seqInputs4comp,axis=1)
+  dsummedOutputs = {pop:np.zeros((len(goodInds),nbseq),dtype=float) for pop in lmotorpop}
+  for pop in lmotorpop:
+    dsummedOutputs[pop] = np.sum(np.sum(dseqOutputs4comp[pop],axis=2),axis=2)
+  lSeqNBs4comp = [0,1,2,3,4,5,6,7,8,9,10]
+  fig, axs = plt.subplots(6, 5, figsize=(10,8));
+  lax = axs.ravel()
+  for i in range(5):
+    cSeq = lSeqNBs4comp[i]
+    if i<len(goodInds):
+      lax[i].imshow(summedInputSequences[cSeq,:,:])
+      lax[i].axis('off')
+      for pop,clr in zip(lmotorpop,['b','r','g']):
+        lax[i+5].plot(dsummedOutputs[pop][cSeq,:],clr+'-o',markersize=3)
+      if i==0: lax[i+5].set_ylabel('# of pop spikes')
+      lax[i+10].plot(seqActions4comp[cSeq,:],'-o',color=(0,0,0,1),markersize=3)
+      lax[i+10].plot(seqPropActions[cSeq,:],'-o',color=(0.5,0.5,0.5,1),markersize=3)
+      lax[i+10].set_yticks([1,3,4])
+      if i==0: lax[i+10].set_yticklabels(['STAY','DOWN','UP'])
+    cSeq = lSeqNBs4comp[i+5]
+    if (i+5)<len(goodInds):
+      lax[i+15].imshow(summedInputSequences[cSeq,:,:])
+      lax[i+15].axis('off')
+      for pop,clr in zip(lmotorpop,['b','r','g']):
+        lax[i+20].plot(dsummedOutputs[pop][cSeq,:],clr+'-o',markersize=3)
+      if i==0: lax[i+20].set_ylabel('# of pop spikes')
+      lax[i+25].plot(seqActions4comp[cSeq,:],'-o',color=(0,0,0,1),markersize=3)
+      lax[i+25].plot(seqPropActions[cSeq,:],'-o',color=(0.5,0.5,0.5,1),markersize=3)
+      lax[i+25].set_yticks([1,3,4])
+      if i==0: lax[i+25].set_yticklabels(['STAY','DOWN','UP'])
+    if i==0:
+      lax[i+5].legend(lmotorpop,loc='best')
+      lax[i+10].legend(['Actions','Proposed'],loc='best')
+
+def analyzeActionLearningForRepeatedInputSequences(dact, InputImages, BallPixel=(10,10), RacketPixel=(5,17)):
+  nbseq=2
+  targetCorr=0.99
+  ballInds = np.where(InputImages[:,BallPixel[0],BallPixel[1]]>250)
+  racketInds = np.where(InputImages[:,RacketPixel[0],RacketPixel[1]]>250)
+  targetInds = []
+  for inds in racketInds[0]:
+    if inds in ballInds[0]:
+      targetInds.append(inds)
+  seqImages = []
+  for inds in targetInds:
+    seqImages.append(np.sum(InputImages[inds:inds+1,:,3:17],0))
+  x = seqImages[0]
+  goodInds = []
+  for j in range(np.shape(seqImages)[0]):
+    y = seqImages[j]
+    corr, p_value = pearsonr(x.flat, y.flat)
+    if corr>targetCorr:
+      goodInds.append(j)
+  lmotorpop = [pop for pop in dconf['net']['EMotorPops'] if dconf['net']['allpops'][pop]>0] 
+  goodSeqImages = []
+  repActions = []
+  repPropActions = []
+  repRewards = []
+  dseqOutputs = {pop:np.zeros((len(goodInds),dact[pop].shape[1],dact[pop].shape[2]),dtype=float) for pop in lmotorpop}
+  for inds in goodInds:
+    goodSeqImages.append(np.sum(InputImages[targetInds[inds]:targetInds[inds]+2,:,:],0))
+    repActions.append(actreward['action'][targetInds[inds]+1])
+    repRewards.append(actreward['reward'][targetInds[inds]+1])
+    repPropActions.append(actreward['proposed'][targetInds[inds]+1])
+    for pop in dseqOutputs.keys():
+      dseqOutputs[pop][inds,:,:]=dact[pop][targetInds[inds]+1,:,:]
+  dsummedOutputs = {pop:np.zeros((len(goodInds),1),dtype=float) for pop in lmotorpop}
+  for pop in lmotorpop:
+    dsummedOutputs[pop] = np.sum(np.sum(dseqOutputs[pop],axis=2),axis=1)
+  fig, axs = plt.subplots(3, 1, figsize=(10,8));
+  lax = axs.ravel()
+  lax[0].imshow(np.sum(goodSeqImages,0))
+  lax[0].axis('off')
+  for pop,clr in zip(lmotorpop,['b','r','g']):
+    lax[1].plot(dsummedOutputs[pop],clr+'-o',markersize=3)
+    lax[1].set_ylabel('# of pop spikes')
+  lax[1].legend(lmotorpop,loc='best')
+  lax[2].plot(repActions,'-o',color=(0,0,0,1),markersize=3)
+  lax[2].plot(repPropActions,'-o',color=(0.5,0.5,0.5,1),markersize=3)
+  lax[2].set_yticks([1,3,4])
+  lax[2].set_yticklabels(['STAY','DOWN','UP'])
+  lax[2].legend(['Actions','Proposed'],loc='best')
+
+def analyzeRepeatedInputForSingleEvent(dact, InputImages, targetPixel=(10,10)):
+  midInds = np.where(InputImages[:,targetPixel[0],targetPixel[1]]>250)
+  repSeqInds = []
+  for i in range(len(midInds[0])-1):
+    if midInds[0][i+1]-midInds[0][i]<5:
+      repSeqInds.append(i+1)
+  uniqueSeqStartInds = []
+  for i in range(len(midInds[0])):
+    if i not in repSeqInds:
+      uniqueSeqStartInds.append(midInds[0][i])
+  # for each midInd, find 14 (13 could be enough but i am not sure) consecutive Images to see the trajectory.
+  ImgH, ImgW = InputImages.shape[1],InputImages.shape[2]
+  lmotorpop = [pop for pop in dconf['net']['EMotorPops'] if dconf['net']['allpops'][pop]>0] 
+  seqInputs = np.zeros((len(uniqueSeqStartInds),ImgH,ImgW),dtype=float)
+  seqActions = np.zeros((len(uniqueSeqStartInds),1),dtype=float)
+  seqPropActions = np.zeros((len(uniqueSeqStartInds),1),dtype=float)
+  seqRewards = np.zeros((len(uniqueSeqStartInds),1),dtype=float)
+  seqHitMiss = np.zeros((len(uniqueSeqStartInds),1),dtype=float)
+  dseqOutputs = {pop:np.zeros((len(uniqueSeqStartInds),dact[pop].shape[1],dact[pop].shape[2]),dtype=float) for pop in lmotorpop}
+  for i in range(len(uniqueSeqStartInds)):
+    cInputInd = uniqueSeqStartInds[i]
+    seqInputs[i,:,:] = InputImages[cInputInd,:,:]
+    seqActions[i] = actreward['action'][cInputInd]
+    seqRewards[i] = actreward['reward'][cInputInd]
+    seqPropActions[i] = actreward['proposed'][cInputInd]
+    seqHitMiss[i] = actreward['hit'][cInputInd]
+    for pop in dseqOutputs.keys():
+        dseqOutputs[pop][i,:,:]=dact[pop][cInputInd,:,:]
+  dFR = {pop:np.sum(np.sum(dseqOutputs[pop],axis=1),axis=1) for pop in lmotorpop}
+  fig, axs = plt.subplots(2, 3, figsize=(12,7));
+  lax = axs.ravel()
+  lax[0].imshow(np.sum(seqInputs,axis=0))
+  lax[0].axis('off')
+  lax[1].hist(seqActions,bins=[-1.5,-0.5,0.5,1.5,2.5,3.5,4.5])
+  lax[1].set_xlabel('Actions')
+  lax[1].set_xticks([1,3,4])
+  lax[1].set_xticklabels(['STAY','DOWN','UP'])
+  lax[2].hist(seqPropActions,bins=[-1.5,-0.5,0.5,1.5,2.5,3.5,4.5])
+  lax[2].set_xlabel('Proposed Actions')
+  lax[2].set_xticks([1,3,4])
+  lax[2].set_xticklabels(['STAY','DOWN','UP'])
+  pop_ind = 1
+  for pop in lmotorpop:
+    lax[pop_ind+2].hist(dFR[pop])
+    lax[pop_ind+2].set_xlabel('# of EMUP spikes')
+    pop_ind = pop_ind+1
+  fig, axs = plt.subplots(4, 1, figsize=(10,8));
+  lax = axs.ravel()
+  lax[0].imshow(np.sum(seqInputs,axis=0))
+  lax[0].axis('off')
+  for pop,clr in zip(lmotorpop,['b','r','g']):
+    lax[1].plot(np.sum(np.sum(dseqOutputs[pop],axis=1),axis=1),clr+'-o',markersize=3)
+  lax[1].set_ylabel('# of pop spikes')
+  lax[2].plot(seqActions,'-o',color=(0,0,0,1),markersize=3)
+  lax[2].plot(seqPropActions,'-o',color=(0.5,0.5,0.5,1),markersize=3)
+  lax[2].set_yticks([1,3,4])
+  lax[2].set_yticklabels(['STAY','DOWN','UP'])
+  lax[3].plot(seqRewards ,'-o',color=(0,0,0,1),markersize=3)
+  lax[3].plot(seqHitMiss,'-o',color=(0.5,0.5,0.5,1),markersize=3)
+  lax[3].set_yticks([-1,0,1])
+  lax[3].legend(['Rewards','Hit/Moss'])
+  lax[1].legend(lmotorpop,loc='best')
+  lax[2].legend(['Actions','Proposed'],loc='best')
+
+def plotAllWeightsChangePreMtoM(pdf, dstartidx, dendidx, targetpop ,tpnt1 = 0, tpnt2 = -1):
+  utimes = np.unique(pdf.time)
+  nbNeurons = dendidx[targetpop]+1-dstartidx[targetpop]
+  tpnts = len(utimes)
+  wts_top = np.zeros((tpnts,nbNeurons))
+  count = 0
+  for idx in range(dstartidx[targetpop],dendidx[targetpop]+1,1): # first plot average weight onto each individual neuron
+    pdfs = pdf[(pdf.postid==idx)]  
+    wts = [np.mean(pdfs[(pdfs.time==t)].weight) for t in utimes]
+    wts_top[:,count] = wts
+    count = count+1
+  dim_neurons = int(np.sqrt(nbNeurons))
+  avgwt_tpnt1 = np.reshape(wts_top[tpnt1,:],(dim_neurons,dim_neurons))
+  avgwt_tpnt2 = np.reshape(wts_top[tpnt2,:],(dim_neurons,dim_neurons))
+  plt.imshow(np.subtract(avgwt_tpnt2,avgwt_tpnt1))
+  plt.title('Change in weights-->'+targetpop)
+  plt.colorbar()
+
+def plotWeightsChangeOnePreMtoM(pdf, dstartidx, dendidx, prepop , targetpop ,tpnt1 = 0, tpnt2 = -1,drawplot=False):
+  utimes = np.unique(pdf.time)
+  nbNeurons = dendidx[targetpop]+1-dstartidx[targetpop]
+  tpnts = len(utimes)
+  wts_top = np.zeros((tpnts,nbNeurons))
+  count = 0
+  prestartidx = dstartidx[prepop]
+  preendidx = dendidx[prepop]
+  for idx in range(dstartidx[targetpop],dendidx[targetpop]+1,1): # first plot average weight onto each individual neuron
+    pdfs = pdf[(pdf.postid==idx) & (pdf.preid>=prestartidx) & (pdf.preid<=preendidx)]  
+    wts = [np.mean(pdfs[(pdfs.time==t)].weight) for t in utimes]
+    wts_top[:,count] = wts
+    count = count+1
+  dim_neurons = int(np.sqrt(nbNeurons))
+  avgwt_tpnt1 = np.reshape(wts_top[tpnt1,:],(dim_neurons,dim_neurons))
+  avgwt_tpnt2 = np.reshape(wts_top[tpnt2,:],(dim_neurons,dim_neurons))
+  if drawplot:
+    plt.imshow(np.subtract(avgwt_tpnt2,avgwt_tpnt1))
+    plt.title('Change in weights '+prepop+' to '+targetpop)
+    plt.colorbar()
+  return np.subtract(avgwt_tpnt2,avgwt_tpnt1)
+
+def plotWeightChangeOnePreMtoMAll(pdf, dstartidx, dendidx, tpnt1 = 0, tpnt2 = -1, figsize=(14,8)):
+  minV = 0
+  maxV = 0
+  weightChanges = dict()
+  for prepop in dconf['net']['EPreMPops']:
+    if dconf['net']['allpops'][prepop]>0:
+      for targetpop in dconf['net']['EMotorPops']:
+        if dconf ['net']['allpops'][targetpop]>0:
+          weightChanges[prepop+'->'+targetpop] = plotWeightsChangeOnePreMtoM(pdf, dstartidx, dendidx, prepop = prepop , targetpop=targetpop)
+          if np.amin(weightChanges[prepop+'->'+targetpop])<minV: minV = np.amin(weightChanges[prepop+'->'+targetpop])
+          if np.amax(weightChanges[prepop+'->'+targetpop])>maxV: maxV = np.amax(weightChanges[prepop+'->'+targetpop])
+  nbrows = 4
+  nbcols = int(np.ceil(len(weightChanges)/4))
+  fig, axs = plt.subplots(nbrows, nbcols, figsize=figsize);
+  lax = axs.ravel()
+  cbaxes = fig.add_axes([0.92, 0.4, 0.01, 0.2])
+  conn_count = 0
+  for conns in weightChanges.keys():
+    pcm = lax[conn_count].imshow(weightChanges[conns],vmin = minV, vmax = maxV)
+    lax[conn_count].set_ylabel(conns,fontsize=8)
+    conn_count = conn_count+1
+    if conn_count==len(weightChanges): plt.colorbar(pcm, cax = cbaxes)
+  for _ in range(conn_count,nbrows*nbcols):
+    lax[conn_count].set_axis_off()
+    conn_count = conn_count+1
+
+
+def plotConns(prepop,postpop):
+  fn = 'data/'+dconf['sim']['name']+'synConns.pkl'
+  D = pickle.load(open(fn,'rb'))
+  fig = plt.figure()
+  ax = fig.add_subplot(111, projection='3d')
+  for conns in D.keys():
+    if conns==prepop+'->'+postpop:
+      cConns = D[conns]['blist']
+      cCoords = D[conns]['coords']
+  for i in range(np.shape(cCoords)[0]):
+    prex, prey, postx, posty = cCoords[i][0],cCoords[i][1],cCoords[i][2],cCoords[i][3]
+    ax.plot([prex,postx],[prey,posty],[9,0],'ro-')
+    ax.set_zticks([0,9])
+    ax.set_zticklabels([postpop,prepop])
+  plt.show()
+
+
+def breakdownPerformance(InputImages,actreward,cend,sthresh,nbframeThresh):
+  cend1= cend   # 16
+  cend2= cend+1       # 17
+  ballThresh = 250 # its 255
+  potential_seqEnds = []
+  potential_seqBegs = []  
+  p0 = np.unique(np.where(InputImages[:,:,0]>ballThresh)[0])
+  p1 = np.unique(np.where(InputImages[:,:,1]>ballThresh)[0])
+  p = list(p0)+list(p1)
+  p = np.unique(p)
+  diff = np.subtract(p[1:],p[0:-1])
+  potential_frames = np.add(np.where(diff>nbframeThresh),1) # was 20 here ...for reduced model
+  seqBegs=[p[0]]
+  for ind in potential_frames[0]:
+    seqBegs.append(p[ind])
+  seqBegs = list(np.sort(seqBegs))
+  seqEnds = []
+  IncompleteSeqs = []
+  for seqBeg in seqBegs:
+    ball_near_player = 0
+    cInds = seqBeg
+    while ball_near_player==0 and cInds+1<len(actreward.time):
+      cInds+=1
+      if cInds in seqBegs:
+        IncompleteSeqs.append(seqBeg)
+        ball_near_player = 1
+      else:
+        if list(actreward['hit'])[cInds]!=0:
+          seqEnds.append(cInds)
+          ball_near_player = 1
+  if len(IncompleteSeqs)>0:
+    for ind in IncompleteSeqs:
+      seqBegs.remove(ind)
+  summed_Seqs = np.zeros((len(seqBegs),InputImages.shape[1],InputImages.shape[2]))
+  for inds in range(len(seqEnds)):
+    summed_Seqs[inds,:,:]=np.sum(InputImages[seqBegs[inds]:seqEnds[inds]+1,:,:],0)
+  # now find similar sequences
+  corrs_all = np.zeros((summed_Seqs.shape[0],summed_Seqs.shape[0]))
+  pvals_all = np.zeros((summed_Seqs.shape[0],summed_Seqs.shape[0]))
+  for i in range(summed_Seqs.shape[0]):
+    x = summed_Seqs[i,:,0:cend2]
+    for j in range(i,summed_Seqs.shape[0]):
+      y = summed_Seqs[j,:,0:cend2]
+      corr, p_value = pearsonr(x.flat, y.flat)
+      corrs_all[i,j]=corr
+      pvals_all[i,j]=p_value
+  lSimilarSeqs = []
+  NBoccur = np.zeros((1,summed_Seqs.shape[0]))
+  for i in range(summed_Seqs.shape[0]):
+    alreadyExists = 0
+    for seqs in lSimilarSeqs:
+      if i in seqs: alreadyExists=1
+    if alreadyExists==0:
+      lseqs = list(np.where(corrs_all[i,:]>0.9)[0])
+    else:
+      lseqs = []
+    lSimilarSeqs.append(lseqs)
+    NBoccur[0,i] = len(lseqs)  
+  seqs2plot = np.where(NBoccur[0]>sthresh)[0]
+  if len(seqBegs)>len(seqEnds):
+    seqBegs = seqBegs[0:len(seqEnds)]
+  return lSimilarSeqs, seqs2plot, seqBegs, seqEnds
+
+def displayPerformaceBreakdown(InputImages, actreward, seqs2plot, lSimilarSeqs, seqBegs, seqEnds_wrtRewards):
+  fig, axs = plt.subplots(6, 6, figsize=(14,12));
+  lax = axs.ravel()
+  i = 0
+  for seqNB in seqs2plot:
+    totalRepeats = len(lSimilarSeqs[seqNB])
+    Scores = []
+    totalInput = np.zeros((InputImages[0].shape[0],InputImages[0].shape[1]))   
+    for rep in lSimilarSeqs[seqNB]:
+      cInput = np.sum(InputImages[seqBegs[rep]:seqEnds_wrtRewards[rep]+1,:,:],0)
+      totalInput = np.add(totalInput,cInput)
+      Scores.append(list(actreward['hit'])[seqEnds_wrtRewards[rep]])
+    lax[i].imshow(totalInput)
+    lax[i].axis('off')
+    i+=1
+    lax[i].plot(Scores,'b-o')
+    lax[i].set_ylim((-1.1,1.1))
+    i+=1
+
+def getconcatactioninputs (lfn):
+  # concatenate the InputImages data frames together so can look at repeated input patterns.
+  # lfn is a list of actionrewards filenames from the simulation
+  pdimg = None
+  for fn in lfn:
+    cfInputImages = loadInputImages(fn) 
+    if pdimg is None:
+      pdimg = cfInputImages
+    else:
+      pdimg = np.concatenate((pdimg,cfInputImages),axis=0)
+  return pdimg
+
+def plotSeqPerf(lSimilarSeqs,seqs2plot,seqsBegs,seqsEnds,InputImages,dCumAct,hitsMiss,seqNB,plotact=False):
+  if plotact:
+    fig,axs = plt.subplots(2,2,figsize=(6,6))
+  else:
+    fig,axs = plt.subplots(2,1,figsize=(4,6))
+  lax=axs.ravel()
+  cseqInds = lSimilarSeqs[seqs2plot[seqNB]]
+  cseqInput = np.zeros(shape=(len(cseqInds),InputImages.shape[1],InputImages.shape[2]))
+  for j in range(len(cseqInds)):
+    cseqInput[j,:,:] = np.sum(InputImages[seqsBegs[cseqInds[j]]:seqsEnds[cseqInds[j]],:,:],0)
+    lax[0].imshow(np.sum(cseqInput,0))
+    lax[0].set_yticks([])
+    lax[0].set_xticks([])
+    cseq_cumact_up = np.array(dCumAct['EMUP'])[cseqInds,:]
+    cseq_cumact_down = np.array(dCumAct['EMDOWN'])[cseqInds,:]
+    goodInds = np.where(cseq_cumact_up[:,0]<np.mean(cseq_cumact_up[:,0])+2*np.std(cseq_cumact_up[:,0]))[0]
+  if plotact:
+    lax[1].plot(np.sum(cseq_cumact_up[goodInds,:],1),'b-o')
+    lax[1].plot(np.sum(cseq_cumact_down[goodInds,:],1),'r-o')
+    lax[1].legend(('EMUP','EMDOWN'))
+    lax[1].set_ylabel('# of spikes')
+  cHitsMiss = []
+  for j in range(len(cseqInds)):
+    if j in goodInds:
+      cHitsMiss.append(hitsMiss[cseqInds[j]][-1])
+  cHitsMiss = np.array(cHitsMiss)
+  hits = np.where(cHitsMiss==1,cHitsMiss,0)
+  miss = np.where(cHitsMiss==-1,-1*cHitsMiss,0)
+  if plotact:
+    tr = 3
+    lax[2].set_axis_off()
+  else:
+    tr = 1
+  if np.sum(miss)==0:
+    lax[tr].plot(np.cumsum(hits),'k-o')
+    lax[tr].set_xlabel('# of repeats')
+    lax[tr].set_ylabel('Hits')
+    lax[tr].set_ylim((0,np.sum(hits)))
+  else:
+    lax[tr].plot(np.divide(np.cumsum(hits),np.cumsum(miss)),'k-o')
+    lax[tr].set_xlabel('# of repeats')
+    lax[tr].set_ylabel('Hits/Miss')
+    lax[tr].set_ylim((0,2))
+
+def gethitmissallseqs(lSimilarSeqs,seqs2plot,dCumAct,hitsMiss):
+  all_hits_miss = []
+  for i in range(len(seqs2plot)):
+    cseqInds = lSimilarSeqs[seqs2plot[i]]
+    cHitsMiss = []
+    cseq_cumact_up = np.array(dCumAct['EMUP'])[cseqInds,:]
+    goodInds = np.where(cseq_cumact_up[:,0]<np.mean(cseq_cumact_up[:,0])+2*np.std(cseq_cumact_up[:,0]))[0]
+    for j in range(len(cseqInds)):
+      if j in goodInds:
+        cHitsMiss.append(hitsMiss[cseqInds[j]][-1])
+    cHitsMiss = np.array(cHitsMiss)
+    hits = np.where(cHitsMiss==1,cHitsMiss,0)
+    miss = np.where(cHitsMiss==-1,-1*cHitsMiss,0)
+    all_hits_miss.append([np.cumsum(hits)[-1],np.cumsum(miss)[-1]])
+  return all_hits_miss
+
+"""
+current_time_stepNB = 0
+cumRewardActions = []
+cumPunishingActions = []
+f_ax = []
+fig = []
+def updateBehaviorPlot (sim,InputImages,Images,dirSensitiveNeurons,Racket_pos,Ball_pos, current_time_stepNB,f_ax,fig):
+  # update 
+  global cumRewardActions, cumPunishingActions
+  maxtstr = len(str(100000))
+  if current_time_stepNB==0:
+    fig = plt.figure(figsize=(12,8))
+    gs = fig.add_gridspec(4,4)
+    f_ax = []
+    f_ax.append(fig.add_subplot(gs[0:2,0])) #for 5-image input - 0
+    f_ax.append(fig.add_subplot(gs[0:2,1])) #for single image  - 1
+    f_ax.append(fig.add_subplot(gs[0:2,2])) #for direction selectivity - 2
+    f_ax.append(fig.add_subplot(gs[2,0:2])) #display executed/proposed actions - 3
+    f_ax.append(fig.add_subplot(gs[2,2:4])) #display - 4 
+    f_ax.append(fig.add_subplot(gs[3,0:2])) #- 5
+    f_ax.append(fig.add_subplot(gs[3,2:4])) #- 6
+  cbaxes = fig.add_axes([0.75, 0.62, 0.01, 0.24])
+  f_ax[0].cla()
+  f_ax[0].imshow(InputImages[-1])
+  f_ax[0].set_title('Input Images [t-5,t]')
+  f_ax[2].cla()
+  fa = f_ax[2].imshow(dirSensitiveNeurons,origin='upper',vmin=0, vmax=359, cmap='Dark2')
+  f_ax[2].set_xlim((-0.5,9.5))
+  f_ax[2].set_ylim((9.5,-0.5))
+  f_ax[2].set_xticks(ticks=[0,2,4,6,8])
+  f_ax[2].set_title('direction angles [t-5,t]')
+  c1 = plt.colorbar(fa,cax = cbaxes)
+  c1.set_ticks([22,67,112,157,202,247,292,337])
+  c1.set_ticklabels(['E','NE','N','NW','W','SW','S','SE'])
+  Hit_Missed = np.array(sim.allHits)
+  allHit = np.where(Hit_Missed==1,1,0) 
+  allMissed = np.where(Hit_Missed==-1,1,0)
+  cumHits = np.cumsum(allHit) #cummulative hits evolving with time.
+  cumMissHits = np.cumsum(allMissed) #if a reward is -1, replace it with 1 else replace it with 0.
+  Diff_Actions_Proposed = np.subtract(sim.allActions,sim.allProposedActions)
+  t0 = int(dconf['actionsPerPlay'])
+  tpnts = range(t0,len(Diff_Actions_Proposed)+t0,t0)
+  rewardingActions = np.sum(np.where(Diff_Actions_Proposed==0,1,0))
+  punishingActions = np.sum(np.where((Diff_Actions_Proposed>0) | (Diff_Actions_Proposed<0),1,0))
+  totalActs = rewardingActions + punishingActions
+  cumRewardActions.append(rewardingActions/totalActs)
+  cumPunishingActions.append(punishingActions/totalActs)
+  f_ax[3].plot(sim.allActions,LineStyle="None",Marker=2,MarkerSize=6,MarkerFaceColor="None",MarkerEdgeColor='r')
+  f_ax[3].plot(sim.allProposedActions,LineStyle="None",Marker=3,MarkerSize=6,MarkerFaceColor="None",MarkerEdgeColor='b')
+  f_ax[3].set_yticks(ticks=[1,3,4])
+  f_ax[3].set_yticklabels(labels=['No action','Down','Up'])
+  f_ax[3].set_ylim((0.5,4.5))
+  f_ax[3].legend(('Executed','Proposed'),loc='upper left')
+  f_ax[4].cla()
+  f_ax[4].plot(tpnts,np.array(cumRewardActions),'o-',MarkerSize=5,MarkerFaceColor='r',MarkerEdgeColor='r')
+  f_ax[4].plot(tpnts,np.array(cumPunishingActions),'s-',MarkerSize=5,MarkerFaceColor='b',MarkerEdgeColor='b')
+  f_ax[4].legend(('Rewarding actions','Punishing Actions'),loc='upper left')
+  f_ax[5].cla()
+  f_ax[5].plot(sim.allRewards,'o-',MarkerFaceColor="None",MarkerEdgeColor='g')
+  f_ax[5].legend('Rewards')
+  f_ax[6].cla()
+  f_ax[6].plot(cumHits,Marker='o',MarkerSize=5,MarkerFaceColor='r',MarkerEdgeColor='r')
+  f_ax[6].plot(cumMissHits,Marker='s',MarkerSize=3,MarkerFaceColor='k',MarkerEdgeColor='k')
+  f_ax[6].legend(('Cumm. Hits','Cumm. Miss'),loc='upper left')
+  f_ax[1].cla()
+  for nbi in range(np.shape(Racket_pos)[0]):
+    f_ax[1].imshow(Images[nbi])
+    if Ball_pos[nbi][0]>18: #to account for offset for the court
+      f_ax[1].plot(Racket_pos[nbi][0],Racket_pos[nbi][1],'o',MarkerSize=5, MarkerFaceColor="None",MarkerEdgeColor='r')
+      f_ax[1].plot(Ball_pos[nbi][0],Ball_pos[nbi][1],'o',MarkerSize=5, MarkerFaceColor="None",MarkeredgeColor='b')
+    f_ax[1].set_title('last obs')
+    #plt.pause(0.1)
+    ctstrl = len(str(current_time_stepNB))
+    tpre = ''
+    for ttt in range(maxtstr-ctstrl):
+      tpre = tpre+'0'
+    fn = tpre+str(current_time_stepNB)+'.png'
+    fnimg = '/tmp/'+fn
+    plt.savefig(fnimg)
+    #plt.close() 
+    #lfnimage.append(fnimg)
+    current_time_stepNB = current_time_stepNB+1
+  return current_time_stepNB, f_ax, fig
+"""
+
+def gifpath (): return 'gif/' + getdatestr() + dconf['sim']['name']
+
 if __name__ == '__main__':
   stepNB = -1
   if len(sys.argv) > 1:
@@ -1049,13 +1884,13 @@ if __name__ == '__main__':
     except:
       pass
   print(stepNB)
-  allpossible_pops = ['ER','IR','EV1','EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE','IV1','EV4','IV4','EMT','IMT','EMDOWN','EMUP','EMSTAY','IM']
+  allpossible_pops = ['ER','IR','EV1','EV1DE','EV1DNE','EV1DN','EV1DNW','EV1DW','EV1DSW','EV1DS','EV1DSE','IV1','EV4','IV4','EMT','IMT','EMDOWN','EMUP','IM']
   lpop = []
   for pop_ind in range(len(allpossible_pops)):
     cpop = allpossible_pops[pop_ind]
     #print('cpop',cpop)
-    if cpop in dconf['net']:
-      if dconf['net'][cpop]>0:
+    if cpop in list(dconf['net']['allpops'].keys()):
+      if dconf['net']['allpops'][cpop]>0:
         lpop.append(cpop)
   print('lpop: ', lpop)
   simConfig, pdf, actreward, dstartidx, dendidx, dnumc, dspkID, dspkT, InputImages, ldflow, dact = loadsimdat(getactmap=False,lpop=lpop)
@@ -1071,3 +1906,12 @@ if __name__ == '__main__':
   #plotSynWeightsPostNeuronID(pdf,25)
   #plotSynWeightsPostNeuronID(pdf,35)
   #plotSynWeightsPostNeuronID(pdf,45)
+  #fig=animInput(InputImages,gifpath()+'_input.mp4')  
+  #figure(); drawcellVm(simConfig,lclr=['r','g','b','c','m','y'])
+  if totalDur <= 10e3:
+    pravgrates(dspkT,dspkID,dnumc,tlim=(totalDur-1e3,totalDur))
+    drawraster(dspkT,dspkID)
+    figure(); drawcellVm(simConfig,lclr=['r','g','b','c','m','y'])    
+  else:
+    pravgrates(dspkT,dspkID,dnumc,tlim=(250,totalDur))    
+
