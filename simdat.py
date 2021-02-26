@@ -1761,13 +1761,13 @@ def showMostActiveMNeuronsPerSeq(lSimilarSeqs, seqs2plot, dCumAct, topM):
     # total activity of 300 neurons for each seq
     if np.amax(cact_up)>0:
       cumactup = np.cumsum(cact_up)[-1]
-      norm_seq_act_up.append(np.divide(cact_up,cumactup)
+      norm_seq_act_up.append(np.divide(cact_up,cumactup))
     else:
       norm_seq_act_up.append(cact_up) 
     cact_down = dCumAct['EMDOWN'][i]
     if np.amax(cact_down)>0:
       cumactdown = np.cumsum(cact_down)[-1]
-      norm_seq_act_down.append(np.divide(cact_down,cumactdown)
+      norm_seq_act_down.append(np.divide(cact_down,cumactdown))
     else:
       norm_seq_act_down.append(cact_down)
   norm_seq_act_up = np.array(norm_seq_act_up)
