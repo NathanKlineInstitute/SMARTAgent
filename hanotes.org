@@ -15654,6 +15654,1180 @@ RL: AMPA:
   RLlenhebb: 100
   RLlenanti: 100
 (base) hanwar@cycle:~/GamesProject/SMARTAgent$ python multistepSim.py simFullHA.json 30 20 21feb5_RL3_A0_cycle_multi
+...completed on Feb11,2021......
+
+>>> lfnT
+['21feb5_cycle_RL3_A0__step_0_', 
+  '21feb5_cycle_RL3_A0__step_1_', 
+  '21feb5_cycle_RL3_A0__step_2_', 
+  '21feb5_cycle_RL3_A0__step_3_', 
+  '21feb5_cycle_RL3_A0__step_4_', 
+  '21feb5_cycle_RL3_A0__step_5_', 
+  '21feb5_cycle_RL3_A0__step_6_', 
+  '21feb5_cycle_RL3_A0__step_7_', 
+  '21feb5_cycle_RL3_A0__step_8_', 
+  '21feb5_cycle_RL3_A0__step_9_', 
+  '21feb5_cycle_RL3_A0__step_10_', 
+  '21feb5_cycle_RL3_A0__step_11_', 
+  '21feb5_cycle_RL3_A0__step_12_', 
+  '21feb5_cycle_RL3_A0__step_13_', 
+  '21feb5_cycle_RL3_A0__step_14_', 
+  '21feb5_cycle_RL3_A0__step_15_', 
+  '21feb5_cycle_RL3_A0__step_16_', 
+  '21feb5_cycle_RL3_A0__step_17_', 
+  '21feb5_cycle_RL3_A0__step_18_', 
+  '21feb5_cycle_RL3_A0__step_19_']
+
+>>> lpdaT = getindivactionreward(lfnT)
+>>> csm = cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+>>> lclr = [csm.to_rgba(float(i)/len(lpdaT)) for i in range(len(lpdaT))]
+>>> plotComparePerf(lpdaT,lclr,yl=(0,2),lleg=lfnT,skipscore=True,skipfollow=True)
+.... saved as 21feb11_21feb5_cycle_RL3_A0_allsteps_comparePerf.png
+
+>>> pdfcT = getconcatweightpdf(lfnT)
+>>> plotMeanWeights(pdfcT,gca(),msz=6,xl=(0,np.amax(pdfcT.time)),lpop=['EMUP','EMDOWN'],lclr=['r','b'],plotindiv=False)
+.... saved as 21feb11_21feb5_cycle_RL3_A0_allsteps_meanWeights.png
+
+>>> II_allT = getconcatactioninputs(lfnT)
+loading input images from data/21feb5_cycle_RL3_A0__step_0_InputImages.txt
+loading input images from data/21feb5_cycle_RL3_A0__step_1_InputImages.txt
+loading input images from data/21feb5_cycle_RL3_A0__step_2_InputImages.txt
+loading input images from data/21feb5_cycle_RL3_A0__step_3_InputImages.txt
+loading input images from data/21feb5_cycle_RL3_A0__step_4_InputImages.txt
+loading input images from data/21feb5_cycle_RL3_A0__step_5_InputImages.txt
+loading input images from data/21feb5_cycle_RL3_A0__step_6_InputImages.txt
+loading input images from data/21feb5_cycle_RL3_A0__step_7_InputImages.txt
+loading input images from data/21feb5_cycle_RL3_A0__step_8_InputImages.txt
+loading input images from data/21feb5_cycle_RL3_A0__step_9_InputImages.txt
+loading input images from data/21feb5_cycle_RL3_A0__step_10_InputImages.txt
+loading input images from data/21feb5_cycle_RL3_A0__step_11_InputImages.txt
+loading input images from data/21feb5_cycle_RL3_A0__step_12_InputImages.txt
+loading input images from data/21feb5_cycle_RL3_A0__step_13_InputImages.txt
+loading input images from data/21feb5_cycle_RL3_A0__step_14_InputImages.txt
+loading input images from data/21feb5_cycle_RL3_A0__step_15_InputImages.txt
+loading input images from data/21feb5_cycle_RL3_A0__step_16_InputImages.txt
+loading input images from data/21feb5_cycle_RL3_A0__step_17_InputImages.txt
+loading input images from data/21feb5_cycle_RL3_A0__step_18_InputImages.txt
+loading input images from data/21feb5_cycle_RL3_A0__step_19_InputImages.txt
+>>> actrewards_allT = getconcatactionreward(lfnT)
+
+>>> lSimilarSeqs_allT, seqs2plot_allT, seqsBegs_allT, seqsEnds_allT = breakdownPerformance(II_allT,pdacT,cend=69,sthresh=5,nbframeThresh=5)
+
+>>> len(seqs2plot_allT)
+97
+
+
+>>> dspkID_allT, dspkT_allT, totalDur_allT = getconcatactivity(lfnT,lpop=['EA','EA2','EMUP','EMDOWN'])
+>>> dact1D_allT = getdActMap1D(totalDur_allT, tstepPerAction, dspkT_allT, dspkID_allT, dnumc, dstartidx, lpop = ['EA','EA2','EMUP','EMDOWN'])
+
+>>> dCumAct_allT, dStepAct_allT = getCumActivityMapForInput(seqsBegs_allT, seqsEnds_allT,dact1D_allT,lpop=['EA','EA2','EMUP','EMDOWN'])
+>>> rewards_allT, hitsMiss_allT = getRewardsPerSeq(pdacT,seqsBegs_allT,seqsEnds_allT)
+
+
+>>> plotSeqPerf(lSimilarSeqs_allT,seqs2plot_allT,seqsBegs_allT,seqsEnds_allT,II_allT,dCumAct_allT,hitsMiss_allT,0,plotact=False)
+saved as 21feb12_21feb5_cycle_RL3_A0_seq0
+
+... similarly save all seqs....
+
+HOW TO EVALUATE LEARNING PERFORMANCE
+1. median value of Hits/Miss for all sequences.
+2. peak value of Hits/Miss for all sequences.
+3. Nb of seqs to peak
+4. ratio of Nb of seqs to peak / total number of repeats. 
+
+# find some stats to summerize learning performance.
+>>> lperf_T = []
+>>> for i in range(len(seqs2plot_allT)):
+...   cseqInds = lSimilarSeqs_allT[seqs2plot_allT[i]]
+...   cHitsMiss = []
+...   for j in range(len(cseqInds)):
+...     cHitsMiss.append(hitsMiss_allT[cseqInds[j]][-1])
+...   cHitsMiss = np.array(cHitsMiss)
+...   hits = np.where(cHitsMiss==1,cHitsMiss,0)
+...   miss = np.where(cHitsMiss==-1,-1*cHitsMiss,0)
+...   perf = np.divide(np.cumsum(hits),np.cumsum(miss))
+...   l = len(perf)
+...   if len(np.where(np.isfinite(perf))[0])>0:
+...     f0 = np.where(np.isfinite(perf))[0][0]
+...     f1 = np.where(np.isfinite(perf))[0][-1]
+...     perf = perf[f0:f1+1]
+...   lperf_T.append([np.median(perf),np.amax(perf),np.where(perf==np.amax(perf))[0][0],l])
+
+lperf_T = np.array(lperf_T)
+
+inds = np.argsort(lperf_T[:,1])
+
+>>> plt.plot(lperf_T[inds,0],'b-o')
+[<matplotlib.lines.Line2D object at 0x7f34305f8210>]
+>>> plt.plot(lperf_T[inds,1],'r-o')
+[<matplotlib.lines.Line2D object at 0x7f342efe77d0>]
+>>> plt.legend(('median','max'))
+<matplotlib.legend.Legend object at 0x7f33cfd0ef10>
+>>> xlabel('Input Sequences')
+Text(0.5,19.5222,'Input Sequences')
+>>> ylabel('Hit/Miss')
+Text(43.4722,0.5,'Hit/Miss')
+
+saved as 21feb11_21feb5_cycle_RL3_A0_learningPerformance.png
+
+>>> plt.plot(lperf_T[inds,2],'r-o')
+[<matplotlib.lines.Line2D object at 0x7f3455778850>]
+>>> xlabel('Input Sequences')
+Text(0.5,19.5222,'Input Sequences')
+>>> ylabel('# of repeats for max. Hit/Miss')
+Text(32.9722,0.5,'# of repeats for max. Hit/Miss')
+
+saved as 21feb11_21feb5_cycle_RL3_A0_LearningPerformancePeaks.png
+
+>>> plt.plot(np.divide(lperf_T[inds,2],lperf_T[inds,3]),'r-o')
+[<matplotlib.lines.Line2D object at 0x7f342bf56450>]
+>>> xlabel('Input Sequences')
+Text(0.5,19.5222,'Input Sequences')
+>>> ylabel('relative # of repeats for max. Hit/Miss')
+Text(38.3472,0.5,'relative # of repeats for max. Hit/Miss')
+
+saved as 21feb11_21feb5_cycle_RL3_A0_LearningPerformancePeaks2.png
+
+ANALYSIS ROUTINE:
+summarizeLearningPerf(lSimilarSeqs,seqs2plot,hitsMiss) 
+... Use this only for data during the learning... this is to highlight that network learns and forgets.
+
+...new analysis
+
+>>> cseqInds = lSimilarSeqs_allT[seqs2plot_allT[0]]
+>>> cseqInds
+[0, 17, 40, 60, 69, 84, 92, 109, 123, 142, 146, 173, 179, 197, 222, 228, 308, 326, 351, 369, 379, 394, 414, 417, 480, 499, 503, 521, 558, 565, 588, 620, 638, 647, 653, 691, 742, 757, 802, 804, 813, 818, 859, 864, 907, 921, 927, 959, 973, 990, 1032, 1033, 1068, 1073, 1078, 1084, 1087, 1105, 1112, 1118, 1123, 1132, 1138, 1150, 1164, 1170, 1180, 1185, 1199, 1218, 1222, 1234, 1313, 1322, 1327, 1334, 1345, 1350, 1367, 1377, 1382, 1439, 1445, 1448, 1476, 1492, 1507, 1541, 1550, 1554, 1555, 1575, 1607, 1617, 1623, 1648, 1675, 1708, 1717, 1735, 1751, 1756, 1777, 1783, 1814, 1819, 1828, 1830, 1841, 1853, 1884, 1889, 1909, 1935, 1941, 1958, 1977, 1993, 2010, 2020, 2031, 2045, 2063, 2064, 2079, 2110, 2143, 2165, 2171, 2183, 2192, 2197, 2215, 2230, 2253, 2274, 2308, 2314, 2320, 2328, 2346, 2360, 2378, 2383, 2399, 2463, 2470, 2494, 2521, 2530, 2559, 2560, 2580, 2639, 2646, 2651, 2675, 2677, 2687, 2692, 2710, 2737, 2738, 2758, 2800, 2856, 2879, 2906, 2935, 2952, 2958, 2968, 2974, 3007, 3022, 3025, 3035, 3064, 3077, 3123, 3206, 3217, 3233, 3236, 3280, 3287, 3308, 3343, 3356, 3366]
+>>> cseq_act_up = np.array(dCumAct_allT['EMUP'])[cseqInds,:]
+>>> cseq_act_down = np.array(dCumAct_allT['EMDOWN'])[cseqInds,:]
+
+... pool activity seperately for successful and unsuccessful play... 
+
+# normalize the activity for all sequences
+>>> norm_seq_act_up = []
+>>> norm_seq_act_down = []
+>>> for i in range(len(dCumAct_allT['EMUP'])):
+...   cact_up = dCumAct_allT['EMUP'][i]
+...   if np.amax(cact_up)>0:
+...     norm_seq_act_up.append(np.divide(cact_up,np.amax(cact_up)))
+...   else:
+...     norm_seq_act_up.append(cact_up)
+...   cact_down = dCumAct_allT['EMDOWN'][i]
+...   if np.amax(cact_down)>0:
+...     norm_seq_act_down.append(np.divide(cact_down,np.amax(cact_down)))
+...   else:
+...     norm_seq_act_down.append(cact_down)
+
+norm_seq_act_up = np.array(norm_seq_act_up)
+norm_seq_act_down = np.array(norm_seq_act_down)
+
+# normalization above is not proper. sum of all activity should be 1.
+norm_seq_act_up = []
+norm_seq_act_down = []
+for i in range(len(dCumAct_allT['EMUP'])):
+  cact_up = dCumAct_allT['EMUP'][i] # total activity of 300 neurons for each seq
+  if np.amax(cact_up)>0:
+    cumactup = np.cumsum(cact_up)[-1]
+    norm_seq_act_up.append(np.divide(cact_up,cumactup)
+  else:
+    norm_seq_act_up.append(cact_up) # if no activity, no need to normalize.
+  cact_down = dCumAct_allT['EMDOWN'][i]
+  if np.amax(cact_down)>0:
+    cumactdown = np.cumsum(cact_down)[-1]
+    norm_seq_act_down.append(np.divide(cact_down,cumactdown)
+  else:
+    norm_seq_act_down.append(cact_down)
+
+norm_seq_act_up = np.array(norm_seq_act_up)
+norm_seq_act_down = np.array(norm_seq_act_down)
+
+
+..... now can use norm_seq_act_down and norm_seq_act_up to look at activities for each sequence.
+
+>>> cseqInds = lSimilarSeqs_allT[seqs2plot_allT[0]]
+>>> cseq_norm_act_up = norm_seq_act_up[cseqInds,:]
+>>> cseq_norm_act_down = norm_seq_act_down[cseqInds,:]
+>>> chitsmiss = []
+>>> for i in cseqInds:
+...   chitsmiss.append(hitsMiss_allT[i][-1])
+
+>>> successfulplays = np.where(np.array(chitsmiss)==1)[0]
+>>> unsuccessfulplays = np.where(np.array(chitsmiss)==-1)[0]
+>>> cseq_actup_splays = cseq_norm_act_up[successfulplays,:] 
+>>> cseq_actdown_splays = cseq_norm_act_down[successfulplays,:] 
+>>> cseq_actup_usplays = cseq_norm_act_up[unsuccessfulplays,:] 
+>>> cseq_actdown_unsplays = cseq_norm_act_down[unsuccessfulplays,:] 
+
+>>> med_cseq_actup_splays = np.median(cseq_actup_splays,0)
+>>> med_cseq_actup_usplays = np.median(cseq_actup_usplays,0)
+>>> med_cseq_actdown_splays = np.median(cseq_actdown_splays,0)
+>>> med_cseq_actdown_usplays = np.median(cseq_actdown_unsplays,0)
+
+>>> sinds_up = np.argsort(med_cseq_actup_splays)
+>>> sinds_down = np.argsort(med_cseq_actdown_splays)
+
+>>> plt.plot(med_cseq_actup_usplays[sinds_up],'b--')
+[<matplotlib.lines.Line2D object at 0x7f65b64b2590>]
+>>> plt.plot(med_cseq_actup_splays[sinds_up],'b')
+[<matplotlib.lines.Line2D object at 0x7f65b60ef0d0>]
+>>> plt.plot(med_cseq_actdown_usplays[sinds_down],'r--')
+[<matplotlib.lines.Line2D object at 0x7f65b60c8710>]
+>>> plt.plot(med_cseq_actdown_splays[sinds_down],'r')
+[<matplotlib.lines.Line2D object at 0x7f65b684c950>]
+>>> ylabel('median[rel. contribution of each neuron in pop activity]')
+Text(-3.77778,0.5,'median[rel. contribution of each neuron in pop activity]')
+>>> xlabel('Neurons')
+Text(0.5,40.5322,'Neurons')
+>>> legend(('EMUP-unsuccessfull','EMUP-successful','EMDOWN-unsuccessful','EMDOWN-successful'))
+
+saved as 21feb18_21feb5_cycle_RL3_A0_compareEventsAct_seq0.png
+
+>>> cseqInds = lSimilarSeqs_allT[seqs2plot_allT[2]]
+>>> cseq_norm_act_up = norm_seq_act_up[cseqInds,:]
+>>> cseq_norm_act_down = norm_seq_act_down[cseqInds,:]
+>>> chitsmiss = []
+>>> for i in cseqInds:
+...   chitsmiss.append(hitsMiss_allT[i][-1])
+
+>>> successfulplays = np.where(np.array(chitsmiss)==1)[0]
+>>> successfulplays
+array([67, 76])
+>>> unsuccessfulplays = np.where(np.array(chitsmiss)==-1)[0]
+>>> cseq_actup_splays = cseq_norm_act_up[successfulplays,:]
+>>> cseq_actup_usplays = cseq_norm_act_up[unsuccessfulplays,:]
+>>> cseq_actdown_splays = cseq_norm_act_down[successfulplays,:]
+>>> cseq_actdown_usplays = cseq_norm_act_down[unsuccessfulplays,:]
+>>> med_cseq_actup_splays = np.median(cseq_actup_splays,0)
+>>> med_cseq_actup_usplays = np.median(cseq_actup_usplays,0)
+>>> med_cseq_actdown_splays = np.median(cseq_actdown_splays,0)
+>>> med_cseq_actdown_usplays = np.median(cseq_actdown_usplays,0)
+>>> sinds_up = np.argsort(med_cseq_actup_splays)
+>>> sinds_down = np.argsort(med_cseq_actdown_splays)
+
+>>> plt.plot(med_cseq_actup_usplays[sinds_up],'b--')
+[<matplotlib.lines.Line2D object at 0x7f65b6ad0b10>]
+>>> plt.plot(med_cseq_actup_splays[sinds_up],'b')
+[<matplotlib.lines.Line2D object at 0x7f65b61b0950>]
+>>> plt.plot(med_cseq_actdown_usplays[sinds_down],'r--')
+[<matplotlib.lines.Line2D object at 0x7f65b60c5310>]
+>>> plt.plot(med_cseq_actdown_splays[sinds_down],'r')
+[<matplotlib.lines.Line2D object at 0x7f65b60d8b90>]
+>>> ylabel('median[rel. contribution of each neuron in pop activity]')
+Text(-3.77778,0.5,'median[rel. contribution of each neuron in pop activity]')
+>>> xlabel('Neurons')
+Text(0.5,19.1922,'Neurons')
+>>> legend(('EMUP-unsuccessfull','EMUP-successful','EMDOWN-unsuccessful','EMDOWN-successful'))
+<matplotlib.legend.Legend object at 0x7f65b64b2b50>
+
+saved as 21feb18_21feb5_cycle_RL3_A0_compareEventsAct_seq2.png
+
+.... PROBABLY THESE PLOTS ARE NOT VERY USEFUL....
+
+# save rel. activity based sorted neuron ids
+
+>>> norm_seq_act_up.shape
+(3391, 300)
+
+>>> sorted_ids_actup = np.zeros(shape=norm_seq_act_up.shape)
+>>> sorted_ids_actdown = np.zeros(shape=norm_seq_act_down.shape)
+>>> for i in range(norm_seq_act_up.shape[0]):
+...   sorted_ids_actup[i,:]=np.argsort(norm_seq_act_up[i,:])
+...   sorted_ids_actdown[i,:]=np.argsort(norm_seq_act_down[i,:])
+
+
+.. no need to use normalized activity to sort...can be done on just summed activity.....
+.. but if need normalized activity sorted too, then might be relevant.... not clear at this point....
+
+# now see 1) for each sequence, mostly active neurons, 2) for each sequence- successful play, mostly active neurons and 3) for each sequence-unsuccessful play, mostly actove neurons.
+
+>>> cseqInds0 = lSimilarSeqs_allT[seqs2plot_allT[0]]
+>>> cseqInds2 = lSimilarSeqs_allT[seqs2plot_allT[2]]
+>>> seq0_sorted_ids_actup = sorted_ids_actup[cseqInds0,:]
+>>> seq2_sorted_ids_actup = sorted_ids_actup[cseqInds2,:]
+>>> seq0_sorted_ids_actdown = sorted_ids_actdown[cseqInds0,:]
+>>> seq2_sorted_ids_actdown = sorted_ids_actdown[cseqInds2,:]
+
+# for each sequence, mostly active neurons
+
+>>> cseqInds0 = lSimilarSeqs_allT[seqs2plot_allT[0]]
+>>> cseqInds2 = lSimilarSeqs_allT[seqs2plot_allT[2]]
+>>> seq0_sorted_ids_actup = sorted_ids_actup[cseqInds0,:]
+>>> seq2_sorted_ids_actup = sorted_ids_actup[cseqInds2,:]
+>>> seq0_sorted_ids_actdown = sorted_ids_actdown[cseqInds0,:]
+>>> seq2_sorted_ids_actdown = sorted_ids_actdown[cseqInds2,:]
+
+... HOW MANY NEURONS SHOULD I USE IN THE ANALYSIS? most active 1% (3), 2% (6), 3% (9), 5% (15) or 10% (30)
+... lets try with 5%
+
+>>> p5_seq0_actup_allrepeats = seq0_sorted_ids_actup[:,285:]
+>>> p5_seq0_actdown_allrepeats = seq0_sorted_ids_actdown[:,285:]
+>>> p5_seq2_actup_allrepeats = seq2_sorted_ids_actup[:,285:]
+>>> p5_seq2_actdown_allrepeats = seq2_sorted_ids_actdown[:,285:]
+
+>>> hist_p5_seq0_actup_allrepeats = np.zeros((300,1))
+>>> hist_p5_seq0_actdown_allrepeats = np.zeros((300,1))
+>>> hist_p5_seq2_actup_allrepeats = np.zeros((300,1))
+>>> hist_p5_seq2_actdown_allrepeats = np.zeros((300,1))
+
+
+>>> for i in range(300):
+...   hist_p5_seq0_actup_allrepeats[i] = np.where(p5_seq0_actup_allrepeats==i)[0].shape[0]
+...   hist_p5_seq0_actdown_allrepeats[i] = np.where(p5_seq0_actdown_allrepeats==i)[0].shape[0]
+...   hist_p5_seq2_actup_allrepeats[i] = np.where(p5_seq2_actup_allrepeats==i)[0].shape[0]
+...   hist_p5_seq2_actdown_allrepeats[i] = np.where(p5_seq2_actdown_allrepeats==i)[0].shape[0]
+
+>>> pearsonr(hist_p5_seq0_actup_allrepeats.flat,hist_p5_seq2_actup_allrepeats.flat)
+(0.9547144808720871, 6.220324738374319e-159)
+
+
+----
+# write a function to do this for all sequences.
+
+# normalization so that sum of all activity should be 1 except when there is no activity.
+norm_seq_act_up = []
+norm_seq_act_down = []
+for i in range(len(dCumAct_allT['EMUP'])):
+  cact_up = dCumAct_allT['EMUP'][i] # total activity of 300 neurons for each seq
+  if np.amax(cact_up)>0:
+    cumactup = np.cumsum(cact_up)[-1]
+    norm_seq_act_up.append(np.divide(cact_up,cumactup)
+  else:
+    norm_seq_act_up.append(cact_up) # if no activity, no need to normalize.
+  cact_down = dCumAct_allT['EMDOWN'][i]
+  if np.amax(cact_down)>0:
+    cumactdown = np.cumsum(cact_down)[-1]
+    norm_seq_act_down.append(np.divide(cact_down,cumactdown)
+  else:
+    norm_seq_act_down.append(cact_down)
+
+norm_seq_act_up = np.array(norm_seq_act_up)
+norm_seq_act_down = np.array(norm_seq_act_down)
+
+# for each sequence sort neurons based on the norm. activity (mostly active neurons)
+
+sorted_ids_actup = np.zeros(shape=norm_seq_act_up.shape)
+sorted_ids_actdown = np.zeros(shape=norm_seq_act_down.shape)
+for i in range(norm_seq_act_up.shape[0]):
+  sorted_ids_actup[i,:]=np.argsort(norm_seq_act_up[i,:])
+  sorted_ids_actdown[i,:]=np.argsort(norm_seq_act_down[i,:])
+
+hist_p5_allseqs_actup_allrepeats = np.zeros((300,len(seqs2plot_allT)))
+hist_p5_allseqs_actdown_allrepeats = np.zeros((300,len(seqs2plot_allT)))
+
+for seqInds in range(len(seqs2plot_allT)):
+  cseqInds = lSimilarSeqs_allT[seqs2plot_allT[seqInds]]
+  cseq_sorted_ids_actup = sorted_ids_actup[cseqInds,:]
+  cseq_sorted_ids_actdown = sorted_ids_actdown[cseqInds,:]
+  p5_cseq_actup_allrepeats = cseq_sorted_ids_actup[:,285:]
+  p5_cseq_actdown_allrepeats = cseq_sorted_ids_actdown[:,285:]
+  for i in range(300):
+    hist_p5_allseqs_actup_allrepeats[i,seqInds] = np.where(p5_cseq_actup_allrepeats==i)[0].shape[0]/len(cseqInds)
+    hist_p5_allseqs_actdown_allrepeats[i,seqInds] = np.where(p5_cseq_actdown_allrepeats==i)[0].shape[0]/len(cseqInds)
+
+>>> plt.imshow(hist_p5_allseqs_actup_allrepeats.T)
+<matplotlib.image.AxesImage object at 0x7f65b612b190>
+>>> xlabel('EMUP-Neuron')
+Text(0.5,33.5497,'EMUP-Neuron')
+>>> ylabel('seq #')
+Text(133.972,0.5,'seq #')
+>>> title('Average # of times a neuron is among top 5% active neurons in a pop. for a seq')
+
+saved as 21feb18_21feb5_cycle_RL3_A0_top5pactiveneurons_EMUP.png
+saved as 21feb18_21feb5_cycle_RL3_A0_top5pactiveneurons_EMDOWN.png
+
+cbaxes = fig.add_axes([0.92, 0.2, 0.01, 0.6])
+plt.colorbar(pcm, cax = cbaxes)
+
+>>> hist_allseqs_actup_allrepeats = np.zeros((300,len(seqs2plot_allT)))
+>>> hist_allseqs_actdown_allrepeats = np.zeros((300,len(seqs2plot_allT)))
+>>> for seqInds in range(len(seqs2plot_allT)):
+...   cseqInds = lSimilarSeqs_allT[seqs2plot_allT[seqInds]]
+...   cseq_sorted_ids_actup = sorted_ids_actup[cseqInds,:]
+...   cseq_sorted_ids_actdown = sorted_ids_actdown[cseqInds,:]
+...   for i in range(300):
+...     hist_allseqs_actup_allrepeats[i,seqInds] = np.where(cseq_sorted_ids_actup==i)[0].shape[0]/len(cseqInds)
+...     hist_allseqs_actdown_allrepeats[i,seqInds] = np.where(cseq_sorted_ids_actdown==i)[0].shape[0]/len(cseqInds)
+
+(Feb22,2021)
+
+here i got 1 for all neurons..... meaning that for every repeated seq all neurons were active.
+
+may be i should look for each step, how many neurons were active.....
+
+no need to look at sorted indices when looking at whole population.....
+
+>>> len(dStepAct_allT['EMUP'])
+3391 .... There are 3391 sequences in the multistep sim.
+
+>>> len(dStepAct_allT['EMUP'][0])
+141 .... there are 141 steps in seq 0.
+
+>>> a = np.array(dStepAct_allT['EMUP'][0])
+>>> a.shape
+(141, 300) .... a has activity of 300 neurons for all 141 steps.
+
+# look at which neurons were active at each step..... one way could be to see how many times a neuron was active during all steps/total number of steps.
+# ... this will give me 300 values for each sequence.
+
+pactup_acrosssteps_allseqs = np.zeros(shape=(len(seqsBegs_allT),300))
+pactdown_acrosssteps_allseqs = np.zeros(shape=(len(seqsBegs_allT),300))
+for seq in range(len(seqsBegs_allT)):
+  cseqactup = np.array(dStepAct_allT['EMUP'][seq])
+  cseqactdown = np.array(dStepAct_allT['EMDOWN'][seq])
+  nbsteps = cseqactup.shape[0]
+  for cell in range(300):
+    pactup_acrosssteps_allseqs[seq,cell] = len(np.where(cseqactup[:,cell]>0)[0])/nbsteps
+    pactdown_acrosssteps_allseqs[seq,cell] = len(np.where(cseqactdown[:,cell]>0)[0])/nbsteps
+
+# for each sequence repeats, find repeats with similar number of steps.
+
+cseqInds = lSimilarSeqs_allT[seqs2plot_allT[0]]
+lens = []
+for seq in cseqInds:
+  lens.append(len(dStepAct_allT['EMUP'][seq]))
+ul = np.unique(lens)
+ul_inds = np.add(np.where(np.subtract(ul[1:],ul[0:-1])>10)[0],1)
+
+if ul[0]>0:
+  gls = [ul[0]]
+else:
+  gls = []
+
+for inds in ul_inds:
+  gls.append(ul[inds])
+
+cseqInds_d = []
+for l in gls:
+  c = []
+  for j in range(len(lens)):
+    if lens[j]>=l and lens[j]<l+9:
+      c.append(j)
+  cseqInds_d.append(c)  
+
+# pact divided based on number of steps.....
+pactup_acrosssteps_seq0_0 = pactup_acrosssteps_allseqs[np.array(cseqInds)[cseqInds_d[0]],:]
+pactup_acrosssteps_seq0_1 = pactup_acrosssteps_allseqs[np.array(cseqInds)[cseqInds_d[1]],:]
+
+sinds = np.argsort(np.add(np.mean(pactup_acrosssteps_seq0_0,0),np.mean(pactup_acrosssteps_seq0_1,0)))
+
+
+rewards_allseqs = np.zeros(shape=(len(seqsBegs_allT)))
+for i in range(len(seqsBegs_allT)):
+  rewards_allseqs[i]=hitsMiss_allT[i][-1]
+
+rewards_seq0_0 = rewards_allseqs[np.array(cseqInds)[cseqInds_d[0]]]
+
+# Q1: Why model can learn how to play for some input patterns while not for others?
+#     -- compare activity of neurons for both cases.
+# Q2: Why model performs good with some input patterns without learning?
+# Q3: Why model learns how to play for some input patterns and then start forgetting?
+
+--------------------------------------------------------------------------------------------------------
+.... For each seq, we have M 600xN activity matrices, where N is number of steps and M is number of repeats.
+with repetition of input sequences, does the activity becomes more correlated?
+for each repeat, can have a distribution of correlations between neurons.
+... can see how distribution evolves with number of repeats and
+... can see how for each pair, the correlation evolves with repetitions.
+
+# try this with one sequence.
+seq1 = np.array(cseqInds)[cseqInds_d[0]]
+l = gls[0]
+act1 = np.zeros((len(seq1),l,600))
+count = 0
+for cseq in seq1:
+  cactup = np.array(dStepAct_allT['EMUP'][cseq])
+  cactdown = np.array(dStepAct_allT['EMDOWN'][cseq])
+  act1[count,:,0:cactup.shape[1]] = cactup[0:l,:]
+  act1[count,:,cactup.shape[1]:] = cactdown[0:l,:]
+  count+=1
+
+Mcorrs = []
+for m in range(act1.shape[0]):
+  cAct = act1[m,:,:]
+  cCorrs = []
+  for i in range(600):
+    for j in range(i,600):
+      c,p = pearsonr(cAct[:,i].flat,cAct[:,j].flat)
+      cCorrs.append(c)
+  Mcorrs.append(cCorrs)
+
+# try same sequence with different ball speed
+
+>>> seq2 = np.array(cseqInds)[cseqInds_d[1]]
+>>> l = gls[1]
+>>> act2 = np.zeros((len(seq2),l,600))
+>>> count = 0
+>>> for seq in seq2:
+...   cactup = np.array(dStepAct_allT['EMUP'][seq])
+...   cactdown = np.array(dStepAct_allT['EMDOWN'][seq])
+...   act2[count,:,0:cactup.shape[1]]=cactup[0:l,:]
+...   act2[count,:,cactup.shape[1]:]=cactdown[0:l,:]
+...   count+=1
+... 
+>>> Mcorrs2 = []
+>>> for m in range(act2.shape[0]):
+...   cAct = act2[m,:,:]
+...   cCorrs = []
+...   for i in range(600):
+...     for j in range(i,600):
+...       c,p = pearsonr(cAct[:,i].flat,cAct[:,j].flat)
+...       cCorrs.append(c)
+...   Mcorrs2.append(cCorrs)
+
+>>> h2 = np.histogram(np.nanmean(Mcorrs2,0),0.01*np.arange(100))
+>>> h = np.histogram(np.nanmean(Mcorrs,0),0.01*np.arange(100))
+
+
+>>> plt.plot(h[1][1:],h[0],'b-o')
+>>> plt.plot(h2[1][1:],h2[0],'r-o')
+>>> xlim((0.4,0.7))
+(0.4, 0.7)
+>>> xlabel('pearson correlation between EM neurons')
+>>> ylabel('count')
+>>> legend(('Seq 0 - Fast','Seq 0 - Slow'))
+
+saved as 21feb22_21feb5_cycle_RL3_A0_corrs_seq0.png (only means across repeats shown here.)
+
+
+>>> Mcorrs2 = np.array(Mcorrs2)
+>>> h2 = np.histogram(Mcorrs2.flat,0.01*np.arange(100))
+>>> h = np.histogram(Mcorrs.flat,0.01*np.arange(100))
+>>> plt.plot(h[1][1:],np.divide(h[0],np.max(h[0])),'b-o')
+>>> plt.plot(h2[1][1:],np.divide(h2[0],np.max(h2[0])),'r-o')
+>>> legend(('Seq 0 - Fast','Seq 0 - Slow'))
+>>> xlabel('pearson correlation of EM neurons activity')
+
+saved as 21feb22_21feb5_cycle_RL3_A0_corrs_seq0all.png
+
+
+>>> h_t = np.zeros((Mcorrs.shape[0],99))
+>>> h2_t = np.zeros((Mcorrs2.shape[0],99))
+>>> for t in range(Mcorrs.shape[0]):
+...   h_ct = np.histogram(Mcorrs[t,:].flat,0.01*np.arange(100))
+...   h2_ct = np.histogram(Mcorrs2[t,:].flat,0.01*np.arange(100))
+...   h_t[t,:] = np.divide(h_ct[0],np.amax(h_ct[0]))
+...   h2_t[t,:] = np.divide(h2_ct[0],np.amax(h2_ct[0]))
+
+
+>>> fig, axs = plt.subplots(1,2,figsize=(10,4))
+>>> lax = axs.ravel()
+>>> lax[0].imshow(h_t.T)
+>>> lax[1].imshow(h2_t.T)
+>>> lax[0].set_title('Seq 0 - Fast')
+>>> lax[1].set_title('Seq 0 - Slow')
+>>> lax[1].set_xlabel('# of repeats')
+>>> lax[0].set_xlabel('# of repeats')
+
+>>> lax[1].set_yticks(ticks=np.arange(0,90,20))
+>>> lax[1].set_yticklabels(labels=[str(h_ct[1][0]),str(h_ct[1][20]),str(h_ct[1][40]),str(h_ct[1][60]),str(h_ct[1][80])])
+
+>>> lax[0].set_yticks(ticks=np.arange(0,90,20))
+>>> lax[0].set_yticklabels(labels=[str(h_ct[1][0]),str(h_ct[1][20]),str(h_ct[1][40]),str(h_ct[1][60]),str(h_ct[1][80])])
+
+>>> lax[1].set_ylabel('pearson correlation')
+>>> lax[0].set_ylabel('pearson correlation')
+
+saved as 21feb22_21feb5_cycle_RL3_A0_corrs_seq0all2.png
+
+
+# try seq 13
+
+cseqInds13 = lSimilarSeqs_allT[seqs2plot_allT[13]]
+lens = []
+for seq in cseqInds13:
+  lens.append(len(dStepAct_allT['EMUP'][seq]))
+ul = np.unique(lens)
+ul_inds = np.add(np.where(np.subtract(ul[1:],ul[0:-1])>10)[0],1)
+
+if ul[0]>0:
+  gls = [ul[0]]
+else:
+  gls = []
+
+for inds in ul_inds:
+  gls.append(ul[inds])
+
+cseqInds13_d = []
+for l in gls:
+  c = []
+  for j in range(len(lens)):
+    if lens[j]>=l and lens[j]<l+12:
+      c.append(j)
+  cseqInds13_d.append(c)  
+
+
+
+seq13_1 = np.array(cseqInds13)[cseqInds13_d[0]]
+l = gls[0]
+act13_1 = np.zeros((len(seq13_1),l,600))
+count = 0
+for cseq in seq13_1:
+  cactup = np.array(dStepAct_allT['EMUP'][cseq])
+  cactdown = np.array(dStepAct_allT['EMDOWN'][cseq])
+  act13_1[count,:,0:cactup.shape[1]] = cactup[0:l,:]
+  act13_1[count,:,cactup.shape[1]:] = cactdown[0:l,:]
+  count+=1
+
+Mcorrs13_1 = []
+for m in range(act13_1.shape[0]):
+  cAct = act13_1[m,:,:]
+  cCorrs = []
+  for i in range(600):
+    for j in range(i,600):
+      c,p = pearsonr(cAct[:,i].flat,cAct[:,j].flat)
+      cCorrs.append(c)
+  Mcorrs13_1.append(cCorrs)
+
+>>> Mcorr13_1 = np.array(Mcorrs13_1)
+>>> Mcorr13_2 = np.array(Mcorrs13_2)
+
+
+
+seq13_2 = np.array(cseqInds13)[cseqInds13_d[1]]
+l = gls[1]
+act13_2 = np.zeros((len(seq13_2),l,600))
+count = 0
+for cseq in seq13_2:
+  cactup = np.array(dStepAct_allT['EMUP'][cseq])
+  cactdown = np.array(dStepAct_allT['EMDOWN'][cseq])
+  act13_2[count,:,0:cactup.shape[1]] = cactup[0:l,:]
+  act13_2[count,:,cactup.shape[1]:] = cactdown[0:l,:]
+  count+=1
+
+Mcorrs13_2 = []
+for m in range(act13_2.shape[0]):
+  cAct = act13_2[m,:,:]
+  cCorrs = []
+  for i in range(600):
+    for j in range(i,600):
+      c,p = pearsonr(cAct[:,i].flat,cAct[:,j].flat)
+      cCorrs.append(c)
+  Mcorrs13_2.append(cCorrs)
+
+
+h13_1 = np.histogram(np.nanmean(Mcorrs13_1,0),0.01*np.arange(100))
+h13_2 = np.histogram(np.nanmean(Mcorrs13_2,0),0.01*np.arange(100))
+
+
+plt.plot(h13_1[1][1:],h13_1[0],'b-o')
+plt.plot(h13_2[1][1:],h13_2[0],'r-o')
+>>> xlim((0.4,0.7))
+(0.4, 0.7)
+>>> xlabel('pearson correlation between EM neurons')
+>>> ylabel('count')
+>>> legend(('Seq 13 - Fast','Seq 13 - Slow'))
+
+saved as 21feb22_21feb5_cycle_RL3_A0_corrs_seq13.png (only means across repeats shown here.)
+
+
+h13_1 = np.histogram(Mcorr13_1.flat,0.01*np.arange(100))
+h13_2 = np.histogram(Mcorr13_2.flat,0.01*np.arange(100))
+
+plt.plot(h13_1[1][1:],np.divide(h13_1[0],np.amax(h13_1[0])),'b-o')
+plt.plot(h13_2[1][1:],np.divide(h13_2[0],np.amax(h13_2[0])),'r-o')
+legend(('Seq 0 - Fast','Seq 0 - Slow'))
+xlabel('pearson correlation of EM neurons activity')
+
+saved as 21feb22_21feb5_cycle_RL3_A0_corrs_seq13all.png
+
+h13_1_t = np.zeros((Mcorr13_1.shape[0],99))
+h13_2_t = np.zeros((Mcorr13_2.shape[0],99))
+>>> for t in range(Mcorr13_1.shape[0]):
+...   h13_1_ct = np.histogram(Mcorr13_1[t,:].flat,0.01*np.arange(100))
+...   h13_1_t[t,:]=np.divide(h13_1_ct[0],np.amax(h13_1_ct[0]))
+... 
+>>> for t in range(Mcorr13_2.shape[0]):
+...   h13_2_ct = np.histogram(Mcorr13_2[t,:].flat,0.01*np.arange(100))
+...   h13_2_t[t,:]=np.divide(h13_2_ct[0],np.amax(h13_2_ct[0]))
+
+
+fig, axs = plt.subplots(1,2,figsize=(10,4))
+lax = axs.ravel()
+lax[0].imshow(h13_1_t.T)
+lax[1].imshow(h13_2_t.T)
+lax[0].set_title('Seq 0 - Fast')
+lax[1].set_title('Seq 0 - Slow')
+lax[1].set_xlabel('# of repeats')
+lax[0].set_xlabel('# of repeats')
+
+>>> lax[1].set_yticks(ticks=np.arange(0,90,20))
+>>> lax[1].set_yticklabels(labels=[str(h_ct[1][0]),str(h_ct[1][20]),str(h_ct[1][40]),str(h_ct[1][60]),str(h_ct[1][80])])
+
+>>> lax[0].set_yticks(ticks=np.arange(0,90,20))
+>>> lax[0].set_yticklabels(labels=[str(h_ct[1][0]),str(h_ct[1][20]),str(h_ct[1][40]),str(h_ct[1][60]),str(h_ct[1][80])])
+
+>>> lax[1].set_ylabel('pearson correlation')
+>>> lax[0].set_ylabel('pearson correlation')
+
+saved as 21feb22_21feb5_cycle_RL3_A0_corrs_seq13all2.png
+
+
+
+# try seq 14
+
+cseqInds14 = lSimilarSeqs_allT[seqs2plot_allT[14]]
+lens = []
+for seq in cseqInds14:
+  lens.append(len(dStepAct_allT['EMUP'][seq]))
+ul = np.unique(lens)
+ul_inds = np.add(np.where(np.subtract(ul[1:],ul[0:-1])>10)[0],1)
+
+if ul[0]>0:
+  gls = [ul[0]]
+else:
+  gls = []
+
+for inds in ul_inds:
+  gls.append(ul[inds])
+
+cseqInds14_d = []
+for l in gls:
+  c = []
+  for j in range(len(lens)):
+    if lens[j]>=l and lens[j]<l+12:
+      c.append(j)
+  cseqInds14_d.append(c)  
+
+
+seq14_1 = np.array(cseqInds14)[cseqInds14_d[0]]
+l = gls[0]
+act14_1 = np.zeros((len(seq14_1),l,600))
+count = 0
+for cseq in seq14_1:
+  cactup = np.array(dStepAct_allT['EMUP'][cseq])
+  cactdown = np.array(dStepAct_allT['EMDOWN'][cseq])
+  act14_1[count,:,0:cactup.shape[1]] = cactup[0:l,:]
+  act14_1[count,:,cactup.shape[1]:] = cactdown[0:l,:]
+  count+=1
+
+Mcorrs14_1 = []
+for m in range(act14_1.shape[0]):
+  cAct = act14_1[m,:,:]
+  cCorrs = []
+  for i in range(600):
+    for j in range(i,600):
+      c,p = pearsonr(cAct[:,i].flat,cAct[:,j].flat)
+      cCorrs.append(c)
+  Mcorrs14_1.append(cCorrs)
+
+>>> Mcorrs14_1 = np.array(Mcorrs14_1)
+
+
+h14_1 = np.histogram(np.nanmean(Mcorrs14_1,0),0.01*np.arange(100))
+
+
+plt.plot(h14_1[1][1:],h14_1[0],'b-o')
+>>> xlim((0.4,0.7))
+(0.4, 0.7)
+>>> xlabel('pearson correlation between EM neurons')
+>>> ylabel('count')
+>>> legend(('Seq 14 - Fast')
+
+saved as 21feb22_21feb5_cycle_RL3_A0_corrs_seq14.png (only means across repeats shown here.)
+
+
+h14_1 = np.histogram(Mcorrs14_1.flat,0.01*np.arange(100))
+
+plt.plot(h14_1[1][1:],np.divide(h14_1[0],np.amax(h14_1[0])),'b-o')
+xlabel('pearson correlation of EM neurons activity')
+
+saved as 21feb22_21feb5_cycle_RL3_A0_corrs_seq14all.png
+
+h14_1_t = np.zeros((Mcorrs14_1.shape[0],99))
+for t in range(Mcorrs14_1.shape[0]):
+  h14_1_ct = np.histogram(Mcorrs14_1[t,:].flat,0.01*np.arange(100))
+  h14_1_t[t,:]=np.divide(h14_1_ct[0],np.amax(h14_1_ct[0]))
+
+plt.imshow(h14_1_t.T)
+plt.title('Seq 14 - Fast')
+xlabel('# of repeats')
+yticks(ticks=np.arange(0,90,20),labels=[str(h14_1_ct[1][0]),str(h14_1_ct[1][20]),str(h14_1_ct[1][40]),str(h14_1_ct[1][60]),str(h14_1_ct[1][80])])
+ylabel('pearson correlation')
+
+saved as 21feb22_21feb5_cycle_RL3_A0_corrs_seq14all2.png
+
+# find corr across repeats.
+
+>>> act14_1.shape
+(40, 49, 600)---> 40 repeats, 49 steps, 600 neurons.
+
+Rcorrs14_1 = []
+for i in range(act14_1.shape[0]):
+  iAct = act14_1[i,:,:].flat
+  for j in range(i,act14_1.shape[0]):
+    jAct = act14_1[j,:,:].flat
+    c,p = pearsonr(iAct,jAct)
+    Rcorrs14_1.append(c)
+
+plt.hist(Rcorrs14_1,0.01*np.arange(100))
+
+----
+write a more generalizeable code to compute these correlations......
+
+def getActCorrs(lSimilarSeqs,seqs2plot,dStepAct,I):
+  cseqIndsI = lSimilarSeqs[seqs2plot[I]]
+  lens = []
+  for seq in cseqIndsI:
+    lens.append(len(dStepAct['EMUP'][seq]))
+  ul = np.unique(lens)
+  ul_inds = np.add(np.where(np.subtract(ul[1:],ul[0:-1])>12)[0],1)
+  if ul[0]>0:
+    gls = [ul[0]]
+  else:
+    gls = []
+  for inds in ul_inds:
+    gls.append(ul[inds])
+  cseqIndsI_d = []
+  for l in gls:
+    c = []
+    for j in range(len(lens)):
+      if lens[j]>=l and lens[j]<l+12:
+        c.append(j)
+    cseqIndsI_d.append(c)
+  Mcorrs = []
+  Rcorrs = []
+  for subseqs in range(len(cseqIndsI_d)):  
+    seqI = np.array(cseqIndsI)[cseqIndsI_d[subseqs]]
+    l = gls[subseqs]
+    actI = np.zeros((len(seqI),l,600))
+    count = 0
+    for cseq in seqI:
+      cactup = np.array(dStepAct['EMUP'][cseq])
+      cactdown = np.array(dStepAct['EMDOWN'][cseq])
+      actI[count,:,0:cactup.shape[1]] = cactup[0:l,:]
+      actI[count,:,cactup.shape[1]:] = cactdown[0:l,:]
+      count+=1
+    McorrsI = []
+    for m in range(actI.shape[0]):
+      cAct = actI[m,:,:]
+      cCorrs = []
+      for i in range(600):
+        for j in range(i,600):
+          c,p = pearsonr(cAct[:,i].flat,cAct[:,j].flat)
+          cCorrs.append(c)
+      McorrsI.append(cCorrs)
+    Mcorrs.append(McorrsI)
+    RcorrsI = []
+    for i in range(actI.shape[0]):
+      iAct = actI[i,:,:].flat
+      for j in range(i,actI.shape[0]):
+        jAct = actI[j,:,:].flat
+        c,p = pearsonr(iAct,jAct)
+        RcorrsI.append(c)
+    Rcorrs.append(RcorrsI)
+  return Mcorrs, Rcorrs
+
+Mcorrs = []
+Rcorrs = []
+>>> for I in range(5,len(seqs2plot_allT)):
+...   cMcorrs,cRcorrs=getActCorrs(lSimilarSeqs_allT,seqs2plot_allT,dStepAct_allT,I)
+...   Mcorrs.append(cMcorrs)
+...   Rcorrs.append(cRcorrs)
+
+
+medRcorrs = []
+for i in range(len(Rcorrs)):
+  for j in range(len(Rcorrs[i])):
+    medRcorrs.append(np.nanmean(Rcorrs[i][j]))
+
+# heatmap shows the distribution of correlations across repeats for each input sequence. 
+
+histRcorrs = []
+for i in range(len(Rcorrs)):
+  for j in range(len(Rcorrs[i])):
+    ch = np.histogram(Rcorrs[i][j].flat,0.01*np.arange(-100,101))
+    histRcorrs.append(np.divide(ch[0],np.amax(ch[0])))
+
+>>> plt.imshow(histRcorrs)
+>>> plt.xticks(np.arange(0,200,25),[str(ch[1][0]),str(ch[1][25]),str(ch[1][50]),str(ch[1][75]),str(ch[1][100]),str(ch[1][125]),str(ch[1][150]),str(ch[1][175])])
+>>> xlabel('pearson corr between repeats')
+>>> ylabel('Input Sequences')
+>>> plt.colorbar()
+>>> xlim((50,150))
+
+saved as 21feb24_21feb5_cycle_RL3_A0_corrs_btw_repeats.png
+
+# heatmap shows the distribution of correlations across neurons for each input sequence. 
+
+>>> histMcorrs = []
+>>> for i in range(len(Mcorrs)):
+...   for j in range(len(Mcorrs[i])):
+...     cMcorrs = np.array(Mcorrs[i][j])
+...     ch = np.histogram(cMcorrs.flat,0.01*np.arange(-100,101))
+...     histMcorrs.append(np.divide(ch[0],np.amax(ch[0])))
+... 
+>>> plt.imshow(histMcorrs)
+>>> xlabel('pearson corr between neurons')
+>>> plt.xticks(np.arange(0,200,25),[str(ch[1][0]),str(ch[1][25]),str(ch[1][50]),str(ch[1][75]),str(ch[1][100]),str(ch[1][125]),str(ch[1][150]),str(ch[1][175])])
+>>> ylabel('Input Sequences')
+>>> plt.colorbar()
+>>> xlim((75,199))
+
+saved as 21feb24_21feb5_cycle_RL3_A0_corrs_btw_neurons.png
+
+# Instead of computing correlations using the activity for all steps per seq. we will use step by step activity.
+
+def getActCorrsStepWise(lSimilarSeqs,seqs2plot,dStepAct,I):
+  cseqIndsI = lSimilarSeqs[seqs2plot[I]]
+  lens = []
+  for seq in cseqIndsI:
+    lens.append(len(dStepAct['EMUP'][seq]))
+  ul = np.unique(lens)
+  ul_inds = np.add(np.where(np.subtract(ul[1:],ul[0:-1])>12)[0],1)
+  if ul[0]>0:
+    gls = [ul[0]]
+  else:
+    gls = []
+  for inds in ul_inds:
+    gls.append(ul[inds])
+  cseqIndsI_d = []
+  for l in gls:
+    c = []
+    for j in range(len(lens)):
+      if lens[j]>=l and lens[j]<l+12:
+        c.append(j)
+    cseqIndsI_d.append(c)
+  RcorrsSteps = []
+  for subseqs in range(len(cseqIndsI_d)):  
+    seqI = np.array(cseqIndsI)[cseqIndsI_d[subseqs]]
+    l = gls[subseqs]
+    actI = np.zeros((len(seqI),l,600))
+    count = 0
+    for cseq in seqI:
+      cactup = np.array(dStepAct['EMUP'][cseq])
+      cactdown = np.array(dStepAct['EMDOWN'][cseq])
+      actI[count,:,0:cactup.shape[1]] = cactup[0:l,:]
+      actI[count,:,cactup.shape[1]:] = cactdown[0:l,:]
+      count+=1
+    RcorrsI = []
+    for i in range(actI.shape[0]):
+      iAct = actI[i,:,:]
+      for j in range(i,actI.shape[0]):
+        jAct = actI[j,:,:]
+        cCorrs = []
+        for k in range(jAct.shape[0]):
+          c,p = pearsonr(iAct[k,:].flat,jAct[k,:].flat)
+          cCorrs.append(c)
+        RcorrsI.append(cCorrs)
+    RcorrsSteps.append(RcorrsI)
+  return RcorrsSteps
+
+
+>>> for I in range(4):
+...   cRcorrsS = getActCorrsStepWise(lSimilarSeqs_allT,seqs2plot_allT,dStepAct_allT,I)
+...   print(I)
+...   RcorrsS.append(cRcorrsS)
+
+...seq4 indices are not correct....has some issues....
+
+>>> RcorrsS.append([])
+>>> for I in range(5,len(seqs2plot_allT)):
+...   cRcorrsS = getActCorrsStepWise(lSimilarSeqs_allT,seqs2plot_allT,dStepAct_allT,I)
+...   print(I)
+...   RcorrsS.append(cRcorrsS)
+
+
+>>> histRcorrsS = []
+>>> for i in range(len(RcorrsS)):
+...   for j in range(len(RcorrS[i])):
+...     cRcorrs = np.array(RcorrsS[i][j])
+        cRcorrs = np.reshape(cRcorrs,(cRcorrs.shape[0]*cRcorrs.shape[1],))
+        goodInds = np.where(np.isnan(cRcorrs)==False)
+...     ch = np.histogram(cRcorrs[goodInds],0.01*np.arange(-100,101))
+...     histRcorrsS.append(np.divide(ch[0],np.amax(ch[0])))
+
+
+
+... noticed something wrong with seq nb 4.....
+---------------------------------------------------------------------
+
+# divide pact based on hit or miss and compare stats.
+>>> hitseqs = np.where(rewards_allseqs>0)[0]
+>>> missseqs = np.where(rewards_allseqs<0)[0]
+
+>>> pactup_hitseqs = pactup_acrosssteps_allseqs[hitseqs,:]
+>>> pactdown_hitseqs = pactdown_acrosssteps_allseqs[hitseqs,:]
+>>> pactup_missseqs = pactup_acrosssteps_allseqs[missseqs,:]
+>>> pactdown_missseqs = pactdown_acrosssteps_allseqs[missseqs,:]
+
+
+---
+
+
+# get all data for one seq.
+cseqInds = lSimilarSeqs_allT[seqs2plot_allT[0]]
+
+>>> lens = []
+>>> for seq in cseqInds:
+...   lens.append(len(dStepAct_allT['EMUP'][seq]))
+
+
+>>> lens
+[141, 145, 145, 145, 136, 68, 73, 68, 68, 141, 138, 141, 136, 136, 141, 136, 68, 141, 141, 136, 143, 141, 136, 136, 68, 136, 145, 136, 68, 145, 137, 68, 73, 145, 145, 145, 136, 145, 136, 73, 136, 68, 68, 136, 145, 145, 145, 73, 136, 73, 73, 136, 136, 68, 136, 137, 147, 136, 145, 73, 68, 68, 147, 73, 73, 73, 69, 145, 136, 136, 145, 145, 73, 136, 68, 68, 69, 145, 69, 138, 145, 136, 136, 143, 73, 68, 73, 70, 73, 136, 137, 136, 136, 145, 136, 68, 68, 69, 137, 138, 136, 68, 145, 136, 73, 147, 145, 68, 136, 73, 73, 145, 145, 136, 136, 136, 68, 73, 68, 145, 73, 141, 68, 138, 74, 145, 136, 68, 138, 73, 136, 68, 69, 136, 139, 136, 145, 73, 73, 73, 73, 73, 69, 145, 137, 136, 136, 73, 73, 145, 136, 136, 145, 137, 73, 68, 136, 68, 136, 68, 74, 68, 136, 136, 145, 73, 73, 143, 138, 141, 136, 136, 145, 69, 137, 73, 136, 138, 145, 139, 137, 68, 147, 137, 137, 136, 136, 147, 69, 0]
+>>> seq
+3366
+>>> np.unique(lens)
+array([  0,  68,  69,  70,  73,  74, 136, 137, 138, 139, 141, 143, 145,
+       147])
+
+
+.... should split analysis into 2 seqs.
+
+>>> cseqact_up = []
+>>> for seq in cseqInds:
+...   cseqact_up.append(dStepAct_allT['EMUP'][seq])
+
+ul = np.unique(lens)
+ul_inds = np.add(np.where(np.subtract(ul[1:],ul[0:-1])>10)[0],1)
+
+
+if ul[0]>0:
+  gls = [ul[0]]
+else:
+  gls = []
+for inds in ul_inds:
+  gls.append(ul[inds])
+
+cseqInds_d = []
+for l in gls:
+  c = []
+  for j in range(len(lens)):
+    if lens[j]>=l and lens[j]<l+9:
+      c.append(j)
+  cseqInds_d.append(c)  
+
+>>> cseqact_up1 = []
+>>> for i in cseqInds_d[0]:
+...   cseqact_up1.append(cseqact_up[i][0:gls[0]])
+... 
+>>> cseqact_up2 = []
+>>> for i in cseqInds_d[1]:
+...   cseqact_up2.append(cseqact_up[i][0:gls[1]])
+... 
+>>> cseqact_up1 = np.array(cseqact_up1)
+>>> cseqact_up2 = np.array(cseqact_up2)
+
+>>> cseqact_up1.shape
+(71, 68, 300) --> 71 repeats, 68 steps per repeat and 300 EMUP neurons for seq0
+>>> cseqact_up2.shape
+(81, 136, 300) --> 81 repeats, 136 steps per repeat and 300 EMUP neurons for seq0
+
+1. corr across repeats. (71,68x300)
+2. corr across neurons for each repeats. calculate 71 times (300,68). Is the distribution, median, IQR of corr evolving with learning?
+corr_neurons_repeats = np.zeros((71,300,300))
+
+>>> corr_neurons_repeats = np.zeros((71,300,300))
+>>> for reps in range(71):
+...   for i in range(300):
+...     for j in range(i+1,300):
+...       c,p = pearsonr(cseqact_up1[reps,:,i].flat,cseqact_up1[reps,:,j].flat)
+...       corr_neurons_repeats[reps,i,j] = c
+... 
+>>> corr_neurons_repeats2 = np.zeros((81,300,300))
+>>> for reps in range(81):
+...   for i in range(300):
+...     for j in range(i+1,300):
+...       c,p = pearsonr(cseqact_up2[reps,:,i].flat,cseqact_up2[reps,:,j].flat)
+...       corr_neurons_repeats2[reps,i,j] = c
+
+Because this data set is from during training, the correlations could evolve across repeats.
+more stable correlations and more varying correlations.
+
+... to look at distribution of correlations across time.
+
+>>> corr_neurons_repeats_fordist = []
+>>> for reps in range(71):
+...   cdist = []
+...   for i in range(300):
+...     for j in range(i+1,300):
+...       c,p=pearsonr(cseqact_up1[reps,:,i].flat,cseqact_up1[reps,:,j].flat)
+...       if np.isfinite(c):
+...         cdist.append(c)
+...   corr_neurons_repeats_fordist.append(cdist)
+
+>>> corr_neurons_repeats2_fordist = []
+>>> for reps in range(81):
+...   cdist = []
+...   for i in range(300):
+...     for j in range(i+1,300):
+...       c,p=pearsonr(cseqact_up2[reps,:,i].flat,cseqact_up2[reps,:,j].flat)
+...       if np.isfinite(c):
+...         cdist.append(c)
+...   corr_neurons_repeats2_fordist.append(cdist)
+
+>>> med_p25_p50_corrs_repeats1 = []
+>>> for i in range(len(corr_neurons_repeats_fordist)):
+...   med_p25_p50_corrs_repeats1.append([np.median(corr_neurons_repeats_fordist[i]),np.percentile(corr_neurons_repeats_fordist[i],25),np.percentile(corr_neurons_repeats_fordist[i],75)])
+
+>>> med_p25_p50_corrs_repeats1 = np.array(med_p25_p50_corrs_repeats1)
+
+
+>>> cseqact_rewards = []
+>>> for seq in cseqInds:
+...   cseqact_rewards.append(hitsMiss_allAT[seq][-1])
+
+>>> cseq_rewards_rep1 = np.array(cseqact_rewards)[cseqInds_d[0]]
+>>> cseq_rewards_rep2 = np.array(cseqact_rewards)[cseqInds_d[1]]
+
+
+
+----
+
+
+>>> cseqInds = lSimilarSeqs_allT[seqs2plot_allT[2]]
+>>> cseq_norm_act_up = norm_seq_act_up[cseqInds,:]
+>>> cseq_norm_act_down = norm_seq_act_down[cseqInds,:]
+
+
+------
+.... save median act
+>>> med_norm_act_up = np.zeros((len(seqs2plot_allT),300))
+>>> med_norm_act_down = np.zeros((len(seqs2plot_allT),300))
+>>> for i in range(len(seqs2plot_allT)):
+...   cseqInds=lSimilarSeqs_allT[seqs2plot_allT[i]]
+...   cseq_norm_act_up = norm_seq_act_up[cseqInds,:]
+...   cseq_norm_act_down = norm_seq_act_down[cseqInds,:]
+...   med_norm_act_up[i,:] = np.median(cseq_norm_act_up,0)
+...   med_norm_act_down[i,:] = np.median(cseq_norm_act_down,0)
+
+2,10,14,16,21,22,30,33,35,43,50,59,65,66,67,69,72,74,79,87,88,
+
+91,95
+----------------------------------------
+>>> mean_seq_act_up = np.nanmean(norm_seq_act_up,0)
+>>> std_seq_act_up = np.nanstd(norm_seq_act_up,0)
+>>> mean_seq_act_down = np.nanmean(norm_seq_act_down,0)
+>>> std_seq_act_down = np.nanstd(norm_seq_act_down,0)
+>>> inds_up = np.argsort(mean_seq_act_up)
+>>> inds_down = np.argsort(mean_seq_act_down)
+
+
+>>> median_seq_act_down = np.nanmedian(norm_seq_act_down,0)
+>>> median_seq_act_up = np.nanmedian(norm_seq_act_up,0)
+>>> p25_seq_act_up = np.percentile(norm_seq_act_up,25,0)
+>>> p75_seq_act_up = np.percentile(norm_seq_act_up,75,0)
+>>> p25_seq_act_down = np.percentile(norm_seq_act_down,25,0)
+>>> p75_seq_act_down = np.percentile(norm_seq_act_down,75,0)
+>>> inds_up = np.argsort(median_seq_act_up)
+>>> inds_down = np.argsort(median_seq_act_down)
+
+---------
+>>> s_cseq_act_up = []
+>>> s_cseq_act_down = []
+>>> f_cseq_act_down = []
+>>> f_cseq_act_up = []
+>>> for i in range(len(dCumAct_allT['EMUP'])):
+...   if hitsMiss_allT[i][-1]==1:
+...     s_cseq_act_up.append(dCumAct_allT['EMUP'][i])
+...     s_cseq_act_down.append(dCumAct_allT['EMDOWN'][i])
+...   elif hitsMiss_allT[i][-1]==-1:
+...     f_cseq_act_up.append(dCumAct_allT['EMUP'][i])
+...     f_cseq_act_down.append(dCumAct_allT['EMDOWN'][i])
+
+>>> f_cseq_act_up = np.array(f_cseq_act_up)
+>>> f_cseq_act_down = np.array(f_cseq_act_down)
+>>> s_cseq_act_down = np.array(s_cseq_act_down)
+>>> s_cseq_act_up = np.array(s_cseq_act_up)
+
 
 -- run simFullHA with another modifications (Feb5)
 
@@ -15662,7 +16836,176 @@ RL: AMPA:
   RLlenanti: 50
   RLwindhebb: 25 (reduced from 50)
 (base) hanwar@cycle:~/GamesProject/SMARTAgent$ python multistepSim.py simFullHA.json 30 20 21feb5_RL3_B0_cycle_multi
+...completed on Feb11,2021.....
 
+>>> lfnT = ['21feb5_cycle_RL3_B0__step_0_',
+            '21feb5_cycle_RL3_B0__step_1_',
+            '21feb5_cycle_RL3_B0__step_2_',
+            '21feb5_cycle_RL3_B0__step_3_',
+            '21feb5_cycle_RL3_B0__step_4_',
+            '21feb5_cycle_RL3_B0__step_5_',
+            '21feb5_cycle_RL3_B0__step_6_',
+            '21feb5_cycle_RL3_B0__step_7_',
+            '21feb5_cycle_RL3_B0__step_8_',
+            '21feb5_cycle_RL3_B0__step_9_',
+            '21feb5_cycle_RL3_B0__step_10_',
+            '21feb5_cycle_RL3_B0__step_11_',
+            '21feb5_cycle_RL3_B0__step_12_',
+            '21feb5_cycle_RL3_B0__step_13_',
+            '21feb5_cycle_RL3_B0__step_14_',
+            '21feb5_cycle_RL3_B0__step_15_',
+            '21feb5_cycle_RL3_B0__step_16_',
+            '21feb5_cycle_RL3_B0__step_17_',
+            '21feb5_cycle_RL3_B0__step_18_',
+            '21feb5_cycle_RL3_B0__step_19_']
+
+>>> lpdaT = getindivactionreward(lfnT)
+>>> csm = cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+>>> lclr = [csm.to_rgba(float(i)/len(lpdaT)) for i in range(len(lpdaT))]
+>>> plotComparePerf(lpdaT,lclr,yl=(0,2),lleg=lfnT,skipscore=True,skipfollow=True)
+.... saved as 21feb11_21feb5_cycle_RL3_B0_allsteps_comparePerf.png
+
+>>> plotComparePerf(lpdaT,lclr,yl=(0,2),lleg=['step0','step1','step2','step3','step4','step5','step6','step7','step8','step9','step10','step11','step12','step13','step14','step15','step16','step17','step18','step19'],skipscore=True,skipfollow=True)
+.... saved as 21feb11_21feb5_cycle_RL3_B0_allsteps_comparePerf2.png
+
+>>> pdacT = getconcatactionreward(lfnT)
+>>> plotPerf(pdacT)
+.... saved as 21feb11_21feb5_cycle_RL3_B0_allsteps_cumPerf.png
+
+>>> II_allT = getconcatactioninputs(lfnT)
+loading input images from data/21feb5_cycle_RL3_B0__step_0_InputImages.txt
+loading input images from data/21feb5_cycle_RL3_B0__step_1_InputImages.txt
+loading input images from data/21feb5_cycle_RL3_B0__step_2_InputImages.txt
+loading input images from data/21feb5_cycle_RL3_B0__step_3_InputImages.txt
+loading input images from data/21feb5_cycle_RL3_B0__step_4_InputImages.txt
+loading input images from data/21feb5_cycle_RL3_B0__step_5_InputImages.txt
+loading input images from data/21feb5_cycle_RL3_B0__step_6_InputImages.txt
+loading input images from data/21feb5_cycle_RL3_B0__step_7_InputImages.txt
+loading input images from data/21feb5_cycle_RL3_B0__step_8_InputImages.txt
+loading input images from data/21feb5_cycle_RL3_B0__step_9_InputImages.txt
+loading input images from data/21feb5_cycle_RL3_B0__step_10_InputImages.txt
+loading input images from data/21feb5_cycle_RL3_B0__step_11_InputImages.txt
+loading input images from data/21feb5_cycle_RL3_B0__step_12_InputImages.txt
+loading input images from data/21feb5_cycle_RL3_B0__step_13_InputImages.txt
+loading input images from data/21feb5_cycle_RL3_B0__step_14_InputImages.txt
+loading input images from data/21feb5_cycle_RL3_B0__step_15_InputImages.txt
+loading input images from data/21feb5_cycle_RL3_B0__step_16_InputImages.txt
+loading input images from data/21feb5_cycle_RL3_B0__step_17_InputImages.txt
+loading input images from data/21feb5_cycle_RL3_B0__step_18_InputImages.txt
+loading input images from data/21feb5_cycle_RL3_B0__step_19_InputImages.txt
+
+>>> lSimilarSeqs_allT, seqs2plot_allT, seqsBegs_allT, seqsEnds_allT = breakdownPerformance(II_allT,pdacT,cend=69,sthresh=5,nbframeThresh=5)
+
+>>> len(seqs2plot_allT)
+87
+
+>>> dspkID_allT, dspkT_allT, totalDur_allT = getconcatactivity(lfnT,lpop=['EA','EA2','EMUP','EMDOWN'])
+>>> dact1D_allT = getdActMap1D(totalDur_allT, tstepPerAction, dspkT_allT, dspkID_allT, dnumc, dstartidx, lpop = ['EA','EA2','EMUP','EMDOWN'])
+
+>>> dCumAct_allT, dStepAct_allT = getCumActivityMapForInput(seqsBegs_allT, seqsEnds_allT,dact1D_allT,lpop=['EA','EA2','EMUP','EMDOWN'])
+>>> rewards_allT, hitsMiss_allT = getRewardsPerSeq(pdacT,seqsBegs_allT,seqsEnds_allT)
+
+
+>>> plotSeqPerf(lSimilarSeqs_allT,seqs2plot_allT,seqsBegs_allT,seqsEnds_allT,II_allT,dCumAct_allT,hitsMiss_allT,0,plotact=False)
+saved as 21feb11_21feb5_cycle_RL3_B0_seq0
+... similarly save all seqs....
+
+HOW TO EVALUATE LEARNING PERFORMANCE
+1. median value of Hits/Miss for all sequences.
+2. peak value of Hits/Miss for all sequences.
+3. Nb of seqs to peak
+4. ratio of Nb of seqs to peak / total number of repeats. 
+
+# find some stats to summerize learning performance.
+>>> lperf_T = []
+>>> for i in range(len(seqs2plot_allT)):
+...   cseqInds = lSimilarSeqs_allT[seqs2plot_allT[i]]
+...   cHitsMiss = []
+...   for j in range(len(cseqInds)):
+...     cHitsMiss.append(hitsMiss_allT[cseqInds[j]][-1])
+...   cHitsMiss = np.array(cHitsMiss)
+...   hits = np.where(cHitsMiss==1,cHitsMiss,0)
+...   miss = np.where(cHitsMiss==-1,-1*cHitsMiss,0)
+...   perf = np.divide(np.cumsum(hits),np.cumsum(miss))
+...   l = len(perf)
+...   if len(np.where(np.isfinite(perf))[0])>0:
+...     f0 = np.where(np.isfinite(perf))[0][0]
+...     f1 = np.where(np.isfinite(perf))[0][-1]
+...     perf = perf[f0:f1+1]
+...   lperf_T.append([np.median(perf),np.amax(perf),np.where(perf==np.amax(perf))[0][0],l])
+
+lperf_T = np.array(lperf_T)
+
+inds = np.argsort(lperf_T[:,1])
+
+>>> plt.plot(lperf_T[inds,0],'b-o')
+[<matplotlib.lines.Line2D object at 0x7f34305f8210>]
+>>> plt.plot(lperf_T[inds,1],'r-o')
+[<matplotlib.lines.Line2D object at 0x7f342efe77d0>]
+>>> plt.legend(('median','max'))
+<matplotlib.legend.Legend object at 0x7f33cfd0ef10>
+>>> xlabel('Input Sequences')
+Text(0.5,19.5222,'Input Sequences')
+>>> ylabel('Hit/Miss')
+Text(43.4722,0.5,'Hit/Miss')
+
+saved as 21feb11_21feb5_cycle_RL3_B0_learningPerformance.png
+
+>>> plt.plot(lperf_T[inds,2],'r-o')
+[<matplotlib.lines.Line2D object at 0x7f3455778850>]
+>>> xlabel('Input Sequences')
+Text(0.5,19.5222,'Input Sequences')
+>>> ylabel('# of repeats for max. Hit/Miss')
+Text(32.9722,0.5,'# of repeats for max. Hit/Miss')
+
+saved as 21feb11_21feb5_cycle_RL3_B0_LearningPerformancePeaks.png
+
+>>> plt.plot(np.divide(lperf_T[inds,2],lperf_T[inds,3]),'r-o')
+[<matplotlib.lines.Line2D object at 0x7f342bf56450>]
+>>> xlabel('Input Sequences')
+Text(0.5,19.5222,'Input Sequences')
+>>> ylabel('relative # of repeats for max. Hit/Miss')
+Text(38.3472,0.5,'relative # of repeats for max. Hit/Miss')
+
+saved as 21feb11_21feb5_cycle_RL3_B0_LearningPerformancePeaks2.png
+
+-------------
+
+-- run simFullHA with a different seed.....
+"name": "21feb16_cycle_RL3_B1_",
+change random.seed(1234) in sim.py to random.seed(4321)
+
+(base) hanwar@cycle:~/GamesProject/SMARTAgent$ python multistepSim.py simFullHA.json 40 20 21feb16_RL3_B1_cycle_multi
+
+
+
+-- run simFullHA with a different seed.....
+"name": "21feb16_cycle_RL3_B2_",
+change random.seed(4321) to random.seed(2222)
+(base) hanwar@cycle:~/GamesProject/SMARTAgent$ python multistepSim.py simFullHA.json 30 20 21feb16_RL3_B2_cycle_multi (start on Feb22,2021)
+
+
+-- run 21feb16_falcor_RL3_B1__step_0_ on falcor (Feb22,2021) 
+----------------
+
+-- run simFullHA with another modifications (Feb5)--actually started on Feb12,2021
+
+ "name": "21feb5_cycle_RL3_C0_"
+   RLlenhebb: 25
+  RLlenanti: 25
+  RLwindhebb: 25 (reduced from 50)
+
+(base) hanwar@cycle:~/GamesProject/SMARTAgent$ python multistepSim.py simFullHA.json 40 20 21feb5_RL3_C0_cycle_multi
+...started on Feb12,2021....
+
+
+--analyzing on Feb16,2021
+
+python -i simdat.py backupcfg/21feb5_cycle_RL3_C0__step_0_sim.json 
+
+>>> lfnT = ['21feb5_cycle_RL3_C0__step_0_','21feb5_cycle_RL3_C0__step_1_','21feb5_cycle_RL3_C0__step_2_','21feb5_cycle_RL3_C0__step_3_','21feb5_cycle_RL3_C0__step_4_','21feb5_cycle_RL3_C0__step_5_','21feb5_cycle_RL3_C0__step_6_','21feb5_cycle_RL3_C0__step_7_','21feb5_cycle_RL3_C0__step_8_','21feb5_cycle_RL3_C0__step_9_','21feb5_cycle_RL3_C0__step_10_','21feb5_cycle_RL3_C0__step_11_','21feb5_cycle_RL3_C0__step_12_','21feb5_cycle_RL3_C0__step_13_','21feb5_cycle_RL3_C0__step_14_','21feb5_cycle_RL3_C0__step_15_','21feb5_cycle_RL3_C0__step_16_','21feb5_cycle_RL3_C0__step_17_','21feb5_cycle_RL3_C0__step_18_','21feb5_cycle_RL3_C0__step_19_']
+
+saved as 21feb16_21feb5_cycle_RL3_C0_allsteps_comparePerf.png .... NOT GOOD...should not pursue....
 
 -- Repeating the analysis (Feb10,2021)
 
@@ -15691,3 +17034,257 @@ loading input images from data/21jan21_TARG4_gcp_RLhebbwt_0_p5_InputImages.txt
 >>> dCumAct_allBT, dStepAct_allBT = getCumActivityMapForInput(seqsBegs_allBT, seqsEnds_allBT, dact1D_allBT, lpop = ['EA','EA2','EMUP','EMDOWN'])
 
 >>> rewards_allBT, hitsMiss_allBT = getRewardsPerSeq(actrewards_allBT, seqsBegs_allBT, seqsEnds_allBT)
+
+plot and save all input seqs with 5 or more repeats......
+an example:
+>>> plotSeqPerf(lSimilarSeqs_allBT,seqs2plot_allBT,seqsBegs_allBT,seqsEnds_allBT, II_allBT,dCumAct_allBT,hitsMiss_allBT,22,plotact=False)
+
+
+>>> all_hits_miss_BT = []
+>>> for i in range(len(seqs2plot_allBT)):
+...   cseqInds = lSimilarSeqs_allBT[seqs2plot_allBT[i]]
+...   cHitsMiss = []
+...   cseq_cumact_up = np.array(dCumAct_allBT['EMUP'])[cseqInds,:]
+...   goodInds = np.where(cseq_cumact_up[:,0]<np.mean(cseq_cumact_up[:,0])+2*np.std(cseq_cumact_up[:,0]))[0]
+...   if len(goodInds)==0:
+...     goodInds = np.where(np.sum(cseq_cumact_up,1)<np.mean(np.sum(cseq_cumact_up,1))+2*np.std(np.sum(cseq_cumact_up,1)))[0]
+...   for j in range(len(cseqInds)):
+...     if j in goodInds:
+...       cHitsMiss.append(hitsMiss_allBT[cseqInds[j]][-1])
+...   cHitsMiss = np.array(cHitsMiss)
+...   hits = np.where(cHitsMiss==1,cHitsMiss,0)
+...   miss = np.where(cHitsMiss==-1,-1*cHitsMiss,0)
+...   all_hits_miss_BT.append([np.cumsum(hits)[-1],np.cumsum(miss)[-1]])
+
+>>> all_hits_miss_BT = np.array(all_hits_miss_BT)
+>>> pHit  = np.divide(all_hits_miss_BT[:,0],np.sum(all_hits_miss_BT,1))
+>>> rHit = np.divide(all_hits_miss_BT[:,0],all_hits_miss_BT[:,1])
+
+....saved plt.hist(pHit) as 21feb10_hist1_BT.png
+
+-- include this in the code of 
+def gethitmissallseqs(lSimilarSeqs,seqs2plot,dCumAct,hitsMiss):
+
+...   if len(goodInds)==0:
+...     goodInds = np.where(np.sum(cseq_cumact_up,1)<np.mean(np.sum(cseq_cumact_up,1))+2*np.std(np.sum(cseq_cumact_up,1)))[0]
+
+
+scp hanwar@10.76.252.198:/home/hanwar/GamesProject/SMARTAgent/21feb10* figs_cycle_21Jan8/.
+
+... now look at the activity of neurons when there performance is great (case 1) seqNB = [8], [9,11,14,15]
+
+
+
+... now look at the activity of neurons when there performance is worse (case 2) seqNBs=[3,10,21]
+
+>>> lSimilarSeqs_allBT[seqs2plot_allBT[3]]
+[3, 10, 31, 80, 87, 210, 238, 241, 316, 391, 420, 443]
+>>> seq3Inds = lSimilarSeqs_allBT[seqs2plot_allBT[3]]
+
+>>> seq3_cumact_ea = np.array(dCumAct_allBT['EA'])[seq3Inds,:]
+>>> seq3_cumact_ea2 = np.array(dCumAct_allBT['EA2'])[seq3Inds,:]
+>>> seq3_cumact_up = np.array(dCumAct_allBT['EMUP'])[seq3Inds,:]
+>>> seq3_cumact_down = np.array(dCumAct_allBT['EMDOWN'])[seq3Inds,:]
+
+
+# load performance after training for repeated positions
+>>> lfnAT0
+['21jan14_21jan6_TARG4_gcp__step_0_RLhebbwt_0_', 
+  '21jan20_21jan6_TARG4_gcp__step_0_RLhebbwt_0_p1_', 
+  '21jan20_21jan6_TARG4_gcp__step_0_RLhebbwt_0_p2_', 
+  '21jan20_21jan6_TARG4_gcp__step_0_RLhebbwt_0_p3_', 
+  '21jan20_21jan6_TARG4_gcp__step_0_RLhebbwt_0_p4_', 
+  '21jan20_21jan6_TARG4_gcp__step_0_RLhebbwt_0_p5_']
+
+>>> II_allAT0 = getconcatactioninputs(lfnAT0)
+loading input images from data/21jan14_21jan6_TARG4_gcp__step_0_RLhebbwt_0_InputImages.txt
+loading input images from data/21jan20_21jan6_TARG4_gcp__step_0_RLhebbwt_0_p1_InputImages.txt
+loading input images from data/21jan20_21jan6_TARG4_gcp__step_0_RLhebbwt_0_p2_InputImages.txt
+loading input images from data/21jan20_21jan6_TARG4_gcp__step_0_RLhebbwt_0_p3_InputImages.txt
+loading input images from data/21jan20_21jan6_TARG4_gcp__step_0_RLhebbwt_0_p4_InputImages.txt
+loading input images from data/21jan20_21jan6_TARG4_gcp__step_0_RLhebbwt_0_p5_InputImages.txt
+
+>>> actrewards_allAT0 = getconcatactionreward(lfnAT0)
+
+>>> lSimilarSeqs_allAT0, seqs2plot_allAT0, seqsBegs_allAT0, seqsEnds_allAT0 = breakdownPerformance(II_allAT0, actrewards_allAT0,cend=69,sthresh=5,nbframeThresh=5)
+
+>>> dspkID_allAT0, dspkT_allAT0, totalDur_allAT0 = getconcatactivity(lfnAT0,lpop=['EA','EA2','EMUP','EMDOWN'])
+
+>>> dact1D_allAT0 = getdActMap1D(totalDur_allAT0, tstepPerAction,dspkT_allAT0,dspkID_allAT0,dnumc,dstartidx,lpop=['EA','EA2','EMUP','EMDOWN'])
+
+>>> dCumAct_allAT0, dStepAct_allAT0 = getCumActivityMapForInput(seqsBegs_allAT0, seqsEnds_allAT0,dact1D_allAT0,lpop=['EA','EA2','EMUP','EMDOWN'])
+
+>>> rewards_allAT0, hitsMiss_allAT0 = getRewardsPerSeq(actrewards_allAT0, seqsBegs_allAT0, seqsEnds_allAT0)
+
+
+>>> all_hits_miss_AT0 = []
+>>> for i in range(len(seqs2plot_allAT0)):
+...   cseqInds = lSimilarSeqs_allAT0[seqs2plot_allAT0[i]]
+...   cHitsMiss = []
+...   cseq_cumact_up = np.array(dCumAct_allAT0['EMUP'])[cseqInds,:]
+...   goodInds = np.where(cseq_cumact_up[:,0]<np.mean(cseq_cumact_up[:,0])+2*np.std(cseq_cumact_up[:,0]))[0]
+...   if len(goodInds)==0:
+...     goodInds = np.where(np.sum(cseq_cumact_up,1)<np.mean(np.sum(cseq_cumact_up,1))+2*np.std(np.sum(cseq_cumact_up,1)))[0]
+...   for j in range(len(cseqInds)):
+...     if j in goodInds:
+...       cHitsMiss.append(hitsMiss_allAT0[cseqInds[j]][-1])
+...   cHitsMiss = np.array(cHitsMiss)
+...   hits = np.where(cHitsMiss==1,cHitsMiss,0)
+...   miss = np.where(cHitsMiss==-1,-1*cHitsMiss,0)
+...   all_hits_miss_AT0.append([np.cumsum(hits)[-1],np.cumsum(miss)[-1]])
+
+>>> all_hits_miss_AT0 = np.array(all_hits_miss_AT0)
+>>> pHit_AT0 = np.divide(all_hits_miss_AT0[:,0],np.sum(all_hits_miss_AT0,1))
+>>> rHit_AT0 = np.divide(all_hits_miss_AT0[:,0],all_hits_miss_AT0[:,1])
+
+
+>>> lfnAT21
+['21jan11_TARG4_gcp__step_1_RLhebbwt_0_', 
+  '21jan19_21jan11_TARG4_gcp__step_1_RLhebbwt_0_p1_', 
+  '21jan19_21jan11_TARG4_gcp__step_1_RLhebbwt_0_p2_', 
+  '21jan19_21jan11_TARG4_gcp__step_1_RLhebbwt_0_p3_', 
+  '21jan19_21jan11_TARG4_gcp__step_1_RLhebbwt_0_p4_', 
+  '21jan19_21jan11_TARG4_gcp__step_1_RLhebbwt_0_p5_']
+
+>>> II_allAT21 = getconcatactioninputs(lfnAT21)
+loading input images from data/21jan11_TARG4_gcp__step_1_RLhebbwt_0_InputImages.txt
+loading input images from data/21jan19_21jan11_TARG4_gcp__step_1_RLhebbwt_0_p1_InputImages.txt
+loading input images from data/21jan19_21jan11_TARG4_gcp__step_1_RLhebbwt_0_p2_InputImages.txt
+loading input images from data/21jan19_21jan11_TARG4_gcp__step_1_RLhebbwt_0_p3_InputImages.txt
+loading input images from data/21jan19_21jan11_TARG4_gcp__step_1_RLhebbwt_0_p4_InputImages.txt
+loading input images from data/21jan19_21jan11_TARG4_gcp__step_1_RLhebbwt_0_p5_InputImages.txt
+
+>>> actrewards_allAT21 = getconcatactionreward(lfnAT21)
+
+>>> lSimilarSeqs_allAT21, seqs2plot_allAT21, seqsBegs_allAT21, seqsEnds_allAT21 = breakdownPerformance(II_allAT21, actrewards_allAT21,cend=69,sthresh=5,nbframeThresh=5)
+
+>>> dspkID_allAT21, dspkT_allAT21, totalDur_allAT21 = getconcatactivity(lfnAT21,lpop=['EA','EA2','EMUP','EMDOWN'])
+
+>>> dact1D_allAT21 = getdActMap1D(totalDur_allAT21, tstepPerAction,dspkT_allAT21,dspkID_allAT21,dnumc,dstartidx,lpop=['EA','EA2','EMUP','EMDOWN'])
+
+>>> dCumAct_allAT21, dStepAct_allAT21 = getCumActivityMapForInput(seqsBegs_allAT21, seqsEnds_allAT21,dact1D_allAT21,lpop=['EA','EA2','EMUP','EMDOWN'])
+
+>>> rewards_allAT21, hitsMiss_allAT21 = getRewardsPerSeq(actrewards_allAT21, seqsBegs_allAT21, seqsEnds_allAT21)
+
+>>> all_hits_miss_AT21 = []
+>>> for i in range(len(seqs2plot_allAT21)):
+...   cseqInds = lSimilarSeqs_allAT21[seqs2plot_allAT21[i]]
+...   cHitsMiss = []
+...   cseq_cumact_up = np.array(dCumAct_allAT21['EMUP'])[cseqInds,:]
+...   goodInds = np.where(cseq_cumact_up[:,0]<np.mean(cseq_cumact_up[:,0])+2*np.std(cseq_cumact_up[:,0]))[0]
+...   if len(goodInds)==0:
+...     goodInds = np.where(np.sum(cseq_cumact_up,1)<np.mean(np.sum(cseq_cumact_up,1))+2*np.std(np.sum(cseq_cumact_up,1)))[0]
+...   for j in range(len(cseqInds)):
+...     if j in goodInds:
+...       cHitsMiss.append(hitsMiss_allAT21[cseqInds[j]][-1])
+...   cHitsMiss = np.array(cHitsMiss)
+...   hits = np.where(cHitsMiss==1,cHitsMiss,0)
+...   miss = np.where(cHitsMiss==-1,-1*cHitsMiss,0)
+...   all_hits_miss_AT21.append([np.cumsum(hits)[-1],np.cumsum(miss)[-1]])
+
+---
+
+>>> lfnT
+['21jan6_TARG4_gcp__step_0_', '21jan6_TARG4_gcp__step_1_', '21jan6_TARG4_gcp__step_2_', '21jan6_TARG4_gcp__step_3_', '21jan6_TARG4_gcp__step_4_', '21jan6_TARG4_gcp__step_5_', '21jan6_TARG4_gcp__step_6_', '21jan6_TARG4_gcp__step_7_', '21jan6_TARG4_gcp__step_8_', '21jan6_TARG4_gcp__step_9_', '21jan6_TARG4_gcp__step_10_', '21jan6_TARG4_gcp__step_11_', '21jan6_TARG4_gcp__step_12_', '21jan6_TARG4_gcp__step_13_', '21jan6_TARG4_gcp__step_14_', '21jan6_TARG4_gcp__step_15_', '21jan6_TARG4_gcp__step_16_', '21jan6_TARG4_gcp__step_17_', '21jan6_TARG4_gcp__step_18_', '21jan6_TARG4_gcp__step_19_', '21jan11_TARG4_gcp__step_0_', '21jan11_TARG4_gcp__step_1_', '21jan11_TARG4_gcp__step_2_']
+
+>>> II_allT = getconcatactioninputs(lfnT)
+loading input images from data/21jan6_TARG4_gcp__step_0_InputImages.txt
+loading input images from data/21jan6_TARG4_gcp__step_1_InputImages.txt
+loading input images from data/21jan6_TARG4_gcp__step_2_InputImages.txt
+loading input images from data/21jan6_TARG4_gcp__step_3_InputImages.txt
+loading input images from data/21jan6_TARG4_gcp__step_4_InputImages.txt
+loading input images from data/21jan6_TARG4_gcp__step_5_InputImages.txt
+loading input images from data/21jan6_TARG4_gcp__step_6_InputImages.txt
+loading input images from data/21jan6_TARG4_gcp__step_7_InputImages.txt
+loading input images from data/21jan6_TARG4_gcp__step_8_InputImages.txt
+loading input images from data/21jan6_TARG4_gcp__step_9_InputImages.txt
+loading input images from data/21jan6_TARG4_gcp__step_10_InputImages.txt
+loading input images from data/21jan6_TARG4_gcp__step_11_InputImages.txt
+loading input images from data/21jan6_TARG4_gcp__step_12_InputImages.txt
+loading input images from data/21jan6_TARG4_gcp__step_13_InputImages.txt
+loading input images from data/21jan6_TARG4_gcp__step_14_InputImages.txt
+loading input images from data/21jan6_TARG4_gcp__step_15_InputImages.txt
+loading input images from data/21jan6_TARG4_gcp__step_16_InputImages.txt
+loading input images from data/21jan6_TARG4_gcp__step_17_InputImages.txt
+loading input images from data/21jan6_TARG4_gcp__step_18_InputImages.txt
+loading input images from data/21jan6_TARG4_gcp__step_19_InputImages.txt
+loading input images from data/21jan11_TARG4_gcp__step_0_InputImages.txt
+loading input images from data/21jan11_TARG4_gcp__step_1_InputImages.txt
+loading input images from data/21jan11_TARG4_gcp__step_2_InputImages.txt
+>>> actrewards_allT = getconcatactionreward(lfn
+lfnBT  lfnT   
+>>> actrewards_allT = getconcatactionreward(lfnT)
+
+>>> lSimilarSeqs_allT, seqs2plot_allT, seqsBegs_allT, seqsEnds_allT = breakdownPerformance(II_allT,actrewards_allT, cend=69,sthresh=5,nbframeThresh=5)
+
+>>> dspkID_allT, dspkT_allT, totalDur_allT = getconcatactivity(lfnT,lpop = ['EA','EA2','EMUP','EMDOWN'])
+>>> dact1D_allT = getdActMap1D(totalDur_allT,tstepPerAction,dspkT_allT,dspkID_allT,dnumc,dstartidx,lpop=['EA','EA2','EMUP','EMDOWN'])
+>>> dCumAct_allT, dStepAct_allT = getCumActivityMapForInput(seqsBegs_allT, seqsEnds_allT,dact1D_allT, lpop = ['EA','EA2','EMUP','EMDOWN'])
+>>> rewards_allT, hitsMiss_allT = getRewardsPerSeq(actrewards_allT, seqsBegs_allT, seqsEnds_allT)
+
+
+# load performance after training for repeated positions
+>>> lfnAT0
+['21jan14_21jan6_TARG4_gcp__step_0_RLhebbwt_0_', 
+  '21jan20_21jan6_TARG4_gcp__step_0_RLhebbwt_0_p1_', 
+  '21jan20_21jan6_TARG4_gcp__step_0_RLhebbwt_0_p2_', 
+  '21jan20_21jan6_TARG4_gcp__step_0_RLhebbwt_0_p3_', 
+  '21jan20_21jan6_TARG4_gcp__step_0_RLhebbwt_0_p4_', 
+  '21jan20_21jan6_TARG4_gcp__step_0_RLhebbwt_0_p5_']
+
+>>> II_allAT0 = getconcatactioninputs(lfnAT0)
+loading input images from data/21jan14_21jan6_TARG4_gcp__step_0_RLhebbwt_0_InputImages.txt
+loading input images from data/21jan20_21jan6_TARG4_gcp__step_0_RLhebbwt_0_p1_InputImages.txt
+loading input images from data/21jan20_21jan6_TARG4_gcp__step_0_RLhebbwt_0_p2_InputImages.txt
+loading input images from data/21jan20_21jan6_TARG4_gcp__step_0_RLhebbwt_0_p3_InputImages.txt
+loading input images from data/21jan20_21jan6_TARG4_gcp__step_0_RLhebbwt_0_p4_InputImages.txt
+loading input images from data/21jan20_21jan6_TARG4_gcp__step_0_RLhebbwt_0_p5_InputImages.txt
+
+>>> lfnAT21
+['21jan11_TARG4_gcp__step_1_RLhebbwt_0_', 
+  '21jan19_21jan11_TARG4_gcp__step_1_RLhebbwt_0_p1_', 
+  '21jan19_21jan11_TARG4_gcp__step_1_RLhebbwt_0_p2_', 
+  '21jan19_21jan11_TARG4_gcp__step_1_RLhebbwt_0_p3_', 
+  '21jan19_21jan11_TARG4_gcp__step_1_RLhebbwt_0_p4_', 
+  '21jan19_21jan11_TARG4_gcp__step_1_RLhebbwt_0_p5_']
+
+>>> II_allAT21 = getconcatactioninputs(lfnAT21)
+loading input images from data/21jan11_TARG4_gcp__step_1_RLhebbwt_0_InputImages.txt
+loading input images from data/21jan19_21jan11_TARG4_gcp__step_1_RLhebbwt_0_p1_InputImages.txt
+loading input images from data/21jan19_21jan11_TARG4_gcp__step_1_RLhebbwt_0_p2_InputImages.txt
+loading input images from data/21jan19_21jan11_TARG4_gcp__step_1_RLhebbwt_0_p3_InputImages.txt
+loading input images from data/21jan19_21jan11_TARG4_gcp__step_1_RLhebbwt_0_p4_InputImages.txt
+loading input images from data/21jan19_21jan11_TARG4_gcp__step_1_RLhebbwt_0_p5_InputImages.txt
+
+
+--------------------------------------------------------------------
+-- BT should be compared with AT.
+-- T (during training), should see if perf increases for individual patterns. 
+    How many increase (remember), 
+    how many decrease (forget)
+    how many remain unchanged (no affect)
+    how many random etc...
+
+
+
+for overlap question was thinking maybe can look at which neurons are active during specific sequences
+2:17
+is it a consistent subset of neurons on each sequence, how many neurons overlap between sequences that work well vs those that don't (for latter might predict more overlap in neurons so representation can't be learned)
+2:17
+some variation on that kind of idea might work
+
+--------------------------------------------------------------------
+POTENTIAL METHOD FOR MEASURE SIMILARITY IN ACTIVITY....
+
+-- A new similarity measure for spike trains: Sensitivity to bursts and periods of inhibition. 
+David Lyttle and Jean-Marc Fellous
+J Neurosci Methods 2011; 199(2): 296-309
+
+how similar a neuron responds to repeated presentation of inputs?
+how populations of neurons work together for repeated presentation of inputs?
+
+classically, cross-correlation coefficient at zero lag or entire cross correlogram....
+
+lets take x and y 2 spike trains in time interval [t1,t2]
+
+
