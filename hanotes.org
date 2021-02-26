@@ -17318,3 +17318,6 @@ lets take x and y 2 spike trains in time interval [t1,t2]
 
 # plotSeqPerf(lSimilarSeqs_allT,seqs2plot_allT,seqsBegs_allT,seqsEnds_allT,II_allT,dCumAct_allT,hitsMiss_allT,0,plotact=False)
 # saved as 21feb12_21feb5_cycle_RL3_A0_seq0
+
+>>> summarizeLearningPerf(lSimilarSeqs_allT,seqs2plot_allT,hitsMiss_allT)
+saved as 21feb26_21jan6_TARG4_gcp__22steps_learningPerformanceSummary.png

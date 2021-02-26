@@ -1755,7 +1755,7 @@ def showMostActiveMNeuronsPerSeq(lSimilarSeqs, seqs2plot, dCumAct, topM):
   norm_seq_act_up = []
   norm_seq_act_down = []
   NB_motorneurons = 300 # 300 EMUP and 300 EMDOWN
-  NBthresh = NB_motorneurons - (0.01*topM*NB_motorneurons)
+  NBthresh = int(NB_motorneurons - (0.01*topM*NB_motorneurons))
   for i in range(len(dCumAct['EMUP'])):
     cact_up = dCumAct['EMUP'][i] 
     # total activity of 300 neurons for each seq
