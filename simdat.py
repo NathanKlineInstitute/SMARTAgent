@@ -1778,8 +1778,8 @@ def showMostActiveMNeuronsPerSeq(lSimilarSeqs, seqs2plot, dCumAct, topM):
   for i in range(norm_seq_act_up.shape[0]):
     sorted_ids_actup[i,:]=np.argsort(norm_seq_act_up[i,:])
     sorted_ids_actdown[i,:]=np.argsort(norm_seq_act_down[i,:])
-  hist_topM_allseqs_actup_allrepeats = np.zeros((300,len(seqs2plot_allT)))
-  hist_topM_allseqs_actdown_allrepeats = np.zeros((300,len(seqs2plot_allT)))
+  hist_topM_allseqs_actup_allrepeats = np.zeros((300,len(seqs2plot)))
+  hist_topM_allseqs_actdown_allrepeats = np.zeros((300,len(seqs2plot)))
   for seqInds in range(len(seqs2plot)):
     cseqInds = lSimilarSeqs[seqs2plot[seqInds]]
     cseq_sorted_ids_actup = sorted_ids_actup[cseqInds,:]
