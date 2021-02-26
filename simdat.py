@@ -1743,7 +1743,7 @@ def summarizeLearningPerf(lSimilarSeqs,seqs2plot,hitsMiss):
   lax[0].plot(lperf_T[inds,1],'r-o')
   lax[0].legend(('median','max'))
   lax[0].set_xlabel('Input Sequences')
-  lax[0].ylabel('Hit/Miss')
+  lax[0].set_ylabel('Hit/Miss')
   lax[1].plot(lperf_T[inds,2],'r-o')
   lax[1].set_xlabel('Input Sequences')
   lax[1].set_ylabel('# of repeats for max. Hit/Miss')

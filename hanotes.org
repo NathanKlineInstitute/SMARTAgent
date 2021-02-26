@@ -17288,3 +17288,33 @@ classically, cross-correlation coefficient at zero lag or entire cross correlogr
 lets take x and y 2 spike trains in time interval [t1,t2]
 
 
+* 2011feb26
+
+-- analyzing sam's model during training (was trained on gcp).
+
+# list of files during training.
+>>> lfnT
+['21jan6_TARG4_gcp__step_0_', '21jan6_TARG4_gcp__step_1_', '21jan6_TARG4_gcp__step_2_', '21jan6_TARG4_gcp__step_3_', '21jan6_TARG4_gcp__step_4_', '21jan6_TARG4_gcp__step_5_', '21jan6_TARG4_gcp__step_6_', '21jan6_TARG4_gcp__step_7_', '21jan6_TARG4_gcp__step_8_', '21jan6_TARG4_gcp__step_9_', '21jan6_TARG4_gcp__step_10_', '21jan6_TARG4_gcp__step_11_', '21jan6_TARG4_gcp__step_12_', '21jan6_TARG4_gcp__step_13_', '21jan6_TARG4_gcp__step_14_', '21jan6_TARG4_gcp__step_15_', '21jan6_TARG4_gcp__step_16_', '21jan6_TARG4_gcp__step_17_', '21jan6_TARG4_gcp__step_18_', '21jan6_TARG4_gcp__step_19_', '21jan11_TARG4_gcp__step_0_', '21jan11_TARG4_gcp__step_1_', '21jan11_TARG4_gcp__step_2_']
+
+# load action rewards concatenated.
+>>> actrewards_allT = getconcatactionreward(lfnT)
+
+# load all inputs
+>>> II_allT = getconcatactioninputs(lfnT)
+
+# breakdown performance based on input sequences
+>>> lSimilarSeqs_allT, seqs2plot_allT, seqsBegs_allT, seqsEnds_allT = breakdownPerformance(II_allT,actrewards_allT,cend=69,sthresh=5,nbframeThresh=5)
+
+>>> len(seqs2plot_allT)
+46
+
+# concatenate spkIDs and spkTs for all steps for EMUP and EMDOWN
+>>> dspkID_allT, dspkT_allT, totalDur_allT = getconcatactivity(lfnT,lpop=['EMUP','EMDOWN'])
+
+>>> dact1D_allT = getdActMap1D(totalDur_allT, tstepPerAction, dspkT_allT, dspkID_allT, dnumc, dstartidx, lpop = ['EMUP','EMDOWN'])
+
+>>> dCumAct_allT, dStepAct_allT = getCumActivityMapForInput(seqsBegs_allT, seqsEnds_allT,dact1D_allT,lpop=['EMUP','EMDOWN'])
+>>> rewards_allT, hitsMiss_allT = getRewardsPerSeq(actrewards_allT,seqsBegs_allT,seqsEnds_allT)
+
+# plotSeqPerf(lSimilarSeqs_allT,seqs2plot_allT,seqsBegs_allT,seqsEnds_allT,II_allT,dCumAct_allT,hitsMiss_allT,0,plotact=False)
+# saved as 21feb12_21feb5_cycle_RL3_A0_seq0
