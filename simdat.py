@@ -111,9 +111,12 @@ def getdActMap (totalDur, tstepPerAction, dspkT, dspkID, dnumc, dstartidx,lpop =
       dact[pop] = generateActivityMap(t1, t2, dspkT[pop], dspkID[pop], dnumc[pop], dstartidx[pop])
   return dact
 
-def getdActMap1D (totalDur, tstepPerAction, dspkT, dspkID, dnumc, dstartidx,lpop = allpossible_pops):
-  t1 = range(0,totalDur,tstepPerAction)
-  t2 = range(tstepPerAction,totalDur+tstepPerAction,tstepPerAction)
+def getdActMap1D (totalDur, actreward, dspkT, dspkID, dnumc, dstartidx,lpop = allpossible_pops):
+  t2 = np.array(actreward.time)
+  t1 = [0]
+  for i in range(len(t2)-1):
+    t1.append(t2[i])
+  t1 = np.array(t1)
   dact = {}
   for pop in lpop:
     if pop in dnumc and dnumc[pop] > 0:
@@ -140,6 +143,37 @@ def getRewardsPerSeq(actreward, seqBegs, seqEnds):
     rewards.append(list(actreward.reward)[seqBegs[i]:seqEnds[i]+1])
     hitsMiss.append(list(actreward.hit)[seqBegs[i]:seqEnds[i]+1])
   return rewards,hitsMiss
+
+def getActionsPerSeq(actreward, seqBegs, seqEnds):
+  proposedActions = []
+  executedActions = []
+  for i in range(len(seqBegs)): 
+    proposedActions.append(list(actreward.proposed)[seqBegs[i]:seqEnds[i]+1])
+    executedActions.append(list(actreward.action)[seqBegs[i]:seqEnds[i]+1])
+  return proposedActions,executedActions
+
+def getStepwiseNeuralContribution(executedActions,dStepAct):
+  stepwisecontribEMUP = []
+  stepwisecontribEMDOWN = []
+  for i in range(len(executedActions)):
+    cTrial_eActions = executedActions[i]
+    cTrial_actup = dStepAct['EMUP'][i]
+    cTrial_actdown = dStepAct['EMDOWN'][i]
+    for steps in range(len(cTrial_eActions)):
+      popemup = np.zeros((300,))
+      popemdown = np.zeros((300,))
+      if cTrial_eActions[steps]==4:
+        popemup[np.where(cTrial_actup[steps]>0)[0]]=1
+      elif cTrial_eActions[steps]==3:
+        popemdown[np.where(cTrial_actdown[steps]>0)[0]]=1
+      elif cTrial_eActions[steps]==1:
+        popemup[np.where(cTrial_actup[steps]>0)[0]]=1
+        popemdown[np.where(cTrial_actdown[steps]>0)[0]]=1
+      stepwisecontribEMUP.append(list(popemup))
+      stepwisecontribEMDOWN.append(list(popemdown))
+  stepwisecontribEMUP = np.array(stepwisecontribEMUP)
+  stepwisecontribEMDOWN = np.array(stepwisecontribEMDOWN)
+  return stepwisecontribEMUP, stepwisecontribEMDOWN
 
 def loadsimdat (name=None,getactmap=True,lpop = allpossible_pops): # load simulation data
   global totalDur, tstepPerAction
@@ -1791,7 +1825,7 @@ def showMostActiveMNeuronsPerSeq(lSimilarSeqs, seqs2plot, dCumAct, topM):
       hist_topM_allseqs_actdown_allrepeats[i,seqInds] = np.where(topM_cseq_actdown_allrepeats==i)[0].shape[0]/len(cseqInds)
   fig, axs = plt.subplots(1, 2, figsize=(12,4))
   cb1 = fig.add_axes([0.92, 0.2, 0.01, 0.6])
-  cb0 = fig.add_axes([0.46, 0.2, 0.01, 0.6])
+  cb0 = fig.add_axes([0.5, 0.2, 0.01, 0.6])
   lax = axs.ravel()
   pcm0 = lax[0].imshow(hist_topM_allseqs_actup_allrepeats.T)
   lax[0].set_xlabel('EMUP-Neuron')
