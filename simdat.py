@@ -562,6 +562,69 @@ def getdistvstimecorr (pdpos, ballxmin=137, ballxmax=141, minN=2):
   dout['lN'] = lN
   return dout
 
+def getconcatobjpos (lfn):
+  # concatenate the object position data frames together so can correlate ball position with learning behavior
+  # lfn is a list of objpos.pkl filenames from the simulation
+  pdpos = None
+  for fn in lfn:
+    acl = ObjPos2pd(loadObjPos(fn)) 
+    if pdpos is None:
+      pdpos = acl
+    else:
+      acl.time += np.amax(pdpos.time)
+      pdpos = pdpos.append(acl)
+  return pdpos
+
+def showSpatialBehaviorHitMiss(pdpos,seqsBegs,seqsEnds):
+  # find y pos of ball and score at the end of each seq.
+  yballpos = []
+  hit_miss_seqs = []
+  for seq in range(len(seqsBegs)):
+    y = np.array(pdpos.iloc[seqsBegs[seq]:seqsEnds[seq]].ballY)
+    yballpos.append(y[np.where(y>1)[0][-1]])
+    hit_miss_seqs.append(hitsMiss_allBT[seq][-1])
+  hit_inds = np.where(np.array(hit_miss_seqs)==1)[0]
+  miss_inds = np.where(np.array(hit_miss_seqs)==-1)[0]
+  hhit = np.histogram(np.array(yballpos)[hit_inds],range(0,161,10))
+  hmiss = np.histogram(np.array(yballpos)[miss_inds],range(0,161,10))
+  width = 3
+  ypos0 = hhit[1][1:]-3 
+  ypos1 = [x + width for x in ypos0] 
+  plt.bar(ypos0, hhit[0], color ='b', width =width, edgecolor ='black', label ='Hits',align='edge') 
+  plt.bar(ypos1, hmiss[0], color ='r', width = width, edgecolor ='black', label ='Miss',align='edge') 
+  xlabel('ball ypos when hit or miss')
+  ylabel('count')
+  legend()
+
+def showSpatialBehaviorStepWise(pdpos,actrewards,binsize):
+  # used binsize of 4
+  stepwise_correct_spatialmoves = np.zeros((160,160))
+  stepwise_incorrect_spatialmoves = np.zeros((160,160))
+  for step in range(len(pdpos)):
+    reward = actrewards.iloc[step].reward
+    x = pdpos.iloc[step].ballX
+    y = pdpos.iloc[step].ballY
+    r = pdpos.iloc[step].racketY
+    if reward==dconf['rewardcodes']['followTarget']:
+      if int(x)>0 and int(y)>0:
+        stepwise_correct_spatialmoves[int(x),int(y)]+=1
+    elif reward==dconf['rewardcodes']['avoidTarget']:
+      if int(x)>0 and int(y)>0:
+        stepwise_incorrect_spatialmoves[int(x),int(y)]+=1
+  ds_stepwise_correct_spatialmoves = np.zeros((int(160/binsize),int(160/binsize)))
+  ds_stepwise_incorrect_spatialmoves = np.zeros((int(160/binsize),int(160/binsize)))
+  icount = 0
+  for i in range(0,160,int(binsize)):
+    jcount = 0
+    for j in range(0,160,int(binsize)):
+      ds_stepwise_correct_spatialmoves[icount,jcount]=np.sum(stepwise_correct_spatialmoves[i:i+binsize,j:j+binsize])
+      ds_stepwise_incorrect_spatialmoves[icount,jcount]=np.sum(stepwise_incorrect_spatialmoves[i:i+binsize,j:j+binsize])
+      jcount+=1
+    icount+=1
+  stepwise_pcorrent_spatialmoves = np.divide(ds_stepwise_correct_spatialmoves,np.add(ds_stepwise_correct_spatialmoves,ds_stepwise_incorrect_spatialmoves))
+  plt.imshow(stepwise_pcorrent_spatialmoves.T)
+  plt.colorbar()
+  title('probability of correct move, when the ball is at a location')
 
 def getspikehist (spkT, numc, binsz, tmax):
   tt = np.arange(0,tmax,binsz)
@@ -1874,7 +1937,7 @@ def getActCorrs(lSimilarSeqs,seqs2plot,dStepAct,I):
       cAct = actI[m,:,:]
       cCorrs = []
       for i in range(600):
-        for j in range(i,600):
+        for j in range(i+1,600):
           c,p = pearsonr(cAct[:,i].flat,cAct[:,j].flat)
           cCorrs.append(c)
       McorrsI.append(cCorrs)
@@ -1882,7 +1945,7 @@ def getActCorrs(lSimilarSeqs,seqs2plot,dStepAct,I):
     RcorrsI = []
     for i in range(actI.shape[0]):
       iAct = actI[i,:,:].flat
-      for j in range(i,actI.shape[0]):
+      for j in range(i+1,actI.shape[0]):
         jAct = actI[j,:,:].flat
         c,p = pearsonr(iAct,jAct)
         RcorrsI.append(c)
@@ -1926,7 +1989,7 @@ def getActCorrsStepWise(lSimilarSeqs,seqs2plot,dStepAct,I):
     RcorrsI = []
     for i in range(actI.shape[0]):
       iAct = actI[i,:,:]
-      for j in range(i,actI.shape[0]):
+      for j in range(i+1,actI.shape[0]):
         jAct = actI[j,:,:]
         cCorrs = []
         for k in range(jAct.shape[0]):

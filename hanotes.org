@@ -15231,7 +15231,7 @@ python multistepSim.py simFull.json 30 20 21feb1_RL4_L1_cycle_multi
 
 ------------------
 
-* 21feb2 
+* DONE DONEDONE DROP DROPDROP TODOTODO DONE TODOTODO 21feb2 
 
 - for any input sequence Iseq, measure firing rate of each M neuron in EMUP and EMDOWN populations.
 - see how those firing rate matrices evolve with repeated occurances.
@@ -17287,9 +17287,6 @@ classically, cross-correlation coefficient at zero lag or entire cross correlogr
 
 lets take x and y 2 spike trains in time interval [t1,t2]
 
-
-* 2011feb26
-
 -- analyzing sam's model during training (was trained on gcp).
 
 # list of files during training.
@@ -17537,3 +17534,236 @@ saved as 21feb26_21jan6_TARG4_gcp__22steps_individualneuronInActionContribution.
 >>> legend(('EMUP','EMDOWN'))
 
 saved as 21feb26_21jan6_TARG4_gcp__22steps_popActionContribution.png
+
+-- analyzing data on my laptop Mar2,2021 and Mar3,2021
+
+lfnBT = ['21jan21_TARG4_gcp_RLhebbwt_0_p0_',
+            '21jan21_TARG4_gcp_RLhebbwt_0_p1_',
+            '21jan21_TARG4_gcp_RLhebbwt_0_p2_',
+            '21jan21_TARG4_gcp_RLhebbwt_0_p3_',
+            '21jan21_TARG4_gcp_RLhebbwt_0_p4_',
+            '21jan21_TARG4_gcp_RLhebbwt_0_p5_']
+# load action rewards concatenated.
+>>> actrewards_allBT = getconcatactionreward(lfnBT)
+
+# load all inputs
+>>> II_allBT = getconcatactioninputs(lfnBT)
+
+# breakdown performance based on input sequences
+>>> lSimilarSeqs_allBT, seqs2plot_allBT, seqsBegs_allBT, seqsEnds_allBT = breakdownPerformance(II_allBT,actrewards_allBT,cend=69,sthresh=5,nbframeThresh=5)
+
+>>> len(seqs2plot_allT)
+46
+
+# concatenate spkIDs and spkTs for all steps for EMUP and EMDOWN
+>>> dspkID_allBT, dspkT_allBT, totalDur_allBT = getconcatactivity(lfnBT,lpop=['EMUP','EMDOWN'])
+
+>>> dact1D_allBT = getdActMap1D(totalDur_allBT, actrewards_allBT, dspkT_allBT, dspkID_allBT, dnumc, dstartidx, lpop = ['EMUP','EMDOWN'])
+
+>>> dCumAct_allBT, dStepAct_allBT = getCumActivityMapForInput(seqsBegs_allBT, seqsEnds_allBT,dact1D_allBT,lpop=['EMUP','EMDOWN'])
+>>> rewards_allBT, hitsMiss_allBT = getRewardsPerSeq(actrewards_allBT,seqsBegs_allBT,seqsEnds_allBT)
+
+>>> plotSeqPerf(lSimilarSeqs_allBT,seqs2plot_allBT,seqsBegs_allBT,seqsEnds_allBT,II_allBT,dCumAct_allBT,hitsMiss_allBT,22,plotact=False)
+>>> savefig('21mar3_21jan21_TARG4_gcp_RLhebbwt_0_seq22.png') # 23 seqs
+
+>>> summarizeLearningPerf(lSimilarSeqs_allBT,seqs2plot_allBT,hitsMiss_allBT)
+savefig('21mar3_21jan21_TARG4_gcp_RLhebbwt_0_PerformanceSummary.png')
+
+>>> proposedActions, executedActions = getActionsPerSeq(actrewards_allBT,seqsBegs_allBT,seqsEnds_allBT)
+>>> stepwisecontribEMUP, stepwisecontribEMDOWN = getStepwiseNeuralContribution(executedActions,dStepAct_allBT)
+
+>>> plt.plot(np.sort(np.cumsum(stepwisecontribEMUP,0)[-1,:]))
+>>> plt.plot(np.sort(np.cumsum(stepwisecontribEMDOWN,0)[-1,:]))
+>>> legend(('EMUP','EMDOWN'))
+>>> xlabel('sorted neuron ids')
+>>> ylabel('Times a neuron actively contributed to action')
+
+savefig('21mar3_21jan21_TARG4_gcp_RLhebbwt_0_individualneuronActionContribution.png')
+
+>>> plt.plot(np.flip(np.sort(np.subtract(stepwisecontribEMUP.shape[0]*np.ones((300,)),np.cumsum(stepwisecontribEMUP,0)[-1,:]))))
+>>> plt.plot(np.flip(np.sort(np.subtract(stepwisecontribEMDOWN.shape[0]*np.ones((300,)),np.cumsum(stepwisecontribEMDOWN,0)[-1,:]))))
+>>> xlabel('sorted neuron ids')
+>>> ylabel('Times a neuron did not contribute to action')
+>>> legend(('EMUP','EMDOWN'))
+
+savefig('21mar3_21jan21_TARG4_gcp_RLhebbwt_0_individualneuronInActionContribution.png')
+
+>>> plt.plot(np.sum(stepwisecontribEMUP,1),'b')
+>>> plt.plot(np.sum(stepwisecontribEMDOWN,1),'r')
+>>> xlabel('# of actions')
+>>> ylabel('# of neurons from action-associated motor area')
+>>> legend(('EMUP','EMDOWN'))
+
+savefig('21mar3_21jan21_TARG4_gcp_RLhebbwt_0_popActionContribution.png')
+
+
+>>> showMostActiveMNeuronsPerSeq(lSimilarSeqs_allBT,seqs2plot_allBT,dCumAct_allBT,5)
+>>> savefig('21mar3_21jan21_TARG4_gcp_RLhebbwt_0_top5Pmostactiveneurons.png')
+>>> showMostActiveMNeuronsPerSeq(lSimilarSeqs_allBT,seqs2plot_allBT,dCumAct_allBT,10)
+>>> savefig('21mar3_21jan21_TARG4_gcp_RLhebbwt_0_top10Pmostactiveneurons.png')
+>>> showMostActiveMNeuronsPerSeq(lSimilarSeqs_allBT,seqs2plot_allBT,dCumAct_allBT,20)
+>>> savefig('21mar3_21jan21_TARG4_gcp_RLhebbwt_0_top20Pmostactiveneurons.png')
+>>> showMostActiveMNeuronsPerSeq(lSimilarSeqs_allBT,seqs2plot_allBT,dCumAct_allBT,50)
+>>> savefig('21mar3_21jan21_TARG4_gcp_RLhebbwt_0_top50Pmostactiveneurons.png')
+>>> showMostActiveMNeuronsPerSeq(lSimilarSeqs_allBT,seqs2plot_allBT,dCumAct_allBT,70)
+>>> savefig('21mar3_21jan21_TARG4_gcp_RLhebbwt_0_top70Pmostactiveneurons.png')
+>>> showMostActiveMNeuronsPerSeq(lSimilarSeqs_allBT,seqs2plot_allBT,dCumAct_allBT,90)
+>>> savefig('21mar3_21jan21_TARG4_gcp_RLhebbwt_0_top90Pmostactiveneurons.png')
+
+import importlib
+import simdat
+importlib.reload(simdat)
+
+
+Mcorrs = []
+Rcorrs = []
+for I in range(len(seqs2plot_allBT)):
+  cMcorrs, cRcorrs = simdat.getActCorrs(lSimilarSeqs_allBT,seqs2plot_allBT,dStepAct_allBT,I)
+  Mcorrs.append(cMcorrs)
+  Rcorrs.append(cRcorrs)
+  print(I)
+
+
+# heatmap shows the distribution of correlations across repeats for each input sequence. 
+
+histRcorrs = []
+for i in range(len(Rcorrs)):
+  for j in range(len(Rcorrs[i])):
+    ch = np.histogram(np.array(Rcorrs[i][j]).flat,0.01*np.arange(-100,101))
+    histRcorrs.append(np.divide(ch[0],np.amax(ch[0])))
+
+plt.imshow(histRcorrs)
+plt.xticks(np.arange(0,200,25),[str(ch[1][0]),str(ch[1][25]),str(ch[1][50]),str(ch[1][75]),str(ch[1][100]),str(ch[1][125]),str(ch[1][150]),str(ch[1][175])])
+xlabel('pearson corr between repeats')
+ylabel('Input Sequences')
+plt.colorbar()
+xlim((75,125))
+
+savefig('21mar3_21jan21_TARG4_gcp_RLhebbwt_0_corr_btw_repeats.png')
+
+# heatmap shows the distribution of correlations across neurons for each input sequence. 
+
+histMcorrs = []
+for i in range(len(Mcorrs)):
+  for j in range(len(Mcorrs[i])):
+    cMcorrs = np.array(Mcorrs[i][j])
+    ch = np.histogram(cMcorrs.flat,0.01*np.arange(-100,101))
+    histMcorrs.append(np.divide(ch[0],np.amax(ch[0])))
+ 
+plt.imshow(histMcorrs)
+xlabel('pearson corr between neurons')
+plt.xticks(np.arange(0,200,25),[str(ch[1][0]),str(ch[1][25]),str(ch[1][50]),str(ch[1][75]),str(ch[1][100]),str(ch[1][125]),str(ch[1][150]),str(ch[1][175])])
+ylabel('Input Sequences')
+plt.colorbar()
+xlim((75,199))
+
+savefig('21mar3_21jan21_TARG4_gcp_RLhebbwt_0_corr_btw_neurons.png')
+
+
+RcorrsS = []
+for I in range(len(seqs2plot_allBT)):
+  cRcorrsS = simdat.getActCorrsStepWise(lSimilarSeqs_allBT,seqs2plot_allBT,dStepAct_allBT,I)
+  print(I)
+  RcorrsS.append(cRcorrsS)
+
+
+histRcorrsS = []
+actPairs = []
+inactPairs = []
+for i in range(len(RcorrsS)):
+  for j in range(len(RcorrsS[i])):
+    cRcorrs = np.array(RcorrsS[i][j])
+    cRcorrs = np.reshape(cRcorrs,(cRcorrs.shape[0]*cRcorrs.shape[1],))
+    goodInds = np.where(np.isnan(cRcorrs)==False)
+    badInds = np.where(np.isnan(cRcorrs)==True)
+    actPairs.append(len(goodInds))
+    inactPairs.append(len(badInds))
+    ch = np.histogram(cRcorrs[goodInds],0.01*np.arange(-100,101))
+    histRcorrsS.append(np.divide(ch[0],np.amax(ch[0])))
+
+
+plt.imshow(histRcorrsS)
+plt.xticks(np.arange(0,200,25),[str(ch[1][0]),str(ch[1][25]),str(ch[1][50]),str(ch[1][75]),str(ch[1][100]),str(ch[1][125]),str(ch[1][150]),str(ch[1][175])])
+ylabel('Input sequences')
+xlabel('pearson corr between stepswise activity')
+xlim((75,125))
+plt.colorbar()
+
+savefig('21mar3_21jan21_TARG4_gcp_RLhebbwt_0_corr_btw_stepwise.png')
+
+-- analyze obj positions vs performance.
+dobjpos = loadObjPos()
+pdpos = ObjPos2pd(dobjpos)
+dout = getdistvstimecorr(pdos,pval=1)
+
+
+def getconcatobjpos (lfn):
+  # concatenate the object position data frames together so can correlate ball position with learning behavior
+  # lfn is a list of objpos.pkl filenames from the simulation
+  pdpos = None
+  for fn in lfn:
+    acl = ObjPos2pd(loadObjPos(fn)) 
+    if pdpos is None:
+      pdpos = acl
+    else:
+      acl.time += np.amax(pdpos.time)
+      pdpos = pdpos.append(acl)
+  return pdpos
+
+
+def showSpatialBehaviorHitMiss(pdpos,seqsBegs,seqsEnds):
+  # find y pos of ball and score at the end of each seq.
+  yballpos = []
+  hit_miss_seqs = []
+  for seq in range(len(seqsBegs)):
+    y = np.array(pdpos.iloc[seqsBegs[seq]:seqsEnds[seq]].ballY)
+    yballpos.append(y[np.where(y>1)[0][-1]])
+    hit_miss_seqs.append(hitsMiss_allBT[seq][-1])
+  hit_inds = np.where(np.array(hit_miss_seqs)==1)[0]
+  miss_inds = np.where(np.array(hit_miss_seqs)==-1)[0]
+  hhit = np.histogram(np.array(yballpos)[hit_inds],range(0,161,10))
+  hmiss = np.histogram(np.array(yballpos)[miss_inds],range(0,161,10))
+  width = 3
+  ypos0 = hhit[1][1:]-3 
+  ypos1 = [x + width for x in ypos0] 
+  plt.bar(ypos0, hhit[0], color ='b', width =width, edgecolor ='black', label ='Hits',align='edge') 
+  plt.bar(ypos1, hmiss[0], color ='r', width = width, edgecolor ='black', label ='Miss',align='edge') 
+  xlabel('ball ypos when hit or miss')
+  ylabel('count')
+  legend()
+
+showSpatialBehaviorHitMiss(pdpos,seqsBegs_allBT,seqsEnds_allBT)
+savefig('21mar3_21jan21_TARG4_gcp_RLhebbwt_0_spatialbehavior_hitmiss.png')
+
+def showSpatialBehaviorStepWise(pdpos,actrewards,binsize):
+  # used binsize of 4
+  stepwise_correct_spatialmoves = np.zeros((160,160))
+  stepwise_incorrect_spatialmoves = np.zeros((160,160))
+  for step in range(len(pdpos)):
+    reward = actrewards.iloc[step].reward
+    x = pdpos.iloc[step].ballX
+    y = pdpos.iloc[step].ballY
+    r = pdpos.iloc[step].racketY
+    if reward==dconf['rewardcodes']['followTarget']:
+      if int(x)>0 and int(y)>0:
+        stepwise_correct_spatialmoves[int(x),int(y)]+=1
+    elif reward==dconf['rewardcodes']['avoidTarget']:
+      if int(x)>0 and int(y)>0:
+        stepwise_incorrect_spatialmoves[int(x),int(y)]+=1
+  ds_stepwise_correct_spatialmoves = np.zeros((int(160/binsize),int(160/binsize)))
+  ds_stepwise_incorrect_spatialmoves = np.zeros((int(160/binsize),int(160/binsize)))
+  icount = 0
+  for i in range(0,160,int(binsize)):
+    jcount = 0
+    for j in range(0,160,int(binsize)):
+      ds_stepwise_correct_spatialmoves[icount,jcount]=np.sum(stepwise_correct_spatialmoves[i:i+binsize,j:j+binsize])
+      ds_stepwise_incorrect_spatialmoves[icount,jcount]=np.sum(stepwise_incorrect_spatialmoves[i:i+binsize,j:j+binsize])
+      jcount+=1
+    icount+=1
+  stepwise_pcorrent_spatialmoves = np.divide(ds_stepwise_correct_spatialmoves,np.add(ds_stepwise_correct_spatialmoves,ds_stepwise_incorrect_spatialmoves))
+  plt.imshow(stepwise_pcorrent_spatialmoves.T)
+  plt.colorbar()
+  title('probability of correct move, when the ball is at a location')
+
+showSpatialBehaviorStepWise(pdpos,actrewards_allBT,4)
+savefig('21mar3_21jan21_TARG4_gcp_RLhebbwt_0_spatialbehavior_stepwise.png')
