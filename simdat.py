@@ -575,14 +575,14 @@ def getconcatobjpos (lfn):
       pdpos = pdpos.append(acl)
   return pdpos
 
-def showSpatialBehaviorHitMiss(pdpos,seqsBegs,seqsEnds):
+def showSpatialBehaviorHitMiss(pdpos,hitsMiss,seqsBegs,seqsEnds):
   # find y pos of ball and score at the end of each seq.
   yballpos = []
   hit_miss_seqs = []
   for seq in range(len(seqsBegs)):
     y = np.array(pdpos.iloc[seqsBegs[seq]:seqsEnds[seq]].ballY)
     yballpos.append(y[np.where(y>1)[0][-1]])
-    hit_miss_seqs.append(hitsMiss_allBT[seq][-1])
+    hit_miss_seqs.append(hitsMiss[seq][-1])
   hit_inds = np.where(np.array(hit_miss_seqs)==1)[0]
   miss_inds = np.where(np.array(hit_miss_seqs)==-1)[0]
   hhit = np.histogram(np.array(yballpos)[hit_inds],range(0,161,10))

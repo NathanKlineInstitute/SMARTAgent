@@ -17767,3 +17767,208 @@ def showSpatialBehaviorStepWise(pdpos,actrewards,binsize):
 
 showSpatialBehaviorStepWise(pdpos,actrewards_allBT,4)
 savefig('21mar3_21jan21_TARG4_gcp_RLhebbwt_0_spatialbehavior_stepwise.png')
+
+-- start analyzing all of fullmodels that Haroon ran.....
+2021mar4:
+
+"name": "21feb5_cycle_RL3_A0_",
+RL: AMPA:
+RLhebbwt: 0.1 (reduced from 0.5)
+RLlenhebb: 100
+RLlenanti: 100
+
+
+(base) hanwar@cycle:~/GamesProject/SMARTAgent$ python -i simdat.py backupcfg/21feb5_cycle_RL3_A0__step_0_sim.json
+>>> lfn = ['21feb5_cycle_RL3_A0__step_0_']
+>>> lfn.append('21feb5_cycle_RL3_A0__step_1_')
+>>> lfn.append('21feb5_cycle_RL3_A0__step_2_')
+>>> lfn.append('21feb5_cycle_RL3_A0__step_3_')
+>>> lfn.append('21feb5_cycle_RL3_A0__step_4_')
+>>> lfn.append('21feb5_cycle_RL3_A0__step_5_')
+>>> lfn.append('21feb5_cycle_RL3_A0__step_6_')
+>>> lfn.append('21feb5_cycle_RL3_A0__step_7_')
+>>> lfn.append('21feb5_cycle_RL3_A0__step_8_')
+>>> lfn.append('21feb5_cycle_RL3_A0__step_9_')
+>>> lfn.append('21feb5_cycle_RL3_A0__step_10_')
+>>> lfn.append('21feb5_cycle_RL3_A0__step_11_')
+>>> lfn.append('21feb5_cycle_RL3_A0__step_12_')
+>>> lfn.append('21feb5_cycle_RL3_A0__step_13_')
+>>> lfn.append('21feb5_cycle_RL3_A0__step_14_')
+>>> lfn.append('21feb5_cycle_RL3_A0__step_15_')
+>>> lfn.append('21feb5_cycle_RL3_A0__step_16_')
+>>> lfn.append('21feb5_cycle_RL3_A0__step_17_')
+>>> lfn.append('21feb5_cycle_RL3_A0__step_18_')
+>>> lfn.append('21feb5_cycle_RL3_A0__step_19_')
+
+# load action rewards concatenated.
+>>> actrewards_allT = getconcatactionreward(lfn)
+
+# load all inputs
+>>> II_allT = getconcatactioninputs(lfn)
+
+# breakdown performance based on input sequences
+>>> lSimilarSeqs_allT, seqs2plot_allT, seqsBegs_allT, seqsEnds_allT = breakdownPerformance(II_allT,actrewards_allT,cend=69,sthresh=5,nbframeThresh=5)
+
+>>> len(seqs2plot_allT)
+97
+
+# concatenate spkIDs and spkTs for all steps for EMUP and EMDOWN
+>>> dspkID_allT, dspkT_allT, totalDur_allT = getconcatactivity(lfn,lpop=['EMUP','EMDOWN'])
+
+
+>>> dact1D_allT = getdActMap1D(totalDur_allT, actrewards_allT, dspkT_allT, dspkID_allT, dnumc, dstartidx, lpop = ['EMUP','EMDOWN'])
+
+>>> dCumAct_allT, dStepAct_allT = getCumActivityMapForInput(seqsBegs_allT, seqsEnds_allT,dact1D_allT,lpop=['EMUP','EMDOWN'])
+>>> rewards_allT, hitsMiss_allT = getRewardsPerSeq(actrewards_allT,seqsBegs_allT,seqsEnds_allT)
+
+>>> plotSeqPerf(lSimilarSeqs_allT,seqs2plot_allT,seqsBegs_allT,seqsEnds_allT,II_allT,dCumAct_allT,hitsMiss_allT,0,plotact=False)
+>>> savefig('21mar5_21feb5_cycle_RL3_A0_seq0.png') # 23 seqs
+......
+>>> plotSeqPerf(lSimilarSeqs_allT,seqs2plot_allT,seqsBegs_allT,seqsEnds_allT,II_allT,dCumAct_allT,hitsMiss_allT,96,plotact=False)
+>>> savefig('21mar5_21feb5_cycle_RL3_A0_seq96.png')
+
+>>> summarizeLearningPerf(lSimilarSeqs_allT,seqs2plot_allT,hitsMiss_allT)
+saved as 21mar5_21feb5_cycle_RL3_A0_learningPerformanceSummary.png
+
+
+
+>>> proposedActions, executedActions = getActionsPerSeq(actrewards_allBT,seqsBegs_allBT,seqsEnds_allBT)
+>>> stepwisecontribEMUP, stepwisecontribEMDOWN = getStepwiseNeuralContribution(executedActions,dStepAct_allBT)
+
+>>> plt.plot(np.sort(np.cumsum(stepwisecontribEMUP,0)[-1,:]))
+>>> plt.plot(np.sort(np.cumsum(stepwisecontribEMDOWN,0)[-1,:]))
+>>> legend(('EMUP','EMDOWN'))
+>>> xlabel('sorted neuron ids')
+>>> ylabel('Times a neuron actively contributed to action')
+
+savefig('21mar5_21feb5_cycle_RL3_A0_individualneuronActionContribution.png')
+
+>>> plt.plot(np.flip(np.sort(np.subtract(stepwisecontribEMUP.shape[0]*np.ones((300,)),np.cumsum(stepwisecontribEMUP,0)[-1,:]))))
+>>> plt.plot(np.flip(np.sort(np.subtract(stepwisecontribEMDOWN.shape[0]*np.ones((300,)),np.cumsum(stepwisecontribEMDOWN,0)[-1,:]))))
+>>> xlabel('sorted neuron ids')
+>>> ylabel('Times a neuron did not contribute to action')
+>>> legend(('EMUP','EMDOWN'))
+
+savefig('21mar5_21feb5_cycle_RL3_A0_individualneuronInActionContribution.png')
+
+>>> plt.plot(np.sort(np.sum(stepwisecontribEMUP,1)))
+>>> plt.plot(np.sort(np.sum(stepwisecontribEMDOWN,1)))
+>>> xlim((200000,360000))
+>>> xlabel('# of action steps')
+>>> ylabel('# of neurons active at each action step')
+>>> legend(('EMUP','EMDOWN'))
+
+savefig('21mar5_21feb5_cycle_RL3_A0_popActionContribution.png')
+
+
+>>> showMostActiveMNeuronsPerSeq(lSimilarSeqs_allBT,seqs2plot_allBT,dCumAct_allBT,5)
+>>> savefig('21mar5_21feb5_cycle_RL3_A0_top5Pmostactiveneurons.png')
+>>> showMostActiveMNeuronsPerSeq(lSimilarSeqs_allBT,seqs2plot_allBT,dCumAct_allBT,10)
+>>> savefig('21mar5_21feb5_cycle_RL3_A0_top10Pmostactiveneurons.png')
+>>> showMostActiveMNeuronsPerSeq(lSimilarSeqs_allBT,seqs2plot_allBT,dCumAct_allBT,20)
+>>> savefig('21mar5_21feb5_cycle_RL3_A0_top20Pmostactiveneurons.png')
+>>> showMostActiveMNeuronsPerSeq(lSimilarSeqs_allBT,seqs2plot_allBT,dCumAct_allBT,50)
+>>> savefig('21mar5_21feb5_cycle_RL3_A0_top50Pmostactiveneurons.png')
+>>> showMostActiveMNeuronsPerSeq(lSimilarSeqs_allBT,seqs2plot_allBT,dCumAct_allBT,70)
+>>> savefig('21mar5_21feb5_cycle_RL3_A0_top70Pmostactiveneurons.png')
+>>> showMostActiveMNeuronsPerSeq(lSimilarSeqs_allBT,seqs2plot_allBT,dCumAct_allBT,90)
+>>> savefig('21mar5_21feb5_cycle_RL3_A0_top90Pmostactiveneurons.png')
+
+
+
+Mcorrs = []
+Rcorrs = []
+for I in range(len(seqs2plot_allBT)):
+  cMcorrs, cRcorrs = simdat.getActCorrs(lSimilarSeqs_allBT,seqs2plot_allBT,dStepAct_allBT,I)
+  Mcorrs.append(cMcorrs)
+  Rcorrs.append(cRcorrs)
+  print(I)
+
+
+# heatmap shows the distribution of correlations across repeats for each input sequence. 
+
+histRcorrs = []
+for i in range(len(Rcorrs)):
+  for j in range(len(Rcorrs[i])):
+    ch = np.histogram(np.array(Rcorrs[i][j]).flat,0.01*np.arange(-100,101))
+    histRcorrs.append(np.divide(ch[0],np.amax(ch[0])))
+
+plt.imshow(histRcorrs)
+plt.xticks(np.arange(0,200,25),[str(ch[1][0]),str(ch[1][25]),str(ch[1][50]),str(ch[1][75]),str(ch[1][100]),str(ch[1][125]),str(ch[1][150]),str(ch[1][175])])
+xlabel('pearson corr between repeats')
+ylabel('Input Sequences')
+plt.colorbar()
+xlim((75,125))
+
+savefig('21mar5_21feb5_cycle_RL3_A0_corr_btw_repeats.png')
+
+# heatmap shows the distribution of correlations across neurons for each input sequence. 
+
+histMcorrs = []
+for i in range(len(Mcorrs)):
+  for j in range(len(Mcorrs[i])):
+    cMcorrs = np.array(Mcorrs[i][j])
+    ch = np.histogram(cMcorrs.flat,0.01*np.arange(-100,101))
+    histMcorrs.append(np.divide(ch[0],np.amax(ch[0])))
+ 
+plt.imshow(histMcorrs)
+xlabel('pearson corr between neurons')
+plt.xticks(np.arange(0,200,25),[str(ch[1][0]),str(ch[1][25]),str(ch[1][50]),str(ch[1][75]),str(ch[1][100]),str(ch[1][125]),str(ch[1][150]),str(ch[1][175])])
+ylabel('Input Sequences')
+plt.colorbar()
+xlim((75,199))
+
+savefig('21mar5_21feb5_cycle_RL3_A0_corr_btw_neurons.png')
+
+
+RcorrsS = []
+for I in range(len(seqs2plot_allBT)):
+  cRcorrsS = simdat.getActCorrsStepWise(lSimilarSeqs_allBT,seqs2plot_allBT,dStepAct_allBT,I)
+  print(I)
+  RcorrsS.append(cRcorrsS)
+
+
+histRcorrsS = []
+actPairs = []
+inactPairs = []
+for i in range(len(RcorrsS)):
+  for j in range(len(RcorrsS[i])):
+    if len(RcorrsS[i][j])>0:
+      cRcorrs = np.array(RcorrsS[i][j])
+      cRcorrs = np.reshape(cRcorrs,(cRcorrs.shape[0]*cRcorrs.shape[1],))
+      goodInds = np.where(np.isnan(cRcorrs)==False)
+      badInds = np.where(np.isnan(cRcorrs)==True)
+      actPairs.append(len(goodInds))
+      inactPairs.append(len(badInds))
+      ch = np.histogram(cRcorrs[goodInds],0.01*np.arange(-100,101))
+      histRcorrsS.append(np.divide(ch[0],np.amax(ch[0])))
+
+
+plt.imshow(histRcorrsS)
+plt.xticks(np.arange(0,200,25),[str(ch[1][0]),str(ch[1][25]),str(ch[1][50]),str(ch[1][75]),str(ch[1][100]),str(ch[1][125]),str(ch[1][150]),str(ch[1][175])])
+ylabel('Input sequences')
+xlabel('pearson corr between stepswise activity')
+xlim((50,150))
+plt.colorbar()
+
+savefig('21mar5_21feb5_cycle_RL3_A0_corr_btw_stepwise.png')
+
+
+
+pdpos = getconcatobjpos(lfn)
+>>> import importlib
+>>> import simdat
+>>> importlib.reload(simdat)
+<module 'simdat' from '/home/hanwar/GamesProject/SMARTAgent/simdat.py'>
+>>> simdat.showSpatialBehaviorHitMiss(pdpos,hitsMiss_allT,seqsBegs_allT,seqsEnds_allT)
+
+savefig('21mar5_21feb5_cycle_RL3_A0_spatialbehavior_hitmiss.png')
+
+
+showSpatialBehaviorStepWise(pdpos,actrewards_allBT,4)
+savefig('21mar5_21feb5_cycle_RL3_A0_spatialbehavior_stepwise.png')
+
+>>> showSpatialBehaviorStepWise(pdpos,actrewards_allT,2)
+>>> savefig('21mar5_21feb5_cycle_RL3_A0_spatialbehavior_stepwise1.png')
+>>> showSpatialBehaviorStepWise(pdpos,actrewards_allT,1)
+>>> savefig('21mar5_21feb5_cycle_RL3_A0_spatialbehavior_stepwise2.png')
