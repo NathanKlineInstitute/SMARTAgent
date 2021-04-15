@@ -26324,3 +26324,8 @@ savefig(gifpath()+'all_steps_avg_weight.png') # [[./gif/21jan13_21jan11_TARG4_B_
 
 may as well continue some more to see if improves but no indication that's happening right now...
 
+* 21apr14
+** longer time constant help with less immediate reward?
+
+much longer time constant ... 
+
