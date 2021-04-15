@@ -26407,3 +26407,13 @@ python multistepSim.py sn.json 30 20 21apr15_TARG0_A_gcp_multi
 
 started ~13:31 ...
 
+** run another with 50 s RL time constant (21apr15_TARG0_B_gcp_)
+
+everything else the same as last multistep above (21apr15_TARG0_A_gcp_)
+
+            "RLlenhebb": 50000
+
+python multistepSim.py sn.json 30 20 21apr15_TARG0_B_gcp_multi
+
+started ~13:40 ...
+
