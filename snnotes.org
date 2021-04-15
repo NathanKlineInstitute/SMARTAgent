@@ -26345,3 +26345,65 @@ python multistepSim.py sn.json 30 20 21apr14_TARG0_gcp_multi
 
 started ~21:49 ...
 
+* 21apr15
+** check output on gcp from 21apr14_TARG0_gcp__step_3_ -- might improve but gets epileptic
+
+looks like getting epileptic after ~3 steps since did not include punishment signal
+
+python -i simdat.py backupcfg/21apr14_TARG0_gcp__step_3_sim.json
+
+EV1 0.02 Hz
+EA 1.94 Hz
+IA 4.68 Hz
+IAL 0.31 Hz
+EA2 0.38 Hz
+IA2 1.47 Hz
+IA2L 2.12 Hz
+EMDOWN 0.63 Hz
+EMUP 0.63 Hz
+IM 2.16 Hz
+IML 3.08 Hz
+
+ax=plotPerf(actreward,yl=(0,0.6))
+savefig(gifpath()+'perf.png') # [[./gif/21apr15_21apr14_TARG0_gcp__step_3_perf.png]]
+
+lfn = ['21apr14_TARG0_gcp__step_' + str(i) + '_' for i in range(4)]
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0,3))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/21apr15_21apr14_TARG0_gcp__step_3_perf_all_steps_so_far.png]]
+
+lpda = getindivactionreward(lfn)
+csm=cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+lclr = [csm.to_rgba(float(i)/(len(lpda))) for i in range(len(lpda))]
+clf(); plotComparePerf(lpda,lclr,yl=(0,2),lleg=lfn,skipscore=True,skipfollow=True)
+savefig(gifpath()+'perf_compareD.png') # [[./gif/21apr15_21apr14_TARG0_gcp__step_3_perf_compareD.png]]
+
+clf(); drawraster(dspkT,dspkID); xlim((490e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/21apr15_21apr14_TARG0_gcp__step_3_rast.png]]
+
+up to there the rates were ok ... but in next step the rates got too high ... 
+
+clf(); pdfc = getconcatweightpdf(lfn)
+popwtsE = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP','EA','EA2'],lclr=['r','b','g','c'],plotindiv=False)
+savefig(gifpath()+'all_steps_avg_weight.png') 
+[[./gif/21apr15_21apr14_TARG0_gcp__step_3_all_steps_avg_weight.png]]
+
+all weights going up ... need to counterbalance
+
+** restart last multistep with some punishment for loss (21apr15_TARG0_A_gcp_)
+
+and this one will have same long time constants for RL (100 s)
+
+these reward codes:
+    "rewardcodes": {
+        "scorePoint": 0.0,
+        "losePoint": -0.1,
+        "followTarget": 0.0,
+        "avoidTarget": 0.0,
+        "hitBall": 1.0
+    },
+
+python multistepSim.py sn.json 30 20 21apr15_TARG0_A_gcp_multi
+
+started ~13:31 ...
+
