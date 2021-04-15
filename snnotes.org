@@ -26329,3 +26329,19 @@ may as well continue some more to see if improves but no indication that's happe
 
 much longer time constant ... 
 
+use simulated env, turn off targeted, use long time constant (100 s), only have reward for hits
+
+21apr14_TARG0_gcp_
+
+./myrun 32 sn.json
+
+python -i simdat.py backupcfg/21apr14_TARG0_gcp_sim.json
+
+looks ok ... 
+
+try a multistep sim ... each step 500 s ...
+
+python multistepSim.py sn.json 30 20 21apr14_TARG0_gcp_multi
+
+started ~21:49 ...
+

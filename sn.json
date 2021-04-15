@@ -30,8 +30,8 @@
     "rewardcodes": {
         "scorePoint": 0.0,
         "losePoint": 0.0,
-        "followTarget": 0.1,
-        "avoidTarget": -0.01,
+        "followTarget": 0.0,
+        "avoidTarget": 0.0,
         "hitBall": 1.0
     },
     "actionsPerPlay": 1,
@@ -47,7 +47,7 @@
     "verbose": 0,
     "stayStepLim": 0,
     "simtype": {
-        "ResumeSim": 1,
+        "ResumeSim": 0,
         "ResumeSimFromFile": "data/21jan6_TARG4_gcp__step_19_synWeights_final.pkl"
     },
     "sim": {
@@ -62,12 +62,12 @@
         "RLFakeUpRule": 0,
         "RLFakeDownRule": 0,
         "RLFakeStayRule": 0,
-        "name": "21jan11_TARG4_B_gcp_",
+        "name": "21apr14_TARG0_gcp_",
         "doquit": 1,
         "doplot": 0,
         "saveCellSecs": 0,
         "saveCellConns": 0,
-        "targettedRL": 4,
+        "targettedRL": 0,
 	"targettedRLOppFctr": 0.5,
 	"targettedRLDscntFctr": 0.05,	
         "tstepPerAction": 50,
@@ -593,7 +593,7 @@
             "wmax": 5,
             "RLon": 1,
             "STDPon": 0,
-            "RLlenhebb": 500,
+            "RLlenhebb": 100000,
             "RLlenanti": 500,
             "useRLexp": 1,
             "RLhebbwt": 0.01,
