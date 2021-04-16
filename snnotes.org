@@ -26543,8 +26543,23 @@ fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward
 
 looks nonrandom but overall perf not as good as sim with 100 s tau so will discontinue this one further ... 
 
-** other sim?
+** other sim? 21apr16_TARG0_C_gcp_
 
 could adjust architecture - denser connectivity?? or keep architecture, have 100 s RL tau,
 and have equal negative weight for miss ... ?
+
+for now will keep architecture and increase punishment weight to make sure network can
+continue learning longer ... 
+
+    "rewardcodes": {
+        "scorePoint": 0.0,
+        "losePoint": -0.15,
+        "followTarget": 0.0,
+        "avoidTarget": 0.0,
+        "hitBall": 1.0
+    },
+
+python multistepSim.py sn.json 30 20 21apr16_TARG0_C_gcp_multi
+
+started ~11:02 ... 
 
