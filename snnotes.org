@@ -26417,3 +26417,134 @@ python multistepSim.py sn.json 30 20 21apr15_TARG0_B_gcp_multi
 
 started ~13:40 ...
 
+* 21apr16
+** check output from 21apr15_TARG0_A_gcp__step_4_
+
+this one has 100 s RL tau with non-targetted RL
+and reward, punishment values for hit and miss:
+    "rewardcodes": {
+        "scorePoint": 0.0,
+        "losePoint": -0.1,
+        "followTarget": 0.0,
+        "avoidTarget": 0.0,
+        "hitBall": 1.0
+    },
+
+
+python -i simdat.py backupcfg/21apr15_TARG0_A_gcp__step_4_sim.json
+
+EV1 0.02 Hz
+EA 1.91 Hz
+IA 4.57 Hz
+IAL 0.28 Hz
+EA2 0.28 Hz
+IA2 1.36 Hz
+IA2L 1.96 Hz
+EMDOWN 0.52 Hz
+EMUP 0.52 Hz
+IM 1.86 Hz
+IML 2.73 Hz
+
+ax=plotPerf(actreward,yl=(0,0.6))
+savefig(gifpath()+'perf.png') # [[./gif/21apr16_21apr15_TARG0_A_gcp__step_4_perf.png]]
+
+lfn = ['21apr15_TARG0_A_gcp__step_' + str(i) + '_' for i in range(5)]
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0,2))
+savefig(gifpath()+'perf_all_steps_so_far.png') 
+[[./gif/21apr16_21apr15_TARG0_A_gcp__step_4_perf_all_steps_so_far.png]]
+may be improving slowly at the end - the first 500 s probably can be discarded...
+savefig(gifpath()+'perf_all_steps_so_farB.png') 
+[[./gif/21apr16_21apr15_TARG0_A_gcp__step_4_perf_all_steps_so_farB.png]]
+
+lpda = getindivactionreward(lfn)
+csm=cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+lclr = [csm.to_rgba(float(i)/(len(lpda))) for i in range(len(lpda))]
+clf(); plotComparePerf(lpda,lclr,yl=(0,2),lleg=lfn,skipscore=True,skipfollow=True)
+savefig(gifpath()+'perf_compareD.png') 
+[[./gif/21apr16_21apr15_TARG0_A_gcp__step_4_perf_compareD.png]]
+well, not too convincing yet ... will continue some more
+
+clf(); drawraster(dspkT,dspkID); xlim((490e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/21apr16_21apr15_TARG0_A_gcp__step_4_rast.png]]
+
+clf(); pdfc = getconcatweightpdf(lfn)
+popwtsE = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP','EA','EA2'],lclr=['r','b','g','c'],plotindiv=False)
+savefig(gifpath()+'all_steps_avg_weight.png') 
+[[./gif/21apr16_21apr15_TARG0_A_gcp__step_4_all_steps_avg_weight.png]]
+weights going up, but less rapidly compared to sim with only reward ... 
+will probably get epileptic sooner or later ... 
+
+fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
+[[./gif/21apr16_21apr15_TARG0_A_gcp__step_4__with_reward_input.mp4]]
+
+watching video - activity does not appear random ... 
+
+** check output from 21apr15_TARG0_B_gcp__step_4_
+
+this one has 50 s RL tau with non-targetted RL
+and reward, punishment values for hit and miss:
+    "rewardcodes": {
+        "scorePoint": 0.0,
+        "losePoint": -0.1,
+        "followTarget": 0.0,
+        "avoidTarget": 0.0,
+        "hitBall": 1.0
+    },
+
+
+python -i simdat.py backupcfg/21apr15_TARG0_B_gcp__step_4_sim.json
+
+EV1 0.02 Hz
+EA 1.91 Hz
+IA 4.6 Hz
+IAL 0.28 Hz
+EA2 0.24 Hz
+IA2 1.33 Hz
+IA2L 1.91 Hz
+EMDOWN 0.42 Hz
+EMUP 0.42 Hz
+IM 1.73 Hz
+IML 2.54 Hz
+
+rates are very slightly lower than the sim above with 100 s RL tau
+
+ax=plotPerf(actreward,yl=(0,0.1))
+savefig(gifpath()+'perf.png') # [[./gif/21apr16_21apr15_TARG0_B_gcp__step_4_perf.png]]
+
+lfn = ['21apr15_TARG0_B_gcp__step_' + str(i) + '_' for i in range(5)]
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0,2))
+savefig(gifpath()+'perf_all_steps_so_far.png') 
+[[./gif/21apr16_21apr15_TARG0_B_gcp__step_4_perf_all_steps_so_far.png]]
+this one looks like decreasing gradually - also ignore first 500 s
+savefig(gifpath()+'perf_all_steps_so_farB.png') 
+[[./gif/21apr16_21apr15_TARG0_B_gcp__step_4_perf_all_steps_so_farB.png]]
+
+lpda = getindivactionreward(lfn)
+csm=cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+lclr = [csm.to_rgba(float(i)/(len(lpda))) for i in range(len(lpda))]
+clf(); plotComparePerf(lpda,lclr,yl=(0,2),lleg=lfn,skipscore=True,skipfollow=True)
+savefig(gifpath()+'perf_compareD.png') 
+[[./gif/21apr16_21apr15_TARG0_B_gcp__step_4_perf_compareD.png]]
+not clear yet...
+
+clf(); drawraster(dspkT,dspkID); xlim((490e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/21apr16_21apr15_TARG0_B_gcp__step_4_rast.png]]
+
+clf(); pdfc = getconcatweightpdf(lfn)
+popwtsE = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP','EA','EA2'],lclr=['r','b','g','c'],plotindiv=False)
+savefig(gifpath()+'all_steps_avg_weight.png') 
+[[./gif/21apr16_21apr15_TARG0_B_gcp__step_4_all_steps_avg_weight.png]]
+average weights are pretty similar to the sim with longer tau (100 s)
+
+fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
+[[./gif/21apr16_21apr15_TARG0_B_gcp__step_4__with_reward_input.mp4]]
+
+looks nonrandom but overall perf not as good as sim with 100 s tau so will discontinue this one further ... 
+
+** other sim?
+
+could adjust architecture - denser connectivity?? or keep architecture, have 100 s RL tau,
+and have equal negative weight for miss ... ?
+
