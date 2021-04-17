@@ -29,7 +29,7 @@
     "useImagePadding": 0,
     "rewardcodes": {
         "scorePoint": 0.0,
-        "losePoint": -0.15,
+        "losePoint": -0.2,
         "followTarget": 0.0,
         "avoidTarget": 0.0,
         "hitBall": 1.0
@@ -62,7 +62,7 @@
         "RLFakeUpRule": 0,
         "RLFakeDownRule": 0,
         "RLFakeStayRule": 0,
-        "name": "21apr16_TARG0_C_gcp_",
+        "name": "21apr16_TARG0_D_gcp_",
         "doquit": 1,
         "doplot": 0,
         "saveCellSecs": 0,

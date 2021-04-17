@@ -26480,6 +26480,56 @@ fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward
 
 watching video - activity does not appear random ... 
 
+check output from a few steps later ... 
+
+python -i simdat.py backupcfg/21apr15_TARG0_A_gcp__step_6_sim.json
+
+EV1 0.02 Hz
+EA 1.98 Hz
+IA 4.76 Hz
+IAL 0.35 Hz
+EA2 0.56 Hz
+IA2 1.71 Hz
+IA2L 2.4 Hz
+EMDOWN 2.09 Hz
+EMUP 2.08 Hz
+IM 3.96 Hz
+IML 4.83 Hz
+
+average rates got too high??
+
+ax=plotPerf(actreward,yl=(0,0.6))
+savefig(gifpath()+'perf.png') # [[./gif/21apr16_21apr15_TARG0_A_gcp__step_6_perf.png]]
+
+lfn = ['21apr15_TARG0_A_gcp__step_' + str(i) + '_' for i in range(7)]
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0,2))
+savefig(gifpath()+'perf_all_steps_so_far.png') 
+[[./gif/21apr16_21apr15_TARG0_A_gcp__step_6_perf_all_steps_so_far.png]]
+
+savefig(gifpath()+'perf_all_steps_so_farB.png') 
+[[./gif/21apr16_21apr15_TARG0_A_gcp__step_6_perf_all_steps_so_farB.png]]
+
+lpda = getindivactionreward(lfn)
+csm=cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+lclr = [csm.to_rgba(float(i)/(len(lpda))) for i in range(len(lpda))]
+clf(); plotComparePerf(lpda,lclr,yl=(0,2),lleg=lfn,skipscore=True,skipfollow=True)
+savefig(gifpath()+'perf_compareD.png') 
+[[./gif/21apr16_21apr15_TARG0_A_gcp__step_6_perf_compareD.png]]
+
+clf(); drawraster(dspkT,dspkID); xlim((490e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/21apr16_21apr15_TARG0_A_gcp__step_6_rast.png]]
+savefig(gifpath()+'rastB.png') # [[./gif/21apr16_21apr15_TARG0_A_gcp__step_6_rastB.png]]
+rates here are ok, tending towards hypersychrnony, but stopped next step sim since rates got way too high
+
+clf(); pdfc = getconcatweightpdf(lfn)
+popwtsE = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP','EA','EA2'],lclr=['r','b','g','c'],plotindiv=False)
+savefig(gifpath()+'all_steps_avg_weight.png') 
+[[./gif/21apr16_21apr15_TARG0_A_gcp__step_6_all_steps_avg_weight.png]]
+
+fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
+[[./gif/21apr16_21apr15_TARG0_A_gcp__step_6__with_reward_input.mp4]]
+
 ** check output from 21apr15_TARG0_B_gcp__step_4_
 
 this one has 50 s RL tau with non-targetted RL
@@ -26543,7 +26593,7 @@ fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward
 
 looks nonrandom but overall perf not as good as sim with 100 s tau so will discontinue this one further ... 
 
-** other sim? 21apr16_TARG0_C_gcp_
+** other sim? 21apr16_TARG0_C_gcp_ -->> with larger miss punish value
 
 could adjust architecture - denser connectivity?? or keep architecture, have 100 s RL tau,
 and have equal negative weight for miss ... ?
@@ -26562,4 +26612,70 @@ continue learning longer ...
 python multistepSim.py sn.json 30 20 21apr16_TARG0_C_gcp_multi
 
 started ~11:02 ... 
+
+check interm output ... 
+
+python -i simdat.py backupcfg/21apr16_TARG0_C_gcp__step_1_sim.json
+
+EV1 0.02 Hz
+EA 1.78 Hz
+IA 4.32 Hz
+IAL 0.24 Hz
+EA2 0.13 Hz
+IA2 1.22 Hz
+IA2L 1.75 Hz
+EMDOWN 0.24 Hz
+EMUP 0.24 Hz
+IM 1.46 Hz
+IML 2.18 Hz
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/21apr16_21apr16_TARG0_C_gcp__step_1_perf.png]]
+
+lfn = ['21apr16_TARG0_C_gcp__step_' + str(i) + '_' for i in range(2)]
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0,2))
+savefig(gifpath()+'perf_all_steps_so_far.png') 
+[[./gif/21apr17_21apr16_TARG0_C_gcp__step_1_perf_all_steps_so_far.png]]
+
+savefig(gifpath()+'perf_all_steps_so_farB.png') 
+[[./gif/21apr17_21apr16_TARG0_C_gcp__step_1_perf_all_steps_so_farB.png]]
+
+seems like improving...only 2 steps so far...
+
+lpda = getindivactionreward(lfn)
+csm=cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+lclr = [csm.to_rgba(float(i)/(len(lpda))) for i in range(len(lpda))]
+clf(); plotComparePerf(lpda,lclr,yl=(0,2),lleg=lfn,skipscore=True,skipfollow=True)
+savefig(gifpath()+'perf_compareD.png') 
+[[./gif/21apr17_21apr16_TARG0_C_gcp__step_1_perf_compareD.png]]
+
+clf(); drawraster(dspkT,dspkID); xlim((490e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/21apr17_21apr16_TARG0_C_gcp__step_1_rast.png]]
+good rates so far ~0.3 Hz for EM
+
+clf(); pdfc = getconcatweightpdf(lfn)
+popwtsE = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP','EA','EA2'],lclr=['r','b','g','c'],plotindiv=False)
+savefig(gifpath()+'all_steps_avg_weight.png') 
+[[./gif/21apr17_21apr16_TARG0_C_gcp__step_1_all_steps_avg_weight.png]]
+weights increasing slowly ...
+
+fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
+[[./gif/21apr17_21apr16_TARG0_C_gcp__step_1__with_reward_input.mp4]]
+
+** and another sim 21apr16_TARG0_D_gcp_ -->> with even larger miss punish value
+
+increase punishment weight to make sure network can continue learning longer ... 
+
+    "rewardcodes": {
+        "scorePoint": 0.0,
+        "losePoint": -0.2,
+        "followTarget": 0.0,
+        "avoidTarget": 0.0,
+        "hitBall": 1.0
+    },
+
+python multistepSim.py sn.json 30 20 21apr16_TARG0_D_gcp_multi
+
+started ~21:58 ...
 
