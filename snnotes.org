@@ -26798,3 +26798,22 @@ python multistepSim.py sn.json 30 20 21apr17_TARG0_E_gcp_multi
 
 started ~21:31 ...
 
+* 21apr18
+** sim D also became hyperexcitable - so stopped on step 7
+** sim E still running
+** start another sim with slightly more miss punish value 21apr18_TARG0_F_gcp_
+
+    "rewardcodes": {
+        "scorePoint": 0.0,
+        "losePoint": -0.3,
+        "followTarget": 0.0,
+        "avoidTarget": 0.0,
+        "hitBall": 1.0
+    },
+
+keep all else same, RL tau at 100 s ... and non targetted RL ... 
+
+python multistepSim.py sn.json 30 20 21apr18_TARG0_F_gcp_multi
+
+started ~10:06 ...
+
