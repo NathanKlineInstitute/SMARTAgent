@@ -26679,3 +26679,122 @@ python multistepSim.py sn.json 30 20 21apr16_TARG0_D_gcp_multi
 
 started ~21:58 ...
 
+* 21apr17
+** check output from 21apr16_TARG0_C_gcp__step_7_ -->> epileptic - stopped
+
+stopped step 8 since had developed hyperexcitability ... 
+
+python -i simdat.py backupcfg/21apr16_TARG0_C_gcp__step_7_sim.json
+
+EV1 0.02 Hz
+EA 2.01 Hz
+IA 4.87 Hz
+IAL 0.38 Hz
+EA2 0.53 Hz
+IA2 1.68 Hz
+IA2L 2.36 Hz
+EMDOWN 3.61 Hz
+EMUP 3.61 Hz
+IM 4.74 Hz
+IML 5.88 Hz
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[.gif/21apr18_21apr16_TARG0_C_gcp__step_7_perf.png]]
+might have hyperexcit already in this step 7... 
+
+lfn = ['21apr16_TARG0_C_gcp__step_' + str(i) + '_' for i in range(8)]
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0,2))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/21apr18_21apr16_TARG0_C_gcp__step_7_perf_all_steps_so_far.png]]
+
+savefig(gifpath()+'perf_all_steps_so_farB.png') 
+[[./gif/21apr18_21apr16_TARG0_C_gcp__step_7_perf_all_steps_so_farB.png]]
+
+lpda = getindivactionreward(lfn)
+csm=cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+lclr = [csm.to_rgba(float(i)/(len(lpda))) for i in range(len(lpda))]
+clf(); plotComparePerf(lpda,lclr,yl=(0,2),lleg=lfn,skipscore=True,skipfollow=True)
+savefig(gifpath()+'perf_compareD.png') 
+[[./gif/21apr18_21apr16_TARG0_C_gcp__step_7_perf_compareD.png]]
+not sure which step best ... 
+
+clf(); drawraster(dspkT,dspkID); xlim((490e3,500e3))
+savefig(gifpath()+'rast.png')
+[[./gif/21apr18_21apr16_TARG0_C_gcp__step_7_rast.png]]
+
+clf(); pdfc = getconcatweightpdf(lfn)
+popwtsE = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP','EA','EA2'],lclr=['r','b','g','c'],plotindiv=False)
+savefig(gifpath()+'all_steps_avg_weight.png') 
+[[./gifpath()+'all_steps_avg_weight.png]]
+
+once average weights get to ~0.8, becomes epileptic ... 
+
+fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
+[[./gif/21apr18_21apr16_TARG0_C_gcp__step_7__with_reward_input.mp4]]
+
+** check output from 21apr16_TARG0_D_gcp__step_4_ -->> best from this set so far
+
+python -i simdat.py backupcfg/21apr16_TARG0_D_gcp__step_4_sim.json
+
+EA 1.89 Hz
+IA 4.54 Hz
+IAL 0.27 Hz
+EA2 0.23 Hz
+IA2 1.31 Hz
+IA2L 1.89 Hz
+EMDOWN 0.41 Hz
+EMUP 0.4 Hz
+IM 1.7 Hz
+IML 2.5 Hz
+
+ax=plotPerf(actreward,yl=(0,3))
+savefig(gifpath()+'perf.png') # [[./gif/21apr18_21apr16_TARG0_D_gcp__step_4_perf.png]]
+that's best perf seen so far for this set of sims ... with non targetted RL, no intermediate
+rewards, and long RL tau
+
+lfn = ['21apr16_TARG0_D_gcp__step_' + str(i) + '_' for i in range(5)]
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0,2))
+savefig(gifpath()+'perf_all_steps_so_far.png') 
+[[./gif/21apr18_21apr16_TARG0_D_gcp__step_4_perf_all_steps_so_far.png]]
+
+savefig(gifpath()+'perf_all_steps_so_farB.png') 
+[[./gif/21apr18_21apr16_TARG0_D_gcp__step_4_perf_all_steps_so_farB.png]]
+might still be improving ... 
+
+lpda = getindivactionreward(lfn)
+csm=cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+lclr = [csm.to_rgba(float(i)/(len(lpda))) for i in range(len(lpda))]
+clf(); plotComparePerf(lpda,lclr,yl=(0,2),lleg=lfn,skipscore=True,skipfollow=True)
+savefig(gifpath()+'perf_compareD.png') 
+[[./gif/21apr18_21apr16_TARG0_D_gcp__step_4_perf_compareD.png]]
+step 4 is best so far ... 
+
+clf(); drawraster(dspkT,dspkID); xlim((490e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/21apr18_21apr16_TARG0_D_gcp__step_4_rast.png]]
+
+clf(); pdfc = getconcatweightpdf(lfn)
+popwtsE = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP','EA','EA2'],lclr=['r','b','g','c'],plotindiv=False)
+savefig(gifpath()+'all_steps_avg_weight.png') 
+[[./gif/21apr18_21apr16_TARG0_D_gcp__step_4_all_steps_avg_weight.png]]
+weights going up and this will most likely get epileptic within a few steps ... 
+
+fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
+[[./gif/21apr18_21apr16_TARG0_D_gcp__step_4__with_reward_input.mp4]]
+
+** start another sim with slightly more miss punish value 21apr17_TARG0_E_gcp_
+
+    "rewardcodes": {
+        "scorePoint": 0.0,
+        "losePoint": -0.25,
+        "followTarget": 0.0,
+        "avoidTarget": 0.0,
+        "hitBall": 1.0
+    },
+
+keep all else same, RL tau at 100 s ... and non targetted RL ... 
+
+python multistepSim.py sn.json 30 20 21apr17_TARG0_E_gcp_multi
+
+started ~21:31 ...
+
