@@ -26817,3 +26817,174 @@ python multistepSim.py sn.json 30 20 21apr18_TARG0_F_gcp_multi
 
 started ~10:06 ...
 
+* 21apr19
+** check output from 21apr18_TARG0_F_gcp__step_4_ : -> weights decreasing -> too sparse activity
+
+python -i simdat.py backupcfg/21apr18_TARG0_F_gcp__step_4_sim.json
+
+EV1 0.02 Hz
+EA 1.74 Hz
+IA 4.26 Hz
+IAL 0.23 Hz
+EA2 0.1 Hz
+IA2 1.2 Hz
+IA2L 1.7 Hz
+EMDOWN 0.18 Hz
+EMUP 0.18 Hz
+IM 1.38 Hz
+IML 2.07 Hz
+
+these firing rates lower than other sims...
+
+ax=plotPerf(actreward,yl=(0,0.6))
+savefig(gifpath()+'perf.png') # [[./gif/21apr19_21apr18_TARG0_F_gcp__step_4_perf.png]]
+
+lfn = ['21apr18_TARG0_F_gcp__step_' + str(i) + '_' for i in range(5)]
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0,2))
+savefig(gifpath()+'perf_all_steps_so_far.png') 
+[[./gif/21apr19_21apr18_TARG0_F_gcp__step_4_perf_all_steps_so_far.png]]
+performance is dropping in this one - probably due to too much punishment and suppression
+of E firing...
+savefig(gifpath()+'perf_all_steps_so_farB.png') 
+[[./gif/21apr19_21apr18_TARG0_F_gcp__step_4_perf_all_steps_so_farB.png]]
+
+lpda = getindivactionreward(lfn)
+csm=cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+lclr = [csm.to_rgba(float(i)/(len(lpda))) for i in range(len(lpda))]
+clf(); plotComparePerf(lpda,lclr,yl=(0,2),lleg=lfn,skipscore=True,skipfollow=True)
+savefig(gifpath()+'perf_compareD.png') 
+[[./gif/21apr19_21apr18_TARG0_F_gcp__step_4_perf_compareD.png]]
+yeah, step 0 does the best for this sim ... 
+
+clf(); drawraster(dspkT,dspkID); xlim((490e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/21apr19_21apr18_TARG0_F_gcp__step_4_rast.png]]
+
+clf(); pdfc = getconcatweightpdf(lfn)
+popwtsE = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP','EA','EA2'],lclr=['r','b','g','c'],plotindiv=False)
+savefig(gifpath()+'all_steps_avg_weight.png') 
+gifpath()+'all_steps_avg_weight.png'
+[[./gif/21apr19_21apr18_TARG0_F_gcp__step_4_all_steps_avg_weight.png]]
+here, the weights are generally decreasing ... may need some form of weight scaling
+to preserve activity - as was suggested from prior simulations
+
+** check output from 21apr17_TARG0_E_gcp__step_8_
+
+python -i simdat.py backupcfg/21apr17_TARG0_E_gcp__step_8_sim.json
+
+EV1 0.02 Hz
+EA 1.91 Hz
+IA 4.59 Hz
+IAL 0.3 Hz
+EA2 0.34 Hz
+IA2 1.43 Hz
+IA2L 2.05 Hz
+EMDOWN 0.53 Hz
+EMUP 0.52 Hz
+IM 1.96 Hz
+IML 2.86 Hz
+
+ax=plotPerf(actreward,yl=(0,2))
+savefig(gifpath()+'perf.png') # [[./gif/21apr19_21apr17_TARG0_E_gcp__step_8_perf.png]]
+not terrible ... 
+
+lfn = ['21apr17_TARG0_E_gcp__step_' + str(i) + '_' for i in range(9)]
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0,2))
+savefig(gifpath()+'perf_all_steps_so_far.png') 
+[[./gif/21apr19_21apr17_TARG0_E_gcp__step_8_perf_all_steps_so_far.png]]
+
+savefig(gifpath()+'perf_all_steps_so_farB.png') 
+[[./gif/21apr19_21apr17_TARG0_E_gcp__step_8_perf_all_steps_so_farB.png]]
+overall not changing much ... so far ... ? 
+
+lpda = getindivactionreward(lfn)
+csm=cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+lclr = [csm.to_rgba(float(i)/(len(lpda))) for i in range(len(lpda))]
+clf(); plotComparePerf(lpda,lclr,yl=(0,2),lleg=lfn,skipscore=True,skipfollow=True)
+savefig(gifpath()+'perf_compareD.png') 
+[[./gif/21apr19_21apr17_TARG0_E_gcp__step_8_perf_compareD.png]]
+
+best ones from this sim (21apr17_TARG0_E_gcp_ similar but not as good to sims
+in [[./gif/21apr18_21apr16_TARG0_D_gcp__step_4_perf_compareD.png]]  - 21apr16_TARG0_D_gcp_ -- so
+not clear which one to use for paper)
+
+clf(); drawraster(dspkT,dspkID); xlim((490e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/21apr19_21apr17_TARG0_E_gcp__step_8_rast.png]]
+
+clf(); pdfc = getconcatweightpdf(lfn)
+popwtsE = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP','EA','EA2'],lclr=['r','b','g','c'],plotindiv=False)
+savefig(gifpath()+'all_steps_avg_weight.png') 
+[[./gif/21apr19_21apr17_TARG0_E_gcp__step_8_all_steps_avg_weight.png]]
+between steps average weights going up sometimes, down sometimes, but overall trend is increasing
+
+fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
+[[./gif/21apr19_21apr17_TARG0_E_gcp__step_8__with_reward_input.mp4]]
+
+** conn bug - HA pointed out
+
+            "IA":{"EA":{"GA": 9.0,"conv": 22},
+                  "IA":{"GA": 4.5,"conv": 31},
+		  "IAL":{"GA": 4.5,"p": 17}},
+
+IA -> IAL should use conv instead of p
+that means p is probably all to all which explains low IAL firing rates
+may want to fix for next steps ... or keep consistent with manuscript
+
+** another sim (21apr19_TARG0_G_gcp_)
+
+include EIplast to make sure activity does not get hyperexcitable - or some form of weight/rate balancing??
+
+21apr16_TARG0_D_gcp__step_4_sim.json seemed to do best so far ... 
+
+21apr19_TARG0_G_gcp_
+
+if changing architecture/connectivity, will change the conn bug mentioned above to use conv instead of p : 
+            "IA":{"EA":{"GA": 9.0,"conv": 22},
+                  "IA":{"GA": 4.5,"conv": 31},
+		  "IAL":{"GA": 4.5,"conv": 17}},  <<-- fix
+
+basically that bug meant that IAL was firing much less (since IA->IAL was at 100%) and then EA had less feedback inhibition
+which could lead to hyperexcit
+as a result also could not support as much recurrent/feedback connectivity to EA ... so now trying with some more
+recurrent connectivity in EA and higher weights for feedback connections
+might lead to runaway excitation but the extra connections (doubled EA->EA conv) and stronger feedback connections
+could allow storage of more info:
+
+            "EA":{"EA":{"AM2": 0.5,"NM2": 0.01, "conv": 60},
+                  "EA2":{"AM2": 0.5,"NM2": 0.01, "conv": 100},
+                  "EM":{"AM2": 0.5,"NM2": 0.01, "conv": 100},
+                  "IA":{"AM2": 1.95,"NM2":0.0195, "conv": 93},
+		  "IAL":{"AM2": 0.98,"NM2":0.098, "conv": 110}},
+            "EA2":{"EA":{"AM2": 0.5,"NM2": 0.01,"conv": 3},
+                   "EA2":{"AM2": 0.5,"NM2": 0.01,"conv": 60},
+                   "EM":{"AM2": 0.5,"NM2": 0.01,"conv": 60},
+                   "IA2":{"AM2": 1.95,"NM2":0.0195,"conv": 93},
+		   "IA2L":{"AM2": 0.98,"NM2":0.098,"conv": 110}},	    
+            "EM":{"EM":{"AM2": 0.5,"NM2": 0.01,"conv": 60},
+                  "EA":{"AM2": 0.5,"NM2": 0.01,"conv": 3},
+                  "EA2":{"AM2": 0.5,"NM2": 0.01,"conv": 3},
+                  "IRecip":{"AM2": 20,"NM2": 0,"conv": 18},
+                  "IM":{"AM2": 1.95,"NM2":0.0195,"conv": 93},
+		  "IML":{"AM2": 0.98,"NM2":0.098,"conv": 110}},
+
+./myrun 30 sn.json
+
+python -i simdat.py backupcfg/21apr19_TARG0_G_gcp_sim.json
+
+ok ... at 10 s rates were ok 
+
+and using these reward codes:
+
+    "rewardcodes": {
+        "scorePoint": 0.0,
+        "losePoint": -0.2,
+        "followTarget": 0.0,
+        "avoidTarget": 0.0,
+        "hitBall": 1.0
+    },
+
+python multistepSim.py sn.json 30 20 21apr19_TARG0_G_gcp_multi
+
+started ~12:45 ...
+
