@@ -51,7 +51,7 @@
         "ResumeSimFromFile": "data/21jan6_TARG4_gcp__step_19_synWeights_final.pkl"
     },
     "sim": {
-        "duration": 10000,
+        "duration": 500000,
         "dt": 0.6,
         "verbose": 0,
         "recordStep": 1.0,
