@@ -26868,7 +26868,7 @@ gifpath()+'all_steps_avg_weight.png'
 here, the weights are generally decreasing ... may need some form of weight scaling
 to preserve activity - as was suggested from prior simulations
 
-** check output from 21apr17_TARG0_E_gcp__step_8_
+** check output from 21apr17_TARG0_E_gcp__step_8_ -> some steps decent, eventually hyperexcit
 
 python -i simdat.py backupcfg/21apr17_TARG0_E_gcp__step_8_sim.json
 
@@ -26920,6 +26920,8 @@ between steps average weights going up sometimes, down sometimes, but overall tr
 
 fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
 [[./gif/21apr19_21apr17_TARG0_E_gcp__step_8__with_reward_input.mp4]]
+
+this sim became hyperexcitable during step 11 ... 
 
 ** conn bug - HA pointed out
 
@@ -26987,4 +26989,12 @@ and using these reward codes:
 python multistepSim.py sn.json 30 20 21apr19_TARG0_G_gcp_multi
 
 started ~12:51 ...
+
+** another sim (21apr19_TARG0_H_gcp_)
+
+same as 21apr19_TARG0_G_gcp_ but with higher magnitude for point loss (losePoint==-0.25)
+
+python multistepSim.py sn.json 30 20 21apr19_TARG0_H_gcp_multi
+
+started ~22:39 ... 
 
