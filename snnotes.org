@@ -26998,3 +26998,95 @@ python multistepSim.py sn.json 30 20 21apr19_TARG0_H_gcp_multi
 
 started ~22:39 ... 
 
+* 21apr20
+** check output from 21apr19_TARG0_G_gcp__step_3_ -->> may need more time/steps
+
+python -i simdat.py backupcfg/21apr19_TARG0_G_gcp__step_3_sim.json
+
+EV1 0.02 Hz
+EA 1.88 Hz
+IA 3.39 Hz
+IAL 4.72 Hz
+EA2 0.19 Hz
+IA2 1.33 Hz
+IA2L 1.97 Hz
+EMDOWN 0.27 Hz
+EMUP 0.27 Hz
+IM 1.55 Hz
+IML 2.26 Hz
+
+ax=plotPerf(actreward,yl=(0,2))
+savefig(gifpath()+'perf.png') # [[./gif/21apr20_21apr19_TARG0_G_gcp__step_3_perf.png]]
+
+lfn = ['21apr19_TARG0_G_gcp__step_' + str(i) + '_' for i in range(4)]
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0,2))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/21apr20_21apr19_TARG0_G_gcp__step_3_perf_all_steps_so_far.png]]
+
+savefig(gifpath()+'perf_all_steps_so_farB.png') 
+[[./gif/21apr20_21apr19_TARG0_G_gcp__step_3_perf_all_steps_so_farB.png]]
+unstable but might be decreasing near the end ...
+
+lpda = getindivactionreward(lfn)
+csm=cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+lclr = [csm.to_rgba(float(i)/(len(lpda))) for i in range(len(lpda))]
+clf(); plotComparePerf(lpda,lclr,yl=(0,2),lleg=lfn,skipscore=True,skipfollow=True)
+savefig(gifpath()+'perf_compareD.png') 
+[[./gif/21apr20_21apr19_TARG0_G_gcp__step_3_perf_compareD.png]]
+
+clf(); drawraster(dspkT,dspkID); xlim((490e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/21apr20_21apr19_TARG0_G_gcp__step_3_rast.png]]
+
+clf(); pdfc = getconcatweightpdf(lfn)
+popwtsE = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP','EA','EA2'],lclr=['r','b','g','c'],plotindiv=False)
+savefig(gifpath()+'all_steps_avg_weight.png') 
+[[./gif/21apr20_21apr19_TARG0_G_gcp__step_3_all_steps_avg_weight.png]]
+
+here EA weights are highest ... in previous sims had EMUP,EMDOWN weights as highest ... will see where this goes ... 
+might become epileptic faster with the higher recurrent connectivity in EA ... although the higher IAL activity
+might prevent that
+
+fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
+[[./gif/21apr20_21apr19_TARG0_G_gcp__step_3__with_reward_input.mp4]]
+
+** check output from 21apr19_TARG0_H_gcp__step_1_
+
+python -i simdat.py backupcfg/21apr19_TARG0_H_gcp__step_1_sim.json
+
+EV1 0.02 Hz
+EA 1.84 Hz
+IA 3.35 Hz
+IAL 4.65 Hz
+EA2 0.16 Hz
+IA2 1.29 Hz
+IA2L 1.9 Hz
+EMDOWN 0.24 Hz
+EMUP 0.24 Hz
+IM 1.49 Hz
+IML 2.19 Hz
+
+ax=plotPerf(actreward,yl=(0,3))
+savefig(gifpath()+'perf.png') # [[./gif/21apr20_21apr19_TARG0_H_gcp__step_1_perf.png]]
+
+lfn = ['21apr19_TARG0_H_gcp__step_' + str(i) + '_' for i in range(2)]
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0,1))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/21apr20_21apr19_TARG0_H_gcp__step_1_perf_all_steps_so_far.png]]
+probably needs more time...
+
+lpda = getindivactionreward(lfn)
+csm=cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+lclr = [csm.to_rgba(float(i)/(len(lpda))) for i in range(len(lpda))]
+clf(); plotComparePerf(lpda,lclr,yl=(0,2),lleg=lfn,skipscore=True,skipfollow=True)
+savefig(gifpath()+'perf_compareD.png') # [[./gif/21apr20_21apr19_TARG0_H_gcp__step_1_perf_compareD.png]]
+
+clf(); drawraster(dspkT,dspkID); xlim((490e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/21apr20_21apr19_TARG0_H_gcp__step_1_rast.png]]
+
+clf(); pdfc = getconcatweightpdf(lfn)
+popwtsE = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP','EA','EA2'],lclr=['r','b','g','c'],plotindiv=False)
+savefig(gifpath()+'all_steps_avg_weight.png') # [[./gif/21apr20_21apr19_TARG0_H_gcp__step_1_all_steps_avg_weight.png]]
+
+fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
+[[./gif/21apr20_21apr19_TARG0_H_gcp__step_1__with_reward_input.mp4]]
+
