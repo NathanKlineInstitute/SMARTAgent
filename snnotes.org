@@ -27142,7 +27142,7 @@ fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward
 [[./gif/21apr21_21apr19_TARG0_G_gcp__step_10__with_reward_input.mp4]]
 
 ** 21apr19_TARG0_G_gcp__step_11_ became epileptic - stopped it
-** check output from 21apr19_TARG0_H_gcp__step_8_ -> not much (or any?) improvement
+** check output from 21apr19_TARG0_H_gcp__step_8_ -> not much (or any?) improvement -- stopped
 
 python -i simdat.py backupcfg/21apr19_TARG0_H_gcp__step_8_sim.json
 
@@ -27187,7 +27187,7 @@ savefig(gifpath()+'all_steps_avg_weight.png') # [[./gif/21apr21_21apr19_TARG0_H_
 
 fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
 [[./gif/21apr21_21apr19_TARG0_H_gcp__step_8__with_reward_input.mp4]]
-** next sim (21apr21_TARG0_I_gcp_)
+** next sim (21apr21_TARG0_I_gcp_) (10 s tau)
 
 reduce RL tau to 10 s -- which is closer to the time it takes to go across the field?
 
@@ -27197,4 +27197,30 @@ were - but also keeping the fix to IA -> IAL)
 python multistepSim.py sn.json 30 20 21apr21_TARG0_I_gcp_multi
 
 started ~16:58 ...
+
+python -i simdat.py backupcfg/21apr21_TARG0_I_gcp__step_0_sim.json
+
+EV1 0.02 Hz
+EA 1.66 Hz
+IA 3.06 Hz
+IAL 4.22 Hz
+EA2 0.11 Hz
+IA2 1.2 Hz
+IA2L 1.72 Hz
+EMDOWN 0.19 Hz
+EMUP 0.19 Hz
+IM 1.4 Hz
+IML 2.1 Hz
+
+ax=plotPerf(actreward,yl=(0,3))
+
+** next sim (21apr21_TARG0_J_gcp_) (5 s tau)
+
+(buffer = s2)
+
+(otherwise same as 21apr21_TARG0_I_gcp_)
+
+python multistepSim.py sn.json 30 20 21apr21_TARG0_J_gcp_multi
+
+started ~22:52 ...
 
