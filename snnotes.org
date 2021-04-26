@@ -27650,3 +27650,13 @@ python multistepSim.py sn.json 30 20 21apr25_TARG0_I2_gcp_multi
 
 started ~9:35 ...
 
+hmm, had a mistake in sn.json that the rewardcode for losePoint was -0.25 instead of -0.2
+
+ok, fixed that and restarting ...
+
+python multistepSim.py sn.json 30 20 21apr25_TARG0_I2_gcp_multi
+
+started ~22:14 ...
+
+(buffer=shell)
+

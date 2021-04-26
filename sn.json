@@ -29,7 +29,7 @@
     "useImagePadding": 0,
     "rewardcodes": {
         "scorePoint": 0.0,
-        "losePoint": -0.25,
+        "losePoint": -0.2,
         "followTarget": 0.0,
         "avoidTarget": 0.0,
         "hitBall": 1.0
