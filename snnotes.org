@@ -28087,7 +28087,7 @@ python multistepSim.py sn.json 30 20 21apr28_TARG0_I3_gcp_multi
 
 started ~9:50 . . .
 
-** check output from 21apr25_TARG0_K2_gcp__step_13_ -->> stopped: prog slow, erf decaying a bit
+** check output from 21apr25_TARG0_K2_gcp__step_13_ -->> stopped: prog slow, perf decaying a bit
 
 python -i simdat.py backupcfg/21apr25_TARG0_K2_gcp__step_13_sim.json
 
@@ -28130,4 +28130,21 @@ savefig(gifpath()+'all_steps_avg_weight.png') # [[./gifpath()+'all_steps_avg_wei
 
 could continue some more but learning much slower than I,I2 model ..
 stopped this ; last step completed was one 21apr25_TARG0_K2_gcp__step_13_
+
+** other sim (21apr28_TARG0_L_gcp_) with lower noise (similar to 21apr22_TARG0_K_gcp_)
+
+but with lower magnitude of losePoint (-0.1 instead of -0.2) so learning could progress more rapidly
+
+cp backupcfg/21apr22_TARG0_K_gcp_sim.json sn.json
+
+then adjust ...
+
+could get rid of EA2, IA2, IA2L as well . . . ? ok - that way the EA2 weights wont have to start so high
+and will run faster ... worth a try...
+
+(buffer=s0)
+
+python multistepSim.py sn.json 30 40 21apr28_TARG0_L_gcp_multi
+
+started ~10:22 ...
 
