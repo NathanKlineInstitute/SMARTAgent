@@ -27965,3 +27965,71 @@ fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward
 
 ** make an I3 sim -- with EIPlast?
 
+hmm, adding new E->I plasticity might not work with current code ... ? 
+looking at the code - should be possible to continue (resume sim to update the
+weights, then continue forward using EIplast)
+
+could use these as starting weights?
+ data/21apr25_TARG0_I2_gcp__step_7_synWeights_final.pkl
+
+but have to set the AMPAI weights carefully so they make sense ...wbase, wmax ...
+also need the right rllenhebb and rlhebbwt ...RLlenhebb does not have to be same
+value as for AMPA ...
+
+cp backupcfg/21apr21_TARG0_I_gcp_sim.json sn.json
+then adjust ...
+
+    "simtype": {
+        "ResumeSim": 1,
+        "ResumeSimFromFile": "data/21apr25_TARG0_I2_gcp__step_7_synWeights_final.pkl"
+    },
+21apr27_TARG0_I3_gcp_
+
+have setup AMPAI like this for now:
+        "AMPAI": {
+            "wbase": 0.4,
+            "wmax": 6,
+            "RLon": 1,
+            "STDPon": 0,
+            "RLlenhebb": 10000,
+            "RLlenanti": 500,
+            "useRLexp": 1,
+            "RLhebbwt": 0.01,
+            "RLantiwt": 0.0,
+            "hebbwt": 0,
+            "antiwt": 0,
+            "tauhebb": 10,
+            "tauanti": 10,
+            "RLwindhebb": 50,
+            "softthresh": 0,
+            "verbose": 0,
+            "maxreward": 0.0
+        },
+        "AMPA": {
+            "wbase": 0.001,
+            "wmax": 5,
+            "RLon": 1,
+            "STDPon": 0,
+            "RLlenhebb": 10000,
+            "RLlenanti": 500,
+            "useRLexp": 1,
+            "RLhebbwt": 0.01,
+            "RLantiwt": 0,
+            "hebbwt": 0.0,
+            "antiwt": 0.0,
+            "tauhebb": 10,
+            "tauanti": 10,
+            "RLwindhebb": 50,
+            "softthresh": 0,
+            "verbose": 0,
+            "maxreward": 0.0
+        },
+so will use similar weight changes as AMPA ... because the network that resuming from is already
+close to the point where it becomes hyperexcitable
+
+(buffer=shell)
+
+python multistepSim.py sn.json 30 20 21apr27_TARG0_I3_gcp_multi
+
+started ~22:20 ...
+
