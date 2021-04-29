@@ -28317,3 +28317,30 @@ savefig(gifpath()+'all_steps_avg_weight.png')
 [[./gif/21apr29_21apr28_TARG0_L_gcp__step_9_all_steps_avg_weight.png]]
 weights are clearly increasing ... but performance - not yet
 
+** 21apr29_TARG0_I3_EIPlast_gcp_
+
+same params as 21apr21_TARG0_I_gcp_ but also include EIPlast ... 
+so basically same params as 21apr28_TARG0_I3_gcp__ but starting over (without resumesim)
+since starting from scratch can reduce the amount of EIplast so dont end up causing dep blockade in interneurons
+
+cp backupcfg/21apr27_TARG0_I3_gcp_sim.json sn.json
+
+and then make modifications ... losePoint at -0.2
+
+for AMPAI will have RLhebbwt at 0.001 and RLlenhebb at 500
+(AMPA has RLhebbwt of 0.01 and RLlenhebb at 10000)
+that way inhibition wont grow too quickly ... (higher firing rates of interneurons with some minor
+EIPlast may be enough to prevent hyperexcitability and extend time that learning can take place over ... )
+
+hmm...may instead resume from 21apr25_TARG0_I2_gcp__step_3_ (previously had resumed 4 steps later when the
+weights were a little higher) ... maybe that will be enough to prevent hyperexcit ... 
+
+    "simtype": {
+        "ResumeSim": 1,
+        "ResumeSimFromFile": "data/21apr25_TARG0_I2_gcp__step_3_synWeights_final.pkl"
+    },
+
+python multistepSim.py sn.json 30 40 21apr29_TARG0_I3_gcp_multi
+
+started ~11:41 ...
+
