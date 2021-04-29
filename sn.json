@@ -47,7 +47,7 @@
     "verbose": 0,
     "stayStepLim": 0,
     "simtype": {
-        "ResumeSim": 1,
+        "ResumeSim": 0,
         "ResumeSimFromFile": "data/21apr25_TARG0_I2_gcp__step_3_synWeights_final.pkl"
     },
     "sim": {
@@ -62,7 +62,7 @@
         "RLFakeUpRule": 0,
         "RLFakeDownRule": 0,
         "RLFakeStayRule": 0,
-        "name": "21apr29_TARG0_I3_EIPlast_gcp_",
+        "name": "21apr29_TARG0_J_EIPlast_gcp_",
         "doquit": 1,
         "doplot": 0,
         "saveCellSecs": 0,

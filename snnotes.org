@@ -28344,3 +28344,17 @@ python multistepSim.py sn.json 30 40 21apr29_TARG0_I3_gcp_multi
 
 started ~11:41 ...
 
+(buffer=shell)
+
+** stopped 21apr28_TARG0_L_gcp_
+
+not improving quickly enough ... hopefully 21apr29_TARG0_I3_gcp_ will improve further
+
+** also start 21apr29_TARG0_J_EIPlast_gcp_
+
+this will use same params as 21apr29_TARG0_I3_gcp_ but will start from scratch
+
+python multistepSim.py sn.json 30 40 21apr29_TARG0_J_EIPlast_gcp_multi
+
+started ~11:49 ...
+
