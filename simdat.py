@@ -792,8 +792,17 @@ def plotMeanNeuronWeight (pdf,postid,clr='k',ax=None,msz=1,xl=None):
   if xl is not None: ax.set_xlim(xl)
   ax.set_ylim((mnw,mxw))
   ax.set_ylabel('Average weight'); 
-  return wts    
-  
+  return wts
+
+def unnanl (l, val=0):
+  out = []
+  for x in l:
+    if isnan(x):
+      out.append(0)
+    else:
+      out.append(x)
+  return out
+      
 def plotMeanWeights (pdf,ax=None,msz=1,xl=None,lpop=['EMDOWN','EMUP'],lclr=['k','r','b','g'],plotindiv=True,fsz=15,prety=None):
   #plot mean weights of all plastic synaptic weights onto lpop
   if ax is None: ax = gca()
@@ -811,7 +820,7 @@ def plotMeanWeights (pdf,ax=None,msz=1,xl=None,lpop=['EMDOWN','EMUP'],lclr=['k',
       pdfs = pdf[(pdf.postid>=dstartidx[pop]) & (pdf.postid<=dendidx[pop])]
       if prety is not None:
         pdfs = pdfs[(pdfs.preid>=dstartidx[prety]) & (pdfs.preid<=dendidx[prety])]
-      popwts[pop] = [np.mean(pdfs[(pdfs.time==t)].weight) for t in utimes] #wts of connections onto pop
+      popwts[pop] = unnanl([np.mean(pdfs[(pdfs.time==t)].weight) for t in utimes]) #wts of connections onto pop      
       ax.plot(utimes,popwts[pop],clr+'-o',markersize=msz)
       mnw=min(mnw, np.amin(popwts[pop]))
       mxw=max(mxw, np.amax(popwts[pop]))            
