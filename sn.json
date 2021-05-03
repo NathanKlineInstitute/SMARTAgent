@@ -47,7 +47,7 @@
     "verbose": 0,
     "stayStepLim": 0,
     "simtype": {
-        "ResumeSim": 1,
+        "ResumeSim": 0,
         "ResumeSimFromFile": "data/21apr25_TARG0_I2_gcp__step_3_synWeights_final.pkl"
     },
     "sim": {
@@ -62,7 +62,7 @@
         "RLFakeUpRule": 0,
         "RLFakeDownRule": 0,
         "RLFakeStayRule": 0,
-        "name": "21apr30_TARG0_I3_EIPlast_gcp_",
+        "name": "21may3_TARG0_N_gcp_",
         "doquit": 1,
         "doplot": 0,
         "saveCellSecs": 0,
@@ -351,7 +351,7 @@
 	    "FeedbackA2toA": 0
         },
         "RLconns": {
-            "EIPlast": 1,
+            "EIPlast": 0,
             "Visual": 0,
             "RecurrentDirNeurons": 0,
             "RecurrentLocNeurons": 0,
@@ -385,7 +385,7 @@
         "cmat": {	    
             "VL":{"VD":{"AM2": 0,"NM2": 0, "conv": 0},
                   "VL":{"AM2": 4,"NM2": 0.6, "conv": 0},
-                  "EA":{"AM2": 12.5,"NM2": 1, "conv": 640},
+                  "EA":{"AM2": 9.0,"NM2": 0.5, "conv": 1600},
 		  "EA2":{"AM2": 0.25,"NM2": 0.0, "conv": 30},
                   "EMDOWN":{"AM2": 0.25,"NM2": 0.0, "conv": 30},
                   "EMUP":{"AM2": 0.25,"NM2": 0.0, "conv": 30}},
@@ -396,9 +396,9 @@
                   "EMDOWN":{"AM2": 0.4,"NM2": 0.0, "conv": 0},
                   "EMUP":{"AM2": 0.4,"NM2": 0.0, "conv": 0},
                   "ID":{"AM2": 10, "conv": 12}},
-            "EA":{"EA":{"AM2": 0.05,"NM2": 0.005, "conv": 30},
-                  "EA2":{"AM2": 0.5,"NM2": 0.01, "conv": 100},
-                  "EM":{"AM2": 0.5,"NM2": 0.01, "conv": 100},
+            "EA":{"EA":{"AM2": 0.05,"NM2": 0.005, "conv": 60},
+                  "EA2":{"AM2": 0.5,"NM2": 0.01, "conv": 180},
+                  "EM":{"AM2": 0.5,"NM2": 0.01, "conv": 180},
                   "IA":{"AM2": 1.95,"NM2":0.0195, "conv": 93},
 		  "IAL":{"AM2": 0.98,"NM2":0.098, "conv": 110}},
             "EA2":{"EA":{"AM2": 0.05,"NM2": 0.005,"conv": 3},
@@ -653,10 +653,10 @@
 	       "GA2": {"w": 1.875, "rate": 100}},	
 	"EA": {"AM": {"w":0, "rate":0},
 	       "NM": {"w":0, "rate":0},
-	       "GA": {"w":1.875, "rate":100},
-	       "AM2": {"w": 3.938, "rate": 200},
+	       "GA": {"w":1.875, "rate":0},
+	       "AM2": {"w": 3.938, "rate": 0},
 	       "NM2": {"w": 0, "rate": 0},
-	       "GA2": {"w": 1.875, "rate": 100}},
+	       "GA2": {"w": 1.875, "rate": 0}},
 	"IA": {"AM": {"w":1.875, "rate":100},
 	       "NM": {"w":0, "rate":0},
 	       "GA": {"w":0, "rate":0},

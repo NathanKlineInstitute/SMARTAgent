@@ -28666,3 +28666,70 @@ subplot(1,2,1); popwtsE = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.ti
 subplot(1,2,2); popwtsI = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['IA','IM','IA2','IAL','IML','IA2L'],lclr=['r','b','g','c','m','y'],plotindiv=False)
 savefig(gifpath()+'all_steps_avg_weight.png') # [[./gif/21may3_21apr29_TARG0_J_EIPlast_gcp__step_14_all_steps_avg_weight.png]]
 
+** discussion with MD & HA
+
+altered actor/critic , TD learning as a network (rather than fixed external reward signal)
+
+weights going up too much is also a problem in DL, sometimes use regularization (higher weight values contribute to loss)
+or other  adjusmtents to keep them in bounds
+
+different learning rates (lower in early layers, higher in deeper layers)
+
+try first a simpler task - e.g. lunar lander (stateful - do not have to deal with all the visual feature
+processing, just get handed the state vector and use it to learn a behavior/policy)
+
+even DL takes a long time to train to good performance levels, so should not expect great
+performance on our models with shorter training
+
+** new sim 21may3_TARG0_N_gcp_
+
+higher density of connections from EV1 to EA, from EA to EA2, from EA to EM
+
+no noise to EA
+
+non targetted 
+
+no EIPlast ... 
+
+python -i simdat.py backupcfg/21may3_TARG0_N_gcp_sim.json
+
+ok, start a multistep ...
+
+python multistepSim.py sn.json 30 40 21may3_TARG0_N_gcp_multi
+
+started ~14:15 ...
+
+** why does performance always decay in 2nd half of simulation?
+
+is it random that hits ball in beginning ... or inputs/netstims not providing enough activation
+as simulation progresses? or some other time constant involved?
+
+python -i simdat.py backupcfg/21apr25_TARG0_I2_gcp__step_3_sim.json
+
+EV1 0.02 Hz
+EA 1.86 Hz
+IA 3.35 Hz
+IAL 4.7 Hz
+EA2 0.32 Hz
+IA2 1.47 Hz
+IA2L 2.11 Hz
+EMDOWN 0.49 Hz
+EMUP 0.47 Hz
+IM 1.9 Hz
+IML 2.75 Hz
+
+binsz = 1000
+dnspk = {pop:getspikehist(dspkT[pop],dnumc[pop],binsz,totalDur) for pop in ['EV1','EA','EA2','EMDOWN','EMUP']}
+for clr,pop in zip(['r','b','g','c','m'],['EV1','EA','EA2','EMDOWN','EMUP']): plot(dnspk[pop][0],dnspk[pop][1],clr)
+xlim((0,totalDur)); ylim((0,3))
+
+savefig(gifpath()+'firing_rates.png')
+[[./gif/21may3_21apr25_TARG0_I2_gcp__step_3_firing_rates.png]]
+rates look ~stable
+
+ax=plotPerf(actreward,yl=(0,4.1))
+savefig(gifpath()+'firing_ratesB.png') 
+[[./gif/21may3_21apr25_TARG0_I2_gcp__step_3_firing_ratesB.png]]
+
+could the initialization when there's a highly synchronous activation provide some benefit for network dynamics??
+
