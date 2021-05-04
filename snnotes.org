@@ -28827,3 +28827,19 @@ savefig(gifpath()+'perf.png') # [[./gif/21may4_21apr29_TARG0_J_EIPlast_gcp__step
 
 fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
 [[./gif/21may4_21apr29_TARG0_J_EIPlast_gcp__step_16__with_reward_input.mp4]]
+
+** stop 21may3_TARG0_N_gcp_ -- probably need higher weight from VL -> EA
+** updated sim for 21may4_TARG0_O_gcp_
+
+increased number of VL -> EA (3200 vs last one which was 1600) but decreased
+the weights (removed VL -> EA NMDA) to prevent hyperexcit; this way less likely
+that the important visual info is not propagating in network
+
+VL -> EA weights are static for now
+
+also change losePoint from -0.2 to -0.15
+
+python multistepSim.py sn.json 30 40 21may4_TARG0_O_gcp_multi
+
+started ~11:52 ...
+

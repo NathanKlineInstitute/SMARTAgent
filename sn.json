@@ -29,7 +29,7 @@
     "useImagePadding": 0,
     "rewardcodes": {
         "scorePoint": 0.0,
-        "losePoint": -0.2,
+        "losePoint": -0.15,
         "followTarget": 0.0,
         "avoidTarget": 0.0,
         "hitBall": 1.0
@@ -62,7 +62,7 @@
         "RLFakeUpRule": 0,
         "RLFakeDownRule": 0,
         "RLFakeStayRule": 0,
-        "name": "21may3_TARG0_N_gcp_",
+        "name": "21may4_TARG0_O_gcp_",
         "doquit": 1,
         "doplot": 0,
         "saveCellSecs": 0,
@@ -385,7 +385,7 @@
         "cmat": {	    
             "VL":{"VD":{"AM2": 0,"NM2": 0, "conv": 0},
                   "VL":{"AM2": 4,"NM2": 0.6, "conv": 0},
-                  "EA":{"AM2": 9.0,"NM2": 0.5, "conv": 1600},
+                  "EA":{"AM2": 5.5,"NM2": 0.0, "conv": 3200},
 		  "EA2":{"AM2": 0.25,"NM2": 0.0, "conv": 30},
                   "EMDOWN":{"AM2": 0.25,"NM2": 0.0, "conv": 30},
                   "EMUP":{"AM2": 0.25,"NM2": 0.0, "conv": 30}},
