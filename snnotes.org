@@ -28877,3 +28877,42 @@ did not seem to be improving much ...
 
 ** next updated sim 21may4_TARG0_P_gcp_
 
+include plasticity from VL -> EA, EA2, EM
+
+        "RLconns": {
+            "EIPlast": 0,
+            "Visual": 0,
+            "RecurrentDirNeurons": 0,
+            "RecurrentLocNeurons": 0,
+            "FeedForwardDirNtoA": 0,
+            "FeedForwardLocNtoA": 1,
+            "FeedForwardDirNtoA2": 0,
+            "FeedForwardLocNtoA2": 1,	    
+            "FeedForwardDirNtoM": 0,
+            "FeedForwardLocNtoM": 1,
+            "FeedForwardAtoM": 1,
+            "FeedForwardAtoA2": 1,
+            "FeedForwardA2toM": 1,
+            "FeedbackLocNeurons": 0,
+            "RecurrentMNeurons": 1,
+            "RecurrentANeurons": 1,
+            "RecurrentA2Neurons": 1,
+            "FeedbackAtoDirN": 0,
+            "FeedbackAtoLocN": 0,
+	    "FeedbackMtoA": 1,
+	    "FeedbackMtoA2": 1,
+	    "FeedbackA2toA": 1
+        },
+
+since those extra RL synapse connections take more time to calc
+while allowing more flexibility will keep the older conv of VL -> EA of 640
+not sure helpful to have potentially ambiguous (from perspective of decision/behavior)
+information from VL -> EA but keeping the weights fixed is also not ideal . . . 
+
+also had to set wmax for RL synapses higher to 25 (since VL -> EA AM weight starts at 12.5);
+most weights will not get that high . . . 
+
+python multistepSim.py sn.json 30 40 21may4_TARG0_P_gcp_multi
+
+started ~23:51 ...
+
