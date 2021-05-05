@@ -29030,3 +29030,18 @@ popwtsE = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDO
 savefig(gifpath()+'all_steps_avg_weight.png') 
 
 fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
+
+** 21may5_TARG0_R_gcp_
+
+same as 21may5_TARG0_Q_gcp_ except turned off inhib noise to EA2, EMDOWN, EMUP
+
+in 5 s sim the rates of EA were ~2.8 Hz, EA2 and EM were ~1 Hz
+
+this net may get to hyperexcit faster ... but balance of dynamics will lean a little
+closer to intrinsic activity ... if hyperexcit emerges can reduce the excitatory noise 
+or increase magnitude of losePoint
+
+python multistepSim.py sn.json 30 40 21may4_TARG0_R_gcp_multi
+
+started ~16:39 ... 
+
