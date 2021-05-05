@@ -28916,3 +28916,90 @@ python multistepSim.py sn.json 30 40 21may4_TARG0_P_gcp_multi
 
 started ~23:51 ...
 
+* 21may5
+** check output from 21may4_TARG0_O_gcp__step_3_
+
+python -i simdat.py backupcfg/21may4_TARG0_O_gcp__step_3_sim.json
+
+EV1 0.02 Hz
+EA 0.56 Hz
+IA 1.79 Hz
+IAL 2.38 Hz
+EA2 0.12 Hz
+IA2 1.22 Hz
+IA2L 1.72 Hz
+EMDOWN 0.18 Hz
+EMUP 0.18 Hz
+IM 1.42 Hz
+IML 2.13 Hz
+
+ax=plotPerf(actreward,yl=(0,1.01))
+savefig(gifpath()+'perf.png') # [[./gif/21may5_21may4_TARG0_O_gcp__step_3_perf.png]]
+
+lfn = ['21may4_TARG0_O_gcp__step_' + str(i) + '_' for i in range(4)]
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0,.81))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/21may5_21may4_TARG0_O_gcp__step_3_perf_all_steps_so_far.png]]
+perf fluctuating ... 
+
+lpda = getindivactionreward(lfn)
+csm=cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+lclr = [csm.to_rgba(float(i)/(len(lpda))) for i in range(len(lpda))]
+clf(); plotComparePerf(lpda,lclr,yl=(0,2.1),lleg=lfn,skipscore=True,skipfollow=True)
+savefig(gifpath()+'perf_compareD.png') # [[./gif/21may5_21may4_TARG0_O_gcp__step_3_perf_compareD.png]]
+step 2 best so far ... look at that one's raster/animation...
+
+python -i simdat.py backupcfg/21may4_TARG0_O_gcp__step_2_sim.json
+
+EV1 0.02 Hz
+EA 0.58 Hz
+IA 1.84 Hz
+IAL 2.43 Hz
+EA2 0.12 Hz
+IA2 1.22 Hz
+IA2L 1.73 Hz
+EMDOWN 0.18 Hz
+EMUP 0.19 Hz
+IM 1.42 Hz
+IML 2.14 Hz
+
+ax=plotPerf(actreward,yl=(0,1.01))
+savefig(gifpath()+'perf.png') # [[./gif/21may5_21may4_TARG0_O_gcp__step_2_perf.png]]
+
+clf(); drawraster(dspkT,dspkID); xlim((490e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/21may5_21may4_TARG0_O_gcp__step_2_rast.png]]
+EA activity looks a little sparse ... partly because of increased number of inputs from VL->EA (3200) had to reduce
+the weight  VL->EA to 5.5 AM2 weight, and removed  NMDA on that connection
+and input weightvar of 0.5 with AM2 range of weights in (5.5-.5*5.5, 5.5+.5*5.5); no plasticity on the VL->EA
+connection either ... could increase weights from VL->EA but dont want to lead to hyperexcitability...
+
+lfn = ['21may4_TARG0_O_gcp__step_' + str(i) + '_' for i in range(4)]
+
+clf(); pdfc = getconcatweightpdf(lfn)
+popwtsE = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP','EA','EA2'],lclr=['r','b','g','c'],plotindiv=False)
+savefig(gifpath()+'all_steps_avg_weight.png') # [[./gif/21may5_21may4_TARG0_O_gcp__step_2_all_steps_avg_weight.png]]
+weight values increasing ... may need more time ... (as usual)
+
+fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
+[[./gif/21may5_21may4_TARG0_O_gcp__step_2__with_reward_input.mp4]]
+
+** 21may4_TARG0_P_gcp_ very slow almost 12 hours for 500 s
+
+main computational cost is number of RL synapses, which is much higher in this sim 
+since VL -> EA plastic
+
+stopped for now ... adjust
+
+** 21may5_TARG0_Q_gcp_
+
+ok, cutting down the size of network to allow faster/longer sims with these
+longer time constants ...
+
+EA, EA2, EM all down to 100 with corresponding number of I, IL in each pop
+increased VL -> EA conv from 640 to 1280 but kept weights same
+also increased EA -> EA weights so dont start so low (to same values as EM->EM weights)
+
+python multistepSim.py sn.json 30 40 21may4_TARG0_Q_gcp_multi
+
+started ~12:05 ...
+
