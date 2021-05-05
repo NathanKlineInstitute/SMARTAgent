@@ -28843,3 +28843,37 @@ python multistepSim.py sn.json 30 40 21may4_TARG0_O_gcp_multi
 
 started ~11:52 ...
 
+** check output from 21may4_TARG0_O_gcp__step_0_
+
+python -i simdat.py backupcfg/21may4_TARG0_O_gcp__step_0_sim.json
+
+EV1 0.02 Hz
+EA 0.59 Hz
+IA 1.84 Hz
+IAL 2.44 Hz
+EA2 0.12 Hz
+IA2 1.21 Hz
+IA2L 1.72 Hz
+EMDOWN 0.18 Hz
+EMUP 0.18 Hz
+IM 1.4 Hz
+IML 2.12 Hz
+
+ax=plotPerf(actreward,yl=(0,1.01))
+savefig(gifpath()+'perf.png') # [[./gif/21may5_21may4_TARG0_O_gcp__step_0_perf.png]]
+
+clf(); drawraster(dspkT,dspkID); xlim((490e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/21may5_21may4_TARG0_O_gcp__step_0_rast.png]]
+
+clf(); pdfc = pdf
+popwtsE = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP','EA','EA2'],lclr=['r','b','g','c'],plotindiv=False)
+savefig(gifpath()+'avg_weight.png') # [[./gif/21may5_21may4_TARG0_O_gcp__step_0_avg_weight.png]]
+
+fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
+[[./gif/21may5_21may4_TARG0_O_gcp__step_0__with_reward_input.mp4]]
+** stopped 21apr29_TARG0_J_EIPlast_gcp_
+
+did not seem to be improving much ... 
+
+** next updated sim 21may4_TARG0_P_gcp_
+
