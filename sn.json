@@ -62,7 +62,7 @@
         "RLFakeUpRule": 0,
         "RLFakeDownRule": 0,
         "RLFakeStayRule": 0,
-        "name": "21may5_TARG0_S_gcp_",
+        "name": "21may5_TARG0_T_gcp_",
         "doquit": 1,
         "doplot": 0,
         "saveCellSecs": 0,
@@ -352,7 +352,7 @@
 	    "FeedbackA2toA": 0
         },
         "RLconns": {
-            "EIPlast": 0,
+            "EIPlast": 1,
             "Visual": 0,
             "RecurrentDirNeurons": 0,
             "RecurrentLocNeurons": 0,

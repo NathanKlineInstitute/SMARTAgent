@@ -29122,3 +29122,7 @@ started ~22:52 ...
 same as 21may5_TARG0_Q_gcp_ but include EIPlast and losePoint of -0.25
 
 (buffer=s0)
+python multistepSim.py sn.json 30 40 21may5_TARG0_T_gcp_multi
+
+started ~22:55 ...
+
