@@ -47,11 +47,11 @@
     "verbose": 0,
     "stayStepLim": 0,
     "simtype": {
-        "ResumeSim": 0,
-        "ResumeSimFromFile": "data/21apr25_TARG0_I2_gcp__step_3_synWeights_final.pkl"
+        "ResumeSim": 1,
+        "ResumeSimFromFile": "data/21may5_TARG0_S_gcp__step_15_synWeights_final.pkl"
     },
     "sim": {
-        "duration": 500000,
+        "duration": 10000,
         "dt": 0.6,
         "verbose": 0,
         "recordStep": 1.0,
@@ -62,7 +62,7 @@
         "RLFakeUpRule": 0,
         "RLFakeDownRule": 0,
         "RLFakeStayRule": 0,
-        "name": "21may5_TARG0_T_gcp_",
+        "name": "21may6_TARG0_S2_gcp_",
         "doquit": 1,
         "doplot": 0,
         "saveCellSecs": 0,
@@ -352,7 +352,7 @@
 	    "FeedbackA2toA": 0
         },
         "RLconns": {
-            "EIPlast": 1,
+            "EIPlast": 0,
             "Visual": 0,
             "RecurrentDirNeurons": 0,
             "RecurrentLocNeurons": 0,
@@ -631,13 +631,13 @@
 	"EMDOWN": {"AM": {"w":0, "rate":0},
 		   "NM": {"w":0, "rate":0},
 		   "GA": {"w":1.875, "rate":100},
-		   "AM2": {"w": 3.938, "rate": 200},
+		   "AM2": {"w": 3.938, "rate": 150},
 		   "NM2": {"w": 0, "rate": 0},
 		   "GA2": {"w": 1.875, "rate": 100}},
 	"EMUP": {"AM": {"w":0, "rate":0},
 		 "NM": {"w":0, "rate":0},
 		 "GA": {"w":1.875, "rate":100},
-		 "AM2": {"w": 3.938, "rate": 200},
+		 "AM2": {"w": 3.938, "rate": 150},
 		 "NM2": {"w": 0, "rate": 0},
 		 "GA2": {"w": 1.875, "rate": 100}},
 	"IM": {"AM": {"w":1.875, "rate":100},
@@ -673,7 +673,7 @@
 	"EA2": {"AM": {"w":0, "rate":0},
 		"NM": {"w":0, "rate":0},
 		"GA": {"w":1.875, "rate":100},
-		"AM2": {"w": 3.938, "rate": 200},
+		"AM2": {"w": 3.938, "rate": 150},
 		"NM2": {"w": 0, "rate": 0},
 		"GA2": {"w": 1.875, "rate": 100}},
 	"IA2": {"AM": {"w":1.875, "rate":100},
