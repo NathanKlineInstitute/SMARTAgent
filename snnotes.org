@@ -29331,10 +29331,21 @@ clf(); pdfc = getconcatweightpdf(lfn)
 popwtsE = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP','EA','EA2'],lclr=['r','b','g','c'],plotindiv=False)
 savefig(gifpath()+'all_steps_avg_weight.png') # [[./gif/21may6_21may5_TARG0_S_gcp__step_15_all_steps_avg_weight.png]]
 
-continue from 21may5_TARG0_S_gcp__step_15_ but first reduce E noise to EM, EA2
+continue from 21may5_TARG0_S_gcp__step_15_ but first reduce E (AM2) noise rates to EM, EA2 from 200 Hz to 175 Hz
 
     "simtype": {
         "ResumeSim": 1,
         "ResumeSimFromFile": "data/21may5_TARG0_S_gcp__step_15_synWeights_final.pkl"
     },
+
+./myrun 30 sn.json
+
+python -i simdat.py backupcfg/21may6_TARG0_S2_gcp_sim.json
+
+that produces sparser firing ... could also reduce the RLhebbwt for continuation ... will leave that for now ... 
+
+(buffer=shell)
+python multistepSim.py sn.json 30 15 21may6_TARG0_S2_gcp_multi
+
+started ~15:49 ...
 
