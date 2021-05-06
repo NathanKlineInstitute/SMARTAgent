@@ -29108,3 +29108,17 @@ clf(); pdfc = getconcatweightpdf(lfn)
 popwtsE = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP','EA','EA2'],lclr=['r','b','g','c'],plotindiv=False)
 savefig(gifpath()+'all_steps_avg_weight.png') # [[./gif/21may6_21may5_TARG0_R_gcp__step_4_all_steps_avg_weight.png]]
 
+** 21may5_TARG0_S_gcp_
+
+same as 21may5_TARG0_Q_gcp_ but has higher magnitude for losePoint (-0.25 instead of -0.15)
+
+(buffer=shell)
+python multistepSim.py sn.json 30 40 21may5_TARG0_S_gcp_multi
+
+started ~22:52 ...
+
+** 21may5_TARG0_T_gcp_
+
+same as 21may5_TARG0_Q_gcp_ but include EIPlast and losePoint of -0.25
+
+(buffer=s0)
