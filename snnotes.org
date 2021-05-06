@@ -29349,3 +29349,18 @@ python multistepSim.py sn.json 30 15 21may6_TARG0_S2_gcp_multi
 
 started ~15:49 ...
 
+** 21may6_TARG0_S2B_gcp_
+
+(same as 21may6_TARG0_S2_gcp_ except reduces AM2 noise even further)
+continue from 21may5_TARG0_S_gcp__step_15_ but reduce E (AM2) noise rates to EM, EA2 from 200 Hz further to 150 Hz
+
+    "simtype": {
+        "ResumeSim": 1,
+        "ResumeSimFromFile": "data/21may5_TARG0_S_gcp__step_15_synWeights_final.pkl"
+    },
+
+(buffer=s0)
+python multistepSim.py sn.json 30 15 21may6_TARG0_S2B_gcp_multi
+
+started ~16:00 ...
+
