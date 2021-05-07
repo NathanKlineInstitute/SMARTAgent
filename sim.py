@@ -1962,12 +1962,13 @@ def saveInputImages (Images):
   InputImages = np.array(Images)
   print(InputImages.shape)
   if dconf['net']['useBinaryImage']:
-    InputImages = np.where(InputImages>0,1,0)
+    #InputImages = np.where(InputImages>0,1,0)
     with open('data/'+dconf['sim']['name']+'InputImages.txt', 'w') as outfile:
       outfile.write('# Array shape: {0}\n'.format(InputImages.shape))
       for Input_Image in InputImages:
         np.savetxt(outfile, Input_Image, fmt='%d', delimiter=' ')
         outfile.write('# New slice\n')
+    np.save('test.npz',InputImages)
   else:
     with open('data/'+dconf['sim']['name']+'InputImages.txt', 'w') as outfile:
       outfile.write('# Array shape: {0}\n'.format(InputImages.shape))
