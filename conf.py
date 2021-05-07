@@ -54,6 +54,7 @@ def ensureDefaults (dconf):
   checkDefVal(dconf, 'stayStepLim', 0)
   for k in ['anticipatedRL', 'RLFakeUpRule', 'RLFakeDownRule', 'RLFakeStayRule', 'doplot', 'saveCellSecs', 'saveCellConns']:
     checkDefVal(dconf['sim'], k, 0)
+  checkDefVal(dconf['sim'], 'saveMotionFields', 1)
   checkDefVal(dconf['sim'], 'targettedRL', 1)
   checkDefVal(dconf['sim'], 'targettedRLOppFctr', 0.5)
   checkDefVal(dconf['sim'], 'targettedRLDscntFctr', 0.5)
