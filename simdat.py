@@ -436,16 +436,21 @@ def animDetectedMotionMaps (outpath, framerate=10, figsize=(7,3)):
   return fig, axs, plt
 
 def loadInputImages (name=None):
-  fn = 'data/'+getsimname(name)+'InputImages.txt'
-  print('loading input images from', fn)
-  Input_Images = np.loadtxt(fn)
-  New_InputImages = []
-  NB_Images = int(Input_Images.shape[0]/Input_Images.shape[1])
-  for x in range(NB_Images):
-    fp = x*Input_Images.shape[1]
-    # 20 is sqrt of 400 (20x20 pixels). what is 400? number of ER neurons? or getting rid of counter @ top of screen?
-    New_InputImages.append(Input_Images[fp:fp+Input_Images.shape[1],:])
-  return np.array(New_InputImages)
+  try:
+    fn = 'data/'+getsimname(name)+'InputImages.npy'
+    print('loading input images from', fn)
+    return np.load(fn)
+  except:
+    fn = 'data/'+getsimname(name)+'InputImages.txt'
+    print('loading input images from', fn)
+    Input_Images = np.loadtxt(fn)
+    New_InputImages = []
+    NB_Images = int(Input_Images.shape[0]/Input_Images.shape[1])
+    for x in range(NB_Images):
+      fp = x*Input_Images.shape[1]
+      # 20 is sqrt of 400 (20x20 pixels). what is 400? number of ER neurons? or getting rid of counter @ top of screen?
+      New_InputImages.append(Input_Images[fp:fp+Input_Images.shape[1],:])
+    return np.array(New_InputImages)
 
 def loadMotionFields (name=None): return pickle.load(open('data/'+getsimname(name)+'MotionFields.pkl','rb'))
 
