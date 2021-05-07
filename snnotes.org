@@ -29627,5 +29627,11 @@ and RL between VL and EA
 
 python multistepSim.py sn.json 30 20 21may6_TARG0_V_gcp_multi
 
-started ~13:28 ...
+started ~13:36 ...
+
+** 21may7_TARG0_W_gcp_
+
+same as 21may7_TARG0_V_gcp_ but also include RLlenanti of 10 s with RLantiwt of -0.01 ... 
+
+python multistepSim.py sn.json 30 20 21may6_TARG0_W_gcp_multi
 
