@@ -292,6 +292,7 @@ def animInput (InputImages, outpath, framerate=50, figsize=None, showflow=False,
   lax = [subplot(1,ncol,i+1) for i in range(ncol)]
   ltitle = ['Input Images']
   lact = [InputImages]; lvmax = [255]; xl = [(-.5,19.5)]; yl = [(19.5,-0.5)]
+  if dconf['net']['useBinaryImage']: lvmax = [1]
   ddat = {}
   fig.suptitle('Time = ' + str(0*tstepPerAction) + ' ms')
   idx = 0

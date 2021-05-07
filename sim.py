@@ -1960,12 +1960,20 @@ def saveAssignedFiringRates (dAllFiringRates): pickle.dump(dAllFiringRates, open
 def saveInputImages (Images):
   # save input images to txt file (switch to pkl?)
   InputImages = np.array(Images)
-  print(InputImages.shape)  
-  with open('data/'+dconf['sim']['name']+'InputImages.txt', 'w') as outfile:
-    outfile.write('# Array shape: {0}\n'.format(InputImages.shape))
-    for Input_Image in InputImages:
-      np.savetxt(outfile, Input_Image, fmt='%-7.2f')
-      outfile.write('# New slice\n')
+  print(InputImages.shape)
+  if dconf['net']['useBinaryImage']:
+    InputImages = np.where(InputImages>0,1,0)
+    with open('data/'+dconf['sim']['name']+'InputImages.txt', 'w') as outfile:
+      outfile.write('# Array shape: {0}\n'.format(InputImages.shape))
+      for Input_Image in InputImages:
+        np.savetxt(outfile, Input_Image, fmt='%d', delimiter=' ')
+        outfile.write('# New slice\n')
+  else:
+    with open('data/'+dconf['sim']['name']+'InputImages.txt', 'w') as outfile:
+      outfile.write('# Array shape: {0}\n'.format(InputImages.shape))
+      for Input_Image in InputImages:
+        np.savetxt(outfile, Input_Image, fmt='%-7.2f', delimiter=' ')
+        outfile.write('# New slice\n')
       
 if sim.rank == 0: # only rank 0 should save. otherwise all the other nodes could over-write the output or quit first; rank 0 plots
   if dconf['sim']['doplot']:
