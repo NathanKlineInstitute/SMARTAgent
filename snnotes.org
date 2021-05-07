@@ -29635,3 +29635,5 @@ same as 21may7_TARG0_V_gcp_ but also include RLlenanti of 10 s with RLantiwt of 
 
 python multistepSim.py sn.json 30 20 21may6_TARG0_W_gcp_multi
 
+started ~13:39 ...
+
