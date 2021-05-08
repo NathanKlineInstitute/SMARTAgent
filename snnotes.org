@@ -29677,3 +29677,17 @@ savefig(gifpath()+'all_steps_avg_weight.png')
 
 weights are changing way too slowly ... stopped for now ... will adjust
 
+** 21may7_TARG0_X_gcp_
+
+increase weights from VL -> EA to get more activity there
+increase some of the feedback connectivity numbers and weights (~25 inputs and same weights as feedforward)
+change losePoint to -0.1 ... 
+
+./myrun 30 sn.json
+
+python -i simdat.py backupcfg/21may7_TARG0_X_gcp_sim.json
+
+python multistepSim.py sn.json 30 20 21may6_TARG0_X_gcp_multi
+
+started ~21:57 ... 
+
