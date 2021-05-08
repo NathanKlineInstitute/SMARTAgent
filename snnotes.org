@@ -29699,3 +29699,79 @@ python multistepSim.py sn.json 30 20 21may6_TARG0_Y_gcp_multi
 
 started ~22:00 . . . 
 
+* 21may8
+** check 21may7_TARG0_X_gcp__step_2_
+  
+python -i simdat.py backupcfg/21may7_TARG0_X_gcp__step_2_sim.json
+
+EV1 0.01 Hz
+EA 1.52 Hz
+IA 3.54 Hz
+IAL 3.49 Hz
+EA2 0.06 Hz
+IA2 1.15 Hz
+IA2L 1.64 Hz
+EMDOWN 0.06 Hz
+EMUP 0.06 Hz
+IM 1.21 Hz
+IML 1.68 Hz
+
+ax=plotPerf(actreward,yl=(0,0.71))
+savefig(gifpath()+'perf.png') # [[./gif/21may8_21may7_TARG0_X_gcp__step_2_perf.png]]
+
+perf decaying ... 
+
+lfn = ['21may7_TARG0_X_gcp__step_' + str(i) + '_' for i in range(3)]
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0.1,.51))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/21may8_21may7_TARG0_X_gcp__step_2_perf_all_steps_so_far.png]]
+
+clf(); drawraster(dspkT,dspkID); xlim((490e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/21may8_21may7_TARG0_X_gcp__step_2_rast.png]]
+
+clf(); pdfc = getconcatweightpdf(lfn)
+popwtsE = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP','EA','EA2'],lclr=['r','b','g','c'],plotindiv=False)
+savefig(gifpath()+'all_steps_avg_weight.png') # [[./gif/21may8_21may7_TARG0_X_gcp__step_2_all_steps_avg_weight.png]]
+savefig(gifpath()+'all_steps_avg_weightB.png') # [[./gif/21may8_21may7_TARG0_X_gcp__step_2_all_steps_avg_weightB.png]]
+savefig(gifpath()+'all_steps_avg_weightC.png') # [[./gif/21may8_21may7_TARG0_X_gcp__step_2_all_steps_avg_weightC.png]]
+weights look almost flat
+
+fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
+[[./gif/21may8_21may7_TARG0_X_gcp__step_2__with_reward_input.mp4]]
+
+** check 21may7_TARG0_Y_gcp__step_2_
+  
+python -i simdat.py backupcfg/21may7_TARG0_Y_gcp__step_2_sim.json
+
+ax=plotPerf(actreward,yl=(0,0.71))
+savefig(gifpath()+'perf.png') # [[./gif/21may8_21may7_TARG0_Y_gcp__step_2_perf.png]]
+
+
+lfn = ['21may7_TARG0_Y_gcp__step_' + str(i) + '_' for i in range(3)]
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0.1,.51))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/21may8_21may7_TARG0_Y_gcp__step_2_perf_all_steps_so_far.png]]
+
+perf also decaying, but not as much
+
+clf(); drawraster(dspkT,dspkID); xlim((490e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/21may8_21may7_TARG0_Y_gcp__step_2_rast.png]]
+
+clf(); pdfc = getconcatweightpdf(lfn)
+popwtsE = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP','EA','EA2'],lclr=['r','b','g','c'],plotindiv=False)
+savefig(gifpath()+'all_steps_avg_weight.png') # [[./gif/21may8_21may7_TARG0_Y_gcp__step_2_all_steps_avg_weight.png]]
+weights also changing too slowly ...
+
+** stop 21may7_TARG0_X_gcp_ and 21may7_TARG0_Y_gcp_ -- weights changing too slowly
+** 21may8_TARG0_Z_gcp_
+
+set RLhebbwt to 0.1 and losePoint to -0.05
+
+try same sim with higher RLhebbwt
+
+python multistepSim.py sn.json 30 20 21may8_TARG0_Z_gcp_multi
+
+started ~11:04 ...
+
+** 21may8_TARG0_A_gcp_
+
