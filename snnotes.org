@@ -29765,13 +29765,13 @@ weights also changing too slowly ...
 ** stop 21may7_TARG0_X_gcp_ and 21may7_TARG0_Y_gcp_ -- weights changing too slowly
 ** 21may8_TARG0_Z_gcp_
 
-set RLhebbwt to 0.1 and losePoint to -0.05
+set RLhebbwt to 0.1 and losePoint to -0.025
 
 try same sim with higher RLhebbwt
 
 python multistepSim.py sn.json 30 20 21may8_TARG0_Z_gcp_multi
 
-started ~11:04 ...
+started ~11:07 ...
 
 ** 21may8_TARG0_A_gcp_
 
