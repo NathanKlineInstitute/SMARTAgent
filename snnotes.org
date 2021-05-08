@@ -29773,6 +29773,11 @@ python multistepSim.py sn.json 30 20 21may8_TARG0_Z_gcp_multi
 
 started ~11:07 ...
 
+got hyperexcit after a few steps
+adjust RLhebbwt to 0.05 and losePoint to -0.1
+
+restarted ~17:42 ...
+
 ** 21may8_TARG0_A_gcp_
 
 same as 21may8_TARG0_Z_gcp_ but increase RLhebbwt to 0.2
