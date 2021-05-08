@@ -29637,3 +29637,43 @@ python multistepSim.py sn.json 30 20 21may6_TARG0_W_gcp_multi
 
 started ~13:39 ...
 
+** check 21may7_TARG0_V_gcp__step_1_
+  
+python -i simdat.py backupcfg/21may7_TARG0_V_gcp__step_1_sim.json
+
+EV1 0.01 Hz
+EA 0.22 Hz
+IA 1.28 Hz
+IAL 1.78 Hz
+EA2 0.05 Hz
+IA2 1.14 Hz
+IA2L 1.63 Hz
+EMDOWN 0.05 Hz
+EMUP 0.05 Hz
+IM 1.2 Hz
+IML 1.66 Hz
+
+ax=plotPerf(actreward,yl=(0,0.71))
+savefig(gifpath()+'perf.png') # [[./gif/21may8_21may7_TARG0_V_gcp__step_1_perf.png]]
+low perf...
+
+lfn = ['21may7_TARG0_V_gcp__step_' + str(i) + '_' for i in range(2)]
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0.1,.51))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/21may8_21may7_TARG0_V_gcp__step_1_perf_all_steps_so_far.png]]
+
+lpda = getindivactionreward(lfn)
+csm=cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+lclr = [csm.to_rgba(float(i)/(len(lpda))) for i in range(len(lpda))]
+clf(); plotComparePerf(lpda,lclr,yl=(0,.51),lleg=lfn,skipscore=True,skipfollow=True)
+savefig(gifpath()+'perf_compareD.png') 
+
+clf(); drawraster(dspkT,dspkID); xlim((490e3,500e3))
+savefig(gifpath()+'rast.png') 
+
+clf(); pdfc = getconcatweightpdf(lfn)
+popwtsE = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP','EA','EA2'],lclr=['r','b','g','c'],plotindiv=False)
+savefig(gifpath()+'all_steps_avg_weight.png') 
+
+weights are changing way too slowly ... stopped for now ... will adjust
+
