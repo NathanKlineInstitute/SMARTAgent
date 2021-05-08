@@ -29691,3 +29691,11 @@ python multistepSim.py sn.json 30 20 21may6_TARG0_X_gcp_multi
 
 started ~21:57 ... 
 
+** 21may7_TARG0_Y_gcp_
+
+same as 21may7_TARG0_X_gcp_ but losePoint of -0.05
+
+python multistepSim.py sn.json 30 20 21may6_TARG0_Y_gcp_multi
+
+started ~22:00 . . . 
+
