@@ -29779,5 +29779,5 @@ same as 21may8_TARG0_Z_gcp_ but increase RLhebbwt to 0.2
 
 python multistepSim.py sn.json 30 20 21may8_TARG0_A_gcp_multi
 
-started ~11:05 ...
+started ~11:08 ...
 
