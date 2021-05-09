@@ -29778,6 +29778,44 @@ adjust RLhebbwt to 0.05 and losePoint to -0.1
 
 restarted ~17:42 ...
 
+*** check 21may8_TARG0_Z_gcp__step_0_
+  
+python -i simdat.py backupcfg/21may8_TARG0_Z_gcp__step_0_sim.json
+
+EV1 0.01 Hz
+EA 1.49 Hz
+IA 3.44 Hz
+IAL 3.44 Hz
+EA2 0.06 Hz
+IA2 1.14 Hz
+IA2L 1.64 Hz
+EMDOWN 0.06 Hz
+EMUP 0.06 Hz
+IM 1.21 Hz
+IML 1.68 Hz
+
+ax=plotPerf(actreward,yl=(0,0.71))
+savefig(gifpath()+'perf.png') # [[./gif/21may9_21may8_TARG0_Z_gcp__step_0_perf.png]]
+
+lfn = ['21may8_TARG0_Z_gcp__step_' + str(i) + '_' for i in range(1)]
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0.1,.51))
+#savefig(gifpath()+'perf_all_steps_so_far.png') 
+
+clf(); drawraster(dspkT,dspkID); xlim((990e3,1000e3))
+savefig(gifpath()+'rast.png') # [[./gif/21may9_21may8_TARG0_Z_gcp__step_0_rast.png]]
+
+clf(); pdfc = getconcatweightpdf(lfn)
+popwtsE = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP','EA','EA2'],lclr=['r','b','g','c'],plotindiv=False)
+savefig(gifpath()+'all_steps_avg_weight.png') # [[./gif/21may9_21may8_TARG0_Z_gcp__step_0_all_steps_avg_weight.png]]
+
+weights might be changing too slowly...
+
+fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
+[[./gif/21may9_21may8_TARG0_Z_gcp__step_0__with_reward_input.mp4]]
+
+but looking at video, seems the output activity is non-random ... 
+
 ** 21may8_TARG0_A_gcp_
 
 same as 21may8_TARG0_Z_gcp_ but increase RLhebbwt to 0.2
@@ -29793,3 +29831,37 @@ python multistepSim.py sn.json 30 20 21may8_TARG0_A_gcp_multi
 
 restarted ~17:44 ...
 
+*** check 21may8_TARG0_A_gcp__step_0_
+  
+python -i simdat.py backupcfg/21may8_TARG0_A_gcp__step_0_sim.json
+
+EA 1.52 Hz
+IA 3.49 Hz
+IAL 3.46 Hz
+EA2 0.06 Hz
+IA2 1.15 Hz
+IA2L 1.64 Hz
+EMDOWN 0.06 Hz
+EMUP 0.06 Hz
+IM 1.21 Hz
+IML 1.68 Hz
+
+ax=plotPerf(actreward,yl=(0,0.71))
+savefig(gifpath()+'perf.png') # [[./gif/21may9_21may8_TARG0_A_gcp__step_0_perf.png]]
+
+lfn = ['21may8_TARG0_A_gcp__step_' + str(i) + '_' for i in range(1)]
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0.1,.51))
+#savefig(gifpath()+'perf_all_steps_so_far.png') 
+
+clf(); drawraster(dspkT,dspkID); xlim((990e3,1000e3))
+savefig(gifpath()+'rast.png') # [[./gif/21may9_21may8_TARG0_A_gcp__step_0_rast.png]]
+
+clf(); pdfc = getconcatweightpdf(lfn)
+popwtsE = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP','EA','EA2'],lclr=['r','b','g','c'],plotindiv=False)
+savefig(gifpath()+'all_steps_avg_weight.png') # [[./gif/21may9_21may8_TARG0_A_gcp__step_0_all_steps_avg_weight.png]]
+
+weights here changing very slowly too . . . 
+
+fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
+[[./gif/21may9_21may8_TARG0_A_gcp__step_0__with_reward_input.mp4]]
