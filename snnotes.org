@@ -29865,3 +29865,84 @@ weights here changing very slowly too . . .
 
 fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
 [[./gif/21may9_21may8_TARG0_A_gcp__step_0__with_reward_input.mp4]]
+
+* 21may9
+** check 21may8_TARG0_Z_gcp__step4_
+  
+python -i simdat.py backupcfg/21may8_TARG0_Z_gcp__step_4_sim.json
+
+EV1 0.02 Hz
+EA 86.91 Hz
+IA 344.0 Hz
+IAL 358.03 Hz
+EA2 136.8 Hz
+IA2 193.49 Hz
+IA2L 173.54 Hz
+EMDOWN 128.97 Hz
+EMUP 129.67 Hz
+IM 96.67 Hz
+IML 108.81 Hz
+
+already hyperexcit
+
+ax=plotPerf(actreward,yl=(0,0.71))
+savefig(gifpath()+'perf.png') # [[./gif/21may9_21may8_TARG0_Z_gcp__step_4_perf.png]]
+
+lfn = ['21may8_TARG0_Z_gcp__step_' + str(i) + '_' for i in range(5)]
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0.1,.51))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/21may9_21may8_TARG0_Z_gcp__step_4_perf_all_steps_so_far.png]]
+
+#clf(); drawraster(dspkT,dspkID); xlim((990e3,1000e3))
+#savefig(gifpath()+'rast.png') 
+
+lpda = getindivactionreward(lfn)
+csm=cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+lclr = [csm.to_rgba(float(i)/(len(lpda))) for i in range(len(lpda))]
+clf(); plotComparePerf(lpda,lclr,yl=(0,.51),lleg=lfn,skipscore=True,skipfollow=True)
+savefig(gifpath()+'perf_compareD.png') # [[./gif/21may9_21may8_TARG0_Z_gcp__step_4_perf_compareD.png]]
+
+step 2,3 were improved compared to steps 0,1 but then got hyperexcitable
+
+clf(); pdfc = getconcatweightpdf(lfn)
+popwtsE = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP','EA','EA2'],lclr=['r','b','g','c'],plotindiv=False)
+savefig(gifpath()+'all_steps_avg_weight.png') 
+[[./gif/21may9_21may8_TARG0_Z_gcp__step_4_all_steps_avg_weight.png]]
+savefig(gifpath()+'all_steps_avg_weightB.png') 
+./gif/21may9_21may8_TARG0_Z_gcp__step_4_all_steps_avg_weightB.png]]
+
+python -i simdat.py backupcfg/21may8_TARG0_Z_gcp__step_2_sim.json
+
+EV1 0.01 Hz
+EA 1.6 Hz
+IA 3.66 Hz
+IAL 3.66 Hz
+EA2 0.09 Hz
+IA2 1.24 Hz
+IA2L 1.76 Hz
+EMDOWN 0.09 Hz
+EMUP 0.09 Hz
+IM 1.29 Hz
+IML 1.83 Hz
+
+ax=plotPerf(actreward,yl=(0,1.1))
+savefig(gifpath()+'perf.png') # [[./gif/21may9_21may8_TARG0_Z_gcp__step_2_perf.png]]
+
+fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
+[[./gif/21may9_21may8_TARG0_Z_gcp__step_2__with_reward_input.mp4]]
+
+so may need to adjust the reward / loss values and/or reduce feedback connection weights to see if can run
+longer ... 
+
+** check 21may8_TARG0_A_gcp__step_1_
+
+the sim stopped during weight conversion ... so never finished step 1?
+** 21may9_TARG0_B_gcp_
+
+set RLhebbwt down to 0.025 ... and reduce VL -> EA2, EM to 0.01 (from 0.5)
+and reduce starting feedback weights from 0.5 to 0.01 ... 
+
+python multistepSim.py sn.json 30 20 21may9_TARG0_B_gcp_multi
+
+started ~9:52 ...
+
