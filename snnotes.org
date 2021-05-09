@@ -29946,3 +29946,11 @@ python multistepSim.py sn.json 30 20 21may9_TARG0_B_gcp_multi
 
 started ~9:52 ...
 
+** 21may9_TARG0_C_gcp_
+
+same as B but RLhebbwt of 0.05 ...
+
+python multistepSim.py sn.json 30 20 21may9_TARG0_C_gcp_multi
+
+started ~9:55 ... 
+
