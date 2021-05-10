@@ -30062,3 +30062,120 @@ weights are a little higher than for sim B (makes sense given higher value of RL
 fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
 [[./gif/21may10_21may9_TARG0_C_gcp__step_2__with_reward_input.mp4]]
 
+* 21may10
+** check 21may9_TARG0_B_gcp__step_5_
+  
+python -i simdat.py backupcfg/21may9_TARG0_B_gcp__step_5_sim.json
+
+EV1 0.01 Hz
+EA 1.6 Hz
+IA 3.65 Hz
+IAL 3.64 Hz
+EA2 0.07 Hz
+IA2 1.16 Hz
+IA2L 1.65 Hz
+EMDOWN 0.07 Hz
+EMUP 0.07 Hz
+IM 1.28 Hz
+IML 1.74 Hz
+
+ax=plotPerf(actreward,yl=(0,1.01))
+savefig(gifpath()+'perf.png') # [[./gif/21may10_21may9_TARG0_B_gcp__step_5_perf.png]]
+
+lfn = ['21may9_TARG0_B_gcp__step_' + str(i) + '_' for i in range(6)]
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0.1,.51))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/21may10_21may9_TARG0_B_gcp__step_5_perf_all_steps_so_far.png]]
+
+lpda = getindivactionreward(lfn)
+csm=cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+lclr = [csm.to_rgba(float(i)/(len(lpda))) for i in range(len(lpda))]
+clf(); plotComparePerf(lpda,lclr,yl=(0,.62),lleg=lfn,skipscore=True,skipfollow=True)
+savefig(gifpath()+'perf_compareD.png') # [[./gif/21may10_21may9_TARG0_B_gcp__step_5_perf_compareD.png]]
+step 5 is ok except for the end ...
+
+clf(); drawraster(dspkT,dspkID); xlim((990e3,1000e3))
+savefig(gifpath()+'rast.png') # [[./gif/21may10_21may9_TARG0_B_gcp__step_5_rast.png]]
+
+clf(); pdfc = getconcatweightpdf(lfn)
+popwtsE = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP','EA','EA2'],lclr=['r','b','g','c'],plotindiv=False)
+savefig(gifpath()+'all_steps_avg_weight.png') # [[./gif/21may10_21may9_TARG0_B_gcp__step_5_all_steps_avg_weight.png]]
+savefig(gifpath()+'all_steps_avg_weightB.png') # [[./gif/21may10_21may9_TARG0_B_gcp__step_5_all_steps_avg_weightB.png]]
+savefig(gifpath()+'all_steps_avg_weightC.png') # [[./gif/21may10_21may9_TARG0_B_gcp__step_5_all_steps_avg_weightC.png]]
+
+fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
+[[./gif/21may10_21may9_TARG0_B_gcp__step_5__with_reward_input.mp4]]
+
+** check 21may9_TARG0_C_gcp__step_4_
+  
+python -i simdat.py backupcfg/21may9_TARG0_C_gcp__step_4_sim.json
+
+EV1 0.01 Hz
+EA 1.86 Hz
+IA 4.3 Hz
+IAL 4.05 Hz
+EA2 0.08 Hz
+IA2 1.22 Hz
+IA2L 1.68 Hz
+EMDOWN 0.1 Hz
+EMUP 0.1 Hz
+IM 1.43 Hz
+IML 1.93 Hz
+
+ax=plotPerf(actreward,yl=(0,1.01))
+savefig(gifpath()+'perf.png') # [[./gif/21may10_21may9_TARG0_C_gcp__step_4_perf.png]]
+
+lfn = ['21may9_TARG0_C_gcp__step_' + str(i) + '_' for i in range(5)]
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0.1,.51))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/21may10_21may9_TARG0_C_gcp__step_4_perf_all_steps_so_far.png]]
+
+clf(); drawraster(dspkT,dspkID); xlim((990e3,1000e3))
+savefig(gifpath()+'rast.png') # [[./gif/21may10_21may9_TARG0_C_gcp__step_4_rast.png]]
+savefig(gifpath()+'rastB.png') # [[./gif/21may10_21may9_TARG0_C_gcp__step_4_rastB.png]]
+
+lpda = getindivactionreward(lfn)
+csm=cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+lclr = [csm.to_rgba(float(i)/(len(lpda))) for i in range(len(lpda))]
+clf(); plotComparePerf(lpda,lclr,yl=(0,1.01),lleg=lfn,skipscore=True,skipfollow=True)
+savefig(gifpath()+'perf_compareD.png') # [[./gif/21may10_21may9_TARG0_C_gcp__step_4_perf_compareD.png]]
+
+clf(); pdfc = getconcatweightpdf(lfn)
+popwtsE = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP','EA','EA2'],lclr=['r','b','g','c'],plotindiv=False)
+savefig(gifpath()+'all_steps_avg_weight.png') # [[./gif/21may10_21may9_TARG0_C_gcp__step_4_all_steps_avg_weight.png]]
+savefig(gifpath()+'all_steps_avg_weightB.png') # [[./gif/21may10_21may9_TARG0_C_gcp__step_4_all_steps_avg_weightB.png]]
+savefig(gifpath()+'all_steps_avg_weightC.png') # [[./gif/21may10_21may9_TARG0_C_gcp__step_4_all_steps_avg_weightC.png]]
+
+this sim got hyperexcitable in the next step
+since EA driving everything else, could put a max weight value around 15.5
+
+check next step to make sure cancelling this sim continuation... 
+
+python -i simdat.py backupcfg/21may9_TARG0_C_gcp__step_5_sim.json
+
+EV1 0.02 Hz
+EA 107.15 Hz
+IA 278.7 Hz
+IAL 272.08 Hz
+EA2 89.36 Hz
+IA2 305.05 Hz
+IA2L 292.52 Hz
+EMDOWN 127.69 Hz
+EMUP 128.34 Hz
+IM 106.62 Hz
+IML 100.77 Hz
+
+ax=plotPerf(actreward,yl=(0,1.01))
+savefig(gifpath()+'perf.png') # [[./gif/21may10_21may9_TARG0_C_gcp__step_5_perf.png]]
+
+lfn = ['21may9_TARG0_C_gcp__step_' + str(i) + '_' for i in range(6)]
+clf(); pdfc = getconcatweightpdf(lfn)
+popwtsE = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP','EA','EA2'],lclr=['r','b','g','c'],plotindiv=False)
+savefig(gifpath()+'all_steps_avg_weight.png') # [[./gif/21may10_21may9_TARG0_C_gcp__step_5_all_steps_avg_weight.png]]
+savefig(gifpath()+'all_steps_avg_weightB.png') # [[./gif/21may10_21may9_TARG0_C_gcp__step_5_all_steps_avg_weightB.png]]
+savefig(gifpath()+'all_steps_avg_weightC.png') # [[./gif/21may10_21may9_TARG0_C_gcp__step_5_all_steps_avg_weightC.png]]
+yeah, the weights really took off at that last step ...
+
+what about adding EIplast there to prevent hyperexcit?
+
+** next sim 
