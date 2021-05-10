@@ -62,7 +62,7 @@
         "RLFakeUpRule": 0,
         "RLFakeDownRule": 0,
         "RLFakeStayRule": 0,
-        "name": "21may9_TARG0_C_gcp_",
+        "name": "21may10_TARG0_D_gcp_",
         "doquit": 1,
         "doplot": 0,
         "saveCellSecs": 0,
@@ -352,7 +352,7 @@
 	    "FeedbackA2toA": 0
         },
         "RLconns": {
-            "EIPlast": 0,
+            "EIPlast": 1,
             "Visual": 0,
             "RecurrentDirNeurons": 0,
             "RecurrentLocNeurons": 0,
@@ -572,7 +572,7 @@
     "RL": {
         "AMPAI": {
             "wbase": 0.4,
-            "wmax": 25,
+            "wmax": 30,
             "RLon": 1,
             "STDPon": 0,
             "RLlenhebb": 1000,

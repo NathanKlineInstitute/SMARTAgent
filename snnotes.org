@@ -30178,4 +30178,15 @@ yeah, the weights really took off at that last step ...
 
 what about adding EIplast there to prevent hyperexcit?
 
-** next sim 
+** next sim  21may10_TARG0_D_gcp_
+
+./myrun 30 sn.json
+
+python -i simdat.py backupcfg/21may10_TARG0_D_gcp_sim.json
+
+same as 21may9_TARG0_C_gcp_ but also include EIPlast ... 
+
+python multistepSim.py sn.json 30 20 21may10_TARG0_D_gcp_multi
+
+started ~1 pm ...
+
