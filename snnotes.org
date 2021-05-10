@@ -29946,6 +29946,68 @@ python multistepSim.py sn.json 30 20 21may9_TARG0_B_gcp_multi
 
 started ~9:52 ...
 
+*** check 21may9_TARG0_B_gcp__step_2_
+  
+python -i simdat.py backupcfg/21may9_TARG0_B_gcp__step_2_sim.json
+
+EV1 0.01 Hz
+EA 1.53 Hz
+IA 3.53 Hz
+IAL 3.49 Hz
+EA2 0.06 Hz
+IA2 1.14 Hz
+IA2L 1.64 Hz
+EMDOWN 0.06 Hz
+EMUP 0.06 Hz
+IM 1.21 Hz
+IML 1.68 Hz
+
+ax=plotPerf(actreward,yl=(0,0.71))
+savefig(gifpath()+'perf.png') # [[./gif/21may10_21may9_TARG0_B_gcp__step_2_perf.png]]
+
+lfn = ['21may9_TARG0_B_gcp__step_' + str(i) + '_' for i in range(3)]
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0.1,.51))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/21may10_21may9_TARG0_B_gcp__step_2_perf_all_steps_so_far.png]]
+getting worse perf with time?
+
+lpda = getindivactionreward(lfn)
+csm=cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+lclr = [csm.to_rgba(float(i)/(len(lpda))) for i in range(len(lpda))]
+clf(); plotComparePerf(lpda,lclr,yl=(0,.62),lleg=lfn,skipscore=True,skipfollow=True)
+savefig(gifpath()+'perf_compareD.png') # [[./gif/21may10_21may9_TARG0_B_gcp__step_2_perf_compareD.png]]
+
+clf(); drawraster(dspkT,dspkID); xlim((990e3,1000e3))
+savefig(gifpath()+'rast.png') # [[./gif/21may10_21may9_TARG0_B_gcp__step_2_rast.png]]
+
+clf(); pdfc = getconcatweightpdf(lfn)
+popwtsE = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP','EA','EA2'],lclr=['r','b','g','c'],plotindiv=False)
+savefig(gifpath()+'all_steps_avg_weight.png') # [[./gif/21may10_21may9_TARG0_B_gcp__step_2_all_steps_avg_weight.png]]
+savefig(gifpath()+'all_steps_avg_weightB.png') # [[./gif/21may10_21may9_TARG0_B_gcp__step_2_all_steps_avg_weightB.png]]
+savefig(gifpath()+'all_steps_avg_weightC.png') # [[./gif/21may10_21may9_TARG0_B_gcp__step_2_all_steps_avg_weightC.png]]
+
+step 1 looked better in perf ... take a look at animation ... 
+
+python -i simdat.py backupcfg/21may9_TARG0_B_gcp__step_1_sim.json
+
+EV1 0.01 Hz
+EA 1.49 Hz
+IA 3.44 Hz
+IAL 3.42 Hz
+EA2 0.06 Hz
+IA2 1.14 Hz
+IA2L 1.64 Hz
+EMDOWN 0.06 Hz
+EMUP 0.06 Hz
+IM 1.21 Hz
+IML 1.68 Hz
+
+ax=plotPerf(actreward,yl=(0,0.71))
+savefig(gifpath()+'perf.png') # [[./gif/21may10_21may9_TARG0_B_gcp__step_1_perf.png]]
+
+fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
+[[./gif/21may10_21may9_TARG0_B_gcp__step_1__with_reward_input.mp4]]
+
 ** 21may9_TARG0_C_gcp_
 
 same as B but RLhebbwt of 0.05 ...
@@ -29953,4 +30015,50 @@ same as B but RLhebbwt of 0.05 ...
 python multistepSim.py sn.json 30 20 21may9_TARG0_C_gcp_multi
 
 started ~9:55 ... 
+
+*** check 21may9_TARG0_C_gcp__step_2_
+  
+python -i simdat.py backupcfg/21may9_TARG0_C_gcp__step_2_sim.json
+
+EA 1.55 Hz
+IA 3.59 Hz
+IAL 3.56 Hz
+EA2 0.06 Hz
+IA2 1.15 Hz
+IA2L 1.64 Hz
+EMDOWN 0.07 Hz
+EMUP 0.06 Hz
+IM 1.23 Hz
+IML 1.69 Hz
+
+ax=plotPerf(actreward,yl=(0,1.01))
+savefig(gifpath()+'perf.png') # [[./gif/21may10_21may9_TARG0_C_gcp__step_2_perf.png]]
+
+lfn = ['21may9_TARG0_C_gcp__step_' + str(i) + '_' for i in range(3)]
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0.1,.51))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/21may10_21may9_TARG0_C_gcp__step_2_perf_all_steps_so_far.png]]
+
+clf(); drawraster(dspkT,dspkID); xlim((990e3,1000e3))
+savefig(gifpath()+'rast.png') # [[./gif/21may10_21may9_TARG0_C_gcp__step_2_rast.png]]
+savefig(gifpath()+'rastB.png') # [[./gif/21may10_21may9_TARG0_C_gcp__step_2_rastB.png]]
+
+lpda = getindivactionreward(lfn)
+csm=cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+lclr = [csm.to_rgba(float(i)/(len(lpda))) for i in range(len(lpda))]
+clf(); plotComparePerf(lpda,lclr,yl=(0,1.01),lleg=lfn,skipscore=True,skipfollow=True)
+savefig(gifpath()+'perf_compareD.png') # [[./gif/21may10_21may9_TARG0_C_gcp__step_2_perf_compareD.png]]
+
+step 2 best so far ...
+
+clf(); pdfc = getconcatweightpdf(lfn)
+popwtsE = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP','EA','EA2'],lclr=['r','b','g','c'],plotindiv=False)
+savefig(gifpath()+'all_steps_avg_weight.png') # [[./gif/21may10_21may9_TARG0_C_gcp__step_2_all_steps_avg_weight.png]]
+savefig(gifpath()+'all_steps_avg_weightB.png') # [[./gif/21may10_21may9_TARG0_C_gcp__step_2_all_steps_avg_weightB.png]]
+savefig(gifpath()+'all_steps_avg_weightC.png') # [[./gif/21may10_21may9_TARG0_C_gcp__step_2_all_steps_avg_weightC.png]]
+
+weights are a little higher than for sim B (makes sense given higher value of RLhebbwt [0.05 in C vs 0.025 in B])
+
+fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
+[[./gif/21may10_21may9_TARG0_C_gcp__step_2__with_reward_input.mp4]]
 
