@@ -30190,3 +30190,101 @@ python multistepSim.py sn.json 30 20 21may10_TARG0_D_gcp_multi
 
 started ~1 pm ...
 
+** check 21may9_TARG0_B_gcp__step_9_
+  
+python -i simdat.py backupcfg/21may9_TARG0_B_gcp__step_9_sim.json
+
+EV1 0.01 Hz
+EA 2.11 Hz
+IA 4.67 Hz
+IAL 4.36 Hz
+EA2 0.12 Hz
+IA2 1.54 Hz
+IA2L 1.8 Hz
+EMDOWN 0.18 Hz
+EMUP 0.18 Hz
+IM 1.95 Hz
+IML 2.53 Hz
+
+ax=plotPerf(actreward,yl=(0,1.01))
+savefig(gifpath()+'perf.png') # [[./gif/21may11_21may9_TARG0_B_gcp__step_9_perf.png]]
+
+lfn = ['21may9_TARG0_B_gcp__step_' + str(i) + '_' for i in range(10)]
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0.1,.51))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/21may11_21may9_TARG0_B_gcp__step_9_perf_all_steps_so_far.png]]
+
+lpda = getindivactionreward(lfn)
+csm=cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+lclr = [csm.to_rgba(float(i)/(len(lpda))) for i in range(len(lpda))]
+clf(); plotComparePerf(lpda,lclr,yl=(0,.62),lleg=lfn,skipscore=True,skipfollow=True)
+savefig(gifpath()+'perf_compareD.png') # [[./gif/21may11_21may9_TARG0_B_gcp__step_9_perf_compareD.png]]
+
+no better ... and next step got hyperexcitable so stopped it ...
+
+clf(); drawraster(dspkT,dspkID); xlim((990e3,1000e3))
+savefig(gifpath()+'rast.png') # [[./gif/21may11_21may9_TARG0_B_gcp__step_9_rast.png]]
+
+clf(); pdfc = getconcatweightpdf(lfn)
+popwtsE = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP','EA','EA2'],lclr=['r','b','g','c'],plotindiv=False)
+savefig(gifpath()+'all_steps_avg_weight.png') # [[./gif/21may11_21may9_TARG0_B_gcp__step_9_all_steps_avg_weight.png]]
+savefig(gifpath()+'all_steps_avg_weightB.png') # [[./gif/21may11_21may9_TARG0_B_gcp__step_9_all_steps_avg_weightB.png]]
+savefig(gifpath()+'all_steps_avg_weightC.png') # [[./gif/21may11_21may9_TARG0_B_gcp__step_9_all_steps_avg_weightC.png]]
+
+# fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
+
+** check 21may10_TARG0_D_gcp__step_1_
+  
+python -i simdat.py backupcfg/21may10_TARG0_D_gcp__step_1_sim.json
+
+EV1 0.01 Hz
+EA 1.54 Hz
+IA 3.98 Hz
+IAL 3.96 Hz
+EA2 0.06 Hz
+IA2 1.15 Hz
+IA2L 1.64 Hz
+EMDOWN 0.06 Hz
+EMUP 0.06 Hz
+IM 1.22 Hz
+IML 1.68 Hz
+
+ax=plotPerf(actreward,yl=(0,1.01))
+savefig(gifpath()+'perf.png') # [[./gif/21may11_21may10_TARG0_D_gcp__step_1_perf.png]]
+
+lfn = ['21may10_TARG0_D_gcp__step_' + str(i) + '_' for i in range(2)]
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0.1,.51))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/21may11_21may10_TARG0_D_gcp__step_1_perf_all_steps_so_far.png]]
+
+lpda = getindivactionreward(lfn)
+csm=cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+lclr = [csm.to_rgba(float(i)/(len(lpda))) for i in range(len(lpda))]
+clf(); plotComparePerf(lpda,lclr,yl=(0,.62),lleg=lfn,skipscore=True,skipfollow=True)
+savefig(gifpath()+'perf_compareD.png') # [[./gif/21may11_21may10_TARG0_D_gcp__step_1_perf_compareD.png]]
+
+clf(); drawraster(dspkT,dspkID); xlim((990e3,1000e3))
+savefig(gifpath()+'rast.png') # [[./gif/21may11_21may10_TARG0_D_gcp__step_1_rast.png]]
+
+clf(); pdfc = getconcatweightpdf(lfn)
+subplot(1,2,1); popwtsE = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP','EA','EA2'],lclr=['r','b','g','c'],plotindiv=False)
+subplot(1,2,2); popwtsI = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['IA','IM','IA2','IAL','IML','IA2L'],lclr=['r','b','g','c','m','y'],plotindiv=False)
+savefig(gifpath()+'all_steps_avg_weight.png') # [[./gif/21may11_21may10_TARG0_D_gcp__step_1_all_steps_avg_weight.png]]
+
+IA and IAL weights are going up too fast . . . 
+
+** 21may10_TARG0_E_gcp_
+
+./myrun 30 sn.json
+
+python -i simdat.py backupcfg/21may10_TARG0_E_gcp_sim.json
+
+go back to larger network ... with higher number of connections ... and some AM2 noise in EA ...
+reduce feedback connection numbers a bit ... 
+500 s step size ... RLhebbwt down to 0.01 ... no EIPlast, but including the plasticity
+from VL -> EA ... 
+
+python multistepSim.py sn.json 30 40 21may10_TARG0_E_gcp_multi
+
+started ~23:32 ...
+
