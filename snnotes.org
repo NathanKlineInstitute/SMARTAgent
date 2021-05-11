@@ -30288,3 +30288,103 @@ python multistepSim.py sn.json 30 40 21may10_TARG0_E_gcp_multi
 
 started ~23:32 ...
 
+* 21may11
+** check 21may10_TARG0_D_gcp__step_3_
+  
+step 4 already became hyperexcitable ... 
+
+python -i simdat.py backupcfg/21may10_TARG0_D_gcp__step_3_sim.json
+
+EV1 0.01 Hz
+EA 1.71 Hz
+IA 4.94 Hz
+IAL 5.0 Hz
+EA2 0.07 Hz
+IA2 1.18 Hz
+IA2L 1.66 Hz
+EMDOWN 0.09 Hz
+EMUP 0.09 Hz
+IM 1.34 Hz
+IML 1.84 Hz
+
+ax=plotPerf(actreward,yl=(0,1.01))
+savefig(gifpath()+'perf.png') # [[./gif/21may11_21may10_TARG0_D_gcp__step_3_perf.png]]
+
+lfn = ['21may10_TARG0_D_gcp__step_' + str(i) + '_' for i in range(4)]
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0.1,.51))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/21may11_21may10_TARG0_D_gcp__step_3_perf_all_steps_so_far.png]]
+
+lpda = getindivactionreward(lfn)
+csm=cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+lclr = [csm.to_rgba(float(i)/(len(lpda))) for i in range(len(lpda))]
+clf(); plotComparePerf(lpda,lclr,yl=(0,1.01),lleg=lfn,skipscore=True,skipfollow=True)
+savefig(gifpath()+'perf_compareD.png') # [[./gif/21may11_21may10_TARG0_D_gcp__step_3_perf_compareD.png]]
+
+clf(); drawraster(dspkT,dspkID); xlim((990e3,1000e3))
+savefig(gifpath()+'rast.png') # [[./gif/21may11_21may10_TARG0_D_gcp__step_3_rast.png]]
+
+clf(); pdfc = getconcatweightpdf(lfn)
+subplot(1,2,1); popwtsE = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP','EA','EA2'],lclr=['r','b','g','c'],plotindiv=False)
+subplot(1,2,2); popwtsI = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['IA','IM','IA2','IAL','IML','IA2L'],lclr=['r','b','g','c','m','y'],plotindiv=False)
+savefig(gifpath()+'all_steps_avg_weight.png') # [[./gif/21may11_21may10_TARG0_D_gcp__step_3_all_steps_avg_weight.png]]
+
+get rid of / reduce feedback connections -- ? to prevent hyperexcit?
+
+** check 21may10_TARG0_D_gcp__step_3_ -->> step 4 hyperexcit, stop it
+  
+step 4 already became hyperexcitable ... 
+
+python -i simdat.py backupcfg/21may10_TARG0_D_gcp__step_3_sim.json
+
+EV1 0.01 Hz
+EA 1.71 Hz
+IA 4.94 Hz
+IAL 5.0 Hz
+EA2 0.07 Hz
+IA2 1.18 Hz
+IA2L 1.66 Hz
+EMDOWN 0.09 Hz
+EMUP 0.09 Hz
+IM 1.34 Hz
+IML 1.84 Hz
+
+ax=plotPerf(actreward,yl=(0,1.01))
+savefig(gifpath()+'perf.png') # [[./gif/21may11_21may10_TARG0_D_gcp__step_3_perf.png]]
+
+lfn = ['21may10_TARG0_D_gcp__step_' + str(i) + '_' for i in range(4)]
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0.1,.51))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/21may11_21may10_TARG0_D_gcp__step_3_perf_all_steps_so_far.png]]
+
+lpda = getindivactionreward(lfn)
+csm=cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+lclr = [csm.to_rgba(float(i)/(len(lpda))) for i in range(len(lpda))]
+clf(); plotComparePerf(lpda,lclr,yl=(0,1.01),lleg=lfn,skipscore=True,skipfollow=True)
+savefig(gifpath()+'perf_compareD.png') # [[./gif/21may11_21may10_TARG0_D_gcp__step_3_perf_compareD.png]]
+
+clf(); drawraster(dspkT,dspkID); xlim((990e3,1000e3))
+savefig(gifpath()+'rast.png') # [[./gif/21may11_21may10_TARG0_D_gcp__step_3_rast.png]]
+
+clf(); pdfc = getconcatweightpdf(lfn)
+subplot(1,2,1); popwtsE = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP','EA','EA2'],lclr=['r','b','g','c'],plotindiv=False)
+subplot(1,2,2); popwtsI = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['IA','IM','IA2','IAL','IML','IA2L'],lclr=['r','b','g','c','m','y'],plotindiv=False)
+savefig(gifpath()+'all_steps_avg_weight.png') # [[./gif/21may11_21may10_TARG0_D_gcp__step_3_all_steps_avg_weight.png]]
+
+get rid of / reduce feedback connections -- ? to prevent hyperexcit?
+
+
+** 21may11_TARG0_F_gcp_
+
+this is the smaller scale model
+same as 21may10_TARG0_D_gcp_ but ... reduce feedback connection numbers and weights
+and remove EIPlast ... 
+
+./myrun 30 sn.json
+
+python -i simdat.py backupcfg/21may11_TARG0_F_gcp_sim.json
+
+python multistepSim.py sn.json 30 20 21may11_TARG0_F_gcp_multi
+
+started ~12:09 ...
+
