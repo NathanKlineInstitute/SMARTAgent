@@ -30380,7 +30380,10 @@ clf(); drawraster(dspkT,dspkID); xlim((490e3,500e3))
 savefig(gifpath()+'rast.png') # [[./gif/21may11_21may10_TARG0_E_gcp__step_0_rast.png]]
 
 clf(); pdfc = getconcatweightpdf(lfn)
-popwtsE = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP','EA','EA2'],lclr=['r','b','g','c'],plotindiv=False)
-savefig(gifpath()+'all_steps_avg_weight.png') 
+subplot(1,3,1); popwtsEA = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EA'],lclr=['g'],plotindiv=False)
+subplot(1,3,2); popwtsEA2 = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EA2'],lclr=['c'],plotindiv=False)
+subplot(1,3,3); popwtsE = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False)
+savefig(gifpath()+'all_steps_avg_weight.png') # [[./gif/21may11_21may10_TARG0_E_gcp__step_0_all_steps_avg_weight.png]]
 
 fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
+[[./gif/21may11_21may10_TARG0_E_gcp__step_0__with_reward_input.mp4]]
