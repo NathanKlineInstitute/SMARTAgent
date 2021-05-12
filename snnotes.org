@@ -30432,3 +30432,48 @@ perf decay after peak could be due to divergence in EM up and down weights ... w
 fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
 [[./gif/21may12_21may10_TARG0_E_gcp__step_1__with_reward_input.mp4]]
 
+* 21may12
+** check 21may10_TARG0_E_gcp__step_2_
+  
+python -i simdat.py backupcfg/21may10_TARG0_E_gcp__step_2_sim.json
+
+
+EV1 0.02 Hz
+EA 1.7 Hz
+IA 3.13 Hz
+IAL 4.29 Hz
+EA2 0.12 Hz
+IA2 1.21 Hz
+IA2L 1.71 Hz
+EMDOWN 0.21 Hz
+EMUP 0.21 Hz
+IM 1.42 Hz
+IML 2.12 Hz
+
+ax=plotPerf(actreward,yl=(0,.6))
+savefig(gifpath()+'perf.png') # [[./gif/21may12_21may10_TARG0_E_gcp__step_2_perf.png]]
+hmm, this step decidedly worse
+
+lfn = ['21may10_TARG0_E_gcp__step_' + str(i) + '_' for i in range(3)]
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0.,1.2))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/21may12_21may10_TARG0_E_gcp__step_2_perf_all_steps_so_far.png]]
+
+lpda = getindivactionreward(lfn)
+csm=cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+lclr = [csm.to_rgba(float(i)/(len(lpda))) for i in range(len(lpda))]
+clf(); plotComparePerf(lpda,lclr,yl=(0,1.01),lleg=lfn,skipscore=True,skipfollow=True)
+savefig(gifpath()+'perf_compareD.png') # [[./gif/21may12_21may10_TARG0_E_gcp__step_2_perf_compareD.png]]
+
+clf(); drawraster(dspkT,dspkID); xlim((490e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/21may12_21may10_TARG0_E_gcp__step_2_rast.png]]
+
+clf(); pdfc = getconcatweightpdf(lfn)
+subplot(1,3,1); popwtsEA = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EA'],lclr=['g'],plotindiv=False)
+subplot(1,3,2); popwtsEA2 = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EA2'],lclr=['c'],plotindiv=False)
+subplot(1,3,3); popwtsE = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False)
+savefig(gifpath()+'all_steps_avg_weight.png') # [[./gif/21may12_21may10_TARG0_E_gcp__step_2_all_steps_avg_weight.png]]
+
+fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
+[[./gif/21may12_21may10_TARG0_E_gcp__step_2__with_reward_input.mp4]]
+
