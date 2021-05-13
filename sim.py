@@ -1595,19 +1595,17 @@ def trainAgent (t):
         lmoves = list(dconf['moves'].values())
         for ts in range(int(dconf['actionsPerPlay'])): actions.append(lmoves[np.random.randint(0,len(lmoves))])
       elif dconf['stochmove']:
-        if F_UPs[ts]>F_DOWNs[ts]: # UP WINS
-          actions.append(dconf['moves']['UP'])
-        elif F_DOWNs[ts]>F_UPs[ts]: # DOWN WINS
-          actions.append(dconf['moves']['DOWN'])
+        if random.uniform(0,1) <= dconf['stochmove']:
+          lmoves = [dconf['moves']['UP'], dconf['moves']['DOWN'], dconf['moves']['NOMOVE']]
+          actions.append(lmoves[np.random.randint(0,len(lmoves))])
+          print('stochastic move = ', actions[-1])
         else:
-          lmoves = [dconf['moves']['UP'], dconf['moves']['DOWN']]
-          actions.append(lmoves[np.random.randint(0,len(lmoves))])          
-        #elif F_DOWNs[ts] == 0:
-        #  actions.append(dconf['moves']['NOMOVE'])
-        #else:
-        #  actions.append(sim.lastMove)          
-        #lmoves = [dconf['moves']['UP'], dconf['moves']['DOWN']]
-        #actions.append(lmoves[np.random.randint(0,len(lmoves))])
+          if F_UPs[ts]>F_DOWNs[ts]: # UP WINS
+            actions.append(dconf['moves']['UP'])
+          elif F_DOWNs[ts]>F_UPs[ts]: # DOWN WINS
+            actions.append(dconf['moves']['DOWN'])
+          else:
+            actions.append(dconf['moves']['NOMOVE'])
         sim.lastMove = actions[-1]
       else:
         for ts in range(int(dconf['actionsPerPlay'])):
