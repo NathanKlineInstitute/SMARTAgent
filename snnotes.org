@@ -30520,3 +30520,32 @@ savefig(gifpath()+'all_steps_avg_weight.png') # [[./gif/21may13_21may10_TARG0_E_
 
 fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
 [[./gif/21may13_21may10_TARG0_E_gcp__step_4__with_reward_input.mp4]]
+
+** stopped 21may10_TARG)_E_gcp_ -- perf decaying
+** adjustments to 21may10_TARG0_E_gcp_
+
+performance seems to be decaying after first few steps ... looking at movie of activity
+seems to show that the movements are larger ... maybe too much noise ? could have a gradual
+decay rate for the noise amplitude, but that's difficult to balance ... 
+
+if noise is a problem - still unclear - could have a probability of random move
+instead of synaptic noise ... 
+
+ok, will try that with adjustment to stochMove ... 
+with some low probability it will move randomly, otherwise will be deterministic ... could have the probability of random
+move decrease over time ... 
+
+21may13_TARG0_G_gcp_
+
+./myrun 30 sn.json
+
+python -i simdat.py backupcfg/21may13_TARG0_G_gcp_sim.json
+
+hmm, gets all or nothing activity without the noise ... so will leave it on ... 
+
+how about larger pop of EA and EA2 ... ? and no plast from loc neurons (EV1) to EA ... no feedback RL for now
+
+python multistepSim.py sn.json 30 20 21may13_TARG0_G_gcp_multi
+
+started ~16:58 ...
+
