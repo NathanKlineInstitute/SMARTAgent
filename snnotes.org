@@ -30738,3 +30738,11 @@ default will be 1 for consistency with old model/code ... and put that into conf
 same as last sim but with bigger RLhebbwt ... should not get same trajectory 2x in a row ... 
 also only using slowest ball speed and no top/bottom hit rule ... (see entry above)
 
+./myrun 30 sn.json
+
+python -i simdat.py backupcfg/21may14_TARG0_I_gcp_sim.json
+
+python multistepSim.py sn.json 30 40 21may14_TARG0_I_gcp_multi
+
+started ~12:41 ...
+

@@ -20,7 +20,7 @@
         "yracket": 40,
 	"dodraw": 0,
 	"racket_dy": 5,
-        "possible_ball_dy" : [1,1,1,1,1,1,1,1,1,1,1,1,1],
+        "possible_ball_dy": [1,1,1,1,1,1,1,1,1,1,1,1,1],
 	"possible_ball_dx": [1,1,1,1,1,1,1,1,1,1,1,1,1],
 	"top_bottom_rule": 0
     },
@@ -602,7 +602,7 @@
             "RLlenhebb": 10000,
             "RLlenanti": 500,
             "useRLexp": 1,
-            "RLhebbwt": 0.001,
+            "RLhebbwt": 0.0025,
             "RLantiwt": 0.0,
             "hebbwt": 0.0,
             "antiwt": 0.0,
