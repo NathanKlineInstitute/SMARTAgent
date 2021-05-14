@@ -361,7 +361,7 @@ def setupStimMod ():
         'preConds': {'pop':stimty},
         'postConds': {'pop':poty},
         'weight':wt,
-        'delay': getInitDelay('Soma'),
+        'delay': getInitDelay('STIMMOD'),
         'connList':blist, 'weightIndex':getWeightIndex('AMPA',ECellModel)}
       wt = stimModDirW # rest of inputs use this weight
   else:

@@ -30549,3 +30549,78 @@ python multistepSim.py sn.json 30 20 21may13_TARG0_G_gcp_multi
 
 started ~16:58 ...
 
+*** check
+
+python -i simdat.py backupcfg/21may13_TARG0_G_gcp__step_0_sim.json
+
+EV1 0.02 Hz
+EA 1.64 Hz
+IA 3.07 Hz
+IAL 4.18 Hz
+EA2 0.11 Hz
+IA2 1.21 Hz
+IA2L 1.71 Hz
+EMDOWN 0.2 Hz
+EMUP 0.2 Hz
+IM 1.41 Hz
+IML 2.1 Hz
+
+ax=plotPerf(actreward,yl=(0,.6))
+savefig(gifpath()+'perf.png') # [[./gif/21may14_21may13_TARG0_G_gcp__step_0_perf.png]]
+
+lfn = ['21may13_TARG0_G_gcp__step_' + str(i) + '_' for i in range(1)]
+#pdac = getconcatactionreward(lfn)
+#clf(); ax=plotPerf(pdac,yl=(0.,1.2))
+#savefig(gifpath()+'perf_all_steps_so_far.png') 
+
+#lpda = getindivactionreward(lfn)
+#csm=cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+#lclr = [csm.to_rgba(float(i)/(len(lpda))) for i in range(len(lpda))]
+#clf(); plotComparePerf(lpda,lclr,yl=(0,4.01),lleg=lfn,skipscore=True,skipfollow=True)
+#savefig(gifpath()+'perf_compareD.png') 
+
+clf(); drawraster(dspkT,dspkID); xlim((490e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/21may14_21may13_TARG0_G_gcp__step_0_rast.png]]
+
+clf(); pdfc = getconcatweightpdf(lfn)
+subplot(1,3,1); popwtsEA = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EA'],lclr=['g'],plotindiv=False)
+subplot(1,3,2); popwtsEA2 = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EA2'],lclr=['c'],plotindiv=False)
+subplot(1,3,3); popwtsE = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False)
+savefig(gifpath()+'all_steps_avg_weight.png') # [[./gif/21may14_21may13_TARG0_G_gcp__step_0_all_steps_avg_weight.png]]
+
+hmm, started -> EA2 weights lower than -> EM by accident ...
+
+also have RLhebbwt of 0.05 which is probably too high ...
+
+fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
+[[./gif/21may14_21may13_TARG0_G_gcp__step_0__with_reward_input.mp4]]
+
+** added delay for STIMMOD -- more variance could reduce eventual hypersynch
+
+between 3-10 instead of 1.8-2.2 seemed to reduce the giant hypersynch spike in beginning of sim
+
+add this to the net in json:
+        "delayMinSTIMMOD": 3,
+        "delayMaxSTIMMOD": 10	
+
+and put defaults in conf.py (old default was 1.8-2.2 ms)
+
+** adjust weights/params (21may13_TARG0_H_gcp_)
+
+        "delayMinSoma": 1.8,
+        "delayMaxSoma": 2.2,	
+        "delayMinDend": 3,
+        "delayMaxDend": 12,
+        "delayMinSTIMMOD": 3,
+        "delayMaxSTIMMOD": 12
+
+also lower weights ... less/no NMDA btwn E E neurons
+
+./myrun 30 sn.json
+
+python -i simdat.py backupcfg/21may13_TARG0_H_gcp_sim.json
+
+python multistepSim.py sn.json 30 20 21may13_TARG0_H_gcp_multi
+
+started ~23:06 ...
+
