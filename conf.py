@@ -107,6 +107,10 @@ def ensureDefaults (dconf):
         "useProbabilistic": 1, 
         "useTopological": 0
     }
+    checkDefVal(dconf,'simulatedEnvParams',{})
+    checkDefVal(dconf['simulatedEnvParams'], 'possible_ball_dy' : [1,1,1,1,1,1,2,2,2,2,3,3,3])
+    checkDefVal(dconf['simulatedEnvParams'], 'possible_ball_dx' : [1,1,1,1,1,1,2,2,2,2,3,3,3])
+    checkDefVal(dconf['simulatedEnvParams'], 'top_bottom_rule', 1)
     
 
 dconf = readconf(fnjson) # read the configuration

@@ -30711,3 +30711,30 @@ savefig(gifpath()+'all_steps_avg_weight.png') # [[./gif/21may14_21may13_TARG0_H_
 weights changing so slowly and that's why get same perf ... weights also low/subthreshold ... 
 
 #fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
+
+** simplePong.py -- use only 1 speed and remove top/bottom hit rule
+
+just keep the changes in the development branch for now
+
+adding these as params for simulatedEnvParams.
+these were original:
+        "possible_ball_dy" : [1,1,1,1,1,1,2,2,2,2,3,3,3],
+	"possible_ball_dx": [1,1,1,1,1,1,2,2,2,2,3,3,3]	
+to keep 1 slow speed, just put 1 for all values
+        "possible_ball_dy" : [1,1,1,1,1,1,1,1,1,1,1,1,1],
+	"possible_ball_dx": [1,1,1,1,1,1,1,1,1,1,1,1,1]	
+and then just read that in simplePong.py
+
+also put in original defaults in conf.py for consistency with older models/code:
+    checkDefVal(dconf,'simulatedEnvParams',{})
+    checkDefVal(dconf['simulatedEnvParams'], 'possible_ball_dy' : [1,1,1,1,1,1,2,2,2,2,3,3,3])
+    checkDefVal(dconf['simulatedEnvParams'], 'possible_ball_dx' : [1,1,1,1,1,1,2,2,2,2,3,3,3])
+
+and also 	"top_bottom_rule": 0
+default will be 1 for consistency with old model/code ... and put that into conf.py as well
+
+** 21may14_TARG0_I_gcp_
+
+same as last sim but with bigger RLhebbwt ... should not get same trajectory 2x in a row ... 
+also only using slowest ball speed and no top/bottom hit rule ... (see entry above)
+
