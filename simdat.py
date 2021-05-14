@@ -1897,7 +1897,76 @@ def showMostActiveMNeuronsPerSeq(lSimilarSeqs, seqs2plot, dCumAct, topM):
   pcm1 = lax[1].imshow(hist_topM_allseqs_actdown_allrepeats.T)
   lax[1].set_xlabel('EMDOWN-Neuron')
   plt.colorbar(pcm1, cax = cb1)
+  return hist_topM_allseqs_actup_allrepeats, hist_topM_allseqs_actdown_allrepeats
 
+def getActCorrAcrossAreasRepWiseIndiv(dStepAct,cseqInds):
+  # must reduce some repetitive code by replacing it with functions - Haroon
+  cseq_stepact_up = np.array(dStepAct['EMUP'])[cseqInds]  
+  cseq_stepact_v1 = np.array(dStepAct['EV1'])[cseqInds]  
+  cseq_stepact_ea = np.array(dStepAct['EA'])[cseqInds]  
+  cseq_stepact_ea2 = np.array(dStepAct['EA2'])[cseqInds]  
+  cseq_stepact_down = np.array(dStepAct['EMDOWN'])[cseqInds]  
+  corrs_v1_up = []
+  corrs_v1_down = []
+  corrs_ea_up = []
+  corrs_ea_down = []
+  corrs_ea2_up = []
+  corrs_ea2_down = []
+  corrs_up_down = []
+  for i in range(len(cseq_stepact_v1)):
+    v1 = np.array(cseq_stepact_v1[i])
+    ea = np.array(cseq_stepact_ea[i])
+    ea2 = np.array(cseq_stepact_ea2[i])
+    up = np.array(cseq_stepact_up[i])
+    down = np.array(cseq_stepact_down[i])
+    v1_up = []
+    v1_down = []
+    ea_up = []
+    ea_down = []
+    ea2_up = []
+    ea2_down = []
+    up_down = []
+    for j in range(v1.shape[1]):
+      v1_cN = v1[:,j]
+      for k in range(up.shape[1]):
+        up_cN = up[:,k]
+        down_cN = down[:,k]
+        c1,p1 = pearsonr(v1_cN,up_cN)
+        c2,p2 = pearsonr(v1_cN,down_cN)
+        v1_up.append(c1)
+        v1_down.append(c2)
+    corrs_v1_up.append(v1_up)    
+    corrs_v1_down.append(v1_down)    
+    for j in range(ea.shape[1]):
+      ea_cN = ea[:,j]
+      for k in range(up.shape[1]):
+        up_cN = up[:,k]
+        down_cN = down[:,k]
+        c1,p1 = pearsonr(ea_cN,up_cN)
+        c2,p2 = pearsonr(ea_cN,down_cN)
+        ea_up.append(c1)
+        ea_down.append(c2)
+    corrs_ea_up.append(ea_up)    
+    corrs_ea_down.append(ea_down)    
+    for j in range(ea2.shape[1]):
+      ea2_cN = ea2[:,j]
+      for k in range(up.shape[1]):
+        up_cN = up[:,k]
+        down_cN = down[:,k]
+        c1,p1 = pearsonr(ea2_cN,up_cN)
+        c2,p2 = pearsonr(ea2_cN,down_cN)
+        ea2_up.append(c1)
+        ea2_down.append(c2)
+    corrs_ea2_up.append(ea2_up)    
+    corrs_ea2_down.append(ea2_down)    
+    for j in range(up.shape[1]):
+      up_cN = up[:,j]
+      for k in range(down.shape[1]):
+        down_cN = down[:,k]
+        c1,p1 = pearsonr(up_cN,down_cN)
+        up_down.append(c1)
+    corrs_up_down.append(up_down)    
+  return corrs_v1_up, corrs_v1_down, corrs_ea_up, corrs_ea_down, corrs_ea2_up, corrs_ea2_down, corrs_up_down
 
 def getActCorrs(lSimilarSeqs,seqs2plot,dStepAct,I):
   cseqIndsI = lSimilarSeqs[seqs2plot[I]]
