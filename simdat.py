@@ -690,12 +690,12 @@ def getCumPerfCols (actreward):
   return cumHits, cumMissed, cumScore
   
 
-def plotPerf (actreward,yl=(0,1)):
+def plotPerf (actreward,yl=(0,1),asratio=True,asbin=False,binsz=10e3):
   # plot performance
   plotFollowBall(actreward,ax=subplot(1,1,1),cumulative=True,color='b');
   if dconf['useFollowMoveOutput']: plotFollowBall(actreward,ax=subplot(1,1,1),cumulative=True,color='m',pun=True);    
-  plotHitMiss(actreward,ax=subplot(1,1,1),lclr=['g'],asratio=True); 
-  plotScoreMiss(actreward,ax=subplot(1,1,1),clr='r',asratio=True);
+  plotHitMiss(actreward,ax=subplot(1,1,1),lclr=['g'],asratio=asratio,asbin=asbin,binsz=binsz); 
+  plotScoreMiss(actreward,ax=subplot(1,1,1),clr='r',asratio=asratio);
   ylim(yl)
   ylabel('Performance')
   if dconf['useFollowMoveOutput']:
@@ -706,7 +706,7 @@ def plotPerf (actreward,yl=(0,1)):
   ax.legend(handles=lpatch,handlelength=1)
   return ax
 
-def plotComparePerf (lpda, lclr, yl=(0,.55), lleg=None, skipfollow=False, skipscore=False):
+def plotComparePerf (lpda, lclr, yl=(0,.55), lleg=None, skipfollow=False, skipscore=False, asratio=True,asbin=False,binsz=10e3):
   # plot comparison of performance of list of action rewards dataframes in lpda
   # lclr is color to plot
   # lleg is optional legend
@@ -716,8 +716,8 @@ def plotComparePerf (lpda, lclr, yl=(0,.55), lleg=None, skipfollow=False, skipsc
   for pda,clr in zip(lpda,lclr):
     gdx=1
     if not skipfollow: plotFollowBall(pda,ax=subplot(1,ngraph,gdx),cumulative=True,color=clr); ylim(yl); gdx+=1
-    plotHitMiss(pda,ax=subplot(1,ngraph,gdx),lclr=[clr],asratio=True); ylim(yl); gdx+=1
-    if not skipscore: plotScoreMiss(pda,ax=subplot(1,ngraph,gdx),clr=clr,asratio=True); ylim(yl);
+    plotHitMiss(pda,ax=subplot(1,ngraph,gdx),lclr=[clr],asratio=asratio,asbin=asbin,binsz=binsz); ylim(yl); gdx+=1
+    if not skipscore: plotScoreMiss(pda,ax=subplot(1,ngraph,gdx),clr=clr,asratio=asratio); ylim(yl);
   if lleg is not None:
     lpatch = [mpatches.Patch(color=c,label=s) for c,s in zip(lclr,lleg)]
     ax=gca()
