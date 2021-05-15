@@ -30787,3 +30787,17 @@ savefig(gifpath()+'all_steps_avg_weight.png') # [[./gif/21may15_21may14_TARG0_I_
 
 fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
 [[./gif/21may15_21may14_TARG0_I_gcp__step_0__with_reward_input.mp4]]
+
+* 21may15
+** adjust sim -- 21may15_TARG0_J_gcp_
+
+starting weights are too small -- 3 steps and nothing is changing in terms of firing rates
+
+./myrun 30 sn.json
+
+python -i simdat.py backupcfg/21may15_TARG0_J_gcp_sim.json
+
+python multistepSim.py sn.json 30 40 21may15_TARG0_J_gcp_multi
+
+started ~11
+
