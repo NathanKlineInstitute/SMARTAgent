@@ -36,7 +36,7 @@ sim.plotWeights = 0  # plot weights
 sim.saveWeights = 1  # save weights
 if 'saveWeights' in dconf['sim']: sim.saveWeights = dconf['sim']['saveWeights']
 sim.saveInputImages = 1 #save Input Images (5 game frames)
-sim.saveMotionFields = 1 # whether to save the motion fields
+sim.saveMotionFields = dconf['sim']['saveMotionFields'] # whether to save the motion fields
 sim.saveObjPos = 1 # save ball and paddle position to file
 sim.saveAssignedFiringRates = dconf['sim']['saveAssignedFiringRates']
 recordWeightStepSize = dconf['sim']['recordWeightStepSize']
@@ -361,7 +361,7 @@ def setupStimMod ():
         'preConds': {'pop':stimty},
         'postConds': {'pop':poty},
         'weight':wt,
-        'delay': getInitDelay('Soma'),
+        'delay': getInitDelay('STIMMOD'),
         'connList':blist, 'weightIndex':getWeightIndex('AMPA',ECellModel)}
       wt = stimModDirW # rest of inputs use this weight
   else:
@@ -1595,19 +1595,17 @@ def trainAgent (t):
         lmoves = list(dconf['moves'].values())
         for ts in range(int(dconf['actionsPerPlay'])): actions.append(lmoves[np.random.randint(0,len(lmoves))])
       elif dconf['stochmove']:
-        if F_UPs[ts]>F_DOWNs[ts]: # UP WINS
-          actions.append(dconf['moves']['UP'])
-        elif F_DOWNs[ts]>F_UPs[ts]: # DOWN WINS
-          actions.append(dconf['moves']['DOWN'])
+        if random.uniform(0,1) <= dconf['stochmove']:
+          lmoves = [dconf['moves']['UP'], dconf['moves']['DOWN'], dconf['moves']['NOMOVE']]
+          actions.append(lmoves[np.random.randint(0,len(lmoves))])
+          print('stochastic move = ', actions[-1])
         else:
-          lmoves = [dconf['moves']['UP'], dconf['moves']['DOWN']]
-          actions.append(lmoves[np.random.randint(0,len(lmoves))])          
-        #elif F_DOWNs[ts] == 0:
-        #  actions.append(dconf['moves']['NOMOVE'])
-        #else:
-        #  actions.append(sim.lastMove)          
-        #lmoves = [dconf['moves']['UP'], dconf['moves']['DOWN']]
-        #actions.append(lmoves[np.random.randint(0,len(lmoves))])
+          if F_UPs[ts]>F_DOWNs[ts]: # UP WINS
+            actions.append(dconf['moves']['UP'])
+          elif F_DOWNs[ts]>F_UPs[ts]: # DOWN WINS
+            actions.append(dconf['moves']['DOWN'])
+          else:
+            actions.append(dconf['moves']['NOMOVE'])
         sim.lastMove = actions[-1]
       else:
         for ts in range(int(dconf['actionsPerPlay'])):
@@ -1960,12 +1958,23 @@ def saveAssignedFiringRates (dAllFiringRates): pickle.dump(dAllFiringRates, open
 def saveInputImages (Images):
   # save input images to txt file (switch to pkl?)
   InputImages = np.array(Images)
-  print(InputImages.shape)  
-  with open('data/'+dconf['sim']['name']+'InputImages.txt', 'w') as outfile:
-    outfile.write('# Array shape: {0}\n'.format(InputImages.shape))
-    for Input_Image in InputImages:
-      np.savetxt(outfile, Input_Image, fmt='%-7.2f')
-      outfile.write('# New slice\n')
+  print(InputImages.shape)
+  if dconf['net']['useBinaryImage']:
+    #InputImages = np.where(InputImages>0,1,0)
+    """
+    with open('data/'+dconf['sim']['name']+'InputImages.txt', 'w') as outfile:
+      outfile.write('# Array shape: {0}\n'.format(InputImages.shape))
+      for Input_Image in InputImages:
+        np.savetxt(outfile, Input_Image, fmt='%d', delimiter=' ')
+        outfile.write('# New slice\n')
+    """
+    np.save('data/'+dconf['sim']['name']+'InputImages',InputImages)
+  else:
+    with open('data/'+dconf['sim']['name']+'InputImages.txt', 'w') as outfile:
+      outfile.write('# Array shape: {0}\n'.format(InputImages.shape))
+      for Input_Image in InputImages:
+        np.savetxt(outfile, Input_Image, fmt='%-7.2f', delimiter=' ')
+        outfile.write('# New slice\n')
       
 if sim.rank == 0: # only rank 0 should save. otherwise all the other nodes could over-write the output or quit first; rank 0 plots
   if dconf['sim']['doplot']:

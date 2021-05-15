@@ -664,15 +664,14 @@ class AIGame:
       dsum_Images = lgimage[0]
       nsum_Images = lgimage_ns[0]
     self.FullImages.append(nsum_Images) # save full images ----> THIS IS JUST USED FOR DIRECTIONS (for accuracy)
-    if self.binary_Image is not None:
-      self.ReducedImages.append(255.0 * self.binary_Image)
-    else:
-      self.ReducedImages.append(dsum_Images) # save the input image
     self.updateInputRates(dsum_Images) # update input rates to retinal neurons
-    if self.intaction==1: #if only one frame used per play, then add the downsampled and scaled image from last_obs for direction computation 
+    if self.binary_Image is not None:
+      self.ReducedImages.append(self.binary_Image)
+    else:
+      self.ReducedImages.append(dsum_Images) # save the input image    
+    if self.intaction==1: #if one frame used per play, add downsampled and scaled image from last_obs for direction computation 
       if len(lobs_gimage_ds)>0:
         dsum_Images = np.maximum(dsum_Images,lobs_gimage_ds)
-
     if self.dirSensitiveNeuronDim > 0: # as long as we have direction selective neurons
       if dconf['DirectionDetectionAlgo']['OpticFlow']:
         self.computeMotionFields(UseFull=dconf['DirectionDetectionAlgo']['UseFull']) # compute the motion fields

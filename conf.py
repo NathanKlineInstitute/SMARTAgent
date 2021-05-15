@@ -33,7 +33,13 @@ def ensureDefaults (dconf):
   checkDefVal(dconf['net'], 'EEMFeedbackProb', 0.0)  
   checkDefVal(dconf, 'verbose', 0)
   checkDefVal(dconf['net'], 'ECellModel', 'Mainen')
-  checkDefVal(dconf['net'], 'ICellModel', 'FS_BasketCell')  
+  checkDefVal(dconf['net'], 'ICellModel', 'FS_BasketCell')
+  checkDefVal(dconf['net'], 'delayMinSoma', 1.8)
+  checkDefVal(dconf['net'], 'delayMaxSoma', 2.2)    
+  checkDefVal(dconf['net'], 'delayMinSTIMMOD', 1.8)
+  checkDefVal(dconf['net'], 'delayMaxSTIMMOD', 2.2)
+  checkDefVal(dconf['net'], 'delayMinDend', 3)
+  checkDefVal(dconf['net'], 'delayMaxDend', 10)      
   for k in ['VisualRL', 'EIPlast', 'VisualFeedback', 'useNeuronPad']: checkDefVal(dconf['net'], k, False)
   for k in ['EEGain', 'EIGain', 'IEGain', 'IIGain', 'scale']: checkDefVal(dconf['net'], k, 1.0)
   for k in ['useBinaryImage', 'EXPDir', 'VTopoI']: checkDefVal(dconf['net'],k,True)
@@ -54,6 +60,7 @@ def ensureDefaults (dconf):
   checkDefVal(dconf, 'stayStepLim', 0)
   for k in ['anticipatedRL', 'RLFakeUpRule', 'RLFakeDownRule', 'RLFakeStayRule', 'doplot', 'saveCellSecs', 'saveCellConns']:
     checkDefVal(dconf['sim'], k, 0)
+  checkDefVal(dconf['sim'], 'saveMotionFields', 1)
   checkDefVal(dconf['sim'], 'targettedRL', 1)
   checkDefVal(dconf['sim'], 'targettedRLOppFctr', 0.5)
   checkDefVal(dconf['sim'], 'targettedRLDscntFctr', 0.5)
@@ -100,6 +107,10 @@ def ensureDefaults (dconf):
         "useProbabilistic": 1, 
         "useTopological": 0
     }
+    checkDefVal(dconf,'simulatedEnvParams',{})
+    checkDefVal(dconf['simulatedEnvParams'], 'possible_ball_dy', [1,1,1,1,1,1,2,2,2,2,3,3,3])
+    checkDefVal(dconf['simulatedEnvParams'], 'possible_ball_dx', [1,1,1,1,1,1,2,2,2,2,3,3,3])
+    checkDefVal(dconf['simulatedEnvParams'], 'top_bottom_rule', 1)
     
 
 dconf = readconf(fnjson) # read the configuration

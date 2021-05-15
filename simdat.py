@@ -366,6 +366,7 @@ def animInput (InputImages, outpath, framerate=50, figsize=None, showflow=False,
   lax = [subplot(1,ncol,i+1) for i in range(ncol)]
   ltitle = ['Input Images']
   lact = [InputImages]; lvmax = [255]; xl = [(-.5,19.5)]; yl = [(19.5,-0.5)]
+  if dconf['net']['useBinaryImage']: lvmax = [1]
   ddat = {}
   fig.suptitle('Time = ' + str(0*tstepPerAction) + ' ms')
   idx = 0
@@ -509,16 +510,21 @@ def animDetectedMotionMaps (outpath, framerate=10, figsize=(7,3)):
   return fig, axs, plt
 
 def loadInputImages (name=None):
-  fn = 'data/'+getsimname(name)+'InputImages.txt'
-  print('loading input images from', fn)
-  Input_Images = np.loadtxt(fn)
-  New_InputImages = []
-  NB_Images = int(Input_Images.shape[0]/Input_Images.shape[1])
-  for x in range(NB_Images):
-    fp = x*Input_Images.shape[1]
-    # 20 is sqrt of 400 (20x20 pixels). what is 400? number of ER neurons? or getting rid of counter @ top of screen?
-    New_InputImages.append(Input_Images[fp:fp+Input_Images.shape[1],:])
-  return np.array(New_InputImages)
+  try:
+    fn = 'data/'+getsimname(name)+'InputImages.npy'
+    print('loading input images from', fn)
+    return np.load(fn)
+  except:
+    fn = 'data/'+getsimname(name)+'InputImages.txt'
+    print('loading input images from', fn)
+    Input_Images = np.loadtxt(fn)
+    New_InputImages = []
+    NB_Images = int(Input_Images.shape[0]/Input_Images.shape[1])
+    for x in range(NB_Images):
+      fp = x*Input_Images.shape[1]
+      # 20 is sqrt of 400 (20x20 pixels). what is 400? number of ER neurons? or getting rid of counter @ top of screen?
+      New_InputImages.append(Input_Images[fp:fp+Input_Images.shape[1],:])
+    return np.array(New_InputImages)
 
 def loadMotionFields (name=None): return pickle.load(open('data/'+getsimname(name)+'MotionFields.pkl','rb'))
 
@@ -821,12 +827,12 @@ def getCumPerfCols (actreward):
   return cumHits, cumMissed, cumScore
   
 
-def plotPerf (actreward,yl=(0,1)):
+def plotPerf (actreward,yl=(0,1),asratio=True,asbin=False,binsz=10e3):
   # plot performance
   plotFollowBall(actreward,ax=subplot(1,1,1),cumulative=True,color='b');
   if dconf['useFollowMoveOutput']: plotFollowBall(actreward,ax=subplot(1,1,1),cumulative=True,color='m',pun=True);    
-  plotHitMiss(actreward,ax=subplot(1,1,1),lclr=['g'],asratio=True); 
-  plotScoreMiss(actreward,ax=subplot(1,1,1),clr='r',asratio=True);
+  plotHitMiss(actreward,ax=subplot(1,1,1),lclr=['g'],asratio=asratio,asbin=asbin,binsz=binsz); 
+  plotScoreMiss(actreward,ax=subplot(1,1,1),clr='r',asratio=asratio);
   ylim(yl)
   ylabel('Performance')
   if dconf['useFollowMoveOutput']:
@@ -837,7 +843,7 @@ def plotPerf (actreward,yl=(0,1)):
   ax.legend(handles=lpatch,handlelength=1)
   return ax
 
-def plotComparePerf (lpda, lclr, yl=(0,.55), lleg=None, skipfollow=False, skipscore=False):
+def plotComparePerf (lpda, lclr, yl=(0,.55), lleg=None, skipfollow=False, skipscore=False, asratio=True,asbin=False,binsz=10e3):
   # plot comparison of performance of list of action rewards dataframes in lpda
   # lclr is color to plot
   # lleg is optional legend
@@ -847,8 +853,8 @@ def plotComparePerf (lpda, lclr, yl=(0,.55), lleg=None, skipfollow=False, skipsc
   for pda,clr in zip(lpda,lclr):
     gdx=1
     if not skipfollow: plotFollowBall(pda,ax=subplot(1,ngraph,gdx),cumulative=True,color=clr); ylim(yl); gdx+=1
-    plotHitMiss(pda,ax=subplot(1,ngraph,gdx),lclr=[clr],asratio=True); ylim(yl); gdx+=1
-    if not skipscore: plotScoreMiss(pda,ax=subplot(1,ngraph,gdx),clr=clr,asratio=True); ylim(yl);
+    plotHitMiss(pda,ax=subplot(1,ngraph,gdx),lclr=[clr],asratio=asratio,asbin=asbin,binsz=binsz); ylim(yl); gdx+=1
+    if not skipscore: plotScoreMiss(pda,ax=subplot(1,ngraph,gdx),clr=clr,asratio=asratio); ylim(yl);
   if lleg is not None:
     lpatch = [mpatches.Patch(color=c,label=s) for c,s in zip(lclr,lleg)]
     ax=gca()
@@ -957,8 +963,17 @@ def plotMeanNeuronWeight (pdf,postid,clr='k',ax=None,msz=1,xl=None):
   if xl is not None: ax.set_xlim(xl)
   ax.set_ylim((mnw,mxw))
   ax.set_ylabel('Average weight'); 
-  return wts    
-  
+  return wts
+
+def unnanl (l, val=0):
+  out = []
+  for x in l:
+    if isnan(x):
+      out.append(0)
+    else:
+      out.append(x)
+  return out
+      
 def plotMeanWeights (pdf,ax=None,msz=1,xl=None,lpop=['EMDOWN','EMUP'],lclr=['k','r','b','g'],plotindiv=True,fsz=15,prety=None):
   #plot mean weights of all plastic synaptic weights onto lpop
   if ax is None: ax = gca()
@@ -976,7 +991,7 @@ def plotMeanWeights (pdf,ax=None,msz=1,xl=None,lpop=['EMDOWN','EMUP'],lclr=['k',
       pdfs = pdf[(pdf.postid>=dstartidx[pop]) & (pdf.postid<=dendidx[pop])]
       if prety is not None:
         pdfs = pdfs[(pdfs.preid>=dstartidx[prety]) & (pdfs.preid<=dendidx[prety])]
-      popwts[pop] = [np.mean(pdfs[(pdfs.time==t)].weight) for t in utimes] #wts of connections onto pop
+      popwts[pop] = unnanl([np.mean(pdfs[(pdfs.time==t)].weight) for t in utimes]) #wts of connections onto pop      
       ax.plot(utimes,popwts[pop],clr+'-o',markersize=msz)
       mnw=min(mnw, np.amin(popwts[pop]))
       mxw=max(mxw, np.amax(popwts[pop]))            
