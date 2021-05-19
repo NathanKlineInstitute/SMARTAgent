@@ -1983,6 +1983,41 @@ def getActCorrAcrossAreasRepWiseIndiv(dStepAct,cseqInds):
     corrs_up_down.append(up_down)    
   return corrs_v1_up, corrs_v1_down, corrs_ea_up, corrs_ea_down, corrs_ea2_up, corrs_ea2_down, corrs_up_down
 
+def getIntermActCorrs(dStepAct,cseqInds):
+  cseq_stepact_v1 = np.array(dStepAct['EV1'])[cseqInds]
+  cseq_stepact_ea = np.array(dStepAct['EA'])[cseqInds]
+  cseq_stepact_ea2 = np.array(dStepAct['EA2'])[cseqInds]
+  corrs_v1_ea = []
+  corrs_v1_ea2 = []
+  corrs_ea_ea2 = []
+  for i in range(len(cseq_stepact_v1)):
+    v1 = np.array(cseq_stepact_v1[i])
+    ea = np.array(cseq_stepact_ea[i])
+    ea2 = np.array(cseq_stepact_ea2[i])
+    v1_ea = []
+    v1_ea2 = []
+    ea_ea2 = []
+    for j in range(v1.shape[1]):
+      v1_cN = v1[:,j]
+      for k in range(ea.shape[1]):
+        ea_cN = ea[:,k]
+        c1,p1 = pearsonr(v1_cN,ea_cN)
+        v1_ea.append(c1)
+      for l in range(ea2.shape[1]):
+        ea2_cN = ea2[:,l]
+        c2,p2 = pearsonr(v1_cN,ea2_cN)
+        v1_ea2.append(c2)
+    corrs_v1_ea.append(v1_ea)
+    corrs_v1_ea2.append(v1_ea2)
+    for j in range(ea.shape[1]):
+      ea_cN = ea[:,j]
+      for l in range(ea2.shape[1]):
+        ea2_cN = ea2[:,l]
+        c3,p3 = pearsonr(ea_cN,ea2_cN)
+        ea_ea2.append(c3)
+    corrs_ea_ea2.append(ea_ea2)
+  return corrs_v1_ea, corrs_v1_ea2, corrs_ea_ea2
+
 def getActCorrs(lSimilarSeqs,seqs2plot,dStepAct,I):
   cseqIndsI = lSimilarSeqs[seqs2plot[I]]
   lens = []
