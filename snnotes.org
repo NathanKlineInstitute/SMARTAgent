@@ -31558,3 +31558,13 @@ and using single ball speed, top_bottom_rule == 0
 
 python -i simdat.py backupcfg/21may20_TARG0_M_cycle_sim.json
 
+compared to the 21may17_TARG0_L_gcp_ sim, here have to reduce the weights from VD -> EA, VL -> EA 
+since the opponent racket contributes to extra acttivation in the network. this way, the EA rates
+will be similar to the L network (w/o an opponent)
+
+(buffer=shell)
+
+python multistepSim.py sn.json 30 40 21may20_TARG0_M_cycle_multi
+
+started ~13:04 ...
+

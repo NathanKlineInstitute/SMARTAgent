@@ -54,7 +54,7 @@
         "ResumeSimFromFile": "data/21may5_TARG0_S_gcp__step_15_synWeights_final.pkl"
     },
     "sim": {
-        "duration": 5000,
+        "duration": 500000,
         "dt": 0.6,
         "verbose": 0,
         "recordStep": 1.0,
@@ -389,13 +389,13 @@
         "cmat": {	    
             "VL":{"VD":{"AM2": 0,"NM2": 0, "conv": 0},
                   "VL":{"AM2": 4,"NM2": 0.6, "conv": 0},
-                  "EA":{"AM2": 5.5,"NM2": 1, "conv": 640},
+                  "EA":{"AM2": 4.9,"NM2": 0.85, "conv": 640},
 		  "EA2":{"AM2": 0.25,"NM2": 0.0, "conv": 30},
                   "EMDOWN":{"AM2": 0.25,"NM2": 0.0, "conv": 30},
                   "EMUP":{"AM2": 0.25,"NM2": 0.0, "conv": 30}},
             "VD":{"VL":{"AM2": 0,"NM2": 0, "conv": 0},
                   "VD":{"AM2": 0,"NM2": 0, "conv": 0},
-                  "EA":{"AM2": 5.5,"NM2": 1, "conv": 40},
+                  "EA":{"AM2": 4.9,"NM2": 0.85, "conv": 40},
 		  "EA2":{"AM2": 0.25,"NM2": 0.0, "conv": 30},
                   "EMDOWN":{"AM2": 0.25,"NM2": 0.0, "conv": 30},
                   "EMUP":{"AM2": 0.25,"NM2": 0.0, "conv": 30},
