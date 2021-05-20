@@ -13,7 +13,7 @@
         3,
         1
     ],
-    "useSimulatedEnv": 1,
+    "useSimulatedEnv": 2,
     "simulatedEnvParams": {
         "random": 0,
         "yball": 80,
@@ -31,7 +31,7 @@
     "avoidStuck": 0,
     "useImagePadding": 0,
     "rewardcodes": {
-        "scorePoint": 0.0,
+        "scorePoint": 2.0,
         "losePoint": -0.25,
         "followTarget": 0.0,
         "avoidTarget": 0.0,
@@ -54,7 +54,7 @@
         "ResumeSimFromFile": "data/21may5_TARG0_S_gcp__step_15_synWeights_final.pkl"
     },
     "sim": {
-        "duration": 500000,
+        "duration": 5000,
         "dt": 0.6,
         "verbose": 0,
         "recordStep": 1.0,
@@ -65,7 +65,7 @@
         "RLFakeUpRule": 0,
         "RLFakeDownRule": 0,
         "RLFakeStayRule": 0,
-        "name": "21may17_TARG0_L_gcp_",
+        "name": "21may20_TARG0_M_cycle_",
         "doquit": 1,
         "doplot": 0,
         "saveCellSecs": 0,
@@ -389,13 +389,13 @@
         "cmat": {	    
             "VL":{"VD":{"AM2": 0,"NM2": 0, "conv": 0},
                   "VL":{"AM2": 4,"NM2": 0.6, "conv": 0},
-                  "EA":{"AM2": 6,"NM2": 1, "conv": 640},
+                  "EA":{"AM2": 5.5,"NM2": 1, "conv": 640},
 		  "EA2":{"AM2": 0.25,"NM2": 0.0, "conv": 30},
                   "EMDOWN":{"AM2": 0.25,"NM2": 0.0, "conv": 30},
                   "EMUP":{"AM2": 0.25,"NM2": 0.0, "conv": 30}},
             "VD":{"VL":{"AM2": 0,"NM2": 0, "conv": 0},
                   "VD":{"AM2": 0,"NM2": 0, "conv": 0},
-                  "EA":{"AM2": 6,"NM2": 1, "conv": 40},
+                  "EA":{"AM2": 5.5,"NM2": 1, "conv": 40},
 		  "EA2":{"AM2": 0.25,"NM2": 0.0, "conv": 30},
                   "EMDOWN":{"AM2": 0.25,"NM2": 0.0, "conv": 30},
                   "EMUP":{"AM2": 0.25,"NM2": 0.0, "conv": 30},

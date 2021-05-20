@@ -31528,3 +31528,33 @@ some burstiness in raster here too...but not out of control...
 
 fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
 [[./gif/21may20_21may17_TARG0_L_gcp__step_11__with_reward_input.mp4]]
+
+** set useSimulatedEnv to 2 to use full 'simulated' pong
+
+  if useSimulatedEnv==1:
+    from simplePong import simplePong
+    env = simplePong()
+  elif useSimulatedEnv==2:
+    from simulatePongFull import simulatePong
+    env = simulatePong()    
+  else:
+    ... the standard env ... (Pong)
+
+** test full simulated Pong 21may20_TARG0_M_cycle_
+
+"useSimulatedEnv": 2,
+
+    "rewardcodes": {
+        "scorePoint": 2.0,
+        "losePoint": -0.25,
+        "followTarget": 0.0,
+        "avoidTarget": 0.0,
+        "hitBall": 1.0
+    },
+
+and using single ball speed, top_bottom_rule == 0
+
+./myrun 30 sn.json
+
+python -i simdat.py backupcfg/21may20_TARG0_M_cycle_sim.json
+
