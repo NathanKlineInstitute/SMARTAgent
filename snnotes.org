@@ -31809,3 +31809,26 @@ python multistepSim.py sn.json 30 40 21may21_TARG0_N_cycle_multi
 
 started ~12:08 ...
 
+** stopped 21may17_TARG0_L_gcp_ during step 21 since became too hyperexcitable
+
+might still have room for improvement but may need an additional mechanism to prevent the hyperexcitability
+ a. EIPlast 
+ b. reducing/increasing excitatory noise as rates increase/decrease
+ c. adjusting reward/punishment values as rates change
+
+EIPlast is more expensive -- more synapses required
+changing noise is possible but shifts excitability of neurons 
+changing reward/punish values does not increase capacity of network
+
+easiest is to try EIPlast ... 
+
+can do same as 21may17_TARG0_L_gcp_ but with EIPlast ... 
+
+21may21_TARG0_L_EIP_gcp_
+
+./myrun 30 sn.json
+
+python -i simdat.py backupcfg/21may21_TARG0_L_EIP_gcp_sim.json
+
+python multistepSim.py sn.json 30 40 21may21_TARG0_L_EIP_gcp_multi
+
