@@ -31736,7 +31736,7 @@ savefig(gifpath()+'all_steps_avg_weight.png') # [[./gif/21may21_21may17_TARG0_L_
 fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
 [[./gif/21may21_21may17_TARG0_L_gcp__step_20__with_reward_input.mp4]]
 
-** check 21may20_TARG0_M_cycle__step_5_
+** check 21may20_TARG0_M_cycle__step_5_ -->> looks ok but no point for now since cant score points
 
 python -i simdat.py backupcfg/21may20_TARG0_M_cycle__step_5_sim.json
 
