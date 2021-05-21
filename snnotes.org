@@ -31788,3 +31788,24 @@ python -i simdat.py backupcfg/21may20_TARG0_M_cycle__step_4_sim.json
 fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
 [[./gif/21may21_21may20_TARG0_M_cycle__step_5__with_reward_input.mp4]]
 
+** need to deal with hyperexcit issue
+
+adjust score/lose values as weights/rate increase? add EIPlast ... ? 
+
+** 21may21_TARG0_N_cycle_
+
+does higher resolution for directional neurons help perf (80x80 instead of 20x20) ?
+
+./myrun 30 sn.json
+
+python -i simdat.py backupcfg/21may21_TARG0_N_cycle_sim.json
+
+had to increase number of inputs from VD -> EA to ~preserve firing rates of EA and the info
+they receive about motion ... (6400 vs 400 is 16X increase but same fraction of visual field
+is occupied by objects...ideally would have same fraction of field covered but that leads to
+hyperexcitability)
+
+python multistepSim.py sn.json 30 40 21may21_TARG0_N_cycle_multi
+
+started ~12:08 ...
+
