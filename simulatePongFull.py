@@ -55,8 +55,8 @@ class simulatePong:
     self.ball_dx = 1  # displacement in horizontal direction
     self.ball_dy = 1  #displacement in vertical direction
     self.possible_ball_ypos = [40,60,80,100,120]
-    self.possible_ball_dy = [1,1,1,1,1,1,2,2,2,2,3,3,3]
-    self.possible_ball_dx = [1,1,1,1,1,1,2,2,2,2,3,3,3]
+    self.possible_ball_dy = dconf['simulatedEnvParams']['possible_ball_dy']
+    self.possible_ball_dx = dconf['simulatedEnvParams']['possible_ball_dx']
 
   def createrackets (self):
     self.racket_width = 4
@@ -186,7 +186,7 @@ class simulatePong:
         self.ball_dx *= -1
         self.ModelHits += 1
         self.hit = 1
-      elif right_racket_yshift < 0 and abs(tmp_bally2 - self.rightrackety1) <= 2:
+      elif dconf['simulatedEnvParams']['top_bottom_rule'] and right_racket_yshift < 0 and abs(tmp_bally2 - self.rightrackety1) <= 2:
         print('hit top R')
         xshift_ball = self.ball_dx + self.rightracketx1 - tmp_ballx2
         self.ball_dy = np.sign(self.ball_dy) * random.choice(self.possible_ball_dy) * 2        
@@ -194,7 +194,7 @@ class simulatePong:
         self.ball_dx *= -1
         self.ModelHits += 1
         self.hit = 1        
-      elif right_racket_yshift > 0 and abs(tmp_bally1 - self.rightrackety2) <= 2:
+      elif dconf['simulatedEnvParams']['top_bottom_rule'] and right_racket_yshift > 0 and abs(tmp_bally1 - self.rightrackety2) <= 2:
         print('hit bottom R')
         xshift_ball = self.ball_dx + self.rightracketx1 - tmp_ballx2
         self.ball_dy = np.sign(self.ball_dy) * random.choice(self.possible_ball_dy) * 2
