@@ -32346,15 +32346,13 @@ for pda in lpda:
 
 plot(lhit,'r'); plot(lhit,'ro')
 plot(lmiss,'g'); plot(lmiss,'go')
-savefig(gifpath()+'hit_miss_total.png') # [[./gif/21may25_21may21_TARG0_L_EIP_gcp__step_14_hit_miss_total.png]]
-not much of a trend, except for at the end - hits (red) are increasing a little (but not maximum number of hits - which occurred
-in step 2)
-np.argmax(lhit) # 2
-np.argmin(lmiss) # 2
+savefig(gifpath()+'hit_miss_total.png') # [[./gif/21may25_21may21_TARG0_N_cycle__step_24_hit_miss_total.png]]
+np.argmax(lhit), np.argmin(lmiss) # (6, 6)
 
-plot(np.array(lhit)/lmiss,'k'); plot(np.array(lhit)/lmiss,'ko')
-xlabel('Step'); ylabel('Hit/miss ratio')
-savefig(gifpath()+'hit_miss_ratio.png') # [[./gif/21may25_21may21_TARG0_N_cycle__step_24_hit_miss_ratio.png]][[
+cla(); lrat = plotHitMissRatioPerStep(lpda)
+savefig(gifpath()+'hit_miss_ratio.png') # [[./gif/21may25_21may21_TARG0_N_cycle__step_24_hit_miss_ratio.png]]
+np.argmax(lrat) # 6
+lrat[6] # 0.6129032258064516
 
 clf(); pdfc = getconcatweightpdf(lfn)
 subplot(1,3,1); popwtsEA = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EA'],lclr=['g'],plotindiv=False)
