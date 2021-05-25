@@ -629,7 +629,7 @@ def plotHitMiss (actreward,ax=None,msz=3,asratio=False,asbin=False,binsz=10e3,lc
     ax.plot(action_times,cumMissed,'-o',color=lclr[1],markersize=msz)
     ax.set_xlim((0,np.max(action_times)))
     ax.set_ylim((0,np.max([cumHits[-1],cumMissed[-1]])))    
-    ax.set_ylabel('Hit Ball ('+str(cumHits[-1])+')','Miss Ball ('+str(cumMissed[-1])+')')
+    ax.set_ylabel('Hit Ball ('+str(cumHits[-1])+'), Miss Ball ('+str(cumMissed[-1])+')')
     return cumHits[-1],cumMissed[-1]
 
 #  
