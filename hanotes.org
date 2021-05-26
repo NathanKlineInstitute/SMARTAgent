@@ -22368,6 +22368,165 @@ Text(0.5,1,'EV1-EA')
 >>> savefig('21may19_21apr21_TARG0_I_I2_gcp_30steps_pairwisecorr_EV1_EA.png')
 >>> Bus error (core dumped)
 
+>>> inds53 = np.argsort(np.nanmedian(np.array(c53_v1_ea2),0))
+/opt/anaconda3/lib/python3.7/site-packages/numpy/lib/nanfunctions.py:1114: RuntimeWarning: All-NaN slice encountered
+  overwrite_input=overwrite_input)
+>>> inds51 = np.argsort(np.nanmedian(np.array(c51_v1_ea2),0))
+>>> inds47 = np.argsort(np.nanmedian(np.array(c47_v1_ea2),0))
+>>> inds39 = np.argsort(np.nanmedian(np.array(c39_v1_ea2),0))
+>>> inds32 = np.argsort(np.nanmedian(np.array(c32_v1_ea2),0))
+>>> inds13 = np.argsort(np.nanmedian(np.array(c13_v1_ea2),0))
+>>> inds10 = np.argsort(np.nanmedian(np.array(c10_v1_ea2),0))
+>>> inds3 = np.argsort(np.nanmedian(np.array(c3_v1_ea2),0))
+>>> plt.plot(np.nanmedian(np.array(c3_v1_ea2),0)[inds3],'.')
+[<matplotlib.lines.Line2D object at 0x7fb8eb36b8d0>]
+>>> plt.plot(np.nanmedian(np.array(c10_v1_ea2),0)[inds10],'r.')
+[<matplotlib.lines.Line2D object at 0x7fb8f3d16e50>]
+>>> plt.plot(np.nanmedian(np.array(c13_v1_ea2),0)[inds13],'g.')
+[<matplotlib.lines.Line2D object at 0x7fb6ba564cd0>]
+>>> plt.plot(np.nanmedian(np.array(c32_v1_ea2),0)[inds32],'c.')
+[<matplotlib.lines.Line2D object at 0x7fb8f3eb8a90>]
+>>> plt.plot(np.nanmedian(np.array(c39_v1_ea2),0)[inds39],'m.')
+[<matplotlib.lines.Line2D object at 0x7fb8f3d16fd0>]
+>>> plt.plot(np.nanmedian(np.array(c53_v1_ea2),0)[inds53],'k.')
+[<matplotlib.lines.Line2D object at 0x7fb8f3eb8310>]
+>>> plt.plot(np.nanmedian(np.array(c51_v1_ea2),0)[inds51],'k.')
+[<matplotlib.lines.Line2D object at 0x7fb2d007aa90>]
+>>> plt.plot(np.nanmedian(np.array(c47_v1_ea2),0)[inds47],'k.')
+[<matplotlib.lines.Line2D object at 0x7fb61a411810>]
+>>> legend(('seq 3', 'seq 10', 'seq 13', 'seq 32', 'seq 39', 'seq 53', 'seq 51', 'seq 47'))
+<matplotlib.legend.Legend object at 0x7fb8c927a110>
+>>> ylabel('pairwise correlation (median over repeats)')
+Text(38.3472,0.5,'pairwise correlation (median over repeats)')
+>>> xlabel('sorted pairs')
+Text(0.5,19.5222,'sorted pairs')
+>>> title('EV1-EA2')
+Text(0.5,1,'EV1-EA2')
+>>> savefig('21may19_21apr21_TARG0_I_I2_gcp_30steps_pairwisecorr_EV1_EA2.png')
+
+
+>>> inds53 = np.argsort(np.nanmedian(np.array(c53_ea_ea2),0))
+>>> inds51 = np.argsort(np.nanmedian(np.array(c51_ea_ea2),0))
+>>> inds47 = np.argsort(np.nanmedian(np.array(c47_ea_ea2),0))
+>>> inds39 = np.argsort(np.nanmedian(np.array(c39_ea_ea2),0))
+>>> inds32 = np.argsort(np.nanmedian(np.array(c32_ea_ea2),0))
+>>> inds13 = np.argsort(np.nanmedian(np.array(c13_ea_ea2),0))
+>>> inds10 = np.argsort(np.nanmedian(np.array(c10_ea_ea2),0))
+>>> inds3 = np.argsort(np.nanmedian(np.array(c3_ea_ea2),0))
+>>> plt.plot(np.nanmedian(np.array(c3_ea_ea2),0)[inds3],'.')
+[<matplotlib.lines.Line2D object at 0x7fb8b86d6d50>]
+>>> plt.plot(np.nanmedian(np.array(c10_ea_ea2),0)[inds10],'r.')
+[<matplotlib.lines.Line2D object at 0x7fb754323090>]
+>>> plt.plot(np.nanmedian(np.array(c13_ea_ea2),0)[inds13],'g.')
+[<matplotlib.lines.Line2D object at 0x7fb8c927a7d0>]
+>>> plt.plot(np.nanmedian(np.array(c32_ea_ea2),0)[inds32],'c.')
+[<matplotlib.lines.Line2D object at 0x7fb8e2eea990>]
+>>> plt.plot(np.nanmedian(np.array(c39_ea_ea2),0)[inds39],'m.')
+[<matplotlib.lines.Line2D object at 0x7fb75435c410>]
+>>> plt.plot(np.nanmedian(np.array(c53_ea_ea2),0)[inds53],'k.')
+[<matplotlib.lines.Line2D object at 0x7fb9a114a5d0>]
+>>> plt.plot(np.nanmedian(np.array(c51_ea_ea2),0)[inds51],'k.')
+[<matplotlib.lines.Line2D object at 0x7fb8eb36bdd0>]
+>>> plt.plot(np.nanmedian(np.array(c47_ea_ea2),0)[inds47],'k.')
+[<matplotlib.lines.Line2D object at 0x7fb646a7fd50>]
+>>> legend(('seq 3', 'seq 10', 'seq 13', 'seq 32', 'seq 39', 'seq 53', 'seq 51', 'seq 47'))
+<matplotlib.legend.Legend object at 0x7fb8c0c97c50>
+>>> ylabel('pairwise correlation (median over repeats)')
+Text(24.4722,0.5,'pairwise correlation (median over repeats)')
+>>> xlabel('sorted pairs')
+Text(0.5,19.5222,'sorted pairs')
+>>> title('EA-EA2')
+Text(0.5,1,'EA-EA2')
+>>> savefig('21may19_21apr21_TARG0_I_I2_gcp_30steps_pairwisecorr_EA_EA2.png')
+
+
+>>> V1_ea_fcount = np.zeros((6400*600))
+>>> V1_ea_lcount = np.zeros((6400*600))
+>>> V1_ea_fcount = np.zeros((6400*300))
+>>> V1_ea_fcount = np.zeros((6400*600))
+>>> V1_ea2_fcount = np.zeros((6400*300))
+>>> V1_ea2_lcount = np.zeros((6400*300))
+>>> Ea_ea2_fcount = np.zeros((600*300))
+>>> Ea_ea2_lcount = np.zeros((600*300))
+
+>>> I3 = np.where(np.array(c3_v1_ea)>0)[1]
+>>> d3 = np.where(np.subtract(I3[:-1],I3[1:])>100000)
+>>> f3 = I3[0:d3[0][0]+1]
+>>> l3 = I3[d3[0][len(d3[0])-1]+1:]
+>>> I10 = np.where(np.array(c10_v1_ea)>0)[1]
+>>> d10 = np.where(np.subtract(I10[:-1],I10[1:])>100000)
+>>> f10 = I10[0:d10[0][0]+1]
+>>> l10 = I10[d10[0][len(d10[0])-1]+1:]
+>>> I13 = np.where(np.array(c13_v1_ea)>0)[1]
+>>> d13 = np.where(np.subtract(I13[:-1],I13[1:])>100000)
+>>> f13 = I13[0:d13[0][0]+1]
+>>> l13 = I13[d13[0][len(d13[0])-1]+1:]
+>>> I32 = np.where(np.array(c32_v1_ea)>0)[1]
+>>> d32 = np.where(np.subtract(I32[:-1],I32[1:])>100000)
+>>> f32 = I32[0:d32[0][0]+1]
+>>> l32 = I32[d32[0][len(d32[0])-1]+1:]
+>>> I39 = np.where(np.array(c39_v1_ea)>0)[1]
+>>> d39 = np.where(np.subtract(I39[:-1],I39[1:])>100000)
+>>> f39 = I39[0:d39[0][0]+1]
+>>> l39 = I39[d39[0][len(d39[0])-1]+1:]
+>>> I53 = np.where(np.array(c53_v1_ea)>0)[1]
+>>> d53 = np.where(np.subtract(I53[:-1],I53[1:])>100000)
+>>> f53 = I53[0:d53[0][0]+1]
+>>> l53 = I53[d53[0][len(d53[0])-1]+1:]
+>>> I51 = np.where(np.array(c51_v1_ea)>0)[1]
+>>> d51 = np.where(np.subtract(I51[:-1],I51[1:])>100000)
+>>> f51 = I51[0:d51[0][0]+1]
+>>> l51 = I51[d51[0][len(d51[0])-1]+1:]
+>>> I47 = np.where(np.array(c47_v1_ea)>0)[1]
+>>> d47 = np.where(np.subtract(I47[:-1],I47[1:])>100000)
+>>> f47 = I47[0:d47[0][0]+1]
+>>> l47 = I51[d47[0][len(d47[0])-1]+1:]
+
+>>> for i in range(6400*600):
+...   V1_ea_fcount[i] = np.where(f3==i)[0].shape[0]+np.where(f10==i)[0].shape[0]+np.where(f13==i)[0].shape[0]+np.where(f32==i)[0].shape[0]+np.where(f39==i)[0].shape[0]+np.where(f53==i)[0].shape[0]+np.where(f51==i)[0].shape[0]+np.where(f47==i)[0].shape[0]
+...   V1_ea_lcount[i] = np.where(l3==i)[0].shape[0]+np.where(l10==i)[0].shape[0]+np.where(l13==i)[0].shape[0]+np.where(l32==i)[0].shape[0]+np.where(l39==i)[0].shape[0]+np.where(l53==i)[0].shape[0]+np.where(l51==i)[0].shape[0]+np.where(l47==i)[0].shape[0]
+
+
+
+>>> I3 = np.where(np.array(c3_v1_ea2)>0)[1]
+>>> I10 = np.where(np.array(c10_v1_ea2)>0)[1]
+>>> I13 = np.where(np.array(c13_v1_ea2)>0)[1]
+>>> I32 = np.where(np.array(c32_v1_ea2)>0)[1]
+>>> I39 = np.where(np.array(c39_v1_ea2)>0)[1]
+>>> I53 = np.where(np.array(c53_v1_ea2)>0)[1]
+>>> I51 = np.where(np.array(c51_v1_ea2)>0)[1]
+>>> I47 = np.where(np.array(c47_v1_ea2)>0)[1]
+
+>>> d3 = np.where(np.subtract(I3[:-1],I3[1:])>100000)
+>>> d10 = np.where(np.subtract(I10[:-1],I10[1:])>100000)
+>>> d13 = np.where(np.subtract(I13[:-1],I13[1:])>100000)
+>>> d32 = np.where(np.subtract(I32[:-1],I32[1:])>100000)
+>>> d39 = np.where(np.subtract(I39[:-1],I39[1:])>100000)
+>>> d53 = np.where(np.subtract(I53[:-1],I53[1:])>100000)
+>>> d51 = np.where(np.subtract(I51[:-1],I51[1:])>100000)
+>>> d47 = np.where(np.subtract(I47[:-1],I47[1:])>100000)
+
+>>> f3 = I3[0:d3[0][0]+1]
+>>> l3 = I3[d3[0][len(d3[0])-1]+1:]
+>>> f10 = I10[0:d10[0][0]+1]
+>>> l10 = I10[d10[0][len(d10[0])-1]+1:]
+>>> f13 = I13[0:d13[0][0]+1]
+>>> l13 = I13[d13[0][len(d13[0])-1]+1:]
+>>> f32 = I32[0:d32[0][0]+1]
+>>> l32 = I32[d32[0][len(d32[0])-1]+1:]
+>>> f39 = I39[0:d39[0][0]+1]
+>>> l39 = I39[d39[0][len(d39[0])-1]+1:]
+>>> f53 = I53[0:d53[0][0]+1]
+>>> l53 = I53[d53[0][len(d53[0])-1]+1:]
+>>> f51 = I51[0:d51[0][0]+1]
+>>> l51 = I51[d51[0][len(d51[0])-1]+1:]
+>>> f47 = I51[0:d47[0][0]+1]
+>>> l47 = I47[d47[0][len(d47[0])-1]+1:]
+>>> f47 = I47[0:d47[0][0]+1]
+>>> for i in range(6400*300):
+...   V1_ea2_fcount[i] = np.where(f3==i)[0].shape[0]+np.where(f10==i)[0].shape[0]+np.where(f13==i)[0].shape[0]+np.where(f32==i)[0].shape[0]+np.where(f39==i)[0].shape[0]+np.where(f53==i)[0].shape[0]+np.where(f51==i)[0].shape[0]+np.where(f47==i)[0].shape[0]
+...   V1_ea2_lcount[i] = np.where(l3==i)[0].shape[0]+np.where(l10==i)[0].shape[0]+np.where(l13==i)[0].shape[0]+np.where(l32==i)[0].shape[0]+np.where(l39==i)[0].shape[0]+np.where(l53==i)[0].shape[0]+np.where(l51==i)[0].shape[0]+np.where(l47==i)[0].shape[0]
+
 THIS IS ALL INTERESTING BUT IT DOES NOT PROVIDE ACCURATE COMPARISON BECAUSE OF Y RESOLUTION (TOO MANY POINTS TO COMPARE CHANGES ACROSS REPEATS)
 
 
@@ -23064,3 +23223,1466 @@ nano simFullHA.json
 ...everything else same as 21feb5_cycle_RL3_B0_
 
 (base) hanwar@cycle:~/GamesProject/SMARTAgent$ python multistepSim.py simFullHA.json 30 20 21may17_B0_cycle_multi
+
+
+-- analysis:
+
+>>> lfnT = ['21may17_cycle_RL3_B0__step_0__step_0_']
+>>> lfnT.append('21may17_cycle_RL3_B0__step_0__step_1_')
+>>> lfnT.append('21may17_cycle_RL3_B0__step_0__step_2_')
+>>> lfnT.append('21may17_cycle_RL3_B0__step_0__step_3_')
+>>> lfnT.append('21may17_cycle_RL3_B0__step_0__step_4_')
+>>> lfnT.append('21may17_cycle_RL3_B0__step_0__step_5_')
+>>> lfnT.append('21may17_cycle_RL3_B0__step_0__step_6_')
+>>> lfnT.append('21may17_cycle_RL3_B0__step_0__step_7_')
+>>> lfnT.append('21may17_cycle_RL3_B0__step_0__step_8_')
+>>> lfnT.append('21may17_cycle_RL3_B0__step_0__step_9_')
+>>> lfnT.append('21may17_cycle_RL3_B0__step_0__step_10_')
+>>> lfnT.append('21may17_cycle_RL3_B0__step_0__step_11_')
+>>> lfnT.append('21may17_cycle_RL3_B0__step_0__step_12_')
+>>> lfnT.append('21may17_cycle_RL3_B0__step_0__step_13_')
+>>> lfnT.append('21may17_cycle_RL3_B0__step_0__step_14_')
+>>> lfnT.append('21may17_cycle_RL3_B0__step_0__step_15_')
+>>> lpdaT = getindivactionreward(lfnT)
+>>> plotHitMiss(lpdaT[0],asratio=True,lclr=['r'])
+simdat.py:760: RuntimeWarning: invalid value encountered in true_divide
+  ax.plot(action_times,cumHits/cumMissed,'-o',color=lclr[0],markersize=msz)
+0.45054945054945056
+>>> title('episode 0')
+Text(0.5,1,'episode 0')
+>>> xlabel('time [ms]')
+Text(0.5,19.5222,'time [ms]')
+>>> savefig('21may21_'+lfnT[0]+'_perf.png')
+>>> plotHitMiss(lpdaT[1],asratio=True,lclr=['r'])
+0.41935483870967744
+>>> xlabel('time [ms]')
+Text(0.5,19.5222,'time [ms]')
+>>> title('episode 1')
+Text(0.5,1,'episode 1')
+>>> savefig('21may21_'+lfnT[1]+'_perf.png')
+>>> plotHitMiss(lpdaT[2],asratio=True,lclr=['r'])
+simdat.py:760: RuntimeWarning: divide by zero encountered in true_divide
+  ax.plot(action_times,cumHits/cumMissed,'-o',color=lclr[0],markersize=msz)
+0.5679012345679012
+>>> title('episode 2')
+Text(0.5,1,'episode 2')
+>>> xlabel('time [ms]')
+Text(0.5,19.5222,'time [ms]')
+>>> savefig('21may21_'+lfnT[2]+'_perf.png')
+>>> plotHitMiss(lpdaT[3],asratio=True,lclr=['r'])
+0.6447368421052632
+>>> xlabel('time [ms]')
+Text(0.5,19.5222,'time [ms]')
+>>> title('episode 3')
+Text(0.5,1,'episode 3')
+>>> savefig('21may21_'+lfnT[3]+'_perf.png')
+>>> plotHitMiss(lpdaT[4],asratio=True,lclr=['r'])
+0.8333333333333334
+>>> title('episode 4')
+Text(0.5,1,'episode 4')
+>>> xlabel('time [ms]')
+Text(0.5,19.5222,'time [ms]')
+>>> savefig('21may21_'+lfnT[4]+'_perf.png')
+>>> plotHitMiss(lpdaT[5],asratio=True,lclr=['r'])
+0.7323943661971831
+>>> xlabel('time [ms]')
+Text(0.5,19.5222,'time [ms]')
+>>> title('episode 5')
+Text(0.5,1,'episode 5')
+>>> savefig('21may21_'+lfnT[5]+'_perf.png')
+>>> plotHitMiss(lpdaT[6],asratio=True,lclr=['r'])
+0.7083333333333334
+>>> title('episode 6')
+Text(0.5,1,'episode 6')
+>>> xlabel('time [ms]')
+Text(0.5,19.5222,'time [ms]')
+>>> savefig('21may21_'+lfnT[6]+'_perf.png')
+>>> plotHitMiss(lpdaT[7],asratio=True,lclr=['r'])
+0.875
+>>> xlabel('time [ms]')
+Text(0.5,19.5222,'time [ms]')
+>>> title('episode 7')
+Text(0.5,1,'episode 7')
+>>> savefig('21may21_'+lfnT[7]+'_perf.png')
+>>> plotHitMiss(lpdaT[8],asratio=True,lclr=['r'])
+0.7571428571428571
+>>> title('episode 8')
+Text(0.5,1,'episode 8')
+>>> xlabel('time [ms]')
+Text(0.5,19.5222,'time [ms]')
+>>> savefig('21may21_'+lfnT[8]+'_perf.png')
+>>> plotHitMiss(lpdaT[9],asratio=True,lclr=['r'])
+0.6447368421052632
+>>> xlabel('time [ms]')
+Text(0.5,19.5222,'time [ms]')
+>>> title('episode 9')
+Text(0.5,1,'episode 9')
+>>> savefig('21may21_'+lfnT[9]+'_perf.png')
+>>> plotHitMiss(lpdaT[10],asratio=True,lclr=['r'])
+0.875
+>>> title('episode 10')
+Text(0.5,1,'episode 10')
+>>> xlabel('time [ms]')
+Text(0.5,19.5222,'time [ms]')
+>>> savefig('21may21_'+lfnT[10]+'_perf.png')
+>>> plotHitMiss(lpdaT[11],asratio=True,lclr=['r'])
+0.9193548387096774
+>>> xlabel('time [ms]')
+Text(0.5,19.5222,'time [ms]')
+>>> title('episode 11')
+Text(0.5,1,'episode 11')
+>>> savefig('21may21_'+lfnT[11]+'_perf.png')
+>>> plotHitMiss(lpdaT[12],asratio=True,lclr=['r'])
+0.9193548387096774
+>>> title('episode 12')
+Text(0.5,1,'episode 12')
+>>> xlabel('time [ms]')
+Text(0.5,19.5222,'time [ms]')
+>>> savefig('21may21_'+lfnT[12]+'_perf.png')
+>>> plotHitMiss(lpdaT[13],asratio=True,lclr=['r'])
+0.8059701492537313
+>>> xlabel('time [ms]')
+Text(0.5,19.5222,'time [ms]')
+>>> title('episode 13')
+Text(0.5,1,'episode 13')
+>>> savefig('21may21_'+lfnT[13]+'_perf.png')
+>>> plotHitMiss(lpdaT[14],asratio=True,lclr=['r'])
+0.8059701492537313
+>>> title('episode 14')
+Text(0.5,1,'episode 14')
+>>> xlabel('time [ms]')
+Text(0.5,19.5222,'time [ms]')
+>>> savefig('21may21_'+lfnT[14]+'_perf.png')
+>>> plotHitMiss(lpdaT[15],asratio=True,lclr=['r'])
+0.8461538461538461
+>>> xlabel('time [ms]')
+Text(0.5,19.5222,'time [ms]')
+>>> title('episode 15')
+Text(0.5,1,'episode 15')
+>>> savefig('21may21_'+lfnT[15]+'_perf.png')
+>>> plotHitMiss(lpdaT[16],asratio=True,lclr=['r'])
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+IndexError: list index out of range
+>>> csm = cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+>>> lclr = [csm.to_rgba(float(i)/len(lpdaT)) for i in range(len(lpdaT))]
+>>> plotComparePerf(lpdaT,lclr,yl=(0,2),lleg=lfnT,skipscore=True,skipfollow=True)
+>>> savefig('21may21_'+lfnT[0]+'_15steps_perf.png')
+
+....still runnins more steps....
+
+-- run "name": "21may24_cycle_RL3_B0_", with dx=2 and dy = 1 instead of 1.... speed up the game... to see the effects.
+
+
+
+---------------------------------------------------
+Which reduced version should be included? (2021, May 21)
+
+backupcfg/20dec11_A0_cycle_reduced_2obj_INTF7__step_0_sim.json
+backupcfg/20dec11_A0_cycle_reduced_2obj_INTF7__step_1_sim.json
+backupcfg/20dec11_A0_cycle_reduced_2obj_INTF7__step_2_sim.json
+backupcfg/20dec11_A0_cycle_reduced_2obj_INTF7__step_3_sim.json
+backupcfg/20dec11_A0_cycle_reduced_2obj_INTF7__step_4_sim.json
+backupcfg/20dec11_A0_cycle_reduced_2obj_INTF7__step_5_sim.json
+backupcfg/20dec11_A0_cycle_reduced_2obj_INTF7__step_6_sim.json
+backupcfg/20dec11_A0_cycle_reduced_2obj_INTF7__step_7_sim.json
+backupcfg/20dec11_A0_cycle_reduced_2obj_INTF7__step_8_sim.json
+backupcfg/20dec11_A0_cycle_reduced_2obj_INTF7__step_9_sim.json
+
+
+>>> lfnT = ['20dec11_A0_cycle_reduced_2obj_INTF7__step_0_']
+>>> lfnT.append('20dec11_A0_cycle_reduced_2obj_INTF7__step_1_')
+>>> lfnT.append('20dec11_A0_cycle_reduced_2obj_INTF7__step_2_')
+>>> lfnT.append('20dec11_A0_cycle_reduced_2obj_INTF7__step_3_')
+>>> lfnT.append('20dec11_A0_cycle_reduced_2obj_INTF7__step_4_')
+>>> lfnT.append('20dec11_A0_cycle_reduced_2obj_INTF7__step_5_')
+>>> lfnT.append('20dec11_A0_cycle_reduced_2obj_INTF7__step_6_')
+>>> lfnT.append('20dec11_A0_cycle_reduced_2obj_INTF7__step_7_')
+>>> lfnT.append('20dec11_A0_cycle_reduced_2obj_INTF7__step_8_')
+>>> lfnT.append('20dec11_A0_cycle_reduced_2obj_INTF7__step_9_')
+>>> lpdaT = getindivactionreward(lfnT)
+>>> plotHitMiss(lpdaT[0],asratio=True,lclr=['r'])
+simdat.py:760: RuntimeWarning: invalid value encountered in true_divide
+  ax.plot(action_times,cumHits/cumMissed,'-o',color=lclr[0],markersize=msz)
+0.9565217391304348
+>>> title('episode 0')
+Text(0.5,1,'episode 0')
+>>> xlabel('time [ms]')
+Text(0.5,19.5222,'time [ms]')
+>>> savefig('21may21_'+lfnT[0]+'_perf.png')
+>>> plotHitMiss(lpdaT[1],asratio=True,lclr=['r'])
+0.7130434782608696
+>>> title('episode 1')
+Text(0.5,1,'episode 1')
+>>> xlabel('time [ms]')
+Text(0.5,19.5222,'time [ms]')
+>>> savefig('21may21_'+lfnT[1]+'_perf.png')
+>>> plotHitMiss(lpdaT[2],asratio=True,lclr=['r'])
+0.8
+>>> title('episode 2')
+Text(0.5,1,'episode 2')
+>>> xlabel('time [ms]')
+Text(0.5,19.5222,'time [ms]')
+>>> savefig('21may21_'+lfnT[2]+'_perf.png')
+>>> plotHitMiss(lpdaT[3],asratio=True,lclr=['r'])
+simdat.py:760: RuntimeWarning: divide by zero encountered in true_divide
+  ax.plot(action_times,cumHits/cumMissed,'-o',color=lclr[0],markersize=msz)
+0.5963302752293578
+>>> xlabel('time [ms]')
+Text(0.5,19.5222,'time [ms]')
+>>> title('episode 3')
+Text(0.5,1,'episode 3')
+>>> savefig('21may21_'+lfnT[3]+'_perf.png')
+>>> plotHitMiss(lpdaT[4],asratio=True,lclr=['r'])
+0.9753086419753086
+>>> title('episode 4')
+Text(0.5,1,'episode 4')
+>>> xlabel('time [ms]')
+Text(0.5,19.5222,'time [ms]')
+>>> savefig('21may21_'+lfnT[4]+'_perf.png')
+>>> plotHitMiss(lpdaT[5],asratio=True,lclr=['r'])
+0.9166666666666666
+>>> xlabel('time [ms]')
+Text(0.5,19.5222,'time [ms]')
+>>> title('episode 5')
+Text(0.5,1,'episode 5')
+>>> savefig('21may21_'+lfnT[5]+'_perf.png')
+>>> plotHitMiss(lpdaT[6],asratio=True,lclr=['r'])
+0.7254901960784313
+>>> title('episode 6')
+Text(0.5,1,'episode 6')
+>>> xlabel('time [ms]')
+Text(0.5,19.5222,'time [ms]')
+>>> savefig('21may21_'+lfnT[6]+'_perf.png')
+>>> plotHitMiss(lpdaT[7],asratio=True,lclr=['r'])
+0.8390804597701149
+>>> title('episode 7')
+Text(0.5,1,'episode 7')
+>>> xlabel('time [ms]')
+Text(0.5,19.5222,'time [ms]')
+>>> savefig('21may21_'+lfnT[7]+'_perf.png')
+>>> plotHitMiss(lpdaT[8],asratio=True,lclr=['r'])
+0.8275862068965517
+>>> xlabel('time [ms]')
+Text(0.5,19.5222,'time [ms]')
+>>> title('episode 8')
+Text(0.5,1,'episode 8')
+>>> savefig('21may21_'+lfnT[8]+'_perf.png')
+>>> plotHitMiss(lpdaT[9],asratio=True,lclr=['r'])
+0.5636363636363636
+>>> title('episode 9')
+Text(0.5,1,'episode 9')
+>>> xlabel('time [ms]')
+Text(0.5,19.5222,'time [ms]')
+>>> savefig('21may21_'+lfnT[9]+'_perf.png')
+
+
+
+backupcfg/20dec15_A0_cycle_reduced_2obj_INTF7__step_0_sim.json
+backupcfg/20dec15_A0_cycle_reduced_2obj_INTF7__step_1_sim.json
+backupcfg/20dec15_A0_cycle_reduced_2obj_INTF7__step_2_sim.json
+backupcfg/20dec15_A0_cycle_reduced_2obj_INTF7__step_3_sim.json
+backupcfg/20dec15_A0_cycle_reduced_2obj_INTF7__step_4_sim.json
+
+
+>>> lfnT = ['20dec15_A0_cycle_reduced_2obj_INTF7__step_0_']
+>>> lfnT.append('20dec15_A0_cycle_reduced_2obj_INTF7__step_1_')
+>>> lfnT.append('20dec15_A0_cycle_reduced_2obj_INTF7__step_2_')
+>>> lfnT.append('20dec15_A0_cycle_reduced_2obj_INTF7__step_3_')
+>>> lfnT.append('20dec15_A0_cycle_reduced_2obj_INTF7__step_4_')
+>>> lpdaT = getindivactionreward(lfnT)
+>>> plotHitMiss(lpdaT[0],asratio=True,lclr=['r'])
+simdat.py:760: RuntimeWarning: divide by zero encountered in true_divide
+  ax.plot(action_times,cumHits/cumMissed,'-o',color=lclr[0],markersize=msz)
+simdat.py:760: RuntimeWarning: invalid value encountered in true_divide
+  ax.plot(action_times,cumHits/cumMissed,'-o',color=lclr[0],markersize=msz)
+0.5517241379310345
+>>> xlabel('time [ms]')
+Text(0.5,19.5222,'time [ms]')
+>>> title('episode 0')
+Text(0.5,1,'episode 0')
+>>> savefig('21may21_'+lfnT[0]+'_perf.png')
+>>> plotHitMiss(lpdaT[1],asratio=True,lclr=['r'])
+0.6581196581196581
+>>> title('episode 1')
+Text(0.5,1,'episode 1')
+>>> xlabel('time [ms]')
+Text(0.5,19.5222,'time [ms]')
+>>> savefig('21may21_'+lfnT[1]+'_perf.png')
+>>> plotHitMiss(lpdaT[2],asratio=True,lclr=['r'])
+0.9764705882352941
+>>> xlabel('time [ms]')
+Text(0.5,19.5222,'time [ms]')
+>>> title('episode 2')
+Text(0.5,1,'episode 2')
+>>> savefig('21may21_'+lfnT[2]+'_perf.png')
+>>> plotHitMiss(lpdaT[3],asratio=True,lclr=['r'])
+0.5555555555555556
+>>> title('episode 3')
+Text(0.5,1,'episode 3')
+>>> xlabel('time [ms]')
+Text(0.5,19.5222,'time [ms]')
+>>> savefig('21may21_'+lfnT[3]+'_perf.png')
+>>> plotHitMiss(lpdaT[4],asratio=True,lclr=['r'])
+0.5517241379310345
+>>> title('episode 4')
+Text(0.5,1,'episode 4')
+>>> xlabel('time [ms]')
+Text(0.5,19.5222,'time [ms]')
+>>> savefig('21may21_'+lfnT[4]+'_perf.png')
+
+
+backupcfg/20dec17_B0_cycle_reduced_2obj_INTF7__step_0_sim.json
+backupcfg/20dec17_B0_cycle_reduced_2obj_INTF7__step_1_sim.json
+backupcfg/20dec17_B0_cycle_reduced_2obj_INTF7__step_2_sim.json
+backupcfg/20dec17_B0_cycle_reduced_2obj_INTF7__step_3_sim.json
+
+>>> lfnT = ['20dec17_B0_cycle_reduced_2obj_INTF7__step_0_']
+>>> lfnT.append('20dec17_B0_cycle_reduced_2obj_INTF7__step_1_')
+>>> lfnT.append('20dec17_B0_cycle_reduced_2obj_INTF7__step_2_')
+>>> lfnT.append('20dec17_B0_cycle_reduced_2obj_INTF7__step_3_')
+>>> lpdaT = getindivactionreward(lfnT)
+>>> plotHitMiss(lpdaT[0],asratio=True,lclr=['r'])
+simdat.py:760: RuntimeWarning: divide by zero encountered in true_divide
+  ax.plot(action_times,cumHits/cumMissed,'-o',color=lclr[0],markersize=msz)
+simdat.py:760: RuntimeWarning: invalid value encountered in true_divide
+  ax.plot(action_times,cumHits/cumMissed,'-o',color=lclr[0],markersize=msz)
+1.0389610389610389
+>>> xlabel('time [ms]')
+Text(0.5,19.5222,'time [ms]')
+>>> title('episode 0')
+Text(0.5,1,'episode 0')
+>>> savefig('21may21_'+lfnT[0]+'_perf.png')
+>>> plotHitMiss(lpdaT[1],asratio=True,lclr=['r'])
+1.075
+>>> title('episode 1')
+Text(0.5,1,'episode 1')
+>>> xlabel('time [ms]')
+Text(0.5,19.5222,'time [ms]')
+>>> savefig('21may21_'+lfnT[1]+'_perf.png')
+>>> plotHitMiss(lpdaT[2],asratio=True,lclr=['r'])
+0.7358490566037735
+>>> xlabel('time [ms]')
+Text(0.5,19.5222,'time [ms]')
+>>> title('episode 2')
+Text(0.5,1,'episode 2')
+>>> savefig('21may21_'+lfnT[2]+'_perf.png')
+>>> plotHitMiss(lpdaT[3],asratio=True,lclr=['r'])
+0.5294117647058824
+>>> title('episode 3')
+Text(0.5,1,'episode 3')
+>>> xlabel('time [ms]')
+Text(0.5,19.5222,'time [ms]')
+>>> savefig('21may21_'+lfnT[3]+'_perf.png')
+
+
+
+backupcfg/20dec27_B0_cycle_reduced_2obj_INTF7__step_0_sim.json
+backupcfg/20dec27_B0_cycle_reduced_2obj_INTF7__step_1_sim.json
+backupcfg/20dec27_B0_cycle_reduced_2obj_INTF7__step_2_sim.json
+backupcfg/20dec27_B0_cycle_reduced_2obj_INTF7__step_3_sim.json
+backupcfg/20dec27_B0_cycle_reduced_2obj_INTF7__step_4_sim.json
+
+>>> lfnT = ['20dec27_B0_cycle_reduced_2obj_INTF7__step_0_']
+>>> lfnT.append('20dec27_B0_cycle_reduced_2obj_INTF7__step_1_')
+>>> lfnT.append('20dec27_B0_cycle_reduced_2obj_INTF7__step_2_')
+>>> lfnT.append('20dec27_B0_cycle_reduced_2obj_INTF7__step_3_')
+>>> lfnT.append('20dec27_B0_cycle_reduced_2obj_INTF7__step_4_')
+>>> lpdaT = getindivactionreward(lfnT)
+>>> plotHitMiss(lpdaT[0],asratio=True,lclr=['r'])
+simdat.py:760: RuntimeWarning: divide by zero encountered in true_divide
+  ax.plot(action_times,cumHits/cumMissed,'-o',color=lclr[0],markersize=msz)
+simdat.py:760: RuntimeWarning: invalid value encountered in true_divide
+  ax.plot(action_times,cumHits/cumMissed,'-o',color=lclr[0],markersize=msz)
+0.5714285714285714
+>>> plotHitMiss(lpdaT[1],asratio=True,lclr=['r'])
+0.7346938775510204
+>>> plotHitMiss(lpdaT[2],asratio=True,lclr=['r'])
+0.7941176470588235
+>>> plotHitMiss(lpdaT[3],asratio=True,lclr=['r'])
+0.7422680412371134
+>>> plotHitMiss(lpdaT[0],asratio=True,lclr=['r'])
+0.5714285714285714
+>>> title('episode 0')
+Text(0.5,1,'episode 0')
+>>> xlabel('time ms[]')
+Text(0.5,19.5222,'time ms[]')
+>>> xlabel('time [ms]')
+Text(0.5,19.5222,'time [ms]')
+>>> savefig('21may21_'+lfnT[0]+'_perf.png')
+>>> plotHitMiss(lpdaT[1],asratio=True,lclr=['r'])
+0.7346938775510204
+>>> title('episode 1')
+Text(0.5,1,'episode 1')
+>>> xlabel('time [ms]')
+Text(0.5,19.5222,'time [ms]')
+>>> savefig('21may21_'+lfnT[1]+'_perf.png')
+>>> savefig('21may21_'+lfnT[1]+'_perf.png')
+>>> plotHitMiss(lpdaT[2],asratio=True,lclr=['r'])
+0.7941176470588235
+>>> title('episode 2')
+Text(0.5,1,'episode 2')
+>>> xlabel('time [ms]')
+Text(0.5,19.5222,'time [ms]')
+>>> savefig('21may21_'+lfnT[2]+'_perf.png')
+>>> plotHitMiss(lpdaT[3],asratio=True,lclr=['r'])
+0.7422680412371134
+>>> xlabel('time [ms]')
+Text(0.5,19.5222,'time [ms]')
+>>> title('episode 3')
+Text(0.5,1,'episode 3')
+>>> savefig('21may21_'+lfnT[3]+'_perf.png')
+>>> plotHitMiss(lpdaT[4],asratio=True,lclr=['r'])
+0.8461538461538461
+>>> title('episode 4')
+Text(0.5,1,'episode 4')
+>>> xlabel('time [ms]')
+Text(0.5,19.5222,'time [ms]')
+>>> savefig('21may21_'+lfnT[4]+'_perf.png')
+
+
+backupcfg/20dec27_D0_cycle_reduced_2obj_INTF7__step_0_sim.json
+backupcfg/20dec27_D0_cycle_reduced_2obj_INTF7__step_1_sim.json
+backupcfg/20dec27_D0_cycle_reduced_2obj_INTF7__step_2_sim.json
+backupcfg/20dec27_D0_cycle_reduced_2obj_INTF7__step_3_sim.json
+backupcfg/20dec27_D0_cycle_reduced_2obj_INTF7__step_4_sim.json
+
+>>> lfnT = ['20dec27_D0_cycle_reduced_2obj_INTF7__step_0_']
+>>> lfnT.append('20dec27_D0_cycle_reduced_2obj_INTF7__step_1_')
+>>> lfnT.append('20dec27_D0_cycle_reduced_2obj_INTF7__step_2_')
+>>> lfnT.append('20dec27_D0_cycle_reduced_2obj_INTF7__step_3_')
+>>> lfnT.append('20dec27_D0_cycle_reduced_2obj_INTF7__step_4_')
+>>> lpdaT = getindivactionreward(lfnT)
+>>> plotHitMiss(lpdaT[0],asratio=True,lclr=['r'])
+0.359375
+>>> plotHitMiss(lpdaT[1],asratio=True,lclr=['r'])
+0.6388888888888888
+>>> plotHitMiss(lpdaT[0],asratio=True,lclr=['r'])
+0.359375
+>>> title('episode 0')
+Text(0.5,1,'episode 0')
+>>> xlabel('time [ms]')
+Text(0.5,19.5222,'time [ms]')
+>>> savefig('21may21_'+lfnT[0]+'_perf.png')
+>>> plotHitMiss(lpdaT[1],asratio=True,lclr=['r'])
+0.6388888888888888
+>>> xlabel('time [ms]')
+Text(0.5,19.5222,'time [ms]')
+>>> title('episode 1')
+Text(0.5,1,'episode 1')
+>>> savefig('21may21_'+lfnT[1]+'_perf.png')
+>>> plotHitMiss(lpdaT[2],asratio=True,lclr=['r'])
+0.6981132075471698
+>>> title('episode 2')
+Text(0.5,1,'episode 2')
+>>> xlabel('time [ms]')
+Text(0.5,19.5222,'time [ms]')
+>>> savefig('21may21_'+lfnT[2]+'_perf.png')
+>>> plotHitMiss(lpdaT[3],asratio=True,lclr=['r'])
+0.7352941176470589
+>>> xlabel('time [ms]')
+Text(0.5,19.5222,'time [ms]')
+>>> title('episode 3')
+Text(0.5,1,'episode 3')
+>>> savefig('21may21_'+lfnT[3]+'_perf.png')
+>>> plotHitMiss(lpdaT[4],asratio=True,lclr=['r'])
+0.8260869565217391
+>>> title('episode 4')
+Text(0.5,1,'episode 4')
+>>> xlabel('time [ms]')
+Text(0.5,19.5222,'time [ms]')
+>>> savefig('21may21_'+lfnT[4]+'_perf.png')
+
+
+* 2021may24
+
+-- analyze controls for FF model.
+
+>>> lfnBT = ['21feb5_cycle_RL3_B0_BT_p0_']
+>>> lfnBT.append('21feb5_cycle_RL3_B0_BT_p1_')
+>>> lfnBT.append('21feb5_cycle_RL3_B0_BT_p2_')
+>>> lfnBT.append('21feb5_cycle_RL3_B0_BT_p3_')
+>>> lfnBT.append('21feb5_cycle_RL3_B0_BT_p4_')
+>>> lfnBT.append('21feb5_cycle_RL3_B0_BT_p5_')
+
+>>> lfnAT17 = ['21feb5_cycle_RL3_B0_AT__step_17_p0_']
+>>> lfnAT17.append('21feb5_cycle_RL3_B0_AT__step_17_p1_')
+>>> lfnAT17.append('21feb5_cycle_RL3_B0_AT__step_17_p2_')
+>>> lfnAT17.append('21feb5_cycle_RL3_B0_AT__step_17_p3_')
+>>> lfnAT17.append('21feb5_cycle_RL3_B0_AT__step_17_p4_')
+>>> lfnAT17.append('21feb5_cycle_RL3_B0_AT__step_17_p5_')
+>>> lfnAT18 = ['21feb5_cycle_RL3_B0_AT__step_18_p0_']
+
+>>> lfnAT18.append('21feb5_cycle_RL3_B0_AT__step_18_p1_')
+>>> lfnAT18.append('21feb5_cycle_RL3_B0_AT__step_18_p2_')
+>>> lfnAT18.append('21feb5_cycle_RL3_B0_AT__step_18_p3_')
+>>> lfnAT18.append('21feb5_cycle_RL3_B0_AT__step_18_p4_')
+>>> lfnAT18.append('21feb5_cycle_RL3_B0_AT__step_18_p5_')
+
+>>> lfnAT19 = ['21feb5_cycle_RL3_B0_AT__step_19_p0_']
+>>> lfnAT19.append('21feb5_cycle_RL3_B0_AT__step_19_p1_')
+>>> lfnAT19.append('21feb5_cycle_RL3_B0_AT__step_19_p2_')
+>>> lfnAT19.append('21feb5_cycle_RL3_B0_AT__step_19_p3_')
+>>> lfnAT19.append('21feb5_cycle_RL3_B0_AT__step_19_p4_')
+>>> lfnAT19.append('21feb5_cycle_RL3_B0_AT__step_19_p5_')
+
+
+>>> lpdaBT = getindivactionreward(lfnBT)
+>>> pdacBT =getconcatactionreward(lfnBT)
+>>> II_allBT = getconcatactioninputs(lfnBT)
+loading input images from data/21feb5_cycle_RL3_B0_BT_p0_InputImages.npy
+loading input images from data/21feb5_cycle_RL3_B0_BT_p0_InputImages.txt
+loading input images from data/21feb5_cycle_RL3_B0_BT_p1_InputImages.npy
+loading input images from data/21feb5_cycle_RL3_B0_BT_p1_InputImages.txt
+loading input images from data/21feb5_cycle_RL3_B0_BT_p2_InputImages.npy
+loading input images from data/21feb5_cycle_RL3_B0_BT_p2_InputImages.txt
+loading input images from data/21feb5_cycle_RL3_B0_BT_p3_InputImages.npy
+loading input images from data/21feb5_cycle_RL3_B0_BT_p3_InputImages.txt
+loading input images from data/21feb5_cycle_RL3_B0_BT_p4_InputImages.npy
+loading input images from data/21feb5_cycle_RL3_B0_BT_p4_InputImages.txt
+loading input images from data/21feb5_cycle_RL3_B0_BT_p5_InputImages.npy
+loading input images from data/21feb5_cycle_RL3_B0_BT_p5_InputImages.txt
+>>> lSimilarSeqs_allBT, seqs2plot_allBT, seqsBegs_allBT, seqsEnds_allBT = breakdownPerformance(II_allBT,pdacBT,cend=69,sthresh=5,nbframeThresh=5)
+>>> dspkID_allBT, dspkT_allBT, totalDur_allBT = getconcatactivity(lfnBT,lpop=['EV1','EA','EA2','EMUP','EMDOWN'])
+>>> dact1D_allBT = getdActMap1D(totalDur_allBT, pdacBT, dspkT_allBT,dspkID_allBT,dnumc,dstartidx,lpop=['EV1','EA','EA2','EMUP','EMDOWN'])
+>>> dCumAct_allBT, dStepAct_allBT = getCumActivityMapForInput(seqsBegs_allBT,seqsEnds_allBT,dact1D_allBT,lpop=['EV1','EA','EA2','EMUP','EMDOWN'])
+>>> rewards_allBT, hitsMiss_allBT = getRewardsPerSeq(pdacBT,seqsBegs_allBT,seqsEnds_allBT)
+>>> proposedActionsBT, executedActionsBT = getActionsPerSeq(pdacBT,seqsBegs_allBT,seqsEnds_allBT)
+
+
+>>> lpdaAT19 = getindivactionreward(lfnAT19)
+>>> pdacAT19 =getconcatactionreward(lfnAT19)
+>>> II_allAT19 = getconcatactioninputs(lfnAT19)
+loading input images from data/21feb5_cycle_RL3_B0_AT__step_19_p0_InputImages.npy
+loading input images from data/21feb5_cycle_RL3_B0_AT__step_19_p0_InputImages.txt
+loading input images from data/21feb5_cycle_RL3_B0_AT__step_19_p1_InputImages.npy
+loading input images from data/21feb5_cycle_RL3_B0_AT__step_19_p1_InputImages.txt
+loading input images from data/21feb5_cycle_RL3_B0_AT__step_19_p2_InputImages.npy
+loading input images from data/21feb5_cycle_RL3_B0_AT__step_19_p2_InputImages.txt
+loading input images from data/21feb5_cycle_RL3_B0_AT__step_19_p3_InputImages.npy
+loading input images from data/21feb5_cycle_RL3_B0_AT__step_19_p3_InputImages.txt
+loading input images from data/21feb5_cycle_RL3_B0_AT__step_19_p4_InputImages.npy
+loading input images from data/21feb5_cycle_RL3_B0_AT__step_19_p4_InputImages.txt
+loading input images from data/21feb5_cycle_RL3_B0_AT__step_19_p5_InputImages.npy
+loading input images from data/21feb5_cycle_RL3_B0_AT__step_19_p5_InputImages.txt
+>>> lSimilarSeqs_allAT19, seqs2plot_allAT19, seqsBegs_allAT19, seqsEnds_allAT19 = breakdownPerformance(II_allAT19,pdacAT19,cend=69,sthresh=5,nbframeThresh=5)
+>>> dspkID_allAT19, dspkT_allAT19, totalDur_allAT19 = getconcatactivity(lfnAT19,lpop=['EV1','EA','EA2','EMUP','EMDOWN'])
+>>> dact1D_allAT19 = getdActMap1D(totalDur_allAT19, pdacAT19, dspkT_allAT19,dspkID_allAT19,dnumc,dstartidx,lpop=['EV1','EA','EA2','EMUP','EMDOWN'])
+>>> dCumAct_allAT19, dStepAct_allAT19 = getCumActivityMapForInput(seqsBegs_allAT19,seqsEnds_allAT19,dact1D_allAT19,lpop=['EV1','EA','EA2','EMUP','EMDOWN'])
+>>> rewards_allAT19, hitsMiss_allAT19 = getRewardsPerSeq(pdacAT19,seqsBegs_allAT19,seqsEnds_allAT19)
+>>> proposedActionsAT19, executedActionsAT19 = getActionsPerSeq(pdacAT19,seqsBegs_allAT19,seqsEnds_allAT19)
+
+
+>>> lpdaAT18 = getindivactionreward(lfnAT18)
+>>> pdacAT18 =getconcatactionreward(lfnAT18)
+>>> II_allAT18 = getconcatactioninputs(lfnAT18)
+loading input images from data/21feb5_cycle_RL3_B0_AT__step_18_p0_InputImages.npy
+loading input images from data/21feb5_cycle_RL3_B0_AT__step_18_p0_InputImages.txt
+loading input images from data/21feb5_cycle_RL3_B0_AT__step_18_p1_InputImages.npy
+loading input images from data/21feb5_cycle_RL3_B0_AT__step_18_p1_InputImages.txt
+loading input images from data/21feb5_cycle_RL3_B0_AT__step_18_p2_InputImages.npy
+loading input images from data/21feb5_cycle_RL3_B0_AT__step_18_p2_InputImages.txt
+loading input images from data/21feb5_cycle_RL3_B0_AT__step_18_p3_InputImages.npy
+loading input images from data/21feb5_cycle_RL3_B0_AT__step_18_p3_InputImages.txt
+loading input images from data/21feb5_cycle_RL3_B0_AT__step_18_p4_InputImages.npy
+loading input images from data/21feb5_cycle_RL3_B0_AT__step_18_p4_InputImages.txt
+loading input images from data/21feb5_cycle_RL3_B0_AT__step_18_p5_InputImages.npy
+loading input images from data/21feb5_cycle_RL3_B0_AT__step_18_p5_InputImages.txt
+>>> lSimilarSeqs_allAT18, seqs2plot_allAT18, seqsBegs_allAT18, seqsEnds_allAT18 = breakdownPerformance(II_allAT18,pdacAT18,cend=69,sthresh=5,nbframeThresh=5)
+>>> dspkID_allAT18, dspkT_allAT18, totalDur_allAT18 = getconcatactivity(lfnAT18,lpop=['EV1','EA','EA2','EMUP','EMDOWN'])
+>>> dact1D_allAT18 = getdActMap1D(totalDur_allAT18, pdacAT18, dspkT_allAT18,dspkID_allAT18,dnumc,dstartidx,lpop=['EV1','EA','EA2','EMUP','EMDOWN'])
+
+>>> dCumAct_allAT18, dStepAct_allAT18 = getCumActivityMapForInput(seqsBegs_allAT18,seqsEnds_allAT18,dact1D_allAT18,lpop=['EV1','EA','EA2','EMUP','EMDOWN'])
+>>> rewards_allAT18, hitsMiss_allAT18 = getRewardsPerSeq(pdacAT18,seqsBegs_allAT18,seqsEnds_allAT18)
+>>> proposedActionsAT18, executedActionsAT18 = getActionsPerSeq(pdacAT18,seqsBegs_allAT18,seqsEnds_allAT18)
+>>> summarizeLearningPerf(lSimilarSeqs_allBT,seqs2plot_allBT,hitsMiss_allBT)
+simdat.py:1843: RuntimeWarning: divide by zero encountered in true_divide
+  perf = np.divide(np.cumsum(hits),np.cumsum(miss))
+>>> lfnBT[0]
+'21feb5_cycle_RL3_B0_BT_p0_'
+>>> savefig('21may24_21feb5_cycle_RL3_B0_BT_p0top5_learningPerformanceSummary.png')
+>>> summarizeLearningPerf(lSimilarSeqs_allAT19,seqs2plot_allAT19,hitsMiss_allAT19)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_AT19_p0top5_learningPerformanceSummary.png')
+>>> summarizeLearningPerf(lSimilarSeqs_allAT18,seqs2plot_allAT18,hitsMiss_allAT18)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_AT18_p0top5_learningPerformanceSummary.png')
+>>> pdposBT = getconcatobjpos(lfnBT)
+>>> pdposAT19 = getconcatobjpos(lfnAT19)
+>>> pdposAT18 = getconcatobjpos(lfnAT18)
+>>> showSpatialBehaviorHitMiss(pdposBT,hitsMiss_allBT,seqsBegs_allBT,seqsEnds_allBT)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_BT_p0top5_spatialbehavior_hitmiss.png')
+>>> showSpatialBehaviorHitMiss(pdposAT19,hitsMiss_allAT19,seqsBegs_allAT19,seqsEnds_allAT19)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_AT19_p0top5_spatialbehavior_hitmiss.png')
+>>> showSpatialBehaviorHitMiss(pdposAT18,hitsMiss_allAT18,seqsBegs_allAT18,seqsEnds_allAT18)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_AT18_p0top5_spatialbehavior_hitmiss.png')
+>>> showSpatialBehaviorStepWise(pdposBT,pdacBT,1)
+simdat.py:630: RuntimeWarning: invalid value encountered in true_divide
+  stepwise_pcorrent_spatialmoves = np.divide(ds_stepwise_correct_spatialmoves,np.add(ds_stepwise_correct_spatialmoves,ds_stepwise_incorrect_spatialmoves))
+>>> savefig('21may24_21feb5_cycle_RL3_B0_BT_p0top5_stepwise_spatialbehavior_hitmiss.png')
+>>> showSpatialBehaviorStepWise(pdposAT18,pdacAT19,1)
+>>> showSpatialBehaviorStepWise(pdposAT19,pdacAT19,1)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_AT19_p0top5_stepwise_spatialbehavior_hitmiss.png')
+>>> showSpatialBehaviorStepWise(pdposAT18,pdacAT18,1)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_AT18_p0top5_stepwise_spatialbehavior_hitmiss.png')
+>>> stepwisecontribEMUP_BT, stepwisecontribEMDOWN_BT = getStepwiseNeuralContribution(executedActionsBT,dStepAct_allBT)
+>>> nEMUP_BT = (100/stepwisecontribEMUP_BT.shape[0])*np.sum(stepwisecontribEMUP_BT,0)  
+>>> nEMDOWN_BT = (100/stepwisecontribEMDOWN_BT.shape[0])*np.sum(stepwisecontribEMDOWN_BT,0) 
+>>> stepwisecontribEMUP_AT19, stepwisecontribEMDOWN_AT19 = getStepwiseNeuralContribution(executedActionsAT19,dStepAct_allAT19)
+>>> nEMUP_AT19 = (100/stepwisecontribEMUP_AT19.shape[0])*np.sum(stepwisecontribEMUP_AT19,0) 
+>>> nEMDOWN_AT19 = (100/stepwisecontribEMDOWN_AT19.shape[0])*np.sum(stepwisecontribEMDOWN_AT19,0) 
+>>> stepwisecontribEMUP_AT18, stepwisecontribEMDOWN_AT18 = getStepwiseNeuralContribution(executedActionsAT18,dStepAct_allAT18)
+>>> nEMUP_AT18 = (100/stepwisecontribEMUP_AT18.shape[0])*np.sum(stepwisecontribEMUP_AT18,0) 
+>>> nEMDOWN_AT18 = (100/stepwisecontribEMDOWN_AT18.shape[0])*np.sum(stepwisecontribEMDOWN_AT18,0) 
+>>> iBT = np.argsort(nEMUP)
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+NameError: name 'nEMUP' is not defined
+>>> iBT = np.argsort(nEMUP_BT)
+>>> plt.plot(nEMUP_BT[iBT])
+[<matplotlib.lines.Line2D object at 0x7f2f3da11250>]
+>>> plt.plot(nEMUP_AT19[iBT])
+[<matplotlib.lines.Line2D object at 0x7f2f3d912810>]
+>>> plt.plot(nEMUP_AT18[iBT])
+[<matplotlib.lines.Line2D object at 0x7f2fa57b7790>]
+>>> legend(('Before Training','After Training Ep 19','After Training Ep 18'))
+<matplotlib.legend.Legend object at 0x7f2fa454d4d0>
+>>> xlabel('neuron ids')
+Text(0.5,19.5222,'neuron ids')
+>>> ylabel('Times a neuron actively contributed to action (%)')
+Text(43.4722,0.5,'Times a neuron actively contributed to action (%)')
+>>> title('EMUP')
+Text(0.5,1,'EMUP')
+>>> savefig('21may24_21feb5_cycle_RL3_B0_BT_AT19_AT18_p0top5_individualneuronActionContribution.png')
+>>> savefig('21may24_21feb5_cycle_RL3_B0_BT_AT19_AT18_p0top5_individualneuronActionContribution_EMUP.png')
+>>> iBT = np.argsort(nEMDOWN_BT)
+>>> plt.plot(nEMDOWN_BT[iBT])
+[<matplotlib.lines.Line2D object at 0x7f2fa6a2cc10>]
+>>> plt.plot(nEMDOWN_AT19[iBT])
+[<matplotlib.lines.Line2D object at 0x7f2f3d8b6e50>]
+>>> plt.plot(nEMDOWN_AT18[iBT])
+[<matplotlib.lines.Line2D object at 0x7f2acd9f1910>]
+>>> title('EMDOWN')
+Text(0.5,1,'EMDOWN')
+>>> legend(('Before Training','After Training Ep 19','After Training Ep 18'))
+<matplotlib.legend.Legend object at 0x7f2f3d91c9d0>
+>>> ylabel('Times a neuron actively contributed to action (%)')
+Text(43.4722,0.5,'Times a neuron actively contributed to action (%)')
+>>> xlabel('neuron ids')
+Text(0.5,19.5222,'neuron ids')
+>>> savefig('21may24_21feb5_cycle_RL3_B0_BT_AT19_AT18_p0top5_individualneuronActionContribution_EMDOWN.png')
+>>> step_atleast1activeEMUP_BT = (100/stepwisecontribEMUP_BT.shape[0])*len(np.where(np.sum(stepwisecontribEMUP_BT,1)>0)[0])
+>>> step_atleast1activeEMUP_AT19 = (100/stepwisecontribEMUP_AT19.shape[0])*len(np.where(np.sum(stepwisecontribEMUP_AT19,1)>0)[0])
+>>> step_atleast1activeEMUP_AT18 = (100/stepwisecontribEMUP_AT18.shape[0])*len(np.where(np.sum(stepwisecontribEMUP_AT18,1)>0)[0])
+>>> step_atleast1activeEMDOWN_BT = (100/stepwisecontribEMDOWN_BT.shape[0])*len(np.where(np.sum(stepwisecontribEMDOWN_BT,1)>0)[0])
+>>> step_atleast1activeEMDOWN_AT19 = (100/stepwisecontribEMDOWN_AT19.shape[0])*len(np.where(np.sum(stepwisecontribEMDOWN_AT19,1)>0)[0])
+>>> step_atleast1activeEMDOWN_AT18 = (100/stepwisecontribEMDOWN_AT18.shape[0])*len(np.where(np.sum(stepwisecontribEMDOWN_AT18,1)>0)[0])
+>>> step_atleast1activeEMUP_BT
+27.820964621337755
+>>> step_atleast1activeEMUP_AT18
+41.82792267448045
+>>> step_atleast1activeEMUP_AT19
+42.03306634196458
+>>> step_atleast1activeEMDOWN_BT
+29.304864566058594
+>>> step_atleast1activeEMDOWN_AT18
+42.94970359840243
+>>> step_atleast1activeEMDOWN_AT19
+43.233576225718686
+>>> step_atleast1activeEM_BT = (100/stepwisecontribEMDOWN_BT.shape[0])*len(np.where(np.add(np.sum(stepwisecontribEMUP_BT,1),np.sum(stepwisecontribEMDOWN_BT,1))>0)[0])
+>>> step_atleast1activeEM_AT18 = (100/stepwisecontribEMDOWN_AT18.shape[0])*len(np.where(np.add(np.sum(stepwisecontribEMUP_AT18,1),np.sum(stepwisecontribEMDOWN_AT18,1))>0)[0])
+>>> step_atleast1activeEM_AT19 = (100/stepwisecontribEMDOWN_AT19.shape[0])*len(np.where(np.add(np.sum(stepwisecontribEMUP_AT19,1),np.sum(stepwisecontribEMDOWN_AT19,1))>0)[0])
+>>> step_atleast1activeEM_BT
+52.51779297954671
+>>> step_atleast1activeEM_AT18
+82.39094065198681
+>>> step_atleast1activeEM_AT19
+82.83518197903389
+>>> iCon = np.argsort(np.sum(stepwisecontribEMUP_BT,1))
+>>> plt.plot((100/stepwisecontribEMUP_BT.shape[0])*np.arange(0,stepwisecontribEMUP_BT.shape[0]),np.sum(stepwisecontribEMUP_BT,1)[iCon])
+[<matplotlib.lines.Line2D object at 0x7f306bb4ed10>]
+>>> plt.plot((100/stepwisecontribEMUP_AT19.shape[0])*np.arange(0,stepwisecontribEMUP_AT19.shape[0]),np.sum(stepwisecontribEMUP_AT19,1)[iCon])
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+IndexError: index 105124 is out of bounds for axis 0 with size 105122
+>>> plt.plot(np.sum(stepwisecontribEMUP_AT19,1)[iCon])
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+IndexError: index 105124 is out of bounds for axis 0 with size 105122
+>>> plt.plot(np.sum(stepwisecontribEMUP_AT19,1))
+[<matplotlib.lines.Line2D object at 0x7f2ad94bbb10>]
+>>> stepwisecontribEMUP_AT19.shape
+(105122, 300)
+>>> stepwisecontribEMUP_AT18.shape
+(103407, 300)
+>>> stepwisecontribEMUP_BT.shape
+(115776, 300)
+>>> np.sum(stepwisecontribEMUP_BT,1).shape
+(115776,)
+>>> plt.plot((100/stepwisecontribEMUP_BT.shape[0])*np.arange(0,stepwisecontribEMUP_BT.shape[0]),np.sum(stepwisecontribEMUP_BT,1)[iCon])
+[<matplotlib.lines.Line2D object at 0x7f2f3d9fd8d0>]
+>>> plt.plot((100/stepwisecontribEMUP_BT.shape[0])*np.arange(0,stepwisecontribEMUP_BT.shape[0]),np.sort(np.sum(stepwisecontribEMUP_BT,1)))
+[<matplotlib.lines.Line2D object at 0x7f2a9a98d510>]
+>>> plt.plot((100/stepwisecontribEMUP_AT19.shape[0])*np.arange(0,stepwisecontribEMUP_AT19.shape[0]),np.sort(np.sum(stepwisecontribEMUP_AT19,1)))
+[<matplotlib.lines.Line2D object at 0x7f2ad94bb9d0>]
+>>> plt.plot((100/stepwisecontribEMUP_AT18.shape[0])*np.arange(0,stepwisecontribEMUP_AT18.shape[0]),np.sort(np.sum(stepwisecontribEMUP_AT18,1)))
+[<matplotlib.lines.Line2D object at 0x7f30bba143d0>]
+>>> xlim((50,110))
+(50, 110)
+>>> xlim((50,102))
+(50, 102)
+>>> xlim((50,101))
+(50, 101)
+>>> legend(('Before Training','After Training Ep 19','After Training Ep 18'))
+<matplotlib.legend.Legend object at 0x7f2ad8a43a90>
+>>> xlabel('Percentage of actions (ball moving towards the racket)')
+Text(0.5,19.5222,'Percentage of actions (ball moving towards the racket)')
+>>> ylabel('number of active neurons')
+Text(33.0972,0.5,'number of active neurons')
+>>> ylabel('number of active EMUP neurons')
+Text(33.0972,0.5,'number of active EMUP neurons')
+>>> savefig('21may24_21feb5_cycle_RL3_B0_BT_AT19_AT18_p0top5_popActionContribution_EMUP.png')
+>>> plt.plot((100/stepwisecontribEMDOWN_BT.shape[0])*np.arange(0,stepwisecontribEMDOWN_BT.shape[0]),np.sort(np.sum(stepwisecontribEMDOWN_BT,1)))
+[<matplotlib.lines.Line2D object at 0x7f2fa69eb650>]
+>>> plt.plot((100/stepwisecontribEMDOWN_AT19.shape[0])*np.arange(0,stepwisecontribEMDOWN_AT19.shape[0]),np.sort(np.sum(stepwisecontribEMDOWN_AT19,1)))
+[<matplotlib.lines.Line2D object at 0x7f2a2d9b9ed0>]
+>>> plt.plot((100/stepwisecontribEMDOWN_AT18.shape[0])*np.arange(0,stepwisecontribEMDOWN_AT18.shape[0]),np.sort(np.sum(stepwisecontribEMDOWN_AT18,1)))
+[<matplotlib.lines.Line2D object at 0x7f2fa6b3cd90>]
+>>> ylabel('number of active EMDOWN neurons')
+Text(33.0972,0.5,'number of active EMDOWN neurons')
+>>> xlabel('Percentage of actions (ball moving towards the racket)')
+Text(0.5,19.5222,'Percentage of actions (ball moving towards the racket)')
+>>> legend(('Before Training','After Training Ep 19','After Training Ep 18'))
+<matplotlib.legend.Legend object at 0x7f306bb4b610>
+>>> xlim((50,101))
+(50, 101)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_BT_AT19_AT18_p0top5_popActionContribution_EMDOWN.png')
+>>> plt.plot((100/stepwisecontribEM_BT.shape[0])*np.arange(0,stepwisecontribEM_BT.shape[0]),np.sort(np.sum(stepwisecontribEM_BT,1)))
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+NameError: name 'stepwisecontribEM_BT' is not defined
+>>> plt.plot((100/stepwisecontribEMUP_BT.shape[0])*np.arange(0,stepwisecontribEMUP_BT.shape[0]),np.sort(np.add(np.sum(stepwisecontribEMDOWN_BT,1),np.sum(stepwisecontribEMUP_BT,1))))
+[<matplotlib.lines.Line2D object at 0x7f2fa58a0bd0>]
+>>> plt.plot((100/stepwisecontribEMUP_AT19.shape[0])*np.arange(0,stepwisecontribEMUP_AT19.shape[0]),np.sort(np.add(np.sum(stepwisecontribEMDOWN_AT19,1),np.sum(stepwisecontribEMUP_AT19,1))))
+[<matplotlib.lines.Line2D object at 0x7f2a9a98d290>]
+>>> plt.plot((100/stepwisecontribEMUP_AT18.shape[0])*np.arange(0,stepwisecontribEMUP_AT18.shape[0]),np.sort(np.add(np.sum(stepwisecontribEMDOWN_AT18,1),np.sum(stepwisecontribEMUP_AT18,1))))
+[<matplotlib.lines.Line2D object at 0x7f2fa58be710>]
+>>> legend(('Before Training','After Training Ep 19','After Training Ep 18'))
+<matplotlib.legend.Legend object at 0x7f2fa58be490>
+>>> xlabel('Percentage of actions (ball moving towards the racket)')
+Text(0.5,19.5222,'Percentage of actions (ball moving towards the racket)')
+>>> ylabel('number of active EM neurons')
+Text(33.0972,0.5,'number of active EM neurons')
+>>> ylim((0,300))
+(0, 300)
+>>> ylim((-1,300))
+(-1, 300)
+>>> ylim((-5,300))
+(-5, 300)
+>>> ylim((-5,305))
+(-5, 305)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_BT_AT19_AT18_p0top5_popActionContribution_EM.png')
+
+>>> showMostActiveMNeuronsPerSeq(lSimilarSeqs_allBT,seqs2plot_allBT,dCumAct_allBT,70)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_BT_top70Pmostactiveneuron.png')
+>>> showMostActiveMNeuronsPerSeq(lSimilarSeqs_allAT19,seqs2plot_allAT19,dCumAct_allAT19,70)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_AT19_top70Pmostactiveneuron.png')
+>>> showMostActiveMNeuronsPerSeq(lSimilarSeqs_allAT18,seqs2plot_allAT18,dCumAct_allAT18,70)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_AT18_top70Pmostactiveneuron.png')
+
+
+>>> h40u_BT, h40d_BT = showMostActiveMNeuronsPerSeq(lSimilarSeqs_allBT,seqs2plot_allBT,dCumAct_allBT,40)
+>>> h50u_BT, h50d_BT = showMostActiveMNeuronsPerSeq(lSimilarSeqs_allBT,seqs2plot_allBT,dCumAct_allBT,50)
+>>> h60u_BT, h60d_BT = showMostActiveMNeuronsPerSeq(lSimilarSeqs_allBT,seqs2plot_allBT,dCumAct_allBT,60)
+>>> h70u_BT, h70d_BT = showMostActiveMNeuronsPerSeq(lSimilarSeqs_allBT,seqs2plot_allBT,dCumAct_allBT,70)
+>>> h40u_AT19, h40d_AT19 = showMostActiveMNeuronsPerSeq(lSimilarSeqs_allAT19,seqs2plot_allAT19,dCumAct_allAT19,40)
+>>> h50u_AT19, h50d_AT19 = showMostActiveMNeuronsPerSeq(lSimilarSeqs_allAT19,seqs2plot_allAT19,dCumAct_allAT19,50)
+>>> h60u_AT19, h60d_AT19 = showMostActiveMNeuronsPerSeq(lSimilarSeqs_allAT19,seqs2plot_allAT19,dCumAct_allAT19,60)
+>>> h70u_AT19, h70d_AT19 = showMostActiveMNeuronsPerSeq(lSimilarSeqs_allAT19,seqs2plot_allAT19,dCumAct_allAT19,70)
+>>> h40u_AT18, h40d_AT18 = showMostActiveMNeuronsPerSeq(lSimilarSeqs_allAT18,seqs2plot_allAT18,dCumAct_allAT18,40)
+>>> h50u_AT18, h50d_AT18 = showMostActiveMNeuronsPerSeq(lSimilarSeqs_allAT18,seqs2plot_allAT18,dCumAct_allAT18,50)
+>>> h60u_AT18, h60d_AT18 = showMostActiveMNeuronsPerSeq(lSimilarSeqs_allAT18,seqs2plot_allAT18,dCumAct_allAT18,60)
+>>> h70u_AT18, h70d_AT18 = showMostActiveMNeuronsPerSeq(lSimilarSeqs_allAT18,seqs2plot_allAT18,dCumAct_allAT18,70)
+>>> indsu0 = np.argsort(np.mean(h70u_BT,1))
+>>> indsd0 = np.argsort(np.mean(h70d_BT,1))
+>>> indsu1 = np.argsort(np.mean(h70u_AT19,1))
+>>> indsd1 = np.argsort(np.mean(h70d_AT19,1))
+>>> indsu2 = np.argsort(np.mean(h70u_AT18,1))
+>>> indsd2 = np.argsort(np.mean(h70d_AT18,1))
+>>> plt(np.mean(h70u_BT,1))
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+TypeError: 'module' object is not callable
+>>> plt(np.mean(h70u_BT,1)[indsu],'o')
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+NameError: name 'indsu' is not defined
+>>> plt(np.mean(h70u_BT,1)[indsu],'o')
+indsu0  indsu1  indsu2  
+>>> plt(np.mean(h70u_BT,1)[indsu0],'o')
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+TypeError: 'module' object is not callable
+>>> plt.plot(np.mean(h70u_BT,1)[indsu0],'o')
+[<matplotlib.lines.Line2D object at 0x7f2fa697b510>]
+>>> plt.plot(np.mean(h70u_BT,1)[indsu0],'.')
+[<matplotlib.lines.Line2D object at 0x7f2a1c3e2ad0>]
+>>> plt.plot(np.mean(h70u_AT19,1)[indsu0],'.')
+[<matplotlib.lines.Line2D object at 0x7f2fa58a6c10>]
+>>> plt.plot(np.mean(h70u_AT18,1)[indsu0],'.')
+[<matplotlib.lines.Line2D object at 0x7f2fa457a450>]
+>>> plt.plot(np.mean(h70u_BT,1)[indsu0],'.')
+[<matplotlib.lines.Line2D object at 0x7f2fa586ec10>]
+>>> plt.plot(np.mean(h60u_BT,1)[indsu0],'.')
+[<matplotlib.lines.Line2D object at 0x7f2fa4577c90>]
+>>> plt.plot(np.mean(h50u_BT,1)[indsu0],'.')
+[<matplotlib.lines.Line2D object at 0x7f2fa587f750>]
+>>> plt.plot(np.mean(h40u_BT,1)[indsu0],'.')
+[<matplotlib.lines.Line2D object at 0x7f2fa5875990>]
+>>> legend(('Top 70%','Top 60%','Top 50%','Top 40%'))
+<matplotlib.legend.Legend object at 0x7f2fa587a810>
+>>> ylabel('Average probability of neurons being most active')
+Text(38.3472,0.5,'Average probability of neurons being most active')
+>>> xlabel('sorted neurin ids (using Top 70%)')
+Text(0.5,19.5222,'sorted neurin ids (using Top 70%)')
+>>> title('Most active EMUP neurons across input sequences')
+Text(0.5,1,'Most active EMUP neurons across input sequences')
+>>> savefig('21may24_21feb5_cycle_RL3_B0_BT_topNPmostactiveneuronsCompareEMUP.png')
+>>> plt.plot(np.mean(h70d_BT,1)[indsd0],'.')
+[<matplotlib.lines.Line2D object at 0x7f2f3d8271d0>]
+>>> plt.plot(np.mean(h60d_BT,1)[indsd0],'.')
+[<matplotlib.lines.Line2D object at 0x7f2f3d84f590>]
+>>> plt.plot(np.mean(h50d_BT,1)[indsd0],'.')
+[<matplotlib.lines.Line2D object at 0x7f2fa5662310>]
+>>> plt.plot(np.mean(h40d_BT,1)[indsd0],'.')
+[<matplotlib.lines.Line2D object at 0x7f2fa56860d0>]
+>>> legend(('Top 70%','Top 60%','Top 50%','Top 40%'))
+<matplotlib.legend.Legend object at 0x7f2fa4573590>
+>>> ylabel('Average probability of neurons being most active')
+Text(38.3472,0.5,'Average probability of neurons being most active')
+>>> xlabel('sorted neurin ids (using Top 70%)')
+Text(0.5,19.5222,'sorted neurin ids (using Top 70%)')
+>>> title('Most active EMDOWN neurons across input sequences')
+Text(0.5,1,'Most active EMDOWN neurons across input sequences')
+>>> savefig('21may24_21feb5_cycle_RL3_B0_BT_topNPmostactiveneuronsCompareEMDOWN.png')
+>>> plt.plot(np.mean(h70u_AT19,1)[indsu1],'.')
+[<matplotlib.lines.Line2D object at 0x7f2fa6adc290>]
+>>> plt.plot(np.mean(h60u_AT19,1)[indsu1],'.')
+[<matplotlib.lines.Line2D object at 0x7f2fa5875b50>]
+>>> plt.plot(np.mean(h50u_AT19,1)[indsu1],'.')
+[<matplotlib.lines.Line2D object at 0x7f2fa565acd0>]
+>>> plt.plot(np.mean(h40u_AT19,1)[indsu1],'.')
+[<matplotlib.lines.Line2D object at 0x7f2f3d7fbb90>]
+>>> xlabel('sorted neurin ids (using Top 70%)')
+Text(0.5,19.5222,'sorted neurin ids (using Top 70%)')
+>>> ylabel('Average probability of neurons being most active')
+Text(38.3472,0.5,'Average probability of neurons being most active')
+>>> legend(('Top 70%','Top 60%','Top 50%','Top 40%'))
+<matplotlib.legend.Legend object at 0x7f2fa5875f10>
+>>> title('Most active EMUP neurons across input sequences')
+Text(0.5,1,'Most active EMUP neurons across input sequences')
+>>> savefig('21may24_21feb5_cycle_RL3_B0_AT19_topNPmostactiveneuronsCompareEMUP.png')
+>>> plt.plot(np.mean(h70d_AT19,1)[indsd1],'.')
+[<matplotlib.lines.Line2D object at 0x7f2a28d9ded0>]
+>>> plt.plot(np.mean(h60d_AT19,1)[indsd1],'.')
+[<matplotlib.lines.Line2D object at 0x7f2fa5900110>]
+>>> plt.plot(np.mean(h50d_AT19,1)[indsd1],'.')
+[<matplotlib.lines.Line2D object at 0x7f2a28d9d650>]
+>>> plt.plot(np.mean(h40d_AT19,1)[indsd1],'.')
+[<matplotlib.lines.Line2D object at 0x7f2a28da9a90>]
+>>> legend(('Top 70%','Top 60%','Top 50%','Top 40%'))
+<matplotlib.legend.Legend object at 0x7f2f3d90de90>
+>>> title('Most active EMDOWN neurons across input sequences')
+Text(0.5,1,'Most active EMDOWN neurons across input sequences')
+>>> ylabel('Average probability of neurons being most active')
+Text(38.3472,0.5,'Average probability of neurons being most active')
+>>> xlabel('sorted neurin ids (using Top 70%)')
+Text(0.5,19.5222,'sorted neurin ids (using Top 70%)')
+>>> xlabel('sorted neuron ids (using Top 70%)')
+Text(0.5,19.5222,'sorted neuron ids (using Top 70%)')
+>>> savefig('21may24_21feb5_cycle_RL3_B0_AT19_topNPmostactiveneuronsCompareEMDOWN.png')
+>>> plt.plot(np.mean(h70u_AT18,1)[indsu2],'.')
+[<matplotlib.lines.Line2D object at 0x7f2f3d94d250>]
+>>> plt.plot(np.mean(h60u_AT18,1)[indsu2],'.')
+[<matplotlib.lines.Line2D object at 0x7f2fa697bc10>]
+>>> plt.plot(np.mean(h50u_AT18,1)[indsu2],'.')
+[<matplotlib.lines.Line2D object at 0x7f2f3d8f0fd0>]
+>>> plt.plot(np.mean(h40u_AT18,1)[indsu2],'.')
+[<matplotlib.lines.Line2D object at 0x7f2f3d87c1d0>]
+>>> xlabel('sorted neuron ids (using Top 70%)')
+Text(0.5,19.5222,'sorted neuron ids (using Top 70%)')
+>>> ylabel('Average probability of neurons being most active')
+Text(38.3472,0.5,'Average probability of neurons being most active')
+>>> legend(('Top 70%','Top 60%','Top 50%','Top 40%'))
+<matplotlib.legend.Legend object at 0x7f2f3d8744d0>
+>>> title('Most active EMUP neurons across input sequences')
+Text(0.5,1,'Most active EMUP neurons across input sequences')
+>>> savefig('21may24_21feb5_cycle_RL3_B0_AT18_topNPmostactiveneuronsCompareEMUP.png')
+>>> plt.plot(np.mean(h70d_AT18,1)[indsd2],'.')
+[<matplotlib.lines.Line2D object at 0x7f2fa56a8310>]
+>>> plt.plot(np.mean(h60d_AT18,1)[indsd2],'.')
+[<matplotlib.lines.Line2D object at 0x7f2fa5900850>]
+>>> plt.plot(np.mean(h50d_AT18,1)[indsd2],'.')
+[<matplotlib.lines.Line2D object at 0x7f2a1c33aa10>]
+>>> plt.plot(np.mean(h40d_AT18,1)[indsd2],'.')
+[<matplotlib.lines.Line2D object at 0x7f2a1c3738d0>]
+>>> title('Most active EMDOWN neurons across input sequences')
+Text(0.5,1,'Most active EMDOWN neurons across input sequences')
+>>> legend(('Top 70%','Top 60%','Top 50%','Top 40%'))
+<matplotlib.legend.Legend object at 0x7f2fa56c58d0>
+>>> ylabel('Average probability of neurons being most active')
+Text(38.3472,0.5,'Average probability of neurons being most active')
+>>> xlabel('sorted neuron ids (using Top 70%)')
+Text(0.5,19.5222,'sorted neuron ids (using Top 70%)')
+>>> savefig('21may24_21feb5_cycle_RL3_B0_AT18_topNPmostactiveneuronsCompareEMDOWN.png')
+>>> plt.plot(np.mean(h70u_BT,1)[indsu0],'.')
+[<matplotlib.lines.Line2D object at 0x7f2f3d974450>]
+>>> plt.plot(np.mean(h70u_AT19,1)[indsu1],'.')
+[<matplotlib.lines.Line2D object at 0x7f2a1c33a0d0>]
+>>> plt.plot(np.mean(h70u_AT18,1)[indsu2],'.')
+[<matplotlib.lines.Line2D object at 0x7f2f3d974f10>]
+>>> xlabel('sorted neuron ids (arbitrary)')
+Text(0.5,19.5222,'sorted neuron ids (arbitrary)')
+>>> legend(('Before learning','After training Ep. 19','After training Ep. 18'))
+<matplotlib.legend.Legend object at 0x7f2a1c345090>
+>>> ylabel('Average probability of neurons being most active')
+Text(38.3472,0.5,'Average probability of neurons being most active')
+>>> ylabel('Average probability of neurons being most active (top 70%)')
+Text(38.3472,0.5,'Average probability of neurons being most active (top 70%)')
+>>> ylabel('Average probability of neurons being most active')
+Text(38.3472,0.5,'Average probability of neurons being most active')
+>>> title('Top 70% most active EMUP neurons')
+Text(0.5,1,'Top 70% most active EMUP neurons')
+>>> savefig('21may24_21feb5_cycle_RL3_B0_BT_AT19_AT18_topNPmostactiveneuronsCompareEMUP.png')
+>>> plt.plot(np.mean(h70d_BT,1)[indsd0],'.')
+[<matplotlib.lines.Line2D object at 0x7f2fa5756850>]
+>>> plt.plot(np.mean(h70d_AT19,1)[indsd1],'.')
+[<matplotlib.lines.Line2D object at 0x7f2f3d773650>]
+>>> plt.plot(np.mean(h70d_AT18,1)[indsd2],'.')
+[<matplotlib.lines.Line2D object at 0x7f2fa5777290>]
+>>> title('Top 70% most active EMDOWN neurons')
+Text(0.5,1,'Top 70% most active EMDOWN neurons')
+>>> ylabel('Average probability of neurons being most active')
+Text(38.3472,0.5,'Average probability of neurons being most active')
+>>> xlabel('sorted neuron ids (arbitrary)')
+Text(0.5,19.5222,'sorted neuron ids (arbitrary)')
+>>> legend(('Before learning','After training Ep. 19','After training Ep. 18'))
+<matplotlib.legend.Legend object at 0x7f2fa5777450>
+>>> savefig('21may24_21feb5_cycle_RL3_B0_BT_AT19_AT18_topNPmostactiveneuronsCompareEMDOWN.png')
+
+
+
+>>> plotSeqPerf(lSimilarSeqs_allBT,seqs2plot_allBT,seqsBegs_allBT,seqsEnds_allBT,II_allBT,dCumAct_allBT,hitsMiss_allBT,0,plotact=False)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_BT_seq0.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allBT,seqs2plot_allBT,seqsBegs_allBT,seqsEnds_allBT,II_allBT,dCumAct_allBT,hitsMiss_allBT,1,plotact=False)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_BT_seq1.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allBT,seqs2plot_allBT,seqsBegs_allBT,seqsEnds_allBT,II_allBT,dCumAct_allBT,hitsMiss_allBT,2,plotact=False)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_BT_seq2.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allBT,seqs2plot_allBT,seqsBegs_allBT,seqsEnds_allBT,II_allBT,dCumAct_allBT,hitsMiss_allBT,3,plotact=False)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_BT_seq3.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allBT,seqs2plot_allBT,seqsBegs_allBT,seqsEnds_allBT,II_allBT,dCumAct_allBT,hitsMiss_allBT,4,plotact=False)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_BT_seq4.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allBT,seqs2plot_allBT,seqsBegs_allBT,seqsEnds_allBT,II_allBT,dCumAct_allBT,hitsMiss_allBT,5,plotact=False)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_BT_seq5.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allBT,seqs2plot_allBT,seqsBegs_allBT,seqsEnds_allBT,II_allBT,dCumAct_allBT,hitsMiss_allBT,6,plotact=False)
+>>> ylim(0,6)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_BT_seq6.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allBT,seqs2plot_allBT,seqsBegs_allBT,seqsEnds_allBT,II_allBT,dCumAct_allBT,hitsMiss_allBT,7,plotact=False)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_BT_seq7.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allBT,seqs2plot_allBT,seqsBegs_allBT,seqsEnds_allBT,II_allBT,dCumAct_allBT,hitsMiss_allBT,8,plotact=False)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_BT_seq8.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allBT,seqs2plot_allBT,seqsBegs_allBT,seqsEnds_allBT,II_allBT,dCumAct_allBT,hitsMiss_allBT,9,plotact=False)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_BT_seq9.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allBT,seqs2plot_allBT,seqsBegs_allBT,seqsEnds_allBT,II_allBT,dCumAct_allBT,hitsMiss_allBT,10,plotact=False)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_BT_seq10.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allBT,seqs2plot_allBT,seqsBegs_allBT,seqsEnds_allBT,II_allBT,dCumAct_allBT,hitsMiss_allBT,11,plotact=False)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_BT_seq11.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allBT,seqs2plot_allBT,seqsBegs_allBT,seqsEnds_allBT,II_allBT,dCumAct_allBT,hitsMiss_allBT,12,plotact=False)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_BT_seq12.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allBT,seqs2plot_allBT,seqsBegs_allBT,seqsEnds_allBT,II_allBT,dCumAct_allBT,hitsMiss_allBT,13,plotact=False)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_BT_seq13.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allBT,seqs2plot_allBT,seqsBegs_allBT,seqsEnds_allBT,II_allBT,dCumAct_allBT,hitsMiss_allBT,14,plotact=False)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_BT_seq14.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allBT,seqs2plot_allBT,seqsBegs_allBT,seqsEnds_allBT,II_allBT,dCumAct_allBT,hitsMiss_allBT,15,plotact=False)
+>>> ylim(0,4)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_BT_seq15.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allBT,seqs2plot_allBT,seqsBegs_allBT,seqsEnds_allBT,II_allBT,dCumAct_allBT,hitsMiss_allBT,16,plotact=False)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_BT_seq16.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allBT,seqs2plot_allBT,seqsBegs_allBT,seqsEnds_allBT,II_allBT,dCumAct_allBT,hitsMiss_allBT,17,plotact=False)
+>>> ylim(0,4)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_BT_seq17.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allBT,seqs2plot_allBT,seqsBegs_allBT,seqsEnds_allBT,II_allBT,dCumAct_allBT,hitsMiss_allBT,18,plotact=False)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_BT_seq18.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allBT,seqs2plot_allBT,seqsBegs_allBT,seqsEnds_allBT,II_allBT,dCumAct_allBT,hitsMiss_allBT,19,plotact=False)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_BT_seq19.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allBT,seqs2plot_allBT,seqsBegs_allBT,seqsEnds_allBT,II_allBT,dCumAct_allBT,hitsMiss_allBT,20,plotact=False)
+>>> ylim(0,4)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_BT_seq20.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allBT,seqs2plot_allBT,seqsBegs_allBT,seqsEnds_allBT,II_allBT,dCumAct_allBT,hitsMiss_allBT,21,plotact=False)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_BT_seq21.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allBT,seqs2plot_allBT,seqsBegs_allBT,seqsEnds_allBT,II_allBT,dCumAct_allBT,hitsMiss_allBT,22,plotact=False)
+>>> ylim(0,4)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_BT_seq22.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allBT,seqs2plot_allBT,seqsBegs_allBT,seqsEnds_allBT,II_allBT,dCumAct_allBT,hitsMiss_allBT,23,plotact=False)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_BT_seq23.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allBT,seqs2plot_allBT,seqsBegs_allBT,seqsEnds_allBT,II_allBT,dCumAct_allBT,hitsMiss_allBT,24,plotact=False)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_BT_seq24.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allBT,seqs2plot_allBT,seqsBegs_allBT,seqsEnds_allBT,II_allBT,dCumAct_allBT,hitsMiss_allBT,25,plotact=False)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_BT_seq25.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allBT,seqs2plot_allBT,seqsBegs_allBT,seqsEnds_allBT,II_allBT,dCumAct_allBT,hitsMiss_allBT,26,plotact=False)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_BT_seq26.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allBT,seqs2plot_allBT,seqsBegs_allBT,seqsEnds_allBT,II_allBT,dCumAct_allBT,hitsMiss_allBT,27,plotact=False)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_BT_seq27.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allBT,seqs2plot_allBT,seqsBegs_allBT,seqsEnds_allBT,II_allBT,dCumAct_allBT,hitsMiss_allBT,28,plotact=False)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_BT_seq28.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allBT,seqs2plot_allBT,seqsBegs_allBT,seqsEnds_allBT,II_allBT,dCumAct_allBT,hitsMiss_allBT,29,plotact=False)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_BT_seq29.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allBT,seqs2plot_allBT,seqsBegs_allBT,seqsEnds_allBT,II_allBT,dCumAct_allBT,hitsMiss_allBT,30,plotact=False)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_BT_seq30.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allBT,seqs2plot_allBT,seqsBegs_allBT,seqsEnds_allBT,II_allBT,dCumAct_allBT,hitsMiss_allBT,31,plotact=False)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_BT_seq31.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allBT,seqs2plot_allBT,seqsBegs_allBT,seqsEnds_allBT,II_allBT,dCumAct_allBT,hitsMiss_allBT,32,plotact=False)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_BT_seq32.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allBT,seqs2plot_allBT,seqsBegs_allBT,seqsEnds_allBT,II_allBT,dCumAct_allBT,hitsMiss_allBT,33,plotact=False)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_BT_seq33.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allBT,seqs2plot_allBT,seqsBegs_allBT,seqsEnds_allBT,II_allBT,dCumAct_allBT,hitsMiss_allBT,34,plotact=False)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_BT_seq34.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allBT,seqs2plot_allBT,seqsBegs_allBT,seqsEnds_allBT,II_allBT,dCumAct_allBT,hitsMiss_allBT,35,plotact=False)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_BT_seq35.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allAT19,seqs2plot_allAT19,seqsBegs_allAT19,seqsEnds_allAT19,II_allAT19,dCumAct_allAT19,hitsMiss_allAT19,0,plotact=False)
+>>> ylim(0,3)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_AT19_seq0.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allAT19,seqs2plot_allAT19,seqsBegs_allAT19,seqsEnds_allAT19,II_allAT19,dCumAct_allAT19,hitsMiss_allAT19,1,plotact=False)
+>>> ylim(0,4)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_AT19_seq1.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allAT19,seqs2plot_allAT19,seqsBegs_allAT19,seqsEnds_allAT19,II_allAT19,dCumAct_allAT19,hitsMiss_allAT19,2,plotact=False)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_AT19_seq2.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allAT19,seqs2plot_allAT19,seqsBegs_allAT19,seqsEnds_allAT19,II_allAT19,dCumAct_allAT19,hitsMiss_allAT19,3,plotact=False)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_AT19_seq3.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allAT19,seqs2plot_allAT19,seqsBegs_allAT19,seqsEnds_allAT19,II_allAT19,dCumAct_allAT19,hitsMiss_allAT19,4,plotact=False)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_AT19_seq4.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allAT19,seqs2plot_allAT19,seqsBegs_allAT19,seqsEnds_allAT19,II_allAT19,dCumAct_allAT19,hitsMiss_allAT19,5,plotact=False)
+>>> ylim(0,20)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_AT19_seq5.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allAT19,seqs2plot_allAT19,seqsBegs_allAT19,seqsEnds_allAT19,II_allAT19,dCumAct_allAT19,hitsMiss_allAT19,6,plotact=False)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_AT19_seq6.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allAT19,seqs2plot_allAT19,seqsBegs_allAT19,seqsEnds_allAT19,II_allAT19,dCumAct_allAT19,hitsMiss_allAT19,7,plotact=False)
+>>> ylim(0,14)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_AT19_seq7.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allAT19,seqs2plot_allAT19,seqsBegs_allAT19,seqsEnds_allAT19,II_allAT19,dCumAct_allAT19,hitsMiss_allAT19,8,plotact=False)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_AT19_seq8.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allAT19,seqs2plot_allAT19,seqsBegs_allAT19,seqsEnds_allAT19,II_allAT19,dCumAct_allAT19,hitsMiss_allAT19,9,plotact=False)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_AT19_seq9.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allAT19,seqs2plot_allAT19,seqsBegs_allAT19,seqsEnds_allAT19,II_allAT19,dCumAct_allAT19,hitsMiss_allAT19,10,plotact=False)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_AT19_seq10.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allAT19,seqs2plot_allAT19,seqsBegs_allAT19,seqsEnds_allAT19,II_allAT19,dCumAct_allAT19,hitsMiss_allAT19,11,plotact=False)
+>>> ylim(0,3)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_AT19_seq11.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allAT19,seqs2plot_allAT19,seqsBegs_allAT19,seqsEnds_allAT19,II_allAT19,dCumAct_allAT19,hitsMiss_allAT19,12,plotact=False)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_AT19_seq12.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allAT19,seqs2plot_allAT19,seqsBegs_allAT19,seqsEnds_allAT19,II_allAT19,dCumAct_allAT19,hitsMiss_allAT19,13,plotact=False)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_AT19_seq13.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allAT19,seqs2plot_allAT19,seqsBegs_allAT19,seqsEnds_allAT19,II_allAT19,dCumAct_allAT19,hitsMiss_allAT19,14,plotact=False)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_AT19_seq14.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allAT19,seqs2plot_allAT19,seqsBegs_allAT19,seqsEnds_allAT19,II_allAT19,dCumAct_allAT19,hitsMiss_allAT19,15,plotact=False)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_AT19_seq15.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allAT19,seqs2plot_allAT19,seqsBegs_allAT19,seqsEnds_allAT19,II_allAT19,dCumAct_allAT19,hitsMiss_allAT19,16,plotact=False)
+>>> ylim(0,4)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_AT19_seq16.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allAT19,seqs2plot_allAT19,seqsBegs_allAT19,seqsEnds_allAT19,II_allAT19,dCumAct_allAT19,hitsMiss_allAT19,17,plotact=False)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_AT19_seq17.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allAT19,seqs2plot_allAT19,seqsBegs_allAT19,seqsEnds_allAT19,II_allAT19,dCumAct_allAT19,hitsMiss_allAT19,18,plotact=False)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_AT19_seq18.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allAT19,seqs2plot_allAT19,seqsBegs_allAT19,seqsEnds_allAT19,II_allAT19,dCumAct_allAT19,hitsMiss_allAT19,19,plotact=False)
+>>> ylim(0,9)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_AT19_seq19.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allAT19,seqs2plot_allAT19,seqsBegs_allAT19,seqsEnds_allAT19,II_allAT19,dCumAct_allAT19,hitsMiss_allAT19,20,plotact=False)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_AT19_seq20.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allAT19,seqs2plot_allAT19,seqsBegs_allAT19,seqsEnds_allAT19,II_allAT19,dCumAct_allAT19,hitsMiss_allAT19,21,plotact=False)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_AT19_seq21.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allAT19,seqs2plot_allAT19,seqsBegs_allAT19,seqsEnds_allAT19,II_allAT19,dCumAct_allAT19,hitsMiss_allAT19,22,plotact=False)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_AT19_seq22.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allAT19,seqs2plot_allAT19,seqsBegs_allAT19,seqsEnds_allAT19,II_allAT19,dCumAct_allAT19,hitsMiss_allAT19,23,plotact=False)
+>>> ylim(0,6)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_AT19_seq23.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allAT19,seqs2plot_allAT19,seqsBegs_allAT19,seqsEnds_allAT19,II_allAT19,dCumAct_allAT19,hitsMiss_allAT19,24,plotact=False)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_AT19_seq24.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allAT19,seqs2plot_allAT19,seqsBegs_allAT19,seqsEnds_allAT19,II_allAT19,dCumAct_allAT19,hitsMiss_allAT19,25,plotact=False)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_AT19_seq25.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allAT19,seqs2plot_allAT19,seqsBegs_allAT19,seqsEnds_allAT19,II_allAT19,dCumAct_allAT19,hitsMiss_allAT19,26,plotact=False)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_AT19_seq26.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allAT19,seqs2plot_allAT19,seqsBegs_allAT19,seqsEnds_allAT19,II_allAT19,dCumAct_allAT19,hitsMiss_allAT19,27,plotact=False)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_AT19_seq27.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allAT19,seqs2plot_allAT19,seqsBegs_allAT19,seqsEnds_allAT19,II_allAT19,dCumAct_allAT19,hitsMiss_allAT19,28,plotact=False)
+>>> ylim(0,5)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_AT19_seq28.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allAT19,seqs2plot_allAT19,seqsBegs_allAT19,seqsEnds_allAT19,II_allAT19,dCumAct_allAT19,hitsMiss_allAT19,29,plotact=False)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_AT19_seq29.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allAT19,seqs2plot_allAT19,seqsBegs_allAT19,seqsEnds_allAT19,II_allAT19,dCumAct_allAT19,hitsMiss_allAT19,30,plotact=False)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_AT19_seq30.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allAT19,seqs2plot_allAT19,seqsBegs_allAT19,seqsEnds_allAT19,II_allAT19,dCumAct_allAT19,hitsMiss_allAT19,31,plotact=False)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_AT19_seq31.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allAT19,seqs2plot_allAT19,seqsBegs_allAT19,seqsEnds_allAT19,II_allAT19,dCumAct_allAT19,hitsMiss_allAT19,32,plotact=False)
+>>> ylim(0,7)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_AT19_seq32.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allAT19,seqs2plot_allAT19,seqsBegs_allAT19,seqsEnds_allAT19,II_allAT19,dCumAct_allAT19,hitsMiss_allAT19,33,plotact=False)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_AT19_seq33.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allAT19,seqs2plot_allAT19,seqsBegs_allAT19,seqsEnds_allAT19,II_allAT19,dCumAct_allAT19,hitsMiss_allAT19,34,plotact=False)
+>>> ylim(0,11)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_AT19_seq34.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allAT19,seqs2plot_allAT19,seqsBegs_allAT19,seqsEnds_allAT19,II_allAT19,dCumAct_allAT19,hitsMiss_allAT19,35,plotact=False)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_AT19_seq35.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allAT19,seqs2plot_allAT19,seqsBegs_allAT19,seqsEnds_allAT19,II_allAT19,dCumAct_allAT19,hitsMiss_allAT19,36,plotact=False)
+>>> ylim(0,4)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_AT19_seq36.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allAT19,seqs2plot_allAT19,seqsBegs_allAT19,seqsEnds_allAT19,II_allAT19,dCumAct_allAT19,hitsMiss_allAT19,37,plotact=False)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_AT19_seq37.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allAT19,seqs2plot_allAT19,seqsBegs_allAT19,seqsEnds_allAT19,II_allAT19,dCumAct_allAT19,hitsMiss_allAT19,38,plotact=False)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_AT19_seq38.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allAT19,seqs2plot_allAT19,seqsBegs_allAT19,seqsEnds_allAT19,II_allAT19,dCumAct_allAT19,hitsMiss_allAT19,39,plotact=False)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_AT19_seq39.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allAT19,seqs2plot_allAT19,seqsBegs_allAT19,seqsEnds_allAT19,II_allAT19,dCumAct_allAT19,hitsMiss_allAT19,40,plotact=False)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_AT19_seq40.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allAT19,seqs2plot_allAT19,seqsBegs_allAT19,seqsEnds_allAT19,II_allAT19,dCumAct_allAT19,hitsMiss_allAT19,41,plotact=False)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_AT19_seq41.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allAT19,seqs2plot_allAT19,seqsBegs_allAT19,seqsEnds_allAT19,II_allAT19,dCumAct_allAT19,hitsMiss_allAT19,42,plotact=False)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_AT19_seq42.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allAT18,seqs2plot_allAT18,seqsBegs_allAT18,seqsEnds_allAT18,II_allAT18,dCumAct_allAT18,hitsMiss_allAT18,0,plotact=False)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_AT18_seq0.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allAT18,seqs2plot_allAT18,seqsBegs_allAT18,seqsEnds_allAT18,II_allAT18,dCumAct_allAT18,hitsMiss_allAT18,1,plotact=False)
+>>> ylim(0,50)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_AT18_seq1.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allAT18,seqs2plot_allAT18,seqsBegs_allAT18,seqsEnds_allAT18,II_allAT18,dCumAct_allAT18,hitsMiss_allAT18,2,plotact=False)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_AT18_seq2.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allAT18,seqs2plot_allAT18,seqsBegs_allAT18,seqsEnds_allAT18,II_allAT18,dCumAct_allAT18,hitsMiss_allAT18,3,plotact=False)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_AT18_seq3.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allAT18,seqs2plot_allAT18,seqsBegs_allAT18,seqsEnds_allAT18,II_allAT18,dCumAct_allAT18,hitsMiss_allAT18,4,plotact=False)
+>>> ylim(0,6)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_AT18_seq4.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allAT18,seqs2plot_allAT18,seqsBegs_allAT18,seqsEnds_allAT18,II_allAT18,dCumAct_allAT18,hitsMiss_allAT18,5,plotact=False)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_AT18_seq5.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allAT18,seqs2plot_allAT18,seqsBegs_allAT18,seqsEnds_allAT18,II_allAT18,dCumAct_allAT18,hitsMiss_allAT18,6,plotact=False)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_AT18_seq6.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allAT18,seqs2plot_allAT18,seqsBegs_allAT18,seqsEnds_allAT18,II_allAT18,dCumAct_allAT18,hitsMiss_allAT18,7,plotact=False)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_AT18_seq7.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allAT18,seqs2plot_allAT18,seqsBegs_allAT18,seqsEnds_allAT18,II_allAT18,dCumAct_allAT18,hitsMiss_allAT18,8,plotact=False)
+>>> ylim(0,4)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_AT18_seq8.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allAT18,seqs2plot_allAT18,seqsBegs_allAT18,seqsEnds_allAT18,II_allAT18,dCumAct_allAT18,hitsMiss_allAT18,9,plotact=False)
+>>> ylim(0,10)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_AT18_seq9.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allAT18,seqs2plot_allAT18,seqsBegs_allAT18,seqsEnds_allAT18,II_allAT18,dCumAct_allAT18,hitsMiss_allAT18,10,plotact=False)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_AT18_seq10.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allAT18,seqs2plot_allAT18,seqsBegs_allAT18,seqsEnds_allAT18,II_allAT18,dCumAct_allAT18,hitsMiss_allAT18,11,plotact=False)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_AT18_seq11.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allAT18,seqs2plot_allAT18,seqsBegs_allAT18,seqsEnds_allAT18,II_allAT18,dCumAct_allAT18,hitsMiss_allAT18,12,plotact=False)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_AT18_seq12.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allAT18,seqs2plot_allAT18,seqsBegs_allAT18,seqsEnds_allAT18,II_allAT18,dCumAct_allAT18,hitsMiss_allAT18,13,plotact=False)
+>>> ylim(0,12)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_AT18_seq13.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allAT18,seqs2plot_allAT18,seqsBegs_allAT18,seqsEnds_allAT18,II_allAT18,dCumAct_allAT18,hitsMiss_allAT18,14,plotact=False)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_AT18_seq14.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allAT18,seqs2plot_allAT18,seqsBegs_allAT18,seqsEnds_allAT18,II_allAT18,dCumAct_allAT18,hitsMiss_allAT18,15,plotact=False)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_AT18_seq15.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allAT18,seqs2plot_allAT18,seqsBegs_allAT18,seqsEnds_allAT18,II_allAT18,dCumAct_allAT18,hitsMiss_allAT18,16,plotact=False)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_AT18_seq16.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allAT18,seqs2plot_allAT18,seqsBegs_allAT18,seqsEnds_allAT18,II_allAT18,dCumAct_allAT18,hitsMiss_allAT18,17,plotact=False)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_AT18_seq17.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allAT18,seqs2plot_allAT18,seqsBegs_allAT18,seqsEnds_allAT18,II_allAT18,dCumAct_allAT18,hitsMiss_allAT18,18,plotact=False)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_AT18_seq18.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allAT18,seqs2plot_allAT18,seqsBegs_allAT18,seqsEnds_allAT18,II_allAT18,dCumAct_allAT18,hitsMiss_allAT18,19,plotact=False)
+>>> ylim(0,10)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_AT18_seq19.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allAT18,seqs2plot_allAT18,seqsBegs_allAT18,seqsEnds_allAT18,II_allAT18,dCumAct_allAT18,hitsMiss_allAT18,20,plotact=False)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_AT18_seq20.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allAT18,seqs2plot_allAT18,seqsBegs_allAT18,seqsEnds_allAT18,II_allAT18,dCumAct_allAT18,hitsMiss_allAT18,21,plotact=False)
+>>> ylim(0,5)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_AT18_seq21.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allAT18,seqs2plot_allAT18,seqsBegs_allAT18,seqsEnds_allAT18,II_allAT18,dCumAct_allAT18,hitsMiss_allAT18,22,plotact=False)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_AT18_seq22.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allAT18,seqs2plot_allAT18,seqsBegs_allAT18,seqsEnds_allAT18,II_allAT18,dCumAct_allAT18,hitsMiss_allAT18,23,plotact=False)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_AT18_seq23.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allAT18,seqs2plot_allAT18,seqsBegs_allAT18,seqsEnds_allAT18,II_allAT18,dCumAct_allAT18,hitsMiss_allAT18,24,plotact=False)
+>>> ylim(0,10)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_AT18_seq24.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allAT18,seqs2plot_allAT18,seqsBegs_allAT18,seqsEnds_allAT18,II_allAT18,dCumAct_allAT18,hitsMiss_allAT18,25,plotact=False)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_AT18_seq25.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allAT18,seqs2plot_allAT18,seqsBegs_allAT18,seqsEnds_allAT18,II_allAT18,dCumAct_allAT18,hitsMiss_allAT18,26,plotact=False)
+>>> ylim(0,8)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_AT18_seq26.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allAT18,seqs2plot_allAT18,seqsBegs_allAT18,seqsEnds_allAT18,II_allAT18,dCumAct_allAT18,hitsMiss_allAT18,27,plotact=False)
+>>> ylim(0,3)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_AT18_seq27.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allAT18,seqs2plot_allAT18,seqsBegs_allAT18,seqsEnds_allAT18,II_allAT18,dCumAct_allAT18,hitsMiss_allAT18,28,plotact=False)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_AT18_seq28.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allAT18,seqs2plot_allAT18,seqsBegs_allAT18,seqsEnds_allAT18,II_allAT18,dCumAct_allAT18,hitsMiss_allAT18,29,plotact=False)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_AT18_seq29.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allAT18,seqs2plot_allAT18,seqsBegs_allAT18,seqsEnds_allAT18,II_allAT18,dCumAct_allAT18,hitsMiss_allAT18,30,plotact=False)
+>>> ylim(0,10)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_AT18_seq30.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allAT18,seqs2plot_allAT18,seqsBegs_allAT18,seqsEnds_allAT18,II_allAT18,dCumAct_allAT18,hitsMiss_allAT18,31,plotact=False)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_AT18_seq31.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allAT18,seqs2plot_allAT18,seqsBegs_allAT18,seqsEnds_allAT18,II_allAT18,dCumAct_allAT18,hitsMiss_allAT18,32,plotact=False)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_AT18_seq32.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allAT18,seqs2plot_allAT18,seqsBegs_allAT18,seqsEnds_allAT18,II_allAT18,dCumAct_allAT18,hitsMiss_allAT18,33,plotact=False)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_AT18_seq33.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allAT18,seqs2plot_allAT18,seqsBegs_allAT18,seqsEnds_allAT18,II_allAT18,dCumAct_allAT18,hitsMiss_allAT18,34,plotact=False)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_AT18_seq34.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allAT18,seqs2plot_allAT18,seqsBegs_allAT18,seqsEnds_allAT18,II_allAT18,dCumAct_allAT18,hitsMiss_allAT18,35,plotact=False)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_AT18_seq35.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allAT18,seqs2plot_allAT18,seqsBegs_allAT18,seqsEnds_allAT18,II_allAT18,dCumAct_allAT18,hitsMiss_allAT18,36,plotact=False)
+>>> ylim(0,5)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_AT18_seq36.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allAT18,seqs2plot_allAT18,seqsBegs_allAT18,seqsEnds_allAT18,II_allAT18,dCumAct_allAT18,hitsMiss_allAT18,37,plotact=False)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_AT18_seq37.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allAT18,seqs2plot_allAT18,seqsBegs_allAT18,seqsEnds_allAT18,II_allAT18,dCumAct_allAT18,hitsMiss_allAT18,38,plotact=False)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_AT18_seq38.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allAT18,seqs2plot_allAT18,seqsBegs_allAT18,seqsEnds_allAT18,II_allAT18,dCumAct_allAT18,hitsMiss_allAT18,39,plotact=False)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_AT18_seq39.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allAT18,seqs2plot_allAT18,seqsBegs_allAT18,seqsEnds_allAT18,II_allAT18,dCumAct_allAT18,hitsMiss_allAT18,40,plotact=False)
+>>> ylim(0,6)
+>>> savefig('21may24_21feb5_cycle_RL3_B0_AT18_seq40.png')
+
+
+--------
+
+>>> plt.imshow(np.subtract(np.sum(II_allBT[seqsBegs_allBT[0]:seqsEnds_allBT[0]],0),np.sum(II_allAT19[seqsBegs_allAT19[0]:seqsEnds_allAT19[0]],0)))
+<matplotlib.image.AxesImage object at 0x7f2a28cd5a50>
+>>> plt.imshow(np.subtract(np.sum(II_allBT[seqsBegs_allBT[0]:seqsEnds_allBT[0]],0),np.sum(II_allAT18[seqsBegs_allAT18[0]:seqsEnds_allAT18[0]],0)))
+<matplotlib.image.AxesImage object at 0x7f306bbcfd90>
+
+
+>>> s0 = []
+>>> for i in len(lSimilarSeqs_allBT[0]):
+...   s0.append(np.max(II_allBT[seqsBegs_allBT[lSimilarSeqs_allBT[0][i]]:seqsEnds_allBT[lSimilarSeqs_allBT[0][i]]],0))
+... 
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+TypeError: 'int' object is not iterable
+>>> for i in range(len(lSimilarSeqs_allBT[0])):
+...   s0.append(np.max(II_allBT[seqsBegs_allBT[lSimilarSeqs_allBT[0][i]]:seqsEnds_allBT[lSimilarSeqs_allBT[0][i]]],0))
+... 
+>>> len(s0)
+53
+>>> np.array(s0).shape
+(53, 80, 80)
+>>> plt.imshow(np.mean(np.array(s0),0))
+<matplotlib.image.AxesImage object at 0x7f2d6b707b10>
+>>> savefig('21may24_21feb5_cycle_RL3_B0_BT_seq0_maxProjection.png')
+>>> s0 = []
+>>> for i in range(len(lSimilarSeqs_allAT19[0])):
+...   s0.append(np.max(II_allAT19[seqsBegs_allAT19[lSimilarSeqs_allAT19[0][i]]:seqsEnds_allAT19[lSimilarSeqs_allAT19[0][i]]],0))
+... 
+>>> len(s0)
+44
+>>> plt.imshow(np.mean(np.array(s0),0))
+<matplotlib.image.AxesImage object at 0x7f2ad9acdd90>
+>>> savefig('21may24_21feb5_cycle_RL3_B0_AT19_seq0_maxProjection.png')
+>>> s0 = []
+>>> for i in range(len(lSimilarSeqs_allAT18[0])):
+...   s0.append(np.max(II_allAT18[seqsBegs_allAT18[lSimilarSeqs_allAT18[0][i]]:seqsEnds_allAT18[lSimilarSeqs_allAT18[0][i]]],0))
+... 
+>>> plt.imshow(np.mean(np.array(s0),0))
+<matplotlib.image.AxesImage object at 0x7f2d6b6e29d0>
+>>> savefig('21may24_21feb5_cycle_RL3_B0_AT18_seq0_maxProjection.png')
+>>> s1 = []
+>>> for i in range(len(lSimilarSeqs_allAT18[1])):
+...   s1.append(np.max(II_allAT18[seqsBegs_allAT18[lSimilarSeqs_allAT18[1][i]]:seqsEnds_allAT18[lSimilarSeqs_allAT18[1][i]]],0))
+... 
+>>> plt.imshow(np.mean(np.array(s1),0))
+<matplotlib.image.AxesImage object at 0x7f2d1e6173d0>
+>>> savefig('21may24_21feb5_cycle_RL3_B0_AT18_seq1_maxProjection.png')
+>>> s1 = []
+>>> for i in range(len(lSimilarSeqs_allAT19[1])):
+...   s1.append(np.max(II_allAT19[seqsBegs_allAT19[lSimilarSeqs_allAT19[1][i]]:seqsEnds_allAT19[lSimilarSeqs_allAT19[1][i]]],0))
+... 
+>>> plt.imshow(np.mean(np.array(s1),0))
+<matplotlib.image.AxesImage object at 0x7f2f3d9c67d0>
+>>> savefig('21may24_21feb5_cycle_RL3_B0_AT19_seq1_maxProjection.png')
+>>> s1 = []
+>>> for i in range(len(lSimilarSeqs_allBT[1])):
+...   s1.append(np.max(II_allBT[seqsBegs_allBT[lSimilarSeqs_allBT[1][i]]:seqsEnds_allBT[lSimilarSeqs_allBT[1][i]]],0))
+... 
+>>> plt.imshow(np.mean(np.array(s1),0))
+<matplotlib.image.AxesImage object at 0x7f32b0178950>
+>>> savefig('21may24_21feb5_cycle_RL3_B0_BT_seq1_maxProjection.png')
+>>> s2 = []
+>>> for i in range(len(lSimilarSeqs_allBT[24])):
+...   s2.append(np.max(II_allBT[seqsBegs_allBT[lSimilarSeqs_allBT[24][i]]:seqsEnds_allBT[lSimilarSeqs_allBT[24][i]]],0))
+... 
+>>> plt.imshow(np.mean(np.array(s2),0))
+<matplotlib.image.AxesImage object at 0x7f2fa6a3ed90>
+>>> s2 = []
+>>> seqs2plot_allBT[24]
+68
+>>> s2 = []
+>>> for i in range(len(lSimilarSeqs_allBT[68])):
+...   s2.append(np.max(II_allBT[seqsBegs_allBT[lSimilarSeqs_allBT[68][i]]:seqsEnds_allBT[lSimilarSeqs_allBT[68][i]]],0))
+... 
+>>> plt.imshow(np.mean(np.array(s2),0))
+<matplotlib.image.AxesImage object at 0x7f30a218a710>
+>>> savefig('21may24_21feb5_cycle_RL3_B0_BT_seq24_maxProjection.png')
+>>> seqs2plot_allAT18[19]
+43
+>>> s2 = []
+>>> for i in range(len(lSimilarSeqs_allAT18[43])):
+...   s2.append(np.max(II_allAT18[seqsBegs_allAT18[lSimilarSeqs_allAT18[43][i]]:seqsEnds_allAT18[lSimilarSeqs_allAT18[43][i]]],0))
+... 
+>>> plt.imshow(np.mean(np.array(s2),0))
+<matplotlib.image.AxesImage object at 0x7f2fa45dfc90>
+>>> savefig('21may24_21feb5_cycle_RL3_B0_AT18_seq19_maxProjection.png')
+>>> seqs2plot_allAT19[16]
+31
+>>> s2 = []
+>>> for i in range(len(lSimilarSeqs_allAT19[31])):
+...   s2.append(np.max(II_allAT19[seqsBegs_allAT19[lSimilarSeqs_allAT19[31][i]]:seqsEnds_allAT19[lSimilarSeqs_allAT19[31][i]]],0))
+... 
+>>> plt.imshow(np.mean(np.array(s2),0))
+<matplotlib.image.AxesImage object at 0x7f2acd9f1310>
+>>> savefig('21may24_21feb5_cycle_RL3_B0_AT19_seq16_maxProjection.png')
+>>> 
+>>> 
+>>> seqs2plot_allAT19[34]
+124
+>>> s3 = []
+>>> for i in range(len(lSimilarSeqs_allAT19[124])):
+...   s3.append(np.max(II_allAT19[seqsBegs_allAT19[lSimilarSeqs_allAT19[124][i]]:seqsEnds_allAT19[lSimilarSeqs_allAT19[124][i]]],0))
+... 
+>>> plt.imshow(np.mean(np.array(s3),0))
+<matplotlib.image.AxesImage object at 0x7f2fa6ab3d50>
+>>> savefig('21may24_21feb5_cycle_RL3_B0_AT19_seq34_maxProjection.png')
+>>> seqs2plot_allAT18[22]
+64
+>>> s3 = []
+>>> for i in range(len(lSimilarSeqs_allAT18[64])):
+...   s3.append(np.max(II_allAT18[seqsBegs_allAT18[lSimilarSeqs_allAT18[64][i]]:seqsEnds_allAT18[lSimilarSeqs_allAT18[64][i]]],0))
+... 
+>>> plt.imshow(np.mean(np.array(s3),0))
+<matplotlib.image.AxesImage object at 0x7f2a1c3c4890>
+>>> savefig('21may24_21feb5_cycle_RL3_B0_AT18_seq22_maxProjection.png')
+>>> seqs2plot_allBT[21]
+59
+>>> s3 = []
+>>> for i in range(len(lSimilarSeqs_allBT[59])):
+...   s3.append(np.max(II_allBT[seqsBegs_allBT[lSimilarSeqs_allBT[59][i]]:seqsEnds_allBT[lSimilarSeqs_allBT[59][i]]],0))
+... 
+>>> plt.imshow(np.mean(np.array(s3),0))
+<matplotlib.image.AxesImage object at 0x7f2a28db0ad0>
+>>> savefig('21may24_21feb5_cycle_RL3_B0_BT_seq21_maxProjection.png')
