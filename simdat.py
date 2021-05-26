@@ -766,9 +766,23 @@ def plotHitMiss (actreward,ax=None,msz=3,asratio=False,asbin=False,binsz=10e3,lc
     ax.plot(action_times,cumMissed,'-o',color=lclr[1],markersize=msz)
     ax.set_xlim((0,np.max(action_times)))
     ax.set_ylim((0,np.max([cumHits[-1],cumMissed[-1]])))    
-    ax.set_ylabel('Hit Ball ('+str(cumHits[-1])+')','Miss Ball ('+str(cumMissed[-1])+')')
+    ax.set_ylabel('Hit Ball ('+str(cumHits[-1])+'), Miss Ball ('+str(cumMissed[-1])+')')
     return cumHits[-1],cumMissed[-1]
 
+#
+def plotHitMissRatioPerStep (lpda,ax=None):
+  if ax is None: ax=gca()
+  lhit,lmiss = [],[]
+  for pda in lpda: 
+    hit,miss = plotHitMiss(pda,asratio=False,asbin=False,ax=ax)
+    lhit.append(hit); lmiss.append(miss)
+  cla()
+  lrat = np.array(lhit)/lmiss
+  cla(); plot(lrat,'k',linewidth=4); plot(lrat,'ko',markersize=15)
+  xlabel('Step',fontsize=35); ylabel('Hit/miss ratio',fontsize=35); xlim((0-.1,len(lhit)-1+.1))
+  return lrat
+  
+  
 #  
 def plotScoreMiss (actreward,ax=None,msz=3,asratio=False,clr='r'):
   if ax is None: ax = gca()

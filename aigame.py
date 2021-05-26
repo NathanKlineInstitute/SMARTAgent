@@ -33,11 +33,12 @@ from conf import dconf
 useSimulatedEnv = False
 try:
   if 'useSimulatedEnv' in dconf: useSimulatedEnv = dconf['useSimulatedEnv']
-  if useSimulatedEnv:
-    #from simulatePongFull import simulatePong
-    #env = simulatePong()
+  if useSimulatedEnv==1:
     from simplePong import simplePong
     env = simplePong()
+  elif useSimulatedEnv==2:
+    from simulatePongFull import simulatePong
+    env = simulatePong()    
   else:
     if 'frameskip' in dconf['env']:
       env = gym.make(dconf['env']['name'],frameskip=dconf['env']['frameskip'],repeat_action_probability=0.)
@@ -605,13 +606,15 @@ class AIGame:
           reward += interreward  # Uses summation so no reinforcement/punishment is missed
           stay_step += 1
         self.env.render() # Renders the game after the stay steps
+      elif useSimulatedEnv==2:
+        observation, reward, done, info, hit = self.env.step(caction) # Re-Initializes reward before if statement
       else:
         #observation, reward, done, info, hit = self.env.step(caction)
         observation, reward = self.env.step(caction)
       #find position of ball after action
       proposed_target_action, FollowTargetSign, current_ball_dir, xpos_Ball2 = self.useRacketPredictedPos(observation)
       ball_hits_racket = 0
-      if not useSimulatedEnv:
+      if useSimulatedEnv==0 or useSimulatedEnv==2:
         # previously I assumed when current_ball_dir is 0 there is no way to find out if the ball hit the racket
         if current_ball_dir-self.last_ball_dir<0 and reward==0 and xpos_Ball2>courtXRng[1]-courtXRng[0]-40:
           ball_hits_racket = 1
