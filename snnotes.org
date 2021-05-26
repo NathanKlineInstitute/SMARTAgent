@@ -32362,3 +32362,10 @@ savefig(gifpath()+'all_steps_avg_weight.png')
 
 ## fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
 
+** stopped 21may24_TARG0_K2_gcp_ -- had wrong losePoint value (-0.1 instead of -0.25)
+** start 21may25_TARG0_K2_gcp_
+
+python multistepSim.py sn.json 30 40 21may25_TARG0_K2_gcp_multi
+
+started ~21:12 ...
+
