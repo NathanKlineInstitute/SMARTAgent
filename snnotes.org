@@ -32556,3 +32556,17 @@ subplot(1,3,3); popwtsE = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.ti
 savefig(gifpath()+'all_steps_avg_weight.png') # [[./gif/21may26_21may21_TARG0_N_cycle__step_29_all_steps_avg_weight.png]]
 
 ## fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
+** 21may26_TARG0_O_gcp_  -- test even larger EA(2400),EA2(1200) 
+
+interneurons in A, A2 layers increased accordingly...kept convergence same (so that means information
+is a little sparser)
+
+./myrun 30 sn.json
+
+python -i simdat.py backupcfg/21may26_TARG0_O_gcp_sim.json
+
+python multistepSim.py sn.json 30 40 21may26_TARG0_O_gcp_multi
+
+started ~12:53 
+
+
