@@ -24686,3 +24686,285 @@ TypeError: 'int' object is not iterable
 >>> plt.imshow(np.mean(np.array(s3),0))
 <matplotlib.image.AxesImage object at 0x7f2a28db0ad0>
 >>> savefig('21may24_21feb5_cycle_RL3_B0_BT_seq21_maxProjection.png')
+
+----------
+performance movies:
+
+saved animation to gif/21may26_21feb5_cycle_RL3_B0__step_18__with_reward_input.mp4
+
+saved animation to gif/21may26_21feb5_cycle_RL3_B0_AT__step_18_p0__with_reward_input.mp4
+saved animation to gif/21may26_21feb5_cycle_RL3_B0_AT__step_18_p1__with_reward_input.mp4
+saved animation to gif/21may26_21feb5_cycle_RL3_B0_AT__step_18_p2__with_reward_input.mp4
+saved animation to gif/21may26_21feb5_cycle_RL3_B0_AT__step_18_p3__with_reward_input.mp4
+saved animation to gif/21may26_21feb5_cycle_RL3_B0_AT__step_18_p4__with_reward_input.mp4
+saved animation to gif/21may26_21feb5_cycle_RL3_B0_AT__step_18_p5__with_reward_input.mp4
+
+saved animation to gif/21may26_21feb5_cycle_RL3_B0_BT_p0__with_reward_input.mp4
+----------
+
+performance over training......
+
+>>> lfnT = ['21feb5_cycle_RL3_B0__step_0_']
+>>> lfnT.append('21feb5_cycle_RL3_B0__step_1_')
+>>> lfnT.append('21feb5_cycle_RL3_B0__step_2_')
+>>> lfnT.append('21feb5_cycle_RL3_B0__step_3_')
+>>> lfnT.append('21feb5_cycle_RL3_B0__step_4_')
+>>> lfnT.append('21feb5_cycle_RL3_B0__step_5_')
+>>> lfnT.append('21feb5_cycle_RL3_B0__step_6_')
+>>> lfnT.append('21feb5_cycle_RL3_B0__step_7_')
+>>> lfnT.append('21feb5_cycle_RL3_B0__step_8_')
+>>> lfnT.append('21feb5_cycle_RL3_B0__step_9_')
+>>> lfnT.append('21feb5_cycle_RL3_B0__step_10_')
+>>> lfnT.append('21feb5_cycle_RL3_B0__step_11_')
+>>> lfnT.append('21feb5_cycle_RL3_B0__step_12_')
+>>> lfnT.append('21feb5_cycle_RL3_B0__step_13_')
+>>> lfnT.append('21feb5_cycle_RL3_B0__step_14_')
+>>> lfnT.append('21feb5_cycle_RL3_B0__step_15_')
+>>> lfnT.append('21feb5_cycle_RL3_B0__step_16_')
+>>> lfnT.append('21feb5_cycle_RL3_B0__step_17_')
+>>> lfnT.append('21feb5_cycle_RL3_B0__step_18_')
+>>> lfnT.append('21feb5_cycle_RL3_B0__step_19_')
+
+>>> lpdaT = getindivactionreward(lfnT)
+>>> lrat = plotHitMissRatioPerStep(lpdaT)
+>>> xlabel('training episodes',size=24)
+>>> ylabel('Hit/miss ratio',size=24)
+>>> savefig('21may26_21feb5_cycle_RL3_B0__20steps_hit_miss_ratio.png')
+
+>>> lhit, lmiss = [],[]
+>>> for pda in lpdaT:
+...   hit,miss = plotHitMiss(pda,asratio=False,asbin=False,ax=gca())
+...   lhit.append(hit); lmiss.append(miss)
+... 
+>>> plt.plot(lhit,'g-o')
+>>> plt.plot(lmiss,'r-o')
+>>> legend(('Hits','Miss'))
+>>> ylabel('total hits or miss per training episode',size=16)
+>>> xlabel('training episodes',size=16)
+>>> savefig('21may26_21feb5_cycle_RL3_B0__20steps_hit_miss_total.png')
+
+(base) hanwar@cycle:~/GamesProject/SMARTAgent$ python -i simdat.py backupcfg/21feb5_cycle_RL3_B0__step_0_sim.json 
+reading  backupcfg/21feb5_cycle_RL3_B0__step_0_sim.json
+-1
+lpop:  ['EV1', 'EV1DE', 'EV1DNE', 'EV1DN', 'EV1DNW', 'EV1DW', 'EV1DSW', 'EV1DS', 'EV1DSE', 'EMDOWN', 'EMUP', 'IM']
+loading data from 21feb5_cycle_RL3_B0__step_0_
+loading input images from data/21feb5_cycle_RL3_B0__step_0_InputImages.npy
+loading input images from data/21feb5_cycle_RL3_B0__step_0_InputImages.txt
+loaded simulation data 21feb5_cycle_RL3_B0__step_0_ on 21may26_
+EV1 0.14 Hz
+EV1DE 0.07 Hz
+EV1DNE 0.66 Hz
+EV1DN 0.93 Hz
+EV1DNW 0.18 Hz
+EV1DW 0.01 Hz
+EV1DSW 0.14 Hz
+EV1DS 0.93 Hz
+EV1DSE 0.69 Hz
+EA 0.14 Hz
+EA2 0.13 Hz
+EMDOWN 5.92 Hz
+EMUP 5.9 Hz
+IM 26.83 Hz
+IML 29.93 Hz
+stimModEV1 0.0 Hz
+stimModEV1DE 0.0 Hz
+stimModEV1DNE 0.0 Hz
+stimModEV1DN 0.0 Hz
+stimModEV1DNW 0.0 Hz
+stimModEV1DW 0.0 Hz
+stimModEV1DSW 0.0 Hz
+stimModEV1DS 0.0 Hz
+stimModEV1DSE 0.0 Hz
+stimNoiseEMDOWN_AM2 0.0 Hz
+stimNoiseEMUP_AM2 0.0 Hz
+>>> drawraster(dspkT,dspkID)
+>>> xlim(497e3,501e3)
+>>> gifpath()
+>>> savefig('21may26_21feb5_cycle_RL3_B0__step_0_rast.png')
+
+
+--
+2021may27:
+
+start controls on sam's recurrent models
+
+"that one is already on cycle
+12:40
+/home/samn/SMARTAgent/backupcfg/21may21_TARG0_N_cycle__step32_sim.json
+12:42
+the one from yesterday is uploaded to cycle too: 21may15_TARG0_K_gcp__step_31_sim.json"
+
+
+(base) hanwar@cycle:~/GamesProject/SMARTAgent$ cp /home/samn/SMARTAgent/backupcfg/21may21_TARG0_N_cycle__step_32_sim.json backupcfg/.
+
+(base) hanwar@cycle:~/GamesProject/SMARTAgent$ cp /home/samn/SMARTAgent/data/21may21_TARG0_N_cycle__step_32_* data/.
+
+(base) hanwar@cycle:~/GamesProject/SMARTAgent$ nano sn.json
+
+    "ResumeSim": 1,
+    "ResumeSimFromFile": "data/21may21_TARG0_N_cycle__step_32_synWeights_final.pkl"
+
+"name": "21may21_TARG0_N_cycle__step_32_AT_p0_",
+
+  "STDP": {
+    "AMPAI": {
+      "wbase": 5,
+      "wmax": 20,
+      "RLon": 0,
+      "STDPon": 0,
+      "RLlenhebb": 250,
+      "RLlenanti": 250,
+      "useRLexp": 0,
+      "RLhebbwt": 0.0,
+      "RLantiwt": 0.0,
+      "hebbwt": 0.0,
+      "antiwt": -0.0,
+
+    "AMPA": {
+      "wbase": 0.001,
+      "wmax": 16,
+      "RLon": 0,
+      "STDPon": 0,
+      "RLlenhebb": 200,
+      "RLlenanti": 200,
+      "useRLexp": 0,
+      "RLhebbwt": 0.0,
+      "RLantiwt": 0.0,
+      "hebbwt": 0.00,
+      "antiwt": -0.00,
+
+  "RL": {
+    "AMPAI": {
+      "wbase": 0.4,
+      "wmax": 30,
+      "RLon": 1,
+      "STDPon": 0,
+      "RLlenhebb": 1000,
+      "RLlenanti": 1000,
+      "useRLexp": 1,
+      "RLhebbwt": 0.0,
+      "RLantiwt": 0.0,
+      "hebbwt": 0,
+      "antiwt": 0,
+
+
+    "AMPA": {
+      "wbase": 0.001,
+      "wmax": 30,
+      "RLon": 1,
+      "STDPon": 0,
+      "RLlenhebb": 10000,
+      "RLlenanti": 500,
+      "useRLexp": 1,
+      "RLhebbwt": 0.0,
+      "RLantiwt": 0.0,
+      "hebbwt": 0.0,
+      "antiwt": 0.0,
+
+    "NMDA": {
+      "wbase": 1e-06,
+      "wmax": 7.5e-05,
+      "RLon": 0,
+      "STDPon": 0,
+      "RLlenhebb": 1000,
+      "RLlenanti": 1000,
+      "useRLexp": 1,
+      "RLhebbwt": 0,
+      "RLantiwt": -0.0,
+      "hebbwt": 0,
+      "antiwt": 0,
+
+
+(base) hanwar@cycle:~/GamesProject/SMARTAgent$ mpiexec -n 30 nrniv -python -mpi sim.py sn.json
+
+
+
+
+
+(base) hanwar@cycle:~/GamesProject/SMARTAgent$ cp /home/samn/SMARTAgent/data/21may15_TARG0_K_gcp__step_31_ backupcfg/.
+(base) hanwar@cycle:~/GamesProject/SMARTAgent$ cp /home/samn/SMARTAgent/data/21may15_TARG0_K_gcp__step_31_* data/.
+(base) hanwar@cycle:~/GamesProject/SMARTAgent$ cp backupcfg/21may15_TARG0_K_gcp__step_31_sim.json sn.json
+(base) hanwar@cycle:~/GamesProject/SMARTAgent$ nano sn.json
+
+    "ResumeSim": 1,
+    "ResumeSimFromFile": "data/21may15_TARG0_K_gcp__step_31_synWeights_final.pkl"
+
+    "name": "21may15_TARG0_K_gcp__step_31_AT_p0_",
+RLhebbwt: 0
+
+(base) hanwar@cycle:~/GamesProject/SMARTAgent$ mpiexec -n 30 nrniv -python -mpi sim.py sn.json
+
+perf = 0.56
+--
+started sim     "name": "21may15_TARG0_K_gcp__step_31_AT_p1_", with yball = 100, yracket = 40 position.
+
+Hits:  20 Missed:  29
+perf = 0.69
+----------
+
+started sim "name": "21may15_TARG0_K_gcp__step_31_AT_p2_", and     "yball": 120,
+    "yracket": 20,
+Hits:  13 Missed:  41
+perf = 0.32
+--
+started sim "name": "21may15_TARG0_K_gcp__step_31_AT_p3_",
+    "yball": 20,
+    "yracket": 120,
+
+Hits:  18 Missed:  32
+perf = 0.56
+--
+
+starting on May 29, 2021
+
+"name": "21may15_TARG0_K_gcp__step_31_AT_p4_",
+    "yball": 40,
+    "yracket": 100,
+
+Hits:  18 Missed:  32
+perf = 0.56
+
+--
+
+starting on May 30, 2021
+
+"name": "21may15_TARG0_K_gcp__step_31_AT_p5_",
+    "yball": 60,
+    "yracket": 100,
+
+
+
+----
+>>> cseqInds0_BT = lSimilarSeqs_allBT[seqs2plot_allBT[0]]
+>>> c0_v1_up_BT, c0_v1_down_BT, c0_ea_up_BT,c0_ea_down_BT, c0_ea2_up_BT, c0_ea2_down_BT, c0_up_down_BT = getActCorrAcrossAreasRepWiseIndiv(dStepAct_allBT,cseqInds0_BT)
+>>> cseqInds0_AT18 = lSimilarSeqs_allAT18[seqs2plot_allAT18[0]]
+>>> c0_v1_up_AT18, c0_v1_down_AT18, c0_ea_up_AT18,c0_ea_down_AT18, c0_ea2_up_AT18, c0_ea2_down_AT18, c0_up_down_AT18 = getActCorrAcrossAreasRepWiseIndiv(dStepAct_allAT18,cseqInds0_AT18)
+>>> cseqInds0_AT19 = lSimilarSeqs_allAT19[seqs2plot_allAT19[0]]
+>>> c0_v1_up_AT19, c0_v1_down_AT19, c0_ea_up_AT19,c0_ea_down_AT19, c0_ea2_up_AT19, c0_ea2_down_AT19, c0_up_down_AT19 = getActCorrAcrossAreasRepWiseIndiv(dStepAct_allAT19,cseqInds0_AT19)
+
+>>> cseqInds1_BT = lSimilarSeqs_allBT[seqs2plot_allBT[1]]
+>>> c1_v1_up_BT, c1_v1_down_BT, c1_ea_up_BT,c1_ea_down_BT, c1_ea2_up_BT, c1_ea2_down_BT, c1_up_down_BT = getActCorrAcrossAreasRepWiseIndiv(dStepAct_allBT,cseqInds1_BT)
+>>> cseqInds1_AT18 = lSimilarSeqs_allAT18[seqs2plot_allAT18[1]]
+>>> c1_v1_up_AT18, c1_v1_down_AT18, c1_ea_up_AT18,c1_ea_down_AT18, c1_ea2_up_AT18, c1_ea2_down_AT18, c1_up_down_AT18 = getActCorrAcrossAreasRepWiseIndiv(dStepAct_allAT18,cseqInds1_AT18)
+>>> cseqInds1_AT19 = lSimilarSeqs_allAT19[seqs2plot_allAT19[1]]
+>>> c1_v1_up_AT19, c1_v1_down_AT19, c1_ea_up_AT19,c1_ea_down_AT19, c1_ea2_up_AT19, c1_ea2_down_AT19, c1_up_down_AT19 = getActCorrAcrossAreasRepWiseIndiv(dStepAct_allAT19,cseqInds1_AT19)
+
+
+>>> cseqInds3_BT = lSimilarSeqs_allBT[seqs2plot_allBT[24]]
+>>> c3_v1_up_BT, c3_v1_down_BT, c3_ea_up_BT,c3_ea_down_BT, c3_ea2_up_BT, c3_ea2_down_BT, c3_up_down_BT = getActCorrAcrossAreasRepWiseIndiv(dStepAct_allBT,cseqInds3_BT)
+>>> cseqInds3_AT18 = lSimilarSeqs_allAT18[seqs2plot_allAT18[19]]
+>>> c3_v1_up_AT18, c3_v1_down_AT18, c3_ea_up_AT18,c3_ea_down_AT18, c3_ea2_up_AT18, c3_ea2_down_AT18, c3_up_down_AT18 = getActCorrAcrossAreasRepWiseIndiv(dStepAct_allAT18,cseqInds3_AT18)
+>>> cseqInds3_AT19 = lSimilarSeqs_allAT19[seqs2plot_allAT19[16]]
+>>> c3_v1_up_AT19, c3_v1_down_AT19, c3_ea_up_AT19,c3_ea_down_AT19, c3_ea2_up_AT19, c3_ea2_down_AT19, c3_up_down_AT19 = getActCorrAcrossAreasRepWiseIndiv(dStepAct_allAT19,cseqInds3_AT19)
+
+
+>>> cseqInds4_BT = lSimilarSeqs_allBT[seqs2plot_allBT[21]]
+>>> c4_v1_up_BT, c4_v1_down_BT, c4_ea_up_BT,c4_ea_down_BT, c4_ea2_up_BT, c4_ea2_down_BT, c4_up_down_BT = getActCorrAcrossAreasRepWiseIndiv(dStepAct_allBT,cseqInds4_BT)
+>>> cseqInds4_AT18 = lSimilarSeqs_allAT18[seqs2plot_allAT18[22]]
+>>> c4_v1_up_AT18, c4_v1_down_AT18, c4_ea_up_AT18,c4_ea_down_AT18, c4_ea2_up_AT18, c4_ea2_down_AT18, c4_up_down_AT18 = getActCorrAcrossAreasRepWiseIndiv(dStepAct_allAT18,cseqInds4_AT18)
+>>> cseqInds4_AT19 = lSimilarSeqs_allAT19[seqs2plot_allAT19[34]]
+>>> c4_v1_up_AT19, c4_v1_down_AT19, c4_ea_up_AT19,c4_ea_down_AT19, c4_ea2_up_AT19, c4_ea2_down_AT19, c4_up_down_AT19 = getActCorrAcrossAreasRepWiseIndiv(dStepAct_allAT19,cseqInds4_AT19)
+
+>>> c0_v1_ea_BT, c0_v1_ea2_BT, c0_ea_ea2_BT = getIntermActCorrs(dStepAct_allBT,cseqInds0_BT)
+>>> c0_v1_ea_AT18, c0_v1_ea2_AT18, c0_ea_ea2_AT18 = getIntermActCorrs(dStepAct_allAT18,cseqInds0_AT18)
+
