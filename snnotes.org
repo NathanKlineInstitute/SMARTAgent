@@ -33140,3 +33140,43 @@ savefig(gifpath()+'all_steps_avg_weight.png') # [[./gif/21jun2_21may26_TARG0_O_g
 
 this simulation still has a long way to go ... 
 
+** dh code optimization for getSpikesWithInterval
+
+dh pointed out problem with getSpikesWithInterval, since all spikes are checked
+which takes longer and longer as the simulation progresses
+
+original code is:
+
+def getSpikesWithInterval (trange = None, neuronal_pop = None):
+  if len(neuronal_pop) < 1: return 0.0
+  spkts = sim.simData['spkt']
+  spkids = sim.simData['spkid']
+  pop_spikes = 0
+  if len(spkts)>0:
+    for i in range(len(spkids)):
+      if trange[0] <= spkts[i] <= trange[1] and spkids[i] in neuronal_pop:
+        pop_spikes += 1
+  return pop_spikes
+
+here's his replacement:
+
+def getSpikesWithInterval(trange=None, neuronal_pop=None):
+  if len(neuronal_pop) < 1:
+    return 0.0
+  spkts = sim.simData['spkt']
+  spkids = sim.simData['spkid']
+  pop_spikes = dict([(v,0) for v in set(neuronal_pop.values())])
+  if len(spkts) > 0:
+    for idx in range(len(spkids)):
+      i = len(spkids) - 1 - idx
+      if trange[0] <= spkts[i] <= trange[1] and spkids[i] in neuronal_pop:
+        pop_spikes[neuronal_pop[spkids[i]]] += 1
+      if trange[0] > spkts[i]:
+        break
+  return pop_spikes
+
+however, that new code has different return type - dictionary, with number of spikes
+in a population indexed by neuronal ID, so make sure to adjust call code
+
+DH code is here: https://github.com/NathanKlineInstitute/netpyne-STDP
+
