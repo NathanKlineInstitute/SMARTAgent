@@ -33039,7 +33039,7 @@ fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward
  [[./gif/21jun1_21may26_TARG0_O_gcp__step_15__with_reward_input.mp4]]
 
 * 21jun2
-** check 21may25_TARG0_K2_gcp__step_32_
+** check 21may25_TARG0_K2_gcp__step_32_ -->> stopped after step 33, hyperexcit
 
 python -i simdat.py backupcfg/21may25_TARG0_K2_gcp__step_32_sim.json
 
