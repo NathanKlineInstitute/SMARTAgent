@@ -24932,9 +24932,326 @@ starting on May 30, 2021
     "yball": 60,
     "yracket": 100,
 
+Hits:  17 Missed:  35
+perf = 0.49
 
+-- 
+
+starting on June 1, 2021
+
+
+    "yball": 80,
+    "yracket": 80,
+
+"name": "21may15_TARG0_K_gcp__step_31_AT_p6_",
+
+Hits:  13 Missed:  41
+p = 0.32
+
+-----
+
+    "yball": 120,
+    "yracket": 120,
+
+"name": "21may15_TARG0_K_gcp__step_31_AT_p7_",
+
+Hits:  18 Missed:  32
+p = 0.56
 
 ----
+
+    "yball": 40,
+    "yracket": 40,
+"name": "21may15_TARG0_K_gcp__step_31_AT_p8_",
+Hits:  18 Missed:  32
+p = 0.56
+
+----
+Before Training:
+
+----
+    "yball": 40,
+    "yracket": 40,
+
+"ResumeSim": 0,
+"name": "21may15_TARG0_K_gcp__step_31_BT_p8_",
+
+Hits:  11 Missed:  45
+perf = 0.24
+-----
+
+    "yball": 120,
+    "yracket": 120,
+
+"ResumeSim": 0,
+"name": "21may15_TARG0_K_gcp__step_31_BT_p7_",
+
+Hits:  11 Missed:  45
+perf = 0.24
+-----
+
+    "yball": 80,
+    "yracket": 80,
+
+"name": "21may15_TARG0_K_gcp__step_31_BT_p6_",
+
+Hits:  12 Missed:  43
+perf = 0.28
+-----
+
+
+    "yball": 60,
+    "yracket": 100,
+
+ "name": "21may15_TARG0_K_gcp__step_31_BT_p5_",
+
+Hits:  13 Missed:  41
+perf = 0.32
+
+------
+
+    "yball": 40,
+    "yracket": 100,
+
+"name": "21may15_TARG0_K_gcp__step_31_BT_p4_",
+
+Hits:  11 Missed:  45
+perf = 0.24
+------
+
+    "yball": 20,
+    "yracket": 120,
+"name": "21may15_TARG0_K_gcp__step_31_BT_p3_",
+
+Hits:  11 Missed:  45
+perf = 0.24
+
+-------
+
+"yball": 120,
+    "yracket": 20,
+
+"name": "21may15_TARG0_K_gcp__step_31_BT_p2_",
+
+Hits:  14 Missed:  39
+perf = 0.36
+-------
+    "yball": 100,
+    "yracket": 40,
+"name": "21may15_TARG0_K_gcp__step_31_BT_p1_",
+
+Hits:  11 Missed:  45
+perf = 0.24
+
+-------
+
+    "yball": 80,
+    "yracket": 40,
+"name": "21may15_TARG0_K_gcp__step_31_BT_p0_",
+
+Hits:  12 Missed:  43
+perf: 0.28
+
+------
+analyzing controls:
+
+
+>>> lfnBT  = ['21may15_TARG0_K_gcp__step_31_BT_p0_']
+>>> lfnBT.append('21may15_TARG0_K_gcp__step_31_BT_p1_')
+>>> lfnBT.append('21may15_TARG0_K_gcp__step_31_BT_p2_')
+>>> lfnBT.append('21may15_TARG0_K_gcp__step_31_BT_p3_')
+>>> lfnBT.append('21may15_TARG0_K_gcp__step_31_BT_p4_')
+>>> lfnBT.append('21may15_TARG0_K_gcp__step_31_BT_p5_')
+>>> lfnBT.append('21may15_TARG0_K_gcp__step_31_BT_p6_')
+>>> lfnBT.append('21may15_TARG0_K_gcp__step_31_BT_p7_')
+>>> lfnBT.append('21may15_TARG0_K_gcp__step_31_BT_p8_')
+>>> lfnAT  = ['21may15_TARG0_K_gcp__step_31_AT_p0_']
+>>> lfnAT.append('21may15_TARG0_K_gcp__step_31_AT_p1_')
+>>> lfnAT.append('21may15_TARG0_K_gcp__step_31_AT_p2_')
+>>> lfnAT.append('21may15_TARG0_K_gcp__step_31_AT_p3_')
+>>> lfnAT.append('21may15_TARG0_K_gcp__step_31_AT_p4_')
+>>> lfnAT.append('21may15_TARG0_K_gcp__step_31_AT_p5_')
+>>> lfnAT.append('21may15_TARG0_K_gcp__step_31_AT_p6_')
+>>> lfnAT.append('21may15_TARG0_K_gcp__step_31_AT_p7_')
+>>> lfnAT.append('21may15_TARG0_K_gcp__step_31_AT_p8_')
+>>> lpdaAT = getindivactionreward(lfnAT)
+>>> lpdaBT = getindivactionreward(lfnBT)
+
+
+>>> TotalHits = []
+>>> TotalMissed = []
+>>> for i in range(len(lpdaBT)):
+...   Hit_Missed = np.array(lpdaBT[i].hit)
+...   allHit = np.where(Hit_Missed==1,1,0)
+...   allMissed = np.where(Hit_Missed==-1,1,0)
+...   TotalHits.append(np.sum(allHit)) 
+...   TotalMissed.append(np.sum(allMissed)) 
+
+>>> TotalHits_AT = []
+>>> TotalMissed_AT = []
+>>> for i in range(len(lpdaAT)):
+...   Hit_Missed = np.array(lpdaAT[i].hit)
+...   allHit = np.where(Hit_Missed==1,1,0)
+...   allMissed = np.where(Hit_Missed==-1,1,0)
+...   TotalHits_AT.append(np.sum(allHit)) 
+...   TotalMissed_AT.append(np.sum(allMissed)) 
+
+>>> plt.bar([0,1],[np.mean(np.divide(TotalHits,TotalMissed)), np.mean(np.divide(TotalHits_AT,TotalMissed_AT))])
+<BarContainer object of 2 artists>
+>>> plt.xticks([0,1],['Before training','After training'])
+([<matplotlib.axis.XTick object at 0x7f1af7ef90d0>, <matplotlib.axis.XTick object at 0x7f1af7ef9b50>], <a list of 2 Text xticklabel objects>)
+>>> ylabel('Hit/Miss')
+Text(38.3472,0.5,'Hit/Miss')
+>>> plt.plot([-0.2,-0.15,-0.1,-0.05,0,0.05,0.1,0.15,0.2],np.divide(TotalHits,TotalMissed),'ko')
+[<matplotlib.lines.Line2D object at 0x7f1b00700a10>]
+>>> plt.plot([0.8,0.85,0.9,0.95,1,1.05,1.1,1.15,1.2],np.divide(TotalHits_AT,TotalMissed_AT),'ko')
+[<matplotlib.lines.Line2D object at 0x7f1b00b2fbd0>]
+>>> savefig('21june3_21may15_TARG0_K_gcp__step_31_BTvsAT_perf.png')
+
+>>> lpdaT = getindivactionreward(lfnT)
+>>> plotHitMiss(lpdaT[0],asratio=True,lclr=['r'])
+0.88
+>>> xlabel('Time [ms]')
+>>> title('Training episode 31')
+>>> savefig('21june3_21may15_TARG0_K_gcp__step_31_perf.png')
+
+>>> lfnT.append('21may15_TARG0_K_gcp__step_38_')
+>>> lfnT.append('21may15_TARG0_K_gcp__step_39_')
+>>> lpdaT = getindivactionreward(lfnT)
+>>> lrat = plotHitMissRatioPerStep(lpdaT)
+>>> xlabel('training episodes',size=14)
+Text(0.5,19.5222,'training episodes')
+>>> ylabel('Hit/miss',size=14)
+Text(38.3472,0.5,'Hit/miss')
+>>> ylabel('Hit/Miss',size=14)
+Text(38.3472,0.5,'Hit/Miss')
+>>> savefig('21june3_21may15_TARG0_K_gcp__40steps_hit_miss_ratio.png')
+
+
+>>> lhit, lmiss = [], []
+>>> for pda in lpdaT:
+...   hit, miss = plotHitMiss(pda,asratio=False,asbin=False,ax=gca())
+...   lhit.append(hit); lmiss.append(miss)
+... 
+>>> plt.plot(lhit,'g-o')
+[<matplotlib.lines.Line2D object at 0x7fb729498950>]
+>>> plt.plot(lmiss,'r-o')
+[<matplotlib.lines.Line2D object at 0x7fb775d63bd0>]
+>>> legend(('Hits','Miss'))
+<matplotlib.legend.Legend object at 0x7fb72939de50>
+>>> ylabel('total hits or miss per training episode',size=14)
+Text(43.5972,0.5,'total hits or miss per training episode')
+>>> xlabel('training episodes',size=14)
+Text(0.5,19.5222,'training episodes')
+>>> savefig('21june3_21may15_TARG0_K_gcp__40steps_hit_miss_total.png')
+-------------------
+Do same for Feedforward model
+>>> lfnBT = ['21feb5_cycle_RL3_B0_BT_p0_']
+>>> lfnBT.append('21feb5_cycle_RL3_B0_BT_p1_')
+>>> lfnBT.append('21feb5_cycle_RL3_B0_BT_p2_')
+>>> lfnBT.append('21feb5_cycle_RL3_B0_BT_p3_')
+>>> lfnBT.append('21feb5_cycle_RL3_B0_BT_p4_')
+>>> lfnBT.append('21feb5_cycle_RL3_B0_BT_p5_')
+>>> lpdaBT = getindivactionreward(lfnBT)
+
+>>> lfnAT18 = ['21feb5_cycle_RL3_B0_AT__step_18_p0_']
+>>> lfnAT18.append('21feb5_cycle_RL3_B0_AT__step_18_p1_')
+>>> lfnAT18.append('21feb5_cycle_RL3_B0_AT__step_18_p2_')
+>>> lfnAT18.append('21feb5_cycle_RL3_B0_AT__step_18_p3_')
+>>> lfnAT18.append('21feb5_cycle_RL3_B0_AT__step_18_p4_')
+>>> lfnAT18.append('21feb5_cycle_RL3_B0_AT__step_18_p5_')
+>>> lpdaAT18 = getindivactionreward(lfnAT18)
+
+>>> lfnAT19 = ['21feb5_cycle_RL3_B0_AT__step_19_p0_']
+>>> lfnAT19.append('21feb5_cycle_RL3_B0_AT__step_19_p1_')
+>>> lfnAT19.append('21feb5_cycle_RL3_B0_AT__step_19_p2_')
+>>> lfnAT19.append('21feb5_cycle_RL3_B0_AT__step_19_p3_')
+>>> lfnAT19.append('21feb5_cycle_RL3_B0_AT__step_19_p4_')
+>>> lfnAT19.append('21feb5_cycle_RL3_B0_AT__step_19_p5_')
+>>> lpdaAT19 = getindivactionreward(lfnAT19)
+
+>>> TotalHits_BT = []
+>>> TotalMissed_BT = []
+>>> for i in range(len(lfnBT)):
+...   Hit_Missed = np.array(lpdaBT[i].hit)
+...   allHit = np.where(Hit_Missed==1,1,0)
+...   allMissed = np.where(Hit_Missed==-1,1,0)
+...   TotalHits_BT.append(np.sum(allHit))
+...   TotalMissed_BT.append(np.sum(allMissed))
+... 
+>>> TotalHits
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+NameError: name 'TotalHits' is not defined
+>>> TotalHits_BT
+[45, 51, 47, 47, 50, 48]
+>>> TotalMissed_BT
+[132, 120, 150, 150, 127, 139]
+>>> 
+>>> 
+>>> TotalHits_AT18 = []
+>>> TotalMissed_AT18 = []
+>>> for i in range(len(lfnAT18)):
+...   Hit_Missed = np.array(lpdaAT18[i].hit)
+...   allHit = np.where(Hit_Missed==1,1,0)
+...   allMissed = np.where(Hit_Missed==-1,1,0)
+...   TotalHits_AT18.append(np.sum(allHit))
+...   TotalMissed_AT18.append(np.sum(allMissed))
+... 
+>>> TotalHits_AT19 = []
+>>> TotalMissed_AT19 = []
+>>> for i in range(len(lfnAT19)):
+...   Hit_Missed = np.array(lpdaAT19[i].hit)
+...   allHit = np.where(Hit_Missed==1,1,0)
+...   allMissed = np.where(Hit_Missed==-1,1,0)
+...   TotalHits_AT19.append(np.sum(allHit))
+...   TotalMissed_AT19.append(np.sum(allMissed))
+... 
+
+>>> plt.bar([0,1,2],[np.mean(np.divide(TotalHits_BT,TotalMissed_BT)),np.mean(np.divide(TotalHits_AT18,TotalMissed_AT18)),np.mean(np.divide(TotalHits_AT19,TotalMissed_AT19))])
+>>> plt.xticks([0,1,2],['Before training','After training\n episode 18','After training\n episode 19'])
+>>> ylabel('Hit/Miss')
+>>> plt.plot([-0.15,-0.1,-0.05,0,0.05,0.1],np.divide(TotalHits_BT,TotalMissed_BT),'ko')
+>>> plt.plot([0.85,0.9,0.95,1,1.05,1.1],np.divide(TotalHits_AT18,TotalMissed_AT18),'ko')
+>>> plt.plot([1.85,1.9,1.95,2,2.05,2.1],np.divide(TotalHits_AT19,TotalMissed_AT19),'ko')
+>>> savefig('21june3_21feb5_cycle_RL3_B0_BTvsAT18vsAT19_perf.png')
+
+--------
+Do same for recurrent model
+
+>>> lfnT.append('21jan6_TARG4_gcp__step_17_')
+>>> lfnT.append('21jan6_TARG4_gcp__step_18_')
+>>> lfnT.append('21jan6_TARG4_gcp__step_19_')
+>>> lfnT.append('21jan11_TARG4_gcp__step_0_')
+>>> lfnT.append('21jan11_TARG4_gcp__step_1_')
+>>> lfnT.append('21jan11_TARG4_gcp__step_2_')
+>>> lpdaT = getindivactionreward(lfnT)
+>>> lrat = plotHitMissRatioPerStep(lpdaT)
+>>> xlabel('training episodes',size=14)
+Text(0.5,19.5222,'training episodes')
+>>> ylabel('Hit/Miss',size=14)
+Text(27.8472,0.5,'Hit/Miss')
+>>> savefig('21june3_21jan6_TARG4_gcp__22steps_hit_miss_ratio.png')
+>>> lhit, lmiss = [], []
+>>> for pda in lpdaT:
+...   hit, miss = plotHitMiss(pda,asratio=False,asbin=False,ax=gca())
+...   lhit.append(hit); lmiss.append(miss)
+... 
+>>> plt.plot(lhit,'g-o')
+[<matplotlib.lines.Line2D object at 0x7fa697f3a250>]
+>>> plt.plot(lmiss,'r-o')
+[<matplotlib.lines.Line2D object at 0x7fa68f810810>]
+>>> legend(('Hits','Miss'))
+<matplotlib.legend.Legend object at 0x7fa664da4050>
+>>> ylabel('total hits or miss per training episode',size=14)
+Text(43.5972,0.5,'total hits or miss per training episode')
+>>> xlabel('training episodes',size=14)
+Text(0.5,19.5222,'training episodes')
+>>> savefig('21june3_21jan6_TARG4_gcp__22steps_hit_miss_total.png')
+
+
+----------------------------------------------------------
+
 >>> cseqInds0_BT = lSimilarSeqs_allBT[seqs2plot_allBT[0]]
 >>> c0_v1_up_BT, c0_v1_down_BT, c0_ea_up_BT,c0_ea_down_BT, c0_ea2_up_BT, c0_ea2_down_BT, c0_up_down_BT = getActCorrAcrossAreasRepWiseIndiv(dStepAct_allBT,cseqInds0_BT)
 >>> cseqInds0_AT18 = lSimilarSeqs_allAT18[seqs2plot_allAT18[0]]
@@ -24967,4 +25284,510 @@ starting on May 30, 2021
 
 >>> c0_v1_ea_BT, c0_v1_ea2_BT, c0_ea_ea2_BT = getIntermActCorrs(dStepAct_allBT,cseqInds0_BT)
 >>> c0_v1_ea_AT18, c0_v1_ea2_AT18, c0_ea_ea2_AT18 = getIntermActCorrs(dStepAct_allAT18,cseqInds0_AT18)
+
+--- 
+compoare distribution of correlations before training with after training.
+
+
+>>> np.array(c0_v1_up_BT).shape
+(53, 1920000)
+>>> np.array(c0_v1_up_AT18).shape
+(45, 1920000)
+>>> np.array(c0_v1_up_AT19).shape
+(44, 1920000)
+
+53, 45 and 44 repeats respectively.
+
+>>> c0_h19 = np.histogram(c0_v1_up_AT19,bins=0.01*arange(160)-0.5) 
+>>> c0_h18 = np.histogram(c0_v1_up_AT18,bins=0.01*arange(160)-0.5) 
+>>> c0_h0 = np.histogram(c0_v1_up_BT,bins=0.01*arange(160)-0.5) 
+>>> plt.plot(c0_h0[1][:-1],c0_h0[0],'-o')
+>>> plt.plot(c0_h18[1][:-1],c0_h18[0],'-o')
+>>> plt.plot(c0_h19[1][:-1],c0_h19[0],'-o')
+>>> xlabel('pearson correlation coefficient')
+>>> ylabel('# of neuron pairs')
+>>> title('EV1-EMUP')
+>>> legend(('Before training','After training episode 18','After training episode 19'))
+>>> xlim(-0.3,0.3)
+>>> savefig('21june3_21feb5_cycle_RL3_B0_BTvsAT18vsAT19.png')
+
+
+>>> c0_h0 = np.histogram(c0_v1_down_BT,bins=0.01*arange(160)-0.5) 
+>>> c0_h18 = np.histogram(c0_v1_down_AT18,bins=0.01*arange(160)-0.5) 
+>>> c0_h19 = np.histogram(c0_v1_down_AT19,bins=0.01*arange(160)-0.5) 
+>>> plt.plot(c0_h0[1][:-1],c0_h0[0],'-o')
+>>> plt.plot(c0_h18[1][:-1],c0_h18[0],'-o')
+>>> plt.plot(c0_h19[1][:-1],c0_h19[0],'-o')
+>>> xlabel('pearson correlation coefficient')
+>>> ylabel('# of neuron pairs')
+>>> legend(('Before training','After training episode 18','After training episode 19'))
+>>> title('EV1-EMDOWN')
+>>> xlim(-0.3,0.3)
+>>> savefig('21june3_21feb5_cycle_RL3_B0_BTvsAT18vsAT19_EV1_EMDown.png')
+
+
+>>> c0_h0 = np.histogram(c0_ea_up_BT,bins=0.01*arange(160)-0.5) 
+>>> c0_h18 = np.histogram(c0_ea_up_AT18,bins=0.01*arange(160)-0.5) 
+>>> c0_h19 = np.histogram(c0_ea_up_AT19,bins=0.01*arange(160)-0.5) 
+>>> plt.plot(c0_h0[1][:-1],c0_h0[0],'-o')
+>>> plt.plot(c0_h18[1][:-1],c0_h18[0],'-o')
+>>> plt.plot(c0_h19[1][:-1],c0_h19[0],'-o')
+>>> legend(('Before training','After training episode 18','After training episode 19'))
+>>> ylabel('# of neuron pairs')
+>>> xlabel('pearson correlation coefficient')
+>>> title('EA-EMUP')
+>>> xlim(-0.2,0.6)
+>>> savefig('21june3_21feb5_cycle_RL3_B0_BTvsAT18vsAT19_EA_EMUP.png')
+
+>>> c0_h0 = np.histogram(c0_ea2_up_BT,bins=0.01*arange(160)-0.5) 
+>>> c0_h18 = np.histogram(c0_ea2_up_AT18,bins=0.01*arange(160)-0.5) 
+>>> c0_h19 = np.histogram(c0_ea2_up_AT19,bins=0.01*arange(160)-0.5) 
+>>> plt.plot(c0_h0[1][:-1],c0_h0[0],'-o')
+>>> plt.plot(c0_h18[1][:-1],c0_h18[0],'-o')
+>>> plt.plot(c0_h19[1][:-1],c0_h19[0],'-o')
+>>> xlabel('pearson correlation coefficient')
+>>> ylabel('# of neuron pairs')
+>>> xlim(-0.2,0.8)
+>>> legend(('Before training','After training episode 18','After training episode 19'))
+>>> title('EA2-EMUP')
+>>> savefig('21june3_21feb5_cycle_RL3_B0_BTvsAT18vsAT19_EA2_EMUP.png')
+
+>>> c0_h0 = np.histogram(c0_ea_down_BT,bins=0.01*arange(160)-0.5) 
+>>> c0_h18 = np.histogram(c0_ea_down_AT18,bins=0.01*arange(160)-0.5) 
+>>> c0_h19 = np.histogram(c0_ea_down_AT19,bins=0.01*arange(160)-0.5) 
+>>> plt.plot(c0_h0[1][:-1],c0_h0[0],'-o')
+>>> plt.plot(c0_h18[1][:-1],c0_h18[0],'-o')
+>>> plt.plot(c0_h19[1][:-1],c0_h19[0],'-o')
+>>> ylabel('# of neuron pairs')
+>>> legend(('Before training','After training episode 18','After training episode 19'))
+>>> title('EA-EMDOWN')
+>>> xlabel('pearson correlation coefficient')
+>>> xlim(-0.2,0.6)
+>>> savefig('21june3_21feb5_cycle_RL3_B0_BTvsAT18vsAT19_EA_EMDOWN.png')
+
+>>> c0_h0 = np.histogram(c0_ea2_down_BT,bins=0.01*arange(160)-0.5) 
+>>> c0_h18 = np.histogram(c0_ea2_down_AT18,bins=0.01*arange(160)-0.5) 
+>>> c0_h19 = np.histogram(c0_ea2_down_AT19,bins=0.01*arange(160)-0.5) 
+>>> plt.plot(c0_h0[1][:-1],c0_h0[0],'-o')
+>>> plt.plot(c0_h18[1][:-1],c0_h18[0],'-o')
+>>> plt.plot(c0_h19[1][:-1],c0_h19[0],'-o')
+>>> xlim(-0.2,0.8)
+>>> xlabel('pearson correlation coefficient')
+>>> title('EA2-EMDOWN')
+>>> legend(('Before training','After training episode 18','After training episode 19'))
+>>> ylabel('# of neuron pairs')
+>>> savefig('21june3_21feb5_cycle_RL3_B0_BTvsAT18vsAT19_EA2_EMDOWN.png')
+
+>>> c0_h0 = np.histogram(c0_up_down_BT,bins=0.01*arange(160)-0.5) 
+>>> c0_h18 = np.histogram(c0_up_down_AT18,bins=0.01*arange(160)-0.5) 
+>>> c0_h19 = np.histogram(c0_up_down_AT19,bins=0.01*arange(160)-0.5) 
+>>> plt.plot(c0_h0[1][:-1],c0_h0[0],'-o')
+>>> plt.plot(c0_h18[1][:-1],c0_h18[0],'-o')
+>>> plt.plot(c0_h19[1][:-1],c0_h19[0],'-o')
+>>> ylabel('# of neuron pairs')
+>>> legend(('Before training','After training episode 18','After training episode 19'))
+>>> xlabel('pearson correlation coefficient')
+>>> title('EMUP-EMDOWN')
+>>> xlim(-0.2,1)
+>>> savefig('21june3_21feb5_cycle_RL3_B0_BTvsAT18vsAT19_EMUP_EMDOWN.png')
+
+----
+Find how variable neuronal activity is for repeated presentation of input sequences.
+
+... Most of the variance comes from the pixels activated by the racket.
+... Almost negligible variance comes from the pixels activated by the ball.
+... The variance in input could be the potential source driving the variabilitly in responses (thus interfering with learned behavior).
+
+
+>>> s0_cumact_v1_BT = np.array(dCumAct_allBT['EV1'])[cseqInds0_BT]
+>>> s0_cumact_v1_BT.shape
+(53, 6400)
+>>> s0_cumact_v1_AT18 = np.array(dCumAct_allAT18['EV1'])[cseqInds0_AT18]
+>>> s0_cumact_v1_AT19 = np.array(dCumAct_allAT19['EV1'])[cseqInds0_AT19]
+
+
+>>> plt.imshow(np.reshape(np.nanvar(s0_cumact_v1_BT,0),(80,80)))
+>>> colorbar()
+>>> title('seq 0 - var[EV1] - BT')
+>>> savefig('21june3_21feb5_cycle_RL3_B0_BT_s0_varEV1.png')
+
+>>> plt.imshow(np.reshape(np.nanvar(s0_cumact_v1_AT18,0),(80,80)))
+>>> title('seq 0 - var[EV1] - AT18')
+>>> colorbar()
+>>> savefig('21june3_21feb5_cycle_RL3_B0_AT18_s0_varEV1.png')
+
+>>> plt.imshow(np.reshape(np.nanvar(s0_cumact_v1_AT19,0),(80,80)))
+>>> colorbar()
+>>> title('seq 0 - var[EV1] - AT19')
+>>> savefig('21june3_21feb5_cycle_RL3_B0_AT19_s0_varEV1.png')
+
+
+>>> s0_cumact_ea_BT = np.array(dCumAct_allBT['EA'])[cseqInds0_BT]
+>>> s0_cumact_ea2_BT = np.array(dCumAct_allBT['EA2'])[cseqInds0_BT]
+>>> s0_cumact_emup_BT = np.array(dCumAct_allBT['EMUP'])[cseqInds0_BT]
+>>> s0_cumact_emdown_BT = np.array(dCumAct_allBT['EMDOWN'])[cseqInds0_BT]
+>>> s0_cumact_ea_BT.shape
+(53, 1400)
+>>> s0_cumact_ea2_BT.shape
+(53, 1400)
+>>> s0_cumact_emup_BT.shape
+(53, 300)
+>>> s0_cumact_emdown_BT.shape
+(53, 300)
+
+>>> s0_cumact_ea_AT18 = np.array(dCumAct_allAT18['EA'])[cseqInds0_AT18]
+>>> s0_cumact_ea2_AT18 = np.array(dCumAct_allAT18['EA2'])[cseqInds0_AT18]
+>>> s0_cumact_emup_AT18 = np.array(dCumAct_allAT18['EMUP'])[cseqInds0_AT18]
+>>> s0_cumact_emdown_AT18 = np.array(dCumAct_allAT18['EMDOWN'])[cseqInds0_AT18]
+>>> s0_cumact_ea_AT19 = np.array(dCumAct_allAT19['EA'])[cseqInds0_AT19]
+>>> s0_cumact_ea2_AT19 = np.array(dCumAct_allAT19['EA2'])[cseqInds0_AT19]
+>>> s0_cumact_emup_AT19 = np.array(dCumAct_allAT19['EMUP'])[cseqInds0_AT19]
+>>> s0_cumact_emdown_AT19 = np.array(dCumAct_allAT19['EMDOWN'])[cseqInds0_AT19]
+
+
+>>> plt.imshow(np.reshape(np.nanvar(s0_cumact_ea_BT,0),(40,35)))
+>>> colorbar()
+>>> title('seq 0 - var[EA] - BT')
+>>> savefig('21june3_21feb5_cycle_RL3_B0_BT_s0_varEA.png')
+
+>>> plt.imshow(np.reshape(np.nanvar(s0_cumact_ea2_BT,0),(40,35)))
+>>> colorbar()
+>>> title('seq 0 - var[EA2] - BT')
+>>> savefig('21june3_21feb5_cycle_RL3_B0_BT_s0_varEA2.png')
+
+>>> plt.imshow(np.reshape(np.nanvar(s0_cumact_emup_BT,0),(20,15)))
+>>> colorbar()
+>>> title('seq 0 - var[EMUP] - BT')
+>>> savefig('21june3_21feb5_cycle_RL3_B0_BT_s0_varEMUP.png')
+
+>>> plt.imshow(np.reshape(np.nanvar(s0_cumact_emdown_BT,0),(20,15)))
+>>> title('seq 0 - var[EMDOWN] - BT')
+>>> colorbar()
+>>> savefig('21june3_21feb5_cycle_RL3_B0_BT_s0_varEMDOWN.png')
+
+>>> plt.imshow(np.reshape(np.nanvar(s0_cumact_emdown_AT18,0),(20,15)))
+>>> colorbar()
+>>> title('seq 0 - var[EMDOWN] - AT18')
+>>> savefig('21june3_21feb5_cycle_RL3_B0_AT18_s0_varEMDOWN.png')
+
+>>> plt.imshow(np.reshape(np.nanvar(s0_cumact_emup_AT18,0),(20,15)))
+>>> title('seq 0 - var[EMUP] - AT18')
+>>> colorbar()
+>>> savefig('21june3_21feb5_cycle_RL3_B0_AT18_s0_varEMUP.png')
+
+>>> plt.imshow(np.reshape(np.nanvar(s0_cumact_ea2_AT18,0),(40,35)))
+>>> colorbar()
+>>> title('seq 0 - var[EA2] - AT18')
+>>> savefig('21june3_21feb5_cycle_RL3_B0_AT18_s0_varEA2.png')
+
+>>> plt.imshow(np.reshape(np.nanvar(s0_cumact_ea_AT18,0),(40,35)))
+>>> title('seq 0 - var[EA] - AT18')
+>>> colorbar()
+>>> savefig('21june3_21feb5_cycle_RL3_B0_AT18_s0_varEA.png')
+
+>>> plt.imshow(np.reshape(np.nanvar(s0_cumact_ea_AT19,0),(40,35)))
+>>> colorbar()
+>>> title('seq 0 - var[EA] - AT19')
+>>> savefig('21june3_21feb5_cycle_RL3_B0_AT19_s0_varEA.png')
+
+>>> plt.imshow(np.reshape(np.nanvar(s0_cumact_ea2_AT19,0),(40,35)))
+>>> title('seq 0 - var[EA2] - AT19')
+>>> colorbar()
+>>> savefig('21june3_21feb5_cycle_RL3_B0_AT19_s0_varEA2.png')
+
+>>> plt.imshow(np.reshape(np.nanvar(s0_cumact_emup_AT19,0),(20,15)))
+>>> colorbar()
+>>> title('seq 0 - var[EMUP] - AT19')
+>>> savefig('21june3_21feb5_cycle_RL3_B0_AT19_s0_varEMUP.png')
+
+>>> plt.imshow(np.reshape(np.nanvar(s0_cumact_emdown_AT19,0),(20,15)))
+>>> title('seq 0 - var[EMDOWN] - AT19')
+>>> colorbar()
+>>> savefig('21june3_21feb5_cycle_RL3_B0_AT19_s0_varEMDOWN.png')
+
+
+Seq 1:
+
+>>> s1_cumact_v1_BT = np.array(dCumAct_allBT['EV1'])[cseqInds1_BT]
+>>> s1_cumact_ea_BT = np.array(dCumAct_allBT['EA'])[cseqInds1_BT]
+>>> s1_cumact_ea2_BT = np.array(dCumAct_allBT['EA2'])[cseqInds1_BT]
+>>> s1_cumact_emup_BT = np.array(dCumAct_allBT['EMUP'])[cseqInds1_BT]
+>>> s1_cumact_emdown_BT = np.array(dCumAct_allBT['EMDOWN'])[cseqInds1_BT]
+>>> s1_cumact_v1_AT18 = np.array(dCumAct_allAT18['EV1'])[cseqInds1_AT18]
+>>> s1_cumact_ea_AT18 = np.array(dCumAct_allAT18['EA'])[cseqInds1_AT18]
+>>> s1_cumact_ea2_AT18 = np.array(dCumAct_allAT18['EA2'])[cseqInds1_AT18]
+>>> s1_cumact_emup_AT18 = np.array(dCumAct_allAT18['EMUP'])[cseqInds1_AT18]
+>>> s1_cumact_emdown_AT18 = np.array(dCumAct_allAT18['EMDOWN'])[cseqInds1_AT18]
+>>> s1_cumact_v1_AT19 = np.array(dCumAct_allAT19['EV1'])[cseqInds1_AT19]
+>>> s1_cumact_ea_AT19 = np.array(dCumAct_allAT19['EA'])[cseqInds1_AT19]
+>>> s1_cumact_ea2_AT19 = np.array(dCumAct_allAT19['EA2'])[cseqInds1_AT19]
+>>> s1_cumact_emup_AT19 = np.array(dCumAct_allAT19['EMUP'])[cseqInds1_AT19]
+>>> s1_cumact_emdown_AT19 = np.array(dCumAct_allAT19['EMDOWN'])[cseqInds1_AT19]
+
+>>> plt.imshow(np.reshape(np.nanvar(s1_cumact_v1_BT,0),(80,80)))
+>>> title('seq 1 - var[EV1] - BT')
+>>> colorbar()
+>>> savefig('21june3_21feb5_cycle_RL3_B0_BT_s1_varEV1.png')
+
+>>> plt.imshow(np.reshape(np.nanvar(s1_cumact_v1_AT18,0),(80,80)))
+>>> colorbar()
+>>> title('seq 1 - var[EV1] - AT18')
+>>> savefig('21june3_21feb5_cycle_RL3_B0_AT18_s1_varEV1.png')
+
+>>> plt.imshow(np.reshape(np.nanvar(s1_cumact_v1_AT19,0),(80,80)))
+>>> title('seq 1 - var[EV1] - AT19')
+>>> colorbar()
+>>> savefig('21june3_21feb5_cycle_RL3_B0_AT19_s1_varEV1.png')
+
+>>> plt.imshow(np.reshape(np.nanvar(s1_cumact_ea_AT19,0),(40,35)))
+>>> colorbar()
+>>> title('seq 1 - var[EA] - AT19')
+>>> savefig('21june3_21feb5_cycle_RL3_B0_AT19_s1_varEA.png')
+
+>>> plt.imshow(np.reshape(np.nanvar(s1_cumact_ea_AT18,0),(40,35)))
+>>> title('seq 1 - var[EA] - AT18')
+>>> colorbar()
+>>> savefig('21june3_21feb5_cycle_RL3_B0_AT18_s1_varEA.png')
+
+>>> plt.imshow(np.reshape(np.nanvar(s1_cumact_ea_BT,0),(40,35)))
+>>> colorbar()
+>>> title('seq 1 - var[EA] - BT')
+>>> savefig('21june3_21feb5_cycle_RL3_B0_BT_s1_varEA.png')
+
+>>> plt.imshow(np.reshape(np.nanvar(s1_cumact_ea2_BT,0),(40,35)))
+>>> title('seq 1 - var[EA2] - BT')
+>>> colorbar()
+>>> savefig('21june3_21feb5_cycle_RL3_B0_BT_s1_varEA2.png')
+
+>>> plt.imshow(np.reshape(np.nanvar(s1_cumact_ea2_AT18,0),(40,35)))
+>>> colorbar()
+>>> title('seq 1 - var[EA2] - AT18')
+>>> savefig('21june3_21feb5_cycle_RL3_B0_AT18_s1_varEA2.png')
+
+>>> plt.imshow(np.reshape(np.nanvar(s1_cumact_ea2_AT19,0),(40,35)))
+>>> title('seq 1 - var[EA2] - AT19')
+>>> colorbar()
+>>> savefig('21june3_21feb5_cycle_RL3_B0_AT19_s1_varEA2.png')
+
+>>> plt.imshow(np.reshape(np.nanvar(s1_cumact_emup_AT19,0),(20,15)))
+>>> colorbar()
+>>> title('seq 1 - var[EMUP] - AT19')
+>>> savefig('21june3_21feb5_cycle_RL3_B0_AT19_s1_varEMUP.png')
+
+>>> plt.imshow(np.reshape(np.nanvar(s1_cumact_emup_AT18,0),(20,15)))
+>>> title('seq 1 - var[EMUP] - AT18')
+>>> colorbar()
+>>> savefig('21june3_21feb5_cycle_RL3_B0_AT18_s1_varEMUP.png')
+
+>>> plt.imshow(np.reshape(np.nanvar(s1_cumact_emup_BT,0),(20,15)))
+>>> colorbar()
+>>> title('seq 1 - var[EMUP] - BT')
+>>> savefig('21june3_21feb5_cycle_RL3_B0_BT_s1_varEMUP.png')
+
+>>> plt.imshow(np.reshape(np.nanvar(s1_cumact_emdown_BT,0),(20,15)))
+>>> title('seq 1 - var[EMDOWN] - BT')
+>>> colorbar()
+>>> savefig('21june3_21feb5_cycle_RL3_B0_BT_s1_varEMDOWN.png')
+
+>>> plt.imshow(np.reshape(np.nanvar(s1_cumact_emdown_AT18,0),(20,15)))
+>>> title('seq 1 - var[EMDOWN] - AT18')
+>>> colorbar()
+>>> savefig('21june3_21feb5_cycle_RL3_B0_AT18_s1_varEMDOWN.png')
+
+>>> plt.imshow(np.reshape(np.nanvar(s1_cumact_emdown_AT19,0),(20,15)))
+>>> colorbar()
+>>> title('seq 1 - var[EMDOWN] - AT19')
+>>> savefig('21june3_21feb5_cycle_RL3_B0_AT19_s1_varEMDOWN.png')
+
+Seq 3:
+
+>>> s3_cumact_v1_BT = np.array(dCumAct_allBT['EV1'])[cseqInds3_BT]
+>>> s3_cumact_ea_BT = np.array(dCumAct_allBT['EA'])[cseqInds3_BT]
+>>> s3_cumact_ea2_BT = np.array(dCumAct_allBT['EA2'])[cseqInds3_BT]
+>>> s3_cumact_emup_BT = np.array(dCumAct_allBT['EMUP'])[cseqInds3_BT]
+>>> s3_cumact_emdown_BT = np.array(dCumAct_allBT['EMDOWN'])[cseqInds3_BT]
+>>> 
+>>> s3_cumact_v1_AT18 = np.array(dCumAct_allAT18['EV1'])[cseqInds3_AT18]
+>>> s3_cumact_ea_AT18 = np.array(dCumAct_allAT18['EA'])[cseqInds3_AT18]
+>>> s3_cumact_ea2_AT18 = np.array(dCumAct_allAT18['EA2'])[cseqInds3_AT18]
+>>> s3_cumact_emup_AT18 = np.array(dCumAct_allAT18['EMUP'])[cseqInds3_AT18]
+>>> s3_cumact_emdown_AT18 = np.array(dCumAct_allAT18['EMDOWN'])[cseqInds3_AT18]
+>>> 
+>>> s3_cumact_v1_AT19 = np.array(dCumAct_allAT19['EV1'])[cseqInds3_AT19]
+>>> s3_cumact_ea_AT19 = np.array(dCumAct_allAT19['EA'])[cseqInds3_AT19]
+>>> s3_cumact_ea2_AT19 = np.array(dCumAct_allAT19['EA2'])[cseqInds3_AT19]
+>>> s3_cumact_emup_AT19 = np.array(dCumAct_allAT19['EMUP'])[cseqInds3_AT19]
+>>> s3_cumact_emdown_AT19 = np.array(dCumAct_allAT19['EMDOWN'])[cseqInds3_AT19]
+
+>>> plt.imshow(np.reshape(np.nanvar(s3_cumact_v1_BT,0),(80,80)))
+>>> title('seq 3 - var[EV1] - BT')
+>>> colorbar()
+>>> savefig('21june3_21feb5_cycle_RL3_B0_BT_s3_varEV1.png')
+
+>>> plt.imshow(np.reshape(np.nanvar(s3_cumact_v1_AT18,0),(80,80)))
+>>> title('seq 3 - var[EV1] - AT18')
+>>> colorbar()
+>>> savefig('21june3_21feb5_cycle_RL3_B0_AT18_s3_varEV1.png')
+
+>>> plt.imshow(np.reshape(np.nanvar(s3_cumact_v1_AT19,0),(80,80)))
+>>> title('seq 3 - var[EV1] - AT19')
+>>> colorbar()
+>>> savefig('21june3_21feb5_cycle_RL3_B0_AT19_s3_varEV1.png')
+
+>>> plt.imshow(np.reshape(np.nanvar(s3_cumact_ea_BT,0),(40,35)))
+>>> colorbar()
+>>> title('seq 3 - var[EA] - BT')
+>>> savefig('21june3_21feb5_cycle_RL3_B0_BT_s3_varEA.png')
+
+>>> plt.imshow(np.reshape(np.nanvar(s3_cumact_ea2_BT,0),(40,35)))
+>>> title('seq 3 - var[EA2] - BT')
+>>> colorbar()
+>>> savefig('21june3_21feb5_cycle_RL3_B0_BT_s3_varEA2.png')
+
+>>> plt.imshow(np.reshape(np.nanvar(s3_cumact_emup_BT,0),(20,15)))
+>>> colorbar()
+>>> title('seq 3 - var[EMUP] - BT')
+>>> savefig('21june3_21feb5_cycle_RL3_B0_BT_s3_varEMUP.png')
+
+>>> plt.imshow(np.reshape(np.nanvar(s3_cumact_emdown_BT,0),(20,15)))
+>>> title('seq 3 - var[EMDOWN] - BT')
+>>> colorbar()
+>>> savefig('21june3_21feb5_cycle_RL3_B0_BT_s3_varEMDOWN.png')
+
+>>> plt.imshow(np.reshape(np.nanvar(s3_cumact_emdown_AT18,0),(20,15)))
+>>> colorbar()
+>>> title('seq 3 - var[EMDOWN] - AT18')
+>>> savefig('21june3_21feb5_cycle_RL3_B0_AT18_s3_varEMDOWN.png')
+
+>>> plt.imshow(np.reshape(np.nanvar(s3_cumact_emup_AT18,0),(20,15)))
+>>> title('seq 3 - var[EMUP] - AT18')
+>>> colorbar()
+>>> savefig('21june3_21feb5_cycle_RL3_B0_AT18_s3_varEMUP.png')
+
+>>> plt.imshow(np.reshape(np.nanvar(s3_cumact_ea2_AT18,0),(40,35)))
+>>> colorbar()
+>>> title('seq 3 - var[EA2] - AT18')
+>>> savefig('21june3_21feb5_cycle_RL3_B0_AT18_s3_varEA2.png')
+
+>>> plt.imshow(np.reshape(np.nanvar(s3_cumact_ea_AT18,0),(40,35)))
+>>> title('seq 3 - var[EA] - AT18')
+>>> colorbar()
+>>> savefig('21june3_21feb5_cycle_RL3_B0_AT18_s3_varEA.png')
+
+>>> plt.imshow(np.reshape(np.nanvar(s3_cumact_ea_AT19,0),(40,35)))
+>>> title('seq 3 - var[EA] - AT19')
+>>> colorbar()
+>>> savefig('21june3_21feb5_cycle_RL3_B0_AT19_s3_varEA.png')
+
+>>> plt.imshow(np.reshape(np.nanvar(s3_cumact_ea2_AT19,0),(40,35)))
+>>> colorbar()
+>>> title('seq 3 - var[EA2] - AT19')
+>>> savefig('21june3_21feb5_cycle_RL3_B0_AT19_s3_varEA2.png')
+
+>>> plt.imshow(np.reshape(np.nanvar(s3_cumact_emup_AT19,0),(20,15)))
+>>> title('seq 3 - var[EMUP] - AT19')
+>>> colorbar()
+>>> savefig('21june3_21feb5_cycle_RL3_B0_AT19_s3_varEMUP.png')
+
+>>> plt.imshow(np.reshape(np.nanvar(s3_cumact_emdown_AT19,0),(20,15)))
+>>> colorbar()
+>>> title('seq 3 - var[EMDOWN] - AT19')
+>>> savefig('21june3_21feb5_cycle_RL3_B0_AT19_s3_varEMDOWN.png')
+
+
+Seq 4:
+
+>>> s4_cumact_v1_BT = np.array(dCumAct_allBT['EV1'])[cseqInds4_BT]
+>>> s4_cumact_ea_BT = np.array(dCumAct_allBT['EA'])[cseqInds4_BT]
+>>> s4_cumact_ea2_BT = np.array(dCumAct_allBT['EA2'])[cseqInds4_BT]
+>>> s4_cumact_emup_BT = np.array(dCumAct_allBT['EMUP'])[cseqInds4_BT]
+>>> s4_cumact_emdown_BT = np.array(dCumAct_allBT['EMDOWN'])[cseqInds4_BT]
+>>> 
+>>> s4_cumact_v1_AT18 = np.array(dCumAct_allAT18['EV1'])[cseqInds4_AT18]
+>>> s4_cumact_ea_AT18 = np.array(dCumAct_allAT18['EA'])[cseqInds4_AT18]
+>>> s4_cumact_ea2_AT18 = np.array(dCumAct_allAT18['EA2'])[cseqInds4_AT18]
+>>> s4_cumact_emup_AT18 = np.array(dCumAct_allAT18['EMUP'])[cseqInds4_AT18]
+>>> s4_cumact_emdown_AT18 = np.array(dCumAct_allAT18['EMDOWN'])[cseqInds4_AT18]
+>>> 
+>>> s4_cumact_v1_AT19 = np.array(dCumAct_allAT19['EV1'])[cseqInds4_AT19]
+>>> s4_cumact_ea_AT19 = np.array(dCumAct_allAT19['EA'])[cseqInds4_AT19]
+>>> s4_cumact_ea2_AT19 = np.array(dCumAct_allAT19['EA2'])[cseqInds4_AT19]
+>>> s4_cumact_emup_AT19 = np.array(dCumAct_allAT19['EMUP'])[cseqInds4_AT19]
+>>> s4_cumact_emdown_AT19 = np.array(dCumAct_allAT19['EMDOWN'])[cseqInds4_AT19]
+
+>>> plt.imshow(np.reshape(np.nanvar(s4_cumact_v1_BT,0),(80,80)))
+>>> title('seq 4 - var[EV1] - BT')
+>>> colorbar()
+>>> savefig('21june3_21feb5_cycle_RL3_B0_BT_s4_varEV1.png')
+
+>>> plt.imshow(np.reshape(np.nanvar(s4_cumact_v1_AT18,0),(80,80)))
+>>> colorbar()
+>>> title('seq 4 - var[EV1] - AT18')
+>>> savefig('21june3_21feb5_cycle_RL3_B0_AT18_s4_varEV1.png')
+
+>>> plt.imshow(np.reshape(np.nanvar(s4_cumact_v1_AT19,0),(80,80)))
+>>> title('seq 4 - var[EV1] - AT19')
+>>> colorbar()
+>>> savefig('21june3_21feb5_cycle_RL3_B0_AT19_s4_varEV1.png')
+
+>>> plt.imshow(np.reshape(np.nanvar(s4_cumact_ea_BT,0),(40,35)))
+>>> colorbar()
+>>> title('seq 4 - var[EA] - BT')
+>>> savefig('21june3_21feb5_cycle_RL3_B0_BT_s4_varEA.png')
+
+>>> plt.imshow(np.reshape(np.nanvar(s4_cumact_ea2_BT,0),(40,35)))
+>>> title('seq 4 - var[EA2] - BT')
+>>> colorbar()
+>>> savefig('21june3_21feb5_cycle_RL3_B0_BT_s4_varEA2.png')
+
+>>> plt.imshow(np.reshape(np.nanvar(s4_cumact_emup_BT,0),(20,15)))
+>>> colorbar()
+>>> title('seq 4 - var[EMUP] - BT')
+>>> savefig('21june3_21feb5_cycle_RL3_B0_BT_s4_varEMUP.png')
+
+>>> plt.imshow(np.reshape(np.nanvar(s4_cumact_emdown_BT,0),(20,15)))
+>>> title('seq 4 - var[EMDOWN] - BT')
+>>> colorbar()
+>>> savefig('21june3_21feb5_cycle_RL3_B0_BT_s4_varEMDOWN.png')
+
+>>> plt.imshow(np.reshape(np.nanvar(s4_cumact_emdown_AT18,0),(20,15)))
+>>> colorbar()
+>>> title('seq 4 - var[EMDOWN] - AT18')
+>>> savefig('21june3_21feb5_cycle_RL3_B0_AT18_s4_varEMDOWN.png')
+
+>>> plt.imshow(np.reshape(np.nanvar(s4_cumact_emup_AT18,0),(20,15)))
+>>> title('seq 4 - var[EMUP] - AT18')
+>>> colorbar()
+>>> savefig('21june3_21feb5_cycle_RL3_B0_AT18_s4_varEMUP.png')
+
+>>> plt.imshow(np.reshape(np.nanvar(s4_cumact_ea2_AT18,0),(40,35)))
+>>> colorbar()
+>>> title('seq 4 - var[EA2] - AT18')
+>>> savefig('21june3_21feb5_cycle_RL3_B0_AT18_s4_varEA2.png')
+
+>>> plt.imshow(np.reshape(np.nanvar(s4_cumact_ea_AT18,0),(40,35)))
+>>> title('seq 4 - var[EA] - AT18')
+>>> colorbar()
+>>> savefig('21june3_21feb5_cycle_RL3_B0_AT18_s4_varEA.png')
+
+>>> plt.imshow(np.reshape(np.nanvar(s4_cumact_ea_AT19,0),(40,35)))
+>>> title('seq 4 - var[EA] - AT19')
+>>> colorbar()
+>>> savefig('21june3_21feb5_cycle_RL3_B0_AT19_s4_varEA.png')
+
+>>> plt.imshow(np.reshape(np.nanvar(s4_cumact_ea2_AT19,0),(40,35)))
+>>> title('seq 4 - var[EA2] - AT19')
+>>> colorbar()
+>>> savefig('21june3_21feb5_cycle_RL3_B0_AT19_s4_varEA2.png')
+
+>>> plt.imshow(np.reshape(np.nanvar(s4_cumact_emup_AT19,0),(20,15)))
+>>> title('seq 4 - var[EMUP] - AT19')
+>>> colorbar()
+>>> savefig('21june3_21feb5_cycle_RL3_B0_AT19_s4_varEMUP.png')
+
+>>> plt.imshow(np.reshape(np.nanvar(s4_cumact_emdown_AT19,0),(20,15)))
+>>> colorbar()
+>>> title('seq 4 - var[EMDOWN] - AT19')
+>>> savefig('21june3_21feb5_cycle_RL3_B0_AT19_s4_varEMDOWN.png')
+
 
