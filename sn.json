@@ -50,8 +50,8 @@
     "verbose": 0,
     "stayStepLim": 0,
     "simtype": {
-        "ResumeSim": 0,
-        "ResumeSimFromFile": "data/21may15_TARG0_K_gcp__step_39_synWeights_final.pkl"
+        "ResumeSim": 1,
+        "ResumeSimFromFile": "data/21may26_TARG0_O_gcp__step_39_synWeights_final.pkl"
     },
     "sim": {
         "duration": 500000,
@@ -65,7 +65,7 @@
         "RLFakeUpRule": 0,
         "RLFakeDownRule": 0,
         "RLFakeStayRule": 0,
-        "name": "21may26_TARG0_O_gcp_",
+        "name": "21jun8_TARG0_O2_gcp_",
         "doquit": 1,
         "doplot": 0,
         "saveCellSecs": 0,

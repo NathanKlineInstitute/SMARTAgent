@@ -33181,7 +33181,7 @@ in a population indexed by neuronal ID, so make sure to adjust call code
 DH code is here: https://github.com/NathanKlineInstitute/netpyne-STDP
 
 * 21jun7
-** check 21may26_TARG0_O_cycle__step_36_
+** check 21may26_TARG0_O_gcp__step_36_
 
 python -i simdat.py backupcfg/21may26_TARG0_O_gcp__step_36_sim.json
 
@@ -33231,4 +33231,66 @@ subplot(1,3,3); popwtsE = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.ti
 savefig(gifpath()+'all_steps_avg_weight.png') # [[./gif/21jun7_21may26_TARG0_O_gcp__step_36_all_steps_avg_weight.png]]
 
 # fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
+
+* 21jun8
+** check 21may26_TARG0_O_gcp__step_39_ -->> last step; continue as 21jun8_TARG0_O2_gcp_
+
+python -i simdat.py backupcfg/21may26_TARG0_O_gcp__step_39_sim.json
+
+EV1 0.02 Hz
+EA 1.44 Hz
+IA 2.72 Hz
+IAL 3.92 Hz
+EA2 0.16 Hz
+IA2 1.3 Hz
+IA2L 1.89 Hz
+EMDOWN 0.27 Hz
+EMUP 0.27 Hz
+IM 1.52 Hz
+IML 2.21 Hz
+
+and again, rates still low
+
+ax=plotPerf(actreward,yl=(0,2.1))
+savefig(gifpath()+'perf.png') # [[./gif/21jun8_21may26_TARG0_O_gcp__step_39_perf.png]]
+bad perf this step...
+
+lfn = ['21may26_TARG0_O_gcp__step_' + str(i) + '_' for i in range(40)]
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0.35,0.45))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/21jun8_21may26_TARG0_O_gcp__step_39_perf_all_steps_so_far.png]]
+
+lpda = getindivactionreward(lfn)
+csm=cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+lclr = [csm.to_rgba(float(i)/(len(lpda))) for i in range(len(lpda))]
+clf(); plotComparePerf(lpda,lclr,yl=(0,2.1),lleg=lfn,skipscore=True,skipfollow=True)
+savefig(gifpath()+'perf_compareD.png') # [[./gif/21jun8_21may26_TARG0_O_gcp__step_39_perf_compareD.png]]
+
+cla(); lrat = plotHitMissRatioPerStep(lpda)
+savefig(gifpath()+'hit_miss_ratio.png') # [[./gif/21jun8_21may26_TARG0_O_gcp__step_39_hit_miss_ratio.png]]
+np.argmax(lrat) # 32
+lrat[np.argmax(lrat)] # 0.7777777777777778
+step 32 still best so far ...
+
+clf(); drawraster(dspkT,dspkID); xlim((498e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/21jun8_21may26_TARG0_O_gcp__step_39_rast.png]]
+
+clf(); pdfc = getconcatweightpdf(lfn)
+subplot(1,3,1); popwtsEA = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EA'],lclr=['g'],plotindiv=False)
+subplot(1,3,2); popwtsEA2 = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EA2'],lclr=['c'],plotindiv=False)
+subplot(1,3,3); popwtsE = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False)
+savefig(gifpath()+'all_steps_avg_weight.png') # [[./gif/21jun8_21may26_TARG0_O_gcp__step_39_all_steps_avg_weight.png]]
+
+# fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
+
+since this was the last step of multistep sim, continue as 21jun8_TARG0_O2_gcp_
+
+    "simtype": {
+        "ResumeSim": 1,
+        "ResumeSimFromFile": "data/21may26_TARG0_O_gcp__step_39_synWeights_final.pkl"
+    },
+
+python multistepSim.py sn.json 30 40 21jun8_TARG0_O2_gcp_multi
+
+started ~10:29 ...
 
