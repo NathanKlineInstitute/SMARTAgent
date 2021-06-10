@@ -1153,12 +1153,14 @@ def wireNoisePops ():
   prety = 'EN'
   if dnumc[prety] <= 0 or prety not in cmat: return # dynamic E Noise population
   lpoty = ETypes
-  # for ty in ITypes: lpoty.append(ty)
+  for ty in ITypes: lpoty.append(ty)
   for poty in lpoty:
     if dnumc[poty] <= 0: continue
+    gn = cfg.EEGain
+    if poty in ITypes: gn = cfg.EIGain
     # print(prety, poty, dnumc[prety], dnumc[poty])
     if getconv(cmat, prety, poty, dnumc[prety]) > 0:
-      for strty,synmech,weight in zip(['','n'],['AM2', 'NM2'],[cmat[prety][poty]['AM2']*cfg.EEGain, cmat[prety][poty]['NM2']*cfg.EEGain]):
+      for strty,synmech,weight in zip(['','n'],['AM2', 'NM2'],[cmat[prety][poty]['AM2']*gn, cmat[prety][poty]['NM2']*gn]):
         k = strty+prety+'->'+strty+poty
         if weight <= 0.0: continue
         netParams.connParams[k] = {
@@ -1173,7 +1175,7 @@ def wireNoisePops ():
         if sy.count('AM') > 0:
           if dconf['net']['RLconns']['Noise'] and dSTDPparamsRL['AMPAN']['RLon']: # only turn on plasticity when specified to do so
             netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL['AMPAN']}
-            netParams.connParams[k]['weight'] = getInitWeight(cmat[prety][poty]['AM2'] * cfg.EEGain)
+            netParams.connParams[k]['weight'] = getInitWeight(cmat[prety][poty]['AM2'] * gn)
                     
 if 'EN' in dnumc: wireNoisePops() # connect dynamic noise populations
 
