@@ -54,12 +54,12 @@
         "ResumeSimFromFile": "data/21may26_TARG0_O_gcp__step_39_synWeights_final.pkl"
     },
     "sim": {
-        "duration": 5000,
+        "duration": 20000,
         "dt": 0.6,
         "verbose": 0,
         "recordStep": 1.0,
 	"recordStim": 0,
-        "recordWeightStepSize": 200,
+        "recordWeightStepSize": 20,
         "normalizeWeightStepSize": 50000000000000000000000000000000000000,
         "normalizeWeightsAtStart": 0,
         "RLFakeUpRule": 0,

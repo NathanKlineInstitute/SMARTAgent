@@ -33443,3 +33443,66 @@ should make sure the noise-related weights are saved properly ...
 
 try a 30 s sim with saving weights every 2 s ... 
 
+./myrun 30 sn.json
+
+python -i simdat.py backupcfg/21jun10_N_gcp_sim.json
+
+EV1 0.02 Hz
+EA 1.22 Hz
+IA 0.88 Hz
+IAL 4.34 Hz
+EA2 0.17 Hz
+IA2 0.36 Hz
+IA2L 2.93 Hz
+EMDOWN 1.02 Hz
+EMUP 1.01 Hz
+IM 1.5 Hz
+IML 6.11 Hz
+EN 0.87 Hz
+
+clf(); drawraster(dspkT,dspkID); xlim((28e3,30e3))
+savefig(gifpath()+'rastB.png') # [[./gif/21jun10_21jun10_N_gcp_rastB.png]]
+
+hmm, had a bug in setting up plast from EN -> X; fixed that...will retest now...
+
+20 s sim ...
+
+./myrun 30 sn.json
+
+python -i simdat.py backupcfg/21jun10_N_gcp_sim.json
+
+EV1 0.02 Hz
+EA 1.29 Hz
+IA 0.93 Hz
+IAL 4.55 Hz
+EA2 0.17 Hz
+IA2 0.35 Hz
+IA2L 3.06 Hz
+EMDOWN 1.45 Hz
+EMUP 1.45 Hz
+IM 2.07 Hz
+IML 7.68 Hz
+EN 0.86 Hz
+
+utimes = np.unique(pdf.time)
+
+poid = dstartidx['EMDOWN']
+
+dlw = {'EN':[], 'EA':[]}
+dpdfs = {}
+
+for k in dlw.keys():
+  dpdfs[k] = pdf[(pdf.postid==poid) & (pdf.preid>=dstartidx[k]) & (pdf.preid<=dendidx[k])]
+  for t in utimes:
+    pdfs2 = dpdfs[k][dpdfs[k].time==t]
+    dlw[k].append(mean(pdfs2.weight))
+
+gdx=1
+for k,c in zip(dlw.keys(),['r','b']): 
+  subplot(1,2,gdx)
+  plot(utimes,dlw[k],c)
+  gdx+=1
+
+savefig(gifpath()+'wttestC.png') # [[./gif/21jun10_21jun10_N_gcp_wttestC.png]]
+hmm, should have opposite signs ... must still have a bug ...
+

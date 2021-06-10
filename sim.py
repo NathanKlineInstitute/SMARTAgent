@@ -104,39 +104,43 @@ def getpadding ():
 
 dnumc_padx, dtopoldivcons,dtopolconvcons,allpops_withconvtopology,allpops_withdivtopology = getpadding()
 
-lrecpop = ['EMUP', 'EMDOWN'] # which populations to record from
-  
-if cmat['VD']['VD']['conv'] > 0 or \
-   cmat['VD']['VL']['conv'] > 0 or \
-   cmat['VL']['VL']['conv'] > 0 or \
-   cmat['VL']['VD']['conv'] > 0 or \
-   dconf['net']['VisualFeedback']:
-  for pop in EVPops:
-    lrecpop.append(pop)
-  if dconf['net']['VisualFeedback'] and dnumc['ER']>0: lrecpop.append('ER')
+def setlrecpop ():
+  lrecpop = ['EMUP', 'EMDOWN'] # which populations to record from
+  if cmat['VD']['VD']['conv'] > 0 or \
+     cmat['VD']['VL']['conv'] > 0 or \
+     cmat['VL']['VL']['conv'] > 0 or \
+     cmat['VL']['VD']['conv'] > 0 or \
+     dconf['net']['VisualFeedback']:
+    for pop in EVPops:
+      lrecpop.append(pop)
+    if dconf['net']['VisualFeedback'] and dnumc['ER']>0: lrecpop.append('ER')
+  if dnumc['EA']>0 and (dconf['net']['RLconns']['RecurrentANeurons'] or \
+                        dconf['net']['STDPconns']['RecurrentANeurons'] or \
+                        dconf['net']['RLconns']['FeedbackMtoA'] or \
+                        dconf['net']['STDPconns']['FeedbackMtoA']):
+    lrecpop.append('EA')
+  if dnumc['EA2']>0 and (dconf['net']['RLconns']['RecurrentA2Neurons'] or \
+                         dconf['net']['STDPconns']['RecurrentA2Neurons'] or \
+                         dconf['net']['RLconns']['FeedbackMtoA2'] or \
+                         dconf['net']['STDPconns']['FeedbackMtoA2']): 
+    lrecpop.append('EA2')
+  if dconf['net']['RLconns']['Visual'] or dconf['net']['STDPconns']['Visual']:
+    if lrecpop.count('EV4')==0: lrecpop.append('EV4')
+    if lrecpop.count('EMT')==0: lrecpop.append('EMT')
+  recITypes = False
+  if dconf['net']['RLconns']['EIPlast'] or dconf['net']['STDPconns']['EIPlast']: recITypes = True
+  elif 'Noise' in dconf['net']['RLconns']:
+    if dconf['net']['RLconns']['Noise']:
+      recITypes = True  
+  if recITypes:
+    for IType in ITypes:
+      if dnumc[IType] > 0: lrecpop.append(IType)
+  # this is not needed - since lrecpop has the postsynaptic type
+  #if dnumc['EN'] > 0 and 'Noise' in dconf['net']['RLconns']:
+  #  if dconf['net']['RLconns']['Noise']: lrecpop.append('EN')
+  return lrecpop
 
-if dnumc['EA']>0 and (dconf['net']['RLconns']['RecurrentANeurons'] or \
-                      dconf['net']['STDPconns']['RecurrentANeurons'] or \
-                      dconf['net']['RLconns']['FeedbackMtoA'] or \
-                      dconf['net']['STDPconns']['FeedbackMtoA']):
-  lrecpop.append('EA')
-
-if dnumc['EA2']>0 and (dconf['net']['RLconns']['RecurrentA2Neurons'] or \
-                       dconf['net']['STDPconns']['RecurrentA2Neurons'] or \
-                       dconf['net']['RLconns']['FeedbackMtoA2'] or \
-                       dconf['net']['STDPconns']['FeedbackMtoA2']): 
-  lrecpop.append('EA2')
-  
-if dconf['net']['RLconns']['Visual'] or dconf['net']['STDPconns']['Visual']:
-  if lrecpop.count('EV4')==0: lrecpop.append('EV4')
-  if lrecpop.count('EMT')==0: lrecpop.append('EMT')
-  
-if dconf['net']['RLconns']['EIPlast'] or dconf['net']['STDPconns']['EIPlast']:
-  for IType in ITypes:
-    if dnumc[IType] > 0: lrecpop.append(IType)
-
-if dnumc['EN'] > 0 and 'Noise' in dconf['net']['RLconns']:
-  if dconf['net']['RLconns']['Noise']: lrecpop.append('EN')
+lrecpop = setlrecpop()
         
 # Network parameters
 netParams = specs.NetParams() #object of class NetParams to store the network parameters
@@ -322,7 +326,7 @@ def readSTDPParams ():
   lsy = ['AMPA', 'NMDA']
   if 'AMPAI' in dconf['RL']: lsy.append('AMPAI')
   if 'AMPAN' in dconf['RL']: lsy.append('AMPAN') # RL for NOISE synapses 
-  for sy,gain in zip(lsy,[cfg.EEGain,cfg.EEGain,cfg.EIGain]):
+  for sy,gain in zip(lsy,[cfg.EEGain,cfg.EEGain,cfg.EIGain,cfg.EEGain]):
     dSTDPparamsRL[sy] = dconf['RL'][sy]
     for k in dSTDPparamsRL[sy].keys():
       if k.count('wt') or k.count('wbase') or k.count('wmax'): dSTDPparamsRL[sy][k] *= gain      
@@ -1172,7 +1176,7 @@ def wireNoisePops ():
           'synMech': synmech,
           'sec':EExcitSec, 'loc':0.5,'weightIndex':getWeightIndex(synmech, ECellModel)
         }
-        if sy.count('AM') > 0:
+        if synmech.count('AM') > 0:
           if dconf['net']['RLconns']['Noise'] and dSTDPparamsRL['AMPAN']['RLon']: # only turn on plasticity when specified to do so
             netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL['AMPAN']}
             netParams.connParams[k]['weight'] = getInitWeight(cmat[prety][poty]['AM2'] * gn)
@@ -1776,7 +1780,6 @@ def trainAgent (t):
     if dconf['verbose'] > 0 and sim.rank==0:
       print('Weights Recording Time:', t, 'NBsteps:',NBsteps,'recordWeightStepSize:',recordWeightStepSize)
     recordAdjustableWeights(sim, t, lrecpop) 
-    #recordWeights(sim, t)
   if NBsteps % normalizeWeightStepSize == 0:
     if dconf['verbose'] > 0 and sim.rank==0:
       print('Weight Normalize Time:', t, 'NBsteps:',NBsteps,'normalizeWeightStepSize:',normalizeWeightStepSize)
