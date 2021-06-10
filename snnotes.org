@@ -33394,3 +33394,20 @@ savefig(gifpath()+'all_steps_avg_weight.png') # [[./gif/21jun10_21jun8_TARG0_O2_
 
 fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
 [[./gif/21jun10_21jun8_TARG0_O2_gcp__step_5__with_reward_input.mp4]]
+** ENoise population
+
+could test a dynamically regulated noise population; it would provide noise to the other populations and it would be
+regulated opposite to normal RL. so when the network performs well, the ENoise -> Other population weights decrease (noise goes down)
+and when network performs poorly, the ENoise -> Other population weights increase (noise goes up)
+
+that way could avoid adding extra instrumentation for noise regulation 
+
+test on laptop first with a small network ... 
+
+population will be called EN for short ... Noise in RLCONNS specifies whether to use the RL there
+control would be to keep RL off and have weights of Noise -> EA, EA2, EM fixed
+
+./myrun 8 sn.json
+
+python -i simdat.py backupcfg/21jun10_N_lp_sim.json
+

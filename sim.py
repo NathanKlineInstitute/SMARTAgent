@@ -135,6 +135,9 @@ if dconf['net']['RLconns']['EIPlast'] or dconf['net']['STDPconns']['EIPlast']:
   for IType in ITypes:
     if dnumc[IType] > 0: lrecpop.append(IType)
 
+if dnumc['EN'] > 0 and 'Noise' in dconf['net']['RLconns']:
+  if dconf['net']['RLconns']['Noise']: lrecpop.append('EN')
+        
 # Network parameters
 netParams = specs.NetParams() #object of class NetParams to store the network parameters
 netParams.defaultThreshold = 0.0 # spike threshold, 10 mV is NetCon default, lower it for all cells
@@ -156,7 +159,7 @@ simConfig.saveFolder = 'data'
 # simConfig.backupCfg = ['sim.json', 'backupcfg/'+dconf['sim']['name']+'sim.json']
 simConfig.createNEURONObj = True  # create HOC objects when instantiating network
 simConfig.createPyStruct = True  # create Python structure (simulator-independent) when instantiating network
-simConfig.analysis['plotTraces'] = {'include': [(pop, 0) for pop in ['ER','IR','EV1','EV1DE','ID','IV1','EV4','IV4','EMT','IMT','EMDOWN','EMUP','IM','IML','IMUP','IMDOWN','EA','IA','IAL','EA2','IA2','IA2L']]}
+simConfig.analysis['plotTraces'] = {'include': [(pop, 0) for pop in ['ER','IR','EV1','EV1DE','ID','IV1','EV4','IV4','EMT','IMT','EMDOWN','EMUP','IM','IML','IMUP','IMDOWN','EA','IA','IAL','EA2','IA2','IA2L','EN']]}
 simConfig.analysis['plotRaster'] = {'popRates':'overlay','showFig':dconf['sim']['doplot']}
 #simConfig.analysis['plot2Dnet'] = True 
 #simConfig.analysis['plotConn'] = True           # plot connectivity matrix
@@ -317,7 +320,8 @@ netParams.synMechParams['GA'] = netParams.synMechParams['GABA'] = {'mod': 'Exp2S
 def readSTDPParams ():
   dSTDPparamsRL = {} # STDP-RL parameters for AMPA,NMDA synapses; generally uses shorter/longer eligibility traces
   lsy = ['AMPA', 'NMDA']
-  if 'AMPAI' in dconf['RL']: lsy.append('AMPAI')  
+  if 'AMPAI' in dconf['RL']: lsy.append('AMPAI')
+  if 'AMPAN' in dconf['RL']: lsy.append('AMPAN') # RL for NOISE synapses 
   for sy,gain in zip(lsy,[cfg.EEGain,cfg.EEGain,cfg.EIGain]):
     dSTDPparamsRL[sy] = dconf['RL'][sy]
     for k in dSTDPparamsRL[sy].keys():
@@ -1142,7 +1146,36 @@ if getconv(cmat,'EM','EA',dnumc['EMDOWN'])>0:
           if useRL and dSTDPparamsRL[synmech]['RLon']: # only turn on plasticity when specified to do so
             netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL[synmech]}
           elif useSTDP and dSTDPparams[synmech]['STDPon']:
-            netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparams[synmech]}            
+            netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparams[synmech]}
+
+def wireNoisePops ():
+  if 'EN' not in dnumc: return
+  prety = 'EN'
+  if dnumc[prety] <= 0 or prety not in cmat: return # dynamic E Noise population
+  lpoty = ETypes
+  # for ty in ITypes: lpoty.append(ty)
+  for poty in lpoty:
+    if dnumc[poty] <= 0: continue
+    # print(prety, poty, dnumc[prety], dnumc[poty])
+    if getconv(cmat, prety, poty, dnumc[prety]) > 0:
+      for strty,synmech,weight in zip(['','n'],['AM2', 'NM2'],[cmat[prety][poty]['AM2']*cfg.EEGain, cmat[prety][poty]['NM2']*cfg.EEGain]):
+        k = strty+prety+'->'+strty+poty
+        if weight <= 0.0: continue
+        netParams.connParams[k] = {
+          'preConds': {'pop': prety},
+          'postConds': {'pop': poty},
+          'convergence': getconv(cmat,prety,poty,dnumc[prety]),
+          'weight': getInitWeight(weight),
+          'delay': getInitDelay('Dend'),
+          'synMech': synmech,
+          'sec':EExcitSec, 'loc':0.5,'weightIndex':getWeightIndex(synmech, ECellModel)
+        }
+        if sy.count('AM') > 0:
+          if dconf['net']['RLconns']['Noise'] and dSTDPparamsRL['AMPAN']['RLon']: # only turn on plasticity when specified to do so
+            netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL['AMPAN']}
+            netParams.connParams[k]['weight'] = getInitWeight(cmat[prety][poty]['AM2'] * cfg.EEGain)
+                    
+if 'EN' in dnumc: wireNoisePops() # connect dynamic noise populations
 
 fconn = 'data/'+dconf['sim']['name']+'synConns.pkl'
 pickle.dump(sim.topologicalConns, open(fconn, 'wb'))            
@@ -1721,9 +1754,10 @@ def trainAgent (t):
             for STDPmech in dSTDPmech['EMUP']: STDPmech.reward_punish(float(-dconf['sim']['targettedRLOppFctr']*critic))
           if dconf['sim']['targettedRL']>=4: # apply to non-EM with a discount factor
             for STDPmech in dSTDPmech['nonEM']: STDPmech.reward_punish(float(dconf['sim']['targettedRLDscntFctr']*critic))            
-      else:
+      else: # this is non-targetted RL
         if dconf['verbose']: print('APPLY RL to both EMUP and EMDOWN')
         for STDPmech in dSTDPmech['all']: STDPmech.reward_punish(critic)
+        for STDPmech in dSTDPmech['NOISE']: STDPmech.reward_punish(-critic) # SN exptl - noise sources get opposite sign
   if sim.rank==0:
     # print('t=',round(t,2),' game rewards:', rewards) # only rank 0 has access to rewards      
     for action in actions: sim.allActions.append(action)
@@ -1761,49 +1795,49 @@ def trainAgent (t):
 def getAllSTDPObjects (sim):
   # get all the STDP objects from the simulation's cells
   Mpops = ['EMUP', 'EMDOWN']  
-  dSTDPmech = {'all':[]} # dictionary of STDP objects keyed by type (all, for EMUP, EMDOWN populations)
+  dSTDPmech = {'all':[]} # dictionary of STDP objects keyed by type (all, for EMUP, EMDOWN populations) -- excludes NOISE RL (see below)
   for pop in Mpops: dSTDPmech[pop] = []
   if dconf['sim']['targettedRL']:
-    # dcell = {pop:[] for pop in Mpops} # SN: exptl
     if dconf['sim']['targettedRL']>=4:
       dSTDPmech['nonEM'] = [] # not post-synapse of an EM neuron (only used for targetted RL when RL plasticity at non-EM neurons)
       dSTDPmech['EM'] = [] # post-synapse of an EM neuron (EMDOWN or EMUP, etc.)
-  for cell in sim.net.cells:
-    #if cell.gid in sim.net.pops['EMDOWN'].cellGids and cell.gid==sim.simData['dminID']['EMDOWN']: print(cell.conns)
-    for conn in cell.conns:
-      STDPmech = conn.get('hSTDP')  # check if the connection has a NEURON STDP mechanism object
-      if STDPmech:
-        dSTDPmech['all'].append(STDPmech)
-        isEM = False
-        for pop in Mpops:
-          if cell.gid in sim.net.pops[pop].cellGids:
-            dSTDPmech[pop].append(STDPmech)
-            isEM = True
-            if dconf['sim']['targettedRL']>=4: dSTDPmech['EM'].append(STDPmech) # any EM
-            # if dconf['sim']['targettedRL']: dcell[pop].append(conn.preGid) # SN: exptl presynaptic ID
-        if dconf['sim']['targettedRL']>=4:
-          if not isEM: dSTDPmech['nonEM'].append(STDPmech)
-  # SN: exptl
-  #if 'hSTDP' not in conn: continue
-  #cpreID = conn.preGid  #find preID
-  #if type(cpreID) != int: continue
-  """
-  if dconf['sim']['targettedRL'] > 1:
-    for pop in Mpops: dcell[pop] = np.unique(dcell[pop])
-    nhost = sim.pc.nhost()
-    src = [dcell]*nhost
-    dcellgid = sim.pc.py_alltoall(src)
-    for dcell in dcellgid:
-      for pop in Mpops:
-        for cell in sim.net.cells:
-          if cell.gid in dcell[pop]:
-            for conn in cell.conns:
-              STDPmech = conn.get('hSTDP')
-              if STDPmech:
-                if STDPmech not in dSTDPmech[pop]:
-                  dSTDPmech[pop].append(STDPmech)
-  """
-  # SN: exptl
+  dSTDPmech['NOISE'] = [] # for noise RL (presynaptic source is noisy neuron)
+  if 'EN' in sim.net.pops:
+    for cell in sim.net.cells:
+      for conn in cell.conns:
+        STDPmech = conn.get('hSTDP')  # check if the connection has a NEURON STDP mechanism object
+        if STDPmech:
+          preNoise = False
+          cpreID = conn.preGid  #find preID
+          if type(cpreID) == int:
+            if cpreID in sim.net.pops['EN'].cellGids:
+              preNoise = True
+          if preNoise:
+            dSTDPmech['NOISE'].append(STDPmech)
+          else:
+            dSTDPmech['all'].append(STDPmech)
+            isEM = False
+            for pop in Mpops:
+              if cell.gid in sim.net.pops[pop].cellGids:
+                dSTDPmech[pop].append(STDPmech)
+                isEM = True
+                if dconf['sim']['targettedRL']>=4: dSTDPmech['EM'].append(STDPmech) # any EM
+            if dconf['sim']['targettedRL']>=4:
+              if not isEM: dSTDPmech['nonEM'].append(STDPmech)    
+  else:
+    for cell in sim.net.cells:
+      for conn in cell.conns:
+        STDPmech = conn.get('hSTDP')  # check if the connection has a NEURON STDP mechanism object
+        if STDPmech:
+          dSTDPmech['all'].append(STDPmech)
+          isEM = False
+          for pop in Mpops:
+            if cell.gid in sim.net.pops[pop].cellGids:
+              dSTDPmech[pop].append(STDPmech)
+              isEM = True
+              if dconf['sim']['targettedRL']>=4: dSTDPmech['EM'].append(STDPmech) # any EM
+          if dconf['sim']['targettedRL']>=4:
+            if not isEM: dSTDPmech['nonEM'].append(STDPmech)
   return dSTDPmech
         
 # Alternate to create network and run simulation
