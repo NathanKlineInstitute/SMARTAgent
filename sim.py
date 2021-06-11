@@ -1719,8 +1719,7 @@ def trainAgent (t):
     DOWNactions = sim.pc.py_broadcast(None, 0)
     if dconf['sim']['anticipatedRL']: proposed_actions = sim.pc.py_broadcast(None, 0)      
     if dconf['verbose']>1:
-      print('UPactions: ', UPactions,'DOWNactions: ', DOWNactions)
-      
+      print('UPactions: ', UPactions,'DOWNactions: ', DOWNactions)      
   if dconf['sim']['anticipatedRL']:
     cpaction = proposed_actions 
     anticipated_reward = dconf['rewardcodes']['followTarget']
@@ -1796,54 +1795,6 @@ def trainAgent (t):
       if sim.rank==0: print('adjustWeightsBasedOnFiringRates')
       adjustWeightsBasedOnFiringRates(sim,sim.dHPlastPops,synType=dconf['net']['homPlast']['synType'])
       sim.pc.barrier()
-
-def getAllSTDPObjects (sim):
-  # get all the STDP objects from the simulation's cells
-  Mpops = ['EMUP', 'EMDOWN']  
-  dSTDPmech = {'all':[]} # dictionary of STDP objects keyed by type (all, for EMUP, EMDOWN populations) -- excludes NOISE RL (see below)
-  for pop in Mpops: dSTDPmech[pop] = []
-  if dconf['sim']['targettedRL']:
-    if dconf['sim']['targettedRL']>=4:
-      dSTDPmech['nonEM'] = [] # not post-synapse of an EM neuron (only used for targetted RL when RL plasticity at non-EM neurons)
-      dSTDPmech['EM'] = [] # post-synapse of an EM neuron (EMDOWN or EMUP, etc.)
-  dSTDPmech['NOISE'] = [] # for noise RL (presynaptic source is noisy neuron)
-  if 'EN' in sim.net.pops:
-    for cell in sim.net.cells:
-      for conn in cell.conns:
-        STDPmech = conn.get('hSTDP')  # check if the connection has a NEURON STDP mechanism object
-        if STDPmech:
-          preNoise = False
-          cpreID = conn.preGid  #find preID
-          if type(cpreID) == int:
-            if cpreID in sim.net.pops['EN'].cellGids:
-              preNoise = True
-          if preNoise:
-            dSTDPmech['NOISE'].append(STDPmech)
-          else:
-            dSTDPmech['all'].append(STDPmech)
-            isEM = False
-            for pop in Mpops:
-              if cell.gid in sim.net.pops[pop].cellGids:
-                dSTDPmech[pop].append(STDPmech)
-                isEM = True
-                if dconf['sim']['targettedRL']>=4: dSTDPmech['EM'].append(STDPmech) # any EM
-            if dconf['sim']['targettedRL']>=4:
-              if not isEM: dSTDPmech['nonEM'].append(STDPmech)    
-  else:
-    for cell in sim.net.cells:
-      for conn in cell.conns:
-        STDPmech = conn.get('hSTDP')  # check if the connection has a NEURON STDP mechanism object
-        if STDPmech:
-          dSTDPmech['all'].append(STDPmech)
-          isEM = False
-          for pop in Mpops:
-            if cell.gid in sim.net.pops[pop].cellGids:
-              dSTDPmech[pop].append(STDPmech)
-              isEM = True
-              if dconf['sim']['targettedRL']>=4: dSTDPmech['EM'].append(STDPmech) # any EM
-          if dconf['sim']['targettedRL']>=4:
-            if not isEM: dSTDPmech['nonEM'].append(STDPmech)
-  return dSTDPmech
         
 # Alternate to create network and run simulation
 # create network object and set cfg and net params; pass simulation config and network params as arguments
@@ -1876,6 +1827,68 @@ def setrecspikes ():
 
 setrecspikes()
 sim.setupRecording()                  # setup variables to record for each cell (spikes, V traces, etc)
+
+def setdminmaxID (sim, lpop):
+  # setup min,max ID for each population in lpop
+  alltags = sim._gatherAllCellTags() #gather cell tags; see https://github.com/Neurosim-lab/netpyne/blob/development/netpyne/sim/gather.py
+  dGIDs = {pop:[] for pop in lpop}
+  for tinds in range(len(alltags)):
+    if alltags[tinds]['pop'] in lpop:
+      dGIDs[alltags[tinds]['pop']].append(tinds)
+  sim.simData['dminID'] = {pop:np.amin(dGIDs[pop]) for pop in lpop if len(dGIDs[pop])>0}
+  sim.simData['dmaxID'] = {pop:np.amax(dGIDs[pop]) for pop in lpop if len(dGIDs[pop])>0} 
+
+setdminmaxID(sim, allpops) # this needs to be called before getALLSTDPObjects (since uses dminID,dmaxID for EN populations when they're present)
+
+def getAllSTDPObjects (sim):
+  # get all the STDP objects from the simulation's cells
+  Mpops = ['EMUP', 'EMDOWN']  
+  dSTDPmech = {'all':[]} # dictionary of STDP objects keyed by type (all, for EMUP, EMDOWN populations) -- excludes NOISE RL (see below)
+  for pop in Mpops: dSTDPmech[pop] = []
+  if dconf['sim']['targettedRL']:
+    if dconf['sim']['targettedRL']>=4:
+      dSTDPmech['nonEM'] = [] # not post-synapse of an EM neuron (only used for targetted RL when RL plasticity at non-EM neurons)
+      dSTDPmech['EM'] = [] # post-synapse of an EM neuron (EMDOWN or EMUP, etc.)
+  dSTDPmech['NOISE'] = [] # for noise RL (presynaptic source is noisy neuron)
+  # print('sim.rank=',sim.rank,'len(sim.net.pops[EN].cellGids)=',len(sim.net.pops['EN'].cellGids),dnumc['EN'])
+  if 'EN' in sim.net.pops:
+    for cell in sim.net.cells:
+      for conn in cell.conns:
+        STDPmech = conn.get('hSTDP')  # check if the connection has a NEURON STDP mechanism object
+        if STDPmech:
+          preNoise = False
+          cpreID = conn.preGid  #find preID
+          if type(cpreID) == int:
+            if cpreID >= sim.simData['dminID']['EN'] and cpreID <= sim.simData['dmaxID']['EN']:
+              preNoise = True
+              # print('found preNoise')
+          if preNoise:
+            dSTDPmech['NOISE'].append(STDPmech)
+          else:
+            dSTDPmech['all'].append(STDPmech)
+            isEM = False
+            for pop in Mpops:
+              if cell.gid in sim.net.pops[pop].cellGids:
+                dSTDPmech[pop].append(STDPmech)
+                isEM = True
+                if dconf['sim']['targettedRL']>=4: dSTDPmech['EM'].append(STDPmech) # any EM
+            if dconf['sim']['targettedRL']>=4:
+              if not isEM: dSTDPmech['nonEM'].append(STDPmech)    
+  else:
+    for cell in sim.net.cells:
+      for conn in cell.conns:
+        STDPmech = conn.get('hSTDP')  # check if the connection has a NEURON STDP mechanism object
+        if STDPmech:
+          dSTDPmech['all'].append(STDPmech)
+          isEM = False
+          for pop in Mpops:
+            if cell.gid in sim.net.pops[pop].cellGids:
+              dSTDPmech[pop].append(STDPmech)
+              isEM = True
+              if dconf['sim']['targettedRL']>=4: dSTDPmech['EM'].append(STDPmech) # any EM
+          if dconf['sim']['targettedRL']>=4:
+            if not isEM: dSTDPmech['nonEM'].append(STDPmech)
+  return dSTDPmech
 
 dSTDPmech = getAllSTDPObjects(sim) # get all the STDP objects up-front
 
@@ -1920,16 +1933,6 @@ if dconf['net']['homPlast']['On']:
   # call this once before running the simulation.    
   initTargetW(sim,list(dconf['net']['homPlast']['mintargetFR'].keys()),synType=dconf['net']['homPlast']['synType']) 
 
-def setdminID (sim, lpop):
-  # setup min ID for each population in lpop
-  alltags = sim._gatherAllCellTags() #gather cell tags; see https://github.com/Neurosim-lab/netpyne/blob/development/netpyne/sim/gather.py
-  dGIDs = {pop:[] for pop in lpop}
-  for tinds in range(len(alltags)):
-    if alltags[tinds]['pop'] in lpop:
-      dGIDs[alltags[tinds]['pop']].append(tinds)
-  sim.simData['dminID'] = {pop:np.amin(dGIDs[pop]) for pop in lpop if len(dGIDs[pop])>0}
-
-setdminID(sim, allpops)
 tPerPlay = tstepPerAction*dconf['actionsPerPlay']
 InitializeInputRates()
 #InitializeNoiseRates()

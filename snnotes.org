@@ -33506,3 +33506,32 @@ for k,c in zip(dlw.keys(),['r','b']):
 savefig(gifpath()+'wttestC.png') # [[./gif/21jun10_21jun10_N_gcp_wttestC.png]]
 hmm, should have opposite signs ... must still have a bug ...
 
+yeah, problem was that using cellGids only has info on current node, so have to use the
+sim.simData structure after gatheralltags to get the info about ALL IDs associated with
+a population across nodes ... 
+
+python -i simdat.py backupcfg/21jun10_N2_gcp_sim.json
+
+utimes = np.unique(pdf.time)
+
+poid = dstartidx['EMDOWN']
+
+dlw = {'EN':[], 'EA':[]}
+dpdfs = {}
+
+for k in dlw.keys():
+  dpdfs[k] = pdf[(pdf.postid==poid) & (pdf.preid>=dstartidx[k]) & (pdf.preid<=dendidx[k])]
+  for t in utimes:
+    pdfs2 = dpdfs[k][dpdfs[k].time==t]
+    dlw[k].append(mean(pdfs2.weight))
+
+gdx=1
+for k,c in zip(dlw.keys(),['r','b']): 
+  subplot(1,2,gdx)
+  plot(utimes,dlw[k],c)
+  gdx+=1
+
+savefig(gifpath()+'wttestC.png') # [[./gif/21jun11_21jun10_N2_gcp_wttestC.png]]
+that's the expected pattern - missing ball leads to EN -> EM weight to increase
+and EA -> EM weight to decrease ... 
+
