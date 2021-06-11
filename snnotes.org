@@ -33535,3 +33535,11 @@ savefig(gifpath()+'wttestC.png') # [[./gif/21jun11_21jun10_N2_gcp_wttestC.png]]
 that's the expected pattern - missing ball leads to EN -> EM weight to increase
 and EA -> EM weight to decrease ... 
 
+ok, will run a multistep sim to see whether this new dynamic noise / EN population helps ... 
+
+21jun10_EN0_gcp_
+
+python multistepSim.py sn.json 30 40 21jun10_EN0_gcp_multi
+
+started ~22:44 ...
+
