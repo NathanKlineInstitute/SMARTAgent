@@ -33344,7 +33344,7 @@ savefig(gifpath()+'all_steps_avg_weight.png') # [[./gif/21jun9_21jun8_TARG0_O2_g
 
 given low firing rates, still has room to improve...
 
-* 21jun10
+* 21jun10 - check sims; setup EN dynamic noise pop
 ** check 21jun8_TARG0_O2_gcp__step_5_ -->> this one looks better (final hit/miss ratio = 1.1)
 
 python -i simdat.py backupcfg/21jun8_TARG0_O2_gcp__step_5_sim.json
@@ -33639,4 +33639,177 @@ savefig(gifpath()+'wttestC.png') # [[./gif/21jun11_21jun10_EN0_gcp__step_0_wttes
 good, as EN -> EM decreases (left), EA -> EM increases (right)
 
 after next step, will make sure weights get reloaded properly ... 
+
+** check 21jun10_EN0_gcp__step_2_
+
+python -i simdat.py backupcfg/21jun10_EN0_gcp__step_2_sim.json
+
+EV1 0.02 Hz
+EA 1.17 Hz
+IA 0.82 Hz
+IAL 3.71 Hz
+EA2 0.18 Hz
+IA2 0.35 Hz
+IA2L 2.58 Hz
+EMDOWN 0.24 Hz
+EMUP 0.23 Hz
+IM 0.44 Hz
+IML 2.88 Hz
+EN 0.87 Hz
+
+ax=plotPerf(actreward,yl=(0,2.1))
+savefig(gifpath()+'perf.png') # [[./gif/21jun11_21jun10_EN0_gcp__step_2_perf.png]]
+
+clf(); drawraster(dspkT,dspkID); xlim((498e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/21jun11_21jun10_EN0_gcp__step_2_rast.png]]
+
+utimes = np.unique(pdf.time)
+
+poid = dstartidx['EMDOWN']
+
+dlw = {'EN':[], 'EA':[]}
+dpdfs = {}
+
+for k in dlw.keys():
+  dpdfs[k] = pdf[(pdf.postid==poid) & (pdf.preid>=dstartidx[k]) & (pdf.preid<=dendidx[k])]
+  for t in utimes:
+    pdfs2 = dpdfs[k][dpdfs[k].time==t]
+    dlw[k].append(mean(pdfs2.weight))
+
+gdx=1
+for k,c in zip(dlw.keys(),['r','b']): 
+  subplot(1,2,gdx)
+  plot(utimes,dlw[k],c)
+  gdx+=1
+
+savefig(gifpath()+'wttestC.png') # [[./gif/21jun11_21jun10_EN0_gcp__step_2_wttestC.png]]
+
+yes, weights continuing properly ...
+
+lfn = ['21jun10_EN0_gcp__step_' + str(i) + '_' for i in range(3)]
+
+lpda = getindivactionreward(lfn)
+csm=cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+lclr = [csm.to_rgba(float(i)/(len(lpda))) for i in range(len(lpda))]
+clf(); plotComparePerf(lpda,lclr,yl=(0,2.1),lleg=lfn,skipscore=True,skipfollow=True)
+savefig(gifpath()+'perf_compareD.png') # [[./gif/21jun11_21jun10_EN0_gcp__step_2_perf_compareD.png]]
+
+cla(); lrat = plotHitMissRatioPerStep(lpda)
+savefig(gifpath()+'hit_miss_ratio.png') # [[./gif/21jun11_21jun10_EN0_gcp__step_2_hit_miss_ratio.png]]
+
+hmm, looks ~monotonic ... 
+
+fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
+[[./gif/21jun11_21jun10_EN0_gcp__step_2__with_reward_input.mp4]]
+
+* 21jun14
+** check 21jun10_EN0_gcp__step_15_
+
+python -i simdat.py backupcfg/21jun10_EN0_gcp__step_15_sim.json
+
+EV1 0.02 Hz
+EA 1.12 Hz
+IA 0.67 Hz
+IAL 2.33 Hz
+EA2 0.17 Hz
+IA2 0.28 Hz
+IA2L 1.55 Hz
+EMDOWN 0.27 Hz
+EMUP 0.26 Hz
+IM 0.4 Hz
+IML 1.82 Hz
+EN 0.87 Hz
+
+ax=plotPerf(actreward,yl=(0,2.1))
+savefig(gifpath()+'perf.png') # [[./gif/21jun14_21jun10_EN0_gcp__step_15_perf.png]]
+
+clf(); drawraster(dspkT,dspkID); xlim((498e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/21jun14_21jun10_EN0_gcp__step_15_rast.png]]
+
+utimes = np.unique(pdf.time)
+
+poid = dstartidx['EMDOWN']
+
+dlw = {'EN':[], 'EA':[]}
+dpdfs = {}
+
+for k in dlw.keys():
+  dpdfs[k] = pdf[(pdf.postid==poid) & (pdf.preid>=dstartidx[k]) & (pdf.preid<=dendidx[k])]
+  for t in utimes:
+    pdfs2 = dpdfs[k][dpdfs[k].time==t]
+    dlw[k].append(mean(pdfs2.weight))
+
+gdx=1
+for k,c in zip(dlw.keys(),['r','b']): 
+  subplot(1,2,gdx)
+  plot(utimes,dlw[k],c)
+  gdx+=1
+
+savefig(gifpath()+'wttestC.png') # [[./gif/21jun14_21jun10_EN0_gcp__step_15_wttestC.png]]
+
+lfn = ['21jun10_EN0_gcp__step_' + str(i) + '_' for i in range(16)]
+
+lpda = getindivactionreward(lfn)
+csm=cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+lclr = [csm.to_rgba(float(i)/(len(lpda))) for i in range(len(lpda))]
+clf(); plotComparePerf(lpda,lclr,yl=(0,2.1),lleg=lfn,skipscore=True,skipfollow=True)
+savefig(gifpath()+'perf_compareD.png') # [[./gif/21jun14_21jun10_EN0_gcp__step_15_perf_compareD.png]]
+
+cla(); lrat = plotHitMissRatioPerStep(lpda)
+savefig(gifpath()+'hit_miss_ratio.png') # [[./gif/21jun14_21jun10_EN0_gcp__step_15_hit_miss_ratio.png]]
+
+best is still step 2 ... perf fluctuates, as before ... 
+
+# fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
+
+** check 21jun8_TARG0_O2_gcp__step_17_ 
+
+python -i simdat.py backupcfg/21jun8_TARG0_O2_gcp__step_17_sim.json
+
+EV1 0.02 Hz
+EA 1.54 Hz
+IA 2.88 Hz
+IAL 4.17 Hz
+EA2 0.32 Hz
+IA2 1.57 Hz
+IA2L 2.23 Hz
+EMDOWN 0.53 Hz
+EMUP 0.5 Hz
+IM 1.93 Hz
+IML 2.74 Hz
+
+ax=plotPerf(actreward,yl=(0,2.1))
+savefig(gifpath()+'perf.png') # [[./gif/21jun14_21jun8_TARG0_O2_gcp__step_17_perf.png]]
+
+lfn = ['21may26_TARG0_O_gcp__step_' + str(i) + '_' for i in range(40)]
+for i in range(18): lfn.append('21jun8_TARG0_O2_gcp__step_'+str(i)+'_')
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0.35,0.45))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/21jun14_21jun8_TARG0_O2_gcp__step_17_perf_all_steps_so_far.png]]
+
+lpda = getindivactionreward(lfn)
+csm=cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+lclr = [csm.to_rgba(float(i)/(len(lpda))) for i in range(len(lpda))]
+clf(); plotComparePerf(lpda,lclr,yl=(0,2.1),lleg=lfn,skipscore=True,skipfollow=True)
+savefig(gifpath()+'perf_compareD.png') # [[./gif/21jun14_21jun8_TARG0_O2_gcp__step_17_perf_compareD.png]]
+
+cla(); lrat = plotHitMissRatioPerStep(lpda)
+savefig(gifpath()+'hit_miss_ratio.png') # [[./gif/21jun14_21jun8_TARG0_O2_gcp__step_17_hit_miss_ratio.png]]
+np.argmax(lrat) # 45
+lrat[np.argmax(lrat)] # 1.0909090909090908
+step 45 still best ...
+
+clf(); drawraster(dspkT,dspkID); xlim((498e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/21jun14_21jun8_TARG0_O2_gcp__step_17_rast.png]]
+getting more synchronized patterns ... and firing rates going up ... probably getting close to end of training with this sim
+
+clf(); pdfc = getconcatweightpdf(lfn)
+subplot(1,3,1); popwtsEA = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EA'],lclr=['g'],plotindiv=False)
+subplot(1,3,2); popwtsEA2 = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EA2'],lclr=['c'],plotindiv=False)
+subplot(1,3,3); popwtsE = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False)
+savefig(gifpath()+'all_steps_avg_weight.png') # [[./gif/21jun14_21jun8_TARG0_O2_gcp__step_17_all_steps_avg_weight.png]]
+
+# fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
+
+yeah, when EA weights get ~that high, that's usually when starts to become hyperexcit ... 
 
