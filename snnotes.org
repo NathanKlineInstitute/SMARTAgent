@@ -34170,3 +34170,6 @@ subplot(1,3,3); popwtsE = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.ti
 savefig(gifpath()+'all_steps_avg_weight.png') # [[./gif/21jun17_21jun8_TARG0_O2_gcp__step_26_all_steps_avg_weight.png]]
 
 # fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
+
+** 21jun8_TARG0_O2_gcp__step_28_ became hyperexcitable; stopped at step 27
+
