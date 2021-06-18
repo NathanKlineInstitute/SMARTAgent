@@ -34447,3 +34447,27 @@ savefig(gifpath()+'perf.png') # [[./gif/21jun18_21jun17_EN0_VLEAINC_gcp__step_0_
 
 fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
 [[./gif/21jun18_21jun17_EN0_VLEAINC_gcp__step_0__with_reward_input.mp4]]
+
+** stop 21jun17_EN0_VLEAINC_gcp_
+
+not different enough from previous one ... see below
+
+** other sim -- 21jun18_ENM_gcp_
+
+although in 21jun10_EN0_gcp_ EN -> I and EN -> E both have (opposite sign) RL plasticity, and all populations
+will have less influence from noise over time ... maybe should have no noise in EA? worth a try ... 
+
+what about only providing EN -> EM, and no noise elsewhere? that way, EA wouldn't get noisy influence ... 
+hmm, requires a lot of retuning ... for now will just remove noise from EA and keep noise elsewhere, and keep the VL -> EA
+at 13.75 (instead of original 12.5) ... 
+
+./myrun 30 sn.json
+
+python -i simdat.py backupcfg/21jun18_ENM_gcp_sim.json
+
+ok ... EA firing lower, but worth a try ... 
+
+python multistepSim.py sn.json 30 40 21jun18_ENM_gcp_multi
+
+started ~16:58 ...
+

@@ -65,7 +65,7 @@
         "RLFakeUpRule": 0,
         "RLFakeDownRule": 0,
         "RLFakeStayRule": 0,
-        "name": "21jun17_EN0_VLEAINC_gcp_",
+        "name": "21jun18_ENM_gcp_",
         "doquit": 1,
         "doplot": 0,
         "saveCellSecs": 0,
@@ -390,7 +390,7 @@
         "stimModVD": 35,
         "stimModVL": 35,
         "cmat": {
-	    "EN":{"EA":{"AM2": 9,"NM2": 0.0, "conv": 30},
+	    "EN":{"EA":{"AM2": 0,"NM2": 0.0, "conv": 30},
 		  "EA2":{"AM2": 9,"NM2": 0.0, "conv": 30},
                   "EMDOWN":{"AM2": 9,"NM2": 0.0, "conv": 30},
                   "EMUP":{"AM2": 9,"NM2": 0.0, "conv": 30},
