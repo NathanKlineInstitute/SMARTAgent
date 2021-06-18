@@ -34172,4 +34172,77 @@ savefig(gifpath()+'all_steps_avg_weight.png') # [[./gif/21jun17_21jun8_TARG0_O2_
 # fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
 
 ** 21jun8_TARG0_O2_gcp__step_28_ became hyperexcitable; stopped at step 27
+** check 21jun10_EN0_gcp__step_31_  -> 0.88
 
+python -i simdat.py backupcfg/21jun10_EN0_gcp__step_31_sim.json
+
+EV1 0.02 Hz
+EA 1.07 Hz
+IA 0.59 Hz
+IAL 1.33 Hz
+EA2 0.19 Hz
+IA2 0.27 Hz
+IA2L 0.89 Hz
+EMDOWN 0.32 Hz
+EMUP 0.3 Hz
+IM 0.4 Hz
+IML 1.11 Hz
+EN 0.87 Hz
+
+
+ax=plotPerf(actreward,yl=(0,2.1))
+savefig(gifpath()+'perf.png') # [[./gif/21jun18_21jun10_EN0_gcp__step_31_perf.png]]
+perf looks good for a large portion of the sim...
+
+clf(); drawraster(dspkT,dspkID); xlim((498e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/21jun18_21jun10_EN0_gcp__step_31_rast.png]]
+
+utimes = np.unique(pdf.time)
+
+poid = dstartidx['EMDOWN']
+
+dlw = {'EN':[], 'EA':[]}
+dpdfs = {}
+
+for k in dlw.keys():
+  dpdfs[k] = pdf[(pdf.postid==poid) & (pdf.preid>=dstartidx[k]) & (pdf.preid<=dendidx[k])]
+  for t in utimes:
+    pdfs2 = dpdfs[k][dpdfs[k].time==t]
+    dlw[k].append(mean(pdfs2.weight))
+
+gdx=1
+for k,c in zip(dlw.keys(),['r','b']): 
+  subplot(1,2,gdx)
+  plot(utimes,dlw[k],c)
+  gdx+=1
+
+savefig(gifpath()+'wttestC.png') # [[./gif/21jun18_21jun10_EN0_gcp__step_31_wttestC.png]]
+
+lfn = ['21jun10_EN0_gcp__step_' + str(i) + '_' for i in range(32)]
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0.2,0.8))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/21jun18_21jun10_EN0_gcp__step_31_perf_all_steps_so_far.png]]
+
+lpda = getindivactionreward(lfn)
+csm=cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+lclr = [csm.to_rgba(float(i)/(len(lpda))) for i in range(len(lpda))]
+clf(); plotComparePerf(lpda,lclr,yl=(0,2.1),lleg=lfn,skipscore=True,skipfollow=True)
+savefig(gifpath()+'perf_compareD.png') # [[./gif/21jun18_21jun10_EN0_gcp__step_31_perf_compareD.png]]
+
+cla(); lrat = plotHitMissRatioPerStep(lpda)
+savefig(gifpath()+'hit_miss_ratio.png') # [[./gif/21jun18_21jun10_EN0_gcp__step_31_hit_miss_ratio.png]]
+
+step 19 still best so far...
+
+np.argmax(lrat) # 19
+lrat[np.argmax(lrat)] # 0.92
+
+clf(); pdfc = getconcatweightpdf(lfn)
+subplot(1,3,1); popwtsfromEN = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False,prety='EN'); ylabel('Average EN->EM')
+subplot(1,3,2); popwtsfromEA = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False,prety='EA'); ylabel('Average EA->EM')
+subplot(1,3,3); popwtsfromEA2 = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False,prety='EA2'); ylabel('Average EA2->EM')
+
+savefig(gifpath()+'all_steps_avg_weightEN.png') # [[./gif/21jun18_21jun10_EN0_gcp__step_31_all_steps_avg_weightEN.png]]
+
+fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
+[[./gif/21jun18_21jun10_EN0_gcp__step_31__with_reward_input.mp4]]
