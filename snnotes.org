@@ -34189,6 +34189,8 @@ IM 0.4 Hz
 IML 1.11 Hz
 EN 0.87 Hz
 
+EA rates down a bit since beginning ... may need to test another sim with slightly higher VL -> EA weights,
+to make sure info from environment not lost ...
 
 ax=plotPerf(actreward,yl=(0,2.1))
 savefig(gifpath()+'perf.png') # [[./gif/21jun18_21jun10_EN0_gcp__step_31_perf.png]]
@@ -34246,3 +34248,37 @@ savefig(gifpath()+'all_steps_avg_weightEN.png') # [[./gif/21jun18_21jun10_EN0_gc
 
 fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
 [[./gif/21jun18_21jun10_EN0_gcp__step_31__with_reward_input.mp4]]
+
+** another sim 21jun17_EN0_VLEAINC_gcp_
+
+increase VL -> EA AM2 weight from 12.5 to 13.75; to make sure EA active enough when noise goes down ... (since seeing EA rate decrease
+slightly in sim above)
+
+./myrun 30 sn.json
+
+python -i simdat.py backupcfg/21jun17_EN0_VLEAINC_gcp_sim.json
+
+EV1 0.02 Hz
+EA 1.67 Hz
+IA 1.37 Hz
+IAL 4.65 Hz
+EA2 0.18 Hz
+IA2 0.27 Hz
+IA2L 3.47 Hz
+EMDOWN 0.27 Hz
+EMUP 0.25 Hz
+IM 0.3 Hz
+IML 3.28 Hz
+EN 0.86 Hz
+
+ok, a little higher start for EA ... 
+
+# clf(); drawraster(dspkT,dspkID); 
+# xlim((8e3,10e3))
+
+will try this one out in parallel ... 
+
+python multistepSim.py sn.json 30 40 21jun17_EN0_VLEAINC_gcp_multi
+
+started ~22:52 ...
+
