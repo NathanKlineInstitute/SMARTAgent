@@ -34471,3 +34471,17 @@ python multistepSim.py sn.json 30 40 21jun18_ENM_gcp_multi
 
 started ~16:58 ...
 
+* 21jun19
+** 21jun10_EN0_gcp__step_39_ finished, continue as 21jun19_EN02_gcp_
+
+use these weights to resume: 21jun10_EN0_gcp__step_39_synWeights_final.pkl
+
+    "simtype": {
+        "ResumeSim": 1,
+        "ResumeSimFromFile": "data/21jun10_EN0_gcp__step_39_synWeights_final.pkl"
+    },
+
+and keep the EN -> EA connection intact, with VL -> EA AM2 weights at 12.5, same as 21jun10_EN0_gcp_ (unlike 21jun18_ENM_gcp_)
+
+python multistepSim.py sn.json 30 60 21jun19_EN02_gcp_multi
+

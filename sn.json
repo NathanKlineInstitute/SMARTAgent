@@ -50,8 +50,8 @@
     "verbose": 0,
     "stayStepLim": 0,
     "simtype": {
-        "ResumeSim": 0,
-        "ResumeSimFromFile": "data/21may26_TARG0_O_gcp__step_39_synWeights_final.pkl"
+        "ResumeSim": 1,
+        "ResumeSimFromFile": "data/21jun10_EN0_gcp__step_39_synWeights_final.pkl"
     },
     "sim": {
         "duration": 500000,
@@ -65,7 +65,7 @@
         "RLFakeUpRule": 0,
         "RLFakeDownRule": 0,
         "RLFakeStayRule": 0,
-        "name": "21jun18_ENM_gcp_",
+        "name": "21jun19_EN02_gcp_",
         "doquit": 1,
         "doplot": 0,
         "saveCellSecs": 0,
@@ -390,7 +390,7 @@
         "stimModVD": 35,
         "stimModVL": 35,
         "cmat": {
-	    "EN":{"EA":{"AM2": 0,"NM2": 0.0, "conv": 30},
+	    "EN":{"EA":{"AM2": 9,"NM2": 0.0, "conv": 30},
 		  "EA2":{"AM2": 9,"NM2": 0.0, "conv": 30},
                   "EMDOWN":{"AM2": 9,"NM2": 0.0, "conv": 30},
                   "EMUP":{"AM2": 9,"NM2": 0.0, "conv": 30},
@@ -402,7 +402,7 @@
                   "IML":{"AM2": 9,"NM2": 0.0, "conv": 30}},
             "VL":{"VD":{"AM2": 0,"NM2": 0, "conv": 0},
                   "VL":{"AM2": 4,"NM2": 0.6, "conv": 0},
-                  "EA":{"AM2": 13.75,"NM2": 1, "conv": 640},
+                  "EA":{"AM2": 12.5,"NM2": 1, "conv": 640},
 		  "EA2":{"AM2": 0.25,"NM2": 0.0, "conv": 30},
                   "EMDOWN":{"AM2": 0.25,"NM2": 0.0, "conv": 30},
                   "EMUP":{"AM2": 0.25,"NM2": 0.0, "conv": 30}},
