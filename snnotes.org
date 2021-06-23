@@ -34921,3 +34921,10 @@ getspikeswithinterval also checks time range of spike to determine whether to te
 
 python -i simdat.py backupcfg/21jun23_EN0_cycle_sim.json
 
+adjusted cmat, increased VL -> EA, increase EA->IA,IAL,EA,EM weights, EM->IM,IML weights
+took out EA2,IA2,IA2L ... only provide noise to EM; increase RLhebbwt to 0.02 ... 
+
+python multistepSim.py sn.json 30 60 21jun23_EN0_cycle_multi
+
+started ~14:43 ... 
+
