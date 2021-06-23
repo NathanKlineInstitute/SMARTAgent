@@ -1404,6 +1404,26 @@ def saveGameBehavior(sim):
 
 ######################################################################################
 
+# adjusted from https://github.com/NathanKlineInstitute/netpyne-STDP/blob/master/neurosim/sim.py
+def getSpikesWithInterval(trange=None, neuronal_pop=None):
+  if len(neuronal_pop) < 1:
+    return 0.0
+  spkts = sim.simData['spkt']
+  spkids = sim.simData['spkid']
+  pop_spikes = dict([(v,0) for v in set(neuronal_pop.values())])
+  if len(spkts) > 0:
+    # if random.random() < 0.005:
+    #   print('length', len(spkts), spkts.buffer_size())
+    len_skts = len(spkids)
+    for idx in range(len_skts):
+      i = len_skts - 1 - idx
+      if trange[0] <= spkts[i] <= trange[1] and spkids[i] in neuronal_pop:
+        pop_spikes[neuronal_pop[spkids[i]]] += 1
+      if trange[0] > spkts[i]:
+        break
+  return pop_spikes
+
+"""
 def getSpikesWithInterval (trange = None, neuronal_pop = None):
   if len(neuronal_pop) < 1: return 0.0
   spkts = sim.simData['spkt']
@@ -1414,6 +1434,7 @@ def getSpikesWithInterval (trange = None, neuronal_pop = None):
       if trange[0] <= spkts[i] <= trange[1] and spkids[i] in neuronal_pop:
         pop_spikes += 1
   return pop_spikes
+"""
 
 NBsteps = 0 # this is a counter for recording the plastic weights
 epCount = []
@@ -1600,10 +1621,11 @@ def adjustWeightsBasedOnFiringRates (sim,lpop,synType='AMPA'):
               conn['hObj'].weight[PlastWeightIndex] *= sfctr
   print(sim.rank,'adjust W: UP=', countScaleUps, ', DOWN=', countScaleDowns)
 
+  
 def trainAgent (t):
   """ training interface between simulation and game environment
   """
-  global NBsteps, epCount, proposed_actions, total_hits, fid4, tstepPerAction
+  global NBsteps, epCount, proposed_actions, total_hits, fid4, tstepPerAction, cgids_map
   vec = h.Vector()
   if t<(tstepPerAction*dconf['actionsPerPlay']): # for the first time interval use randomly selected actions
     actions =[]
@@ -1616,8 +1638,11 @@ def trainAgent (t):
     for ts in range(int(dconf['actionsPerPlay'])):
       ts_beg = t-tstepPerAction*(dconf['actionsPerPlay']-ts-1) 
       ts_end = t-tstepPerAction*(dconf['actionsPerPlay']-ts)
-      F_UPs.append(getSpikesWithInterval([ts_end,ts_beg], sim.net.pops['EMUP'].cellGids))
-      F_DOWNs.append(getSpikesWithInterval([ts_end,ts_beg], sim.net.pops['EMDOWN'].cellGids))
+      freq = getSpikesWithInterval([ts_end,ts_beg], cgids_map)
+      F_UPs.append(freq['EMUP'])
+      F_DOWNs.append(freq['EMDOWN'])
+      #F_UPs.append(getSpikesWithInterval([ts_end,ts_beg], sim.net.pops['EMUP'].cellGids))
+      #F_DOWNs.append(getSpikesWithInterval([ts_end,ts_beg], sim.net.pops['EMDOWN'].cellGids))
     sim.pc.allreduce(vec.from_python(F_UPs),1) #sum
     F_UPs = vec.to_python()
     sim.pc.allreduce(vec.from_python(F_DOWNs),1) #sum
@@ -1937,6 +1962,13 @@ tPerPlay = tstepPerAction*dconf['actionsPerPlay']
 InitializeInputRates()
 #InitializeNoiseRates()
 dsumWInit = getSumAdjustableWeights(sim) # get sum of adjustable weights at start of sim
+
+#
+cgids_map = {} # just maps the EM populations' cell IDs to the population names
+for pop in ['EMUP', 'EMDOWN']:
+  for cgid in sim.net.pops[pop].cellGids: cgids_map[cgid] = pop
+#
+  
 sim.runSimWithIntervalFunc(tPerPlay,trainAgent) # has periodic callback to adjust STDP weights based on RL signal
 if sim.rank==0 and fid4 is not None: fid4.close()
 if ECellModel == 'INTF7' or ICellModel == 'INTF7': intf7.insertSpikes(sim, simConfig.recordStep)  

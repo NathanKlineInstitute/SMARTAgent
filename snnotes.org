@@ -34815,7 +34815,6 @@ still seems worth continuing, given that EN -> X weights have a lot of room to d
 fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
 [[./gif/21jun23_21jun19_EN02_gcp__step_15__with_reward_input.mp4]]
 
-
 ** check 21jun18_ENM_gcp__step_21_
 
 python -i simdat.py backupcfg/21jun18_ENM_gcp__step_21_sim.json
@@ -34867,3 +34866,58 @@ this one has even more room to advance...
 
 fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
 [[./gif/21jun23_21jun18_ENM_gcp__step_21__with_reward_input.mp4]]
+** adjust getSpikesWithInterval for faster version in netpyne-STDP
+
+# adjusted from https://github.com/NathanKlineInstitute/netpyne-STDP/blob/master/neurosim/sim.py
+def getSpikesWithInterval(trange=None, neuronal_pop=None):
+  if len(neuronal_pop) < 1:
+    return 0.0
+  spkts = sim.simData['spkt']
+  spkids = sim.simData['spkid']
+  pop_spikes = dict([(v,0) for v in set(neuronal_pop.values())])
+  if len(spkts) > 0:
+    # if random.random() < 0.005:
+    #   print('length', len(spkts), spkts.buffer_size())
+    len_skts = len(spkids)
+    for idx in range(len_skts):
+      i = len_skts - 1 - idx
+      if trange[0] <= spkts[i] <= trange[1] and spkids[i] in neuronal_pop:
+        pop_spikes[neuronal_pop[spkids[i]]] += 1
+      if trange[0] > spkts[i]:
+        break
+  return pop_spikes
+
+
+# Get move frequencies
+  move_freq = {}
+  vec = h.Vector()
+  freq = []
+  for ts in range(int(dconf['actionsPerPlay'])):
+    ts_beg = t-tstepPerAction*(dconf['actionsPerPlay']-ts-1)
+    ts_end = t-tstepPerAction*(dconf['actionsPerPlay']-ts)
+    cgids_map = {}
+    for move in moves:
+      pop_name = [p for p, m in pop_to_move.items() if m == move][0]
+      for cgid in sim.net.pops[pop_name].cellGids:
+        cgids_map[cgid] = move
+    freq.append(getSpikesWithInterval([ts_end, ts_beg], cgids_map))
+  for move in moves:
+    freq_move = [q[move] for q in freq]
+    sim.pc.allreduce(vec.from_python(freq_move), 1)  # sum
+    move_freq[move] = vec.to_python()
+
+  actions = []
+
+
+ok, adjusted the code ... 
+
+cgids_map just maps the EM populations' cell GIDs to the population name
+that way getspikeswithinterval only has to check spikes of specific populations
+getspikeswithinterval also checks time range of spike to determine whether to terminate early
+
+** sim on cycle - with dynamic noise (21jun23_EN0_cycle_)
+
+./myrun 30 sn.json
+
+python -i simdat.py backupcfg/21jun23_EN0_cycle_sim.json
+
