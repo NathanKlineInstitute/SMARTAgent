@@ -34753,3 +34753,117 @@ savefig(gifpath()+'all_steps_avg_weightEN.png') # [[./gif/21jun22_21jun18_ENM_gc
 
 fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
 [[./gif/21jun22_21jun18_ENM_gcp__step_17__with_reward_input.mp4]]
+
+* 21jun23
+** check 21jun19_EN02_gcp__step_15_  
+
+python -i simdat.py backupcfg/21jun19_EN02_gcp__step_15_sim.json
+
+EV1 0.01 Hz
+EA 0.81 Hz
+IA 0.48 Hz
+IAL 0.66 Hz
+EA2 0.34 Hz
+IA2 0.48 Hz
+IA2L 0.68 Hz
+EMDOWN 1.11 Hz
+EMUP 0.99 Hz
+IM 1.97 Hz
+IML 1.8 Hz
+EN 0.87 Hz
+
+EA dropped further; EM went up ... biased towards EMDOWN, more of the ball trajectories go down
+
+ax=plotPerf(actreward,yl=(0,2.1))
+savefig(gifpath()+'perf.png') # [[./gif/21jun23_21jun19_EN02_gcp__step_15_perf.png]]
+
+clf(); drawraster(dspkT,dspkID); xlim((498e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/21jun23_21jun19_EN02_gcp__step_15_rast.png]]
+xlim((498e3,499e3))
+savefig(gifpath()+'rastB.png') # [[./gif/21jun23_21jun19_EN02_gcp__step_15_rastB.png]]
+
+firing looks pretty bursty ... 
+
+lfn = ['21jun10_EN0_gcp__step_' + str(i) + '_' for i in range(40)]
+for i in range(16): lfn.append('21jun19_EN02_gcp__step_'+str(i)+'_')
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0.2,0.8))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/21jun23_21jun19_EN02_gcp__step_15_perf_all_steps_so_far.png]]
+
+lpda = getindivactionreward(lfn)
+cla(); lrat = plotHitMissRatioPerStep(lpda)
+savefig(gifpath()+'hit_miss_ratio.png') # [[./gif/21jun23_21jun19_EN02_gcp__step_15_hit_miss_ratio.png]]
+
+np.argmax(lrat) # 40
+lrat[np.argmax(lrat)] # 0.9583333333333334
+lfn[np.argmax(lrat)] # '21jun19_EN02_gcp__step_0_'
+
+nothing better so far...
+
+clf(); pdfc = getconcatweightpdf(lfn)
+subplot(2,3,1); popwtsfromEN = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False,prety='EN'); ylabel('Average EN->EM')
+subplot(2,3,2); popwtsfromEA = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False,prety='EA'); ylabel('Average EA->EM')
+subplot(2,3,3); popwtsfromEA2 = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False,prety='EA2'); ylabel('Average EA2->EM')
+subplot(2,3,4); popwtsfromENA = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EA'],lclr=['g'],plotindiv=False,prety='EN'); ylabel('Average EN->EA')
+subplot(2,3,5); popwtsfromEAA = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EA'],lclr=['g'],plotindiv=False,prety='EA'); ylabel('Average EA->EA')
+subplot(2,3,6); popwtsfromEA2A = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EA'],lclr=['g'],plotindiv=False,prety='EA2'); ylabel('Average EA2->EA')
+
+savefig(gifpath()+'all_steps_avg_weightEN.png') # [[./gif/21jun23_21jun19_EN02_gcp__step_15_all_steps_avg_weightEN.png]]
+
+still seems worth continuing, given that EN -> X weights have a lot of room to decrease and overall firing rates still not too high
+
+fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
+[[./gif/21jun23_21jun19_EN02_gcp__step_15__with_reward_input.mp4]]
+
+
+** check 21jun18_ENM_gcp__step_21_
+
+python -i simdat.py backupcfg/21jun18_ENM_gcp__step_21_sim.json
+
+EV1 0.02 Hz
+EA 0.44 Hz
+IA 0.35 Hz
+IAL 1.52 Hz
+EA2 0.12 Hz
+IA2 0.25 Hz
+IA2L 1.38 Hz
+EMDOWN 0.19 Hz
+EMUP 0.19 Hz
+IM 0.35 Hz
+IML 1.6 Hz
+EN 0.87 Hz
+
+ax=plotPerf(actreward,yl=(0,2.1))
+savefig(gifpath()+'perf.png') # [[./gif/21jun23_21jun18_ENM_gcp__step_21_perf.png]]
+low overall...
+
+clf(); drawraster(dspkT,dspkID); xlim((498e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/21jun23_21jun18_ENM_gcp__step_21_rast.png]]
+
+lfn = ['21jun18_ENM_gcp__step_' + str(i) + '_' for i in range(22)]
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0.2,0.8))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/21jun23_21jun18_ENM_gcp__step_21_perf_all_steps_so_far.png]]
+
+lpda = getindivactionreward(lfn)
+cla(); lrat = plotHitMissRatioPerStep(lpda)
+savefig(gifpath()+'hit_miss_ratio.png') # [[./gif/21jun23_21jun18_ENM_gcp__step_21_hit_miss_ratio.png]]
+seems like perf decreasing...
+
+np.argmax(lrat) # 1
+lrat[np.argmax(lrat)] # 0.7777777777777778
+lfn[np.argmax(lrat)] # '21jun18_ENM_gcp__step_1_'
+
+clf(); pdfc = getconcatweightpdf(lfn)
+subplot(2,3,1); popwtsfromEN = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False,prety='EN'); ylabel('Average EN->EM')
+subplot(2,3,2); popwtsfromEA = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False,prety='EA'); ylabel('Average EA->EM')
+subplot(2,3,3); popwtsfromEA2 = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False,prety='EA2'); ylabel('Average EA2->EM')
+subplot(2,3,4); popwtsfromENA = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EA'],lclr=['g'],plotindiv=False,prety='EN'); ylabel('Average EN->EA')
+subplot(2,3,5); popwtsfromEAA = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EA'],lclr=['g'],plotindiv=False,prety='EA'); ylabel('Average EA->EA')
+subplot(2,3,6); popwtsfromEA2A = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EA'],lclr=['g'],plotindiv=False,prety='EA2'); ylabel('Average EA2->EA')
+
+savefig(gifpath()+'all_steps_avg_weightEN.png') # [[./gif/21jun23_21jun18_ENM_gcp__step_21_all_steps_avg_weightEN.png]]
+this one has even more room to advance...
+
+fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
+[[./gif/21jun23_21jun18_ENM_gcp__step_21__with_reward_input.mp4]]
