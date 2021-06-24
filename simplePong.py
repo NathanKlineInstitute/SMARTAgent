@@ -51,7 +51,7 @@ class simplePong:
     # create ball speed or displacement
     self.ball_dx = 1  # displacement in horizontal direction
     self.ball_dy = 1  #displacement in vertical direction
-    self.possible_ball_ypos = [40,60,80,100,120]
+    self.possible_ball_ypos = dconf['simulatedEnvParams']['possible_ball_ypos']
     self.possible_ball_dy = dconf['simulatedEnvParams']['possible_ball_dy']
     self.possible_ball_dx = dconf['simulatedEnvParams']['possible_ball_dx']
 
