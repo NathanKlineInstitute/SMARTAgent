@@ -35143,3 +35143,9 @@ python multistepSim.py sn.json 30 60 21jun24_EN0_cycle_multi
 
 started ~16:45 ...
 
+** other sim on gcp (21jun24_EN0_OAI_gcp_)
+
+re-try openai pong on gcp ... using same architecture as 21jun24_EN0_cycle_ , but with scorePoint at 2
+
+python multistepSim.py sn.json 30 60 21jun24_EN0_OAI_gcp_multi
+

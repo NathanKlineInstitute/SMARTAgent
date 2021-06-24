@@ -13,7 +13,7 @@
         3,
         1
     ],
-    "useSimulatedEnv": 1,
+    "useSimulatedEnv": 0,
     "simulatedEnvParams": {
         "random": 0,
         "yball": 80,
@@ -32,7 +32,7 @@
     "avoidStuck": 0,
     "useImagePadding": 0,
     "rewardcodes": {
-        "scorePoint": 0.0,
+        "scorePoint": 2.0,
         "losePoint": -0.25,
         "followTarget": 0.0,
         "avoidTarget": 0.0,
@@ -66,7 +66,7 @@
         "RLFakeUpRule": 0,
         "RLFakeDownRule": 0,
         "RLFakeStayRule": 0,
-        "name": "21jun24_EN0_cycle_",
+        "name": "21jun24_EN0_OAI_gcp_",
         "doquit": 1,
         "doplot": 0,
         "saveCellSecs": 0,
