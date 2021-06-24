@@ -35149,3 +35149,13 @@ re-try openai pong on gcp ... using same architecture as 21jun24_EN0_cycle_ , bu
 
 python multistepSim.py sn.json 30 60 21jun24_EN0_OAI_gcp_multi
 
+** other sim on gcp (21jun24_EN0_FSIM_gcp_)
+
+full simulated env
+
+    "useSimulatedEnv": 2,
+
+python multistepSim.py sn.json 30 60 21jun24_EN0_FSIM_gcp_multi
+
+started ~5
+

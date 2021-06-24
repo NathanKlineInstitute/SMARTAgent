@@ -13,7 +13,7 @@
         3,
         1
     ],
-    "useSimulatedEnv": 0,
+    "useSimulatedEnv": 2,
     "simulatedEnvParams": {
         "random": 0,
         "yball": 80,
@@ -66,7 +66,7 @@
         "RLFakeUpRule": 0,
         "RLFakeDownRule": 0,
         "RLFakeStayRule": 0,
-        "name": "21jun24_EN0_OAI_gcp_",
+        "name": "21jun24_EN0_FSIM_gcp_",
         "doquit": 1,
         "doplot": 0,
         "saveCellSecs": 0,
