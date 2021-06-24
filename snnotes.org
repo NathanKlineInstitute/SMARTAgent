@@ -35119,5 +35119,5 @@ increase the E -> I weights and VL -> EA to 15 (from 13.75)
 
 python multistepSim.py sn.json 30 60 21jun24_EN0_cycle_multi
 
-started ~16:15 ...
+started ~16:16 ...
 
