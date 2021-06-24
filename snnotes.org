@@ -35113,11 +35113,33 @@ IM 0.57 Hz
 IML 4.06 Hz
 EN 0.85 Hz
 
+** other adjustments -- possible_ball_dy (1,-1), possible_ball_ypos (more values)
+
+also add some more variability
+
+        "possible_ball_dy": [1,-1],
+	"possible_ball_dx": [1,1,1,1,1,1,1,1,1,1,1,1,1],
+	"possible_ball_ypos" : [5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100,105,110,115,120],
+
+note that previously when model misses, the ball always moves down on next serve, never up; that's because possible_ball_dy
+was always 1 ... should be 1,-1
+
+possible_ball_ypos should also have more values ... (default stays same and set in conf.py)
+
 ** restart multistep on cycle (21jun24_EN0_cycle_)
 
 increase the E -> I weights and VL -> EA to 15 (from 13.75)
 
+and have these params:
+
+        "possible_ball_dy": [1,-1],
+	"possible_ball_dx": [1,1,1,1,1,1,1,1,1,1,1,1,1],
+	"possible_ball_ypos" : [5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100,105,110,115,120],
+
+since in many of the newer sims, the EMDOWN pop has higher weights, because ball is always pushed down on new serves (dy was always 1
+on a new serve!) ...
+
 python multistepSim.py sn.json 30 60 21jun24_EN0_cycle_multi
 
-started ~16:16 ...
+started ~16:45 ...
 
