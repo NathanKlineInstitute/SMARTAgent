@@ -35246,3 +35246,89 @@ this one is a little better...
 
 fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
 [[./gif/21jun25_21jun24_EN0_FSIM_gcp__step_4__with_reward_input.mp4]]
+** check 21jun24_EN0_OAI_gcp__step_7_
+
+python -i simdat.py backupcfg/21jun24_EN0_OAI_gcp__step_7_sim.json
+
+EV1 0.01 Hz
+EA 0.54 Hz
+IA 1.4 Hz
+IAL 2.39 Hz
+EMDOWN 0.19 Hz
+EMUP 0.2 Hz
+IM 0.99 Hz
+IML 5.72 Hz
+EN 0.87 Hz
+
+ax=plotPerf(actreward,yl=(0,2.1))
+savefig(gifpath()+'perf.png') # [[./gif/21jun26_21jun24_EN0_OAI_gcp__step_7_perf.png]]
+
+clf(); drawraster(dspkT,dspkID); xlim((498e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/21jun26_21jun24_EN0_OAI_gcp__step_7_rast.png]]
+
+lfn = ['21jun24_EN0_OAI_gcp__step_' + str(i) + '_' for i in range(8)]
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0.0,1.0))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/21jun26_21jun24_EN0_OAI_gcp__step_7_perf_all_steps_so_far.png]]
+
+lpda = getindivactionreward(lfn)
+cla(); lrat = plotHitMissRatioPerStep(lpda)
+savefig(gifpath()+'hit_miss_ratio.png') # [[./gif/21jun26_21jun24_EN0_OAI_gcp__step_7_hit_miss_ratio.png]]
+really bad...
+
+clf(); pdfc = getconcatweightpdf(lfn)
+subplot(2,2,1); popwtsfromEN = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False,prety='EN'); ylabel('Average EN->EM')
+subplot(2,2,2); popwtsfromEA = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False,prety='EA'); ylabel('Average EA->EM')
+subplot(2,2,3); popwtsfromENA = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EA'],lclr=['g'],plotindiv=False,prety='EN'); ylabel('Average EN->EA')
+subplot(2,2,4); popwtsfromEAA = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EA'],lclr=['g'],plotindiv=False,prety='EA'); ylabel('Average EA->EA')
+
+savefig(gifpath()+'all_steps_avg_weightEN.png') # [[./gif/21jun26_21jun24_EN0_OAI_gcp__step_7_all_steps_avg_weightEN.png]]
+
+here EN -> X weights increasing, indicating performance not improving (less reward)
+
+fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
+[[./gif/21jun26_21jun24_EN0_OAI_gcp__step_7__with_reward_input.mp4]]
+
+
+** check 21jun24_EN0_FSIM_gcp__step_7_  ; step 8 was epileptic, stopped this sim
+
+python -i simdat.py backupcfg/21jun24_EN0_FSIM_gcp__step_7_sim.json
+
+EV1 0.02 Hz
+EA 1.65 Hz
+IA 4.59 Hz
+IAL 9.77 Hz
+EMDOWN 9.28 Hz
+EMUP 8.99 Hz
+IM 11.17 Hz
+IML 17.82 Hz
+EN 0.87 Hz
+
+rates too high...
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/21jun26_21jun24_EN0_FSIM_gcp__step_7_perf.png]]
+
+clf(); drawraster(dspkT,dspkID); xlim((498e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/21jun26_21jun24_EN0_FSIM_gcp__step_7_rast.png]]
+
+lfn = ['21jun24_EN0_FSIM_gcp__step_' + str(i) + '_' for i in range(8)]
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0.0,1.0))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gifpath()+'perf_all_steps_so_far.png']]
+
+lpda = getindivactionreward(lfn)
+cla(); lrat = plotHitMissRatioPerStep(lpda)
+savefig(gifpath()+'hit_miss_ratio.png') # [[./gif/21jun26_21jun24_EN0_FSIM_gcp__step_7_hit_miss_ratio.png]]
+not as bad as other...
+
+clf(); pdfc = getconcatweightpdf(lfn)
+subplot(2,2,1); popwtsfromEN = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False,prety='EN'); ylabel('Average EN->EM')
+subplot(2,2,2); popwtsfromEA = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False,prety='EA'); ylabel('Average EA->EM')
+subplot(2,2,3); popwtsfromENA = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EA'],lclr=['g'],plotindiv=False,prety='EN'); ylabel('Average EN->EA')
+subplot(2,2,4); popwtsfromEAA = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EA'],lclr=['g'],plotindiv=False,prety='EA'); ylabel('Average EA->EA')
+
+savefig(gifpath()+'all_steps_avg_weightEN.png') # [[./gif/21jun26_21jun24_EN0_FSIM_gcp__step_7_all_steps_avg_weightEN.png]]
+
+fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
+[[./gif/21jun26_21jun24_EN0_FSIM_gcp__step_7__with_reward_input.mp4]]
