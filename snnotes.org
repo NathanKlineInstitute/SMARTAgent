@@ -35478,5 +35478,31 @@ savefig(gifpath()+'all_steps_avg_weightENB.png') # [[./gif/21jun26_21jun25_EN0_c
 fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
 [[./gif/21jun26_21jun25_EN0_cycle__step_9__with_reward_input.mp4]]
 
-pretty slow progress, if any ... 
+pretty slow progress, if any ... watching video can see some behavior going in right direction, seems non-random; surprising
+given how sparse connectivity from VL (EV1) -> EA is
+
+** 21jun25_EN0_gcp_ became epileptic; stopped sim
+** 21jun26_EN0_gcp_ -- same as 21jun25_EN0_cycle_ but VL -> EA conv = 128 instead of 64
+
+./myrun 30 sn.json
+
+python -i simdat.py backupcfg/21jun26_EN0_gcp_sim.json
+
+EV1 0.02 Hz
+EA 0.05 Hz
+IA 0.0 Hz
+IAL 0.0 Hz
+EMDOWN 0.11 Hz
+EMUP 0.11 Hz
+IM 0.34 Hz
+IML 3.4 Hz
+EN 0.84 Hz
+
+savefig(gifpath()+'rast.png') # [[./gif/21jun27_21jun26_EN0_gcp_rast.png]]
+
+EA rates a bit higher than 21jun25_EN0_cycle_ ... worth running for comparison 
+
+python multistepSim.py sn.json 30 60 21jun25_EN0_gcp_multi
+
+started ~22:09 ...
 
