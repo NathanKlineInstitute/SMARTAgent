@@ -35694,3 +35694,13 @@ for the EN -> X RL weights so they decrease slower or with smaller step ...
 
 # fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
 
+** 21jun28_EN0_64_cycle_
+
+VL -> EA conv = 64, shorter AMPAN RLlenhebb (200 instead of 10000), smaller AMPAN RLhebbwt (0.01 instead of 0.02)
+see if that helps the noise modulation, to prevent rates from going down too quickly due to EN -> X weight reductions
+happening too quickly ... (w/o enough time for internal weights to increase)
+
+python multistepSim.py sn.json 30 60 21jun28_EN0_64_cycle_multi
+
+started ~13:54 ...
+
