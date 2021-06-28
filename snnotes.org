@@ -35506,3 +35506,142 @@ python multistepSim.py sn.json 30 60 21jun25_EN0_gcp_multi
 
 started ~22:09 ...
 
+* 21jun28
+** check 21jun26_EN0_gcp__step_7_ -->> has some decent steps (surprising given sparse connectivity)
+
+python -i simdat.py backupcfg/21jun26_EN0_gcp__step_7_sim.json
+
+EV1 0.02 Hz
+EA 0.07 Hz
+IA 0.0 Hz
+IAL 0.0 Hz
+EMDOWN 0.12 Hz
+EMUP 0.12 Hz
+IM 0.43 Hz
+IML 3.21 Hz
+EN 0.87 Hz
+
+ax=plotPerf(actreward,yl=(0,1.01))
+savefig(gifpath()+'perf.png') # [[./gif/21jun28_21jun26_EN0_gcp__step_7_perf.png]]
+
+clf(); drawraster(dspkT,dspkID); xlim((498e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/21jun28_21jun26_EN0_gcp__step_7_rast.png]]
+
+lfn = ['21jun26_EN0_gcp__step_' + str(i) + '_' for i in range(8)]
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0.0,1.0))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/21jun28_21jun26_EN0_gcp__step_7_perf_all_steps_so_far.png]]
+
+lpda = getindivactionreward(lfn)
+cla(); lrat = plotHitMissRatioPerStep(lpda)
+savefig(gifpath()+'hit_miss_ratio.png') # [[./gif/21jun28_21jun26_EN0_gcp__step_7_hit_miss_ratio.png]]
+
+np.argmax(lrat) # 4
+lrat[np.argmax(lrat)] # 0.6666666666666666
+lfn[np.argmax(lrat)] # '21jun26_EN0_gcp__step_4_'
+
+clf(); pdfc = getconcatweightpdf(lfn)
+subplot(2,2,1); popwtsfromEN = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False,prety='EN'); ylabel('Average EN->EM')
+subplot(2,2,2); popwtsfromEA = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False,prety='EA'); ylabel('Average EA->EM')
+subplot(2,2,3); popwtsfromENA = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EA'],lclr=['g'],plotindiv=False,prety='EN'); ylabel('Average EN->EA')
+subplot(2,2,4); popwtsfromEAA = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EA'],lclr=['g'],plotindiv=False,prety='EA'); ylabel('Average EA->EA')
+
+savefig(gifpath()+'all_steps_avg_weightEN.png') # [[./gif/21jun28_21jun26_EN0_gcp__step_7_all_steps_avg_weightEN.png]]
+
+subplot(1,1,1); popwtsfromVLA = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EA'],lclr=['g'],plotindiv=False,prety='EV1'); ylabel('Average EV1->EA')
+savefig(gifpath()+'all_steps_avg_weightENB.png') # [[./gif/21jun28_21jun26_EN0_gcp__step_7_all_steps_avg_weightENB.png]]
+
+check step 4 ... 
+python -i simdat.py backupcfg/21jun26_EN0_gcp__step_4_sim.json
+
+EV1 0.02 Hz
+EA 0.07 Hz
+IA 0.0 Hz
+IAL 0.0 Hz
+EMDOWN 0.12 Hz
+EMUP 0.12 Hz
+IM 0.45 Hz
+IML 3.46 Hz
+EN 0.87 Hz
+
+ax=plotPerf(actreward,yl=(0,1.01))
+savefig(gifpath()+'perf.png') # [[./gif/21jun28_21jun26_EN0_gcp__step_4_perf.png]]
+
+clf(); drawraster(dspkT,dspkID); xlim((498e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/21jun28_21jun26_EN0_gcp__step_4_rast.png]]
+
+fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
+[[./gif/21jun28_21jun26_EN0_gcp__step_4__with_reward_input.mp4]]
+
+** check 21jun24_EN0_OAI_gcp__step_24_ -->> perf decreasing, stopped
+
+python -i simdat.py backupcfg/21jun24_EN0_OAI_gcp__step_24_sim.json
+
+EV1 0.01 Hz
+EA 0.46 Hz
+IA 1.19 Hz
+IAL 1.94 Hz
+EMDOWN 0.16 Hz
+EMUP 0.17 Hz
+IM 0.84 Hz
+IML 10.9 Hz
+EN 0.87 Hz
+
+rates down ... indicating poor performance
+
+ax=plotPerf(actreward,yl=(0,1.01))
+savefig(gifpath()+'perf.png') # [[./gif/21jun28_21jun24_EN0_OAI_gcp__step_24_perf.png]]
+
+clf(); drawraster(dspkT,dspkID); xlim((498e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/21jun28_21jun24_EN0_OAI_gcp__step_24_rast.png]]
+
+lfn = ['21jun24_EN0_OAI_gcp__step_' + str(i) + '_' for i in range(25)]
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0.0,1.0))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/21jun28_21jun24_EN0_OAI_gcp__step_24_perf_all_steps_so_far.png]]
+
+decreasing perf...
+
+lpda = getindivactionreward(lfn)
+cla(); lrat = plotHitMissRatioPerStep(lpda)
+savefig(gifpath()+'hit_miss_ratio.png') # [[./gif/21jun28_21jun24_EN0_OAI_gcp__step_24_hit_miss_ratio.png]]
+pretty clear that performance is decreasing
+
+clf(); pdfc = getconcatweightpdf(lfn)
+subplot(2,2,1); popwtsfromEN = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False,prety='EN'); ylabel('Average EN->EM')
+subplot(2,2,2); popwtsfromEA = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False,prety='EA'); ylabel('Average EA->EM')
+subplot(2,2,3); popwtsfromENA = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EA'],lclr=['g'],plotindiv=False,prety='EN'); ylabel('Average EN->EA')
+subplot(2,2,4); popwtsfromEAA = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EA'],lclr=['g'],plotindiv=False,prety='EA'); ylabel('Average EA->EA')
+
+savefig(gifpath()+'all_steps_avg_weightEN.png') # [[./gif/21jun28_21jun24_EN0_OAI_gcp__step_24_all_steps_avg_weightEN.png]]
+
+here EN -> EM is increasing ... another sign of bad perf ... will prob stop this sim ... 
+
+# fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
+
+** 21jun28_EN0_gcp_ , 21jun28_EN0_256_gcp_ -- same as 21jun25_EN0_cycle_ but VL -> EA conv = 256 instead of 64
+
+./myrun 30 sn.json
+
+python -i simdat.py backupcfg/21jun28_EN0_gcp_sim.json
+
+EV1 0.02 Hz
+EA 0.29 Hz
+IA 0.0 Hz
+IAL 0.0 Hz
+EMDOWN 0.13 Hz
+EMUP 0.11 Hz
+IM 0.38 Hz
+IML 3.43 Hz
+EN 0.84 Hz
+
+savefig(gifpath()+'rast.png') # [[./gif/21jun28_21jun28_EN0_gcp_rast.png]]
+
+slightly higher rates for EA ... 
+
+use this name in sn.json : 21jun28_EN0_256_gcp_
+
+python multistepSim.py sn.json 30 60 21jun28_EN0_256_gcp_multi
+
+started ~12:03 ...
+
