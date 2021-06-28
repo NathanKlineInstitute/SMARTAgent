@@ -35704,3 +35704,37 @@ python multistepSim.py sn.json 30 60 21jun28_EN0_64_cycle_multi
 
 started ~13:54 ...
 
+** 21jun28_EN0_K_cycle_ -- use 21may15_TARG0_K_gcp_ as start for noise mod sim
+
+so connectivity is same as 21may15_TARG0_K_gcp_ except that have EN -> X
+also,only provide noise to EN
+
+since that's the one HA is using in the manuscript
+
+./myrun 30 sn.json
+
+python -i simdat.py backupcfg/21jun28_EN0_K_cycle_sim.json
+
+EV1 0.02 Hz
+EA 1.43 Hz
+IA 0.92 Hz
+IAL 4.01 Hz
+EA2 0.18 Hz
+IA2 0.35 Hz
+IA2L 2.66 Hz
+EMDOWN 0.19 Hz
+EMUP 0.18 Hz
+IM 0.4 Hz
+IML 2.66 Hz
+EN 0.86 Hz
+
+drawraster(dspkT,dspkID)
+savefig(gifpath()+'rast.png') # [[./gif/21jun28_21jun28_EN0_K_cycle_rast.png]]
+
+ok...give it a try...increased EN to 3600 so lower chance of correlated noise...also have the shorter
+tau and weight for AMPAN
+
+python multistepSim.py sn.json 30 60 21jun28_EN0_K_cycle_multi
+
+started ~14:35 ...
+
