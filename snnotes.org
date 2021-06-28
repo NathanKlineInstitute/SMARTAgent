@@ -35645,3 +35645,52 @@ python multistepSim.py sn.json 30 60 21jun28_EN0_256_gcp_multi
 
 started ~12:03 ...
 
+** check 21jun25_EN0_cycle__step_27_ -->> rates decreasing -- stopping sim
+
+python -i simdat.py backupcfg/21jun25_EN0_cycle__step_27_sim.json
+
+EV1 0.01 Hz
+EA 0.01 Hz
+IA 0.0 Hz
+IAL 0.0 Hz
+EMDOWN 0.04 Hz
+EMUP 0.05 Hz
+IM 0.06 Hz
+IML 0.1 Hz
+EN 0.87 Hz
+
+hmm, EA, EM rates down...
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/21jun28_21jun25_EN0_cycle__step_27_perf.png]]
+terrible perf...
+
+clf(); drawraster(dspkT,dspkID); xlim((498e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/21jun28_21jun25_EN0_cycle__step_27_rast.png]]
+
+lfn = ['21jun25_EN0_cycle__step_' + str(i) + '_' for i in range(28)]
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0.0,1.0))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/21jun28_21jun25_EN0_cycle__step_27_perf_all_steps_so_far.png]]
+
+lpda = getindivactionreward(lfn)
+cla(); lrat = plotHitMissRatioPerStep(lpda)
+savefig(gifpath()+'hit_miss_ratio.png') # [[./gif/21jun28_21jun25_EN0_cycle__step_27_hit_miss_ratio.png]]
+pretty bad ... 
+
+clf(); pdfc = getconcatweightpdf(lfn)
+subplot(2,2,1); popwtsfromEN = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False,prety='EN'); ylabel('Average EN->EM')
+subplot(2,2,2); popwtsfromEA = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False,prety='EA'); ylabel('Average EA->EM')
+subplot(2,2,3); popwtsfromENA = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EA'],lclr=['g'],plotindiv=False,prety='EN'); ylabel('Average EN->EA')
+subplot(2,2,4); popwtsfromEAA = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EA'],lclr=['g'],plotindiv=False,prety='EA'); ylabel('Average EA->EA')
+
+savefig(gifpath()+'all_steps_avg_weightEN.png') # [[./gif/21jun28_21jun25_EN0_cycle__step_27_all_steps_avg_weightEN.png]]
+
+subplot(1,1,1); popwtsfromVLA = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EA'],lclr=['g'],plotindiv=False,prety='EV1'); ylabel('Average EV1->EA')
+savefig(gifpath()+'all_steps_avg_weightENB.png') # [[./gif/21jun28_21jun25_EN0_cycle__step_27_all_steps_avg_weightENB.png]]
+
+why are firing rates decreasing if weights increasing ... since EN -> EM decreasing too quickly ? could use shorter time constant
+for the EN -> X RL weights so they decrease slower or with smaller step ... 
+
+# fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
+
