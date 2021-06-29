@@ -35739,7 +35739,7 @@ python multistepSim.py sn.json 30 60 21jun28_EN0_K_cycle_multi
 started ~14:35 ...
 
 * 21jun29
-** check 21jun26_EN0_gcp__step_12_ 
+** check 21jun26_EN0_gcp__step_12_  -->> stop this sim
 
 python -i simdat.py backupcfg/21jun26_EN0_gcp__step_12_sim.json
 
@@ -35785,7 +35785,7 @@ savefig(gifpath()+'all_steps_avg_weightEN.png') # [[./gif/21jun29_21jun26_EN0_gc
 subplot(1,1,1); popwtsfromVLA = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EA'],lclr=['g'],plotindiv=False,prety='EV1'); ylabel('Average EV1->EA')
 savefig(gifpath()+'all_steps_avg_weightENB.png') # [[./gif/21jun29_21jun26_EN0_gcp__step_12_all_steps_avg_weightENB.png]]
 
-weights moving in right direction, but very slowly...could use larger RLhebbwt ... 
+weights moving in right direction, but very slowly...could use larger RLhebbwt ... this also has long tau for AMPAN RL
 
 # fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
 
@@ -35925,4 +35925,13 @@ savefig(gifpath()+'all_steps_avg_weightEN.png') # [[./gif/21jun29_21jun28_EN0_K_
 
 fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
 [[./gif/21jun29_21jun28_EN0_K_cycle__step_2__with_reward_input.mp4]]
+
+** restart modified version of 21jun26_EN0_gcp_ as 21jun29_EN0_128_gcp_
+
+made RLhebbwt for AMPA at 0.1 -- pretty high but the weights were not increasing too quickly
+RLhebbwt for AMPAN at 0.01 and RLlenhebb at 200
+
+python multistepSim.py sn.json 30 60 21jun29_EN0_128_gcp_multi
+
+started ~15:30 ...
 
