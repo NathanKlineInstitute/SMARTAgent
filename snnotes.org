@@ -35944,3 +35944,12 @@ python multistepSim.py sn.json 30 60 21jun29_EN0_256_gcp_multi
 
 started ~15:37 ...
 
+** restart modified version of 21jun28_EN0_64_cycle_ as 21jun29_EN0_64_cycle_
+
+made RLhebbwt for AMPA at 0.1 -- pretty high but the weights were not increasing too quickly
+RLhebbwt for AMPAN at 0.01 and RLlenhebb at 200
+
+python multistepSim.py sn.json 30 60 21jun29_EN0_64_cycle_multi
+
+started ~15:46 ...
+
