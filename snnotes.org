@@ -35738,3 +35738,97 @@ python multistepSim.py sn.json 30 60 21jun28_EN0_K_cycle_multi
 
 started ~14:35 ...
 
+* 21jun29
+** check 21jun26_EN0_gcp__step_12_ 
+
+python -i simdat.py backupcfg/21jun26_EN0_gcp__step_12_sim.json
+
+EV1 0.02 Hz
+EA 0.07 Hz
+IA 0.0 Hz
+IAL 0.0 Hz
+EMDOWN 0.12 Hz
+EMUP 0.12 Hz
+IM 0.42 Hz
+IML 2.91 Hz
+EN 0.87 Hz
+
+ax=plotPerf(actreward,yl=(0,1.01))
+savefig(gifpath()+'perf.png') # [[./gif/21jun29_21jun26_EN0_gcp__step_12_perf.png]]
+
+clf(); drawraster(dspkT,dspkID); xlim((498e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/21jun29_21jun26_EN0_gcp__step_12_rast.png]]
+
+lfn = ['21jun26_EN0_gcp__step_' + str(i) + '_' for i in range(13)]
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0.0,1.0))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/21jun29_21jun26_EN0_gcp__step_12_perf_all_steps_so_far.png]]
+
+lpda = getindivactionreward(lfn)
+cla(); lrat = plotHitMissRatioPerStep(lpda)
+savefig(gifpath()+'hit_miss_ratio.png') # [[./gif/21jun29_21jun26_EN0_gcp__step_12_hit_miss_ratio.png]]
+
+np.argmax(lrat) # 4
+lrat[np.argmax(lrat)] # 0.6666666666666666
+lfn[np.argmax(lrat)] # '21jun26_EN0_gcp__step_4_'
+
+nothing better yet ... 
+
+clf(); pdfc = getconcatweightpdf(lfn)
+subplot(2,2,1); popwtsfromEN = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False,prety='EN'); ylabel('Average EN->EM')
+subplot(2,2,2); popwtsfromEA = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False,prety='EA'); ylabel('Average EA->EM')
+subplot(2,2,3); popwtsfromENA = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EA'],lclr=['g'],plotindiv=False,prety='EN'); ylabel('Average EN->EA')
+subplot(2,2,4); popwtsfromEAA = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EA'],lclr=['g'],plotindiv=False,prety='EA'); ylabel('Average EA->EA')
+
+savefig(gifpath()+'all_steps_avg_weightEN.png') # [[./gif/21jun29_21jun26_EN0_gcp__step_12_all_steps_avg_weightEN.png]]
+
+subplot(1,1,1); popwtsfromVLA = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EA'],lclr=['g'],plotindiv=False,prety='EV1'); ylabel('Average EV1->EA')
+savefig(gifpath()+'all_steps_avg_weightENB.png') # [[./gif/21jun29_21jun26_EN0_gcp__step_12_all_steps_avg_weightENB.png]]
+
+weights moving in right direction, but very slowly...could use larger RLhebbwt ... 
+
+# fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
+
+** check 21jun28_EN0_256_gcp__step_2_
+
+python -i simdat.py backupcfg/21jun28_EN0_256_gcp__step_2_sim.json
+
+EV1 0.02 Hz
+EA 0.29 Hz
+IA 0.01 Hz
+IAL 0.02 Hz
+EMDOWN 0.14 Hz
+EMUP 0.14 Hz
+IM 0.47 Hz
+IML 3.68 Hz
+EN 0.87 Hz
+
+ax=plotPerf(actreward,yl=(0,1.01))
+savefig(gifpath()+'perf.png') # [[./gif/21jun29_21jun28_EN0_256_gcp__step_2_perf.png]]
+
+clf(); drawraster(dspkT,dspkID); xlim((498e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/21jun29_21jun28_EN0_256_gcp__step_2_rast.png]]
+
+lfn = ['21jun28_EN0_256_gcp__step_' + str(i) + '_' for i in range(3)]
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0.0,1.0))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/21jun29_21jun28_EN0_256_gcp__step_2_perf_all_steps_so_far.png]]
+
+lpda = getindivactionreward(lfn)
+cla(); lrat = plotHitMissRatioPerStep(lpda)
+savefig(gifpath()+'hit_miss_ratio.png') # [[./gif/21jun29_21jun28_EN0_256_gcp__step_2_hit_miss_ratio.png]]
+
+clf(); pdfc = getconcatweightpdf(lfn)
+subplot(2,2,1); popwtsfromEN = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False,prety='EN'); ylabel('Average EN->EM')
+subplot(2,2,2); popwtsfromEA = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False,prety='EA'); ylabel('Average EA->EM')
+subplot(2,2,3); popwtsfromENA = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EA'],lclr=['g'],plotindiv=False,prety='EN'); ylabel('Average EN->EA')
+subplot(2,2,4); popwtsfromEAA = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EA'],lclr=['g'],plotindiv=False,prety='EA'); ylabel('Average EA->EA')
+
+savefig(gifpath()+'all_steps_avg_weightEN.png') # [[./gif/21jun29_21jun28_EN0_256_gcp__step_2_all_steps_avg_weightEN.png]]
+
+subplot(1,1,1); popwtsfromVLA = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EA'],lclr=['g'],plotindiv=False,prety='EV1'); ylabel('Average EV1->EA')
+savefig(gifpath()+'all_steps_avg_weightENB.png') # [[./gif/21jun29_21jun28_EN0_256_gcp__step_2_all_steps_avg_weightENB.png]]
+
+weights changing too slowly ... better if they could change by a % of original synaptic weight instead of fixed increment ... 
+
+# fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
