@@ -36046,3 +36046,114 @@ savefig(gifpath()+'all_steps_avg_weightENB.png') # [[./gif/21jun30_21jun26_EN0_2
 fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
 [[./gif/21jun30_21jun26_EN0_256_gcp__step_2__with_reward_input.mp4]]
 
+** check 21jun26_EN0_64_cycle__step_6_ (started 21jun29 -- see above)
+
+python -i simdat.py backupcfg/21jun26_EN0_64_cycle__step_6_sim.json
+
+EV1 0.02 Hz
+EA 0.02 Hz
+IA 0.0 Hz
+IAL 0.0 Hz
+EMDOWN 0.12 Hz
+EMUP 0.12 Hz
+IM 0.46 Hz
+IML 3.46 Hz
+EN 0.87 Hz
+
+note that EA has very low firing ... 
+
+ax=plotPerf(actreward,yl=(0,3.01))
+savefig(gifpath()+'perf.png') # [[./gif/21jun30_21jun26_EN0_64_cycle__step_6_perf.png]]
+
+clf(); drawraster(dspkT,dspkID); xlim((498e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/21jun30_21jun26_EN0_64_cycle__step_6_rast.png]]
+
+lfn = ['21jun26_EN0_64_cycle__step_' + str(i) + '_' for i in range(7)]
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0.0,1.0))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/21jun30_21jun26_EN0_64_cycle__step_6_perf_all_steps_so_far.png]]
+
+lpda = getindivactionreward(lfn)
+cla(); lrat = plotHitMissRatioPerStep(lpda)
+savefig(gifpath()+'hit_miss_ratio.png') # [[./gif/21jun30_21jun26_EN0_64_cycle__step_6_hit_miss_ratio.png]]
+
+clf(); pdfc = getconcatweightpdf(lfn,usefinal=True)
+subplot(2,2,1); popwtsfromEN = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False,prety='EN'); ylabel('Average EN->EM')
+subplot(2,2,2); popwtsfromEA = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False,prety='EA'); ylabel('Average EA->EM')
+subplot(2,2,3); popwtsfromENA = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EA'],lclr=['g'],plotindiv=False,prety='EN'); ylabel('Average EN->EA')
+subplot(2,2,4); popwtsfromEAA = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EA'],lclr=['g'],plotindiv=False,prety='EA'); ylabel('Average EA->EA')
+
+savefig(gifpath()+'all_steps_avg_weightEN.png') # [[./gif/21jun30_21jun26_EN0_64_cycle__step_6_all_steps_avg_weightEN.png]]
+weights changing pretty slowly ... 
+
+subplot(1,1,1); popwtsfromVLA = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EA'],lclr=['g'],plotindiv=False,prety='EV1'); ylabel('Average EV1->EA')
+savefig(gifpath()+'all_steps_avg_weightENB.png') # [[./gif/21jun30_21jun26_EN0_64_cycle__step_6_all_steps_avg_weightENB.png]]
+
+fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
+[[./gif/21jun30_21jun26_EN0_64_cycle__step_6__with_reward_input.mp4]]
+** check 21jun28_EN0_K_cycle__step_5_
+
+python -i simdat.py backupcfg/21jun28_EN0_K_cycle__step_5_sim.json
+
+EV1 0.02 Hz
+EA 1.26 Hz
+IA 0.88 Hz
+IAL 4.15 Hz
+EA2 0.18 Hz
+IA2 0.35 Hz
+IA2L 2.78 Hz
+EMDOWN 0.25 Hz
+EMUP 0.25 Hz
+IM 0.49 Hz
+IML 3.12 Hz
+EN 0.87 Hz
+
+ax=plotPerf(actreward,yl=(0,1.01))
+savefig(gifpath()+'perf.png') # [[./gif/21jun30_21jun28_EN0_K_cycle__step_5_perf.png]]
+
+pretty low perf
+
+clf(); drawraster(dspkT,dspkID); xlim((498e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/21jun30_21jun28_EN0_K_cycle__step_5_rast.png]]
+
+lfn = ['21jun28_EN0_K_cycle__step_' + str(i) + '_' for i in range(6)]
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0.0,1.0))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/21jun30_21jun28_EN0_K_cycle__step_5_perf_all_steps_so_far.png]]
+
+lpda = getindivactionreward(lfn)
+cla(); lrat = plotHitMissRatioPerStep(lpda)
+savefig(gifpath()+'hit_miss_ratio.png') # [[./gif/21jun30_21jun28_EN0_K_cycle__step_5_hit_miss_ratio.png]]
+
+clf(); pdfc = getconcatweightpdf(lfn,usefinal=True)
+subplot(2,2,1); popwtsfromEN = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False,prety='EN'); ylabel('Average EN->EM')
+subplot(2,2,2); popwtsfromEA = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False,prety='EA'); ylabel('Average EA->EM')
+subplot(2,2,3); popwtsfromENA = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EA'],lclr=['g'],plotindiv=False,prety='EN'); ylabel('Average EN->EA')
+subplot(2,2,4); popwtsfromEAA = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EA'],lclr=['g'],plotindiv=False,prety='EA'); ylabel('Average EA->EA')
+
+savefig(gifpath()+'all_steps_avg_weightEN.png') # [[./gif/21jun30_21jun28_EN0_K_cycle__step_5_all_steps_avg_weightEN.png]]
+
+python -i simdat.py backupcfg/21jun28_EN0_K_cycle__step_4_sim.json
+
+EV1 0.02 Hz
+EA 1.26 Hz
+IA 0.88 Hz
+IAL 4.14 Hz
+EA2 0.18 Hz
+IA2 0.35 Hz
+IA2L 2.78 Hz
+EMDOWN 0.24 Hz
+EMUP 0.25 Hz
+IM 0.49 Hz
+IML 3.11 Hz
+EN 0.87 Hz
+
+ax=plotPerf(actreward,yl=(0,1.01))
+savefig(gifpath()+'perf.png') # [[./gif/21jun30_21jun28_EN0_K_cycle__step_4_perf.png]]
+
+clf(); drawraster(dspkT,dspkID); xlim((498e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/21jun30_21jun28_EN0_K_cycle__step_4_rast.png]]
+
+fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
+[[./gif/21jun30_21jun28_EN0_K_cycle__step_4__with_reward_input.mp4]]
+
