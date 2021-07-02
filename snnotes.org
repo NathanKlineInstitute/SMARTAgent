@@ -36451,7 +36451,7 @@ python multistepSim.py sn.json 30 60 21jul2_EN0_256_gcp_multi
 
 started ~12:45 ...
 
-** check 21jun26_EN0_64_cycle__step_15_ 
+** check 21jun26_EN0_64_cycle__step_15_  -->> stopped on cycle
 
 python -i simdat.py backupcfg/21jun26_EN0_64_cycle__step_15_sim.json
 
