@@ -36445,3 +36445,10 @@ same mistake in the network with 256 conv from VL -> EA
 python multistepSim.py sn.json 30 60 21jul2_EN0_128_gcp_multi
 
 started ~12:44 ...
+
+** 21jul2_EN0_256_gcp_
+
+python multistepSim.py sn.json 30 60 21jul2_EN0_256_gcp_multi
+
+started ~12:45 ...
+
