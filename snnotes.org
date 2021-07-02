@@ -36379,3 +36379,63 @@ will let it continue some more ...
 
 # fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
 
+* 21jul2
+** check 21jun26_EN0_128_gcp__step_14_ -->> had wrong reward codes, hyperexcitable, stopped
+
+python -i simdat.py backupcfg/21jun26_EN0_128_gcp__step_14_sim.json
+
+EV1 0.02 Hz
+EA 0.76 Hz
+IA 0.4 Hz
+IAL 1.69 Hz
+EMDOWN 43.33 Hz
+EMUP 43.26 Hz
+IM 77.18 Hz
+IML 62.56 Hz
+EN 0.87 Hz
+
+hyperexcit should stop
+
+ax=plotPerf(actreward,yl=(0,1.01))
+savefig(gifpath()+'perf.png') # [[./gif/21jul2_21jun26_EN0_128_gcp__step_14_perf.png]]
+
+clf(); drawraster(dspkT,dspkID); xlim((498e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/21jul2_21jun26_EN0_128_gcp__step_14_rast.png]]
+
+lfn = ['21jun26_EN0_128_gcp__step_' + str(i) + '_' for i in range(15)]
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0.0,1.0))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/21jul2_21jun26_EN0_128_gcp__step_14_perf_all_steps_so_far.png]]
+
+lpda = getindivactionreward(lfn)
+cla(); lrat = plotHitMissRatioPerStep(lpda)
+savefig(gifpath()+'hit_miss_ratio.png') # [[./gif/21jul2_21jun26_EN0_128_gcp__step_14_hit_miss_ratio.png]]
+not progressing so far...
+
+clf(); pdfc = getconcatweightpdf(lfn,usefinal=True)
+subplot(2,2,1); popwtsfromEN = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False,prety='EN'); ylabel('Average EN->EM')
+subplot(2,2,2); popwtsfromEA = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False,prety='EA'); ylabel('Average EA->EM')
+subplot(2,2,3); popwtsfromENA = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EA'],lclr=['g'],plotindiv=False,prety='EN'); ylabel('Average EN->EA')
+subplot(2,2,4); popwtsfromEAA = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EA'],lclr=['g'],plotindiv=False,prety='EA'); ylabel('Average EA->EA')
+
+savefig(gifpath()+'all_steps_avg_weightEN.png') # [[./gif/21jul2_21jun26_EN0_128_gcp__step_14_all_steps_avg_weightEN.png]]
+
+subplot(1,1,1); popwtsfromVLA = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EA'],lclr=['g'],plotindiv=False,prety='EV1'); ylabel('Average EV1->EA')
+savefig(gifpath()+'all_steps_avg_weightENB.png') # [[./gif/21jul2_21jun26_EN0_128_gcp__step_14_all_steps_avg_weightENB.png]]
+
+# fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
+
+stopping - had a bug in rewardcodes ... : 
+  "rewardcodes": {
+    "scorePoint": 2.0,
+    "losePoint": -0.25,
+    "followTarget": 0.0,
+    "avoidTarget": 0.0,
+    "hitBall": 1.0
+  },
+
+and network is hyperexcitable too ... 
+
+same mistake in the network with 256 conv from VL -> EA
+
+
