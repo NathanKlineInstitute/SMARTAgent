@@ -36706,3 +36706,62 @@ savefig(gifpath()+'rast.png') # [[./gif/21jul13_21jun28_EN0_K_cycle__step_39_ras
 fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
 [[./gif/21jul13_21jun28_EN0_K_cycle__step_39__with_reward_input.mp4]]
 
+* 21jul16
+** check 21jun28_EN0_K_cycle__step_56_
+
+python -i simdat.py backupcfg/21jun28_EN0_K_cycle__step_56_sim.json
+
+EV1 0.02 Hz
+EA 1.31 Hz
+IA 0.91 Hz
+IAL 4.18 Hz
+EA2 0.22 Hz
+IA2 0.37 Hz
+IA2L 2.81 Hz
+EMDOWN 0.33 Hz
+EMUP 0.33 Hz
+IM 0.56 Hz
+IML 3.23 Hz
+EN 0.87 Hz
+
+ax=plotPerf(actreward,yl=(0,1.01))
+savefig(gifpath()+'perf.png') # [[./gif/21jul16_21jun28_EN0_K_cycle__step_56_perf.png]]
+
+clf(); drawraster(dspkT,dspkID); xlim((498e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/21jul16_21jun28_EN0_K_cycle__step_56_rast.png]]
+
+lfn = ['21jun28_EN0_K_cycle__step_' + str(i) + '_' for i in range(57)]
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0.0,1.0))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/21jul16_21jun28_EN0_K_cycle__step_56_perf_all_steps_so_far.png]]
+
+lpda = getindivactionreward(lfn)
+cla(); lrat = plotHitMissRatioPerStep(lpda)
+savefig(gifpath()+'hit_miss_ratio.png') # [[./gif/21jul16_21jun28_EN0_K_cycle__step_56_hit_miss_ratio.png]]
+
+still does not look better ...
+
+clf(); pdfc = getconcatweightpdf(lfn,usefinal=True)
+subplot(2,2,1); popwtsfromEN = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False,prety='EN'); ylabel('Average EN->EM')
+subplot(2,2,2); popwtsfromEA = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False,prety='EA'); ylabel('Average EA->EM')
+subplot(2,2,3); popwtsfromENA = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EA'],lclr=['g'],plotindiv=False,prety='EN'); ylabel('Average EN->EA')
+subplot(2,2,4); popwtsfromEAA = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EA'],lclr=['g'],plotindiv=False,prety='EA'); ylabel('Average EA->EA')
+
+savefig(gifpath()+'all_steps_avg_weightEN.png') # [[./gif/21jul16_21jun28_EN0_K_cycle__step_56_all_steps_avg_weightEN.png]]
+
+fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
+[[./gif/21jul16_21jun28_EN0_K_cycle__step_56__with_reward_input.mp4]]
+
+** restart backupcfg/21jul2_EN0_256_gcp__step_29_sim.json  on cycle as 21jul16_EN02_256_cycle_
+
+use these weights for resume:
+ data/21jul2_EN0_256_gcp__step_28_synWeights_final.pkl
+
+    "name": "21jul16_EN02_256_cycle_",
+
+(emacs buffer=s5)
+
+python multistepSim.py sn.json 30 60 21jul16_EN02_256_cycle_multi
+
+started ~11:16 ...
+
