@@ -82,12 +82,7 @@ ASSIGNED {
 }
 
 INITIAL {
-  tlastpre = -1            : no spike yet
-  tlastpost = -1           : no spike yet
-  tlasthebbelig = -1      : no eligibility yet
-  tlastantielig = -1  : no eligibility yet   
-  interval = 0
-  cumreward = 0					     
+  reset_eligibility()
 }
 
 PARAMETER {
@@ -113,7 +108,16 @@ PARAMETER {
   : cumreward = 0				 
   :NOSTDPTAG = 0
   initialtime = 1000 (ms) : initialization time before any weight changes possible				  
-}				      
+}
+
+PROCEDURE reset_eligibility () {
+  tlastpre = -1            : no spike yet
+  tlastpost = -1           : no spike yet
+  tlasthebbelig = -1      : no eligibility yet
+  tlastantielig = -1  : no eligibility yet
+  interval = 0
+  cumreward = 0					    
+}
 
 NET_RECEIVE (w) {
 		 :LOCAL deltaw
@@ -272,3 +276,4 @@ PROCEDURE adjustweight (wc) {
    if (synweight > wmax) { synweight = wmax }
    if (synweight < wbase) { synweight = wbase }
 }
+
