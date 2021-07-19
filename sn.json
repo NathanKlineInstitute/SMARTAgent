@@ -94,7 +94,7 @@
   "stayStepLim": 0,
   "simtype": {
     "ResumeSim": 1,
-    "ResumeSimFromFile": "data/21jul2_EN0_256_gcp__step_28_synWeights_final.pkl"
+    "ResumeSimFromFile": "data/21jun28_EN0_K_cycle__step_59_synWeights_final.pkl"
   },
   "sim": {
     "duration": 500000,
@@ -108,7 +108,7 @@
     "RLFakeUpRule": 0,
     "RLFakeDownRule": 0,
     "RLFakeStayRule": 0,
-    "name": "21jul16_EN02_256_cycle_",
+    "name": "21jul19_EN02_K_cycle_",
     "doquit": 1,
     "doplot": 0,
     "saveCellSecs": 0,
@@ -206,19 +206,19 @@
       "IV4": 0,
       "EMT": 0,
       "IMT": 0,
-      "EA": 600,
-      "IA": 206,
-      "IAL": 94,
-      "EA2": 0,
-      "IA2": 0,
-      "IA2L": 0,
+      "EA": 1200,
+      "IA": 412,
+      "IAL": 188,
+      "EA2": 600,
+      "IA2": 206,
+      "IA2L": 94,
       "EMDOWN": 300,
       "EMUP": 300,
       "IM": 206,
       "IML": 94,
       "IMUP": 0,
       "IMDOWN": 0,
-      "EN": 3000
+      "EN": 3600
     },
     "ETypes": [
       "ER",
@@ -412,7 +412,7 @@
       "RecurrentDirNeurons": 0,
       "RecurrentLocNeurons": 0,
       "FeedForwardDirNtoA": 0,
-      "FeedForwardLocNtoA": 1,
+      "FeedForwardLocNtoA": 0,
       "FeedForwardDirNtoA2": 0,
       "FeedForwardLocNtoA2": 0,
       "FeedForwardDirNtoM": 0,
@@ -441,12 +441,12 @@
     "cmat": {
       "EN": {
         "EA": {
-          "AM2": 0,
+          "AM2": 9,
           "NM2": 0.0,
           "conv": 30
         },
         "EA2": {
-          "AM2": 0,
+          "AM2": 9,
           "NM2": 0.0,
           "conv": 30
         },
@@ -461,22 +461,22 @@
           "conv": 30
         },
         "IA": {
-          "AM2": 0,
+          "AM2": 9,
           "NM2": 0.0,
           "conv": 30
         },
         "IAL": {
-          "AM2": 0,
+          "AM2": 9,
           "NM2": 0.0,
           "conv": 30
         },
         "IA2": {
-          "AM2": 0,
+          "AM2": 9,
           "NM2": 0.0,
           "conv": 30
         },
         "IA2L": {
-          "AM2": 0,
+          "AM2": 9,
           "NM2": 0.0,
           "conv": 30
         },
@@ -503,9 +503,9 @@
           "conv": 0
         },
         "EA": {
-          "AM2": 15,
+          "AM2": 12.5,
           "NM2": 1,
-          "conv": 256
+          "conv": 640
         },
         "EA2": {
           "AM2": 0.25,
@@ -561,27 +561,27 @@
       },
       "EA": {
         "EA": {
-          "AM2": 0.5,
-          "NM2": 0.01,
+          "AM2": 0.05,
+          "NM2": 0.005,
           "conv": 30
         },
         "EA2": {
-          "AM2": 1,
+          "AM2": 0.5,
           "NM2": 0.01,
           "conv": 100
         },
         "EM": {
-          "AM2": 1,
+          "AM2": 0.5,
           "NM2": 0.01,
           "conv": 100
         },
         "IA": {
-          "AM2": 3.95,
+          "AM2": 1.95,
           "NM2": 0.0195,
           "conv": 93
         },
         "IAL": {
-          "AM2": 2.98,
+          "AM2": 0.98,
           "NM2": 0.098,
           "conv": 110
         }
@@ -635,12 +635,12 @@
           "conv": 18
         },
         "IM": {
-          "AM2": 3.95,
+          "AM2": 1.95,
           "NM2": 0.0195,
           "conv": 93
         },
         "IML": {
-          "AM2": 2.98,
+          "AM2": 0.98,
           "NM2": 0.098,
           "conv": 110
         }
@@ -984,7 +984,7 @@
       "RLon": 1,
       "STDPon": 0,
       "RLlenhebb": 200,
-      "RLlenanti": 500,
+      "RLlenanti": 200,
       "useRLexp": 1,
       "RLhebbwt": 0.01,
       "RLantiwt": 0.0,
@@ -1024,7 +1024,7 @@
       "RLlenhebb": 10000,
       "RLlenanti": 500,
       "useRLexp": 1,
-      "RLhebbwt": 0.05,
+      "RLhebbwt": 0.02,
       "RLantiwt": 0.0,
       "hebbwt": 0.0,
       "antiwt": 0.0,
