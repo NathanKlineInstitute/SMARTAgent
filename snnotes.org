@@ -36876,3 +36876,10 @@ python multistepSim.py sn.json 30 60 21jul19_EN02_K_cycle_multi
 
 started ~10:58 ...
 
+* 21jul20
+** evo
+
+setup model to use evo ... with inspyred
+
+all plastic weights are set by evolutionary strategy instead of via STDP/RL 
+
