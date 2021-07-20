@@ -1,0 +1,850 @@
+import sys
+import random 
+import time 
+import inspyred
+from inspyred import ec
+from inspyred.ec import terminators
+from inspyred.ec.variators import mutator
+from random import Random
+from time import time, clock
+import datetime # to format time of run
+import os
+import tempfile
+import sim # runs different cell models (most contain Ben Suter ion channels)
+import pickle
+import logging
+from subprocess import Popen, PIPE, call
+import paramiko # py SSH
+import popen2
+from neuron import h
+import shlex
+import lex
+import copy
+from functools import wraps
+
+pc = h.ParallelContext()
+mydir = os.getcwd()
+simf = mydir + '/sim.py' 
+ngen = 0
+nfunc = 0 # number of fitness functions used
+
+# make dir, catch exceptions
+def safemkdir (dn):
+  if os.path.exists(dn): return True
+  try:
+    os.mkdir(dn)
+    return True
+  except OSError:
+    if not os.path.exists(dn):
+      print('could not create', dn)
+      return False
+    else:
+      return True
+
+# backup the config file, return path to backed-up file
+def backupcfg (evostr,fcfg):
+  fout = 'data/' + evostr + '/evo.cfg'
+  if os.path.exists(fout):
+    print('removing prior cfg file' , fout)
+    os.system('rm ' + fout)  
+  os.system('cp ' + fcfg + ' ' + fout) # fcfg created in geom.py via conf.py
+  with open(fout,'a') as fp: # write command line args too
+    fp.write('################\n')
+    fp.write('# command-line args:\n')
+    fp.write('#')
+    for s in sys.argv: fp.write(' ' + s)
+    fp.write('\n')
+  return fout 
+
+#
+def FitJobStrFN (p, args):  
+  simconfig = args['simconfig']
+  fd,fn = tempfile.mkstemp(dir=mydir+'/batch')
+  os.close(fd) # make sure closed
+  strc = 'nrniv -python ' + args['simf'] + ' '
+  for i in range(len(p)): strc += str(p[i]) + ' '
+  strc += fn + ' ' + simconfig
+  for s in ['useRMP', 'useSpikeTimes', 'useFI', 'useVoltDiff', \
+            'useISI', 'useISIFeat', 'useSpikeCoinc', 'useSag', \
+            'useSpikeAmp','useSpikePeak', 'useSpikeW', 'useSpikeSlope', 'useSpikeThresh', \
+            'useInstRate','useTTFS', 'noBound', 'useLVar', 'useSFA', 'useSpikeShape',\
+            'useundefERR','useISIDepth','useISIDur']:
+    if args[s]: strc += ' ' + s
+  if nfunc > 1:
+    if args['useEMO']: strc += ' useEMO'
+    elif args['useLEX']: strc += ' useLEX'
+  return strc,fn
+
+# evaluate fitness with sim run
+def EvalFIT (candidates, args):
+  fitness = []; 
+  for p in candidates:
+    strc,fn = FitJobStrFN(p, args)
+    ret = os.system(strc)
+    fp = open(fn,'r')
+    fit = float(fp.readlines()[0].strip())
+    fp.close()
+    os.unlink(fn)
+    fitness.append(fit)
+  return fitness
+
+lconn,lssh=None,None
+
+# evaluate fitness with sim run using ssh to the nodes (created via makeSSHClients)
+def EvalFISSH (candidates, args):
+  fitness = []; # fitness values returned
+  global lconn,lssh
+  #print 'there are ' , len(candidates), ' candidates'
+  #lconn = args['lconn']; # ssh client connections - send jobs there
+  #lssh = args['lssh'];  # ssh clients - can spawn connections if connection breaks
+  nproc = args['nproc'] # max number of jobs to run at once
+  lf = []; procs = []
+  ncand = len(candidates) # number of candidates
+  nhost = len(lconn) # number of hosts
+  print('ncand:',ncand,'nhost:',nhost)
+  nrunning = 0; # number of jobs running
+  cdx = 0; # candidate index
+  hdx = 0; # host index
+  lf = [None for i in range(ncand)]
+  fitness = [1e9 for i in range(ncand)]
+  while  cdx < ncand: # go through all the candidates
+    #print 'A cdx:',cdx,'ncand:',ncand
+    while nrunning < nproc and cdx < ncand: # send jobs via ssh
+      #print 'B cdx:',cdx,'ncand:',ncand,'nrunning:',nrunning
+      # run a new job     
+      p = candidates[cdx]
+      strc,fn = FitJobStrFN(p, args) + '\n';
+      lf[cdx] = fn
+      clen = len(strc)
+      if lconn[hdx].closed or lconn[hdx].active != 1: # make sure the connection is still active
+        print('recreating conn for ', hdx)
+        lconn[hdx] = makeSSHConn(lssh[hdx])
+      elif not lconn[hdx].send_ready() and lconn[hdx].recv_ready():
+        print('receving for ' , hdx)
+        lconn[hdx].recv(100000)
+      chk = lconn[hdx].send(strc) # send the job command
+      while chk < clen:
+        'warning: chk=',chk,'clen=',clen, ' attempting recv.'
+        while lconn[hdx].recv_ready():
+          print('recv_ready == True')
+          lconn[hdx].recv(100000)
+        lconn[hdx].send('\n') # so last, partial command will not interfere with full command
+        chk = lconn[hdx].send(strc) # send the job command
+        print('next chk is ' , chk)
+      #while not lconn[hdx].recv_ready(): pass
+      #while lconn[hdx].recv_ready(): lconn[hdx].recv(10000)
+      nrunning += 1
+      cdx += 1
+      hdx += 1 # move to next host
+      if hdx >= nhost: hdx = 0 # next job goes to first host
+    for i in range(ncand): # check if any jobs finished
+      if lf[i] is None: continue
+      try:
+        with open(lf[i],'r') as fp: # ensures close even if exception occurs
+          fit = float(fp.readlines()[0].strip())
+          # print('fit is ', fit)
+          fitness[i] = fit
+          os.unlink(lf[i])
+          nrunning -= 1
+          lf[i] = None # dont check this job again
+      except:
+        pass
+    time.sleep(0.05)
+  # wait for remaining jobs to finish
+  while nrunning > 0:
+    for i in range(ncand):
+      if lf[i] is None: continue
+      try:
+        with open(lf[i],'r') as fp:
+          fit = float(fp.readlines()[0].strip())
+          # print 'fit is ', fit
+          fitness[i] = fit
+          os.unlink(lf[i])
+          nrunning -= 1
+          lf[i] = None
+      except:
+        pass
+    time.sleep(0.05)
+  return fitness
+
+# run sim command via mpi, then delete the temp file. returns job index and fitness.
+def RunViaMPI (cdx, cmd, fn, maxfittime):
+  global pc
+  if nfunc > 1 and (useEMO or useLEX): fit = [1e9 for i in range(nfunc)]
+  else: fit = 1e9
+  #print 'pc.id()==',pc.id(),'. starting py job', cdx, 'command:', cmd
+  #print 'pc.id()==',pc.id(),'. starting py job', cdx
+  cmdargs = shlex.split(cmd)
+  #proc = Popen(cmdargs)
+  proc = Popen(cmdargs,stdout=PIPE,stderr=PIPE)
+  #print 'py job', cdx, ' called popen'
+  cstart = time(); killed = False
+  while not killed and proc.poll() is None: # job is not done
+    #print 'py job', cdx, ' called poll'
+    cend = time(); rtime = cend - cstart
+    if rtime >= maxfittime:
+      killed = True
+      print(' ran for ' , round(rtime,2) , 's. too slow , killing.')
+      try:
+        proc.kill() # has to be called before proc ends
+        #proc.terminate()
+      except:
+        print('could not kill')
+  #print 'py job', cdx, ' reading output'
+  if not killed:
+    #print 'not killed'
+    try: proc.communicate() # avoids deadlock due to stdout/stderr buffer overfill
+    except: print('could not communicate') # Process finished.
+    try: # lack of output file may occur if invalid param values lead to an nrniv crash
+      #print 'here'
+      if nfunc > 1 and (useEMO or useLEX):
+        with open(fn,'r') as fp:
+          i = 0
+          for ln in fp.readlines():
+            fit[i] = float(ln.strip())          
+            i += 1
+      else:
+        #print 'trying to read single fit value'
+        with open(fn,'r')  as fp: fit = float(fp.readlines()[0].strip())
+    except:
+      print('WARN: could not read.')
+  #print 'py job', cdx, ' removing temp file'
+  os.unlink(fn)
+  #print 'pc.id()==',pc.id(),'py job', cdx, ' returning', fit
+  if nfunc > 1:
+    if useEMO: return cdx,inspyred.ec.emo.Pareto(fit)
+    elif useLEX: return cdx,lex.Lexicographic(fit)
+    else: return cdx,fit
+  else:
+    return cdx,fit
+
+def printfin (fin):
+  sys.stdout.write('\rFinished:{0}...'.format(fin));
+  sys.stdout.flush()
+
+# evaluate fitness with sim run
+def EvalFITMPI (candidates, args):
+  global pc
+  #print 'pcid' , pc.id(), ' len(candidates)', len(candidates) # only pc.id() == 0 goes here
+  fitness = [1e9 for i in range(len(candidates))]; 
+  lcomm = ['' for i in range(len(candidates))] # commands
+  lfile = ['' for i in range(len(candidates))] # temp files
+  for cdx,p in enumerate(candidates): lcomm[cdx],lfile[cdx] = FitJobStrFN(p,args)
+  # print lcomm[0]
+  verbose=args['verbose']
+  njob = len(candidates); cdx = 0
+  maxfittime = args['maxfittime']
+  for i in range(int(pc.nhost())): # first submit nhost jobs
+    if cdx >= njob: break
+    pc.submit(RunViaMPI, cdx,lcomm[cdx],lfile[cdx],maxfittime)
+    cdx += 1
+  finished = 0;
+  if verbose: printfin(finished)
+  while cdx < njob: # then submit the remainder
+    if verbose: printfin(finished)
+    while pc.working(): # submit a job each time one job finishes
+      outidx,fit = pc.pyret()
+      fitness[int(outidx)] = fit
+      finished += 1; 
+      if verbose: printfin(finished)
+      if cdx < njob:
+        pc.submit(RunViaMPI, cdx,lcomm[cdx],lfile[cdx],maxfittime)
+        cdx += 1
+  while pc.working(): # then wait for the remainder
+    outidx,fit = pc.pyret()
+    fitness[int(outidx)] = fit
+    finished += 1;
+    if verbose: printfin(finished)
+  if verbose: print('')
+  return fitness
+
+#
+def setEClog ():
+  logger = logging.getLogger('inspyred.ec')
+  logger.setLevel(logging.DEBUG)
+  file_handler = logging.FileHandler('inspyred.log', mode='w')
+  file_handler.setLevel(logging.DEBUG)
+  formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+  file_handler.setFormatter(formatter)
+  logger.addHandler(file_handler)
+  return logger
+
+#
+def makeSSHConn (ssh):
+  conn = ssh.invoke_shell()
+  out = conn.recv(1000)
+  print(out)
+  #print 'send_ready?',conn.send_ready()
+  conn.send('cd ' + mydir + '\n') # always need \n at end to enter command
+  #print 'recv_ready?',conn.recv_ready()
+  out = conn.recv(1000)
+  print(out)
+  conn.send('ls\n')
+  while not conn.recv_ready(): pass
+  while conn.recv_ready(): conn.recv(1000)
+  return conn
+
+#
+def makeSSHClient (host,username='samn'):
+  ssh = paramiko.SSHClient()
+  ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+  ssh.connect(host, username=username) # , password=None
+  conn = makeSSHConn(ssh)
+  return ssh,conn
+
+#
+def makeSSHClients (fn='machinefile'):
+  global lconn,lssh
+  try:
+    fp = open(fn,'r')
+  except IOError:
+    print('could not open ' , fn)
+    return False
+  lssh,lconn = [],[]
+  for host in fp.readlines():
+    host = host.strip()
+    if len(host) < 1: continuerint
+    print('connecting to ' , host)
+    ssh,conn = makeSSHClient(host)
+    if ssh is not None:
+      print('connected to ' , host)
+      lssh.append(ssh)
+      lconn.append(conn)
+  return lssh,lconn
+
+my_generate = sim.my_generate
+my_bounder = sim.my_bounder # when noBound==True, this is not guaranteed to be the same
+
+# prints stats and saves current archive to binary file (pkl)
+def my_EMO_observe (population, num_generations, num_evaluations, args):
+  print('gen:',num_generations,'eval:',num_evaluations,\
+    'worst:',population[-1].fitness,'best:',population[0].fitness)
+  es=args['es']
+  fn = 'data/' + evostr + '/ARCH.pkl'
+  pickle.dump(es.archive,open(fn,'w'))
+
+
+# prints stats and saves current archive to binary file (pkl)
+def my_LEX_observe (population, num_generations, num_evaluations, args):
+  print('gen:',num_generations,'eval:',num_evaluations,\
+    'pop[-1]:',population[-1].fitness,'pop[0]:',population[0].fitness)
+
+# saves individuals in a population to binary file (pkl)
+def my_indiv_observe (population, num_generations, num_evaluations, args):
+  fn = 'data/' + evostr + '/gen_' + str(num_generations) + '_indiv.pkl'
+  pickle.dump(population,open(fn,'w'))
+
+es = None
+
+# adjusts boundary of parameters and saves new param bounds to file (pkl)
+def my_bound_observe (population, num_generations, num_evaluations, args):
+  if args['verbose']: print('adjusting param boundaries')
+  sim.boundinc(population)
+  #args['bounder'] = sim.my_bounder() # reset it here
+  es.bounder = sim.my_bounder() # reset it here
+  fn = 'data/' + evostr + '/dprm.pkl' # just saves to 1 to avoid extra files - dprm rarely changes
+  pickle.dump(sim.dprm,open(fn,'w'))
+
+@mutator
+def my_mutation (random, candidate, args):
+    """Return the mutants produced by nonuniform mutation on the candidates.
+    .. Arguments:
+       random -- the random number generator object
+       candidate -- the candidate solution
+       args -- a dictionary of keyword arguments
+    Required keyword arguments in args:       
+    Optional keyword arguments in args:    
+    - *mutation_strength* -- the strength of the mutation, where higher
+      values correspond to greater variation (default 1)
+    
+    """
+    bounder = args['_ec'].bounder
+    num_gens = args['_ec'].num_generations
+    strength = args.setdefault('mutation_strength', 1)
+    exponent = strength
+    mutant = copy.copy(candidate)
+    for i, (c, lo, hi) in enumerate(zip(candidate, bounder.lower_bound, bounder.upper_bound)):
+        if random.random() <= 0.5:
+            new_value = c + (hi - c) * (1.0 - random.random() ** exponent)
+        else:
+            new_value = c - (c - lo) * (1.0 - random.random() ** exponent)
+        mutant[i] = new_value
+    return mutant
+
+# use the archive_seeds to initialize an archive
+def initialize_archive(f, archive_seeds):
+  @wraps(f)
+  def wrapper(random, population, archive, args):
+    if args['_ec'].num_generations == 0:
+      return archive_seeds
+    else:
+      return f(random, population, archive, args)
+  return wrapper
+
+# run the evolution
+def runevo (popsize=100,maxgen=10,my_generate=my_generate,\
+            mybounder=my_bounder,nproc=16,rdmseed=1234,useDEA=True,\
+            fstats='/dev/null',findiv='/dev/null',mutation_rate=0.2,useMPI=False,\
+            numselected=100,useSSH=True,useRMP=False,useSpikeTimes=False,\
+            useFI=True,useVoltDiff=False,useEMO=False,useSpikeCoinc=False,useISI=False,useISIFeat=False,\
+            useSag=False,useSpikeAmp=False,useSpikePeak=False,useSpikeW=False,useSpikeSlope=False,useSpikeThresh=False,\
+            useInstRate=False,useTTFS=False,noBound=False,simconfig='sim.cfg',useLVar=False,useSFA=False,useSpikeShape=False,\
+            useLOG=False,maxfittime=600,useLEX=False,lseed=None,larch=None,verbose=True,\
+            useundefERR=False,useISIDepth=False,useISIDur=False):
+  global es
+  if useLOG: logger=setEClog()
+  rand = Random(); rand.seed(rdmseed) # alternative - provide int(time.time()) as seed
+  if useEMO:
+    #es = inspyred.ec.emo.PAES(rand)
+    es = inspyred.ec.emo.NSGA2(rand)
+    if larch is not None: es.archiver = initialize_archive(inspyred.ec.archivers.best_archiver, larch)
+  elif useDEA:
+    es = ec.DEA(rand)
+  else:
+    es = ec.ES(rand)
+
+  es.terminator = terminators.generation_termination 
+  es.variator = [inspyred.ec.variators.heuristic_crossover,my_mutation]#inspyred.ec.variators.nonuniform_mutation
+  es.observer = [my_indiv_observe] # saves individuals to pkl file each generation
+
+  statfile = open(fstats,'w'); indfile = open(findiv,'w')
+  if useEMO:
+    es.observer.append(my_EMO_observe)
+  else: 
+    es.observer.append(inspyred.ec.observers.file_observer)
+    if useLEX: es.observer.append(my_LEX_observe)
+    else: es.observer.append(inspyred.ec.observers.stats_observer)
+    es.selector = inspyred.ec.selectors.tournament_selection
+    es.replacer = inspyred.ec.replacers.generational_replacement#inspyred.ec.replacers.plus_replacement
+
+  if noBound: es.observer.append(my_bound_observe)
+
+  if useSSH:
+    global lssh,lconn
+    lssh,lconn = makeSSHClients()
+    final_pop = es.evolve(generator=my_generate,
+                          evaluator=EvalFISSH, 
+                          pop_size=popsize,
+                          maximize=False,
+                          bounder=mybounder(),
+                          max_generations=maxgen,
+                          statistics_file=statfile,
+                          individuals_file=indfile,
+                          mutation_rate=mutation_rate,
+                          simf=simf,
+                          nproc=nproc,
+                          num_selected=numselected,
+                          lssh=lssh,
+                          lconn=lconn,
+                          useRMP=useRMP,
+                          useSpikeTimes=useSpikeTimes,
+                          maxfittime=maxfittime,
+                          seeds=lseed)
+    for ssh in lssh: ssh.close()
+  elif useMPI:
+    pc.barrier()
+    if pc.id()==0: print('nhost : ' , pc.nhost())
+    pc.runworker()
+    print('before evolve my id is ' , pc.id())# checked that only host 0 calls evolution.
+    if useEMO:
+          final_pop = es.evolve(generator=my_generate,
+                          evaluator=EvalFITMPI, 
+                          pop_size=popsize,
+                          maximize=False,
+                          bounder=mybounder(),
+                          max_generations=maxgen,
+                          statistics_file=statfile,
+                          individuals_file=indfile,
+                          mutation_rate=mutation_rate,
+                          simf=simf,
+                          useSpikeTimes=useSpikeTimes,
+                          useRMP=useRMP,
+                          useFI=useFI,
+                          useVoltDiff=useVoltDiff,
+                          useEMO=useEMO,
+                          max_archive_size=max(numselected,popsize),
+                          useSpikeCoinc=useSpikeCoinc,
+                          useISI=useISI,
+                          useISIFeat=useISIFeat,
+                          simconfig=simconfig,
+                          useSag=useSag,
+                          useSpikeAmp=useSpikeAmp,
+                          useSpikePeak=useSpikePeak,
+                          useSpikeW=useSpikeW,
+                          useSpikeSlope=useSpikeSlope,
+                          useSpikeThresh=useSpikeThresh,                                
+                          useSpikeShape=useSpikeShape,
+                          useInstRate=useInstRate,
+                          useTTFS=useTTFS,
+                          noBound=noBound,
+                          useLVar=useLVar,
+                          useSFA=useSFA,
+                          es=es,
+                          maxfittime=maxfittime,
+                          useLEX=useLEX,
+                          seeds=lseed,
+                          verbose=verbose,
+                          useundefERR=useundefERR,
+                          useISIDepth=useISIDepth,
+                          useISIDur=useISIDur)
+    else:
+      final_pop = es.evolve(generator=my_generate,
+                            evaluator=EvalFITMPI, 
+                            pop_size=popsize,
+                            maximize=False,
+                            bounder=mybounder(),
+                            max_generations=maxgen,
+                            statistics_file=statfile,
+                            individuals_file=indfile,
+                            mutation_rate=mutation_rate,
+                            simf=simf,
+                            num_selected=numselected,
+                            useSpikeTimes=useSpikeTimes,
+                            useRMP=useRMP,
+                            useFI=useFI,
+                            useVoltDiff=useVoltDiff,
+                            useEMO=useEMO,
+                            max_archive_size=max(popsize,numselected),
+                            tournament_size=2,
+                            num_elites=int(popsize/10.0),
+                            useSpikeCoinc=useSpikeCoinc,
+                            useISI=useISI,
+                            useISIFeat=useISIFeat,
+                            simconfig=simconfig,
+                            useSag=useSag,
+                            useSpikeAmp=useSpikeAmp,
+                            useSpikePeak=useSpikePeak,
+                            useSpikeW=useSpikeW,
+                            useSpikeSlope=useSpikeSlope,
+                            useSpikeThresh=useSpikeThresh,
+                            useSpikeShape=useSpikeShape,
+                            useInstRate=useInstRate,
+                            useTTFS=useTTFS,
+                            noBound=noBound,
+                            useLVar=useLVar,
+                            useSFA=useSFA,
+                            es=es,
+                            maxfittime=maxfittime,
+                            useLEX=useLEX,
+                            seeds=lseed,
+                            verbose=verbose,
+                            useundefERR=useundefERR,
+                            useISIDepth=useISIDepth,
+                            useISIDur=useISIDur)
+    print('after evolve my id is ' , pc.id()) # checked that only host 0 calls evolution.
+    pc.done()
+  else: # use multiprocessing
+    print('using multiprocessing')
+    if useEMO:
+          final_pop = es.evolve(generator=my_generate,
+                          evaluator=inspyred.ec.evaluators.parallel_evaluation_mp,
+                          mp_evaluator=EvalFIT, 
+                          mp_nprocs=nproc,
+                          pop_size=popsize,
+                          maximize=False,
+                          bounder=mybounder(),
+                          max_generations=maxgen,
+                          statistics_file=statfile,
+                          individuals_file=indfile,
+                          mutation_rate=mutation_rate,
+                          simf=simf,
+                          useSpikeTimes=useSpikeTimes,
+                          useRMP=useRMP,
+                          useFI=useFI,
+                          useVoltDiff=useVoltDiff,
+                          useEMO=useEMO,
+                          max_archive_size=max(numselected,popsize),
+                          useSpikeCoinc=useSpikeCoinc,
+                          useISI=useISI,
+                          useISIFeat=useISIFeat,
+                          simconfig=simconfig,
+                          useSag=useSag,
+                          useSpikeAmp=useSpikeAmp,
+                          useSpikePeak=useSpikePeak,
+                          useSpikeW=useSpikeW,
+                          useSpikeSlope=useSpikeSlope,
+                          useSpikeThresh=useSpikeThresh,
+                          useSpikeShape=useSpikeShape,
+                          useInstRate=useInstRate,
+                          useTTFS=useTTFS,
+                          noBound=noBound,
+                          useLVar=useLVar,
+                          useSFA=useSFA,
+                          es=es,
+                          maxfittime=maxfittime,
+                          useLEX=useLEX,
+                          seeds=lseed,
+                          verbose=verbose,
+                          useundefERR=useundefERR,
+                          useISIDepth=useISIDepth,
+                          useISIDur=useISIDur)
+    else:
+      final_pop = es.evolve(generator=my_generate,
+                            evaluator=inspyred.ec.evaluators.parallel_evaluation_mp,
+                            mp_evaluator=EvalFIT, 
+                            mp_nprocs=nproc,
+                            pop_size=popsize,
+                            maximize=False,
+                            bounder=mybounder(),
+                            max_generations=maxgen,
+                            statistics_file=statfile,
+                            individuals_file=indfile,
+                            mutation_rate=mutation_rate,
+                            simf=simf,
+                            num_selected=numselected,
+                            useSpikeTimes=useSpikeTimes,
+                            useRMP=useRMP,
+                            useFI=useFI,
+                            useVoltDiff=useVoltDiff,
+                            useEMO=useEMO,
+                            max_archive_size=max(popsize,numselected),
+                            tournament_size=2,
+                            num_elites=int(popsize/10.0),
+                            useSpikeCoinc=useSpikeCoinc,
+                            useISI=useISI,
+                            useISIFeat=useISIFeat,
+                            simconfig=simconfig,
+                            useSag=useSag,
+                            useSpikeAmp=useSpikeAmp,
+                            useSpikePeak=useSpikePeak,
+                            useSpikeW=useSpikeW,
+                            useSpikeSlope=useSpikeSlope,
+                            useSpikeThresh=useSpikeThresh,
+                            useSpikeShape=useSpikeShape,
+                            useInstRate=useInstRate,
+                            useTTFS=useTTFS,
+                            noBound=noBound,
+                            useLVar=useLVar,
+                            useSFA=useSFA,
+                            es=es,
+                            maxfittime=maxfittime,
+                            useLEX=useLEX,
+                            seeds=lseed,
+                            verbose=verbose,
+                            useundefERR=useundefERR,
+                            useISIDepth=useISIDepth,
+                            useISIDur=useISIDur)
+  # Sort and print the best individual, who will be at index 0.
+  final_pop.sort(reverse=True)
+  print(final_pop[0])
+  statfile.close(); indfile.close()
+  if useEMO: return [final_pop,es.archive]
+  else: return [final_pop]
+
+# plot generation progress over time
+def genplot (fn='evo_stats.txt'): inspyred.ec.analysis.generation_plot(fn)
+
+# individual pkl (or archive file) to list of candidates (each entry has params)
+def indivpkl2list (fname):
+  ark = pickle.load(open(fname))
+  if type(ark[0])==list: lout = [indiv for indiv in ark]
+  else: lout = [indiv.candidate for indiv in ark]
+  return lout
+
+if __name__ == "__main__":
+  if len(sys.argv) < 2:
+    print('usage: python evo.py [popsize n] [maxgen n] [nproc n] [useMPI 0/1] [useSSH 0/1] [useDEA 0/1] [mutation_rate 0--1] [numselected n] [evostr name] [simf name]')
+    print('[useRMP 0/1] [useSpikeTimes 0/1][useVoltDiff 0/1][useSpikeCoinc 0/1][useISI 0/1][useISIFeat 0/1][useSag 0/1]')
+    print('[useSpikeAmp 0/1] [useSpikePeak 0/1] [useSpikeW 0/1] [useSpikeSlope 0/1] [useSpikeThresh 0/1] [useSpikeShape 0/1]')
+    print('[useInstRate 0/1] [useTTFS 0/1] [noBound 0/1] [useLVar 0/1][useSFA 0/1][useLEX 0/1][useundefERR 0/1]')
+    print('[useISIDepth 0/1] [useISIDur 0/1] [maxfittime seconds][simconfig path][verbose 0/1][rdmseed int]')
+  else:
+    popsize=100; maxgen=10; nproc=16; useMPI=True; numselected=100; useSSH = useDEA = False;
+    mutation_rate=0.2; evostr='15sep17_XYZ'; simconfig = 'sim.cfg'; maxfittime = 600; 
+    useRMP = useSpikeTimes = useFI = useVoltDiff = useEMO = useSpikeCoinc = useISI = useISIFeat = useLEX = False; 
+    useSag = noBound = useLVar = useLOG = useSpikeAmp = useInstRate = useTTFS = useSFA = False;
+    useSpikeThresh = useSpikePeak = useSpikeSlope = useSpikeW = useSpikeShape = False;
+    verbose = True; rdmseed=1234; useundefERR = useISIDepth = useISIDur = False; 
+    fseed = farch = lseed = larch = None; # files,lists for initial population and archive
+    i = 1; narg = len(sys.argv)
+    while i < narg:
+      if sys.argv[i] == 'popsize' or sys.argv[i] == '-popsize':
+        if i+1<narg:
+          i+=1; popsize = int(sys.argv[i]); 
+      elif sys.argv[i] == 'maxgen' or sys.argv[i] == '-maxgen':
+        if i+1 < narg:
+          i+=1; maxgen = int(sys.argv[i]); 
+      elif sys.argv[i] == 'nproc' or sys.argv[i] == '-nproc':
+        if i+1 < narg:
+          i+=1; nproc = int(sys.argv[i]); 
+      elif sys.argv[i] == 'rdmseed' or sys.argv[i] == '-rdmseed':
+        if i+1 < narg:
+          i+=1; rdmseed = int(sys.argv[i]); 
+      elif sys.argv[i] == 'useMPI' or sys.argv[i] == '-useMPI':
+        if i+1 < narg:
+          i+=1; useMPI = bool(int(sys.argv[i])); 
+      elif sys.argv[i] == 'useSSH' or sys.argv[i] == '-useSSH':
+        if i+1 < narg:
+          i+=1; useSSH = bool(int(sys.argv[i])); 
+      elif sys.argv[i] == 'useDEA' or sys.argv[i] == '-useDEA':
+        if i+1 < narg:
+          i+=1; useDEA = bool(int(sys.argv[i])); 
+      elif sys.argv[i] == 'numselected' or sys.argv[i] == '-numselected':
+        if i+1 < narg:
+          i+=1; numselected = int(sys.argv[i]);
+      elif sys.argv[i] == 'evostr' or sys.argv[i] == '-evostr':
+        if i+1 < narg:
+          i+=1; evostr = sys.argv[i]
+      elif sys.argv[i] == 'simconfig' or sys.argv[i] == '-simconfig':
+        if i+1 < narg:
+          i+=1; simconfig = sys.argv[i]
+      elif sys.argv[i] == 'mutation_rate' or sys.argv[i] == '-mutation_rate' or sys.argv[i] == '-mutationrate' or sys.argv[i] == 'mutationrate':
+        if i+1 < narg:
+          i+=1; mutation_rate = float(sys.argv[i])
+      elif sys.argv[i] == 'useRMP' or sys.argv[i] == '-useRMP':
+        if i+1 < narg:
+          i+=1; useRMP = bool(int(sys.argv[i])); 
+      elif sys.argv[i] == 'useFI' or sys.argv[i] == '-useFI':
+        if i+1 < narg:
+          i+=1; useFI = bool(int(sys.argv[i])); 
+      elif sys.argv[i] == 'useSpikeTimes' or sys.argv[i] == '-useSpikeTimes':
+        if i+1 < narg:
+          i+=1; useSpikeTimes = bool(int(sys.argv[i])); 
+      elif sys.argv[i] == 'useVoltDiff' or sys.argv[i] == '-useVoltDiff':
+        if i+1 < narg:
+          i+=1; useVoltDiff = bool(int(sys.argv[i]));
+      elif sys.argv[i] == 'useEMO' or sys.argv[i] == '-useEMO':
+        if i+1 < narg:
+          i+=1; useEMO = bool(int(sys.argv[i]));
+          if useEMO: useLEX = False
+      elif sys.argv[i] == 'useLEX' or sys.argv[i] == '-useLEX':
+        if i+1 < narg:
+          i+=1; useLEX = bool(int(sys.argv[i]));
+          if useLEX: useEMO = False
+      elif sys.argv[i] == 'useSpikeCoinc' or sys.argv[i] == '-useSpikeCoinc':
+        if i+1 < narg:
+          i+=1; useSpikeCoinc = bool(int(sys.argv[i]));
+      elif sys.argv[i] == 'useISI' or sys.argv[i] == '-useISI':
+        if i+1 < narg:
+          i+=1; useISI = bool(int(sys.argv[i]));
+      elif sys.argv[i] == 'useISIFeat' or sys.argv[i] == '-useISIFeat':
+        if i+1 < narg:
+          i+=1; useISIFeat = bool(int(sys.argv[i]));
+      elif sys.argv[i] == 'useISIDepth' or sys.argv[i] == '-useISIDepth':
+        if i+1 < narg:
+          i+=1; useISIDepth = bool(int(sys.argv[i]));
+      elif sys.argv[i] == 'useISIDur' or sys.argv[i] == '-useISIDur':
+        if i+1 < narg:
+          i+=1; useISIDur = bool(int(sys.argv[i]));
+      elif sys.argv[i] == 'useSag' or sys.argv[i] == '-useSag':
+        if i+1 < narg:
+          i+=1; useSag = bool(int(sys.argv[i]));
+      elif sys.argv[i] == 'useSpikeAmp' or sys.argv[i] == '-useSpikeAmp':
+        if i+1 < narg:
+          i+=1; useSpikeAmp = bool(int(sys.argv[i]));
+      elif sys.argv[i] == 'useSpikePeak' or sys.argv[i] == '-useSpikePeak':
+        if i+1 < narg:
+          i+=1; useSpikePeak = bool(int(sys.argv[i]));
+      elif sys.argv[i] == 'useSpikeW' or sys.argv[i] == '-useSpikeW':
+        if i+1 < narg:
+          i+=1; useSpikeW = bool(int(sys.argv[i]));
+      elif sys.argv[i] == 'useSpikeSlope' or sys.argv[i] == '-useSpikeSlope':
+        if i+1 < narg:
+          i+=1; useSpikeSlope = bool(int(sys.argv[i]));
+      elif sys.argv[i] == 'useSpikeThresh' or sys.argv[i] == '-useSpikeThresh':
+        if i+1 < narg:
+          i+=1; useSpikeThresh = bool(int(sys.argv[i]));
+      elif sys.argv[i] == 'useSpikeShape' or sys.argv[i] == '-useSpikeShape':
+        if i+1 < narg:
+          i+=1; useSpikeShape = bool(int(sys.argv[i]));
+      elif sys.argv[i] == 'useInstRate' or sys.argv[i] == '-useInstRate':
+        if i+1 < narg:
+          i+=1; useInstRate = bool(int(sys.argv[i]));
+      elif sys.argv[i] == 'useTTFS' or sys.argv[i] == '-useTTFS':
+        if i+1 < narg:
+          i+=1; useTTFS = bool(int(sys.argv[i]));
+      elif sys.argv[i] == 'useLVar' or sys.argv[i] == '-useLVar':
+        if i+1 < narg:
+          i+=1; useLVar = bool(int(sys.argv[i]));
+      elif sys.argv[i] == 'useSFA' or sys.argv[i] == '-useSFA':
+        if i+1 < narg:
+          i+=1; useSFA = bool(int(sys.argv[i]));
+      elif sys.argv[i] == 'useLOG' or sys.argv[i] == '-useLOG':
+        if i+1 < narg:
+          i+=1; useLOG = bool(int(sys.argv[i]));
+      elif sys.argv[i] == 'verbose' or sys.argv[i] == '-verbose':
+        if i+1 < narg:
+          i+=1; verbose = bool(int(sys.argv[i]));
+      elif sys.argv[i] == 'noBound' or sys.argv[i] == '-noBound':
+        if i+1 < narg:
+          i+=1; noBound = bool(int(sys.argv[i]));
+      elif sys.argv[i] == 'useundefERR' or sys.argv[i] == '-useundefERR':
+        if i+1 < narg:
+          i+=1; useundefERR = bool(int(sys.argv[i]));
+      elif sys.argv[i] == 'simf' or sys.argv[i] == '-simf':
+        if i+1 < narg:
+          i+=1; simf = sys.argv[i]
+      elif sys.argv[i] == 'maxfittime' or sys.argv[i] == '-maxfittime':
+        if i+1 < narg:
+          i+=1; maxfittime = float(sys.argv[i])
+      elif sys.argv[i] == 'fseed':
+        if i+1 < narg:
+          i+=1; fseed = sys.argv[i]; lseed = indivpkl2list(fseed)
+      elif sys.argv[i] == 'farch':
+        if i+1 < narg:
+          i+=1; farch = sys.argv[i]; larch = pickle.load(open(farch)) 
+      elif sys.argv[i] == '-python' or sys.argv[i] == '-mpi' or sys.argv[i] == 'evo.py':
+        pass
+      else: raise Exception('unknown arg:'+sys.argv[i])
+      i+=1;
+
+    if useFI: nfunc += 1
+    if useRMP: nfunc += 1
+    if useSpikeTimes: nfunc += 1
+    if useVoltDiff: nfunc += 1
+    if useSpikeCoinc: nfunc += 1
+    if useISI: nfunc += 1
+    if useISIFeat: nfunc += 1
+    if useSag: nfunc += 1
+    if useLVar: nfunc += 1
+    if useSFA: nfunc += 1
+    if useSpikeAmp: nfunc += 1
+    if useSpikePeak: nfunc += 1
+    if useSpikeW: nfunc += 1
+    if useSpikeSlope: nfunc += 1
+    if useSpikeThresh: nfunc += 1
+    if useSpikeShape: nfunc += 1
+    if useInstRate: nfunc += 1
+    if useTTFS: nfunc += 1
+    if useISIDepth: nfunc += 1
+    if useISIDur: nfunc += 1
+
+    if (useMPI and pc.id()==0) or not useMPI:
+      print('popsize:',popsize,'maxgen:',maxgen,'nproc:',nproc,'useMPI:',useMPI,'numselected:',numselected,'evostr:',evostr,'useSSH:',useSSH,\
+          'useDEA:',useDEA,'mutation_rate:',mutation_rate,'useRMP:',useRMP,'useSpikeTimes:',useSpikeTimes,'useFI:',useFI,\
+          'useVoltDiff:',useVoltDiff,'useEMO:',useEMO,'nfunc:',nfunc,'useSpikeCoinc:',useSpikeCoinc,'useISI:',useISI,\
+          'useSag:',useSag,'noBound:',noBound,'useLVar:',useLVar,'useSFA:',useSFA,'useLOG:',useLOG,\
+          'maxfittime:',maxfittime,'useSpikeAmp:',useSpikeAmp,'useSpikePeak:',useSpikePeak,'useSpikeW:',useSpikeW,\
+          'useSpikeSlope:',useSpikeSlope,'useSpikeThresh:',useSpikeThresh,'useInstRate:',useInstRate,\
+          'useTTFS:',useTTFS,'useLEX:',useLEX,'useISIFeat:',useISIFeat,'useSpikeShape:',useSpikeShape,\
+          'fseed:',fseed,'farch:',farch,'verbose:',verbose,'rdmseed:',rdmseed,'useundefERR:',useundefERR,\
+          'useISIDepth:',useISIDepth,'useISIDur:',useISIDur)
+
+    # make sure master node does not work on submitted jobs (that would prevent it managing/submitting other jobs)
+    if useMPI and pc.id()==0: pc.master_works_on_jobs(0) 
+
+    if (useMPI and pc.id()==0) or not useMPI:
+      # backup the config file and use backed-up version for evo (in case local version changed during evolution)
+      safemkdir('data/'+evostr) # make a data output dir
+      simconfig = backupcfg(evostr,simconfig) 
+      safemkdir(mydir+'/batch') # for temp files
+
+    myout = runevo(popsize=popsize,maxgen=maxgen,nproc=nproc,rdmseed=rdmseed,useMPI=useMPI,\
+                   numselected=numselected,useSSH=useSSH,mutation_rate=mutation_rate,\
+                   useDEA=useDEA,useRMP=useRMP,useSpikeTimes=useSpikeTimes,\
+                   useFI=useFI,useVoltDiff=useVoltDiff,useEMO=useEMO,useSpikeCoinc=useSpikeCoinc,useISI=useISI,\
+                   fstats='/dev/null',findiv='/dev/null',simconfig=simconfig,\
+                   useSag=useSag,noBound=noBound,useLVar=useLVar,useSFA=useSFA,\
+                   useSpikeAmp=useSpikeAmp,useSpikePeak=useSpikePeak,useSpikeW=useSpikeW,useSpikeSlope=useSpikeSlope,\
+                   useSpikeThresh=useSpikeThresh,useSpikeShape=useSpikeShape,useInstRate=useInstRate,useTTFS=useTTFS,\
+                   useLOG=useLOG,maxfittime=maxfittime,useLEX=useLEX,useISIFeat=useISIFeat,lseed=lseed,larch=larch,\
+                   verbose=verbose,useundefERR=useundefERR,useISIDepth=useISIDepth,useISIDur=useISIDur);
+
+    if (useMPI and pc.id()==0) or not useMPI:
+      pickle.dump(myout[0],open('data/' + evostr + '/fpop.pkl','w'))
+      if useEMO: pickle.dump(myout[1],open('data/' + evostr + '/ARCH.pkl','w'))
+
+    if useMPI:
+      if pc.id()==0: print('MPI finished, exiting.')
+      quit() # make sure CPUs freed
+  
