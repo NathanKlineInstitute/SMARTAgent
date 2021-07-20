@@ -5,6 +5,7 @@ import inspyred
 from inspyred import ec
 from inspyred.ec import terminators
 from inspyred.ec.variators import mutator
+from inspyred.ec.generators import diversify
 from random import Random
 from time import time, clock
 import datetime # to format time of run
@@ -21,6 +22,14 @@ import shlex
 import lex
 import copy
 from functools import wraps
+
+import random
+import os
+import json
+import pickle
+import sys
+
+from simdat import readweightsfile2pdf
 
 pc = h.ParallelContext()
 mydir = os.getcwd()
@@ -64,15 +73,8 @@ def FitJobStrFN (p, args):
   strc = 'nrniv -python ' + args['simf'] + ' '
   for i in range(len(p)): strc += str(p[i]) + ' '
   strc += fn + ' ' + simconfig
-  for s in ['useRMP', 'useSpikeTimes', 'useFI', 'useVoltDiff', \
-            'useISI', 'useISIFeat', 'useSpikeCoinc', 'useSag', \
-            'useSpikeAmp','useSpikePeak', 'useSpikeW', 'useSpikeSlope', 'useSpikeThresh', \
-            'useInstRate','useTTFS', 'noBound', 'useLVar', 'useSFA', 'useSpikeShape',\
-            'useundefERR','useISIDepth','useISIDur']:
+  for s in ['noBound', 'useundefERR']:
     if args[s]: strc += ' ' + s
-  if nfunc > 1:
-    if args['useEMO']: strc += ' useEMO'
-    elif args['useLEX']: strc += ' useLEX'
   return strc,fn
 
 # evaluate fitness with sim run
@@ -89,6 +91,28 @@ def EvalFIT (candidates, args):
   return fitness
 
 lconn,lssh=None,None
+
+# checks bounds for params
+def my_bounder ():
+  lmin,lmax=[],[]
+  for k in dprm.keys():
+    mn,mx = dprm[k].minval,dprm[k].maxval
+    lmin.append(mn); lmax.append(mx)
+  return ec.Bounder(lmin,lmax)
+
+
+weightVar = 0.75
+wmin = 1.0 - weightVar
+wmax = 1.0 + weightVar
+
+# generate params 
+@diversify
+def my_generate (random, args):
+  pout = []
+  W = startweight['W']
+  for i in len(W):
+    pout.append(random.uniform( wmin * W[i], wmax * W[i] ))
+  return pout
 
 # run sim command via mpi, then delete the temp file. returns job index and fitness.
 def RunViaMPI (cdx, cmd, fn, maxfittime):
@@ -120,26 +144,14 @@ def RunViaMPI (cdx, cmd, fn, maxfittime):
     except: print('could not communicate') # Process finished.
     try: # lack of output file may occur if invalid param values lead to an nrniv crash
       #print 'here'
-      if nfunc > 1 and (useEMO or useLEX):
-        with open(fn,'r') as fp:
-          i = 0
-          for ln in fp.readlines():
-            fit[i] = float(ln.strip())          
-            i += 1
-      else:
-        #print 'trying to read single fit value'
-        with open(fn,'r')  as fp: fit = float(fp.readlines()[0].strip())
+      #print 'trying to read single fit value'
+      with open(fn,'r')  as fp: fit = float(fp.readlines()[0].strip())
     except:
       print('WARN: could not read.')
   #print 'py job', cdx, ' removing temp file'
   os.unlink(fn)
   #print 'pc.id()==',pc.id(),'py job', cdx, ' returning', fit
-  if nfunc > 1:
-    if useEMO: return cdx,inspyred.ec.emo.Pareto(fit)
-    elif useLEX: return cdx,lex.Lexicographic(fit)
-    else: return cdx,fit
-  else:
-    return cdx,fit
+  return cdx,fit
 
 def printfin (fin):
   sys.stdout.write('\rFinished:{0}...'.format(fin));
@@ -192,8 +204,8 @@ def setEClog ():
   logger.addHandler(file_handler)
   return logger
 
-my_generate = sim.my_generate
-my_bounder = sim.my_bounder # when noBound==True, this is not guaranteed to be the same
+# my_generate = sim.my_generate
+# my_bounder = sim.my_bounder # when noBound==True, this is not guaranteed to be the same
 
 # saves individuals in a population to binary file (pkl)
 def my_indiv_observe (population, num_generations, num_evaluations, args):
@@ -448,3 +460,28 @@ if __name__ == "__main__":
       if pc.id()==0: print('MPI finished, exiting.')
       quit() # make sure CPUs freed
   
+"""
+if __name__ == '__main__':
+  basefn = sys.argv[1]
+  ncore = int(sys.argv[2])
+  nstep = 1
+  startweight = readweightsfile2pdf(sys.argv[3]) # starting weights - placeholders
+  outf = sys.argv[4]
+  print(basefn,nstep)
+  fpout = open(outf,'w')
+  d = json.load(open(basefn,'r'))
+  simstr = d['sim']['name']
+  d['sim']['name'] += '_step_' + str(i) + '_'
+  d['sim']['doquit'] = 1
+  d['sim']['doplot'] = 0
+  d['simtype']['ResumeSim'] = 1
+  d['simtype']['ResumeSimFromFile'] = 'data/' + simstr + '_step_' + str(i-1) + '_synWeights_final.pkl'
+  fnjson = d['sim']['name'] + '.json'
+  fpout.writelines('./myrun ' + str(ncore) + ' ' + fnjson + '\n')
+  json.dump(d, open(fnjson,'w'), indent=2)
+  fpout.close()
+  os.chmod(outf,0o775)
+  print('running ', outf)
+  os.system('./'+outf)
+"""
+      
