@@ -29,7 +29,7 @@ import json
 import pickle
 import sys
 
-from simdat import readweightsfile2pdf
+from simdat import readweightsfile2pdf, pdf2weightsdict
 
 pc = h.ParallelContext()
 mydir = os.getcwd()
@@ -66,15 +66,45 @@ def backupcfg (evostr,fcfg):
   return fout 
 
 #
-def FitJobStrFN (p, args):  
+def FitJobStrFN (p, args):
+
+  pdfnew = args['startweight'].copy()
+  Wnew = pdfnew['W']
+  for i in len(p): Wnew[i] = p[i]
+
   simconfig = args['simconfig']
   fd,fn = tempfile.mkstemp(dir=mydir+'/batch')
   os.close(fd) # make sure closed
-  strc = 'nrniv -python ' + args['simf'] + ' '
-  for i in range(len(p)): strc += str(p[i]) + ' '
-  strc += fn + ' ' + simconfig
-  for s in ['noBound', 'useundefERR']:
-    if args[s]: strc += ' ' + s
+  #strc = 'nrniv -python ' + args['simf'] + ' '
+
+  pdfnew = pdfnew[pdfnew.time==np.amax(pdfnew.time)]
+  D = pdf2weightsdict(pdfnew)
+  pickle.dump(D, open(fn,'wb'))  
+    
+  #ncore = int(sys.argv[2])
+  #nstep = 1
+  #outf = sys.argv[4]
+  print(basefn,nstep)
+  fpout = open(outf,'w')
+  d = json.load(open(basefn,'r'))
+  simstr = d['sim']['name']
+  d['sim']['name'] += '_evo_gen_'
+  d['sim']['doquit'] = 1
+  d['sim']['doplot'] = 0
+  d['simtype']['ResumeSim'] = 1
+  d['simtype']['ResumeSimFromFile'] = fn
+  fnjson = d['sim']['name'] + '.json'
+  fpout.writelines('./myrun ' + str(ncore) + ' ' + fnjson + '\n')
+  json.dump(d, open(fnjson,'w'), indent=2)
+  fpout.close()
+  
+  strc = './myrun 1 tmp.json'
+  
+  #for i in range(len(p)): strc += str(p[i]) + ' '
+  #strc += fn + ' ' + simconfig
+  #for s in ['noBound', 'useundefERR']:
+  #  if args[s]: strc += ' ' + s
+  
   return strc,fn
 
 # evaluate fitness with sim run
@@ -109,9 +139,9 @@ wmax = 1.0 + weightVar
 @diversify
 def my_generate (random, args):
   pout = []
-  W = startweight['W']
+  W = args['startweight']['W']
   for i in len(W):
-    pout.append(random.uniform( wmin * W[i], wmax * W[i] ))
+    pout.append(random.uniform(wmin * W[i], wmax * W[i] ))
   return pout
 
 # run sim command via mpi, then delete the temp file. returns job index and fitness.
@@ -120,7 +150,6 @@ def RunViaMPI (cdx, cmd, fn, maxfittime):
   if nfunc > 1 and (useEMO or useLEX): fit = [1e9 for i in range(nfunc)]
   else: fit = 1e9
   #print 'pc.id()==',pc.id(),'. starting py job', cdx, 'command:', cmd
-  #print 'pc.id()==',pc.id(),'. starting py job', cdx
   cmdargs = shlex.split(cmd)
   #proc = Popen(cmdargs)
   proc = Popen(cmdargs,stdout=PIPE,stderr=PIPE)
@@ -266,7 +295,7 @@ def runevo (popsize=100,maxgen=10,my_generate=my_generate,\
             numselected=100,\            
             noBound=False,simconfig='sim.cfg',\
             useLOG=False,maxfittime=600,lseed=None,larch=None,verbose=True,\
-            useundefERR=False):
+            useundefERR=False,startweight=None):
   global es
   if useLOG: logger=setEClog()
   rand = Random(); rand.seed(rdmseed) # alternative - provide int(time.time()) as seed
@@ -274,20 +303,15 @@ def runevo (popsize=100,maxgen=10,my_generate=my_generate,\
     es = ec.DEA(rand)
   else:
     es = ec.ES(rand)
-
   es.terminator = terminators.generation_termination 
   es.variator = [inspyred.ec.variators.heuristic_crossover,my_mutation]#inspyred.ec.variators.nonuniform_mutation
   es.observer = [my_indiv_observe] # saves individuals to pkl file each generation
-
   statfile = open(fstats,'w'); indfile = open(findiv,'w')
-
   es.observer.append(inspyred.ec.observers.file_observer)
   es.observer.append(inspyred.ec.observers.stats_observer)
   es.selector = inspyred.ec.selectors.tournament_selection
   es.replacer = inspyred.ec.replacers.generational_replacement#inspyred.ec.replacers.plus_replacement
-
   if noBound: es.observer.append(my_bound_observe)
-
   if useMPI:
     pc.barrier()
     if pc.id()==0: print('nhost : ' , pc.nhost())
@@ -296,7 +320,7 @@ def runevo (popsize=100,maxgen=10,my_generate=my_generate,\
     final_pop = es.evolve(generator=my_generate,
                             evaluator=EvalFITMPI, 
                             pop_size=popsize,
-                            maximize=False,
+                            maximize=True,
                             bounder=mybounder(),
                             max_generations=maxgen,
                             statistics_file=statfile,
@@ -313,7 +337,8 @@ def runevo (popsize=100,maxgen=10,my_generate=my_generate,\
                             maxfittime=maxfittime,
                             seeds=lseed,
                             verbose=verbose,
-                            useundefERR=useundefERR)
+                            useundefERR=useundefERR,
+                            startweight=startweight)
     print('after evolve my id is ' , pc.id()) # checked that only host 0 calls evolution.
     pc.done()
   else: # use multiprocessing
@@ -323,7 +348,7 @@ def runevo (popsize=100,maxgen=10,my_generate=my_generate,\
                             mp_evaluator=EvalFIT, 
                             mp_nprocs=nproc,
                             pop_size=popsize,
-                            maximize=False,
+                            maximize=True,
                             bounder=mybounder(),
                             max_generations=maxgen,
                             statistics_file=statfile,
@@ -340,10 +365,11 @@ def runevo (popsize=100,maxgen=10,my_generate=my_generate,\
                             maxfittime=maxfittime,
                             seeds=lseed,
                             verbose=verbose,
-                            useundefERR=useundefERR)
-  # Sort and print the best individual, who will be at index 0.
-  final_pop.sort(reverse=True)
-  print(final_pop[0])
+                            useundefERR=useundefERR,
+                            startweight=startweight)
+  # Sort and print the best individual
+  final_pop.sort(reverse=False)
+  # print(final_pop[0],final_pop[-1]))
   statfile.close(); indfile.close()
   return [final_pop]
 
@@ -360,128 +386,106 @@ def indivpkl2list (fname):
 if __name__ == "__main__":
   if len(sys.argv) < 2:
     print('usage: python evo.py [popsize n] [maxgen n] [nproc n] [useMPI 0/1] [useDEA 0/1] [mutation_rate 0--1] [numselected n] [evostr name] [simf name]')
-    print('[noBound 0/1]')
-    print('[maxfittime seconds][simconfig path][verbose 0/1][rdmseed int]')
-  else:
-    popsize=100; maxgen=10; nproc=16; useMPI=True; numselected=100; useDEA = False;
-    mutation_rate=0.2; evostr='15sep17_XYZ'; simconfig = 'sim.cfg'; maxfittime = 600; 
-    noBound = useLOG = False;
-    verbose = True; rdmseed=1234; useundefERR = False; 
-    fseed = farch = lseed = larch = None; # files,lists for initial population and archive
-    i = 1; narg = len(sys.argv)
-    while i < narg:
-      if sys.argv[i] == 'popsize' or sys.argv[i] == '-popsize':
-        if i+1<narg:
-          i+=1; popsize = int(sys.argv[i]); 
-      elif sys.argv[i] == 'maxgen' or sys.argv[i] == '-maxgen':
-        if i+1 < narg:
-          i+=1; maxgen = int(sys.argv[i]); 
-      elif sys.argv[i] == 'nproc' or sys.argv[i] == '-nproc':
-        if i+1 < narg:
-          i+=1; nproc = int(sys.argv[i]); 
-      elif sys.argv[i] == 'rdmseed' or sys.argv[i] == '-rdmseed':
-        if i+1 < narg:
-          i+=1; rdmseed = int(sys.argv[i]); 
-      elif sys.argv[i] == 'useMPI' or sys.argv[i] == '-useMPI':
-        if i+1 < narg:
-          i+=1; useMPI = bool(int(sys.argv[i])); 
-      elif sys.argv[i] == 'useDEA' or sys.argv[i] == '-useDEA':
-        if i+1 < narg:
-          i+=1; useDEA = bool(int(sys.argv[i])); 
-      elif sys.argv[i] == 'numselected' or sys.argv[i] == '-numselected':
-        if i+1 < narg:
-          i+=1; numselected = int(sys.argv[i]);
-      elif sys.argv[i] == 'evostr' or sys.argv[i] == '-evostr':
-        if i+1 < narg:
-          i+=1; evostr = sys.argv[i]
-      elif sys.argv[i] == 'simconfig' or sys.argv[i] == '-simconfig':
-        if i+1 < narg:
-          i+=1; simconfig = sys.argv[i]
-      elif sys.argv[i] == 'mutation_rate' or sys.argv[i] == '-mutation_rate' or sys.argv[i] == '-mutationrate' or sys.argv[i] == 'mutationrate':
-        if i+1 < narg:
-          i+=1; mutation_rate = float(sys.argv[i])
-      elif sys.argv[i] == 'useLOG' or sys.argv[i] == '-useLOG':
-        if i+1 < narg:
-          i+=1; useLOG = bool(int(sys.argv[i]));
-      elif sys.argv[i] == 'verbose' or sys.argv[i] == '-verbose':
-        if i+1 < narg:
-          i+=1; verbose = bool(int(sys.argv[i]));
-      elif sys.argv[i] == 'noBound' or sys.argv[i] == '-noBound':
-        if i+1 < narg:
-          i+=1; noBound = bool(int(sys.argv[i]));
-      elif sys.argv[i] == 'useundefERR' or sys.argv[i] == '-useundefERR':
-        if i+1 < narg:
-          i+=1; useundefERR = bool(int(sys.argv[i]));
-      elif sys.argv[i] == 'simf' or sys.argv[i] == '-simf':
-        if i+1 < narg:
-          i+=1; simf = sys.argv[i]
-      elif sys.argv[i] == 'maxfittime' or sys.argv[i] == '-maxfittime':
-        if i+1 < narg:
-          i+=1; maxfittime = float(sys.argv[i])
-      elif sys.argv[i] == 'fseed':
-        if i+1 < narg:
-          i+=1; fseed = sys.argv[i]; lseed = indivpkl2list(fseed)
-      elif sys.argv[i] == 'farch':
-        if i+1 < narg:
-          i+=1; farch = sys.argv[i]; larch = pickle.load(open(farch)) 
-      elif sys.argv[i] == '-python' or sys.argv[i] == '-mpi' or sys.argv[i] == 'evo.py':
-        pass
-      else: raise Exception('unknown arg:'+sys.argv[i])
-      i+=1;
+    print('[noBound 0/1] [maxfittime seconds][simconfig path][verbose 0/1][rdmseed int]')
+    quit()
 
-    if (useMPI and pc.id()==0) or not useMPI:
-      print('popsize:',popsize,'maxgen:',maxgen,'nproc:',nproc,'useMPI:',useMPI,'numselected:',numselected,'evostr:',evostr,\
-          'useDEA:',useDEA,'mutation_rate:',mutation_rate,\
-          'noBound:',noBound,'useLOG:',useLOG,\
-          'maxfittime:',maxfittime,\                    
-          'fseed:',fseed,'farch:',farch,'verbose:',verbose,'rdmseed:',rdmseed,'useundefERR:',useundefERR)
+  popsize=100; maxgen=10; nproc=16; useMPI=True; numselected=100; useDEA = False;
+  mutation_rate=0.2; evostr='21jul21A'; simconfig = 'sn.json'; maxfittime = 600; 
+  noBound = useLOG = False;
+  verbose = True; rdmseed=1234; useundefERR = False; 
+  fseed = farch = lseed = larch = None; # files,lists for initial population and archive
+  i = 1; narg = len(sys.argv)
+  while i < narg:
+    if sys.argv[i] == 'popsize' or sys.argv[i] == '-popsize':
+      if i+1<narg:
+        i+=1; popsize = int(sys.argv[i]); 
+    elif sys.argv[i] == 'maxgen' or sys.argv[i] == '-maxgen':
+      if i+1 < narg:
+        i+=1; maxgen = int(sys.argv[i]); 
+    elif sys.argv[i] == 'nproc' or sys.argv[i] == '-nproc':
+      if i+1 < narg:
+        i+=1; nproc = int(sys.argv[i]); 
+    elif sys.argv[i] == 'rdmseed' or sys.argv[i] == '-rdmseed':
+      if i+1 < narg:
+        i+=1; rdmseed = int(sys.argv[i]); 
+    elif sys.argv[i] == 'useMPI' or sys.argv[i] == '-useMPI':
+      if i+1 < narg:
+        i+=1; useMPI = bool(int(sys.argv[i])); 
+    elif sys.argv[i] == 'useDEA' or sys.argv[i] == '-useDEA':
+      if i+1 < narg:
+        i+=1; useDEA = bool(int(sys.argv[i])); 
+    elif sys.argv[i] == 'numselected' or sys.argv[i] == '-numselected':
+      if i+1 < narg:
+        i+=1; numselected = int(sys.argv[i]);
+    elif sys.argv[i] == 'evostr' or sys.argv[i] == '-evostr':
+      if i+1 < narg:
+        i+=1; evostr = sys.argv[i]
+    elif sys.argv[i] == 'simconfig' or sys.argv[i] == '-simconfig':
+      if i+1 < narg:
+        i+=1; simconfig = sys.argv[i]
+    elif sys.argv[i] == 'mutation_rate' or sys.argv[i] == '-mutation_rate' or sys.argv[i] == '-mutationrate' or sys.argv[i] == 'mutationrate':
+      if i+1 < narg:
+        i+=1; mutation_rate = float(sys.argv[i])
+    elif sys.argv[i] == 'useLOG' or sys.argv[i] == '-useLOG':
+      if i+1 < narg:
+        i+=1; useLOG = bool(int(sys.argv[i]));
+    elif sys.argv[i] == 'verbose' or sys.argv[i] == '-verbose':
+      if i+1 < narg:
+        i+=1; verbose = bool(int(sys.argv[i]));
+    elif sys.argv[i] == 'noBound' or sys.argv[i] == '-noBound':
+      if i+1 < narg:
+        i+=1; noBound = bool(int(sys.argv[i]));
+    elif sys.argv[i] == 'useundefERR' or sys.argv[i] == '-useundefERR':
+      if i+1 < narg:
+        i+=1; useundefERR = bool(int(sys.argv[i]));
+    elif sys.argv[i] == 'simf' or sys.argv[i] == '-simf':
+      if i+1 < narg:
+        i+=1; simf = sys.argv[i]
+    elif sys.argv[i] == 'maxfittime' or sys.argv[i] == '-maxfittime':
+      if i+1 < narg:
+        i+=1; maxfittime = float(sys.argv[i])
+    elif sys.argv[i] == 'fseed':
+      if i+1 < narg:
+        i+=1; fseed = sys.argv[i]; lseed = indivpkl2list(fseed)
+    elif sys.argv[i] == 'farch':
+      if i+1 < narg:
+        i+=1; farch = sys.argv[i]; larch = pickle.load(open(farch))
+    elif sys.argv[i] == 'startweight':
+      if i+1 < narg:
+        i+=1; startweight = readweightsfile2pdf(sys.argv[i]) # starting weights - placeholders
+    elif sys.argv[i] == '-python' or sys.argv[i] == '-mpi' or sys.argv[i] == 'evo.py':
+      pass
+    else: raise Exception('unknown arg:'+sys.argv[i])
+    i+=1;
 
-    # make sure master node does not work on submitted jobs (that would prevent it managing/submitting other jobs)
-    if useMPI and pc.id()==0: pc.master_works_on_jobs(0) 
-
-    if (useMPI and pc.id()==0) or not useMPI:
-      # backup the config file and use backed-up version for evo (in case local version changed during evolution)
-      safemkdir('data/'+evostr) # make a data output dir
-      simconfig = backupcfg(evostr,simconfig) 
-      safemkdir(mydir+'/batch') # for temp files
-
-    myout = runevo(popsize=popsize,maxgen=maxgen,nproc=nproc,rdmseed=rdmseed,useMPI=useMPI,\
-                   numselected=numselected,mutation_rate=mutation_rate,\
-                   useDEA=useDEA,\                   
-                   fstats='/dev/null',findiv='/dev/null',simconfig=simconfig,\                  
-                   useLOG=useLOG,maxfittime=maxfittime,lseed=lseed,larch=larch,\
-                   verbose=verbose,useundefERR=useundefERR);
-
-    if (useMPI and pc.id()==0) or not useMPI:
-      pickle.dump(myout[0],open('data/' + evostr + '/fpop.pkl','w'))
-      if useEMO: pickle.dump(myout[1],open('data/' + evostr + '/ARCH.pkl','w'))
-
-    if useMPI:
-      if pc.id()==0: print('MPI finished, exiting.')
-      quit() # make sure CPUs freed
-  
-"""
-if __name__ == '__main__':
-  basefn = sys.argv[1]
-  ncore = int(sys.argv[2])
-  nstep = 1
-  startweight = readweightsfile2pdf(sys.argv[3]) # starting weights - placeholders
-  outf = sys.argv[4]
-  print(basefn,nstep)
-  fpout = open(outf,'w')
-  d = json.load(open(basefn,'r'))
-  simstr = d['sim']['name']
-  d['sim']['name'] += '_step_' + str(i) + '_'
-  d['sim']['doquit'] = 1
-  d['sim']['doplot'] = 0
-  d['simtype']['ResumeSim'] = 1
-  d['simtype']['ResumeSimFromFile'] = 'data/' + simstr + '_step_' + str(i-1) + '_synWeights_final.pkl'
-  fnjson = d['sim']['name'] + '.json'
-  fpout.writelines('./myrun ' + str(ncore) + ' ' + fnjson + '\n')
-  json.dump(d, open(fnjson,'w'), indent=2)
-  fpout.close()
-  os.chmod(outf,0o775)
-  print('running ', outf)
-  os.system('./'+outf)
-"""
+  if (useMPI and pc.id()==0) or not useMPI:
+    print('popsize:',popsize,'maxgen:',maxgen,'nproc:',nproc,'useMPI:',useMPI,'numselected:',numselected,'evostr:',evostr,\
+        'useDEA:',useDEA,'mutation_rate:',mutation_rate,\
+        'noBound:',noBound,'useLOG:',useLOG,\
+        'maxfittime:',maxfittime,\                    
+        'fseed:',fseed,'farch:',farch,'verbose:',verbose,'rdmseed:',rdmseed,'useundefERR:',useundefERR)
       
+  # make sure master node does not work on submitted jobs (that would prevent it managing/submitting other jobs)
+  if useMPI and pc.id()==0: pc.master_works_on_jobs(0) 
+
+  if (useMPI and pc.id()==0) or not useMPI:
+    # backup the config file and use backed-up version for evo (in case local version changed during evolution)
+    safemkdir('data/'+evostr) # make a data output dir
+    simconfig = backupcfg(evostr,simconfig) 
+    safemkdir(mydir+'/batch') # for temp files
+
+  myout = runevo(popsize=popsize,maxgen=maxgen,nproc=nproc,rdmseed=rdmseed,useMPI=useMPI,\
+                 numselected=numselected,mutation_rate=mutation_rate,\
+                 useDEA=useDEA,\                   
+                 fstats='/dev/null',findiv='/dev/null',simconfig=simconfig,\                  
+                 useLOG=useLOG,maxfittime=maxfittime,lseed=lseed,larch=larch,\
+                 verbose=verbose,useundefERR=useundefERR,startweight=startweight);
+
+  if (useMPI and pc.id()==0) or not useMPI:
+    pickle.dump(myout[0],open('data/' + evostr + '/fpop.pkl','w'))
+    if useEMO: pickle.dump(myout[1],open('data/' + evostr + '/ARCH.pkl','w'))
+
+  if useMPI:
+    if pc.id()==0: print('MPI finished, exiting.')
+    quit() # make sure CPUs freed
+  
