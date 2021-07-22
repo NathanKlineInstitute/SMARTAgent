@@ -74,7 +74,7 @@ def FitJobStrFN (p, args, cdx):
   # for i in range(len(p)): Wnew[i] = p[i] # update the weights based on the candidate
   for i in range(len(p)): pdfnew.at[i,'weight'] = p[i] # update the weights based on the candidate
   # next read the
-  fd,fnweight = tempfile.mkstemp(dir=mydir+'/batch')
+  fd,fnweight = tempfile.mkstemp(dir=mydir+'/evo')
   os.close(fd) # make sure closed
   #strc = 'nrniv -python ' + args['simf'] + ' '
   # save new synaptic weights to temp file
@@ -471,7 +471,7 @@ if __name__ == "__main__":
     # backup the config file and use backed-up version for evo (in case local version changed during evolution)
     safemkdir('data/'+evostr) # make a data output dir
     # simconfig = backupcfg(evostr,simconfig) 
-    safemkdir(mydir+'/batch') # for temp files
+    safemkdir(mydir+'/evo') # for temp files
 
   myout = runevo(popsize=popsize,maxgen=maxgen,nproc=nproc,rdmseed=rdmseed,useMPI=useMPI,\
                  numselected=numselected,mutation_rate=mutation_rate,\
