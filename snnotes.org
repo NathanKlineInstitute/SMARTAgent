@@ -36988,3 +36988,5 @@ name:
 (emacs buffer=shell)
 python multistepSim.py sn.json 30 60 21jul22_EN0_256_RSE_cycle_multi
 
+started ~14:32 ...
+
