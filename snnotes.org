@@ -36972,3 +36972,19 @@ savefig(gifpath()+'all_steps_avg_weightEN.png') # [[./gif/21jul22_21jul19_EN02_K
 
 # fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
 
+** for non-targetted RL: should try reset_eligibility (21jul22_EN0_256_RSE_cycle_)
+
+after each reward, punishment ... otherwise same synapses can get rewarded/punished multiple times
+and for the wrong reasons
+
+will stop 21jul19_EN02_K_cycle_multi for now so can test that on cycle
+
+will use this flag:     "ResetEligAfterCritic": 1
+off by default (added to conf.py with default value of 0)
+
+name:
+21jul22_EN0_256_RSE_cycle_
+
+(emacs buffer=shell)
+python multistepSim.py sn.json 30 60 21jul22_EN0_256_RSE_cycle_multi
+

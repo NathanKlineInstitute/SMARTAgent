@@ -1790,7 +1790,10 @@ def trainAgent (t):
       else: # this is non-targetted RL
         if dconf['verbose']: print('APPLY RL to both EMUP and EMDOWN')
         for STDPmech in dSTDPmech['all']: STDPmech.reward_punish(critic)
-        for STDPmech in dSTDPmech['NOISE']: STDPmech.reward_punish(-critic) # SN exptl - noise sources get opposite sign
+        for STDPmech in dSTDPmech['NOISE']: STDPmech.reward_punish(-critic) # noise sources get opposite sign RL
+      if dconf['sim']['ResetEligAfterCritic']: # reset eligibility after applying reward/punishment
+        for STDPmech in dSTDPmech['all']: STDPmech.reset_eligibility()
+        for STDPmech in dSTDPmech['NOISE']: STDPmech.reset_eligibility()        
   if sim.rank==0:
     # print('t=',round(t,2),' game rewards:', rewards) # only rank 0 has access to rewards      
     for action in actions: sim.allActions.append(action)
