@@ -66,43 +66,41 @@ def backupcfg (evostr,fcfg):
   return fout 
 
 #
-def FitJobStrFN (p, args):
+def FitJobStrFN (p, args, cdx):
   pdfnew = args['startweight'].copy() # copy starting synaptic weights
   Wnew = pdfnew['W'] # array to weights
   for i in len(p): Wnew[i] = p[i] # update the weights based on the candidate
   # next read the
-  fd,fn = tempfile.mkstemp(dir=mydir+'/batch')
+  fd,fnweight = tempfile.mkstemp(dir=mydir+'/batch')
   os.close(fd) # make sure closed
   #strc = 'nrniv -python ' + args['simf'] + ' '
   # save new synaptic weights to temp file
   pdfnew = pdfnew[pdfnew.time==np.amax(pdfnew.time)]  
   D = pdf2weightsdict(pdfnew)
-  pickle.dump(D, open(fn,'wb')) # temp file for synaptic weights
+  pickle.dump(D, open(fnweight,'wb')) # temp file for synaptic weights
   # next update the simulation's json file
   simconfig = args['simconfig']
   d = json.load(open(simconfig,'r')) # original input json
   simstr = d['sim']['name']
-  d['sim']['name'] += '_evo_gen_' + str(args['_ec'].num_generations) # also need candidate ID
+  d['sim']['name'] += '_evo_gen_' + str(args['_ec'].num_generations) + '_cand_' + str(cdx) +'_' # also need candidate ID
   d['sim']['doquit'] = 1
   d['sim']['doplot'] = 0
   d['simtype']['ResumeSim'] = 1
-  d['simtype']['ResumeSimFromFile'] = fn
+  d['simtype']['ResumeSimFromFile'] = fnweight
   fnjson = d['sim']['name'] + '.json'
   json.dump(d, open(fnjson,'w'), indent=2)
-  strc = './myrun 1 ' + fnjson # command string  
-  return strc,fn
+  ncore = 1
+  strc = './myrun ' + str(ncore) + ' ' + fnjson # command string  
+  return strc,'data/'+d['sim']['name']+'ActionsRewards.txt'
 
 # evaluate fitness with sim run
 def EvalFIT (candidates, args):
   fitness = []; 
-  for p in candidates:
-    strc,fn = FitJobStrFN(p, args)
+  for cdx, p in enumerate(candidates):
+    strc,fn = FitJobStrFN(p, args, cdx)
     ret = os.system(strc)
-    fp = open(fn,'r')
-    fit = float(fp.readlines()[0].strip())
-    fp.close()
-    os.unlink(fn)
-    fitness.append(fit)
+    actreward = pd.DataFrame(np.loadtxt(fn),columns=['time','action','reward','proposed','hit','followtargetsign'])
+    fitness.append(np.sum(actreward['reward']))
   return fitness
 
 lconn,lssh=None,None
@@ -159,7 +157,9 @@ def RunViaMPI (cdx, cmd, fn, maxfittime):
     try: # lack of output file may occur if invalid param values lead to an nrniv crash
       #print 'here'
       #print 'trying to read single fit value'
-      with open(fn,'r')  as fp: fit = float(fp.readlines()[0].strip())
+      # with open(fn,'r')  as fp: fit = float(fp.readlines()[0].strip())
+      actreward = pd.DataFrame(np.loadtxt(fn),columns=['time','action','reward','proposed','hit','followtargetsign'])
+      fit = np.sum(actreward['reward'])        
     except:
       print('WARN: could not read.')
   #print 'py job', cdx, ' removing temp file'
@@ -178,7 +178,7 @@ def EvalFITMPI (candidates, args):
   fitness = [1e9 for i in range(len(candidates))]; 
   lcomm = ['' for i in range(len(candidates))] # commands
   lfile = ['' for i in range(len(candidates))] # temp files
-  for cdx,p in enumerate(candidates): lcomm[cdx],lfile[cdx] = FitJobStrFN(p,args)
+  for cdx,p in enumerate(candidates): lcomm[cdx],lfile[cdx] = FitJobStrFN(p,args,cdx)
   # print lcomm[0]
   verbose=args['verbose']
   njob = len(candidates); cdx = 0
