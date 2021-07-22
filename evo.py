@@ -277,8 +277,7 @@ def initialize_archive(f, archive_seeds):
 def runevo (popsize=100,maxgen=10,my_generate=my_generate,\
             mybounder=my_bounder,nproc=16,rdmseed=1234,useDEA=True,\
             fstats='/dev/null',findiv='/dev/null',mutation_rate=0.2,useMPI=False,\
-            numselected=100,\            
-            noBound=False,simconfig='sim.cfg',\
+            numselected=100,noBound=False,simconfig='sn.json',\
             useLOG=False,maxfittime=600,lseed=None,larch=None,verbose=True,\
             useundefERR=False,startweight=None):
   global es
@@ -447,8 +446,7 @@ if __name__ == "__main__":
     print('popsize:',popsize,'maxgen:',maxgen,'nproc:',nproc,'useMPI:',useMPI,'numselected:',numselected,'evostr:',evostr,\
         'useDEA:',useDEA,'mutation_rate:',mutation_rate,\
         'noBound:',noBound,'useLOG:',useLOG,\
-        'maxfittime:',maxfittime,\                    
-        'fseed:',fseed,'farch:',farch,'verbose:',verbose,'rdmseed:',rdmseed,'useundefERR:',useundefERR)
+        'maxfittime:',maxfittime,'fseed:',fseed,'farch:',farch,'verbose:',verbose,'rdmseed:',rdmseed,'useundefERR:',useundefERR)
       
   # make sure master node does not work on submitted jobs (that would prevent it managing/submitting other jobs)
   if useMPI and pc.id()==0: pc.master_works_on_jobs(0) 
@@ -461,8 +459,7 @@ if __name__ == "__main__":
 
   myout = runevo(popsize=popsize,maxgen=maxgen,nproc=nproc,rdmseed=rdmseed,useMPI=useMPI,\
                  numselected=numselected,mutation_rate=mutation_rate,\
-                 useDEA=useDEA,\                   
-                 fstats='/dev/null',findiv='/dev/null',simconfig=simconfig,\                  
+                 useDEA=useDEA,fstats='/dev/null',findiv='/dev/null',simconfig=simconfig,\
                  useLOG=useLOG,maxfittime=maxfittime,lseed=lseed,larch=larch,\
                  verbose=verbose,useundefERR=useundefERR,startweight=startweight);
 
