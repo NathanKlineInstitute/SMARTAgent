@@ -67,44 +67,29 @@ def backupcfg (evostr,fcfg):
 
 #
 def FitJobStrFN (p, args):
-
-  pdfnew = args['startweight'].copy()
-  Wnew = pdfnew['W']
-  for i in len(p): Wnew[i] = p[i]
-
-  simconfig = args['simconfig']
+  pdfnew = args['startweight'].copy() # copy starting synaptic weights
+  Wnew = pdfnew['W'] # array to weights
+  for i in len(p): Wnew[i] = p[i] # update the weights based on the candidate
+  # next read the
   fd,fn = tempfile.mkstemp(dir=mydir+'/batch')
   os.close(fd) # make sure closed
   #strc = 'nrniv -python ' + args['simf'] + ' '
-
-  pdfnew = pdfnew[pdfnew.time==np.amax(pdfnew.time)]
+  # save new synaptic weights to temp file
+  pdfnew = pdfnew[pdfnew.time==np.amax(pdfnew.time)]  
   D = pdf2weightsdict(pdfnew)
-  pickle.dump(D, open(fn,'wb'))  
-    
-  #ncore = int(sys.argv[2])
-  #nstep = 1
-  #outf = sys.argv[4]
-  print(basefn,nstep)
-  fpout = open(outf,'w')
-  d = json.load(open(basefn,'r'))
+  pickle.dump(D, open(fn,'wb')) # temp file for synaptic weights
+  # next update the simulation's json file
+  simconfig = args['simconfig']
+  d = json.load(open(simconfig,'r')) # original input json
   simstr = d['sim']['name']
-  d['sim']['name'] += '_evo_gen_'
+  d['sim']['name'] += '_evo_gen_' + str(args['_ec'].num_generations) # also need candidate ID
   d['sim']['doquit'] = 1
   d['sim']['doplot'] = 0
   d['simtype']['ResumeSim'] = 1
   d['simtype']['ResumeSimFromFile'] = fn
   fnjson = d['sim']['name'] + '.json'
-  fpout.writelines('./myrun ' + str(ncore) + ' ' + fnjson + '\n')
   json.dump(d, open(fnjson,'w'), indent=2)
-  fpout.close()
-  
-  strc = './myrun 1 tmp.json'
-  
-  #for i in range(len(p)): strc += str(p[i]) + ' '
-  #strc += fn + ' ' + simconfig
-  #for s in ['noBound', 'useundefERR']:
-  #  if args[s]: strc += ' ' + s
-  
+  strc = './myrun 1 ' + fnjson # command string  
   return strc,fn
 
 # evaluate fitness with sim run
@@ -147,7 +132,7 @@ def my_generate (random, args):
 # run sim command via mpi, then delete the temp file. returns job index and fitness.
 def RunViaMPI (cdx, cmd, fn, maxfittime):
   global pc
-  if nfunc > 1 and (useEMO or useLEX): fit = [1e9 for i in range(nfunc)]
+  if nfunc > 1 and useEMO: fit = [1e9 for i in range(nfunc)]
   else: fit = 1e9
   #print 'pc.id()==',pc.id(),'. starting py job', cdx, 'command:', cmd
   cmdargs = shlex.split(cmd)
