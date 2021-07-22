@@ -36992,3 +36992,5 @@ started ~14:32 ...
 
 ** back to evo
 
+python -i evo.py popsize 1 maxgen 1 nproc 1 useMPI 0 simconfig sn.json verbose 1 startweight data/21jul22_test_EVO_lp_synWeights_final.pkl
+

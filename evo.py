@@ -11,18 +11,18 @@ from time import time, clock
 import datetime # to format time of run
 import os
 import tempfile
-import sim # runs different cell models (most contain Ben Suter ion channels)
+# import sim # runs different cell models (most contain Ben Suter ion channels)
 import pickle
 import logging
 from subprocess import Popen, PIPE, call
-import paramiko # py SSH
-import popen2
+# import paramiko # py SSH
+# import popen2
 from neuron import h
 import shlex
-import lex
+# import lex
 import copy
 from functools import wraps
-
+import numpy as np
 import random
 import os
 import json
@@ -68,8 +68,9 @@ def backupcfg (evostr,fcfg):
 #
 def FitJobStrFN (p, args, cdx):
   pdfnew = args['startweight'].copy() # copy starting synaptic weights
-  Wnew = pdfnew['W'] # array to weights
-  for i in len(p): Wnew[i] = p[i] # update the weights based on the candidate
+  print('pdfnew columns:',pdfnew.columns)
+  Wnew = pdfnew['weight'] # array to weights
+  for i in range(len(p)): Wnew[i] = p[i] # update the weights based on the candidate
   # next read the
   fd,fnweight = tempfile.mkstemp(dir=mydir+'/batch')
   os.close(fd) # make sure closed
@@ -89,7 +90,8 @@ def FitJobStrFN (p, args, cdx):
   d['simtype']['ResumeSimFromFile'] = fnweight
   fnjson = d['sim']['name'] + '.json'
   json.dump(d, open(fnjson,'w'), indent=2)
-  ncore = 1
+  print('fnjson is:',fnjson)
+  ncore = 6
   strc = './myrun ' + str(ncore) + ' ' + fnjson # command string  
   return strc,'data/'+d['sim']['name']+'ActionsRewards.txt'
 
@@ -105,6 +107,7 @@ def EvalFIT (candidates, args):
 
 lconn,lssh=None,None
 
+"""
 # checks bounds for params
 def my_bounder ():
   lmin,lmax=[],[]
@@ -112,7 +115,7 @@ def my_bounder ():
     mn,mx = dprm[k].minval,dprm[k].maxval
     lmin.append(mn); lmax.append(mx)
   return ec.Bounder(lmin,lmax)
-
+"""
 
 weightVar = 0.75
 wmin = 1.0 - weightVar
@@ -122,8 +125,9 @@ wmax = 1.0 + weightVar
 @diversify
 def my_generate (random, args):
   pout = []
-  W = args['startweight']['W']
-  for i in len(W):
+  print('type:',type(args['startweight']))
+  W = args['startweight']['weight']
+  for i in range(len(W)):
     pout.append(random.uniform(wmin * W[i], wmax * W[i] ))
   return pout
 
@@ -228,6 +232,7 @@ def my_indiv_observe (population, num_generations, num_evaluations, args):
 
 es = None
 
+"""
 # adjusts boundary of parameters and saves new param bounds to file (pkl)
 def my_bound_observe (population, num_generations, num_evaluations, args):
   if args['verbose']: print('adjusting param boundaries')
@@ -236,20 +241,21 @@ def my_bound_observe (population, num_generations, num_evaluations, args):
   es.bounder = sim.my_bounder() # reset it here
   fn = 'data/' + evostr + '/dprm.pkl' # just saves to 1 to avoid extra files - dprm rarely changes
   pickle.dump(sim.dprm,open(fn,'w'))
+"""
 
+"""
 @mutator
 def my_mutation (random, candidate, args):
-    """Return the mutants produced by nonuniform mutation on the candidates.
-    .. Arguments:
-       random -- the random number generator object
-       candidate -- the candidate solution
-       args -- a dictionary of keyword arguments
-    Required keyword arguments in args:       
-    Optional keyword arguments in args:    
-    - *mutation_strength* -- the strength of the mutation, where higher
-      values correspond to greater variation (default 1)
-    
-    """
+    # Return the mutants produced by nonuniform mutation on the candidates.
+    #.. Arguments:
+    #   random -- the random number generator object
+    #   candidate -- the candidate solution
+    #   args -- a dictionary of keyword arguments
+    #Required keyword arguments in args:       
+    #Optional keyword arguments in args:    
+    #- *mutation_strength* -- the strength of the mutation, where higher
+    #  values correspond to greater variation (default 1)
+    #
     bounder = args['_ec'].bounder
     num_gens = args['_ec'].num_generations
     strength = args.setdefault('mutation_strength', 1)
@@ -262,7 +268,8 @@ def my_mutation (random, candidate, args):
             new_value = c - (c - lo) * (1.0 - random.random() ** exponent)
         mutant[i] = new_value
     return mutant
-
+"""
+      
 # use the archive_seeds to initialize an archive
 def initialize_archive(f, archive_seeds):
   @wraps(f)
@@ -275,7 +282,7 @@ def initialize_archive(f, archive_seeds):
 
 # run the evolution
 def runevo (popsize=100,maxgen=10,my_generate=my_generate,\
-            mybounder=my_bounder,nproc=16,rdmseed=1234,useDEA=True,\
+            nproc=16,rdmseed=1234,useDEA=True,\
             fstats='/dev/null',findiv='/dev/null',mutation_rate=0.2,useMPI=False,\
             numselected=100,noBound=False,simconfig='sn.json',\
             useLOG=False,maxfittime=600,lseed=None,larch=None,verbose=True,\
@@ -288,14 +295,15 @@ def runevo (popsize=100,maxgen=10,my_generate=my_generate,\
   else:
     es = ec.ES(rand)
   es.terminator = terminators.generation_termination 
-  es.variator = [inspyred.ec.variators.heuristic_crossover,my_mutation]#inspyred.ec.variators.nonuniform_mutation
+  #es.variator = [inspyred.ec.variators.heuristic_crossover,my_mutation]#inspyred.ec.variators.nonuniform_mutation
+  es.variator = [inspyred.ec.variators.heuristic_crossover,inspyred.ec.variators.nonuniform_mutation]
   es.observer = [my_indiv_observe] # saves individuals to pkl file each generation
   statfile = open(fstats,'w'); indfile = open(findiv,'w')
   es.observer.append(inspyred.ec.observers.file_observer)
   es.observer.append(inspyred.ec.observers.stats_observer)
   es.selector = inspyred.ec.selectors.tournament_selection
   es.replacer = inspyred.ec.replacers.generational_replacement#inspyred.ec.replacers.plus_replacement
-  if noBound: es.observer.append(my_bound_observe)
+  # if noBound: es.observer.append(my_bound_observe)
   if useMPI:
     pc.barrier()
     if pc.id()==0: print('nhost : ' , pc.nhost())
@@ -305,7 +313,6 @@ def runevo (popsize=100,maxgen=10,my_generate=my_generate,\
                             evaluator=EvalFITMPI, 
                             pop_size=popsize,
                             maximize=True,
-                            bounder=mybounder(),
                             max_generations=maxgen,
                             statistics_file=statfile,
                             individuals_file=indfile,
@@ -333,7 +340,6 @@ def runevo (popsize=100,maxgen=10,my_generate=my_generate,\
                             mp_nprocs=nproc,
                             pop_size=popsize,
                             maximize=True,
-                            bounder=mybounder(),
                             max_generations=maxgen,
                             statistics_file=statfile,
                             individuals_file=indfile,
@@ -437,6 +443,7 @@ if __name__ == "__main__":
     elif sys.argv[i] == 'startweight':
       if i+1 < narg:
         i+=1; startweight = readweightsfile2pdf(sys.argv[i]) # starting weights - placeholders
+        print('startweight columns:',startweight.columns)
     elif sys.argv[i] == '-python' or sys.argv[i] == '-mpi' or sys.argv[i] == 'evo.py':
       pass
     else: raise Exception('unknown arg:'+sys.argv[i])
