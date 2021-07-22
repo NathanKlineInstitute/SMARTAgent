@@ -107,7 +107,9 @@ def EvalFIT (candidates, args):
     strc,fn = FitJobStrFN(p, args, cdx)
     ret = os.system(strc)
     actreward = pd.DataFrame(np.loadtxt(fn),columns=['time','action','reward','proposed','hit','followtargetsign'])
-    fitness.append(np.sum(actreward['reward']))
+    fit = np.sum(actreward['reward'])
+    print('fit is':,fit)
+    fitness.append(fit)
   return fitness
 
 lconn,lssh=None,None
