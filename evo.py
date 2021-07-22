@@ -28,7 +28,7 @@ import os
 import json
 import pickle
 import sys
-
+import pandas as pd
 from simdat import readweightsfile2pdf, pdf2weightsdict
 
 pc = h.ParallelContext()
@@ -67,10 +67,12 @@ def backupcfg (evostr,fcfg):
 
 #
 def FitJobStrFN (p, args, cdx):
+  global es
   pdfnew = args['startweight'].copy() # copy starting synaptic weights
   print('pdfnew columns:',pdfnew.columns)
-  Wnew = pdfnew['weight'] # array to weights
-  for i in range(len(p)): Wnew[i] = p[i] # update the weights based on the candidate
+  #Wnew = pdfnew['weight'] # array to weights
+  # for i in range(len(p)): Wnew[i] = p[i] # update the weights based on the candidate
+  for i in range(len(p)): pdfnew.at[i,'weight'] = p[i] # update the weights based on the candidate
   # next read the
   fd,fnweight = tempfile.mkstemp(dir=mydir+'/batch')
   os.close(fd) # make sure closed
@@ -83,7 +85,8 @@ def FitJobStrFN (p, args, cdx):
   simconfig = args['simconfig']
   d = json.load(open(simconfig,'r')) # original input json
   simstr = d['sim']['name']
-  d['sim']['name'] += '_evo_gen_' + str(args['_ec'].num_generations) + '_cand_' + str(cdx) +'_' # also need candidate ID
+  print('args.keys():',args.keys())
+  d['sim']['name'] += '_evo_gen_' + str(es.num_generations) + '_cand_' + str(cdx) +'_' # also need candidate ID
   d['sim']['doquit'] = 1
   d['sim']['doplot'] = 0
   d['simtype']['ResumeSim'] = 1
@@ -97,6 +100,8 @@ def FitJobStrFN (p, args, cdx):
 
 # evaluate fitness with sim run
 def EvalFIT (candidates, args):
+  global es
+  print('EvalFIT args.keys():',args.keys())
   fitness = []; 
   for cdx, p in enumerate(candidates):
     strc,fn = FitJobStrFN(p, args, cdx)
@@ -127,8 +132,10 @@ def my_generate (random, args):
   pout = []
   print('type:',type(args['startweight']))
   W = args['startweight']['weight']
+  pdf = args['startweight']
   for i in range(len(W)):
-    pout.append(random.uniform(wmin * W[i], wmax * W[i] ))
+    pout.append(random.uniform(wmin * pdf.at[i,'weight'], wmax * pdf.at[i,'weight']))
+    #pout.append(random.uniform(wmin * W[i], wmax * W[i] ))
   return pout
 
 # run sim command via mpi, then delete the temp file. returns job index and fitness.
@@ -461,7 +468,7 @@ if __name__ == "__main__":
   if (useMPI and pc.id()==0) or not useMPI:
     # backup the config file and use backed-up version for evo (in case local version changed during evolution)
     safemkdir('data/'+evostr) # make a data output dir
-    simconfig = backupcfg(evostr,simconfig) 
+    # simconfig = backupcfg(evostr,simconfig) 
     safemkdir(mydir+'/batch') # for temp files
 
   myout = runevo(popsize=popsize,maxgen=maxgen,nproc=nproc,rdmseed=rdmseed,useMPI=useMPI,\
