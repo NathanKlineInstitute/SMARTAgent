@@ -11,15 +11,11 @@ from time import time, clock
 import datetime # to format time of run
 import os
 import tempfile
-# import sim # runs different cell models (most contain Ben Suter ion channels)
 import pickle
 import logging
 from subprocess import Popen, PIPE, call
-# import paramiko # py SSH
-# import popen2
 from neuron import h
 import shlex
-# import lex
 import copy
 from functools import wraps
 import numpy as np
@@ -103,16 +99,6 @@ def EvalFIT (candidates, args):
     fitness.append(fit)
   return fitness
 
-"""
-# checks bounds for params
-def my_bounder ():
-  lmin,lmax=[],[]
-  for k in dprm.keys():
-    mn,mx = dprm[k].minval,dprm[k].maxval
-    lmin.append(mn); lmax.append(mx)
-  return ec.Bounder(lmin,lmax)
-"""
-
 weightVar = 0.9
 wmin = 1.0 - weightVar
 wmax = 1.0 + weightVar
@@ -121,12 +107,10 @@ wmax = 1.0 + weightVar
 @diversify
 def my_generate (random, args):
   pout = []
-  # print('type:',type(args['startweight']))
   W = args['startweight']['weight']
   pdf = args['startweight']
   for i in range(len(W)):
     pout.append(max(0,random.uniform(wmin * pdf.at[i,'weight'], wmax * pdf.at[i,'weight'])))
-    #pout.append(random.uniform(wmin * W[i], wmax * W[i] ))
   return pout
 
 # run sim command via mpi, then delete the temp file. returns job index and fitness.
@@ -227,44 +211,6 @@ def my_indiv_observe (population, num_generations, num_evaluations, args):
   pickle.dump(population,open(fn,'wb'))
 
 es = None
-
-"""
-# adjusts boundary of parameters and saves new param bounds to file (pkl)
-def my_bound_observe (population, num_generations, num_evaluations, args):
-  if args['verbose']: print('adjusting param boundaries')
-  sim.boundinc(population)
-  #args['bounder'] = sim.my_bounder() # reset it here
-  es.bounder = sim.my_bounder() # reset it here
-  fn = 'data/' + evostr + '/dprm.pkl' # just saves to 1 to avoid extra files - dprm rarely changes
-  pickle.dump(sim.dprm,open(fn,'w'))
-"""
-
-"""
-@mutator
-def my_mutation (random, candidate, args):
-    # Return the mutants produced by nonuniform mutation on the candidates.
-    #.. Arguments:
-    #   random -- the random number generator object
-    #   candidate -- the candidate solution
-    #   args -- a dictionary of keyword arguments
-    #Required keyword arguments in args:       
-    #Optional keyword arguments in args:    
-    #- *mutation_strength* -- the strength of the mutation, where higher
-    #  values correspond to greater variation (default 1)
-    #
-    bounder = args['_ec'].bounder
-    num_gens = args['_ec'].num_generations
-    strength = args.setdefault('mutation_strength', 1)
-    exponent = strength
-    mutant = copy.copy(candidate)
-    for i, (c, lo, hi) in enumerate(zip(candidate, bounder.lower_bound, bounder.upper_bound)):
-        if random.random() <= 0.5:
-            new_value = c + (hi - c) * (1.0 - random.random() ** exponent)
-        else:
-            new_value = c - (c - lo) * (1.0 - random.random() ** exponent)
-        mutant[i] = new_value
-    return mutant
-"""
       
 # use the archive_seeds to initialize an archive
 def initialize_archive(f, archive_seeds):
@@ -287,9 +233,9 @@ def runevo (popsize=100,maxgen=10,my_generate=my_generate,\
   useMProc = False
   if useLOG: logger=setEClog()
   rand = Random(); rand.seed(rdmseed) # alternative - provide int(time.time()) as seed
-  if useDEA:
+  if useDEA: # differential evolution
     es = ec.DEA(rand)
-  else:
+  else: # evolution strategy
     es = ec.ES(rand)
   es.terminator = terminators.generation_termination 
   #es.variator = [inspyred.ec.variators.heuristic_crossover,my_mutation]#inspyred.ec.variators.nonuniform_mutation
@@ -317,9 +263,6 @@ def runevo (popsize=100,maxgen=10,my_generate=my_generate,\
                             mutation_rate=mutation_rate,
                             simf=simf,
                             num_selected=numselected,
-                            max_archive_size=max(popsize,numselected),
-                            tournament_size=2,
-                            num_elites=int(popsize/10.0),
                             simconfig=simconfig,
                             noBound=noBound,
                             es=es,
@@ -345,9 +288,6 @@ def runevo (popsize=100,maxgen=10,my_generate=my_generate,\
                             mutation_rate=mutation_rate,
                             simf=simf,
                             num_selected=numselected,
-                            max_archive_size=max(popsize,numselected),
-                            tournament_size=2,
-                            num_elites=int(popsize/10.0),
                             simconfig=simconfig,
                             noBound=noBound,
                             es=es,
@@ -363,14 +303,11 @@ def runevo (popsize=100,maxgen=10,my_generate=my_generate,\
                             maximize=True,
                             bounder=ec.Bounder(0,35.0),
                             max_generations=maxgen,
-                            #statistics_file=statfile,
-                            #individuals_file=indfile,
+                            statistics_file=statfile,
+                            individuals_file=indfile,
                             mutation_rate=mutation_rate,
                             simf=simf,
                             num_selected=numselected,
-                            #max_archive_size=max(popsize,numselected),
-                            #tournament_size=2,
-                            #num_elites=int(popsize/10.0),
                             simconfig=simconfig,
                             noBound=noBound,
                             es=es,
@@ -382,8 +319,7 @@ def runevo (popsize=100,maxgen=10,my_generate=my_generate,\
     
   # Sort and print the best individual
   final_pop.sort(reverse=False)
-  # print(final_pop[0],final_pop[-1]))
-  # statfile.close(); indfile.close()
+  statfile.close(); indfile.close()
   return [final_pop]
 
 # plot generation progress over time
