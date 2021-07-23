@@ -67,44 +67,40 @@ def backupcfg (evostr,fcfg):
 
 #
 def FitJobStrFN (p, args, cdx):
-  global es
+  global es # global evolution object
   pdfnew = args['startweight'].copy() # copy starting synaptic weights
-  print('pdfnew columns:',pdfnew.columns)
-  #Wnew = pdfnew['weight'] # array to weights
-  # for i in range(len(p)): Wnew[i] = p[i] # update the weights based on the candidate
+  # print('pdfnew columns:',pdfnew.columns)
   for i in range(len(p)): pdfnew.at[i,'weight'] = p[i] # update the weights based on the candidate
-  # next read the
-  fd,fnweight = tempfile.mkstemp(dir=mydir+'/evo')
-  os.close(fd) # make sure closed
-  #strc = 'nrniv -python ' + args['simf'] + ' '
-  # save new synaptic weights to temp file
-  pdfnew = pdfnew[pdfnew.time==np.amax(pdfnew.time)]  
-  D = pdf2weightsdict(pdfnew)
-  pickle.dump(D, open(fnweight,'wb')) # temp file for synaptic weights
   # next update the simulation's json file
   simconfig = args['simconfig']
   d = json.load(open(simconfig,'r')) # original input json
-  simstr = d['sim']['name']
   print('args.keys():',args.keys())
-  d['sim']['name'] += '_evo_gen_' + str(es.num_generations) + '_cand_' + str(cdx) +'_' # also need candidate ID
-  d['sim']['doquit'] = 1
-  d['sim']['doplot'] = 0
-  d['simtype']['ResumeSim'] = 1
+  d['sim']['name'] += '_evo_gen_' + str(es.num_generations) + '_cand_' + str(cdx) # also include candidate ID
+  simstr = d['sim']['name']
+  fnweight = mydir+'/evo/'+ simstr + '_weight.pkl' # filename for weights
+  d['sim']['doquit'] = 1; d['sim']['doplot'] = 0
+  d['simtype']['ResumeSim'] = 1 # make sure simulation loads the weights
   d['simtype']['ResumeSimFromFile'] = fnweight
-  fnjson = d['sim']['name'] + '.json'
+  fnjson = mydir+'/evo/'+d['sim']['name'] + '.json'
   json.dump(d, open(fnjson,'w'), indent=2)
   print('fnjson is:',fnjson)
-  ncore = 6
+  # save synaptic weights to file
+  pdfnew = pdfnew[pdfnew.time==np.amax(pdfnew.time)]  
+  D = pdf2weightsdict(pdfnew)
+  pickle.dump(D, open(fnweight,'wb')) # temp file for synaptic weights
+  # generate a command for running the simulation
+  ncore = 8
   strc = './myrun ' + str(ncore) + ' ' + fnjson # command string  
   return strc,'data/'+d['sim']['name']+'ActionsRewards.txt'
 
 # evaluate fitness with sim run
 def EvalFIT (candidates, args):
   global es
-  print('EvalFIT args.keys():',args.keys())
+  # print('EvalFIT args.keys():',args.keys())
   fitness = []; 
   for cdx, p in enumerate(candidates):
     strc,fn = FitJobStrFN(p, args, cdx)
+    print('EvalFIT:', cdx, strc, fn)
     ret = os.system(strc)
     actreward = pd.DataFrame(np.loadtxt(fn),columns=['time','action','reward','proposed','hit','followtargetsign'])
     fit = np.sum(actreward['reward'])
@@ -142,7 +138,7 @@ def my_generate (random, args):
 
 # run sim command via mpi, then delete the temp file. returns job index and fitness.
 def RunViaMPI (cdx, cmd, fn, maxfittime):
-  global pc
+  global pc, useEMO
   if nfunc > 1 and useEMO: fit = [1e9 for i in range(nfunc)]
   else: fit = 1e9
   #print 'pc.id()==',pc.id(),'. starting py job', cdx, 'command:', cmd
@@ -306,8 +302,8 @@ def runevo (popsize=100,maxgen=10,my_generate=my_generate,\
     es = ec.ES(rand)
   es.terminator = terminators.generation_termination 
   #es.variator = [inspyred.ec.variators.heuristic_crossover,my_mutation]#inspyred.ec.variators.nonuniform_mutation
-  es.variator = [inspyred.ec.variators.heuristic_crossover,inspyred.ec.variators.nonuniform_mutation]
-  es.observer = [my_indiv_observe] # saves individuals to pkl file each generation
+  es.variator = [inspyred.ec.variators.heuristic_crossover] # ,inspyred.ec.variators.nonuniform_mutation]
+  es.observer = [] # my_indiv_observe] # saves individuals to pkl file each generation
   statfile = open(fstats,'w'); indfile = open(findiv,'w')
   es.observer.append(inspyred.ec.observers.file_observer)
   es.observer.append(inspyred.ec.observers.stats_observer)
@@ -391,7 +387,7 @@ if __name__ == "__main__":
 
   popsize=100; maxgen=10; nproc=16; useMPI=True; numselected=100; useDEA = False;
   mutation_rate=0.2; evostr='21jul21A'; simconfig = 'sn.json'; maxfittime = 600; 
-  noBound = False; useLOG = True;
+  noBound = False; useLOG = True; useEMO = False
   verbose = True; rdmseed=1234; useundefERR = False; 
   fseed = farch = lseed = larch = None; # files,lists for initial population and archive
   i = 1; narg = len(sys.argv)

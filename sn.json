@@ -102,7 +102,7 @@
     "verbose": 0,
     "recordStep": 1.0,
     "recordStim": 0,
-    "recordWeightStepSize": 1,
+    "recordWeightStepSize": 199,
     "normalizeWeightStepSize": 50000000000000000000000000000000000000,
     "normalizeWeightsAtStart": 0,
     "RLFakeUpRule": 0,

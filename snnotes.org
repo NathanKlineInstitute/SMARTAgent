@@ -37089,3 +37089,13 @@ only 3 steps so need further to test ... dont expect this to help all that much 
 traces decay with time anyway; but the sharp cutoff in e traces might help a bit to reduce interference on which synapses responsible and prevent
 them from getting rewarded/punished multiple times...
 
+** fixup evo code
+
+before running evo, made sure to produce a weight file with initial weights ... have weightVar in sn.json set to 0 so that all weights
+have same starting value; then evo.py will use its own weightVar when generating new 'candidates' to vary the weights
+
+during evo, the weights are generated and stored as pandas dataframes, then read in by sim.py as resume weights. the rlhebbwt values
+should all be set to 0 so that no RL is used but leaving RLon == 1 so that the synapses are modifiable/settable
+
+python -i evo.py popsize 1 maxgen 1 nproc 1 useMPI 0 simconfig sn.json verbose 1 startweight data/21jul22_test_EVO_lp_synWeights_final.pkl
+
