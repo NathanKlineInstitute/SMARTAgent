@@ -108,7 +108,7 @@ def EvalFIT (candidates, args):
     ret = os.system(strc)
     actreward = pd.DataFrame(np.loadtxt(fn),columns=['time','action','reward','proposed','hit','followtargetsign'])
     fit = np.sum(actreward['reward'])
-    print('fit is':,fit)
+    print('fit is:',fit)
     fitness.append(fit)
   return fitness
 
@@ -237,7 +237,8 @@ def setEClog ():
 # saves individuals in a population to binary file (pkl)
 def my_indiv_observe (population, num_generations, num_evaluations, args):
   fn = 'data/' + evostr + '/gen_' + str(num_generations) + '_indiv.pkl'
-  pickle.dump(population,open(fn,'w'))
+  print('type(population=)',type(population))
+  pickle.dump(population,open(fn,'wb'))
 
 es = None
 
@@ -390,7 +391,7 @@ if __name__ == "__main__":
 
   popsize=100; maxgen=10; nproc=16; useMPI=True; numselected=100; useDEA = False;
   mutation_rate=0.2; evostr='21jul21A'; simconfig = 'sn.json'; maxfittime = 600; 
-  noBound = useLOG = False;
+  noBound = False; useLOG = True;
   verbose = True; rdmseed=1234; useundefERR = False; 
   fseed = farch = lseed = larch = None; # files,lists for initial population and archive
   i = 1; narg = len(sys.argv)
@@ -480,8 +481,8 @@ if __name__ == "__main__":
                  verbose=verbose,useundefERR=useundefERR,startweight=startweight);
 
   if (useMPI and pc.id()==0) or not useMPI:
-    pickle.dump(myout[0],open('data/' + evostr + '/fpop.pkl','w'))
-    if useEMO: pickle.dump(myout[1],open('data/' + evostr + '/ARCH.pkl','w'))
+    pickle.dump(myout[0],open('data/' + evostr + '/fpop.pkl','wb'))
+    if useEMO: pickle.dump(myout[1],open('data/' + evostr + '/ARCH.pkl','wb'))
 
   if useMPI:
     if pc.id()==0: print('MPI finished, exiting.')
