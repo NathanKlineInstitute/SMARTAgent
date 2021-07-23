@@ -405,7 +405,7 @@ if __name__ == "__main__":
     elif sys.argv[i] == 'startweight':
       if i+1 < narg:
         i+=1; startweight = readweightsfile2pdf(sys.argv[i]) # starting weights - placeholders
-        print('startweight columns:',startweight.columns)
+        # print('startweight columns:',startweight.columns)
     elif sys.argv[i] == '-python' or sys.argv[i] == '-mpi' or sys.argv[i] == 'evo.py':
       pass
     else: raise Exception('unknown arg:'+sys.argv[i])
