@@ -36994,3 +36994,98 @@ started ~14:32 ...
 
 python -i evo.py popsize 1 maxgen 1 nproc 1 useMPI 0 simconfig sn.json verbose 1 startweight data/21jul22_test_EVO_lp_synWeights_final.pkl
 
+* 21jul23
+** check 21jul16_EN02_256_cycle__step_32_ 
+
+python -i simdat.py backupcfg/21jul16_EN02_256_cycle__step_32_sim.json
+
+EV1 0.02 Hz
+EA 0.54 Hz
+IA 0.17 Hz
+IAL 0.65 Hz
+EMDOWN 0.66 Hz
+EMUP 0.64 Hz
+IM 1.3 Hz
+IML 6.77 Hz
+EN 0.87 Hz
+
+ax=plotPerf(actreward,yl=(0,1.01))
+savefig(gifpath()+'perf.png') # [[./gif/21jul23_21jul16_EN02_256_cycle__step_32_perf.png]]
+
+clf(); drawraster(dspkT,dspkID); xlim((498e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/21jul23_21jul16_EN02_256_cycle__step_32_rast.png]]
+
+rates are up, as is synchrony ...
+
+lfn = ['21jul2_EN0_256_gcp__step_' + str(i) + '_' for i in range(29)]
+for i in range(33): lfn.append('21jul16_EN02_256_cycle__step_' + str(i) + '_')
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0.2,0.35))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/21jul23_21jul16_EN02_256_cycle__step_32_perf_all_steps_so_far.png]]
+
+lpda = getindivactionreward(lfn)
+cla(); lrat = plotHitMissRatioPerStep(lpda)
+savefig(gifpath()+'hit_miss_ratio.png') # [[./gif/21jul23_21jul16_EN02_256_cycle__step_32_hit_miss_ratio.png]]
+
+clf(); pdfc = getconcatweightpdf(lfn,usefinal=True)
+subplot(2,2,1); popwtsfromEN = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False,prety='EN'); ylabel('Average EN->EM')
+subplot(2,2,2); popwtsfromEA = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False,prety='EA'); ylabel('Average EA->EM')
+subplot(2,2,3); popwtsfromENA = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EA'],lclr=['g'],plotindiv=False,prety='EN'); ylabel('Average EN->EA')
+subplot(2,2,4); popwtsfromEAA = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EA'],lclr=['g'],plotindiv=False,prety='EA'); ylabel('Average EA->EA')
+
+savefig(gifpath()+'all_steps_avg_weightEN.png') # [[./gif/21jul23_21jul16_EN02_256_cycle__step_32_all_steps_avg_weightEN.png]]
+
+weight changes look more steep near the end ... hit/miss ratio seems to be increasing more as well
+
+subplot(1,1,1); popwtsfromVLA = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EA'],lclr=['g'],plotindiv=False,prety='EV1'); ylabel('Average EV1->EA')
+savefig(gifpath()+'all_steps_avg_weightENB.png') # [[./gif/21jul23_21jul16_EN02_256_cycle__step_32_all_steps_avg_weightENB.png]]
+
+fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
+
+** check 21jul22_EN0_256_RSE_cycle__step_2_
+
+python -i simdat.py backupcfg/21jul22_EN0_256_RSE_cycle__step_2_sim.json
+
+EV1 0.02 Hz
+EA 0.31 Hz
+IA 0.01 Hz
+IAL 0.03 Hz
+EMDOWN 0.14 Hz
+EMUP 0.14 Hz
+IM 0.47 Hz
+IML 3.73 Hz
+EN 0.87 Hz
+
+ax=plotPerf(actreward,yl=(0,1.01))
+savefig(gifpath()+'perf.png') # [[./gif/21jul23_21jul22_EN0_256_RSE_cycle__step_2_perf.png]]
+
+clf(); drawraster(dspkT,dspkID); xlim((498e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/21jul23_21jul22_EN0_256_RSE_cycle__step_2_rast.png]]
+
+lfn = ['21jul22_EN0_256_RSE_cycle__step_' + str(i) + '_' for i in range(3)]
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0,1.01))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/21jul23_21jul22_EN0_256_RSE_cycle__step_2_perf_all_steps_so_far.png]]
+
+lpda = getindivactionreward(lfn)
+cla(); lrat = plotHitMissRatioPerStep(lpda)
+savefig(gifpath()+'hit_miss_ratio.png') # [[./gif/21jul23_21jul22_EN0_256_RSE_cycle__step_2_hit_miss_ratio.png]]
+
+clf(); pdfc = getconcatweightpdf(lfn,usefinal=True)
+subplot(2,2,1); popwtsfromEN = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False,prety='EN'); ylabel('Average EN->EM')
+subplot(2,2,2); popwtsfromEA = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False,prety='EA'); ylabel('Average EA->EM')
+subplot(2,2,3); popwtsfromENA = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EA'],lclr=['g'],plotindiv=False,prety='EN'); ylabel('Average EN->EA')
+subplot(2,2,4); popwtsfromEAA = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EA'],lclr=['g'],plotindiv=False,prety='EA'); ylabel('Average EA->EA')
+
+savefig(gifpath()+'all_steps_avg_weightEN.png') # [[./gif/21jul23_21jul22_EN0_256_RSE_cycle__step_2_all_steps_avg_weightEN.png]]
+
+subplot(1,1,1); popwtsfromVLA = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EA'],lclr=['g'],plotindiv=False,prety='EV1'); ylabel('Average EV1->EA')
+savefig(gifpath()+'all_steps_avg_weightENB.png') # [[./gif/21jul23_21jul22_EN0_256_RSE_cycle__step_2_all_steps_avg_weightENB.png]]
+
+fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
+[[./gif/21jul23_21jul22_EN0_256_RSE_cycle__step_2__with_reward_input.mp4]]
+
+only 3 steps so need further to test ... dont expect this to help all that much since time between points is large and eligibility
+traces decay with time anyway; but the sharp cutoff in e traces might help a bit to reduce interference on which synapses responsible and prevent
+them from getting rewarded/punished multiple times...
+
