@@ -73,7 +73,6 @@ def FitJobStrFN (p, args, cdx):
   # next update the simulation's json file
   simconfig = args['simconfig']
   d = json.load(open(simconfig,'r')) # original input json
-  print('args.keys():',args.keys())
   d['sim']['name'] += '_evo_gen_' + str(args['_ec'].num_generations) + '_cand_' + str(cdx) + '_' # also include candidate ID
   simstr = d['sim']['name']
   fnweight = mydir+'/evo/'+ simstr + 'weight.pkl' # filename for weights
@@ -93,7 +92,6 @@ def FitJobStrFN (p, args, cdx):
 # evaluate fitness with sim run
 def EvalFIT (candidates, args):
   global es
-  # print('EvalFIT args.keys():',args.keys())
   fitness = []; 
   for cdx, p in enumerate(candidates):
     strc,fn = FitJobStrFN(p, args, cdx)
@@ -105,8 +103,6 @@ def EvalFIT (candidates, args):
     fitness.append(fit)
   return fitness
 
-lconn,lssh=None,None
-
 """
 # checks bounds for params
 def my_bounder ():
@@ -117,7 +113,7 @@ def my_bounder ():
   return ec.Bounder(lmin,lmax)
 """
 
-weightVar = 0.75
+weightVar = 0.9
 wmin = 1.0 - weightVar
 wmax = 1.0 + weightVar
 
@@ -125,7 +121,7 @@ wmax = 1.0 + weightVar
 @diversify
 def my_generate (random, args):
   pout = []
-  print('type:',type(args['startweight']))
+  # print('type:',type(args['startweight']))
   W = args['startweight']['weight']
   pdf = args['startweight']
   for i in range(len(W)):
@@ -224,9 +220,6 @@ def setEClog ():
   logger.addHandler(file_handler)
   return logger
 
-# my_generate = sim.my_generate
-# my_bounder = sim.my_bounder # when noBound==True, this is not guaranteed to be the same
-
 # saves individuals in a population to binary file (pkl)
 def my_indiv_observe (population, num_generations, num_evaluations, args):
   fn = 'data/' + evostr + '/gen_' + str(num_generations) + '_indiv.pkl'
@@ -317,6 +310,7 @@ def runevo (popsize=100,maxgen=10,my_generate=my_generate,\
                             evaluator=EvalFITMPI, 
                             pop_size=popsize,
                             maximize=True,
+                            bounder=ec.Bounder(0,35.0),                            
                             max_generations=maxgen,
                             statistics_file=statfile,
                             individuals_file=indfile,
@@ -344,6 +338,7 @@ def runevo (popsize=100,maxgen=10,my_generate=my_generate,\
                             mp_nprocs=nproc,
                             pop_size=popsize,
                             maximize=True,
+                            bounder=ec.Bounder(0,35.0),                            
                             max_generations=maxgen,
                             statistics_file=statfile,
                             individuals_file=indfile,
@@ -366,6 +361,7 @@ def runevo (popsize=100,maxgen=10,my_generate=my_generate,\
                             evaluator=EvalFIT,
                             pop_size=popsize,
                             maximize=True,
+                            bounder=ec.Bounder(0,35.0),
                             max_generations=maxgen,
                             #statistics_file=statfile,
                             #individuals_file=indfile,
