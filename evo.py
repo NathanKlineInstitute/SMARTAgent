@@ -67,29 +67,26 @@ def backupcfg (evostr,fcfg):
 
 #
 def FitJobStrFN (p, args, cdx):
-  global es # global evolution object
+  global es,ncore # global evolution object
   pdfnew = args['startweight'].copy() # copy starting synaptic weights
-  # print('pdfnew columns:',pdfnew.columns)
   for i in range(len(p)): pdfnew.at[i,'weight'] = p[i] # update the weights based on the candidate
   # next update the simulation's json file
   simconfig = args['simconfig']
   d = json.load(open(simconfig,'r')) # original input json
   print('args.keys():',args.keys())
-  d['sim']['name'] += '_evo_gen_' + str(es.num_generations) + '_cand_' + str(cdx) # also include candidate ID
+  d['sim']['name'] += '_evo_gen_' + str(args['_ec'].num_generations) + '_cand_' + str(cdx) + '_' # also include candidate ID
   simstr = d['sim']['name']
-  fnweight = mydir+'/evo/'+ simstr + '_weight.pkl' # filename for weights
+  fnweight = mydir+'/evo/'+ simstr + 'weight.pkl' # filename for weights
   d['sim']['doquit'] = 1; d['sim']['doplot'] = 0
   d['simtype']['ResumeSim'] = 1 # make sure simulation loads the weights
   d['simtype']['ResumeSimFromFile'] = fnweight
-  fnjson = mydir+'/evo/'+d['sim']['name'] + '.json'
+  fnjson = mydir+'/evo/'+d['sim']['name'] + 'sim.json'
   json.dump(d, open(fnjson,'w'), indent=2)
-  print('fnjson is:',fnjson)
   # save synaptic weights to file
   pdfnew = pdfnew[pdfnew.time==np.amax(pdfnew.time)]  
   D = pdf2weightsdict(pdfnew)
   pickle.dump(D, open(fnweight,'wb')) # temp file for synaptic weights
   # generate a command for running the simulation
-  ncore = 8
   strc = './myrun ' + str(ncore) + ' ' + fnjson # command string  
   return strc,'data/'+d['sim']['name']+'ActionsRewards.txt'
 
@@ -132,7 +129,7 @@ def my_generate (random, args):
   W = args['startweight']['weight']
   pdf = args['startweight']
   for i in range(len(W)):
-    pout.append(random.uniform(wmin * pdf.at[i,'weight'], wmax * pdf.at[i,'weight']))
+    pout.append(max(0,random.uniform(wmin * pdf.at[i,'weight'], wmax * pdf.at[i,'weight'])))
     #pout.append(random.uniform(wmin * W[i], wmax * W[i] ))
   return pout
 
@@ -288,12 +285,13 @@ def initialize_archive(f, archive_seeds):
 
 # run the evolution
 def runevo (popsize=100,maxgen=10,my_generate=my_generate,\
-            nproc=16,rdmseed=1234,useDEA=True,\
+            nproc=16,ncore=8,rdmseed=1234,useDEA=True,\
             fstats='/dev/null',findiv='/dev/null',mutation_rate=0.2,useMPI=False,\
             numselected=100,noBound=False,simconfig='sn.json',\
             useLOG=False,maxfittime=600,lseed=None,larch=None,verbose=True,\
             useundefERR=False,startweight=None):
   global es
+  useMProc = False
   if useLOG: logger=setEClog()
   rand = Random(); rand.seed(rdmseed) # alternative - provide int(time.time()) as seed
   if useDEA:
@@ -302,13 +300,13 @@ def runevo (popsize=100,maxgen=10,my_generate=my_generate,\
     es = ec.ES(rand)
   es.terminator = terminators.generation_termination 
   #es.variator = [inspyred.ec.variators.heuristic_crossover,my_mutation]#inspyred.ec.variators.nonuniform_mutation
-  es.variator = [inspyred.ec.variators.heuristic_crossover] # ,inspyred.ec.variators.nonuniform_mutation]
+  # es.variator = [inspyred.ec.variators.heuristic_crossover] # ,inspyred.ec.variators.nonuniform_mutation]
   es.observer = [] # my_indiv_observe] # saves individuals to pkl file each generation
   statfile = open(fstats,'w'); indfile = open(findiv,'w')
   es.observer.append(inspyred.ec.observers.file_observer)
   es.observer.append(inspyred.ec.observers.stats_observer)
-  es.selector = inspyred.ec.selectors.tournament_selection
-  es.replacer = inspyred.ec.replacers.generational_replacement#inspyred.ec.replacers.plus_replacement
+  # es.selector = inspyred.ec.selectors.tournament_selection
+  # es.replacer = inspyred.ec.replacers.generational_replacement#inspyred.ec.replacers.plus_replacement
   # if noBound: es.observer.append(my_bound_observe)
   if useMPI:
     pc.barrier()
@@ -338,7 +336,7 @@ def runevo (popsize=100,maxgen=10,my_generate=my_generate,\
                             startweight=startweight)
     print('after evolve my id is ' , pc.id()) # checked that only host 0 calls evolution.
     pc.done()
-  else: # use multiprocessing
+  elif useMProc: # use multiprocessing
     print('using multiprocessing')
     final_pop = es.evolve(generator=my_generate,
                             evaluator=inspyred.ec.evaluators.parallel_evaluation_mp,
@@ -363,10 +361,33 @@ def runevo (popsize=100,maxgen=10,my_generate=my_generate,\
                             verbose=verbose,
                             useundefERR=useundefERR,
                             startweight=startweight)
+  else:
+    final_pop = es.evolve(generator=my_generate,
+                            evaluator=EvalFIT,
+                            pop_size=popsize,
+                            maximize=True,
+                            max_generations=maxgen,
+                            #statistics_file=statfile,
+                            #individuals_file=indfile,
+                            mutation_rate=mutation_rate,
+                            simf=simf,
+                            num_selected=numselected,
+                            #max_archive_size=max(popsize,numselected),
+                            #tournament_size=2,
+                            #num_elites=int(popsize/10.0),
+                            simconfig=simconfig,
+                            noBound=noBound,
+                            es=es,
+                            maxfittime=maxfittime,
+                            seeds=lseed,
+                            verbose=verbose,
+                            useundefERR=useundefERR,
+                            startweight=startweight)
+    
   # Sort and print the best individual
   final_pop.sort(reverse=False)
   # print(final_pop[0],final_pop[-1]))
-  statfile.close(); indfile.close()
+  # statfile.close(); indfile.close()
   return [final_pop]
 
 # plot generation progress over time
@@ -400,7 +421,10 @@ if __name__ == "__main__":
         i+=1; maxgen = int(sys.argv[i]); 
     elif sys.argv[i] == 'nproc' or sys.argv[i] == '-nproc':
       if i+1 < narg:
-        i+=1; nproc = int(sys.argv[i]); 
+        i+=1; nproc = int(sys.argv[i]);
+    elif sys.argv[i] == 'ncore' or sys.argv[i] == '-ncore':
+      if i+1 < narg:
+        i+=1; ncore = int(sys.argv[i]);    
     elif sys.argv[i] == 'rdmseed' or sys.argv[i] == '-rdmseed':
       if i+1 < narg:
         i+=1; rdmseed = int(sys.argv[i]); 
@@ -456,9 +480,8 @@ if __name__ == "__main__":
     i+=1;
 
   if (useMPI and pc.id()==0) or not useMPI:
-    print('popsize:',popsize,'maxgen:',maxgen,'nproc:',nproc,'useMPI:',useMPI,'numselected:',numselected,'evostr:',evostr,\
-        'useDEA:',useDEA,'mutation_rate:',mutation_rate,\
-        'noBound:',noBound,'useLOG:',useLOG,\
+    print('popsize:',popsize,'maxgen:',maxgen,'nproc:',nproc,'ncore:',ncore,'useMPI:',useMPI,'numselected:',numselected,'evostr:',evostr,\
+        'useDEA:',useDEA,'mutation_rate:',mutation_rate,'noBound:',noBound,'useLOG:',useLOG,\
         'maxfittime:',maxfittime,'fseed:',fseed,'farch:',farch,'verbose:',verbose,'rdmseed:',rdmseed,'useundefERR:',useundefERR)
       
   # make sure master node does not work on submitted jobs (that would prevent it managing/submitting other jobs)
