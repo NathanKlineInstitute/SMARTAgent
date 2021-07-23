@@ -1,1 +1,1 @@
-python -i evo.py popsize 1 maxgen 1 nproc 1 ncore 8 useMPI 0 simconfig sn.json verbose 1 startweight data/21jul22_test_EVO_lp_synWeights_final.pkl
+python -i evo.py popsize 100 maxgen 25 nproc 1 ncore 8 useMPI 0 simconfig sn.json verbose 1 startweight data/21jul23_test_EVO_lp_synWeights_final.pkl

@@ -37099,3 +37099,25 @@ should all be set to 0 so that no RL is used but leaving RLon == 1 so that the s
 
 python -i evo.py popsize 1 maxgen 1 nproc 1 useMPI 0 simconfig sn.json verbose 1 startweight data/21jul22_test_EVO_lp_synWeights_final.pkl
 
+ok, mostly setup ... dont see bugs in running
+
+will try smaller network
+
+name = 21jul23_test_EVO_lp_
+
+first run the model to save initial weights once
+
+./myrun 8 sn.json
+
+produces data/21jul23_test_EVO_lp_synWeights_final.pkl
+
+put that into runevo and now make sure have long recordWeightStepSize 1000000000000 in sn.json 
+(should automate the process ... )
+
+
+
+** fitness func for evo
+
+could either integrate reward - punishment signal over a fixed duration
+or assess how long the model can last before it misses the ball (similar to the cartpole error function md used)
+
