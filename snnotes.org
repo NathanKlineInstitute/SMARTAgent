@@ -37115,9 +37115,37 @@ put that into runevo and now make sure have long recordWeightStepSize 1000000000
 (should automate the process ... )
 
 
-
 ** fitness func for evo
 
 could either integrate reward - punishment signal over a fixed duration
 or assess how long the model can last before it misses the ball (similar to the cartpole error function md used)
+
+** adjust fitness for evo -->> will do later
+
+do not reward hits, just punish misses; then add a flag that stops the simulation as soon as a punishment (miss)
+is delivered
+
+hmm, to do that have to make sure run sim with interval func exits early ... for a first step will try hit - miss
+as fitness function
+
+** run evo test with hit-miss fitness func on cycle
+
+on cycle ... 
+
+21jul23_test_EVO_cycle_
+
+again, first run the sim (duration of 1000 with     "recordWeightStepSize": 10) to save the starting weights
+
+./myrun 16 sn.json
+
+saved data/21jul23_test_EVO_cycle_synWeights_final.pkl
+
+then plug those weights as startweight into runevo; increase recordWeightStepSize to large number (1000000000) so the
+weights dont get saved all the time ... 
+
+also make sure that losePoint == -1.0 and hitBall == 1.0 in sn.json
+
+run whole sim for 30 s ... so that there would be enough time for a few hits/misses ... 
+
+python -i evo.py popsize 100 maxgen 100 nproc 1 ncore 16 useMPI 0 simconfig sn.json verbose 1 startweight data/21jul23_test_EVO_cycle_synWeights_final.pkl
 

@@ -64,7 +64,8 @@ def ensureDefaults (dconf):
   checkDefVal(dconf['sim'], 'targettedRL', 1)
   checkDefVal(dconf['sim'], 'targettedRLOppFctr', 0.5)
   checkDefVal(dconf['sim'], 'targettedRLDscntFctr', 0.5)
-  checkDefVal(dconf['sim'], 'ResetEligAfterCritic', 0)  
+  checkDefVal(dconf['sim'], 'ResetEligAfterCritic', 0)
+  checkDefVal(dconf['sim'], 'QuitAfterMiss', 0) 
   if 'alltopoldivcons' not in dconf['net']:
     dconf['net']['alltopoldivcons'] = {
       "IR":{"ER":5},
