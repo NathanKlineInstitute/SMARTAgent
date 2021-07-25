@@ -37149,3 +37149,117 @@ run whole sim for 100 s ... so that there would be enough time for a few hits/mi
 
 python -i evo.py popsize 100 maxgen 100 nproc 1 ncore 16 useMPI 0 simconfig sn.json verbose 1 startweight data/21jul23_test_EVO_cycle_synWeights_final.pkl
 
+* 21jul24
+** check 21jul16_EN02_256_cycle__step_38_  -->> stopped, rates got too high
+
+python -i simdat.py backupcfg/21jul16_EN02_256_cycle__step_38_sim.json
+
+EV1 0.02 Hz
+EA 0.49 Hz
+IA 0.25 Hz
+IAL 0.99 Hz
+EMDOWN 7.63 Hz
+EMUP 7.7 Hz
+IM 11.93 Hz
+IML 18.35 Hz
+EN 0.87 Hz
+
+firing rates got too high...
+
+ax=plotPerf(actreward,yl=(0,1.01))
+savefig(gifpath()+'perf.png') # [[./gif/21jul24_21jul16_EN02_256_cycle__step_38_perf.png]]
+
+clf(); drawraster(dspkT,dspkID); xlim((498e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/21jul24_21jul16_EN02_256_cycle__step_38_rast.png]]
+
+lfn = ['21jul2_EN0_256_gcp__step_' + str(i) + '_' for i in range(29)]
+for i in range(39): lfn.append('21jul16_EN02_256_cycle__step_' + str(i) + '_')
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0.2,0.35))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/21jul24_21jul16_EN02_256_cycle__step_38_perf_all_steps_so_far.png]]
+
+lpda = getindivactionreward(lfn)
+cla(); lrat = plotHitMissRatioPerStep(lpda)
+savefig(gifpath()+'hit_miss_ratio.png') # [[./gif/21jul24_21jul16_EN02_256_cycle__step_38_hit_miss_ratio.png]]
+
+clf(); pdfc = getconcatweightpdf(lfn,usefinal=True)
+subplot(2,2,1); popwtsfromEN = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False,prety='EN'); ylabel('Average EN->EM')
+subplot(2,2,2); popwtsfromEA = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False,prety='EA'); ylabel('Average EA->EM')
+subplot(2,2,3); popwtsfromENA = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EA'],lclr=['g'],plotindiv=False,prety='EN'); ylabel('Average EN->EA')
+subplot(2,2,4); popwtsfromEAA = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EA'],lclr=['g'],plotindiv=False,prety='EA'); ylabel('Average EA->EA')
+
+savefig(gifpath()+'all_steps_avg_weightEN.png') # [[./gif/21jul24_21jul16_EN02_256_cycle__step_38_all_steps_avg_weightEN.png]]
+
+subplot(1,1,1); popwtsfromVLA = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EA'],lclr=['g'],plotindiv=False,prety='EV1'); ylabel('Average EV1->EA')
+savefig(gifpath()+'all_steps_avg_weightENB.png') # [[./gif/21jul24_21jul16_EN02_256_cycle__step_38_all_steps_avg_weightENB.png]]
+
+hmm, still not seeing perf go up much ... weights have increased quite a bit, noise has gone down ... 
+
+## fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
+
+may need to use diff params . . . 
+
+** check 21jul22_EN0_256_RSE_cycle__step_8_
+
+python -i simdat.py backupcfg/21jul22_EN0_256_RSE_cycle__step_8_sim.json
+
+EV1 0.02 Hz
+EA 0.31 Hz
+IA 0.01 Hz
+IAL 0.03 Hz
+EMDOWN 0.14 Hz
+EMUP 0.14 Hz
+IM 0.48 Hz
+IML 3.73 Hz
+EN 0.87 Hz
+
+ax=plotPerf(actreward,yl=(0,1.01))
+savefig(gifpath()+'perf.png') # [[./gif/21jul24_21jul22_EN0_256_RSE_cycle__step_8_perf.png]]
+
+clf(); drawraster(dspkT,dspkID); xlim((498e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/21jul24_21jul22_EN0_256_RSE_cycle__step_8_rast.png]]
+
+lfn = ['21jul22_EN0_256_RSE_cycle__step_' + str(i) + '_' for i in range(9)]
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0,1.01))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/21jul24_21jul22_EN0_256_RSE_cycle__step_8_perf_all_steps_so_far.png]]
+
+looks like getting worse, then stabilizing??
+
+lpda = getindivactionreward(lfn)
+cla(); lrat = plotHitMissRatioPerStep(lpda)
+savefig(gifpath()+'hit_miss_ratio.png') # [[./gif/21jul24_21jul22_EN0_256_RSE_cycle__step_8_hit_miss_ratio.png]]
+
+clf(); pdfc = getconcatweightpdf(lfn,usefinal=True)
+subplot(2,2,1); popwtsfromEN = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False,prety='EN'); ylabel('Average EN->EM')
+subplot(2,2,2); popwtsfromEA = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False,prety='EA'); ylabel('Average EA->EM')
+subplot(2,2,3); popwtsfromENA = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EA'],lclr=['g'],plotindiv=False,prety='EN'); ylabel('Average EN->EA')
+subplot(2,2,4); popwtsfromEAA = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EA'],lclr=['g'],plotindiv=False,prety='EA'); ylabel('Average EA->EA')
+
+savefig(gifpath()+'all_steps_avg_weightEN.png') # [[./gif/21jul24_21jul22_EN0_256_RSE_cycle__step_8_all_steps_avg_weightEN.png]]
+
+subplot(1,1,1); popwtsfromVLA = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EA'],lclr=['g'],plotindiv=False,prety='EV1'); ylabel('Average EV1->EA')
+savefig(gifpath()+'all_steps_avg_weightENB.png') # [[./gif/21jul24_21jul22_EN0_256_RSE_cycle__step_8_all_steps_avg_weightENB.png]]
+
+fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
+[[./gif/21jul24_21jul22_EN0_256_RSE_cycle__step_8__with_reward_input.mp4]]
+
+** evo not incrementing generation properly -- it was correct
+
+Generation Evaluation      Worst       Best     Median    Average    Std Dev
+---------- ---------- ---------- ---------- ---------- ---------- ----------
+         0        100      -12.0        1.0       -8.0      -7.44 4.02074619
+
+Generation Evaluation      Worst       Best     Median    Average    Std Dev
+---------- ---------- ---------- ---------- ---------- ---------- ----------
+         1        200       -7.0        3.0       -4.0      -3.46 2.63598179
+
+so that looks like a slight improvement ... but the candidates and weights are getting over-written ... 
+
+hmm, it was working correctly ... but for some reason gen 0 seems to be run 2X??
+
+will restart with 30 cores instead of 16 ... 
+
+(buffer=s0)
+python -i evo.py popsize 100 maxgen 100 nproc 1 ncore 30 useMPI 0 simconfig sn.json verbose 1 startweight data/21jul23_test_EVO_cycle_synWeights_final.pkl
+
