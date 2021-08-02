@@ -37453,3 +37453,22 @@ Generation Evaluation      Worst       Best     Median    Average    Std Dev
 ---------- ---------- ---------- ---------- ---------- ---------- ----------
         11       1200        1.0        4.0        3.0        2.4 1.06770782
 
+stopped here
+
+** for evolution, turn off STDP/RL altogether -- should run faster
+
+for recording and restoring dont need to have hstdp...?
+
+can just keep the weights fixed
+
+    "name": "21aug2_test_EVO_cycle_",
+
+
+./myrun 16 sn.json
+
+python -i simdat.py backupcfg/21aug2_test_EVO_cycle_sim.json
+
+21aug2_test_EVO_cycle_synWeights_final.pkl
+
+python -i evo.py fstats 21aug2_fstats.txt findiv 21aug2_findiv.txt popsize 100 maxgen 500 nproc 1 ncore 16 useMPI 0 simconfig sn.json verbose 1 startweight data/21aug2_test_EVO_cycle_synWeights_final.pkl
+

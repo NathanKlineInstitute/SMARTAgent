@@ -407,9 +407,9 @@ if __name__ == "__main__":
       if i+1 < narg:
         i+=1; startweight = readweightsfile2pdf(sys.argv[i]) # starting weights - placeholders
         # print('startweight columns:',startweight.columns)
-    elif sys.argv[i] == 'fstat':
+    elif sys.argv[i] == 'fstats':
       if i+1 < narg:
-        i+=1; fstat = sys.argv[i]
+        i+=1; fstats = sys.argv[i]
     elif sys.argv[i] == 'findiv':
       if i+1 < narg:
         i+=1; findiv = sys.argv[i]        
@@ -421,7 +421,7 @@ if __name__ == "__main__":
   if (useMPI and pc.id()==0) or not useMPI:
     print('popsize:',popsize,'maxgen:',maxgen,'nproc:',nproc,'ncore:',ncore,'useMPI:',useMPI,'numselected:',numselected,'evostr:',evostr,\
           'useDEA:',useDEA,'mutation_rate:',mutation_rate,'noBound:',noBound,'useLOG:',useLOG,\
-          'maxfittime:',maxfittime,'fseed:',fseed,'farch:',farch,'verbose:',verbose,'rdmseed:',rdmseed,'useundefERR:',useundefERR,'fstat:':fstat,'findiv:',findiv)
+          'maxfittime:',maxfittime,'fseed:',fseed,'farch:',farch,'verbose:',verbose,'rdmseed:',rdmseed,'useundefERR:',useundefERR,'fstats:',fstats,'findiv:',findiv)
       
   # make sure master node does not work on submitted jobs (that would prevent it managing/submitting other jobs)
   if useMPI and pc.id()==0: pc.master_works_on_jobs(0) 
@@ -434,10 +434,9 @@ if __name__ == "__main__":
 
   myout = runevo(popsize=popsize,maxgen=maxgen,nproc=nproc,rdmseed=rdmseed,useMPI=useMPI,\
                  numselected=numselected,mutation_rate=mutation_rate,\
-                 useDEA=useDEA,fstats='/dev/null',findiv='/dev/null',simconfig=simconfig,\
+                 useDEA=useDEA,fstats=fstats,findiv=findiv,simconfig=simconfig,\
                  useLOG=useLOG,maxfittime=maxfittime,lseed=lseed,larch=larch,\
-                 verbose=verbose,useundefERR=useundefERR,startweight=startweight,\
-                 fstat=fstat,findiv=findiv);
+                 verbose=verbose,useundefERR=useundefERR,startweight=startweight)
 
   if (useMPI and pc.id()==0) or not useMPI:
     pickle.dump(myout[0],open('data/' + evostr + '/fpop.pkl','wb'))
