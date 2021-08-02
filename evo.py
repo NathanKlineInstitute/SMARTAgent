@@ -343,6 +343,7 @@ if __name__ == "__main__":
   noBound = False; useLOG = True; useEMO = False
   verbose = True; rdmseed=1234; useundefERR = False; 
   fseed = farch = lseed = larch = None; # files,lists for initial population and archive
+  fstat = findiv = '/dev/null'
   i = 1; narg = len(sys.argv)
   while i < narg:
     if sys.argv[i] == 'popsize' or sys.argv[i] == '-popsize':
@@ -406,6 +407,12 @@ if __name__ == "__main__":
       if i+1 < narg:
         i+=1; startweight = readweightsfile2pdf(sys.argv[i]) # starting weights - placeholders
         # print('startweight columns:',startweight.columns)
+    elif sys.argv[i] == 'fstat':
+      if i+1 < narg:
+        i+=1; fstat = sys.argv[i]
+    elif sys.argv[i] == 'findiv':
+      if i+1 < narg:
+        i+=1; findiv = sys.argv[i]        
     elif sys.argv[i] == '-python' or sys.argv[i] == '-mpi' or sys.argv[i] == 'evo.py':
       pass
     else: raise Exception('unknown arg:'+sys.argv[i])
@@ -413,8 +420,8 @@ if __name__ == "__main__":
 
   if (useMPI and pc.id()==0) or not useMPI:
     print('popsize:',popsize,'maxgen:',maxgen,'nproc:',nproc,'ncore:',ncore,'useMPI:',useMPI,'numselected:',numselected,'evostr:',evostr,\
-        'useDEA:',useDEA,'mutation_rate:',mutation_rate,'noBound:',noBound,'useLOG:',useLOG,\
-        'maxfittime:',maxfittime,'fseed:',fseed,'farch:',farch,'verbose:',verbose,'rdmseed:',rdmseed,'useundefERR:',useundefERR)
+          'useDEA:',useDEA,'mutation_rate:',mutation_rate,'noBound:',noBound,'useLOG:',useLOG,\
+          'maxfittime:',maxfittime,'fseed:',fseed,'farch:',farch,'verbose:',verbose,'rdmseed:',rdmseed,'useundefERR:',useundefERR,'fstat:':fstat,'findiv:',findiv)
       
   # make sure master node does not work on submitted jobs (that would prevent it managing/submitting other jobs)
   if useMPI and pc.id()==0: pc.master_works_on_jobs(0) 
@@ -429,7 +436,8 @@ if __name__ == "__main__":
                  numselected=numselected,mutation_rate=mutation_rate,\
                  useDEA=useDEA,fstats='/dev/null',findiv='/dev/null',simconfig=simconfig,\
                  useLOG=useLOG,maxfittime=maxfittime,lseed=lseed,larch=larch,\
-                 verbose=verbose,useundefERR=useundefERR,startweight=startweight);
+                 verbose=verbose,useundefERR=useundefERR,startweight=startweight,\
+                 fstat=fstat,findiv=findiv);
 
   if (useMPI and pc.id()==0) or not useMPI:
     pickle.dump(myout[0],open('data/' + evostr + '/fpop.pkl','wb'))
