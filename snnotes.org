@@ -37327,3 +37327,129 @@ python -i evo.py popsize 100 maxgen 500 nproc 1 ncore 16 useMPI 0 simconfig sn.j
 
 started ~13:48 ...
 
+* 21aug2
+** check 21jul22_EN0_256_RSE_cycle__step_40_
+
+python -i simdat.py backupcfg/21jul22_EN0_256_RSE_cycle__step_40_sim.json
+
+EV1 0.02 Hz
+EA 0.31 Hz
+IA 0.02 Hz
+IAL 0.09 Hz
+EMDOWN 0.14 Hz
+EMUP 0.15 Hz
+IM 0.48 Hz
+IML 3.75 Hz
+EN 0.87 Hz
+
+ax=plotPerf(actreward,yl=(0,1.01))
+savefig(gifpath()+'perf.png') # [[./gif/21aug2_21jul22_EN0_256_RSE_cycle__step_40_perf.png]]
+
+clf(); drawraster(dspkT,dspkID); xlim((498e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/21aug2_21jul22_EN0_256_RSE_cycle__step_40_rast.png]]
+
+lfn = ['21jul22_EN0_256_RSE_cycle__step_' + str(i) + '_' for i in range(41)]
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0.2,0.5))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/21aug2_21jul22_EN0_256_RSE_cycle__step_40_perf_all_steps_so_far.png]]
+
+lpda = getindivactionreward(lfn)
+cla(); lrat = plotHitMissRatioPerStep(lpda)
+savefig(gifpath()+'hit_miss_ratio.png') # [[./gif/21aug2_21jul22_EN0_256_RSE_cycle__step_40_hit_miss_ratio.png]]
+
+no improvements seen...
+
+clf(); pdfc = getconcatweightpdf(lfn,usefinal=True)
+subplot(2,2,1); popwtsfromEN = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False,prety='EN'); ylabel('Average EN->EM')
+subplot(2,2,2); popwtsfromEA = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False,prety='EA'); ylabel('Average EA->EM')
+subplot(2,2,3); popwtsfromENA = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EA'],lclr=['g'],plotindiv=False,prety='EN'); ylabel('Average EN->EA')
+subplot(2,2,4); popwtsfromEAA = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EA'],lclr=['g'],plotindiv=False,prety='EA'); ylabel('Average EA->EA')
+
+savefig(gifpath()+'all_steps_avg_weightEN.png') # [[./gif/21aug2_21jul22_EN0_256_RSE_cycle__step_40_all_steps_avg_weightEN.png]]
+
+weights have barely moved...
+
+subplot(1,1,1); popwtsfromVLA = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EA'],lclr=['g'],plotindiv=False,prety='EV1'); ylabel('Average EV1->EA')
+savefig(gifpath()+'all_steps_avg_weightENB.png') # [[./gif/21aug2_21jul22_EN0_256_RSE_cycle__step_40_all_steps_avg_weightENB.png]]
+
+fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
+[[./gif/21aug2_21jul22_EN0_256_RSE_cycle__step_40__with_reward_input.mp4]]
+
+** evolution progress
+
+Generation Evaluation      Worst       Best     Median    Average    Std Dev
+---------- ---------- ---------- ---------- ---------- ---------- ----------
+         0        100      -12.0        1.0       -8.0      -7.44 4.02074619
+         1        200       -7.0        3.0       -4.0      -3.46 2.63598179
+         2        300       -4.0        3.0       -2.0      -1.89 1.91778518
+         3        400       -2.0        4.0       -1.0      -0.35 1.45859521
+         4        500       -1.0        4.0        0.0       0.41 1.47712558
+         5        600       -1.0        4.0        1.0       0.86 1.37127677
+         6        700        0.0        4.0        1.0       1.46 1.14385313
+         7        800        1.0        4.0        1.0       1.73 1.06634891
+         8        900        1.0        4.0        1.0       1.89 1.09448618
+         9       1000        1.0        4.0        1.0       1.99 1.09995454
+        10       1100        1.0        4.0        3.0       2.16 1.10199818
+
+can see improvements...best model not improving much, but population overall improving
+in terms of average fitness and worst (improving); only 10 generations in so far ... 
+
+hmm, not saving the fitness of generations/individuals as progress ... it's OK for initial
+testing, but then difficult to parse the results ... 
+
+python
+
+import numpy as np
+ep = np.loadtxt('tstats.txt')
+
+from pylab import *
+ion()
+
+#
+for col, clr in zip([2,3,5],['r','b','k']):
+  plot(ep[:,col],clr,linewidth=3);
+  plot(ep[:,col],clr+'o',markersize=10)
+
+xlabel('Generation',fontsize=25); ylabel('Fitness (Hit minus Miss)',fontsize=25)
+
+savefig('gif/21aug2_test_evo_a0.png') # [[./gif/21aug2_test_evo_a0.png]]
+
+average is improving slowly but best seems mostly stuck ... 
+
+can take a look at one model with best performance to see how it looks ... 
+
+this one had fitness of 4 (highest so far):
+backupcfg/21jul23_test_EVO_cycle__evo_gen_9_cand_0_sim.json
+
+python -i simdat.py backupcfg/21jul23_test_EVO_cycle__evo_gen_9_cand_0_sim.json
+
+EV1 0.02 Hz
+EA 0.74 Hz
+IA 0.88 Hz
+IAL 1.62 Hz
+EMDOWN 0.77 Hz
+EMUP 0.67 Hz
+IM 1.46 Hz
+IML 4.36 Hz
+EN 0.87 Hz
+
+ax=plotPerf(actreward,yl=(0,7))
+savefig(gifpath()+'perf.png') # [[./gif/21aug2_21jul23_test_EVO_cycle__evo_gen_9_cand_0_perf.png]]
+
+no hits until 60 s
+
+clf(); drawraster(dspkT,dspkID); xlim((98e3,100e3))
+savefig(gifpath()+'rast.png') # [[./gif/21aug2_21jul23_test_EVO_cycle__evo_gen_9_cand_0_rast.png]]
+
+fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
+[[./gif/21aug2_21jul23_test_EVO_cycle__evo_gen_9_cand_0__with_reward_input.mp4]]
+
+looking at video, model does not miss until ~60 s; by the end, it has 6 hits and 2 misses
+it might not have enough time to improve much further ... or to generalize beyond what
+it's seen . . . 
+
+next gen:
+Generation Evaluation      Worst       Best     Median    Average    Std Dev
+---------- ---------- ---------- ---------- ---------- ---------- ----------
+        11       1200        1.0        4.0        3.0        2.4 1.06770782
+
