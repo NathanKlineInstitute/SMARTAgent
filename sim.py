@@ -1609,6 +1609,102 @@ def adjustWeightsBasedOnFiringRates (sim,lpop,synType='AMPA'):
               conn['hObj'].weight[PlastWeightIndex] *= sfctr
   print(sim.rank,'adjust W: UP=', countScaleUps, ', DOWN=', countScaleDowns)
 
+def LSynWeightToD (L):
+  # convert list of synaptic weights to dictionary to save disk space
+  print('converting synaptic weight list to dictionary...')
+  dout = {}; doutfinal = {}
+  for row in L:
+    #t,preID,poID,w,cumreward = row
+    t,preID,poID,w = row
+    if preID not in dout:
+      dout[preID] = {}
+      doutfinal[preID] = {}
+    if poID not in dout[preID]:
+      dout[preID][poID] = []
+      doutfinal[preID][poID] = []
+    #dout[preID][poID].append([t,w,cumreward])
+    dout[preID][poID].append([t,w])
+  for preID in doutfinal.keys():
+    for poID in doutfinal[preID].keys():
+      doutfinal[preID][poID].append(dout[preID][poID][-1])
+  return dout, doutfinal
+
+def saveSynWeights ():
+  # save synaptic weights 
+  fn = 'data/'+dconf['sim']['name']+'synWeights_'+str(sim.rank)+'.pkl'
+  pickle.dump(lsynweights, open(fn, 'wb')) # save synaptic weights to disk for this node
+  sim.pc.barrier() # wait for other nodes
+  time.sleep(1)    
+  if sim.rank == 0: # rank 0 reads and assembles the synaptic weights into a single output file
+    L = []
+    for i in range(sim.nhosts):
+      fn = 'data/'+dconf['sim']['name']+'synWeights_'+str(i)+'.pkl'
+      while not os.path.isfile(fn): # wait until the file is written/available
+        print('saveSynWeights: waiting for finish write of', fn)
+        time.sleep(1)      
+      lw = pickle.load(open(fn,'rb'))
+      print(fn,'len(lw)=',len(lw),type(lw))
+      os.unlink(fn) # remove the temporary file
+      L = L + lw # concatenate to the list L
+    #pickle.dump(L,open('data/'+dconf['sim']['name']+'synWeights.pkl', 'wb')) # this would save as a List
+    # now convert the list to a dictionary to save space, and save it to disk
+    dout, doutfinal = LSynWeightToD(L)
+    pickle.dump(dout,open('data/'+dconf['sim']['name']+'synWeights.pkl', 'wb'))
+    pickle.dump(doutfinal,open('data/'+dconf['sim']['name']+'synWeights_final.pkl', 'wb'))        
+
+def saveMotionFields (ldflow): pickle.dump(ldflow, open('data/'+dconf['sim']['name']+'MotionFields.pkl', 'wb'))
+
+def saveObjPos (dobjpos):
+  # save object position dictionary
+  for k in dobjpos.keys(): dobjpos[k] = np.array(dobjpos[k])
+  pickle.dump(dobjpos, open('data/'+dconf['sim']['name']+'objpos.pkl', 'wb'))
+
+def saveAssignedFiringRates (dAllFiringRates): pickle.dump(dAllFiringRates, open('data/'+dconf['sim']['name']+'AssignedFiringRates.pkl', 'wb'))
+
+def saveInputImages (Images):
+  # save input images to txt file (switch to pkl?)
+  InputImages = np.array(Images)
+  print(InputImages.shape)
+  if dconf['net']['useBinaryImage']:
+    #InputImages = np.where(InputImages>0,1,0)
+    """
+    with open('data/'+dconf['sim']['name']+'InputImages.txt', 'w') as outfile:
+      outfile.write('# Array shape: {0}\n'.format(InputImages.shape))
+      for Input_Image in InputImages:
+        np.savetxt(outfile, Input_Image, fmt='%d', delimiter=' ')
+        outfile.write('# New slice\n')
+    """
+    np.save('data/'+dconf['sim']['name']+'InputImages',InputImages)
+  else:
+    with open('data/'+dconf['sim']['name']+'InputImages.txt', 'w') as outfile:
+      outfile.write('# Array shape: {0}\n'.format(InputImages.shape))
+      for Input_Image in InputImages:
+        np.savetxt(outfile, Input_Image, fmt='%-7.2f', delimiter=' ')
+        outfile.write('# New slice\n')  
+  
+def finishSim ():        
+  if sim.rank==0 and fid4 is not None: fid4.close()
+  if ECellModel == 'INTF7' or ICellModel == 'INTF7': intf7.insertSpikes(sim, simConfig.recordStep)  
+  sim.gatherData() # gather data from different nodes
+  sim.saveData() # save data to disk    
+  if sim.saveWeights: saveSynWeights()
+  # only rank 0 should save. otherwise all the other nodes could over-write the output or quit first; rank 0 plots  
+  if sim.rank == 0: 
+    if dconf['sim']['doplot']:
+      print('plot raster:')
+      sim.analysis.plotData()    
+    if sim.plotWeights: plotWeights() 
+    saveGameBehavior(sim)
+    fid5 = open('data/'+dconf['sim']['name']+'ActionsPerEpisode.txt','w')
+    for i in range(len(epCount)):
+      fid5.write('\t%0.1f' % epCount[i])
+      fid5.write('\n')
+    if sim.saveInputImages: saveInputImages(sim.AIGame.ReducedImages)
+    #anim.savemp4('/tmp/*.png','data/'+dconf['sim']['name']+'randGameBehavior.mp4',10)
+    if sim.saveMotionFields: saveMotionFields(sim.AIGame.ldflow)
+    if sim.saveObjPos: saveObjPos(sim.AIGame.dObjPos)
+    if sim.saveAssignedFiringRates: saveAssignedFiringRates(sim.AIGame.dAllFiringRates)
+    if dconf['sim']['doquit']: quit()
   
 def trainAgent (t):
   """ training interface between simulation and game environment
@@ -1931,102 +2027,4 @@ InitializeInputRates()
 dsumWInit = getSumAdjustableWeights(sim) # get sum of adjustable weights at start of sim
 
 sim.runSimWithIntervalFunc(tPerPlay,trainAgent) # has periodic callback to adjust STDP weights based on RL signal
-
-def LSynWeightToD (L):
-  # convert list of synaptic weights to dictionary to save disk space
-  print('converting synaptic weight list to dictionary...')
-  dout = {}; doutfinal = {}
-  for row in L:
-    #t,preID,poID,w,cumreward = row
-    t,preID,poID,w = row
-    if preID not in dout:
-      dout[preID] = {}
-      doutfinal[preID] = {}
-    if poID not in dout[preID]:
-      dout[preID][poID] = []
-      doutfinal[preID][poID] = []
-    #dout[preID][poID].append([t,w,cumreward])
-    dout[preID][poID].append([t,w])
-  for preID in doutfinal.keys():
-    for poID in doutfinal[preID].keys():
-      doutfinal[preID][poID].append(dout[preID][poID][-1])
-  return dout, doutfinal
-
-def saveSynWeights ():
-  # save synaptic weights 
-  fn = 'data/'+dconf['sim']['name']+'synWeights_'+str(sim.rank)+'.pkl'
-  pickle.dump(lsynweights, open(fn, 'wb')) # save synaptic weights to disk for this node
-  sim.pc.barrier() # wait for other nodes
-  time.sleep(1)    
-  if sim.rank == 0: # rank 0 reads and assembles the synaptic weights into a single output file
-    L = []
-    for i in range(sim.nhosts):
-      fn = 'data/'+dconf['sim']['name']+'synWeights_'+str(i)+'.pkl'
-      while not os.path.isfile(fn): # wait until the file is written/available
-        print('saveSynWeights: waiting for finish write of', fn)
-        time.sleep(1)      
-      lw = pickle.load(open(fn,'rb'))
-      print(fn,'len(lw)=',len(lw),type(lw))
-      os.unlink(fn) # remove the temporary file
-      L = L + lw # concatenate to the list L
-    #pickle.dump(L,open('data/'+dconf['sim']['name']+'synWeights.pkl', 'wb')) # this would save as a List
-    # now convert the list to a dictionary to save space, and save it to disk
-    dout, doutfinal = LSynWeightToD(L)
-    pickle.dump(dout,open('data/'+dconf['sim']['name']+'synWeights.pkl', 'wb'))
-    pickle.dump(doutfinal,open('data/'+dconf['sim']['name']+'synWeights_final.pkl', 'wb'))        
-
-def saveMotionFields (ldflow): pickle.dump(ldflow, open('data/'+dconf['sim']['name']+'MotionFields.pkl', 'wb'))
-
-def saveObjPos (dobjpos):
-  # save object position dictionary
-  for k in dobjpos.keys(): dobjpos[k] = np.array(dobjpos[k])
-  pickle.dump(dobjpos, open('data/'+dconf['sim']['name']+'objpos.pkl', 'wb'))
-
-def saveAssignedFiringRates (dAllFiringRates): pickle.dump(dAllFiringRates, open('data/'+dconf['sim']['name']+'AssignedFiringRates.pkl', 'wb'))
-
-def saveInputImages (Images):
-  # save input images to txt file (switch to pkl?)
-  InputImages = np.array(Images)
-  print(InputImages.shape)
-  if dconf['net']['useBinaryImage']:
-    #InputImages = np.where(InputImages>0,1,0)
-    """
-    with open('data/'+dconf['sim']['name']+'InputImages.txt', 'w') as outfile:
-      outfile.write('# Array shape: {0}\n'.format(InputImages.shape))
-      for Input_Image in InputImages:
-        np.savetxt(outfile, Input_Image, fmt='%d', delimiter=' ')
-        outfile.write('# New slice\n')
-    """
-    np.save('data/'+dconf['sim']['name']+'InputImages',InputImages)
-  else:
-    with open('data/'+dconf['sim']['name']+'InputImages.txt', 'w') as outfile:
-      outfile.write('# Array shape: {0}\n'.format(InputImages.shape))
-      for Input_Image in InputImages:
-        np.savetxt(outfile, Input_Image, fmt='%-7.2f', delimiter=' ')
-        outfile.write('# New slice\n')
-
-def finishSim ():        
-  if sim.rank==0 and fid4 is not None: fid4.close()
-  if ECellModel == 'INTF7' or ICellModel == 'INTF7': intf7.insertSpikes(sim, simConfig.recordStep)  
-  sim.gatherData() # gather data from different nodes
-  sim.saveData() # save data to disk    
-  if sim.saveWeights: saveSynWeights()
-  # only rank 0 should save. otherwise all the other nodes could over-write the output or quit first; rank 0 plots  
-  if sim.rank == 0: 
-    if dconf['sim']['doplot']:
-      print('plot raster:')
-      sim.analysis.plotData()    
-    if sim.plotWeights: plotWeights() 
-    saveGameBehavior(sim)
-    fid5 = open('data/'+dconf['sim']['name']+'ActionsPerEpisode.txt','w')
-    for i in range(len(epCount)):
-      fid5.write('\t%0.1f' % epCount[i])
-      fid5.write('\n')
-    if sim.saveInputImages: saveInputImages(sim.AIGame.ReducedImages)
-    #anim.savemp4('/tmp/*.png','data/'+dconf['sim']['name']+'randGameBehavior.mp4',10)
-    if sim.saveMotionFields: saveMotionFields(sim.AIGame.ldflow)
-    if sim.saveObjPos: saveObjPos(sim.AIGame.dObjPos)
-    if sim.saveAssignedFiringRates: saveAssignedFiringRates(sim.AIGame.dAllFiringRates)
-    if dconf['sim']['doquit']: quit()
-
 finishSim() # gather data, save, plot (optional), quit
