@@ -37472,3 +37472,81 @@ python -i simdat.py backupcfg/21aug2_test_EVO_cycle_sim.json
 
 python -i evo.py fstats 21aug2_fstats.txt findiv 21aug2_findiv.txt popsize 100 maxgen 500 nproc 1 ncore 16 useMPI 0 simconfig sn.json verbose 1 startweight data/21aug2_test_EVO_cycle_synWeights_final.pkl
 
+* 21aug4
+** check 21jul22_EN0_256_RSE_cycle__step_50_ -->> fix bug and restart from step 43
+
+python -i simdat.py backupcfg/21jul22_EN0_256_RSE_cycle__step_50_sim.json
+
+EV1 0.01 Hz
+EA 2.12 Hz
+IA 0.0 Hz
+IAL 0.0 Hz
+EMDOWN 123.13 Hz
+EMUP 125.48 Hz
+IM 0.03 Hz
+IML 101.48 Hz
+EN 0.87 Hz
+
+
+rates too high, this sim is done...
+
+ax=plotPerf(actreward,yl=(0,1.01))
+savefig(gifpath()+'perf.png') # [[./gif/21aug4_21jul22_EN0_256_RSE_cycle__step_50_perf.png]]
+
+clf(); drawraster(dspkT,dspkID); xlim((498e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/21aug4_21jul22_EN0_256_RSE_cycle__step_50_rast.png]]
+
+lfn = ['21jul22_EN0_256_RSE_cycle__step_' + str(i) + '_' for i in range(51)]
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0.2,0.5))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/21aug4_21jul22_EN0_256_RSE_cycle__step_50_perf_all_steps_so_far.png]]
+
+lpda = getindivactionreward(lfn)
+cla(); lrat = plotHitMissRatioPerStep(lpda)
+savefig(gifpath()+'hit_miss_ratio.png') # [[./gif/21aug4_21jul22_EN0_256_RSE_cycle__step_50_hit_miss_ratio.png]]
+
+looks like performance finally increased (step 42) then dropped down due to hyperexcitability...
+
+clf(); pdfc = getconcatweightpdf(lfn,usefinal=True)
+subplot(2,2,1); popwtsfromEN = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False,prety='EN'); ylabel('Average EN->EM')
+subplot(2,2,2); popwtsfromEA = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False,prety='EA'); ylabel('Average EA->EM')
+subplot(2,2,3); popwtsfromENA = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EA'],lclr=['g'],plotindiv=False,prety='EN'); ylabel('Average EN->EA')
+subplot(2,2,4); popwtsfromEAA = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EA'],lclr=['g'],plotindiv=False,prety='EA'); ylabel('Average EA->EA')
+
+savefig(gifpath()+'all_steps_avg_weightEN.png') # [[./gif/21aug4_21jul22_EN0_256_RSE_cycle__step_50_all_steps_avg_weightEN.png]]
+
+hmm, looks like there may be a bug since the change required for evolution ... since some of the weights
+staying fixed a few steps ago ... if that's the case, could run evolution from a separate location so the two 
+will not interfere ... or fix it up to work with both ...
+
+this line in recordAdjustableWeightsPop is probably incorrect:
+      if True or 'hSTDP' in conn:
+since only want to record the weights which are adjusted either by STDP-RL or evolution
+but for restoring the weights do not really need a STDP object since it's just based on pre/post ID...
+
+subplot(1,1,1); popwtsfromVLA = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EA'],lclr=['g'],plotindiv=False,prety='EV1'); ylabel('Average EV1->EA')
+savefig(gifpath()+'all_steps_avg_weightENB.png') # [[./gif/21aug4_21jul22_EN0_256_RSE_cycle__step_50_all_steps_avg_weightENB.png]]
+
+python -i simdat.py backupcfg/21jul22_EN0_256_RSE_cycle__step_42_sim.json
+
+EV1 0.02 Hz
+EA 0.32 Hz
+IA 0.03 Hz
+IAL 0.1 Hz
+EMDOWN 0.15 Hz
+EMUP 0.15 Hz
+IM 0.48 Hz
+IML 3.76 Hz
+EN 0.87 Hz
+
+ax=plotPerf(actreward,yl=(0,1.11))
+savefig(gifpath()+'perf.png') # [[./gif/21aug4_21jul22_EN0_256_RSE_cycle__step_42_perf.png]]
+
+clf(); drawraster(dspkT,dspkID); xlim((498e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/21aug4_21jul22_EN0_256_RSE_cycle__step_42_rast.png]]
+
+fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
+[[./gif/21aug4_21jul22_EN0_256_RSE_cycle__step_42__with_reward_input.mp4]]
+
+ok, will start over from step 43 after that fix ... 
+

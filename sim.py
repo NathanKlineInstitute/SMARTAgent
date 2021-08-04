@@ -1232,20 +1232,6 @@ def recordAdjustableWeights (sim, t, lpop):
   """
   for pop in lpop: recordAdjustableWeightsPop(sim, t, pop)
 
-def recordWeights (sim, t):
-  """ record the STDP weights during the simulation - called in trainAgent
-  """
-  #lRcell = [c for c in sim.net.cells if c.gid in sim.net.pops['ER'].cellGids]
-  sim.WeightsRecordingTimes.append(t)
-  sim.allRLWeights.append([]) # Save this time
-  sim.allNonRLWeights.append([])
-  for cell in sim.net.cells:
-    for conn in cell.conns:
-      if 'hSTDP' in conn:
-        if conn.plast.params.RLon ==1:
-          sim.allRLWeights[-1].append(float(conn['hObj'].weight[PlastWeightIndex])) # save weight only for Rl-STDP conns
-        else:
-          sim.allNonRLWeights[-1].append(float(conn['hObj'].weight[PlastWeightIndex])) # save weight only for nonRL-STDP conns
     
 def saveWeights(sim, downSampleCells):
   ''' Save the weights for each plastic synapse '''
@@ -1930,7 +1916,7 @@ def updateSTDPWeights (sim, W):
     cpostID = cell.gid#find postID
     WPost = W[(W.postid==cpostID)] #find the record for a connection with post neuron ID
     for conn in cell.conns:
-      if 'hSTDP' not in conn: continue
+      # if 'hSTDP' not in conn: continue
       cpreID = conn.preGid  #find preID
       if type(cpreID) != int: continue
       cConnW = WPost[(WPost.preid==cpreID)] #find the record for a connection with pre and post neuron ID
