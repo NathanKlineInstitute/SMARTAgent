@@ -1613,8 +1613,7 @@ def adjustWeightsBasedOnFiringRates (sim,lpop,synType='AMPA'):
 def trainAgent (t):
   """ training interface between simulation and game environment
   """
-  global NBsteps, epCount, proposed_actions, total_hits, fid4, tstepPerAction
-  
+  global NBsteps, epCount, proposed_actions, total_hits, fid4, tstepPerAction  
   vec = h.Vector()
   if t<(tstepPerAction*dconf['actionsPerPlay']): # for the first time interval use randomly selected actions
     actions =[]
@@ -1675,111 +1674,87 @@ def trainAgent (t):
     rewards, epCount, proposed_actions, total_hits, FollowTargetSign = sim.AIGame.playGame(actions, epCount, t)
     dback = {4:'UP',3:'DOWN',1:'STAY',-1:'NOP'}
     print('t=',round(t,2),'proposed,model action:', [dback[x] for x in proposed_actions],[dback[x] for x in actions])
-    if dconf['sim']['RLFakeUpRule']: # fake rule for testing reinforcing of up moves
-      critic = np.sign(actions.count(dconf['moves']['UP']) - actions.count(dconf['moves']['DOWN']))          
-      rewards = [critic for i in range(len(rewards))]
-    elif dconf['sim']['RLFakeDownRule']: # fake rule for testing reinforcing of down moves
-      critic = np.sign(actions.count(dconf['moves']['DOWN']) - actions.count(dconf['moves']['UP']))
-      rewards = [critic for i in range(len(rewards))]
-    elif dconf['sim']['RLFakeStayRule']: # fake rule for testing reinforcing of stay still
-      critic = np.sign(actions.count(dconf['moves']['NOMOVE']) - actions.count(dconf['moves']['DOWN']) - actions.count(dconf['moves']['UP']))
-      rewards = [critic for i in range(len(rewards))]                    
-    else: # normal game play scoring rules
-      #normal game based rewards
-      critic = sum(rewards) # get critic signal (-1, 0 or 1)
-      if critic>0:
-        critic  = dconf['rewardcodes']['scorePoint'] 
-      elif critic<0:
-        critic = dconf['rewardcodes']['losePoint']  #-0.01, e.g. to reduce magnitude of punishment so rewards dominate
-      else:
-        critic = 0
-      #rewards for hitting the ball
-      critic_for_avoidingloss = 0
-      if sum(total_hits)>0:
-        critic_for_avoidingloss = dconf['rewardcodes']['hitBall'] #should be able to change this number from config file
-      #rewards for following or avoiding the ball
-      critic_for_following_ball = 0
-      if dconf['useFollowMoveOutput']:
-        for caction, cproposed_action in zip(actions, proposed_actions):
-          if cproposed_action == -1: # invalid action since e.g. ball not visible
-            continue
-          elif FollowTargetSign > 0: # model moved racket towards predicted y intercept - gets a reward
-            critic_for_following_ball += dconf['rewardcodes']['followTarget'] #follow the ball
-          elif FollowTargetSign < 0: # model moved racket away from predicted y intercept - gets a punishment
-            critic_for_following_ball += dconf['rewardcodes']['avoidTarget'] # didn't follow the ball        
-      else:
-        for caction, cproposed_action in zip(actions, proposed_actions):
-          if cproposed_action == -1: # invalid action since e.g. ball not visible
-            continue
-          elif caction - cproposed_action == 0: # model followed proposed action - gets a reward
-            critic_for_following_ball += dconf['rewardcodes']['followTarget'] #follow the ball
-          else: # model did not follow proposed action - gets a punishment
-            critic_for_following_ball += dconf['rewardcodes']['avoidTarget'] # didn't follow the ball
-      #total rewards
-      critic = critic + critic_for_avoidingloss + critic_for_following_ball
-      rewards = [critic for i in range(len(rewards))]  # reset rewards to modified critic signal - should use more granular recording
+    #normal game based rewards
+    critic = sum(rewards) # get critic signal (-1, 0 or 1)
+    if critic>0:
+      critic  = dconf['rewardcodes']['scorePoint'] 
+    elif critic<0:
+      critic = dconf['rewardcodes']['losePoint']  #-0.01, e.g. to reduce magnitude of punishment so rewards dominate
+    else:
+      critic = 0
+    #rewards for hitting the ball
+    critic_for_avoidingloss = 0
+    if sum(total_hits)>0:
+      critic_for_avoidingloss = dconf['rewardcodes']['hitBall'] #should be able to change this number from config file
+    #rewards for following or avoiding the ball
+    critic_for_following_ball = 0
+    if dconf['useFollowMoveOutput']:
+      for caction, cproposed_action in zip(actions, proposed_actions):
+        if cproposed_action == -1: # invalid action since e.g. ball not visible
+          continue
+        elif FollowTargetSign > 0: # model moved racket towards predicted y intercept - gets a reward
+          critic_for_following_ball += dconf['rewardcodes']['followTarget'] #follow the ball
+        elif FollowTargetSign < 0: # model moved racket away from predicted y intercept - gets a punishment
+          critic_for_following_ball += dconf['rewardcodes']['avoidTarget'] # didn't follow the ball        
+    else:
+      for caction, cproposed_action in zip(actions, proposed_actions):
+        if cproposed_action == -1: # invalid action since e.g. ball not visible
+          continue
+        elif caction - cproposed_action == 0: # model followed proposed action - gets a reward
+          critic_for_following_ball += dconf['rewardcodes']['followTarget'] #follow the ball
+        else: # model did not follow proposed action - gets a punishment
+          critic_for_following_ball += dconf['rewardcodes']['avoidTarget'] # didn't follow the ball
+    #total rewards
+    critic = critic + critic_for_avoidingloss + critic_for_following_ball
+    rewards = [critic for i in range(len(rewards))]  # reset rewards to modified critic signal - should use more granular recording
     # use py_broadcast to avoid converting to/from Vector
     sim.pc.py_broadcast(critic, 0) # broadcast critic value to other nodes
     UPactions = np.sum(np.where(np.array(actions)==dconf['moves']['UP'],1,0))
     DOWNactions = np.sum(np.where(np.array(actions)==dconf['moves']['DOWN'],1,0))
     sim.pc.py_broadcast(UPactions,0) # broadcast UPactions
     sim.pc.py_broadcast(DOWNactions,0) # broadcast DOWNactions
-    if dconf['sim']['anticipatedRL']:
-      print(proposed_actions)
-      sim.pc.py_broadcast(proposed_actions,0) # used proposed actions to target/potentiate the pop representing anticipated action.      
   else: # other workers
     critic = sim.pc.py_broadcast(None, 0) # receive critic value from master node
     UPactions = sim.pc.py_broadcast(None, 0)
     DOWNactions = sim.pc.py_broadcast(None, 0)
-    if dconf['sim']['anticipatedRL']: proposed_actions = sim.pc.py_broadcast(None, 0)      
     if dconf['verbose']>1:
       print('UPactions: ', UPactions,'DOWNactions: ', DOWNactions)      
-  if dconf['sim']['anticipatedRL']:
-    cpaction = proposed_actions 
-    anticipated_reward = dconf['rewardcodes']['followTarget']
-    if cpaction==dconf['moves']['UP']:
-      if dconf['verbose']: print('APPLY RL to EMUP')
-      for STDPmech in dSTDPmech['EMUP']: STDPmech.reward_punish(float(anticipated_reward))
-    elif cpaction==dconf['moves']['DOWN']:
-      if dconf['verbose']: print('APPLY RL to EMDOWN')
-      for STDPmech in dSTDPmech['EMDOWN']: STDPmech.reward_punish(float(anticipated_reward))
-    else:
-      print('No anticipated action for the input!!!')
-  else:
-    if critic != 0: # if critic signal indicates punishment (-1) or reward (+1)
-      if sim.rank==0: print('t=',round(t,2),'RLcritic:',critic)
-      if dconf['sim']['targettedRL']:
-        if UPactions==DOWNactions and \
-           sum(F_UPs)>0 and sum(F_DOWNs)>0: # same number of actions/spikes -> stay; only apply critic when > 0 spikes
-          if dconf['verbose']: print('APPLY RL to both EMUP and EMDOWN')
-          if dconf['sim']['targettedRL']>=4:
-            for STDPmech in dSTDPmech['EM']: STDPmech.reward_punish(float(critic)) # EM populations get reward/punishment on a tie            
-            for STDPmech in dSTDPmech['nonEM']: STDPmech.reward_punish(float(dconf['sim']['targettedRLDscntFctr']*critic)) # but non-EM get less than EM
-          else: # usual targetted RL (==1 or ==3)
-            for STDPmech in dSTDPmech['all']: STDPmech.reward_punish(float(critic))          
-        elif UPactions>DOWNactions: # UP WINS vs DOWN
-          if dconf['verbose']: print('APPLY RL to EMUP')
-          for STDPmech in dSTDPmech['EMUP']: STDPmech.reward_punish(float(critic))
-          if dconf['sim']['targettedRL']>=3 and sum(F_DOWNs)>0: # opposite to pop that did not contribute
-            if dconf['verbose']: print('APPLY -RL to EMDOWN')
-            for STDPmech in dSTDPmech['EMDOWN']: STDPmech.reward_punish(float(-dconf['sim']['targettedRLOppFctr']*critic))
-          if dconf['sim']['targettedRL']>=4: # apply to non-EM with a discount factor
-            for STDPmech in dSTDPmech['nonEM']: STDPmech.reward_punish(float(dconf['sim']['targettedRLDscntFctr']*critic))
-        elif DOWNactions>UPactions: # DOWN WINS vs UP
-          if dconf['verbose']: print('APPLY RL to EMDOWN')
-          for STDPmech in dSTDPmech['EMDOWN']: STDPmech.reward_punish(float(critic))
-          if dconf['sim']['targettedRL']>=3 and sum(F_UPs)>0: # opposite to pop that did not contribute
-            if dconf['verbose']: print('APPLY -RL to EMUP')            
-            for STDPmech in dSTDPmech['EMUP']: STDPmech.reward_punish(float(-dconf['sim']['targettedRLOppFctr']*critic))
-          if dconf['sim']['targettedRL']>=4: # apply to non-EM with a discount factor
-            for STDPmech in dSTDPmech['nonEM']: STDPmech.reward_punish(float(dconf['sim']['targettedRLDscntFctr']*critic))            
-      else: # this is non-targetted RL
+  if critic != 0: # if critic signal indicates punishment (-1) or reward (+1)
+    if sim.rank==0: print('t=',round(t,2),'RLcritic:',critic)
+    if dconf['sim']['targettedRL']:
+      if UPactions==DOWNactions and \
+         sum(F_UPs)>0 and sum(F_DOWNs)>0: # same number of actions/spikes -> stay; only apply critic when > 0 spikes
         if dconf['verbose']: print('APPLY RL to both EMUP and EMDOWN')
-        for STDPmech in dSTDPmech['all']: STDPmech.reward_punish(critic)
-        for STDPmech in dSTDPmech['NOISE']: STDPmech.reward_punish(-critic) # noise sources get opposite sign RL
-      if dconf['sim']['ResetEligAfterCritic']: # reset eligibility after applying reward/punishment
-        for STDPmech in dSTDPmech['all']: STDPmech.reset_eligibility()
-        for STDPmech in dSTDPmech['NOISE']: STDPmech.reset_eligibility()        
+        if dconf['sim']['targettedRL']>=4:
+          for STDPmech in dSTDPmech['EM']: STDPmech.reward_punish(float(critic)) # EM populations get reward/punishment on a tie            
+          for STDPmech in dSTDPmech['nonEM']: STDPmech.reward_punish(float(dconf['sim']['targettedRLDscntFctr']*critic)) # but non-EM get less than EM
+        else: # usual targetted RL (==1 or ==3)
+          for STDPmech in dSTDPmech['all']: STDPmech.reward_punish(float(critic))          
+      elif UPactions>DOWNactions: # UP WINS vs DOWN
+        if dconf['verbose']: print('APPLY RL to EMUP')
+        for STDPmech in dSTDPmech['EMUP']: STDPmech.reward_punish(float(critic))
+        if dconf['sim']['targettedRL']>=3 and sum(F_DOWNs)>0: # opposite to pop that did not contribute
+          if dconf['verbose']: print('APPLY -RL to EMDOWN')
+          for STDPmech in dSTDPmech['EMDOWN']: STDPmech.reward_punish(float(-dconf['sim']['targettedRLOppFctr']*critic))
+        if dconf['sim']['targettedRL']>=4: # apply to non-EM with a discount factor
+          for STDPmech in dSTDPmech['nonEM']: STDPmech.reward_punish(float(dconf['sim']['targettedRLDscntFctr']*critic))
+      elif DOWNactions>UPactions: # DOWN WINS vs UP
+        if dconf['verbose']: print('APPLY RL to EMDOWN')
+        for STDPmech in dSTDPmech['EMDOWN']: STDPmech.reward_punish(float(critic))
+        if dconf['sim']['targettedRL']>=3 and sum(F_UPs)>0: # opposite to pop that did not contribute
+          if dconf['verbose']: print('APPLY -RL to EMUP')            
+          for STDPmech in dSTDPmech['EMUP']: STDPmech.reward_punish(float(-dconf['sim']['targettedRLOppFctr']*critic))
+        if dconf['sim']['targettedRL']>=4: # apply to non-EM with a discount factor
+          for STDPmech in dSTDPmech['nonEM']: STDPmech.reward_punish(float(dconf['sim']['targettedRLDscntFctr']*critic))  
+    else: # this is non-targetted RL
+      if dconf['verbose']: print('APPLY RL to both EMUP and EMDOWN')
+      for STDPmech in dSTDPmech['all']: STDPmech.reward_punish(critic)
+      for STDPmech in dSTDPmech['NOISE']: STDPmech.reward_punish(-critic) # noise sources get opposite sign RL
+    if dconf['sim']['ResetEligAfterCritic']: # reset eligibility after applying reward/punishment
+      for STDPmech in dSTDPmech['all']: STDPmech.reset_eligibility()
+      for STDPmech in dSTDPmech['NOISE']: STDPmech.reset_eligibility()
+    if dconf['sim']['QuitAfterMiss'] and critic < 0.0:
+      pass
   if sim.rank==0:
     # print('t=',round(t,2),' game rewards:', rewards) # only rank 0 has access to rewards      
     for action in actions: sim.allActions.append(action)
