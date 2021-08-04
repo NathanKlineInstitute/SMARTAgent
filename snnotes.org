@@ -37550,3 +37550,39 @@ fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward
 
 ok, will start over from step 43 after that fix ... 
 
+** stopped evo after fix
+
+since may have been updating weights incorrectly
+
+** evo with quit after miss
+
+still, better if had option to stop a sim after a miss and use total time until miss as the fitness
+otherwise, first 100 s are too much of a constraint
+
+another way is to increase the duration each generation ... 
+
+will try with quit after a miss ... ok, set that up using the finishSim function to terminate early
+if the critic < 0 and the dconf['sim']['QuitAfterMiss'] flag is set ... 
+
+evo.py will have a flag quitaftermiss that will use the max time in the actionsrewards.txt file (first column)
+as the fitness when it's set ... only works properly if sn.json has the flag set as well ... 
+
+first get the starting weights saved ... 
+
+name = 21aug4_test_EVO_cycle_
+
+./myrun 16 sn.json
+
+data/21aug4_test_EVO_cycle_synWeights_final.pkl
+
+also should save record of individual fitness to a log file so can later easily find best solutions (even
+before whole evolution finishes) ... ok, added that into logging. 
+
+set max duration to 1000 s ... that's a long time for a sim to survive without missing
+
+python -i evo.py fstats 21aug4_fstats.txt popsize 100 maxgen 500 nproc 1 ncore 16 useMPI 0 simconfig sn.json verbose 1 startweight data/21aug4_test_EVO_cycle_synWeights_final.pkl quitaftermiss 1 evostr 21aug4
+
+started ~16:28 ...
+
+log file is : 21aug4.log
+
