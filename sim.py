@@ -1613,7 +1613,8 @@ def adjustWeightsBasedOnFiringRates (sim,lpop,synType='AMPA'):
 def trainAgent (t):
   """ training interface between simulation and game environment
   """
-  global NBsteps, epCount, proposed_actions, total_hits, fid4, tstepPerAction  
+  global NBsteps, epCount, proposed_actions, total_hits, fid4, tstepPerAction
+  critic = 0
   vec = h.Vector()
   if t<(tstepPerAction*dconf['actionsPerPlay']): # for the first time interval use randomly selected actions
     actions =[]
@@ -1753,8 +1754,6 @@ def trainAgent (t):
     if dconf['sim']['ResetEligAfterCritic']: # reset eligibility after applying reward/punishment
       for STDPmech in dSTDPmech['all']: STDPmech.reset_eligibility()
       for STDPmech in dSTDPmech['NOISE']: STDPmech.reset_eligibility()
-    if dconf['sim']['QuitAfterMiss'] and critic < 0.0:
-      pass
   if sim.rank==0:
     # print('t=',round(t,2),' game rewards:', rewards) # only rank 0 has access to rewards      
     for action in actions: sim.allActions.append(action)
@@ -1787,6 +1786,7 @@ def trainAgent (t):
       if sim.rank==0: print('adjustWeightsBasedOnFiringRates')
       adjustWeightsBasedOnFiringRates(sim,sim.dHPlastPops,synType=dconf['net']['homPlast']['synType'])
       sim.pc.barrier()
+  if dconf['sim']['QuitAfterMiss'] and critic < 0.0: finishSim()
         
 # Alternate to create network and run simulation
 # create network object and set cfg and net params; pass simulation config and network params as arguments
@@ -1931,10 +1931,6 @@ InitializeInputRates()
 dsumWInit = getSumAdjustableWeights(sim) # get sum of adjustable weights at start of sim
 
 sim.runSimWithIntervalFunc(tPerPlay,trainAgent) # has periodic callback to adjust STDP weights based on RL signal
-if sim.rank==0 and fid4 is not None: fid4.close()
-if ECellModel == 'INTF7' or ICellModel == 'INTF7': intf7.insertSpikes(sim, simConfig.recordStep)  
-sim.gatherData() # gather data from different nodes
-sim.saveData() # save data to disk
 
 def LSynWeightToD (L):
   # convert list of synaptic weights to dictionary to save disk space
@@ -1979,8 +1975,6 @@ def saveSynWeights ():
     pickle.dump(dout,open('data/'+dconf['sim']['name']+'synWeights.pkl', 'wb'))
     pickle.dump(doutfinal,open('data/'+dconf['sim']['name']+'synWeights_final.pkl', 'wb'))        
 
-if sim.saveWeights: saveSynWeights()
-
 def saveMotionFields (ldflow): pickle.dump(ldflow, open('data/'+dconf['sim']['name']+'MotionFields.pkl', 'wb'))
 
 def saveObjPos (dobjpos):
@@ -2010,20 +2004,29 @@ def saveInputImages (Images):
       for Input_Image in InputImages:
         np.savetxt(outfile, Input_Image, fmt='%-7.2f', delimiter=' ')
         outfile.write('# New slice\n')
-      
-if sim.rank == 0: # only rank 0 should save. otherwise all the other nodes could over-write the output or quit first; rank 0 plots
-  if dconf['sim']['doplot']:
-    print('plot raster:')
-    sim.analysis.plotData()    
-  if sim.plotWeights: plotWeights() 
-  saveGameBehavior(sim)
-  fid5 = open('data/'+dconf['sim']['name']+'ActionsPerEpisode.txt','w')
-  for i in range(len(epCount)):
-    fid5.write('\t%0.1f' % epCount[i])
-    fid5.write('\n')
-  if sim.saveInputImages: saveInputImages(sim.AIGame.ReducedImages)
-  #anim.savemp4('/tmp/*.png','data/'+dconf['sim']['name']+'randGameBehavior.mp4',10)
-  if sim.saveMotionFields: saveMotionFields(sim.AIGame.ldflow)
-  if sim.saveObjPos: saveObjPos(sim.AIGame.dObjPos)
-  if sim.saveAssignedFiringRates: saveAssignedFiringRates(sim.AIGame.dAllFiringRates)
-  if dconf['sim']['doquit']: quit()
+
+def finishSim ():        
+  if sim.rank==0 and fid4 is not None: fid4.close()
+  if ECellModel == 'INTF7' or ICellModel == 'INTF7': intf7.insertSpikes(sim, simConfig.recordStep)  
+  sim.gatherData() # gather data from different nodes
+  sim.saveData() # save data to disk    
+  if sim.saveWeights: saveSynWeights()
+  # only rank 0 should save. otherwise all the other nodes could over-write the output or quit first; rank 0 plots  
+  if sim.rank == 0: 
+    if dconf['sim']['doplot']:
+      print('plot raster:')
+      sim.analysis.plotData()    
+    if sim.plotWeights: plotWeights() 
+    saveGameBehavior(sim)
+    fid5 = open('data/'+dconf['sim']['name']+'ActionsPerEpisode.txt','w')
+    for i in range(len(epCount)):
+      fid5.write('\t%0.1f' % epCount[i])
+      fid5.write('\n')
+    if sim.saveInputImages: saveInputImages(sim.AIGame.ReducedImages)
+    #anim.savemp4('/tmp/*.png','data/'+dconf['sim']['name']+'randGameBehavior.mp4',10)
+    if sim.saveMotionFields: saveMotionFields(sim.AIGame.ldflow)
+    if sim.saveObjPos: saveObjPos(sim.AIGame.dObjPos)
+    if sim.saveAssignedFiringRates: saveAssignedFiringRates(sim.AIGame.dAllFiringRates)
+    if dconf['sim']['doquit']: quit()
+
+finishSim() # gather data, save, plot (optional), quit
