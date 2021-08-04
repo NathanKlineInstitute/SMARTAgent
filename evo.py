@@ -87,14 +87,17 @@ def FitJobStrFN (p, args, cdx):
 
 # evaluate fitness with sim run
 def EvalFIT (candidates, args):
-  global es
+  global es, quitaftermiss
   fitness = []; 
   for cdx, p in enumerate(candidates):
     strc,fn = FitJobStrFN(p, args, cdx)
     print('EvalFIT:', cdx, strc, fn)
     ret = os.system(strc)
     actreward = pd.DataFrame(np.loadtxt(fn),columns=['time','action','reward','proposed','hit','followtargetsign'])
-    fit = np.sum(actreward['reward'])
+    if quitaftermiss:
+      fit = np.amax(actreward['time'])
+    else:
+      fit = np.sum(actreward['reward'])
     print('fit is:',fit)
     fitness.append(fit)
   return fitness
@@ -115,7 +118,7 @@ def my_generate (random, args):
 
 # run sim command via mpi, then delete the temp file. returns job index and fitness.
 def RunViaMPI (cdx, cmd, fn, maxfittime):
-  global pc, useEMO
+  global pc, useEMO, quitaftermiss
   if nfunc > 1 and useEMO: fit = [1e9 for i in range(nfunc)]
   else: fit = 1e9
   #print 'pc.id()==',pc.id(),'. starting py job', cdx, 'command:', cmd
@@ -145,7 +148,10 @@ def RunViaMPI (cdx, cmd, fn, maxfittime):
       #print 'trying to read single fit value'
       # with open(fn,'r')  as fp: fit = float(fp.readlines()[0].strip())
       actreward = pd.DataFrame(np.loadtxt(fn),columns=['time','action','reward','proposed','hit','followtargetsign'])
-      fit = np.sum(actreward['reward'])        
+      if quitaftermiss:
+        fit = np.amax(actreward['time'])
+      else:
+        fit = np.sum(actreward['reward'])      
     except:
       print('WARN: could not read.')
   #print 'py job', cdx, ' removing temp file'
@@ -343,7 +349,7 @@ if __name__ == "__main__":
   noBound = False; useLOG = True; useEMO = False
   verbose = True; rdmseed=1234; useundefERR = False; 
   fseed = farch = lseed = larch = None; # files,lists for initial population and archive
-  fstat = findiv = '/dev/null'
+  fstat = findiv = '/dev/null'; quitaftermiss = True
   i = 1; narg = len(sys.argv)
   while i < narg:
     if sys.argv[i] == 'popsize' or sys.argv[i] == '-popsize':
@@ -412,7 +418,10 @@ if __name__ == "__main__":
         i+=1; fstats = sys.argv[i]
     elif sys.argv[i] == 'findiv':
       if i+1 < narg:
-        i+=1; findiv = sys.argv[i]        
+        i+=1; findiv = sys.argv[i]
+    elif sys.argv[i] == 'quitaftermiss':
+      if i+1 < narg:
+        i+=1; quitaftermiss = bool(int(sys.argv[i]))
     elif sys.argv[i] == '-python' or sys.argv[i] == '-mpi' or sys.argv[i] == 'evo.py':
       pass
     else: raise Exception('unknown arg:'+sys.argv[i])
