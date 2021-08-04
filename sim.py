@@ -1882,7 +1882,9 @@ def trainAgent (t):
       if sim.rank==0: print('adjustWeightsBasedOnFiringRates')
       adjustWeightsBasedOnFiringRates(sim,sim.dHPlastPops,synType=dconf['net']['homPlast']['synType'])
       sim.pc.barrier()
-  if dconf['sim']['QuitAfterMiss'] and critic < 0.0: finishSim()
+  if dconf['sim']['QuitAfterMiss'] and critic < 0.0:
+    if sim.rank == 0: print('QuitAfterMiss: t = ', t)
+    finishSim()
         
 # Alternate to create network and run simulation
 # create network object and set cfg and net params; pass simulation config and network params as arguments
