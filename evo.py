@@ -99,6 +99,7 @@ def EvalFIT (candidates, args):
     else:
       fit = np.sum(actreward['reward'])
     print('fit is:',fit)
+    logger.info(strc + ', ' + fn + ', fit=' + str(fit))
     fitness.append(fit)
   return fitness
 
@@ -201,9 +202,10 @@ def EvalFITMPI (candidates, args):
 
 #
 def setEClog ():
+  global logger
   logger = logging.getLogger('inspyred.ec')
   logger.setLevel(logging.DEBUG)
-  file_handler = logging.FileHandler('inspyred.log', mode='w')
+  file_handler = logging.FileHandler(evostr+'.log', mode='w')
   file_handler.setLevel(logging.DEBUG)
   formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
   file_handler.setFormatter(formatter)
@@ -345,7 +347,7 @@ if __name__ == "__main__":
     quit()
 
   popsize=100; maxgen=10; nproc=16; useMPI=True; numselected=100; useDEA = False;
-  mutation_rate=0.2; evostr='21jul21A'; simconfig = 'sn.json'; maxfittime = 600; 
+  mutation_rate=0.2; evostr='21aug4A'; simconfig = 'sn.json'; maxfittime = 600; 
   noBound = False; useLOG = True; useEMO = False
   verbose = True; rdmseed=1234; useundefERR = False; 
   fseed = farch = lseed = larch = None; # files,lists for initial population and archive
