@@ -1916,7 +1916,7 @@ def updateSTDPWeights (sim, W):
     cpostID = cell.gid#find postID
     WPost = W[(W.postid==cpostID)] #find the record for a connection with post neuron ID
     for conn in cell.conns:
-      # if 'hSTDP' not in conn: continue
+      if 'hSTDP' not in conn: continue
       cpreID = conn.preGid  #find preID
       if type(cpreID) != int: continue
       cConnW = WPost[(WPost.preid==cpreID)] #find the record for a connection with pre and post neuron ID
