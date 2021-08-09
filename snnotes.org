@@ -37711,3 +37711,15 @@ looks ok in beginning ... as in previous simulations, not clear whether noise in
 the evolution; the evolution could just be leveraging noise activation ... but in long run, any
 noise source benefit/harm should average out ... 
 
+** update sim for evo -- 21aug9_test_EVO_cycle_
+
+./myrun 30 sn.json
+
+python -i simdat.py backupcfg/21aug9_test_EVO_cycle_sim.json
+
+ok, get some firing even w/o noise ... 
+
+python -i evo.py fstats 21aug9_test_EVO_cycle_fstats.txt popsize 100 maxgen 500 nproc 1 ncore 30 useMPI 0 simconfig sn.json verbose 1 startweight data/21aug9_test_EVO_cycle_synWeights_final.pkl quitaftermiss 1 evostr 21aug9_test_EVO_cycle_
+
+started ~13:49 ...
+

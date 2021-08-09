@@ -97,7 +97,7 @@
     "ResumeSimFromFile": "data/21jul2_EN0_256_gcp__step_28_synWeights_final.pkl"
   },
   "sim": {
-    "duration": 1000000 ,
+    "duration": 1000000,
     "dt": 0.6,
     "verbose": 0,
     "recordStep": 1.0,
@@ -108,7 +108,7 @@
     "RLFakeUpRule": 0,
     "RLFakeDownRule": 0,
     "RLFakeStayRule": 0,
-    "name": "21aug4_test_EVO_cycle_",
+    "name": "21aug9_test_EVO_cycle_",
     "doquit": 1,
     "doplot": 0,
     "saveCellSecs": 0,
@@ -220,7 +220,7 @@
       "IML": 5,
       "IMUP": 0,
       "IMDOWN": 0,
-      "EN": 3000
+      "EN": 0
     },
     "ETypes": [
       "ER",
@@ -507,7 +507,7 @@
         "EA": {
           "AM2": 15,
           "NM2": 1,
-          "conv": 256
+          "conv": 800
         },
         "EA2": {
           "AM2": 0.25,
@@ -563,7 +563,7 @@
       },
       "EA": {
         "EA": {
-          "AM2": 0.5,
+          "AM2": 1,
           "NM2": 0.01,
           "conv": 30
         },
@@ -573,9 +573,9 @@
           "conv": 100
         },
         "EM": {
-          "AM2": 1,
+          "AM2": 6,
           "NM2": 0.01,
-          "conv": 100
+          "conv": 30
         },
         "IA": {
           "AM2": 3.95,
@@ -617,9 +617,9 @@
       },
       "EM": {
         "EM": {
-          "AM2": 0.5,
+          "AM2": 1,
           "NM2": 0.01,
-          "conv": 60
+          "conv": 15
         },
         "EA": {
           "AM2": 0.05,

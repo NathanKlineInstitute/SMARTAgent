@@ -1941,7 +1941,7 @@ def getAllSTDPObjects (sim):
       dSTDPmech['EM'] = [] # post-synapse of an EM neuron (EMDOWN or EMUP, etc.)
   dSTDPmech['NOISE'] = [] # for noise RL (presynaptic source is noisy neuron)
   # print('sim.rank=',sim.rank,'len(sim.net.pops[EN].cellGids)=',len(sim.net.pops['EN'].cellGids),dnumc['EN'])
-  if 'EN' in sim.net.pops:
+  if 'EN' in sim.net.pops and 'EN' in dnumc and dnumc['EN'] > 0:
     for cell in sim.net.cells:
       for conn in cell.conns:
         STDPmech = conn.get('hSTDP')  # check if the connection has a NEURON STDP mechanism object
@@ -1949,7 +1949,8 @@ def getAllSTDPObjects (sim):
           preNoise = False
           cpreID = conn.preGid  #find preID
           if type(cpreID) == int:
-            if cpreID >= sim.simData['dminID']['EN'] and cpreID <= sim.simData['dmaxID']['EN']:
+            if 'EN' in sim.simData['dminID'] and \
+               cpreID >= sim.simData['dminID']['EN'] and cpreID <= sim.simData['dmaxID']['EN']:
               preNoise = True
               # print('found preNoise')
           if preNoise:

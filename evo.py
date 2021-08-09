@@ -48,12 +48,12 @@ def safemkdir (dn):
 
 # backup the config file, return path to backed-up file
 def backupcfg (evostr,fcfg):
-  fout = 'data/' + evostr + '/evo.cfg'
+  fout = 'backupcfg/' + evostr + '/evo.json'
   if os.path.exists(fout):
-    print('removing prior cfg file' , fout)
+    print('removing prior json file' , fout)
     os.system('rm ' + fout)  
   os.system('cp ' + fcfg + ' ' + fout) # fcfg created conf.py
-  with open(fout+'_command.txt','a') as fp: # write command line args too
+  with open('backupcfg/' + evostr + '/command.txt','a') as fp: # write command line args too
     for s in sys.argv: fp.write(' ' + s)
     fp.write('\n')
   return fout 
@@ -436,7 +436,7 @@ if __name__ == "__main__":
 
   if (useMPI and pc.id()==0) or not useMPI:
     # backup the config file and use backed-up version for evo (in case local version changed during evolution)
-    safemkdir('data/'+evostr) # make a data output dir
+    safemkdir('backupcfg/'+evostr) # make a data output dir
     simconfig = backupcfg(evostr,simconfig) 
     safemkdir(mydir+'/evo') # for temp files
 
