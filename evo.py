@@ -52,11 +52,8 @@ def backupcfg (evostr,fcfg):
   if os.path.exists(fout):
     print('removing prior cfg file' , fout)
     os.system('rm ' + fout)  
-  os.system('cp ' + fcfg + ' ' + fout) # fcfg created in geom.py via conf.py
-  with open(fout,'a') as fp: # write command line args too
-    fp.write('################\n')
-    fp.write('# command-line args:\n')
-    fp.write('#')
+  os.system('cp ' + fcfg + ' ' + fout) # fcfg created conf.py
+  with open(fout+'_command.txt','a') as fp: # write command line args too
     for s in sys.argv: fp.write(' ' + s)
     fp.write('\n')
   return fout 
@@ -440,7 +437,7 @@ if __name__ == "__main__":
   if (useMPI and pc.id()==0) or not useMPI:
     # backup the config file and use backed-up version for evo (in case local version changed during evolution)
     safemkdir('data/'+evostr) # make a data output dir
-    # simconfig = backupcfg(evostr,simconfig) 
+    simconfig = backupcfg(evostr,simconfig) 
     safemkdir(mydir+'/evo') # for temp files
 
   myout = runevo(popsize=popsize,maxgen=maxgen,nproc=nproc,rdmseed=rdmseed,useMPI=useMPI,\

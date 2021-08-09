@@ -37656,3 +37656,58 @@ may help to remove the noise, and add in direction selective neurons ...
 
 hmm, evo got messed up with the change in sn.json ... 
 
+should not use the same file each time to initialize, should just copy it at beginning and 
+use from the copy ... that's what was doing previously -- so will fix again ... 
+
+also need a way to restore populations from last generation saved ... 
+
+python
+import numpy as np
+ep = np.loadtxt('21aug4_fstats.txt',delimiter=',')
+
+from pylab import *
+ion()
+
+#
+for col, clr in zip([2,3,5],['r','b','k']):
+  plot(ep[:,col],clr,linewidth=3);
+  plot(ep[:,col],clr+'o',markersize=10)
+
+xlabel('Generation',fontsize=25); ylabel('Fitness (Time Before Miss',fontsize=25)
+
+savefig('gif/21aug9_test_evo_a0.png') # [[./gif/21aug9_test_evo_a0.png]]
+
+ylim((75e3,76e3))
+savefig('gif/21aug9_test_evo_a0b.png') # [[./gif/21aug9_test_evo_a0b.png]]
+
+np.amax(ep[:,3]) # 75795.6
+
+take a look at that simulation first ...
+
+this has info on each sim:
+21aug4.log
+
+2021-08-07 02:36:24,042 - inspyred.ec - INFO - ./myrun 16 /home/samn/SMARTAgent/evo/21aug4_test_EVO_cycle__evo_gen_14_cand_9_sim.json, data/21aug4_test_EVO_cycle__evo_gen_14_cand_9_ActionsRewards.txt, fit=75795.6
+
+python -i simdat.py backupcfg/21aug4_test_EVO_cycle__evo_gen_14_cand_9_sim.json
+
+EV1 0.0 Hz
+EA 0.05 Hz
+IA 0.05 Hz
+IAL 0.09 Hz
+EMDOWN 0.04 Hz
+EMUP 0.04 Hz
+IM 0.09 Hz
+IML 0.35 Hz
+EN 0.07 Hz
+
+clf(); drawraster(dspkT,dspkID); xlim((73e3,75e3))
+savefig(gifpath()+'rast.png') # [[./gif/21aug9_21aug4_test_EVO_cycle__evo_gen_14_cand_9_rast.png]]
+
+fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
+[[./gif/21aug9_21aug4_test_EVO_cycle__evo_gen_14_cand_9__with_reward_input.mp4]]
+
+looks ok in beginning ... as in previous simulations, not clear whether noise interferes with
+the evolution; the evolution could just be leveraging noise activation ... but in long run, any
+noise source benefit/harm should average out ... 
+
