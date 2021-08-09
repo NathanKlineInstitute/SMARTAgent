@@ -37586,3 +37586,73 @@ started ~16:28 ...
 
 log file is : 21aug4.log
 
+* 21aug9
+** check 21jul22_EN0_256_RSE_cycle__step_59_ -->> continue
+
+python -i simdat.py backupcfg/21jul22_EN0_256_RSE_cycle__step_59_sim.json
+
+EV1 0.02 Hz
+EA 0.37 Hz
+IA 0.05 Hz
+IAL 0.17 Hz
+EMDOWN 0.16 Hz
+EMUP 0.16 Hz
+IM 0.51 Hz
+IML 3.87 Hz
+EN 0.87 Hz
+
+ax=plotPerf(actreward,yl=(0,2.02))
+savefig(gifpath()+'perf.png') # [[./gif/21aug9_21jul22_EN0_256_RSE_cycle__step_59_perf.png]]
+
+clf(); drawraster(dspkT,dspkID); xlim((498e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/21aug9_21jul22_EN0_256_RSE_cycle__step_59_rast.png]]
+
+lfn = ['21jul22_EN0_256_RSE_cycle__step_' + str(i) + '_' for i in range(60)]
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0.2,0.5))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/21aug9_21jul22_EN0_256_RSE_cycle__step_59_perf_all_steps_so_far.png]]
+
+lpda = getindivactionreward(lfn)
+cla(); lrat = plotHitMissRatioPerStep(lpda)
+savefig(gifpath()+'hit_miss_ratio.png') # [[./gif/21aug9_21jul22_EN0_256_RSE_cycle__step_59_hit_miss_ratio.png]]
+
+step 42 still best ... 
+
+clf(); pdfc = getconcatweightpdf(lfn,usefinal=True)
+subplot(2,2,1); popwtsfromEN = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False,prety='EN'); ylabel('Average EN->EM')
+subplot(2,2,2); popwtsfromEA = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False,prety='EA'); ylabel('Average EA->EM')
+subplot(2,2,3); popwtsfromENA = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EA'],lclr=['g'],plotindiv=False,prety='EN'); ylabel('Average EN->EA')
+subplot(2,2,4); popwtsfromEAA = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EA'],lclr=['g'],plotindiv=False,prety='EA'); ylabel('Average EA->EA')
+
+savefig(gifpath()+'all_steps_avg_weightEN.png') 
+[[./gif/21aug9_21jul22_EN0_256_RSE_cycle__step_59_all_steps_avg_weightEN.png]]
+
+subplot(1,1,1); popwtsfromVLA = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EA'],lclr=['g'],plotindiv=False,prety='EV1'); ylabel('Average EV1->EA')
+savefig(gifpath()+'all_steps_avg_weightENB.png') 
+[[./gif/21aug9_21jul22_EN0_256_RSE_cycle__step_59_all_steps_avg_weightENB.png]]
+
+ok, this multistep sim finished so can continue from last step ... 
+
+copy 21jul22_EN0_256_RSE_cycle__step_59_sim.json to sn.json and update ...
+
+  "simtype": {
+    "ResumeSim": 1,
+    "ResumeSimFromFile": "data/21jul22_EN0_256_RSE_cycle__step_59_synWeights_final.pkl"
+  },
+
+    "name": "21aug9_EN02_256_RSE_cycle_",
+
+(buffer=s0)
+python multistepSim.py sn.json 30 60 21aug9_EN02_256_RSE_cycle_
+
+started ~12:03 ... 
+
+** evo -- some progress
+
+average fitness improving with almost every generation but best fitness improves in steps (every so often by
+a little)
+
+may help to remove the noise, and add in direction selective neurons ... 
+
+hmm, evo got messed up with the change in sn.json ... 
+
