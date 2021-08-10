@@ -37768,3 +37768,22 @@ savefig(gifpath()+'all_steps_avg_weightENB.png')
 
 fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
 [[./gif/21aug10_21aug9_EN02_256_RSE_cycle__step_4__with_reward_input.mp4]]
+
+** check best evo sim so far -- runs for ~75 s
+
+python -i simdat.py backupcfg/21aug9_test_EVO_cycle__evo_gen_1_cand_70_sim.json
+
+EV1 0.0 Hz
+EA 0.18 Hz
+IA 0.99 Hz
+IAL 1.2 Hz
+EMDOWN 0.46 Hz
+EMUP 0.44 Hz
+IM 1.1 Hz
+IML 0.95 Hz
+
+clf(); drawraster(dspkT,dspkID); xlim((72e3,74e3))
+savefig(gifpath()+'rast.png') # [[./gif/21aug10_21aug9_test_EVO_cycle__evo_gen_1_cand_70_rast.png]]
+
+fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
+[[./gif/21aug10_21aug9_test_EVO_cycle__evo_gen_1_cand_70__with_reward_input.mp4]]
