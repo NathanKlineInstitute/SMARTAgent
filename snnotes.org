@@ -37787,3 +37787,55 @@ savefig(gifpath()+'rast.png') # [[./gif/21aug10_21aug9_test_EVO_cycle__evo_gen_1
 
 fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
 [[./gif/21aug10_21aug9_test_EVO_cycle__evo_gen_1_cand_70__with_reward_input.mp4]]
+
+* 21aug12
+** check 21aug9_EN02_256_RSE_cycle__step_14_ -->> improving overall, better than last few
+
+python -i simdat.py backupcfg/21aug9_EN02_256_RSE_cycle__step_14_sim.json
+
+EV1 0.02 Hz
+EA 0.53 Hz
+IA 0.15 Hz
+IAL 0.6 Hz
+EMDOWN 0.26 Hz
+EMUP 0.25 Hz
+IM 0.74 Hz
+IML 5.21 Hz
+EN 0.87 Hz
+
+ax=plotPerf(actreward,yl=(0,2.02))
+savefig(gifpath()+'perf.png') # [[./gif/21aug12_21aug9_EN02_256_RSE_cycle__step_14_perf.png]]
+
+perf looks better than last few... EA rates up, EM down a bit ... see some synch in raster
+
+clf(); drawraster(dspkT,dspkID); xlim((498e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/21aug12_21aug9_EN02_256_RSE_cycle__step_14_rast.png]]
+
+lfn = ['21jul22_EN0_256_RSE_cycle__step_' + str(i) + '_' for i in range(60)]
+for i in range(15): lfn.append('21aug9_EN02_256_RSE_cycle__step_'+str(i)+'_')
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0.2,0.5))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/21aug12_21aug9_EN02_256_RSE_cycle__step_14_perf_all_steps_so_far.png]]
+looks like improving near end ... question is how much time left before hypersynch
+
+lpda = getindivactionreward(lfn)
+cla(); lrat = plotHitMissRatioPerStep(lpda)
+savefig(gifpath()+'hit_miss_ratio.png') # [[./gif/21aug12_21aug9_EN02_256_RSE_cycle__step_14_hit_miss_ratio.png]]
+
+clf(); pdfc = getconcatweightpdf(lfn,usefinal=True)
+subplot(2,2,1); popwtsfromEN = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False,prety='EN'); ylabel('Average EN->EM')
+subplot(2,2,2); popwtsfromEA = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False,prety='EA'); ylabel('Average EA->EM')
+subplot(2,2,3); popwtsfromENA = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EA'],lclr=['g'],plotindiv=False,prety='EN'); ylabel('Average EN->EA')
+subplot(2,2,4); popwtsfromEAA = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EA'],lclr=['g'],plotindiv=False,prety='EA'); ylabel('Average EA->EA')
+
+savefig(gifpath()+'all_steps_avg_weightEN.png') 
+[[./gif/21aug12_21aug9_EN02_256_RSE_cycle__step_14_all_steps_avg_weightEN.png]]
+
+yeah, weights getting high...although noise weights dipping, so just need to find the right balance
+
+subplot(1,1,1); popwtsfromVLA = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EA'],lclr=['g'],plotindiv=False,prety='EV1'); ylabel('Average EV1->EA')
+savefig(gifpath()+'all_steps_avg_weightENB.png') # [[./gif/21aug12_21aug9_EN02_256_RSE_cycle__step_14_all_steps_avg_weightENB.png]]
+
+fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
+[[./gif/21aug12_21aug9_EN02_256_RSE_cycle__step_14__with_reward_input.mp4]]
+
