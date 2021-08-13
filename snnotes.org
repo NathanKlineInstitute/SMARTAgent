@@ -37839,3 +37839,51 @@ savefig(gifpath()+'all_steps_avg_weightENB.png') # [[./gif/21aug12_21aug9_EN02_2
 fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
 [[./gif/21aug12_21aug9_EN02_256_RSE_cycle__step_14__with_reward_input.mp4]]
 
+* 21aug13
+** check 21aug9_EN02_256_RSE_cycle__step_19_
+
+python -i simdat.py backupcfg/21aug9_EN02_256_RSE_cycle__step_19_sim.json
+
+EV1 0.02 Hz
+EA 0.59 Hz
+IA 0.24 Hz
+IAL 0.88 Hz
+EMDOWN 0.64 Hz
+EMUP 0.61 Hz
+IM 3.76 Hz
+IML 9.64 Hz
+EN 0.87 Hz
+
+ax=plotPerf(actreward,yl=(0,3.01))
+savefig(gifpath()+'perf.png') # [[./gif/21aug13_21aug9_EN02_256_RSE_cycle__step_19_perf.png]]
+
+clf(); drawraster(dspkT,dspkID); xlim((498e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/21aug13_21aug9_EN02_256_RSE_cycle__step_19_rast.png]]
+
+lfn = ['21jul22_EN0_256_RSE_cycle__step_' + str(i) + '_' for i in range(60)]
+for i in range(20): lfn.append('21aug9_EN02_256_RSE_cycle__step_'+str(i)+'_')
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0.2,0.5))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/21aug13_21aug9_EN02_256_RSE_cycle__step_19_perf_all_steps_so_far.png]]
+looks like still improving near end ... and still the 
+question is how much time left before hypersynch
+
+lpda = getindivactionreward(lfn)
+cla(); lrat = plotHitMissRatioPerStep(lpda)
+savefig(gifpath()+'hit_miss_ratio.png') # [[./gif/21aug13_21aug9_EN02_256_RSE_cycle__step_19_hit_miss_ratio.png]]
+
+clf(); pdfc = getconcatweightpdf(lfn,usefinal=True)
+subplot(2,2,1); popwtsfromEN = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False,prety='EN'); ylabel('Average EN->EM')
+subplot(2,2,2); popwtsfromEA = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False,prety='EA'); ylabel('Average EA->EM')
+subplot(2,2,3); popwtsfromENA = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EA'],lclr=['g'],plotindiv=False,prety='EN'); ylabel('Average EN->EA')
+subplot(2,2,4); popwtsfromEAA = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EA'],lclr=['g'],plotindiv=False,prety='EA'); ylabel('Average EA->EA')
+
+savefig(gifpath()+'all_steps_avg_weightEN.png') 
+[[./gif/21aug13_21aug9_EN02_256_RSE_cycle__step_19_all_steps_avg_weightEN.png]]
+
+subplot(1,1,1); popwtsfromVLA = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EA'],lclr=['g'],plotindiv=False,prety='EV1'); ylabel('Average EV1->EA')
+savefig(gifpath()+'all_steps_avg_weightENB.png') # [[./gif/21aug13_21aug9_EN02_256_RSE_cycle__step_19_all_steps_avg_weightENB.png]]
+
+fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
+[[./gif/21aug13_21aug9_EN02_256_RSE_cycle__step_19__with_reward_input.mp4]]
+
