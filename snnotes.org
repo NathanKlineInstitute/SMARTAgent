@@ -37887,3 +37887,56 @@ savefig(gifpath()+'all_steps_avg_weightENB.png') # [[./gif/21aug13_21aug9_EN02_2
 fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
 [[./gif/21aug13_21aug9_EN02_256_RSE_cycle__step_19__with_reward_input.mp4]]
 
+* 21aug16
+** check 21aug9_EN02_256_RSE_cycle__step_29_ -->> finished this multistep, reached hyperexcit
+
+python -i simdat.py backupcfg/21aug9_EN02_256_RSE_cycle__step_29_sim.json
+
+EV1 0.02 Hz
+EA 0.91 Hz
+IA 0.95 Hz
+IAL 3.67 Hz
+EMDOWN 64.71 Hz
+EMUP 65.08 Hz
+IM 24.64 Hz
+IML 24.82 Hz
+EN 0.87 Hz
+
+on average, hyperexcitable ...
+
+ax=plotPerf(actreward,yl=(0,3.01))
+savefig(gifpath()+'perf.png') # [[./gif/21aug16_21aug9_EN02_256_RSE_cycle__step_29_perf.png]]
+
+clf(); drawraster(dspkT,dspkID); xlim((498e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/21aug16_21aug9_EN02_256_RSE_cycle__step_29_rast.png]]
+
+lfn = ['21jul22_EN0_256_RSE_cycle__step_' + str(i) + '_' for i in range(60)]
+for i in range(30): lfn.append('21aug9_EN02_256_RSE_cycle__step_'+str(i)+'_')
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0.2,0.5))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/21aug16_21aug9_EN02_256_RSE_cycle__step_29_perf_all_steps_so_far.png]]
+
+lpda = getindivactionreward(lfn)
+cla(); lrat = plotHitMissRatioPerStep(lpda)
+savefig(gifpath()+'hit_miss_ratio.png') # [[./gif/21aug16_21aug9_EN02_256_RSE_cycle__step_29_hit_miss_ratio.png]]
+
+lrat[79] # 0.6896551724137931
+lfn[79] # '21aug9_EN02_256_RSE_cycle__step_19_'
+
+so, no improvement since the last step examines (lfn[79])
+
+clf(); pdfc = getconcatweightpdf(lfn,usefinal=True)
+subplot(2,2,1); popwtsfromEN = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False,prety='EN'); ylabel('Average EN->EM')
+subplot(2,2,2); popwtsfromEA = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False,prety='EA'); ylabel('Average EA->EM')
+subplot(2,2,3); popwtsfromENA = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EA'],lclr=['g'],plotindiv=False,prety='EN'); ylabel('Average EN->EA')
+subplot(2,2,4); popwtsfromEAA = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EA'],lclr=['g'],plotindiv=False,prety='EA'); ylabel('Average EA->EA')
+
+savefig(gifpath()+'all_steps_avg_weightEN.png') # [[./gif/21aug16_21aug9_EN02_256_RSE_cycle__step_29_all_steps_avg_weightEN.png]]
+
+subplot(1,1,1); popwtsfromVLA = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EA'],lclr=['g'],plotindiv=False,prety='EV1'); ylabel('Average EV1->EA')
+savefig(gifpath()+'all_steps_avg_weightENB.png') # [[./gif/21aug16_21aug9_EN02_256_RSE_cycle__step_29_all_steps_avg_weightENB.png]]
+
+# fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
+
+and this sim is concluded due to hyperexcitability ... 
+
