@@ -37940,3 +37940,21 @@ savefig(gifpath()+'all_steps_avg_weightENB.png') # [[./gif/21aug16_21aug9_EN02_2
 
 and this sim is concluded due to hyperexcitability ... 
 
+also note that the RSE (reset eligibility trace) rule did not prevent hyperexcit ... 
+
+previous sim without RSE stopped here: 21jul16_EN02_256_cycle__step_38_sim.json , which is further along ... 
+
+but does seem clearer in terms of the improvement over time ... 
+
+** next sim for noise modulation (21aug16_EN0_RSE_cycle_)
+
+use EIPlast (AMPAI), no feedforward LOCNTOA RL, and longer tau for AMPAN
+
+./myrun 30 sn.json
+
+python -i simdat.py backupcfg/21aug16_EN0_RSE_cycle_sim.json
+
+python multistepSim.py sn.json 30 60 21aug16_EN0_RSE_cycle_
+
+started ~17:07 ...
+
