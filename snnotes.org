@@ -37958,3 +37958,52 @@ python multistepSim.py sn.json 30 60 21aug16_EN0_RSE_cycle_
 
 started ~17:07 ...
 
+* 21aug18
+** check 21aug16_EN0_RSE_cycle__step_11_
+
+python -i simdat.py backupcfg/21aug16_EN0_RSE_cycle__step_11_sim.json
+
+EV1 0.02 Hz
+EA 0.39 Hz
+IA 0.12 Hz
+IAL 0.37 Hz
+EMDOWN 0.14 Hz
+EMUP 0.15 Hz
+IM 0.49 Hz
+IML 3.69 Hz
+EN 0.87 Hz
+
+ax=plotPerf(actreward,yl=(0,3.02))
+savefig(gifpath()+'perf.png') # [[./gif/21aug18_21aug16_EN0_RSE_cycle__step_11_perf.png]]
+
+clf(); drawraster(dspkT,dspkID); xlim((498e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/21aug18_21aug16_EN0_RSE_cycle__step_11_rast.png]]
+
+lfn = ['21aug16_EN0_RSE_cycle__step_' + str(i) + '_' for i in range(12)]
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0.2,0.375))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/21aug18_21aug16_EN0_RSE_cycle__step_11_perf_all_steps_so_far.png]]
+
+lpda = getindivactionreward(lfn)
+cla(); lrat = plotHitMissRatioPerStep(lpda)
+savefig(gifpath()+'hit_miss_ratio.png') # [[./gif/21aug18_21aug16_EN0_RSE_cycle__step_11_hit_miss_ratio.png]]
+
+clf(); pdfc = getconcatweightpdf(lfn,usefinal=True)
+subplot(2,2,1); popwtsfromEN = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False,prety='EN'); ylabel('Average EN->EM')
+subplot(2,2,2); popwtsfromEA = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False,prety='EA'); ylabel('Average EA->EM')
+subplot(2,2,3); popwtsfromENA = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EA'],lclr=['g'],plotindiv=False,prety='EN'); ylabel('Average EN->EA')
+subplot(2,2,4); popwtsfromEAA = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EA'],lclr=['g'],plotindiv=False,prety='EA'); ylabel('Average EA->EA')
+
+savefig(gifpath()+'all_steps_avg_weightEN.png') # [[./gif/21aug18_21aug16_EN0_RSE_cycle__step_11_all_steps_avg_weightEN.png]]
+
+subplot(2,2,1); popwtsIM = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['IM'],lclr=['k'],plotindiv=False)
+subplot(2,2,2); popwtsIML = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['IML'],lclr=['k'],plotindiv=False)
+subplot(2,2,3); popwtsIA = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['IA'],lclr=['k'],plotindiv=False)
+subplot(2,2,4); popwtsIAL = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['IAL'],lclr=['k'],plotindiv=False)
+
+savefig(gifpath()+'all_steps_avg_I_weight.png') # [[./gif/21aug18_21aug16_EN0_RSE_cycle__step_11_all_steps_avg_I_weight.png]]
+
+IM weights decreasing; IA weights increasing
+
+fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
+[[./gif/21aug18_21aug16_EN0_RSE_cycle__step_11__with_reward_input.mp4]]
