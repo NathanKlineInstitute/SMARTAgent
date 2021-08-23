@@ -64,6 +64,8 @@ def ensureDefaults (dconf):
   checkDefVal(dconf['sim'], 'targettedRL', 1)
   checkDefVal(dconf['sim'], 'targettedRLOppFctr', 0.5)
   checkDefVal(dconf['sim'], 'targettedRLDscntFctr', 0.5)
+  checkDefVal(dconf['sim'], 'ResetEligAfterCritic', 0)
+  checkDefVal(dconf['sim'], 'QuitAfterMiss', 0) 
   if 'alltopoldivcons' not in dconf['net']:
     dconf['net']['alltopoldivcons'] = {
       "IR":{"ER":5},
@@ -110,6 +112,7 @@ def ensureDefaults (dconf):
     checkDefVal(dconf,'simulatedEnvParams',{})
     checkDefVal(dconf['simulatedEnvParams'], 'possible_ball_dy', [1,1,1,1,1,1,2,2,2,2,3,3,3])
     checkDefVal(dconf['simulatedEnvParams'], 'possible_ball_dx', [1,1,1,1,1,1,2,2,2,2,3,3,3])
+    checkDefVal(dconf['simulatedEnvParams'], 'possible_ball_ypos', [40,60,80,100,120])
     checkDefVal(dconf['simulatedEnvParams'], 'top_bottom_rule', 1)
     
 

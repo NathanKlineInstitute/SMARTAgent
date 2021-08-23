@@ -18,6 +18,8 @@ def conv2prob (conv, npre):
 
 def getconv (cmat, prety, poty, npre):
   # get convergence value from cmat dictionary (uses convergence if specified directly, otherwise uses p to calculate)
+  if prety not in cmat: return 0
+  if poty not in cmat[prety]: return 0
   if 'conv' in cmat[prety][poty]:
     return cmat[prety][poty]['conv']
   elif 'p' in cmat[prety][poty]:

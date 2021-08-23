@@ -104,37 +104,44 @@ def getpadding ():
 
 dnumc_padx, dtopoldivcons,dtopolconvcons,allpops_withconvtopology,allpops_withdivtopology = getpadding()
 
-lrecpop = ['EMUP', 'EMDOWN'] # which populations to record from
-  
-if cmat['VD']['VD']['conv'] > 0 or \
-   cmat['VD']['VL']['conv'] > 0 or \
-   cmat['VL']['VL']['conv'] > 0 or \
-   cmat['VL']['VD']['conv'] > 0 or \
-   dconf['net']['VisualFeedback']:
-  for pop in EVPops:
-    lrecpop.append(pop)
-  if dconf['net']['VisualFeedback'] and dnumc['ER']>0: lrecpop.append('ER')
+def setlrecpop ():
+  lrecpop = ['EMUP', 'EMDOWN'] # which populations to record from
+  if cmat['VD']['VD']['conv'] > 0 or \
+     cmat['VD']['VL']['conv'] > 0 or \
+     cmat['VL']['VL']['conv'] > 0 or \
+     cmat['VL']['VD']['conv'] > 0 or \
+     dconf['net']['VisualFeedback']:
+    for pop in EVPops:
+      lrecpop.append(pop)
+    if dconf['net']['VisualFeedback'] and dnumc['ER']>0: lrecpop.append('ER')
+  if dnumc['EA']>0 and (dconf['net']['RLconns']['RecurrentANeurons'] or \
+                        dconf['net']['STDPconns']['RecurrentANeurons'] or \
+                        dconf['net']['RLconns']['FeedbackMtoA'] or \
+                        dconf['net']['STDPconns']['FeedbackMtoA']):
+    lrecpop.append('EA')
+  if dnumc['EA2']>0 and (dconf['net']['RLconns']['RecurrentA2Neurons'] or \
+                         dconf['net']['STDPconns']['RecurrentA2Neurons'] or \
+                         dconf['net']['RLconns']['FeedbackMtoA2'] or \
+                         dconf['net']['STDPconns']['FeedbackMtoA2']): 
+    lrecpop.append('EA2')
+  if dconf['net']['RLconns']['Visual'] or dconf['net']['STDPconns']['Visual']:
+    if lrecpop.count('EV4')==0: lrecpop.append('EV4')
+    if lrecpop.count('EMT')==0: lrecpop.append('EMT')
+  recITypes = False
+  if dconf['net']['RLconns']['EIPlast'] or dconf['net']['STDPconns']['EIPlast']: recITypes = True
+  elif 'Noise' in dconf['net']['RLconns']:
+    if dconf['net']['RLconns']['Noise']:
+      recITypes = True  
+  if recITypes:
+    for IType in ITypes:
+      if dnumc[IType] > 0: lrecpop.append(IType)
+  # this is not needed - since lrecpop has the postsynaptic type
+  #if dnumc['EN'] > 0 and 'Noise' in dconf['net']['RLconns']:
+  #  if dconf['net']['RLconns']['Noise']: lrecpop.append('EN')
+  return lrecpop
 
-if dnumc['EA']>0 and (dconf['net']['RLconns']['RecurrentANeurons'] or \
-                      dconf['net']['STDPconns']['RecurrentANeurons'] or \
-                      dconf['net']['RLconns']['FeedbackMtoA'] or \
-                      dconf['net']['STDPconns']['FeedbackMtoA']):
-  lrecpop.append('EA')
-
-if dnumc['EA2']>0 and (dconf['net']['RLconns']['RecurrentA2Neurons'] or \
-                       dconf['net']['STDPconns']['RecurrentA2Neurons'] or \
-                       dconf['net']['RLconns']['FeedbackMtoA2'] or \
-                       dconf['net']['STDPconns']['FeedbackMtoA2']): 
-  lrecpop.append('EA2')
-  
-if dconf['net']['RLconns']['Visual'] or dconf['net']['STDPconns']['Visual']:
-  if lrecpop.count('EV4')==0: lrecpop.append('EV4')
-  if lrecpop.count('EMT')==0: lrecpop.append('EMT')
-  
-if dconf['net']['RLconns']['EIPlast'] or dconf['net']['STDPconns']['EIPlast']:
-  for IType in ITypes:
-    if dnumc[IType] > 0: lrecpop.append(IType)
-
+lrecpop = setlrecpop()
+        
 # Network parameters
 netParams = specs.NetParams() #object of class NetParams to store the network parameters
 netParams.defaultThreshold = 0.0 # spike threshold, 10 mV is NetCon default, lower it for all cells
@@ -156,7 +163,7 @@ simConfig.saveFolder = 'data'
 # simConfig.backupCfg = ['sim.json', 'backupcfg/'+dconf['sim']['name']+'sim.json']
 simConfig.createNEURONObj = True  # create HOC objects when instantiating network
 simConfig.createPyStruct = True  # create Python structure (simulator-independent) when instantiating network
-simConfig.analysis['plotTraces'] = {'include': [(pop, 0) for pop in ['ER','IR','EV1','EV1DE','ID','IV1','EV4','IV4','EMT','IMT','EMDOWN','EMUP','IM','IML','IMUP','IMDOWN','EA','IA','IAL','EA2','IA2','IA2L']]}
+simConfig.analysis['plotTraces'] = {'include': [(pop, 0) for pop in ['ER','IR','EV1','EV1DE','ID','IV1','EV4','IV4','EMT','IMT','EMDOWN','EMUP','IM','IML','IMUP','IMDOWN','EA','IA','IAL','EA2','IA2','IA2L','EN']]}
 simConfig.analysis['plotRaster'] = {'popRates':'overlay','showFig':dconf['sim']['doplot']}
 #simConfig.analysis['plot2Dnet'] = True 
 #simConfig.analysis['plotConn'] = True           # plot connectivity matrix
@@ -317,8 +324,9 @@ netParams.synMechParams['GA'] = netParams.synMechParams['GABA'] = {'mod': 'Exp2S
 def readSTDPParams ():
   dSTDPparamsRL = {} # STDP-RL parameters for AMPA,NMDA synapses; generally uses shorter/longer eligibility traces
   lsy = ['AMPA', 'NMDA']
-  if 'AMPAI' in dconf['RL']: lsy.append('AMPAI')  
-  for sy,gain in zip(lsy,[cfg.EEGain,cfg.EEGain,cfg.EIGain]):
+  if 'AMPAI' in dconf['RL']: lsy.append('AMPAI')
+  if 'AMPAN' in dconf['RL']: lsy.append('AMPAN') # RL for NOISE synapses 
+  for sy,gain in zip(lsy,[cfg.EEGain,cfg.EEGain,cfg.EIGain,cfg.EEGain]):
     dSTDPparamsRL[sy] = dconf['RL'][sy]
     for k in dSTDPparamsRL[sy].keys():
       if k.count('wt') or k.count('wbase') or k.count('wmax'): dSTDPparamsRL[sy][k] *= gain      
@@ -1142,7 +1150,38 @@ if getconv(cmat,'EM','EA',dnumc['EMDOWN'])>0:
           if useRL and dSTDPparamsRL[synmech]['RLon']: # only turn on plasticity when specified to do so
             netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL[synmech]}
           elif useSTDP and dSTDPparams[synmech]['STDPon']:
-            netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparams[synmech]}            
+            netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparams[synmech]}
+
+def wireNoisePops ():
+  if 'EN' not in dnumc: return
+  prety = 'EN'
+  if dnumc[prety] <= 0 or prety not in cmat: return # dynamic E Noise population
+  lpoty = ETypes
+  for ty in ITypes: lpoty.append(ty)
+  for poty in lpoty:
+    if dnumc[poty] <= 0: continue
+    gn = cfg.EEGain
+    if poty in ITypes: gn = cfg.EIGain
+    # print(prety, poty, dnumc[prety], dnumc[poty])
+    if getconv(cmat, prety, poty, dnumc[prety]) > 0:
+      for strty,synmech,weight in zip(['','n'],['AM2', 'NM2'],[cmat[prety][poty]['AM2']*gn, cmat[prety][poty]['NM2']*gn]):
+        k = strty+prety+'->'+strty+poty
+        if weight <= 0.0: continue
+        netParams.connParams[k] = {
+          'preConds': {'pop': prety},
+          'postConds': {'pop': poty},
+          'convergence': getconv(cmat,prety,poty,dnumc[prety]),
+          'weight': getInitWeight(weight),
+          'delay': getInitDelay('Dend'),
+          'synMech': synmech,
+          'sec':EExcitSec, 'loc':0.5,'weightIndex':getWeightIndex(synmech, ECellModel)
+        }
+        if synmech.count('AM') > 0:
+          if dconf['net']['RLconns']['Noise'] and dSTDPparamsRL['AMPAN']['RLon']: # only turn on plasticity when specified to do so
+            netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL['AMPAN']}
+            netParams.connParams[k]['weight'] = getInitWeight(cmat[prety][poty]['AM2'] * gn)
+                    
+if 'EN' in dnumc: wireNoisePops() # connect dynamic noise populations
 
 fconn = 'data/'+dconf['sim']['name']+'synConns.pkl'
 pickle.dump(sim.topologicalConns, open(fconn, 'wb'))            
@@ -1193,20 +1232,6 @@ def recordAdjustableWeights (sim, t, lpop):
   """
   for pop in lpop: recordAdjustableWeightsPop(sim, t, pop)
 
-def recordWeights (sim, t):
-  """ record the STDP weights during the simulation - called in trainAgent
-  """
-  #lRcell = [c for c in sim.net.cells if c.gid in sim.net.pops['ER'].cellGids]
-  sim.WeightsRecordingTimes.append(t)
-  sim.allRLWeights.append([]) # Save this time
-  sim.allNonRLWeights.append([])
-  for cell in sim.net.cells:
-    for conn in cell.conns:
-      if 'hSTDP' in conn:
-        if conn.plast.params.RLon ==1:
-          sim.allRLWeights[-1].append(float(conn['hObj'].weight[PlastWeightIndex])) # save weight only for Rl-STDP conns
-        else:
-          sim.allNonRLWeights[-1].append(float(conn['hObj'].weight[PlastWeightIndex])) # save weight only for nonRL-STDP conns
     
 def saveWeights(sim, downSampleCells):
   ''' Save the weights for each plastic synapse '''
@@ -1365,6 +1390,28 @@ def saveGameBehavior(sim):
 
 ######################################################################################
 
+# adjusted from https://github.com/NathanKlineInstitute/netpyne-STDP/blob/master/neurosim/sim.py
+def getSpikesWithInterval(trange=None, neuronal_pop=None):
+  if len(neuronal_pop) < 1:
+    return 0.0
+  spkts = sim.simData['spkt']
+  spkids = sim.simData['spkid']
+  dminID = sim.simData['dminID']
+  dmaxID = sim.simData['dmaxID']
+  pop_spikes = {p:0 for p in neuronal_pop}
+  if len(spkts) > 0:
+    len_skts = len(spkids)
+    for idx in range(len_skts):
+      i = len_skts - 1 - idx
+      if trange[0] <= spkts[i] <= trange[1]:
+        for p in neuronal_pop:
+          if spkids[i] >= dminID[p] and spkids[i] <= dmaxID[p]:
+            pop_spikes[p] += 1
+            break
+      if trange[0] > spkts[i]: break
+  return pop_spikes
+
+""" old version
 def getSpikesWithInterval (trange = None, neuronal_pop = None):
   if len(neuronal_pop) < 1: return 0.0
   spkts = sim.simData['spkt']
@@ -1375,6 +1422,7 @@ def getSpikesWithInterval (trange = None, neuronal_pop = None):
       if trange[0] <= spkts[i] <= trange[1] and spkids[i] in neuronal_pop:
         pop_spikes += 1
   return pop_spikes
+"""
 
 NBsteps = 0 # this is a counter for recording the plastic weights
 epCount = []
@@ -1561,10 +1609,108 @@ def adjustWeightsBasedOnFiringRates (sim,lpop,synType='AMPA'):
               conn['hObj'].weight[PlastWeightIndex] *= sfctr
   print(sim.rank,'adjust W: UP=', countScaleUps, ', DOWN=', countScaleDowns)
 
+def LSynWeightToD (L):
+  # convert list of synaptic weights to dictionary to save disk space
+  print('converting synaptic weight list to dictionary...')
+  dout = {}; doutfinal = {}
+  for row in L:
+    #t,preID,poID,w,cumreward = row
+    t,preID,poID,w = row
+    if preID not in dout:
+      dout[preID] = {}
+      doutfinal[preID] = {}
+    if poID not in dout[preID]:
+      dout[preID][poID] = []
+      doutfinal[preID][poID] = []
+    #dout[preID][poID].append([t,w,cumreward])
+    dout[preID][poID].append([t,w])
+  for preID in doutfinal.keys():
+    for poID in doutfinal[preID].keys():
+      doutfinal[preID][poID].append(dout[preID][poID][-1])
+  return dout, doutfinal
+
+def saveSynWeights ():
+  # save synaptic weights 
+  fn = 'data/'+dconf['sim']['name']+'synWeights_'+str(sim.rank)+'.pkl'
+  pickle.dump(lsynweights, open(fn, 'wb')) # save synaptic weights to disk for this node
+  sim.pc.barrier() # wait for other nodes
+  time.sleep(1)    
+  if sim.rank == 0: # rank 0 reads and assembles the synaptic weights into a single output file
+    L = []
+    for i in range(sim.nhosts):
+      fn = 'data/'+dconf['sim']['name']+'synWeights_'+str(i)+'.pkl'
+      while not os.path.isfile(fn): # wait until the file is written/available
+        print('saveSynWeights: waiting for finish write of', fn)
+        time.sleep(1)      
+      lw = pickle.load(open(fn,'rb'))
+      print(fn,'len(lw)=',len(lw),type(lw))
+      os.unlink(fn) # remove the temporary file
+      L = L + lw # concatenate to the list L
+    #pickle.dump(L,open('data/'+dconf['sim']['name']+'synWeights.pkl', 'wb')) # this would save as a List
+    # now convert the list to a dictionary to save space, and save it to disk
+    dout, doutfinal = LSynWeightToD(L)
+    pickle.dump(dout,open('data/'+dconf['sim']['name']+'synWeights.pkl', 'wb'))
+    pickle.dump(doutfinal,open('data/'+dconf['sim']['name']+'synWeights_final.pkl', 'wb'))        
+
+def saveMotionFields (ldflow): pickle.dump(ldflow, open('data/'+dconf['sim']['name']+'MotionFields.pkl', 'wb'))
+
+def saveObjPos (dobjpos):
+  # save object position dictionary
+  for k in dobjpos.keys(): dobjpos[k] = np.array(dobjpos[k])
+  pickle.dump(dobjpos, open('data/'+dconf['sim']['name']+'objpos.pkl', 'wb'))
+
+def saveAssignedFiringRates (dAllFiringRates): pickle.dump(dAllFiringRates, open('data/'+dconf['sim']['name']+'AssignedFiringRates.pkl', 'wb'))
+
+def saveInputImages (Images):
+  # save input images to txt file (switch to pkl?)
+  InputImages = np.array(Images)
+  print(InputImages.shape)
+  if dconf['net']['useBinaryImage']:
+    #InputImages = np.where(InputImages>0,1,0)
+    """
+    with open('data/'+dconf['sim']['name']+'InputImages.txt', 'w') as outfile:
+      outfile.write('# Array shape: {0}\n'.format(InputImages.shape))
+      for Input_Image in InputImages:
+        np.savetxt(outfile, Input_Image, fmt='%d', delimiter=' ')
+        outfile.write('# New slice\n')
+    """
+    np.save('data/'+dconf['sim']['name']+'InputImages',InputImages)
+  else:
+    with open('data/'+dconf['sim']['name']+'InputImages.txt', 'w') as outfile:
+      outfile.write('# Array shape: {0}\n'.format(InputImages.shape))
+      for Input_Image in InputImages:
+        np.savetxt(outfile, Input_Image, fmt='%-7.2f', delimiter=' ')
+        outfile.write('# New slice\n')  
+  
+def finishSim ():        
+  if sim.rank==0 and fid4 is not None: fid4.close()
+  if ECellModel == 'INTF7' or ICellModel == 'INTF7': intf7.insertSpikes(sim, simConfig.recordStep)  
+  sim.gatherData() # gather data from different nodes
+  sim.saveData() # save data to disk    
+  if sim.saveWeights: saveSynWeights()
+  # only rank 0 should save. otherwise all the other nodes could over-write the output or quit first; rank 0 plots  
+  if sim.rank == 0: 
+    if dconf['sim']['doplot']:
+      print('plot raster:')
+      sim.analysis.plotData()    
+    if sim.plotWeights: plotWeights() 
+    saveGameBehavior(sim)
+    fid5 = open('data/'+dconf['sim']['name']+'ActionsPerEpisode.txt','w')
+    for i in range(len(epCount)):
+      fid5.write('\t%0.1f' % epCount[i])
+      fid5.write('\n')
+    if sim.saveInputImages: saveInputImages(sim.AIGame.ReducedImages)
+    #anim.savemp4('/tmp/*.png','data/'+dconf['sim']['name']+'randGameBehavior.mp4',10)
+    if sim.saveMotionFields: saveMotionFields(sim.AIGame.ldflow)
+    if sim.saveObjPos: saveObjPos(sim.AIGame.dObjPos)
+    if sim.saveAssignedFiringRates: saveAssignedFiringRates(sim.AIGame.dAllFiringRates)
+    if dconf['sim']['doquit']: quit()
+  
 def trainAgent (t):
   """ training interface between simulation and game environment
   """
   global NBsteps, epCount, proposed_actions, total_hits, fid4, tstepPerAction
+  critic = 0
   vec = h.Vector()
   if t<(tstepPerAction*dconf['actionsPerPlay']): # for the first time interval use randomly selected actions
     actions =[]
@@ -1577,8 +1723,11 @@ def trainAgent (t):
     for ts in range(int(dconf['actionsPerPlay'])):
       ts_beg = t-tstepPerAction*(dconf['actionsPerPlay']-ts-1) 
       ts_end = t-tstepPerAction*(dconf['actionsPerPlay']-ts)
-      F_UPs.append(getSpikesWithInterval([ts_end,ts_beg], sim.net.pops['EMUP'].cellGids))
-      F_DOWNs.append(getSpikesWithInterval([ts_end,ts_beg], sim.net.pops['EMDOWN'].cellGids))
+      dfreq = getSpikesWithInterval([ts_end,ts_beg], ['EMUP', 'EMDOWN'])
+      F_UPs.append(dfreq['EMUP'])
+      F_DOWNs.append(dfreq['EMDOWN'])
+      #F_UPs.append(getSpikesWithInterval([ts_end,ts_beg], sim.net.pops['EMUP'].cellGids))
+      #F_DOWNs.append(getSpikesWithInterval([ts_end,ts_beg], sim.net.pops['EMDOWN'].cellGids))
     sim.pc.allreduce(vec.from_python(F_UPs),1) #sum
     F_UPs = vec.to_python()
     sim.pc.allreduce(vec.from_python(F_DOWNs),1) #sum
@@ -1622,108 +1771,85 @@ def trainAgent (t):
     rewards, epCount, proposed_actions, total_hits, FollowTargetSign = sim.AIGame.playGame(actions, epCount, t)
     dback = {4:'UP',3:'DOWN',1:'STAY',-1:'NOP'}
     print('t=',round(t,2),'proposed,model action:', [dback[x] for x in proposed_actions],[dback[x] for x in actions])
-    if dconf['sim']['RLFakeUpRule']: # fake rule for testing reinforcing of up moves
-      critic = np.sign(actions.count(dconf['moves']['UP']) - actions.count(dconf['moves']['DOWN']))          
-      rewards = [critic for i in range(len(rewards))]
-    elif dconf['sim']['RLFakeDownRule']: # fake rule for testing reinforcing of down moves
-      critic = np.sign(actions.count(dconf['moves']['DOWN']) - actions.count(dconf['moves']['UP']))
-      rewards = [critic for i in range(len(rewards))]
-    elif dconf['sim']['RLFakeStayRule']: # fake rule for testing reinforcing of stay still
-      critic = np.sign(actions.count(dconf['moves']['NOMOVE']) - actions.count(dconf['moves']['DOWN']) - actions.count(dconf['moves']['UP']))
-      rewards = [critic for i in range(len(rewards))]                    
-    else: # normal game play scoring rules
-      #normal game based rewards
-      critic = sum(rewards) # get critic signal (-1, 0 or 1)
-      if critic>0:
-        critic  = dconf['rewardcodes']['scorePoint'] 
-      elif critic<0:
-        critic = dconf['rewardcodes']['losePoint']  #-0.01, e.g. to reduce magnitude of punishment so rewards dominate
-      else:
-        critic = 0
-      #rewards for hitting the ball
-      critic_for_avoidingloss = 0
-      if sum(total_hits)>0:
-        critic_for_avoidingloss = dconf['rewardcodes']['hitBall'] #should be able to change this number from config file
-      #rewards for following or avoiding the ball
-      critic_for_following_ball = 0
-      if dconf['useFollowMoveOutput']:
-        for caction, cproposed_action in zip(actions, proposed_actions):
-          if cproposed_action == -1: # invalid action since e.g. ball not visible
-            continue
-          elif FollowTargetSign > 0: # model moved racket towards predicted y intercept - gets a reward
-            critic_for_following_ball += dconf['rewardcodes']['followTarget'] #follow the ball
-          elif FollowTargetSign < 0: # model moved racket away from predicted y intercept - gets a punishment
-            critic_for_following_ball += dconf['rewardcodes']['avoidTarget'] # didn't follow the ball        
-      else:
-        for caction, cproposed_action in zip(actions, proposed_actions):
-          if cproposed_action == -1: # invalid action since e.g. ball not visible
-            continue
-          elif caction - cproposed_action == 0: # model followed proposed action - gets a reward
-            critic_for_following_ball += dconf['rewardcodes']['followTarget'] #follow the ball
-          else: # model did not follow proposed action - gets a punishment
-            critic_for_following_ball += dconf['rewardcodes']['avoidTarget'] # didn't follow the ball
-      #total rewards
-      critic = critic + critic_for_avoidingloss + critic_for_following_ball
-      rewards = [critic for i in range(len(rewards))]  # reset rewards to modified critic signal - should use more granular recording
+    #normal game based rewards
+    critic = sum(rewards) # get critic signal (-1, 0 or 1)
+    if critic>0:
+      critic  = dconf['rewardcodes']['scorePoint'] 
+    elif critic<0:
+      critic = dconf['rewardcodes']['losePoint']  #-0.01, e.g. to reduce magnitude of punishment so rewards dominate
+    else:
+      critic = 0
+    #rewards for hitting the ball
+    critic_for_avoidingloss = 0
+    if sum(total_hits)>0:
+      critic_for_avoidingloss = dconf['rewardcodes']['hitBall'] #should be able to change this number from config file
+    #rewards for following or avoiding the ball
+    critic_for_following_ball = 0
+    if dconf['useFollowMoveOutput']:
+      for caction, cproposed_action in zip(actions, proposed_actions):
+        if cproposed_action == -1: # invalid action since e.g. ball not visible
+          continue
+        elif FollowTargetSign > 0: # model moved racket towards predicted y intercept - gets a reward
+          critic_for_following_ball += dconf['rewardcodes']['followTarget'] #follow the ball
+        elif FollowTargetSign < 0: # model moved racket away from predicted y intercept - gets a punishment
+          critic_for_following_ball += dconf['rewardcodes']['avoidTarget'] # didn't follow the ball        
+    else:
+      for caction, cproposed_action in zip(actions, proposed_actions):
+        if cproposed_action == -1: # invalid action since e.g. ball not visible
+          continue
+        elif caction - cproposed_action == 0: # model followed proposed action - gets a reward
+          critic_for_following_ball += dconf['rewardcodes']['followTarget'] #follow the ball
+        else: # model did not follow proposed action - gets a punishment
+          critic_for_following_ball += dconf['rewardcodes']['avoidTarget'] # didn't follow the ball
+    #total rewards
+    critic = critic + critic_for_avoidingloss + critic_for_following_ball
+    rewards = [critic for i in range(len(rewards))]  # reset rewards to modified critic signal - should use more granular recording
     # use py_broadcast to avoid converting to/from Vector
     sim.pc.py_broadcast(critic, 0) # broadcast critic value to other nodes
     UPactions = np.sum(np.where(np.array(actions)==dconf['moves']['UP'],1,0))
     DOWNactions = np.sum(np.where(np.array(actions)==dconf['moves']['DOWN'],1,0))
     sim.pc.py_broadcast(UPactions,0) # broadcast UPactions
     sim.pc.py_broadcast(DOWNactions,0) # broadcast DOWNactions
-    if dconf['sim']['anticipatedRL']:
-      print(proposed_actions)
-      sim.pc.py_broadcast(proposed_actions,0) # used proposed actions to target/potentiate the pop representing anticipated action.      
   else: # other workers
     critic = sim.pc.py_broadcast(None, 0) # receive critic value from master node
     UPactions = sim.pc.py_broadcast(None, 0)
     DOWNactions = sim.pc.py_broadcast(None, 0)
-    if dconf['sim']['anticipatedRL']: proposed_actions = sim.pc.py_broadcast(None, 0)      
     if dconf['verbose']>1:
-      print('UPactions: ', UPactions,'DOWNactions: ', DOWNactions)
-      
-  if dconf['sim']['anticipatedRL']:
-    cpaction = proposed_actions 
-    anticipated_reward = dconf['rewardcodes']['followTarget']
-    if cpaction==dconf['moves']['UP']:
-      if dconf['verbose']: print('APPLY RL to EMUP')
-      for STDPmech in dSTDPmech['EMUP']: STDPmech.reward_punish(float(anticipated_reward))
-    elif cpaction==dconf['moves']['DOWN']:
-      if dconf['verbose']: print('APPLY RL to EMDOWN')
-      for STDPmech in dSTDPmech['EMDOWN']: STDPmech.reward_punish(float(anticipated_reward))
-    else:
-      print('No anticipated action for the input!!!')
-  else:
-    if critic != 0: # if critic signal indicates punishment (-1) or reward (+1)
-      if sim.rank==0: print('t=',round(t,2),'RLcritic:',critic)
-      if dconf['sim']['targettedRL']:
-        if UPactions==DOWNactions and \
-           sum(F_UPs)>0 and sum(F_DOWNs)>0: # same number of actions/spikes -> stay; only apply critic when > 0 spikes
-          if dconf['verbose']: print('APPLY RL to both EMUP and EMDOWN')
-          if dconf['sim']['targettedRL']>=4:
-            for STDPmech in dSTDPmech['EM']: STDPmech.reward_punish(float(critic)) # EM populations get reward/punishment on a tie            
-            for STDPmech in dSTDPmech['nonEM']: STDPmech.reward_punish(float(dconf['sim']['targettedRLDscntFctr']*critic)) # but non-EM get less than EM
-          else: # usual targetted RL (==1 or ==3)
-            for STDPmech in dSTDPmech['all']: STDPmech.reward_punish(float(critic))          
-        elif UPactions>DOWNactions: # UP WINS vs DOWN
-          if dconf['verbose']: print('APPLY RL to EMUP')
-          for STDPmech in dSTDPmech['EMUP']: STDPmech.reward_punish(float(critic))
-          if dconf['sim']['targettedRL']>=3 and sum(F_DOWNs)>0: # opposite to pop that did not contribute
-            if dconf['verbose']: print('APPLY -RL to EMDOWN')
-            for STDPmech in dSTDPmech['EMDOWN']: STDPmech.reward_punish(float(-dconf['sim']['targettedRLOppFctr']*critic))
-          if dconf['sim']['targettedRL']>=4: # apply to non-EM with a discount factor
-            for STDPmech in dSTDPmech['nonEM']: STDPmech.reward_punish(float(dconf['sim']['targettedRLDscntFctr']*critic))
-        elif DOWNactions>UPactions: # DOWN WINS vs UP
-          if dconf['verbose']: print('APPLY RL to EMDOWN')
-          for STDPmech in dSTDPmech['EMDOWN']: STDPmech.reward_punish(float(critic))
-          if dconf['sim']['targettedRL']>=3 and sum(F_UPs)>0: # opposite to pop that did not contribute
-            if dconf['verbose']: print('APPLY -RL to EMUP')            
-            for STDPmech in dSTDPmech['EMUP']: STDPmech.reward_punish(float(-dconf['sim']['targettedRLOppFctr']*critic))
-          if dconf['sim']['targettedRL']>=4: # apply to non-EM with a discount factor
-            for STDPmech in dSTDPmech['nonEM']: STDPmech.reward_punish(float(dconf['sim']['targettedRLDscntFctr']*critic))            
-      else:
+      print('UPactions: ', UPactions,'DOWNactions: ', DOWNactions)      
+  if critic != 0: # if critic signal indicates punishment (-1) or reward (+1)
+    if sim.rank==0: print('t=',round(t,2),'RLcritic:',critic)
+    if dconf['sim']['targettedRL']:
+      if UPactions==DOWNactions and \
+         sum(F_UPs)>0 and sum(F_DOWNs)>0: # same number of actions/spikes -> stay; only apply critic when > 0 spikes
         if dconf['verbose']: print('APPLY RL to both EMUP and EMDOWN')
-        for STDPmech in dSTDPmech['all']: STDPmech.reward_punish(critic)
+        if dconf['sim']['targettedRL']>=4:
+          for STDPmech in dSTDPmech['EM']: STDPmech.reward_punish(float(critic)) # EM populations get reward/punishment on a tie            
+          for STDPmech in dSTDPmech['nonEM']: STDPmech.reward_punish(float(dconf['sim']['targettedRLDscntFctr']*critic)) # but non-EM get less than EM
+        else: # usual targetted RL (==1 or ==3)
+          for STDPmech in dSTDPmech['all']: STDPmech.reward_punish(float(critic))          
+      elif UPactions>DOWNactions: # UP WINS vs DOWN
+        if dconf['verbose']: print('APPLY RL to EMUP')
+        for STDPmech in dSTDPmech['EMUP']: STDPmech.reward_punish(float(critic))
+        if dconf['sim']['targettedRL']>=3 and sum(F_DOWNs)>0: # opposite to pop that did not contribute
+          if dconf['verbose']: print('APPLY -RL to EMDOWN')
+          for STDPmech in dSTDPmech['EMDOWN']: STDPmech.reward_punish(float(-dconf['sim']['targettedRLOppFctr']*critic))
+        if dconf['sim']['targettedRL']>=4: # apply to non-EM with a discount factor
+          for STDPmech in dSTDPmech['nonEM']: STDPmech.reward_punish(float(dconf['sim']['targettedRLDscntFctr']*critic))
+      elif DOWNactions>UPactions: # DOWN WINS vs UP
+        if dconf['verbose']: print('APPLY RL to EMDOWN')
+        for STDPmech in dSTDPmech['EMDOWN']: STDPmech.reward_punish(float(critic))
+        if dconf['sim']['targettedRL']>=3 and sum(F_UPs)>0: # opposite to pop that did not contribute
+          if dconf['verbose']: print('APPLY -RL to EMUP')            
+          for STDPmech in dSTDPmech['EMUP']: STDPmech.reward_punish(float(-dconf['sim']['targettedRLOppFctr']*critic))
+        if dconf['sim']['targettedRL']>=4: # apply to non-EM with a discount factor
+          for STDPmech in dSTDPmech['nonEM']: STDPmech.reward_punish(float(dconf['sim']['targettedRLDscntFctr']*critic))  
+    else: # this is non-targetted RL
+      if dconf['verbose']: print('APPLY RL to both EMUP and EMDOWN')
+      for STDPmech in dSTDPmech['all']: STDPmech.reward_punish(critic)
+      for STDPmech in dSTDPmech['NOISE']: STDPmech.reward_punish(-critic) # noise sources get opposite sign RL
+    if dconf['sim']['ResetEligAfterCritic']: # reset eligibility after applying reward/punishment
+      for STDPmech in dSTDPmech['all']: STDPmech.reset_eligibility()
+      for STDPmech in dSTDPmech['NOISE']: STDPmech.reset_eligibility()
   if sim.rank==0:
     # print('t=',round(t,2),' game rewards:', rewards) # only rank 0 has access to rewards      
     for action in actions: sim.allActions.append(action)
@@ -1740,7 +1866,6 @@ def trainAgent (t):
     if dconf['verbose'] > 0 and sim.rank==0:
       print('Weights Recording Time:', t, 'NBsteps:',NBsteps,'recordWeightStepSize:',recordWeightStepSize)
     recordAdjustableWeights(sim, t, lrecpop) 
-    #recordWeights(sim, t)
   if NBsteps % normalizeWeightStepSize == 0:
     if dconf['verbose'] > 0 and sim.rank==0:
       print('Weight Normalize Time:', t, 'NBsteps:',NBsteps,'normalizeWeightStepSize:',normalizeWeightStepSize)
@@ -1757,54 +1882,9 @@ def trainAgent (t):
       if sim.rank==0: print('adjustWeightsBasedOnFiringRates')
       adjustWeightsBasedOnFiringRates(sim,sim.dHPlastPops,synType=dconf['net']['homPlast']['synType'])
       sim.pc.barrier()
-
-def getAllSTDPObjects (sim):
-  # get all the STDP objects from the simulation's cells
-  Mpops = ['EMUP', 'EMDOWN']  
-  dSTDPmech = {'all':[]} # dictionary of STDP objects keyed by type (all, for EMUP, EMDOWN populations)
-  for pop in Mpops: dSTDPmech[pop] = []
-  if dconf['sim']['targettedRL']:
-    # dcell = {pop:[] for pop in Mpops} # SN: exptl
-    if dconf['sim']['targettedRL']>=4:
-      dSTDPmech['nonEM'] = [] # not post-synapse of an EM neuron (only used for targetted RL when RL plasticity at non-EM neurons)
-      dSTDPmech['EM'] = [] # post-synapse of an EM neuron (EMDOWN or EMUP, etc.)
-  for cell in sim.net.cells:
-    #if cell.gid in sim.net.pops['EMDOWN'].cellGids and cell.gid==sim.simData['dminID']['EMDOWN']: print(cell.conns)
-    for conn in cell.conns:
-      STDPmech = conn.get('hSTDP')  # check if the connection has a NEURON STDP mechanism object
-      if STDPmech:
-        dSTDPmech['all'].append(STDPmech)
-        isEM = False
-        for pop in Mpops:
-          if cell.gid in sim.net.pops[pop].cellGids:
-            dSTDPmech[pop].append(STDPmech)
-            isEM = True
-            if dconf['sim']['targettedRL']>=4: dSTDPmech['EM'].append(STDPmech) # any EM
-            # if dconf['sim']['targettedRL']: dcell[pop].append(conn.preGid) # SN: exptl presynaptic ID
-        if dconf['sim']['targettedRL']>=4:
-          if not isEM: dSTDPmech['nonEM'].append(STDPmech)
-  # SN: exptl
-  #if 'hSTDP' not in conn: continue
-  #cpreID = conn.preGid  #find preID
-  #if type(cpreID) != int: continue
-  """
-  if dconf['sim']['targettedRL'] > 1:
-    for pop in Mpops: dcell[pop] = np.unique(dcell[pop])
-    nhost = sim.pc.nhost()
-    src = [dcell]*nhost
-    dcellgid = sim.pc.py_alltoall(src)
-    for dcell in dcellgid:
-      for pop in Mpops:
-        for cell in sim.net.cells:
-          if cell.gid in dcell[pop]:
-            for conn in cell.conns:
-              STDPmech = conn.get('hSTDP')
-              if STDPmech:
-                if STDPmech not in dSTDPmech[pop]:
-                  dSTDPmech[pop].append(STDPmech)
-  """
-  # SN: exptl
-  return dSTDPmech
+  if dconf['sim']['QuitAfterMiss'] and critic < 0.0:
+    if sim.rank == 0: print('QuitAfterMiss: t = ', t)
+    finishSim()
         
 # Alternate to create network and run simulation
 # create network object and set cfg and net params; pass simulation config and network params as arguments
@@ -1837,6 +1917,69 @@ def setrecspikes ():
 
 setrecspikes()
 sim.setupRecording()                  # setup variables to record for each cell (spikes, V traces, etc)
+
+def setdminmaxID (sim, lpop):
+  # setup min,max ID for each population in lpop
+  alltags = sim._gatherAllCellTags() #gather cell tags; see https://github.com/Neurosim-lab/netpyne/blob/development/netpyne/sim/gather.py
+  dGIDs = {pop:[] for pop in lpop}
+  for tinds in range(len(alltags)):
+    if alltags[tinds]['pop'] in lpop:
+      dGIDs[alltags[tinds]['pop']].append(tinds)
+  sim.simData['dminID'] = {pop:np.amin(dGIDs[pop]) for pop in lpop if len(dGIDs[pop])>0}
+  sim.simData['dmaxID'] = {pop:np.amax(dGIDs[pop]) for pop in lpop if len(dGIDs[pop])>0} 
+
+setdminmaxID(sim, allpops) # this needs to be called before getALLSTDPObjects (since uses dminID,dmaxID for EN populations when they're present)
+
+def getAllSTDPObjects (sim):
+  # get all the STDP objects from the simulation's cells
+  Mpops = ['EMUP', 'EMDOWN']  
+  dSTDPmech = {'all':[]} # dictionary of STDP objects keyed by type (all, for EMUP, EMDOWN populations) -- excludes NOISE RL (see below)
+  for pop in Mpops: dSTDPmech[pop] = []
+  if dconf['sim']['targettedRL']:
+    if dconf['sim']['targettedRL']>=4:
+      dSTDPmech['nonEM'] = [] # not post-synapse of an EM neuron (only used for targetted RL when RL plasticity at non-EM neurons)
+      dSTDPmech['EM'] = [] # post-synapse of an EM neuron (EMDOWN or EMUP, etc.)
+  dSTDPmech['NOISE'] = [] # for noise RL (presynaptic source is noisy neuron)
+  # print('sim.rank=',sim.rank,'len(sim.net.pops[EN].cellGids)=',len(sim.net.pops['EN'].cellGids),dnumc['EN'])
+  if 'EN' in sim.net.pops and 'EN' in dnumc and dnumc['EN'] > 0:
+    for cell in sim.net.cells:
+      for conn in cell.conns:
+        STDPmech = conn.get('hSTDP')  # check if the connection has a NEURON STDP mechanism object
+        if STDPmech:
+          preNoise = False
+          cpreID = conn.preGid  #find preID
+          if type(cpreID) == int:
+            if 'EN' in sim.simData['dminID'] and \
+               cpreID >= sim.simData['dminID']['EN'] and cpreID <= sim.simData['dmaxID']['EN']:
+              preNoise = True
+              # print('found preNoise')
+          if preNoise:
+            dSTDPmech['NOISE'].append(STDPmech)
+          else:
+            dSTDPmech['all'].append(STDPmech)
+            isEM = False
+            for pop in Mpops:
+              if cell.gid in sim.net.pops[pop].cellGids:
+                dSTDPmech[pop].append(STDPmech)
+                isEM = True
+                if dconf['sim']['targettedRL']>=4: dSTDPmech['EM'].append(STDPmech) # any EM
+            if dconf['sim']['targettedRL']>=4:
+              if not isEM: dSTDPmech['nonEM'].append(STDPmech)    
+  else:
+    for cell in sim.net.cells:
+      for conn in cell.conns:
+        STDPmech = conn.get('hSTDP')  # check if the connection has a NEURON STDP mechanism object
+        if STDPmech:
+          dSTDPmech['all'].append(STDPmech)
+          isEM = False
+          for pop in Mpops:
+            if cell.gid in sim.net.pops[pop].cellGids:
+              dSTDPmech[pop].append(STDPmech)
+              isEM = True
+              if dconf['sim']['targettedRL']>=4: dSTDPmech['EM'].append(STDPmech) # any EM
+          if dconf['sim']['targettedRL']>=4:
+            if not isEM: dSTDPmech['nonEM'].append(STDPmech)
+  return dSTDPmech
 
 dSTDPmech = getAllSTDPObjects(sim) # get all the STDP objects up-front
 
@@ -1881,114 +2024,10 @@ if dconf['net']['homPlast']['On']:
   # call this once before running the simulation.    
   initTargetW(sim,list(dconf['net']['homPlast']['mintargetFR'].keys()),synType=dconf['net']['homPlast']['synType']) 
 
-def setdminID (sim, lpop):
-  # setup min ID for each population in lpop
-  alltags = sim._gatherAllCellTags() #gather cell tags; see https://github.com/Neurosim-lab/netpyne/blob/development/netpyne/sim/gather.py
-  dGIDs = {pop:[] for pop in lpop}
-  for tinds in range(len(alltags)):
-    if alltags[tinds]['pop'] in lpop:
-      dGIDs[alltags[tinds]['pop']].append(tinds)
-  sim.simData['dminID'] = {pop:np.amin(dGIDs[pop]) for pop in lpop if len(dGIDs[pop])>0}
-
-setdminID(sim, allpops)
 tPerPlay = tstepPerAction*dconf['actionsPerPlay']
 InitializeInputRates()
 #InitializeNoiseRates()
 dsumWInit = getSumAdjustableWeights(sim) # get sum of adjustable weights at start of sim
+
 sim.runSimWithIntervalFunc(tPerPlay,trainAgent) # has periodic callback to adjust STDP weights based on RL signal
-if sim.rank==0 and fid4 is not None: fid4.close()
-if ECellModel == 'INTF7' or ICellModel == 'INTF7': intf7.insertSpikes(sim, simConfig.recordStep)  
-sim.gatherData() # gather data from different nodes
-sim.saveData() # save data to disk
-
-def LSynWeightToD (L):
-  # convert list of synaptic weights to dictionary to save disk space
-  print('converting synaptic weight list to dictionary...')
-  dout = {}; doutfinal = {}
-  for row in L:
-    #t,preID,poID,w,cumreward = row
-    t,preID,poID,w = row
-    if preID not in dout:
-      dout[preID] = {}
-      doutfinal[preID] = {}
-    if poID not in dout[preID]:
-      dout[preID][poID] = []
-      doutfinal[preID][poID] = []
-    #dout[preID][poID].append([t,w,cumreward])
-    dout[preID][poID].append([t,w])
-  for preID in doutfinal.keys():
-    for poID in doutfinal[preID].keys():
-      doutfinal[preID][poID].append(dout[preID][poID][-1])
-  return dout, doutfinal
-
-def saveSynWeights ():
-  # save synaptic weights 
-  fn = 'data/'+dconf['sim']['name']+'synWeights_'+str(sim.rank)+'.pkl'
-  pickle.dump(lsynweights, open(fn, 'wb')) # save synaptic weights to disk for this node
-  sim.pc.barrier() # wait for other nodes
-  time.sleep(1)    
-  if sim.rank == 0: # rank 0 reads and assembles the synaptic weights into a single output file
-    L = []
-    for i in range(sim.nhosts):
-      fn = 'data/'+dconf['sim']['name']+'synWeights_'+str(i)+'.pkl'
-      while not os.path.isfile(fn): # wait until the file is written/available
-        print('saveSynWeights: waiting for finish write of', fn)
-        time.sleep(1)      
-      lw = pickle.load(open(fn,'rb'))
-      print(fn,'len(lw)=',len(lw),type(lw))
-      os.unlink(fn) # remove the temporary file
-      L = L + lw # concatenate to the list L
-    #pickle.dump(L,open('data/'+dconf['sim']['name']+'synWeights.pkl', 'wb')) # this would save as a List
-    # now convert the list to a dictionary to save space, and save it to disk
-    dout, doutfinal = LSynWeightToD(L)
-    pickle.dump(dout,open('data/'+dconf['sim']['name']+'synWeights.pkl', 'wb'))
-    pickle.dump(doutfinal,open('data/'+dconf['sim']['name']+'synWeights_final.pkl', 'wb'))        
-
-if sim.saveWeights: saveSynWeights()
-
-def saveMotionFields (ldflow): pickle.dump(ldflow, open('data/'+dconf['sim']['name']+'MotionFields.pkl', 'wb'))
-
-def saveObjPos (dobjpos):
-  # save object position dictionary
-  for k in dobjpos.keys(): dobjpos[k] = np.array(dobjpos[k])
-  pickle.dump(dobjpos, open('data/'+dconf['sim']['name']+'objpos.pkl', 'wb'))
-
-def saveAssignedFiringRates (dAllFiringRates): pickle.dump(dAllFiringRates, open('data/'+dconf['sim']['name']+'AssignedFiringRates.pkl', 'wb'))
-
-def saveInputImages (Images):
-  # save input images to txt file (switch to pkl?)
-  InputImages = np.array(Images)
-  print(InputImages.shape)
-  if dconf['net']['useBinaryImage']:
-    #InputImages = np.where(InputImages>0,1,0)
-    """
-    with open('data/'+dconf['sim']['name']+'InputImages.txt', 'w') as outfile:
-      outfile.write('# Array shape: {0}\n'.format(InputImages.shape))
-      for Input_Image in InputImages:
-        np.savetxt(outfile, Input_Image, fmt='%d', delimiter=' ')
-        outfile.write('# New slice\n')
-    """
-    np.save('data/'+dconf['sim']['name']+'InputImages',InputImages)
-  else:
-    with open('data/'+dconf['sim']['name']+'InputImages.txt', 'w') as outfile:
-      outfile.write('# Array shape: {0}\n'.format(InputImages.shape))
-      for Input_Image in InputImages:
-        np.savetxt(outfile, Input_Image, fmt='%-7.2f', delimiter=' ')
-        outfile.write('# New slice\n')
-      
-if sim.rank == 0: # only rank 0 should save. otherwise all the other nodes could over-write the output or quit first; rank 0 plots
-  if dconf['sim']['doplot']:
-    print('plot raster:')
-    sim.analysis.plotData()    
-  if sim.plotWeights: plotWeights() 
-  saveGameBehavior(sim)
-  fid5 = open('data/'+dconf['sim']['name']+'ActionsPerEpisode.txt','w')
-  for i in range(len(epCount)):
-    fid5.write('\t%0.1f' % epCount[i])
-    fid5.write('\n')
-  if sim.saveInputImages: saveInputImages(sim.AIGame.ReducedImages)
-  #anim.savemp4('/tmp/*.png','data/'+dconf['sim']['name']+'randGameBehavior.mp4',10)
-  if sim.saveMotionFields: saveMotionFields(sim.AIGame.ldflow)
-  if sim.saveObjPos: saveObjPos(sim.AIGame.dObjPos)
-  if sim.saveAssignedFiringRates: saveAssignedFiringRates(sim.AIGame.dAllFiringRates)
-  if dconf['sim']['doquit']: quit()
+finishSim() # gather data, save, plot (optional), quit

@@ -896,13 +896,13 @@ def getactsel (dhist, actreward):
       actsel.append(dconf['moves']['NOMOVE'])
   return actsel  
 
-def getconcatweightpdf (lfn):
+def getconcatweightpdf (lfn,usefinal=False):
   # concatenate the weights together so can look at cumulative rewards,actions,etc.
   # lfn is a list of actionrewards filenames from the simulation
   pdf = None
   for fn in lfn:
     try:
-      wtmp = readinweights(fn) # if RL was off, no weights saved
+      wtmp = readinweights(fn,final=usefinal) 
     except:
       try:
         wtmp = readinweights(fn,final=True)

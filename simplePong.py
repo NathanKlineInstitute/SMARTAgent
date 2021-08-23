@@ -51,7 +51,7 @@ class simplePong:
     # create ball speed or displacement
     self.ball_dx = 1  # displacement in horizontal direction
     self.ball_dy = 1  #displacement in vertical direction
-    self.possible_ball_ypos = [40,60,80,100,120]
+    self.possible_ball_ypos = dconf['simulatedEnvParams']['possible_ball_ypos']
     self.possible_ball_dy = dconf['simulatedEnvParams']['possible_ball_dy']
     self.possible_ball_dx = dconf['simulatedEnvParams']['possible_ball_dx']
 
@@ -125,7 +125,7 @@ class simplePong:
     if self.ball_dx<0: # moving leftwards
       if tmp_ballx1<0: # if hit the bottom of the court, bounces back
         xshift_ball = self.ball_dx - tmp_ballx1
-        self.ball_dy = np.sign(self.ball_dy) * random.choice(self.possible_ball_dy)
+        self.ball_dy = np.sign(self.ball_dy) * abs(random.choice(self.possible_ball_dy))
         y_shift_ball = self.ball_dy
         self.ball_dx *= -1        
     # 2. check if the ball hits upper edge or lower edge
@@ -149,7 +149,7 @@ class simplePong:
       if (tmp_bally1>=self.rightrackety1 and tmp_bally1<=self.rightrackety2) or (tmp_bally2>=self.rightrackety1 and tmp_bally2<=self.rightrackety2): 
         # if upper or lower edge of the ball is within the range of the racket
         xshift_ball = self.ball_dx + self.rightracketx1-tmp_ballx2
-        self.ball_dy = np.sign(self.ball_dy) * random.choice(self.possible_ball_dy)
+        self.ball_dy = np.sign(self.ball_dy) * abs(random.choice(self.possible_ball_dy))
         y_shift_ball = self.ball_dy
         self.ball_dx *= -1
         self.TotalHits += 1
@@ -157,7 +157,7 @@ class simplePong:
       elif dconf['simulatedEnvParams']['top_bottom_rule'] and right_racket_yshift < 0 and abs(tmp_bally2 - self.rightrackety1) <= 2:
         print('hit top R')
         xshift_ball = self.ball_dx + self.rightracketx1 - tmp_ballx2
-        self.ball_dy = np.sign(self.ball_dy) * random.choice(self.possible_ball_dy) * 2        
+        self.ball_dy = np.sign(self.ball_dy) * abs(random.choice(self.possible_ball_dy)) * 2        
         y_shift_ball = self.ball_dy
         self.ball_dx *= -1
         self.TotalHits += 1
@@ -165,7 +165,7 @@ class simplePong:
       elif dconf['simulatedEnvParams']['top_bottom_rule'] and right_racket_yshift > 0 and abs(tmp_bally1 - self.rightrackety2) <= 2:
         print('hit bottom R')
         xshift_ball = self.ball_dx + self.rightracketx1 - tmp_ballx2
-        self.ball_dy = np.sign(self.ball_dy) * random.choice(self.possible_ball_dy) * 2
+        self.ball_dy = np.sign(self.ball_dy) * abs(random.choice(self.possible_ball_dy)) * 2
         y_shift_ball = self.ball_dy
         self.ball_dx *= -1
         self.TotalHits += 1
