@@ -1761,10 +1761,10 @@ def plotConns(prepop,postpop):
   plt.show()
 
 
-def breakdownPerformance(InputImages,actreward,cend,sthresh,nbframeThresh):
+def breakdownPerformance(InputImages,actreward,cend,sthresh,nbframeThresh,ballThresh):
   cend1= cend   # 16
   cend2= cend+1       # 17
-  ballThresh = 250 # its 255
+  # ballThresh = 250 # its 255
   potential_seqEnds = []
   potential_seqBegs = []  
   p0 = np.unique(np.where(InputImages[:,:,0]>ballThresh)[0])

@@ -25144,6 +25144,401 @@ Text(43.5972,0.5,'total hits or miss per training episode')
 >>> xlabel('training episodes',size=14)
 Text(0.5,19.5222,'training episodes')
 >>> savefig('21june3_21may15_TARG0_K_gcp__40steps_hit_miss_total.png')
+
+
+>>> lfnBT = ['21may15_TARG0_K_gcp__step_31_BT_p0_']
+>>> lfnBT.append('21may15_TARG0_K_gcp__step_31_BT_p1_')
+>>> lfnBT.append('21may15_TARG0_K_gcp__step_31_BT_p2_')
+>>> lfnBT.append('21may15_TARG0_K_gcp__step_31_BT_p3_')
+>>> lfnBT.append('21may15_TARG0_K_gcp__step_31_BT_p4_')
+>>> lfnBT.append('21may15_TARG0_K_gcp__step_31_BT_p5_')
+>>> lfnBT.append('21may15_TARG0_K_gcp__step_31_BT_p6_')
+>>> lfnBT.append('21may15_TARG0_K_gcp__step_31_BT_p7_')
+>>> lfnBT.append('21may15_TARG0_K_gcp__step_31_BT_p8_')
+>>> lfnAT = ['21may15_TARG0_K_gcp__step_31_AT_p0_']
+>>> lfnAT.append('21may15_TARG0_K_gcp__step_31_AT_p1_')
+>>> lfnAT.append('21may15_TARG0_K_gcp__step_31_AT_p2_')
+>>> lfnAT.append('21may15_TARG0_K_gcp__step_31_AT_p3_')
+>>> lfnAT.append('21may15_TARG0_K_gcp__step_31_AT_p4_')
+>>> lfnAT.append('21may15_TARG0_K_gcp__step_31_AT_p5_')
+>>> lfnAT.append('21may15_TARG0_K_gcp__step_31_AT_p6_')
+>>> lfnAT.append('21may15_TARG0_K_gcp__step_31_AT_p7_')
+>>> lfnAT.append('21may15_TARG0_K_gcp__step_31_AT_p8_')
+>>> lpdaBT = getindivactionreward(lfnAT)
+>>> lpdaBT = getindivactionreward(lfnBT)
+>>> lpdaAT = getindivactionreward(lfnAT)
+>>> II_allBT = getconcatactioninputs(lfnBT)
+loading input images from data/21may15_TARG0_K_gcp__step_31_BT_p0_InputImages.npy
+loading input images from data/21may15_TARG0_K_gcp__step_31_BT_p1_InputImages.npy
+loading input images from data/21may15_TARG0_K_gcp__step_31_BT_p2_InputImages.npy
+loading input images from data/21may15_TARG0_K_gcp__step_31_BT_p3_InputImages.npy
+loading input images from data/21may15_TARG0_K_gcp__step_31_BT_p4_InputImages.npy
+loading input images from data/21may15_TARG0_K_gcp__step_31_BT_p5_InputImages.npy
+loading input images from data/21may15_TARG0_K_gcp__step_31_BT_p6_InputImages.npy
+loading input images from data/21may15_TARG0_K_gcp__step_31_BT_p7_InputImages.npy
+loading input images from data/21may15_TARG0_K_gcp__step_31_BT_p8_InputImages.npy
+>>> II_allAT = getconcatactioninputs(lfnAT)
+loading input images from data/21may15_TARG0_K_gcp__step_31_AT_p0_InputImages.npy
+loading input images from data/21may15_TARG0_K_gcp__step_31_AT_p1_InputImages.npy
+loading input images from data/21may15_TARG0_K_gcp__step_31_AT_p2_InputImages.npy
+loading input images from data/21may15_TARG0_K_gcp__step_31_AT_p3_InputImages.npy
+loading input images from data/21may15_TARG0_K_gcp__step_31_AT_p4_InputImages.npy
+loading input images from data/21may15_TARG0_K_gcp__step_31_AT_p5_InputImages.npy
+loading input images from data/21may15_TARG0_K_gcp__step_31_AT_p6_InputImages.npy
+loading input images from data/21may15_TARG0_K_gcp__step_31_AT_p7_InputImages.npy
+loading input images from data/21may15_TARG0_K_gcp__step_31_AT_p8_InputImages.npy
+>>> pdacBT = getconcatactionreward(lfnBT)
+>>> pdacAT = getconcatactionreward(lfnAT)
+>>> lSimilarSeqs_allBT, seqs2plot_allBT, seqsBegs_allBT, seqsEnds_allBT = breakdownPerformance(II_allBT,pdacBT,cend=69,sthresh=5,nbframeThresh=5,ballThresh=0)
+>>> lSimilarSeqs_allAT, seqs2plot_allAT, seqsBegs_allAT, seqsEnds_allAT = breakdownPerformance(II_allAT,pdacAT,cend=69,sthresh=5,nbframeThresh=5,ballThresh=0)
+/opt/anaconda3/lib/python3.7/site-packages/scipy/stats/stats.py:3508: PearsonRConstantInputWarning: An input array is constant; the correlation coefficent is not defined.
+  warnings.warn(PearsonRConstantInputWarning())
+>>> seqs2plot_allBT
+array([  0,   1,   8,   9,  12,  52,  57,  89,  90, 104])
+>>> seqs2plot_allAT
+array([ 0,  1,  2,  8,  9, 12, 13, 15, 16, 20, 31, 40])
+>>> dspkID_allBT, dspkT_allBT, totalDur_allBT = getconcatactivity(lfnBT,['EV1','EA','EA2','EMUP','EMDOWN'])
+>>> dspkID_allAT, dspkT_allAT, totalDur_allAT = getconcatactivity(lfnAT,['EV1','EA','EA2','EMUP','EMDOWN'])
+>>> dact1D_allBT = getdActMap1D(totalDur_allBT,pdacBT,dspkT_allBT,dspkID_allBT,dnumc,dstartidx,lpop=['EV1','EA','EA2','EMUP','EMDOWN'])
+>>> dCumAct_allBT, dStepAct_allBT = getCumActivityMapForInput(seqsBegs_allBT, seqsEnds_allBT,dact1D_allBT,lpop=['EV1','EA','EA2','EMUP','EMDOWN'])
+>>> rewards_allBT, hitsMiss_allBT = getRewardsPerSeq(pdacBT,seqsBegs_allBT,seqsEnds_allBT)
+>>> proposedActionsBT, executedActionsBT = getActionsPerSeq(pdacBT,seqsBegs_allBT, seqsEnds_allBT)
+>>> dspkID_allAT, dspkT_allAT, totalDur_allAT = getconcatactivity(lfnAT,['EV1','EA','EA2','EMUP','EMDOWN'])
+>>> dact1D_allAT = getdActMap1D(totalDur_allAT,pdacAT,dspkT_allAT,dspkID_allAT,dnumc,dstartidx,lpop=['EV1','EA','EA2','EMUP','EMDOWN'])
+>>> dCumAct_allAT, dStepAct_allAT = getCumActivityMapForInput(seqsBegs_allAT, seqsEnds_allBT,dact1D_allAT,lpop=['EV1','EA','EA2','EMUP','EMDOWN'])
+>>> dCumAct_allAT, dStepAct_allAT = getCumActivityMapForInput(seqsBegs_allAT, seqsEnds_allAT,dact1D_allAT,lpop=['EV1','EA','EA2','EMUP','EMDOWN'])
+>>> rewards_allAT, hitsMiss_allAT = getRewardsPerSeq(pdacAT,seqsBegs_allAT,seqsEnds_allAT)
+>>> proposedActionsAT, executedActionsAT = getActionsPerSeq(pdacAT,seqsBegs_allAT, seqsEnds_allAT)
+>>> summarizeLearningPerf(lSimilarSeqs_allBT,seqs2plot_allBT,hitsMiss_allBT)
+simdat.py:1857: RuntimeWarning: divide by zero encountered in true_divide
+  perf = np.divide(np.cumsum(hits),np.cumsum(miss))
+>>> lfnBT
+['21may15_TARG0_K_gcp__step_31_BT_p0_', '21may15_TARG0_K_gcp__step_31_BT_p1_', '21may15_TARG0_K_gcp__step_31_BT_p2_', '21may15_TARG0_K_gcp__step_31_BT_p3_', '21may15_TARG0_K_gcp__step_31_BT_p4_', '21may15_TARG0_K_gcp__step_31_BT_p5_', '21may15_TARG0_K_gcp__step_31_BT_p6_', '21may15_TARG0_K_gcp__step_31_BT_p7_', '21may15_TARG0_K_gcp__step_31_BT_p8_']
+>>> savefig('21june23_21may15_TARG0_K_gcp__step_31_BT_summarylearningperformance.png')
+>>> summarizeLearningPerf(lSimilarSeqs_allBT,seqs2plot_allBT,hitsMiss_allBT)
+>>> savefig('21june23_21may15_TARG0_K_gcp__step_31_BT_summarylearningperformance.png')
+>>> summarizeLearningPerf(lSimilarSeqs_allAT,seqs2plot_allAT,hitsMiss_allAT)
+>>> savefig('21june23_21may15_TARG0_K_gcp__step_31_AT_summarylearningperformance.png')
+>>> pdposBT = getconcatobjpos(lfnBT)
+>>> pdposAT = getconcatobjpos(lfnAT)
+>>> showSpatialBehaviorHitMiss(pdposBT,hitsMiss_allBT,seqsBegs_allBT, seqsEnds_allBT)
+>>> savefig('21june23_21may15_TARG0_K_gcp__step_31_BT_p0to8_spatialbehavior_hitmiss.png')
+>>> showSpatialBehaviorHitMiss(pdposAT,hitsMiss_allAT,seqsBegs_allAT, seqsEnds_allAT)
+>>> savefig('21june23_21may15_TARG0_K_gcp__step_31_AT_p0to8_spatialbehavior_hitmiss.png')
+>>> 
+>>> 
+>>> 
+>>> stepwiecontribEMUP_BT, stepwisecontribEMDOWN_BT = getStepwiseNeuralContribution(executedActionsBT,dStepAct_allBT)
+>>> stepwiecontribEMUP_AT, stepwisecontribEMDOWN_AT = getStepwiseNeuralContribution(executedActionsAT,dStepAct_allAT)
+>>> nEMUP_BT = (100/stepwiecontribEMUP_BT.shape[0])*np.sum(stepwiecontribEMUP_BT,0)
+>>> nEMUP_AT = (100/stepwiecontribEMUP_AT.shape[0])*np.sum(stepwiecontribEMUP_AT,0)
+>>> nEMDOWN_BT = (100/stepwisecontribEMDOWN_BT.shape[0])*np.sum(stepwisecontribEMDOWN_BT,0)
+>>> nEMDOWN_AT = (100/stepwisecontribEMDOWN_AT.shape[0])*np.sum(stepwisecontribEMDOWN_AT,0)
+
+>>> iBT = np.argsort(nEMUP_BT)
+>>> plt.plot(nEMUP_BT[iBT])
+>>> plt.plot(nEMUP_AT[iBT])
+>>> xlabel('neuron ids')
+>>> ylabel('Times a neuron actively contributed to action (%)')
+>>> title('EMUP')
+>>> legend(('Before training','After training'))
+>>> savefig('21june23_21may15_TARG0_K_gcp__step_31_BTvsAT_p0to8_individualneuronActionContributionEMUP.png')
+
+>>> iBT = np.argsort(nEMDOWN_BT)
+>>> plt.plot(nEMDOWN_BT[iBT])
+>>> plt.plot(nEMDOWN_AT[iBT])
+>>> legend(('Before training','After training'))
+>>> title('EMDOWN')
+>>> ylabel('Times a neuron actively contributed to action (%)')
+>>> xlabel('neuron ids')
+>>> savefig('21june23_21may15_TARG0_K_gcp__step_31_BTvsAT_p0to8_individualneuronActionContributionEMDOWN.png')
+
+>>> step_atleast1activeEMUP_BT = (100/stepwiecontribEMUP_BT.shape[0])*len(np.where(np.sum(stepwiecontribEMUP_BT,1)>0)[0])
+>>> step_atleast1activeEMUP_AT = (100/stepwiecontribEMUP_AT.shape[0])*len(np.where(np.sum(stepwiecontribEMUP_AT,1)>0)[0])
+>>> step_atleast1activeEMDOWN_BT = (100/stepwisecontribEMDOWN_BT.shape[0])*len(np.where(np.sum(stepwisecontribEMDOWN_BT,1)>0)[0])
+>>> step_atleast1activeEMDOWN_AT = (100/stepwisecontribEMDOWN_AT.shape[0])*len(np.where(np.sum(stepwisecontribEMDOWN_AT,1)>0)[0])
+>>> step_atleast1activeEMUP_BT
+54.80240883609924
+>>> step_atleast1activeEMUP_AT
+54.68501852832186
+>>> step_atleast1activeEMDOWN_BT
+54.64144974191042
+>>> step_atleast1activeEMDOWN_AT
+56.379036527263096
+>>> step_atleast1activeEM_BT = (100/stepwiecontribEMUP_BT.shape[0])*len(np.where(np.add(np.sum(stepwiecontribEMUP_BT,1),np.sum(stepwisecontribEMDOWN_BT,1))>0)[0])
+>>> step_atleast1activeEM_AT = (100/stepwiecontribEMUP_AT.shape[0])*len(np.where(np.add(np.sum(stepwiecontribEMUP_AT,1),np.sum(stepwisecontribEMDOWN_AT,1))>0)[0])
+>>> step_atleast1activeEM_BT
+91.05844480213132
+>>> step_atleast1activeEM_AT
+92.99705059366255
+
+
+>>> plt.plot((100/stepwiecontribEMUP_BT.shape[0])*np.arange(0,stepwiecontribEMUP_BT.shape[0]),np.sort(np.sum(stepwiecontribEMUP_BT,1)))
+>>> plt.plot((100/stepwiecontribEMUP_AT.shape[0])*np.arange(0,stepwiecontribEMUP_AT.shape[0]),np.sort(np.sum(stepwiecontribEMUP_AT,1)))
+>>> xlim(40,101)
+>>> legend(('Before training','After training'))
+>>> xlabel('Percentage of actions (ball moving towards the racket)')
+>>> ylabel('number of active neurons')
+>>> ylabel('number of active EMUP neurons')
+>>> savefig('21june23_21may15_TARG0_K_gcp__step_31_BTvsAT_p0to8_popActionContributionEMUP.png')
+>>> ylim(-5,100)
+>>> ylim(-5,50)
+>>> ylim(-5,20)
+>>> ylim(-1,12)
+>>> savefig('21june23_21may15_TARG0_K_gcp__step_31_BTvsAT_p0to8_popActionContributionEMUPzoomed.png')
+
+>>> plt.plot((100/stepwisecontribEMDOWN_BT.shape[0])*np.arange(0,stepwisecontribEMDOWN_BT.shape[0]),np.sort(np.sum(stepwisecontribEMDOWN_BT,1)))
+>>> plt.plot((100/stepwisecontribEMDOWN_AT.shape[0])*np.arange(0,stepwisecontribEMDOWN_AT.shape[0]),np.sort(np.sum(stepwisecontribEMDOWN_AT,1)))
+>>> ylabel('number of active EMDOWN neurons')
+>>> xlabel('Percentage of actions (ball moving towards the racket)')
+>>> legend(('Before training','After training'))
+>>> xlim(40,101)
+>>> savefig('21june23_21may15_TARG0_K_gcp__step_31_BTvsAT_p0to8_popActionContributionEMDOWN.png')
+
+>>> ylim(-1,12)
+>>> savefig('21june23_21may15_TARG0_K_gcp__step_31_BTvsAT_p0to8_popActionContributionEMDOWNzoomed.png')
+
+>>> plt.plot((100/stepwiecontribEMUP_AT.shape[0])*np.arange(0,stepwiecontribEMUP_AT.shape[0]),np.sort(np.add(np.sum(stepwiecontribEMUP_AT,1),np.sum(stepwisecontribEMDOWN_AT,1))))
+>>> plt.plot((100/stepwiecontribEMUP_BT.shape[0])*np.arange(0,stepwiecontribEMUP_BT.shape[0]),np.sort(np.add(np.sum(stepwiecontribEMUP_BT,1),np.sum(stepwisecontribEMDOWN_BT,1))))
+>>> plt.plot((100/stepwiecontribEMUP_AT.shape[0])*np.arange(0,stepwiecontribEMUP_AT.shape[0]),np.sort(np.add(np.sum(stepwiecontribEMUP_AT,1),np.sum(stepwisecontribEMDOWN_AT,1))))
+>>> legend(('Before training','After training'))
+>>> xlabel('Percentage of actions (ball moving towards the racket)')
+>>> ylabel('number of active EM neurons')
+>>> ylim(-1,100)
+>>> ylim(-1,20)
+>>> ylim(-1,15)
+>>> savefig('21june23_21may15_TARG0_K_gcp__step_31_BTvsAT_p0to8_popActionContributionEMzoomed.png')
+
+>>> showMostActiveMNeuronsPerSeq(lSimilarSeqs_allBT,seqs2plot_allBT,dCumAct_allBT,70)
+>>> savefig('21june23_21may15_TARG0_K_gcp__step_31_BT_p0to8_top70Pmostactiveneurons.png')
+
+>>> showMostActiveMNeuronsPerSeq(lSimilarSeqs_allAT,seqs2plot_allAT,dCumAct_allAT,70)
+>>> savefig('21june23_21may15_TARG0_K_gcp__step_31_AT_p0to8_top70Pmostactiveneurons.png')
+>>> 
+>>> 
+>>> h40u_BT, h40d_BT = showMostActiveMNeuronsPerSeq(lSimilarSeqs_allBT,seqs2plot_allBT,dCumAct_allBT,40)
+>>> h50u_BT, h50d_BT = showMostActiveMNeuronsPerSeq(lSimilarSeqs_allBT,seqs2plot_allBT,dCumAct_allBT,50)
+>>> h60u_BT, h60d_BT = showMostActiveMNeuronsPerSeq(lSimilarSeqs_allBT,seqs2plot_allBT,dCumAct_allBT,60)
+>>> h70u_BT, h70d_BT = showMostActiveMNeuronsPerSeq(lSimilarSeqs_allBT,seqs2plot_allBT,dCumAct_allBT,70)
+>>> h70u_AT, h70d_AT = showMostActiveMNeuronsPerSeq(lSimilarSeqs_allAT,seqs2plot_allAT,dCumAct_allAT,70)
+>>> h60u_AT, h60d_AT = showMostActiveMNeuronsPerSeq(lSimilarSeqs_allAT,seqs2plot_allAT,dCumAct_allAT,60)
+>>> h50u_AT, h50d_AT = showMostActiveMNeuronsPerSeq(lSimilarSeqs_allAT,seqs2plot_allAT,dCumAct_allAT,50)
+>>> h40u_AT, h40d_AT = showMostActiveMNeuronsPerSeq(lSimilarSeqs_allAT,seqs2plot_allAT,dCumAct_allAT,40)
+
+>>> indsu0 = np.argsort(np.mean(h70u_BT,1))
+>>> indsd0 = np.argsort(np.mean(h70d_BT,1))
+>>> indsu1 = np.argsort(np.mean(h70u_AT,1))
+>>> indsd1 = np.argsort(np.mean(h70d_AT,1))
+
+>>> plt.plot(np.mean(h70u_BT,1)[indsu0],'.')
+>>> plt.plot(np.mean(h60u_BT,1)[indsu0],'.')
+>>> plt.plot(np.mean(h50u_BT,1)[indsu0],'.')
+>>> plt.plot(np.mean(h40u_BT,1)[indsu0],'.')
+>>> ylabel('Average probability of neurons being most active')
+>>> xlabel('sorted neuron ids (using top 70%)')
+>>> title('Most active EMUP neurons across input sequences')
+>>> legend(('Top 70%','Top 60%','Top 50%','Top 40%'))
+>>> savefig('21june23_21may15_TARG0_K_gcp__step_31_BT_p0to8_topNPmostactiveneuronsEMUP.png')
+
+>>> plt.plot(np.mean(h70u_AT,1)[indsu1],'.')
+>>> plt.plot(np.mean(h60u_AT,1)[indsu1],'.')
+>>> plt.plot(np.mean(h50u_AT,1)[indsu1],'.')
+>>> plt.plot(np.mean(h40u_AT,1)[indsu1],'.')
+>>> title('Most active EMUP neurons across input sequences')
+>>> legend(('Top 70%','Top 60%','Top 50%','Top 40%'))
+>>> xlabel('sorted neuron ids (using top 70%)')
+>>> ylabel('Average probability of neurons being most active')
+>>> savefig('21june23_21may15_TARG0_K_gcp__step_31_AT_p0to8_topNPmostactiveneuronsEMUP.png')
+
+>>> plt.plot(np.mean(h70d_BT,1)[indsd0],'.')
+>>> plt.plot(np.mean(h60d_BT,1)[indsd0],'.')
+>>> plt.plot(np.mean(h50d_BT,1)[indsd0],'.')
+>>> plt.plot(np.mean(h40d_BT,1)[indsd0],'.')
+>>> legend(('Top 70%','Top 60%','Top 50%','Top 40%'))
+>>> ylabel('Average probability of neurons being most active')
+>>> xlabel('sorted neuron ids (using top 70%)')
+>>> title('Most active EMDOWN neurons across input sequences')
+>>> savefig('21june23_21may15_TARG0_K_gcp__step_31_BT_p0to8_topNPmostactiveneuronsEMDOWN.png')
+
+>>> plt.plot(np.mean(h70d_AT,1)[indsd1],'.')
+>>> plt.plot(np.mean(h60d_AT,1)[indsd1],'.')
+>>> plt.plot(np.mean(h50d_AT,1)[indsd1],'.')
+>>> plt.plot(np.mean(h40d_AT,1)[indsd1],'.')
+>>> legend(('Top 70%','Top 60%','Top 50%','Top 40%'))
+>>> ylabel('Average probability of neurons being most active')
+>>> xlabel('sorted neuron ids (using top 70%)')
+>>> title('Most active EMDOWN neurons across input sequences')
+>>> savefig('21june23_21may15_TARG0_K_gcp__step_31_AT_p0to8_topNPmostactiveneuronsEMDOWN.png')
+
+>>> plt.plot(np.mean(h70u_BT,1)[indsu0],'.')
+>>> plt.plot(np.mean(h70u_AT,1)[indsu0],'.')
+>>> plt.plot(np.mean(h70u_BT,1)[indsu0],'.')
+>>> plt.plot(np.mean(h70u_AT,1)[indsu1],'.')
+>>> legend(('Before training','After training'))
+>>> xlabel('sorted neuron ids (arbitrary)')
+>>> ylabel('Average probability of neurons being most active')
+>>> title('Most active 70% EMUP neurons across input sequences')
+>>> savefig('21june23_21may15_TARG0_K_gcp__step_31_AT_p0to8_top70PmostactiveneuronsEMUP.png')
+
+>>> plt.plot(np.mean(h70d_BT,1)[indsd0],'.')
+>>> plt.plot(np.mean(h70d_AT,1)[indsd1],'.')
+>>> title('Most active 70% EMDOWN neurons across input sequences')
+>>> ylabel('Average probability of neurons being most active')
+>>> xlabel('sorted neuron ids (arbitrary)')
+>>> legend(('Before training','After training'))
+>>> savefig('21june23_21may15_TARG0_K_gcp__step_31_AT_p0to8_top70PmostactiveneuronsEMDOWN.png')
+>>> 
+>>> 
+>>> plotSeqPerf(lSimilarSeqs_allBT,seqs2plot_allBT,seqsBegs_allBT,seqsEnds_allBT,II_allBT,dCumAct_allBT,hitsMiss_allBT,0,plotact=False)
+>>> savefig('21june23_21may15_TARG0_K_gcp__step_31_BT_p0to8_seq0.png')
+>>> plotSeqPerf(lSimilarSeqs_allBT,seqs2plot_allBT,seqsBegs_allBT,seqsEnds_allBT,II_allBT,dCumAct_allBT,hitsMiss_allBT,1,plotact=False)
+>>> savefig('21june23_21may15_TARG0_K_gcp__step_31_BT_p0to8_seq1.png')
+>>> plotSeqPerf(lSimilarSeqs_allBT,seqs2plot_allBT,seqsBegs_allBT,seqsEnds_allBT,II_allBT,dCumAct_allBT,hitsMiss_allBT,2,plotact=False)
+>>> savefig('21june23_21may15_TARG0_K_gcp__step_31_BT_p0to8_seq2.png')
+>>> plotSeqPerf(lSimilarSeqs_allBT,seqs2plot_allBT,seqsBegs_allBT,seqsEnds_allBT,II_allBT,dCumAct_allBT,hitsMiss_allBT,3,plotact=False)
+>>> savefig('21june23_21may15_TARG0_K_gcp__step_31_BT_p0to8_seq3.png')
+>>> plotSeqPerf(lSimilarSeqs_allBT,seqs2plot_allBT,seqsBegs_allBT,seqsEnds_allBT,II_allBT,dCumAct_allBT,hitsMiss_allBT,4,plotact=False)
+>>> savefig('21june23_21may15_TARG0_K_gcp__step_31_BT_p0to8_seq4.png')
+>>> plotSeqPerf(lSimilarSeqs_allBT,seqs2plot_allBT,seqsBegs_allBT,seqsEnds_allBT,II_allBT,dCumAct_allBT,hitsMiss_allBT,5,plotact=False)
+>>> savefig('21june23_21may15_TARG0_K_gcp__step_31_BT_p0to8_seq5.png')
+>>> plotSeqPerf(lSimilarSeqs_allBT,seqs2plot_allBT,seqsBegs_allBT,seqsEnds_allBT,II_allBT,dCumAct_allBT,hitsMiss_allBT,6,plotact=False)
+>>> savefig('21june23_21may15_TARG0_K_gcp__step_31_BT_p0to8_seq6.png')
+>>> plotSeqPerf(lSimilarSeqs_allBT,seqs2plot_allBT,seqsBegs_allBT,seqsEnds_allBT,II_allBT,dCumAct_allBT,hitsMiss_allBT,7,plotact=False)
+>>> savefig('21june23_21may15_TARG0_K_gcp__step_31_BT_p0to8_seq7.png')
+>>> plotSeqPerf(lSimilarSeqs_allBT,seqs2plot_allBT,seqsBegs_allBT,seqsEnds_allBT,II_allBT,dCumAct_allBT,hitsMiss_allBT,8,plotact=False)
+>>> savefig('21june23_21may15_TARG0_K_gcp__step_31_BT_p0to8_seq8.png')
+>>> plotSeqPerf(lSimilarSeqs_allBT,seqs2plot_allBT,seqsBegs_allBT,seqsEnds_allBT,II_allBT,dCumAct_allBT,hitsMiss_allBT,9,plotact=False)
+>>> savefig('21june23_21may15_TARG0_K_gcp__step_31_BT_p0to8_seq9.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allAT,seqs2plot_allAT,seqsBegs_allAT,seqsEnds_allAT,II_allAT,dCumAct_allAT,hitsMiss_allAT,0,plotact=False)
+>>> savefig('21june23_21may15_TARG0_K_gcp__step_31_AT_p0to8_seq0.png')
+>>> plotSeqPerf(lSimilarSeqs_allAT,seqs2plot_allAT,seqsBegs_allAT,seqsEnds_allAT,II_allAT,dCumAct_allAT,hitsMiss_allAT,1,plotact=False)
+>>> savefig('21june23_21may15_TARG0_K_gcp__step_31_AT_p0to8_seq1.png')
+>>> plotSeqPerf(lSimilarSeqs_allAT,seqs2plot_allAT,seqsBegs_allAT,seqsEnds_allAT,II_allAT,dCumAct_allAT,hitsMiss_allAT,2,plotact=False)
+>>> savefig('21june23_21may15_TARG0_K_gcp__step_31_AT_p0to8_seq2.png')
+>>> plotSeqPerf(lSimilarSeqs_allAT,seqs2plot_allAT,seqsBegs_allAT,seqsEnds_allAT,II_allAT,dCumAct_allAT,hitsMiss_allAT,3,plotact=False)
+>>> savefig('21june23_21may15_TARG0_K_gcp__step_31_AT_p0to8_seq3.png')
+>>> plotSeqPerf(lSimilarSeqs_allAT,seqs2plot_allAT,seqsBegs_allAT,seqsEnds_allAT,II_allAT,dCumAct_allAT,hitsMiss_allAT,4,plotact=False)
+>>> savefig('21june23_21may15_TARG0_K_gcp__step_31_AT_p0to8_seq4.png')
+>>> plotSeqPerf(lSimilarSeqs_allAT,seqs2plot_allAT,seqsBegs_allAT,seqsEnds_allAT,II_allAT,dCumAct_allAT,hitsMiss_allAT,5,plotact=False)
+>>> savefig('21june23_21may15_TARG0_K_gcp__step_31_AT_p0to8_seq5.png')
+>>> plotSeqPerf(lSimilarSeqs_allAT,seqs2plot_allAT,seqsBegs_allAT,seqsEnds_allAT,II_allAT,dCumAct_allAT,hitsMiss_allAT,6,plotact=False)
+>>> savefig('21june23_21may15_TARG0_K_gcp__step_31_AT_p0to8_seq6.png')
+>>> plotSeqPerf(lSimilarSeqs_allAT,seqs2plot_allAT,seqsBegs_allAT,seqsEnds_allAT,II_allAT,dCumAct_allAT,hitsMiss_allAT,7,plotact=False)
+>>> savefig('21june23_21may15_TARG0_K_gcp__step_31_AT_p0to8_seq7.png')
+>>> plotSeqPerf(lSimilarSeqs_allAT,seqs2plot_allAT,seqsBegs_allAT,seqsEnds_allAT,II_allAT,dCumAct_allAT,hitsMiss_allAT,8,plotact=False)
+>>> savefig('21june23_21may15_TARG0_K_gcp__step_31_AT_p0to8_seq8.png')
+>>> plotSeqPerf(lSimilarSeqs_allAT,seqs2plot_allAT,seqsBegs_allAT,seqsEnds_allAT,II_allAT,dCumAct_allAT,hitsMiss_allAT,9,plotact=False)
+>>> savefig('21june23_21may15_TARG0_K_gcp__step_31_AT_p0to8_seq9.png')
+>>> savefig('21june23_21may15_TARG0_K_gcp__step_31_AT_p0to8_seq11.png')
+>>> plotSeqPerf(lSimilarSeqs_allAT,seqs2plot_allAT,seqsBegs_allAT,seqsEnds_allAT,II_allAT,dCumAct_allAT,hitsMiss_allAT,10,plotact=False)
+>>> savefig('21june23_21may15_TARG0_K_gcp__step_31_AT_p0to8_seq10.png')
+>>> plotSeqPerf(lSimilarSeqs_allAT,seqs2plot_allAT,seqsBegs_allAT,seqsEnds_allAT,II_allAT,dCumAct_allAT,hitsMiss_allAT,11,plotact=False)
+>>> savefig('21june23_21may15_TARG0_K_gcp__step_31_AT_p0to8_seq11.png')
+
+>>> TotalHits = []
+>>> TotalMissed = []
+>>> for i in range(len(lpdaBT)):
+...   Hit_Missed = np.array(lpdaBT[i].hit)
+...   allHit = np.where(Hit_Missed==1,1,0)
+...   allMissed = np.where(Hit_Missed==-1,1,0)
+...   TotalHits.append(np.sum(allHit))
+...   TotalMissed.append(np.sum(allMissed))
+... 
+>>> TotalHits_AT = []
+>>> TotatMissed_AT = []
+>>> for i in range(len(lpdaAT)):
+...   Hit_Missed = np.array(lpdaAT[i].hit)
+...   allHit = np.where(Hit_Missed==1,1,0)
+...   allMissed = np.where(Hit_Missed==-1,1,0)
+...   TotalHits_AT.append(np.sum(allHit))
+...   TotatMissed_AT.append(np.sum(allMissed))
+... 
+>>> np.divide(TotalHits,TotalMissed)
+array([0.27906977, 0.24444444, 0.35897436, 0.24444444, 0.24444444,
+       0.31707317, 0.27906977, 0.24444444, 0.24444444])
+>>> np.divide(TotalHits_AT,TotatMissed_AT)
+array([0.5625    , 0.68965517, 0.31707317, 0.5625    , 0.5625    ,
+       0.48571429, 0.31707317, 0.5625    , 0.5625    ])
+>>> import scipy.stats as stats
+>>> stats.ttest_ind(np.divide(TotalHits,TotalMissed),np.divide(TotalHits_AT,TotatMissed_AT))
+Ttest_indResult(statistic=-5.56810787851396, pvalue=4.24236854937847e-05)
+
+FIND VARIABILITY (VARIANCE) IN ACTIVITY OF EACH NEURON for each input pattern. (Fixed input and variable response)
+FIND VARIABILITY IN ACTIVITY OF EACH NEURON ACROSS INPUT PATTERNS. 
+
+
+def compareTwoSeqs(lSimilarSeqs1,seqs2plot1,s1,I1,sBegs1,sEnds1,lSimilarSeqs2,seqs2plot2,s2,I2,sBegs2,sEnds2):
+  c1 = lSimilarSeqs1[seqs2plot1[s1]]
+  c2 = lSimilarSeqs2[seqs2plot2[s2]]
+  cI1 = np.zeros(shape=(len(c1),I1.shape[1],I1.shape[2]))
+  cI2 = np.zeros(shape=(len(c2),I2.shape[1],I2.shape[2]))
+  for i in range(len(c1)):
+    cI1[i,:,:] = np.sum(I1[sBegs1[c1[i]]:sEnds1[c1[i]],:,:],0)
+  for i in range(len(c2)):
+    cI2[i,:,:] = np.sum(I2[sBegs2[c2[i]]:sEnds2[c2[i]],:,:],0)
+
+>>> cseqInds0_AT = lSimilarSeqs_allAT[seqs2plot_allAT[0]]
+>>> I0_AT = np.zeros(shape=(len(cseqInds0_AT),80,80))
+>>> for i in range(len(cseqInds0_AT)):
+...   I0_AT[i,:,:] = np.sum(II_allAT[seqsBegs_allAT[cseqInds0_AT[i]]:seqsEnds_allAT[cseqInds0_AT[i]],:,:],0)
+... 
+>>> plt.imshow(I0_AT[0,:,:])
+<matplotlib.image.AxesImage object at 0x7f1b08709e50>
+
+
+
+>>> cseqInds0_BT = lSimilarSeqs_allBT[seqs2plot_allBT[0]]
+>>> cseqInds1_BT = lSimilarSeqs_allBT[seqs2plot_allBT[1]]
+>>> cseqInds2_BT = lSimilarSeqs_allBT[seqs2plot_allBT[2]]
+>>> cseqInds3_BT = lSimilarSeqs_allBT[seqs2plot_allBT[3]]
+>>> cseqInds4_BT = lSimilarSeqs_allBT[seqs2plot_allBT[4]]
+>>> cseqInds5_BT = lSimilarSeqs_allBT[seqs2plot_allBT[5]]
+>>> cseqInds6_BT = lSimilarSeqs_allBT[seqs2plot_allBT[6]]
+>>> cseqInds7_BT = lSimilarSeqs_allBT[seqs2plot_allBT[7]]
+>>> cseqInds8_BT = lSimilarSeqs_allBT[seqs2plot_allBT[8]]
+>>> cseqInds9_BT = lSimilarSeqs_allBT[seqs2plot_allBT[9]]
+
+>>> cseqInds0_AT = lSimilarSeqs_allAT[seqs2plot_allAT[0]]
+>>> cseqInds1_AT = lSimilarSeqs_allAT[seqs2plot_allAT[1]]
+>>> cseqInds2_AT = lSimilarSeqs_allAT[seqs2plot_allAT[2]]
+>>> cseqInds3_AT = lSimilarSeqs_allAT[seqs2plot_allAT[3]]
+>>> cseqInds4_AT = lSimilarSeqs_allAT[seqs2plot_allAT[4]]
+>>> cseqInds5_AT = lSimilarSeqs_allAT[seqs2plot_allAT[5]]
+>>> cseqInds6_AT = lSimilarSeqs_allAT[seqs2plot_allAT[6]]
+>>> cseqInds7_AT = lSimilarSeqs_allAT[seqs2plot_allAT[7]]
+>>> cseqInds8_AT = lSimilarSeqs_allAT[seqs2plot_allAT[8]]
+>>> cseqInds9_AT = lSimilarSeqs_allAT[seqs2plot_allAT[9]]
+>>> cseqInds10_AT = lSimilarSeqs_allAT[seqs2plot_allAT[10]]
+>>> cseqInds11_AT = lSimilarSeqs_allAT[seqs2plot_allAT[11]]
+
+>>> I0_BT = II_allBT[cseqInds0_BT,:,:]
+>>> I0_BT.shape
+(86, 80, 80)
+>>> I1_BT = II_allBT[cseqInds1_BT,:,:]
+>>> I2_BT = II_allBT[cseqInds2_BT,:,:]
+>>> I3_BT = II_allBT[cseqInds3_BT,:,:]
+>>> I4_BT = II_allBT[cseqInds4_BT,:,:]
+>>> I5_BT = II_allBT[cseqInds5_BT,:,:]
+>>> I6_BT = II_allBT[cseqInds6_BT,:,:]
+>>> I7_BT = II_allBT[cseqInds7_BT,:,:]
+>>> I8_BT = II_allBT[cseqInds8_BT,:,:]
+>>> I9_BT = II_allBT[cseqInds9_BT,:,:]
+
+>>> I0_AT = II_allAT[cseqInds0_AT,:,:]
+>>> I1_AT = II_allAT[cseqInds1_AT,:,:]
+>>> I2_AT = II_allAT[cseqInds2_AT,:,:]
+>>> I3_AT = II_allAT[cseqInds3_AT,:,:]
+>>> I4_AT = II_allAT[cseqInds4_AT,:,:]
+>>> I5_AT = II_allAT[cseqInds5_AT,:,:]
+>>> I6_AT = II_allAT[cseqInds6_AT,:,:]
+>>> I7_AT = II_allAT[cseqInds7_AT,:,:]
+>>> I8_AT = II_allAT[cseqInds8_AT,:,:]
+>>> I9_AT = II_allAT[cseqInds9_AT,:,:]
+>>> I10_AT = II_allAT[cseqInds10_AT,:,:]
+>>> I11_AT = II_allAT[cseqInds11_AT,:,:]
+
+
 -------------------
 Do same for Feedforward model
 >>> lfnBT = ['21feb5_cycle_RL3_B0_BT_p0_']
@@ -25791,3 +26186,2227 @@ Seq 4:
 >>> savefig('21june3_21feb5_cycle_RL3_B0_AT19_s4_varEMDOWN.png')
 
 
+
+-- plotting performance of controls for recurrent model with intermediate rewards 
+
+backupcfg/21jan14_21jan6_TARG4_gcp__step_0_RLhebbwt_0_sim.json
+backupcfg/21jan20_21jan6_TARG4_gcp__step_0_RLhebbwt_0_p1_sim.json
+backupcfg/21jan20_21jan6_TARG4_gcp__step_0_RLhebbwt_0_p2_sim.json
+backupcfg/21jan20_21jan6_TARG4_gcp__step_0_RLhebbwt_0_p3_sim.json
+backupcfg/21jan20_21jan6_TARG4_gcp__step_0_RLhebbwt_0_p4_sim.json
+backupcfg/21jan20_21jan6_TARG4_gcp__step_0_RLhebbwt_0_p5_sim.json
+
+backupcfg/21jan11_TARG4_gcp__step_1_RLhebbwt_0_sim.json
+backupcfg/21jan19_21jan11_TARG4_gcp__step_1_RLhebbwt_0_p1_sim.json
+backupcfg/21jan19_21jan11_TARG4_gcp__step_1_RLhebbwt_0_p2_sim.json
+backupcfg/21jan19_21jan11_TARG4_gcp__step_1_RLhebbwt_0_p3_sim.json
+backupcfg/21jan19_21jan11_TARG4_gcp__step_1_RLhebbwt_0_p4_sim.json
+backupcfg/21jan19_21jan11_TARG4_gcp__step_1_RLhebbwt_0_p5_sim.json
+
+
+
+lpdaBT = getindivactionreward(lfnBT)
+
+
+>>> lfnBT = ['21jan21_TARG4_gcp_RLhebbwt_0_p0_',
+            '21jan21_TARG4_gcp_RLhebbwt_0_p1_',
+            '21jan21_TARG4_gcp_RLhebbwt_0_p2_',
+            '21jan21_TARG4_gcp_RLhebbwt_0_p3_',
+            '21jan21_TARG4_gcp_RLhebbwt_0_p4_',
+            '21jan21_TARG4_gcp_RLhebbwt_0_p5_']
+
+
+
+........
+
+>>> lfnBT
+['21jan21_TARG4_gcp_RLhebbwt_0_p0_', 
+'21jan21_TARG4_gcp_RLhebbwt_0_p1_', 
+'21jan21_TARG4_gcp_RLhebbwt_0_p2_', 
+'21jan21_TARG4_gcp_RLhebbwt_0_p3_', 
+'21jan21_TARG4_gcp_RLhebbwt_0_p4_', 
+'21jan21_TARG4_gcp_RLhebbwt_0_p5_']
+
+>>> lfnAT0
+['21jan14_21jan6_TARG4_gcp__step_0_RLhebbwt_0_', 
+'21jan20_21jan6_TARG4_gcp__step_0_RLhebbwt_0_p1_', 
+'21jan20_21jan6_TARG4_gcp__step_0_RLhebbwt_0_p2_', 
+'21jan20_21jan6_TARG4_gcp__step_0_RLhebbwt_0_p3_', 
+'21jan20_21jan6_TARG4_gcp__step_0_RLhebbwt_0_p4_', 
+'21jan20_21jan6_TARG4_gcp__step_0_RLhebbwt_0_p5_']
+
+>>> lfnAT21
+['21jan11_TARG4_gcp__step_1_RLhebbwt_0_', 
+'21jan19_21jan11_TARG4_gcp__step_1_RLhebbwt_0_p1_', 
+'21jan19_21jan11_TARG4_gcp__step_1_RLhebbwt_0_p2_', 
+'21jan19_21jan11_TARG4_gcp__step_1_RLhebbwt_0_p3_', 
+'21jan19_21jan11_TARG4_gcp__step_1_RLhebbwt_0_p4_', 
+'21jan19_21jan11_TARG4_gcp__step_1_RLhebbwt_0_p5_']
+
+>>> lpdaBT = getindivactionreward(lfnBT)
+>>> lpdaAT0 = getindivactionreward(lfnAT0)
+>>> lpdaAT21 = getindivactionreward(lfnAT21)
+
+... with so much noise, 6 runs are not enough. should run more.....
+
+(base) hanwar@cycle:~/GamesProject/SMARTAgent$ cp backupcfg/21jan11_TARG4_gcp__step_1_RLhebbwt_0_sim.json simFull.json
+
+nano simFull.json
+
+    "possible_ball_dy": [1,1,1,1,1,1,1,1,1,1,1,1,1],
+    "possible_ball_dx":[1,1,1,1,1,1,1,1,1,1,1,1,1],
+    "top_bottom_rule": 0
+
+    "ResumeSim": 1,
+    "ResumeSimFromFile": "/home/samn/SMARTAgent/data/21jan11_TARG4_gcp__step_1_synWeights_final.pkl"
+
+"name": "21june7_TARG4_gcp__AT21_p0_",
+(base) hanwar@cycle:~/GamesProject/SMARTAgent$ mpiexec -n 30 nrniv -python -mpi sim.py simFull.json
+
+Hits:  14 Missed:  39
+perf = 0.36
+
+----
+    "yball": 100,
+    "yracket": 40,
+"name": "21june7_TARG4_gcp__AT21_p1_",
+Hits:  22 Missed:  26
+perf = 0.85
+
+----
+    "yball": 120,
+    "yracket": 20,
+"name": "21june7_TARG4_gcp__AT21_p2_",
+
+---
+    "yball": 20,
+    "yracket": 120,
+"name": "21june7_TARG4_gcp__AT21_p3_"
+
+hits: 17, miss = 34
+----
+
+    "yball": 40,
+    "yracket": 100,
+
+"name": "21june7_TARG4_gcp__AT21_p4_",
+
+Hits:  15 Missed:  38
+
+-----
+
+    "yball": 60,
+    "yracket": 100,
+"name": "21june7_TARG4_gcp__AT21_p5_",
+
+-------
+
+    "yball": 80,
+    "yracket": 80,
+"name": "21june7_TARG4_gcp__AT21_p6_",
+
+-----
+
+    "yball": 120,
+    "yracket": 120,
+"name": "21june7_TARG4_gcp__AT21_p7_",
+
+-----
+    "yball": 40,
+    "yracket": 40,
+"name": "21june7_TARG4_gcp__AT21_p8_",
+
+
+------------
+
+Now before training.....
+
+
+    "yball": 40,
+    "yracket": 40,
+
+"ResumeSim": 0,
+"name": "21june7_TARG4_gcp__BT_p8_",
+------
+
+    "yball": 120,
+    "yracket": 120,
+"name": "21june7_TARG4_gcp__BT_p7_",
+-------
+
+    "yball": 80,
+    "yracket": 80,
+"name": "21june7_TARG4_gcp__BT_p6_",
+Hits:  14 Missed:  39
+--------
+    "yball": 60,
+    "yracket": 100,
+"name": "21june7_TARG4_gcp__BT_p5_",
+Hits:  12 Missed:  44
+--------
+    "yball": 40,
+    "yracket": 100,
+"name": "21june7_TARG4_gcp__BT_p4_",
+Hits:  19 Missed:  31
+-------
+    "yball": 20,
+    "yracket": 120,
+"name": "21june7_TARG4_gcp__BT_p3_",
+-----
+
+    "yball": 120,
+    "yracket": 20,
+"name": "21june7_TARG4_gcp__BT_p2_",
+
+----
+
+    "yball": 100,
+    "yracket": 40,
+"name": "21june7_TARG4_gcp__BT_p1_",
+-----
+
+    "yball": 80,
+    "yracket": 40,
+"name": "21june7_TARG4_gcp__BT_p0_",
+-----
+
+
+
+
+originally the model was train with....
+possible_ball_dx = [1,1,1,1,1,1,2,2,2,2,3,3,3]
+possible_ball_dy = [1,1,1,1,1,1,2,2,2,2,3,3,3]
+top_bottom_rule = 1
+
+SHOULD RERUN CONTROLS WITH DEFAULT
+-----
+
+Before training.....
+
+
+    "possible_ball_dy": [1,1,1,1,1,1,2,2,2,2,3,3,3],
+    "possible_ball_dx":[1,1,1,1,1,1,2,2,2,2,3,3,3],
+    "top_bottom_rule": 1
+
+    "yball": 80,
+    "yracket": 40,
+"name": "21june9_TARG4_gcp__BT_p0_",
+
+
+-----
+
+    "yball": 100,
+    "yracket": 40,
+"name": "21june9_TARG4_gcp__BT_p1_",
+
+-----
+
+    "yball": 120,
+    "yracket": 20,
+"name": "21june9_TARG4_gcp__BT_p2_",
+------
+
+    "yball": 20,
+    "yracket": 120,
+"name": "21june9_TARG4_gcp__BT_p3_",
+
+Hits:  13 Missed:  62
+
+------
+
+    "yball": 40,
+    "yracket": 100,
+"name": "21june9_TARG4_gcp__BT_p4_",
+
+Hits:  17 Missed:  60
+------
+
+    "yball": 60,
+    "yracket": 100,
+"name": "21june9_TARG4_gcp__BT_p5_",
+
+-------
+
+    "yball": 80,
+    "yracket": 80,
+"name": "21june9_TARG4_gcp__BT_p6_",
+
+-------
+
+    "yball": 120,
+    "yracket": 120,
+"name": "21june9_TARG4_gcp__BT_p7_",
+
+-------
+
+    "yball": 40,
+    "yracket": 40,
+"name": "21june9_TARG4_gcp__BT_p8_",
+
+-------
+
+.....After training
+
+
+    "yball": 40,
+    "yracket": 40,
+
+    "ResumeSim": 1,
+    "ResumeSimFromFile": "/home/samn/SMARTAgent/data/21jan11_TARG4_gcp__step_1_synWeights_final.pkl"
+"name": "21june9_TARG4_gcp__AT21_p8_",
+
+--------
+    "yball": 120,
+    "yracket": 120,
+"name": "21june9_TARG4_gcp__AT21_p7_",
+Hits:  16 Missed:  59
+
+---------
+
+    "yball": 80,
+    "yracket": 80,
+"name": "21june9_TARG4_gcp__AT21_p6_",
+Hits:  23 Missed:  42
+
+--------
+
+    "yball": 60,
+    "yracket": 100,
+"name": "21june9_TARG4_gcp__AT21_p5_",
+Hits:  24 Missed:  42
+---------
+    "yball": 40,
+    "yracket": 100,
+"name": "21june9_TARG4_gcp__AT21_p4_",
+
+---------
+    "yball": 20,
+    "yracket": 120,
+"name": "21june9_TARG4_gcp__AT21_p3_",
+
+-----------
+    "yball": 120,
+    "yracket": 20,
+"name": "21june9_TARG4_gcp__AT21_p2_",
+Hits:  21 Missed:  51
+
+---------
+
+    "yball": 100,
+    "yracket": 40,
+"name": "21june9_TARG4_gcp__AT21_p1_",
+Hits:  25 Missed:  41
+
+---------
+
+    "yball": 80,
+    "yracket": 40,
+"name": "21june9_TARG4_gcp__AT21_p0_",
+
+---
+ANALYZE CONTROLS FOR RECURRENT MODEL WITH INTERMEDIATE REWARDS
+
+>>> lfnBT = ['21june9_TARG4_gcp__BT_p0_']
+>>> lfnBT.append('21june9_TARG4_gcp__BT_p1_')
+>>> lfnBT.append('21june9_TARG4_gcp__BT_p2_')
+>>> lfnBT.append('21june9_TARG4_gcp__BT_p3_')
+>>> lfnBT.append('21june9_TARG4_gcp__BT_p4_')
+>>> lfnBT.append('21june9_TARG4_gcp__BT_p5_')
+>>> lfnBT.append('21june9_TARG4_gcp__BT_p6_')
+>>> lfnBT.append('21june9_TARG4_gcp__BT_p7_')
+>>> lfnBT.append('21june9_TARG4_gcp__BT_p8_')
+>>> lfnAT = ['21june9_TARG4_gcp__AT21_p0_']
+>>> lfnAT.append('21june9_TARG4_gcp__AT21_p1_')
+>>> lfnAT.append('21june9_TARG4_gcp__AT21_p2_')
+>>> lfnAT.append('21june9_TARG4_gcp__AT21_p3_')
+>>> lfnAT.append('21june9_TARG4_gcp__AT21_p4_')
+>>> lfnAT.append('21june9_TARG4_gcp__AT21_p5_')
+>>> lfnAT.append('21june9_TARG4_gcp__AT21_p6_')
+>>> lfnAT.append('21june9_TARG4_gcp__AT21_p7_')
+>>> lfnAT.append('21june9_TARG4_gcp__AT21_p8_')
+
+>>> TotalHits_BT = []
+>>> TotalMissed_BT = []
+>>> for i in range(len(lfnBT)):
+...   Hit_Missed = np.array(lpdaBT[i].hit)
+...   allHit = np.where(Hit_Missed==1,1,0)
+...   allMissed = np.where(Hit_Missed==-1,1,0)
+...   TotalHits_BT.append(np.sum(allHit))
+...   TotalMissed_BT.append(np.sum(allMissed))
+... 
+>>> TotalHits_AT = []
+>>> TotalMissed_AT = []
+>>> for i in range(len(lfnAT)):
+...   Hit_Missed = np.array(lpdaAT[i].hit)
+...   allHit = np.where(Hit_Missed==1,1,0)
+...   allMissed = np.where(Hit_Missed==-1,1,0)
+...   TotalHits_AT.append(np.sum(allHit))
+...   TotalMissed_AT.append(np.sum(allMissed))
+... 
+
+>>> plt.bar([0,1],[np.mean(np.divide(TotalHits_BT,TotalMissed_BT)),np.mean(np.divide(TotalHits_AT,TotalMissed_AT))])
+>>> plt.plot([-0.2,-0.15,-0.1,-0.05,0,0.05,0.1,0.15,0.2],np.divide(TotalHits_BT,TotalMissed_BT),'ko')
+>>> plt.plot([0.8,0.85,0.9,0.95,1,1.05,1.1,1.15,1.2],np.divide(TotalHits_AT,TotalMissed_AT),'ko')
+>>> plt.xticks([0,1],['Before training','After training\n episode 20'])
+>>> ylabel('Hits/Misses')
+>>> savefig('21june17_21june9_TARG4_gcp__BTvsAT_perf.png')
+
+import scipy.stats as stats
+stats.ttest_ind(np.divide(TotalHits_BT,TotalMissed_BT),
+                np.divide(TotalHits_AT,TotalMissed_AT))
+
+Means are not significantly different......
+
+
+Can i combine previous controls with new controls?
+>>> lfnBT
+['21june9_TARG4_gcp__BT_p0_', 
+'21june9_TARG4_gcp__BT_p1_', 
+'21june9_TARG4_gcp__BT_p2_', 
+'21june9_TARG4_gcp__BT_p3_', 
+'21june9_TARG4_gcp__BT_p4_', 
+'21june9_TARG4_gcp__BT_p5_', 
+'21june9_TARG4_gcp__BT_p6_', 
+'21june9_TARG4_gcp__BT_p7_', 
+'21june9_TARG4_gcp__BT_p8_', 
+'21jan21_TARG4_gcp_RLhebbwt_0_p1_', 
+'21jan21_TARG4_gcp_RLhebbwt_0_p2_', 
+'21jan21_TARG4_gcp_RLhebbwt_0_p3_', 
+'21jan21_TARG4_gcp_RLhebbwt_0_p4_', 
+'21jan21_TARG4_gcp_RLhebbwt_0_p5_']
+
+
+>>> lfnAT
+['21june9_TARG4_gcp__AT21_p0_', 
+'21june9_TARG4_gcp__AT21_p1_', 
+'21june9_TARG4_gcp__AT21_p2_', 
+'21june9_TARG4_gcp__AT21_p3_', 
+'21june9_TARG4_gcp__AT21_p4_', 
+'21june9_TARG4_gcp__AT21_p5_', 
+'21june9_TARG4_gcp__AT21_p6_', 
+'21june9_TARG4_gcp__AT21_p7_', 
+'21june9_TARG4_gcp__AT21_p8_', 
+'21jan20_21jan6_TARG4_gcp__step_0_RLhebbwt_0_p1_', 
+'21jan20_21jan6_TARG4_gcp__step_0_RLhebbwt_0_p2_', 
+'21jan20_21jan6_TARG4_gcp__step_0_RLhebbwt_0_p3_', 
+'21jan20_21jan6_TARG4_gcp__step_0_RLhebbwt_0_p4_', 
+'21jan20_21jan6_TARG4_gcp__step_0_RLhebbwt_0_p5_']
+
+
+>>> TotalHits_BT = []
+>>> TotalMissed_BT = []
+>>> for i in range(len(lfnBT)):
+...   Hit_Missed = np.array(lpdaBT[i].hit)
+...   allHit = np.where(Hit_Missed==1,1,0)
+...   allMissed = np.where(Hit_Missed==-1,1,0)
+...   TotalHits_BT.append(np.sum(allHit))
+...   TotalMissed_BT.append(np.sum(allMissed))
+... 
+>>> TotalHits_AT = []
+>>> TotalMissed_AT = []
+>>> for i in range(len(lfnAT)):
+...   Hit_Missed = np.array(lpdaAT[i].hit)
+...   allHit = np.where(Hit_Missed==1,1,0)
+...   allMissed = np.where(Hit_Missed==-1,1,0)
+...   TotalHits_AT.append(np.sum(allHit))
+...   TotalMissed_AT.append(np.sum(allMissed))
+
+>>> stats.ttest_ind(np.divide(TotalHits_BT,TotalMissed_BT),np.divide(TotalHits_AT,TotalMissed_AT))
+Ttest_indResult(statistic=-1.9079801755550905, pvalue=0.06749508883247685)
+
+NOT SIGNIFICANTLY DIFFERENT
+
+>>> plt.bar([0,1],[np.mean(np.divide(TotalHits_BT,TotalMissed_BT)),np.mean(np.divide(TotalHits_AT,TotalMissed_AT))])
+>>> plt.plot([-0.35,-0.3,-0.25,-0.2,-0.15,-0.1,-0.05,0,0.05,0.1,0.15,0.2,0.25,0.3],np.divide(TotalHits_BT,TotalMissed_BT),'ko')
+>>> plt.plot([0.65,0.7,0.75,0.8,0.85,0.9,0.95,1,1.05,1.1,1.15,1.2,1.25,1.3],np.divide(TotalHits_AT,TotalMissed_AT),'ko')
+>>> plt.xticks([0,1],['Before training','After training\n episode 20'])
+>>> ylabel('Hits/Misses')
+>>> savefig('21june17_21june9_TARG4_gcp__BTvsAT_perf_moresamples.png')
+
+Before training the performance mean was (n = 14)
+>>> np.mean(np.divide(TotalHits_BT,TotalMissed_BT))
+0.36
+
+After training the performance mean was (n = 14)
+>>> np.mean(np.divide(TotalHits_AT,TotalMissed_AT))
+0.47
+
+... means were not significantly different due to large amount of noise
+
+
+...plot best and worst performances before and after training.
+
+>>> np.divide(TotalHits_BT,TotalMissed_BT)
+array([0.34482759, 0.33333333, 0.45098039, 0.20967742, 0.28333333,
+       0.3       , 0.33333333, 0.33333333, 0.66666667, 0.37931034,
+       0.25396825, 0.31578947, 0.42592593, 0.44230769])
+
+>>> plotHitMiss(lpdaBT[8],asratio=True,lclr=['r'])
+0.6666666666666666
+>>> title('Before training')
+>>> xlabel('time [ms]')
+>>> savefig('21june17_21june9_TARG4_gcp__BT_best_perf.png')
+
+>>> plotHitMiss(lpdaBT[3],asratio=True,lclr=['r'])
+0.20967741935483872
+>>> xlabel('time [ms]')
+>>> title('Before training')
+>>> savefig('21june17_21june9_TARG4_gcp__BT_worst_perf.png')
+
+
+>>> np.divide(TotalHits_AT,TotalMissed_AT)
+array([0.83870968, 0.6097561 , 0.41176471, 0.30357143, 0.40384615,
+       0.57142857, 0.54761905, 0.27118644, 0.46153846, 0.26229508,
+       0.5952381 , 0.6097561 , 0.41509434, 0.23333333])
+
+>>> plotHitMiss(lpdaAT[0],asratio=True,lclr=['r'])
+0.8387096774193549
+>>> title('After training')
+>>> xlabel('time [ms]')
+>>> savefig('21june17_21june9_TARG4_gcp__AT_best_perf.png')
+
+>>> plotHitMiss(lpdaAT[13],asratio=True,lclr=['r'])
+0.23333333333333334
+>>> title('After training')
+>>> xlabel('time [ms]')
+>>> savefig('21june17_21june9_TARG4_gcp__AT_worst_perf.png')
+
+>>> lpdaBT = getindivactionreward(lfnBT)
+>>> lpdaAT = getindivactionreward(lfnAT)
+>>> pdacBT = getconcatactionreward(lfnBT)
+>>> pdacAT = getconcatactionreward(lfnAT)
+>>> II_allBT = getconcatactioninputs(lfnBT)
+loading input images from data/21june9_TARG4_gcp__BT_p0_InputImages.npy
+loading input images from data/21june9_TARG4_gcp__BT_p1_InputImages.npy
+loading input images from data/21june9_TARG4_gcp__BT_p2_InputImages.npy
+loading input images from data/21june9_TARG4_gcp__BT_p3_InputImages.npy
+loading input images from data/21june9_TARG4_gcp__BT_p4_InputImages.npy
+loading input images from data/21june9_TARG4_gcp__BT_p5_InputImages.npy
+loading input images from data/21june9_TARG4_gcp__BT_p6_InputImages.npy
+loading input images from data/21june9_TARG4_gcp__BT_p7_InputImages.npy
+loading input images from data/21june9_TARG4_gcp__BT_p8_InputImages.npy
+loading input images from data/21jan21_TARG4_gcp_RLhebbwt_0_p1_InputImages.npy
+loading input images from data/21jan21_TARG4_gcp_RLhebbwt_0_p1_InputImages.txt
+loading input images from data/21jan21_TARG4_gcp_RLhebbwt_0_p2_InputImages.npy
+loading input images from data/21jan21_TARG4_gcp_RLhebbwt_0_p2_InputImages.txt
+loading input images from data/21jan21_TARG4_gcp_RLhebbwt_0_p3_InputImages.npy
+loading input images from data/21jan21_TARG4_gcp_RLhebbwt_0_p3_InputImages.txt
+loading input images from data/21jan21_TARG4_gcp_RLhebbwt_0_p4_InputImages.npy
+loading input images from data/21jan21_TARG4_gcp_RLhebbwt_0_p4_InputImages.txt
+loading input images from data/21jan21_TARG4_gcp_RLhebbwt_0_p5_InputImages.npy
+loading input images from data/21jan21_TARG4_gcp_RLhebbwt_0_p5_InputImages.txt
+>>> II_allAT = getconcatactioninputs(lfnAT)
+loading input images from data/21june9_TARG4_gcp__AT21_p0_InputImages.npy
+loading input images from data/21june9_TARG4_gcp__AT21_p1_InputImages.npy
+loading input images from data/21june9_TARG4_gcp__AT21_p2_InputImages.npy
+loading input images from data/21june9_TARG4_gcp__AT21_p3_InputImages.npy
+loading input images from data/21june9_TARG4_gcp__AT21_p4_InputImages.npy
+loading input images from data/21june9_TARG4_gcp__AT21_p5_InputImages.npy
+loading input images from data/21june9_TARG4_gcp__AT21_p6_InputImages.npy
+loading input images from data/21june9_TARG4_gcp__AT21_p7_InputImages.npy
+loading input images from data/21june9_TARG4_gcp__AT21_p8_InputImages.npy
+loading input images from data/21jan20_21jan6_TARG4_gcp__step_0_RLhebbwt_0_p1_InputImages.npy
+loading input images from data/21jan20_21jan6_TARG4_gcp__step_0_RLhebbwt_0_p1_InputImages.txt
+loading input images from data/21jan20_21jan6_TARG4_gcp__step_0_RLhebbwt_0_p2_InputImages.npy
+loading input images from data/21jan20_21jan6_TARG4_gcp__step_0_RLhebbwt_0_p2_InputImages.txt
+loading input images from data/21jan20_21jan6_TARG4_gcp__step_0_RLhebbwt_0_p3_InputImages.npy
+loading input images from data/21jan20_21jan6_TARG4_gcp__step_0_RLhebbwt_0_p3_InputImages.txt
+loading input images from data/21jan20_21jan6_TARG4_gcp__step_0_RLhebbwt_0_p4_InputImages.npy
+loading input images from data/21jan20_21jan6_TARG4_gcp__step_0_RLhebbwt_0_p4_InputImages.txt
+loading input images from data/21jan20_21jan6_TARG4_gcp__step_0_RLhebbwt_0_p5_InputImages.npy
+loading input images from data/21jan20_21jan6_TARG4_gcp__step_0_RLhebbwt_0_p5_InputImages.txt
+>>> lSimilarSeqs_allBT, seqs2plot_allBT, seqsBegs_allBT, seqsEnds_allBT = breakdownPerformance(II_allBT,pdacBT,cend=69,sthresh=5,nbframeThresh=5)
+>>> lSimilarSeqs_allAT, seqs2plot_allAT, seqsBegs_allAT, seqsEnds_allAT = breakdownPerformance(II_allAT,pdacAT,cend=69,sthresh=5,nbframeThresh=5)
+>>> rewards_allBT, hitsMiss_allBT = getRewardsPerSeq(pdacBT,seqsBegs_allBT,seqsEnds_allBT)
+>>> proposedActionsBT, executedActionsBT = getActionsPerSeq(pdacBT,seqsBegs_allBT, seqsEnds_allBT)
+>>> rewards_allAT, hitsMiss_allAT = getRewardsPerSeq(pdacAT,seqsBegs_allAT,seqsEnds_allAT)
+>>> proposedActionsAT, executedActionsAT = getActionsPerSeq(pdacAT,seqsBegs_allAT, seqsEnds_allAT)
+
+>>> summarizeLearningPerf(lSimilarSeqs_allBT,seqs2plot_allBT,hitsMiss_allBT)
+>>> savefig('21june17_21june9_TARG4_gcp__BT_learningPerformanceSummary.png')
+
+>>> summarizeLearningPerf(lSimilarSeqs_allAT,seqs2plot_allAT,hitsMiss_allAT)
+>>> savefig('21june17_21june9_TARG4_gcp__AT_learningPerformanceSummary.png')
+
+--------------------------------------
+RUN FEEDFORWARD SIMS FOR LONGER....
+---------------------------------------
+
+(base) hanwar@cycle:~/GamesProject/SMARTAgent$ cp 21feb5_cycle_RL3_B0__step_19_.json simFullHA.json
+
+(base) hanwar@cycle:~/GamesProject/SMARTAgent$ nano simFullHA.json
+
+    "possible_ball_dy": [1,1,1,1,1,1,2,2,2,2,3,3,3],
+    "possible_ball_dx": [1,1,1,1,1,1,2,2,2,2,3,3,3],
+    "top_bottom_rule":1
+
+   "ResumeSim": 1,
+    "ResumeSimFromFile": "data/21feb5_cycle_RL3_B0__step_19_synWeights_final.pkl"
+
+"name": "21june11_21feb5_cycle_RL3_B0_",
+
+(base) hanwar@cycle:~/GamesProject/SMARTAgent$ python multistepSim.py simFullHA.json 30 20 21june11_B0_cycle_multi
+
+>>> lfnT = ['21feb5_cycle_RL3_B0__step_0_']
+>>> lfnT.append('21feb5_cycle_RL3_B0__step_1_')
+>>> lfnT.append('21feb5_cycle_RL3_B0__step_2_')
+>>> lfnT.append('21feb5_cycle_RL3_B0__step_3_')
+>>> lfnT.append('21feb5_cycle_RL3_B0__step_4_')
+>>> lfnT.append('21feb5_cycle_RL3_B0__step_5_')
+>>> lfnT.append('21feb5_cycle_RL3_B0__step_6_')
+>>> lfnT.append('21feb5_cycle_RL3_B0__step_7_')
+>>> lfnT.append('21feb5_cycle_RL3_B0__step_8_')
+>>> lfnT.append('21feb5_cycle_RL3_B0__step_9_')
+>>> lfnT.append('21feb5_cycle_RL3_B0__step_10_')
+>>> lfnT.append('21feb5_cycle_RL3_B0__step_11_')
+>>> lfnT.append('21feb5_cycle_RL3_B0__step_12_')
+>>> lfnT.append('21feb5_cycle_RL3_B0__step_13_')
+>>> lfnT.append('21feb5_cycle_RL3_B0__step_14_')
+>>> lfnT.append('21feb5_cycle_RL3_B0__step_15_')
+>>> lfnT.append('21feb5_cycle_RL3_B0__step_16_')
+>>> lfnT.append('21feb5_cycle_RL3_B0__step_17_')
+>>> lfnT.append('21feb5_cycle_RL3_B0__step_18_')
+>>> lfnT.append('21feb5_cycle_RL3_B0__step_19_')
+>>> lfnT.append('21june11_21feb5_cycle_RL3_B0__step_0_')
+>>> lfnT.append('21june11_21feb5_cycle_RL3_B0__step_1_')
+>>> lfnT.append('21june11_21feb5_cycle_RL3_B0__step_2_')
+>>> lfnT.append('21june11_21feb5_cycle_RL3_B0__step_3_')
+>>> lfnT.append('21june11_21feb5_cycle_RL3_B0__step_4_')
+>>> lfnT.append('21june11_21feb5_cycle_RL3_B0__step_5_')
+>>> lfnT.append('21june11_21feb5_cycle_RL3_B0__step_6_')
+>>> lfnT.append('21june11_21feb5_cycle_RL3_B0__step_7_')
+>>> lfnT.append('21june11_21feb5_cycle_RL3_B0__step_8_')
+>>> lfnT.append('21june11_21feb5_cycle_RL3_B0__step_9_')
+>>> lfnT.append('21june11_21feb5_cycle_RL3_B0__step_10_')
+>>> lfnT.append('21june11_21feb5_cycle_RL3_B0__step_11_')
+>>> lfnT.append('21june11_21feb5_cycle_RL3_B0__step_12_')
+>>> lfnT.append('21june11_21feb5_cycle_RL3_B0__step_13_')
+>>> lfnT.append('21june11_21feb5_cycle_RL3_B0__step_14_')
+>>> lfnT.append('21june11_21feb5_cycle_RL3_B0__step_15_')
+>>> lfnT.append('21june11_21feb5_cycle_RL3_B0__step_16_')
+>>> lfnT.append('21june11_21feb5_cycle_RL3_B0__step_17_')
+>>> lfnT.append('21june11_21feb5_cycle_RL3_B0__step_18_')
+>>> lfnT.append('21june11_21feb5_cycle_RL3_B0__step_19_')
+>>> lpdaT = getindivactionreward(lfnT)
+>>> lrat = plotHitMissRatioPerStep(lpdaT)
+>>> xlabel('training episodes',size=24)
+Text(0.5,19.5222,'training episodes')
+>>> xlabel('training episodes',size=14)
+Text(0.5,19.5222,'training episodes')
+>>> ylabel('Hit/Miss',size=14)
+Text(38.3472,0.5,'Hit/Miss')
+>>> savefig('21june18_21feb5_cycle_RL3_B0__40steps_hit_miss_ratio.png')
+
+
+----------
+
+2021June17.... running feedforward sims for 20 more steps didnt improve the performance. probably the weights reached the max.
+
+---> Increase the max limit of weights and rerun 20 more steps.
+
+change:
+"name": "21june17_21feb5_cycle_RL3_B0_",
+RL:
+    "AMPA": {
+      "wbase": 2,
+      "wmax": 40, (was using 20 before)
+
+(base) hanwar@cycle:~/GamesProject/SMARTAgent$ python multistepSim.py simFullHA.json 30 20 21june17_B0_cycle_multi
+
+-------
+
+CONTROLS FOR RECURRENT MODEL WITH SPARSE REWARDS:
+
+(base) hanwar@cycle:~/GamesProject/SMARTAgent$ cp /home/samn/SMARTAgent/backupcfg/21jun8_TARG0_O2_gcp__step_5_sim.json backupcfg/.
+
+(base) hanwar@cycle:~/GamesProject/SMARTAgent$ cp /home/samn/SMARTAgent/data/21jun8_TARG0_O2_gcp__step_5_* data/.
+
+(base) hanwar@cycle:~/GamesProject/SMARTAgent$ cp backupcfg/21jun8_TARG0_O2_gcp__step_5_sim.json sn.json
+(base) hanwar@cycle:~/GamesProject/SMARTAgent$ nano sn.json
+
+    "ResumeSim": 1,
+    "ResumeSimFromFile": "data/21jun8_TARG0_O2_gcp__step_5_synWeights_final.pkl"
+
+    "name": "21jun8_TARG0_O2_gcp__step_5_AT_p0_",
+
+  "RL": {
+    "AMPAI": {
+
+          "RLhebbwt": 0.0,
+      "RLantiwt": 0.0,
+
+"AMPA": {
+  "RLhebbwt": 0.0,
+      "RLantiwt": 0.0,
+
+"NMDA": {
+  "RLhebbwt": 0.0,
+      "RLantiwt": -0.0,
+
+(base) hanwar@cycle:~/GamesProject/SMARTAgent$ mpiexec -n 30 nrniv -python -mpi sim.py sn.json
+
+16 hits, 37 misses
+
+-------
+
+    "yball": 100,
+    "yracket": 40,
+"name": "21jun8_TARG0_O2_gcp__step_5_AT_p1_",
+
+perf ~ 0.4
+
+------
+"yball": 120,
+    "yracket": 20,
+"name": "21jun8_TARG0_O2_gcp__step_5_AT_p2_",
+
+perf = 0.48
+
+------
+
+    "yball": 20,
+    "yracket": 120,
+"name": "21jun8_TARG0_O2_gcp__step_5_AT_p3_",
+
+perf = 0.85
+------
+
+    "yball": 40,
+    "yracket": 100,
+"name": "21jun8_TARG0_O2_gcp__step_5_AT_p4_",
+
+22/26
+perf = 0.85
+
+-------
+
+    "yball": 60,
+    "yracket": 100,
+"name": "21jun8_TARG0_O2_gcp__step_5_AT_p5_",
+17/34
+perf = 0.5
+-------
+
+
+    "yball": 80,
+    "yracket": 80,
+"name": "21jun8_TARG0_O2_gcp__step_5_AT_p6_",
+
+-------
+
+    "yball": 120,
+    "yracket": 120,
+"name": "21jun8_TARG0_O2_gcp__step_5_AT_p7_",
+
+-------
+
+    "yball": 40,
+    "yracket": 40,
+"name": "21jun8_TARG0_O2_gcp__step_5_AT_p8_",
+
+
+-------
+ANALYSIS FOR CONTROL AFTER TRAINING
+
+>>> lfnT = ['21jun8_TARG0_O2_gcp__step_5_AT_p0_']
+>>> lfnT.append('21jun8_TARG0_O2_gcp__step_5_AT_p1_')
+>>> lfnT.append('21jun8_TARG0_O2_gcp__step_5_AT_p2_')
+>>> lfnT.append('21jun8_TARG0_O2_gcp__step_5_AT_p3_')
+>>> lfnT.append('21jun8_TARG0_O2_gcp__step_5_AT_p4_')
+>>> lfnT.append('21jun8_TARG0_O2_gcp__step_5_AT_p5_')
+>>> lfnT.append('21jun8_TARG0_O2_gcp__step_5_AT_p6_')
+>>> lfnT.append('21jun8_TARG0_O2_gcp__step_5_AT_p7_')
+>>> lfnT.append('21jun8_TARG0_O2_gcp__step_5_AT_p8_')
+>>> lpdaT = getindivactionreward(lfnT)
+>>> lrat = plotHitMissRatioPerStep(lpdaT)
+>>> ylabel('Hit/Miss',size=14)
+Text(38.4722,0.5,'Hit/Miss')
+>>> xlabel('Sims with different initial positions of racket and ball',size=14)
+Text(0.5,19.5222,'Sims with different initial positions of racket and ball')
+>>> lrat
+array([0.43243243, 0.35      , 0.48571429, 0.84615385, 0.84615385,
+       0.5       , 0.77777778, 0.66666667, 0.68965517])
+>>> np.mean(lrat)
+0.6216171141458499
+>>> title('After training - mean perf = 0.62')
+Text(0.5,1,'After training - mean perf = 0.62')
+>>> savefig('21june18_21jun8_TARG0_O2_gcp__step_5_AT__p0top8_hit_miss_ratio.png')
+
+
+
+-------
+
+BEFORE TRAINING:
+
+    "yball": 40,
+    "yracket": 40,
+"name": "21jun8_TARG0_O2_gcp__step_5_BT_p8_",
+
+-------
+
+    "yball": 120,
+    "yracket": 120,
+"name": "21jun8_TARG0_O2_gcp__step_5_BT_p7_",
+
+-------
+    "yball": 80,
+    "yracket": 80,
+"name": "21jun8_TARG0_O2_gcp__step_5_BT_p6_",
+
+-------
+
+    "yball": 60,
+    "yracket": 100,
+"name": "21jun8_TARG0_O2_gcp__step_5_BT_p5_",
+
+-------
+
+    "yball": 40,
+    "yracket": 100,
+"name": "21jun8_TARG0_O2_gcp__step_5_BT_p4_",
+
+-------
+
+    "yball": 20,
+    "yracket": 120,
+"name": "21jun8_TARG0_O2_gcp__step_5_BT_p3_",
+
+-------
+
+    "yball": 120,
+    "yracket": 20,
+"name": "21jun8_TARG0_O2_gcp__step_5_BT_p2_",
+
+-------
+
+    "yball": 100,
+    "yracket": 40,
+"name": "21jun8_TARG0_O2_gcp__step_5_BT_p1_",
+
+-------
+
+    "yball": 80,
+    "yracket": 40,
+"name": "21jun8_TARG0_O2_gcp__step_5_BT_p0_",
+
+
+--------
+
+ANALYSIS OF CONTROL AND FIGURES FOR THE paper
+
+>>> lfnBT = ['21jun8_TARG0_O2_gcp__step_5_BT_p0_']
+>>> lfnBT.append('21jun8_TARG0_O2_gcp__step_5_BT_p1_')
+>>> lfnBT.append('21jun8_TARG0_O2_gcp__step_5_BT_p2_')
+>>> lfnBT.append('21jun8_TARG0_O2_gcp__step_5_BT_p3_')
+>>> lfnBT.append('21jun8_TARG0_O2_gcp__step_5_BT_p4_')
+>>> lfnBT.append('21jun8_TARG0_O2_gcp__step_5_BT_p5_')
+>>> lfnBT.append('21jun8_TARG0_O2_gcp__step_5_BT_p6_')
+>>> lfnBT.append('21jun8_TARG0_O2_gcp__step_5_BT_p7_')
+>>> lfnBT.append('21jun8_TARG0_O2_gcp__step_5_BT_p8_')
+>>> lpdaBT = getindivactionreward(lfnBT)
+>>> pdacBT = getconcatactionreward(lfnBT)
+>>> II_allBT = getconcatactioninputs(lfnBT)
+loading input images from data/21jun8_TARG0_O2_gcp__step_5_BT_p0_InputImages.npy
+loading input images from data/21jun8_TARG0_O2_gcp__step_5_BT_p1_InputImages.npy
+loading input images from data/21jun8_TARG0_O2_gcp__step_5_BT_p2_InputImages.npy
+loading input images from data/21jun8_TARG0_O2_gcp__step_5_BT_p3_InputImages.npy
+loading input images from data/21jun8_TARG0_O2_gcp__step_5_BT_p4_InputImages.npy
+loading input images from data/21jun8_TARG0_O2_gcp__step_5_BT_p5_InputImages.npy
+loading input images from data/21jun8_TARG0_O2_gcp__step_5_BT_p6_InputImages.npy
+loading input images from data/21jun8_TARG0_O2_gcp__step_5_BT_p7_InputImages.npy
+loading input images from data/21jun8_TARG0_O2_gcp__step_5_BT_p8_InputImages.npy
+>>> lSimilarSeqs_allBT, seqs2plot_allBT, seqsBegs_allBT,seqsEnds_allBT = breakdownPerformance(II_allBT,pdacBT,cend=69,sthresh=5,nbframeThresh=5,ballThresh=0)
+>>> seqs2plot_allBT
+array([ 0,  1,  2,  8, 12, 20, 35, 76])
+>>> dspkID_allBT, dspkT_allBT, totalDur_allBT = getconcatactivity(lfnBT,['EV1','EA','EA2','EMUP','EMDOWN'])
+>>> lSimilarSeqs_allBT, seqs2plot_allBT, seqsBegs_allBT,seqsEnds_allBT = breakdownPerformance(II_allBT,pdacBT,cend=69,sthresh=5,nbframeThresh=3,ballThresh=0)
+>>> seqs2plot_allBT
+array([ 0,  1,  2,  8, 12, 20, 35, 76])
+>>> dspkID_allBT, dspkT_allBT, totalDur_allBT = getconcatactivity(lfnBT,['EV1','EA','EA2','EMUP','EMDOWN'])
+>>> dact1D_allBT = getdActMap1D(totalDur_allBT, pdacBT, dspkT_allBT,dspkID_allBT,dnumc,dstartidx,lpop = ['EV1','EA','EA2','EMUP','EMDOWN'])
+>>> dCumAct_allBT, dStepAct_allBT = getCumActivityMapForInput(seqsBegs_allBT,seqsEnds_allBT,dact1D_allBT,lpop=['EV1','EA','EA2','EMUP','EMDOWN'])
+>>> rewards_allBT,hitsMiss_allBT = getRewardsPerSeq(pdacBT,seqsBegs_allBT,seqsEnds_allBT)
+>>> proposedActionsBT, executedActionsBT = getActionsPerSeq(pdacBT,seqsBegs_allBT,seqsEnds_allBT)
+>>> summarizeLearningPerf(lSimilarSeqs_allBT,seqs2plot_allBT,hitsMiss_allBT)
+simdat.py:1857: RuntimeWarning: divide by zero encountered in true_divide
+  perf = np.divide(np.cumsum(hits),np.cumsum(miss))
+>>> lfnBT[0]
+'21jun8_TARG0_O2_gcp__step_5_BT_p0_'
+>>> savefig('21june21_21jun8_TARG0_O2_gcp__step_5_BT_p0to8_learningPerformanceSummary.png')
+>>> pdposBT = getconcatobjpos(lfnBT)
+>>> showSpatialBehaviorHitMiss(pdposBT,hitsMiss_allBT,seqsBegs_allBT,seqsEnds_allBT)
+>>> savefig('21june21_21jun8_TARG0_O2_gcp__step_5_BT_p0to8_spatialbehavior_hitmiss.png')
+>>> showSpatialBehaviorStepWise(pdposBT,pdacBT,1)
+simdat.py:630: RuntimeWarning: invalid value encountered in true_divide
+  stepwise_pcorrent_spatialmoves = np.divide(ds_stepwise_correct_spatialmoves,np.add(ds_stepwise_correct_spatialmoves,ds_stepwise_incorrect_spatialmoves))
+>>> clim(0,1)
+>>> savefig('21june21_21jun8_TARG0_O2_gcp__step_5_BT_p0to8_stepwise_spatialbehavior_hitmiss.png')
+>>> stepwisecontribEMUP_BT, stepwisecontribEMDOWN_BT = getStepwiseNeuralContribution(executedActionsBT,dStepAct_allBT)
+>>> nEMUP_BT = (100/stepwisecontribEMUP_BT.shape[0])*np.sum(stepwisecontribEMUP_BT,0)
+>>> nEMDOWN_BT = (100/stepwisecontribEMDOWN_BT.shape[0])*np.sum(stepwisecontribEMDOWN_BT,0)
+
+
+
+>>> lfnAT = ['21jun8_TARG0_O2_gcp__step_5_AT_p0_']
+>>> lfnAT.append('21jun8_TARG0_O2_gcp__step_5_AT_p1_')
+>>> lfnAT.append('21jun8_TARG0_O2_gcp__step_5_AT_p2_')
+>>> lfnAT.append('21jun8_TARG0_O2_gcp__step_5_AT_p3_')
+>>> lfnAT.append('21jun8_TARG0_O2_gcp__step_5_AT_p4_')
+>>> lfnAT.append('21jun8_TARG0_O2_gcp__step_5_AT_p5_')
+>>> lfnAT.append('21jun8_TARG0_O2_gcp__step_5_AT_p6_')
+>>> lfnAT.append('21jun8_TARG0_O2_gcp__step_5_AT_p7_')
+>>> lfnAT.append('21jun8_TARG0_O2_gcp__step_5_AT_p8_')
+>>> lpdaAT = getindivactionreward(lfnAT)
+>>> pdacAT = getconcatactionreward(lfnAT)
+>>> II_allAT = getconcatactioninputs(lfnAT)
+loading input images from data/21jun8_TARG0_O2_gcp__step_5_AT_p0_InputImages.npy
+loading input images from data/21jun8_TARG0_O2_gcp__step_5_AT_p1_InputImages.npy
+loading input images from data/21jun8_TARG0_O2_gcp__step_5_AT_p2_InputImages.npy
+loading input images from data/21jun8_TARG0_O2_gcp__step_5_AT_p3_InputImages.npy
+loading input images from data/21jun8_TARG0_O2_gcp__step_5_AT_p4_InputImages.npy
+loading input images from data/21jun8_TARG0_O2_gcp__step_5_AT_p5_InputImages.npy
+loading input images from data/21jun8_TARG0_O2_gcp__step_5_AT_p6_InputImages.npy
+loading input images from data/21jun8_TARG0_O2_gcp__step_5_AT_p7_InputImages.npy
+loading input images from data/21jun8_TARG0_O2_gcp__step_5_AT_p8_InputImages.npy
+>>> lSimilarSeqs_allAT, seqs2plot_allAT, seqsBegs_allAT,seqsEnds_allAT = breakdownPerformance(II_allAT,pdacAT,cend=69,sthresh=5,nbframeThresh=5,ballThresh=0)
+/opt/anaconda3/lib/python3.7/site-packages/scipy/stats/stats.py:3508: PearsonRConstantInputWarning: An input array is constant; the correlation coefficent is not defined.
+  warnings.warn(PearsonRConstantInputWarning())
+>>> seqs2plot_allBT
+array([ 0,  1,  2,  8, 12, 20, 35, 76])
+>>> seqs2plot_allAT
+array([ 0,  1,  2,  5,  6,  8,  9, 17, 29, 64])
+>>> dspkID_allAT, dspkT_allAT, totalDur_allAT = getconcatactivity(lfnAT,['EV1','EA','EA2','EMUP','EMDOWN'])
+>>> dact1D_allAT = getdActMap1D(totalDur_allAT, pdacAT, dspkT_allAT,dspkID_allAT,dnumc,dstartidx,lpop = ['EV1','EA','EA2','EMUP','EMDOWN'])
+>>> dCumAct_allAT, dStepAct_allAT = getCumActivityMapForInput(seqsBegs_allAT,seqsEnds_allAT,dact1D_allAT,lpop=['EV1','EA','EA2','EMUP','EMDOWN'])
+>>> rewards_allAT,hitsMiss_allAT = getRewardsPerSeq(pdacAT,seqsBegs_allAT,seqsEnds_allAT)
+>>> proposedActionsAT, executedActionsAT = getActionsPerSeq(pdacAT,seqsBegs_allAT,seqsEnds_allAT)
+>>> summarizeLearningPerf(lSimilarSeqs_allAT,seqs2plot_allAT,hitsMiss_allAT)
+>>> savefig('21june21_21jun8_TARG0_O2_gcp__step_5_AT_p0to8_spatialbehavior_hitmiss.png')
+>>> pdposAT = getconcatobjpos(lfnAT)
+>>> showSpatialBehaviorHitMiss(pdposAT,hitsMiss_allAT,seqsBegs_allAT,seqsEnds_allAT)
+>>> savefig('21june21_21jun8_TARG0_O2_gcp__step_5_AT_p0to8_spatialbehavior_hitmiss.png')
+>>> showSpatialBehaviorStepWise(pdposAT,pdacAT,1)
+>>> clim(0,1)
+>>> savefig('21june21_21jun8_TARG0_O2_gcp__step_5_AT_p0to8_stepwise_spatialbehavior_hitmiss.png')
+>>> stepwisecontribEMUP_AT, stepwisecontribEMDOWN_AT = getStepwiseNeuralContribution(executedActionsAT,dStepAct_allAT)
+>>> nEMUP_AT = (100/stepwisecontribEMUP_AT.shape[0])*np.sum(stepwisecontribEMUP_AT,0)
+>>> nEMDOWN_AT = (100/stepwisecontribEMDOWN_AT.shape[0])*np.sum(stepwisecontribEMDOWN_AT,0)
+
+>>> iBT = np.argsort(nEMUP_BT)
+>>> plt.plot(nEMUP_BT[iBT])
+[<matplotlib.lines.Line2D object at 0x7f4b8292a390>]
+>>> plt.plot(nEMUP_AT[iBT])
+[<matplotlib.lines.Line2D object at 0x7f49d4ffeed0>]
+>>> xlabel('neuron ids')
+Text(0.5,19.5222,'neuron ids')
+>>> ylabel('Times a neuron actively contributed to action (%)')
+Text(38.3472,0.5,'Times a neuron actively contributed to action (%)')
+>>> title('EMUP')
+Text(0.5,1,'EMUP')
+>>> legend(('Before training','After training'))
+<matplotlib.legend.Legend object at 0x7f4cf7dd1990>
+>>> savefig('21june21_21jun8_TARG0_O2_gcp__step_5_AT_p0to8_individualneuronActionContribution.png')
+>>> iBT = np.argsort(nEMDOWN_BT)
+>>> plt.plot(nEMDOWN_BT[iBT])
+[<matplotlib.lines.Line2D object at 0x7f4b82883e90>]
+>>> plt.plot(nEMDOWN_AT[iBT])
+[<matplotlib.lines.Line2D object at 0x7f4de0c08d50>]
+>>> legend(('Before training','After training'))
+<matplotlib.legend.Legend object at 0x7f4b82881710>
+>>> title('EMDOWN')
+Text(0.5,1,'EMDOWN')
+>>> ylabel('Times a neuron actively contributed to action (%)')
+Text(38.3472,0.5,'Times a neuron actively contributed to action (%)')
+>>> xlabel('neuron ids')
+Text(0.5,19.5222,'neuron ids')
+>>> savefig('21june21_21jun8_TARG0_O2_gcp__step_5_AT_p0to8_individualneuronActionContribution_EMDOWN.png')
+>>> step_atleast1activeEMUP_BT = (100/stepwisecontribEMUP_BT.shape[0])*len(np.where(np.sum(stepwisecontribEMUP_BT,1)>0)[0])
+>>> step_atleast1activeEMUP_AT = (100/stepwisecontribEMUP_AT.shape[0])*len(np.where(np.sum(stepwisecontribEMUP_AT,1)>0)[0])
+>>> step_atleast1activeEMDOWN_BT = (100/stepwisecontribEMDOWN_BT.shape[0])*len(np.where(np.sum(stepwisecontribEMDOWN_BT,1)>0)[0])
+>>> step_atleast1activeEMDOWN_AT = (100/stepwisecontribEMDOWN_AT.shape[0])*len(np.where(np.sum(stepwisecontribEMDOWN_AT,1)>0)[0])
+>>> step_atleast1activeEMUP_BT
+54.97250429165818
+>>> step_atleast1activeEMUP_AT
+54.308254289836384
+>>> step_atleast1activeEMDOWN_BT
+54.86193953853764
+>>> step_atleast1activeEMDOWN_AT
+57.333394726340664
+>>> step_atleast1activeEM_BT = (100/stepwisecontribEMDOWN_BT.shape[0])*len(np.where(np.add(np.sum(stepwisecontribEMUP_BT,1),np.sum(stepwisecontribEMDOWN_BT,1))>0)[0])
+>>> step_atleast1activeEM_AT = (100/stepwisecontribEMDOWN_AT.shape[0])*len(np.where(np.add(np.sum(stepwisecontribEMUP_AT,1),np.sum(stepwisecontribEMDOWN_AT,1))>0)[0])
+>>> step_atleast1activeEM_BT
+91.34685326893423
+>>> step_atleast1activeEM_AT
+94.94275102065875
+
+
+>>> plt.plot((100/stepwisecontribEMUP_BT.shape[0])*np.arange(0,stepwisecontribEMUP_BT.shape[0]),np.sort(np.sum(stepwisecontribEMUP_BT,1)))
+[<matplotlib.lines.Line2D object at 0x7f4ca26e6e50>]
+>>> plt.plot((100/stepwisecontribEMUP_AT.shape[0])*np.arange(0,stepwisecontribEMUP_AT.shape[0]),np.sort(np.sum(stepwisecontribEMUP_AT,1)))
+[<matplotlib.lines.Line2D object at 0x7f4b21771510>]
+>>> xlim(40,101)
+(40, 101)
+>>> legend(('Before training','After training'))
+<matplotlib.legend.Legend object at 0x7f4afddc1bd0>
+>>> xlabel('Percentage of actions (ball moving towards the racket)')
+Text(0.5,19.5222,'Percentage of actions (ball moving towards the racket)')
+>>> ylabel('number of active neurons')
+Text(33.0972,0.5,'number of active neurons')
+>>> ylabel('number of active EMUP neurons')
+Text(33.0972,0.5,'number of active EMUP neurons')
+>>> savefig('21june21_21jun8_TARG0_O2_gcp__step_5_AT_p0to8_popActionContribution_EMUP.png')
+>>> ylim(-5,50)
+(-5, 50)
+>>> ylim(-5,20)
+(-5, 20)
+>>> ylim(-1,12)
+(-1, 12)
+>>> savefig('21june21_21jun8_TARG0_O2_gcp__step_5_AT_p0to8_popActionContribution_EMUPzoomed.png')
+>>> 
+>>> plt.plot((100/stepwisecontribEMDOWN_BT.shape[0])*np.arange(0,stepwisecontribEMDOWN_BT.shape[0]),np.sort(np.sum(stepwisecontribEMDOWN_BT,1)))
+[<matplotlib.lines.Line2D object at 0x7f4b217f7a10>]
+>>> plt.plot((100/stepwisecontribEMDOWN_AT.shape[0])*np.arange(0,stepwisecontribEMDOWN_AT.shape[0]),np.sort(np.sum(stepwisecontribEMDOWN_AT,1)))
+[<matplotlib.lines.Line2D object at 0x7f4b2168e290>]
+>>> ylabel('number of active EMDOWN neurons')
+Text(33.0972,0.5,'number of active EMDOWN neurons')
+>>> xlabel('Percentage of actions (ball moving towards the racket)')
+Text(0.5,19.5222,'Percentage of actions (ball moving towards the racket)')
+>>> legend(('Before training','After training'))
+<matplotlib.legend.Legend object at 0x7f4b82995b50>
+>>> xlim(40,101)
+(40, 101)
+>>> savefig('21june21_21jun8_TARG0_O2_gcp__step_5_AT_p0to8_popActionContribution_EMDOWN.png')
+>>> ylim(-1,20)
+(-1, 20)
+>>> ylim(-1,15)
+(-1, 15)
+>>> ylim(-1,12)
+(-1, 12)
+>>> savefig('21june21_21jun8_TARG0_O2_gcp__step_5_AT_p0to8_popActionContribution_EMDOWNzoomed.png')
+>>> plt.plot((100/stepwisecontribEM_BT.shape[0])*np.arange(0,stepwisecontribEM_BT.shape[0]),np.sort(np.sum(stepwisecontribEM_BT,1)))
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+NameError: name 'stepwisecontribEM_BT' is not defined
+>>> 
+>>> 
+>>> plt.plot((100/stepwisecontribEMUP_BT.shape[0])*np.arange(0,stepwisecontribEMUP_BT.shape[0]),np.sort(np.add(np.sum(stepwisecontribEMUP_BT,1),np.sum(stepwisecontribEMDOWN_BT,1))))
+[<matplotlib.lines.Line2D object at 0x7f4b218557d0>]
+>>> plt.plot((100/stepwisecontribEMUP_AT.shape[0])*np.arange(0,stepwisecontribEMUP_AT.shape[0]),np.sort(np.add(np.sum(stepwisecontribEMUP_AT,1),np.sum(stepwisecontribEMDOWN_AT,1))))
+[<matplotlib.lines.Line2D object at 0x7f4b2173a050>]
+>>> legend(('Before training','After training'))
+<matplotlib.legend.Legend object at 0x7f4b82995f90>
+>>> xlabel('Percentage of actions (ball moving towards the racket)')
+Text(0.5,19.5222,'Percentage of actions (ball moving towards the racket)')
+>>> ylabel('number of active EM neurons')
+Text(33.0972,0.5,'number of active EM neurons')
+>>> savefig('21june21_21jun8_TARG0_O2_gcp__step_5_AT_p0to8_popActionContribution_EM.png')
+>>> ylim(-1,100)
+(-1, 100)
+>>> ylim(-1,50)
+(-1, 50)
+>>> ylim(-1,20)
+(-1, 20)
+>>> ylim(-1,15)
+(-1, 15)
+>>> savefig('21june21_21jun8_TARG0_O2_gcp__step_5_AT_p0to8_popActionContribution_EMzoomed.png')
+>>> showMostActiveMNeuronsPerSeq(lSimilarSeqs_allBT,seqs2plot_allBT,dCumAct_allBT,70)
+(array([[0.546875  , 0.53508772, 0.27777778, ..., 0.53409091, 0.1       ,
+        0.13636364],
+       [1.        , 0.99122807, 0.98148148, ..., 1.        , 1.        ,
+        1.        ],
+       [0.984375  , 0.98245614, 1.        , ..., 1.        , 1.        ,
+        1.        ],
+       ...,
+       [0.78125   , 0.72807018, 0.87037037, ..., 0.70454545, 0.9       ,
+        0.72727273],
+       [0.390625  , 0.64035088, 0.5       , ..., 0.48863636, 0.8       ,
+        0.86363636],
+       [0.828125  , 0.9122807 , 0.85185185, ..., 0.90909091, 1.        ,
+        1.        ]]), array([[0.265625  , 0.45614035, 0.38888889, ..., 0.43181818, 0.8       ,
+        0.54545455],
+       [1.        , 1.        , 1.        , ..., 1.        , 1.        ,
+        1.        ],
+       [0.984375  , 0.99122807, 0.98148148, ..., 1.        , 1.        ,
+        1.        ],
+       ...,
+       [0.765625  , 0.79824561, 0.87037037, ..., 0.64772727, 0.8       ,
+        0.77272727],
+       [0.484375  , 0.44736842, 0.40740741, ..., 0.59090909, 1.        ,
+        0.54545455],
+       [0.875     , 0.90350877, 0.90740741, ..., 0.92045455, 1.        ,
+        1.        ]]))
+>>> savefig('21june21_21jun8_TARG0_O2_gcp__step_5_BT_p0to8_top70Pmostactiveneurons.png')
+>>> showMostActiveMNeuronsPerSeq(lSimilarSeqs_allAT,seqs2plot_allAT,dCumAct_allAT,70)
+(array([[0.73584906, 0.73148148, 0.79545455, ..., 0.66666667, 0.91666667,
+        0.57142857],
+       [0.77358491, 0.80555556, 0.86363636, ..., 0.64444444, 0.66666667,
+        1.        ],
+       [0.90566038, 0.80555556, 0.84090909, ..., 0.77777778, 0.83333333,
+        1.        ],
+       ...,
+       [0.77358491, 0.75925926, 0.81818182, ..., 0.73333333, 0.83333333,
+        0.71428571],
+       [0.75471698, 0.78703704, 0.77272727, ..., 0.75555556, 0.58333333,
+        0.71428571],
+       [0.66037736, 0.62962963, 0.47727273, ..., 0.62222222, 0.25      ,
+        0.42857143]]), array([[0.60377358, 0.65740741, 0.68181818, ..., 0.75555556, 0.75      ,
+        0.71428571],
+       [0.88679245, 0.89814815, 0.77272727, ..., 0.88888889, 0.75      ,
+        0.71428571],
+       [0.77358491, 0.84259259, 0.77272727, ..., 0.86666667, 0.91666667,
+        0.42857143],
+       ...,
+       [0.73584906, 0.81481481, 0.75      , ..., 0.73333333, 0.66666667,
+        1.        ],
+       [0.62264151, 0.68518519, 0.61363636, ..., 0.77777778, 0.58333333,
+        0.57142857],
+       [0.62264151, 0.52777778, 0.56818182, ..., 0.53333333, 0.66666667,
+        0.85714286]]))
+>>> savefig('21june21_21jun8_TARG0_O2_gcp__step_5_AT_p0to8_top70Pmostactiveneurons.png')
+>>> h40u_BT, h40d_BT = showMostActiveMNeuronsPerSeq(lSimilarSeqs_allBT,seqs2plot_allBT,dCumAct_allBT,40)
+>>> h50u_BT, h50d_BT = showMostActiveMNeuronsPerSeq(lSimilarSeqs_allBT,seqs2plot_allBT,dCumAct_allBT,50)
+>>> h60u_BT, h60d_BT = showMostActiveMNeuronsPerSeq(lSimilarSeqs_allBT,seqs2plot_allBT,dCumAct_allBT,60)
+>>> h70u_BT, h70d_BT = showMostActiveMNeuronsPerSeq(lSimilarSeqs_allBT,seqs2plot_allBT,dCumAct_allBT,70)
+>>> h40u_AT, h40d_AT = showMostActiveMNeuronsPerSeq(lSimilarSeqs_allAT,seqs2plot_allAT,dCumAct_allAT,40)
+>>> h50u_AT, h50d_AT = showMostActiveMNeuronsPerSeq(lSimilarSeqs_allAT,seqs2plot_allAT,dCumAct_allAT,50)
+>>> h60u_AT, h60d_AT = showMostActiveMNeuronsPerSeq(lSimilarSeqs_allAT,seqs2plot_allAT,dCumAct_allAT,60)
+>>> h70u_AT, h70d_AT = showMostActiveMNeuronsPerSeq(lSimilarSeqs_allAT,seqs2plot_allAT,dCumAct_allAT,70)
+>>> indsu0 = np.argsort(np.mean(h70u_BT,1))
+>>> indsd0 = np.argsort(np.mean(h70d_BT,1))
+>>> indsu1 = np.argsort(np.mean(h70u_AT,1))
+>>> indsd1 = np.argsort(np.mean(h70d_AT,1))
+>>> plt.plot(np.mean(h70u_BT,1),'.')
+[<matplotlib.lines.Line2D object at 0x7f4b21692f50>]
+>>> 
+>>> 
+>>> 
+>>> 
+>>> plt.plot(np.mean(h70u_BT,1)[indsu0],'.')
+[<matplotlib.lines.Line2D object at 0x7f49f1821990>]
+>>> plt.plot(np.mean(h60u_BT,1)[indsu0],'.')
+[<matplotlib.lines.Line2D object at 0x7f4afedfcd10>]
+>>> plt.plot(np.mean(h50u_BT,1)[indsu0],'.')
+[<matplotlib.lines.Line2D object at 0x7f4b2168eb50>]
+>>> plt.plot(np.mean(h40u_BT,1)[indsu0],'.')
+[<matplotlib.lines.Line2D object at 0x7f49f1834210>]
+>>> ylabel('Average probability of neurons being most active')
+Text(38.3472,0.5,'Average probability of neurons being most active')
+>>> xlabel('sorted neuron ids (using top 70%)')
+Text(0.5,19.5222,'sorted neuron ids (using top 70%)')
+>>> title('Most active EMUP neurons across input sequences')
+Text(0.5,1,'Most active EMUP neurons across input sequences')
+>>> legend(('Top 70%','Top 60%','Top 50%','Top 40%'))
+<matplotlib.legend.Legend object at 0x7f4afec5add0>
+>>> savefig('21june21_21jun8_TARG0_O2_gcp__step_5_BT_p0to8_topNPmostactiveneuronsEMUP.png')
+>>> plt.plot(np.mean(h70d_BT,1)[indsd0],'.')
+[<matplotlib.lines.Line2D object at 0x7f4afedb6810>]
+>>> plt.plot(np.mean(h60d_BT,1)[indsd0],'.')
+[<matplotlib.lines.Line2D object at 0x7f49f1825a50>]
+>>> plt.plot(np.mean(h50d_BT,1)[indsd0],'.')
+[<matplotlib.lines.Line2D object at 0x7f4afedbccd0>]
+>>> plt.plot(np.mean(h40d_BT,1)[indsd0],'.')
+[<matplotlib.lines.Line2D object at 0x7f4afedb0450>]
+>>> legend(('Top 70%','Top 60%','Top 50%','Top 40%'))
+<matplotlib.legend.Legend object at 0x7f4afedc8350>
+>>> title('Most active EMDOWN neurons across input sequences')
+Text(0.5,1,'Most active EMDOWN neurons across input sequences')
+>>> xlabel('sorted neuron ids (using top 70%)')
+Text(0.5,19.5222,'sorted neuron ids (using top 70%)')
+>>> ylabel('Average probability of neurons being most active')
+Text(38.3472,0.5,'Average probability of neurons being most active')
+>>> savefig('21june21_21jun8_TARG0_O2_gcp__step_5_BT_p0to8_topNPmostactiveneuronsEMDOWN.png')
+>>> plt.plot(np.mean(h70u_AT,1)[indsu1],'.')
+[<matplotlib.lines.Line2D object at 0x7f49f823d590>]
+>>> plt.plot(np.mean(h60u_AT,1)[indsu1],'.')
+[<matplotlib.lines.Line2D object at 0x7f4afedbf2d0>]
+>>> plt.plot(np.mean(h50u_AT,1)[indsu1],'.')
+[<matplotlib.lines.Line2D object at 0x7f49f182bd10>]
+>>> plt.plot(np.mean(h40u_AT,1)[indsu1],'.')
+[<matplotlib.lines.Line2D object at 0x7f49f19bbd90>]
+>>> xlabel('sorted neuron ids (using top 70%)')
+Text(0.5,19.5222,'sorted neuron ids (using top 70%)')
+>>> title('Most active EMUP neurons across input sequences')
+Text(0.5,1,'Most active EMUP neurons across input sequences')
+>>> legend(('Top 70%','Top 60%','Top 50%','Top 40%'))
+<matplotlib.legend.Legend object at 0x7f49f19aa350>
+>>> ylabel('Average probability of neurons being most active')
+Text(38.3472,0.5,'Average probability of neurons being most active')
+>>> savefig('21june21_21jun8_TARG0_O2_gcp__step_5_AT_p0to8_topNPmostactiveneuronsEMUP.png')
+>>> plt.plot(np.mean(h70d_AT,1)[indsd1],'.')
+[<matplotlib.lines.Line2D object at 0x7f4afed70710>]
+>>> plt.plot(np.mean(h60d_AT,1)[indsd1],'.')
+[<matplotlib.lines.Line2D object at 0x7f4b2168ec10>]
+>>> plt.plot(np.mean(h50d_AT,1)[indsd1],'.')
+[<matplotlib.lines.Line2D object at 0x7f4afed7dc10>]
+>>> plt.plot(np.mean(h40d_AT,1)[indsd1],'.')
+[<matplotlib.lines.Line2D object at 0x7f4afec04110>]
+>>> ylabel('Average probability of neurons being most active')
+Text(38.3472,0.5,'Average probability of neurons being most active')
+>>> legend(('Top 70%','Top 60%','Top 50%','Top 40%'))
+<matplotlib.legend.Legend object at 0x7f4afed70f50>
+>>> xlabel('sorted neuron ids (using top 70%)')
+Text(0.5,19.5222,'sorted neuron ids (using top 70%)')
+>>> title('Most active EMDOWN neurons across input sequences')
+Text(0.5,1,'Most active EMDOWN neurons across input sequences')
+>>> savefig('21june21_21jun8_TARG0_O2_gcp__step_5_AT_p0to8_topNPmostactiveneuronsEMDOWN.png')
+>>> plt.plot(np.mean(h70u_BT,1)[indsu0],'.')
+[<matplotlib.lines.Line2D object at 0x7f4afed62990>]
+>>> plt.plot(np.mean(h70u_AT,1)[indsu0],'.')
+[<matplotlib.lines.Line2D object at 0x7f4afec22b50>]
+>>> 
+>>> plt.plot(np.mean(h70u_BT,1)[indsu0],'.')
+[<matplotlib.lines.Line2D object at 0x7f49f191a550>]
+>>> plt.plot(np.mean(h70u_AT,1)[indsu1],'.')
+[<matplotlib.lines.Line2D object at 0x7f4afed43890>]
+>>> legend(('Before training','After training'))
+<matplotlib.legend.Legend object at 0x7f4afed43250>
+>>> title('Most active 70% EMUP neurons across input sequences')
+Text(0.5,1,'Most active 70% EMUP neurons across input sequences')
+>>> xlabel('sorted neuron ids (using top 70%)')
+Text(0.5,19.5222,'sorted neuron ids (using top 70%)')
+>>> xlabel('sorted neuron ids (arbitrary)')
+Text(0.5,19.5222,'sorted neuron ids (arbitrary)')
+>>> ylabel('Average probability of neurons being most active')
+Text(38.3472,0.5,'Average probability of neurons being most active')
+>>> savefig('21june21_21jun8_TARG0_O2_gcp__step_5_BTvsAT_p0to8_top70PmostactiveneuronsEMUP.png')
+>>> plt.plot(np.mean(h70d_BT,1)[indsd0],'.')
+[<matplotlib.lines.Line2D object at 0x7f49f18b0850>]
+>>> plt.plot(np.mean(h70d_AT,1)[indsd1],'.')
+[<matplotlib.lines.Line2D object at 0x7f4b217b0150>]
+>>> ylabel('Average probability of neurons being most active')
+Text(38.3472,0.5,'Average probability of neurons being most active')
+>>> xlabel('sorted neuron ids (arbitrary)')
+Text(0.5,19.5222,'sorted neuron ids (arbitrary)')
+>>> title('Most active 70% EMDOWN neurons across input sequences')
+Text(0.5,1,'Most active 70% EMDOWN neurons across input sequences')
+>>> legend(('Before training','After training'))
+<matplotlib.legend.Legend object at 0x7f4afec221d0>
+>>> savefig('21june21_21jun8_TARG0_O2_gcp__step_5_BTvsAT_p0to8_top70PmostactiveneuronsEMDOWN.png')
+>>> plotSeqPerf(lSimilarSeqs_allBT, seqs2plot_allBT,seqsBegs_allBT,seqsEnds_allBT,II_allBT,dCumAct_allBT,hitsMiss_allBT,0,plotact=False)
+simdat.py:2188: RuntimeWarning: divide by zero encountered in true_divide
+  lax[tr].plot(np.divide(np.cumsum(hits),np.cumsum(miss)),'k-o')
+>>> savefig('21june21_21jun8_TARG0_O2_gcp__step_5_BT_seq0.png')
+>>> plotSeqPerf(lSimilarSeqs_allBT, seqs2plot_allBT,seqsBegs_allBT,seqsEnds_allBT,II_allBT,dCumAct_allBT,hitsMiss_allBT,1,plotact=False)
+>>> savefig('21june21_21jun8_TARG0_O2_gcp__step_5_BT_seq1.png')
+>>> plotSeqPerf(lSimilarSeqs_allBT, seqs2plot_allBT,seqsBegs_allBT,seqsEnds_allBT,II_allBT,dCumAct_allBT,hitsMiss_allBT,2,plotact=False)
+>>> savefig('21june21_21jun8_TARG0_O2_gcp__step_5_BT_seq2.png')
+>>> plotSeqPerf(lSimilarSeqs_allBT, seqs2plot_allBT,seqsBegs_allBT,seqsEnds_allBT,II_allBT,dCumAct_allBT,hitsMiss_allBT,3,plotact=False)
+>>> savefig('21june21_21jun8_TARG0_O2_gcp__step_5_BT_seq3.png')
+>>> plotSeqPerf(lSimilarSeqs_allBT, seqs2plot_allBT,seqsBegs_allBT,seqsEnds_allBT,II_allBT,dCumAct_allBT,hitsMiss_allBT,4,plotact=False)
+>>> savefig('21june21_21jun8_TARG0_O2_gcp__step_5_BT_seq4.png')
+>>> plotSeqPerf(lSimilarSeqs_allBT, seqs2plot_allBT,seqsBegs_allBT,seqsEnds_allBT,II_allBT,dCumAct_allBT,hitsMiss_allBT,5,plotact=False)
+>>> savefig('21june21_21jun8_TARG0_O2_gcp__step_5_BT_seq5.png')
+>>> plotSeqPerf(lSimilarSeqs_allBT, seqs2plot_allBT,seqsBegs_allBT,seqsEnds_allBT,II_allBT,dCumAct_allBT,hitsMiss_allBT,6,plotact=False)
+>>> savefig('21june21_21jun8_TARG0_O2_gcp__step_5_BT_seq6.png')
+>>> plotSeqPerf(lSimilarSeqs_allBT, seqs2plot_allBT,seqsBegs_allBT,seqsEnds_allBT,II_allBT,dCumAct_allBT,hitsMiss_allBT,7,plotact=False)
+>>> savefig('21june21_21jun8_TARG0_O2_gcp__step_5_BT_seq7.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allAT, seqs2plot_allAT,seqsBegs_allAT,seqsEnds_allAT,II_allAT,dCumAct_allAT,hitsMiss_allAT,0,plotact=False)
+>>> savefig('21june21_21jun8_TARG0_O2_gcp__step_5_AT_seq0.png')
+>>> plotSeqPerf(lSimilarSeqs_allAT, seqs2plot_allAT,seqsBegs_allAT,seqsEnds_allAT,II_allAT,dCumAct_allAT,hitsMiss_allAT,1,plotact=False)
+>>> savefig('21june21_21jun8_TARG0_O2_gcp__step_5_AT_seq1.png')
+>>> plotSeqPerf(lSimilarSeqs_allAT, seqs2plot_allAT,seqsBegs_allAT,seqsEnds_allAT,II_allAT,dCumAct_allAT,hitsMiss_allAT,2,plotact=False)
+>>> savefig('21june21_21jun8_TARG0_O2_gcp__step_5_AT_seq2.png')
+>>> plotSeqPerf(lSimilarSeqs_allAT, seqs2plot_allAT,seqsBegs_allAT,seqsEnds_allAT,II_allAT,dCumAct_allAT,hitsMiss_allAT,3,plotact=False)
+>>> savefig('21june21_21jun8_TARG0_O2_gcp__step_5_AT_seq3.png')
+>>> plotSeqPerf(lSimilarSeqs_allAT, seqs2plot_allAT,seqsBegs_allAT,seqsEnds_allAT,II_allAT,dCumAct_allAT,hitsMiss_allAT,4,plotact=False)
+>>> savefig('21june21_21jun8_TARG0_O2_gcp__step_5_AT_seq4.png')
+>>> plotSeqPerf(lSimilarSeqs_allAT, seqs2plot_allAT,seqsBegs_allAT,seqsEnds_allAT,II_allAT,dCumAct_allAT,hitsMiss_allAT,5,plotact=False)
+>>> savefig('21june21_21jun8_TARG0_O2_gcp__step_5_AT_seq5.png')
+>>> plotSeqPerf(lSimilarSeqs_allAT, seqs2plot_allAT,seqsBegs_allAT,seqsEnds_allAT,II_allAT,dCumAct_allAT,hitsMiss_allAT,6,plotact=False)
+>>> savefig('21june21_21jun8_TARG0_O2_gcp__step_5_AT_seq6.png')
+>>> plotSeqPerf(lSimilarSeqs_allAT, seqs2plot_allAT,seqsBegs_allAT,seqsEnds_allAT,II_allAT,dCumAct_allAT,hitsMiss_allAT,7,plotact=False)
+>>> savefig('21june21_21jun8_TARG0_O2_gcp__step_5_AT_seq7.png')
+>>> plotSeqPerf(lSimilarSeqs_allAT, seqs2plot_allAT,seqsBegs_allAT,seqsEnds_allAT,II_allAT,dCumAct_allAT,hitsMiss_allAT,8,plotact=False)
+>>> savefig('21june21_21jun8_TARG0_O2_gcp__step_5_AT_seq8.png')
+>>> plotSeqPerf(lSimilarSeqs_allAT, seqs2plot_allAT,seqsBegs_allAT,seqsEnds_allAT,II_allAT,dCumAct_allAT,hitsMiss_allAT,9,plotact=False)
+>>> savefig('21june21_21jun8_TARG0_O2_gcp__step_5_AT_seq9.png')
+
+
+>>> TotalHits = []
+>>> TotalMissed = []
+>>> for i in range(len(lpdaBT)):
+...   Hit_Missed = np.array(lpdaBT[i].hit)
+...   allHit = np.where(Hit_Missed==1,1,0)
+...   allMissed = np.where(Hit_Missed==-1,1,0)
+...   TotalHits.append(np.sum(allHit))
+...   TotalMissed.append(np.sum(allMissed))
+... 
+>>> TotalHits_AT = []
+>>> TotalMissed_AT = []
+>>> for i in range(len(lpdaAT)):
+...   Hit_Missed = np.array(lpdaAT[i].hit)
+...   allHit = np.where(Hit_Missed==1,1,0)
+...   allMissed = np.where(Hit_Missed==-1,1,0)
+...   TotalHits_AT.append(np.sum(allHit))
+...   TotalMissed_AT.append(np.sum(allMissed))
+... 
+>>> plt.bar([0,1],[np.mean(np.divide(TotalHits,TotalMissed)),np.mean(np.divide(TotalHits_AT,TotalMissed_AT))])
+<BarContainer object of 2 artists>
+>>> plt.plot([-0.2,-0.15,-0.1,-0.05,0,0.05,0.1,0.15,0.2],np.divide(TotalHits,TotalMissed),'ko')
+[<matplotlib.lines.Line2D object at 0x7f4afeb82290>]
+>>> plt.plot([0.8,0.85,0.9,0.95,0,1.05,1.1,1.15,1.2],np.divide(TotalHits_AT,TotalMissed_AT),'ko')
+[<matplotlib.lines.Line2D object at 0x7f4afea8db10>]
+>>> plt.bar([0,1],[np.mean(np.divide(TotalHits,TotalMissed)),np.mean(np.divide(TotalHits_AT,TotalMissed_AT))])
+<BarContainer object of 2 artists>
+>>> plt.plot([-0.2,-0.15,-0.1,-0.05,0,0.05,0.1,0.15,0.2],np.divide(TotalHits,TotalMissed),'ko')
+[<matplotlib.lines.Line2D object at 0x7f4afea97c90>]
+>>> plt.plot([0.8,0.85,0.9,0.95,1,1.05,1.1,1.15,1.2],np.divide(TotalHits_AT,TotalMissed_AT),'ko')
+[<matplotlib.lines.Line2D object at 0x7f4afeb84d50>]
+>>> ylabel('Hit/Miss')
+Text(38.3472,0.5,'Hit/Miss')
+>>> plt.xticks([0,1],['Before training','After training'])
+([<matplotlib.axis.XTick object at 0x7f4afebade10>, <matplotlib.axis.XTick object at 0x7f4afebad990>], <a list of 2 Text xticklabel objects>)
+>>> savefig('21june21_21jun8_TARG0_O2_gcp__step_5_BTvsAT_perf.png')
+>>> 
+>>> import scipy.stats as stats
+>>> stats.ttest_ind(np.divide(TotalHits,TotalMissed),np.divide(TotalHits_AT,TotalMissed_AT))
+Ttest_indResult(statistic=-3.2624702331162285, pvalue=0.004890951778562461)
+
+-------
+
+p8:
+    "yball": 40,
+    "yracket": 40,
+p7:
+    "yball": 120,
+    "yracket": 120,
+p6:
+    "yball": 80,
+    "yracket": 80,
+p5:
+    "yball": 60,
+    "yracket": 100,
+p4:
+    "yball": 40,
+    "yracket": 100,
+p3:
+    "yball": 20,
+    "yracket": 120,
+p2:
+    "yball": 120,
+    "yracket": 20,
+p1:
+    "yball": 100,
+    "yracket": 40,
+p0:
+    "yball": 80,
+    "yracket": 40,
+
+
+-- run sim 21jan21_TARG4_gcp_RLhebbwt_0_p1_
+    "yball": 100,
+    "yracket": 20,
+
+-- run sim 21jan21_TARG4_gcp_RLhebbwt_0_p2_
+    "yball": 120,
+    "yracket": 10,
+
+-- run sim 21jan21_TARG4_gcp_RLhebbwt_0_p3_
+    "yball": 10,
+    "yracket": 120,
+
+-- run sim 21jan21_TARG4_gcp_RLhebbwt_0_p4_
+    "yball": 20,
+    "yracket": 100,
+
+-- run sim 21jan21_TARG4_gcp_RLhebbwt_0_p5_
+    "yball": 40,
+    "yracket": 80,
+
+
+14 unique ball and racket positions.
+
+7 unique ball positions: 
+10 - 1 time
+20 - 2 times
+40 - 3 times
+60 - 1 time
+80 - 2 times
+100 - 2 times
+120 - 3 times
+
+
+
+-- run sim 21jan20_21jan6_TARG4_gcp__step_0_RLhebbwt_0_p1_ (Jan20)
+-- run sim 21jan20_21jan6_TARG4_gcp__step_0_RLhebbwt_0_p2_ (Jan20)
+-- run sim 21jan20_21jan6_TARG4_gcp__step_0_RLhebbwt_0_p3_ (Jan20)
+-- run sim 21jan20_21jan6_TARG4_gcp__step_0_RLhebbwt_0_p4_ (Jan20)
+-- run sim "21jan20_21jan6_TARG4_gcp__step_0_RLhebbwt_0_p5_ (Jan20)
+
+
+
+--------
+* 2021june24:
+
+DURING TRAINING WITH SPARSE REWARDS:
+
+(base) hanwar@cycle:~/GamesProject/SMARTAgent$ cp /home/samn/SMARTAgent/backupcfg/21may15_TARG0_K_gcp_* backupcfg/.
+(base) hanwar@cycle:~/GamesProject/SMARTAgent$ cp /home/samn/SMARTAgent/data/21may15_TARG0_K_gcp_* data/.
+
+(base) hanwar@cycle:~/GamesProject/SMARTAgent$ python -i simdat.py backupcfg/21may15_TARG0_K_gcp__step_0_sim.json 
+
+>>> lfnT = ['21may15_TARG0_K_gcp__step_0_']
+>>> lfnT.append('21may15_TARG0_K_gcp__step_1_')
+>>> lfnT.append('21may15_TARG0_K_gcp__step_2_')
+>>> lfnT.append('21may15_TARG0_K_gcp__step_3_')
+>>> lfnT.append('21may15_TARG0_K_gcp__step_4_')
+>>> lfnT.append('21may15_TARG0_K_gcp__step_5_')
+>>> lfnT.append('21may15_TARG0_K_gcp__step_6_')
+>>> lfnT.append('21may15_TARG0_K_gcp__step_7_')
+>>> lfnT.append('21may15_TARG0_K_gcp__step_8_')
+>>> lfnT.append('21may15_TARG0_K_gcp__step_9_')
+>>> lfnT.append('21may15_TARG0_K_gcp__step_10_')
+>>> lfnT.append('21may15_TARG0_K_gcp__step_11_')
+>>> lfnT.append('21may15_TARG0_K_gcp__step_12_')
+>>> lfnT.append('21may15_TARG0_K_gcp__step_13_')
+>>> lfnT.append('21may15_TARG0_K_gcp__step_14_')
+>>> lfnT.append('21may15_TARG0_K_gcp__step_15_')
+>>> lfnT.append('21may15_TARG0_K_gcp__step_16_')
+>>> lfnT.append('21may15_TARG0_K_gcp__step_17_')
+>>> lfnT.append('21may15_TARG0_K_gcp__step_18_')
+>>> lfnT.append('21may15_TARG0_K_gcp__step_19_')
+>>> lfnT.append('21may15_TARG0_K_gcp__step_20_')
+>>> lfnT.append('21may15_TARG0_K_gcp__step_21_')
+>>> lfnT.append('21may15_TARG0_K_gcp__step_22_')
+>>> lfnT.append('21may15_TARG0_K_gcp__step_23_')
+>>> lfnT.append('21may15_TARG0_K_gcp__step_24_')
+>>> lfnT.append('21may15_TARG0_K_gcp__step_25_')
+>>> lfnT.append('21may15_TARG0_K_gcp__step_26_')
+>>> lfnT.append('21may15_TARG0_K_gcp__step_27_')
+>>> lfnT.append('21may15_TARG0_K_gcp__step_28_')
+>>> lfnT.append('21may15_TARG0_K_gcp__step_29_')
+>>> lfnT.append('21may15_TARG0_K_gcp__step_30_')
+>>> lfnT.append('21may15_TARG0_K_gcp__step_31_')
+>>> lfnT.append('21may15_TARG0_K_gcp__step_32_')
+>>> lfnT.append('21may15_TARG0_K_gcp__step_33_')
+>>> lfnT.append('21may15_TARG0_K_gcp__step_34_')
+>>> lfnT.append('21may15_TARG0_K_gcp__step_35_')
+>>> lfnT.append('21may15_TARG0_K_gcp__step_36_')
+>>> lfnT.append('21may15_TARG0_K_gcp__step_37_')
+>>> lfnT.append('21may15_TARG0_K_gcp__step_38_')
+>>> lfnT.append('21may15_TARG0_K_gcp__step_39_')
+
+>>> pdfc = getconcatweightpdf(lfnT)
+>>> plotMeanWeights(pdfc,gca(),msz=2,xl=(0,np.amax(pdfc.time)),lpop=['EMUP','EMDOWN'],lclr=['b','r'],plotindiv=False)
+>>> savefig('21june24_21may15_TARG0_K_gcp_40steps_meanWeights_EM.png')
+
+>>> plotMeanWeights(pdfc,gca(),msz=1,xl=(0,np.amax(pdfc.time)),lpop=['EA','EA2'],lclr=['b','r'],plotindiv=False)
+>>> savefig('21june24_21may15_TARG0_K_gcp_40steps_meanWeights_EAandEA2.png')
+
+>>> drawraster(dspkT,dspkID)
+>>> xlim(497e3,501e3)
+>>> savefig('21june24_21may15_TARG0_K_gcp__step_0_raster1.png')
+
+>>> xlim(1e3,4e3)
+(1000.0, 4000.0)
+>>> ylabel('Neuron IDs')
+Text(63.5972,0.5,'Neuron IDs')
+>>> savefig('21june24_21may15_TARG0_K_gcp__step_0_raster2.png')
+
+>>> pdacT = getconcatactionreward(lfnT)
+>>> II_allT = getconcatactioninputs(lfnT)
+loading input images from data/21may15_TARG0_K_gcp__step_0_InputImages.npy
+loading input images from data/21may15_TARG0_K_gcp__step_1_InputImages.npy
+loading input images from data/21may15_TARG0_K_gcp__step_2_InputImages.npy
+loading input images from data/21may15_TARG0_K_gcp__step_3_InputImages.npy
+loading input images from data/21may15_TARG0_K_gcp__step_4_InputImages.npy
+loading input images from data/21may15_TARG0_K_gcp__step_5_InputImages.npy
+loading input images from data/21may15_TARG0_K_gcp__step_6_InputImages.npy
+loading input images from data/21may15_TARG0_K_gcp__step_7_InputImages.npy
+loading input images from data/21may15_TARG0_K_gcp__step_8_InputImages.npy
+loading input images from data/21may15_TARG0_K_gcp__step_9_InputImages.npy
+loading input images from data/21may15_TARG0_K_gcp__step_10_InputImages.npy
+loading input images from data/21may15_TARG0_K_gcp__step_11_InputImages.npy
+loading input images from data/21may15_TARG0_K_gcp__step_12_InputImages.npy
+loading input images from data/21may15_TARG0_K_gcp__step_13_InputImages.npy
+loading input images from data/21may15_TARG0_K_gcp__step_14_InputImages.npy
+loading input images from data/21may15_TARG0_K_gcp__step_15_InputImages.npy
+loading input images from data/21may15_TARG0_K_gcp__step_16_InputImages.npy
+loading input images from data/21may15_TARG0_K_gcp__step_17_InputImages.npy
+loading input images from data/21may15_TARG0_K_gcp__step_18_InputImages.npy
+loading input images from data/21may15_TARG0_K_gcp__step_19_InputImages.npy
+loading input images from data/21may15_TARG0_K_gcp__step_20_InputImages.npy
+loading input images from data/21may15_TARG0_K_gcp__step_21_InputImages.npy
+loading input images from data/21may15_TARG0_K_gcp__step_22_InputImages.npy
+loading input images from data/21may15_TARG0_K_gcp__step_23_InputImages.npy
+loading input images from data/21may15_TARG0_K_gcp__step_24_InputImages.npy
+loading input images from data/21may15_TARG0_K_gcp__step_25_InputImages.npy
+loading input images from data/21may15_TARG0_K_gcp__step_26_InputImages.npy
+loading input images from data/21may15_TARG0_K_gcp__step_27_InputImages.npy
+loading input images from data/21may15_TARG0_K_gcp__step_28_InputImages.npy
+loading input images from data/21may15_TARG0_K_gcp__step_29_InputImages.npy
+loading input images from data/21may15_TARG0_K_gcp__step_30_InputImages.npy
+loading input images from data/21may15_TARG0_K_gcp__step_31_InputImages.npy
+loading input images from data/21may15_TARG0_K_gcp__step_32_InputImages.npy
+loading input images from data/21may15_TARG0_K_gcp__step_33_InputImages.npy
+loading input images from data/21may15_TARG0_K_gcp__step_34_InputImages.npy
+loading input images from data/21may15_TARG0_K_gcp__step_35_InputImages.npy
+loading input images from data/21may15_TARG0_K_gcp__step_36_InputImages.npy
+loading input images from data/21may15_TARG0_K_gcp__step_37_InputImages.npy
+loading input images from data/21may15_TARG0_K_gcp__step_38_InputImages.npy
+loading input images from data/21may15_TARG0_K_gcp__step_39_InputImages.npy
+>>> lSimilarSeqs_allT, seqs2plot_allT, seqsBegs_allT, seqsEnds_allT = breakdownPerformance(II_allT,pdacT,cend=69,sthresh=5,nbframeThresh=5,ballThresh=0)
+/opt/anaconda3/lib/python3.7/site-packages/scipy/stats/stats.py:3508: PearsonRConstantInputWarning: An input array is constant; the correlation coefficent is not defined.
+  warnings.warn(PearsonRConstantInputWarning())
+>>> len(seqs2plot_allT)
+23
+>>> dspkID_allT, dspkT_allT, totalDur_allT = getconcatactivity(lfnT,['EV1','EA','EA2','EMUP','EMDOWN'])
+>>> dact1D_allT = getdActMap1D(totalDur_allT,pdacT,dspkT_allT,dspkID_allT,dnumc,dstartidx,lpop=['EV1','EA','EA2','EMUP','EMDOWN'])
+>>> dCumAct_allT, dStepAct_allT = getCumActivityMapForInput(seqsBegs_allT,seqsEnds_allT,dact1D_allT,lpop=['EV1','EA','EA2','EMUP','EMDOWN'])
+>>> rewards_allT, hitsMiss_allT = getRewardsPerSeq(pdacT,seqsBegs_allT,seqsEnds_allT)
+>>> proposedActionsT, executedActionsT = getActionsPerSeq(pdacT,seqsBegs_allT,seqsEnds_allT)
+>>> summarizeLearningPerf(lSimilarSeqs_allT,seqs2plot_allT,hitsMiss_allT)
+simdat.py:1857: RuntimeWarning: divide by zero encountered in true_divide
+  perf = np.divide(np.cumsum(hits),np.cumsum(miss))
+>>> savefig('21june24_21may15_TARG0_K_gcp_40steps_learningPerformanceSummary.png')
+>>> pdposT = getconcatobjpos(lfnT)
+>>> showSpatialBehaviorHitMiss(pdposT,hitsMiss_allT,seqsBegs_allT,seqsEnds_allT)
+>>> showSpatialBehaviorHitMiss(pdposT,hitsMiss_allT,seqsBegs_allT,seqsEnds_allT)
+>>> savefig('21june24_21may15_TARG0_K_gcp_40steps_spatialbehavior_hitmiss.png')
+
+>>> EA_fr = []
+>>> EA2_fr = []
+>>> EMUP_fr = []
+>>> EMDOWN_fr = []
+>>> for seq in range(len(seqsEnds_allT)):
+...   upfr = (1000/(50*(seqsEnds_allT[seq]-seqsBegs_allT[seq])))*np.array(dCumAct_allT['EMUP'][seq])
+...   downfr = (1000/(50*(seqsEnds_allT[seq]-seqsBegs_allT[seq])))*np.array(dCumAct_allT['EMDOWN'][seq])
+...   eafr = (1000/(50*(seqsEnds_allT[seq]-seqsBegs_allT[seq])))*np.array(dCumAct_allT['EA'][seq])
+...   ea2fr = (1000/(50*(seqsEnds_allT[seq]-seqsBegs_allT[seq])))*np.array(dCumAct_allT['EA2'][seq])
+...   EA_fr.append(list(eafr))
+...   EA2_fr.append(list(ea2fr))
+...   EMUP_fr.append(list(upfr))
+...   EMDOWN_fr.append(list(downfr))
+... 
+>>> EA2_fr = np.array(EA2_fr)
+>>> EA_fr = np.array(EA_fr)
+>>> EMUP_fr = np.array(EMUP_fr)
+>>> EMDOWN_fr = np.array(EMDOWN_fr)
+>>> meanFR_EMUP_seqwise = np.nanmean(EMUP_fr,1)
+>>> meanFR_EMDOWN_seqwise = np.nanmean(EMDOWN_fr,1)
+>>> meanFR_EA_seqwise = np.nanmean(EA_fr,1)
+>>> meanFR_EA2_seqwise = np.nanmean(EA2_fr,1)
+
+>>> plt.plot(meanFR_EMUP_seqwise,'.')
+>>> plt.plot(meanFR_EMDOWN_seqwise,'.')
+>>> ylim(0.05,0.15)
+>>> legend(('EMUP','EMDOWN'))
+>>> title('pop mean for each input seq')
+>>> ylabel('Firing rate (Hz) per input sequence')
+>>> xlabel('Input Sequences (as experienced)')
+>>> savefig('21june24_21may15_TARG0_K_gcp_40steps_popFRUPandDOWNseqwise.png')
+
+>>> fig, ax1 = plt.subplots()
+>>> ax1.plot(meanFR_EA_seqwise,'b.')
+>>> ax1.set_ylabel('EA firing rare (Hz) per input sequence',color='b')
+>>> ax1.set_xlabel('Input sequences (as experienced)')
+>>> ax1.tick_params(axis='y',labelcolor='b')
+>>> ax2 = ax1.twinx()
+>>> ax2.set_ylabel('EA2 firing rare (Hz) per input sequence',color='r')
+>>> ax2.tick_params(axis='y',labelcolor='r')
+>>> ax2.plot(meanFR_EA2_seqwise,'r.')
+>>> ax1.set_ylim(0.75,1.75)
+>>> ax2.set_ylim(0.07,0.14)
+>>> savefig('21june24_21may15_TARG0_K_gcp_40steps_popFREAandEA2seqwise.png')
+
+>>> plotSeqPerf(lSimilarSeqs_allT,seqs2plot_allT,seqsBegs_allT,seqsEnds_allT,II_allT,dCumAct_allT,hitsMiss_allT,0,plotact=False)
+>>> savefig('21june24_21may15_TARG0_K_gcp_40steps_seq0.png')
+>>> plotSeqPerf(lSimilarSeqs_allT,seqs2plot_allT,seqsBegs_allT,seqsEnds_allT,II_allT,dCumAct_allT,hitsMiss_allT,1,plotact=False)
+>>> savefig('21june24_21may15_TARG0_K_gcp_40steps_seq1.png')
+>>> plotSeqPerf(lSimilarSeqs_allT,seqs2plot_allT,seqsBegs_allT,seqsEnds_allT,II_allT,dCumAct_allT,hitsMiss_allT,2,plotact=False)
+>>> savefig('21june24_21may15_TARG0_K_gcp_40steps_seq2.png')
+>>> plotSeqPerf(lSimilarSeqs_allT,seqs2plot_allT,seqsBegs_allT,seqsEnds_allT,II_allT,dCumAct_allT,hitsMiss_allT,3,plotact=False)
+>>> savefig('21june24_21may15_TARG0_K_gcp_40steps_seq3.png')
+>>> plotSeqPerf(lSimilarSeqs_allT,seqs2plot_allT,seqsBegs_allT,seqsEnds_allT,II_allT,dCumAct_allT,hitsMiss_allT,4,plotact=False)
+>>> savefig('21june24_21may15_TARG0_K_gcp_40steps_seq4.png')
+>>> plotSeqPerf(lSimilarSeqs_allT,seqs2plot_allT,seqsBegs_allT,seqsEnds_allT,II_allT,dCumAct_allT,hitsMiss_allT,5,plotact=False)
+simdat.py:2188: RuntimeWarning: divide by zero encountered in true_divide
+  lax[tr].plot(np.divide(np.cumsum(hits),np.cumsum(miss)),'k-o')
+>>> savefig('21june24_21may15_TARG0_K_gcp_40steps_seq5.png')
+>>> plotSeqPerf(lSimilarSeqs_allT,seqs2plot_allT,seqsBegs_allT,seqsEnds_allT,II_allT,dCumAct_allT,hitsMiss_allT,6,plotact=False)
+>>> savefig('21june24_21may15_TARG0_K_gcp_40steps_seq6.png')
+>>> plotSeqPerf(lSimilarSeqs_allT,seqs2plot_allT,seqsBegs_allT,seqsEnds_allT,II_allT,dCumAct_allT,hitsMiss_allT,7,plotact=False)
+>>> savefig('21june24_21may15_TARG0_K_gcp_40steps_seq7.png')
+>>> plotSeqPerf(lSimilarSeqs_allT,seqs2plot_allT,seqsBegs_allT,seqsEnds_allT,II_allT,dCumAct_allT,hitsMiss_allT,8,plotact=False)
+>>> savefig('21june24_21may15_TARG0_K_gcp_40steps_seq8.png')
+>>> plotSeqPerf(lSimilarSeqs_allT,seqs2plot_allT,seqsBegs_allT,seqsEnds_allT,II_allT,dCumAct_allT,hitsMiss_allT,9,plotact=False)
+>>> savefig('21june24_21may15_TARG0_K_gcp_40steps_seq9.png')
+>>> plotSeqPerf(lSimilarSeqs_allT,seqs2plot_allT,seqsBegs_allT,seqsEnds_allT,II_allT,dCumAct_allT,hitsMiss_allT,10,plotact=False)
+>>> savefig('21june24_21may15_TARG0_K_gcp_40steps_seq10.png')
+>>> plotSeqPerf(lSimilarSeqs_allT,seqs2plot_allT,seqsBegs_allT,seqsEnds_allT,II_allT,dCumAct_allT,hitsMiss_allT,11,plotact=False)
+>>> savefig('21june24_21may15_TARG0_K_gcp_40steps_seq11.png')
+>>> plotSeqPerf(lSimilarSeqs_allT,seqs2plot_allT,seqsBegs_allT,seqsEnds_allT,II_allT,dCumAct_allT,hitsMiss_allT,12,plotact=False)
+>>> savefig('21june24_21may15_TARG0_K_gcp_40steps_seq12.png')
+>>> plotSeqPerf(lSimilarSeqs_allT,seqs2plot_allT,seqsBegs_allT,seqsEnds_allT,II_allT,dCumAct_allT,hitsMiss_allT,13,plotact=False)
+>>> savefig('21june24_21may15_TARG0_K_gcp_40steps_seq13.png')
+>>> plotSeqPerf(lSimilarSeqs_allT,seqs2plot_allT,seqsBegs_allT,seqsEnds_allT,II_allT,dCumAct_allT,hitsMiss_allT,14,plotact=False)
+>>> savefig('21june24_21may15_TARG0_K_gcp_40steps_seq14.png')
+>>> plotSeqPerf(lSimilarSeqs_allT,seqs2plot_allT,seqsBegs_allT,seqsEnds_allT,II_allT,dCumAct_allT,hitsMiss_allT,15,plotact=False)
+>>> savefig('21june24_21may15_TARG0_K_gcp_40steps_seq15.png')
+>>> plotSeqPerf(lSimilarSeqs_allT,seqs2plot_allT,seqsBegs_allT,seqsEnds_allT,II_allT,dCumAct_allT,hitsMiss_allT,16,plotact=False)
+>>> savefig('21june24_21may15_TARG0_K_gcp_40steps_seq16.png')
+>>> plotSeqPerf(lSimilarSeqs_allT,seqs2plot_allT,seqsBegs_allT,seqsEnds_allT,II_allT,dCumAct_allT,hitsMiss_allT,17,plotact=False)
+>>> savefig('21june24_21may15_TARG0_K_gcp_40steps_seq17.png')
+>>> plotSeqPerf(lSimilarSeqs_allT,seqs2plot_allT,seqsBegs_allT,seqsEnds_allT,II_allT,dCumAct_allT,hitsMiss_allT,18,plotact=False)
+>>> savefig('21june24_21may15_TARG0_K_gcp_40steps_seq18.png')
+>>> plotSeqPerf(lSimilarSeqs_allT,seqs2plot_allT,seqsBegs_allT,seqsEnds_allT,II_allT,dCumAct_allT,hitsMiss_allT,19,plotact=False)
+>>> savefig('21june24_21may15_TARG0_K_gcp_40steps_seq19.png')
+>>> plotSeqPerf(lSimilarSeqs_allT,seqs2plot_allT,seqsBegs_allT,seqsEnds_allT,II_allT,dCumAct_allT,hitsMiss_allT,20,plotact=False)
+>>> savefig('21june24_21may15_TARG0_K_gcp_40steps_seq20.png')
+>>> plotSeqPerf(lSimilarSeqs_allT,seqs2plot_allT,seqsBegs_allT,seqsEnds_allT,II_allT,dCumAct_allT,hitsMiss_allT,21,plotact=False)
+>>> savefig('21june24_21may15_TARG0_K_gcp_40steps_seq21.png')
+>>> plotSeqPerf(lSimilarSeqs_allT,seqs2plot_allT,seqsBegs_allT,seqsEnds_allT,II_allT,dCumAct_allT,hitsMiss_allT,22,plotact=False)
+>>> savefig('21june24_21may15_TARG0_K_gcp_40steps_seq22.png')
+
+---------------------------------------------------
+
+FIND CV of dCumAct for each ball trajectory.
+
+
+>>> ea_act = np.array(dCumAct_allBT['EA'])
+>>> ea2_act = np.array(dCumAct_allBT['EA2'])
+>>> emup_act = np.array(dCumAct_allBT['EMUP'])
+>>> emdown_act = np.array(dCumAct_allBT['EMDOWN'])
+
+
+ea_cv = []
+ea2_cv = []
+emup_cv = []
+emdown_cv = []
+for seq in range(len(lSimilarSeqs_allBT))
+  cseqs = lSimilarSeqs_allBT[seqs2plot_allBT[seq]]
+  cseqs_ea_act = []
+  cseqs_ea2_act = []
+  cseqs_emup_act = []
+  cseqs_emdown_act = []
+  for i in cseqs:
+    cseqs_ea_act.append(ea_act[i,:])
+    cseqs_ea2_act.append(ea2_act[i,:])
+    cseqs_emup_act.append(emup_act[i,:])
+    cseqs_emdown_act.append(emdown_act[i,:])
+  ea_cv.append(list(np.divide(np.std(cseqs_ea_act,0),np.mean(cseqs_ea_act,0))))
+  ea2_cv.append(list(np.divide(np.std(cseqs_ea2_act,0),np.mean(cseqs_ea2_act,0))))
+  emup_cv.append(list(np.divide(np.std(cseqs_emup_act,0),np.mean(cseqs_emup_act,0))))
+  emdown_cv.append(list(np.divide(np.std(cseqs_emdown_act,0),np.mean(cseqs_emdown_act,0))))
+
+
+>>> plt.plot(np.sort(np.divide(np.std(cseqs_emup_act,0),np.mean(cseqs_emup_act,0))),'b.')
+[<matplotlib.lines.Line2D object at 0x7f27bf5b88d0>]
+
+>>> ea_act = np.array(dCumAct_allBT['EA'])
+>>> ea2_act = np.array(dCumAct_allBT['EA2'])
+>>> emup_act = np.array(dCumAct_allBT['EMUP'])
+>>> emdown_act = np.array(dCumAct_allBT['EMDOWN'])
+>>> ea_var = []
+>>> ea2_var = []
+>>> emup_var = []
+>>> emdown_var = []
+>>> for seq in range(len(seqs2plot_allBT)):
+...   cseqs = lSimilarSeqs_allBT[seqs2plot_allBT[seq]]
+...   cseqs_ea_act = []
+...   cseqs_ea2_act = []
+...   cseqs_emup_act = []
+...   cseqs_emdown_act = []
+...   for i in cseqs:
+...     cseqs_ea_act.append(ea_act[i,:])
+...     cseqs_ea2_act.append(ea2_act[i,:])
+...     cseqs_emup_act.append(emup_act[i,:])
+...     cseqs_emdown_act.append(emdown_act[i,:])
+...   ea_var.append(list(np.var(cseqs_ea_act,0)))
+...   ea2_var.append(list(np.var(cseqs_ea2_act,0)))
+...   emdown_var.append(list(np.var(cseqs_emdown_act,0)))
+...   emup_var.append(list(np.var(cseqs_emup_act,0)))
+
+
+>>> ea_act18 = np.array(dCumAct_allAT18['EA'])
+>>> ea2_act18 = np.array(dCumAct_allAT18['EA2'])
+>>> emup_act18 = np.array(dCumAct_allAT18['EMUP'])
+>>> emdown_act18 = np.array(dCumAct_allAT18['EMDOWN'])
+>>> ea_var_AT18 = []
+>>> ea2_var_AT18 = []
+>>> emup_var_AT18 = []
+>>> emdown_var_AT18 = []
+>>> for seq in range(len(seqs2plot_allAT18)):
+...   cseqs = lSimilarSeqs_allAT18[seqs2plot_allAT18[seq]]
+...   cseqs_ea_act = []
+...   cseqs_ea2_act = []
+...   cseqs_emup_act = []
+...   cseqs_emdown_act = []
+...   for i in cseqs:
+...     cseqs_ea_act.append(ea_act18[i,:])
+...     cseqs_ea2_act.append(ea2_act18[i,:])
+...     cseqs_emup_act.append(emup_act18[i,:])
+...     cseqs_emdown_act.append(emdown_act18[i,:])
+...   ea_var_AT18.append(list(np.var(cseqs_ea_act,0)))
+...   ea2_var_AT18.append(list(np.var(cseqs_ea2_act,0)))
+...   emdown_var_AT18.append(list(np.var(cseqs_emdown_act,0)))
+...   emup_var_AT18.append(list(np.var(cseqs_emup_act,0)))
+
+
+>>> ea_act19 = np.array(dCumAct_allAT19['EA'])
+>>> ea2_act19 = np.array(dCumAct_allAT19['EA2'])
+>>> emup_act19 = np.array(dCumAct_allAT19['EMUP'])
+>>> emdown_act19 = np.array(dCumAct_allAT19['EMDOWN'])
+>>> ea_var_AT19 = []
+>>> ea2_var_AT19 = []
+>>> emup_var_AT19 = []
+>>> emdown_var_AT19 = []
+>>> for seq in range(len(seqs2plot_allAT19)):
+...   cseqs = lSimilarSeqs_allAT19[seqs2plot_allAT19[seq]]
+...   cseqs_ea_act = []
+...   cseqs_ea2_act = []
+...   cseqs_emup_act = []
+...   cseqs_emdown_act = []
+...   for i in cseqs:
+...     cseqs_ea_act.append(ea_act19[i,:])
+...     cseqs_ea2_act.append(ea2_act19[i,:])
+...     cseqs_emup_act.append(emup_act19[i,:])
+...     cseqs_emdown_act.append(emdown_act19[i,:])
+...   ea_var_AT19.append(list(np.var(cseqs_ea_act,0)))
+...   ea2_var_AT19.append(list(np.var(cseqs_ea2_act,0)))
+...   emdown_var_AT19.append(list(np.var(cseqs_emdown_act,0)))
+...   emup_var_AT19.append(list(np.var(cseqs_emup_act,0)))
+
+
+>>> np.array(ea_var).shape
+(36, 1400) ----> 36 unique ball trajectories and 1400 neurons (variance is computed for repeated ball trajectory)
+>>> np.array(ea_var_AT18).shape
+(41, 1400) ----> 41 unique ball trajectories and 1400 neurons
+>>> np.array(ea_var_AT19).shape
+(43, 1400) ----> 43 unique ball trajectories and 1400 neurons.
+
+
+>>> ea_cv = []
+>>> ea2_cv = []
+>>> emup_cv = []
+>>> emdown_cv = []
+>>> for seq in range(len(seqs2plot_allBT)):
+...   cseqs = lSimilarSeqs_allBT[seqs2plot_allBT[seq]]
+...   cseqs_ea_act = []
+...   cseqs_ea2_act = []
+...   cseqs_emup_act = []
+...   cseqs_emdown_act = []
+...   for i in cseqs:
+...     cseqs_ea_act.append(ea_act[i,:])
+...     cseqs_ea2_act.append(ea2_act[i,:])
+...     cseqs_emup_act.append(emup_act[i,:])
+...     cseqs_emdown_act.append(emdown_act[i,:])
+...   ea_cv.append(list(np.divide(np.std(cseqs_ea_act,0),np.mean(cseqs_ea_act,0))))
+...   ea2_cv.append(list(np.divide(np.std(cseqs_ea2_act,0),np.mean(cseqs_ea2_act,0))))
+...   emup_cv.append(list(np.divide(np.std(cseqs_emup_act,0),np.mean(cseqs_emup_act,0))))
+...   emdown_cv.append(list(np.divide(np.std(cseqs_emdown_act,0),np.mean(cseqs_emdown_act,0))))
+... 
+>>> ea_cv_AT18 = []
+>>> ea2_cv_AT18 = []
+>>> emup_cv_AT18 = []
+>>> emdown_cv_AT18 = []
+>>> for seq in range(len(seqs2plot_allAT18)):
+...   cseqs = lSimilarSeqs_allAT18[seqs2plot_allAT18[seq]]
+...   cseqs_ea_act = []
+...   cseqs_ea2_act = []
+...   cseqs_emup_act = []
+...   cseqs_emdown_act = []
+...   for i in cseqs:
+...     cseqs_ea_act.append(ea_act18[i,:])
+...     cseqs_ea2_act.append(ea2_act18[i,:])
+...     cseqs_emup_act.append(emup_act18[i,:])
+...     cseqs_emdown_act.append(emdown_act18[i,:])
+...   ea_cv_AT18.append(list(np.divide(np.std(cseqs_ea_act,0),np.mean(cseqs_ea_act,0))))
+...   ea2_cv_AT18.append(list(np.divide(np.std(cseqs_ea2_act,0),np.mean(cseqs_ea2_act,0))))
+...   emup_cv_AT18.append(list(np.divide(np.std(cseqs_emup_act,0),np.mean(cseqs_emup_act,0))))
+...   emdown_cv_AT18.append(list(np.divide(np.std(cseqs_emdown_act,0),np.mean(cseqs_emdown_act,0))))
+... 
+>>> ea_cv_AT19 = []
+>>> ea2_cv_AT19 = []
+>>> emup_cv_AT19 = []
+>>> emdown_cv_AT19 = []
+>>> for seq in range(len(seqs2plot_allAT19)):
+...   cseqs = lSimilarSeqs_allAT19[seqs2plot_allAT19[seq]]
+...   cseqs_ea_act = []
+...   cseqs_ea2_act = []
+...   cseqs_emup_act = []
+...   cseqs_emdown_act = []
+...   for i in cseqs:
+...     cseqs_ea_act.append(ea_act19[i,:])
+...     cseqs_ea2_act.append(ea2_act19[i,:])
+...     cseqs_emup_act.append(emup_act19[i,:])
+...     cseqs_emdown_act.append(emdown_act19[i,:])
+...   ea_cv_AT19.append(list(np.divide(np.std(cseqs_ea_act,0),np.mean(cseqs_ea_act,0))))
+...   ea2_cv_AT19.append(list(np.divide(np.std(cseqs_ea2_act,0),np.mean(cseqs_ea2_act,0))))
+...   emup_cv_AT19.append(list(np.divide(np.std(cseqs_emup_act,0),np.mean(cseqs_emup_act,0))))
+...   emdown_cv_AT19.append(list(np.divide(np.std(cseqs_emdown_act,0),np.mean(cseqs_emdown_act,0))))
+
+
+>>> np.nanmean(np.nanmean(ea_cv))
+2.538288071529888
+>>> np.nanmean(np.nanmean(ea_cv_AT18))
+1.8821709215395481
+>>> np.nanmean(np.nanmean(ea_cv_AT19))
+1.9033927156981698
+>>> np.nanmean(np.nanmean(ea2_cv))
+2.3868419588165617
+>>> np.nanmean(np.nanmean(ea2_cv_AT18))
+1.8429749897167538
+>>> np.nanmean(np.nanmean(ea2_cv_AT19))
+1.8661812205418773
+>>> np.nanmean(np.nanmean(emup_cv))
+0.5191925238722217
+>>> np.nanmean(np.nanmean(emup_cv_AT18))
+0.28699422338769365
+>>> np.nanmean(np.nanmean(emup_cv_AT19))
+0.2906329255008573
+>>> np.nanmean(np.nanmean(emdown_cv))
+0.5179262078691595
+>>> np.nanmean(np.nanmean(emdown_cv_AT18))
+0.28990071859949723
+>>> np.nanmean(np.nanmean(emdown_cv_AT19))
+0.2939918137729761
+>>> ea_cv_rs = np.reshape(np.array(ea_cv),(np.array(ea_cv).shape[0]*np.array(ea_cv).shape[1]))
+>>> ea_cv_rs.shape
+(50400,)
+>>> ea_cv_AT18_rs = np.reshape(np.array(ea_cv_AT18),(np.array(ea_cv_AT18).shape[0]*np.array(ea_cv_AT18).shape[1]))
+>>> ea_cv_AT18_rs.shape
+(57400,)
+>>> ea_cv_AT19_rs = np.reshape(np.array(ea_cv_AT19),(np.array(ea_cv_AT19).shape[0]*np.array(ea_cv_AT19).shape[1]))
+>>> ea2_cv_rs = np.reshape(np.array(ea2_cv),(np.array(ea2_cv).shape[0]*np.array(ea2_cv).shape[1]))
+>>> ea2_cv_AT18_rs = np.reshape(np.array(ea2_cv_AT18),(np.array(ea2_cv_AT18).shape[0]*np.array(ea2_cv_AT18).shape[1]))
+>>> ea2_cv_AT19_rs = np.reshape(np.array(ea2_cv_AT19),(np.array(ea2_cv_AT19).shape[0]*np.array(ea2_cv_AT19).shape[1]))
+>>> emup_cv_rs = np.reshape(np.array(emup_cv),(np.array(emup_cv).shape[0]*np.array(emup_cv).shape[1]))
+>>> emup_cv_AT18_rs = np.reshape(np.array(emup_cv_AT18),(np.array(emup_cv_AT18).shape[0]*np.array(emup_cv_AT18).shape[1]))
+>>> emup_cv_AT19_rs = np.reshape(np.array(emup_cv_AT19),(np.array(emup_cv_AT19).shape[0]*np.array(emup_cv_AT19).shape[1]))
+>>> emdown_cv_rs = np.reshape(np.array(emdown_cv),(np.array(emdown_cv).shape[0]*np.array(emdown_cv).shape[1]))
+>>> emdown_cv_AT18_rs = np.reshape(np.array(emdown_cv_AT18),(np.array(emdown_cv_AT18).shape[0]*np.array(emdown_cv_AT18).shape[1]))
+>>> emdown_cv_AT19_rs = np.reshape(np.array(emdown_cv_AT19),(np.array(emdown_cv_AT19).shape[0]*np.array(emdown_cv_AT19).shape[1]))
+
+
+>>> import scipy.stats as stats
+>>> stats.ttest_ind(ea_cv_rs[~isnan(ea_cv_rs)],ea_cv_AT18_rs[~isnan(ea_cv_AT18_rs)])
+Ttest_indResult(statistic=58.550988725722775, pvalue=0.0)
+>>> stats.ttest_ind(ea_cv_rs[~isnan(ea_cv_rs)],ea_cv_AT19_rs[~isnan(ea_cv_AT19_rs)])
+Ttest_indResult(statistic=56.84105228240889, pvalue=0.0)
+>>> stats.ttest_ind(ea_cv_AT18_rs[~isnan(ea_cv_AT18_rs)],ea_cv_AT19_rs[~isnan(ea_cv_AT19_rs)])
+Ttest_indResult(statistic=-2.0722582717620464, pvalue=0.038245458590093206)
+
+>>> stats.ttest_ind(ea2_cv_rs[~isnan(ea2_cv_rs)],ea2_cv_AT18_rs[~isnan(ea2_cv_AT18_rs)])
+Ttest_indResult(statistic=76.17627762927641, pvalue=0.0)
+>>> stats.ttest_ind(ea2_cv_rs[~isnan(ea2_cv_rs)],ea2_cv_AT19_rs[~isnan(ea2_cv_AT19_rs)])
+Ttest_indResult(statistic=73.5752821017557, pvalue=0.0)
+>>> stats.ttest_ind(ea2_cv_AT18_rs[~isnan(ea2_cv_AT18_rs)],ea2_cv_AT19_rs[~isnan(ea2_cv_AT19_rs)])
+Ttest_indResult(statistic=-3.5562012571843327, pvalue=0.00037643312755920687)
+>>> 
+>>> stats.ttest_ind(emup_cv_rs[~isnan(emup_cv_rs)],emup_cv_AT18_rs[~isnan(emup_cv_AT18_rs)])
+Ttest_indResult(statistic=133.5857423705571, pvalue=0.0)
+>>> stats.ttest_ind(emup_cv_rs[~isnan(emup_cv_rs)],emup_cv_AT19_rs[~isnan(emup_cv_AT19_rs)])
+Ttest_indResult(statistic=130.13844615904048, pvalue=0.0)
+>>> stats.ttest_ind(emup_cv_AT18_rs[~isnan(emup_cv_AT18_rs)],emup_cv_AT19_rs[~isnan(emup_cv_AT19_rs)])
+Ttest_indResult(statistic=-2.6296953799712126, pvalue=0.008551332434053942)
+>>> 
+>>> stats.ttest_ind(emdown_cv_rs[~isnan(emdown_cv_rs)],emdown_cv_AT18_rs[~isnan(emdown_cv_AT18_rs)])
+Ttest_indResult(statistic=131.2435126056258, pvalue=0.0)
+>>> stats.ttest_ind(emdown_cv_rs[~isnan(emdown_cv_rs)],emdown_cv_AT19_rs[~isnan(emdown_cv_AT19_rs)])
+Ttest_indResult(statistic=127.55720798245417, pvalue=0.0)
+>>> stats.ttest_ind(emdown_cv_AT18_rs[~isnan(emdown_cv_AT18_rs)],emdown_cv_AT19_rs[~isnan(emdown_cv_AT19_rs)])
+Ttest_indResult(statistic=-2.9510385446793848, pvalue=0.0031699893032743624)
+
+>>> plt.bar([0,1,2,3],[nanmean(ea_cv_rs),nanmean(ea2_cv_rs),nanmean(emup_cv_rs),nanmean(emdown_cv_rs)],width=0.2,edgecolor='black',color=[0,0,1])
+<BarContainer object of 4 artists>
+>>> plt.bar([0.2,1.2,2.2,3.2],[nanmean(ea_cv_AT18_rs),nanmean(ea2_cv_AT18_rs),nanmean(emup_cv_AT18_rs),nanmean(emdown_cv_AT18_rs)],width=0.2,edgecolor='black',color=[1,0.2,0.2])
+<BarContainer object of 4 artists>
+>>> plt.bar([0.4,1.4,2.4,3.4],[nanmean(ea_cv_AT19_rs),nanmean(ea2_cv_AT19_rs),nanmean(emup_cv_AT19_rs),nanmean(emdown_cv_AT19_rs)],width=0.2,edgecolor='black',color=[1,0.4,0.4])
+<BarContainer object of 4 artists>
+>>> legend(('Before training','After training episode 18','After training episode 19'))
+<matplotlib.legend.Legend object at 0x7f2669d05050>
+>>> plt.xticks([0.2,1.2,2.2,3.2],['EA','EA2','EMUP','EMDOWN'])
+([<matplotlib.axis.XTick object at 0x7f2669e0b350>, <matplotlib.axis.XTick object at 0x7f2669e3b1d0>, <matplotlib.axis.XTick object at 0x7f2669e02c50>, <matplotlib.axis.XTick object at 0x7f2669ed89d0>], <a list of 4 Text xticklabel objects>)
+>>> ylabel('Average CV of neural responses')
+Text(38.3472,0.5,'Average CV of neural responses')
+>>> lfnBT
+['21feb5_cycle_RL3_B0_BT_p0_', '21feb5_cycle_RL3_B0_BT_p1_', '21feb5_cycle_RL3_B0_BT_p2_', '21feb5_cycle_RL3_B0_BT_p3_', '21feb5_cycle_RL3_B0_BT_p4_', '21feb5_cycle_RL3_B0_BT_p5_']
+>>> lfnBT[0]
+'21feb5_cycle_RL3_B0_BT_p0_'
+>>> savefig('21june30_21feb5_cycle_RL3_B0_BTvsAT18vsAT19_avgCVneuralresponses.png')
+
+I think this is wrong... I should compute CV of each neuron's responses.
+
+
+
+>>> ea_cv1 = np.divide(np.std(ea_act,0),np.mean(ea_act,0))
+>>> ea2_cv1 = np.divide(np.std(ea2_act,0),np.mean(ea2_act,0))
+>>> emup_cv1 = np.divide(np.std(emup_act,0),np.mean(emup_act,0))
+>>> emdown_cv1 = np.divide(np.std(emdown_act,0),np.mean(emdown_act,0))
+>>> 
+>>> ea_cv1_AT18 = np.divide(np.std(ea_act18,0),np.mean(ea_act18,0))
+>>> ea2_cv1_AT18 = np.divide(np.std(ea2_act18,0),np.mean(ea2_act18,0))
+>>> emup_cv1_AT18 = np.divide(np.std(emup_act18,0),np.mean(emup_act18,0))
+>>> emdown_cv1_AT18 = np.divide(np.std(emdown_act18,0),np.mean(emdown_act18,0))
+>>> 
+>>> ea_cv1_AT19 = np.divide(np.std(ea_act19,0),np.mean(ea_act19,0))
+>>> ea2_cv1_AT19 = np.divide(np.std(ea2_act19,0),np.mean(ea2_act19,0))
+>>> emup_cv1_AT19 = np.divide(np.std(emup_act19,0),np.mean(emup_act19,0))
+>>> emdown_cv1_AT19 = np.divide(np.std(emdown_act19,0),np.mean(emdown_act19,0))
+>>> 
+>>> stats.ttest_ind(ea_cv1[~isnan(ea_cv1)],ea_cv1_AT18[~isnan(ea_cv1_AT18)])
+Ttest_indResult(statistic=6.508736299631143, pvalue=8.949816605504621e-11)
+>>> stats.ttest_ind(ea_cv1[~isnan(ea_cv1)],ea_cv1_AT19[~isnan(ea_cv1_AT19)])
+Ttest_indResult(statistic=6.0546918225851405, pvalue=1.5952290966403243e-09)
+>>> stats.ttest_ind(ea_cv1_AT18[~isnan(ea_cv1_AT18)],ea_cv1_AT19[~isnan(ea_cv1_AT19)])
+Ttest_indResult(statistic=-0.5231789339798164, pvalue=0.6008912567616767)
+>>> 
+>>> stats.ttest_ind(ea2_cv1[~isnan(ea2_cv1)],ea2_cv1_AT18[~isnan(ea2_cv1_AT18)])
+Ttest_indResult(statistic=18.80548705495025, pvalue=2.1790028782334555e-74)
+>>> stats.ttest_ind(ea2_cv1[~isnan(ea2_cv1)],ea2_cv1_AT19[~isnan(ea2_cv1_AT19)])
+Ttest_indResult(statistic=17.257295330484425, pvalue=1.7034010215630456e-63)
+>>> stats.ttest_ind(ea2_cv1_AT18[~isnan(ea2_cv1_AT18)],ea2_cv1_AT19[~isnan(ea2_cv1_AT19)])
+Ttest_indResult(statistic=-1.4886414581686755, pvalue=0.13669450317062887)
+>>> 
+>>> stats.ttest_ind(emup_cv1[~isnan(emup_cv1)],emup_cv1_AT18[~isnan(emup_cv1_AT18)])
+Ttest_indResult(statistic=112.79909826269737, pvalue=0.0)
+>>> stats.ttest_ind(emup_cv1[~isnan(emup_cv1)],emup_cv1_AT19[~isnan(emup_cv1_AT19)])
+Ttest_indResult(statistic=93.94842531867839, pvalue=0.0)
+>>> stats.ttest_ind(emup_cv1_AT18[~isnan(emup_cv1_AT18)],emup_cv1_AT19[~isnan(emup_cv1_AT19)])
+Ttest_indResult(statistic=-15.911184899392982, pvalue=8.598783771164714e-48)
+>>> 
+>>> stats.ttest_ind(emdown_cv1[~isnan(emdown_cv1)],emdown_cv1_AT18[~isnan(emdown_cv1_AT18)])
+Ttest_indResult(statistic=113.72150938091147, pvalue=0.0)
+>>> stats.ttest_ind(emdown_cv1[~isnan(emdown_cv1)],emdown_cv1_AT19[~isnan(emdown_cv1_AT19)])
+Ttest_indResult(statistic=95.87254600405262, pvalue=0.0)
+>>> stats.ttest_ind(emdown_cv1_AT18[~isnan(emdown_cv1_AT18)],emdown_cv1_AT19[~isnan(emdown_cv1_AT19)])
+Ttest_indResult(statistic=-15.756183793299204, pvalue=4.879838216307873e-47)
+
+--
+>>> np.array(ea_cv).shape
+(36, 1400)
+>>> np.array(ea_cv_AT18).shape
+(41, 1400)
+>>> np.array(ea_cv_AT19).shape
+(43, 1400)
+
+
+-------------------------------------------
+
+--------
+
+1. When comparing for same ball trajectory before and after training, cv would be a better measure.
+2. A single neuron responds variably to different ball trajectories (first factor) and multiple repeats (2nd factor).
+.... plot distribution of var for each neuron.
+.... plot distribution of cv for each neuron.
+3. For each ball trajectory, pop var for multiple repeats.
+.... plot distribution of var for each ball trajectory.
+.... plot distribution of cv for each ball trajectory.
+
+
+---
+Train feedforward model in simFullHA.json without EA2.
+
+"ResumeSim": 0,
+"name": "21july1_21feb5_cycle_RL3_B0_noEA2_",
+
+"EA2": 0, (originally it was 1400)
+
+(base) hanwar@cycle:~/GamesProject/SMARTAgent$ python multistepSim.py simFullHA.json 30 20 21july1_B0_cycle_mult
+
+>>> lfnT = ['21july1_21feb5_cycle_RL3_B0_noEA2__step_0_']
+>>> lfnT.append('21july1_21feb5_cycle_RL3_B0_noEA2__step_1_')
+>>> lfnT.append('21july1_21feb5_cycle_RL3_B0_noEA2__step_2_')
+>>> lfnT.append('21july1_21feb5_cycle_RL3_B0_noEA2__step_3_')
+>>> lfnT.append('21july1_21feb5_cycle_RL3_B0_noEA2__step_4_')
+>>> lfnT.append('21july1_21feb5_cycle_RL3_B0_noEA2__step_5_')
+>>> lfnT.append('21july1_21feb5_cycle_RL3_B0_noEA2__step_6_')
+>>> lfnT.append('21july1_21feb5_cycle_RL3_B0_noEA2__step_7_')
+>>> lfnT.append('21july1_21feb5_cycle_RL3_B0_noEA2__step_8_')
+>>> lfnT.append('21july1_21feb5_cycle_RL3_B0_noEA2__step_9_')
+>>> lfnT.append('21july1_21feb5_cycle_RL3_B0_noEA2__step_10_')
+>>> lfnT.append('21july1_21feb5_cycle_RL3_B0_noEA2__step_11_')
+>>> lfnT.append('21july1_21feb5_cycle_RL3_B0_noEA2__step_12_')
+>>> lfnT.append('21july1_21feb5_cycle_RL3_B0_noEA2__step_13_')
+>>> lfnT.append('21july1_21feb5_cycle_RL3_B0_noEA2__step_14_')
+>>> lfnT.append('21july1_21feb5_cycle_RL3_B0_noEA2__step_15_')
+>>> lfnT.append('21july1_21feb5_cycle_RL3_B0_noEA2__step_16_')
+>>> lfnT.append('21july1_21feb5_cycle_RL3_B0_noEA2__step_17_')
+>>> lfnT.append('21july1_21feb5_cycle_RL3_B0_noEA2__step_18_')
+>>> lfnT.append('21july1_21feb5_cycle_RL3_B0_noEA2__step_19_')
+
+>>> lpdaT = getindivactionreward(lfnT)
+>>> lrat = plotHitMissRatioPerStep(lpdaT)
+>>> xlabel('training episodes',size=24)
+Text(0.5,19.5222,'training episodes')
+>>> xlabel('training episodes',size=14)
+Text(0.5,19.5222,'training episodes')
+>>> ylabel('Hit/Miss',size=14)
+Text(27.8472,0.5,'Hit/Miss')
+>>> savefig('21july1_21feb5_cycle_RL3_B0_noEA2_20steps_hit_miss_ratio.png')
+>>> lhit, lmiss = [],[]
+>>> for pda in lpdaT:
+...   hit,miss = plotHitMiss(pda,asratio=False,asbin=False,ax=gca())
+...   lhit.append(hit); lmiss.append(miss)
+... 
+>>> plt.plot(lhit,'g-o')
+[<matplotlib.lines.Line2D object at 0x7f2b4e088d10>]
+>>> plt.plot(lmiss,'r-o')
+[<matplotlib.lines.Line2D object at 0x7f2b23884550>]
+>>> legend(('Hits','Miss'))
+<matplotlib.legend.Legend object at 0x7f2b119d9a90>
+>>> xlabel('training episodes',size=16)
+Text(0.5,19.5222,'training episodes')
+>>> ylabel('total hits or miss per training episode', size=16)
+Text(32.9722,0.5,'total hits or miss per training episode')
+>>> savefig('21july1_21feb5_cycle_RL3_B0_noEA2_20steps_hit_miss.png')
+
+
+....resume for 20 more steps
+
+    "ResumeSim": 1,
+    "ResumeSimFromFile": "data/21july1_21feb5_cycle_RL3_B0_noEA2__step_19_synWeights_final.pkl"
+
+"name": "21july6_21feb5_cycle_RL3_B0_noEA2_",
+
+(base) hanwar@cycle:~/GamesProject/SMARTAgent$ python multistepSim.py simFullHA.json 30 20 21july6_B0_cycle_multi
+
+--
+Since we removed EA2 completely, may be increase EA to EM conn strengths
+
+"ResumeSim": 0,
+"name": "21july1_21feb5_cycle_RL3_B0_noEA2v2_",
+"EA2": 0, (originally it was 1400)
+
+EA->EM: AM2:16 (before it was 8)
+(base) hanwar@cycle:~/GamesProject/SMARTAgent$ python multistepSim.py simFullHA.json 30 20 21july1_B0_v2_cycle_mult
+
+>>> lfnT = ['21july1_21feb5_cycle_RL3_B0_noEA2v2__step_0_']
+>>> lfnT.append('21july1_21feb5_cycle_RL3_B0_noEA2v2__step_1_')
+>>> lfnT.append('21july1_21feb5_cycle_RL3_B0_noEA2v2__step_2_')
+>>> lfnT.append('21july1_21feb5_cycle_RL3_B0_noEA2v2__step_3_')
+>>> lfnT.append('21july1_21feb5_cycle_RL3_B0_noEA2v2__step_4_')
+>>> lfnT.append('21july1_21feb5_cycle_RL3_B0_noEA2v2__step_5_')
+>>> lfnT.append('21july1_21feb5_cycle_RL3_B0_noEA2v2__step_6_')
+>>> lfnT.append('21july1_21feb5_cycle_RL3_B0_noEA2v2__step_7_')
+>>> lfnT.append('21july1_21feb5_cycle_RL3_B0_noEA2v2__step_8_')
+>>> lfnT.append('21july1_21feb5_cycle_RL3_B0_noEA2v2__step_9_')
+>>> lfnT.append('21july1_21feb5_cycle_RL3_B0_noEA2v2__step_10_')
+>>> lfnT.append('21july1_21feb5_cycle_RL3_B0_noEA2v2__step_11_')
+>>> lfnT.append('21july1_21feb5_cycle_RL3_B0_noEA2v2__step_12_')
+>>> lfnT.append('21july1_21feb5_cycle_RL3_B0_noEA2v2__step_13_')
+>>> lfnT.append('21july1_21feb5_cycle_RL3_B0_noEA2v2__step_14_')
+>>> lfnT.append('21july1_21feb5_cycle_RL3_B0_noEA2v2__step_15_')
+>>> lfnT.append('21july1_21feb5_cycle_RL3_B0_noEA2v2__step_16_')
+>>> lfnT.append('21july1_21feb5_cycle_RL3_B0_noEA2v2__step_17_')
+>>> lfnT.append('21july1_21feb5_cycle_RL3_B0_noEA2v2__step_18_')
+>>> lfnT.append('21july1_21feb5_cycle_RL3_B0_noEA2v2__step_19_')
+>>> lpdaT = getindivactionreward(lfnT)
+>>> lpdaT = getindivactionreward(lfnT)
+>>> lrat = plotHitMissRatioPerStep(lpdaT)
+>>> xlabel('training episodes',size=14)
+Text(0.5,19.5222,'training episodes')
+>>> ylabel('Hit/Miss',size=14)
+Text(38.4722,0.5,'Hit/Miss')
+>>> savefig('21july1_21feb5_cycle_RL3_B0_noEA2v2_20steps_hit_miss_ratio.png')
+>>> lhit, lmiss = [],[]
+>>> for pda in lpdaT:
+...   hit,miss = plotHitMiss(pda,asratio=False,asbin=False,ax=gca())
+...   lhit.append(hit); lmiss.append(miss)
+... 
+>>> plt.plot(lhit,'g-o')
+[<matplotlib.lines.Line2D object at 0x7fb4b28f9810>]
+>>> plt.plot(lmiss,'r-o')
+[<matplotlib.lines.Line2D object at 0x7fb4bb0d5ad0>]
+>>> legend(('Hits','Miss'))
+<matplotlib.legend.Legend object at 0x7fb4a192cc50>
+>>> xlabel('training episodes',size=16)
+Text(0.5,19.5222,'training episodes')
+>>> ylabel('total hits or miss per training episode', size=16)
+Text(32.9722,0.5,'total hits or miss per training episode')
+>>> savefig('21july1_21feb5_cycle_RL3_B0_noEA2v2_20steps_hit_miss.png')
+>>> pdfc = getconcatweightpdf(lfnT)
+>>> plotMeanWeights(pdfc, gca(),msz=1,xl=(0,np.amax(pdfc.time)),lpop=['EMUP','EMDOWN'],lclr=['b','r'],plotindiv=False)
+>>> savefig('21july1_21feb5_cycle_RL3_B0_noEA2v2_20steps_meanWeights_EM.png')
+>>> drawraster(dspkT,dspkID)
+>>> xlim(497e3,501e3)
+(497000.0, 501000.0)
+>>> savefig('21july1_21feb5_cycle_RL3_B0_noEA2v2__step_0_raster.png')
+
+
+....resume to 20 more steps.
+
+    "ResumeSim": 1,
+    "ResumeSimFromFile": "data/21july1_21feb5_cycle_RL3_B0_noEA2v2__step_19_synWeights_final.pkl"
+
+"name": "21july6_21feb5_cycle_RL3_B0_noEA2v2_",
+
+
+>>> lfnT = ['21july1_21feb5_cycle_RL3_B0_noEA2v2__step_0_']
+>>> lfnT.append('21july1_21feb5_cycle_RL3_B0_noEA2v2__step_1_')
+>>> lfnT.append('21july1_21feb5_cycle_RL3_B0_noEA2v2__step_2_')
+>>> lfnT.append('21july1_21feb5_cycle_RL3_B0_noEA2v2__step_3_')
+>>> lfnT.append('21july1_21feb5_cycle_RL3_B0_noEA2v2__step_4_')
+>>> lfnT.append('21july1_21feb5_cycle_RL3_B0_noEA2v2__step_5_')
+>>> lfnT.append('21july1_21feb5_cycle_RL3_B0_noEA2v2__step_6_')
+>>> lfnT.append('21july1_21feb5_cycle_RL3_B0_noEA2v2__step_7_')
+>>> lfnT.append('21july1_21feb5_cycle_RL3_B0_noEA2v2__step_8_')
+>>> lfnT.append('21july1_21feb5_cycle_RL3_B0_noEA2v2__step_9_')
+>>> lfnT.append('21july1_21feb5_cycle_RL3_B0_noEA2v2__step_10_')
+>>> lfnT.append('21july1_21feb5_cycle_RL3_B0_noEA2v2__step_11_')
+>>> lfnT.append('21july1_21feb5_cycle_RL3_B0_noEA2v2__step_12_')
+>>> lfnT.append('21july1_21feb5_cycle_RL3_B0_noEA2v2__step_13_')
+>>> lfnT.append('21july1_21feb5_cycle_RL3_B0_noEA2v2__step_14_')
+>>> lfnT.append('21july1_21feb5_cycle_RL3_B0_noEA2v2__step_15_')
+>>> lfnT.append('21july1_21feb5_cycle_RL3_B0_noEA2v2__step_16_')
+>>> lfnT.append('21july1_21feb5_cycle_RL3_B0_noEA2v2__step_17_')
+>>> lfnT.append('21july1_21feb5_cycle_RL3_B0_noEA2v2__step_18_')
+>>> lfnT.append('21july1_21feb5_cycle_RL3_B0_noEA2v2__step_19_')
+>>> lfnT.append('21july6_21feb5_cycle_RL3_B0_noEA2v2__step_0_')
+>>> lfnT.append('21july6_21feb5_cycle_RL3_B0_noEA2v2__step_1_')
+>>> lfnT.append('21july6_21feb5_cycle_RL3_B0_noEA2v2__step_2_')
+>>> lfnT.append('21july6_21feb5_cycle_RL3_B0_noEA2v2__step_3_')
+>>> lfnT.append('21july6_21feb5_cycle_RL3_B0_noEA2v2__step_4_')
+>>> lfnT.append('21july6_21feb5_cycle_RL3_B0_noEA2v2__step_5_')
+>>> lfnT.append('21july6_21feb5_cycle_RL3_B0_noEA2v2__step_6_')
+>>> lfnT.append('21july6_21feb5_cycle_RL3_B0_noEA2v2__step_7_')
+>>> lfnT.append('21july6_21feb5_cycle_RL3_B0_noEA2v2__step_8_')
+>>> lfnT.append('21july6_21feb5_cycle_RL3_B0_noEA2v2__step_9_')
+>>> lfnT.append('21july6_21feb5_cycle_RL3_B0_noEA2v2__step_10_')
+>>> lfnT.append('21july6_21feb5_cycle_RL3_B0_noEA2v2__step_11_')
+>>> lfnT.append('21july6_21feb5_cycle_RL3_B0_noEA2v2__step_12_')
+>>> lfnT.append('21july6_21feb5_cycle_RL3_B0_noEA2v2__step_13_')
+>>> lfnT.append('21july6_21feb5_cycle_RL3_B0_noEA2v2__step_14_')
+>>> lfnT.append('21july6_21feb5_cycle_RL3_B0_noEA2v2__step_15_')
+>>> lfnT.append('21july6_21feb5_cycle_RL3_B0_noEA2v2__step_16_')
+>>> lfnT.append('21july6_21feb5_cycle_RL3_B0_noEA2v2__step_17_')
+>>> lfnT.append('21july6_21feb5_cycle_RL3_B0_noEA2v2__step_18_')
+>>> lfnT.append('21july6_21feb5_cycle_RL3_B0_noEA2v2__step_19_')
+>>> lpdaT = getindivactionreward(lfnT)
+>>> lrat = plotHitMissRatioPerStep(lpdaT)
+>>> ylabel('Hit/miss',size=14)
+Text(38.2222,0.5,'Hit/miss')
+>>> xlabel('training episodes',size=14)
+Text(0.5,19.5222,'training episodes')
+>>> savefig('21july6_21july1_21feb5_cycle_RL3_B0_noEA2v2_40steps_performance.png')
+>>> lhit, lmiss = [],[]
+>>> for pda in lpdaT:
+...   hit,miss = plotHitMiss(pda,asratio=False,asbin=False,ax=gca())
+...   lhit.append(hit); lmiss.append(miss)
+... 
+>>> plt.plot(lhit,'g-o')
+[<matplotlib.lines.Line2D object at 0x7fa30ec569d0>]
+>>> plt.plot(lmiss,'r-o')
+[<matplotlib.lines.Line2D object at 0x7fa31fa99c10>]
+>>> xlabel('training episodes')
+Text(0.5,19.5222,'training episodes')
+>>> ylabel('Hit/miss',size=14)
+Text(32.9722,0.5,'Hit/miss')
+>>> ylabel('total hits or miss per training episode')
+Text(32.9722,0.5,'total hits or miss per training episode')
+>>> xlabel('training episodes')
+Text(0.5,19.5222,'training episodes')
+>>> legend(('Hits','Miss'))
+<matplotlib.legend.Legend object at 0x7fa408553b90>
+>>> savefig('21july6_21july1_21feb5_cycle_RL3_B0_noEA2v2_40steps_Hits_Miss.png')
+
+>>> pdfc = getconcatweightpdf(lfnT)
+>>> plotMeanWeights(pdfc,gca(),msz=1,xl=(0,np.amax(pdfc.time)),lpop=['EMUP','EMDOWN'],lclr=['b','r'],plotindiv=False)
+>>> savefig('21july6_21july1_21feb5_cycle_RL3_B0_noEA2v2_40steps_avgWeights.png')
+
+-----------------
+"name": "21july12_21feb5_cycle_RL3_B0_noEA2v2_",
+"EA": 2800,
+"EA"->"EM": {"AM2": 16,
+
+
+>>> lfnT = ['21july12_21feb5_cycle_RL3_B0_noEA2v2__step_0_']
+>>> lfnT.append('21july12_21feb5_cycle_RL3_B0_noEA2v2__step_1_')
+>>> lfnT.append('21july12_21feb5_cycle_RL3_B0_noEA2v2__step_2_')
+>>> lfnT.append('21july12_21feb5_cycle_RL3_B0_noEA2v2__step_3_')
+>>> lfnT.append('21july12_21feb5_cycle_RL3_B0_noEA2v2__step_4_')
+>>> lfnT.append('21july12_21feb5_cycle_RL3_B0_noEA2v2__step_5_')
+>>> lfnT.append('21july12_21feb5_cycle_RL3_B0_noEA2v2__step_6_')
+>>> lfnT.append('21july12_21feb5_cycle_RL3_B0_noEA2v2__step_7_')
+>>> lfnT.append('21july12_21feb5_cycle_RL3_B0_noEA2v2__step_8_')
+>>> lfnT.append('21july12_21feb5_cycle_RL3_B0_noEA2v2__step_9_')
+>>> lfnT.append('21july12_21feb5_cycle_RL3_B0_noEA2v2__step_10_')
+>>> lfnT.append('21july12_21feb5_cycle_RL3_B0_noEA2v2__step_11_')
+>>> lfnT.append('21july12_21feb5_cycle_RL3_B0_noEA2v2__step_12_')
+>>> lfnT.append('21july12_21feb5_cycle_RL3_B0_noEA2v2__step_13_')
+>>> lfnT.append('21july12_21feb5_cycle_RL3_B0_noEA2v2__step_14_')
+>>> lfnT.append('21july12_21feb5_cycle_RL3_B0_noEA2v2__step_15_')
+>>> lfnT.append('21july12_21feb5_cycle_RL3_B0_noEA2v2__step_16_')
+>>> lfnT.append('21july12_21feb5_cycle_RL3_B0_noEA2v2__step_17_')
+>>> lfnT.append('21july12_21feb5_cycle_RL3_B0_noEA2v2__step_18_')
+>>> lfnT.append('21july12_21feb5_cycle_RL3_B0_noEA2v2__step_19_')
+>>> lpdaT = getindivactionreward(lfnT)
+>>> lrat = plotHitMissRatioPerStep(lpdaT)
+>>> xlabel('training episodes')
+Text(0.5,19.5222,'training episodes')
+>>> xlabel('training episodes',size=12)
+Text(0.5,19.5222,'training episodes')
+>>> ylabel('Hit/miss',size=12)
+Text(38.2222,0.5,'Hit/miss')
+>>> savefig('21july12_21feb5_cycle_RL3_B0_noEA2v2_20steps.png')
+
+-----------------
+
+"name": "21july12_21feb5_cycle_RL3_B0_noEA2v3_",
+"EA": 2800,
+      "EMDOWN": 600,
+      "EMUP": 600,
+"EA"->"EM": {"AM2": 16,
+....This sim was stopped.....after 6 steps.
+
+
+---
+
+animations for the paper:
+
+gif/21jul28_21feb5_cycle_RL3_B0__step_18__with_reward_input.mp4 - Fig 3C
+gif/21jul28_21feb5_cycle_RL3_B0__step_19__with_reward_input.mp4 - Fig 3D
+
+gif/21jul28_21feb5_cycle_RL3_B0_BT_p0__with_reward_input.mp4
+gif/21jul28_21feb5_cycle_RL3_B0_BT_p1__with_reward_input.mp4 - Fig 4B
+gif/21jul28_21feb5_cycle_RL3_B0_BT_p2__with_reward_input.mp4
+gif/21jul28_21feb5_cycle_RL3_B0_BT_p3__with_reward_input.mp4
+gif/21jul28_21feb5_cycle_RL3_B0_BT_p4__with_reward_input.mp4
+gif/21jul28_21feb5_cycle_RL3_B0_BT_p5__with_reward_input.mp4
+
+
+gif/21jul28_21feb5_cycle_RL3_B0_AT__step_18_p0__with_reward_input.mp4
+gif/21jul28_21feb5_cycle_RL3_B0_AT__step_18_p1__with_reward_input.mp4 - Fig 4C
+gif/21jul28_21feb5_cycle_RL3_B0_AT__step_18_p2__with_reward_input.mp4
+gif/21jul28_21feb5_cycle_RL3_B0_AT__step_18_p3__with_reward_input.mp4
+gif/21jul28_21feb5_cycle_RL3_B0_AT__step_18_p4__with_reward_input.mp4
+gif/21jul28_21feb5_cycle_RL3_B0_AT__step_18_p5__with_reward_input.mp4
+
+gif/21jul29_21feb5_cycle_RL3_B0_AT__step_19_p0__with_reward_input.mp4
+gif/21jul29_21feb5_cycle_RL3_B0_AT__step_19_p1__with_reward_input.mp4 - Fig 4D
+gif/21jul29_21feb5_cycle_RL3_B0_AT__step_19_p2__with_reward_input.mp4
+gif/21jul29_21feb5_cycle_RL3_B0_AT__step_19_p3__with_reward_input.mp4
+gif/21jul29_21feb5_cycle_RL3_B0_AT__step_19_p4__with_reward_input.mp4
+gif/21jul29_21feb5_cycle_RL3_B0_AT__step_19_p5__with_reward_input.mp4
+
+
+gif/21jul29_21may15_TARG0_K_gcp__step_31__with_reward_input.mp4 - Fig 8C
+gif/21jul29_21may15_TARG0_K_gcp__step_31_AT_p1__with_reward_input.mp4 - Fig 8D (AT - 1 example)
+gif/21jul29_21may15_TARG0_K_gcp__step_31_BT_p1__with_reward_input.mp4 - Fig 8D (BT - 1 example)
+
+gif/21jul29_21jan6_TARG4_gcp__step_8__with_reward_input.mp4
+gif/21jul29_21jan6_TARG4_gcp__step_12__with_reward_input.mp4
+gif/21jul29_21jan6_TARG4_gcp__step_15__with_reward_input.mp4
+gif/21jul29_21jan11_TARG4_gcp__step_0__with_reward_input.mp4
+
+--------------------------------------------------------------------
+gif/21jul28_21feb5_cycle_RL3_B0__step_18__with_reward_input.mp4 - Fig 3C
+gif/21jul28_21feb5_cycle_RL3_B0__step_19__with_reward_input.mp4 - Fig 3D
+gif/21jul28_21feb5_cycle_RL3_B0_BT_p1__with_reward_input.mp4 - Fig 4B
+gif/21jul28_21feb5_cycle_RL3_B0_AT__step_18_p1__with_reward_input.mp4 - Fig 4C
+gif/21jul29_21feb5_cycle_RL3_B0_AT__step_19_p1__with_reward_input.mp4 - Fig 4D
+gif/21jul29_21may15_TARG0_K_gcp__step_31__with_reward_input.mp4 - Fig 8C
+gif/21jul29_21may15_TARG0_K_gcp__step_31_AT_p1__with_reward_input.mp4 - Fig 8D (AT - 1 example)
+gif/21jul29_21may15_TARG0_K_gcp__step_31_BT_p1__with_reward_input.mp4 - Fig 8D (BT - 1 example)
+
+gif/21jul29_21jan6_TARG4_gcp__step_8__with_reward_input.mp4 - SFig 2C - ep8
+gif/21jul29_21jan6_TARG4_gcp__step_12__with_reward_input.mp4- SFig 2C - ep12
+gif/21jul29_21jan6_TARG4_gcp__step_15__with_reward_input.mp4- SFig 2C - ep15
+gif/21jul29_21jan11_TARG4_gcp__step_0__with_reward_input.mp4- SFig 2C - ep20
+
+Some notes on Tonic vs Phasic dopaminergic signaling....
+
+
+* Tonic dopamine is thought to encode net costs and benefits of the current situation, tracking reward rate and any associated costs over long time periods (Niv et al., 2007). In line with this theory, a change in tonic dopamine negatively correlates with effort required to obtain a reward (Ostlund et al., 2011). Tonic dopamine also tracks motivational state information, as tonic dopamine efflux is reduced when animals are sated, compared to a hungry state (Ostlund et al., 2011). Together, these data suggest that slower, tonic changes in dopamine concentrations in the ventral striatum control motivation broadly, to regulate effort expenditure based on physiological state and work demands (Figure 2C).
