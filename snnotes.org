@@ -38056,5 +38056,33 @@ savefig(gifpath()+'all_steps_avg_I_weight.png') # [[./gif/21aug23_21aug16_EN0_RS
 
 still have IM weights decreasing; IA weights increasing
 
+why are the IM,IML weights starting higher than IA,IAL weights when both have same values in cmat? 
+
+dconf['net']['cmat']['EA']['IA']['AM2'] # 3.95
+dconf['net']['cmat']['EM']['IM']['AM2'] # 3.95
+dconf['net']['EIGain'] # 1.0
+
+because of noise to IM,IML ... 
+
 fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
 [[./gif/21aug23_21aug16_EN0_RSE_cycle__step_45__with_reward_input.mp4]]
+
+
+** next noise modulation sim (21aug23_EN0_RSE_cycle_)
+
+since performance seems to be decreasing ... will terminate 21aug16_EN0_RSE_cycle_ 
+
+can turn off noise to IM, IML ... remove plasticity within EA ... 
+
+./myrun 30 sn.json
+
+python -i simdat.py backupcfg/21aug23_EN0_RSE_cycle_sim.json
+
+ok, made some adjustments. no plasticity for recurrent EA, no recurrent EA connections, but
+have higher VL -> EA; since during previous sims EA -> EA was increasing with performance, may
+not have had enough activation of EA ... also remove EN from IM,IML, and AMPAN with higher RLhebbwt
+
+python multistepSim.py sn.json 30 120 21aug23_EN0_RSE_cycle_
+
+ok, started ~12:15 ...
+

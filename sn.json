@@ -108,7 +108,7 @@
     "RLFakeUpRule": 0,
     "RLFakeDownRule": 0,
     "RLFakeStayRule": 0,
-    "name": "21aug16_EN0_RSE_cycle_",
+    "name": "21aug23_EN0_RSE_cycle_",
     "doquit": 1,
     "doplot": 0,
     "saveCellSecs": 0,
@@ -423,13 +423,13 @@
       "FeedForwardA2toM": 1,
       "FeedbackLocNeurons": 0,
       "RecurrentMNeurons": 1,
-      "RecurrentANeurons": 1,
-      "RecurrentA2Neurons": 1,
+      "RecurrentANeurons": 0,
+      "RecurrentA2Neurons": 0,
       "FeedbackAtoDirN": 0,
       "FeedbackAtoLocN": 0,
-      "FeedbackMtoA": 1,
-      "FeedbackMtoA2": 1,
-      "FeedbackA2toA": 1
+      "FeedbackMtoA": 0,
+      "FeedbackMtoA2": 0,
+      "FeedbackA2toA": 0
     },
     "useBinaryImage": 1,
     "useNeuronPad": 0,
@@ -482,12 +482,12 @@
           "conv": 30
         },
         "IM": {
-          "AM2": 9,
+          "AM2": 0,
           "NM2": 0.0,
           "conv": 30
         },
         "IML": {
-          "AM2": 9,
+          "AM2": 0,
           "NM2": 0.0,
           "conv": 30
         }
@@ -504,7 +504,7 @@
           "conv": 0
         },
         "EA": {
-          "AM2": 12.5,
+          "AM2": 15,
           "NM2": 1,
           "conv": 640
         },
@@ -562,9 +562,9 @@
       },
       "EA": {
         "EA": {
-          "AM2": 0.5,
-          "NM2": 0.01,
-          "conv": 30
+          "AM2": 0.0,
+          "NM2": 0.0,
+          "conv": 0
         },
         "EA2": {
           "AM2": 1,
@@ -987,7 +987,7 @@
       "RLlenhebb": 10000,
       "RLlenanti": 500,
       "useRLexp": 1,
-      "RLhebbwt": 0.01,
+      "RLhebbwt": 0.025,
       "RLantiwt": 0.0,
       "hebbwt": 0.0,
       "antiwt": 0.0,
