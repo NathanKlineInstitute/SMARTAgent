@@ -38067,7 +38067,6 @@ because of noise to IM,IML ...
 fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
 [[./gif/21aug23_21aug16_EN0_RSE_cycle__step_45__with_reward_input.mp4]]
 
-
 ** next noise modulation sim (21aug23_EN0_RSE_cycle_)
 
 since performance seems to be decreasing ... will terminate 21aug16_EN0_RSE_cycle_ 
@@ -38085,4 +38084,140 @@ not have had enough activation of EA ... also remove EN from IM,IML, and AMPAN w
 python multistepSim.py sn.json 30 120 21aug23_EN0_RSE_cycle_
 
 ok, started ~12:15 ...
+
+* 21aug24
+** check 21aug23_EN0_RSE_cycle__step_6_
+
+python -i simdat.py backupcfg/21aug23_EN0_RSE_cycle__step_6_sim.json
+
+EV1 0.02 Hz
+EA 1.28 Hz
+IA 2.09 Hz
+IAL 7.36 Hz
+EMDOWN 0.72 Hz
+EMUP 0.71 Hz
+IM 3.71 Hz
+IML 7.85 Hz
+EN 0.87 Hz
+
+ax=plotPerf(actreward,yl=(0,1.0))
+savefig(gifpath()+'perf.png') # [[./gif/21aug24_21aug23_EN0_RSE_cycle__step_6_perf.png]]
+
+clf(); drawraster(dspkT,dspkID); xlim((498e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/21aug24_21aug23_EN0_RSE_cycle__step_6_rast.png]]
+
+lfn = ['21aug23_EN0_RSE_cycle__step_' + str(i) + '_' for i in range(7)]
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0.,0.7))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/21aug24_21aug23_EN0_RSE_cycle__step_6_perf_all_steps_so_far.png]]
+
+lpda = getindivactionreward(lfn)
+cla(); lrat = plotHitMissRatioPerStep(lpda)
+savefig(gifpath()+'hit_miss_ratio.png') # [[./gif/21aug24_21aug23_EN0_RSE_cycle__step_6_hit_miss_ratio.png]]
+
+clf(); pdfc = getconcatweightpdf(lfn,usefinal=True)
+subplot(2,2,1); popwtsfromEA = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False,prety='EN'); ylabel('Average EN->EM')
+subplot(2,2,2); popwtsfromEB = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False,prety='EA'); ylabel('Average EA->EM')
+subplot(2,2,3); popwtsfromEC = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False,prety='EMUP'); ylabel('Average EMUP->EM')
+subplot(2,2,4); popwtsfromED = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False,prety='EMDOWN'); ylabel('Average EMDOWN->EM')
+
+savefig(gifpath()+'all_steps_avg_weightEN.png') # [[./gif/21aug24_21aug23_EN0_RSE_cycle__step_6_all_steps_avg_weightEN.png]]
+
+subplot(1,2,1); popwtsIM = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['IM'],lclr=['k'],plotindiv=False)
+subplot(1,2,2); popwtsIML = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['IML'],lclr=['k'],plotindiv=False)
+
+savefig(gifpath()+'all_steps_avg_I_weight.png') # [[./gif/21aug24_21aug23_EN0_RSE_cycle__step_6_all_steps_avg_I_weight.png]]
+
+best step so far was...
+
+python -i simdat.py backupcfg/21aug23_EN0_RSE_cycle__step_5_sim.json
+
+EV1 0.02 Hz
+EA 1.31 Hz
+IA 2.1 Hz
+IAL 7.23 Hz
+EMDOWN 0.83 Hz
+EMUP 0.82 Hz
+IM 1.81 Hz
+IML 5.04 Hz
+EN 0.87 Hz
+
+here the IM,IML rates are lower ...  so may want to redo w/o the EIPlast ...
+
+ax=plotPerf(actreward,yl=(0,1.0))
+savefig(gifpath()+'perf.png') # [[./gif/21aug24_21aug23_EN0_RSE_cycle__step_5_perf.png]]
+
+clf(); drawraster(dspkT,dspkID); xlim((498e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/21aug24_21aug23_EN0_RSE_cycle__step_5_rast.png]]
+
+fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
+[[./gif/21aug24_21aug23_EN0_RSE_cycle__step_5__with_reward_input.mp4]]
+
+stopped this sim since next step (8) already hyperexcitable ... 
+
+python -i simdat.py backupcfg/21aug23_EN0_RSE_cycle__step_7_sim.json
+
+EV1 0.02 Hz
+EA 1.29 Hz
+IA 2.09 Hz
+IAL 7.32 Hz
+EMDOWN 1.36 Hz
+EMUP 1.34 Hz
+IM 3.23 Hz
+IML 7.1 Hz
+EN 0.87 Hz
+
+ax=plotPerf(actreward,yl=(0,1.0))
+savefig(gifpath()+'perf.png') # [[./gif/21aug24_21aug23_EN0_RSE_cycle__step_7_perf.png]]
+
+clf(); drawraster(dspkT,dspkID); xlim((498e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/21aug24_21aug23_EN0_RSE_cycle__step_7_rast.png]]
+
+lfn = ['21aug23_EN0_RSE_cycle__step_' + str(i) + '_' for i in range(8)]
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0.,0.7))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/21aug24_21aug23_EN0_RSE_cycle__step_7_perf_all_steps_so_far.png]]
+
+lpda = getindivactionreward(lfn)
+cla(); lrat = plotHitMissRatioPerStep(lpda)
+savefig(gifpath()+'hit_miss_ratio.png') # [[./gif/21aug24_21aug23_EN0_RSE_cycle__step_7_hit_miss_ratio.png]]
+
+clf(); pdfc = getconcatweightpdf(lfn,usefinal=True)
+subplot(2,2,1); popwtsfromEA = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False,prety='EN'); ylabel('Average EN->EM')
+subplot(2,2,2); popwtsfromEB = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False,prety='EA'); ylabel('Average EA->EM')
+subplot(2,2,3); popwtsfromEC = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False,prety='EMUP'); ylabel('Average EMUP->EM')
+subplot(2,2,4); popwtsfromED = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False,prety='EMDOWN'); ylabel('Average EMDOWN->EM')
+
+savefig(gifpath()+'all_steps_avg_weightEN.png') # [[./gif/21aug24_21aug23_EN0_RSE_cycle__step_7_all_steps_avg_weightEN.png]]
+
+subplot(1,2,1); popwtsIM = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['IM'],lclr=['k'],plotindiv=False)
+subplot(1,2,2); popwtsIML = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['IML'],lclr=['k'],plotindiv=False)
+
+savefig(gifpath()+'all_steps_avg_I_weight.png') # [[./gif/21aug24_21aug23_EN0_RSE_cycle__step_7_all_steps_avg_I_weight.png]]
+
+** next noise modulation sim -- adjust from last one (21aug24_EN0_RSE_cycle_)
+
+remove connectivity across populations of EMDOWN,EMUP
+remove EIPlast
+increase RLhebbwt for AMPAN so that noise weights decrease same amount as EA->EM weights increase
+
+./myrun 30 sn.json
+
+python -i simdat.py backupcfg/21aug24_EN0_RSE_cycle_sim.json
+
+EV1 0.02 Hz
+EA 1.22 Hz
+IA 1.93 Hz
+IAL 5.77 Hz
+EMDOWN 0.38 Hz
+EMUP 0.46 Hz
+IM 0.05 Hz
+IML 0.37 Hz
+EN 0.86 Hz
+
+may need to increase E -> I weights but can try this first ... 
+
+python multistepSim.py sn.json 30 120 21aug24_EN0_RSE_cycle_
+
+started ~11:56 ...
 
