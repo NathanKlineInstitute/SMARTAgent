@@ -38221,3 +38221,88 @@ python multistepSim.py sn.json 30 120 21aug24_EN0_RSE_cycle_
 
 started ~11:56 ...
 
+* 21aug26
+** check 21aug24_EN0_RSE_cycle__step_43_
+
+python -i simdat.py backupcfg/21aug24_EN0_RSE_cycle__step_43_sim.json
+
+EV1 0.02 Hz
+EA 1.54 Hz
+IA 2.7 Hz
+IAL 7.54 Hz
+EMDOWN 86.77 Hz
+EMUP 88.5 Hz
+IM 0.07 Hz
+IML 0.08 Hz
+EN 0.87 Hz
+
+hyperexcitable...will stop the multistep sim (was in middle of step 44); looked like only
+the EMDOWN population was firing, EMUP was silent...
+
+ax=plotPerf(actreward,yl=(0,1.0))
+savefig(gifpath()+'perf.png') # [[./gif/21aug26_21aug24_EN0_RSE_cycle__step_43_perf.png]]
+
+clf(); drawraster(dspkT,dspkID); xlim((498e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/21aug26_21aug24_EN0_RSE_cycle__step_43_rast.png]]
+
+lfn = ['21aug24_EN0_RSE_cycle__step_' + str(i) + '_' for i in range(44)]
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0.2,0.45))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/21aug26_21aug24_EN0_RSE_cycle__step_43_perf_all_steps_so_far.png]]
+
+clearly increasing in beginning, then clearly decreasing...
+
+lpda = getindivactionreward(lfn)
+cla(); lrat = plotHitMissRatioPerStep(lpda)
+savefig(gifpath()+'hit_miss_ratio.png') # [[./gif/21aug26_21aug24_EN0_RSE_cycle__step_43_hit_miss_ratio.png]]
+
+lrat[np.argmax(lrat)] # 0.75
+lfn[np.argmax(lrat)] # '21aug24_EN0_RSE_cycle__step_19_'
+
+step 19 was best...what happened after?
+
+clf(); pdfc = getconcatweightpdf(lfn,usefinal=True)
+subplot(2,2,1); popwtsfromEA = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False,prety='EN'); ylabel('Average EN->EM')
+subplot(2,2,2); popwtsfromEB = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False,prety='EA'); ylabel('Average EA->EM')
+subplot(2,2,3); popwtsfromEC = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['','EMUP'],lclr=['r','b'],plotindiv=False,prety='EMUP'); ylabel('Average EMUP->EM')
+subplot(2,2,4); popwtsfromED = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN'],lclr=['r','b'],plotindiv=False,prety='EMDOWN'); ylabel('Average EMDOWN->EM')
+
+savefig(gifpath()+'all_steps_avg_weightEN.png') # [[./gif/21aug26_21aug24_EN0_RSE_cycle__step_43_all_steps_avg_weightEN.png]]
+
+python -i simdat.py backupcfg/21aug24_EN0_RSE_cycle__step_19_sim.json
+
+EV1 0.02 Hz
+EA 1.19 Hz
+IA 1.73 Hz
+IAL 5.2 Hz
+EMDOWN 31.79 Hz
+EMUP 22.23 Hz
+IM 31.17 Hz
+IML 33.84 Hz
+EN 0.87 Hz
+
+hmm, rates already high here ...
+
+ax=plotPerf(actreward,yl=(0,1.75))
+savefig(gifpath()+'perf.png') # [[./gif/21aug26_21aug24_EN0_RSE_cycle__step_19_perf.png]]
+
+but the perf looks good for most of the time ... and this, despite the fact that EMDOWN has significantly
+faster firing rates than EMUP...seems to indicate that ball more likely to go to bottom of court ... which
+makes it easier for biases to develop ... output weight norm would be helpful here ... 
+
+clf(); drawraster(dspkT,dspkID); xlim((498e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/21aug26_21aug24_EN0_RSE_cycle__step_19_rast.png]]
+
+fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
+[[./gif/21aug26_21aug24_EN0_RSE_cycle__step_19__with_reward_input.mp4]]
+
+since rates already getting too high, could remove the recurrent conn/plasticity within the EM populations ... 
+
+** next noise mod sim 21aug26_EN0_RSE_cycle_
+
+same as last one just w/o RLconns for recurrent M ... 
+
+python multistepSim.py sn.json 30 120 21aug26_EN0_RSE_cycle_
+
+start ~11:40 ...
+
