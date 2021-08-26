@@ -38306,3 +38306,48 @@ python multistepSim.py sn.json 30 120 21aug26_EN0_RSE_cycle_
 
 start ~11:40 ...
 
+** check evo
+
+worst/best have not improved in a while. each generation takes longer since each sim takes longer; most sims
+probably similar to each other . . . 
+
+best so far occurred in generation 20, already up to around generation 83 (see 21aug9_test_EVO_cycle_.log)
+
+python -i simdat.py backupcfg/21aug9_test_EVO_cycle__evo_gen_20_cand_41_sim.json
+
+EV1 0.0 Hz
+EA 0.27 Hz
+IA 1.91 Hz
+IAL 2.05 Hz
+EMDOWN 0.84 Hz
+EMUP 0.8 Hz
+IM 2.49 Hz
+IML 2.15 Hz
+
+drawraster(dspkT,dspkID); xlim((86e3,88e3))
+savefig(gifpath()+'rast.png') # [[./gif/21aug26_21aug9_test_EVO_cycle__evo_gen_20_cand_41_rast.png]]
+
+fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
+[[./gif/21aug26_21aug9_test_EVO_cycle__evo_gen_20_cand_41__with_reward_input.mp4]]
+
+ep = np.loadtxt('21aug9_test_EVO_cycle_fstats.txt',delimiter=',')
+
+#
+for col, clr in zip([2,3,5],['r','b','k']):
+  plot(ep[:,col],clr,linewidth=3);
+  plot(ep[:,col],clr+'o',markersize=10)
+
+xlabel('Generation',fontsize=25); ylabel('Fitness (Time Before Miss)',fontsize=25)
+ylim((0,100e3))
+
+savefig('gif/21aug26_test_evo_b0.png') # [[./gif/21aug26_test_evo_b0.png]]
+
+np.amax(ep[:,3]) # 88893.0
+
+savefig('gif/21aug26_test_evo_b0b.png') # [[./gif/21aug26_test_evo_b0b.png]]
+
+not sure if should terminate this one ... still some minor improvements ... 
+
+will let it run some more ... worst model was stable for a long time before it jumped up suddenly, similar
+occurred with best and average...so might improve further 
+
