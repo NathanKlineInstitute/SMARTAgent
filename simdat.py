@@ -633,7 +633,7 @@ def plotHitMiss (actreward,ax=None,msz=3,asratio=False,asbin=False,binsz=10e3,lc
     return cumHits[-1],cumMissed[-1]
 
 #
-def plotHitMissRatioPerStep (lpda,ax=None):
+def plotHitMissRatioPerStep (lpda,ax=None,clr='k'):
   if ax is None: ax=gca()
   lhit,lmiss = [],[]
   for pda in lpda: 
@@ -641,7 +641,7 @@ def plotHitMissRatioPerStep (lpda,ax=None):
     lhit.append(hit); lmiss.append(miss)
   cla()
   lrat = np.array(lhit)/lmiss
-  cla(); plot(lrat,'k',linewidth=4); plot(lrat,'ko',markersize=15)
+  cla(); plot(lrat,clr,linewidth=4); plot(lrat,clr+'o',markersize=15)
   xlabel('Step',fontsize=35); ylabel('Hit/miss ratio',fontsize=35); xlim((0-.1,len(lhit)-1+.1))
   return lrat
   

@@ -38351,3 +38351,96 @@ not sure if should terminate this one ... still some minor improvements ...
 will let it run some more ... worst model was stable for a long time before it jumped up suddenly, similar
 occurred with best and average...so might improve further 
 
+* 21aug27
+** check 21aug26_EN0_RSE_cycle__step_35_
+
+python -i simdat.py backupcfg/21aug26_EN0_RSE_cycle__step_35_sim.json
+
+EV1 0.01 Hz
+EA 0.63 Hz
+IA 0.84 Hz
+IAL 2.38 Hz
+EMDOWN 3.3 Hz
+EMUP 3.13 Hz
+IM 33.92 Hz
+IML 39.46 Hz
+EN 0.87 Hz
+
+ax=plotPerf(actreward,yl=(0,1.0))
+savefig(gifpath()+'perf.png') # [[./gif/21aug27_21aug26_EN0_RSE_cycle__step_35_perf.png]]
+
+clf(); drawraster(dspkT,dspkID); xlim((498e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/21aug27_21aug26_EN0_RSE_cycle__step_35_rast.png]]
+
+lfn = ['21aug26_EN0_RSE_cycle__step_' + str(i) + '_' for i in range(36)]
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0.2,0.45))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/21aug27_21aug26_EN0_RSE_cycle__step_35_perf_all_steps_so_far.png]]
+
+lpda = getindivactionreward(lfn)
+cla(); lrat = plotHitMissRatioPerStep(lpda)
+savefig(gifpath()+'hit_miss_ratio.png') # [[./gif/21aug27_21aug26_EN0_RSE_cycle__step_35_hit_miss_ratio.png]]
+
+lrat[np.argmax(lrat)] # 0.7777777777777778
+lfn[np.argmax(lrat)] # '21aug26_EN0_RSE_cycle__step_7_'
+
+step 7 was best, then started to decay...
+
+clf(); pdfc = getconcatweightpdf(lfn,usefinal=True)
+subplot(1,2,1); popwtsfromEA = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False,prety='EN'); ylabel('Average EN->EM')
+subplot(1,2,2); popwtsfromEB = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False,prety='EA'); ylabel('Average EA->EM')
+
+savefig(gifpath()+'all_steps_avg_weightEN.png') # [[./gif/21aug27_21aug26_EN0_RSE_cycle__step_35_all_steps_avg_weightEN.png]]
+
+python -i simdat.py backupcfg/21aug26_EN0_RSE_cycle__step_7_sim.json
+
+EV1 0.02 Hz
+EA 1.34 Hz
+IA 2.01 Hz
+IAL 5.99 Hz
+EMDOWN 0.47 Hz
+EMUP 0.47 Hz
+IM 0.58 Hz
+IML 2.05 Hz
+EN 0.87 Hz
+
+ax=plotPerf(actreward,yl=(0,4.1))
+savefig(gifpath()+'perf.png') # [[./gif/21aug27_21aug26_EN0_RSE_cycle__step_7_perf.png]]
+
+clf(); drawraster(dspkT,dspkID); xlim((498e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/21aug27_21aug26_EN0_RSE_cycle__step_7_rast.png]]
+
+fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
+[[./gif/21aug27_21aug26_EN0_RSE_cycle__step_7__with_reward_input.mp4]]
+
+how does it compare to previous one?
+
+
+lfnA = ['21aug24_EN0_RSE_cycle__step_' + str(i) + '_' for i in range(44)]
+lfnB = ['21aug26_EN0_RSE_cycle__step_' + str(i) + '_' for i in range(36)]
+lpdaA = getindivactionreward(lfnA)
+lratA = plotHitMissRatioPerStep(lpdaA,ax=subplot(1,2,1),clr='r'); ylim((0.05,0.8)); title('Recurrent EM',fontsize=35);
+lpdaB = getindivactionreward(lfnB)
+lratB = plotHitMissRatioPerStep(lpdaB,ax=subplot(1,2,2),clr='b'); ylim((0.05,0.8)); title('No Recurrent EM',fontsize=35);
+
+savefig(gifpath()+'compare_hit_miss_ratio.png') # [[./gif/21aug27_21aug26_EN0_RSE_cycle__step_7_compare_hit_miss_ratio.png]]
+
+w/o recurrent a little better?
+
+perf is decaying; will stop this multistep sim ... 
+
+smaller RLhebbwt may help ... 
+
+** next noise modulation sim (21aug27_EN0_RSE_cycle_)
+
+same as 21aug26_EN0_RSE_cycle_ but smaller RLhebbwt for AMPA, AMPAN (0.01)
+and larger EMDOWN,EMUP population
+
+./myrun 30 sn.json
+
+python -i simdat.py backupcfg/21aug27_EN0_RSE_cycle_sim.json
+
+python multistepSim.py sn.json 30 120 21aug27_EN0_RSE_cycle_
+
+started ~14:14 ...
+
