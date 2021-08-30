@@ -38444,3 +38444,69 @@ python multistepSim.py sn.json 30 120 21aug27_EN0_RSE_cycle_
 
 started ~14:14 ...
 
+* 21aug30
+** check 21aug27_EN0_RSE_cycle__step_47_ -->> best at step 10, not improving much
+
+python -i simdat.py backupcfg/21aug27_EN0_RSE_cycle__step_47_sim.json
+
+EV1 0.02 Hz
+EA 1.34 Hz
+IA 2.0 Hz
+IAL 5.92 Hz
+EMDOWN 0.66 Hz
+EMUP 0.65 Hz
+IM 3.52 Hz
+IML 6.55 Hz
+EN 0.87 Hz
+
+ax=plotPerf(actreward,yl=(0,1.0))
+savefig(gifpath()+'perf.png') # [[./gif/21aug30_21aug27_EN0_RSE_cycle__step_47_perf.png]]
+
+clf(); drawraster(dspkT,dspkID); xlim((498e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/21aug30_21aug27_EN0_RSE_cycle__step_47_rast.png]]
+
+lfn = ['21aug27_EN0_RSE_cycle__step_' + str(i) + '_' for i in range(48)]
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0.2,0.45))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/21aug30_21aug27_EN0_RSE_cycle__step_47_perf_all_steps_so_far.png]]
+
+lpda = getindivactionreward(lfn)
+cla(); lrat = plotHitMissRatioPerStep(lpda)
+savefig(gifpath()+'hit_miss_ratio.png') # [[./gif/21aug30_21aug27_EN0_RSE_cycle__step_47_hit_miss_ratio.png]]
+
+lrat[np.argmax(lrat)] # 0.6896551724137931
+lfn[np.argmax(lrat)] # '21aug27_EN0_RSE_cycle__step_10_'
+
+hmm, nothing better since step 10, already at step 47 ... 
+
+clf(); pdfc = getconcatweightpdf(lfn,usefinal=True)
+subplot(1,2,1); popwtsfromEA = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False,prety='EN'); ylabel('Average EN->EM')
+subplot(1,2,2); popwtsfromEB = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False,prety='EA'); ylabel('Average EA->EM')
+
+savefig(gifpath()+'all_steps_avg_weightEN.png') # [[./gif/21aug30_21aug27_EN0_RSE_cycle__step_47_all_steps_avg_weightEN.png]]
+
+python -i simdat.py backupcfg/21aug27_EN0_RSE_cycle__step_10_sim.json
+
+EV1 0.02 Hz
+EA 1.39 Hz
+IA 2.11 Hz
+IAL 6.26 Hz
+EMDOWN 0.44 Hz
+EMUP 0.44 Hz
+IM 0.33 Hz
+IML 1.32 Hz
+EN 0.87 Hz
+
+ax=plotPerf(actreward,yl=(0,1.1))
+savefig(gifpath()+'perf.png') # [[./gif/21aug30_21aug27_EN0_RSE_cycle__step_10_perf.png]]
+
+clf(); drawraster(dspkT,dspkID); xlim((498e3,500e3))
+savefig(gifpath()+'rast.png') # [[./gif/21aug30_21aug27_EN0_RSE_cycle__step_10_rast.png]]
+
+fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
+[[./gif/21aug30_21aug27_EN0_RSE_cycle__step_10__with_reward_input.mp4]]
+
+looks decent ... but gets best perf pretty early on ... 
+
+stopped this sim ... 
+
