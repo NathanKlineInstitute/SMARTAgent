@@ -1650,12 +1650,12 @@ def updatePFCInputRates ():
         for cell in lCell:
           if pop[lsz:]=='EPFC1':
             if int(cell.gid-offset) in sl1:
-              cell.hPointp.interval = 2 #40
+              cell.hPointp.interval = 6 #40
             else:
               cell.hPointp.interval = 1e12
           elif pop[lsz:]=='EPFC2':
             if int(cell.gid-offset) in sl2:
-              cell.hPointp.interval = 2
+              cell.hPointp.interval = 6
             else:
               cell.hPointp.interval = 1e12
              

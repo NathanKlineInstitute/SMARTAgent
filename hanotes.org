@@ -28662,3 +28662,6 @@ InitializePFCInputRates()
   was using pop=='EPFC2' whereas pop was stimModEPFC2
   so corrected it as
   pop[lsz:]=='EPFC2'
+
+  -- too fast spiking in PFC, so reduce it.
+  -- also reduce connection weights from EA to PFC and EA to St.
