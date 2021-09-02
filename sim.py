@@ -1636,7 +1636,7 @@ def updatePFCInputRates ():
     src1 = [None]*nhost
     src2 = [None]*nhost
   sl1 = sim.pc.py_alltoall(src1)[0]
-  sl2 = sim.pc.py_alltotal(src2)[0]
+  sl2 = sim.pc.py_alltoall(src2)[0]
   if sim.rank==0:
     sl1=slist1
     sl2=slist2
