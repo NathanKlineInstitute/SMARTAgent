@@ -1624,8 +1624,8 @@ def updatePFCInputRates ():
   # this py_alltoall seems to work, but is apparently not as fast as py_broadcast (which has problems - wrong-sized array sometimes!)
   nhost = sim.pc.nhost()
   if sim.rank==0:
-    val1 = randint(1, int(0.1*dnumc['EPFC1'])) #pick at most 10%
-    val2 = randint(1, int(0.1*dnumc['EPFC2'])) #pick at most 10%
+    val1 = randint(1, int(0.01*dnumc['EPFC1'])) #pick at most 10%; further reduce to 1%
+    val2 = randint(1, int(0.01*dnumc['EPFC2'])) #pick at most 10%
     list1 = range(0,dnumc['EPFC1']) 
     list2 = range(0,dnumc['EPFC2'])
     slist1 = sample(list1,val1)
