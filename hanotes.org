@@ -28410,3 +28410,229 @@ Some notes on Tonic vs Phasic dopaminergic signaling....
 
 
 * Tonic dopamine is thought to encode net costs and benefits of the current situation, tracking reward rate and any associated costs over long time periods (Niv et al., 2007). In line with this theory, a change in tonic dopamine negatively correlates with effort required to obtain a reward (Ostlund et al., 2011). Tonic dopamine also tracks motivational state information, as tonic dopamine efflux is reduced when animals are sated, compared to a hungry state (Ostlund et al., 2011). Together, these data suggest that slower, tonic changes in dopamine concentrations in the ventral striatum control motivation broadly, to regulate effort expenditure based on physiological state and work demands (Figure 2C).
+
+
+* 2021Aug23
+
+- Literature review on conrtico-striatal loop, STDP dynamics and dopaminergic release related to RL (presented in lab meeting on Aug20).
+
+https://docs.google.com/presentation/d/1LvnjKB1-7rlP2byePWn8ERb6E8xmrUmohq5Sc0bK6ts/edit#slide=id.ge8377de35f_2_56
+
+- Will design a new architecture:
+
+- copy sn.json into a new file: simFullHACoSt.json
+
+-- added EPFC1, EPFC2, ESt1 and ESt2 neurons in the model.
+
+        "EPFC1":400,
+        "EPFC2":400,
+        "ESt1":400,
+        "ESt2":400
+
+-- included those neurons as ETYPES
+
+"ETYPES":[
+        ...
+        "EPFC1",
+        "EPFC2",
+        "ESt1",
+        "ESt2"
+      ],
+
+-- included definition of plastic connections with new areas for both "STDPconns" and "RLconns"
+
+        "AtoPFC":0,
+        "AtoSt":0,
+        "PFCtoM":0,
+        "MtoSt":0,
+        "SttoPFC":0
+
+
+In "cmat", include:
+
+        "EN": {
+          "EPFC1": {"AM2": 9,"NM2": 0.0,"conv": 0},
+          "EPFC2": {"AM2": 9,"NM2": 0.0,"conv": 0},
+
+  "EA": {
+    "EPFC1": {"AM2": 12.5,"NM2": 0.15,"conv": 300},
+    "EPFC2": {"AM2": 12.5,"NM2": 0.15,"conv": 300},
+    "ESt1": {"AM2": 12.5,"NM2": 0.15,"conv": 300},
+    "ESt2": {"AM2": 12.5,"NM2": 0.15,"conv": 300},
+
+  "EPFC1":{
+    "EMUP":{"AM2": 8,"NM2": 0,"conv": 1} # this is not used
+  },
+  
+  "EPFC2":{
+    "EMDOWN":{"AM2": 8,"NM2": 0,"conv": 1} # this is not used
+  },
+        
+  "EMUP":{
+    "ESt1":{"AM2": 8,"NM2": 0,"conv": 1} # this is not used
+  },
+        
+  "EMDOWN":{
+    "ESt2":{"AM2": 8,"NM2": 0,"conv": 1} # this is not used
+  },
+
+  "ESt1":{
+    "EPFC1":{"AM2": 8,"NM2": 0,"conv": 1} # this is not used
+  },
+
+  "ESt2":{
+    "EPFC2":{"AM2": 8,"NM2": 0,"conv": 1} # this is not used.
+  },
+        
+
+
+-- from random import randint, sample
+
+-- added new pops in plotting traces.
+
+simConfig.analysis['plotTraces'] = {'include': [(pop, 0) for pop in ['ER','IR','EV1','EV1DE','ID','IV1','EV4','IV4','EMT','IMT','EMDOWN','EMUP','IM','IML','IMUP','IMDOWN','EA','IA','IAL','EA2','IA2','IA2L','EN','ESt1','ESt2','EPFC1','EPFC2']]}
+
+
+
+
+-- setup stimMod for random activation of neurons in PFC
+
+def setupStimModPFC ():
+  # setup variable rate NetStim sources (send spikes based on image contents)
+  lstimpfc = []
+  wt = dconf['net']['stimModVL']
+  for poty in ['EPFC1','EPFC2']:
+    if dnumc[poty] <= 0: continue
+    stimpfc = 'stimMod'+poty
+    lstimpfc.append(stimpfc)
+    netParams.popParams[stimpfc] = {'cellModel': 'NSLOC', 'numCells': dnumc[poty],'rate': 'variable', 'noise': 0, 'start': 0}
+    blist = [[i,i] for i in range(dnumc[poty])]
+    netParams.connParams[stimpfc+'->'+poty] = {
+      'preConds': {'pop':stimpfc},
+      'postConds': {'pop':poty},
+      'weight':wt,
+      'delay': getInitDelay('STIMMOD'),
+      'connList':blist, 'weightIndex':getWeightIndex('AMPA',ECellModel)}
+  return lstimpfc
+
+sim.lstimpfc = setupStimModPFC() # when using IntFire4 cells lstimty has the NetStim populations that send spikes to EV1, EV1DE, etc.
+for ty in sim.lstimpfc: allpops.append(ty)
+
+-- creating cortiostriatal loop.
+
+def createCorticoStriatalLoop():
+  # this function considers 1-1 conns in the loop
+  lCSconns = []
+  for i in range(dnumc['EPFC1']): lCSconns.append([i,i])
+  lprety = ['EPFC1','EPFC2','EMUP','EMDOWN','ESt1','ESt2']
+  lpoty = ['EMUP','EMDOWN','ESt1','ESt2','EPFC1','EPFC2']
+  lconns = ['PFCtoM','PFCtoM','MtoSt','MtoSt','SttoPFC','SttoPFC']
+  for prety,poty,connty in zip(lprety,lpoty,lconns):
+    lsynw = [cmat[prety][poty]['AM2']*cfg.EEGain, cmat[prety][poty]['NM2']*cfg.EEGain]
+    for strty,synmech,weight in zip(['','n'],['AM2', 'NM2'],lsynw):
+      k = strty+prety+'->'+strty+poty
+      if weight <= 0.0: continue    
+      netParams.connParams[k] = {
+        'preConds': {'pop': prety},
+        'postConds': {'pop': poty},
+        'connList': lCSconns,
+        'weight': weight,
+        'delay': dconf['net']['delayMinDend'],
+        'synMech': synmech,
+        'sec':EExcitSec, 'loc':0.5,'weightIndex':getWeightIndex(synmech, ECellModel)
+      }
+    useRL = useSTDP = False
+    if dconf['net']['RLconns'][connty]: useRL = True
+    if dconf['net']['STDPconns'][connty]: useSTDP = True          
+    if dSTDPparamsRL[synmech]['RLon'] and useRL: # only turn on plasticity when specified to do so
+      netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL[synmech]}
+    elif dSTDPparams[synmech]['STDPon'] and useSTDP:
+      netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparams[synmech]}
+
+-- connecting corticostriatal loop with visual areas (for now EA specifically)
+
+def connectCorticoStriatalLoop():
+  # this function considers 1-1 conns in the loop
+  prety = 'EA'
+  lpoty = ['EPFC1','EPFC2','ESt1','ESt2']
+  lconns = ['AtoPFC','AtoPFC','AtoSt','AtoSt']
+  for poty,connty in zip(lpoty,lconns):
+    lsynw = [cmat[prety][poty]['AM2']*cfg.EEGain, cmat[prety][poty]['NM2']*cfg.EEGain]
+    for strty,synmech,weight in zip(['','n'],['AM2', 'NM2'],lsynw):
+      k = strty+prety+'->'+strty+poty
+      if weight <= 0.0: continue    
+      netParams.connParams[k] = {
+        'preConds': {'pop': prety},
+        'postConds': {'pop': poty},
+        'convergence': getconv(cmat,prety,poty,dnumc[prety]),
+        'weight': getInitWeight(weight),
+        'delay': dconf['net']['delayMinDend'],
+        'synMech': synmech,
+        'sec':EExcitSec, 'loc':0.5,'weightIndex':getWeightIndex(synmech, ECellModel)
+      }
+    useRL = useSTDP = False
+    if dconf['net']['RLconns'][connty]: useRL = True
+    if dconf['net']['STDPconns'][connty]: useSTDP = True          
+    if dSTDPparamsRL[synmech]['RLon'] and useRL: # only turn on plasticity when specified to do so
+      netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL[synmech]}
+    elif dSTDPparams[synmech]['STDPon'] and useSTDP:
+      netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparams[synmech]}
+
+-- incluse corticostriatal loop if PFC and striatal populations defined.
+
+if dnumc['ESt1']>0 and dnumc['ESt2']>0 and dnumc['EPFC1']>0 and dnumc['EPFC2']>0:
+  createCorticoStriatalLoop()
+  connectCorticoStriatalLoop()
+
+-- Initializing PFC input rates
+
+def InitializePFCInputRates ():
+  np.random.seed(1234)
+  for pop in sim.lstimpfc:
+    if pop in sim.net.pops:
+      for cell in sim.net.cells:
+        if cell.gid in sim.net.pops[pop].cellGids:
+          cell.hPointp.interval = 1e12
+          cell.hPointp.start = 0 # np.random.uniform(0,1200) 
+
+-- generate random activity patterns in PFC1 and PFC2
+
+def updatePFCInputRates ():
+  # update the source firing rates for the primary visual neuron populations (location V1 and direction sensitive)
+  # based on image contents
+  # this py_alltoall seems to work, but is apparently not as fast as py_broadcast (which has problems - wrong-sized array sometimes!)
+  val1 = randint(1, dnumc['EPFC1'])
+  val2 = randint(1, dnumc['EPFC2'])
+  list1 = range(0,dnumc['EPFC1']) 
+  list2 = range(0,dnumc['EPFC2'])
+  slist1 = sample(list1,val1)
+  slist2 = sample(list2,val2)
+  if ECellModel == 'IntFire4' or ECellModel == 'INTF7': # different rules/code when dealing with artificial cells
+    for pop in sim.lstimpfc: # go through NetStim populations
+      if pop in sim.net.pops: # make sure the population exists
+        lCell = [c for c in sim.net.cells if c.gid in sim.net.pops[pop].cellGids] # this is the set of NetStim cells
+        offset = sim.simData['dminID'][pop]
+        #print(pop,pop[lsz:],offset)
+        for cell in lCell:
+          if pop=='EPFC1':
+            if int(cell.gid-offset) in slist1:
+              cell.hPointp.interval = 5 #40
+            else:
+              cell.hPointp.interval = 1e12
+          elif pop=='EPFC2':
+            if int(cell.gid-offset) in slist2:
+              cell.hPointp.interval = 5
+            else:
+              cell.hPointp.interval = 1e12
+
+-- update PFC inputs when updating other input firing rates.
+
+  updateInputRates() # update firing rate of inputs to R population (based on image content)
+  updatePFCInputRates() # choose random combination of PFC neurons to activate EM.    
+
+-- initialize PFC inputs when initializing other input rates.
+
+InitializeInputRates()
+InitializePFCInputRates()      
+
+-- Before training, should test whether the code with new architecture working or not. 

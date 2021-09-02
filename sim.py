@@ -2,6 +2,7 @@ from netpyne import specs, sim
 from neuron import h
 import numpy as np
 import random
+from random import randint, sample
 from conf import dconf # configuration dictionary
 import pandas as pd
 import pickle
@@ -106,6 +107,14 @@ dnumc_padx, dtopoldivcons,dtopolconvcons,allpops_withconvtopology,allpops_withdi
 
 def setlrecpop ():
   lrecpop = ['EMUP', 'EMDOWN'] # which populations to record from
+  if dnumc['ESt1']>0:
+    lrecpop.append('ESt1')
+  if dnumc['ESt2']>0:
+    lrecpop.append('ESt2')
+  if dnumc['EPFC1']>0:
+    lrecpop.append('EPFC1')
+  if dnumc['EPFC2']>0:
+    lrecpop.append('EPFC2')
   if cmat['VD']['VD']['conv'] > 0 or \
      cmat['VD']['VL']['conv'] > 0 or \
      cmat['VL']['VL']['conv'] > 0 or \
@@ -163,7 +172,7 @@ simConfig.saveFolder = 'data'
 # simConfig.backupCfg = ['sim.json', 'backupcfg/'+dconf['sim']['name']+'sim.json']
 simConfig.createNEURONObj = True  # create HOC objects when instantiating network
 simConfig.createPyStruct = True  # create Python structure (simulator-independent) when instantiating network
-simConfig.analysis['plotTraces'] = {'include': [(pop, 0) for pop in ['ER','IR','EV1','EV1DE','ID','IV1','EV4','IV4','EMT','IMT','EMDOWN','EMUP','IM','IML','IMUP','IMDOWN','EA','IA','IAL','EA2','IA2','IA2L','EN']]}
+simConfig.analysis['plotTraces'] = {'include': [(pop, 0) for pop in ['ER','IR','EV1','EV1DE','ID','IV1','EV4','IV4','EMT','IMT','EMDOWN','EMUP','IM','IML','IMUP','IMDOWN','EA','IA','IAL','EA2','IA2','IA2L','EN','ESt1','ESt2','EPFC1','EPFC2']]}
 simConfig.analysis['plotRaster'] = {'popRates':'overlay','showFig':dconf['sim']['doplot']}
 #simConfig.analysis['plot2Dnet'] = True 
 #simConfig.analysis['plotConn'] = True           # plot connectivity matrix
@@ -395,6 +404,29 @@ def setupStimMod ():
 sim.lstimty = setupStimMod() # when using IntFire4 cells lstimty has the NetStim populations that send spikes to EV1, EV1DE, etc.
 for ty in sim.lstimty: allpops.append(ty)
             
+# setup stimMod for random activation of neurons in PFC
+
+def setupStimModPFC ():
+  # setup variable rate NetStim sources (send spikes based on image contents)
+  lstimpfc = []
+  wt = dconf['net']['stimModVL']
+  for poty in ['EPFC1','EPFC2']:
+    if dnumc[poty] <= 0: continue
+    stimpfc = 'stimMod'+poty
+    lstimpfc.append(stimpfc)
+    netParams.popParams[stimpfc] = {'cellModel': 'NSLOC', 'numCells': dnumc[poty],'rate': 'variable', 'noise': 0, 'start': 0}
+    blist = [[i,i] for i in range(dnumc[poty])]
+    netParams.connParams[stimpfc+'->'+poty] = {
+      'preConds': {'pop':stimpfc},
+      'postConds': {'pop':poty},
+      'weight':wt,
+      'delay': getInitDelay('STIMMOD'),
+      'connList':blist, 'weightIndex':getWeightIndex('AMPA',ECellModel)}
+  return lstimpfc
+
+sim.lstimpfc = setupStimModPFC() # when using IntFire4 cells lstimty has the NetStim populations that send spikes to EV1, EV1DE, etc.
+for ty in sim.lstimpfc: allpops.append(ty)
+
 # Stimulation parameters
 def setupNoiseStim ():
   lnoisety = []
@@ -1005,6 +1037,66 @@ def connectEVToTarget (lpoty, useTopological):
 connectEVToTarget(['EA','EA2'], dconf['architectureVtoA']['useTopological']) # connect primary visual to visual association
 connectEVToTarget(EMotorPops, dconf['architectureVtoM']['useTopological']) # connect primary visual to motor
 
+def createCorticoStriatalLoop():
+  # this function considers 1-1 conns in the loop
+  lCSconns = []
+  for i in range(dnumc['EPFC1']): lCSconns.append([i,i])
+  lprety = ['EPFC1','EPFC2','EMUP','EMDOWN','ESt1','ESt2']
+  lpoty = ['EMUP','EMDOWN','ESt1','ESt2','EPFC1','EPFC2']
+  lconns = ['PFCtoM','PFCtoM','MtoSt','MtoSt','SttoPFC','SttoPFC']
+  for prety,poty,connty in zip(lprety,lpoty,lconns):
+    lsynw = [cmat[prety][poty]['AM2']*cfg.EEGain, cmat[prety][poty]['NM2']*cfg.EEGain]
+    for strty,synmech,weight in zip(['','n'],['AM2', 'NM2'],lsynw):
+      k = strty+prety+'->'+strty+poty
+      if weight <= 0.0: continue    
+      netParams.connParams[k] = {
+        'preConds': {'pop': prety},
+        'postConds': {'pop': poty},
+        'connList': lCSconns,
+        'weight': weight,
+        'delay': dconf['net']['delayMinDend'],
+        'synMech': synmech,
+        'sec':EExcitSec, 'loc':0.5,'weightIndex':getWeightIndex(synmech, ECellModel)
+      }
+    useRL = useSTDP = False
+    if dconf['net']['RLconns'][connty]: useRL = True
+    if dconf['net']['STDPconns'][connty]: useSTDP = True          
+    if dSTDPparamsRL[synmech]['RLon'] and useRL: # only turn on plasticity when specified to do so
+      netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL[synmech]}
+    elif dSTDPparams[synmech]['STDPon'] and useSTDP:
+      netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparams[synmech]}
+
+def connectCorticoStriatalLoop():
+  # this function considers 1-1 conns in the loop
+  prety = 'EA'
+  lpoty = ['EPFC1','EPFC2','ESt1','ESt2']
+  lconns = ['AtoPFC','AtoPFC','AtoSt','AtoSt']
+  for poty,connty in zip(lpoty,lconns):
+    lsynw = [cmat[prety][poty]['AM2']*cfg.EEGain, cmat[prety][poty]['NM2']*cfg.EEGain]
+    for strty,synmech,weight in zip(['','n'],['AM2', 'NM2'],lsynw):
+      k = strty+prety+'->'+strty+poty
+      if weight <= 0.0: continue    
+      netParams.connParams[k] = {
+        'preConds': {'pop': prety},
+        'postConds': {'pop': poty},
+        'convergence': getconv(cmat,prety,poty,dnumc[prety]),
+        'weight': getInitWeight(weight),
+        'delay': dconf['net']['delayMinDend'],
+        'synMech': synmech,
+        'sec':EExcitSec, 'loc':0.5,'weightIndex':getWeightIndex(synmech, ECellModel)
+      }
+    useRL = useSTDP = False
+    if dconf['net']['RLconns'][connty]: useRL = True
+    if dconf['net']['STDPconns'][connty]: useSTDP = True          
+    if dSTDPparamsRL[synmech]['RLon'] and useRL: # only turn on plasticity when specified to do so
+      netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL[synmech]}
+    elif dSTDPparams[synmech]['STDPon'] and useSTDP:
+      netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparams[synmech]}
+
+if dnumc['ESt1']>0 and dnumc['ESt2']>0 and dnumc['EPFC1']>0 and dnumc['EPFC2']>0:
+  createCorticoStriatalLoop()
+  connectCorticoStriatalLoop()
+
 # add connections from first to second visual association area
 # EA -> EA2 (feedforward)
 prety = 'EA'; poty = 'EA2'
@@ -1476,6 +1568,15 @@ def InitializeInputRates ():
           if stim['source'] == 'stimMod':
             stim['hObj'].interval = 1e12
 
+def InitializePFCInputRates ():
+  np.random.seed(1234)
+  for pop in sim.lstimpfc:
+    if pop in sim.net.pops:
+      for cell in sim.net.cells:
+        if cell.gid in sim.net.pops[pop].cellGids:
+          cell.hPointp.interval = 1e12
+          cell.hPointp.start = 0 # np.random.uniform(0,1200) 
+
 def updateInputRates ():
   # update the source firing rates for the primary visual neuron populations (location V1 and direction sensitive)
   # based on image contents
@@ -1516,6 +1617,36 @@ def updateInputRates ():
               stim['hObj'].interval = 1e12
             else:
               stim['hObj'].interval = 1000.0/dFiringRates[pop][int(cell.gid-offset)] #40 #fchoices[rind] #10 #
+
+def updatePFCInputRates ():
+  # update the source firing rates for the primary visual neuron populations (location V1 and direction sensitive)
+  # based on image contents
+  # this py_alltoall seems to work, but is apparently not as fast as py_broadcast (which has problems - wrong-sized array sometimes!)
+  val1 = randint(1, dnumc['EPFC1'])
+  val2 = randint(1, dnumc['EPFC2'])
+  list1 = range(0,dnumc['EPFC1']) 
+  list2 = range(0,dnumc['EPFC2'])
+  slist1 = sample(list1,val1)
+  slist2 = sample(list2,val2)
+  if ECellModel == 'IntFire4' or ECellModel == 'INTF7': # different rules/code when dealing with artificial cells
+    for pop in sim.lstimpfc: # go through NetStim populations
+      if pop in sim.net.pops: # make sure the population exists
+        lCell = [c for c in sim.net.cells if c.gid in sim.net.pops[pop].cellGids] # this is the set of NetStim cells
+        offset = sim.simData['dminID'][pop]
+        #print(pop,pop[lsz:],offset)
+        for cell in lCell:
+          if pop=='EPFC1':
+            if int(cell.gid-offset) in slist1:
+              cell.hPointp.interval = 5 #40
+            else:
+              cell.hPointp.interval = 1e12
+          elif pop=='EPFC2':
+            if int(cell.gid-offset) in slist2:
+              cell.hPointp.interval = 5
+            else:
+              cell.hPointp.interval = 1e12
+             
+
 
 # homeostasis based on Sanda et al. 2017.
 def initTargetFR (sim,dMINinitTargetFR,dMAXinitTargetFR):
@@ -1860,7 +1991,8 @@ def trainAgent (t):
     tvec_actions = []
     for ts in range(len(actions)): tvec_actions.append(t-tstepPerAction*(len(actions)-ts-1))
     for ltpnt in tvec_actions: sim.allTimes.append(ltpnt)
-  updateInputRates() # update firing rate of inputs to R population (based on image content)                
+  updateInputRates() # update firing rate of inputs to R population (based on image content)
+  updatePFCInputRates() # choose random combination of PFC neurons to activate EM.               
   NBsteps += 1
   if NBsteps % recordWeightStepSize == 0:
     if dconf['verbose'] > 0 and sim.rank==0:
@@ -2026,6 +2158,7 @@ if dconf['net']['homPlast']['On']:
 
 tPerPlay = tstepPerAction*dconf['actionsPerPlay']
 InitializeInputRates()
+InitializePFCInputRates()
 #InitializeNoiseRates()
 dsumWInit = getSumAdjustableWeights(sim) # get sum of adjustable weights at start of sim
 
