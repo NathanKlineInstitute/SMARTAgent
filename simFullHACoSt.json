@@ -501,10 +501,10 @@
           "IAL": {"AM2": 0,"NM2": 0,"conv": 0}
         },
         "EPFC1":{
-            "EMUP":{"AM2": 16,"NM2": 0,"conv": 1}
+            "EMUP":{"AM2": 20,"NM2": 0,"conv": 1}
         },
         "EPFC2":{
-            "EMDOWN":{"AM2": 16,"NM2": 0,"conv": 1}
+            "EMDOWN":{"AM2": 20,"NM2": 0,"conv": 1}
         },
         "EMUP":{
             "ESt1":{"AM2": 8,"NM2": 0,"conv": 1}
