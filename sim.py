@@ -1641,18 +1641,19 @@ def updatePFCInputRates ():
     sl1=slist1
     sl2=slist2
   if ECellModel == 'IntFire4' or ECellModel == 'INTF7': # different rules/code when dealing with artificial cells
+    lsz = len('stimMod')
     for pop in sim.lstimpfc: # go through NetStim populations
       if pop in sim.net.pops: # make sure the population exists
         lCell = [c for c in sim.net.cells if c.gid in sim.net.pops[pop].cellGids] # this is the set of NetStim cells
         offset = sim.simData['dminID'][pop]
         #print(pop,pop[lsz:],offset)
         for cell in lCell:
-          if pop=='EPFC1':
+          if pop[lsz:]=='EPFC1':
             if int(cell.gid-offset) in sl1:
               cell.hPointp.interval = 2 #40
             else:
               cell.hPointp.interval = 1e12
-          elif pop=='EPFC2':
+          elif pop[lsz:]=='EPFC2':
             if int(cell.gid-offset) in sl2:
               cell.hPointp.interval = 2
             else:

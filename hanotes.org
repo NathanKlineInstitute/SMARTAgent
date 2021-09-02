@@ -28657,3 +28657,8 @@ InitializePFCInputRates()
   if sim.rank==0:
     sl1=slist1
     sl2=slist2
+  
+  -- found a bug in updatePFCInputRates():
+  was using pop=='EPFC2' whereas pop was stimModEPFC2
+  so corrected it as
+  pop[lsz:]=='EPFC2'
