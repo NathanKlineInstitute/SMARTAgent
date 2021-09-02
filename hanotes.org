@@ -28636,3 +28636,24 @@ InitializeInputRates()
 InitializePFCInputRates()      
 
 -- Before training, should test whether the code with new architecture working or not. 
+
+-- passing list of neuron to be activated in PFC in function "updatePFCInputRates"
+
+  nhost = sim.pc.nhost()
+  if sim.rank==0:
+    val1 = randint(1, dnumc['EPFC1'])
+    val2 = randint(1, dnumc['EPFC2'])
+    list1 = range(0,dnumc['EPFC1']) 
+    list2 = range(0,dnumc['EPFC2'])
+    slist1 = sample(list1,val1)
+    slist2 = sample(list2,val2)
+    src1 = [slist1]*nhost
+    src2 = [slist2]*nhost
+  else:
+    src1 = [None]*nhost
+    src2 = [None]*nhost
+  sl1 = sim.pc.py_alltoall(src1)[0]
+  sl2 = sim.pc.py_alltotal(src2)[0]
+  if sim.rank==0:
+    sl1=slist1
+    sl2=slist2

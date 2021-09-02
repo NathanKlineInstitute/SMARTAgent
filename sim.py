@@ -1622,12 +1622,24 @@ def updatePFCInputRates ():
   # update the source firing rates for the primary visual neuron populations (location V1 and direction sensitive)
   # based on image contents
   # this py_alltoall seems to work, but is apparently not as fast as py_broadcast (which has problems - wrong-sized array sometimes!)
-  val1 = randint(1, dnumc['EPFC1'])
-  val2 = randint(1, dnumc['EPFC2'])
-  list1 = range(0,dnumc['EPFC1']) 
-  list2 = range(0,dnumc['EPFC2'])
-  slist1 = sample(list1,val1)
-  slist2 = sample(list2,val2)
+  nhost = sim.pc.nhost()
+  if sim.rank==0:
+    val1 = randint(1, dnumc['EPFC1'])
+    val2 = randint(1, dnumc['EPFC2'])
+    list1 = range(0,dnumc['EPFC1']) 
+    list2 = range(0,dnumc['EPFC2'])
+    slist1 = sample(list1,val1)
+    slist2 = sample(list2,val2)
+    src1 = [slist1]*nhost
+    src2 = [slist2]*nhost
+  else:
+    src1 = [None]*nhost
+    src2 = [None]*nhost
+  sl1 = sim.pc.py_alltoall(src1)[0]
+  sl2 = sim.pc.py_alltotal(src2)[0]
+  if sim.rank==0:
+    sl1=slist1
+    sl2=slist2
   if ECellModel == 'IntFire4' or ECellModel == 'INTF7': # different rules/code when dealing with artificial cells
     for pop in sim.lstimpfc: # go through NetStim populations
       if pop in sim.net.pops: # make sure the population exists
@@ -1636,13 +1648,13 @@ def updatePFCInputRates ():
         #print(pop,pop[lsz:],offset)
         for cell in lCell:
           if pop=='EPFC1':
-            if int(cell.gid-offset) in slist1:
-              cell.hPointp.interval = 5 #40
+            if int(cell.gid-offset) in sl1:
+              cell.hPointp.interval = 2 #40
             else:
               cell.hPointp.interval = 1e12
           elif pop=='EPFC2':
-            if int(cell.gid-offset) in slist2:
-              cell.hPointp.interval = 5
+            if int(cell.gid-offset) in sl2:
+              cell.hPointp.interval = 2
             else:
               cell.hPointp.interval = 1e12
              
