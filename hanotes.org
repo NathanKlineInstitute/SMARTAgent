@@ -28665,3 +28665,6 @@ InitializePFCInputRates()
 
   -- too fast spiking in PFC, so reduce it.
   -- also reduce connection weights from EA to PFC and EA to St.
+
+-- PROBLEM: RL-STDP is not working..... Trying to figure out why....
+...probably indentation problem in createCorticoStriatalLoop and connectCorticoStriatalLoop

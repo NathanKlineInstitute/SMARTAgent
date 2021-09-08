@@ -1058,13 +1058,13 @@ def createCorticoStriatalLoop():
         'synMech': synmech,
         'sec':EExcitSec, 'loc':0.5,'weightIndex':getWeightIndex(synmech, ECellModel)
       }
-    useRL = useSTDP = False
-    if dconf['net']['RLconns'][connty]: useRL = True
-    if dconf['net']['STDPconns'][connty]: useSTDP = True          
-    if dSTDPparamsRL[synmech]['RLon'] and useRL: # only turn on plasticity when specified to do so
-      netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL[synmech]}
-    elif dSTDPparams[synmech]['STDPon'] and useSTDP:
-      netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparams[synmech]}
+      useRL = useSTDP = False
+      if dconf['net']['RLconns'][connty]: useRL = True
+      if dconf['net']['STDPconns'][connty]: useSTDP = True          
+      if dSTDPparamsRL[synmech]['RLon'] and useRL: # only turn on plasticity when specified to do so
+        netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL[synmech]}
+      elif dSTDPparams[synmech]['STDPon'] and useSTDP:
+        netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparams[synmech]}
 
 def connectCorticoStriatalLoop():
   # this function considers 1-1 conns in the loop
@@ -1085,13 +1085,13 @@ def connectCorticoStriatalLoop():
         'synMech': synmech,
         'sec':EExcitSec, 'loc':0.5,'weightIndex':getWeightIndex(synmech, ECellModel)
       }
-    useRL = useSTDP = False
-    if dconf['net']['RLconns'][connty]: useRL = True
-    if dconf['net']['STDPconns'][connty]: useSTDP = True          
-    if dSTDPparamsRL[synmech]['RLon'] and useRL: # only turn on plasticity when specified to do so
-      netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL[synmech]}
-    elif dSTDPparams[synmech]['STDPon'] and useSTDP:
-      netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparams[synmech]}
+      useRL = useSTDP = False
+      if dconf['net']['RLconns'][connty]: useRL = True
+      if dconf['net']['STDPconns'][connty]: useSTDP = True          
+      if dSTDPparamsRL[synmech]['RLon'] and useRL: # only turn on plasticity when specified to do so
+        netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparamsRL[synmech]}
+      elif dSTDPparams[synmech]['STDPon'] and useSTDP:
+        netParams.connParams[k]['plast'] = {'mech': 'STDP', 'params': dSTDPparams[synmech]}
 
 if dnumc['ESt1']>0 and dnumc['ESt2']>0 and dnumc['EPFC1']>0 and dnumc['EPFC2']>0:
   createCorticoStriatalLoop()
