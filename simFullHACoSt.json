@@ -517,7 +517,7 @@
           "EA2": {"AM2": 0,"NM2": 0,"conv": 0},
           "IRecip": {"AM2": 0,"NM2": 0,"conv": 0},
           "IM": {"AM2": 0,"NM2": 0,"conv": 0},
-          "IML": {"AM2": 0,"NM2": 0,"conv": 0},
+          "IML": {"AM2": 0,"NM2": 0,"conv": 0}
         },
         "ESt1":{
             "EMUP":{"AM2": 20,"NM2": 0,"conv": 1}
