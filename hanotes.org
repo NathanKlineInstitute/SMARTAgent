@@ -28975,5 +28975,6 @@ to
   lconns = ['AtoPFC','AtoPFC']
 
 
+-- increase EA to PFC from 16 to 32
 
 If the action is good, choose that action for the next time (by inhibiting other).
