@@ -28668,3 +28668,312 @@ InitializePFCInputRates()
 
 -- PROBLEM: RL-STDP is not working..... Trying to figure out why....
 ...probably indentation problem in createCorticoStriatalLoop and connectCorticoStriatalLoop
+
+-------
+
+"name": "21sept08_CoStLoop_B0_cycle_",
+
+"RLhebbwt": 0.01,
+
+(base) hanwar@cycle:~/GamesProject/SMARTAgent$ python multistepSim.py simFullHACoSt.json 30 40 21sept08_CoStLoop_B0_cycle_mult 
+
+-------
+
+"name": "21sept08_CoStLoop_B1_cycle_",
+"RLhebbwt": 0.001,
+
+(base) hanwar@cycle:~/GamesProject/SMARTAgent$ python multistepSim.py simFullHACoSt.json 30 40 21sept08_CoStLoop_B1_cycle_mult 
+
+weights not increasing well.... so terminated after ~20 steps
+------
+
+"name": "21sept09_CoStLoop_A0_cycle_",
+"RLhebbwt": 0.1,
+"RLwindhebb": 20,
+
+------
+
+"name": "21sept09_CoStLoop_A1_cycle_",
+"RLhebbwt": 0.5,
+"RLwindhebb": 20,
+
+-----
+
+"name": "21sept09_CoStLoop_B1_cycle_",
+"AtoSt":0,
+
+(base) hanwar@cycle:~/GamesProject/SMARTAgent$ python -i simdat.py backupcfg/21sept09_CoStLoop_B1_cycle__step_0_sim.json
+>>> plotMeanWeights(pdfc,gca(),msz=1,xl=(0,np.amax(pdfc.time)),lpop=['ESt1','ESt2'],lclr=['b','r'],plotindiv=True)
+>>> savefig('21sept13_21sept09_CoStLoop_B1_cycle__step_0_sim_meanWeights_Indiv.png')
+
+>>> plotMeanWeights(pdfc,gca(),msz=1,xl=(0,np.amax(pdfc.time)),lpop=['ESt1','ESt2'],lclr=['b','r'],plotindiv=False)
+savefig('21sept13_21sept09_CoStLoop_B1_cycle__step_0_sim_meanWeights.png')
+
+-- now activate plasticity at "AtoSt":1,
+"name": "21sept13_CoStLoop_B2_cycle_",
+
+(base) hanwar@cycle:~/GamesProject/SMARTAgent$ python multistepSim.py simFullHACoSt.json 30 5 21sept13_CoStLoop_B2_cycle_mult
+
+---
+
+repeat for MtoSt:1 and AtoSt:0... also turn off AtoSt synapses.
+ EA to ESt1 and EA to ESt2 = 1.6 (reduced from 16)
+
+ "name": "21sept13_CoStLoop_C2_cycle_",
+
+ .....
+
+  EA to ESt1 and EA to ESt2 = 3.2 (reduced from 16)
+
+ "name": "21sept13_CoStLoop_C3_cycle_",
+
+  .....
+
+  EA to ESt1 and EA to ESt2 = 6.4 (reduced from 16)
+
+ "name": "21sept13_CoStLoop_C4_cycle_",
+
+
+   EA to ESt1 and EA to ESt2 = 12.8 (reduced from 16)
+
+ "name": "21sept13_CoStLoop_C5_cycle_",
+
+    EA to ESt1 and EA to ESt2 = 25.6 (reduced from 16)
+
+ "name": "21sept13_CoStLoop_C6_cycle_",
+
+
+ ------
+
+ EST to EPFC: increase from 8 to 16
+ EA to ESt1 and EA to ESt2 = 25.6 (reduced from 16)
+
+ "name": "21sept14_CoStLoop_C6_cycle_",
+
+
+..
+ EST to EPFC: increase from 8 to 16
+EA to ESt1 and EA to ESt2 = 12.8 (reduced from 16)
+
+ "name": "21sept14_CoStLoop_C5_cycle_",
+-----
+
+
+
+21sept14_CoStLoop_C6_cycle ..... 20 steps....
+
+"MtoSt":1,
+
+EA to ESt: 25.6 (30 to 1)
+EA to EPFC: 2.5 (30 to 1)
+EPFC to EM: 20 (1 to 1)
+EM to ESt: 16 (1 to 1) - RL-STDP on
+
+
+>>> lfnT = ['21sept14_CoStLoop_C6_cycle__step_0_']
+>>> lfnT.append('21sept14_CoStLoop_C6_cycle__step_1_')
+>>> lfnT.append('21sept14_CoStLoop_C6_cycle__step_2_')
+>>> lfnT.append('21sept14_CoStLoop_C6_cycle__step_3_')
+>>> lfnT.append('21sept14_CoStLoop_C6_cycle__step_4_')
+>>> lfnT.append('21sept14_CoStLoop_C6_cycle__step_5_')
+>>> lfnT.append('21sept14_CoStLoop_C6_cycle__step_6_')
+>>> lfnT.append('21sept14_CoStLoop_C6_cycle__step_7_')
+>>> lfnT.append('21sept14_CoStLoop_C6_cycle__step_8_')
+>>> lfnT.append('21sept14_CoStLoop_C6_cycle__step_9_')
+>>> lfnT.append('21sept14_CoStLoop_C6_cycle__step_10_')
+>>> lfnT.append('21sept14_CoStLoop_C6_cycle__step_11_')
+>>> lfnT.append('21sept14_CoStLoop_C6_cycle__step_12_')
+>>> lfnT.append('21sept14_CoStLoop_C6_cycle__step_13_')
+>>> lfnT.append('21sept14_CoStLoop_C6_cycle__step_14_')
+>>> lfnT.append('21sept14_CoStLoop_C6_cycle__step_15_')
+>>> lfnT.append('21sept14_CoStLoop_C6_cycle__step_16_')
+>>> lfnT.append('21sept14_CoStLoop_C6_cycle__step_17_')
+>>> lfnT.append('21sept14_CoStLoop_C6_cycle__step_18_')
+>>> lfnT.append('21sept14_CoStLoop_C6_cycle__step_19_')
+
+
+>>> lpdaT = getindivactionreward(lfnT)
+>>> csm = cm.ScalarMappable(cmap=cm.jet)
+>>> csm.set_clim((0,1))
+>>> lclr = [csm.to_rgba(float(i)/len(lpdaT)) for i in range(len(lpdaT))]
+>>> plotComparePerf(lpdaT,lclr,yl=(0,1),lleg=lfnT,skipscore=True,skipfollow=True)
+>>> savefig('21sept15_s1sept14_CoStLoop_C6_cycle_20steps_comparePerf.png')
+
+>>> pdfc = getconcatweightpdf(lfnT)
+>>> plotMeanWeights(pdfc,gca(),msz=1,xl=(0,np.amax(pdfc.time)),lpop=['ESt1','ESt2'],lclr=['b','r'],plotindiv=False)
+>>> savefig('21sept15_s1sept14_CoStLoop_C6_cycle_20steps_avgWeights.png')
+
+>>> plotMeanWeights(pdfc,gca(),msz=1,xl=(0,np.amax(pdfc.time)),lpop=['ESt1','ESt2'],lclr=['b','r'],plotindiv=True
+>>> savefig('21sept15_s1sept14_CoStLoop_C6_cycle_20steps_indivWeights.png')
+
+-- check 
+        1) what happens if increase the limit of weights
+        2) what happens if increase the limit of weights and decrease the learning rate.
+
+checking 1 by increaseing wmax from 35 to 70: "name": "21sept15_CoStLoop_C6_cycle_",
+
+..........
+
+.... I dont think its working.... why not? what am I doing wrong.
+
+-- EA to ESt only promotes chances of synapses being potentiated....
+
+Lets say EA encodes ball location, ball direction, racket location and racket direction.
+  - Racket direction seems unnecessary information.
+  - I just need ball location, ball direction and racket location (relative to the ball).
+
+For each environment, the model needs to execute an action which moves the racket towards the goal.
+  -when using intermediate rewards, this is simple. at each step, if the model makes a move towards the target, it gets rewarded and punished otherwise.
+  
+
+-- dorsomedial PFC plays a central role in adaptive decision making (Corbit and Balleine 2003, Killcross and Coutureau 2003).
+
+ IMPORTANT PAPER:
+
+ Thalamic control of cortical dynamics in a model of flexible motor sequencing.
+ Laueline Logiaco, Larry Abbott, Sean Escola
+
+https://www.cell.com/cell-reports/pdf/S2211-1247(21)00424-1.pdf
+
+
+
+Loop 1: Cortex ->BG ->Thalamus -> Cortex
+Loop 2: Thalamus -> Cortex -> Thalamus.
+
+We could use motif-specific thalamic units (seperate units for MOVE-UP and MOVE-DOWN)
+
+To generate an arbitrary sequence, the BG switches between inhibiting different subsets of thalamic units to prepare and execute different motifs (actions).
+
+BG .... sequence selection.
+thalamocortical loop + Motor cortex ... motor preparation and motif execution.
+
+
+Model:
+
+Motor cortex, Motor Thalamus and GPi/SNr.
+
+Motor cortex <- Highly recurrent
+Motor output (Weighted sum of Motor cortex activity)
+
+Motor thalamus <- no E recurrence (but recurrent inhibition present).
+
+Motor cortex <--> Motor thalamus
+GPi/SNr inhibit Motor thalamus. (activity patterns are sustained during motif execution and switche at the transitions between motifs)
+
+Strong synapses from BG to thalamus to completely inhibit target thalamic neurons.
+
+Plastic synapses within thalamocortical loops (Both from Cortex to Thalamus and Thalamus to Cortex) + fixed synapses withint cortex and motor output sypanses.
+
+non-overlapping subsets of thalamocorticl neurons for different motifs. (Unique thalamocortical neurons for UP and DOWN)
+
+
+------
+
+All actions have to be associated with the visual input.
+
+PFC activates Motor cortex.
+PFC also activates BG.
+Motor cortex activates Thalamus.
+
+EA to PFC1 and PFC2 (fixed and random connections) 
+BG learns which actions to be allowed for a visual scene. (EA to BG - RL-STDP)
+
+
+---- 
+Every input generates a (might be overlapping) combination of EA neurons.
+
+"VL": {
+          "EA": {"AM2": 6,"NM2": 0.1,"conv": 128},
+}
+"VD": {
+    "EA": {"AM2": 6,"NM2": 0.1,"conv": 8},
+}
+
+Each EA neuron, activates a unique (might be overlapping) sequence of PFC neurons.
+
+"EA": {
+    "EPFC1": {"AM2": 16,"NM2": 0.15,"conv": 30},
+    "EPFC2": {"AM2": 16,"NM2": 0.15,"conv": 30},
+}
+
+Each PFC neuron only activates 1 EMUP and 1 EMDOWN neuron.
+Racket either moves up or down depending on the relative activity of EMUP and EMDOWN.
+
+Each PFC also activates only 1 ESt1 and 1 ESt2 neuron.
+
+- make striatal neuron inhibitory instead of excitatory.
+
+        "EPFC1":{
+            "EMUP":{"AM2": 20,"NM2": 0,"conv": 1},
+            "ESt1":{"AM2": 20,"NM2": 0,"conv": 1}
+        },
+        "EPFC2":{
+            "EMDOWN":{"AM2": 20,"NM2": 0,"conv": 1},
+            "ESt2":{"AM2": 20,"NM2": 0,"conv": 1}
+        },
+
+- remove the following connections...
+EM:{
+  "ESt":{"AM2": 8,"NM2": 0,"conv": 1}
+}
+        "EMUP":{
+            "ESt1":{"AM2": 16,"NM2": 0,"conv": 1}
+        },
+        "EMDOWN":{
+            "ESt2":{"AM2": 16,"NM2": 0,"conv": 1}
+        },
+
+- change the following connections...
+
+        "ESt1":{
+            "EPFC1":{"AM2": 8,"NM2": 0,"conv": 1}
+        },
+        "ESt2":{
+            "EPFC2":{"AM2": 8,"NM2": 0,"conv": 1}
+        },
+  to
+
+        "ESt1":{
+            "EMUP":{"AM2": 20,"NM2": 0,"conv": 1}
+        },
+        "ESt2":{
+            "EMDOWN":{"AM2": 20,"NM2": 0,"conv": 1}
+        },
+
+- Don't instantiate stimMod for PFC neurons
+
+# sim.lstimpfc = setupStimModPFC() # when using IntFire4 cells lstimty has the NetStim populations that send spikes to EV1, EV1DE, etc.
+# for ty in sim.lstimpfc: allpops.append(ty)
+
+- while creating PFC loop, change the following:
+
+  lprety = ['EPFC1','EPFC2','EMUP','EMDOWN','ESt1','ESt2']
+  lpoty = ['EMUP','EMDOWN','ESt1','ESt2','EPFC1','EPFC2']
+  lconns = ['PFCtoM','PFCtoM','MtoSt','MtoSt','SttoPFC','SttoPFC']
+
+to 
+
+  lprety = ['EPFC1','EPFC2','EPFC1','EPFC2','ESt1','ESt2']
+  lpoty = ['EMUP','EMDOWN','ESt1','ESt2','EMUP','EMDOWN']
+  lconns = ['PFCtoM','PFCtoM','PFCtoSt','PFCtoSt','SttoM','SttoM']
+
+- remove from RLconns and STDPconns:
+
+        "AtoSt":1, and         "SttoPFC":0
+- change in RLconns and STDPconns:
+        "PFCtoSt":0,
+        "SttoM":0
+
+- connect corticostriatal loop at PFC only.
+... in function connectCorticoStriatalLoop, change the following:
+  lpoty = ['EPFC1','EPFC2','ESt1','ESt2']
+  lconns = ['AtoPFC','AtoPFC','AtoSt','AtoSt']
+
+to 
+
+  lpoty = ['EPFC1','EPFC2']
+  lconns = ['AtoPFC','AtoPFC']
+
+
+
+If the action is good, choose that action for the next time (by inhibiting other).

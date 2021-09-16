@@ -424,8 +424,8 @@ def setupStimModPFC ():
       'connList':blist, 'weightIndex':getWeightIndex('AMPA',ECellModel)}
   return lstimpfc
 
-sim.lstimpfc = setupStimModPFC() # when using IntFire4 cells lstimty has the NetStim populations that send spikes to EV1, EV1DE, etc.
-for ty in sim.lstimpfc: allpops.append(ty)
+# sim.lstimpfc = setupStimModPFC() # when using IntFire4 cells lstimty has the NetStim populations that send spikes to EV1, EV1DE, etc.
+#for ty in sim.lstimpfc: allpops.append(ty)
 
 # Stimulation parameters
 def setupNoiseStim ():
@@ -1041,9 +1041,9 @@ def createCorticoStriatalLoop():
   # this function considers 1-1 conns in the loop
   lCSconns = []
   for i in range(dnumc['EPFC1']): lCSconns.append([i,i])
-  lprety = ['EPFC1','EPFC2','EMUP','EMDOWN','ESt1','ESt2']
-  lpoty = ['EMUP','EMDOWN','ESt1','ESt2','EPFC1','EPFC2']
-  lconns = ['PFCtoM','PFCtoM','MtoSt','MtoSt','SttoPFC','SttoPFC']
+  lprety = ['EPFC1','EPFC2','EPFC1','EPFC2','ESt1','ESt2']
+  lpoty = ['EMUP','EMDOWN','ESt1','ESt2','EMUP','EMDOWN']
+  lconns = ['PFCtoM','PFCtoM','PFCtoSt','PFCtoSt','SttoM','SttoM']
   for prety,poty,connty in zip(lprety,lpoty,lconns):
     lsynw = [cmat[prety][poty]['AM2']*cfg.EEGain, cmat[prety][poty]['NM2']*cfg.EEGain]
     for strty,synmech,weight in zip(['','n'],['AM2', 'NM2'],lsynw):
@@ -1069,8 +1069,8 @@ def createCorticoStriatalLoop():
 def connectCorticoStriatalLoop():
   # this function considers 1-1 conns in the loop
   prety = 'EA'
-  lpoty = ['EPFC1','EPFC2','ESt1','ESt2']
-  lconns = ['AtoPFC','AtoPFC','AtoSt','AtoSt']
+  lpoty = ['EPFC1','EPFC2']
+  lconns = ['AtoPFC','AtoPFC']
   for poty,connty in zip(lpoty,lconns):
     lsynw = [cmat[prety][poty]['AM2']*cfg.EEGain, cmat[prety][poty]['NM2']*cfg.EEGain]
     for strty,synmech,weight in zip(['','n'],['AM2', 'NM2'],lsynw):

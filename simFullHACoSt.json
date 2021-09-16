@@ -108,7 +108,7 @@
       "RLFakeUpRule": 0,
       "RLFakeDownRule": 0,
       "RLFakeStayRule": 0,
-      "name": "21sept02_CoStLoop_A0_cycle_",
+      "name": "21sept16_CoStLoop_A0_cycle_",
       "doquit": 1,
       "doplot": 0,
       "saveCellSecs": 0,
@@ -244,9 +244,7 @@
         "EA2",
         "EN",
         "EPFC1",
-        "EPFC2",
-        "ESt1",
-        "ESt2"
+        "EPFC2"
       ],
       "ITypes": [
         "IR",
@@ -261,7 +259,9 @@
         "IA",
         "IAL",
         "IA2",
-        "IA2L"
+        "IA2L",
+        "ESt1",
+        "ESt2"
       ],
       "EMotorPops": [
         "EMDOWN",
@@ -414,10 +414,9 @@
         "FeedbackMtoA2": 0,
         "FeedbackA2toA": 0,
         "AtoPFC":0,
-        "AtoSt":0,
         "PFCtoM":0,
-        "MtoSt":0,
-        "SttoPFC":0
+        "PFCtoSt":0,
+        "SttoM":0
       },
       "RLconns": {
         "Noise": 0,
@@ -444,10 +443,9 @@
         "FeedbackMtoA2": 0,
         "FeedbackA2toA": 0,
         "AtoPFC":0,
-        "AtoSt":1,
         "PFCtoM":0,
-        "MtoSt":1,
-        "SttoPFC":0
+        "PFCtoSt":1,
+        "SttoM":1
       },
       "useBinaryImage": 1,
       "useNeuronPad": 0,
@@ -490,10 +488,8 @@
           "ID": {"AM2": 0,"conv": 0}
         },
         "EA": {
-          "EPFC1": {"AM2": 2.5,"NM2": 0.15,"conv": 30},
-          "EPFC2": {"AM2": 2.5,"NM2": 0.15,"conv": 30},
-          "ESt1": {"AM2": 16,"NM2": 0.15,"conv": 30},
-          "ESt2": {"AM2": 16,"NM2": 0.15,"conv": 30},
+          "EPFC1": {"AM2": 16,"NM2": 0.15,"conv": 30},
+          "EPFC2": {"AM2": 16,"NM2": 0.15,"conv": 30},
           "EA": {"AM2": 0,"NM2": 0,"conv": 0},
           "EA2": {"AM2": 0,"NM2": 0,"conv": 0},
           "EM": {"AM2": 0,"NM2": 0,"conv": 0},
@@ -501,16 +497,12 @@
           "IAL": {"AM2": 0,"NM2": 0,"conv": 0}
         },
         "EPFC1":{
-            "EMUP":{"AM2": 20,"NM2": 0,"conv": 1}
+            "EMUP":{"AM2": 20,"NM2": 0,"conv": 1},
+            "ESt1":{"AM2": 20,"NM2": 0,"conv": 1}
         },
         "EPFC2":{
-            "EMDOWN":{"AM2": 20,"NM2": 0,"conv": 1}
-        },
-        "EMUP":{
-            "ESt1":{"AM2": 16,"NM2": 0,"conv": 1}
-        },
-        "EMDOWN":{
-            "ESt2":{"AM2": 16,"NM2": 0,"conv": 1}
+            "EMDOWN":{"AM2": 20,"NM2": 0,"conv": 1},
+            "ESt2":{"AM2": 20,"NM2": 0,"conv": 1}
         },
         "EA2": {
           "EA": {"AM2": 0,"NM2": 0,"conv": 0},
@@ -526,13 +518,12 @@
           "IRecip": {"AM2": 0,"NM2": 0,"conv": 0},
           "IM": {"AM2": 0,"NM2": 0,"conv": 0},
           "IML": {"AM2": 0,"NM2": 0,"conv": 0},
-          "ESt":{"AM2": 8,"NM2": 0,"conv": 1}
         },
         "ESt1":{
-            "EPFC1":{"AM2": 8,"NM2": 0,"conv": 1}
+            "EMUP":{"AM2": 20,"NM2": 0,"conv": 1}
         },
         "ESt2":{
-            "EPFC2":{"AM2": 8,"NM2": 0,"conv": 1}
+            "EMDOWN":{"AM2": 20,"NM2": 0,"conv": 1}
         },
         "IR": {
           "IR": {"GA": 0,"p": 0}
