@@ -2005,7 +2005,7 @@ def trainAgent (t):
     for ts in range(len(actions)): tvec_actions.append(t-tstepPerAction*(len(actions)-ts-1))
     for ltpnt in tvec_actions: sim.allTimes.append(ltpnt)
   updateInputRates() # update firing rate of inputs to R population (based on image content)
-  updatePFCInputRates() # choose random combination of PFC neurons to activate EM.               
+  # updatePFCInputRates() # choose random combination of PFC neurons to activate EM.               
   NBsteps += 1
   if NBsteps % recordWeightStepSize == 0:
     if dconf['verbose'] > 0 and sim.rank==0:
@@ -2171,7 +2171,7 @@ if dconf['net']['homPlast']['On']:
 
 tPerPlay = tstepPerAction*dconf['actionsPerPlay']
 InitializeInputRates()
-InitializePFCInputRates()
+# InitializePFCInputRates()
 #InitializeNoiseRates()
 dsumWInit = getSumAdjustableWeights(sim) # get sum of adjustable weights at start of sim
 
