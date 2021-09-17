@@ -97,7 +97,7 @@
       "ResumeSimFromFile": "data/21jul2_EN0_256_gcp__step_28_synWeights_final.pkl"
     },
     "sim": {
-      "duration": 500000,
+      "duration": 5000,
       "dt": 0.6,
       "verbose": 0,
       "recordStep": 1.0,
@@ -109,8 +109,8 @@
       "RLFakeDownRule": 0,
       "RLFakeStayRule": 0,
       "name": "21sept16_CoStLoop_A0_cycle_",
-      "doquit": 1,
-      "doplot": 0,
+      "doquit": 0,
+      "doplot": 1,
       "saveCellSecs": 0,
       "saveCellConns": 0,
       "saveMotionFields": 0,
@@ -207,7 +207,7 @@
         "IV4": 0,
         "EMT": 0,
         "IMT": 0,
-        "EA": 400,
+        "EA": 1400,
         "IA": 0,
         "IAL": 0,
         "EA2": 0,
@@ -244,7 +244,9 @@
         "EA2",
         "EN",
         "EPFC1",
-        "EPFC2"
+        "EPFC2",
+        "ESt1",
+        "ESt2"
       ],
       "ITypes": [
         "IR",
@@ -259,9 +261,7 @@
         "IA",
         "IAL",
         "IA2",
-        "IA2L",
-        "ESt1",
-        "ESt2"
+        "IA2L"
       ],
       "EMotorPops": [
         "EMDOWN",
@@ -473,7 +473,7 @@
         "VL": {
           "VD": {"AM2": 0,"NM2": 0,"conv": 0},
           "VL": {"AM2": 0,"NM2": 0,"conv": 0},
-          "EA": {"AM2": 6,"NM2": 0.1,"conv": 128},
+          "EA": {"AM2": 8,"NM2": 0.1,"conv": 128},
           "EA2": {"AM2": 0,"NM2": 0,"conv": 0},
           "EMDOWN": {"AM2": 0,"NM2": 0,"conv": 0},
           "EMUP": {"AM2": 0,"NM2": 0,"conv": 0}
@@ -481,15 +481,15 @@
         "VD": {
           "VL": {"AM2": 0,"NM2": 0,"conv": 0},
           "VD": {"AM2": 0,"NM2": 0,"conv": 0},
-          "EA": {"AM2": 6,"NM2": 0.1,"conv": 8},
+          "EA": {"AM2": 8,"NM2": 0.1,"conv": 8},
           "EA2": {"AM2": 0,"NM2": 0,"conv": 0},
           "EMDOWN": {"AM2": 0,"NM2": 0,"conv": 0},
           "EMUP": {"AM2": 0,"NM2": 0,"conv": 0},
           "ID": {"AM2": 0,"conv": 0}
         },
         "EA": {
-          "EPFC1": {"AM2": 32,"NM2": 0.15,"conv": 30},
-          "EPFC2": {"AM2": 32,"NM2": 0.15,"conv": 30},
+          "EPFC1": {"AM2": 18,"NM2": 0.15,"conv": 30},
+          "EPFC2": {"AM2": 18,"NM2": 0.15,"conv": 30},
           "EA": {"AM2": 0,"NM2": 0,"conv": 0},
           "EA2": {"AM2": 0,"NM2": 0,"conv": 0},
           "EM": {"AM2": 0,"NM2": 0,"conv": 0},
@@ -497,12 +497,12 @@
           "IAL": {"AM2": 0,"NM2": 0,"conv": 0}
         },
         "EPFC1":{
-            "EMUP":{"AM2": 20,"NM2": 0,"conv": 1},
-            "ESt1":{"AM2": 20,"NM2": 0,"conv": 1}
+            "EMUP":{"AM2": 18,"NM2": 0,"conv": 1},
+            "ESt1":{"AM2": 18,"NM2": 0,"conv": 1}
         },
         "EPFC2":{
-            "EMDOWN":{"AM2": 20,"NM2": 0,"conv": 1},
-            "ESt2":{"AM2": 20,"NM2": 0,"conv": 1}
+            "EMDOWN":{"AM2": 18,"NM2": 0,"conv": 1},
+            "ESt2":{"AM2": 18,"NM2": 0,"conv": 1}
         },
         "EA2": {
           "EA": {"AM2": 0,"NM2": 0,"conv": 0},
@@ -520,10 +520,10 @@
           "IML": {"AM2": 0,"NM2": 0,"conv": 0}
         },
         "ESt1":{
-            "EMUP":{"AM2": 20,"NM2": 0,"conv": 1}
+            "EMUP":{"AM2": 1,"NM2": 0,"conv": 1}
         },
         "ESt2":{
-            "EMDOWN":{"AM2": 20,"NM2": 0,"conv": 1}
+            "EMDOWN":{"AM2": 1,"NM2": 0,"conv": 1}
         },
         "IR": {
           "IR": {"GA": 0,"p": 0}
@@ -722,7 +722,7 @@
     "RL": {
       "AMPAN": {
         "wbase": 0.001,
-        "wmax": 35,
+        "wmax": 40,
         "RLon": 1,
         "STDPon": 0,
         "RLlenhebb": 10000,
