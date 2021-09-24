@@ -38510,3 +38510,82 @@ looks decent ... but gets best perf pretty early on ...
 
 stopped this sim ... 
 
+* 21sep24
+** check stdp weights from cartpole
+
+python -i simdat.py
+
+wt = pickle.load(open('data/21sep24_synWeights_final.pkl','rb'))
+wt.keys()
+len(wt) # 120
+
+for i in range(len(wt)): hist(wt
+
+cwt = np.zeros((180,180))
+
+for pre in list(wt.keys()):
+  lwt = []
+  for post in list(wt[pre].keys()):
+    lwt.append(wt[pre][post][0][1])
+    cwt[pre,post] = wt[pre][post][0][1]
+  hist(lwt,histtype='step')
+
+imshow(cwt,cmap='gray',origin='lower',interpolation='None',extent=(0,180,0,180)); 
+xlim((75,180))
+ylim((0,125))
+ylabel('Presynaptic ID'); xlabel('Postsynaptic ID')
+
+savefig('gif/21sep24_synweights_a0.png')
+
+wtES = pickle.load(open('data/21sep24_ES_synWeights_final.pkl','rb'))
+
+cwtES = np.zeros((180,180))
+
+for pre in list(wtES.keys()):
+  lwtES = []
+  for post in list(wtES[pre].keys()):
+    lwtES.append(wtES[pre][post][0][1])
+    cwtES[pre,post] = wtES[pre][post][0][1]
+  hist(lwtES,histtype='step')
+
+imshow(cwtES,cmap='gray',origin='lower',interpolation='None',extent=(0,180,0,180)); 
+xlim((75,180))
+ylim((0,125))
+ylabel('Presynaptic ID'); xlabel('Postsynaptic ID')
+
+savefig('gif/21sep24_synweights_a1.png')
+
+clf()
+subplot(1,3,1)
+imshow(cwt,cmap='gray',origin='lower',interpolation='None',extent=(0,180,0,180),vmin=0,vmax=40); 
+xlim((75,180))
+ylim((0,125))
+ylabel('Presynaptic ID'); xlabel('Postsynaptic ID'); title('STDP/RL matrix')
+subplot(1,3,2)
+imshow(cwtES,cmap='gray',origin='lower',interpolation='None',extent=(0,180,0,180),vmin=0,vmax=40); 
+xlim((75,180))
+ylim((0,125))
+ylabel('Presynaptic ID'); xlabel('Postsynaptic ID'); title('ES matrix');
+subplot(1,3,3)
+imshow(cwt - cwtES,cmap='gray',origin='lower',interpolation='None',extent=(0,180,0,180)); 
+xlim((75,180))
+ylim((0,125))
+ylabel('Presynaptic ID'); xlabel('Postsynaptic ID'); title('STDP/RL minus ES matrix')
+
+savefig('gif/21sep24_synweights_a2.png')
+
+clf()
+subplot(1,2,1); plot(np.mean(cwt,axis=1),color='r')
+subplot(1,2,2); plot(np.mean(cwtES,axis=1),color='b')
+lpatch = [mpatches.Patch(color=c,label=s) for c,s in zip(['r','b'],['STDP/RL','ES'])]
+ax=gca(); ax.legend(handles=lpatch,handlelength=1)
+
+savefig('gif/21sep24_synweights_a2.png')
+
+xlim((75,180))
+
+clf()
+hist(np.mean(cwt[0:80,0:120],axis=0),histtype='step',color='r',bins=20)
+hist(np.mean(cwtES[0:80,0:120],axis=0),histtype='step',color='b',bins=20)
+lpatch = [mpatches.Patch(color=c,label=s) for c,s in zip(['r','b'],['STDP/RL','ES'])]
+ax=gca(); ax.legend(handles=lpatch,handlelength=1)
