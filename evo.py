@@ -100,6 +100,45 @@ def EvalFIT (candidates, args):
     fitness.append(fit)
   return fitness
 
+#
+def FitJobStrFNES (p, args, cdx, startweight, simconfig, num_generations):
+  global es,ncore # global evolution object
+  pdfnew = startweight.copy() # copy starting synaptic weights
+  for i in range(len(p)): pdfnew.at[i,'weight'] = p[i] # update the weights based on the candidate
+  # next update the simulation's json file
+  d = json.load(open(simconfig,'r')) # original input json
+  d['sim']['name'] += '_evo_gen_' + str(num_generations) + '_cand_' + str(cdx) + '_' # also include candidate ID
+  simstr = d['sim']['name']
+  fnweight = mydir+'/evo/'+ simstr + 'weight.pkl' # filename for weights
+  d['sim']['doquit'] = 1; d['sim']['doplot'] = 0
+  d['simtype']['ResumeSim'] = 1 # make sure simulation loads the weights
+  d['simtype']['ResumeSimFromFile'] = fnweight
+  fnjson = mydir+'/evo/'+d['sim']['name'] + 'sim.json'
+  json.dump(d, open(fnjson,'w'), indent=2)
+  # save synaptic weights to file
+  pdfnew = pdfnew[pdfnew.time==np.amax(pdfnew.time)]  
+  D = pdf2weightsdict(pdfnew)
+  pickle.dump(D, open(fnweight,'wb')) # temp file for synaptic weights
+  # generate a command for running the simulation
+  strc = './myrun ' + str(ncore) + ' ' + fnjson # command string  
+  return strc,'data/'+d['sim']['name']+'ActionsRewards.txt'
+
+# evaluate fitness with sim run
+def EvalFITES (p, startweight, simconfig, num_generations, cdx):
+  global es, quitaftermiss
+  strc,fn = FitJobStrFNES(p, args, cdx)
+  print('EvalFIT:', cdx, strc, fn)
+  ret = os.system(strc)
+  actreward = pd.DataFrame(np.loadtxt(fn),columns=['time','action','reward','proposed','hit','followtargetsign'])
+  if quitaftermiss:
+   fit = np.amax(actreward['time'])
+  else:
+   fit = np.sum(actreward['reward'])
+  print('fit is:',fit)
+  logger.info(strc + ', ' + fn + ', fit=' + str(fit))
+  return fit
+
+
 weightVar = 0.9
 wmin = 1.0 - weightVar
 wmax = 1.0 + weightVar
@@ -227,13 +266,62 @@ def initialize_archive(f, archive_seeds):
       return f(random, population, archive, args)
   return wrapper
 
+def EStrain (maxgen, pop_size, simconfig, startweight):
+    dconf = init(dconf)
+    ITERATIONS = maxgen # How many iterations to train for
+    POPULATION_SIZE = pop_size # How many perturbations of weights to try per iteration
+    SIGMA = 0.1 # dconf['ES']['sigma'] # 0.1 # standard deviation of perturbations applied to each member of population
+    LEARNING_RATE = 1.0 # dconf['ES']['learning_rate'] # 1 # what percentage of the return normalized perturbations to add to best_weights
+    # How much to decay the learning rate and sigma by each episode. In theory
+    # this should lead to better
+    LR_DECAY = 1.0 # dconf['ES']['decay_lr'] # 1
+    SIGMA_DECAY = 1.0 # dconf['ES']['decay_sigma'] # 1
+    EPISODES_PER_ITER = 5 # dconf['ES']['episodes_per_iter'] # 5
+    SAVE_WEIGHTS_EVERY_ITER = 10 # dconf['ES']['save_weights_every_iter'] # 10
+    # randomly initialize best weights to the first weights generated
+    best_weights = np.array(startweight['weight']) # neurosim.getWeightArray(netpyne.sim)
+    # fres_train = neurosim.outpath('es_train.txt')
+    # fres_eval = neurosim.outpath('es_eval.txt')
+    total_time = 0
+    for iteration in range(ITERATIONS):
+        print("\n--------------------- ES iteration", iteration, "---------------------")
+        # generate unique randomly sampled perturbations to add to each member of
+        # this iteration's the training population
+        perturbations = np.random.normal(0, SIGMA, (POPULATION_SIZE, best_weights.size))
+        # this should rarely be used with reasonable sigma but just in case we
+        # clip perturbations that are too low since they can make the weights negative
+        perturbations[perturbations < -0.8] = -0.8
+        print("\nSimulating episodes ... ")
+        # get the fitness of each set of perturbations when applied to the current best weights
+        # by simulating each network and getting the episode length as the fitness
+        fitness = []
+        for i in range(POPULATION_SIZE):
+            fit = EvalFITES(best_weights * (1 + perturbations[i]), startweight, simconfig, iteration, i)
+            # Add fitness
+            fitness.append(fit)
+        fitness = np.expand_dims(np.array(fitness), 1)
+        fitness_res = [np.median(fitness), fitness.mean(), fitness.min(), fitness.max(), best_weights.mean()]
+        with open(fres_train, 'a') as out:
+          out.write('\t'.join([str(neurosim.end_after_episode)] + [str(r) for r in fitness_res]) + '\n')
+        print("\nFitness Median: {}; Mean: {} ([{}, {}]). Mean Weight: {}".format(*fitness_res))
+        # normalize the fitness for more stable training
+        normalized_fitness = (fitness - fitness.mean()) / (fitness.std() + 1e-8)
+        # weight the perturbations by their normalized fitness so that perturbations
+        # that performed well are added to the best weights and those that performed poorly are subtracted
+        fitness_weighted_perturbations = (normalized_fitness * perturbations)
+        # apply the fitness_weighted_perturbations to the current best weights proportionally to the LR
+        best_weights = best_weights * (1 + (LEARNING_RATE * fitness_weighted_perturbations.mean(axis = 0)))
+        # decay sigma and the learning rate
+        SIGMA *= SIGMA_DECAY
+        LEARNING_RATE *= LR_DECAY
+
 # run the evolution
 def runevo (popsize=100,maxgen=10,my_generate=my_generate,\
             nproc=16,ncore=8,rdmseed=1234,useDEA=True,\
             fstats='/dev/null',findiv='/dev/null',mutation_rate=0.2,useMPI=False,\
             numselected=100,noBound=False,simconfig='sn.json',\
             useLOG=False,maxfittime=600,lseed=None,larch=None,verbose=True,\
-            useundefERR=False,startweight=None):
+            useundefERR=False,startweight=None,useES=False):
   global es
   useMProc = False
   if useLOG: logger=setEClog()
@@ -301,6 +389,8 @@ def runevo (popsize=100,maxgen=10,my_generate=my_generate,\
                             verbose=verbose,
                             useundefERR=useundefERR,
                             startweight=startweight)
+  elif useES:
+    final_pop = ESTrain(maxgen=maxgen, pop_size=popsize, simconfig=simconfig, startweight=startweight)
   else:
     final_pop = es.evolve(generator=my_generate,
                             evaluator=EvalFIT,
@@ -343,7 +433,7 @@ if __name__ == "__main__":
     print('[noBound 0/1] [maxfittime seconds][simconfig path][verbose 0/1][rdmseed int]')
     quit()
 
-  popsize=100; maxgen=10; nproc=16; useMPI=True; numselected=100; useDEA = False;
+  popsize=100; maxgen=10; nproc=16; useMPI=True; numselected=100; useDEA = useES = False;
   mutation_rate=0.2; evostr='21aug4A'; simconfig = 'sn.json'; maxfittime = 600; 
   noBound = False; useLOG = True; useEMO = False
   verbose = True; rdmseed=1234; useundefERR = False; 
@@ -368,7 +458,10 @@ if __name__ == "__main__":
         i+=1; rdmseed = int(sys.argv[i]); 
     elif sys.argv[i] == 'useMPI' or sys.argv[i] == '-useMPI':
       if i+1 < narg:
-        i+=1; useMPI = bool(int(sys.argv[i])); 
+        i+=1; useMPI = bool(int(sys.argv[i]));
+    elif sys.argv[i] == 'useES' or sys.argv[i] == '-useES':
+      if i+1 < narg:
+        i+=1; useES = bool(int(sys.argv[i]));         
     elif sys.argv[i] == 'useDEA' or sys.argv[i] == '-useDEA':
       if i+1 < narg:
         i+=1; useDEA = bool(int(sys.argv[i])); 
@@ -444,7 +537,7 @@ if __name__ == "__main__":
                  numselected=numselected,mutation_rate=mutation_rate,\
                  useDEA=useDEA,fstats=fstats,findiv=findiv,simconfig=simconfig,\
                  useLOG=useLOG,maxfittime=maxfittime,lseed=lseed,larch=larch,\
-                 verbose=verbose,useundefERR=useundefERR,startweight=startweight)
+                 verbose=verbose,useundefERR=useundefERR,startweight=startweight,useES=useES)
 
   if (useMPI and pc.id()==0) or not useMPI:
     pickle.dump(myout[0],open('data/' + evostr + '/fpop.pkl','wb'))
