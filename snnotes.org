@@ -38589,3 +38589,9 @@ hist(np.mean(cwt[0:80,0:120],axis=0),histtype='step',color='r',bins=20)
 hist(np.mean(cwtES[0:80,0:120],axis=0),histtype='step',color='b',bins=20)
 lpatch = [mpatches.Patch(color=c,label=s) for c,s in zip(['r','b'],['STDP/RL','ES'])]
 ax=gca(); ax.legend(handles=lpatch,handlelength=1)
+* 21sep29
+** evo
+
+move over https://github.com/NathanKlineInstitute/netpyne-STDP/blob/master/neurosim/train_es.py
+into smartagent ... so can use same algorithm for evolution
+
