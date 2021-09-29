@@ -301,8 +301,8 @@ def ESTrain (maxgen, pop_size, simconfig, startweight):
             fitness.append(fit)
         fitness = np.expand_dims(np.array(fitness), 1)
         fitness_res = [np.median(fitness), fitness.mean(), fitness.min(), fitness.max(), best_weights.mean()]
-        with open(fres_train, 'a') as out:
-          out.write('\t'.join([str(neurosim.end_after_episode)] + [str(r) for r in fitness_res]) + '\n')
+        #with open(fres_train, 'a') as out:
+        #  out.write('\t'.join([str(neurosim.end_after_episode)] + [str(r) for r in fitness_res]) + '\n')
         print("\nFitness Median: {}; Mean: {} ([{}, {}]). Mean Weight: {}".format(*fitness_res))
         # normalize the fitness for more stable training
         normalized_fitness = (fitness - fitness.mean()) / (fitness.std() + 1e-8)
@@ -314,6 +314,7 @@ def ESTrain (maxgen, pop_size, simconfig, startweight):
         # decay sigma and the learning rate
         SIGMA *= SIGMA_DECAY
         LEARNING_RATE *= LR_DECAY
+    return best_weights
 
 # run the evolution
 def runevo (popsize=100,maxgen=10,my_generate=my_generate,\
@@ -390,7 +391,8 @@ def runevo (popsize=100,maxgen=10,my_generate=my_generate,\
                             useundefERR=useundefERR,
                             startweight=startweight)
   elif useES:
-    final_pop = ESTrain(maxgen=maxgen, pop_size=popsize, simconfig=simconfig, startweight=startweight)
+    best_weights = ESTrain(maxgen=maxgen, pop_size=popsize, simconfig=simconfig, startweight=startweight)
+    return best_weights
   else:
     final_pop = es.evolve(generator=my_generate,
                             evaluator=EvalFIT,
