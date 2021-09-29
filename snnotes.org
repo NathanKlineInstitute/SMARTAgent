@@ -38595,3 +38595,7 @@ ax=gca(); ax.legend(handles=lpatch,handlelength=1)
 move over https://github.com/NathanKlineInstitute/netpyne-STDP/blob/master/neurosim/train_es.py
 into smartagent ... so can use same algorithm for evolution
 
+try on laptop first ... 
+
+python -i evo.py popsize 10 maxgen 1 nproc 1 ncore 8 useMPI 0 useES 1 simconfig backupcfg/21jul23_test_EVO_lp_sim.json verbose 1 startweight data/21jul23_test_EVO_lp_synWeights_final.pkl
+

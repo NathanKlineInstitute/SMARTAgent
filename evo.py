@@ -101,7 +101,7 @@ def EvalFIT (candidates, args):
   return fitness
 
 #
-def FitJobStrFNES (p, args, cdx, startweight, simconfig, num_generations):
+def FitJobStrFNES (p, cdx, startweight, simconfig, num_generations):
   global es,ncore # global evolution object
   pdfnew = startweight.copy() # copy starting synaptic weights
   for i in range(len(p)): pdfnew.at[i,'weight'] = p[i] # update the weights based on the candidate
@@ -126,7 +126,7 @@ def FitJobStrFNES (p, args, cdx, startweight, simconfig, num_generations):
 # evaluate fitness with sim run
 def EvalFITES (p, startweight, simconfig, num_generations, cdx):
   global es, quitaftermiss
-  strc,fn = FitJobStrFNES(p, args, cdx)
+  strc,fn = FitJobStrFNES(p, cdx, startweight, simconfig, num_generations)
   print('EvalFIT:', cdx, strc, fn)
   ret = os.system(strc)
   actreward = pd.DataFrame(np.loadtxt(fn),columns=['time','action','reward','proposed','hit','followtargetsign'])
@@ -266,8 +266,8 @@ def initialize_archive(f, archive_seeds):
       return f(random, population, archive, args)
   return wrapper
 
-def EStrain (maxgen, pop_size, simconfig, startweight):
-    dconf = init(dconf)
+def ESTrain (maxgen, pop_size, simconfig, startweight):
+    #dconf = init(dconf)
     ITERATIONS = maxgen # How many iterations to train for
     POPULATION_SIZE = pop_size # How many perturbations of weights to try per iteration
     SIGMA = 0.1 # dconf['ES']['sigma'] # 0.1 # standard deviation of perturbations applied to each member of population
@@ -318,7 +318,7 @@ def EStrain (maxgen, pop_size, simconfig, startweight):
 # run the evolution
 def runevo (popsize=100,maxgen=10,my_generate=my_generate,\
             nproc=16,ncore=8,rdmseed=1234,useDEA=True,\
-            fstats='/dev/null',findiv='/dev/null',mutation_rate=0.2,useMPI=False,\
+            fstat='/dev/null',findiv='/dev/null',mutation_rate=0.2,useMPI=False,\
             numselected=100,noBound=False,simconfig='sn.json',\
             useLOG=False,maxfittime=600,lseed=None,larch=None,verbose=True,\
             useundefERR=False,startweight=None,useES=False):
@@ -334,7 +334,7 @@ def runevo (popsize=100,maxgen=10,my_generate=my_generate,\
   #es.variator = [inspyred.ec.variators.heuristic_crossover,my_mutation]#inspyred.ec.variators.nonuniform_mutation
   # es.variator = [inspyred.ec.variators.heuristic_crossover] # ,inspyred.ec.variators.nonuniform_mutation]
   es.observer = [] # my_indiv_observe] # saves individuals to pkl file each generation
-  statfile = open(fstats,'w'); indfile = open(findiv,'w')
+  statfile = open(fstat,'w'); indfile = open(findiv,'w')
   es.observer.append(inspyred.ec.observers.file_observer)
   es.observer.append(inspyred.ec.observers.stats_observer)
   # es.selector = inspyred.ec.selectors.tournament_selection
@@ -505,9 +505,9 @@ if __name__ == "__main__":
       if i+1 < narg:
         i+=1; startweight = readweightsfile2pdf(sys.argv[i]) # starting weights - placeholders
         # print('startweight columns:',startweight.columns)
-    elif sys.argv[i] == 'fstats':
+    elif sys.argv[i] == 'fstat':
       if i+1 < narg:
-        i+=1; fstats = sys.argv[i]
+        i+=1; fstat = sys.argv[i]
     elif sys.argv[i] == 'findiv':
       if i+1 < narg:
         i+=1; findiv = sys.argv[i]
@@ -522,7 +522,7 @@ if __name__ == "__main__":
   if (useMPI and pc.id()==0) or not useMPI:
     print('popsize:',popsize,'maxgen:',maxgen,'nproc:',nproc,'ncore:',ncore,'useMPI:',useMPI,'numselected:',numselected,'evostr:',evostr,\
           'useDEA:',useDEA,'mutation_rate:',mutation_rate,'noBound:',noBound,'useLOG:',useLOG,\
-          'maxfittime:',maxfittime,'fseed:',fseed,'farch:',farch,'verbose:',verbose,'rdmseed:',rdmseed,'useundefERR:',useundefERR,'fstats:',fstats,'findiv:',findiv)
+          'maxfittime:',maxfittime,'fseed:',fseed,'farch:',farch,'verbose:',verbose,'rdmseed:',rdmseed,'useundefERR:',useundefERR,'fstat:',fstat,'findiv:',findiv)
       
   # make sure master node does not work on submitted jobs (that would prevent it managing/submitting other jobs)
   if useMPI and pc.id()==0: pc.master_works_on_jobs(0) 
@@ -535,7 +535,7 @@ if __name__ == "__main__":
 
   myout = runevo(popsize=popsize,maxgen=maxgen,nproc=nproc,rdmseed=rdmseed,useMPI=useMPI,\
                  numselected=numselected,mutation_rate=mutation_rate,\
-                 useDEA=useDEA,fstats=fstats,findiv=findiv,simconfig=simconfig,\
+                 useDEA=useDEA,fstat=fstat,findiv=findiv,simconfig=simconfig,\
                  useLOG=useLOG,maxfittime=maxfittime,lseed=lseed,larch=larch,\
                  verbose=verbose,useundefERR=useundefERR,startweight=startweight,useES=useES)
 
