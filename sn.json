@@ -97,18 +97,18 @@
     "ResumeSimFromFile": "data/21jul2_EN0_256_gcp__step_28_synWeights_final.pkl"
   },
   "sim": {
-    "duration": 500000,
+    "duration": 200000,
     "dt": 0.6,
     "verbose": 0,
     "recordStep": 1.0,
     "recordStim": 0,
-    "recordWeightStepSize": 200,
+    "recordWeightStepSize": 10,
     "normalizeWeightStepSize": 50000000000000000000000000000000000000,
     "normalizeWeightsAtStart": 0,
     "RLFakeUpRule": 0,
     "RLFakeDownRule": 0,
     "RLFakeStayRule": 0,
-    "name": "21aug27_EN0_RSE_cycle_",
+    "name": "21sep29_test_EVO_lp_",
     "doquit": 1,
     "doplot": 0,
     "saveCellSecs": 0,
@@ -192,7 +192,7 @@
     "allpops": {
       "ER": 0,
       "IR": 0,
-      "EV1": 6400,
+      "EV1": 1600,
       "EV1DE": 0,
       "EV1DNE": 0,
       "EV1DN": 0,
@@ -207,16 +207,16 @@
       "IV4": 0,
       "EMT": 0,
       "IMT": 0,
-      "EA": 600,
-      "IA": 206,
-      "IAL": 94,
+      "EA": 100,
+      "IA": 33,
+      "IAL": 15,
       "EA2": 0,
       "IA2": 0,
       "IA2L": 0,
-      "EMDOWN": 600,
-      "EMUP": 600,
-      "IM": 412,
-      "IML": 188,
+      "EMDOWN": 15,
+      "EMUP": 15,
+      "IM": 10,
+      "IML": 5,
       "IMUP": 0,
       "IMDOWN": 0,
       "EN": 3000
@@ -413,7 +413,7 @@
       "RecurrentDirNeurons": 0,
       "RecurrentLocNeurons": 0,
       "FeedForwardDirNtoA": 0,
-      "FeedForwardLocNtoA": 0,
+      "FeedForwardLocNtoA": 1,
       "FeedForwardDirNtoA2": 0,
       "FeedForwardLocNtoA2": 0,
       "FeedForwardDirNtoM": 0,
@@ -422,14 +422,14 @@
       "FeedForwardAtoA2": 1,
       "FeedForwardA2toM": 1,
       "FeedbackLocNeurons": 0,
-      "RecurrentMNeurons": 0,
-      "RecurrentANeurons": 0,
-      "RecurrentA2Neurons": 0,
+      "RecurrentMNeurons": 1,
+      "RecurrentANeurons": 1,
+      "RecurrentA2Neurons": 1,
       "FeedbackAtoDirN": 0,
       "FeedbackAtoLocN": 0,
-      "FeedbackMtoA": 0,
-      "FeedbackMtoA2": 0,
-      "FeedbackA2toA": 0
+      "FeedbackMtoA": 1,
+      "FeedbackMtoA2": 1,
+      "FeedbackA2toA": 1
     },
     "useBinaryImage": 1,
     "useNeuronPad": 0,
@@ -482,12 +482,12 @@
           "conv": 30
         },
         "IM": {
-          "AM2": 0,
+          "AM2": 9,
           "NM2": 0.0,
           "conv": 30
         },
         "IML": {
-          "AM2": 0,
+          "AM2": 9,
           "NM2": 0.0,
           "conv": 30
         }
@@ -506,7 +506,7 @@
         "EA": {
           "AM2": 15,
           "NM2": 1,
-          "conv": 640
+          "conv": 256
         },
         "EA2": {
           "AM2": 0.25,
@@ -562,9 +562,9 @@
       },
       "EA": {
         "EA": {
-          "AM2": 0.0,
-          "NM2": 0.0,
-          "conv": 0
+          "AM2": 0.5,
+          "NM2": 0.01,
+          "conv": 30
         },
         "EA2": {
           "AM2": 1,
@@ -910,9 +910,9 @@
       "updateIntervalSteps": 100,
       "synType": "AMPA"
     },
-    "EEMRecProbCross": 0,
+    "EEMRecProbCross": 1,
     "VisualFeedback": 0,
-    "weightVar": 0.5,
+    "weightVar": 0,
     "delayMinSoma": 1.8,
     "delayMaxSoma": 2.2,
     "delayMinDend": 3,
@@ -984,10 +984,10 @@
       "wmax": 35,
       "RLon": 1,
       "STDPon": 0,
-      "RLlenhebb": 10000,
+      "RLlenhebb": 200,
       "RLlenanti": 500,
       "useRLexp": 1,
-      "RLhebbwt": 0.01,
+      "RLhebbwt": 0.0,
       "RLantiwt": 0.0,
       "hebbwt": 0.0,
       "antiwt": 0.0,
@@ -1006,7 +1006,7 @@
       "RLlenhebb": 1000,
       "RLlenanti": 1000,
       "useRLexp": 1,
-      "RLhebbwt": 0.02,
+      "RLhebbwt": 0.0,
       "RLantiwt": 0.0,
       "hebbwt": 0,
       "antiwt": 0,
@@ -1025,7 +1025,7 @@
       "RLlenhebb": 10000,
       "RLlenanti": 500,
       "useRLexp": 1,
-      "RLhebbwt": 0.01,
+      "RLhebbwt": 0.0,
       "RLantiwt": 0.0,
       "hebbwt": 0.0,
       "antiwt": 0.0,
@@ -1044,8 +1044,8 @@
       "RLlenhebb": 1000,
       "RLlenanti": 1000,
       "useRLexp": 1,
-      "RLhebbwt": 4e-06,
-      "RLantiwt": -0.0,
+      "RLhebbwt": 0.0,
+      "RLantiwt": 0.0,
       "hebbwt": 0,
       "antiwt": 0,
       "tauhebb": 10,
