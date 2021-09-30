@@ -38608,5 +38608,7 @@ LR_DECAY = 1
 SIGMA_DECAY = 1
 EPISODES_PER_ITER= 1
 
-python -i evo.py fstat 21sep30_test_EVO_cycle_fstats.txt popsize 2 maxgen 1 nproc 1 ncore 30 useMPI 0 useES 1 simconfig sn.json verbose 1 quitaftermiss 1 startweight data/21aug9_test_EVO_cycle_synWeights_final.pkl quitaftermiss 1 evostr 21sep30_test_EVO_cycle_
+python -i evo.py fstat 21sep30_test_EVO_cycle_fstats.txt popsize 10 maxgen 200 nproc 1 ncore 30 useMPI 0 useES 1 simconfig sn.json verbose 1 quitaftermiss 1 startweight data/21aug9_test_EVO_cycle_synWeights_final.pkl quitaftermiss 1 evostr 21sep30_test_EVO_cycle_
+
+started ~13:17 ...
 
