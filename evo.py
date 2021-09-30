@@ -60,7 +60,7 @@ def backupcfg (evostr,fcfg):
 
 #
 def FitJobStrFN (p, args, cdx):
-  global es,ncore # global evolution object
+  global es,ncore,quitaftermiss # global evolution object
   pdfnew = args['startweight'].copy() # copy starting synaptic weights
   for i in range(len(p)): pdfnew.at[i,'weight'] = p[i] # update the weights based on the candidate
   # next update the simulation's json file
@@ -70,6 +70,7 @@ def FitJobStrFN (p, args, cdx):
   simstr = d['sim']['name']
   fnweight = mydir+'/evo/'+ simstr + 'weight.pkl' # filename for weights
   d['sim']['doquit'] = 1; d['sim']['doplot'] = 0
+  d['sim']['QuitAfterMiss'] = int(quitaftermiss)  
   d['simtype']['ResumeSim'] = 1 # make sure simulation loads the weights
   d['simtype']['ResumeSimFromFile'] = fnweight
   fnjson = mydir+'/evo/'+d['sim']['name'] + 'sim.json'
@@ -102,7 +103,7 @@ def EvalFIT (candidates, args):
 
 #
 def FitJobStrFNES (p, cdx, startweight, simconfig, num_generations):
-  global es,ncore # global evolution object
+  global es,ncore,quitaftermiss # global evolution object
   pdfnew = startweight.copy() # copy starting synaptic weights
   for i in range(len(p)): pdfnew.at[i,'weight'] = p[i] # update the weights based on the candidate
   # next update the simulation's json file
@@ -111,6 +112,7 @@ def FitJobStrFNES (p, cdx, startweight, simconfig, num_generations):
   simstr = d['sim']['name']
   fnweight = mydir+'/evo/'+ simstr + 'weight.pkl' # filename for weights
   d['sim']['doquit'] = 1; d['sim']['doplot'] = 0
+  d['sim']['QuitAfterMiss'] = int(quitaftermiss)
   d['simtype']['ResumeSim'] = 1 # make sure simulation loads the weights
   d['simtype']['ResumeSimFromFile'] = fnweight
   fnjson = mydir+'/evo/'+d['sim']['name'] + 'sim.json'
@@ -267,54 +269,52 @@ def initialize_archive(f, archive_seeds):
   return wrapper
 
 def ESTrain (maxgen, pop_size, simconfig, startweight):
-    #dconf = init(dconf)
-    ITERATIONS = maxgen # How many iterations to train for
-    POPULATION_SIZE = pop_size # How many perturbations of weights to try per iteration
-    SIGMA = 0.1 # dconf['ES']['sigma'] # 0.1 # standard deviation of perturbations applied to each member of population
-    LEARNING_RATE = 1.0 # dconf['ES']['learning_rate'] # 1 # what percentage of the return normalized perturbations to add to best_weights
-    # How much to decay the learning rate and sigma by each episode. In theory
-    # this should lead to better
-    LR_DECAY = 1.0 # dconf['ES']['decay_lr'] # 1
-    SIGMA_DECAY = 1.0 # dconf['ES']['decay_sigma'] # 1
-    EPISODES_PER_ITER = 5 # dconf['ES']['episodes_per_iter'] # 5
-    SAVE_WEIGHTS_EVERY_ITER = 10 # dconf['ES']['save_weights_every_iter'] # 10
-    # randomly initialize best weights to the first weights generated
-    best_weights = np.array(startweight['weight']) # neurosim.getWeightArray(netpyne.sim)
-    # fres_train = neurosim.outpath('es_train.txt')
-    # fres_eval = neurosim.outpath('es_eval.txt')
-    total_time = 0
-    for iteration in range(ITERATIONS):
-        print("\n--------------------- ES iteration", iteration, "---------------------")
-        # generate unique randomly sampled perturbations to add to each member of
-        # this iteration's the training population
-        perturbations = np.random.normal(0, SIGMA, (POPULATION_SIZE, best_weights.size))
-        # this should rarely be used with reasonable sigma but just in case we
-        # clip perturbations that are too low since they can make the weights negative
-        perturbations[perturbations < -0.8] = -0.8
-        print("\nSimulating episodes ... ")
-        # get the fitness of each set of perturbations when applied to the current best weights
-        # by simulating each network and getting the episode length as the fitness
-        fitness = []
-        for i in range(POPULATION_SIZE):
-            fit = EvalFITES(best_weights * (1 + perturbations[i]), startweight, simconfig, iteration, i)
-            # Add fitness
-            fitness.append(fit)
-        fitness = np.expand_dims(np.array(fitness), 1)
-        fitness_res = [np.median(fitness), fitness.mean(), fitness.min(), fitness.max(), best_weights.mean()]
-        #with open(fres_train, 'a') as out:
-        #  out.write('\t'.join([str(neurosim.end_after_episode)] + [str(r) for r in fitness_res]) + '\n')
-        print("\nFitness Median: {}; Mean: {} ([{}, {}]). Mean Weight: {}".format(*fitness_res))
-        # normalize the fitness for more stable training
-        normalized_fitness = (fitness - fitness.mean()) / (fitness.std() + 1e-8)
-        # weight the perturbations by their normalized fitness so that perturbations
-        # that performed well are added to the best weights and those that performed poorly are subtracted
-        fitness_weighted_perturbations = (normalized_fitness * perturbations)
-        # apply the fitness_weighted_perturbations to the current best weights proportionally to the LR
-        best_weights = best_weights * (1 + (LEARNING_RATE * fitness_weighted_perturbations.mean(axis = 0)))
-        # decay sigma and the learning rate
-        SIGMA *= SIGMA_DECAY
-        LEARNING_RATE *= LR_DECAY
-    return best_weights
+  #dconf = init(dconf)
+  ITERATIONS = maxgen # How many iterations to train for
+  POPULATION_SIZE = pop_size # How many perturbations of weights to try per iteration
+  SIGMA = 0.1 # dconf['ES']['sigma'] # 0.1 # standard deviation of perturbations applied to each member of population
+  LEARNING_RATE = 1.0 # dconf['ES']['learning_rate'] # 1 # what percentage of the return normalized perturbations to add to best_weights
+  # How much to decay the learning rate and sigma by each episode. In theory this should lead to better
+  LR_DECAY = 1.0 
+  SIGMA_DECAY = 1.0 
+  EPISODES_PER_ITER = 1 
+  SAVE_WEIGHTS_EVERY_ITER = 10 
+  # randomly initialize best weights to the first weights generated
+  best_weights = np.array(startweight['weight']) # neurosim.getWeightArray(netpyne.sim)
+  total_time = 0
+  for iteration in range(ITERATIONS):
+    print("\n--------------------- ES iteration", iteration, "---------------------")
+    logger.info("\n--------------------- ES iteration" + str(iteration) + "---------------------")
+    # generate unique randomly sampled perturbations to add to each member of
+    # this iteration's the training population
+    perturbations = np.random.normal(0, SIGMA, (POPULATION_SIZE, best_weights.size))
+    # this should rarely be used with reasonable sigma but just in case we
+    # clip perturbations that are too low since they can make the weights negative
+    perturbations[perturbations < -0.8] = -0.8
+    print("\nSimulating episodes ... ")
+    logger.info("Simulating episodes ... ")
+    # get the fitness of each set of perturbations when applied to the current best weights
+    # by simulating each network and getting the episode length as the fitness
+    fitness = []
+    for i in range(POPULATION_SIZE):
+      fit = EvalFITES(best_weights * (1 + perturbations[i]), startweight, simconfig, iteration, i)
+      # Add fitness
+      fitness.append(fit)
+    fitness = np.expand_dims(np.array(fitness), 1)
+    fitness_res = [np.median(fitness), fitness.mean(), fitness.min(), fitness.max(), best_weights.min(), best_weights.max(), best_weights.mean()]
+    print("\nFitness Median: {}; Mean: {} ([{}, {}]). Min/Max/Mean Weight: {},{},{}".format(*fitness_res))
+    logger.info("Fitness Median: {}; Mean: {} ([{}, {}]). Min/Max/Mean Weight: {},{},{}".format(*fitness_res))
+    # normalize the fitness for more stable training
+    normalized_fitness = (fitness - fitness.mean()) / (fitness.std() + 1e-8)
+    # weight the perturbations by their normalized fitness so that perturbations
+    # that performed well are added to the best weights and those that performed poorly are subtracted
+    fitness_weighted_perturbations = (normalized_fitness * perturbations)
+    # apply the fitness_weighted_perturbations to the current best weights proportionally to the LR
+    best_weights = best_weights * (1 + (LEARNING_RATE * fitness_weighted_perturbations.mean(axis = 0)))
+    # decay sigma and the learning rate
+    SIGMA *= SIGMA_DECAY
+    LEARNING_RATE *= LR_DECAY
+  return best_weights
 
 # run the evolution
 def runevo (popsize=100,maxgen=10,my_generate=my_generate,\
@@ -534,6 +534,7 @@ if __name__ == "__main__":
     safemkdir('backupcfg/'+evostr) # make a data output dir
     simconfig = backupcfg(evostr,simconfig) 
     safemkdir(mydir+'/evo') # for temp files
+    safemkdir('data/'+evostr)
 
   myout = runevo(popsize=popsize,maxgen=maxgen,nproc=nproc,rdmseed=rdmseed,useMPI=useMPI,\
                  numselected=numselected,mutation_rate=mutation_rate,\
@@ -542,7 +543,10 @@ if __name__ == "__main__":
                  verbose=verbose,useundefERR=useundefERR,startweight=startweight,useES=useES)
 
   if (useMPI and pc.id()==0) or not useMPI:
-    pickle.dump(myout[0],open('data/' + evostr + '/fpop.pkl','wb'))
+    if useES:
+      pickle.dump(myout,open('data/' + evostr + '/bestweight.pkl','wb'))
+    else:
+      pickle.dump(myout[0],open('data/' + evostr + '/fpop.pkl','wb'))      
     if useEMO: pickle.dump(myout[1],open('data/' + evostr + '/ARCH.pkl','wb'))
 
   if useMPI:

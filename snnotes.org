@@ -38599,3 +38599,14 @@ try on laptop first ...
 
 python -i evo.py popsize 10 maxgen 1 nproc 1 ncore 8 useMPI 0 useES 1 simconfig sn.json verbose 1 quitaftermiss 1 startweight data/21jul23_test_EVO_lp_synWeights_final.pkl
 
+* 21sep30
+** setup/test updated ES/evo on cycle
+
+SIGMA = 0.1
+LEARNING_RATE = 1
+LR_DECAY = 1
+SIGMA_DECAY = 1
+EPISODES_PER_ITER= 1
+
+python -i evo.py fstat 21sep30_test_EVO_cycle_fstats.txt popsize 2 maxgen 1 nproc 1 ncore 30 useMPI 0 useES 1 simconfig sn.json verbose 1 quitaftermiss 1 startweight data/21aug9_test_EVO_cycle_synWeights_final.pkl quitaftermiss 1 evostr 21sep30_test_EVO_cycle_
+
