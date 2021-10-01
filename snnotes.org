@@ -38708,3 +38708,11 @@ largest magnitude differences are from EA -> EM (bottom-right)
 
 will let this run longer but also look at another network in parallel . . . 
 
+** next net for ES (21oct1_test_ES_cycle_)
+
+./myrun 30 sn.json
+
+python -i simdat.py backupcfg/21oct1_test_ES_cycle_sim.json
+
+python -i evo.py fstat data/21oct1_test_ES_cycle_/allinfo.txt popsize 10 maxgen 300 nproc 1 ncore 30 useMPI 0 useES 1 simconfig sn.json verbose 1 quitaftermiss 1 startweight data/21oct1_test_ES_cycle_synWeights_final.pkl evostr 21oct1_test_ES_cycle_
+

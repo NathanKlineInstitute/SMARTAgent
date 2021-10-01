@@ -102,13 +102,13 @@
     "verbose": 0,
     "recordStep": 1.0,
     "recordStim": 0,
-    "recordWeightStepSize": 10000000000000000000000000000000000000000,
+    "recordWeightStepSize": 50000000000000000000000000000000000000000,
     "normalizeWeightStepSize": 50000000000000000000000000000000000000,
     "normalizeWeightsAtStart": 0,
     "RLFakeUpRule": 0,
     "RLFakeDownRule": 0,
     "RLFakeStayRule": 0,
-    "name": "21sep30_test_EVO_cycle_",
+    "name": "21oct1_test_ES_cycle_",
     "doquit": 1,
     "doplot": 0,
     "saveCellSecs": 0,
@@ -193,7 +193,7 @@
     "allpops": {
       "ER": 0,
       "IR": 0,
-      "EV1": 1600,
+      "EV1": 6400,
       "EV1DE": 0,
       "EV1DNE": 0,
       "EV1DN": 0,
@@ -208,16 +208,16 @@
       "IV4": 0,
       "EMT": 0,
       "IMT": 0,
-      "EA": 100,
-      "IA": 33,
-      "IAL": 15,
+      "EA": 600,
+      "IA": 206,
+      "IAL": 94,
       "EA2": 0,
       "IA2": 0,
       "IA2L": 0,
-      "EMDOWN": 15,
-      "EMUP": 15,
-      "IM": 10,
-      "IML": 5,
+      "EMDOWN": 300,
+      "EMUP": 300,
+      "IM": 206,
+      "IML": 94,
       "IMUP": 0,
       "IMDOWN": 0,
       "EN": 0
@@ -414,7 +414,7 @@
       "RecurrentDirNeurons": 0,
       "RecurrentLocNeurons": 0,
       "FeedForwardDirNtoA": 0,
-      "FeedForwardLocNtoA": 1,
+      "FeedForwardLocNtoA": 0,
       "FeedForwardDirNtoA2": 0,
       "FeedForwardLocNtoA2": 0,
       "FeedForwardDirNtoM": 0,
@@ -507,7 +507,7 @@
         "EA": {
           "AM2": 15,
           "NM2": 1,
-          "conv": 800
+          "conv": 640
         },
         "EA2": {
           "AM2": 0.25,
@@ -517,12 +517,12 @@
         "EMDOWN": {
           "AM2": 0.25,
           "NM2": 0.0,
-          "conv": 30
+          "conv": 0
         },
         "EMUP": {
           "AM2": 0.25,
           "NM2": 0.0,
-          "conv": 30
+          "conv": 0
         }
       },
       "VD": {
@@ -537,8 +537,8 @@
           "conv": 0
         },
         "EA": {
-          "AM2": 1.0,
-          "NM2": 0.1,
+          "AM2": 3,
+          "NM2": 1,
           "conv": 320
         },
         "EA2": {
@@ -563,7 +563,7 @@
       },
       "EA": {
         "EA": {
-          "AM2": 1,
+          "AM2": 1.0,
           "NM2": 0.01,
           "conv": 30
         },
@@ -573,9 +573,9 @@
           "conv": 100
         },
         "EM": {
-          "AM2": 6,
+          "AM2": 1.0,
           "NM2": 0.01,
-          "conv": 30
+          "conv": 100
         },
         "IA": {
           "AM2": 3.95,
@@ -617,19 +617,19 @@
       },
       "EM": {
         "EM": {
-          "AM2": 1,
+          "AM2": 1.0,
           "NM2": 0.01,
-          "conv": 15
+          "conv": 60
         },
         "EA": {
-          "AM2": 0.05,
-          "NM2": 0.005,
-          "conv": 3
+          "AM2": 1.0,
+          "NM2": 0.05,
+          "conv": 0
         },
         "EA2": {
           "AM2": 0.05,
           "NM2": 0.005,
-          "conv": 3
+          "conv": 0
         },
         "IRecip": {
           "AM2": 20,
@@ -913,7 +913,7 @@
     },
     "EEMRecProbCross": 1,
     "VisualFeedback": 0,
-    "weightVar": 0,
+    "weightVar": 0.75,
     "delayMinSoma": 1.8,
     "delayMaxSoma": 2.2,
     "delayMinDend": 3,
