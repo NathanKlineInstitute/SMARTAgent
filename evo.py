@@ -268,7 +268,7 @@ def initialize_archive(f, archive_seeds):
       return f(random, population, archive, args)
   return wrapper
 
-def ESTrain (maxgen, pop_size, simconfig, startweight, statfile):
+def ESTrain (maxgen, pop_size, simconfig, startweight, evostr):
   #dconf = init(dconf)
   ITERATIONS = maxgen # How many iterations to train for
   POPULATION_SIZE = pop_size # How many perturbations of weights to try per iteration
@@ -282,6 +282,7 @@ def ESTrain (maxgen, pop_size, simconfig, startweight, statfile):
   # randomly initialize best weights to the first weights generated
   best_weights = np.array(startweight['weight']) # neurosim.getWeightArray(netpyne.sim)
   total_time = 0
+  evostatslog = 'data/'+evostr+'/stats.log'; fp=open(evostatslog,'w'); fp.close()
   for iteration in range(ITERATIONS):
     print("\n--------------------- ES iteration", iteration, "---------------------")
     logger.info("\n--------------------- ES iteration" + str(iteration) + "---------------------")
@@ -304,7 +305,8 @@ def ESTrain (maxgen, pop_size, simconfig, startweight, statfile):
     fitness_res = [np.median(fitness), fitness.mean(), fitness.min(), fitness.max(), best_weights.min(), best_weights.max(), best_weights.mean()]
     print("\nFitness Median: {}; Mean: {} ([{}, {}]). Min/Max/Mean Weight: {},{},{}".format(*fitness_res))
     logger.info("Fitness Median: {}; Mean: {} ([{}, {}]). Min/Max/Mean Weight: {},{},{}".format(*fitness_res))
-    statfile.write(str(fitness.min()) + '\t' + str(fitness.max()) + '\t' + str(fitness.mean()) + '\t' + str(best_weights.min()) + '\t' + str(best_weights.max()) + '\t' + str(best_weights.mean()) + '\n')
+    with open(evostatslog,'a') as fp:
+      fp.write(str(fitness.min()) + '\t' + str(fitness.max()) + '\t' + str(fitness.mean()) + '\t' + str(best_weights.min()) + '\t' + str(best_weights.max()) + '\t' + str(best_weights.mean()) + '\n')
     # normalize the fitness for more stable training
     normalized_fitness = (fitness - fitness.mean()) / (fitness.std() + 1e-8)
     # weight the perturbations by their normalized fitness so that perturbations
@@ -312,6 +314,7 @@ def ESTrain (maxgen, pop_size, simconfig, startweight, statfile):
     fitness_weighted_perturbations = (normalized_fitness * perturbations)
     # apply the fitness_weighted_perturbations to the current best weights proportionally to the LR
     best_weights = best_weights * (1 + (LEARNING_RATE * fitness_weighted_perturbations.mean(axis = 0)))
+    pickle.dump(best_weights,open('data/'+evostr+'/best_weights_'+str(iteration)+'.pkl','wb')) # save best weights so far
     # decay sigma and the learning rate
     SIGMA *= SIGMA_DECAY
     LEARNING_RATE *= LR_DECAY
@@ -323,7 +326,7 @@ def runevo (popsize=100,maxgen=10,my_generate=my_generate,\
             fstat='/dev/null',findiv='/dev/null',mutation_rate=0.2,useMPI=False,\
             numselected=100,noBound=False,simconfig='sn.json',\
             useLOG=False,maxfittime=600,lseed=None,larch=None,verbose=True,\
-            useundefERR=False,startweight=None,useES=False):
+            useundefERR=False,startweight=None,useES=False,evostr='21sep30_'):
   global es
   useMProc = False
   if useLOG: logger=setEClog()
@@ -392,7 +395,7 @@ def runevo (popsize=100,maxgen=10,my_generate=my_generate,\
                             useundefERR=useundefERR,
                             startweight=startweight)
   elif useES:
-    best_weights = ESTrain(maxgen=maxgen, pop_size=popsize, simconfig=simconfig, startweight=startweight, statfile=statfile)
+    best_weights = ESTrain(maxgen=maxgen, pop_size=popsize, simconfig=simconfig, startweight=startweight, evostr=evostr)
     return best_weights
   else:
     final_pop = es.evolve(generator=my_generate,
@@ -541,7 +544,7 @@ if __name__ == "__main__":
                  numselected=numselected,mutation_rate=mutation_rate,\
                  useDEA=useDEA,fstat=fstat,findiv=findiv,simconfig=simconfig,\
                  useLOG=useLOG,maxfittime=maxfittime,lseed=lseed,larch=larch,\
-                 verbose=verbose,useundefERR=useundefERR,startweight=startweight,useES=useES)
+                 verbose=verbose,useundefERR=useundefERR,startweight=startweight,useES=useES,evostr=evostr)
 
   if (useMPI and pc.id()==0) or not useMPI:
     if useES:

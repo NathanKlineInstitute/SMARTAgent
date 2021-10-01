@@ -38612,3 +38612,11 @@ python -i evo.py fstat 21sep30_test_EVO_cycle_fstats.txt popsize 10 maxgen 200 n
 
 started ~13:17 ...
 
+hmm, does not seem to be improving ... fixup stats file so easier to check progress ... 
+
+try with larger pop, and better stat reporting ... (also do not record weights during each evo sims - they're not changing within a sim)
+
+python -i evo.py fstat data/21sep30_test_EVO_cycle_/allinfo.txt popsize 30 maxgen 300 nproc 1 ncore 30 useMPI 0 useES 1 simconfig sn.json verbose 1 quitaftermiss 1 startweight data/21aug9_test_EVO_cycle_synWeights_final.pkl quitaftermiss 1 evostr 21sep30_test_EVO_cycle_
+
+started ~21:48 ...
+
