@@ -268,7 +268,7 @@ def initialize_archive(f, archive_seeds):
       return f(random, population, archive, args)
   return wrapper
 
-def ESTrain (maxgen, pop_size, simconfig, startweight):
+def ESTrain (maxgen, pop_size, simconfig, startweight, statfile):
   #dconf = init(dconf)
   ITERATIONS = maxgen # How many iterations to train for
   POPULATION_SIZE = pop_size # How many perturbations of weights to try per iteration
@@ -304,6 +304,7 @@ def ESTrain (maxgen, pop_size, simconfig, startweight):
     fitness_res = [np.median(fitness), fitness.mean(), fitness.min(), fitness.max(), best_weights.min(), best_weights.max(), best_weights.mean()]
     print("\nFitness Median: {}; Mean: {} ([{}, {}]). Min/Max/Mean Weight: {},{},{}".format(*fitness_res))
     logger.info("Fitness Median: {}; Mean: {} ([{}, {}]). Min/Max/Mean Weight: {},{},{}".format(*fitness_res))
+    statfile.write(str(fitness.min()) + '\t' + str(fitness.max()) + '\t' + str(fitness.mean()) + '\t' + str(best_weights.min()) + '\t' + str(best_weights.max()) + '\t' + str(best_weights.mean()) + '\n')
     # normalize the fitness for more stable training
     normalized_fitness = (fitness - fitness.mean()) / (fitness.std() + 1e-8)
     # weight the perturbations by their normalized fitness so that perturbations
@@ -391,7 +392,7 @@ def runevo (popsize=100,maxgen=10,my_generate=my_generate,\
                             useundefERR=useundefERR,
                             startweight=startweight)
   elif useES:
-    best_weights = ESTrain(maxgen=maxgen, pop_size=popsize, simconfig=simconfig, startweight=startweight)
+    best_weights = ESTrain(maxgen=maxgen, pop_size=popsize, simconfig=simconfig, startweight=startweight, statfile=statfile)
     return best_weights
   else:
     final_pop = es.evolve(generator=my_generate,
