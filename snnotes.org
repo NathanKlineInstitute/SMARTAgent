@@ -38716,3 +38716,164 @@ python -i simdat.py backupcfg/21oct1_test_ES_cycle_sim.json
 
 python -i evo.py fstat data/21oct1_test_ES_cycle_/allinfo.txt popsize 10 maxgen 300 nproc 1 ncore 30 useMPI 0 useES 1 simconfig sn.json verbose 1 quitaftermiss 1 startweight data/21oct1_test_ES_cycle_synWeights_final.pkl evostr 21oct1_test_ES_cycle_
 
+* 21oct4
+** check ES output from 21sep30_test_EVO_cycle_ run 
+
+python
+
+import numpy as np
+from pylab import *
+ion()
+
+ep = np.loadtxt('data/21sep30_test_EVO_cycle_/stats.log',delimiter='\t')
+
+#
+for col, clr in zip([0,1,2],['r','b','k']):
+  plot(ep[:,col],clr,linewidth=3);
+  plot(ep[:,col],clr+'o',markersize=10)
+
+xlabel('Iteration',fontsize=25); ylabel('Fitness (Time Before Miss)',fontsize=25)
+ylim((0,80e3))
+
+savefig('gif/21oct4_test_ES_a0.png') # [[./gif/21oct4_test_ES_a0.png]]
+
+import pickle
+lbw=[pickle.load(open('data/21sep30_test_EVO_cycle_/best_weights_'+str(i)+'.pkl','rb')) for i in range(38)]
+
+import simdat
+import pandas as pd
+startweight = simdat.readweightsfile2pdf('data/21aug9_test_EVO_cycle_synWeights_final.pkl')
+
+offset = np.amin(startweight['preid'])
+cwt = np.zeros((np.amax(startweight['preid']+1-offset),np.amax(startweight['preid'])+1-offset))
+
+def bw2cwt (bw):
+  cwt = np.zeros((np.amax(startweight['preid']+1-offset),np.amax(startweight['preid'])+1-offset))
+  for i in range(len(startweight)): cwt[startweight.at[i,'preid']-offset,startweight.at[i,'postid']-offset] = bw[i]
+  return cwt
+
+lcwt = [bw2cwt(bw) for bw in lbw]
+
+for idx,cwt in enumerate(lcwt):
+  subplot(6,7,idx+1); title('bw:'+str(idx),fontsize=10)
+  imshow(cwt[1600:,1600:],cmap='gray',origin='lower',interpolation='None',extent=(1600,1777,1600,1777),vmin=0,vmax=2.5); 
+  ylabel('Pre ID',fontsize=10); xlabel('Post ID',fontsize=10)
+
+savefig('gif/21oct4_test_ES_cmat_a5.png')
+
+cwd = lcwt[-1] - lcwt[0]
+imshow(cwd[1600:,1600:],cmap='gray',origin='lower',interpolation='None',extent=(1600,1777,1600,1777),vmin=-0.5,vmax=0.5); 
+
+savefig('gif/21oct4_test_ES_cmat_a6.png')
+
+plot(ep[:,4]) # max weight is increasing (but average and min has no pattern)  --- wmax is set to 35, so soon it will be limited ... and wbase is 0.001 ... 
+savefig('gif/21oct4_test_ES_maxwt_a7.png')
+
+best so far:
+2021-10-01 03:23:54,762 - inspyred.ec - INFO - ./myrun 30 /home/samn/SMARTAgent/evo/21sep30_test_EVO_cycle__evo_gen_5_cand_9_sim.json, data/21sep30_test_EVO_cycle__evo_gen_5_cand_9_ActionsRewards.txt, fit=75496.8
+
+python -i simdat.py backupcfg/21sep30_test_EVO_cycle__evo_gen_5_cand_9_sim.json
+
+EV1 0.0 Hz
+EA 0.17 Hz
+IA 0.87 Hz
+IAL 1.12 Hz
+EMDOWN 0.37 Hz
+EMUP 0.36 Hz
+IM 0.78 Hz
+IML 0.69 Hz
+stimModEV1 0.0 Hz
+
+drawraster(dspkT,dspkID);
+xlim((0,75496.8))
+savefig(gifpath()+'rast.png') # [[./gif/21oct4_21sep30_test_EVO_cycle__evo_gen_5_cand_9_rast.png]]
+xlim((65496.8,75496.8))
+savefig(gifpath()+'rastB.png') # [[./gif/21oct4_21sep30_test_EVO_cycle__evo_gen_5_cand_9_rastB.png]]
+
+hmm, why is EV1 rate calculated as 0 Hz ?? can see EV1 firing in the raster ... because not using the
+correct tlim since sim finished ~75 s ... and using 500 s for the calc ... 
+
+dstartidx['EV1'], dendidx['EV1'], dnumc['EV1'] # (0, 1599, 1600)
+
+drawraster(dspkT,dspkID,tlim=(0,75496.8));
+savefig(gifpath()+'rastC.png') # [[./gif/21oct4_21sep30_test_EVO_cycle__evo_gen_5_cand_9_rastC.png]]
+
+ok, now rate displayed properly ...
+
+pravgrates(dspkT,dspkID,dnumc,tlim=(75496.8-1e3,75496.8))
+
+EV1 0.02 Hz
+EA 1.33 Hz
+IA 4.27 Hz
+IAL 7.07 Hz
+EMDOWN 1.87 Hz
+EMUP 1.4 Hz
+IM 1.9 Hz
+IML 2.0 Hz
+stimModEV1 0.0 Hz
+
+fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
+[[./gif/21oct4_21sep30_test_EVO_cycle__evo_gen_5_cand_9__with_reward_input.mp4]]
+
+hits ball at different positions, ~6 times...
+
+** check ES output from 21oct1_test_ES_cycle_ -->> stopped, not good starting model
+
+python
+
+import numpy as np
+from pylab import *
+ion()
+
+ep = np.loadtxt('data/21oct1_test_ES_cycle_/stats.log',delimiter='\t')
+
+#
+for col, clr in zip([0,1,2],['r','b','k']):
+  plot(ep[:,col],clr,linewidth=3);
+  plot(ep[:,col],clr+'o',markersize=10)
+
+xlabel('Iteration',fontsize=25); ylabel('Fitness (Time Before Miss)',fontsize=25)
+ylim((5e3,22e3))
+
+savefig('gif/21oct4_test_ES_b0.png') # [[./gif/21oct4_test_ES_b0.png]]
+
+best is ~flat ... 
+
+for col,clr,ttl in zip([3,4,5],['r','g','b'],['min','max','mean']): 
+  subplot(1,3,col-2); 
+  plot(ep[:,col],clr); title(ttl)
+
+savefig('gif/21oct4_test_ES_maxwt_b7.png') # [[./gif/21oct4_test_ES_maxwt_b7.png]]
+for weights: min decreasing, max increasing, avg ~flat
+that means the sparse firing might improve as max weight increases ... 
+
+best so far:
+ep[:,1].max() # 21015.6
+2021-10-04 10:51:51,011 - inspyred.ec - INFO - ./myrun 30 /home/samn/SMARTAgent/evo/21oct1_test_ES_cycle__evo_gen_147_cand_0_sim.json, data/21oct1_test_ES_cycle__evo_gen_147_cand_0_ActionsRewards.txt, fit=21015.6
+
+python -i simdat.py backupcfg/21oct1_test_ES_cycle__evo_gen_147_cand_0_sim.json
+
+tmax = 21015.6
+
+drawraster(dspkT,dspkID,tlim=(0,tmax));
+savefig(gifpath()+'rastC.png') # [[./gif/21oct4_21oct1_test_ES_cycle__evo_gen_147_cand_0_rastC.png]]
+
+EM only fires in beginning - this sim not worth continuing - the weights are going up but may as well start from more reasonable initial conditions...
+
+pravgrates(dspkT,dspkID,dnumc,tlim=(tmax-5e3,tmax))
+
+EV1 0.01 Hz
+EA 0.13 Hz
+IA 0.0 Hz
+IAL 0.0 Hz
+EMDOWN 0.0 Hz
+EMUP 0.0 Hz
+IM 0.0 Hz
+IML 0.0 Hz
+stimModEV1 0.0 Hz
+
+fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
+[[./gif/21oct4_21oct1_test_ES_cycle__evo_gen_147_cand_0__with_reward_input.mp4]]
+
+paddle moves 1x then stays still ... yeah, really bad starting point here!!
+

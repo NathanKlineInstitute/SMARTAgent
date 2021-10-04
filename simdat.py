@@ -533,7 +533,7 @@ def drawraster (dspkT,dspkID,tlim=None,msz=2,skipstim=True):
     xlim((0,totalDur))
   xlabel('Time (ms)')
   #lclr.reverse(); 
-  lpatch = [mpatches.Patch(color=c,label=s+' '+str(round(getrate(dspkT,dspkID,s,dnumc),2))+' Hz') for c,s in zip(lclr,lpop)]
+  lpatch = [mpatches.Patch(color=c,label=s+' '+str(round(getrate(dspkT,dspkID,s,dnumc,tlim=tlim),2))+' Hz') for c,s in zip(lclr,lpop)]
   ax=gca()
   ax.legend(handles=lpatch,handlelength=1,loc='best')
   ylim((0,sum([dnumc[x] for x in lpop])))
