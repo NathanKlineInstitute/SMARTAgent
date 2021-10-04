@@ -102,13 +102,13 @@
     "verbose": 0,
     "recordStep": 1.0,
     "recordStim": 0,
-    "recordWeightStepSize": 50000000000000000000000000000000000000000,
+    "recordWeightStepSize": 50000000000000000000000000000000000000,
     "normalizeWeightStepSize": 50000000000000000000000000000000000000,
     "normalizeWeightsAtStart": 0,
     "RLFakeUpRule": 0,
     "RLFakeDownRule": 0,
     "RLFakeStayRule": 0,
-    "name": "21oct1_test_ES_cycle_",
+    "name": "21oct4_ES_FF_cycle_",
     "doquit": 1,
     "doplot": 0,
     "saveCellSecs": 0,
@@ -117,7 +117,7 @@
     "targettedRL": 0,
     "targettedRLOppFctr": 0.5,
     "targettedRLDscntFctr": 0.05,
-    "tstepPerAction": 50,
+    "tstepPerAction": 20,
     "saveWeights": 1,
     "saveAssignedFiringRates": 0,
     "useReducedNetwork": 0,
@@ -190,27 +190,27 @@
     "ECellModel": "INTF7",
     "ICellModel": "INTF7",
     "scale": 1,
-    "allpops": {
+      "allpops": {
       "ER": 0,
       "IR": 0,
       "EV1": 6400,
-      "EV1DE": 0,
-      "EV1DNE": 0,
-      "EV1DN": 0,
-      "EV1DNW": 0,
-      "EV1DW": 0,
-      "EV1DSW": 0,
-      "EV1DS": 0,
-      "EV1DSE": 0,
+      "EV1DE": 400,
+      "EV1DNE": 400,
+      "EV1DN": 400,
+      "EV1DNW": 400,
+      "EV1DW": 400,
+      "EV1DSW": 400,
+      "EV1DS": 400,
+      "EV1DSE": 400,
       "ID": 0,
       "IV1": 0,
       "EV4": 0,
       "IV4": 0,
       "EMT": 0,
       "IMT": 0,
-      "EA": 600,
-      "IA": 206,
-      "IAL": 94,
+      "EA": 1400,
+      "IA": 0,
+      "IAL": 0,
       "EA2": 0,
       "IA2": 0,
       "IA2L": 0,
@@ -408,7 +408,7 @@
       "FeedbackA2toA": 0
     },
     "RLconns": {
-      "Noise": 1,
+      "Noise": 0,
       "EIPlast": 0,
       "Visual": 0,
       "RecurrentDirNeurons": 0,
@@ -420,17 +420,17 @@
       "FeedForwardDirNtoM": 0,
       "FeedForwardLocNtoM": 0,
       "FeedForwardAtoM": 1,
-      "FeedForwardAtoA2": 1,
-      "FeedForwardA2toM": 1,
+      "FeedForwardAtoA2": 0,
+      "FeedForwardA2toM": 0,
       "FeedbackLocNeurons": 0,
-      "RecurrentMNeurons": 1,
-      "RecurrentANeurons": 1,
-      "RecurrentA2Neurons": 1,
+      "RecurrentMNeurons": 0,
+      "RecurrentANeurons": 0,
+      "RecurrentA2Neurons": 0,
       "FeedbackAtoDirN": 0,
       "FeedbackAtoLocN": 0,
-      "FeedbackMtoA": 1,
-      "FeedbackMtoA2": 1,
-      "FeedbackA2toA": 1
+      "FeedbackMtoA": 0,
+      "FeedbackMtoA2": 0,
+      "FeedbackA2toA": 0
     },
     "useBinaryImage": 1,
     "useNeuronPad": 0,
@@ -438,8 +438,8 @@
     "DirMaxRate": 150.0,
     "LocMaxRate": 150.0,
     "FiringRateCutoff": 50.0,
-    "stimModVD": 35,
-    "stimModVL": 35,
+    "stimModVD": 20,
+    "stimModVL": 20,
     "cmat": {
       "EN": {
         "EA": {
@@ -500,27 +500,27 @@
           "conv": 0
         },
         "VL": {
-          "AM2": 4,
-          "NM2": 0.6,
+          "AM2": 0,
+          "NM2": 0,
           "conv": 0
         },
         "EA": {
-          "AM2": 15,
-          "NM2": 1,
-          "conv": 640
+          "AM2": 6,
+          "NM2": 0.1,
+          "conv": 128
         },
         "EA2": {
-          "AM2": 0.25,
+          "AM2": 0,
           "NM2": 0.0,
-          "conv": 30
+          "conv": 0
         },
         "EMDOWN": {
-          "AM2": 0.25,
+          "AM2": 0,
           "NM2": 0.0,
           "conv": 0
         },
         "EMUP": {
-          "AM2": 0.25,
+          "AM2": 0,
           "NM2": 0.0,
           "conv": 0
         }
@@ -537,193 +537,193 @@
           "conv": 0
         },
         "EA": {
-          "AM2": 3,
-          "NM2": 1,
-          "conv": 320
+          "AM2": 6,
+          "NM2": 0.1,
+          "conv": 8
         },
         "EA2": {
-          "AM2": 0.4,
+          "AM2": 0,
           "NM2": 0.0,
           "conv": 0
         },
         "EMDOWN": {
-          "AM2": 0.4,
+          "AM2": 0,
           "NM2": 0.0,
           "conv": 0
         },
         "EMUP": {
-          "AM2": 0.4,
+          "AM2": 0,
           "NM2": 0.0,
           "conv": 0
         },
         "ID": {
-          "AM2": 10,
-          "conv": 12
+          "AM2": 0,
+          "conv": 0
         }
       },
       "EA": {
         "EA": {
-          "AM2": 1.0,
-          "NM2": 0.01,
-          "conv": 30
+          "AM2": 0,
+          "NM2": 0,
+          "conv": 0
         },
         "EA2": {
-          "AM2": 1,
-          "NM2": 0.01,
-          "conv": 100
+          "AM2": 12.5,
+          "NM2": 0.15,
+          "conv": 30
         },
         "EM": {
-          "AM2": 1.0,
-          "NM2": 0.01,
-          "conv": 100
+          "AM2": 16,
+          "NM2": 0.15,
+          "conv": 300
         },
         "IA": {
-          "AM2": 3.95,
-          "NM2": 0.0195,
-          "conv": 93
+          "AM2": 0,
+          "NM2": 0,
+          "conv": 0
         },
         "IAL": {
-          "AM2": 2.98,
-          "NM2": 0.098,
-          "conv": 110
+          "AM2": 0,
+          "NM2": 0,
+          "conv": 0
         }
       },
       "EA2": {
         "EA": {
-          "AM2": 0.05,
-          "NM2": 0.005,
-          "conv": 3
+          "AM2": 0,
+          "NM2": 0.0,
+          "conv": 0
         },
         "EA2": {
-          "AM2": 0.5,
-          "NM2": 0.01,
-          "conv": 60
+          "AM2": 0,
+          "NM2": 0,
+          "conv": 0
         },
         "EM": {
-          "AM2": 0.5,
-          "NM2": 0.01,
-          "conv": 60
+          "AM2": 8,
+          "NM2": 0,
+          "conv": 300
         },
         "IA2": {
-          "AM2": 1.95,
-          "NM2": 0.0195,
-          "conv": 93
+          "AM2": 0,
+          "NM2": 0,
+          "conv": 0
         },
         "IA2L": {
-          "AM2": 0.98,
-          "NM2": 0.098,
-          "conv": 110
+          "AM2": 0,
+          "NM2": 0,
+          "conv": 0
         }
       },
       "EM": {
         "EM": {
-          "AM2": 1.0,
-          "NM2": 0.01,
-          "conv": 60
+          "AM2": 0,
+          "NM2": 0,
+          "conv": 0
         },
         "EA": {
-          "AM2": 1.0,
-          "NM2": 0.05,
+          "AM2": 0,
+          "NM2": 0,
           "conv": 0
         },
         "EA2": {
-          "AM2": 0.05,
-          "NM2": 0.005,
+          "AM2": 0,
+          "NM2": 0,
           "conv": 0
         },
         "IRecip": {
-          "AM2": 20,
+          "AM2": 0,
           "NM2": 0,
-          "conv": 18
+          "conv": 0
         },
         "IM": {
-          "AM2": 3.95,
+          "AM2": 10,
           "NM2": 0.0195,
-          "conv": 93
+          "conv": 20
         },
         "IML": {
-          "AM2": 2.98,
+          "AM2": 5,
           "NM2": 0.098,
-          "conv": 110
+          "conv": 20
         }
       },
       "IR": {
         "IR": {
-          "GA": 1.25,
-          "p": 0.15
+          "GA": 0,
+          "p": 0
         }
       },
       "IV1": {
         "EV1": {
-          "GA": 5,
-          "p": 0.1
+          "GA": 0,
+          "p": 0
         },
         "IV1": {
-          "GA": 1.25,
-          "p": 0.1
+          "GA": 0,
+          "p": 0
         },
         "ER": {
-          "GA": 1.0,
-          "p": 0.0
+          "GA": 0,
+          "p": 0
         },
         "IV4": {
-          "GA": 0.375,
-          "p": 0.0
+          "GA": 0,
+          "p": 0
         }
       },
       "ID": {
         "ED": {
-          "GA": 5,
-          "p": 0.1
+          "GA": 0,
+          "p": 0
         },
         "ID": {
-          "GA": 1.25,
-          "p": 0.1
+          "GA": 0,
+          "p": 0
         }
       },
       "IV4": {
         "EV4": {
-          "GA": 10,
-          "p": 0.25
+          "GA": 0,
+          "p": 0
         },
         "IV4": {
-          "GA": 1.25,
-          "p": 0.25
+          "GA": 0,
+          "p": 0
         },
         "EV1": {
-          "GA": 1.0,
-          "p": 0.0
+          "GA": 0,
+          "p": 0
         },
         "IMT": {
-          "GA": 0.375,
-          "p": 0.0
+          "GA": 0,
+          "p": 0
         }
       },
       "IMT": {
         "EMT": {
-          "GA": 10,
-          "p": 0.25
+          "GA": 0,
+          "p": 0
         },
         "IMT": {
-          "GA": 1.25,
-          "p": 0.25
+          "GA": 0,
+          "p": 0
         },
         "EV4": {
-          "GA": 1.0,
-          "p": 0.0
+          "GA": 0,
+          "p": 0
         }
       },
       "IM": {
         "EM": {
-          "GA": 9.0,
+          "GA": 9,
           "conv": 22
         },
         "IM": {
-          "GA": 4.5,
+          "GA": 0,
           "conv": 31
         },
         "IML": {
-          "GA": 4.5,
+          "GA": 0,
           "conv": 17
         }
       },
@@ -733,100 +733,100 @@
           "conv": 8
         },
         "IM": {
-          "GA2": 2.25,
+          "GA2": 0,
           "conv": 12
         },
         "IML": {
-          "GA2": 4.5,
+          "GA2": 0,
           "conv": 2
         }
       },
       "IMRecip": {
         "EM": {
-          "GA": 10,
-          "p": 0.125
+          "GA": 0,
+          "p": 0
         }
       },
       "IA": {
         "EA": {
-          "GA": 9.0,
-          "conv": 22
+          "GA": 0,
+          "conv": 0
         },
         "IA": {
-          "GA": 4.5,
-          "conv": 31
+          "GA": 0,
+          "conv": 0
         },
         "IAL": {
-          "GA": 4.5,
-          "conv": 17
+          "GA": 0,
+          "p": 0
         }
       },
       "IAL": {
         "EA": {
-          "GA2": 2.5,
-          "conv": 8
+          "GA2": 0,
+          "conv": 0
         },
         "IA": {
-          "GA2": 2.25,
-          "conv": 12
+          "GA2": 0,
+          "conv": 0
         },
         "IAL": {
-          "GA2": 4.5,
-          "conv": 2
+          "GA2": 0,
+          "conv": 0
         }
       },
       "IA2": {
         "EA2": {
-          "GA": 9.0,
-          "conv": 22
+          "GA": 0,
+          "conv": 0
         },
         "IA2": {
-          "GA": 4.5,
-          "conv": 31
+          "GA": 0,
+          "conv": 0
         },
         "IA2L": {
-          "GA": 4.5,
-          "conv": 17
+          "GA": 0,
+          "conv": 0
         }
       },
       "IA2L": {
         "EA2": {
-          "GA2": 2.5,
-          "conv": 8
+          "GA2": 0,
+          "conv": 0
         },
         "IA2": {
-          "GA2": 2.25,
-          "conv": 12
+          "GA2": 0,
+          "conv": 0
         },
         "IA2L": {
-          "GA2": 4.5,
-          "conv": 2
+          "GA2": 0,
+          "conv": 0
         }
       },
       "IMUP": {
         "IMUP": {
-          "GA": 1.25,
-          "p": 0.15
+          "GA": 0,
+          "p": 0
         }
       },
       "IMDOWN": {
         "IMDOWN": {
-          "GA": 1.25,
-          "p": 0.15
+          "GA": 0,
+          "p": 0
         }
       },
       "ER": {
         "EV1": {
-          "AM2": 4.0,
-          "NM2": 0.6,
-          "p": 0.1
+          "AM2": 0,
+          "NM2": 0,
+          "p": 0
         }
       },
       "EV1": {
         "EV4": {
-          "AM2": 4.0,
-          "NM2": 0.6,
-          "p": 0.3
+          "AM2": 0,
+          "NM2": 0,
+          "p": 0
         },
         "ER": {
           "AM2": 0,
@@ -834,15 +834,15 @@
           "p": 0
         },
         "IV1": {
-          "AM2": 10.0,
-          "p": 0.03
+          "AM2": 0,
+          "p": 0
         }
       },
       "EV4": {
         "EMT": {
-          "AM2": 12,
-          "NM2": 1.8,
-          "p": 0.3
+          "AM2": 0,
+          "NM2": 0,
+          "p": 0
         },
         "EV1": {
           "AM2": 0,
@@ -850,8 +850,8 @@
           "p": 0
         },
         "IV4": {
-          "AM2": 20,
-          "p": 0.0225
+          "AM2": 0,
+          "p": 0
         }
       },
       "EMT": {
@@ -861,10 +861,10 @@
           "p": 0
         },
         "IMT": {
-          "AM2": 20,
-          "p": 0.0225
+          "AM2": 0,
+          "p": 0
         }
-      }
+      }	
     },
     "EEMWghtThreshMin": 0.9,
     "EEMWghtThreshMax": 4.0,
@@ -913,11 +913,11 @@
     },
     "EEMRecProbCross": 1,
     "VisualFeedback": 0,
-    "weightVar": 0.75,
+    "weightVar": 0.5,
     "delayMinSoma": 1.8,
     "delayMaxSoma": 2.2,
     "delayMinDend": 3,
-    "delayMaxDend": 12,
+    "delayMaxDend": 5,
     "delayMinSTIMMOD": 1.8,
     "delayMaxSTIMMOD": 2.2
   },
@@ -1019,8 +1019,8 @@
       "maxreward": 0.0
     },
     "AMPA": {
-      "wbase": 0.001,
-      "wmax": 35,
+      "wbase": 0.0001,
+      "wmax": 200,
       "RLon": 1,
       "STDPon": 0,
       "RLlenhebb": 10000,

@@ -38877,3 +38877,44 @@ fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward
 
 paddle moves 1x then stays still ... yeah, really bad starting point here!!
 
+** try HA feedforward model with ES (21oct4_ES_FF_cycle_)
+
+this is what was used in paper:
+/home/hanwar/GamesProject/SMARTAgent/backupcfg/21feb5_cycle_RL3_B0__step_0_sim.json
+
+and this is HA's adaptation to remove EA2 (has higher EA->EM connection to account for reduced number of inputs):
+/home/hanwar/GamesProject/SMARTAgent/backupcfg/21july1_21feb5_cycle_RL3_B0_noEA2v2__step_0_sim.json
+
+copy number of neurons and cmat from there ... and RLconns ... 
+
+also changed some params (tstepperaction down to 20 instead of 50 ms; dend delays back to 3-5 ms; stimmodvd,vl down to 20 from 35)
+
+./myrun 30 sn.json
+
+python -i simdat.py backupcfg/21oct4_ES_FF_cycle_sim.json
+
+EV1 0.14 Hz
+EV1DE 0.0 Hz
+EV1DNE 1.75 Hz
+EV1DN 0.96 Hz
+EV1DNW 0.0 Hz
+EV1DW 0.0 Hz
+EV1DSW 0.0 Hz
+EV1DS 1.02 Hz
+EV1DSE 0.0 Hz
+EA 0.15 Hz
+EMDOWN 6.06 Hz
+EMUP 5.99 Hz
+IM 40.21 Hz
+IML 37.49 Hz
+
+savefig('gif/21oct4_ES_FF_cycle_rast_c0.png') # [[./gif/21oct4_ES_FF_cycle_rast_c0.png]]
+
+firing rates a bit high ... will try out ES on this network ... note that only th feedforward EA -> EM are plastic
+
+starting weights: data/21oct4_ES_FF_cycle_synWeights_final.pkl
+
+python -i evo.py fstat data/21oct4_ES_FF_cycle_/allinfo.txt popsize 30 maxgen 300 nproc 1 ncore 30 useMPI 0 useES 1 simconfig sn.json verbose 1 quitaftermiss 1 startweight data/21oct4_ES_FF_cycle_synWeights_final.pkl evostr 21oct4_ES_FF_cycle_
+
+started ~15:00 ...
+
