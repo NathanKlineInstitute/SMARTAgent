@@ -38918,3 +38918,155 @@ python -i evo.py fstat data/21oct4_ES_FF_cycle_/allinfo.txt popsize 30 maxgen 30
 
 started ~15:00 ...
 
+* 21oct5
+** check ES output from 21sep30_test_EVO_cycle_ run 
+
+python
+
+import numpy as np
+from pylab import *
+ion()
+
+ep = np.loadtxt('data/21sep30_test_EVO_cycle_/stats.log',delimiter='\t')
+
+#
+for col, clr in zip([0,1,2],['r','b','k']):
+  plot(ep[:,col],clr,linewidth=3);
+  plot(ep[:,col],clr+'o',markersize=10)
+
+xlabel('Iteration',fontsize=25); ylabel('Fitness (Time Before Miss)',fontsize=25)
+ylim((0,80e3))
+
+savefig('gif/21oct5_test_ES_a0.png') # [[./gif/21oct5_test_ES_a0.png]]
+
+best still has not improved ...
+
+savefig('gif/21oct5_test_ES_a0b.png') # [[./gif/21oct5_test_ES_a0b.png]]
+
+average not changing much either...
+
+import pickle
+lbw=[pickle.load(open('data/21sep30_test_EVO_cycle_/best_weights_'+str(i)+'.pkl','rb')) for i in range(55)]
+
+import simdat
+import pandas as pd
+startweight = simdat.readweightsfile2pdf('data/21aug9_test_EVO_cycle_synWeights_final.pkl')
+
+offset = np.amin(startweight['preid'])
+cwt = np.zeros((np.amax(startweight['preid']+1-offset),np.amax(startweight['preid'])+1-offset))
+
+def bw2cwt (bw):
+  cwt = np.zeros((np.amax(startweight['preid']+1-offset),np.amax(startweight['preid'])+1-offset))
+  for i in range(len(startweight)): cwt[startweight.at[i,'preid']-offset,startweight.at[i,'postid']-offset] = bw[i]
+  return cwt
+
+lcwt = [bw2cwt(bw) for bw in lbw]
+
+for idx,cwt in enumerate(lcwt):
+  subplot(7,8,idx+1); title('bw:'+str(idx),fontsize=10)
+  imshow(cwt[1600:,1600:],cmap='gray',origin='lower',interpolation='None',extent=(1600,1777,1600,1777),vmin=0,vmax=2.5); 
+  ylabel('Pre ID',fontsize=10); xlabel('Post ID',fontsize=10)
+
+savefig('gif/21oct5_test_ES_cmat_a5.png')
+
+cwd = lcwt[-1] - lcwt[0]
+imshow(cwd[1600:,1600:],cmap='gray',origin='lower',interpolation='None',extent=(1600,1777,1600,1777),vmin=-0.5,vmax=0.5); 
+
+savefig('gif/21oct5_test_ES_cmat_a6.png')
+
+plot(ep[:,4]) # max weight is increasing (but average and min has no pattern)  --- wmax is set to 35, so soon it will be limited ... and wbase is 0.001 ... 
+savefig('gif/21oct5_test_ES_maxwt_a7.png')
+
+best, still no better ... can let this run a little longer, but does not seem to be improving...
+
+** check ES output from 21oct4_ES_FF_cycle_ run
+
+python
+
+import numpy as np
+from pylab import *
+ion()
+
+ep = np.loadtxt('data/21oct4_ES_FF_cycle_/stats.log',delimiter='\t')
+
+#
+for col, clr in zip([0,1,2],['r','b','k']):
+  plot(ep[:,col],clr,linewidth=3);
+  plot(ep[:,col],clr+'o',markersize=10)
+
+xlabel('Iteration',fontsize=25); ylabel('Fitness (Time Before Miss)',fontsize=25)
+ylim((0,32e3))
+
+savefig('gif/21oct5_test_ES_b0.png') # [[./gif/21oct5_test_ES_b0.png]]
+
+not too much improvement yet ... note that using move tstep of 20 ms
+
+savefig('gif/21oct5_test_ES_b0b.png') # [[./gif/21oct5_test_ES_b0b.png]]
+
+import pickle
+lbw=[pickle.load(open('data/21oct4_ES_FF_cycle_/best_weights_'+str(i)+'.pkl','rb')) for i in range(17)]
+
+import simdat
+import pandas as pd
+startweight = simdat.readweightsfile2pdf('data/21oct4_ES_FF_cycle_synWeights_final.pkl')
+
+offset = np.amin(startweight['preid'])
+cwt = np.zeros((np.amax(startweight['preid']+1-offset),np.amax(startweight['postid'])+1-offset))
+
+def bw2cwt (bw):
+  cwt = np.zeros((np.amax(startweight['preid']+1-offset),np.amax(startweight['postid'])+1-offset))
+  for i in range(len(startweight)): cwt[startweight.at[i,'preid']-offset,startweight.at[i,'postid']-offset] = bw[i]
+  return cwt
+
+lcwt = [bw2cwt(bw) for bw in lbw]
+
+for idx,cwt in enumerate(lcwt):
+  subplot(3,6,idx+1); title('bw:'+str(idx),fontsize=10)
+  imshow(cwt[:,1400:],cmap='gray',origin='lower',interpolation='None',extent=(0,2000,1400,2000),vmin=0,vmax=25); 
+  ylabel('Pre ID',fontsize=10); xlabel('Post ID',fontsize=10)
+
+## savefig('gif/21oct5_test_ES_cmat_b5.png')
+
+cwd = lcwt[-1] - lcwt[0]
+imshow(cwd[:,1400:2000],cmap='gray',origin='lower',interpolation='None',extent=(0,2000,1400,2000),vmin=-2.5,vmax=2.5); 
+
+savefig('gif/21oct5_test_ES_cmat_b6.png')
+
+can't see much ...
+
+plot(ep[:,4]) # 
+savefig('gif/21oct5_test_ES_maxwt_b7.png')
+max weight increasing as before ...
+
+best so far:
+2021-10-05 04:48:09,885 - inspyred.ec - INFO - ./myrun 30 /home/samn/SMARTAgent/evo/21oct4_ES_FF_cycle__evo_gen_11_cand_19_sim.json, data/21oct4_ES_FF_cycle__evo_gen_11_cand_19_ActionsRewards.txt, fit=29898.0
+
+python -i simdat.py backupcfg/21oct4_ES_FF_cycle__evo_gen_11_cand_19_sim.json
+
+tmax = 29898.0
+
+drawraster(dspkT,dspkID,tlim=(0,tmax));
+savefig(gifpath()+'rast.png') # [[./gif/21oct5_21oct4_ES_FF_cycle__evo_gen_11_cand_19_rast.png]]
+
+pravgrates(dspkT,dspkID,dnumc,tlim=(tmax-5e3,tmax))
+
+EV1 0.16 Hz
+EV1DE 0.0 Hz
+EV1DNE 1.14 Hz
+EV1DN 1.2 Hz
+EV1DNW 0.29 Hz
+EV1DW 0.0 Hz
+EV1DSW 0.53 Hz
+EV1DS 1.15 Hz
+EV1DSE 0.24 Hz
+EA 0.31 Hz
+EMDOWN 14.83 Hz
+EMUP 14.8 Hz
+IM 71.25 Hz
+IML 88.11 Hz
+
+rates high but not extreme...
+
+fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
+
+[[./gif/21oct5_21oct4_ES_FF_cycle__evo_gen_11_cand_19__with_reward_input.mp4]]
