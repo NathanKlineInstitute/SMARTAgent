@@ -101,6 +101,30 @@ def EvalFIT (candidates, args):
     fitness.append(fit)
   return fitness
 
+def LoadBestESWeights (based,ngen):
+  # load best ES weights from based (directory); ngen is max generations ran so far
+  lwt = []
+  for i in range(ngen):
+    fn = based + '/best_weights_' + str(i) + '.pkl'
+    try:
+      wt = pickle.load(open(fn,'rb'))
+    except:
+      break
+    lwt.append(wt)
+  return lwt
+  
+
+def EvalBest (based, ngen, startweight, simconfig):
+  # load & eval best weights from ES; need to specify startweight file and simconfig
+  global ncore, quitaftermiss
+  setEClog()
+  lwt = LoadBestESWeights(based, ngen)
+  lfit = []
+  for idx,wt in enumerate(lwt):
+    fit = EvalFITES(wt, startweight, simconfig, 'BEST', idx)
+    lfit.append(fit)
+  return lfit  
+
 #
 def FitJobStrFNES (p, cdx, startweight, simconfig, num_generations):
   global es,ncore,quitaftermiss # global evolution object
@@ -434,126 +458,125 @@ def indivpkl2list (fname):
   return lout
 
 if __name__ == "__main__":
-  if len(sys.argv) < 2:
-    print('usage: python evo.py [popsize n] [maxgen n] [nproc n] [useMPI 0/1] [useDEA 0/1] [mutation_rate 0--1] [numselected n] [evostr name] [simf name]')
-    print('[noBound 0/1] [maxfittime seconds][simconfig path][verbose 0/1][rdmseed int]')
-    quit()
-
   popsize=100; maxgen=10; nproc=16; useMPI=True; numselected=100; useDEA = useES = False;
   mutation_rate=0.2; evostr='21aug4A'; simconfig = 'sn.json'; maxfittime = 600; 
   noBound = False; useLOG = True; useEMO = False
   verbose = True; rdmseed=1234; useundefERR = False; 
   fseed = farch = lseed = larch = None; # files,lists for initial population and archive
   fstat = findiv = '/dev/null'; quitaftermiss = True
-  i = 1; narg = len(sys.argv)
-  while i < narg:
-    if sys.argv[i] == 'popsize' or sys.argv[i] == '-popsize':
-      if i+1<narg:
-        i+=1; popsize = int(sys.argv[i]); 
-    elif sys.argv[i] == 'maxgen' or sys.argv[i] == '-maxgen':
-      if i+1 < narg:
-        i+=1; maxgen = int(sys.argv[i]); 
-    elif sys.argv[i] == 'nproc' or sys.argv[i] == '-nproc':
-      if i+1 < narg:
-        i+=1; nproc = int(sys.argv[i]);
-    elif sys.argv[i] == 'ncore' or sys.argv[i] == '-ncore':
-      if i+1 < narg:
-        i+=1; ncore = int(sys.argv[i]);    
-    elif sys.argv[i] == 'rdmseed' or sys.argv[i] == '-rdmseed':
-      if i+1 < narg:
-        i+=1; rdmseed = int(sys.argv[i]); 
-    elif sys.argv[i] == 'useMPI' or sys.argv[i] == '-useMPI':
-      if i+1 < narg:
-        i+=1; useMPI = bool(int(sys.argv[i]));
-    elif sys.argv[i] == 'useES' or sys.argv[i] == '-useES':
-      if i+1 < narg:
-        i+=1; useES = bool(int(sys.argv[i]));         
-    elif sys.argv[i] == 'useDEA' or sys.argv[i] == '-useDEA':
-      if i+1 < narg:
-        i+=1; useDEA = bool(int(sys.argv[i])); 
-    elif sys.argv[i] == 'numselected' or sys.argv[i] == '-numselected':
-      if i+1 < narg:
-        i+=1; numselected = int(sys.argv[i]);
-    elif sys.argv[i] == 'evostr' or sys.argv[i] == '-evostr':
-      if i+1 < narg:
-        i+=1; evostr = sys.argv[i]
-    elif sys.argv[i] == 'simconfig' or sys.argv[i] == '-simconfig':
-      if i+1 < narg:
-        i+=1; simconfig = sys.argv[i]
-    elif sys.argv[i] == 'mutation_rate' or sys.argv[i] == '-mutation_rate' or sys.argv[i] == '-mutationrate' or sys.argv[i] == 'mutationrate':
-      if i+1 < narg:
-        i+=1; mutation_rate = float(sys.argv[i])
-    elif sys.argv[i] == 'useLOG' or sys.argv[i] == '-useLOG':
-      if i+1 < narg:
-        i+=1; useLOG = bool(int(sys.argv[i]));
-    elif sys.argv[i] == 'verbose' or sys.argv[i] == '-verbose':
-      if i+1 < narg:
-        i+=1; verbose = bool(int(sys.argv[i]));
-    elif sys.argv[i] == 'noBound' or sys.argv[i] == '-noBound':
-      if i+1 < narg:
-        i+=1; noBound = bool(int(sys.argv[i]));
-    elif sys.argv[i] == 'useundefERR' or sys.argv[i] == '-useundefERR':
-      if i+1 < narg:
-        i+=1; useundefERR = bool(int(sys.argv[i]));
-    elif sys.argv[i] == 'simf' or sys.argv[i] == '-simf':
-      if i+1 < narg:
-        i+=1; simf = sys.argv[i]
-    elif sys.argv[i] == 'maxfittime' or sys.argv[i] == '-maxfittime':
-      if i+1 < narg:
-        i+=1; maxfittime = float(sys.argv[i])
-    elif sys.argv[i] == 'fseed':
-      if i+1 < narg:
-        i+=1; fseed = sys.argv[i]; lseed = indivpkl2list(fseed)
-    elif sys.argv[i] == 'farch':
-      if i+1 < narg:
-        i+=1; farch = sys.argv[i]; larch = pickle.load(open(farch))
-    elif sys.argv[i] == 'startweight':
-      if i+1 < narg:
-        i+=1; startweight = readweightsfile2pdf(sys.argv[i]) # starting weights - placeholders
-        # print('startweight columns:',startweight.columns)
-    elif sys.argv[i] == 'fstat':
-      if i+1 < narg:
-        i+=1; fstat = sys.argv[i]
-    elif sys.argv[i] == 'findiv':
-      if i+1 < narg:
-        i+=1; findiv = sys.argv[i]
-    elif sys.argv[i] == 'quitaftermiss':
-      if i+1 < narg:
-        i+=1; quitaftermiss = bool(int(sys.argv[i]))
-    elif sys.argv[i] == '-python' or sys.argv[i] == '-mpi' or sys.argv[i] == 'evo.py':
-      pass
-    else: raise Exception('unknown arg:'+sys.argv[i])
-    i+=1;
+  i = 1; narg = len(sys.argv)  
+  if len(sys.argv) < 2:
+    print('usage: python evo.py [popsize n] [maxgen n] [nproc n] [useMPI 0/1] [useDEA 0/1] [mutation_rate 0--1] [numselected n] [evostr name] [simf name]')
+    print('[noBound 0/1] [maxfittime seconds][simconfig path][verbose 0/1][rdmseed int]')
+  else:
+    while i < narg:
+      if sys.argv[i] == 'popsize' or sys.argv[i] == '-popsize':
+        if i+1<narg:
+          i+=1; popsize = int(sys.argv[i]); 
+      elif sys.argv[i] == 'maxgen' or sys.argv[i] == '-maxgen':
+        if i+1 < narg:
+          i+=1; maxgen = int(sys.argv[i]); 
+      elif sys.argv[i] == 'nproc' or sys.argv[i] == '-nproc':
+        if i+1 < narg:
+          i+=1; nproc = int(sys.argv[i]);
+      elif sys.argv[i] == 'ncore' or sys.argv[i] == '-ncore':
+        if i+1 < narg:
+          i+=1; ncore = int(sys.argv[i]);    
+      elif sys.argv[i] == 'rdmseed' or sys.argv[i] == '-rdmseed':
+        if i+1 < narg:
+          i+=1; rdmseed = int(sys.argv[i]); 
+      elif sys.argv[i] == 'useMPI' or sys.argv[i] == '-useMPI':
+        if i+1 < narg:
+          i+=1; useMPI = bool(int(sys.argv[i]));
+      elif sys.argv[i] == 'useES' or sys.argv[i] == '-useES':
+        if i+1 < narg:
+          i+=1; useES = bool(int(sys.argv[i]));         
+      elif sys.argv[i] == 'useDEA' or sys.argv[i] == '-useDEA':
+        if i+1 < narg:
+          i+=1; useDEA = bool(int(sys.argv[i])); 
+      elif sys.argv[i] == 'numselected' or sys.argv[i] == '-numselected':
+        if i+1 < narg:
+          i+=1; numselected = int(sys.argv[i]);
+      elif sys.argv[i] == 'evostr' or sys.argv[i] == '-evostr':
+        if i+1 < narg:
+          i+=1; evostr = sys.argv[i]
+      elif sys.argv[i] == 'simconfig' or sys.argv[i] == '-simconfig':
+        if i+1 < narg:
+          i+=1; simconfig = sys.argv[i]
+      elif sys.argv[i] == 'mutation_rate' or sys.argv[i] == '-mutation_rate' or sys.argv[i] == '-mutationrate' or sys.argv[i] == 'mutationrate':
+        if i+1 < narg:
+          i+=1; mutation_rate = float(sys.argv[i])
+      elif sys.argv[i] == 'useLOG' or sys.argv[i] == '-useLOG':
+        if i+1 < narg:
+          i+=1; useLOG = bool(int(sys.argv[i]));
+      elif sys.argv[i] == 'verbose' or sys.argv[i] == '-verbose':
+        if i+1 < narg:
+          i+=1; verbose = bool(int(sys.argv[i]));
+      elif sys.argv[i] == 'noBound' or sys.argv[i] == '-noBound':
+        if i+1 < narg:
+          i+=1; noBound = bool(int(sys.argv[i]));
+      elif sys.argv[i] == 'useundefERR' or sys.argv[i] == '-useundefERR':
+        if i+1 < narg:
+          i+=1; useundefERR = bool(int(sys.argv[i]));
+      elif sys.argv[i] == 'simf' or sys.argv[i] == '-simf':
+        if i+1 < narg:
+          i+=1; simf = sys.argv[i]
+      elif sys.argv[i] == 'maxfittime' or sys.argv[i] == '-maxfittime':
+        if i+1 < narg:
+          i+=1; maxfittime = float(sys.argv[i])
+      elif sys.argv[i] == 'fseed':
+        if i+1 < narg:
+          i+=1; fseed = sys.argv[i]; lseed = indivpkl2list(fseed)
+      elif sys.argv[i] == 'farch':
+        if i+1 < narg:
+          i+=1; farch = sys.argv[i]; larch = pickle.load(open(farch))
+      elif sys.argv[i] == 'startweight':
+        if i+1 < narg:
+          i+=1; startweight = readweightsfile2pdf(sys.argv[i]) # starting weights - placeholders
+          # print('startweight columns:',startweight.columns)
+      elif sys.argv[i] == 'fstat':
+        if i+1 < narg:
+          i+=1; fstat = sys.argv[i]
+      elif sys.argv[i] == 'findiv':
+        if i+1 < narg:
+          i+=1; findiv = sys.argv[i]
+      elif sys.argv[i] == 'quitaftermiss':
+        if i+1 < narg:
+          i+=1; quitaftermiss = bool(int(sys.argv[i]))
+      elif sys.argv[i] == '-python' or sys.argv[i] == '-mpi' or sys.argv[i] == 'evo.py':
+        pass
+      else: raise Exception('unknown arg:'+sys.argv[i])
+      i+=1;
 
-  if (useMPI and pc.id()==0) or not useMPI:
-    print('popsize:',popsize,'maxgen:',maxgen,'nproc:',nproc,'ncore:',ncore,'useMPI:',useMPI,'numselected:',numselected,'evostr:',evostr,\
-          'useDEA:',useDEA,'mutation_rate:',mutation_rate,'noBound:',noBound,'useLOG:',useLOG,\
-          'maxfittime:',maxfittime,'fseed:',fseed,'farch:',farch,'verbose:',verbose,'rdmseed:',rdmseed,'useundefERR:',useundefERR,'fstat:',fstat,'findiv:',findiv)
-      
-  # make sure master node does not work on submitted jobs (that would prevent it managing/submitting other jobs)
-  if useMPI and pc.id()==0: pc.master_works_on_jobs(0) 
+    if (useMPI and pc.id()==0) or not useMPI:
+      print('popsize:',popsize,'maxgen:',maxgen,'nproc:',nproc,'ncore:',ncore,'useMPI:',useMPI,'numselected:',numselected,'evostr:',evostr,\
+            'useDEA:',useDEA,'mutation_rate:',mutation_rate,'noBound:',noBound,'useLOG:',useLOG,\
+            'maxfittime:',maxfittime,'fseed:',fseed,'farch:',farch,'verbose:',verbose,'rdmseed:',rdmseed,'useundefERR:',useundefERR,'fstat:',fstat,'findiv:',findiv)
 
-  if (useMPI and pc.id()==0) or not useMPI:
-    # backup the config file and use backed-up version for evo (in case local version changed during evolution)
-    safemkdir('backupcfg/'+evostr) # make a data output dir
-    simconfig = backupcfg(evostr,simconfig) 
-    safemkdir(mydir+'/evo') # for temp files
-    safemkdir('data/'+evostr)
+    # make sure master node does not work on submitted jobs (that would prevent it managing/submitting other jobs)
+    if useMPI and pc.id()==0: pc.master_works_on_jobs(0) 
 
-  myout = runevo(popsize=popsize,maxgen=maxgen,nproc=nproc,rdmseed=rdmseed,useMPI=useMPI,\
-                 numselected=numselected,mutation_rate=mutation_rate,\
-                 useDEA=useDEA,fstat=fstat,findiv=findiv,simconfig=simconfig,\
-                 useLOG=useLOG,maxfittime=maxfittime,lseed=lseed,larch=larch,\
-                 verbose=verbose,useundefERR=useundefERR,startweight=startweight,useES=useES,evostr=evostr)
+    if (useMPI and pc.id()==0) or not useMPI:
+      # backup the config file and use backed-up version for evo (in case local version changed during evolution)
+      safemkdir('backupcfg/'+evostr) # make a data output dir
+      simconfig = backupcfg(evostr,simconfig) 
+      safemkdir(mydir+'/evo') # for temp files
+      safemkdir('data/'+evostr)
 
-  if (useMPI and pc.id()==0) or not useMPI:
-    if useES:
-      pickle.dump(myout,open('data/' + evostr + '/bestweight.pkl','wb'))
-    else:
-      pickle.dump(myout[0],open('data/' + evostr + '/fpop.pkl','wb'))      
-    if useEMO: pickle.dump(myout[1],open('data/' + evostr + '/ARCH.pkl','wb'))
+    myout = runevo(popsize=popsize,maxgen=maxgen,nproc=nproc,rdmseed=rdmseed,useMPI=useMPI,\
+                   numselected=numselected,mutation_rate=mutation_rate,\
+                   useDEA=useDEA,fstat=fstat,findiv=findiv,simconfig=simconfig,\
+                   useLOG=useLOG,maxfittime=maxfittime,lseed=lseed,larch=larch,\
+                   verbose=verbose,useundefERR=useundefERR,startweight=startweight,useES=useES,evostr=evostr)
 
-  if useMPI:
-    if pc.id()==0: print('MPI finished, exiting.')
-    quit() # make sure CPUs freed
-  
+    if (useMPI and pc.id()==0) or not useMPI:
+      if useES:
+        pickle.dump(myout,open('data/' + evostr + '/bestweight.pkl','wb'))
+      else:
+        pickle.dump(myout[0],open('data/' + evostr + '/fpop.pkl','wb'))      
+      if useEMO: pickle.dump(myout[1],open('data/' + evostr + '/ARCH.pkl','wb'))
+
+    if useMPI:
+      if pc.id()==0: print('MPI finished, exiting.')
+      quit() # make sure CPUs freed
+

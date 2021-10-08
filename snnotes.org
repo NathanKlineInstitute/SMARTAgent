@@ -39070,3 +39070,22 @@ rates high but not extreme...
 fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
 
 [[./gif/21oct5_21oct4_ES_FF_cycle__evo_gen_11_cand_19__with_reward_input.mp4]]
+
+* 21oct7
+** discussion on population vs best weights
+
+in ES, population does not have to include the best model weights ... so to evaluate performance should use the
+best weights themselves, checked at different initializations 
+
+* 21oct8
+** setup eval for best_weights from ES (21sep30_test_EVO_cycle_)
+
+python -i evo.py
+
+swfn = 'data/21aug9_test_EVO_cycle_synWeights_final.pkl'
+startweight = readweightsfile2pdf(swfn) # starting weights - placeholders
+simconfig = 'backupcfg/21sep30_test_EVO_cycle_/evo.json'
+ncore = 30
+quitaftermiss = 1
+lfit = EvalBest('data/21sep30_test_EVO_cycle_',100,startweight,simconfig)
+
