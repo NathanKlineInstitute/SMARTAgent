@@ -39089,3 +39089,24 @@ ncore = 30
 quitaftermiss = 1
 lfit = EvalBest('data/21sep30_test_EVO_cycle_',100,startweight,simconfig)
 
+from pylab import *
+ion()
+
+plot(lfit,'ko',markersize=15); plot(lfit,'k',linewidth=4)
+
+ep = np.loadtxt('data/21sep30_test_EVO_cycle_/stats.log',delimiter='\t')
+
+#
+for col, clr in zip([0,1,2],['r','b','k']):
+  plot(ep[:,col],clr,linewidth=3);
+  plot(ep[:,col],clr+'o',markersize=10)
+
+xlabel('Iteration',fontsize=25); ylabel('Fitness (Time Before Miss)',fontsize=25)
+ylim((0,80e3))
+
+plot(lfit,'go',markersize=25); 
+
+savefig('gif/21oct8_a0.png') # [[./gif/21oct8_a0.png]]
+
+best weight model is in green ... often not as good as best fitness from population
+
