@@ -74,7 +74,7 @@ def FitJobStrFN (p, args, cdx):
   d['sim']['saveWeights'] = 0 # do NOT need to save weights again
   d['simtype']['ResumeSim'] = 1 # make sure simulation loads the weights
   d['simtype']['ResumeSimFromFile'] = fnweight
-  fnjson = mydir+'/backupcfg/'+d['sim']['name'] + 'sim.json'
+  fnjson = mydir+'/evo/'+d['sim']['name'] + 'sim.json'
   json.dump(d, open(fnjson,'w'), indent=2)
   # save synaptic weights to file
   pdfnew = pdfnew[pdfnew.time==np.amax(pdfnew.time)]  
@@ -141,7 +141,7 @@ def FitJobStrFNES (p, cdx, startweight, simconfig, num_generations, seed=1234):
   d['sim']['seed'] = seed # RDM seed
   d['simtype']['ResumeSim'] = 1 # make sure simulation loads the weights
   d['simtype']['ResumeSimFromFile'] = fnweight
-  fnjson = mydir+'/backupcfg/'+d['sim']['name'] + 'sim.json'
+  fnjson = mydir+'/evo/'+d['sim']['name'] + 'sim.json'
   json.dump(d, open(fnjson,'w'), indent=2)
   # save synaptic weights to file
   pdfnew = pdfnew[pdfnew.time==np.amax(pdfnew.time)]  
