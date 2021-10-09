@@ -39110,3 +39110,37 @@ savefig('gif/21oct8_a0.png') # [[./gif/21oct8_a0.png]]
 
 best weight model is in green ... often not as good as best fitness from population
 
+should eval > 1 time ... 
+
+** setup eval for best_weights from ES (21oct4_ES_FF_cycle__evo_)
+
+python -i evo.py
+
+swfn = 'data/21oct4_ES_FF_cycle_synWeights_final.pkl'
+startweight = readweightsfile2pdf(swfn) # starting weights - placeholders
+simconfig = 'backupcfg/21oct4_ES_FF_cycle_/evo.json'
+ncore = 30
+quitaftermiss = 1
+llfit = EvalBest('data/21oct4_ES_FF_cycle_',150,startweight,simconfig,10)
+
+from pylab import *
+ion()
+
+lfitavg = [mean(llfit[x,:]) for x in range(llfit.shape[0])]
+
+plot(lfitavg,'ko',markersize=15); plot(lfit,'k',linewidth=4)
+
+ep = np.loadtxt('data/21oct4_ES_FF_cycle_/stats.log',delimiter='\t')
+
+#
+for col, clr in zip([0,1,2],['r','b','k']):
+  plot(ep[:,col],clr,linewidth=3);
+  plot(ep[:,col],clr+'o',markersize=10)
+
+xlabel('Iteration',fontsize=25); ylabel('Fitness (Time Before Miss)',fontsize=25)
+ylim((0,80e3))
+
+plot(lfitavg,'go',markersize=25); 
+
+savefig('gif/21oct8_b0.png') # [[./gif/21oct8_a0.png]]
+
