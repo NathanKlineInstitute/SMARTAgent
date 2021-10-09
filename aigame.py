@@ -35,10 +35,10 @@ try:
   if 'useSimulatedEnv' in dconf: useSimulatedEnv = dconf['useSimulatedEnv']
   if useSimulatedEnv==1:
     from simplePong import simplePong
-    env = simplePong()
+    env = simplePong(seed=dconf['sim']['seed'])
   elif useSimulatedEnv==2:
     from simulatePongFull import simulatePong
-    env = simulatePong()    
+    env = simulatePong(seed=dconf['sim']['seed'])
   else:
     if 'frameskip' in dconf['env']:
       env = gym.make(dconf['env']['name'],frameskip=dconf['env']['frameskip'],repeat_action_probability=0.)

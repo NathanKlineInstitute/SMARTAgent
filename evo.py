@@ -115,19 +115,18 @@ def LoadBestESWeights (based,ngen):
   return lwt
   
 
-def EvalBest (based, ngen, startweight, simconfig):
+def EvalBest (based, ngen, startweight, simconfig, neval):
   # load & eval best weights from ES; need to specify startweight file and simconfig
   global ncore, quitaftermiss
   setEClog()
   lwt = LoadBestESWeights(based, ngen)
-  lfit = []
+  llfit = []
   for idx,wt in enumerate(lwt):
-    fit = EvalFITES(wt, startweight, simconfig, 'BEST', idx)
-    lfit.append(fit)
-  return lfit  
+    llfit.append([EvalFITES(wt, startweight, simconfig, 'EVAL_'+str(jdx)+'_BEST', idx, seed=(idx+1)*1234) for jdx in range(neval)])
+  return np.array(llfit)
 
 #
-def FitJobStrFNES (p, cdx, startweight, simconfig, num_generations):
+def FitJobStrFNES (p, cdx, startweight, simconfig, num_generations, seed=1234):
   global es,ncore,quitaftermiss # global evolution object
   pdfnew = startweight.copy() # copy starting synaptic weights
   for i in range(len(p)): pdfnew.at[i,'weight'] = p[i] # update the weights based on the candidate
@@ -139,6 +138,7 @@ def FitJobStrFNES (p, cdx, startweight, simconfig, num_generations):
   d['sim']['doquit'] = 1; d['sim']['doplot'] = 0
   d['sim']['QuitAfterMiss'] = int(quitaftermiss)
   d['sim']['saveWeights'] = 0 # do NOT need to save the weights again from sim.py
+  d['sim']['seed'] = seed # RDM seed
   d['simtype']['ResumeSim'] = 1 # make sure simulation loads the weights
   d['simtype']['ResumeSimFromFile'] = fnweight
   fnjson = mydir+'/backupcfg/'+d['sim']['name'] + 'sim.json'
@@ -152,10 +152,10 @@ def FitJobStrFNES (p, cdx, startweight, simconfig, num_generations):
   return strc,'data/'+d['sim']['name']+'ActionsRewards.txt'
 
 # evaluate fitness with sim run
-def EvalFITES (p, startweight, simconfig, num_generations, cdx):
+def EvalFITES (p, startweight, simconfig, num_generations, cdx, seed=1234):
   global es, quitaftermiss
-  strc,fn = FitJobStrFNES(p, cdx, startweight, simconfig, num_generations)
-  print('EvalFIT:', cdx, strc, fn)
+  strc,fn = FitJobStrFNES(p, cdx, startweight, simconfig, num_generations, seed)
+  print('EvalFIT:', cdx, strc, fn, seed)
   ret = os.system(strc)
   actreward = pd.DataFrame(np.loadtxt(fn),columns=['time','action','reward','proposed','hit','followtargetsign'])
   if quitaftermiss:
@@ -294,7 +294,7 @@ def initialize_archive(f, archive_seeds):
       return f(random, population, archive, args)
   return wrapper
 
-def ESTrain (maxgen, pop_size, simconfig, startweight, evostr):
+def ESTrain (maxgen, pop_size, simconfig, startweight, evostr, seed=1234):
   #dconf = init(dconf)
   ITERATIONS = maxgen # How many iterations to train for
   POPULATION_SIZE = pop_size # How many perturbations of weights to try per iteration
@@ -324,7 +324,7 @@ def ESTrain (maxgen, pop_size, simconfig, startweight, evostr):
     # by simulating each network and getting the episode length as the fitness
     fitness = []
     for i in range(POPULATION_SIZE):
-      fit = EvalFITES(best_weights * (1 + perturbations[i]), startweight, simconfig, iteration, i)
+      fit = EvalFITES(best_weights * (1 + perturbations[i]), startweight, simconfig, iteration, i, seed)
       # Add fitness
       fitness.append(fit)
     fitness = np.expand_dims(np.array(fitness), 1)
