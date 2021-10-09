@@ -35,7 +35,10 @@ class simplePong:
   def createball (self):
     # ball position
     self.ypos_ball = dconf['simulatedEnvParams']['yball']  # this corresponds to 0 index
-    self.xpos_ball = 0  # this corresponds to 1 index        
+    self.xpos_ball = 0  # this corresponds to 1 index
+    self.possible_ball_ypos = dconf['simulatedEnvParams']['possible_ball_ypos']
+    self.possible_ball_dy = dconf['simulatedEnvParams']['possible_ball_dy']
+    self.possible_ball_dx = dconf['simulatedEnvParams']['possible_ball_dx']    
     # start ball from the middle
     self.randomizeYpos = dconf['simulatedEnvParams']['random'] 
     if self.randomizeYpos:
@@ -54,9 +57,6 @@ class simplePong:
     # create ball speed or displacement
     self.ball_dx = 1  # displacement in horizontal direction
     self.ball_dy = 1  #displacement in vertical direction
-    self.possible_ball_ypos = dconf['simulatedEnvParams']['possible_ball_ypos']
-    self.possible_ball_dy = dconf['simulatedEnvParams']['possible_ball_dy']
-    self.possible_ball_dx = dconf['simulatedEnvParams']['possible_ball_dx']
 
   def createrackets (self):
     self.racket_width = 4
