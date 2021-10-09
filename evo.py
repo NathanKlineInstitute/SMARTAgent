@@ -122,7 +122,7 @@ def EvalBest (based, ngen, startweight, simconfig, neval):
   lwt = LoadBestESWeights(based, ngen)
   llfit = []
   for idx,wt in enumerate(lwt):
-    llfit.append([EvalFITES(wt, startweight, simconfig, 'EVAL_'+str(jdx)+'_BEST', idx, seed=(idx+1)*1234) for jdx in range(neval)])
+    llfit.append([EvalFITES(wt, startweight, simconfig, 'EVAL_'+str(jdx)+'_BEST', idx, seed=(jdx+1)*1234) for jdx in range(neval)])
   return np.array(llfit)
 
 #
