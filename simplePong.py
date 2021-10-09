@@ -37,7 +37,10 @@ class simplePong:
     self.ypos_ball = dconf['simulatedEnvParams']['yball']  # this corresponds to 0 index
     self.xpos_ball = 0  # this corresponds to 1 index        
     # start ball from the middle
-    self.randomizeYpos = dconf['simulatedEnvParams']['random']
+    self.randomizeYpos = dconf['simulatedEnvParams']['random'] 
+    if self.randomizeYpos:
+      self.ypos_ball = random.choice(self.possible_ball_ypos)
+      print('randomize y pos, start ball at y = ', self.ypos_ball)
     self.wiggle = dconf['wiggle']
     self.ball_width = 4
     self.ball_height = 4    
