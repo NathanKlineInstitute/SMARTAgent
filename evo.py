@@ -68,12 +68,13 @@ def FitJobStrFN (p, args, cdx):
   d = json.load(open(simconfig,'r')) # original input json
   d['sim']['name'] += '_evo_gen_' + str(args['_ec'].num_generations) + '_cand_' + str(cdx) + '_' # also include candidate ID
   simstr = d['sim']['name']
-  fnweight = mydir+'/evo/'+ simstr + 'weight.pkl' # filename for weights
+  fnweight = mydir+'/data/'+ simstr + 'weight.pkl' # filename for weights
   d['sim']['doquit'] = 1; d['sim']['doplot'] = 0
-  d['sim']['QuitAfterMiss'] = int(quitaftermiss)  
+  d['sim']['QuitAfterMiss'] = int(quitaftermiss)
+  d['sim']['saveWeights'] = 0 # do NOT need to save weights again
   d['simtype']['ResumeSim'] = 1 # make sure simulation loads the weights
   d['simtype']['ResumeSimFromFile'] = fnweight
-  fnjson = mydir+'/evo/'+d['sim']['name'] + 'sim.json'
+  fnjson = mydir+'/backupcfg/'+d['sim']['name'] + 'sim.json'
   json.dump(d, open(fnjson,'w'), indent=2)
   # save synaptic weights to file
   pdfnew = pdfnew[pdfnew.time==np.amax(pdfnew.time)]  
@@ -134,12 +135,13 @@ def FitJobStrFNES (p, cdx, startweight, simconfig, num_generations):
   d = json.load(open(simconfig,'r')) # original input json
   d['sim']['name'] += '_evo_gen_' + str(num_generations) + '_cand_' + str(cdx) + '_' # also include candidate ID
   simstr = d['sim']['name']
-  fnweight = mydir+'/evo/'+ simstr + 'weight.pkl' # filename for weights
+  fnweight = mydir+'/data/'+ simstr + 'weight.pkl' # filename for weights
   d['sim']['doquit'] = 1; d['sim']['doplot'] = 0
   d['sim']['QuitAfterMiss'] = int(quitaftermiss)
+  d['sim']['saveWeights'] = 0 # do NOT need to save the weights again from sim.py
   d['simtype']['ResumeSim'] = 1 # make sure simulation loads the weights
   d['simtype']['ResumeSimFromFile'] = fnweight
-  fnjson = mydir+'/evo/'+d['sim']['name'] + 'sim.json'
+  fnjson = mydir+'/backupcfg/'+d['sim']['name'] + 'sim.json'
   json.dump(d, open(fnjson,'w'), indent=2)
   # save synaptic weights to file
   pdfnew = pdfnew[pdfnew.time==np.amax(pdfnew.time)]  
