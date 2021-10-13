@@ -39126,21 +39126,25 @@ llfit = EvalBest('data/21oct4_ES_FF_cycle_',150,startweight,simconfig,10)
 from pylab import *
 ion()
 
-lfitavg = [mean(llfit[x,:]) for x in range(llfit.shape[0])]
-
-plot(lfitavg,'ko',markersize=15); plot(lfit,'k',linewidth=4)
+lfitavg = np.array([mean(llfit[x,:]) for x in range(llfit.shape[0])])
+lfitmin = np.array([np.min(llfit[x,:]) for x in range(llfit.shape[0])])
+lfitmax = np.array([np.max(llfit[x,:]) for x in range(llfit.shape[0])])
+lfitstd = np.array([np.std(llfit[x,:])/sqrt(10) for x in range(llfit.shape[0])])
+plot(lfitavg,'ko',markersize=15); plot(lfitavg,'k',linewidth=4)
+plot(lfitmin,'ro',markersize=15); plot(lfitmin,'r',linewidth=4)
+plot(lfitmax,'bo',markersize=15); plot(lfitmax,'b',linewidth=4)
+#plot(lfitavg+lfitstd,'ro',markersize=10); plot(lfitavg+lfitstd,'r',linewidth=2)
+#plot(lfitavg-lfitstd,'ro',markersize=10); plot(lfitavg-lfitstd,'r',linewidth=2)
 
 ep = np.loadtxt('data/21oct4_ES_FF_cycle_/stats.log',delimiter='\t')
 
-#
-for col, clr in zip([0,1,2],['r','b','k']):
-  plot(ep[:,col],clr,linewidth=3);
-  plot(ep[:,col],clr+'o',markersize=10)
-
 xlabel('Iteration',fontsize=25); ylabel('Fitness (Time Before Miss)',fontsize=25)
-ylim((0,80e3))
+ylim((0,40e3))
 
-plot(lfitavg,'go',markersize=25); 
+savefig('gif/21oct13_b0.png') # [[./gif/21oct13_b0.png]]
 
-savefig('gif/21oct8_b0.png') # [[./gif/21oct8_a0.png]]
+so this shows evaluations (10 initializatios) for the feedforward model trained with ES using best weights ... blue is best evaluation,
+red is worse, black is average, this does seem to improve gradually
 
+dout = {'llfit':llfit, 'lfitavg':lfitavg,'lfitmin':lfitmin,'lfitmax':lfitmax}
+pickle.dump(dout,open('data/21oct13_eval_21oct4_ES_FF_cycle_.pkl','wb'))
