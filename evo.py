@@ -32,7 +32,8 @@ mydir = os.getcwd()
 simf = mydir + '/sim.py' 
 ngen = 0
 nfunc = 0 # number of fitness functions used
-
+dESparam = {'sigma':0.1, 'sigmadecay':1.0, 'learningrate':1.0, 'learningdecay':1.0} # parameters for ESTrain
+  
 # make dir, catch exceptions
 def safemkdir (dn):
   if os.path.exists(dn): return True
@@ -296,17 +297,15 @@ def initialize_archive(f, archive_seeds):
       return f(random, population, archive, args)
   return wrapper
 
-def ESTrain (maxgen, pop_size, simconfig, startweight, evostr, seed=1234):
+def ESTrain (maxgen, pop_size, simconfig, startweight, evostr, seed=1234, sigma=0.1, learningrate=1.0, sigmadecay=1.0, learningdecay=1.0):
   #dconf = init(dconf)
   ITERATIONS = maxgen # How many iterations to train for
   POPULATION_SIZE = pop_size # How many perturbations of weights to try per iteration
-  SIGMA = 0.1 # dconf['ES']['sigma'] # 0.1 # standard deviation of perturbations applied to each member of population
+  SIGMA = sigma # dconf['ES']['sigma'] # 0.1 # standard deviation of perturbations applied to each member of population
   LEARNING_RATE = 1.0 # dconf['ES']['learning_rate'] # 1 # what percentage of the return normalized perturbations to add to best_weights
   # How much to decay the learning rate and sigma by each episode. In theory this should lead to better
-  LR_DECAY = 1.0 
-  SIGMA_DECAY = 1.0 
-  EPISODES_PER_ITER = 1 
-  SAVE_WEIGHTS_EVERY_ITER = 10 
+  LR_DECAY = learningdecay
+  SIGMA_DECAY = sigmadecay
   # randomly initialize best weights to the first weights generated
   best_weights = np.array(startweight['weight']) # neurosim.getWeightArray(netpyne.sim)
   total_time = 0
@@ -423,7 +422,8 @@ def runevo (popsize=100,maxgen=10,my_generate=my_generate,\
                             useundefERR=useundefERR,
                             startweight=startweight)
   elif useES:
-    best_weights = ESTrain(maxgen=maxgen, pop_size=popsize, simconfig=simconfig, startweight=startweight, evostr=evostr)
+    best_weights = ESTrain(maxgen=maxgen, pop_size=popsize, simconfig=simconfig, startweight=startweight, evostr=evostr, \
+                           sigma=dESparam['sigma'],sigmadecay=dESparam['sigmadecay'],learningrate=dESparam['learningrate'],learningdecay=dESparam['learningdecay'])
     return best_weights
   else:
     final_pop = es.evolve(generator=my_generate,
@@ -474,7 +474,19 @@ if __name__ == "__main__":
     print('[noBound 0/1] [maxfittime seconds][simconfig path][verbose 0/1][rdmseed int]')
   else:
     while i < narg:
-      if sys.argv[i] == 'popsize' or sys.argv[i] == '-popsize':
+      if sys.argv[i] == 'sigma' or sys.argv[i] == '-sigma':
+        if i+1<narg:
+          i+=1; dESparam['sigma'] = float(sys.argv[i]);
+      elif sys.argv[i] == 'sigmadecay' or sys.argv[i] == '-sigmadecay':
+        if i+1<narg:
+          i+=1; dESparam['sigmadecay'] = float(sys.argv[i])
+      elif sys.argv[i] == 'learningrate' or sys.argv[i] == '-learningrate':
+        if i+1<narg:
+          i+=1; dESparam['learningrate'] = float(sys.argv[i])
+      elif sys.argv[i] == 'learningdecay' or sys.argv[i] == '-learningdecay':
+        if i+1<narg:
+          i+=1; dESparam['learningdecay'] = float(sys.argv[i])                    
+      elif sys.argv[i] == 'popsize' or sys.argv[i] == '-popsize':
         if i+1<narg:
           i+=1; popsize = int(sys.argv[i]); 
       elif sys.argv[i] == 'maxgen' or sys.argv[i] == '-maxgen':

@@ -39148,3 +39148,13 @@ red is worse, black is average, this does seem to improve gradually
 
 dout = {'llfit':llfit, 'lfitavg':lfitavg,'lfitmin':lfitmin,'lfitmax':lfitmax}
 pickle.dump(dout,open('data/21oct13_eval_21oct4_ES_FF_cycle_.pkl','wb'))
+
+* 21oct13
+** restart FF evo with adjusted params (21oct5_ES_FF_cycle_) , using sigmadecay, learningdecay
+
+can keep sigma at 0.1, learningrate at 1.0, but use sigmadecay and learningdecay of 0.99
+
+python -i evo.py fstat data/21oct5_ES_FF_cycle_/allinfo.txt popsize 30 maxgen 50 nproc 1 ncore 30 useMPI 0 useES 1 simconfig sn.json verbose 1 quitaftermiss 1 startweight data/21oct4_ES_FF_cycle_synWeights_final.pkl evostr 21oct5_ES_FF_cycle_ sigmadecay 0.99 learningdecay 0.99
+
+started ~12:53 ...
+
