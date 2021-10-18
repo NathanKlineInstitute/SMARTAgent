@@ -39188,7 +39188,16 @@ plot(lfitmax,'bo',markersize=15); plot(lfitmax,'b',linewidth=4)
 ep = np.loadtxt('data/21oct4_ES_FF_cycle_/stats.log',delimiter='\t')
 
 xlabel('Iteration',fontsize=25); ylabel('Fitness (Time Before Miss)',fontsize=25)
-ylim((0,40e3))
+ylim((0,26e3))
 
 savefig('gif/21oct15_a0.png') # [[./gif/21oct15_a0.png]]
+
+looks worse overall compared to previous ES which did not have the learning/sigma decay:  [[./gif/21oct13_b0.png]]
+
+* 21oct18
+** ES with lower sigma
+
+python -i evo.py fstat data/21oct18_ES_FF_sigma0.075_cycle_/allinfo.txt popsize 30 maxgen 50 nproc 1 ncore 30 useMPI 0 useES 1 simconfig sn.json verbose 1 quitaftermiss 1 startweight data/21oct4_ES_FF_cycle_synWeights_final.pkl evostr 21oct18_ES_FF_sigma0.075_cycle_ sigma 0.075
+
+started ~11:19 ...
 
