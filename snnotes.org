@@ -39195,9 +39195,20 @@ savefig('gif/21oct15_a0.png') # [[./gif/21oct15_a0.png]]
 looks worse overall compared to previous ES which did not have the learning/sigma decay:  [[./gif/21oct13_b0.png]]
 
 * 21oct18
-** ES with lower sigma
+** ES with lower sigma (0.075)
 
 python -i evo.py fstat data/21oct18_ES_FF_sigma0.075_cycle_/allinfo.txt popsize 30 maxgen 50 nproc 1 ncore 30 useMPI 0 useES 1 simconfig sn.json verbose 1 quitaftermiss 1 startweight data/21oct4_ES_FF_cycle_synWeights_final.pkl evostr 21oct18_ES_FF_sigma0.075_cycle_ sigma 0.075
 
 started ~11:19 ...
+
+seems to be doing better, but will need post-ES evaluation to determine properly ... 
+
+* 21oct19
+** ES with even lower sigma (0.05)
+
+copy sn.json into sn_sigma0.05.json to have unique names for outputs, and reduce sigma in commandline args ... 
+
+python -i evo.py fstat data/21oct19_ES_FF_sigma0.05_cycle_/allinfo.txt popsize 30 maxgen 50 nproc 1 ncore 30 useMPI 0 useES 1 simconfig sn_sigma0.05.json verbose 1 quitaftermiss 1 startweight data/21oct4_ES_FF_cycle_synWeights_final.pkl evostr 21oct19_ES_FF_sigma0.05_cycle_ sigma 0.05
+
+started ~11:40 ...
 
