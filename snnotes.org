@@ -39276,3 +39276,11 @@ ylim((0,26e3))
 
 savefig('gif/21oct22_eval_ES_sigma0.05_a0.png') #
 
+** another ES with sigma and learning decay at 0.9999
+
+sigma start at 0.1, learning rate start at 1,  but with both decaying at 0.999 rate ... at 50 gen that's about 0.95 instead of 0.6
+
+python -i evo.py fstat data/21oct22_ES_FF_decay0.999_cycle_/allinfo.txt popsize 30 maxgen 50 nproc 1 ncore 30 useMPI 0 useES 1 simconfig sndecay.json verbose 1 quitaftermiss 1 startweight data/21oct4_ES_FF_cycle_synWeights_final.pkl evostr 21oct22_ES_FF_decay0.999_cycle_ sigmadecay 0.999 learningdecay 0.999
+
+started ~10:09 ...
+
