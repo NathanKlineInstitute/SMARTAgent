@@ -39349,7 +39349,7 @@ plot(lfitmax,'bo',markersize=15); plot(lfitmax,'b',linewidth=4)
 xlabel('Iteration',fontsize=25); ylabel('Fitness (Time Before Miss)',fontsize=25)
 ylim((0,26e3))
 
-savefig('gif/21oct22_eval_ES_sigma0.05_a0.png') #
+savefig('gif/21oct22_eval_ES_sigma0.05_a0.png') # does not look better
 
 ** another ES with sigma and learning decay at 0.9999
 
@@ -39472,3 +39472,10 @@ nx.draw_networkx_edges(
     alpha=0.5,
     edge_color="tab:blue",
 )
+* 21oct23
+** ES with sigma of 0.125
+
+python -i evo.py fstat data/21oct23_ES_FF_sigma0.125_cycle_/allinfo.txt popsize 30 maxgen 50 nproc 1 ncore 30 useMPI 0 useES 1 simconfig snsigma0.125.json verbose 1 quitaftermiss 1 startweight data/21oct4_ES_FF_cycle_synWeights_final.pkl evostr 21oct23_ES_FF_sigma0.125_cycle_ sigma 0.125
+
+started ~21:13 ...
+
