@@ -39509,3 +39509,103 @@ ylim((0,26e3))
 
 savefig('gif/21oct24_21oct22_ES_FF_decay0.999_cycle_a0.png') # 
 
+* 21oct25
+** back to networkx for comparing stdp vs ES weights from cartpole 
+
+try some networkx analysis ... 
+
+python -i simdat.py
+
+wt = pickle.load(open('data/21sep24_synWeights_final.pkl','rb'))
+wt.keys()
+len(wt) # 120
+
+cwt = np.zeros((180,180))
+
+for pre in list(wt.keys()):
+  lwt = []
+  for post in list(wt[pre].keys()):
+    lwt.append(wt[pre][post][0][1])
+    cwt[pre,post] = wt[pre][post][0][1]
+
+#imshow(cwt,cmap='gray',origin='lower',interpolation='None',extent=(0,180,0,180)); xlim((75,180)); ylim((0,125)); ylabel('Presynaptic ID'); xlabel('Postsynaptic ID')
+
+wtES = pickle.load(open('data/21sep24_ES_synWeights_final.pkl','rb'))
+cwtES = np.zeros((180,180))
+for pre in list(wtES.keys()):
+  lwtES = []
+  for post in list(wtES[pre].keys()):
+    lwtES.append(wtES[pre][post][0][1])
+    cwtES[pre,post] = wtES[pre][post][0][1]
+
+#imshow(cwtES,cmap='gray',origin='lower',interpolation='None',extent=(0,180,0,180)); xlim((75,180)); ylim((0,125)); ylabel('Presynaptic ID'); xlabel('Postsynaptic ID')
+
+import networkx as nx
+
+DG = nx.DiGraph()
+for pre in list(wtES.keys()):
+  for post in list(wtES[pre].keys()):
+    DG.add_weighted_edges_from([(pre, post, wtES[pre][post][0][1])])
+
+DG.number_of_edges() # 1800
+len(DG.nodes()) # 160
+
+nx.draw(DG, with_labels=True, font_weight='bold')
+
+nx.draw_spring(DG, with_labels=True)
+
+cla(); nx.draw_kamada_kawai(DG, with_labels=True)
+
+      "ES": 80,
+      "EA": 40,
+      "IA": 10,
+      "IAL": 10,
+      "EM": 40,
+      "IM": 10,
+      "IML": 10
+
+weights only stores the 160 E neurons ... 
+
+https://github.com/NathanKlineInstitute/netpyne-STDP/blob/master/config.json
+
+dnumc = {'ES':80, 'EA':40, 'EML': 20, 'EMR': 20}
+dstartidx = {'ES':0, 'EA':80, 'EML':140, 'EMR':160}
+dendidx = {k:dstartidx[k]+dnumc[k]-1 for k in dnumc.keys()}
+
+def gettype (idx): 
+  for k in dnumc.keys():
+    if idx >= dstartidx[k] and idx <= dendidx[k]: return k
+  return 'unknown'
+
+for i in range(160): 
+  if i in DG.nodes:
+    DG.nodes[i]['label'] = gettype(i) + str(i)
+
+cla(); nx.draw(DG, with_labels=True, font_weight='bold')
+
+https://networkx.org/documentation/stable/auto_examples/drawing/plot_labels_and_colors.html?highlight=label
+
+pos = nx.spring_layout(DG, seed=3113794652)
+
+options = {"edgecolors": "tab:gray", "node_size": 800, "alpha": 0.9}
+
+dl = {k:[x for x in range(dstartidx[k],dendidx[k]+1,1) if x in DG.nodes] for k in dnumc.keys()}
+dclr = {'ES':'tab:red', 'EA':'tab:blue', 'EML':'tab:green', 'EMR':'tab:orange'}
+
+for ty in dnumc.keys(): nx.draw_networkx_nodes(DG, pos, nodelist=dl[ty], node_color=dclr[ty], **options)
+
+# edges
+nx.draw_networkx_edges(DG, pos, width=1.0, alpha=0.5)
+
+savefig('gif/21oct25_a0.png') # [[./gif/21oct25_a0.png]]
+
+ok, now all the nodes (neurons) are drawn properly ... though weights not represented here ... ? 
+
+can get the weights this way:
+DG.edges[(76, 106)] # {'weight': 10.954123681423127}
+
+nx.number_strongly_connected_components(DG) # 160
+nx.number_weakly_connected_components(DG) # 1
+
+nx.clustering(DG) # all 0
+
