@@ -39609,3 +39609,33 @@ nx.number_weakly_connected_components(DG) # 1
 
 nx.clustering(DG) # all 0
 
+* 21oct28
+** eval ES with sigma of 0.125 -- only finished 36 generations
+
+since power went out
+
+python -i evo.py
+
+swfn = 'data/21oct4_ES_FF_cycle_synWeights_final.pkl'
+startweight = readweightsfile2pdf(swfn) # starting weights - placeholders
+simconfig = 'backupcfg/21oct23_ES_FF_sigma0.125_cycle_/evo.json'
+ncore = 30
+quitaftermiss = 1
+llfit = EvalBest('data/21oct23_ES_FF_sigma0.125_cycle_',37,startweight,simconfig,10)
+
+started ~15:57 ... 
+
+from pylab import *
+ion()
+
+lfitavg = np.array([mean(llfit[x,:]) for x in range(llfit.shape[0])])
+lfitmin = np.array([np.min(llfit[x,:]) for x in range(llfit.shape[0])])
+lfitmax = np.array([np.max(llfit[x,:]) for x in range(llfit.shape[0])])
+lfitstd = np.array([np.std(llfit[x,:])/sqrt(10) for x in range(llfit.shape[0])])
+plot(lfitavg,'ko',markersize=15); plot(lfitavg,'k',linewidth=4)
+plot(lfitmin,'ro',markersize=15); plot(lfitmin,'r',linewidth=4)
+plot(lfitmax,'bo',markersize=15); plot(lfitmax,'b',linewidth=4)
+xlabel('Iteration',fontsize=25); ylabel('Fitness (Time Before Miss)',fontsize=25)
+ylim((0,26e3))
+
+savefig('gif/21oct28_21oct23_ES_FF_sigma0.125_cycle_a0.png') # 
