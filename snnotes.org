@@ -39636,6 +39636,25 @@ plot(lfitavg,'ko',markersize=15); plot(lfitavg,'k',linewidth=4)
 plot(lfitmin,'ro',markersize=15); plot(lfitmin,'r',linewidth=4)
 plot(lfitmax,'bo',markersize=15); plot(lfitmax,'b',linewidth=4)
 xlabel('Iteration',fontsize=25); ylabel('Fitness (Time Before Miss)',fontsize=25)
-ylim((0,26e3))
+ylim((0,32e3))
 
 savefig('gif/21oct28_21oct23_ES_FF_sigma0.125_cycle_a0.png') # 
+
+this seems better ... or similar to 21oct13_b0.png . . . (used sigma=0.1) ? 
+
+may just want to use original parameters for larger number of generations ... 
+
+* 21oct29
+** ES with sigma=0.1, more generations
+
+could start from generation 50? had already ran up to generation 68:
+ /home/samn/SMARTAgent/data/21oct4_ES_FF_cycle_
+
+will start from scratch, to make sure everything initialized properly ... 
+
+max generation of 1000 ... 
+
+python -i evo.py fstat data/21oct29_ES_FF_sigma0.1_cycle_/allinfo.txt popsize 30 maxgen 1000 nproc 1 ncore 30 useMPI 0 useES 1 simconfig sn.json verbose 1 quitaftermiss 1 startweight data/21oct4_ES_FF_cycle_synWeights_final.pkl evostr 21oct29_ES_FF_sigma0.1_cycle_ sigma 0.1
+
+started ~11:45 ...
+
