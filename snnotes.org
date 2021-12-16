@@ -39658,3 +39658,43 @@ python -i evo.py fstat data/21oct29_ES_FF_sigma0.1_cycle_/allinfo.txt popsize 30
 
 started ~11:45 ...
 
+* 21dec16
+** evo stopped since hard-drive ran out of space
+
+was in middle of generation 478 ... can evaluate from there ...
+
+** evalute evolution 21oct29_ES_FF_sigma0.1_cycle_
+
+hmm, accidentally deleted data/21oct4_ES_FF_cycle_synWeights_final.pkl
+those were the starting weights ... recreate them (just used as placeholders)
+
+cp backupcfg/21oct4_ES_FF_cycle_sim.json ./
+
+./myrun 30 21oct4_ES_FF_cycle_sim.json
+
+python -i evo.py
+
+swfn = 'data/21oct4_ES_FF_cycle_synWeights_final.pkl'
+startweight = readweightsfile2pdf(swfn) # starting weights - placeholders
+simconfig = 'backupcfg/21oct29_ES_FF_sigma0.1_cycle_/evo.json'
+ncore = 30
+quitaftermiss = 1
+llfit = EvalBest('data/21oct29_ES_FF_sigma0.1_cycle_',480,startweight,simconfig,10)
+
+started ~16:56 ... 
+
+from pylab import *
+ion()
+
+lfitavg = np.array([mean(llfit[x,:]) for x in range(llfit.shape[0])])
+lfitmin = np.array([np.min(llfit[x,:]) for x in range(llfit.shape[0])])
+lfitmax = np.array([np.max(llfit[x,:]) for x in range(llfit.shape[0])])
+lfitstd = np.array([np.std(llfit[x,:])/sqrt(10) for x in range(llfit.shape[0])])
+plot(lfitavg,'ko',markersize=15); plot(lfitavg,'k',linewidth=4)
+plot(lfitmin,'ro',markersize=15); plot(lfitmin,'r',linewidth=4)
+plot(lfitmax,'bo',markersize=15); plot(lfitmax,'b',linewidth=4)
+xlabel('Iteration',fontsize=25); ylabel('Fitness (Time Before Miss)',fontsize=25)
+ylim((0,32e3))
+
+savefig('gif/21dec16_21oct29_ES_FF_sigma0.1_cycle_a0.png') # 
+
