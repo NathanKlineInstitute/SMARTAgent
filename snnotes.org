@@ -39712,6 +39712,8 @@ llfit = EvalBest('data/21oct29_ES_FF_sigma0.1_cycle_',480,startweight,simconfig,
 
 started ~10:51
 
+took ~5 hours to run 10 evaluations?? something wrong with this sim ... need to check if weights are loaded properly ... 
+
 from pylab import *
 ion()
 
@@ -39726,3 +39728,4 @@ xlabel('Iteration',fontsize=25); ylabel('Fitness (Time Before Miss)',fontsize=25
 ylim((0,32e3))
 
 savefig('gif/21dec17_21oct29_ES_FF_sigma0.1_cycle_a0.png') # 
+
