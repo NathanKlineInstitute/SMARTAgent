@@ -124,7 +124,10 @@ def EvalBest (based, ngen, startweight, simconfig, neval):
   lwt = LoadBestESWeights(based, ngen)
   llfit = []
   for idx,wt in enumerate(lwt):
-    llfit.append([EvalFITES(wt, startweight, simconfig, 'EVAL_'+str(jdx)+'_BEST', idx, seed=(jdx+1)*1234) for jdx in range(neval)])
+    print('EvalBest, up to generation=',idx)
+    lfit = [EvalFITES(wt, startweight, simconfig, 'EVAL_'+str(jdx)+'_BEST', idx, seed=(jdx+1)*1234) for jdx in range(neval)]
+    llfit.append(lfit)
+    print('generation', idx, 'average fitness is', np.mean(lfit))
   return np.array(llfit)
 
 #
@@ -165,8 +168,9 @@ def EvalFITES (p, startweight, simconfig, num_generations, cdx, seed=1234):
    fit = np.amax(actreward['time'])
   else:
    fit = np.sum(actreward['reward'])
-  print('fit is:',fit)
+  print('evo.py, fit is:',fit)
   logger.info(strc + ', ' + fn + ', fit=' + str(fit))
+  print('evo.py: wrote logger.info, returning',fit)
   return fit
 
 
