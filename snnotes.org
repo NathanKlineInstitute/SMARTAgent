@@ -39729,3 +39729,48 @@ ylim((0,32e3))
 
 savefig('gif/21dec17_21oct29_ES_FF_sigma0.1_cycle_a0.png') # 
 
+* 22jan21
+** evalute evolution 21oct29_ES_FF_sigma0.1_cycle_ got interrupted, restart
+
+python -i evo.py
+
+swfn = 'data/21oct4_ES_FF_cycle_synWeights_final.pkl' # <<-- that is empty!
+
+so, need to rerun 21oct4_ES_FF_cycle_sim.json to generate starting weights
+
+copied over to 22jan21_ES_FF_cycle_sim.json
+changed name
+    "name": "22jan21_ES_FF_cycle_",
+and duration ... to 10 s ... and recordWeightStepSize to 10
+
+./myrun 30 22jan21_ES_FF_cycle_sim.json
+
+ok, now this file is not empty:
+ 22jan21_ES_FF_cycle_synWeights_final.pkl
+set it to read-only to avoid accidental deletion ...
+
+python -i evo.py
+swfn = 'data/22jan21_ES_FF_cycle_synWeights_final.pkl'
+startweight = readweightsfile2pdf(swfn) # starting weights - placeholders
+len(startweight) # 180000
+simconfig = 'backupcfg/21oct29_ES_FF_sigma0.1_cycle_/evo.json'
+ncore = 30
+quitaftermiss = 1
+llfit = EvalBest('data/21oct29_ES_FF_sigma0.1_cycle_',480,startweight,simconfig,10)
+
+started ~11 AM ... 
+
+from pylab import *
+ion()
+
+lfitavg = np.array([mean(llfit[x,:]) for x in range(llfit.shape[0])])
+lfitmin = np.array([np.min(llfit[x,:]) for x in range(llfit.shape[0])])
+lfitmax = np.array([np.max(llfit[x,:]) for x in range(llfit.shape[0])])
+lfitstd = np.array([np.std(llfit[x,:])/sqrt(10) for x in range(llfit.shape[0])])
+plot(lfitavg,'ko',markersize=15); plot(lfitavg,'k',linewidth=4)
+plot(lfitmin,'ro',markersize=15); plot(lfitmin,'r',linewidth=4)
+plot(lfitmax,'bo',markersize=15); plot(lfitmax,'b',linewidth=4)
+xlabel('Iteration',fontsize=25); ylabel('Fitness (Time Before Miss)',fontsize=25)
+ylim((0,32e3))
+
+savefig('gif/22jan21_21oct29_ES_FF_sigma0.1_cycle_a0.png') # 
