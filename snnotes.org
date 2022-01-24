@@ -39774,3 +39774,42 @@ xlabel('Iteration',fontsize=25); ylabel('Fitness (Time Before Miss)',fontsize=25
 ylim((0,32e3))
 
 savefig('gif/22jan21_21oct29_ES_FF_sigma0.1_cycle_a0.png') # 
+
+* 22jan24
+** check output from log file
+
+python
+
+fp = open('21aug4A.log','r')
+lns = fp.readlines()
+lns = [x.strip() for x in lns]
+lns = [float(x.split('fit=')[-1]) for x in lns]
+from pylab import *
+plot(lns)
+
+import numpy as np
+import pandas as pd
+
+data = np.array(lns)
+d = pd.Series(data)
+print(d.rolling(10).mean())
+plot(d.rolling(10).mean())
+
+lns10Avg = [np.mean(lns[x*10:(x+1)*10]) for x in range(int(len(lns)/10))]
+lns10Min = [np.min(lns[x*10:(x+1)*10]) for x in range(int(len(lns)/10))]
+lns10Max = [np.max(lns[x*10:(x+1)*10]) for x in range(int(len(lns)/10))]
+
+plot(lns10Min,'g',linewidth=3)
+plot(lns10Max,'b',linewidth=3)
+plot(lns10Avg,'r',linewidth=3)
+
+xlabel('ES Generation',fontsize=24)
+ylabel('Average Fitness (time to miss, 10 eval per gen)', fontsize=24)
+title('Simple Pong ES',fontsize=24)
+xlim((0,100))
+
+savefig('gif/22jan24_SimpPong_ES_Eval_a0.png')
+[[./gif/22jan24_SimpPong_ES_Eval_a0.png]]
+
+clearly showing improvement ... will see how much farther it goes (have ~300 more gen to evaluate)
+
