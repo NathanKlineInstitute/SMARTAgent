@@ -3,5 +3,5 @@ A closed-loop spiking neuronal network (visual/motor) model that senses dynamic 
 
 # Reference
 Training a spiking neuronal network model of visual-motor cortex to play a virtual racket-ball game using reinforcement learning
-https://doi.org/10.1101/2021.07.29.454361
-(in press)
+https://doi.org/10.1371/journal.pone.0265808
+
