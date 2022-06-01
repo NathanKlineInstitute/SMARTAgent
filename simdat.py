@@ -92,6 +92,16 @@ def generateActivityMap(t1, t2, spkT, spkID, numc, startidx):
         Nact[t][i][j] = len(cbinSpikes)
   return Nact
 
+def generateActivityMap1D(t1, t2, spkT, spkID, numc, startidx):
+  Nact = np.zeros(shape=(len(t1),numc)) # Nact is 2D array of number of spikes, indexed by: time, cellID
+  for i in range(numc):
+    cNeuronID = i + startidx
+    cNeuron_spkT = spkT[spkID==cNeuronID]
+    for t in range(len(t1)):
+      cbinSpikes = cNeuron_spkT[(cNeuron_spkT>t1[t]) & (cNeuron_spkT<=t2[t])]
+      Nact[t][i] = len(cbinSpikes)
+  return Nact
+
 def getdActMap (totalDur, tstepPerAction, dspkT, dspkID, dnumc, dstartidx,lpop = allpossible_pops):
   t1 = range(0,totalDur,tstepPerAction)
   t2 = range(tstepPerAction,totalDur+tstepPerAction,tstepPerAction)
@@ -100,7 +110,71 @@ def getdActMap (totalDur, tstepPerAction, dspkT, dspkID, dnumc, dstartidx,lpop =
     if pop in dnumc and dnumc[pop] > 0:
       dact[pop] = generateActivityMap(t1, t2, dspkT[pop], dspkID[pop], dnumc[pop], dstartidx[pop])
   return dact
-  
+
+def getdActMap1D (totalDur, actreward, dspkT, dspkID, dnumc, dstartidx,lpop = allpossible_pops):
+  t2 = np.array(actreward.time)
+  t1 = [0]
+  for i in range(len(t2)-1):
+    t1.append(t2[i])
+  t1 = np.array(t1)
+  dact = {}
+  for pop in lpop:
+    if pop in dnumc and dnumc[pop] > 0:
+      dact[pop] = generateActivityMap1D(t1, t2, dspkT[pop], dspkID[pop], dnumc[pop], dstartidx[pop])
+  return dact
+
+def getCumActivityMapForInput(t1,t2,dact1D,lpop):
+  dCumAct = {}
+  dStepAct = {}
+  for pop in lpop:
+    dCumAct[pop] = []
+    dStepAct[pop] = []
+    for i in range(len(t1)):
+      cPopAct = list(np.sum(dact1D[pop][t1[i]:t2[i]+1,:],0))
+      cPopStepAct = list(dact1D[pop][t1[i]:t2[i]+1,:])
+      dCumAct[pop].append(cPopAct)
+      dStepAct[pop].append(cPopStepAct)
+  return dCumAct, dStepAct
+
+def getRewardsPerSeq(actreward, seqBegs, seqEnds):
+  rewards = []
+  hitsMiss = []
+  for i in range(len(seqBegs)): 
+    rewards.append(list(actreward.reward)[seqBegs[i]:seqEnds[i]+1])
+    hitsMiss.append(list(actreward.hit)[seqBegs[i]:seqEnds[i]+1])
+  return rewards,hitsMiss
+
+def getActionsPerSeq(actreward, seqBegs, seqEnds):
+  proposedActions = []
+  executedActions = []
+  for i in range(len(seqBegs)): 
+    proposedActions.append(list(actreward.proposed)[seqBegs[i]:seqEnds[i]+1])
+    executedActions.append(list(actreward.action)[seqBegs[i]:seqEnds[i]+1])
+  return proposedActions,executedActions
+
+def getStepwiseNeuralContribution(executedActions,dStepAct):
+  stepwisecontribEMUP = []
+  stepwisecontribEMDOWN = []
+  for i in range(len(executedActions)):
+    cTrial_eActions = executedActions[i]
+    cTrial_actup = dStepAct['EMUP'][i]
+    cTrial_actdown = dStepAct['EMDOWN'][i]
+    for steps in range(len(cTrial_eActions)):
+      popemup = np.zeros((300,))
+      popemdown = np.zeros((300,))
+      if cTrial_eActions[steps]==4:
+        popemup[np.where(cTrial_actup[steps]>0)[0]]=1
+      elif cTrial_eActions[steps]==3:
+        popemdown[np.where(cTrial_actdown[steps]>0)[0]]=1
+      elif cTrial_eActions[steps]==1:
+        popemup[np.where(cTrial_actup[steps]>0)[0]]=1
+        popemdown[np.where(cTrial_actdown[steps]>0)[0]]=1
+      stepwisecontribEMUP.append(list(popemup))
+      stepwisecontribEMDOWN.append(list(popemdown))
+  stepwisecontribEMUP = np.array(stepwisecontribEMUP)
+  stepwisecontribEMDOWN = np.array(stepwisecontribEMDOWN)
+  return stepwisecontribEMUP, stepwisecontribEMDOWN
+
 def loadsimdat (name=None,getactmap=True,lpop = allpossible_pops): # load simulation data
   global totalDur, tstepPerAction
   name = getsimname(name)
@@ -494,6 +568,69 @@ def getdistvstimecorr (pdpos, ballxmin=137, ballxmax=141, minN=2):
   dout['lN'] = lN
   return dout
 
+def getconcatobjpos (lfn):
+  # concatenate the object position data frames together so can correlate ball position with learning behavior
+  # lfn is a list of objpos.pkl filenames from the simulation
+  pdpos = None
+  for fn in lfn:
+    acl = ObjPos2pd(loadObjPos(fn)) 
+    if pdpos is None:
+      pdpos = acl
+    else:
+      acl.time += np.amax(pdpos.time)
+      pdpos = pdpos.append(acl)
+  return pdpos
+
+def showSpatialBehaviorHitMiss(pdpos,hitsMiss,seqsBegs,seqsEnds):
+  # find y pos of ball and score at the end of each seq.
+  yballpos = []
+  hit_miss_seqs = []
+  for seq in range(len(seqsBegs)):
+    y = np.array(pdpos.iloc[seqsBegs[seq]:seqsEnds[seq]].ballY)
+    yballpos.append(y[np.where(y>1)[0][-1]])
+    hit_miss_seqs.append(hitsMiss[seq][-1])
+  hit_inds = np.where(np.array(hit_miss_seqs)==1)[0]
+  miss_inds = np.where(np.array(hit_miss_seqs)==-1)[0]
+  hhit = np.histogram(np.array(yballpos)[hit_inds],range(0,161,10))
+  hmiss = np.histogram(np.array(yballpos)[miss_inds],range(0,161,10))
+  width = 3
+  ypos0 = hhit[1][1:]-3 
+  ypos1 = [x + width for x in ypos0] 
+  plt.bar(ypos0, hhit[0], color ='b', width =width, edgecolor ='black', label ='Hits',align='edge') 
+  plt.bar(ypos1, hmiss[0], color ='r', width = width, edgecolor ='black', label ='Miss',align='edge') 
+  xlabel('ball ypos when hit or miss')
+  ylabel('count')
+  legend()
+
+def showSpatialBehaviorStepWise(pdpos,actrewards,binsize):
+  # used binsize of 4
+  stepwise_correct_spatialmoves = np.zeros((160,160))
+  stepwise_incorrect_spatialmoves = np.zeros((160,160))
+  for step in range(len(pdpos)):
+    reward = actrewards.iloc[step].reward
+    x = pdpos.iloc[step].ballX
+    y = pdpos.iloc[step].ballY
+    r = pdpos.iloc[step].racketY
+    if reward==dconf['rewardcodes']['followTarget']:
+      if int(x)>0 and int(y)>0:
+        stepwise_correct_spatialmoves[int(x),int(y)]+=1
+    elif reward==dconf['rewardcodes']['avoidTarget']:
+      if int(x)>0 and int(y)>0:
+        stepwise_incorrect_spatialmoves[int(x),int(y)]+=1
+  ds_stepwise_correct_spatialmoves = np.zeros((int(160/binsize),int(160/binsize)))
+  ds_stepwise_incorrect_spatialmoves = np.zeros((int(160/binsize),int(160/binsize)))
+  icount = 0
+  for i in range(0,160,int(binsize)):
+    jcount = 0
+    for j in range(0,160,int(binsize)):
+      ds_stepwise_correct_spatialmoves[icount,jcount]=np.sum(stepwise_correct_spatialmoves[i:i+binsize,j:j+binsize])
+      ds_stepwise_incorrect_spatialmoves[icount,jcount]=np.sum(stepwise_incorrect_spatialmoves[i:i+binsize,j:j+binsize])
+      jcount+=1
+    icount+=1
+  stepwise_pcorrent_spatialmoves = np.divide(ds_stepwise_correct_spatialmoves,np.add(ds_stepwise_correct_spatialmoves,ds_stepwise_incorrect_spatialmoves))
+  plt.imshow(stepwise_pcorrent_spatialmoves.T)
+  plt.colorbar()
+  title('probability of correct move, when the ball is at a location')
 
 def getspikehist (spkT, numc, binsz, tmax):
   tt = np.arange(0,tmax,binsz)
@@ -791,6 +928,34 @@ def getconcatactionreward (lfn):
       acl.time += np.amax(pda.time)
       pda = pda.append(acl)
   return pda
+
+def getconcatactivity(lfn, lpop = allpossible_pops): 
+  # CAUTION: this function assumes that the simConfig['simData']['spkid'] are preserved across the steps                                                                                                           
+  spkIDs = []                                                                                                                                                     
+  spkTs = []
+  t_lastSim = 0
+  for fn in lfn:
+    conf.dconf = conf.readconf('backupcfg/'+fn+'sim.json')
+    simConfig = pickle.load(open('data/'+fn+'simConfig.pkl','rb'))
+    spkT = np.add(simConfig['simData']['spkt'],t_lastSim)
+    spkID = np.array(simConfig['simData']['spkid'])
+    for i in range(len(spkT)):
+      spkTs.append(spkT[i])
+      spkIDs.append(spkID[i])
+    totalDur = int(dconf['sim']['duration'])
+    t_lastSim = t_lastSim + totalDur
+  dstartidx, dendidx = {},{}
+  for p in lpop:
+    dstartidx[p] = simConfig['net']['pops'][p]['cellGids'][0]
+    dendidx[p] = simConfig['net']['pops'][p]['cellGids'][-1]
+  dspkID,dspkT = {},{}
+  spkIDs = np.array(spkIDs)
+  spkTs = np.array(spkTs)
+  for pop in lpop:
+    dspkID[pop] = spkIDs[(spkIDs>=dstartidx[pop])&(spkIDs<=dendidx[pop])]
+    dspkT[pop] = spkTs[(spkIDs>=dstartidx[pop])&(spkIDs<=dendidx[pop])]
+  return dspkID, dspkT, t_lastSim
+
 
 def getindivactionreward (lfn):
   # get the individual actionreward data frames separately so can compare cumulative rewards,actions,etc.
@@ -1594,6 +1759,454 @@ def plotConns(prepop,postpop):
     ax.set_zticks([0,9])
     ax.set_zticklabels([postpop,prepop])
   plt.show()
+
+
+def breakdownPerformance(InputImages,actreward,cend,sthresh,nbframeThresh,ballThresh):
+  cend1= cend   # 16
+  cend2= cend+1       # 17
+  # ballThresh = 250 # its 255
+  potential_seqEnds = []
+  potential_seqBegs = []  
+  p0 = np.unique(np.where(InputImages[:,:,0]>ballThresh)[0])
+  p1 = np.unique(np.where(InputImages[:,:,1]>ballThresh)[0])
+  p = list(p0)+list(p1)
+  p = np.unique(p)
+  diff = np.subtract(p[1:],p[0:-1])
+  potential_frames = np.add(np.where(diff>nbframeThresh),1) # was 20 here ...for reduced model
+  seqBegs=[p[0]]
+  for ind in potential_frames[0]:
+    seqBegs.append(p[ind])
+  seqBegs = list(np.sort(seqBegs))
+  seqEnds = []
+  IncompleteSeqs = []
+  for seqBeg in seqBegs:
+    ball_near_player = 0
+    cInds = seqBeg
+    while ball_near_player==0 and cInds+1<len(actreward.time):
+      cInds+=1
+      if cInds in seqBegs:
+        IncompleteSeqs.append(seqBeg)
+        ball_near_player = 1
+      else:
+        if list(actreward['hit'])[cInds]!=0:
+          seqEnds.append(cInds)
+          ball_near_player = 1
+  if len(IncompleteSeqs)>0:
+    for ind in IncompleteSeqs:
+      seqBegs.remove(ind)
+  summed_Seqs = np.zeros((len(seqBegs),InputImages.shape[1],InputImages.shape[2]))
+  for inds in range(len(seqEnds)):
+    summed_Seqs[inds,:,:]=np.sum(InputImages[seqBegs[inds]:seqEnds[inds]+1,:,:],0)
+  # now find similar sequences
+  corrs_all = np.zeros((summed_Seqs.shape[0],summed_Seqs.shape[0]))
+  pvals_all = np.zeros((summed_Seqs.shape[0],summed_Seqs.shape[0]))
+  for i in range(summed_Seqs.shape[0]):
+    x = summed_Seqs[i,:,0:cend2]
+    for j in range(i,summed_Seqs.shape[0]):
+      y = summed_Seqs[j,:,0:cend2]
+      corr, p_value = pearsonr(x.flat, y.flat)
+      corrs_all[i,j]=corr
+      pvals_all[i,j]=p_value
+  lSimilarSeqs = []
+  NBoccur = np.zeros((1,summed_Seqs.shape[0]))
+  for i in range(summed_Seqs.shape[0]):
+    alreadyExists = 0
+    for seqs in lSimilarSeqs:
+      if i in seqs: alreadyExists=1
+    if alreadyExists==0:
+      lseqs = list(np.where(corrs_all[i,:]>0.9)[0])
+    else:
+      lseqs = []
+    lSimilarSeqs.append(lseqs)
+    NBoccur[0,i] = len(lseqs)  
+  seqs2plot = np.where(NBoccur[0]>sthresh)[0]
+  if len(seqBegs)>len(seqEnds):
+    seqBegs = seqBegs[0:len(seqEnds)]
+  return lSimilarSeqs, seqs2plot, seqBegs, seqEnds
+
+def displayPerformaceBreakdown(InputImages, actreward, seqs2plot, lSimilarSeqs, seqBegs, seqEnds_wrtRewards):
+  fig, axs = plt.subplots(6, 6, figsize=(14,12));
+  lax = axs.ravel()
+  i = 0
+  for seqNB in seqs2plot:
+    totalRepeats = len(lSimilarSeqs[seqNB])
+    Scores = []
+    totalInput = np.zeros((InputImages[0].shape[0],InputImages[0].shape[1]))   
+    for rep in lSimilarSeqs[seqNB]:
+      cInput = np.sum(InputImages[seqBegs[rep]:seqEnds_wrtRewards[rep]+1,:,:],0)
+      totalInput = np.add(totalInput,cInput)
+      Scores.append(list(actreward['hit'])[seqEnds_wrtRewards[rep]])
+    lax[i].imshow(totalInput)
+    lax[i].axis('off')
+    i+=1
+    lax[i].plot(Scores,'b-o')
+    lax[i].set_ylim((-1.1,1.1))
+    i+=1
+
+# find some stats to summerize learning performance.
+def summarizeLearningPerf(lSimilarSeqs,seqs2plot,hitsMiss):
+  lperf_T = []
+  for i in range(len(seqs2plot)):
+    cseqInds = lSimilarSeqs[seqs2plot[i]]
+    cHitsMiss = []
+    for j in range(len(cseqInds)):
+      cHitsMiss.append(hitsMiss[cseqInds[j]][-1])
+    cHitsMiss = np.array(cHitsMiss)
+    hits = np.where(cHitsMiss==1,cHitsMiss,0)
+    miss = np.where(cHitsMiss==-1,-1*cHitsMiss,0)
+    perf = np.divide(np.cumsum(hits),np.cumsum(miss))
+    l = len(perf)
+    if len(np.where(np.isfinite(perf))[0])>0:
+      f0 = np.where(np.isfinite(perf))[0][0]
+      f1 = np.where(np.isfinite(perf))[0][-1]
+      perf = perf[f0:f1+1]
+    lperf_T.append([np.median(perf),np.amax(perf),np.where(perf==np.amax(perf))[0][0],l])
+  lperf_T = np.array(lperf_T)
+  inds = np.argsort(lperf_T[:,1])
+  fig, axs = plt.subplots(1, 3, figsize=(12,4))
+  lax = axs.ravel()
+  lax[0].plot(lperf_T[inds,0],'b-o')
+  lax[0].plot(lperf_T[inds,1],'r-o')
+  lax[0].legend(('median','max'))
+  lax[0].set_xlabel('Input Sequences')
+  lax[0].set_ylabel('Hit/Miss')
+  lax[1].plot(lperf_T[inds,2],'r-o')
+  lax[1].set_xlabel('Input Sequences')
+  lax[1].set_ylabel('# of repeats for max. Hit/Miss')
+  lax[2].plot(np.divide(lperf_T[inds,2],lperf_T[inds,3]),'r-o')
+  lax[2].set_xlabel('Input Sequences')
+  lax[2].set_ylabel('relative # of repeats for max. Hit/Miss')
+
+def showMostActiveMNeuronsPerSeq(lSimilarSeqs, seqs2plot, dCumAct, topM):
+  norm_seq_act_up = []
+  norm_seq_act_down = []
+  NB_motorneurons = 300 # 300 EMUP and 300 EMDOWN
+  NBthresh = int(NB_motorneurons - (0.01*topM*NB_motorneurons))
+  for i in range(len(dCumAct['EMUP'])):
+    cact_up = dCumAct['EMUP'][i] 
+    # total activity of 300 neurons for each seq
+    if np.amax(cact_up)>0:
+      cumactup = np.cumsum(cact_up)[-1]
+      norm_seq_act_up.append(np.divide(cact_up,cumactup))
+    else:
+      norm_seq_act_up.append(cact_up) 
+    cact_down = dCumAct['EMDOWN'][i]
+    if np.amax(cact_down)>0:
+      cumactdown = np.cumsum(cact_down)[-1]
+      norm_seq_act_down.append(np.divide(cact_down,cumactdown))
+    else:
+      norm_seq_act_down.append(cact_down)
+  norm_seq_act_up = np.array(norm_seq_act_up)
+  norm_seq_act_down = np.array(norm_seq_act_down)
+  # for each sequence sort neurons based on the norm. activity (mostly active neurons)
+  sorted_ids_actup = np.zeros(shape=norm_seq_act_up.shape)
+  sorted_ids_actdown = np.zeros(shape=norm_seq_act_down.shape)
+  for i in range(norm_seq_act_up.shape[0]):
+    sorted_ids_actup[i,:]=np.argsort(norm_seq_act_up[i,:])
+    sorted_ids_actdown[i,:]=np.argsort(norm_seq_act_down[i,:])
+  hist_topM_allseqs_actup_allrepeats = np.zeros((300,len(seqs2plot)))
+  hist_topM_allseqs_actdown_allrepeats = np.zeros((300,len(seqs2plot)))
+  for seqInds in range(len(seqs2plot)):
+    cseqInds = lSimilarSeqs[seqs2plot[seqInds]]
+    cseq_sorted_ids_actup = sorted_ids_actup[cseqInds,:]
+    cseq_sorted_ids_actdown = sorted_ids_actdown[cseqInds,:]
+    topM_cseq_actup_allrepeats = cseq_sorted_ids_actup[:,NBthresh:]
+    topM_cseq_actdown_allrepeats = cseq_sorted_ids_actdown[:,NBthresh:]
+    for i in range(NB_motorneurons):
+      hist_topM_allseqs_actup_allrepeats[i,seqInds] = np.where(topM_cseq_actup_allrepeats==i)[0].shape[0]/len(cseqInds)
+      hist_topM_allseqs_actdown_allrepeats[i,seqInds] = np.where(topM_cseq_actdown_allrepeats==i)[0].shape[0]/len(cseqInds)
+  fig, axs = plt.subplots(1, 2, figsize=(12,4))
+  cb1 = fig.add_axes([0.92, 0.2, 0.01, 0.6])
+  cb0 = fig.add_axes([0.5, 0.2, 0.01, 0.6])
+  lax = axs.ravel()
+  pcm0 = lax[0].imshow(hist_topM_allseqs_actup_allrepeats.T)
+  lax[0].set_xlabel('EMUP-Neuron')
+  lax[0].set_ylabel('seq #')
+  plt.colorbar(pcm0, cax = cb0)
+  pcm1 = lax[1].imshow(hist_topM_allseqs_actdown_allrepeats.T)
+  lax[1].set_xlabel('EMDOWN-Neuron')
+  plt.colorbar(pcm1, cax = cb1)
+  return hist_topM_allseqs_actup_allrepeats, hist_topM_allseqs_actdown_allrepeats
+
+def getActCorrAcrossAreasRepWiseIndiv(dStepAct,cseqInds):
+  # must reduce some repetitive code by replacing it with functions - Haroon
+  cseq_stepact_up = np.array(dStepAct['EMUP'])[cseqInds]  
+  cseq_stepact_v1 = np.array(dStepAct['EV1'])[cseqInds]  
+  cseq_stepact_ea = np.array(dStepAct['EA'])[cseqInds]  
+  cseq_stepact_ea2 = np.array(dStepAct['EA2'])[cseqInds]  
+  cseq_stepact_down = np.array(dStepAct['EMDOWN'])[cseqInds]  
+  corrs_v1_up = []
+  corrs_v1_down = []
+  corrs_ea_up = []
+  corrs_ea_down = []
+  corrs_ea2_up = []
+  corrs_ea2_down = []
+  corrs_up_down = []
+  for i in range(len(cseq_stepact_v1)):
+    v1 = np.array(cseq_stepact_v1[i])
+    ea = np.array(cseq_stepact_ea[i])
+    ea2 = np.array(cseq_stepact_ea2[i])
+    up = np.array(cseq_stepact_up[i])
+    down = np.array(cseq_stepact_down[i])
+    v1_up = []
+    v1_down = []
+    ea_up = []
+    ea_down = []
+    ea2_up = []
+    ea2_down = []
+    up_down = []
+    for j in range(v1.shape[1]):
+      v1_cN = v1[:,j]
+      for k in range(up.shape[1]):
+        up_cN = up[:,k]
+        down_cN = down[:,k]
+        c1,p1 = pearsonr(v1_cN,up_cN)
+        c2,p2 = pearsonr(v1_cN,down_cN)
+        v1_up.append(c1)
+        v1_down.append(c2)
+    corrs_v1_up.append(v1_up)    
+    corrs_v1_down.append(v1_down)    
+    for j in range(ea.shape[1]):
+      ea_cN = ea[:,j]
+      for k in range(up.shape[1]):
+        up_cN = up[:,k]
+        down_cN = down[:,k]
+        c1,p1 = pearsonr(ea_cN,up_cN)
+        c2,p2 = pearsonr(ea_cN,down_cN)
+        ea_up.append(c1)
+        ea_down.append(c2)
+    corrs_ea_up.append(ea_up)    
+    corrs_ea_down.append(ea_down)    
+    for j in range(ea2.shape[1]):
+      ea2_cN = ea2[:,j]
+      for k in range(up.shape[1]):
+        up_cN = up[:,k]
+        down_cN = down[:,k]
+        c1,p1 = pearsonr(ea2_cN,up_cN)
+        c2,p2 = pearsonr(ea2_cN,down_cN)
+        ea2_up.append(c1)
+        ea2_down.append(c2)
+    corrs_ea2_up.append(ea2_up)    
+    corrs_ea2_down.append(ea2_down)    
+    for j in range(up.shape[1]):
+      up_cN = up[:,j]
+      for k in range(down.shape[1]):
+        down_cN = down[:,k]
+        c1,p1 = pearsonr(up_cN,down_cN)
+        up_down.append(c1)
+    corrs_up_down.append(up_down)    
+  return corrs_v1_up, corrs_v1_down, corrs_ea_up, corrs_ea_down, corrs_ea2_up, corrs_ea2_down, corrs_up_down
+
+def getIntermActCorrs(dStepAct,cseqInds):
+  cseq_stepact_v1 = np.array(dStepAct['EV1'])[cseqInds]
+  cseq_stepact_ea = np.array(dStepAct['EA'])[cseqInds]
+  cseq_stepact_ea2 = np.array(dStepAct['EA2'])[cseqInds]
+  corrs_v1_ea = []
+  corrs_v1_ea2 = []
+  corrs_ea_ea2 = []
+  for i in range(len(cseq_stepact_v1)):
+    v1 = np.array(cseq_stepact_v1[i])
+    ea = np.array(cseq_stepact_ea[i])
+    ea2 = np.array(cseq_stepact_ea2[i])
+    v1_ea = []
+    v1_ea2 = []
+    ea_ea2 = []
+    for j in range(v1.shape[1]):
+      v1_cN = v1[:,j]
+      for k in range(ea.shape[1]):
+        ea_cN = ea[:,k]
+        c1,p1 = pearsonr(v1_cN,ea_cN)
+        v1_ea.append(c1)
+      for l in range(ea2.shape[1]):
+        ea2_cN = ea2[:,l]
+        c2,p2 = pearsonr(v1_cN,ea2_cN)
+        v1_ea2.append(c2)
+    corrs_v1_ea.append(v1_ea)
+    corrs_v1_ea2.append(v1_ea2)
+    for j in range(ea.shape[1]):
+      ea_cN = ea[:,j]
+      for l in range(ea2.shape[1]):
+        ea2_cN = ea2[:,l]
+        c3,p3 = pearsonr(ea_cN,ea2_cN)
+        ea_ea2.append(c3)
+    corrs_ea_ea2.append(ea_ea2)
+  return corrs_v1_ea, corrs_v1_ea2, corrs_ea_ea2
+
+def getActCorrs(lSimilarSeqs,seqs2plot,dStepAct,I):
+  cseqIndsI = lSimilarSeqs[seqs2plot[I]]
+  lens = []
+  for seq in cseqIndsI:
+    lens.append(len(dStepAct['EMUP'][seq]))
+  ul = np.unique(lens)
+  ul_inds = np.add(np.where(np.subtract(ul[1:],ul[0:-1])>12)[0],1)
+  if ul[0]>0:
+    gls = [ul[0]]
+  else:
+    gls = []
+  for inds in ul_inds:
+    gls.append(ul[inds])
+  cseqIndsI_d = []
+  for l in gls:
+    c = []
+    for j in range(len(lens)):
+      if lens[j]>=l and lens[j]<l+12:
+        c.append(j)
+    cseqIndsI_d.append(c)
+  Mcorrs = []
+  Rcorrs = []
+  for subseqs in range(len(cseqIndsI_d)):  
+    seqI = np.array(cseqIndsI)[cseqIndsI_d[subseqs]]
+    l = gls[subseqs]
+    actI = np.zeros((len(seqI),l,600))
+    count = 0
+    for cseq in seqI:
+      cactup = np.array(dStepAct['EMUP'][cseq])
+      cactdown = np.array(dStepAct['EMDOWN'][cseq])
+      actI[count,:,0:cactup.shape[1]] = cactup[0:l,:]
+      actI[count,:,cactup.shape[1]:] = cactdown[0:l,:]
+      count+=1
+    McorrsI = []
+    for m in range(actI.shape[0]):
+      cAct = actI[m,:,:]
+      cCorrs = []
+      for i in range(600):
+        for j in range(i+1,600):
+          c,p = pearsonr(cAct[:,i].flat,cAct[:,j].flat)
+          cCorrs.append(c)
+      McorrsI.append(cCorrs)
+    Mcorrs.append(McorrsI)
+    RcorrsI = []
+    for i in range(actI.shape[0]):
+      iAct = actI[i,:,:].flat
+      for j in range(i+1,actI.shape[0]):
+        jAct = actI[j,:,:].flat
+        c,p = pearsonr(iAct,jAct)
+        RcorrsI.append(c)
+    Rcorrs.append(RcorrsI)
+  return Mcorrs, Rcorrs
+
+# Instead of computing correlations using the activity for all steps per seq. we will use step by step activity.
+
+def getActCorrsStepWise(lSimilarSeqs,seqs2plot,dStepAct,I):
+  cseqIndsI = lSimilarSeqs[seqs2plot[I]]
+  lens = []
+  for seq in cseqIndsI:
+    lens.append(len(dStepAct['EMUP'][seq]))
+  ul = np.unique(lens)
+  ul_inds = np.add(np.where(np.subtract(ul[1:],ul[0:-1])>12)[0],1)
+  if ul[0]>0:
+    gls = [ul[0]]
+  else:
+    gls = []
+  for inds in ul_inds:
+    gls.append(ul[inds])
+  cseqIndsI_d = []
+  for l in gls:
+    c = []
+    for j in range(len(lens)):
+      if lens[j]>=l and lens[j]<l+12:
+        c.append(j)
+    cseqIndsI_d.append(c)
+  RcorrsSteps = []
+  for subseqs in range(len(cseqIndsI_d)):  
+    seqI = np.array(cseqIndsI)[cseqIndsI_d[subseqs]]
+    l = gls[subseqs]
+    actI = np.zeros((len(seqI),l,600))
+    count = 0
+    for cseq in seqI:
+      cactup = np.array(dStepAct['EMUP'][cseq])
+      cactdown = np.array(dStepAct['EMDOWN'][cseq])
+      actI[count,:,0:cactup.shape[1]] = cactup[0:l,:]
+      actI[count,:,cactup.shape[1]:] = cactdown[0:l,:]
+      count+=1
+    RcorrsI = []
+    for i in range(actI.shape[0]):
+      iAct = actI[i,:,:]
+      for j in range(i+1,actI.shape[0]):
+        jAct = actI[j,:,:]
+        cCorrs = []
+        for k in range(jAct.shape[0]):
+          c,p = pearsonr(iAct[k,:].flat,jAct[k,:].flat)
+          cCorrs.append(c)
+        RcorrsI.append(cCorrs)
+    RcorrsSteps.append(RcorrsI)
+  return RcorrsSteps
+
+def getconcatactioninputs (lfn):
+  # concatenate the InputImages data frames together so can look at repeated input patterns.
+  # lfn is a list of actionrewards filenames from the simulation
+  pdimg = None
+  for fn in lfn:
+    cfInputImages = loadInputImages(fn) 
+    if pdimg is None:
+      pdimg = cfInputImages
+    else:
+      pdimg = np.concatenate((pdimg,cfInputImages),axis=0)
+  return pdimg
+
+def plotSeqPerf(lSimilarSeqs,seqs2plot,seqsBegs,seqsEnds,InputImages,dCumAct,hitsMiss,seqNB,plotact=False):
+  if plotact:
+    fig,axs = plt.subplots(2,2,figsize=(6,6))
+  else:
+    fig,axs = plt.subplots(2,1,figsize=(4,6))
+  lax=axs.ravel()
+  cseqInds = lSimilarSeqs[seqs2plot[seqNB]]
+  cseqInput = np.zeros(shape=(len(cseqInds),InputImages.shape[1],InputImages.shape[2]))
+  for j in range(len(cseqInds)):
+    cseqInput[j,:,:] = np.sum(InputImages[seqsBegs[cseqInds[j]]:seqsEnds[cseqInds[j]],:,:],0)
+  lax[0].imshow(np.sum(cseqInput,0))
+  lax[0].set_yticks([])
+  lax[0].set_xticks([])
+  cseq_cumact_up = np.array(dCumAct['EMUP'])[cseqInds,:]
+  cseq_cumact_down = np.array(dCumAct['EMDOWN'])[cseqInds,:]
+  goodInds = np.where(cseq_cumact_up[:,0]<np.mean(cseq_cumact_up[:,0])+2*np.std(cseq_cumact_up[:,0]))[0]
+  if len(goodInds)==0:
+    goodInds = np.where(np.sum(cseq_cumact_up,1)<np.mean(np.sum(cseq_cumact_up,1))+2*np.std(np.sum(cseq_cumact_up,1)))[0]
+  if plotact:
+    lax[1].plot(np.sum(cseq_cumact_up[goodInds,:],1),'b-o')
+    lax[1].plot(np.sum(cseq_cumact_down[goodInds,:],1),'r-o')
+    lax[1].legend(('EMUP','EMDOWN'))
+    lax[1].set_ylabel('# of spikes')
+  cHitsMiss = []
+  for j in range(len(cseqInds)):
+    if j in goodInds:
+      cHitsMiss.append(hitsMiss[cseqInds[j]][-1])
+  cHitsMiss = np.array(cHitsMiss)
+  hits = np.where(cHitsMiss==1,cHitsMiss,0)
+  miss = np.where(cHitsMiss==-1,-1*cHitsMiss,0)
+  if plotact:
+    tr = 3
+    lax[2].set_axis_off()
+  else:
+    tr = 1
+  if np.sum(miss)==0:
+    lax[tr].plot(np.cumsum(hits),'k-o')
+    lax[tr].set_xlabel('# of repeats')
+    lax[tr].set_ylabel('Hits')
+    lax[tr].set_ylim((0,np.sum(hits)))
+  else:
+    lax[tr].plot(np.divide(np.cumsum(hits),np.cumsum(miss)),'k-o')
+    lax[tr].set_xlabel('# of repeats')
+    lax[tr].set_ylabel('Hits/Miss')
+    lax[tr].set_ylim((0,2))
+
+def gethitmissallseqs(lSimilarSeqs,seqs2plot,dCumAct,hitsMiss):
+  all_hits_miss = []
+  for i in range(len(seqs2plot)):
+    cseqInds = lSimilarSeqs[seqs2plot[i]]
+    cHitsMiss = []
+    cseq_cumact_up = np.array(dCumAct['EMUP'])[cseqInds,:]
+    goodInds = np.where(cseq_cumact_up[:,0]<np.mean(cseq_cumact_up[:,0])+2*np.std(cseq_cumact_up[:,0]))[0]
+    if len(goodInds)==0:
+      goodInds = np.where(np.sum(cseq_cumact_up,1)<np.mean(np.sum(cseq_cumact_up,1))+2*np.std(np.sum(cseq_cumact_up,1)))[0]
+    for j in range(len(cseqInds)):
+      if j in goodInds:
+        cHitsMiss.append(hitsMiss[cseqInds[j]][-1])
+    cHitsMiss = np.array(cHitsMiss)
+    hits = np.where(cHitsMiss==1,cHitsMiss,0)
+    miss = np.where(cHitsMiss==-1,-1*cHitsMiss,0)
+    all_hits_miss.append([np.cumsum(hits)[-1],np.cumsum(miss)[-1]])
+  return np.array(all_hits_miss)
 
 """
 current_time_stepNB = 0
