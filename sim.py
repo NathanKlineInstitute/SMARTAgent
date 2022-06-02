@@ -1850,9 +1850,10 @@ def finishSim ():
     if sim.saveAssignedFiringRates: saveAssignedFiringRates(sim.AIGame.dAllFiringRates)
     if dconf['sim']['doquit']: quit()
   
-def trainAgent (t):
+def trainAgent (simTime):
   """ training interface between simulation and game environment
   """
+  t = simTime
   global NBsteps, epCount, proposed_actions, total_hits, fid4, tstepPerAction
   critic = 0
   vec = h.Vector()
