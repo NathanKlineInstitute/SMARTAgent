@@ -39776,7 +39776,7 @@ ylim((0,32e3))
 savefig('gif/22jan21_21oct29_ES_FF_sigma0.1_cycle_a0.png') # 
 
 * 22jan24
-** check output from log file
+** check output from log file (evaluation of ES on simple pong)
 
 python
 
@@ -39812,4 +39812,28 @@ savefig('gif/22jan24_SimpPong_ES_Eval_a0.png')
 [[./gif/22jan24_SimpPong_ES_Eval_a0.png]]
 
 clearly showing improvement ... will see how much farther it goes (have ~300 more gen to evaluate)
+
+* 22jun1
+** test simplified stdp.mod
+
+removed pure STDP rule from simplified version; and adjusted interval rule to be non-negative (rather than > 1 ms) since that
+constraint was previously added due to the pure STDP rule (net_send)
+
+./myrun 30 simFullHA.json
+
+python -i simdat.py backupcfg/22jun2_test_adj_stdp_sim.json
+
+fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
+[[./gif/22jun3_22jun2_test_adj_stdp__with_reward_input.mp4]]
+
+got better perfomance ~0.53 compared to fig 3 step 0 (~0.38) in plos1 paper; will try multiple steps -- or, just the original stdp.mod file to compare
+
+* 22jun3
+** try single step of original stdp.mod -- with same json config (simFullHA.json) (22jun3_test_orig_stdp_)
+
+cd ~/SMARTAgent
+cp ~/mod/stdp.mod.original ~/mod
+nrnivmodl mod
+
+./myrun 30 simFullHA.json
 
