@@ -39837,3 +39837,57 @@ nrnivmodl mod
 
 ./myrun 30 simFullHA.json
 
+python -i simdat.py backupcfg/22jun3_test_orig_stdp_sim.json
+
+fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
+[[./gif/22jun3_22jun3_test_orig_stdp__with_reward_input.mp4]]
+
+57./106 # 0.5377358490566038
+
+* 22jun13
+** weight gain
+
+in old version intf6.mod the STDP/RL rule used weight gain variable which was multiplied
+with each individual synaptic weight. 
+
+    ppre->wgain[idx] += EPOTW * inc * exp( -d / tau ); // increment the wgain of the synapse
+
+* 22jun15
+** weight gain (22jun15_test_gain_stdp_)
+
+cd ~/SMARTAgent
+cp ~/mod/stdp.mod.gain ~/mod
+nrnivmodl mod
+
+./myrun 30 simFullHA.json
+
+final was 60/118 ... not better than previous
+
+python -i simdat.py backupcfg/22jun15_test_gain_stdp_sim.json
+
+fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
+[[./gif/22jun15_22jun15_test_gain_stdp__with_reward_input.mp4]]
+
+hmm, but might be due to weights increasing too much ... note the high firing rates ... 
+
+EV1 0.15 Hz
+EV1DE 0.05 Hz
+EV1DNE 0.57 Hz
+EV1DN 1.35 Hz
+EV1DNW 0.22 Hz
+EV1DW 0.01 Hz
+EV1DSW 0.15 Hz
+EV1DS 1.34 Hz
+EV1DSE 0.68 Hz
+EA 0.22 Hz
+EA2 0.21 Hz
+EMDOWN 22.92 Hz
+EMUP 22.77 Hz
+IM 71.17 Hz
+IML 109.52 Hz
+
+ax=plotPerf(actreward,yl=(0,1.7))
+savefig(gifpath()+'perf.png') # [[./gif/22jun15_22jun15_test_gain_stdp_perf.png]]
+
+could reduce RLhebbwt and try again ... 
+
