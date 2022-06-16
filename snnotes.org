@@ -39891,3 +39891,58 @@ savefig(gifpath()+'perf.png') # [[./gif/22jun15_22jun15_test_gain_stdp_perf.png]
 
 could reduce RLhebbwt and try again ... 
 
+22jun15_test_gain_stdp_B_
+
+cut RL -> AMPA -> RLhebbwt from 0.5 to 0.25 ... 
+
+./myrun 30 simFullHA.json
+
+final hit/miss score: 62/116. # 0.5344827586206896
+
+python -i simdat.py backupcfg/22jun15_test_gain_stdp_B_sim.json
+
+EV1 0.15 Hz
+EV1DE 0.05 Hz
+EV1DNE 0.59 Hz
+EV1DN 1.39 Hz
+EV1DNW 0.19 Hz
+EV1DW 0.04 Hz
+EV1DSW 0.16 Hz
+EV1DS 1.39 Hz
+EV1DSE 0.62 Hz
+EA 0.21 Hz
+EA2 0.21 Hz
+EMDOWN 22.0 Hz
+EMUP 22.07 Hz
+IM 72.13 Hz
+IML 108.46 Hz
+
+ax=plotPerf(actreward,yl=(0,2))
+savefig(gifpath()+'perf.png') # [[./gif/22jun16_22jun15_test_gain_stdp_B_perf.png]]
+
+# fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
+
+tmax=500e3
+drawraster(dspkT,dspkID,tlim=(tmax-5e3,tmax));
+savefig(gifpath()+'rast.png') # [[./gif/22jun16_22jun15_test_gain_stdp_B_rast.png]]
+
+pravgrates(dspkT,dspkID,dnumc,tlim=(tmax-5e3,tmax))
+
+EV1 0.16 Hz
+EV1DE 0.01 Hz
+EV1DNE 0.27 Hz
+EV1DN 1.32 Hz
+EV1DNW 0.49 Hz
+EV1DW 0.0 Hz
+EV1DSW 0.1 Hz
+EV1DS 1.29 Hz
+EV1DSE 1.24 Hz
+EA 0.27 Hz
+EA2 0.31 Hz
+EMDOWN 32.91 Hz
+EMUP 33.02 Hz
+IM 79.8 Hz
+IML 134.71 Hz
+
+those rates too fast ...
+
