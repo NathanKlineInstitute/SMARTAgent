@@ -19,7 +19,11 @@
         "yball": 80,
         "yracket": 40,
 	"dodraw": 0,
-	"racket_dy": 5
+	"racket_dy": 5,
+	"possible_ball_dy": [1,1,1,1,1,1,2,2,2,2,3,3,3],
+	"possible_ball_dx": [1,1,1,1,1,1,2,2,2,2,3,3,3],
+	"possible_ball_ypos": [40,60,80,100,120],
+	"top_bottom_rule": 0
     },
     "wiggle": 6,
     "stochmove": 0,
@@ -47,7 +51,7 @@
     "verbose": 0,
     "stayStepLim": 0,
     "simtype": {
-        "ResumeSim": 1,
+        "ResumeSim": 0,
         "ResumeSimFromFile": "data/21jan11_falcor_RL3_F6__step_7_synWeights_final.pkl"
     },
     "sim": {
@@ -62,7 +66,7 @@
         "RLFakeUpRule": 0,
         "RLFakeDownRule": 0,
         "RLFakeStayRule": 0,
-        "name": "21jan11_falcor_RL3_F6__step_8_",
+        "name": "22jun15_test_gain_stdp_",
         "doquit": 1,
         "doplot": 0,
         "saveCellSecs": 0,
