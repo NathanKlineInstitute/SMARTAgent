@@ -39946,3 +39946,69 @@ IML 134.71 Hz
 
 those rates too fast ...
 
+* 22jun16
+** 22jun16_test_gain_stdp_C_
+
+reduce RLhebbwt down to 0.05
+
+./myrun 30 simFullHA.json
+
+python -i simdat.py backupcfg/22jun16_test_gain_stdp_C_sim.json
+
+EV1 0.15 Hz
+EV1DE 0.07 Hz
+EV1DNE 0.59 Hz
+EV1DN 1.21 Hz
+EV1DNW 0.24 Hz
+EV1DW 0.03 Hz
+EV1DSW 0.18 Hz
+EV1DS 1.23 Hz
+EV1DSE 0.62 Hz
+EA 0.18 Hz
+EA2 0.17 Hz
+EMDOWN 12.77 Hz
+EMUP 12.81 Hz
+IM 53.56 Hz
+IML 69.29 Hz
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/22jun16_22jun16_test_gain_stdp_C_perf.png]]
+
+tmax=500e3
+drawraster(dspkT,dspkID,tlim=(tmax-5e3,tmax));
+savefig(gifpath()+'rast.png') # [[./gif/22jun16_22jun16_test_gain_stdp_C_rast.png]]
+
+pravgrates(dspkT,dspkID,dnumc,tlim=(tmax-5e3,tmax))
+
+EV1 0.15 Hz
+EV1DE 0.0 Hz
+EV1DNE 0.97 Hz
+EV1DN 1.15 Hz
+EV1DNW 0.0 Hz
+EV1DW 0.0 Hz
+EV1DSW 0.0 Hz
+EV1DS 1.12 Hz
+EV1DSE 0.89 Hz
+EA 0.16 Hz
+EA2 0.12 Hz
+EMDOWN 14.13 Hz
+EMUP 14.35 Hz
+IM 56.62 Hz
+IML 76.24 Hz
+
+firing rates still too high ...
+
+
+final score (hit/miss): 60/113 = 0.53
+
+beginning rates were too low, final rates too high ... 
+
+that's where noise/input-output balancing would help ... 
+
+** 22jun16_test_gain_stdp_D_
+
+reduce RLhebbwt down to 0.01
+
+./myrun 30 simFullHA.json
+
+python -i simdat.py backupcfg/22jun16_test_gain_stdp_D_sim.json

@@ -180,7 +180,10 @@ def loadsimdat (name=None,getactmap=True,lpop = allpossible_pops): # load simula
   name = getsimname(name)
   print('loading data from', name)
   conf.dconf = conf.readconf('backupcfg/'+name+'sim.json')
-  simConfig = pickle.load(open('data/'+name+'simConfig.pkl','rb'))
+  try:
+    simConfig = pickle.load(open('data/'+name+'simConfig.pkl','rb'))
+  except:
+    simConfig = pickle.load(open('data/'+name+'simConfig_data.pkl','rb'))
   dstartidx,dendidx={},{} # starting,ending indices for each population
   for p in simConfig['net']['pops'].keys():
     if simConfig['net']['pops'][p]['tags']['numCells'] > 0:
