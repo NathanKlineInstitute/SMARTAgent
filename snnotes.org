@@ -40012,3 +40012,51 @@ reduce RLhebbwt down to 0.01
 ./myrun 30 simFullHA.json
 
 python -i simdat.py backupcfg/22jun16_test_gain_stdp_D_sim.json
+
+EV1 0.14 Hz
+EV1DE 0.05 Hz
+EV1DNE 0.54 Hz
+EV1DN 1.07 Hz
+EV1DNW 0.2 Hz
+EV1DW 0.02 Hz
+EV1DSW 0.15 Hz
+EV1DS 1.08 Hz
+EV1DSE 0.68 Hz
+EA 0.16 Hz
+EA2 0.15 Hz
+EMDOWN 7.08 Hz
+EMUP 7.07 Hz
+IM 32.67 Hz
+IML 36.78 Hz
+
+more reasonable rates ...
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/22jun17_22jun16_test_gain_stdp_D_perf.png]]
+
+but perf lower ... 
+
+tmax=500e3
+drawraster(dspkT,dspkID,tlim=(tmax-5e3,tmax));
+savefig(gifpath()+'rast.png') # [[./gif/22jun17_22jun16_test_gain_stdp_D_rast.png]]
+
+pravgrates(dspkT,dspkID,dnumc,tlim=(tmax-5e3,tmax))
+
+EV1 0.15 Hz
+EV1DE 0.0 Hz
+EV1DNE 0.66 Hz
+EV1DN 0.92 Hz
+EV1DNW 0.6 Hz
+EV1DW 0.0 Hz
+EV1DSW 0.11 Hz
+EV1DS 0.84 Hz
+EV1DSE 0.64 Hz
+EA 0.16 Hz
+EA2 0.14 Hz
+EMDOWN 7.91 Hz
+EMUP 8.09 Hz
+IM 35.88 Hz
+IML 43.01 Hz
+
+could continue one step ... not too much of a point since unlikely to differ substantially ... 
+
