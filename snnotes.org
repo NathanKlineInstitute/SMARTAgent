@@ -40060,3 +40060,19 @@ IML 43.01 Hz
 
 could continue one step ... not too much of a point since unlikely to differ substantially ... 
 
+* 22jun17
+** stdp rules
+
+1) pre -> 2) post
+triggers forward eligibility trace
+
+1) pre -> 2) post -> 3) pre
+1,2 trigger forward eligibility trace (pre before post)
+2,3 trigger backward eligibility trace (post before pre); should 2,3 turn off the forward eligibility trace?
+
+try with turning off forward eligibility trace when presynaptic spike occurs ... 
+
+22jun17_test_stdp_E_
+
+./myrun 30 simFullHA.json
+

@@ -170,6 +170,7 @@ NET_RECEIVE (w) {
         if ((RLon == 1) && (-interval <= RLwindanti)) { tlastantielig = t }
       }
       tlastpre = t : Remember the current spike time for next NET_RECEIVE.
+      tlasthebbelig = -1 : presynaptic spike occurred; turn off forward eligibility trace until a postsynaptic spike occurs
     : Else, if we receive a negative weight value, we are receiving a post-synaptic spike
     : (and thus need to check for a Hebbian event, since the pre-synaptic weight must be earlier).
     }
@@ -187,6 +188,7 @@ NET_RECEIVE (w) {
         }
       }
       tlastpost = t : Remember the current spike time for next NET_RECEIVE.
+      tlastantielig = -1 : postsynaptic spike occurred; turn off backward eligibility trace until a presynaptic spike occurs		      
     }
   }
   : if (verbose > 0)  { printf("t=%f (AFTER) tlaspre=%f, tlastpost=%f, flag=%f, w=%f, deltaw=%f \n",t,tlastpre, tlastpost,flag,w,deltaw) }
@@ -263,8 +265,8 @@ FUNCTION softthreshold (rawwc) {
 }
 
 PROCEDURE adjustweight (wc) {
-   : synweight = synweight + wc : apply the synaptic modification, and then clip the weight if necessary to make sure it is between wbase and wmax.
-   synweight = synweight + origweight * wc
+   synweight = synweight + wc : apply the synaptic modification, and then clip the weight if necessary to make sure it is between wbase and wmax.
+   : synweight = synweight + origweight * wc
    if (synweight > wmax) { synweight = wmax }
    if (synweight < wbase) { synweight = wbase }
 }
