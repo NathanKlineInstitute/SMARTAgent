@@ -40070,9 +40070,90 @@ triggers forward eligibility trace
 1,2 trigger forward eligibility trace (pre before post)
 2,3 trigger backward eligibility trace (post before pre); should 2,3 turn off the forward eligibility trace?
 
-try with turning off forward eligibility trace when presynaptic spike occurs ... 
+try with turning off forward eligibility trace when presynaptic spike occurs ... (only turn on after the
+next postsynaptic spike)
 
 22jun17_test_stdp_E_
+
+./myrun 30 simFullHA.json
+
+* 22jun18
+** check last output
+
+python -i simdat.py backupcfg/22jun17_test_stdp_E_sim.json
+
+EV1 0.15 Hz
+EV1DE 0.11 Hz
+EV1DNE 0.56 Hz
+EV1DN 1.23 Hz
+EV1DNW 0.19 Hz
+EV1DW 0.04 Hz
+EV1DSW 0.15 Hz
+EV1DS 1.25 Hz
+EV1DSE 0.64 Hz
+EA 0.19 Hz
+EA2 0.18 Hz
+EMDOWN 13.92 Hz
+EMUP 13.95 Hz
+IM 52.66 Hz
+IML 70.99 Hz
+
+ax=plotPerf(actreward,yl=(0,2))
+savefig(gifpath()+'perf.png') # [[./gif/22jun18_22jun17_test_stdp_E_perf.png]]
+
+tmax=500e3
+drawraster(dspkT,dspkID,tlim=(tmax-5e3,tmax));
+savefig(gifpath()+'rast.png') # [[./gif/22jun18_22jun17_test_stdp_E_rast.png]]
+
+rates seem to get too high ... 
+
+pravgrates(dspkT,dspkID,dnumc,tlim=(tmax-5e3,tmax))
+
+EV1 0.15 Hz
+EV1DE 0.01 Hz
+EV1DNE 0.8 Hz
+EV1DN 1.28 Hz
+EV1DNW 0.35 Hz
+EV1DW 0.0 Hz
+EV1DSW 0.28 Hz
+EV1DS 1.29 Hz
+EV1DSE 0.85 Hz
+EA 0.26 Hz
+EA2 0.29 Hz
+EMDOWN 27.63 Hz
+EMUP 27.52 Hz
+IM 88.05 Hz
+IML 137.01 Hz
+
+final hit/miss = 60/131. = < 50%
+
+what are firing rates ~75 s?
+pravgrates(dspkT,dspkID,dnumc,tlim=(70e3,75e3))
+
+EV1 0.14 Hz
+EV1DE 0.0 Hz
+EV1DNE 1.0 Hz
+EV1DN 0.88 Hz
+EV1DNW 0.58 Hz
+EV1DW 0.0 Hz
+EV1DSW 0.0 Hz
+EV1DS 0.86 Hz
+EV1DSE 0.55 Hz
+EA 0.15 Hz
+EA2 0.13 Hz
+EMDOWN 6.94 Hz
+EMUP 6.98 Hz
+IM 36.08 Hz
+IML 39.69 Hz
+
+much more reasonable ... and that's when performance still high
+
+fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
+[[./gif/22jun18_22jun17_test_stdp_E__with_reward_input.mp4]]
+
+** another run with lower RLhebbwt (22jun18_test_stdp_F_)
+
+RLhebbwt of 0.25 instead of 0.5
 
 ./myrun 30 simFullHA.json
 
