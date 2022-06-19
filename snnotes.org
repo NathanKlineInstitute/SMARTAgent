@@ -40157,3 +40157,115 @@ RLhebbwt of 0.25 instead of 0.5
 
 ./myrun 30 simFullHA.json
 
+python -i simdat.py backupcfg/22jun18_test_stdp_F_sim.json
+
+EV1 0.14 Hz
+EV1DE 0.11 Hz
+EV1DNE 0.54 Hz
+EV1DN 1.11 Hz
+EV1DNW 0.19 Hz
+EV1DW 0.02 Hz
+EV1DSW 0.11 Hz
+EV1DS 1.1 Hz
+EV1DSE 0.71 Hz
+EA 0.16 Hz
+EA2 0.15 Hz
+EMDOWN 8.46 Hz
+EMUP 8.44 Hz
+IM 38.72 Hz
+IML 45.6 Hz
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/22jun18_22jun18_test_stdp_F_perf.png]]
+
+first perf goes up, then seems to go ~straight down...
+
+drawraster(dspkT,dspkID,tlim=(128e3,133e3));
+savefig(gifpath()+'rast.png') # [[./gif/22jun18_22jun18_test_stdp_F_rast.png]]
+
+pravgrates(dspkT,dspkID,dnumc,tlim=(128e3,133e3))
+
+EV1 0.14 Hz
+EV1DE 0.0 Hz
+EV1DNE 1.35 Hz
+EV1DN 0.96 Hz
+EV1DNW 0.0 Hz
+EV1DW 0.0 Hz
+EV1DSW 0.0 Hz
+EV1DS 0.8 Hz
+EV1DSE 0.81 Hz
+EA 0.18 Hz
+EA2 0.2 Hz
+EMDOWN 9.25 Hz
+EMUP 9.23 Hz
+IM 40.0 Hz
+IML 48.89 Hz
+
+rates not terrible ... but why does perf start decaying in middle of sim ... 
+
+fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
+[[./gif/22jun18_22jun18_test_stdp_F__with_reward_input.mp4]]
+
+** another run with lower RLhebbwt (22jun18_test_stdp_G_)
+
+RLhebbwt of 0.125 instead of 0.5
+
+./myrun 30 simFullHA.json
+
+python -i simdat.py backupcfg/22jun18_test_stdp_G_sim.json
+
+EV1 0.14 Hz
+EV1DE 0.08 Hz
+EV1DNE 0.6 Hz
+EV1DN 1.04 Hz
+EV1DNW 0.2 Hz
+EV1DW 0.03 Hz
+EV1DSW 0.15 Hz
+EV1DS 1.05 Hz
+EV1DSE 0.65 Hz
+EA 0.15 Hz
+EA2 0.13 Hz
+EMDOWN 6.48 Hz
+EMUP 6.47 Hz
+IM 32.22 Hz
+IML 35.27 Hz
+
+ax=plotPerf(actreward,yl=(0,1))
+savefig(gifpath()+'perf.png') # [[./gif/22jun19_22jun18_test_stdp_G_perf.png]]
+
+tmax=500e3; drawraster(dspkT,dspkID,tlim=(tmax-5e3,tmax)); tl(); savefig(gifpath()+'rast.png') 
+[[./gif/22jun19_22jun18_test_stdp_G_rast.png]]
+
+pravgrates(dspkT,dspkID,dnumc,tlim=(tmax-5e3,tmax))
+
+EV1 0.14 Hz
+EV1DE 0.0 Hz
+EV1DNE 0.65 Hz
+EV1DN 1.08 Hz
+EV1DNW 0.68 Hz
+EV1DW 0.0 Hz
+EV1DSW 0.53 Hz
+EV1DS 1.03 Hz
+EV1DSE 0.39 Hz
+EA 0.17 Hz
+EA2 0.13 Hz
+EMDOWN 7.54 Hz
+EMUP 7.68 Hz
+IM 47.76 Hz
+IML 49.6 Hz
+
+fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
+[[./gif/22jun19_22jun18_test_stdp_G__with_reward_input.mp4]]
+
+
+* 22jun19
+** ababab
+
+what (should) happen(s) with eligibility traces in sequence of pre -> post -> pre -> post ... ?
+
+** multistep (22jun19_test_stdp_H_)
+
+use RLhebbwt of 0.08 ... with the modified stdp.mod ... 
+
+python multistepSim.py simFullHA.json 30 20 22jun19_test_stdp_H_cycle_
+
