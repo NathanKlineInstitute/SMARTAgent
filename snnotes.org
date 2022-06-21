@@ -40269,3 +40269,37 @@ use RLhebbwt of 0.08 ... with the modified stdp.mod ...
 
 python multistepSim.py simFullHA.json 30 20 22jun19_test_stdp_H_cycle_
 
+* 22jun21
+** check
+
+python -i simdat.py backupcfg/22jun19_test_stdp_H__step_8_sim.json
+
+EV1 0.16 Hz
+EV1DE 0.1 Hz
+EV1DNE 0.52 Hz
+EV1DN 1.38 Hz
+EV1DNW 0.27 Hz
+EV1DW 0.02 Hz
+EV1DSW 0.18 Hz
+EV1DS 1.38 Hz
+EV1DSE 0.63 Hz
+EA 0.23 Hz
+EA2 0.25 Hz
+EMDOWN 27.4 Hz
+EMUP 27.38 Hz
+IM 73.76 Hz
+IML 120.55 Hz
+
+firing rates too high ... no point continuing
+
+lfn = ['22jun19_test_stdp_H__step_' + str(i) + '_' for i in range(9)]
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0.2,0.6))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/22jun21_22jun19_test_stdp_H__step_8_perf_all_steps_so_far.png]]
+
+lpda = getindivactionreward(lfn)
+cla(); lrat = plotHitMissRatioPerStep(lpda)
+savefig(gifpath()+'hit_miss_ratio.png') # [[./gif/22jun21_22jun19_test_stdp_H__step_8_hit_miss_ratio.png]]
+
+** need a systematic evaluation of stdp.mod rules
+
