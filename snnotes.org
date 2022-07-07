@@ -40302,4 +40302,28 @@ cla(); lrat = plotHitMissRatioPerStep(lpda)
 savefig(gifpath()+'hit_miss_ratio.png') # [[./gif/22jun21_22jun19_test_stdp_H__step_8_hit_miss_ratio.png]]
 
 ** need a systematic evaluation of stdp.mod rules
+* 22jul7
+** check fake up,down rule
+
+./myrun 30 sn.json
+
+python -i simdat.py backupcfg/22jul7_A_cycle_sim.json
+
+fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
+
+gif/22jul7_22jul7_A_cycle__with_reward_input.mp4
+
+df = actreward[actreward.action==4]
+len(df)
+
+df = actreward[actreward.action==3]
+len(df)
+
+there are slightly more actions in the preferred direction but only by a small %
+using non-targetted RL 
+
+shutting off the traces (forward when have a postsynaptic spike, backward when have a presynaptic spike) seem to help
+improve the margin a bit
+
+tmax=60e3; drawraster(dspkT,dspkID,tlim=(tmax-5e3,tmax))
 

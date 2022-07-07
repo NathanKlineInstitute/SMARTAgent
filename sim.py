@@ -1880,6 +1880,18 @@ def trainAgent (simTime):
           critic_for_following_ball += dconf['rewardcodes']['avoidTarget'] # didn't follow the ball
     #total rewards
     critic = critic + critic_for_avoidingloss + critic_for_following_ball
+    ###########################################################################
+    ## simple fake down test
+    simpleFake = True
+    if simpleFake:
+      if actions[-1] == dconf['moves']['DOWN']:
+        print('Moved DOWN, reward')
+        critic = dconf['rewardcodes']['followTarget']
+      elif actions[-1] == dconf['moves']['UP']:
+        print('Moved UP, punish')
+        critic = -dconf['rewardcodes']['followTarget']
+    ###########################################################################
+    ###########################################################################    
     rewards = [critic for i in range(len(rewards))]  # reset rewards to modified critic signal - should use more granular recording
     # use py_broadcast to avoid converting to/from Vector
     sim.pc.py_broadcast(critic, 0) # broadcast critic value to other nodes
