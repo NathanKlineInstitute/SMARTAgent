@@ -103,7 +103,7 @@ PARAMETER {
   wbase = 0
   wmax  = 15.0
   softthresh = 0
-  STDPon = 1
+  STDPon = 0
   RLon = 1
   verbose = 0
   skip = 0
