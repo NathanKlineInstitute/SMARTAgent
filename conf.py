@@ -67,6 +67,7 @@ def ensureDefaults (dconf):
   checkDefVal(dconf['sim'], 'ResetEligAfterCritic', 0)
   checkDefVal(dconf['sim'], 'QuitAfterMiss', 0)
   checkDefVal(dconf['sim'], 'seed', 1234)
+  checkDefVal(dconf['sim'], 'incWeightStepSize', 0) # default off
   if 'alltopoldivcons' not in dconf['net']:
     dconf['net']['alltopoldivcons'] = {
       "IR":{"ER":5},

@@ -34,8 +34,11 @@ useSimulatedEnv = False
 try:
   if 'useSimulatedEnv' in dconf: useSimulatedEnv = dconf['useSimulatedEnv']
   if useSimulatedEnv==1:
+    print('sp A')
     from simplePong import simplePong
+    print('sp B')
     env = simplePong(seed=dconf['sim']['seed'])
+    print('sp C')
   elif useSimulatedEnv==2:
     from simulatePongFull import simulatePong
     env = simulatePong(seed=dconf['sim']['seed'])

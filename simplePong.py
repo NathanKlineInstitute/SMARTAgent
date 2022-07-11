@@ -5,12 +5,19 @@ from matplotlib import pyplot as plt
     
 class simplePong:
   def __init__  (self, seed=1234):
+    print('spp A')
     random.seed(seed)
+    print('spp B')    
     self.createcourt()
+    print('spp C')    
     self.obs = np.zeros(shape=(210,160,3)) # this is the image (observation) frame
+    print('spp D')    
     self.createnewframe()
+    print('spp D')
     self.createball() # create ball
+    print('spp E')    
     self.createrackets() # create rackets
+    print('spp F')    
     # by default no reward
     self.reward =0
     # points
@@ -19,7 +26,9 @@ class simplePong:
     self.MissedTheBall = 0
     self.NewServe = 0
     self.scoreRecorded = 0
+    print('spp G')    
     self.createFigure()
+    print('spp H')    
 
   def createFigure (self):
     self.fig,self.ax = plt.subplots(1,1)
