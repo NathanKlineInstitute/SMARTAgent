@@ -40327,3 +40327,51 @@ improve the margin a bit
 
 tmax=60e3; drawraster(dspkT,dspkID,tlim=(tmax-5e3,tmax))
 
+* 22jul11
+** check fake up,down rule
+
+./myrun 30 sn.json
+
+python -i simdat.py backupcfg/22jul11_A_cycle_sim.json
+
+fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
+
+
+
+df = actreward[actreward.action==4] # UP
+len(df)
+
+df = actreward[actreward.action==3] # DOWN
+len(df)
+
+tmax=60e3; drawraster(dspkT,dspkID,tlim=(tmax-5e3,tmax))
+
+** accumulation rule
+
+only accumulate weight changes during simulation. apply them at the end.
+to avoid small errors/noise and prevent over-learning (e.g. erasure of
+relevant info). also to promote stability in the network during learning.
+
+for applying at end of long episode ... could scale the weight changes
+to synapses to avoid saturation ... (?)
+
+so add a variable to stdp.mod that stores weight change, instead of applying
+it directly to the netcon ... should it use average weight change accumulated
+or total? want to take into account noise-based increments and decrements which
+could balance each other out but also want to reward/punish more if consistently
+positive/negative. average would still allow for that but would have less of an
+impact since smaller ... 
+
+./myrun 30 sn.json
+
+python -i simdat.py backupcfg/22jul11_A_cycle_sim.json
+
+fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
+
+df = actreward[actreward.action==4] # UP
+len(df)
+
+df = actreward[actreward.action==3] # DOWN
+len(df)
+
+tmax=60e3; drawraster(dspkT,dspkID,tlim=(tmax-5e3,tmax))

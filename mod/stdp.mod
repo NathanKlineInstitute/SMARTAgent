@@ -62,12 +62,14 @@ NEURON {
   RANGE interval : Interval between current time t and previous spike.
   RANGE deltaw
   RANGE newweight
-  RANGE origweight : original weight	
+  RANGE origweight : original weight
+  RANGE weightinc : weight increment (accumulates during learning)			    
   RANGE skip : Flag to skip 2nd set of conditions
   RANGE cumreward : cumulative reward magnitude so far
   RANGE maxreward : max reward for scaling
   GLOBAL initialtime
   RANGE NOSTDPTAG
+  RANGE useweightinc : whether to use weightinc variable
 }
 
 ASSIGNED {
@@ -81,11 +83,13 @@ ASSIGNED {
   newweight
   cumreward
   origweight
+  weightinc
 }
 
 INITIAL {
   reset_eligibility()
-  origweight = synweight : store the original weight		      
+  origweight = synweight : store the original weight
+  weightinc = 0.0
 }
 
 PARAMETER {
@@ -111,6 +115,7 @@ PARAMETER {
   : cumreward = 0
   NOSTDPTAG = 0
   initialtime = 0 (ms) : initialization time before any weight changes possible
+  useweightinc = 1						   							 
 }
 
 PROCEDURE reset_eligibility () {
@@ -271,8 +276,21 @@ FUNCTION softthreshold (rawwc) {
 }
 
 PROCEDURE adjustweight (wc) {
+ if (useweightinc) {
+   weightinc = weightinc + wc
+ } else {
    synweight = synweight + wc : apply the synaptic modification, and then clip the weight if necessary to make sure it is between wbase and wmax.
-   : synweight = synweight + origweight * wc
+   : synweight = synweight + origweight * wc	   
    if (synweight > wmax) { synweight = wmax }
    if (synweight < wbase) { synweight = wbase }
+ }
 }
+
+PROCEDURE applyweightinc ()  {
+  printf("weightinc=%g,synweight=%g\n",weightinc,synweight)
+  synweight = synweight + weightinc
+  if (synweight > wmax) { synweight = wmax }
+  if (synweight < wbase) { synweight = wbase  }
+  weightinc = 0.0 : reset to 0 after applying
+}
+

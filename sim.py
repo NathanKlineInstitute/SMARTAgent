@@ -42,6 +42,7 @@ sim.saveObjPos = 1 # save ball and paddle position to file
 sim.saveAssignedFiringRates = dconf['sim']['saveAssignedFiringRates']
 recordWeightStepSize = dconf['sim']['recordWeightStepSize']
 normalizeWeightStepSize = dconf['sim']['normalizeWeightStepSize']
+incWeightStepSize = dconf['sim']['incWeightStepSize']
 #recordWeightDT = 1000 # interval for recording synaptic weights (change later)
 recordWeightDCells = 1 # to record weights for sub samples of neurons
 tstepPerAction = dconf['sim']['tstepPerAction'] # time step per action (in ms)
@@ -1882,14 +1883,23 @@ def trainAgent (simTime):
     critic = critic + critic_for_avoidingloss + critic_for_following_ball
     ###########################################################################
     ## simple fake down test
-    simpleFake = True
-    if simpleFake:
+    simpleFakeDown = False
+    simpleFakeUp = False # True
+    if simpleFakeDown:
       if actions[-1] == dconf['moves']['DOWN']:
         print('Moved DOWN, reward')
         critic = dconf['rewardcodes']['followTarget']
       elif actions[-1] == dconf['moves']['UP']:
         print('Moved UP, punish')
         critic = -dconf['rewardcodes']['followTarget']
+    elif simpleFakeUp:
+      if actions[-1] == dconf['moves']['UP']:
+        print('Moved UP, reward')
+        critic = dconf['rewardcodes']['followTarget']
+      elif actions[-1] == dconf['moves']['DOWN']:
+        print('Moved DOWN, punish')
+        critic = -dconf['rewardcodes']['followTarget']
+        
     ###########################################################################
     ###########################################################################    
     rewards = [critic for i in range(len(rewards))]  # reset rewards to modified critic signal - should use more granular recording
@@ -1952,6 +1962,9 @@ def trainAgent (simTime):
   updateInputRates() # update firing rate of inputs to R population (based on image content)
   # updatePFCInputRates() # choose random combination of PFC neurons to activate EM.               
   NBsteps += 1
+  if NBsteps % incWeightStepSize == 0:
+    if sim.rank == 0: print('Applying weight inc at t =' ,simTime)
+    for STDPmech in dSTDPmech['all']: STDPmech.applyweightinc()
   if NBsteps % recordWeightStepSize == 0:
     if dconf['verbose'] > 0 and sim.rank==0:
       print('Weights Recording Time:', t, 'NBsteps:',NBsteps,'recordWeightStepSize:',recordWeightStepSize)
