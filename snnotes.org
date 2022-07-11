@@ -40360,13 +40360,21 @@ it directly to the netcon ... should it use average weight change accumulated
 or total? want to take into account noise-based increments and decrements which
 could balance each other out but also want to reward/punish more if consistently
 positive/negative. average would still allow for that but would have less of an
-impact since smaller ... 
+impact since smaller ... problem with averaging is it gets rid of the full accumulated
+reward/punishment history and reduces it to a single number ... 
 
 ./myrun 30 sn.json
 
 python -i simdat.py backupcfg/22jul11_A_cycle_sim.json
 
+EV1 0.22 Hz
+EA 0.16 Hz
+EMDOWN 20.07 Hz
+EMUP 20.01 Hz
+stimModEV1 0.0 Hz
+
 fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
+[[./gif/22jul11_22jul11_A_cycle__with_reward_input.mp4]]
 
 df = actreward[actreward.action==4] # UP
 len(df)
@@ -40375,3 +40383,25 @@ df = actreward[actreward.action==3] # DOWN
 len(df)
 
 tmax=60e3; drawraster(dspkT,dspkID,tlim=(tmax-5e3,tmax))
+tmax=500e3; drawraster(dspkT,dspkID,tlim=(tmax-5e3,tmax))
+
+ax=plotPerf(actreward,yl=(0.0,1))
+savefig(gifpath()+'perf.png') # [[./gif/22jul11_22jul11_A_cycle_perf.png]]
+
+## drawcellVm(simConfig,tlim=(490e3,500e3),ldrawpop=['EMDOWN','EMUP'],lclr=['r','g'])
+
+for the fake up, down rule seems to work decently, even in this reduced network
+with 1600 V1 and only 2 EM neurons ...
+
+tried with the follow/avoid target rule and seems to improve ... needs more steps 
+
+so run a few steps, resuming from here ... 
+data/22jul11_A_cycle_synWeights_final.pkl
+
+hmm, those final weights were not saved properly ... since had very large recordWeightStepSize ... could set it to 
+save them every 100 s or so ... make it every 10 s ... 
+
+python multistepSim.py sn.json 30 10 22jul11_test_accum_stdp_A_cycle_
+
+started ~16:15 ...
+

@@ -75,10 +75,10 @@
   "useImagePadding": 0,
   "rewardcodes": {
     "scorePoint": 0.0,
-    "losePoint": -1.0,
-    "followTarget": 0.0,
-    "avoidTarget": 0.0,
-    "hitBall": 1.0
+    "losePoint": 0.0,
+    "followTarget": 1.0,
+    "avoidTarget": -0.1,
+    "hitBall": 0.0
   },
   "actionsPerPlay": 1,
   "followOnlyTowards": 1,
@@ -94,7 +94,7 @@
   "stayStepLim": 0,
   "simtype": {
     "ResumeSim": 0,
-    "ResumeSimFromFile": "data/21jul2_EN0_256_gcp__step_28_synWeights_final.pkl"
+    "ResumeSimFromFile": "data/22jul11_A_cycle_synWeights_final.pkl"
   },
   "sim": {
     "duration": 500000,
@@ -102,13 +102,14 @@
     "verbose": 0,
     "recordStep": 1.0,
     "recordStim": 0,
-    "recordWeightStepSize": 50000000000000000000000000000000000000,
+    "recordWeightStepSize": 500,
+    "incWeightStepSize" :   500, 
     "normalizeWeightStepSize": 50000000000000000000000000000000000000,
     "normalizeWeightsAtStart": 0,
     "RLFakeUpRule": 0,
     "RLFakeDownRule": 0,
     "RLFakeStayRule": 0,
-    "name": "21oct29_ES_FF_sigma0.1_cycle_",
+    "name": "22jul11_A_cycle_",
     "doquit": 1,
     "doplot": 0,
     "saveCellSecs": 0,
@@ -122,7 +123,7 @@
     "saveAssignedFiringRates": 0,
     "useReducedNetwork": 0,
     "ResetEligAfterCritic": 1,
-    "QuitAfterMiss": 1
+    "QuitAfterMiss": 0
   },
   "architectureVtoA": {
     "useProbabilistic": 1,
@@ -193,31 +194,31 @@
       "allpops": {
       "ER": 0,
       "IR": 0,
-      "EV1": 6400,
-      "EV1DE": 400,
-      "EV1DNE": 400,
-      "EV1DN": 400,
-      "EV1DNW": 400,
-      "EV1DW": 400,
-      "EV1DSW": 400,
-      "EV1DS": 400,
-      "EV1DSE": 400,
+      "EV1": 1600,
+      "EV1DE": 0,
+      "EV1DNE": 0,
+      "EV1DN": 0,
+      "EV1DNW": 0,
+      "EV1DW": 0,
+      "EV1DSW": 0,
+      "EV1DS": 0,
+      "EV1DSE": 0,
       "ID": 0,
       "IV1": 0,
       "EV4": 0,
       "IV4": 0,
       "EMT": 0,
       "IMT": 0,
-      "EA": 1400,
+      "EA": 700,
       "IA": 0,
       "IAL": 0,
       "EA2": 0,
       "IA2": 0,
       "IA2L": 0,
-      "EMDOWN": 300,
-      "EMUP": 300,
-      "IM": 206,
-      "IML": 94,
+      "EMDOWN": 1,
+      "EMUP": 1,
+      "IM": 0,
+      "IML": 0,
       "IMUP": 0,
       "IMDOWN": 0,
       "EN": 0
@@ -507,7 +508,7 @@
         "EA": {
           "AM2": 6,
           "NM2": 0.1,
-          "conv": 128
+          "conv": 256
         },
         "EA2": {
           "AM2": 0,
@@ -575,7 +576,7 @@
         "EM": {
           "AM2": 16,
           "NM2": 0.15,
-          "conv": 300
+          "conv": 600
         },
         "IA": {
           "AM2": 0,
@@ -913,7 +914,7 @@
     },
     "EEMRecProbCross": 1,
     "VisualFeedback": 0,
-    "weightVar": 0.5,
+    "weightVar": 0.0,
     "delayMinSoma": 1.8,
     "delayMaxSoma": 2.2,
     "delayMinDend": 3,
@@ -1023,10 +1024,10 @@
       "wmax": 200,
       "RLon": 1,
       "STDPon": 0,
-      "RLlenhebb": 10000,
+      "RLlenhebb": 500,
       "RLlenanti": 500,
       "useRLexp": 1,
-      "RLhebbwt": 0.0,
+      "RLhebbwt": 1.0,
       "RLantiwt": 0.0,
       "hebbwt": 0.0,
       "antiwt": 0.0,
