@@ -63,7 +63,8 @@ NEURON {
   RANGE deltaw
   RANGE newweight
   RANGE origweight : original weight
-  RANGE weightinc : weight increment (accumulates during learning)			    
+  RANGE weightinc : weight increment (accumulates during learning)
+  RANGE weightincSteps : number of reward/punishments contributing to weightinc
   RANGE skip : Flag to skip 2nd set of conditions
   RANGE cumreward : cumulative reward magnitude so far
   RANGE maxreward : max reward for scaling
@@ -84,12 +85,14 @@ ASSIGNED {
   cumreward
   origweight
   weightinc
+  weightincSteps
 }
 
 INITIAL {
   reset_eligibility()
   origweight = synweight : store the original weight
   weightinc = 0.0
+  weightincSteps = 0.0
 }
 
 PARAMETER {
@@ -220,7 +223,9 @@ PROCEDURE reward_punish (reinf) {
     if (softthresh == 1) { : If we have soft-thresholding on, apply it.
       deltaw = softthreshold(deltaw)
     }
-    adjustweight(deltaw) : Adjust the weight.
+    if (fabs(deltaw)>0.0) {				   
+      adjustweight(deltaw) : Adjust the weight.
+    }
   }
 }
 
@@ -278,6 +283,7 @@ FUNCTION softthreshold (rawwc) {
 PROCEDURE adjustweight (wc) {
  if (useweightinc) {
    weightinc = weightinc + wc
+   weightincSteps = weightincSteps + 1.0
  } else {
    synweight = synweight + wc : apply the synaptic modification, and then clip the weight if necessary to make sure it is between wbase and wmax.
    : synweight = synweight + origweight * wc	   
@@ -288,9 +294,12 @@ PROCEDURE adjustweight (wc) {
 
 PROCEDURE applyweightinc ()  {
   printf("weightinc=%g,synweight=%g\n",weightinc,synweight)
-  synweight = synweight + weightinc
-  if (synweight > wmax) { synweight = wmax }
-  if (synweight < wbase) { synweight = wbase  }
+  if (fabs(weightinc)>0.0 && weightincSteps > 0) {
+    synweight = synweight + weightinc / weightincSteps
+    if (synweight > wmax) { synweight = wmax }
+    if (synweight < wbase) { synweight = wbase  }
+  }  
   weightinc = 0.0 : reset to 0 after applying
+  weightincSteps = 0.0 : reset to 0 after applying
 }
 
