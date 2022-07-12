@@ -77,7 +77,7 @@
     "scorePoint": 0.0,
     "losePoint": 0.0,
     "followTarget": 1.0,
-    "avoidTarget": -0.1,
+    "avoidTarget": -0.01,
     "hitBall": 0.0
   },
   "actionsPerPlay": 1,
@@ -109,7 +109,7 @@
     "RLFakeUpRule": 0,
     "RLFakeDownRule": 0,
     "RLFakeStayRule": 0,
-    "name": "22jul11_A_cycle_",
+    "name": "22jul11_B_cycle_",
     "doquit": 1,
     "doplot": 0,
     "saveCellSecs": 0,

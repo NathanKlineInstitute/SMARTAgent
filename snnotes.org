@@ -40436,3 +40436,9 @@ savefig(gifpath()+'comp_perf.png') # [[./gif/22jul11_22jul11_A_cycle__step_6_com
 
 probably the punishment values are too high ... since firing rates decreasing too much ... will try reducing punishment and start again
 
+** reduce punishment to -0.01, 22jul11_B_cycle_
+
+python multistepSim.py sn.json 30 10 22jul11_test_accum_stdp_B_cycle_
+
+started ~21:34 ...
+
