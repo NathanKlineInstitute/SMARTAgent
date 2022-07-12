@@ -40405,3 +40405,34 @@ python multistepSim.py sn.json 30 10 22jul11_test_accum_stdp_A_cycle_
 
 started ~16:15 ...
 
+got through 6 steps so far ... check
+
+python -i simdat.py backupcfg/22jul11_A_cycle__step_6_sim.json
+
+EV1 0.22 Hz
+EA 0.17 Hz
+EMDOWN 10.05 Hz
+EMUP 12.13 Hz
+stimModEV1 0.0 Hz
+
+ax=plotPerf(actreward,yl=(0.0,1))
+savefig(gifpath()+'perf.png') # [[./gif/22jul11_22jul11_A_cycle__step_6_perf.png]]
+low...but firing rates got a lot lower too and EMUP much faster than EMDOWN ... (only 2 neurons)
+
+lfn = ['22jul11_A_cycle__step_' + str(i) + '_' for i in range(7)]
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0.0,0.5))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/22jul11_22jul11_A_cycle__step_6_perf_all_steps_so_far.png]]
+
+lpda = getindivactionreward(lfn)
+cla(); lrat = plotHitMissRatioPerStep(lpda)
+savefig(gifpath()+'hit_miss_ratio.png') # [[./gif/22jul11_22jul11_A_cycle__step_6_hit_miss_ratio.png]]
+
+csm=cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+lclr = [csm.to_rgba(float(i)/(len(lpda))) for i in range(len(lpda))]
+clf(); plotComparePerf(lpda,lclr,yl=(0,1),skipfollow=True)
+
+savefig(gifpath()+'comp_perf.png') # [[./gif/22jul11_22jul11_A_cycle__step_6_comp_perf.png]]
+
+probably the punishment values are too high ... since firing rates decreasing too much ... will try reducing punishment and start again
+
