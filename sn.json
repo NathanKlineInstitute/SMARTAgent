@@ -76,9 +76,9 @@
   "rewardcodes": {
     "scorePoint": 0.0,
     "losePoint": 0.0,
-    "followTarget": 1.0,
-    "avoidTarget": -0.1,
-    "hitBall": 0.0
+    "followTarget": 0.1,
+    "avoidTarget": -0.01,
+    "hitBall": 0.5
   },
   "actionsPerPlay": 1,
   "followOnlyTowards": 1,
@@ -93,11 +93,11 @@
   "verbose": 0,
   "stayStepLim": 0,
   "simtype": {
-    "ResumeSim": 0,
-    "ResumeSimFromFile": "data/22jul11_A_cycle_synWeights_final.pkl"
+    "ResumeSim": 1,
+    "ResumeSimFromFile": "data/22jul12_A_cycle__step_9_synWeights_final.pkl"
   },
   "sim": {
-    "duration": 60000,
+    "duration": 500000,
     "dt": 0.6,
     "verbose": 0,
     "recordStep": 1.0,
@@ -109,7 +109,7 @@
     "RLFakeUpRule": 0,
     "RLFakeDownRule": 0,
     "RLFakeStayRule": 0,
-    "name": "22jul12_A_cycle_",
+    "name": "22jul13_A2_cycle_",
     "doquit": 1,
     "doplot": 0,
     "saveCellSecs": 0,
@@ -194,7 +194,7 @@
       "allpops": {
       "ER": 0,
       "IR": 0,
-      "EV1": 1600,
+      "EV1": 6400,
       "EV1DE": 0,
       "EV1DNE": 0,
       "EV1DN": 0,
@@ -209,16 +209,16 @@
       "IV4": 0,
       "EMT": 0,
       "IMT": 0,
-      "EA": 700,
+      "EA": 1400,
       "IA": 0,
       "IAL": 0,
       "EA2": 0,
       "IA2": 0,
       "IA2L": 0,
-      "EMDOWN": 1,
-      "EMUP": 1,
-      "IM": 0,
-      "IML": 0,
+      "EMDOWN": 20,
+      "EMUP": 20,
+      "IM": 12,
+      "IML": 12,
       "IMUP": 0,
       "IMDOWN": 0,
       "EN": 0
@@ -914,7 +914,7 @@
     },
     "EEMRecProbCross": 1,
     "VisualFeedback": 0,
-    "weightVar": 0.0,
+    "weightVar": 0.5,
     "delayMinSoma": 1.8,
     "delayMaxSoma": 2.2,
     "delayMinDend": 3,

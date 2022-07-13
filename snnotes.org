@@ -40510,3 +40510,66 @@ tmax=500e3; drawraster(dspkT,dspkID,tlim=(tmax-5e3,tmax))
 
 ax=plotPerf(actreward,yl=(0.0,1))
 savefig(gifpath()+'perf.png') 
+
+tmax=10e3
+tmax=500e3
+pravgrates(dspkT,dspkID,dnumc,tlim=(tmax-5e3,tmax))
+
+python multistepSim.py sn.json 30 10 22jul12_test_accum_stdp_A_cycle_
+
+* 22jul13
+** check output
+
+python -i simdat.py backupcfg/22jul12_A_cycle__step_9_sim.json
+
+EV1 0.14 Hz
+EA 0.05 Hz
+EMDOWN 7.63 Hz
+EMUP 7.48 Hz
+IM 26.06 Hz
+IML 30.32 Hz
+
+ax=plotPerf(actreward,yl=(0.0,1))
+savefig(gifpath()+'perf.png') # [[./gif/22jul13_22jul12_A_cycle__step_9_perf.png]]
+
+lfn = ['22jul12_A_cycle__step_' + str(i) + '_' for i in range(10)]
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0.0,0.5))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/22jul13_22jul12_A_cycle__step_9_perf_all_steps_so_far.png]]
+
+lpda = getindivactionreward(lfn)
+cla(); lrat = plotHitMissRatioPerStep(lpda)
+savefig(gifpath()+'hit_miss_ratio.png') # [[./gif/22jul13_22jul12_A_cycle__step_9_hit_miss_ratio.png]]
+
+csm=cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+lclr = [csm.to_rgba(float(i)/(len(lpda))) for i in range(len(lpda))]
+clf(); plotComparePerf(lpda,lclr,yl=(0,1),skipfollow=True)
+savefig(gifpath()+'comp_perf.png') # [[./gif/22jul13_22jul12_A_cycle__step_9_comp_perf.png]]
+
+might be improving slowly ... 
+
+tmax=500e3; drawraster(dspkT,dspkID,tlim=(tmax-5e3,tmax))
+savefig(gifpath()+'rast.png') # [[./gif/22jul13_22jul12_A_cycle__step_9_rast.png]]
+
+tmax=500e3; pravgrates(dspkT,dspkID,dnumc,tlim=(tmax-5e3,tmax))
+EV1 0.14 Hz
+EA 0.06 Hz
+EMDOWN 10.37 Hz
+EMUP 10.15 Hz
+IM 35.47 Hz
+IML 41.03 Hz
+
+fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
+[[./gif/22jul13_22jul12_A_cycle__step_9__with_reward_input.mp4]]
+
+can continue for 10 more steps to check if improves ... 
+
+    "ResumeSim": 1,
+    "ResumeSimFromFile": "data/22jul12_A_cycle__step_9_synWeights_final.pkl"
+
+    "name": "22jul13_A2_cycle_",
+
+python multistepSim.py sn.json 30 10 22jul13_test_accum_stdp_A2_cycle_
+
+started ~11:42 ...
+

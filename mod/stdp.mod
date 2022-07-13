@@ -293,8 +293,8 @@ PROCEDURE adjustweight (wc) {
 }
 
 PROCEDURE applyweightinc ()  {
-  printf("synweight=%g,weightinc=%g,weightincSteps=%g\n",synweight,weightinc,weightincSteps)
   if (fabs(weightinc)>0.0 && weightincSteps > 0) {
+    printf("synweight=%g,weightinc=%g,weightincSteps=%g\n",synweight,weightinc,weightincSteps)						  
     synweight = synweight + weightinc / weightincSteps
     if (synweight > wmax) { synweight = wmax }
     if (synweight < wbase) { synweight = wbase  }

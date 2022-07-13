@@ -1883,7 +1883,7 @@ def trainAgent (simTime):
     critic = critic + critic_for_avoidingloss + critic_for_following_ball
     ###########################################################################
     ## simple fake down test
-    simpleFakeDown = True # False
+    simpleFakeDown = False
     simpleFakeUp = False # True
     if simpleFakeDown:
       if actions[-1] == dconf['moves']['DOWN']:
