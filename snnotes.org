@@ -40573,3 +40573,50 @@ python multistepSim.py sn.json 30 10 22jul13_test_accum_stdp_A2_cycle_
 
 started ~11:42 ...
 
+no longer improving ...
+
+python -i simdat.py backupcfg/22jul13_A2_cycle__step_3_sim.json
+
+EV1 0.14 Hz
+EA 0.05 Hz
+EMDOWN 10.89 Hz
+EMUP 10.94 Hz
+IM 33.73 Hz
+IML 44.85 Hz
+
+ax=plotPerf(actreward,yl=(0.0,1))
+savefig(gifpath()+'perf.png') # [[./gif/22jul13_22jul13_A2_cycle__step_3_perf.png]]
+
+lfn = ['22jul12_A_cycle__step_' + str(i) + '_' for i in range(10)]
+for i in range(4): lfn.append('22jul13_A2_cycle__step_'+str(i)+'_')
+
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0.0,0.5))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/22jul13_22jul13_A2_cycle__step_3_perf_all_steps_so_far.png]]
+
+lpda = getindivactionreward(lfn)
+cla(); lrat = plotHitMissRatioPerStep(lpda)
+savefig(gifpath()+'hit_miss_ratio.png') # [[./gif/22jul13_22jul13_A2_cycle__step_3_hit_miss_ratio.png]]
+
+csm=cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+lclr = [csm.to_rgba(float(i)/(len(lpda))) for i in range(len(lpda))]
+clf(); plotComparePerf(lpda,lclr,yl=(0,1),skipfollow=True)
+savefig(gifpath()+'comp_perf.png') 
+[[./gif/22jul13_22jul13_A2_cycle__step_3_comp_perf.png]]
+
+** previous recurrent model
+
+worth trying with the accumulation rule ... assuming it's having a positive impact ... 
+
+is it this one? backupcfg/21may15_TARG0_K_gcp__step_0_sim.json ?
+
+try it ... 
+
+22jul13_R0_cycle_
+
+# ./myrun 30 sn.json
+
+python multistepSim.py sn.json 30 10 22jul13_test_accum_stdp_R0_cycle_
+
+started ~16:34 ...
+
