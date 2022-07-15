@@ -109,7 +109,7 @@
     "RLFakeUpRule": 0,
     "RLFakeDownRule": 0,
     "RLFakeStayRule": 0,
-    "name": "22jul13_R0_cycle_",
+    "name": "22jul15_R0_cycle_",
     "doquit": 1,
     "doplot": 0,
     "saveCellSecs": 0,
@@ -209,16 +209,16 @@
       "IV4": 0,
       "EMT": 0,
       "IMT": 0,
-      "EA": 1200,
-      "IA": 412,
-      "IAL": 188,
-      "EA2": 600,
-      "IA2": 206,
-      "IA2L": 94,
-      "EMDOWN": 300,
-      "EMUP": 300,
-      "IM": 206,
-      "IML": 94,
+      "EA": 3200,
+      "IA": 0,
+      "IAL": 0,
+      "EA2": 0,
+      "IA2": 0,
+      "IA2L": 0,
+      "EMDOWN": 100,
+      "EMUP": 100,
+      "IM": 68,
+      "IML": 31,
       "IMUP": 0,
       "IMDOWN": 0,
       "EN": 0
@@ -421,17 +421,17 @@
       "FeedForwardDirNtoM": 0,
       "FeedForwardLocNtoM": 0,
       "FeedForwardAtoM": 1,
-      "FeedForwardAtoA2": 1,
-      "FeedForwardA2toM": 1,
+      "FeedForwardAtoA2": 0,
+      "FeedForwardA2toM": 0,
       "FeedbackLocNeurons": 0,
       "RecurrentMNeurons": 1,
-      "RecurrentANeurons": 1,
-      "RecurrentA2Neurons": 1,
+      "RecurrentANeurons": 0,
+      "RecurrentA2Neurons": 0,
       "FeedbackAtoDirN": 0,
       "FeedbackAtoLocN": 0,
-      "FeedbackMtoA": 1,
-      "FeedbackMtoA2": 1,
-      "FeedbackA2toA": 1
+      "FeedbackMtoA": 0,
+      "FeedbackMtoA2": 0,
+      "FeedbackA2toA": 9
     },
     "useBinaryImage": 1,
     "useNeuronPad": 0,
@@ -454,8 +454,8 @@
           "conv": 0
         },
         "EA": {
-          "AM2": 12.5,
-          "NM2": 1,
+          "AM2": 16,
+          "NM2": 0,
           "conv": 640
         },
         "EA2": {
@@ -466,12 +466,12 @@
         "EMDOWN": {
           "AM2": 0.25,
           "NM2": 0.0,
-          "conv": 30
+          "conv": 0
         },
         "EMUP": {
           "AM2": 0.25,
           "NM2": 0.0,
-          "conv": 30
+          "conv": 0
         }
       },
       "VD": {
@@ -514,16 +514,16 @@
         "EA": {
           "AM2": 0.05,
           "NM2": 0.005,
-          "conv": 30
+          "conv": 0
         },
         "EA2": {
           "AM2": 0.5,
           "NM2": 0.01,
-          "conv": 100
+          "conv": 0
         },
         "EM": {
-          "AM2": 0.5,
-          "NM2": 0.01,
+          "AM2": 3.5,
+          "NM2": 0.0,
           "conv": 100
         },
         "IA": {
@@ -566,19 +566,19 @@
       },
       "EM": {
         "EM": {
-          "AM2": 0.5,
-          "NM2": 0.01,
-          "conv": 60
+          "AM2": 1,
+          "NM2": 0.0,
+          "conv": 10
         },
         "EA": {
           "AM2": 0.05,
           "NM2": 0.005,
-          "conv": 3
+          "conv": 0
         },
         "EA2": {
           "AM2": 0.05,
           "NM2": 0.005,
-          "conv": 3
+          "conv": 0
         },
         "IRecip": {
           "AM2": 20,
@@ -860,7 +860,7 @@
       "updateIntervalSteps": 100,
       "synType": "AMPA"
     },
-    "EEMRecProbCross": 1,
+    "EEMRecProbCross": 0,
     "VisualFeedback": 0,
     "weightVar": 0.5,
     "delayMinSoma": 1.8,
@@ -968,14 +968,14 @@
       "maxreward": 0.0
     },
     "AMPA": {
-      "wbase": 0.001,
+      "wbase": 0.00001,
       "wmax": 200,
       "RLon": 1,
       "STDPon": 0,
       "RLlenhebb": 10000,
       "RLlenanti": 500,
       "useRLexp": 1,
-      "RLhebbwt": 0.01,
+      "RLhebbwt": 0.1,
       "RLantiwt": 0.0,
       "hebbwt": 0.0,
       "antiwt": 0.0,
@@ -1021,7 +1021,7 @@
       },
       "AM2": {
         "w": 3.938,
-        "rate": 200
+        "rate": 0
       },
       "NM2": {
         "w": 0,
@@ -1047,7 +1047,7 @@
       },
       "AM2": {
         "w": 3.938,
-        "rate": 200
+        "rate": 0
       },
       "NM2": {
         "w": 0,
@@ -1073,7 +1073,7 @@
       },
       "AM2": {
         "w": 3.938,
-        "rate": 200
+        "rate": 0
       },
       "NM2": {
         "w": 0,
@@ -1087,7 +1087,7 @@
     "IM": {
       "AM": {
         "w": 1.875,
-        "rate": 100
+        "rate": 0
       },
       "NM": {
         "w": 0,
@@ -1099,7 +1099,7 @@
       },
       "AM2": {
         "w": 4.125,
-        "rate": 200
+        "rate": 0
       },
       "NM2": {
         "w": 0,
@@ -1107,13 +1107,13 @@
       },
       "GA2": {
         "w": 1.875,
-        "rate": 100
+        "rate": 0
       }
     },
     "IML": {
       "AM": {
         "w": 1.875,
-        "rate": 100
+        "rate": 0
       },
       "NM": {
         "w": 0,
@@ -1125,7 +1125,7 @@
       },
       "AM2": {
         "w": 3.0,
-        "rate": 200
+        "rate": 0
       },
       "NM2": {
         "w": 0,
@@ -1133,7 +1133,7 @@
       },
       "GA2": {
         "w": 1.875,
-        "rate": 100
+        "rate": 0
       }
     },
     "EA": {
@@ -1147,11 +1147,11 @@
       },
       "GA": {
         "w": 1.875,
-        "rate": 100
+        "rate": 0
       },
       "AM2": {
         "w": 3.938,
-        "rate": 200
+        "rate": 0
       },
       "NM2": {
         "w": 0,
@@ -1159,13 +1159,13 @@
       },
       "GA2": {
         "w": 1.875,
-        "rate": 100
+        "rate": 0
       }
     },
     "IA": {
       "AM": {
         "w": 1.875,
-        "rate": 100
+        "rate": 0
       },
       "NM": {
         "w": 0,
@@ -1177,7 +1177,7 @@
       },
       "AM2": {
         "w": 4.125,
-        "rate": 200
+        "rate": 0
       },
       "NM2": {
         "w": 0,
@@ -1185,13 +1185,13 @@
       },
       "GA2": {
         "w": 1.875,
-        "rate": 100
+        "rate": 0
       }
     },
     "IAL": {
       "AM": {
         "w": 1.875,
-        "rate": 100
+        "rate": 0
       },
       "NM": {
         "w": 0,
@@ -1203,7 +1203,7 @@
       },
       "AM2": {
         "w": 3.0,
-        "rate": 200
+        "rate": 0
       },
       "NM2": {
         "w": 0,
@@ -1211,7 +1211,7 @@
       },
       "GA2": {
         "w": 1.875,
-        "rate": 100
+        "rate": 0
       }
     },
     "EA2": {
@@ -1225,11 +1225,11 @@
       },
       "GA": {
         "w": 1.875,
-        "rate": 100
+        "rate": 0
       },
       "AM2": {
         "w": 3.938,
-        "rate": 200
+        "rate": 0
       },
       "NM2": {
         "w": 0,
@@ -1237,13 +1237,13 @@
       },
       "GA2": {
         "w": 1.875,
-        "rate": 100
+        "rate": 0
       }
     },
     "IA2": {
       "AM": {
         "w": 1.875,
-        "rate": 100
+        "rate": 0
       },
       "NM": {
         "w": 0,
@@ -1255,7 +1255,7 @@
       },
       "AM2": {
         "w": 4.125,
-        "rate": 200
+        "rate": 0
       },
       "NM2": {
         "w": 0,
@@ -1263,13 +1263,13 @@
       },
       "GA2": {
         "w": 1.875,
-        "rate": 100
+        "rate": 0
       }
     },
     "IA2L": {
       "AM": {
         "w": 1.875,
-        "rate": 100
+        "rate": 0
       },
       "NM": {
         "w": 0,
@@ -1281,7 +1281,7 @@
       },
       "AM2": {
         "w": 3.0,
-        "rate": 200
+        "rate": 0
       },
       "NM2": {
         "w": 0,
@@ -1289,7 +1289,7 @@
       },
       "GA2": {
         "w": 1.875,
-        "rate": 100
+        "rate": 0
       }
     }
   }

@@ -40732,5 +40732,18 @@ IML 1.83 Hz
 
 did not see much improvement over the 10 500 s steps ... 
 
-** turn off noise
+** adjustments, turn off most noise (22jul15_R0_cycle_)
+
+kept on inhib noise, increased EA -> EM; reduced most of RL synapses ... 
+
+increased number of EA, removed IA, IAL, EA2, IA2, IA2L ... reduced number of EM ... 
+produces bursty activity but mostly quiet ... 
+
+./myrun 30 sn.json
+
+python -i simdat.py backupcfg/22jul15_R0_cycle_sim.json
+
+tmax=5e3; pravgrates(dspkT,dspkID,dnumc,tlim=(tmax-1e3,tmax))
+
+python multistepSim.py sn.json 30 10 22jul15_test_accum_stdp_R0_cycle_
 
