@@ -93,7 +93,7 @@
   "verbose": 0,
   "stayStepLim": 0,
   "simtype": {
-    "ResumeSim": 1,
+    "ResumeSim": 0,
     "ResumeSimFromFile": "data/22jul12_A_cycle__step_9_synWeights_final.pkl"
   },
   "sim": {

@@ -40618,5 +40618,92 @@ try it ...
 
 python multistepSim.py sn.json 30 10 22jul13_test_accum_stdp_R0_cycle_
 
-started ~16:34 ...
+started ~16:35 ...
+
+* 22jul14
+** check
+
+python -i simdat.py backupcfg/22jul13_R0_cycle__step_2_sim.json
+
+EV1 0.04 Hz
+EA 2.34 Hz
+IA 3.55 Hz
+IAL 5.53 Hz
+EA2 0.12 Hz
+IA2 1.22 Hz
+IA2L 1.75 Hz
+EMDOWN 0.23 Hz
+EMUP 0.23 Hz
+IM 1.44 Hz
+IML 2.13 Hz
+
+ax=plotPerf(actreward,yl=(0.0,1))
+savefig(gifpath()+'perf.png') # [[./gif/22jul14_22jul13_R0_cycle__step_2_perf.png]]
+
+lfn = ['22jul13_R0_cycle__step_' + str(i) + '_' for i in range(3)]
+
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0.0,0.5))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/22jul14_22jul13_R0_cycle__step_2_perf_all_steps_so_far.png]]
+
+lpda = getindivactionreward(lfn)
+cla(); lrat = plotHitMissRatioPerStep(lpda)
+savefig(gifpath()+'hit_miss_ratio.png') # [[./gif/22jul14_22jul13_R0_cycle__step_2_hit_miss_ratio.png]]
+
+csm=cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+lclr = [csm.to_rgba(float(i)/(len(lpda))) for i in range(len(lpda))]
+clf(); plotComparePerf(lpda,lclr,yl=(0,1),skipfollow=True)
+savefig(gifpath()+'comp_perf.png') # [[./gif/22jul14_22jul13_R0_cycle__step_2_comp_perf.png]]
+
+tmax=500e3; drawraster(dspkT,dspkID,tlim=(tmax-5e3,tmax))
+savefig(gifpath()+'rast.png') # [[./gif/22jul14_22jul13_R0_cycle__step_2_rast.png]]
+
+tmax=500e3; pravgrates(dspkT,dspkID,dnumc,tlim=(tmax-5e3,tmax))
+
+EV1 0.04 Hz
+EA 2.47 Hz
+IA 3.63 Hz
+IAL 5.83 Hz
+EA2 0.12 Hz
+IA2 1.22 Hz
+IA2L 1.73 Hz
+EMDOWN 0.12 Hz
+EMUP 0.12 Hz
+IM 1.35 Hz
+IML 1.84 Hz
+
+fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
+[[./gif/22jul14_22jul13_R0_cycle__step_2__with_reward_input.mp4]]
+
+* 22jul15
+** check
+
+python -i simdat.py backupcfg/22jul13_R0_cycle__step_9_sim.json
+
+ax=plotPerf(actreward,yl=(0.0,1))
+savefig(gifpath()+'perf.png') 
+
+lfn = ['22jul13_R0_cycle__step_' + str(i) + '_' for i in range(10)]
+
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0.0,0.5))
+savefig(gifpath()+'perf_all_steps_so_far.png') 
+
+lpda = getindivactionreward(lfn)
+cla(); lrat = plotHitMissRatioPerStep(lpda)
+savefig(gifpath()+'hit_miss_ratio.png') 
+
+csm=cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+lclr = [csm.to_rgba(float(i)/(len(lpda))) for i in range(len(lpda))]
+clf(); plotComparePerf(lpda,lclr,yl=(0,1),skipfollow=True)
+savefig(gifpath()+'comp_perf.png') 
+
+tmax=500e3; drawraster(dspkT,dspkID,tlim=(tmax-5e3,tmax))
+savefig(gifpath()+'rast.png') 
+
+tmax=500e3; pravgrates(dspkT,dspkID,dnumc,tlim=(tmax-5e3,tmax))
+
+fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward)
+
+** turn off noise?
 
