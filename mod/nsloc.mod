@@ -1,10 +1,10 @@
-: $Id: nsloc.mod,v 1.7 2013/06/20  salvad $
+: $Id: nsloc_v2.mod,v 1.7 2013/06/20  salvad $
 : from nrn/src/nrnoc/netstim.mod
 : modified to use as proprioceptive units in arm2dms model
 
-NEURON	{ 
+NEURON	{
   ARTIFICIAL_CELL NSLOC
-  RANGE interval, number, start, xloc, yloc, zloc, id, type, subtype, fflag, mlenmin, mlenmax, checkInterval, ispike
+  RANGE interval, number, start, xloc, yloc, zloc, id, type, subtype, fflag, mlenmin, mlenmax, checkInterval, ispike, version
   RANGE noise
   THREADSAFE : only true if every instance has its own distinct Random
   POINTER donotuse
@@ -15,8 +15,8 @@ PARAMETER {
 	number	= 3000 <0,1e9>	: number of spikes (independent of noise)
 	start		= 1 (ms)	: start of first spike
 	noise		= 0 <0,1>	: amount of randomness (0.0 - 1.0)
-    xloc = -1 
-    yloc = -1 
+    xloc = -1
+    yloc = -1
     zloc = -1         : location
     id = -1
     type = -1
@@ -24,11 +24,13 @@ PARAMETER {
     fflag           = 1             : don't change -- indicates that this is an artcell
     check_interval = 1.0 (ms) : time between checking if interval has changed
     ispike = 0
+    version = 2
 }
 
 ASSIGNED {
 	event (ms)
 	last_interval (ms)
+	interval_diff (ms)
 	transition
 	on
 	donotuse
@@ -58,13 +60,14 @@ INITIAL {
 		}
 		net_send(event, 3)
 	}
-}	
+}
 
 PROCEDURE init_sequence(t(ms)) {
 	if (number > 0) {
 		on = 1
 		event = 0
 		ispike = 0
+		last_interval = interval
 	}
 }
 
@@ -149,34 +152,50 @@ NET_RECEIVE (w) {
 		}
 	}
 	if (flag == 1 && on == 1) {
-		ispike = ispike + 1
-		net_event(t)
-		next_invl()
-		transition = 0
-		if (on == 1) {
-			net_send(event, 1)
+		if (interval_diff > 0) {
+			: There was a change on interval so trigger at interval_diff instead
+			net_send(interval_diff, 1)
+			interval_diff = 0
+		} else {
+			ispike = ispike + 1
+			net_event(t)
+			next_invl()
+			transition = 0
+			if (on == 1) {
+				net_send(event, 1)
+			}
 		}
-	}	
-	if (flag == 5 && on == 1 && transition == 1) {         
-		ispike = ispike + 1
-        net_event(t)
-		next_invl()
-		if (on == 1) {
-			net_send(event, 5)
+	}
+	if (flag == 5 && on == 1 && transition == 1) {
+		if (interval_diff > 0) {
+			: There was a change on interval so trigger at interval_diff instead
+			net_send(interval_diff, 1)
+			interval_diff = 0
+		} else {
+			ispike = ispike + 1
+	        net_event(t)
+			next_invl()
+			if (on == 1) {
+				net_send(event, 5)
+			}
 		}
-    }	
+    }
 	if (flag == 4 && on == 1) { : check if interval has changed
 		if (interval < last_interval) { :if (2*interval < event || interval > 2*event) {
+			interval_diff = 0
 			next_invl()
 			transition = 1
-			net_send(event,5)       
+			net_send(0, 5) : Send a spike right away
+		}
+		if (interval > last_interval) {
+			interval_diff = interval - last_interval
 		}
 		last_interval = interval
 		net_send(check_interval, 4) : next check interval event
 	}
     if (flag == 1 && on == 0) { : For external PMd inputs - .event(timeStamp, 1) in server.py
         net_event(t)
-    }	
+    }
 }
 
 COMMENT
