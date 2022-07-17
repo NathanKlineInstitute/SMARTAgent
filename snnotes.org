@@ -40798,8 +40798,14 @@ so overall that looks like a good trend ... but the problem is the firing rates 
 and have limited room for further growth ... 
 
 * 22jul16
-** next sim
+** next sim (22jul16_R0_cycle_)
 
 would increasing number of neurons from last sim improve perf? 
 could try doubling EA, EM, IM, IML ... 
+
+python -i simdat.py backupcfg/22jul16_R0_cycle_sim.json
+
+python multistepSim.py sn.json 30 10 22jul16_test_accum_stdp_R0_cycle_
+
+started ~22:20 ...
 
