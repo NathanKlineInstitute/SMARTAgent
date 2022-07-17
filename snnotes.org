@@ -40866,9 +40866,14 @@ could also update weights less frequently, or use smaller RLhebbwt ...
 22jul17_R0__EA6400_RLhebbwt0.05_incWeightStepSize500_cycle_
 
 python multistepSim.py sn.json 30 15 22jul17_R0__EA6400_RLhebbwt0.05_incWeightStepSize500_cycle_
-
+(note EA == 3200!!)
 (buffer=s2)
 
-and
+and larger RLhebbwt with longer incWeightStepSize
 
+22jul17_R0__EA3200_RLhebbwt0.1_incWeightStepSize1000_cycle_
+
+python multistepSim.py sn.json 30 15 22jul17_R0__EA3200_RLhebbwt0.1_incWeightStepSize1000_cycle_
+
+(buffer=s0)
 
