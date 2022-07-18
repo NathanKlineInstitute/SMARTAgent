@@ -40855,7 +40855,7 @@ savefig(gifpath()+'rastB.png') # [[./gif/22jul17_22jul16_R0_cycle__step_9_rastB.
 fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward) # [[./gif/22jul17_22jul16_R0_cycle__step_9__with_reward_input.mp4]]
 
 * 22jul17
-** next
+** next sims
 
 hyperparam opt on number of neurons in each area? time step for the accumulation?
 
@@ -40876,4 +40876,101 @@ and larger RLhebbwt with longer incWeightStepSize
 python multistepSim.py sn.json 30 15 22jul17_R0__EA3200_RLhebbwt0.1_incWeightStepSize1000_cycle_
 
 (buffer=s0)
+
+*** check 22jul17_R0__EA3200_RLhebbwt0.1_incWeightStepSize1000_cycle__step_9_ ->> not improving
+
+python -i simdat.py backupcfg/22jul17_R0__EA3200_RLhebbwt0.1_incWeightStepSize1000_cycle__step_9_sim.json
+
+EV1 0.04 Hz
+EA 3.99 Hz
+EMDOWN 14.57 Hz
+EMUP 14.64 Hz
+IM 125.14 Hz
+IML 134.24 Hz
+stimModEV1 0.0 Hz
+
+ax=plotPerf(actreward,yl=(0.0,1))
+savefig(gifpath()+'perf.png') # [[./gif/22jul17_22jul17_R0__EA3200_RLhebbwt0.1_incWeightStepSize1000_cycle__step_9_perf.png]]
+
+lfn = ['22jul17_R0__EA3200_RLhebbwt0.1_incWeightStepSize1000_cycle__step_' + str(i) + '_' for i in range(10)]
+
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0.0,0.5))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/22jul17_22jul17_R0__EA3200_RLhebbwt0.1_incWeightStepSize1000_cycle__step_9_perf_all_steps_so_far.png]]
+
+lpda = getindivactionreward(lfn)
+cla(); lrat = plotHitMissRatioPerStep(lpda)
+savefig(gifpath()+'hit_miss_ratio.png') # [[./gif/22jul17_22jul17_R0__EA3200_RLhebbwt0.1_incWeightStepSize1000_cycle__step_9_hit_miss_ratio.png]]
+
+hmm...this one not working so well.... low/flat perf
+
+csm=cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+lclr = [csm.to_rgba(float(i)/(len(lpda))) for i in range(len(lpda))]
+clf(); plotComparePerf(lpda,lclr,yl=(0,1),skipfollow=True)
+savefig(gifpath()+'comp_perf.png') # [[./gif/22jul17_22jul17_R0__EA3200_RLhebbwt0.1_incWeightStepSize1000_cycle__step_9_comp_perf.png]]
+
+tmax=500e3; drawraster(dspkT,dspkID,tlim=(tmax-5e3,tmax))
+savefig(gifpath()+'rast.png') # [[./gif/22jul17_22jul17_R0__EA3200_RLhebbwt0.1_incWeightStepSize1000_cycle__step_9_rast.png]]
+
+fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward) 
+[[./gif/22jul17_22jul17_R0__EA3200_RLhebbwt0.1_incWeightStepSize1000_cycle__step_9__with_reward_input.mp4]]
+
+maybe not improving since eligibility trace 10 s but incWeightStepSize takes 20 s ... 
+no, weights can still accumulate changes ... 
+
+*** check 22jul17_R0__EA3200_RLhebbwt0.05_incWeightStepSize500_cycle__step_10_
+
+python -i simdat.py backupcfg/22jul17_R0__EA3200_RLhebbwt0.05_incWeightStepSize500_cycle__step_10_sim.json
+
+EV1 0.05 Hz
+EA 5.33 Hz
+EMDOWN 27.98 Hz
+EMUP 28.07 Hz
+IM 213.18 Hz
+IML 254.62 Hz
+
+ax=plotPerf(actreward,yl=(0.0,1))
+savefig(gifpath()+'perf.png') # [[./gif/22jul17_22jul17_R0__EA3200_RLhebbwt0.05_incWeightStepSize500_cycle__step_10_perf.png]]
+
+lfn = ['22jul17_R0__EA3200_RLhebbwt0.05_incWeightStepSize500_cycle__step_' + str(i) + '_' for i in range(11)]
+
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0.0,0.5))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/22jul17_22jul17_R0__EA3200_RLhebbwt0.05_incWeightStepSize500_cycle__step_10_perf_all_steps_so_far.png]]
+
+lpda = getindivactionreward(lfn)
+cla(); lrat = plotHitMissRatioPerStep(lpda)
+savefig(gifpath()+'hit_miss_ratio.png') # [[./gif/22jul17_22jul17_R0__EA3200_RLhebbwt0.05_incWeightStepSize500_cycle__step_10_hit_miss_ratio.png]]
+
+csm=cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+lclr = [csm.to_rgba(float(i)/(len(lpda))) for i in range(len(lpda))]
+clf(); plotComparePerf(lpda,lclr,yl=(0,1),skipfollow=True)
+savefig(gifpath()+'comp_perf.png') # [[./gif/22jul17_22jul17_R0__EA3200_RLhebbwt0.05_incWeightStepSize500_cycle__step_10_comp_perf.png]]
+
+tmax=500e3; drawraster(dspkT,dspkID,tlim=(tmax-5e3,tmax))
+savefig(gifpath()+'rast.png') # [[./gif/22jul17_22jul17_R0__EA3200_RLhebbwt0.05_incWeightStepSize500_cycle__step_10_rast.png]]
+
+fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward) 
+[[./gif/22jul17_22jul17_R0__EA3200_RLhebbwt0.05_incWeightStepSize500_cycle__step_10__with_reward_input.mp4]]
+
+** continue 22jul15_R0_cycle__step_9_
+
+see if 22jul16_22jul15_R0_cycle__step_9_hit_miss_ratio.png continues to improve
+
+rates were high at that point, but worth a try ... 
+
+cp backupcfg/22jul15_R0_cycle_sim.json ~/SMARTAgent/sn.json
+
+then put in resume sim ... 
+
+  "simtype": {
+    "ResumeSim": 1,
+    "ResumeSimFromFile": "data/22jul15_R0_cycle__step_9_synWeights_final.pkl"
+  },
+
+name as 22jul15_R0B_cycle_
+
+python multistepSim.py sn.json 30 10 22jul15_R0B_cycle_
+
+...
 

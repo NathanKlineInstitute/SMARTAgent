@@ -93,8 +93,8 @@
   "verbose": 0,
   "stayStepLim": 0,
   "simtype": {
-    "ResumeSim": 0,
-    "ResumeSimFromFile": "data/22jul12_A_cycle__step_9_synWeights_final.pkl"
+    "ResumeSim": 1,
+    "ResumeSimFromFile": "data/22jul15_R0_cycle__step_9_synWeights_final.pkl"
   },
   "sim": {
     "duration": 500000,
@@ -102,14 +102,14 @@
     "verbose": 0,
     "recordStep": 1.0,
     "recordStim": 0,
-    "recordWeightStepSize": 1000,
-    "incWeightStepSize" :   1000, 
+    "recordWeightStepSize": 500,
+    "incWeightStepSize" :   500, 
     "normalizeWeightStepSize": 50000000000000000000000000000000000000,
     "normalizeWeightsAtStart": 0,
     "RLFakeUpRule": 0,
     "RLFakeDownRule": 0,
     "RLFakeStayRule": 0,
-    "name": "22jul17_R0__EA3200_RLhebbwt0.1_incWeightStepSize1000_cycle_",
+    "name": "22jul15_R0B_cycle_",
     "doquit": 1,
     "doplot": 0,
     "saveCellSecs": 0,
