@@ -93,7 +93,7 @@
   "verbose": 0,
   "stayStepLim": 0,
   "simtype": {
-    "ResumeSim": 1,
+    "ResumeSim": 0,
     "ResumeSimFromFile": "data/22jul15_R0_cycle__step_9_synWeights_final.pkl"
   },
   "sim": {
@@ -104,12 +104,12 @@
     "recordStim": 0,
     "recordWeightStepSize": 500,
     "incWeightStepSize" :   500, 
-    "normalizeWeightStepSize": 50000000000000000000000000000000000000,
+    "normalizeWeightStepSize": 500,
     "normalizeWeightsAtStart": 0,
     "RLFakeUpRule": 0,
     "RLFakeDownRule": 0,
     "RLFakeStayRule": 0,
-    "name": "22jul15_R0B_cycle_",
+    "name": "22jul18_R0_withCellWNorm_cycle_",
     "doquit": 1,
     "doplot": 0,
     "saveCellSecs": 0,
@@ -819,9 +819,9 @@
     "EEMWghtThreshMax": 4.0,
     "EEMPopNorm": 1,
     "CellWNorm": {
-      "On": 0,
-      "MinFctr": 1.0,
-      "MaxFctr": 15.0
+      "On": 1,
+      "MinFctr": 0.9,
+      "MaxFctr": 4.0
     },
     "homPlast": {
       "On": 0,
