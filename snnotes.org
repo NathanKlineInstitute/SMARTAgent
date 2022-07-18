@@ -41054,3 +41054,49 @@ python multistepSim.py sn.json 30 30 22jul18_R0_withCellWNorm_cycle_
 
 started ~13:14 ...
 
+** check 22jul17_R0__EA3200_RLhebbwt0.05_incWeightStepSize500_cycle__step_14_ -> no good
+
+python -i simdat.py backupcfg/22jul17_R0__EA3200_RLhebbwt0.05_incWeightStepSize500_cycle__step_14_sim.json
+
+EV1 0.05 Hz
+EA 5.36 Hz
+EMDOWN 32.6 Hz
+EMUP 32.66 Hz
+IM 223.93 Hz
+IML 272.29 Hz
+
+ax=plotPerf(actreward,yl=(0.0,1))
+savefig(gifpath()+'perf.png') # [[./gif/22jul18_22jul17_R0__EA3200_RLhebbwt0.05_incWeightStepSize500_cycle__step_14_perf.png]]
+pretty bad...
+
+lfn = ['22jul17_R0__EA3200_RLhebbwt0.05_incWeightStepSize500_cycle__step_' + str(i) + '_' for i in range(15)]
+
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0.0,0.5))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/22jul18_22jul17_R0__EA3200_RLhebbwt0.05_incWeightStepSize500_cycle__step_14_perf_all_steps_so_far.png]]
+
+lpda = getindivactionreward(lfn)
+cla(); lrat = plotHitMissRatioPerStep(lpda)
+savefig(gifpath()+'hit_miss_ratio.png') # [[./gif/22jul18_22jul17_R0__EA3200_RLhebbwt0.05_incWeightStepSize500_cycle__step_14_hit_miss_ratio.png]]
+strange oscillating pattern, not consistent...
+
+csm=cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+lclr = [csm.to_rgba(float(i)/(len(lpda))) for i in range(len(lpda))]
+clf(); plotComparePerf(lpda,lclr,yl=(0,1),skipfollow=True)
+savefig(gifpath()+'comp_perf.png') # [[./gif/22jul18_22jul17_R0__EA3200_RLhebbwt0.05_incWeightStepSize500_cycle__step_14_comp_perf.png]]
+
+no point pursuing this one ... 
+
+
+
+** next 22jul18_R0_EA6400_cycle_
+
+raise EA to 6400 but keep EM same at 100
+w/o cell weight normalizaiton
+
+./myrun 30 sn.json
+
+python -i simdat.py backupcfg/22jul18_R0_EA6400_cycle_sim.json
+
+python multistepSim.py sn.json 30 10 22jul18_R0_EA6400_cycle_
+
