@@ -1332,7 +1332,7 @@ def mulAdjustableWeights (sim, dfctr):
 def normalizeAdjustableWeights (sim, t, lpop):
   # normalize the STDP/RL weights during the simulation - called in trainAgent
   if dconf['net']['CellWNorm']['On']:
-    # print('normalizing CellWNorm at t=',t)
+    if sim.rank==0: print('normalizing CellWNorm at t=',t, 'lpop=',lpop)
     global dsumWInit
     dsumWCurr = getSumAdjustableWeights(sim) # get current sum of adjustable weight values
     MinFctr, MaxFctr = dconf['net']['CellWNorm']['MinFctr'], dconf['net']['CellWNorm']['MaxFctr']
@@ -1340,6 +1340,8 @@ def normalizeAdjustableWeights (sim, t, lpop):
       if cell.gid in dsumWInit:
         currW = dsumWCurr[cell.gid]
         initW = dsumWInit[cell.gid]
+        #print('gid,currW,initW,len(cell.conns),w:',cell.gid,currW,initW,len([mysyn for mysyn in cell.conns if 'hSTDP' in mysyn]),[mysyn['hObj'].weight[PlastWeightIndex] for mysyn in cell.conns if 'hSTDP' in mysyn])
+        if sim.rank==0: print('gid,currW,initW,len(cell.conns),w:',cell.gid,currW,initW,len([mysyn for mysyn in cell.conns if 'hSTDP' in mysyn]))        
         if currW > 0 and currW != initW:
           fctrA = currW / initW
           dochange = False
@@ -1349,8 +1351,8 @@ def normalizeAdjustableWeights (sim, t, lpop):
           elif fctrA > MaxFctr:
             fctrB = (MaxFctr * initW) / currW # factor to restore weights to boundary
             dochange = True
-          # print('initW:',initW,'currW:',currW,'fctr:',fctr)
           if dochange:
+            if sim.rank==0: print('initW:',initW,'currW:',currW,'fctr:',fctrB)            
             for conn in cell.conns:
               if 'hSTDP' in conn:
                 conn['hObj'].weight[PlastWeightIndex] *= fctrB
@@ -1970,7 +1972,7 @@ def trainAgent (simTime):
       print('Weights Recording Time:', t, 'NBsteps:',NBsteps,'recordWeightStepSize:',recordWeightStepSize)
     recordAdjustableWeights(sim, t, lrecpop) 
   if NBsteps % normalizeWeightStepSize == 0:
-    if dconf['verbose'] > 0 and sim.rank==0:
+    if sim.rank==0:
       print('Weight Normalize Time:', t, 'NBsteps:',NBsteps,'normalizeWeightStepSize:',normalizeWeightStepSize)
     sim.pc.barrier()
     normalizeAdjustableWeights(sim, t, lrecpop)

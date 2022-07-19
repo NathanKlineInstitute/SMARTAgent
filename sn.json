@@ -104,12 +104,12 @@
     "recordStim": 0,
     "recordWeightStepSize": 500,
     "incWeightStepSize" :   500, 
-    "normalizeWeightStepSize": 500000000000000000000000000000000000000000000,
+    "normalizeWeightStepSize": 500,
     "normalizeWeightsAtStart": 0,
     "RLFakeUpRule": 0,
     "RLFakeDownRule": 0,
     "RLFakeStayRule": 0,
-    "name": "22jul18_R0_EA6400_cycle_",
+    "name": "22jul19_R0_CellWNorm_cycle_",
     "doquit": 1,
     "doplot": 0,
     "saveCellSecs": 0,
@@ -209,7 +209,7 @@
       "IV4": 0,
       "EMT": 0,
       "IMT": 0,
-      "EA": 6400,
+      "EA": 3200,
       "IA": 0,
       "IAL": 0,
       "EA2": 0,
@@ -431,7 +431,7 @@
       "FeedbackAtoLocN": 0,
       "FeedbackMtoA": 0,
       "FeedbackMtoA2": 0,
-      "FeedbackA2toA": 9
+      "FeedbackA2toA": 0
     },
     "useBinaryImage": 1,
     "useNeuronPad": 0,
@@ -817,11 +817,11 @@
     },
     "EEMWghtThreshMin": 0.9,
     "EEMWghtThreshMax": 4.0,
-    "EEMPopNorm": 1,
+    "EEMPopNorm": 0,
     "CellWNorm": {
-      "On": 0,
-      "MinFctr": 0.9,
-      "MaxFctr": 4.0
+      "On": 1,
+      "MinFctr": 1.0,
+      "MaxFctr": 1.0
     },
     "homPlast": {
       "On": 0,
