@@ -2106,7 +2106,9 @@ def updateSTDPWeights (sim, W):
         #hSTDP = conn.get('hSTDP')
         #hSTDP.cumreward = cConnW.at[idx,'cumreward']
         if dconf['verbose'] > 1: print('weight updated:', cW)
-        
+
+dsumWInit = getSumAdjustableWeights(sim) # get sum of adjustable weights at start of sim
+              
 #if specified 'ResumeSim' = 1, load the connection data from 'ResumeSimFromFile' and assign weights to STDP synapses  
 if dconf['simtype']['ResumeSim']:
   try:
@@ -2133,7 +2135,7 @@ tPerPlay = tstepPerAction*dconf['actionsPerPlay']
 InitializeInputRates()
 # InitializePFCInputRates()
 #InitializeNoiseRates()
-dsumWInit = getSumAdjustableWeights(sim) # get sum of adjustable weights at start of sim
+#dsumWInit = getSumAdjustableWeights(sim) # get sum of adjustable weights at start of sim
 
 #sim.runSimWithIntervalFunc(tPerPlay,trainAgent, funcArgs={'simTime': h.t}) # has periodic callback to adjust STDP weights based on RL signal
 sim.runSimWithIntervalFunc(tPerPlay,trainAgent) # has periodic callback to adjust STDP weights based on RL signal
