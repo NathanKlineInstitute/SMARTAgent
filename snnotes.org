@@ -41250,3 +41250,20 @@ relative synaptic weights onto a neuron can still change ... but sum will have t
 
 python multistepSim.py sn.json 30 30 22jul19_R0_withCellWNorm_cycle_
 
+** 22jul19_R0_CellWNorm_1.0_2.0_cycle_
+
+also compare with a sim where allow weights to go up ~100%
+
+make sure the dsumWInit variable is called before the STDP weights get reloaded, since the comparison is relative
+to initial weights before any plasticity applied ... 
+
+and have normalizeWeightsAtStart ... 
+
+    "CellWNorm": {
+      "On": 1,
+      "MinFctr": 1.0,
+      "MaxFctr": 2.0
+    },
+
+python multistepSim.py sn.json 30 30 22jul19_R0_CellWNorm_1.0_2.0_cycle_
+
