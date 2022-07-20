@@ -104,12 +104,12 @@
     "recordStim": 0,
     "recordWeightStepSize": 500,
     "incWeightStepSize" :   500, 
-    "normalizeWeightStepSize": 500,
+    "normalizeWeightStepSize": 50000000000000000000000000000000,
     "normalizeWeightsAtStart": 1,
     "RLFakeUpRule": 0,
     "RLFakeDownRule": 0,
     "RLFakeStayRule": 0,
-    "name": "22jul20_R0_CellWNorm_0.85_1.15_cycle_",
+    "name": "22jul20_R0_EMEM0_cycle_",
     "doquit": 1,
     "doplot": 0,
     "saveCellSecs": 0,
@@ -568,7 +568,7 @@
         "EM": {
           "AM2": 1,
           "NM2": 0.0,
-          "conv": 10
+          "conv": 0
         },
         "EA": {
           "AM2": 0.05,
@@ -819,7 +819,7 @@
     "EEMWghtThreshMax": 4.0,
     "EEMPopNorm": 0,
     "CellWNorm": {
-      "On": 1,
+      "On": 0,
       "MinFctr": 0.85,
       "MaxFctr": 1.15
     },
