@@ -109,7 +109,7 @@
     "RLFakeUpRule": 0,
     "RLFakeDownRule": 0,
     "RLFakeStayRule": 0,
-    "name": "22jul19_R0_CellWNorm_1.0_2.0_cycle_",
+    "name": "22jul20_R0_CellWNorm_0.85_1.15_cycle_",
     "doquit": 1,
     "doplot": 0,
     "saveCellSecs": 0,
@@ -820,8 +820,8 @@
     "EEMPopNorm": 0,
     "CellWNorm": {
       "On": 1,
-      "MinFctr": 1.0,
-      "MaxFctr": 2.0
+      "MinFctr": 0.85,
+      "MaxFctr": 1.15
     },
     "homPlast": {
       "On": 0,

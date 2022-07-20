@@ -41267,3 +41267,111 @@ and have normalizeWeightsAtStart ...
 
 python multistepSim.py sn.json 30 30 22jul19_R0_CellWNorm_1.0_2.0_cycle_
 
+* 22jul20
+** check 22jul19_R0_CellWNorm_cycle__step_18_ -->> flat, stopped
+
+python -i simdat.py backupcfg/22jul19_R0_CellWNorm_cycle__step_18_sim.json
+
+EV1 0.04 Hz
+EA 4.81 Hz
+EMDOWN 20.92 Hz
+EMUP 20.93 Hz
+IM 169.79 Hz
+IML 196.65 Hz
+
+ax=plotPerf(actreward,yl=(0.0,1.0))
+savefig(gifpath()+'perf.png') # [[./gif/22jul20_22jul19_R0_CellWNorm_cycle__step_18_perf.png]]
+
+lfn = ['22jul19_R0_CellWNorm_cycle__step_' + str(i) + '_' for i in range(19)]
+
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0.0,1.0))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/22jul20_22jul19_R0_CellWNorm_cycle__step_18_perf_all_steps_so_far.png]]
+flat...
+
+lpda = getindivactionreward(lfn)
+cla(); lrat = plotHitMissRatioPerStep(lpda)
+savefig(gifpath()+'hit_miss_ratio.png') # [[./gif/22jul20_22jul19_R0_CellWNorm_cycle__step_18_hit_miss_ratio.png]]
+flat...
+
+csm=cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+lclr = [csm.to_rgba(float(i)/(len(lpda))) for i in range(len(lpda))]
+clf(); plotComparePerf(lpda,lclr,yl=(0,1),skipfollow=True)
+savefig(gifpath()+'comp_perf.png') # [[./gif/22jul20_22jul19_R0_CellWNorm_cycle__step_18_comp_perf.png]]
+
+clf(); pdfc = getconcatweightpdf(lfn,usefinal=True)
+popwtsfromEA = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False,prety='EA'); ylabel('Average EA->EM')
+savefig(gifpath()+'all_steps_avg_weight.png') # [[./gif/22jul20_22jul19_R0_CellWNorm_cycle__step_18_all_steps_avg_weight.png]]
+not completely flat ... but close
+
+how does perf compare to sim w/o norm?
+lfnO = ['22jul15_R0_cycle__step_' + str(i) + '_' for i in range(10)]
+lpdaO = getindivactionreward(lfnO)
+lratO = plotHitMissRatioPerStep(lpdaO,clr='b')
+plot(lrat,'r',linewidth=4); plot(lrat,'ro',markersize=15)
+
+w/o norm (blue) seems a little better ... 
+
+savefig('gif/22jul19_compare_perf_hit_miss_ratio_norm_no_norm_a0.png')
+[[./gif/22jul19_compare_perf_hit_miss_ratio_norm_no_norm_a0.png]]
+
+** check 22jul19_R0_CellWNorm_1.0_2.0_cycle__step_18_ -->> stopped
+
+python -i simdat.py backupcfg/22jul19_R0_CellWNorm_1.0_2.0_cycle__step_18_sim.json
+
+EV1 0.05 Hz
+EA 5.82 Hz
+EMDOWN 32.31 Hz
+EMUP 32.35 Hz
+IM 246.72 Hz
+IML 294.84 Hz
+
+ax=plotPerf(actreward,yl=(0.0,1.0))
+savefig(gifpath()+'perf.png') # [[./gif/22jul20_22jul19_R0_CellWNorm_1.0_2.0_cycle__step_18_perf.png]]
+
+lfn = ['22jul19_R0_CellWNorm_1.0_2.0_cycle__step_' + str(i) + '_' for i in range(19)]
+
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0.0,1.0))
+savefig(gifpath()+'perf_all_steps_so_far.png') 
+[[./gif/22jul20_22jul19_R0_CellWNorm_1.0_2.0_cycle__step_18_perf_all_steps_so_far.png]]
+flat...
+
+lpda = getindivactionreward(lfn)
+cla(); lrat = plotHitMissRatioPerStep(lpda)
+savefig(gifpath()+'hit_miss_ratio.png') # [[./gif/22jul20_22jul19_R0_CellWNorm_1.0_2.0_cycle__step_18_hit_miss_ratio.png]]
+U-shaped ... not good
+
+csm=cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+lclr = [csm.to_rgba(float(i)/(len(lpda))) for i in range(len(lpda))]
+clf(); plotComparePerf(lpda,lclr,yl=(0,1),skipfollow=True)
+savefig(gifpath()+'comp_perf.png') # [[./gif/22jul20_22jul19_R0_CellWNorm_1.0_2.0_cycle__step_18_comp_perf.png]]
+
+clf(); pdfc = getconcatweightpdf(lfn,usefinal=True)
+popwtsfromEA = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False,prety='EA'); ylabel('Average EA->EM')
+savefig(gifpath()+'all_steps_avg_weight.png') # [[./gif/22jul20_22jul19_R0_CellWNorm_1.0_2.0_cycle__step_18_all_steps_avg_weight.png]]
+
+how does perf compare to sim w/o norm?
+lfnO = ['22jul15_R0_cycle__step_' + str(i) + '_' for i in range(10)]
+lpdaO = getindivactionreward(lfnO)
+lratO = plotHitMissRatioPerStep(lpdaO,clr='b')
+plot(lrat,'r',linewidth=4); plot(lrat,'ro',markersize=15)
+
+savefig('gif/22jul19_compare_perf_hit_miss_ratio_norm_no_norm_b0.png')
+[[./gif/22jul19_compare_perf_hit_miss_ratio_norm_no_norm_b0.png]]
+
+also seems to be underperforming the simulation w/o normalization ... though possibly starts to pick up at the end where the weights
+have started increasing...
+
+** one more cell norm - 22jul20_R0_CellWNorm_0.85_1.15_cycle_
+
+    "CellWNorm": {
+      "On": 1,
+      "MinFctr": 0.85,
+      "MaxFctr": 1.15
+    },
+
+allow weights to go down and up within fairly narrow range ... 
+
+python multistepSim.py sn.json 30 30 22jul20_R0_CellWNorm_0.85_1.15_cycle_
+
