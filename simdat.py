@@ -231,7 +231,12 @@ def loadsimdat (name=None,getactmap=True,lpop = allpossible_pops): # load simula
   #        'EV1DW','EV1DNW', 'EV1DN', 'EV1DNE','EV1DE','EV1DSW', 'EV1DS', 'EV1DSE',\
   #        'EMDOWN','EMUP']  
   if getactmap: dact = getdActMap(totalDur, tstepPerAction, dspkT, dspkID, dnumc, dstartidx, lpop)
-  return simConfig, pdf, actreward, dstartidx, dendidx, dnumc, dspkID, dspkT, InputImages, ldflow, dact
+  dcumreward=None
+  try:
+    dcumreward = pickle.load(open('data/'+name+'CumReward.pkl','rb'))
+  except:
+    pass  
+  return simConfig, pdf, actreward, dstartidx, dendidx, dnumc, dspkID, dspkT, InputImages, ldflow, dact, dcumreward
 
 #
 def animActivityMaps (outpath='gif/'+dconf['sim']['name']+'actmap.mp4', framerate=10, figsize=(18,10), dobjpos=None,\
@@ -2315,7 +2320,7 @@ if __name__ == '__main__':
       if dconf['net']['allpops'][cpop]>0:
         lpop.append(cpop)
   print('lpop: ', lpop)
-  simConfig, pdf, actreward, dstartidx, dendidx, dnumc, dspkID, dspkT, InputImages, ldflow, dact = loadsimdat(getactmap=False,lpop=lpop)
+  simConfig, pdf, actreward, dstartidx, dendidx, dnumc, dspkID, dspkT, InputImages, ldflow, dact, dcumreward = loadsimdat(getactmap=False,lpop=lpop)
   dstr = getdatestr(); simstr = dconf['sim']['name'] # date and sim string
   print('loaded simulation data',simstr,'on',dstr)
   #davgw = plotavgweights(pdf)
@@ -2335,5 +2340,6 @@ if __name__ == '__main__':
     drawraster(dspkT,dspkID)
     figure(); drawcellVm(simConfig,lclr=['r','g','b','c','m','y'])    
   else:
-    pravgrates(dspkT,dspkID,dnumc,tlim=(250,totalDur))    
+    pravgrates(dspkT,dspkID,dnumc,tlim=(250,totalDur))
+  figure(); plot(dcumreward['TRAIN'],'r'); plot(dcumreward['TRAIN'],'ro'); plot(dcumreward['TEST'],'b');plot(dcumreward['TEST'],'bo')    
 

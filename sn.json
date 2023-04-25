@@ -74,7 +74,7 @@
   "avoidStuck": 0,
   "useImagePadding": 0,
   "rewardcodes": {
-    "scorePoint": 2.0,
+    "scorePoint": 0.0,
     "losePoint": -0.25,
     "followTarget": 0.0,
     "avoidTarget": 0.0,
@@ -1049,7 +1049,7 @@
       },
       "AM2": {
         "w": 3,
-        "rate": 200
+        "rate": 100
       },
       "NM2": {
         "w": 0,
@@ -1075,7 +1075,7 @@
       },
       "AM2": {
         "w": 3,
-        "rate": 200
+        "rate": 100
       },
       "NM2": {
         "w": 0,

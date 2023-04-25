@@ -41460,3 +41460,5 @@ fired. if the postsynaptic neuron fires before the window is done, that's eviden
 * 23apr25 - accum branch (branched off development today)
 ** test accum idea
 
+python multistepSim.py sn.json 10 100 23apr25_A0_
+
