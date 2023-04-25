@@ -41388,3 +41388,72 @@ set it to 0 and turned off cell wnorm ...
 
 python multistepSim.py sn.json 30 10 22jul20_R0_EMEM0_cycle_
 
+* 22jul21
+** check 22jul20_R0_CellWNorm_0.85_1.15_cycle__step_28_
+
+python -i simdat.py backupcfg/22jul20_R0_CellWNorm_0.85_1.15_cycle__step_28_sim.json
+
+EV1 0.05 Hz
+EA 5.33 Hz
+EMDOWN 25.68 Hz
+EMUP 25.74 Hz
+IM 207.14 Hz
+IML 241.87 Hz
+
+ax=plotPerf(actreward,yl=(0.0,1.0))
+savefig(gifpath()+'perf.png') # [[./gif/22jul21_22jul20_R0_CellWNorm_0.85_1.15_cycle__step_28_perf.png]]
+
+firing rates constrained ... only ~25% increase from starting, but same low perf level...
+
+lfn = ['22jul20_R0_CellWNorm_0.85_1.15_cycle__step_' + str(i) + '_' for i in range(29)]
+
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0.0,1.0))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/22jul21_22jul20_R0_CellWNorm_0.85_1.15_cycle__step_28_perf_all_steps_so_far.png]]
+
+lpda = getindivactionreward(lfn)
+cla(); lrat = plotHitMissRatioPerStep(lpda)
+savefig(gifpath()+'hit_miss_ratio.png') # [[./gif/22jul21_22jul20_R0_CellWNorm_0.85_1.15_cycle__step_28_hit_miss_ratio.png]]
+
+csm=cm.ScalarMappable(cmap=cm.jet); csm.set_clim((0,1));
+lclr = [csm.to_rgba(float(i)/(len(lpda))) for i in range(len(lpda))]
+clf(); plotComparePerf(lpda,lclr,yl=(0,1),skipfollow=True)
+savefig(gifpath()+'comp_perf.png') # [[./gif/22jul21_22jul20_R0_CellWNorm_0.85_1.15_cycle__step_28_comp_perf.png]]
+
+not much progress...
+
+clf(); pdfc = getconcatweightpdf(lfn,usefinal=True)
+popwtsfromEA = plotMeanWeights(pdfc,gca(),msz=6,xl=(0,np.amax(pdfc.time)),lpop=['EMDOWN','EMUP'],lclr=['r','b'],plotindiv=False,prety='EA'); ylabel('Average EA->EM')
+savefig(gifpath()+'all_steps_avg_weight.png') # [[./gif/22jul21_22jul20_R0_CellWNorm_0.85_1.15_cycle__step_28_all_steps_avg_weight.png]]
+
+weights staying around where expected ... but once raised from learning, and stay flat, the performance levels off ... 
+
+how does perf compare to sim w/o norm?
+lfnO = ['22jul15_R0_cycle__step_' + str(i) + '_' for i in range(10)]
+lpdaO = getindivactionreward(lfnO)
+lratO = plotHitMissRatioPerStep(lpdaO,clr='b')
+plot(lrat,'r',linewidth=4); plot(lrat,'ro',markersize=15)
+
+savefig('gif/22jul21_compare_perf_hit_miss_ratio_norm_no_norm_a0.png')
+[[./gif/22jul21_compare_perf_hit_miss_ratio_norm_no_norm_a0.png]]
+so again, normalization did not help here, just the opposite ...
+
+** I->E plasticity?
+
+I before E firing ... 
+ when suppressing a neuron is associated with reward, increase the suppression (inhibition) further 
+ when suppressing a neuron is associated with punishment, decrease the suppression (inhibition)
+
+so that is ~same as rule for E -> X ... no, since suppression of the postsynaptic neuron means
+no postsynaptic spike was produced
+
+to detect suppression, is post before pre firing useful? ... 
+if you have pre before post firing that means the I neuron was not effective at suppressing the post neuron
+if you have post before pre I firing and no post firing after, there's effective suppression
+
+as evidence of suppression, could use pre firing, then post firing, but with post firing AFTER window of inhibition to tag a I -> X synapse ... 
+or simply NO firing of post during window of inhibition from presynaptic I firing, since later firing of post should not be required ... 
+
+would probably need a new mod file for that ... to detect no firing would need to send an event after the presynaptic neuron
+fired. if the postsynaptic neuron fires before the window is done, that's evidence of NO suppression ... (so no event sending needed)
+

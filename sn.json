@@ -97,7 +97,7 @@
     "ResumeSimFromFile": "data/22jul15_R0_cycle__step_9_synWeights_final.pkl"
   },
   "sim": {
-    "duration": 500000,
+    "duration": 10000,
     "dt": 0.6,
     "verbose": 0,
     "recordStep": 1.0,
@@ -109,7 +109,7 @@
     "RLFakeUpRule": 0,
     "RLFakeDownRule": 0,
     "RLFakeStayRule": 0,
-    "name": "22jul20_R0_EMEM0_cycle_",
+    "name": "22dec2_test_",
     "doquit": 1,
     "doplot": 0,
     "saveCellSecs": 0,
