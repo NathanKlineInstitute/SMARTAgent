@@ -97,7 +97,7 @@
     "ResumeSimFromFile": "data/22jul15_R0_cycle__step_9_synWeights_final.pkl"
   },
   "sim": {
-    "duration": 10000,
+    "duration": 400000,
     "dt": 0.6,
     "verbose": 0,
     "recordStep": 1.0,
@@ -125,7 +125,7 @@
     "ResetEligAfterCritic": 0,
     "QuitAfterMiss": 0,
     "learningrate": 0.1,
-    "simphasestepsize": 200
+    "simphasestepsize": 400
   },
   "architectureVtoA": {
     "useProbabilistic": 1,
@@ -524,7 +524,7 @@
           "conv": 0
         },
         "EM": {
-          "AM2": 5,
+          "AM2": 6,
           "NM2": 0.0,
           "conv": 100
         },
@@ -1049,7 +1049,7 @@
       },
       "AM2": {
         "w": 3,
-        "rate": 100
+        "rate": 200
       },
       "NM2": {
         "w": 0,
@@ -1075,7 +1075,7 @@
       },
       "AM2": {
         "w": 3,
-        "rate": 100
+        "rate": 200
       },
       "NM2": {
         "w": 0,
