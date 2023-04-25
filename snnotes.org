@@ -41457,3 +41457,6 @@ or simply NO firing of post during window of inhibition from presynaptic I firin
 would probably need a new mod file for that ... to detect no firing would need to send an event after the presynaptic neuron
 fired. if the postsynaptic neuron fires before the window is done, that's evidence of NO suppression ... (so no event sending needed)
 
+* 23apr25 - accum branch (branched off development today)
+** test accum idea
+

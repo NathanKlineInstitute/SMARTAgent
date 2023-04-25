@@ -74,7 +74,7 @@
   "avoidStuck": 0,
   "useImagePadding": 0,
   "rewardcodes": {
-    "scorePoint": 0.0,
+    "scorePoint": 2.0,
     "losePoint": -0.25,
     "followTarget": 0.0,
     "avoidTarget": 0.0,
@@ -105,11 +105,11 @@
     "recordWeightStepSize": 500,
     "incWeightStepSize" :   500, 
     "normalizeWeightStepSize": 50000000000000000000000000000000,
-    "normalizeWeightsAtStart": 1,
+    "normalizeWeightsAtStart": 0,
     "RLFakeUpRule": 0,
     "RLFakeDownRule": 0,
     "RLFakeStayRule": 0,
-    "name": "22dec2_test_",
+    "name": "23apr25_A0_",
     "doquit": 1,
     "doplot": 0,
     "saveCellSecs": 0,
@@ -118,12 +118,14 @@
     "targettedRL": 0,
     "targettedRLOppFctr": 0.5,
     "targettedRLDscntFctr": 0.05,
-    "tstepPerAction": 20,
+    "tstepPerAction": 50,
     "saveWeights": 1,
     "saveAssignedFiringRates": 0,
     "useReducedNetwork": 0,
-    "ResetEligAfterCritic": 1,
-    "QuitAfterMiss": 0
+    "ResetEligAfterCritic": 0,
+    "QuitAfterMiss": 0,
+    "learningrate": 0.1,
+    "simphasestepsize": 200
   },
   "architectureVtoA": {
     "useProbabilistic": 1,
@@ -209,16 +211,16 @@
       "IV4": 0,
       "EMT": 0,
       "IMT": 0,
-      "EA": 3200,
-      "IA": 0,
-      "IAL": 0,
+      "EA": 200,
+      "IA": 200,
+      "IAL": 100,
       "EA2": 0,
       "IA2": 0,
       "IA2L": 0,
-      "EMDOWN": 100,
-      "EMUP": 100,
-      "IM": 68,
-      "IML": 31,
+      "EMDOWN": 30,
+      "EMUP": 30,
+      "IM": 60,
+      "IML": 30,
       "IMUP": 0,
       "IMDOWN": 0,
       "EN": 0
@@ -425,7 +427,7 @@
       "FeedForwardA2toM": 0,
       "FeedbackLocNeurons": 0,
       "RecurrentMNeurons": 1,
-      "RecurrentANeurons": 0,
+      "RecurrentANeurons": 1,
       "RecurrentA2Neurons": 0,
       "FeedbackAtoDirN": 0,
       "FeedbackAtoLocN": 0,
@@ -513,8 +515,8 @@
       "EA": {
         "EA": {
           "AM2": 0.05,
-          "NM2": 0.005,
-          "conv": 0
+          "NM2": 0.0,
+          "conv": 20
         },
         "EA2": {
           "AM2": 0.5,
@@ -522,18 +524,18 @@
           "conv": 0
         },
         "EM": {
-          "AM2": 4.75,
+          "AM2": 5,
           "NM2": 0.0,
           "conv": 100
         },
         "IA": {
           "AM2": 1.95,
-          "NM2": 0.0195,
+          "NM2": 0.0,
           "conv": 93
         },
         "IAL": {
           "AM2": 0.98,
-          "NM2": 0.098,
+          "NM2": 0.0,
           "conv": 110
         }
       },
@@ -932,7 +934,7 @@
     "AMPAN": {
       "wbase": 0.001,
       "wmax": 35,
-      "RLon": 1,
+      "RLon": 0,
       "STDPon": 0,
       "RLlenhebb": 200,
       "RLlenanti": 500,
@@ -951,7 +953,7 @@
     "AMPAI": {
       "wbase": 0.4,
       "wmax": 30,
-      "RLon": 1,
+      "RLon": 0,
       "STDPon": 0,
       "RLlenhebb": 1000,
       "RLlenanti": 1000,
@@ -968,11 +970,11 @@
       "maxreward": 0.0
     },
     "AMPA": {
-      "wbase": 0.00001,
+      "wbase": 0.0,
       "wmax": 200,
       "RLon": 1,
       "STDPon": 0,
-      "RLlenhebb": 10000,
+      "RLlenhebb": 5000,
       "RLlenanti": 500,
       "useRLexp": 1,
       "RLhebbwt": 0.1,
@@ -1046,8 +1048,8 @@
         "rate": 0
       },
       "AM2": {
-        "w": 3.938,
-        "rate": 0
+        "w": 3,
+        "rate": 100
       },
       "NM2": {
         "w": 0,
@@ -1072,8 +1074,8 @@
         "rate": 0
       },
       "AM2": {
-        "w": 3.938,
-        "rate": 0
+        "w": 3,
+        "rate": 100
       },
       "NM2": {
         "w": 0,

@@ -17,6 +17,8 @@ from cells import intf7
 
 random.seed(1234) # this will not work properly across runs with different number of nodes
 
+sim.dcumreward = {'TRAIN':[0.0],'TEST':[]}
+sim.phase = 'TRAIN'
 sim.davgW = {} # average adjustable weights on a target population
 sim.allTimes = []
 sim.allRewards = [] # list to store all rewards
@@ -27,6 +29,7 @@ sim.allMotorOutputs = [] # list to store firing rate of output motor neurons.
 sim.followTargetSign = [] # whether racket moved closer (1) or farther (-1) from y intercept target at each step
 sim.ActionsRewardsfilename = 'data/'+dconf['sim']['name']+'ActionsRewards.txt'
 sim.MotorOutputsfilename = 'data/'+dconf['sim']['name']+'MotorOutputs.txt'
+sim.CumRewardsfilename = 'data/'+dconf['sim']['name']+'CumReward.pkl'
 sim.WeightsRecordingTimes = []
 sim.allRLWeights = [] # list to store weights --- should remove that
 sim.allNonRLWeights = [] # list to store weights --- should remove that
@@ -46,6 +49,7 @@ incWeightStepSize = dconf['sim']['incWeightStepSize']
 #recordWeightDT = 1000 # interval for recording synaptic weights (change later)
 recordWeightDCells = 1 # to record weights for sub samples of neurons
 tstepPerAction = dconf['sim']['tstepPerAction'] # time step per action (in ms)
+simphasestepsize = dconf['sim']['simphasestepsize']
 
 fid4=None # only used by rank 0
 
@@ -1774,6 +1778,7 @@ def finishSim ():
       sim.analysis.plotData()    
     if sim.plotWeights: plotWeights() 
     saveGameBehavior(sim)
+    pickle.dump(sim.dcumreward,open(sim.CumRewardsfilename,'wb'))    
     fid5 = open('data/'+dconf['sim']['name']+'ActionsPerEpisode.txt','w')
     for i in range(len(epCount)):
       fid5.write('\t%0.1f' % epCount[i])
@@ -1911,6 +1916,9 @@ def trainAgent (simTime):
     DOWNactions = np.sum(np.where(np.array(actions)==dconf['moves']['DOWN'],1,0))
     sim.pc.py_broadcast(UPactions,0) # broadcast UPactions
     sim.pc.py_broadcast(DOWNactions,0) # broadcast DOWNactions
+
+    sim.dcumreward[sim.phase][-1] += np.sum(rewards)
+    
   else: # other workers
     critic = sim.pc.py_broadcast(None, 0) # receive critic value from master node
     UPactions = sim.pc.py_broadcast(None, 0)
@@ -1919,32 +1927,7 @@ def trainAgent (simTime):
       print('UPactions: ', UPactions,'DOWNactions: ', DOWNactions)      
   if critic != 0: # if critic signal indicates punishment (-1) or reward (+1)
     if sim.rank==0: print('t=',round(t,2),'RLcritic:',critic)
-    if dconf['sim']['targettedRL']:
-      if UPactions==DOWNactions and \
-         sum(F_UPs)>0 and sum(F_DOWNs)>0: # same number of actions/spikes -> stay; only apply critic when > 0 spikes
-        if dconf['verbose']: print('APPLY RL to both EMUP and EMDOWN')
-        if dconf['sim']['targettedRL']>=4:
-          for STDPmech in dSTDPmech['EM']: STDPmech.reward_punish(float(critic)) # EM populations get reward/punishment on a tie            
-          for STDPmech in dSTDPmech['nonEM']: STDPmech.reward_punish(float(dconf['sim']['targettedRLDscntFctr']*critic)) # but non-EM get less than EM
-        else: # usual targetted RL (==1 or ==3)
-          for STDPmech in dSTDPmech['all']: STDPmech.reward_punish(float(critic))          
-      elif UPactions>DOWNactions: # UP WINS vs DOWN
-        if dconf['verbose']: print('APPLY RL to EMUP')
-        for STDPmech in dSTDPmech['EMUP']: STDPmech.reward_punish(float(critic))
-        if dconf['sim']['targettedRL']>=3 and sum(F_DOWNs)>0: # opposite to pop that did not contribute
-          if dconf['verbose']: print('APPLY -RL to EMDOWN')
-          for STDPmech in dSTDPmech['EMDOWN']: STDPmech.reward_punish(float(-dconf['sim']['targettedRLOppFctr']*critic))
-        if dconf['sim']['targettedRL']>=4: # apply to non-EM with a discount factor
-          for STDPmech in dSTDPmech['nonEM']: STDPmech.reward_punish(float(dconf['sim']['targettedRLDscntFctr']*critic))
-      elif DOWNactions>UPactions: # DOWN WINS vs UP
-        if dconf['verbose']: print('APPLY RL to EMDOWN')
-        for STDPmech in dSTDPmech['EMDOWN']: STDPmech.reward_punish(float(critic))
-        if dconf['sim']['targettedRL']>=3 and sum(F_UPs)>0: # opposite to pop that did not contribute
-          if dconf['verbose']: print('APPLY -RL to EMUP')            
-          for STDPmech in dSTDPmech['EMUP']: STDPmech.reward_punish(float(-dconf['sim']['targettedRLOppFctr']*critic))
-        if dconf['sim']['targettedRL']>=4: # apply to non-EM with a discount factor
-          for STDPmech in dSTDPmech['nonEM']: STDPmech.reward_punish(float(dconf['sim']['targettedRLDscntFctr']*critic))  
-    else: # this is non-targetted RL
+    if True: # this is non-targetted RL
       if dconf['verbose']: print('APPLY RL to both EMUP and EMDOWN')
       for STDPmech in dSTDPmech['all']: STDPmech.reward_punish(critic)
       for STDPmech in dSTDPmech['NOISE']: STDPmech.reward_punish(-critic) # noise sources get opposite sign RL
@@ -1964,29 +1947,45 @@ def trainAgent (simTime):
   updateInputRates() # update firing rate of inputs to R population (based on image content)
   # updatePFCInputRates() # choose random combination of PFC neurons to activate EM.               
   NBsteps += 1
-  if NBsteps % incWeightStepSize == 0:
-    if sim.rank == 0: print('Applying weight inc at t =' ,simTime)
-    for STDPmech in dSTDPmech['all']: STDPmech.applyweightinc()
-  if NBsteps % recordWeightStepSize == 0:
-    if dconf['verbose'] > 0 and sim.rank==0:
-      print('Weights Recording Time:', t, 'NBsteps:',NBsteps,'recordWeightStepSize:',recordWeightStepSize)
-    recordAdjustableWeights(sim, t, lrecpop) 
-  if NBsteps % normalizeWeightStepSize == 0:
-    if sim.rank==0:
-      print('Weight Normalize Time:', t, 'NBsteps:',NBsteps,'normalizeWeightStepSize:',normalizeWeightStepSize)
-    sim.pc.barrier()
-    normalizeAdjustableWeights(sim, t, lrecpop)
-    sim.pc.barrier()    
-  if dconf['net']['homPlast']['On']:
-    if NBsteps % dconf['net']['homPlast']['hsIntervalSteps'] == 0:
-      if sim.rank==0: print('adjustTargetWBasedOnFiringRates')
-      hsInterval = tstepPerAction*dconf['actionsPerPlay']*dconf['net']['homPlast']['hsIntervalSteps']
-      getFiringRateWithIntervalAllNeurons(sim, [t-hsInterval,t], sim.dHPlastPops) # call this function at hsInterval
-      adjustTargetWBasedOnFiringRates(sim) # call this function at hsInterval
-    if NBsteps % dconf['net']['homPlast']['updateIntervalSteps'] == 0:
-      if sim.rank==0: print('adjustWeightsBasedOnFiringRates')
-      adjustWeightsBasedOnFiringRates(sim,sim.dHPlastPops,synType=dconf['net']['homPlast']['synType'])
-      sim.pc.barrier()
+
+  if NBsteps % simphasestepsize == 0:
+    if sim.phase == 'TRAIN':
+      if sim.rank == 0:
+        print(t,'switching to testing phase, dcumreward=',sim.dcumreward)
+        # put agent back to where it started for testing
+        # sim.arena.rat.x=sim.arena.rat.lastx = sim.startX
+        # sim.arena.rat.y=sim.arena.rat.lasty = sim.startY
+        # print('moved agent to', sim.startX, sim.startY, 'at t=',t)
+      for STDPmech in dSTDPmech['all']: STDPmech.settestweight()
+      sim.phase = 'TEST'
+      sim.dcumreward['TEST'].append(0.0) # cumulative reward for next testing phase      
+    elif sim.phase == 'TEST':
+      if sim.rank == 0:
+        print(t,'switching to training phase, dcumreward=',sim.dcumreward)
+        # sim.arena.rat.x=sim.arena.rat.lastx = sim.startX
+        # sim.arena.rat.y=sim.arena.rat.lasty = sim.startY
+        # print('moved agent to', sim.startX, sim.startY, 'at t=',t)        
+        testreward = sim.dcumreward['TEST'][-1]
+        trainreward = sim.dcumreward['TRAIN'][-1]
+        if trainreward != 0.0:
+          deltareward = (testreward - trainreward) / abs(trainreward)
+        else:
+          deltareward = 0.0
+        print('deltareward=',deltareward)                     
+        sim.pc.py_broadcast(deltareward, 0) # broadcast critic value to other nodes
+        # save current location for later testing phase
+        # sim.startX = sim.arena.rat.x
+        # sim.startY = sim.arena.rat.y
+      else: # other workers
+        deltareward = sim.pc.py_broadcast(None, 0) # receive critic value from master node
+      for STDPmech in dSTDPmech['all']: STDPmech.applycumdeltaw(deltareward * dconf['sim']['learningrate'])
+      sim.phase = 'TRAIN'
+      if dconf['verbose'] > 0 and sim.rank==0:
+        print('Weights Recording Time:', t, 'NBsteps:',NBsteps,'recordWeightStepSize:',recordWeightStepSize)
+      recordAdjustableWeights(sim, t, lrecpop) # record weights after changes are applied
+      sim.dcumreward['TRAIN'].append(0.0) # cumulative reward for next training phase
+      #recordWeights(sim, t)
+  
   if dconf['sim']['QuitAfterMiss'] and critic < 0.0:
     if sim.rank == 0: print('QuitAfterMiss: t = ', t)
     finishSim()
