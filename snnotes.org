@@ -41505,3 +41505,10 @@ stay maintained longer ... also keep wbase at 0.5 ...
 
 python multistepSim.py sn.json 10 100 23apr26_A0_
 
+** next sim -- adjusted deltareward
+
+to use positive portion of sigmoid  ... so that when test does worse, does not subtract
+temporarily accumulated weights (which were never applied anyway) ... 
+
+python multistepSim.py sn.json 10 100 23apr26_B0_
+
