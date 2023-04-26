@@ -1789,7 +1789,11 @@ def finishSim ():
     if sim.saveObjPos: saveObjPos(sim.AIGame.dObjPos)
     if sim.saveAssignedFiringRates: saveAssignedFiringRates(sim.AIGame.dAllFiringRates)
     if dconf['sim']['doquit']: quit()
-  
+
+def sgm (x):
+  if x < 0.0: return 0.0
+  return 1/(1 + np.exp(-x))
+    
 def trainAgent (simTime):
   """ training interface between simulation and game environment
   """
@@ -1968,7 +1972,7 @@ def trainAgent (simTime):
         testreward = sim.dcumreward['TEST'][-1]
         trainreward = sim.dcumreward['TRAIN'][-1]
         if trainreward != 0.0:
-          deltareward = (testreward - trainreward) / abs(trainreward)
+          deltareward = dconf['sim']['learningrate'] * sgm( (testreward - trainreward) / abs(trainreward) )          
         else:
           deltareward = 0.0
         print('deltareward=',deltareward)                     
