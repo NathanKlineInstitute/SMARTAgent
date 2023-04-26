@@ -41462,3 +41462,46 @@ fired. if the postsynaptic neuron fires before the window is done, that's eviden
 
 python multistepSim.py sn.json 10 100 23apr25_A0_
 
+* 23apr26
+** check output from 23apr25_A0_
+
+works somewhat but the weights decrease and EM activity dies down too much ... 
+
+python -i simdat.py backupcfg/23apr25_A0__step_66_sim.json
+
+lfn = ['23apr25_A0__step_' + str(i) + '_' for i in range(67)]
+
+pdac = getconcatactionreward(lfn)
+clf(); ax=plotPerf(pdac,yl=(0.0,0.4))
+savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/23apr26_23apr25_A0__step_66_perf_all_steps_so_far.png]]
+
+lpdaO = getindivactionreward(lfn)
+lrat = plotHitMissRatioPerStep(lpdaO,clr='r')
+savefig(gifpath()+'perf_hmr_a0.png') # [[./gif/23apr26_23apr25_A0__step_66_perf_hmr_a0.png]]
+
+take a look at step 23 ... 
+
+python -i simdat.py backupcfg/23apr25_A0__step_23_sim.json
+
+EV1 0.01 Hz
+EA 0.79 Hz
+IA 0.23 Hz
+IAL 0.01 Hz
+EMDOWN 4.85 Hz
+EMUP 4.82 Hz
+IM 14.15 Hz
+IML 5.56 Hz
+
+fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward) ; quit()
+
+[[./gif/23apr26_23apr25_A0__step_23__with_reward_input.mp4]]
+that one does ok but afterwards the firing rates seem to decrease too much ... 
+
+so the algorithm might be working somewhat but need to maintain the EM firing rates ... 
+
+reduce tperstep, lower learning rate ... add plast between M and A ... tends
+to increase firing rates of EA and EM substantially, and may allow activity to
+stay maintained longer ... also keep wbase at 0.5 ... 
+
+python multistepSim.py sn.json 10 100 23apr26_A0_
+
