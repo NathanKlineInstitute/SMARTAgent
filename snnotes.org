@@ -41531,3 +41531,12 @@ for next phase as well ...
 
 python multistepSim.py sn.json 10 100 23apr26_C0_
 
+* 23apr27
+** next sim (23apr27_A0_) 
+
+was still getting hyperexcitability since magnitude of punishment value was too low
+also had feedback plasticity from EM to EA, and that could amplify noise, so should
+shut that off . . . well, EM -> EA convergence was already 0 ... 
+
+python multistepSim.py sn.json 10 100 23apr27_A0_
+
