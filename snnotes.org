@@ -41525,7 +41525,9 @@ did not force same conditions ... so longer durations allow better evaluatoin ..
 
 later on may consider using sigmoid (for both positive and negative input values)
 so that some learning takes place each time (small when test phase is worse than
-accumulate phase) ... 
+accumulate phase) ... will try that now ... also, even in the test phase there
+are delta weights getting accumulated, so should adjust algorithm to use them
+for next phase as well ... 
 
 python multistepSim.py sn.json 10 100 23apr26_C0_
 

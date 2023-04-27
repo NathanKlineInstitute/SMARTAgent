@@ -1791,7 +1791,7 @@ def finishSim ():
     if dconf['sim']['doquit']: quit()
 
 def sgm (x):
-  if x < 0.0: return 0.0
+  # if x < 0.0: return 0.0
   return 1/(1 + np.exp(-x))
     
 def trainAgent (simTime):
