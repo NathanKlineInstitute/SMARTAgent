@@ -75,7 +75,7 @@
   "useImagePadding": 0,
   "rewardcodes": {
     "scorePoint": 0.0,
-    "losePoint": -0.25,
+    "losePoint": -0.01,
     "followTarget": 0.0,
     "avoidTarget": 0.0,
     "hitBall": 1.0
@@ -97,7 +97,7 @@
     "ResumeSimFromFile": "data/22jul15_R0_cycle__step_9_synWeights_final.pkl"
   },
   "sim": {
-    "duration": 300000,
+    "duration": 400000,
     "dt": 0.6,
     "verbose": 0,
     "recordStep": 1.0,
@@ -109,7 +109,7 @@
     "RLFakeUpRule": 0,
     "RLFakeDownRule": 0,
     "RLFakeStayRule": 0,
-    "name": "23apr26_B0_",
+    "name": "23apr26_C0_",
     "doquit": 1,
     "doplot": 0,
     "saveCellSecs": 0,
@@ -125,7 +125,7 @@
     "ResetEligAfterCritic": 0,
     "QuitAfterMiss": 0,
     "learningrate": 1.0,
-    "simphasestepsize": 500
+    "simphasestepsize": 1000
   },
   "architectureVtoA": {
     "useProbabilistic": 1,

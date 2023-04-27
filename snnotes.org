@@ -41512,3 +41512,20 @@ temporarily accumulated weights (which were never applied anyway) ...
 
 python multistepSim.py sn.json 10 100 23apr26_B0_
 
+works ok for some steps ... but firing rate of EM neurons decreasing too much and performance
+tapers off ... so reduce punishment value for missing ball ... 
+
+** next sim (23apr26_C0_)
+
+reducing punishment value from -0.25 to -0.01 ... (keep hit ball at 1.0)
+
+can also lengthen the phase duration ... from 500 to 1000 steps ... that way
+longer period to evaluate quality of accumulate vs testing phase ... in this sim,
+did not force same conditions ... so longer durations allow better evaluatoin ... 
+
+later on may consider using sigmoid (for both positive and negative input values)
+so that some learning takes place each time (small when test phase is worse than
+accumulate phase) ... 
+
+python multistepSim.py sn.json 10 100 23apr26_C0_
+
