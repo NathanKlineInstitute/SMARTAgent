@@ -109,7 +109,7 @@
     "RLFakeUpRule": 0,
     "RLFakeDownRule": 0,
     "RLFakeStayRule": 0,
-    "name": "23apr27_A0_",
+    "name": "23apr27_B0_",
     "doquit": 1,
     "doplot": 0,
     "saveCellSecs": 0,
@@ -1049,7 +1049,7 @@
       },
       "AM2": {
         "w": 3,
-        "rate": 100
+        "rate": 0
       },
       "NM2": {
         "w": 0,
@@ -1075,7 +1075,7 @@
       },
       "AM2": {
         "w": 3,
-        "rate": 100
+        "rate": 0
       },
       "NM2": {
         "w": 0,

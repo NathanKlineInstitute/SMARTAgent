@@ -41540,3 +41540,9 @@ shut that off . . . well, EM -> EA convergence was already 0 ...
 
 python multistepSim.py sn.json 10 100 23apr27_A0_
 
+** next sim (23apr27_B0_)
+
+avoid noise, so can more confidently use sgm with +/- deltareward
+
+python multistepSim.py sn.json 12 100 23apr27_B0_
+

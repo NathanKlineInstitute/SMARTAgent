@@ -1792,7 +1792,8 @@ def finishSim ():
 
 def sgm (x):
   # if x < 0.0: return 0.0
-  return 1/(1 + np.exp(-x))
+  # return 1/(1 + np.exp(-x))
+  return 2.0 * ((1/(1 + np.exp(-x))) - 0.5)  
     
 def trainAgent (simTime):
   """ training interface between simulation and game environment
