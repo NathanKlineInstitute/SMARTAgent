@@ -41546,3 +41546,15 @@ avoid noise, so can more confidently use sgm with +/- deltareward
 
 python multistepSim.py sn.json 12 100 23apr27_B0_
 
+hmm, activity dying down ... 
+
+so previous rule seems better than erasing previous learned values ... 
+
+** restore & continue 23apr27_A0_
+
+used standard sigmoid and had noise to EMDOWN, EMUP
+
+will start over with 12 cores instead of 10 ... 
+
+python multistepSim.py sn.json 12 100 23apr27_A0B_
+
