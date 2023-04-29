@@ -41619,3 +41619,56 @@ same as last but with more punishment for losePoint ...
 
 python multistepSim.py sn.json 16 100 23apr28_A0_
 
+* 23apr29
+** check last sim
+
+python -i simdat.py backupcfg/23apr28_A0__step_37_sim.json
+
+EV1 0.05 Hz
+EA 146.05 Hz
+IA 231.61 Hz
+IAL 392.4 Hz
+EMDOWN 70.07 Hz
+EMUP 70.07 Hz
+IM 372.85 Hz
+IML 261.33 Hz
+
+rates too high
+
+lfn = ['23apr28_A0__step_' + str(i) + '_' for i in range(38)]
+pdac = getconcatactionreward(lfn)
+ax=plotPerf(pdac,yl=(0.0,1))
+clf()
+lpdaO = getindivactionreward(lfn)
+lrat = plotHitMissRatioPerStep(lpdaO,clr='r')
+savefig(gifpath()+'perf_hmr_a0.png') # [[./gif/23apr29_23apr28_A0__step_37_perf_hmr_a0.png]]
+
+perf been declining for a while
+
+check best step ... (17) with ~0.6 h/m ratio
+
+python -i simdat.py backupcfg/23apr28_A0__step_17_sim.json
+
+EV1 0.04 Hz
+EA 5.18 Hz
+IA 4.73 Hz
+IAL 0.56 Hz
+EMDOWN 49.43 Hz
+EMUP 49.07 Hz
+IM 211.86 Hz
+IML 143.11 Hz
+
+even those rates are pretty high ... but in step 17 EA rates are not high ... while in step 37
+the EA rates are very high, so maybe need to limit (or turn off) the plasticity in recurrent EA
+connections ... and/or increase mag of miss punishment
+
+fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward) ; 
+
+** next sim (23apr29_A0_)
+
+higher mag for punishment for missing ball (-0.25)
+
+and lower wmax for RL AMPA ... 
+
+python multistepSim.py sn.json 16 100 23apr29_A0_
+
