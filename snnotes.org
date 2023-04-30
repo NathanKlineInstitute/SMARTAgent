@@ -41678,3 +41678,33 @@ rates going up again ... similar perf trajectory ... adjust the penalty more (-0
 
 python multistepSim.py sn.json 16 100 23apr29_B0_
 
+* 23apr30
+** check 23apr29_B0_ (penalty of -0.5) -- rates too low
+
+python -i simdat.py backupcfg/23apr29_B0__step_23_sim.json
+
+EV1 0.01 Hz
+EA 0.56 Hz
+IA 0.0 Hz
+IAL 0.0 Hz
+EMDOWN 0.01 Hz
+EMUP 0.01 Hz
+IM 0.0 Hz
+IML 0.0 Hz
+
+here, rates went down too much...
+
+lfn = ['23apr29_B0__step_' + str(i) + '_' for i in range(24)]
+clf(); lpdaO = getindivactionreward(lfn)
+lrat = plotHitMissRatioPerStep(lpdaO,clr='r')
+
+savefig(gifpath()+'perf_hmr_a0.png') # [[./gif/23apr30_23apr29_B0__step_23_perf_hmr_a0.png]]
+
+stop this sim...
+
+** next sim (23apr30_A0_)
+
+adjust penalty to -0.375
+
+python multistepSim.py sn.json 16 100 23apr30_A0_
+
