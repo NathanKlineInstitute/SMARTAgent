@@ -41672,3 +41672,9 @@ and lower wmax for RL AMPA ...
 
 python multistepSim.py sn.json 16 100 23apr29_A0_
 
+rates going up again ... similar perf trajectory ... adjust the penalty more (-0.5)
+
+** next sim (23apr29_B0_)
+
+python multistepSim.py sn.json 16 100 23apr29_B0_
+
