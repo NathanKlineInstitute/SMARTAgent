@@ -41731,3 +41731,9 @@ savefig(gifpath()+'perf_hmr_a0.png') # [[./gif/23may1_23apr30_A0__step_34_perf_h
 
 stop this sim too ... 
 
+** next sim (23may1_A0_)
+
+use penalty of -0.3125
+
+python multistepSim.py sn.json 16 100 23may1_A0_
+
