@@ -41708,3 +41708,26 @@ adjust penalty to -0.375
 
 python multistepSim.py sn.json 16 100 23apr30_A0_
 
+* 23may1
+** check 23apr30_A0_
+
+python -i simdat.py backupcfg/23apr30_A0__step_34_sim.json
+
+EV1 0.01 Hz
+EA 0.6 Hz
+IA 0.03 Hz
+IAL 0.0 Hz
+EMDOWN 0.07 Hz
+EMUP 0.07 Hz
+IM 0.1 Hz
+IML 0.01 Hz
+
+rates went down too much again ... 
+
+lfn = ['23apr30_A0__step_' + str(i) + '_' for i in range(35)]
+lpdaO = getindivactionreward(lfn)
+lrat = plotHitMissRatioPerStep(lpdaO,clr='r')
+savefig(gifpath()+'perf_hmr_a0.png') # [[./gif/23may1_23apr30_A0__step_34_perf_hmr_a0.png]]
+
+stop this sim too ... 
+
