@@ -41737,3 +41737,45 @@ use penalty of -0.3125
 
 python multistepSim.py sn.json 16 100 23may1_A0_
 
+*** output
+
+python -i simdat.py backupcfg/23may1_A0__step_19_sim.json
+
+EV1 0.03 Hz
+EA 3.19 Hz
+IA 2.02 Hz
+IAL 0.18 Hz
+EMDOWN 18.4 Hz
+EMUP 18.18 Hz
+IM 65.12 Hz
+IML 27.93 Hz
+
+rates dropping ...
+
+lfn = ['23may1_A0__step_' + str(i) + '_' for i in range(20)]
+lpdaO = getindivactionreward(lfn)
+lrat = plotHitMissRatioPerStep(lpdaO,clr='r')
+savefig(gifpath()+'perf_hmr_a0.png') # [[./gif/23may1_23may1_A0__step_19_perf_hmr_a0.png]]
+
+python -i simdat.py backupcfg/23may1_A0__step_11_sim.json
+
+EV1 0.04 Hz
+EA 3.46 Hz
+IA 2.26 Hz
+IAL 0.21 Hz
+EMDOWN 21.57 Hz
+EMUP 21.25 Hz
+IM 78.76 Hz
+IML 34.51 Hz
+
+[[./gif/23may1_23may1_A0__step_11__with_reward_input.mp4]] <<-- that step does relatively well (~.66),
+but then perf starts to drop ... 
+
+may need to adjust other parts of the circuit, ... # of cells ... etc.
+
+** next sim (23may1_B0_)
+
+penalty of 0.28125
+
+python multistepSim.py sn.json 16 100 23may1_B0_
+
