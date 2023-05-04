@@ -125,7 +125,7 @@
     "ResetEligAfterCritic": 0,
     "QuitAfterMiss": 0,
     "learningrate": 1.0,
-    "simphasestepsize": 500
+    "simphasestepsize": 1000
   },
   "architectureVtoA": {
     "useProbabilistic": 1,

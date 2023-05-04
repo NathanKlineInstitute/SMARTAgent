@@ -41880,5 +41880,8 @@ so ... how to increase training rate, ...
 
 will try with 10 s instead of 20s updates and apply update fully (no test period)
 
+hmm, 20s updates and just apply fully, that's already close to 2x total reward
+of previous simulation
+
 python multistepSim.py sn.json 16 100 23may4_A0_
 
