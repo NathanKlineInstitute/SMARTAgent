@@ -41779,3 +41779,100 @@ penalty of 0.28125
 
 python multistepSim.py sn.json 16 100 23may1_B0_
 
+* 23may3
+** check
+
+python -i simdat.py backupcfg/23may1_B0__step_71_sim.json
+
+EV1 0.04 Hz
+EA 6.0 Hz
+IA 6.49 Hz
+IAL 0.87 Hz
+EMDOWN 56.28 Hz
+EMUP 56.03 Hz
+IM 239.88 Hz
+IML 174.08 Hz
+
+rates getting high...
+
+lfn = ['23may1_B0__step_' + str(i) + '_' for i in range(72)]
+lpdaO = getindivactionreward(lfn)
+lrat = plotHitMissRatioPerStep(lpdaO,clr='r')
+savefig(gifpath()+'perf_hmr_a0.png')
+[[./gif/23may3_23may1_B0__step_71_perf_hmr_a0.png]]
+
+perf looks ~flat ...?
+
+check step 46 ...
+
+python -i simdat.py backupcfg/23may1_B0__step_46_sim.json
+
+EV1 0.04 Hz
+EA 4.7 Hz
+IA 3.79 Hz
+IAL 0.39 Hz
+EMDOWN 37.5 Hz
+EMUP 37.17 Hz
+IM 155.74 Hz
+IML 83.65 Hz
+
+fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward) ; 
+[[./gif/23may3_23may1_B0__step_46__with_reward_input.mp4]]
+
+this one looks best so far ... 
+
+* 23may4
+** check - at step 99, no improvement since step 46
+
+python -i simdat.py backupcfg/23may1_B0__step_99_sim.json
+
+EV1 0.04 Hz
+EA 6.7 Hz
+IA 8.7 Hz
+IAL 1.65 Hz
+EMDOWN 64.21 Hz
+EMUP 63.98 Hz
+IM 263.91 Hz
+IML 213.98 Hz
+
+lfn = ['23may1_B0__step_' + str(i) + '_' for i in range(100)]
+lpdaO = getindivactionreward(lfn)
+lrat = plotHitMissRatioPerStep(lpdaO,clr='r')
+
+savefig(gifpath()+'perf_hmr_a0.png') # [[./gif/23may4_23may1_B0__step_99_perf_hmr_a0.png]]
+
+has not improved beyond best step (46)
+
+and the rates have gone up, but without much improvement ... 
+
+ldreward = [pickle.load(open('data/23may1_B0__step_'+str(i)+'_CumReward.pkl','rb')) for i in range(100)]
+
+lr = []
+for dreward in ldreward:
+  for x in dreward['TEST']: lr.append(x)
+
+lr = []
+for dreward in ldreward:
+  lr.append(np.mean(dreward['TRAIN']))
+
+plot(lr)
+
+no trends seen ... 
+
+pdac = getconcatactionreward(lfn)
+ax=plotPerf(pdac,yl=(0.0,1))
+savefig(gifpath()+'perf_all_steps_so_far.png')
+[[./gif/23may4_23may1_B0__step_99_perf_all_steps_so_far.png]]
+might be improving slowly ...
+
+could try with intermediate rewards and see if works better ... 
+
+savefig(gifpath()+'_follow_perf_all_steps_so_far.png')
+[[./gif/23may4_23may1_B0__step_99__follow_perf_all_steps_so_far.png]]
+follow ball prob seems to be increasing too ... 
+
+so ... how to increase training rate, ... 
+1. intermediate rewards
+2. more frequent updates (shorter interval for applying weight changes)
+3. always apply update fully, no testing period
+
