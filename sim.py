@@ -1954,7 +1954,13 @@ def trainAgent (simTime):
   NBsteps += 1
 
   if NBsteps % simphasestepsize == 0:
-    if sim.phase == 'TRAIN':
+    if True: # testing application of full STDP rewards each period
+      if sim.rank == 0: print(t,'applying full STDP cumdeltaw')
+      for STDPmech in dSTDPmech['all']:
+        STDPmech.adjustweight(STDPmech.cumdeltaw * dconf['sim']['learningrate'])
+        STDPmech.cumdeltaw = 0.0
+      recordAdjustableWeights(sim, t, lrecpop) # record weights after changes are applied
+    elif sim.phase == 'TRAIN':
       if sim.rank == 0:
         print(t,'switching to testing phase, dcumreward=',sim.dcumreward)
         # put agent back to where it started for testing

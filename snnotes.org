@@ -41876,3 +41876,9 @@ so ... how to increase training rate, ...
 2. more frequent updates (shorter interval for applying weight changes)
 3. always apply update fully, no testing period
 
+** next sim (23may4_A0_)
+
+will try with 10 s instead of 20s updates and apply update fully (no test period)
+
+python multistepSim.py sn.json 16 100 23may4_A0_
+

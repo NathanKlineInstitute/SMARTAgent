@@ -109,7 +109,7 @@
     "RLFakeUpRule": 0,
     "RLFakeDownRule": 0,
     "RLFakeStayRule": 0,
-    "name": "23may1_B0_",
+    "name": "23may4_A0_",
     "doquit": 1,
     "doplot": 0,
     "saveCellSecs": 0,
@@ -125,7 +125,7 @@
     "ResetEligAfterCritic": 0,
     "QuitAfterMiss": 0,
     "learningrate": 1.0,
-    "simphasestepsize": 1000
+    "simphasestepsize": 500
   },
   "architectureVtoA": {
     "useProbabilistic": 1,
