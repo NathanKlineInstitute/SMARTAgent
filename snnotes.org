@@ -41924,3 +41924,38 @@ shorten RLlenhebb to 50 ms ...
 and turn off other rewards/penalties ... 
 
 python multistepSim.py sn.json 16 100 23may4_B0_
+
+* 23may5
+** check -- model seems to track ball to some extent
+
+python -i simdat.py backupcfg/23may4_B0__step_22_sim.json
+
+EV1 0.02 Hz
+EA 9.2 Hz
+IA 16.75 Hz
+IAL 5.54 Hz
+EMDOWN 2.72 Hz
+EMUP 2.69 Hz
+IM 5.98 Hz
+IML 1.05 Hz
+
+lfn = ['23may4_B0__step_' + str(i) + '_' for i in range(23)]
+
+lpdaO = getindivactionreward(lfn)
+lrat = plotHitMissRatioPerStep(lpdaO,clr='r')
+savefig(gifpath()+'perf_hmr_a0.png') # [[./gif/23may5_23may4_B0__step_22_perf_hmr_a0.png]]
+
+starts high, drops, then starts to rise ... still could be in rising phase ... 
+
+clf()
+pdac = getconcatactionreward(lfn)
+ax=plotPerf(pdac,yl=(0.0,1))
+savefig(gifpath()+'perf_all_steps_so_far.png') 
+[[./gif/23may5_23may4_B0__step_22_perf_all_steps_so_far.png]]
+
+fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward) ; 
+[[./gif/23may5_23may4_B0__step_22__with_reward_input.mp4]]
+
+looking at video, does look like racket trying to track ball ... and hit/miss ratio
+could be on the rise, so will let it continue for now ... 
+
