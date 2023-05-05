@@ -41912,3 +41912,15 @@ savefig(gifpath()+'perf_all_steps_so_far.png') # [[./gif/23may4_23may4_A0__step_
 
 ** next sim (23may4_B0_)
 
+use intermediate reward ... 
+
+10 s for accum/test phases ... 
+
+shorten RLlenhebb to 50 ms ... 
+
+    "followTarget": 0.1,
+    "avoidTarget": -0.01,
+
+and turn off other rewards/penalties ... 
+
+python multistepSim.py sn.json 16 100 23may4_B0_
