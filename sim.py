@@ -1954,7 +1954,7 @@ def trainAgent (simTime):
   NBsteps += 1
 
   if NBsteps % simphasestepsize == 0:
-    if True: # testing application of full STDP rewards each period
+    if False: # testing application of full STDP rewards each period
       if sim.rank == 0: print(t,'applying full STDP cumdeltaw')
       for STDPmech in dSTDPmech['all']:
         STDPmech.adjustweight(STDPmech.cumdeltaw * dconf['sim']['learningrate'])
