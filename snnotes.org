@@ -41959,3 +41959,35 @@ fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward
 looking at video, does look like racket trying to track ball ... and hit/miss ratio
 could be on the rise, so will let it continue for now ... 
 
+python -i simdat.py backupcfg/23may4_B0__step_38_sim.json
+
+EV1 0.02 Hz
+EA 8.84 Hz
+IA 13.85 Hz
+IAL 4.03 Hz
+EMDOWN 2.18 Hz
+EMUP 2.24 Hz
+IM 4.33 Hz
+IML 0.64 Hz
+
+lfn = ['23may4_B0__step_' + str(i) + '_' for i in range(39)]
+lpdaO = getindivactionreward(lfn)
+lrat = plotHitMissRatioPerStep(lpdaO,clr='r')
+savefig(gifpath()+'perf_hmr_b0.png') # [[./gif/23may5_23may4_B0__step_22_perf_hmr_b0.png]]
+
+seems to have stopped improving ... more decay; may have to do with lower firing rates ... 
+
+could adjust reward/penalty
+
+fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward) ; 
+[[./gif/23may5_23may4_B0__step_38__with_reward_input.mp4]]
+seems to follow ball to some extent, but then gets stuck at top or bottom sometimes ... 
+
+
+** next sim (23may5_A0_)
+
+reducing RLlenhebb from 50 to 20 (that's time per action)
+and followTarget, avoidTarget reduced in magnitude by 1/2
+
+python multistepSim.py sn.json 16 100 23may5_A0_
+

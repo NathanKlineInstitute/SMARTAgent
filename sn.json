@@ -76,8 +76,8 @@
   "rewardcodes": {
     "scorePoint": 0.0,
     "losePoint": 0.0,
-    "followTarget": 0.1,
-    "avoidTarget": -0.01,
+    "followTarget": 0.05,
+    "avoidTarget": -0.005,
     "hitBall": 0.0
   },
   "actionsPerPlay": 1,
@@ -109,7 +109,7 @@
     "RLFakeUpRule": 0,
     "RLFakeDownRule": 0,
     "RLFakeStayRule": 0,
-    "name": "23may4_B0_",
+    "name": "23may5_A0_",
     "doquit": 1,
     "doplot": 0,
     "saveCellSecs": 0,
@@ -974,7 +974,7 @@
       "wmax": 100,
       "RLon": 1,
       "STDPon": 0,
-      "RLlenhebb": 50,
+      "RLlenhebb": 20,
       "RLlenanti": 500,
       "useRLexp": 1,
       "RLhebbwt": 0.1,
