@@ -75,10 +75,10 @@
   "useImagePadding": 0,
   "rewardcodes": {
     "scorePoint": 0.0,
-    "losePoint": 0.0,
-    "followTarget": 0.05,
-    "avoidTarget": -0.005,
-    "hitBall": 0.0
+    "losePoint": -0.28125,
+    "followTarget": 0.0,
+    "avoidTarget": 0.0,
+    "hitBall": 1.0
   },
   "actionsPerPlay": 1,
   "followOnlyTowards": 1,
@@ -109,7 +109,7 @@
     "RLFakeUpRule": 0,
     "RLFakeDownRule": 0,
     "RLFakeStayRule": 0,
-    "name": "23may5_A0_",
+    "name": "23may9_A0_",
     "doquit": 1,
     "doplot": 0,
     "saveCellSecs": 0,
@@ -125,7 +125,7 @@
     "ResetEligAfterCritic": 0,
     "QuitAfterMiss": 0,
     "learningrate": 1.0,
-    "simphasestepsize": 500
+    "simphasestepsize": 1000
   },
   "architectureVtoA": {
     "useProbabilistic": 1,
@@ -211,16 +211,16 @@
       "IV4": 0,
       "EMT": 0,
       "IMT": 0,
-      "EA": 200,
-      "IA": 200,
-      "IAL": 100,
+      "EA": 300,
+      "IA": 300,
+      "IAL": 150,
       "EA2": 0,
       "IA2": 0,
       "IA2L": 0,
-      "EMDOWN": 30,
-      "EMUP": 30,
-      "IM": 60,
-      "IML": 30,
+      "EMDOWN": 45,
+      "EMUP": 45,
+      "IM": 90,
+      "IML": 45,
       "IMUP": 0,
       "IMDOWN": 0,
       "EN": 0
@@ -524,7 +524,7 @@
           "conv": 0
         },
         "EM": {
-          "AM2": 6,
+          "AM2": 4.5,
           "NM2": 0.0,
           "conv": 100
         },
@@ -974,7 +974,7 @@
       "wmax": 100,
       "RLon": 1,
       "STDPon": 0,
-      "RLlenhebb": 20,
+      "RLlenhebb": 5000,
       "RLlenanti": 500,
       "useRLexp": 1,
       "RLhebbwt": 0.1,

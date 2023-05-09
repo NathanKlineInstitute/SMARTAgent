@@ -41959,7 +41959,7 @@ fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward
 looking at video, does look like racket trying to track ball ... and hit/miss ratio
 could be on the rise, so will let it continue for now ... 
 
-python -i simdat.py backupcfg/23may4_B0__step_38_sim.json
+python -i simdat.py backupcfg/23may4_B0__step_38_sim.jsonxo
 
 EV1 0.02 Hz
 EA 8.84 Hz
@@ -41990,4 +41990,61 @@ reducing RLlenhebb from 50 to 20 (that's time per action)
 and followTarget, avoidTarget reduced in magnitude by 1/2
 
 python multistepSim.py sn.json 16 100 23may5_A0_
+
+* 23may6
+** check 23may5_A0_
+
+python -i simdat.py backupcfg/23may5_A0__step_38_sim.json
+
+EV1 0.03 Hz
+EA 10.86 Hz
+IA 31.82 Hz
+IAL 14.09 Hz
+EMDOWN 6.13 Hz
+EMUP 5.76 Hz
+IM 17.68 Hz
+IML 4.03 Hz
+
+lfn = ['23may5_A0__step_' + str(i) + '_' for i in range(39)]
+lpdaO = getindivactionreward(lfn)
+lrat = plotHitMissRatioPerStep(lpdaO,clr='r')
+savefig(gifpath()+'perf_hmr_b0.png') # [[./gif/23may6_23may5_A0__step_38_perf_hmr_b0.png]]
+
+do not notice progress ... 
+
+* 23may8
+** check 23may5_A0_ step 99 
+
+python -i simdat.py backupcfg/23may5_A0__step_99_sim.json
+
+EV1 0.02 Hz
+EA 9.72 Hz
+IA 20.41 Hz
+IAL 8.0 Hz
+EMDOWN 3.1 Hz
+EMUP 3.33 Hz
+IM 7.45 Hz
+IML 1.19 Hz
+
+lfn = ['23may5_A0__step_' + str(i) + '_' for i in range(100)]
+lpdaO = getindivactionreward(lfn)
+lrat = plotHitMissRatioPerStep(lpdaO,clr='r')
+savefig(gifpath()+'perf_hmr_b0.png') # [[./gif/23may8_23may5_A0__step_99_perf_hmr_b0.png]]
+
+yeah, perf just kept dropping ... 
+
+intermediate reward doing worse than sparse reward, with these parameters
+
+** next sim (23may8_A0_)
+
+back to sparse rewards ... implement variability scaling for deltareward?
+
+* 23may9
+** 23may9_A0_
+
+50% larger EA, EM ... 
+
+with the sparse rewards
+
+python multistepSim.py sn.json 24 100 23may9_A0_
 
