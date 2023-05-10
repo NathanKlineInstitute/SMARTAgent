@@ -64,7 +64,7 @@ NEURON {
   RANGE newweight
   RANGE skip : Flag to skip 2nd set of conditions
   :RANGE cumreward : cumulative reward magnitude so far
-  :RANGE maxreward : max reward for scaling
+  RANGE maxreward : max reward for scaling
   RANGE cumdeltaw : cumulative weight changes
   GLOBAL initialtime						     
   :RANGE NOSTDPTAG
@@ -118,7 +118,7 @@ PARAMETER {
   RLon = 1
   verbose = 0
   skip = 0
-  :maxreward = 0
+  maxreward = 0
   :cumreward = 0				 
   :NOSTDPTAG = 0
   initialtime = 10 : 1000 (ms) : initialization time before any weight changes possible				  
