@@ -1995,6 +1995,9 @@ def trainAgent (simTime):
         print('Weights Recording Time:', t, 'NBsteps:',NBsteps,'recordWeightStepSize:',recordWeightStepSize)
       recordAdjustableWeights(sim, t, lrecpop) # record weights after changes are applied
       sim.dcumreward['TRAIN'].append(0.0) # cumulative reward for next training phase
+      if dconf['sim']['ResetEligAfterCritic']: # reset eligibility after applying reward/punishment
+        for STDPmech in dSTDPmech['all']: STDPmech.reset_eligibility()
+        for STDPmech in dSTDPmech['NOISE']: STDPmech.reset_eligibility()      
       #recordWeights(sim, t)
   
   if dconf['sim']['QuitAfterMiss'] and critic < 0.0:

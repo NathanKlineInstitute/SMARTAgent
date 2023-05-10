@@ -63,8 +63,8 @@ NEURON {
   RANGE deltaw
   RANGE newweight
   RANGE skip : Flag to skip 2nd set of conditions
-  RANGE cumreward : cumulative reward magnitude so far
-  RANGE maxreward : max reward for scaling
+  :RANGE cumreward : cumulative reward magnitude so far
+  :RANGE maxreward : max reward for scaling
   RANGE cumdeltaw : cumulative weight changes
   GLOBAL initialtime						     
   :RANGE NOSTDPTAG
@@ -81,7 +81,7 @@ ASSIGNED {
   interval    (ms)
   deltaw
   newweight
-  cumreward
+  :cumreward
   cumdeltaw
   tmpweight
   tmpcumdeltaw
@@ -93,7 +93,7 @@ INITIAL {
   tlasthebbelig = -1      : no eligibility yet
   tlastantielig = -1  : no eligibility yet   
   interval = 0
-  cumreward = 0
+  :cumreward = 0
   cumdeltaw = 0
   tmpweight = 0
   tmpcumdeltaw = 0				    
@@ -118,7 +118,7 @@ PARAMETER {
   RLon = 1
   verbose = 0
   skip = 0
-  maxreward = 0
+  :maxreward = 0
   :cumreward = 0				 
   :NOSTDPTAG = 0
   initialtime = 10 : 1000 (ms) : initialization time before any weight changes possible				  
@@ -315,3 +315,13 @@ PROCEDURE applycumdeltaw (deltareward) {
    cumdeltaw = 0.0		
 }
 			 
+PROCEDURE reset_eligibility () {
+  tlastpre = -1            : no spike yet
+  tlastpost = -1           : no spike yet
+  tlasthebbelig = -1      : no eligibility yet
+  tlastantielig = -1  : no eligibility yet
+  interval = 0
+  :cumreward = 0
+}
+
+			    
