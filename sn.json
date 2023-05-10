@@ -75,7 +75,7 @@
   "useImagePadding": 0,
   "rewardcodes": {
     "scorePoint": 0.0,
-    "losePoint": -0.28125,
+    "losePoint": -0.15,
     "followTarget": 0.0,
     "avoidTarget": 0.0,
     "hitBall": 1.0
@@ -109,7 +109,7 @@
     "RLFakeUpRule": 0,
     "RLFakeDownRule": 0,
     "RLFakeStayRule": 0,
-    "name": "23may9_A0_",
+    "name": "23may10_A0_",
     "doquit": 1,
     "doplot": 0,
     "saveCellSecs": 0,
@@ -122,7 +122,7 @@
     "saveWeights": 1,
     "saveAssignedFiringRates": 0,
     "useReducedNetwork": 0,
-    "ResetEligAfterCritic": 0,
+    "ResetEligAfterCritic": 1,
     "QuitAfterMiss": 0,
     "learningrate": 1.0,
     "simphasestepsize": 1000
@@ -974,7 +974,7 @@
       "wmax": 100,
       "RLon": 1,
       "STDPon": 0,
-      "RLlenhebb": 5000,
+      "RLlenhebb": 20000,
       "RLlenanti": 500,
       "useRLexp": 1,
       "RLhebbwt": 0.1,
