@@ -1790,10 +1790,16 @@ def finishSim ():
     if sim.saveAssignedFiringRates: saveAssignedFiringRates(sim.AIGame.dAllFiringRates)
     if dconf['sim']['doquit']: quit()
 
-def sgm (x):
-  # if x < 0.0: return 0.0
-  return 1/(1 + np.exp(-x))
-  # return 2.0 * ((1/(1 + np.exp(-x))) - 0.5)  
+def deltarewardfunc (x):
+  if dconf['sim']['deltarewardfunc'] == 'sigmoid':
+    return 1/(1 + np.exp(-x))
+  elif dconf['sim']['deltarewardfunc'] == 'sigmoidposneg':
+    return 2.0 * ((1/(1 + np.exp(-x))) - 0.5)
+  elif dconf['sim']['deltarewardfunc'] == 'linearposneg':
+    return x
+  else: # linear but only positive portion   
+    if x < 0.0: return 0.0
+    return x
     
 def trainAgent (simTime):
   """ training interface between simulation and game environment
@@ -1979,7 +1985,7 @@ def trainAgent (simTime):
         testreward = sim.dcumreward['TEST'][-1]
         trainreward = sim.dcumreward['TRAIN'][-1]
         if trainreward != 0.0:
-          deltareward = dconf['sim']['learningrate'] * sgm( (testreward - trainreward) / abs(trainreward) )          
+          deltareward = dconf['sim']['learningrate'] * deltarewardfunc( (testreward - trainreward) / abs(trainreward) )          
         else:
           deltareward = 0.0
         print('deltareward=',deltareward)                     

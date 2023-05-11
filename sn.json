@@ -124,8 +124,9 @@
     "useReducedNetwork": 0,
     "ResetEligAfterCritic": 1,
     "QuitAfterMiss": 0,
-    "learningrate": 1.0,
-    "simphasestepsize": 1000
+    "learningrate": 0.1,
+    "simphasestepsize": 1000,
+    "deltarewardfunc": "linearposneg"
   },
   "architectureVtoA": {
     "useProbabilistic": 1,
