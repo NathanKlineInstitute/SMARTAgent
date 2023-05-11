@@ -42157,3 +42157,18 @@ based on the video, definitely learning ... paddle often moves to area where bal
 will go, and this with the sparse rewards and long taus for RL... and high firing rates
 how to get perf higher ... ? 
 
+** deltarewardfunc parameter
+
+adding deltarewardfunc parameter to allow different functions
+for scaling weights as a function of reward
+
+default is linear (only positive portion)
+also have sigmoid (between 0,1), and sigmoidposneg (between -1,1)
+linearposneg, linear both positive and negative
+
+** next sim (23may11_A0_)
+
+will use linearposneg with learningrate of 0.1 . . . everything else the same 
+
+python multistepSim.py sn.json 24 100 23may11_A0_
+
