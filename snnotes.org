@@ -42081,3 +42081,79 @@ and RLlenhebb to same duration as phase (20s)
 
 python multistepSim.py sn.json 24 100 23may10_A0_
 
+*** check
+
+python -i simdat.py backupcfg/23may10_A0__step_5_sim.json
+
+EV1 0.04 Hz
+EA 3.67 Hz
+IA 2.68 Hz
+IAL 0.21 Hz
+EMDOWN 21.22 Hz
+EMUP 20.84 Hz
+IM 115.66 Hz
+IML 72.85 Hz
+
+lfn = ['23may10_A0__step_' + str(i) + '_' for i in range(6)]
+lpdaO = getindivactionreward(lfn)
+lrat = plotHitMissRatioPerStep(lpdaO,clr='r')
+savefig(gifpath()+'perf_hmr_a0.png') #
+[[./gif/23may10_23may10_A0__step_5_perf_hmr_a0.png]]
+
+nothing good yet ... 
+
+python -i simdat.py backupcfg/23may10_A0__step_2_sim.json
+
+EV1 0.03 Hz
+EA 3.09 Hz
+IA 2.06 Hz
+IAL 0.16 Hz
+EMDOWN 16.09 Hz
+EMUP 15.74 Hz
+IM 85.71 Hz
+IML 50.11 Hz
+
+fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward) ; 
+
+* 23may11
+** check prog
+
+python -i simdat.py backupcfg/23may10_A0__step_34_sim.json
+
+EV1 0.05 Hz
+EA 112.79 Hz
+IA 314.95 Hz
+IAL 390.72 Hz
+EMDOWN 70.22 Hz
+EMUP 70.22 Hz
+IM 395.64 Hz
+IML 382.51 Hz
+
+lfn = ['23may10_A0__step_' + str(i) + '_' for i in range(35)]
+lpdaO = getindivactionreward(lfn)
+lrat = plotHitMissRatioPerStep(lpdaO,clr='r')
+savefig(gifpath()+'perf_hmr_a0.png') #
+[[./gif/23may11_23may10_A0__step_34_perf_hmr_a0.png]]
+
+has some outliers but perf mostly decreaseing...
+
+python -i simdat.py backupcfg/23may10_A0__step_21_sim.json
+
+EV1 0.05 Hz
+EA 138.76 Hz
+IA 247.23 Hz
+IAL 392.15 Hz
+EMDOWN 70.22 Hz
+EMUP 70.22 Hz
+IM 395.63 Hz
+IML 382.46 Hz
+
+rates way too high ... 
+
+fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward) ; 
+[[./gif/23may11_23may10_A0__step_21__with_reward_input.mp4]]
+
+based on the video, definitely learning ... paddle often moves to area where ball
+will go, and this with the sparse rewards and long taus for RL... and high firing rates
+how to get perf higher ... ? 
+
