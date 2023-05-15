@@ -1985,7 +1985,7 @@ def trainAgent (simTime):
         testreward = sim.dcumreward['TEST'][-1]
         trainreward = sim.dcumreward['TRAIN'][-1]
         if trainreward != 0.0:
-          deltareward = dconf['sim']['learningrate'] * deltarewardfunc( (testreward - trainreward) / abs(trainreward) )          
+          deltareward = dconf['sim']['learningrate'] * deltarewardfunc( (testreward - trainreward) / abs(trainreward) )
         else:
           deltareward = 0.0
         print('deltareward=',deltareward)                     

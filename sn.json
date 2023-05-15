@@ -97,7 +97,7 @@
     "ResumeSimFromFile": "data/23apr27_A0__step_2_synWeights_final.pkl"
   },
   "sim": {
-    "duration": 400000,
+    "duration": 200100,
     "dt": 0.6,
     "verbose": 0,
     "recordStep": 1.0,
@@ -109,7 +109,7 @@
     "RLFakeUpRule": 0,
     "RLFakeDownRule": 0,
     "RLFakeStayRule": 0,
-    "name": "23may10_A0_",
+    "name": "23may15_A0_",
     "doquit": 1,
     "doplot": 0,
     "saveCellSecs": 0,
@@ -212,16 +212,16 @@
       "IV4": 0,
       "EMT": 0,
       "IMT": 0,
-      "EA": 300,
-      "IA": 300,
-      "IAL": 150,
+      "EA": 100,
+      "IA": 100,
+      "IAL": 50,
       "EA2": 0,
       "IA2": 0,
       "IA2L": 0,
-      "EMDOWN": 45,
-      "EMUP": 45,
-      "IM": 90,
-      "IML": 45,
+      "EMDOWN": 30,
+      "EMUP": 30,
+      "IM": 60,
+      "IML": 30,
       "IMUP": 0,
       "IMDOWN": 0,
       "EN": 0
@@ -418,7 +418,7 @@
       "RecurrentDirNeurons": 0,
       "RecurrentLocNeurons": 0,
       "FeedForwardDirNtoA": 0,
-      "FeedForwardLocNtoA": 0,
+      "FeedForwardLocNtoA": 1,
       "FeedForwardDirNtoA2": 0,
       "FeedForwardLocNtoA2": 0,
       "FeedForwardDirNtoM": 0,
@@ -428,7 +428,7 @@
       "FeedForwardA2toM": 0,
       "FeedbackLocNeurons": 0,
       "RecurrentMNeurons": 1,
-      "RecurrentANeurons": 1,
+      "RecurrentANeurons": 0,
       "RecurrentA2Neurons": 0,
       "FeedbackAtoDirN": 0,
       "FeedbackAtoLocN": 0,
@@ -517,7 +517,7 @@
         "EA": {
           "AM2": 0.05,
           "NM2": 0.0,
-          "conv": 20
+          "conv": 0
         },
         "EA2": {
           "AM2": 0.5,
@@ -525,7 +525,7 @@
           "conv": 0
         },
         "EM": {
-          "AM2": 4.5,
+          "AM2": 4.0,
           "NM2": 0.0,
           "conv": 100
         },
