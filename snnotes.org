@@ -42219,3 +42219,36 @@ lower weights EA -> EM ...
 
 python multistepSim.py sn.json 30 200 23may15_A0_
 
+* 23may23
+** check output from 23may15_A0_
+
+python -i simdat.py backupcfg/23may15_A0__step_99_sim.json
+
+EV1 0.02 Hz
+EA 1.63 Hz
+IA 1.0 Hz
+IAL 0.01 Hz
+EMDOWN 6.2 Hz
+EMUP 6.17 Hz
+IM 20.38 Hz
+IML 8.47 Hz
+
+lfn = ['23may15_A0__step_' + str(i) + '_' for i in range(100)]
+lpdaO = getindivactionreward(lfn)
+lrat = plotHitMissRatioPerStep(lpdaO,clr='r')
+savefig(gifpath()+'perf_hmr_a0.png') #
+
+[[./gif/23may23_23may15_A0__step_99_perf_hmr_a0.png]]
+
+don't see improving trend...
+
+np.argmax(lrat) # 0
+
+first episode happens to have best performance ... 
+
+** compare against sigmoid
+
+standard sigmoid with learningrate=1.0
+
+python multistepSim.py sn.json 30 200 23may23_A0_
+

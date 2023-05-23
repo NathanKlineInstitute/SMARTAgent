@@ -109,7 +109,7 @@
     "RLFakeUpRule": 0,
     "RLFakeDownRule": 0,
     "RLFakeStayRule": 0,
-    "name": "23may15_A0_",
+    "name": "23may23_A0_",
     "doquit": 1,
     "doplot": 0,
     "saveCellSecs": 0,
@@ -124,9 +124,9 @@
     "useReducedNetwork": 0,
     "ResetEligAfterCritic": 1,
     "QuitAfterMiss": 0,
-    "learningrate": 0.1,
+    "learningrate": 1.0,
     "simphasestepsize": 1000,
-    "deltarewardfunc": "linearposneg"
+    "deltarewardfunc": "sigmoid"
   },
   "architectureVtoA": {
     "useProbabilistic": 1,
