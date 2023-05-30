@@ -42305,3 +42305,9 @@ from location to A neurons here ... as well as feedforward A to M ...
 
 how to push this model further? 
 
+** next simulation (23may30_A0_)
+
+increase number of EA, EM neurons ... 
+
+python multistepSim.py sn.json 30 200 23may30_A0_
+
