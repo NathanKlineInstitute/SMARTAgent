@@ -42252,3 +42252,56 @@ standard sigmoid with learningrate=1.0
 
 python multistepSim.py sn.json 30 200 23may23_A0_
 
+* 23may30
+** check output from 23may23_A0_
+
+python -i simdat.py backupcfg/23may23_A0__step_99_sim.json
+
+EV1 0.04 Hz
+EA 4.5 Hz
+IA 3.12 Hz
+IAL 0.01 Hz
+EMDOWN 64.0 Hz
+EMUP 63.81 Hz
+IM 267.95 Hz
+IML 212.68 Hz
+
+lfn = ['23may23_A0__step_' + str(i) + '_' for i in range(100)]
+lpdaO = getindivactionreward(lfn)
+lrat = plotHitMissRatioPerStep(lpdaO,clr='r')
+savefig(gifpath()+'perf_hmr_a0.png') #
+[[./gif/23may30_23may23_A0__step_99_perf_hmr_a0.png]]
+
+this one looks like could be improving over first ~60 steps ... ? 
+
+np.argmax(lrat) # 61
+
+lrat[61] # 0.8461538461538461
+
+check step 61 ...
+
+python -i simdat.py backupcfg/23may23_A0__step_61_sim.json
+
+EV1 0.04 Hz
+EA 4.19 Hz
+IA 2.94 Hz
+IAL 0.01 Hz
+EMDOWN 46.99 Hz
+EMUP 46.73 Hz
+IM 197.8 Hz
+IML 133.36 Hz
+
+pretty high firing rates by then ...
+
+fig=animInput(InputImages,gifpath()+'_with_reward_input.mp4',actreward=actreward) ; 
+[[./gif/23may30_23may23_A0__step_61__with_reward_input.mp4]]
+
+gets 22 hits vs 26 misses by the end ... 
+
+so standard sigmoid with 'global' error function could be tolerant to noise ... 
+
+if so, may want to use same for navigation ... also note that there is plasticity
+from location to A neurons here ... as well as feedforward A to M ... 
+
+how to push this model further? 
+
