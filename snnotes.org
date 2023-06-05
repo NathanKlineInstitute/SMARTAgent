@@ -42360,3 +42360,7 @@ so not much different from previous sim, which had fewer neurons ...
 
 ** next sim (23jun5_A0_)
 
+double EA, EM again ...
+
+python multistepSim.py sn.json 30 200 23jun5_A0_
+
