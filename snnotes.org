@@ -42364,3 +42364,29 @@ double EA, EM again ...
 
 python multistepSim.py sn.json 30 200 23jun5_A0_
 
+* 23jun9
+** check output from 23jun5_A0_
+
+python -i simdat.py backupcfg/23jun5_A0__step_44_sim.json
+
+EV1 0.05 Hz
+EA 5.04 Hz
+IA 3.19 Hz
+IAL 0.32 Hz
+EMDOWN 61.86 Hz
+EMUP 61.83 Hz
+IM 252.52 Hz
+IML 216.26 Hz
+stimModEV1 0.0 Hz
+
+lfn = ['23jun5_A0__step_' + str(i) + '_' for i in range(45)]
+lpdaO = getindivactionreward(lfn)
+lrat = plotHitMissRatioPerStep(lpdaO,clr='r')
+savefig(gifpath()+'perf_hmr_a0.png') # [[./gif/23jun9_23jun5_A0__step_44_perf_hmr_a0.png]]
+
+np.argmax(lrat) # 3
+
+lrat[3] # 0.8461538461538461
+
+no improvements seen, appears more like decay
+
