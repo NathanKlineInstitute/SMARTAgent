@@ -42390,3 +42390,11 @@ lrat[3] # 0.8461538461538461
 
 no improvements seen, appears more like decay
 
+** next sim (23jun9_A0_)
+
+use smaller model but with longer phase durations ... for more accurate measures of perf./reward
+
+200.1 s sim, with 100 s for each phase ... 
+
+python multistepSim.py sn.json 30 200 23jun9_A0_
+
