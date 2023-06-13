@@ -42398,3 +42398,29 @@ use smaller model but with longer phase durations ... for more accurate measures
 
 python multistepSim.py sn.json 30 200 23jun9_A0_
 
+* 23jun13
+** check output from 23jun9_A0_
+
+python -i simdat.py backupcfg/23jun9_A0__step_116_sim.json
+
+EV1 0.05 Hz
+EA 5.02 Hz
+IA 3.2 Hz
+IAL 0.21 Hz
+EMDOWN 77.14 Hz
+EMUP 76.98 Hz
+IM 294.66 Hz
+IML 337.26 Hz
+
+lfn = ['23jun9_A0__step_' + str(i) + '_' for i in range(117)]
+lpdaO = getindivactionreward(lfn)
+lrat = plotHitMissRatioPerStep(lpdaO,clr='r')
+savefig(gifpath()+'perf_hmr_a0.png') # [[./gif/23jun13_23jun9_A0__step_116_perf_hmr_a0.png]]
+
+np.argmax(lrat) # 54
+
+lrat[54] # 0.8461538461538461
+
+ok, so apart from that dropoff in beginning, gets to a decent point but
+does not improve much past that ... 
+
